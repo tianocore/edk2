@@ -38,6 +38,7 @@ typedef struct {
                       not supported.
 **/
 CHAR16 *
+EFIAPI
 HelperManageabilitySpecName (
   IN EFI_GUID  *SpecificationGuid
   );
@@ -59,6 +60,7 @@ HelperManageabilitySpecName (
                Otherwise              Other errors.
 **/
 EFI_STATUS
+EFIAPI
 HelperManageabilityCheckSupportedSpec (
   IN  EFI_GUID  *TransportGuid,
   IN  EFI_GUID  **SupportedManageabilityProtocolArray,
@@ -81,6 +83,7 @@ HelperManageabilityCheckSupportedSpec (
                Otherwise              Other errors.
 **/
 EFI_STATUS
+EFIAPI
 HelperAcquireManageabilityTransport (
   IN  EFI_GUID                       *ManageabilityProtocolSpec,
   OUT MANAGEABILITY_TRANSPORT_TOKEN  **TransportToken
@@ -99,6 +102,7 @@ HelperAcquireManageabilityTransport (
                Otherwise              Other errors.
 **/
 EFI_STATUS
+EFIAPI
 HelperInitManageabilityTransport (
   IN  MANAGEABILITY_TRANSPORT_TOKEN                 *TransportToken,
   IN  MANAGEABILITY_TRANSPORT_HARDWARE_INFORMATION  HardwareInfo OPTIONAL,
@@ -127,6 +131,7 @@ HelperInitManageabilityTransport (
                                  MANAGEABILITY_TRANSMISSION_MULTI_PACKAGES structure.
 **/
 EFI_STATUS
+EFIAPI
 HelperManageabilitySplitPayload (
   IN UINT16                                      PreambleSize,
   IN UINT16                                      PostambleSize,
@@ -147,6 +152,7 @@ HelperManageabilitySplitPayload (
   @retval  UINT8 CRC value.
 **/
 UINT8
+EFIAPI
 HelperManageabilityGenerateCrc8 (
   IN UINT8   Polynomial,
   IN UINT8   CrcInitialValue,
@@ -205,6 +211,7 @@ HelperManageabilityDebugPrint (
 
 **/
 EFI_STATUS
+EFIAPI
 IpmiHelperCheckCompletionCode (
   IN   UINT8                                      CompletionCode,
   OUT  CHAR16                                     **CompletionCodeStr,
