@@ -273,6 +273,104 @@ PrintDynamicCommandHelp (
   return (Found ? EFI_SUCCESS : Status);
 }
 
+/**
+  Print help text matching a requested command name or pattern.
+
+  @param[in] CommandToGetHelpOn  Command name or pattern to search.
+  @param[in] SectionToGetHelpOn  Comma-separated help sections to print.
+  @param[in] PrintCommandText    TRUE to print the command text heading.
+
+  @retval SHELL_SUCCESS    Matching help text was printed.
+  @retval SHELL_NOT_FOUND  No matching help text was found.
+**/
+STATIC
+SHELL_STATUS
+PrintMatchingHelp (
+  CHAR16   *CommandToGetHelpOn,
+  CHAR16   *SectionToGetHelpOn,
+  BOOLEAN  PrintCommandText
+  )
+{
+  EFI_STATUS    Status;
+  BOOLEAN       Found;
+  CONST CHAR16  *CurrentCommand;
+  CHAR16        *SortedCommandList;
+  UINTN         SortedCommandListSize;
+
+  if (gUnicodeCollation->StriColl (gUnicodeCollation, CommandToGetHelpOn, L"special") == 0) {
+    //
+    // we need info on the special characters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_HEADER), gShellLevel3HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_DATA), gShellLevel3HiiHandle);
+    return SHELL_SUCCESS;
+  }
+
+  Found                 = FALSE;
+  SortedCommandList     = NULL;
+  SortedCommandListSize = 0;
+  CopyListOfCommandNames (&SortedCommandList, &SortedCommandListSize, ShellCommandGetCommandList (TRUE));
+  CopyListOfCommandNamesWithDynamic (&SortedCommandList, &SortedCommandListSize);
+
+  for (CurrentCommand = SortedCommandList;
+       CurrentCommand != NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof (CHAR16) && *CurrentCommand != CHAR_NULL;
+       CurrentCommand += StrLen (CurrentCommand) + 1
+       )
+  {
+    //
+    // Checking execution break flag when print multiple command help information.
+    //
+    if (ShellGetExecutionBreakFlag ()) {
+      break;
+    }
+
+    if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, CommandToGetHelpOn)) ||
+        ((gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL) != NULL) && (gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, (CHAR16 *)(gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL))))))
+    {
+      //
+      // We have a command to look for help on.
+      //
+      Status = ShellPrintHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
+      if (EFI_ERROR (Status)) {
+        //
+        // now try to match against the dynamic command list and print help
+        //
+        Status = PrintDynamicCommandHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
+      }
+
+      if (Status == EFI_DEVICE_ERROR) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
+      } else if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
+      } else {
+        Found = TRUE;
+      }
+    }
+  }
+
+  SHELL_FREE_NON_NULL (SortedCommandList);
+
+  if (Found) {
+    return SHELL_SUCCESS;
+  }
+
+  //
+  // Search the .man file for Shell applications (Shell external commands).
+  //
+  Status = ShellPrintHelp (CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
+  if (!EFI_ERROR (Status)) {
+    return SHELL_SUCCESS;
+  }
+
+  if (Status == EFI_DEVICE_ERROR) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+  } else {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+  }
+
+  return SHELL_NOT_FOUND;
+}
+
 /** Main function of the 'Help' command.
 
   @param[in] Package    List of input parameter for the command.
@@ -283,21 +381,14 @@ MainCmdHelp (
   LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS    Status;
   SHELL_STATUS  ShellStatus;
-  CHAR16        *SortedCommandList;
-  CONST CHAR16  *CurrentCommand;
   CHAR16        *CommandToGetHelpOn;
   CHAR16        *SectionToGetHelpOn;
-  BOOLEAN       Found;
   BOOLEAN       PrintCommandText;
-  UINTN         SortedCommandListSize;
 
   PrintCommandText   = TRUE;
   CommandToGetHelpOn = NULL;
   SectionToGetHelpOn = NULL;
-  SortedCommandList  = NULL;
-  Found              = FALSE;
   ShellStatus        = SHELL_SUCCESS;
 
   //
@@ -350,73 +441,7 @@ MainCmdHelp (
       }
     }
 
-    if (gUnicodeCollation->StriColl (gUnicodeCollation, CommandToGetHelpOn, L"special") == 0) {
-      //
-      // we need info on the special characters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_HEADER), gShellLevel3HiiHandle);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_DATA), gShellLevel3HiiHandle);
-      Found = TRUE;
-    } else {
-      SortedCommandList     = NULL;
-      SortedCommandListSize = 0;
-      CopyListOfCommandNames (&SortedCommandList, &SortedCommandListSize, ShellCommandGetCommandList (TRUE));
-      CopyListOfCommandNamesWithDynamic (&SortedCommandList, &SortedCommandListSize);
-
-      for (CurrentCommand = SortedCommandList;
-           CurrentCommand != NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof (CHAR16) && *CurrentCommand != CHAR_NULL;
-           CurrentCommand += StrLen (CurrentCommand) + 1
-           )
-      {
-        //
-        // Checking execution break flag when print multiple command help information.
-        //
-        if (ShellGetExecutionBreakFlag ()) {
-          break;
-        }
-
-        if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, CommandToGetHelpOn)) ||
-            ((gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL) != NULL) && (gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, (CHAR16 *)(gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL))))))
-        {
-          //
-          // We have a command to look for help on.
-          //
-          Status = ShellPrintHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
-          if (EFI_ERROR (Status)) {
-            //
-            // now try to match against the dynamic command list and print help
-            //
-            Status = PrintDynamicCommandHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
-          }
-
-          if (Status == EFI_DEVICE_ERROR) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
-          } else if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
-          } else {
-            Found = TRUE;
-          }
-        }
-      }
-
-      //
-      // Search the .man file for Shell applications (Shell external commands).
-      //
-      if (!Found) {
-        Status = ShellPrintHelp (CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
-        if (Status == EFI_DEVICE_ERROR) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
-        } else if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
-        } else {
-          Found = TRUE;
-        }
-      }
-    }
-
-    if (!Found) {
-      ShellStatus = SHELL_NOT_FOUND;
-    }
+    ShellStatus = PrintMatchingHelp (CommandToGetHelpOn, SectionToGetHelpOn, PrintCommandText);
   }
 
   if ((CommandToGetHelpOn != NULL) && (StrCmp (CommandToGetHelpOn, L"*") == 0)) {
@@ -434,8 +459,6 @@ MainCmdHelp (
   if (SectionToGetHelpOn != NULL) {
     FreePool (SectionToGetHelpOn);
   }
-
-  SHELL_FREE_NON_NULL (SortedCommandList);
 
   return ShellStatus;
 }
