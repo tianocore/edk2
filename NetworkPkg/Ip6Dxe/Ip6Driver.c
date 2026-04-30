@@ -190,6 +190,14 @@ Ip6CleanService (
   Ip6CleanPrefixListTable (IpSb, &IpSb->OnlinkPrefix);
   Ip6CleanPrefixListTable (IpSb, &IpSb->AutonomousPrefix);
 
+  //
+  // Free the Neighbor Discovery resources before MNP teardown.
+  //
+  while (!IsListEmpty (&IpSb->NeighborTable)) {
+    NeighborCache = NET_LIST_HEAD (&IpSb->NeighborTable, IP6_NEIGHBOR_ENTRY, Link);
+    Ip6FreeNeighborEntry (IpSb, NeighborCache, FALSE, TRUE, EFI_SUCCESS, NULL, NULL);
+  }
+
   if (IpSb->RouteTable != NULL) {
     Ip6CleanRouteTable (IpSb->RouteTable);
     IpSb->RouteTable = NULL;
@@ -229,14 +237,6 @@ Ip6CleanService (
 
   if (IpSb->RecvRequest.MnpToken.Event != NULL) {
     gBS->CloseEvent (IpSb->RecvRequest.MnpToken.Event);
-  }
-
-  //
-  // Free the Neighbor Discovery resources
-  //
-  while (!IsListEmpty (&IpSb->NeighborTable)) {
-    NeighborCache = NET_LIST_HEAD (&IpSb->NeighborTable, IP6_NEIGHBOR_ENTRY, Link);
-    Ip6FreeNeighborEntry (IpSb, NeighborCache, FALSE, TRUE, EFI_SUCCESS, NULL, NULL);
   }
 
   return EFI_SUCCESS;
