@@ -309,6 +309,7 @@ ArmSetMemoryRegionNoExec (
   UINTN       Size;
   UINT32      PageCount;
 
+  Status     = EFI_SUCCESS;
   UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
@@ -391,6 +392,7 @@ ArmClearMemoryRegionNoExec (
   UINTN       Size;
   UINT32      PageCount;
 
+  Status     = EFI_SUCCESS;
   UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
@@ -442,7 +444,7 @@ ArmClearMemoryRegionNoExec (
 }
 
 /**
-  Set the memory to read-only while preserving execute permission.
+  Change memory permission as RO ignoring former permission.
 
   @param [in]  BaseAddress     Base address for the memory region.
   @param [in]  Length          Length of the memory region.
@@ -460,71 +462,44 @@ ArmClearMemoryRegionNoExec (
 
 **/
 EFI_STATUS
-ArmSetMemoryRegionReadOnly (
+ArmSetMemoryRegionReadOnlyPerm (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  EFI_STATUS  Status;
-  UINT32      MemoryAttributes;
-  UINT32      PermissionRequest;
-  BOOLEAN     UseFfaAbis;
-  UINT32      Version;
-  UINTN       Size;
-  UINT32      PageCount;
+  UINT32   PermissionRequest;
+  BOOLEAN  UseFfaAbis;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
+  if (Length == 0) {
+    /// Nothing to do.
+    return EFI_SUCCESS;
+  }
 
-  while (Length > 0) {
-    Status = GetMemoryPermissions (
-               UseFfaAbis,
-               Version,
-               BaseAddress,
-               Length,
-               &MemoryAttributes,
-               &PageCount
-               );
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+  UseFfaAbis = IsFfaMemoryAbiSupported (NULL);
+  Length     = ALIGN_VALUE (Length, EFI_PAGE_SIZE);
 
-    Size = EFI_PAGES_TO_SIZE (PageCount);
+  if (UseFfaAbis) {
+    PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_FFA_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  } else {
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  }
 
-    if (UseFfaAbis) {
-      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
-                            (MemoryAttributes >> ARM_FFA_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    } else {
-      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
-                            (MemoryAttributes >> ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    }
-
-    if (Length < Size) {
-      Length = Size;
-    }
-
-    Status = RequestMemoryPermissionChange (
-               UseFfaAbis,
-               BaseAddress,
-               Size,
-               PermissionRequest
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    Length      -= Size;
-    BaseAddress += Size;
-  } // while
-
-  return Status;
+  return RequestMemoryPermissionChange (
+           UseFfaAbis,
+           BaseAddress,
+           Length,
+           PermissionRequest
+           );
 }
 
 /**
-  Set the memory to read-write while preserving execute permission.
+  Change memory permission as RW ignoring former permission.
 
   @param [in]  BaseAddress     Base address for the memory region.
   @param [in]  Length          Length of the memory region.
@@ -542,65 +517,93 @@ ArmSetMemoryRegionReadOnly (
 
 **/
 EFI_STATUS
-ArmClearMemoryRegionReadOnly (
+ArmSetMemoryRegionReadWritePerm (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  EFI_STATUS  Status;
-  UINT32      MemoryAttributes;
-  UINT32      PermissionRequest;
-  BOOLEAN     UseFfaAbis;
-  UINT32      Version;
-  UINTN       Size;
-  UINT32      PageCount;
+  UINT32   PermissionRequest;
+  BOOLEAN  UseFfaAbis;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
+  if (Length == 0) {
+    /// Nothing to do.
+    return EFI_SUCCESS;
+  }
 
-  while (Length > 0) {
-    Status = GetMemoryPermissions (
-               UseFfaAbis,
-               Version,
-               BaseAddress,
-               Length,
-               &MemoryAttributes,
-               &PageCount
-               );
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+  UseFfaAbis = IsFfaMemoryAbiSupported (NULL);
+  Length     = ALIGN_VALUE (Length, EFI_PAGE_SIZE);
 
-    Size = EFI_PAGES_TO_SIZE (PageCount);
+  if (UseFfaAbis) {
+    PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_FFA_SET_MEM_ATTR_DATA_PERM_RW,
+                          ARM_FFA_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  } else {
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
+                          ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  }
 
-    if (UseFfaAbis) {
-      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_FFA_SET_MEM_ATTR_DATA_PERM_RW,
-                            (MemoryAttributes >> ARM_FFA_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    } else {
-      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
-                            (MemoryAttributes >> ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    }
+  return RequestMemoryPermissionChange (
+           UseFfaAbis,
+           BaseAddress,
+           Length,
+           PermissionRequest
+           );
+}
 
-    if (Length < Size) {
-      Length = Size;
-    }
+/**
+  Change memory permission as ROX ignoring former permission.
 
-    Status = RequestMemoryPermissionChange (
-               UseFfaAbis,
-               BaseAddress,
-               Size,
-               PermissionRequest
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  @param [in]  BaseAddress     Base address for the memory region.
+  @param [in]  Length          Length of the memory region.
 
-    Length      -= Size;
-    BaseAddress += Size;
-  } // while
+  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_NOT_READY           Callee is busy or not in a state to handle
+                                  this request.
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+  @retval EFI_ABORTED             Message target ran into an unexpected error
+                                  and has aborted.
+  @retval EFI_ACCESS_DENIED       Access denied.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory to perform operation.
 
-  return Status;
+**/
+EFI_STATUS
+ArmSetMemoryRegionReadOnlyExecPerm (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  UINT32   PermissionRequest;
+  BOOLEAN  UseFfaAbis;
+
+  if (Length == 0) {
+    /// Nothing to do.
+    return EFI_SUCCESS;
+  }
+
+  UseFfaAbis = IsFfaMemoryAbiSupported (NULL);
+  Length     = ALIGN_VALUE (Length, EFI_PAGE_SIZE);
+
+  if (UseFfaAbis) {
+    PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_FFA_SET_MEM_ATTR_CODE_PERM_X
+                          );
+  } else {
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_X
+                          );
+  }
+
+  return RequestMemoryPermissionChange (
+           UseFfaAbis,
+           BaseAddress,
+           Length,
+           PermissionRequest
+           );
 }
