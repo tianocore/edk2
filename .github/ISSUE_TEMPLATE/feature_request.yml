@@ -70,7 +70,6 @@ body:
         - RedfishPkg
         - SecurityPkg
         - ShellPkg
-        - SignedCapsulePkg
         - SourceLevelDebugPkg
         - StandaloneMmPkg
         - UefiCpuPkg
