@@ -1198,9 +1198,8 @@ CEntryPoint (
              ImageBase,
              SectionHeaderOffset,
              NumberOfSections,
-             ArmSetMemoryRegionNoExec,
-             ArmSetMemoryRegionReadOnly,
-             ArmClearMemoryRegionReadOnly
+             ArmSetMemoryRegionReadOnlyPerm,
+             ArmSetMemoryRegionReadWritePerm
              );
   if (EFI_ERROR (Status)) {
     goto finish;
@@ -1208,8 +1207,7 @@ CEntryPoint (
 
   if (ImageContext.ImageAddress != (UINTN)TeData) {
     ImageContext.ImageAddress = (UINTN)TeData;
-    ArmSetMemoryRegionNoExec (ImageBase, SIZE_4KB);
-    ArmClearMemoryRegionReadOnly (ImageBase, SIZE_4KB);
+    ArmSetMemoryRegionReadWritePerm (ImageBase, SIZE_4KB);
 
     Status = PeCoffLoaderRelocateImage (&ImageContext);
     ASSERT_EFI_ERROR (Status);
