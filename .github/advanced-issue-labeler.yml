@@ -94,8 +94,6 @@ policy:
           keys: ['SecurityPkg']
         - name: 'package:shellpkg'
           keys: ['ShellPkg']
-        - name: 'package:signedcapsulepkg'
-          keys: ['SignedCapsulePkg']
         - name: 'package:sourceleveldebugpkg'
           keys: ['SourceLevelDebugPkg']
         - name: 'package:standalonemmpkg'
