@@ -655,10 +655,6 @@ F: ShellPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
 R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
-SignedCapsulePkg
-F: SignedCapsulePkg/
-W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/signed_capsule_pkg.html
-
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/source_level_debug_pkg.html
