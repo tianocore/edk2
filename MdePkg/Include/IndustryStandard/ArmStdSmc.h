@@ -13,6 +13,8 @@
 *    (https://developer.arm.com/documentation/den0098/latest/)
 *  - [3] Realm Management Monitor (RMM) Specification, version 1.0-rel0
 *    (https://developer.arm.com/documentation/den0137/)
+*  - Realm Host Interface (RHI) Specification, version 1.0-bet0
+*    (https://developer.arm.com/documentation/den0148/)
 *
 *  @par Glossary:
 *    - TRNG - True Random Number Generator
@@ -263,3 +265,14 @@
 #define ARM_CCA_FID_RSI_MEASUREMENT_READ            0xC4000192
 #define ARM_CCA_FID_RSI_REALM_CONFIG                0xC4000196
 #define ARM_CCA_FID_RSI_VERSION                     0xC4000190
+
+/*
+ * Arm CCA FIDs for Realm Host Interface (RHI) Host Session protocol
+ * calls as specified by the Realm Host Interface (RHI) Specification.
+ */
+#define ARM_CCA_FID_RHI_SESSION_VERSION   0xC5000040
+#define ARM_CCA_FID_RHI_SESSION_FEATURES  0xC5000041
+#define ARM_CCA_FID_RHI_SESSION_OPEN      0xC5000042
+#define ARM_CCA_FID_RHI_SESSION_CLOSE     0xC5000043
+#define ARM_CCA_FID_RHI_SESSION_SEND      0xC5000044
+#define ARM_CCA_FID_RHI_SESSION_RECEIVE   0xC5000045
