@@ -82,7 +82,6 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "UefiCpuPkg",
                 "FmpDevicePkg",
                 "ShellPkg",
-                "SignedCapsulePkg",
                 "StandaloneMmPkg",
                 "FatPkg",
                 "CryptoPkg",
