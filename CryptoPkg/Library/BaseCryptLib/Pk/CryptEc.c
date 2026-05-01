@@ -8,6 +8,7 @@
 **/
 
 #include "InternalCryptLib.h"
+#include "KeyContext.h"
 #include <openssl/objects.h>
 #include <openssl/bn.h>
 #include <openssl/core_names.h>
@@ -638,6 +639,69 @@ EcFree (
 
     OPENSSL_free (EcCtx);
   }
+}
+
+/**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component or Nid is NULL.
+**/
+BOOLEAN
+EFIAPI
+EcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  )
+{
+  EC_CONTEXT  *EcCtx;
+  EVP_PKEY    *EvpPkey;
+  CHAR8       GroupName[80];
+
+  if ((EcContext == NULL) || (Nid == NULL)) {
+    return FALSE;
+  }
+
+  EcCtx = (EC_CONTEXT *)EcContext;
+
+  //
+  // Prefer the generated/imported key when present. Otherwise, use the
+  // parameter-only EVP_PKEY created by EcNewByNid(), which still carries
+  // the EC group name.
+  //
+  EvpPkey = (EcCtx->EvpPkey != NULL) ? EcCtx->EvpPkey : EcCtx->EvpParam;
+  if (EvpPkey == NULL) {
+    return FALSE;
+  }
+
+  if (EVP_PKEY_get_utf8_string_param (
+        EvpPkey,
+        OSSL_PKEY_PARAM_GROUP_NAME,
+        GroupName,
+        sizeof (GroupName),
+        NULL
+        ) != 1)
+  {
+    return FALSE;
+  }
+
+  if (AsciiStrCmp (GroupName, SN_X9_62_prime256v1) == 0) {
+    *Nid = CRYPTO_NID_SECP256R1;
+  } else if (AsciiStrCmp (GroupName, SN_secp384r1) == 0) {
+    *Nid = CRYPTO_NID_SECP384R1;
+  } else if (AsciiStrCmp (GroupName, SN_secp521r1) == 0) {
+    *Nid = CRYPTO_NID_SECP521R1;
+  } else if (AsciiStrCmp (GroupName, SN_brainpoolP512r1) == 0) {
+    *Nid = CRYPTO_NID_BRAINPOOLP512R1;
+  } else {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**

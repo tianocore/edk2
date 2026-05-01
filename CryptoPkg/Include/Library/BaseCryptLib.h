@@ -4569,6 +4569,23 @@ EcFree (
   );
 
 /**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+**/
+BOOLEAN
+EFIAPI
+EcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  );
+
+/**
   Generates EC key and returns EC public key (X, Y), Please note, this function uses
   pseudo random number generator. The caller must make sure RandomSeed()
   function was properly called before.
