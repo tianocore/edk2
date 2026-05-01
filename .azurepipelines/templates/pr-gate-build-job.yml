@@ -32,7 +32,7 @@ jobs:
           Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
       ${{ if or(eq(parameters.tool_chain_tag, 'GCC'), startsWith(parameters.tool_chain_tag, 'VS')) }}:
         TARGET_UNIT_TEST:
-          Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
+          Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
           Build.Targets: 'NOOPT'
           Build.Archlist: 'X64'
           Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
@@ -62,7 +62,7 @@ jobs:
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_OTHER:
-        Build.Pkgs: 'ManageabilityPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg'
+        Build.Pkgs: 'ManageabilityPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_FMP_FAT_TEST:
