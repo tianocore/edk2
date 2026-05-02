@@ -45,19 +45,24 @@ STATIC
 BOOLEAN
 EFIAPI
 IsFfaMemoryAbiSupported (
-  OUT UINT32  *Version
+  OUT UINT32  *Version OPTIONAL
   )
 {
   EFI_STATUS  Status;
+  UINT32      CurrentVersion;
 
-  *Version = 0;
+  CurrentVersion = 0;
 
   Status = ArmFfaLibGetVersion (
              ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
-             Version
+             &CurrentVersion
              );
   if (EFI_ERROR (Status)) {
     return FALSE;
+  }
+
+  if (Version != NULL) {
+    *Version = CurrentVersion;
   }
 
   return TRUE;
