@@ -8,6 +8,7 @@
 
 **/
 
+#include <IndustryStandard/ArmFfaPartInfo.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -51,9 +52,9 @@ ValidateTpmInterfaceType (
 }
 
 /**
-  This function is used to get the TPM service partition id.
+  This function is used to get the TPM service partition info.
 
-  @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
+  @param[out] PartitionInfo - Supplies the pointer to the TPM service partition info.
 
   @retval EFI_SUCCESS           The TPM command was successfully sent to the TPM
                                 and the response was copied to the Output buffer.
@@ -63,24 +64,26 @@ ValidateTpmInterfaceType (
 **/
 EFI_STATUS
 EFIAPI
-GetTpmServicePartitionId (
-  OUT UINT16  *PartitionId
+GetTpmServicePartitionInfo (
+  OUT EFI_FFA_PART_INFO_DESC  *PartitionInfo
   )
 {
   EFI_STATUS  Status;
 
-  if (PartitionId == NULL) {
+  if (PartitionInfo == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   if (PcdGet16 (PcdTpmServiceFfaPartitionId) != TPM2_FFA_PARTITION_ID_INVALID) {
-    *PartitionId = PcdGet16 (PcdTpmServiceFfaPartitionId);
+    PartitionInfo->PartitionId = PcdGet16 (PcdTpmServiceFfaPartitionId);
+    /* Continue to use Direct Req V2 */
+    PartitionInfo->PartitionProps = FFA_PART_PROP_RECV_DIRECT_REQ2 | FFA_PART_PROP_SEND_DIRECT_REQ2;
     return EFI_SUCCESS;
   }
 
-  Status = FfaTpm2GetServicePartitionId (PartitionId);
+  Status = FfaTpm2GetServicePartitionInfo (PartitionInfo);
   if (!EFI_ERROR (Status)) {
-    PcdSet16S (PcdTpmServiceFfaPartitionId, *PartitionId);
+    PcdSet16S (PcdTpmServiceFfaPartitionId, PartitionInfo->PartitionId);
   }
 
   return Status;
