@@ -190,6 +190,10 @@ ArmFfaLibGetVersion (
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
 
+  if (CurrentVersion == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_VERSION;
@@ -202,9 +206,7 @@ ArmFfaLibGetVersion (
     return Status;
   }
 
-  if (CurrentVersion != NULL) {
-    *CurrentVersion = FfaArgs.Arg0;
-  }
+  *CurrentVersion = FfaArgs.Arg0;
 
   return EFI_SUCCESS;
 }
