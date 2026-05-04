@@ -274,7 +274,6 @@ ShellCommandRunSerMode (
   Handles     = NULL;
   NoHandles   = 0;
   Index       = 0;
-  Package     = NULL;
 
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
@@ -410,9 +409,7 @@ ShellCommandRunSerMode (
   }
 
 Done:
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   if (Handles != NULL) {
     FreePool (Handles);

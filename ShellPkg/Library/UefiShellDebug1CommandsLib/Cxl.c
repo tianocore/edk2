@@ -302,7 +302,6 @@ ShellCommandRunCxl (
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
   HandleBuf   = NULL;
-  Package     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -521,9 +520,7 @@ Done:
     FreePool (HandleBuf);
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   return ShellStatus;
 }
