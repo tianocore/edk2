@@ -168,8 +168,8 @@
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !else
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
 !endif
+  MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
@@ -340,6 +340,7 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 !if $(TPM2_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
