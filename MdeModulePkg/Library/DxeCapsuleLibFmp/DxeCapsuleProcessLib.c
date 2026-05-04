@@ -36,6 +36,21 @@
 extern EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress;
 
 /**
+  Record capsule status variable.
+
+  @param[in] CapsuleHeader  The capsule image header
+  @param[in] CapsuleStatus  The capsule process stauts
+
+  @retval EFI_SUCCESS          The capsule status variable is recorded.
+  @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
+**/
+EFI_STATUS
+RecordCapsuleStatusVariable (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN EFI_STATUS          CapsuleStatus
+  );
+
+/**
   Return if this FMP is a system FMP or a device FMP, based upon CapsuleHeader.
 
   @param[in] CapsuleHeader A pointer to EFI_CAPSULE_HEADER
@@ -120,6 +135,44 @@ EFI_PHYSICAL_ADDRESS *
 ValidateCapsuleNameCapsuleIntegrity (
   IN  EFI_CAPSULE_HEADER  *CapsuleHeader,
   OUT UINTN               *CapsuleNameNum
+  );
+
+/**
+  Validate Nested FMP capsules layout.
+
+  Caution: This function may receive untrusted input.
+
+  This function assumes the caller validated the capsule by using
+  IsValidCapsuleHeader(), so that all fields in EFI_CAPSULE_HEADER are correct.
+  The capsule buffer size is CapsuleHeader->CapsuleImageSize.
+
+  This function validates the fields in EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER
+  and EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER.
+
+  This function checks if the payload is an FMP capsule.
+
+  @param[in, out] CapsuleHeader         Points to a capsule header.
+                                        On input this parameter points to the outer capsule header.
+                                        On output this parameter points to the inner capsule header,
+                                        if it exists and all operations succeed.
+  @param[out]     EmbeddedDriverCount   If the inner FMP capsule exists, this parameter returns
+                                        its embedded driver count.
+
+  @retval EFI_SUCCESS             The payload is an FMP capsule.
+  @retval EFI_INVALID_PARAMETER   CapsuleHeader pointer is NULL.
+                                  Payload is not an FMP capsule or not a valid FMP capsule.
+  @retval EFI_UNSUPPORTED         The outer capsule contains an embedded driver or multiple payloads.
+                                  The outer capsule is not FMP.
+                                  The outer capsule uses old payload format.
+                                  The outer capsule is not signed.
+                                  Signature is using an unexpected format.
+  @retval EFI_SECURITY_VIOLATION  The inner capsule is not authentic.
+  @retval Others                  Statuses returned by AuthenticateFmpImage().
+**/
+EFI_STATUS
+LiftNestedCapsule (
+  IN OUT EFI_CAPSULE_HEADER  **CapsuleHeader,
+  OUT UINT16                 *EmbeddedDriverCount OPTIONAL
   );
 
 extern BOOLEAN  mDxeCapsuleLibEndOfDxe;
@@ -572,16 +625,34 @@ ProcessTheseCapsules (
       // Call capsule library to process capsule image.
       //
       EmbeddedDriverCount = 0;
-      if (IsFmpCapsule (CapsuleHeader)) {
-        Status = ValidateFmpCapsule (CapsuleHeader, &EmbeddedDriverCount);
+      if (!IsFmpCapsule (CapsuleHeader)) {
+        mCapsuleStatusArray[Index] = EFI_ABORTED;
+        continue;
+      }
+
+      Status = ValidateFmpCapsule (CapsuleHeader, &EmbeddedDriverCount);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "ValidateFmpCapsule failed with %r. Ignore!\n", Status));
+        mCapsuleStatusArray[Index] = EFI_ABORTED;
+        continue;
+      }
+
+      if (PcdGetBool (PcdUseNestedFmpCapsuleFormat)) {
+        Status = LiftNestedCapsule (&CapsuleHeader, &EmbeddedDriverCount);
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "ValidateFmpCapsule failed. Ignore!\n"));
+          DEBUG ((DEBUG_ERROR, "LiftNestedCapsule failed with %r. Ignore!\n", Status));
+          if ((Status == EFI_UNSUPPORTED) || (Status == EFI_SECURITY_VIOLATION)) {
+            //
+            // Report issues with the outer capsule to the user.
+            //
+            RecordCapsuleStatusVariable (CapsuleHeader, Status);
+          }
+
           mCapsuleStatusArray[Index] = EFI_ABORTED;
           continue;
         }
-      } else {
-        mCapsuleStatusArray[Index] = EFI_ABORTED;
-        continue;
+
+        DEBUG ((DEBUG_INFO, "New EmbeddedDriverCount: %d\n", EmbeddedDriverCount));
       }
 
       if ((!FirstRound) || (EmbeddedDriverCount == 0)) {

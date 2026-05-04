@@ -374,6 +374,9 @@ INF ShellPkg/Application/Shell/Shell.inf
 #
 !if $(CAPSULE_SUPPORT) == TRUE
 INF MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+!if $(SEALED_CAPSULE_SUPPORT) == TRUE
+INF FmpDevicePkg/DetectTestKeyDxe/DetectTestKeyDxe.inf
+!endif
 !endif
 
 !if $(UNIVERSAL_PAYLOAD) == TRUE
