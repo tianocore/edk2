@@ -326,6 +326,7 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 !if $(TPM2_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
