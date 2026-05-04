@@ -452,7 +452,6 @@ ShellCommandRunMm (
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
     } else {
       ASSERT (FALSE);
     }
