@@ -185,6 +185,8 @@ ShellCommandRunLoadPciRom (
     }
   }
 
+  ShellCommandLineFreeVarList (Package);
+
   return (ShellStatus);
 }
 
