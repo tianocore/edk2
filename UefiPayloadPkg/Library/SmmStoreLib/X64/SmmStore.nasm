@@ -36,8 +36,10 @@ ASM_PFX(TriggerSmi):
     cmp     rax, rcx                    ; Check if rax was modified by SMM
     jne     @Return                     ; SMM modified rax, return now
     push    rcx                         ; save rcx to stack
-    mov     rcx, 10000
-    rep     pause                       ; add a small delay
+    mov     rcx, 400000
+@Pause:
+    pause                               ; add a delay large enough for late synchronous SMIs
+    loop    @Pause
     pop     rcx                         ; restore rcx
     cmp     r8, 0
     je      @Return
