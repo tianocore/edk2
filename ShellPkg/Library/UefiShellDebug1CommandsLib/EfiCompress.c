@@ -48,7 +48,6 @@ ShellCommandRunEfiCompress (
   InShellFileHandle  = NULL;
   OutShellFileHandle = NULL;
   InBuffer           = NULL;
-  Package            = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -157,12 +156,8 @@ ShellCommandRunEfiCompress (
     }
   }
 
-  ShellCommandLineFreeVarList (Package);
-
 Exit:
-  if ((ShellStatus != SHELL_SUCCESS) && (Package != NULL)) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   if (InShellFileHandle != NULL) {
     gEfiShellProtocol->CloseFile (InShellFileHandle);

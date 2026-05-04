@@ -671,9 +671,7 @@ Done:
     FreePool (InputStr);
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   return ShellStatus;
 }
