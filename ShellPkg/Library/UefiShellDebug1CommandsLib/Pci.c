@@ -2501,7 +2501,6 @@ ShellCommandRunPci (
   Address     = 0;
   IoDev       = NULL;
   HandleBuf   = NULL;
-  Package     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -2979,9 +2978,7 @@ Done:
     FreePool (HandleBuf);
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   mConfigSpace = NULL;
   return ShellStatus;

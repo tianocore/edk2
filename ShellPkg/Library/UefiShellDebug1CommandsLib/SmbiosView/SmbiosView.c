@@ -58,7 +58,6 @@ ShellCommandRunSmbiosView (
 
   mStatisticsTable            = NULL;
   mSmbios64BitStatisticsTable = NULL;
-  Package                     = NULL;
   ShellStatus                 = SHELL_SUCCESS;
 
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
@@ -221,9 +220,7 @@ Done:
     mSmbios64BitStatisticsTable = NULL;
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   LibSmbiosCleanup ();
   LibSmbios64BitCleanup ();

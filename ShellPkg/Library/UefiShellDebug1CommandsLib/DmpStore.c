@@ -744,7 +744,6 @@ ShellCommandRunDmpStore (
   BOOLEAN            StandardFormatOutput;
 
   ShellStatus          = SHELL_SUCCESS;
-  Package              = NULL;
   FileHandle           = NULL;
   File                 = NULL;
   Type                 = DmpStoreDisplay;
@@ -908,9 +907,7 @@ ShellCommandRunDmpStore (
     }
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   return ShellStatus;
 }
