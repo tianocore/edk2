@@ -10,6 +10,10 @@
 #
 # ****VERSION UPDATE INSTRUCTIONS****
 #
+# Use BaseTools/Plugin/CodeQL/CodeQlVersionUpdate.py to update this file,
+# the platform-specific CodeQL CLI dependency files, and CodeQlQueries.qls together.
+# The script refreshes the CLI version, release digests, and cpp query pack pin.
+#
 # When updating the CodeQL CLI used here, update the corresponding codeql/cpp-queries version in CodeQlQueries.qls.
 # Visit the `qlpack.yml` in the release branch for the CodeQL CLI to get the version to use there. For example, the
 # CodeQL CLI 2.18.1 file is https://github.com/github/codeql/blob/codeql-cli-2.18.1/cpp/ql/src/qlpack.yml and the
