@@ -91,6 +91,9 @@
   ## This is the value of MCTP KCS I/O base address
   # @Prompt MCTP KCS (Memory mapped) I/O base address
   gManageabilityPkgTokenSpaceGuid.PcdMctpKcsBaseAddress|0xca2|UINT32|0x00000004
+  ## This is the timeout value for the KCS status check.
+  # @Prompt KCS interface status check timeout in microseconds.
+  gManageabilityPkgTokenSpaceGuid.PcdKcsStatusCheckTimeout|5000000|UINT64|0x00000005
 
   ## This value is the PLDM source and destination terminus ID for transmiting PLDM message.
   # @Prompt PLDM source terminus ID

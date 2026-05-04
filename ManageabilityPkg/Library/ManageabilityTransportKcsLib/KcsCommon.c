@@ -15,6 +15,7 @@
 #include <Library/ManageabilityTransportHelperLib.h>
 #include <Library/ManageabilityTransportMctpLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/TimerLib.h>
 
 #include "ManageabilityTransportKcs.h"
@@ -41,7 +42,8 @@ WaitStatusSet (
   while ((KcsRegisterRead8 (KCS_REG_STATUS) & Flag) != TRUE) {
     MicroSecondDelay (IPMI_KCS_TIMEOUT_1MS);
     Timeout = Timeout + IPMI_KCS_TIMEOUT_1MS;
-    if (Timeout >= IPMI_KCS_TIMEOUT_5_SEC) {
+    if (Timeout >= PcdGet64 (PcdKcsStatusCheckTimeout)) {
+      DEBUG ((DEBUG_MANAGEABILITY, "%a: %d microseconds timeout expired in OBF check.\n", __func__, PcdGet64 (PcdKcsStatusCheckTimeout)));
       return EFI_TIMEOUT;
     }
   }
@@ -69,7 +71,8 @@ WaitStatusClear (
   while (KcsRegisterRead8 (KCS_REG_STATUS) & Flag) {
     MicroSecondDelay (IPMI_KCS_TIMEOUT_1MS);
     Timeout = Timeout + IPMI_KCS_TIMEOUT_1MS;
-    if (Timeout >= IPMI_KCS_TIMEOUT_5_SEC) {
+    if (Timeout >= PcdGet64 (PcdKcsStatusCheckTimeout)) {
+      DEBUG ((DEBUG_MANAGEABILITY, "%a: %d microseconds timeout expired in IBF check.\n", __func__, PcdGet64 (PcdKcsStatusCheckTimeout)));
       return EFI_TIMEOUT;
     }
   }
