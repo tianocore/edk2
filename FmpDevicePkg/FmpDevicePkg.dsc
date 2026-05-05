@@ -102,6 +102,7 @@
     <LibraryClasses>
       CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
   }
+  FmpDevicePkg/SealedCapsulesDxe/SealedCapsulesDxe.inf
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
     <Defines>
       #
