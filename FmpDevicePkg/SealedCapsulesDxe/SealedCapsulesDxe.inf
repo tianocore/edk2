@@ -1,0 +1,47 @@
+## @file
+# This DXE driver implements CAPSULE_TRANSFORMATION_PROTOCOL to unseal outer
+# FMP capsule and extract the authenticated inner FMP capsule.
+#
+# Copyright (c) 2026, 3mdeb Sp. z o.o. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SealedCapsulesDxe
+  FILE_GUID                      = 920689E3-C573-45E1-9736-142A21B5411D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = EntryPoint
+
+[Sources]
+  SealedCapsulesDxe.c
+
+[Packages]
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FmpAuthenticationLib
+  FmpPayloadLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr  ## CONSUMES
+
+[Guids]
+  gEfiCertPkcs7Guid   ## CONSUMES
+  gEfiFmpCapsuleGuid  ## CONSUMES
+
+[Protocols]
+  gCapsuleTransformationProtocolGuid  ## PRODUCES
+
+[Depex]
+  TRUE
