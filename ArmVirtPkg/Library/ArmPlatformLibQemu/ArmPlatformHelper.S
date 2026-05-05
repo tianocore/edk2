@@ -43,6 +43,8 @@
  .set    ID_AA64MMFR1_VH_MASK,  0xf << 8
  .set    HCR_EL2_E2H,           0x1 << 34
 
+ .set    ID_AA64MMFR0_TG4_52,   0xf << 28
+ .set    TCR_DS,                0x1 << 59
 
 ASM_FUNC(ArmPlatformPeiBootAction)
 #ifdef CAVIUM_ERRATUM_27456
@@ -75,15 +77,21 @@ ASM_FUNC(ArmPlatformPeiBootAction)
   mov_i  x0, mairval
   mov_i  x1, tcrval
   adrp   x2, idmap
-  orr    x2, x2, #0xff << 48     // set non-zero ASID
   mov_i  x3, sctlrval
 
   mrs    x6, id_aa64mmfr0_el1    // get the supported PA range
+  and    x4, x6, #ID_AA64MMFR0_TG4_52 // check for LPA2 support
   and    x6, x6, #0xf            // isolate PArange bits
   cmp    x6, #6                  // 0b0110 == 52 bits
+  csel   x4, x4, xzr, eq         // ignore LPA2 capability unless PArange == 52
+  ccmp   x4, xzr, #0, eq         // permit PS == 52 bits iff LPA2 is supported
   sub    x6, x6, #1              // subtract 1
   cinc   x6, x6, ne              // add back 1 unless PArange == 52 bits
   bfi    x1, x6, #32, #3         // copy updated PArange into TCR_EL1.IPS
+  cbz    x4, 1f
+  orr    x1, x1, #TCR_DS
+  adrp   x2, idmap_lpa2          // switch to LPA2 idmap
+1:orr    x2, x2, #0xff << 48     // set non-zero ASID
 
   cmp    x6, #3                  // 0b0011 == 42 bits
   sub    x6, x6, #1              // subtract 1
