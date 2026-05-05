@@ -1717,6 +1717,12 @@ PxeBcDhcp4Dora (
     goto ON_EXIT;
   }
 
+  if ((Private == NULL) ||
+      (Private->Signature != PXEBC_PRIVATE_DATA_SIGNATURE))
+  {
+    return Status;
+  }
+
   //
   // Get the acquired IPv4 address and store them.
   //
@@ -1749,6 +1755,13 @@ PxeBcDhcp4Dora (
   AsciiPrint ("\n");
 
 ON_EXIT:
+
+  if ((Private == NULL) ||
+      (Private->Signature != PXEBC_PRIVATE_DATA_SIGNATURE))
+  {
+    return Status;
+  }
+
   if (EFI_ERROR (Status)) {
     Dhcp4->Stop (Dhcp4);
     Dhcp4->Configure (Dhcp4, NULL);
