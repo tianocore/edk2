@@ -2,6 +2,7 @@
 # BaseCryptLib UnitTest built for execution in UEFI Shell.
 #
 # Copyright (c) Microsoft Corporation.<BR>
+# (c) Copyright 2026 HP Development Company, L.P.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -38,6 +39,7 @@
   RsaPssTests.c
   HkdfTests.c
   AeadAesGcmTests.c
+  AesCtrTests.c
   BnTests.c
   EcTests.c
   X509Tests.c
