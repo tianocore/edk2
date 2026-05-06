@@ -1930,7 +1930,7 @@ XhcExitBootService (
   // Stop AsyncRequest Polling timer then stop the XHCI driver
   // and uninstall the XHCI protocl.
   //
-  gBS->SetTimer (Xhc->PollTimer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Xhc->PollTimer, TimerCancel, 0);
   XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
 
   if (Xhc->PollTimer != NULL) {
@@ -2255,7 +2255,7 @@ XhcDriverBindingStop (
   // Stop AsyncRequest Polling timer then stop the XHCI driver
   // and uninstall the XHCI protocl.
   //
-  gBS->SetTimer (Xhc->PollTimer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Xhc->PollTimer, TimerCancel, 0);
 
   //
   // Disable the device slots occupied by these devices on its downstream ports.

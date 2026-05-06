@@ -736,7 +736,7 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
                           );
 
     if (Status == EFI_NOT_READY) {
-      gBS->SetTimer (TimeoutEvent, TimerRelative, 50000000);
+      (VOID)gBS->SetTimer (TimeoutEvent, TimerRelative, 50000000);
       while (EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
         if (IsAddressOk) {
           Status = EFI_SUCCESS;

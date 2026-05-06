@@ -153,14 +153,14 @@ Ip6CleanService (
   IpSb->State = IP6_SERVICE_DESTROY;
 
   if (IpSb->Timer != NULL) {
-    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
     gBS->CloseEvent (IpSb->Timer);
 
     IpSb->Timer = NULL;
   }
 
   if (IpSb->FasterTimer != NULL) {
-    gBS->SetTimer (IpSb->FasterTimer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (IpSb->FasterTimer, TimerCancel, 0);
     gBS->CloseEvent (IpSb->FasterTimer);
 
     IpSb->FasterTimer = NULL;

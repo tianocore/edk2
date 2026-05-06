@@ -66,11 +66,11 @@ WaitForSingleEvent (
       //
       // Set the timer event
       //
-      gBS->SetTimer (
-             TimerEvent,
-             TimerRelative,
-             Timeout
-             );
+      (VOID)gBS->SetTimer (
+                   TimerEvent,
+                   TimerRelative,
+                   Timeout
+                   );
 
       //
       // Wait for the original event or the timer

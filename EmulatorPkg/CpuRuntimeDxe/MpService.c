@@ -727,11 +727,11 @@ CpuMpServicesStartupThisAP (
   if (WaitEvent != NULL) {
     // Non Blocking
     gMPSystem.WaitEvent = WaitEvent;
-    gBS->SetTimer (
-           gMPSystem.ProcessorData[ProcessorNumber].CheckThisAPEvent,
-           TimerPeriodic,
-           gPollInterval
-           );
+    (VOID)gBS->SetTimer (
+                 gMPSystem.ProcessorData[ProcessorNumber].CheckThisAPEvent,
+                 TimerPeriodic,
+                 gPollInterval
+                 );
     return EFI_SUCCESS;
   }
 
@@ -1120,11 +1120,11 @@ CpuCheckAllAPsStatus (
     return;
   }
 
-  gBS->SetTimer (
-         gMPSystem.CheckAllAPsEvent,
-         TimerCancel,
-         0
-         );
+  (VOID)gBS->SetTimer (
+               gMPSystem.CheckAllAPsEvent,
+               TimerCancel,
+               0
+               );
 
   if (gMPSystem.FailedListIndex == 0) {
     if (gMPSystem.FailedList != NULL) {

@@ -1045,7 +1045,7 @@ WaitForCompletion (
     }
   }
 
-  gBS->SetTimer (WaitEvt, TimerCancel, 0);
+  (VOID)gBS->SetTimer (WaitEvt, TimerCancel, 0);
   gBS->CloseEvent (WaitEvt);
 
   if (*CallBackComplete) {

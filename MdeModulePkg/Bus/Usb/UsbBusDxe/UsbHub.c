@@ -1243,7 +1243,7 @@ UsbRootHubRelease (
 {
   DEBUG ((DEBUG_INFO, "UsbRootHubRelease: root hub released for hub %p\n", HubIf));
 
-  gBS->SetTimer (HubIf->HubNotify, TimerCancel, USB_ROOTHUB_POLL_INTERVAL);
+  (VOID)gBS->SetTimer (HubIf->HubNotify, TimerCancel, USB_ROOTHUB_POLL_INTERVAL);
   gBS->CloseEvent (HubIf->HubNotify);
 
   return EFI_SUCCESS;

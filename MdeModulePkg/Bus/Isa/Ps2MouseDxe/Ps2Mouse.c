@@ -492,7 +492,7 @@ PS2MouseDriverStop (
   //
   // Cancel mouse data polling timer, close timer event
   //
-  gBS->SetTimer (MouseDev->TimerEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (MouseDev->TimerEvent, TimerCancel, 0);
   gBS->CloseEvent (MouseDev->TimerEvent);
 
   //
