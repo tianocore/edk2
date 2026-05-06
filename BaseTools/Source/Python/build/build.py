@@ -6,7 +6,8 @@
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
 #  Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
 #  Copyright (c) 2025 Qualcomm Technologies, Inc. All rights reserved.<BR>
-#
+#  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
+
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -207,6 +208,70 @@ class MakeSubProc(Popen):
         super(MakeSubProc,self).__init__(*args, **argv)
         self.ProcOut = []
 
+## Resolve a namesake source file basename to its full path.
+#
+# Called once per output line of a silent NMAKE build. If the stripped line
+# matches a basename that appears in NameSakeSourceFileMap (i.e. the same
+# filename exists in more than one package), the function returns the full path
+# for the current occurrence by indexing into the ordered path list using
+# OccurenceIndex as a positional counter. This relies on NMAKE compiling files
+# in the same deterministic order as SourceFileList. Lines that do not match
+# any namesake basename are returned unchanged.
+#
+# @param  Line                  A single output line captured from the NMAKE process
+# @param  NameSakeSourceFileMap Dict mapping basename -> [full_path, ...] for namesake files only
+# @param  OccurenceIndex        Dict tracking how many times each basename has been seen so far
+# @param  SourceFileMap         Dict updated with resolved full_path -> full_path entries
+#
+# @retval string                The resolved full path if Line is a namesake basename,
+#                               otherwise the original Line unchanged
+#
+def SourceFileRelativePath(Line, NameSakeSourceFileMap, OccurenceIndex, SourceFileMap):
+    Stripped = Line.strip()
+    if Stripped in NameSakeSourceFileMap:
+        Index = OccurenceIndex[Stripped]
+        if Index < len(NameSakeSourceFileMap[Stripped]):
+            OccurenceIndex[Stripped] += 1 # increment for next occurrence of the same source file name
+            FullPath = NameSakeSourceFileMap[Stripped][Index]
+            SourceFileMap[FullPath] = FullPath
+            return FullPath
+    return Line
+
+## Expand bare source file basenames in silent NMAKE output to their full paths.
+#
+# In silent mode (-s), NMAKE suppresses the compile command echo, leaving only
+# "Note: including file:" dependency lines in the output with no source file
+# identifier. For modules containing namesake source files (e.g., two Setup.c
+# in different packages) the bare basename is ambiguous and cannot be used
+# directly for dependency tracking. This function walks ProcOut sequentially
+# and replaces each ambiguous basename with its resolved full path by calling
+# SourceFileRelativePath with an occurrence counter that mirrors the
+# deterministic compilation order that NMAKE follows.
+#
+# @param  ProcOut               List of output lines captured from the silent NMAKE process
+# @param  iau                   IncludesAutoGen object for the module being built
+#
+# @retval list                  ProcOut unchanged if no namesake files exist,
+#                               otherwise a new list with namesake basenames
+#                               replaced by their resolved full paths
+#
+def ExpandNmakeSourcePaths(ProcOut, iau):
+    if not iau.HasNamesakeSourceFile:
+        return ProcOut
+    BaseNamePath = defaultdict(list)
+    for item in iau.module_autogen.SourceFileList:
+        Basename = os.path.basename(item.File)
+        BaseNamePath[Basename].append(item.Path)
+    NameSakeSourceFileMap = {b: Paths for b, Paths in BaseNamePath.items() if len(Paths) > 1}
+    if not NameSakeSourceFileMap:
+        return ProcOut
+    SourceFileMap = iau.SourceFileList
+    OccurenceIndex = defaultdict(int)
+    Result = []
+    for line in ProcOut:
+        Result.append(SourceFileRelativePath(line, NameSakeSourceFileMap, OccurenceIndex, SourceFileMap))
+    return Result
+
 ## Launch an external program
 #
 # This method will call subprocess.Popen to execute an external program with
@@ -279,7 +344,17 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
     if ModuleAuto:
         iau = IncludesAutoGen(WorkingDir,ModuleAuto)
         if ModuleAuto.ToolChainFamily == TAB_COMPILER_MSFT:
-            iau.CreateDepsFileForMsvc(Proc.ProcOut)
+            if isinstance(Command, str):
+                CmdStr = Command
+            else:
+                CmdStr = ' '.join(Command)
+            CmdTokens = CmdStr.split()
+            IsSilentBuild = '-s' in CmdTokens
+            if not IsSilentBuild:
+                iau.CreateDepsFileForMsvc(Proc.ProcOut)
+            else:
+                DepList = ExpandNmakeSourcePaths(Proc.ProcOut, iau)
+                iau.CreateDepsFileForMsvc(DepList)
         else:
             iau.UpdateDepsFileforNonMsvc()
         iau.UpdateDepsFileforTrim()
