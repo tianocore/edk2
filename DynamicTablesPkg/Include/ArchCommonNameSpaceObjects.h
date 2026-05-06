@@ -78,6 +78,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
   EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjPlatformFwInfo,                       ///< 54 - Platform Firmware Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1285,5 +1286,38 @@ typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
   /// (v2) Contains a mask of bits to set when writing the Read Ack register.
   UINT64                                    ReadAckWrite;
 } CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION_2_INFO;
+
+/** A structure that describes BIOS Information.
+
+  SMBIOS Specification v3.9.0 Type 0
+
+  ID: EArchCommonObjPlatformFwInfo
+**/
+typedef struct CmArchCommonPlatformFwInfo {
+  /// CM Object Token uniquely identifying this Platform Firmware info entry.
+  CM_OBJECT_TOKEN              BiosInfoToken;
+  /// BIOS vendor name string.
+  CHAR8                        BiosVendor[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS version string.
+  CHAR8                        BiosVersion[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS release date string.
+  CHAR8                        BiosReleaseDate[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS ROM size (in 64 KB blocks minus one).
+  UINT8                        BiosSize;
+  /// Bit field of supported BIOS functions.
+  MISC_BIOS_CHARACTERISTICS    BiosCharacteristics;
+  /// Optional set of functions that BIOS supports (bytes 0 and 1).
+  UINT8                        BIOSCharacteristicsExtensionBytes[2];
+  /// System BIOS firmware major version.
+  UINT8                        SystemBiosMajorRelease;
+  /// System BIOS firmware minor version.
+  UINT8                        SystemBiosMinorRelease;
+  /// Embedded Controller firmware major release.
+  UINT8                        ECFirmwareMajorRelease;
+  /// Embedded Controller firmware minor release.
+  UINT8                        ECFirmwareMinorRelease;
+  /// Extended BIOS ROM size.
+  EXTENDED_BIOS_ROM_SIZE       ExtendedBiosSize;
+} CM_ARCH_COMMON_PLATFORM_FW_INFO;
 
 #pragma pack()
