@@ -1521,7 +1521,6 @@ HttpTransmitTcp (
   UINTN              RecordCount;
   UINTN              RemainingLen;
 
-  Status            = EFI_SUCCESS;
   TlsRecord         = NULL;
   PayloadSize       = 0;
   TempFragment.Len  = 0;

@@ -435,7 +435,6 @@ EfiPxeBcDhcp (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status                  = EFI_SUCCESS;
   Private                 = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode                    = Private->PxeBc.Mode;
   Mode->IcmpErrorReceived = FALSE;
@@ -2041,8 +2040,6 @@ EfiPxeBcSetStationIP (
 
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode    = Private->PxeBc.Mode;
-  Status  = EFI_SUCCESS;
-
   if (!Mode->UsingIpv6 &&
       (NewSubnetMask != NULL) &&
       !IP4_IS_VALID_NETMASK (NTOHL (NewSubnetMask->Addr[0])))
@@ -2381,7 +2378,6 @@ EfiPxeLoadFile (
   Private    = VirtualNic->Private;
   PxeBc      = &Private->PxeBc;
   UsingIpv6  = FALSE;
-  Status     = EFI_DEVICE_ERROR;
 
   //
   // Check media status before PXE start

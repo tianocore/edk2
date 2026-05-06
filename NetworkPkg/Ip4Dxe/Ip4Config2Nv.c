@@ -535,7 +535,6 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
   UINTN          DataSize;
   EFI_INPUT_KEY  Key;
 
-  Status    = EFI_SUCCESS;
   Ip4Cfg2   = &Instance->Ip4Config2;
   Ip4NvData = &Instance->Ip4NvData;
 
@@ -878,7 +877,6 @@ Ip4FormExtractConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status             = EFI_SUCCESS;
   IfrFormNvData      = NULL;
   ConfigRequest      = NULL;
   FormResult         = NULL;
