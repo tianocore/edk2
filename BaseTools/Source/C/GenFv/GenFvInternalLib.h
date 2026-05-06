@@ -209,6 +209,7 @@ typedef struct {
   CHAR8                   FvName[MAX_LONG_FILE_PATH];
   EFI_FV_BLOCK_MAP_ENTRY  FvBlocks[MAX_NUMBER_OF_FV_BLOCKS];
   CHAR8                   FvFiles[MAX_NUMBER_OF_FILES_IN_FV][MAX_LONG_FILE_PATH];
+  BOOLEAN                 XipFile[MAX_NUMBER_OF_FILES_IN_FV];
   UINT32                  SizeofFvFiles[MAX_NUMBER_OF_FILES_IN_FV];
   BOOLEAN                 IsPiFvImage;
   INT8                    ForceRebase;
@@ -329,6 +330,7 @@ CalculateFvSize (
 EFI_STATUS
 FfsRebase (
   IN OUT  FV_INFO               *FvInfo,
+  IN      UINTN                 FileIndex,
   IN      CHAR8                 *FileName,
   IN OUT  EFI_FFS_FILE_HEADER   *FfsFile,
   IN      UINTN                 XipOffset,
