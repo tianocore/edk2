@@ -144,6 +144,14 @@ APRIORI DXE {
   INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   INF  UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
+!if $(CAPSULE_SUPPORT) == TRUE
+    INF  UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+    !if $(BOOTSPLASH_IMAGE)
+      INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+      INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+      INF  MdeModulePkg/Logo/LogoDxe.inf
+    !endif
+  !endif
 }
 
 #
@@ -373,6 +381,9 @@ INF ShellPkg/Application/Shell/Shell.inf
 # Capsules
 #
 !if $(CAPSULE_SUPPORT) == TRUE
+!if $(CAPSULE_EMBED_FMP_DXE) == FALSE
+INF  FILE_GUID = $(CAPSULE_MAIN_FW_GUID) FmpDevicePkg/FmpDxe/FmpDxe.inf
+!endif
 INF MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
 !endif
 
