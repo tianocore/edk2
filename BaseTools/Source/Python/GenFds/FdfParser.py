@@ -3900,6 +3900,16 @@ class FdfParser:
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
             EfiSectionObj.Alignment = self._Token
 
+        if self._IsKeyword("Xip"):
+            if not self._IsToken(TAB_EQUAL_SPLIT):
+                raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
+            if not self._GetNextWord():
+                raise Warning.Expected("Xip value (TRUE/FALSE)", self.FileName, self.CurrentLineNumber)
+            XipValue = self._Token.strip().upper()
+            if XipValue not in {"TRUE", "FALSE"}:
+                raise Warning("Invalid Xip value '%s'" % XipValue, self.FileName, self.CurrentLineNumber)
+            EfiSectionObj.Xip = XipValue
+
         if self._IsKeyword('RELOCS_STRIPPED') or self._IsKeyword('RELOCS_RETAINED'):
             if self._SectionCouldHaveRelocFlag(EfiSectionObj.SectionType):
                 if self._Token == 'RELOCS_STRIPPED':
