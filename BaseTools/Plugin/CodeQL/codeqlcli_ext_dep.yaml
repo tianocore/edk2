@@ -10,6 +10,10 @@
 #
 # ****VERSION UPDATE INSTRUCTIONS****
 #
+# Use BaseTools/Plugin/CodeQL/CodeQlVersionUpdate.py to update this file,
+# the platform-specific CodeQL CLI dependency files, and CodeQlQueries.qls together.
+# The script refreshes the CLI version, release digests, and cpp query pack pin.
+#
 # When updating the CodeQL CLI used here, update the corresponding codeql/cpp-queries version in CodeQlQueries.qls.
 # Visit the `qlpack.yml` in the release branch for the CodeQL CLI to get the version to use there. For example, the
 # CodeQL CLI 2.18.1 file is https://github.com/github/codeql/blob/codeql-cli-2.18.1/cpp/ql/src/qlpack.yml and the
@@ -23,9 +27,9 @@
   "scope": "codeql-ext-dep",
   "type": "web",
   "name": "codeql_cli",
-  "source": "https://github.com/github/codeql-cli-binaries/releases/download/v2.18.1/codeql.zip",
-  "version": "2.18.1",
-  "sha256": "815f71c1a46e76f9dafdec26c2a4bab7ea4019a3773e91e39253e2d21cf792a2",
+  "source": "https://github.com/github/codeql-cli-binaries/releases/download/v2.25.3/codeql.zip",
+  "version": "2.25.3",
+  "sha256": "0982c5ba0a96deb69b7a14e68d21f3efb5dd89a820e092a4f2a8212f428095c5",
   "compression_type": "zip",
   "internal_path": "/codeql/",
   "flags": ["set_shell_var", ],
