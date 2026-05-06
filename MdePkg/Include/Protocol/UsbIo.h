@@ -29,7 +29,7 @@ typedef struct _EFI_USB_IO_PROTOCOL EFI_USB_IO_PROTOCOL;
 //
 
 //
-// USB standard descriptors and reqeust
+// USB standard descriptors and request
 //
 typedef USB_DEVICE_REQUEST       EFI_USB_DEVICE_REQUEST;
 typedef USB_DEVICE_DESCRIPTOR    EFI_USB_DEVICE_DESCRIPTOR;

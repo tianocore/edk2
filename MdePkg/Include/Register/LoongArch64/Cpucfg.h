@@ -139,7 +139,7 @@ typedef union {
     ///
     UINT32    FP       : 1;
     ///
-    /// [Bit 1] Sigle-Precision. A value of 1 indicates the processor supports sigle-precision
+    /// [Bit 1] Single-Precision. A value of 1 indicates the processor supports single-precision
     /// floating-point numbers.
     ///
     UINT32    FP_SP    : 1;

@@ -32,7 +32,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   the Length byte, word, or a block of data.
 
   @param  SmbusOperation  Signifies which particular SMBus hardware protocol instance
-                          that it will use toexecute the SMBus transactions.
+                          that it will use to execute the SMBus transactions.
   @param  SmBusAddress    The address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
   @param  Length          Signifies the number of bytes that this operation will

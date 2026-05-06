@@ -65,7 +65,7 @@ typedef struct _EFI_SCSI_IO_PROTOCOL EFI_SCSI_IO_PROTOCOL;
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED   0x10    ///< the adapter failed in issuing request sense command
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT      0x11    ///< selection timeout
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN  0x12    ///< data overrun or data underrun
-#define EFI_SCSI_IO_STATUS_HOST_ADAPTER_BUS_FREE               0x13    ///< Unexepected bus free
+#define EFI_SCSI_IO_STATUS_HOST_ADAPTER_BUS_FREE               0x13    ///< Unexpected bus free
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_PHASE_ERROR            0x14    ///< Target bus phase sequence failure
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_OTHER                  0x7f
 
@@ -79,8 +79,11 @@ typedef struct _EFI_SCSI_IO_PROTOCOL EFI_SCSI_IO_PROTOCOL;
 #define EFI_SCSI_IO_STATUS_TARGET_INTERMEDIATE                0x10     ///< intermediate
 #define EFI_SCSI_IO_STATUS_TARGET_INTERMEDIATE_CONDITION_MET  0x14     ///< intermediate-condition met
 #define EFI_SCSI_IO_STATUS_TARGET_RESERVATION_CONFLICT        0x18     ///< reservation conflict
-#define EFI_SCSI_IO_STATUS_TARGET_COMMOND_TERMINATED          0x22     ///< command terminated
-#define EFI_SCSI_IO_STATUS_TARGET_QUEUE_FULL                  0x28     ///< queue full
+#define EFI_SCSI_IO_STATUS_TARGET_COMMAND_TERMINATED          0x22     ///< command terminated
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_SCSI_IO_STATUS_TARGET_COMMOND_TERMINATED  EFI_SCSI_IO_STATUS_TARGET_COMMAND_TERMINATED
+#define EFI_SCSI_IO_STATUS_TARGET_QUEUE_FULL          0x28             ///< queue full
 
 typedef struct {
   ///

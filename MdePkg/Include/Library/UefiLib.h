@@ -175,7 +175,7 @@ EfiCreateProtocolNotifyEvent (
 /**
   Creates a named event that can be signaled with EfiNamedEventSignal().
 
-  This function creates an event using NotifyTpl, NoifyFunction, and NotifyContext.
+  This function creates an event using NotifyTpl, NotifyFunction, and NotifyContext.
   This event is signaled with EfiNamedEventSignal(). This provides the ability for one or more
   listeners on the same event named by the GUID specified by Name.
   If Name is NULL, then ASSERT().
@@ -620,7 +620,7 @@ AddUnicodeString (
                               the RFC 4646 language code for the Unicode string to add.
                               If Iso639Language is TRUE, then this ASCII string is not
                               assumed to be Null-terminated, and only the first three
-                              chacters are used. If Iso639Language is FALSE, then this
+                              characters are used. If Iso639Language is FALSE, then this
                               ASCII string must be Null-terminated.
   @param  SupportedLanguages  A pointer to a Null-terminated ASCII string that contains
                               a set of ISO 639-2 or RFC 4646 language codes that the Unicode

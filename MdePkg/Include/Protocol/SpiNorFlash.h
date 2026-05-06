@@ -100,7 +100,7 @@ EFI_STATUS
 /**
   Write the flash status register.
 
-  This routine must be called at or below TPL_N OTIFY.
+  This routine must be called at or below TPL_NOTIFY.
   This routine writes the flash part status register.
 
   @param[in] This           Pointer to an EFI_SPI_NOR_FLASH_PROTOCOL data

@@ -47,10 +47,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xcaa4381e, 0x750c, 0x4770, {0xb8, 0x70, 0x7a, 0x23, 0xb4, 0xe4, 0x21, 0x30 } \
   }
 
-#define EFI_HASH_ALGORTIHM_MD5_GUID \
+#define EFI_HASH_ALGORITHM_MD5_GUID \
   { \
     0xaf7c79c, 0x65b5, 0x4319, {0xb0, 0xae, 0x44, 0xec, 0x48, 0x4e, 0x4a, 0xd7 } \
   }
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_HASH_ALGORTIHM_MD5_GUID  EFI_HASH_ALGORITHM_MD5_GUID
 
 #define EFI_HASH_ALGORITHM_SHA1_NOPAD_GUID \
   { \
@@ -69,7 +72,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //       EFI_HASH_ALGORITHM_SHA256_GUID
 //       EFI_HASH_ALGORITHM_SHA384_GUID
 //       EFI_HASH_ALGORITHM_SHA512_GUID
-//       EFI_HASH_ALGORTIHM_MD5_GUID
+//       EFI_HASH_ALGORITHM_MD5_GUID
 //
 
 typedef struct _EFI_HASH_PROTOCOL EFI_HASH_PROTOCOL;

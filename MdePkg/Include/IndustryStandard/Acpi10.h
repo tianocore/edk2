@@ -384,7 +384,10 @@ typedef struct {
 #define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_MODE_MASK               BIT1
 #define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_POLARITY_MASK           BIT2
 #define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARABLE_MASK           BIT3
-#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLITY_MASK     BIT4
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABILITY_MASK    BIT4
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLITY_MASK  EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABILITY_MASK
 
 //
 // Ensure proper structure formats
