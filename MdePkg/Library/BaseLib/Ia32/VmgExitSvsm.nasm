@@ -34,6 +34,6 @@ ASM_PFX(AsmVmgExitSvsm):
 ; implementation that is identical to CpuBreakpoint(). In practice,
 ; AsmVmgExitSvsm() should never be called on IA32.
 ;
-    int  3
+    int3
     ret
 

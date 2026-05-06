@@ -26,6 +26,6 @@
 ;------------------------------------------------------------------------------
 global ASM_PFX(CpuBreakpoint)
 ASM_PFX(CpuBreakpoint):
-    int  3
+    int3
     ret
 
