@@ -10,7 +10,7 @@
 # keep the tool as simple as possible, it has the following limitations:
 #   * Do not support vendor code bytes in a capsule.
 #
-# Copyright (c) 2018 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2026, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -38,8 +38,8 @@ from Common.Edk2.Capsule.FmpPayloadHeader  import FmpPayloadHeaderClass
 # Globals for help information
 #
 __prog__        = 'GenerateCapsule'
-__version__     = '0.11'
-__copyright__   = 'Copyright (c) 2024, Intel Corporation. All rights reserved.'
+__version__     = '0.12'
+__copyright__   = 'Copyright (c) 2026, Intel Corporation. All rights reserved.'
 __description__ = 'Generate a capsule.\n'
 
 #
@@ -176,6 +176,16 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
     CheckHashAlgorithmSupported (TOOL_OPENSSL, HashAlgorithm)
 
     #
+    # Create a temporary directory
+    #
+    TempDirectoryPath = tempfile.mkdtemp()
+
+    #
+    # Get the temp signature file name
+    #
+    TempSignatureFilePath = os.path.join (TempDirectoryPath, 'Signature.bin')
+
+    #
     # Build openssl command
     #
     if ToolPath is None:
@@ -183,23 +193,37 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
     Command = ''
     Command = Command + '"{Path}" '.format (Path = os.path.join (ToolPath, 'openssl'))
     Command = Command + 'smime -sign -binary -outform DER -md {HashAlgorithm} '.format (HashAlgorithm = HashAlgorithm)
-    Command = Command + '-signer "{Private}" -certfile "{Public}"'.format (Private = SignerPrivateCertFile, Public = OtherPublicCertFile)
+    Command = Command + '-signer "{Private}" -certfile "{Public}" '.format (Private = SignerPrivateCertFile, Public = OtherPublicCertFile)
+    Command = Command + '-out "{Output}"'.format (Output = TempSignatureFilePath)
     if Verbose:
         print (Command)
 
     #
-    # Sign the input file using the specified private key and capture signature from STDOUT
+    # Sign the input file using the specified private key
     #
     try:
         Process = subprocess.Popen (Command, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
         Result = Process.communicate(input = Payload)
-        Signature = Result[0]
     except:
+        shutil.rmtree (TempDirectoryPath)
         raise ValueError ('GenerateCapsule: error: can not run openssl.')
 
     if Process.returncode != 0:
+        shutil.rmtree (TempDirectoryPath)
         print (Result[1].decode())
         raise ValueError ('GenerateCapsule: error: openssl failed.')
+
+    #
+    # Read the signature from the generated output file
+    #
+    try:
+        with open (TempSignatureFilePath, 'rb') as File:
+            Signature = File.read ()
+    except:
+        shutil.rmtree (TempDirectoryPath)
+        raise ValueError ('GenerateCapsule: error: can not read signature file.')
+
+    shutil.rmtree (TempDirectoryPath)
 
     return Signature
 
