@@ -265,6 +265,7 @@ class FdfParser:
         self._WipeOffArea = []
         if GenFdsGlobalVariable.WorkSpaceDir == '':
             GenFdsGlobalVariable.WorkSpaceDir = os.getenv("WORKSPACE")
+        self._XipDict = OrderedDict()
 
     ## _SkipWhiteSpace() method
     #
@@ -3899,6 +3900,18 @@ class FdfParser:
             if self._Token == 'Auto' and (not SectionName == BINARY_FILE_TYPE_PE32) and (not SectionName == BINARY_FILE_TYPE_TE):
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
             EfiSectionObj.Alignment = self._Token
+
+        if self._IsKeyword("Xip"):
+            if not self._IsToken(TAB_EQUAL_SPLIT):
+                raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
+            if not self._GetNextWord():
+                raise Warning.Expected("Xip value (TRUE/FALSE)", self.FileName, self.CurrentLineNumber)
+            XipValue = self._Token.strip().upper()
+            if XipValue not in {"TRUE", "FALSE"}:
+                raise Warning("Invalid Xip value '%s'" % XipValue, self.FileName, self.CurrentLineNumber)
+            EfiSectionObj.Xip = XipValue
+            if Obj.FvFileType not in self._XipDict:
+                self._XipDict[Obj.FvFileType] = XipValue
 
         if self._IsKeyword('RELOCS_STRIPPED') or self._IsKeyword('RELOCS_RETAINED'):
             if self._SectionCouldHaveRelocFlag(EfiSectionObj.SectionType):

@@ -127,8 +127,12 @@ class FV (object):
             FileName = FfsFile.GenFfs(MacroDict, FvParentAddr=BaseAddress, IsMakefile=Flag, FvName=self.UiFvName)
             FfsFileList.append(FileName)
             if not Flag:
+                XipSuffix = ""
+                if hasattr(FfsFile, 'XipEnabled') and FfsFile.XipEnabled:
+                    XipSuffix = ",XIP"
                 self.FvInfFile.append("EFI_FILE_NAME = " + \
                                             FileName          + \
+                                            XipSuffix         + \
                                             TAB_LINE_BREAK)
         if not Flag:
             FvInfFile = ''.join(self.FvInfFile)
