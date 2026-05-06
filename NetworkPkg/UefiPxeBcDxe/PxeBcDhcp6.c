@@ -2054,7 +2054,7 @@ PxeBcDhcp6CallBack (
       //
       // Cache the dhcp discover packet to mode data directly.
       //
-      CopyMem (&Mode->DhcpDiscover.Dhcpv4, &Packet->Dhcp6, Packet->Length);
+      CopyMem (&Mode->DhcpDiscover, &Packet->Dhcp6, Packet->Length);
       break;
 
     case Dhcp6RcvdAdvertise:
