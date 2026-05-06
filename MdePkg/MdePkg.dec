@@ -309,6 +309,10 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass  Provides services to securely zero memory buffers.
+  #
+  SecureZeroMemoryLib|Include/Library/SecureZeroMemoryLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
