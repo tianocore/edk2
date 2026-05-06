@@ -4,6 +4,7 @@
 #  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2026 Qualcomm Technologies, Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -20,7 +21,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64 RISCV64
 #
 
 [Sources.IA32]
@@ -47,6 +48,12 @@
   LoongArch64/MpLib.c
   LoongArch64/MpLib.h
 
+[Sources.RISCV64]
+  RiscV64/PeiMpLib.c
+  RiscV64/MpLib.c
+  RiscV64/MpLib.h
+  RiscV64/ApEntryPoint.S
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -69,6 +76,10 @@
   MicrocodeLib
   MtrrLib
   CpuPageTableLib
+
+[LibraryClasses.RISCV64]
+  RiscVSbiLib
+  FdtLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
@@ -96,3 +107,6 @@
 
 [Guids.LoongArch64]
   gProcessorResourceHobGuid              ## SOMETIMES_CONSUMES  ## HOB
+
+[Guids.RISCV64]
+  gFdtHobGuid                                   ## SOMETIMES_CONSUMES  ## HOB
