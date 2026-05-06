@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-###
+##
 
 [Defines]
   INF_VERSION                    = 0x00010017
@@ -25,6 +25,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   DebugLib
+  HobLib
   UefiLib
   TpmPlatformHierarchyLib
 
@@ -36,8 +37,8 @@
 [Sources]
   Tcg2PlatformDxe.c
 
-[Protocols]
-  gEfiDxeSmmReadyToLockProtocolGuid             ## SOMETIMES_CONSUMES ## NOTIFY
+[Guids]
+  gEfiEndOfDxeEventGroupGuid             ## SOMETIMES_CONSUMES ## NOTIFY
 
 [Depex]
   gEfiTcg2ProtocolGuid
