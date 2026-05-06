@@ -78,6 +78,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
   EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjEinjInstructionsInfo,           ///< 54 - Einj Instruction Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1285,5 +1286,13 @@ typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
   /// (v2) Contains a mask of bits to set when writing the Read Ack register.
   UINT64                                    ReadAckWrite;
 } CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION_2_INFO;
+
+/** A structure that describes a
+    Einj Instruction Entry.
+
+    ID: EArchCommonObjEinjInstructionsInfo
+*/
+typedef EFI_ACPI_6_5_EINJ_INJECTION_INSTRUCTION_ENTRY
+  CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
 
 #pragma pack()

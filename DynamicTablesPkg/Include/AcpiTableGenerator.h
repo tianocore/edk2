@@ -38,6 +38,8 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             is in the way the ACPI Table Data is generated from an AML file.
   - SSDT  : The SSDT generator is a clone of the RAW generator. The difference
             is in the way the ACPI Table Data is generated from an AML file.
+  - EINJ  : The EINJ generator collates the required platform information from
+            the Configuration Manager and builds the EINJ table.
   - FADT  : The FADT generator collates the required platform information from
             the Configuration Manager and builds the FADT table.
   - MADT  : The MADT generator collates the GIC information  from the
@@ -129,6 +131,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdRhct,                          ///< RHCT Generator
   EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
   EStdAcpiTableIdHest,                          ///< Hest Generator
+  EStdAcpiTableIdEinj,                          ///< EINJ Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
