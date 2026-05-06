@@ -142,6 +142,7 @@ Returns:
   UINTN       Number;
   EFI_STATUS  Status;
   EFI_GUID    GuidValue;
+  CHAR8       *XipFlag;
 
   //
   // Read the FV base address
@@ -325,6 +326,16 @@ Returns:
     Status = FindToken (InfFile, FILES_SECTION_STRING, EFI_FILE_NAME_STRING, Index, Value);
 
     if (Status == EFI_SUCCESS) {
+      //
+      // Check for ,XIP suffix indicating this file should be rebased
+      //
+      XipFlag = strrchr (Value, ',');
+      if (XipFlag != NULL && stricmp (XipFlag, ",XIP") == 0) {
+        *XipFlag = '\0';
+        FvInfo->XipFile[Number + Index] = TRUE;
+      } else {
+        FvInfo->XipFile[Number + Index] = FALSE;
+      }
       //
       // Add the file
       //
@@ -1289,7 +1300,7 @@ Returns:
       // Rebase the PE or TE image in FileBuffer of FFS file for XIP
       // Rebase for the debug genfvmap tool
       //
-      Status = FfsRebase (FvInfo, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) *VtfFileImage - (UINTN) FvImage->FileImage, FvMapFile);
+      Status = FfsRebase (FvInfo, Index, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) *VtfFileImage - (UINTN) FvImage->FileImage, FvMapFile);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 3000, "Invalid", "Could not rebase %s.", FvInfo->FvFiles[Index]);
         return Status;
@@ -1335,7 +1346,7 @@ Returns:
     // Rebase the PE or TE image in FileBuffer of FFS file for XIP.
     // Rebase Bs and Rt drivers for the debug genfvmap tool.
     //
-    Status = FfsRebase (FvInfo, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage, FvMapFile);
+    Status = FfsRebase (FvInfo, Index, FvInfo->FvFiles[Index], (EFI_FFS_FILE_HEADER *) FileBuffer, (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage, FvMapFile);
   if (EFI_ERROR (Status)) {
     Error (NULL, 0, 3000, "Invalid", "Could not rebase %s.", FvInfo->FvFiles[Index]);
     return Status;
@@ -3377,6 +3388,7 @@ Returns:
 EFI_STATUS
 FfsRebase (
   IN OUT  FV_INFO               *FvInfo,
+  IN      UINTN                 FileIndex,
   IN      CHAR8                 *FileName,
   IN OUT  EFI_FFS_FILE_HEADER   *FfsFile,
   IN      UINTN                 XipOffset,
@@ -3451,6 +3463,14 @@ Returns:
     return EFI_SUCCESS;
   }
 
+  //
+  // If ForceRebase Flag specified to TRUE, only rebase files marked with XIP.
+  //
+  if (FvInfo->ForceRebase == 1) {
+    if (!FvInfo->XipFile[FileIndex]) {
+      return EFI_SUCCESS;
+    }
+  }
 
   XipBase = FvInfo->BaseAddress + XipOffset;
 
