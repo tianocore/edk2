@@ -1115,6 +1115,23 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourceGenericHwVer2InfoParser[] = 
   { "ReadAckWrite",    8,                                              "0x%llx",  NULL },
 };
 
+/** A parser for EArchCommonObjPlatformFwInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPlatformFwInfoParser[] = {
+  { "BiosVendor",                        SMBIOS_MAX_STRING_SIZE,             NULL,    PrintString    },
+  { "BiosVersion",                       SMBIOS_MAX_STRING_SIZE,             NULL,    PrintString    },
+  { "BiosReleaseDate",                   SMBIOS_MAX_STRING_SIZE,             NULL,    PrintString    },
+  { "BiosSize",                          sizeof (UINT8),                     "0x%x",  NULL           },
+  { "BiosCharacteristics",               sizeof (MISC_BIOS_CHARACTERISTICS), "0x%lx", NULL           },
+  { "BIOSCharacteristicsExtensionBytes", 2,                                  "0x%x",  NULL           },
+  { "SystemBiosMajorRelease",            sizeof (UINT8),                     "0x%u",  NULL           },
+  { "SystemBiosMinorRelease",            sizeof (UINT8),                     "0x%u",  NULL           },
+  { "ECFirmwareMajorRelease",            sizeof (UINT8),                     "0x%u",  NULL           },
+  { "ECFirmwareMinorRelease",            sizeof (UINT8),                     "0x%u",  NULL           },
+  { "ExtendedBiosSize",                  sizeof (EXTENDED_BIOS_ROM_SIZE),    "0x%x",  NULL           },
+  { "BiosInfoToken",                     sizeof (CM_OBJECT_TOKEN),           "0x%p",  NULL           },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1172,6 +1189,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciBridgeInfo,       CmArchCommonObjErrSourcePciBridgeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwInfo,       CmArchCommonObjErrSourceGenericHwInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,   CmArchCommonObjErrSourceGenericHwVer2InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPlatformFwInfo,                     CmArchCommonPlatformFwInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
