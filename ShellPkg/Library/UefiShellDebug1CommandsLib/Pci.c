@@ -2636,6 +2636,93 @@ PciEnumerateAll (
   return SHELL_SUCCESS;
 }
 
+/**
+  Parse the three positional PCI BDF fields from the command line.
+
+  @param[in]  Package  Parsed command line package for the `pci` command.
+  @param[out] Bus      Parsed bus number.
+  @param[out] Device   Parsed device number.
+  @param[out] Func     Parsed function number.
+
+  @retval SHELL_SUCCESS            The BDF fields were parsed successfully.
+  @retval SHELL_INVALID_PARAMETER  One of the fields was not valid hexadecimal
+                                   input or exceeded the allowed PCI range.
+**/
+STATIC
+SHELL_STATUS
+ParsePciBdf (
+  IN  LIST_ENTRY  *Package,
+  OUT UINT16      *Bus,
+  OUT UINT16      *Device,
+  OUT UINT16      *Func
+  )
+{
+  CONST CHAR16  *Temp;
+  UINT64        RetVal[3];
+  UINTN         Index;
+
+  ASSERT (Package != NULL);
+  ASSERT (Bus != NULL);
+  ASSERT (Device != NULL);
+  ASSERT (Func != NULL);
+
+  *Bus    = 0;
+  *Device = 0;
+  *Func   = 0;
+
+  //
+  // The first Argument(except "-i") is assumed to be Bus number, second
+  // to be Device number, and third to be Func number.
+  //
+
+  for (Index = 0; Index < 3; Index++) {
+    Temp = ShellCommandLineGetRawValue (Package, Index + 1);
+    if (Temp == NULL) {
+      continue;
+    }
+
+    //
+    // Input converted to hexadecimal number.
+    //
+    if (EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal[Index], TRUE, TRUE))) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
+      return SHELL_INVALID_PARAMETER;
+    }
+
+    switch (Index) {
+      case 0:
+        *Bus = (UINT16)RetVal[Index];
+        if (*Bus > PCI_MAX_BUS) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
+          return SHELL_INVALID_PARAMETER;
+        }
+
+        break;
+      case 1:
+        *Device = (UINT16)RetVal[Index];
+        if (*Device > PCI_MAX_DEVICE) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
+          return SHELL_INVALID_PARAMETER;
+        }
+
+        break;
+      case 2:
+        *Func = (UINT16)RetVal[Index];
+        if (*Func > PCI_MAX_FUNC) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
+          return SHELL_INVALID_PARAMETER;
+        }
+
+        break;
+      default:
+        ASSERT (FALSE);
+        return SHELL_INVALID_PARAMETER;
+    }
+  }
+
+  return SHELL_SUCCESS;
+}
+
 /** Main function of the 'Pci' command.
 
   @param[in] Package    List of input parameter for the command.
@@ -2747,9 +2834,6 @@ MainCmdPci (
 
   ExplainData        = FALSE;
   Segment            = 0;
-  Bus                = 0;
-  Device             = 0;
-  Func               = 0;
   ExtendedCapability = 0xFFFF;
   if (ShellCommandLineGetFlag (Package, L"-i")) {
     ExplainData = TRUE;
@@ -2769,68 +2853,9 @@ MainCmdPci (
     }
   }
 
-  //
-  // The first Argument(except "-i") is assumed to be Bus number, second
-  // to be Device number, and third to be Func number.
-  //
-  Temp = ShellCommandLineGetRawValue (Package, 1);
-  if (Temp != NULL) {
-    //
-    // Input converted to hexadecimal number.
-    //
-    if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-      Bus = (UINT16)RetVal;
-    } else {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    if (Bus > PCI_MAX_BUS) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-  }
-
-  Temp = ShellCommandLineGetRawValue (Package, 2);
-  if (Temp != NULL) {
-    //
-    // Input converted to hexadecimal number.
-    //
-    if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-      Device = (UINT16)RetVal;
-    } else {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    if (Device > PCI_MAX_DEVICE) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-  }
-
-  Temp = ShellCommandLineGetRawValue (Package, 3);
-  if (Temp != NULL) {
-    //
-    // Input converted to hexadecimal number.
-    //
-    if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-      Func = (UINT16)RetVal;
-    } else {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    if (Func > PCI_MAX_FUNC) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
+  ShellStatus = ParsePciBdf (Package, &Bus, &Device, &Func);
+  if (ShellStatus != SHELL_SUCCESS) {
+    goto Done;
   }
 
   Temp = ShellCommandLineGetValue (Package, L"-ec");
