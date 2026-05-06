@@ -27,7 +27,6 @@
 //
 // Partition ID if FF-A support is enabled
 //
-STATIC UINT16  mPartId;
 STATIC UINT16  mStMmPartId;
 
 //
@@ -543,16 +542,6 @@ InitializeFfaCommunication (
 {
   EFI_STATUS              Status;
   EFI_FFA_PART_INFO_DESC  StmmPartInfo;
-
-  Status = ArmFfaLibPartitionIdGet (&mPartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Failed to get partition id. Status: %r\n",
-      Status
-      ));
-    return Status;
-  }
 
   Status = ArmFfaLibGetPartitionInfo (&gEfiMmCommunication2ProtocolGuid, &StmmPartInfo);
   if (EFI_ERROR (Status)) {
