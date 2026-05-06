@@ -355,13 +355,17 @@ NvmExpressMediaClear (
   }
 
   //
-  // If an invalid buffer or buffer size is sent, the Media Clear operation
-  // cannot be performed as it requires a native WRITE command. The overwrite
-  // buffer must have granularity of a namespace block size.
+  // If an invalid buffer is sent, the Media Clear operation
+  // cannot be performed as it requires a native WRITE command.
   //
   if (SectorOwBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  //
+  // Since the parameters do not include OwBuffer Size, the size of the overwrite buffer is assumed to be equal
+  // to the block size of the media.
+  //
 
   Status = EFI_SUCCESS;
 
@@ -373,9 +377,9 @@ NvmExpressMediaClear (
       Status = Device->BlockIo.WriteBlocks (
                                  &Device->BlockIo,
                                  MediaId,
-                                 SectorOffset,  // Sector/LBA offset (increment each pass)
-                                 1,             // Write one sector per write
-                                 SectorOwBuffer // overwrite buffer
+                                 SectorOffset,                   // Sector/LBA offset (increment each pass)
+                                 (UINTN)Device->Media.BlockSize, // Write one block/sector at a time with overwrite buffer
+                                 SectorOwBuffer                  // overwrite buffer
                                  );
     }
 
