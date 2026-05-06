@@ -5,7 +5,7 @@
 # (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2023, American Megatrends International LLC.
 # Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -115,6 +115,9 @@
 
   # Redfish variable guid
   gEfiRedfishVariableGuid           = { 0x85ef8dd3, 0xe606, 0x4b89, { 0x8b, 0xbd, 0x93, 0xbf, 0x5c, 0xbe, 0x1c, 0x18 } }
+
+  # Redfish Configuration Handler Disconnection
+  gEdkIIRedfisEventRedfishInterfaceDisconnectionGuid = { 0x11B81837, 0x249B, 0x4843, { 0xA5, 0x2C, 0xC8, 0x23, 0x7B, 0x35, 0xBF, 0xC2 } }
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   #
