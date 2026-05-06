@@ -835,6 +835,35 @@ WifiMgrGetLinkState (
   return EFI_SUCCESS;
 }
 
+BOOLEAN
+IsSuiteB192Mode (
+  IN    EFI_80211_AKM_SUITE_SELECTOR     *AKMSuiteSelector,
+  IN    EFI_80211_CIPHER_SUITE_SELECTOR  *CipherSuiteSelector
+)
+{
+  BOOLEAN  Result = FALSE;
+  UINT16   IndexOfAKMSuiteList = 0u, IndexOfCipherSuiteList = 0u;
+  UINT32   *AKMSuiteType = NULL;
+  UINT32   *CipherSuiteType = NULL;
+
+  for (IndexOfAKMSuiteList = 0; IndexOfAKMSuiteList < AKMSuiteSelector->AKMSuiteCount; IndexOfAKMSuiteList++)
+  {
+    AKMSuiteType    = (UINT32*) ((AKMSuiteSelector->AKMSuiteList) + IndexOfAKMSuiteList);
+    for (IndexOfCipherSuiteList = 0; IndexOfCipherSuiteList < CipherSuiteSelector->CipherSuiteCount; IndexOfCipherSuiteList++)
+    {
+      CipherSuiteType = (UINT32*) ((CipherSuiteSelector->CipherSuiteList) + IndexOfCipherSuiteList);
+      if ((*AKMSuiteType == IEEE_80211_AKM_SUITE_8021X_SUITE_B192) &&
+          (*CipherSuiteType == IEEE_80211_PAIRWISE_CIPHER_SUITE_GCMP256))
+      {
+         Result = TRUE;
+         break;
+      }
+    }
+  }
+
+  return Result;
+}
+
 /**
   Prepare configuration work before connecting to the target network.
   For WPA2 Personal networks, password should be checked; and for EAP networks, parameters
@@ -894,9 +923,31 @@ WifiMgrPrepareConnection (
         break;
 
       case SECURITY_TYPE_WPA2_ENTERPRISE:
-      case SECURITY_TYPE_WPA3_ENTERPRISE:
 
         Status = WifiMgrConfigEap (Nic, Profile);
+        if (EFI_ERROR (Status)) {
+          if (Status == EFI_INVALID_PARAMETER) {
+            if (Nic->OneTimeConnectRequest) {
+              WifiMgrUpdateConnectMessage (Nic, FALSE, L"Connect Failed: Invalid Configuration!");
+            }
+          }
+
+          return Status;
+        }
+
+        break;
+
+      case SECURITY_TYPE_WPA3_ENTERPRISE:
+
+        if (IsSuiteB192Mode(Profile->Network.AKMSuite, Profile->Network.CipherSuite) &&
+            ((Profile->EapAuthMethod == EAP_AUTH_METHOD_TTLS) || (Profile->EapAuthMethod == EAP_AUTH_METHOD_PEAP)))
+        {
+          Status = EFI_INVALID_PARAMETER;
+        }
+        else
+        {
+          Status = WifiMgrConfigEap (Nic, Profile);
+        }
         if (EFI_ERROR (Status)) {
           if (Status == EFI_INVALID_PARAMETER) {
             if (Nic->OneTimeConnectRequest) {
