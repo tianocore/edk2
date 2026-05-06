@@ -24,16 +24,20 @@
 [Includes]
   Include
 
-[LibraryClasses]
-  ##  @libraryclass Manageability Transport Library
-  #   Manageability Transport Library definitions
-  ManageabilityTransportLib|Include/Library/ManageabilityTransportLib.h
-  ManageabilityTransportLib|Include/Library/ManageabilityTransportIpmiLib.h
-  ManageabilityTransportLib|Include/Library/ManageabilityTransportMctpLib.h
+[Includes.Common.Private]
+  PrivateInclude
 
+[LibraryClasses.Common.Private]
+  ##  @libraryclass Private manageability Transport Library
+  #   Manageability Transport Library definitions
+  ManageabilityTransportLib|PrivateInclude/Library/ManageabilityTransportLib.h
+  ManageabilityTransportLib|PrivateInclude/Library/ManageabilityTransportIpmiLib.h
+  ManageabilityTransportLib|PrivateInclude/Library/ManageabilityTransportMctpLib.h
+
+[LibraryClasses]
   ##  @libraryclass Manageability Transport Helper Library
   #   Provide the help functions to use ManageabilityTransportLib
-  ManageabilityTransportHelperLib|Include/Library/ManageabilityTransportHelperLib.h
+  ManageabilityTransportHelperLib|PrivateInclude/Library/ManageabilityTransportHelperLib.h
 
   ##  @libraryclass PLDM Protocol Library
   #   PLDM Protocol Library Definitions
