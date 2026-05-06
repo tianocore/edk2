@@ -129,6 +129,8 @@
 [Components]
   UefiCpuPkg/Library/SecPeiDxeTimerLibUefiCpu/SecPeiDxeTimerLibUefiCpu.inf
   UefiCpuPkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLib.inf
+  UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+  UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/Application/Cpuid/Cpuid.inf
@@ -154,7 +156,6 @@
   UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
-  UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
