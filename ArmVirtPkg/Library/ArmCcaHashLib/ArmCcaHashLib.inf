@@ -1,0 +1,41 @@
+## @file
+#  Provides hash service by registered hash handler for Arm CCA.
+#
+#  This library is HashLib for Arm CCA.
+#
+# Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaHashLib
+  FILE_GUID                      = fed99f82-00dd-4c22-99fc-f2c46289b4cb
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HashLib|SEC DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM64
+#
+
+[Sources]
+  ArmCcaHashLib.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  ArmCcaLib
+  ArmCcaRsiLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib

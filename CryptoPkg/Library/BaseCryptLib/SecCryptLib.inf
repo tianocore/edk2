@@ -23,7 +23,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -32,7 +32,6 @@
 
   Hash/CryptMd5Null.c
   Hash/CryptSha1Null.c
-  Hash/CryptSha256Null.c
   Hash/CryptSm3Null.c
   Hash/CryptParallelHashNull.c
   Hmac/CryptHmacNull.c
@@ -61,6 +60,12 @@
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
+
+[Sources.IA32, Sources.X64, Sources.RISCV64, Sources.LOONGARCH64]
+  Hash/CryptSha256Null.c
+
+[Sources.AARCH64]
+  Hash/CryptSha256.c
 
 [Packages]
   MdePkg/MdePkg.dec
