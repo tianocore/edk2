@@ -294,6 +294,50 @@ BuildPlatformInfoHob (
   return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
 }
 
+VOID
+CompleteInitialization (
+  IN EFI_HOB_PLATFORM_INFO   *PlatformInfoHob,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
+  )
+{
+  PublishPeiMemory (PlatformInfoHob);
+
+  PlatformQemuUc32BaseInitialization (PlatformInfoHob);
+
+  InitializeRamRegions (PlatformInfoHob);
+
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+    PeiFvInitialization (PlatformInfoHob);
+    MemMapInitialization (PlatformInfoHob);
+    NoexecDxeInitialization (PlatformInfoHob);
+  }
+
+  InstallClearCacheCallback ();
+  AmdSevInitialize (PlatformInfoHob);
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff) {
+    MiscInitializationForMicrovm (PlatformInfoHob);
+  } else {
+    MiscInitialization (PlatformInfoHob);
+    PlatformIdInitialization (PeiServices);
+  }
+
+  IntelTdxInitialize ();
+  InstallFeatureControlCallback (PlatformInfoHob);
+  if (PlatformInfoHob->SmmSmramRequire) {
+    RelocateSmBase ();
+  }
+
+  //
+  // Performed after CoCo (SEV/TDX) initialization to allow the memory
+  // used to be validated before being used.
+  //
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+    if (!PlatformInfoHob->SmmSmramRequire) {
+      ReserveEmuVariableNvStore ();
+    }
+  }
+}
+
 /**
   Perform Platform PEI initialization.
 
@@ -357,43 +401,17 @@ InitializePlatform (
     Q35SmramAtDefaultSmbaseInitialization (PlatformInfoHob);
   }
 
-  PublishPeiMemory (PlatformInfoHob);
-
-  PlatformQemuUc32BaseInitialization (PlatformInfoHob);
-
-  InitializeRamRegions (PlatformInfoHob);
-
   if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
-    PeiFvInitialization (PlatformInfoHob);
-    MemTypeInfoInitialization (PlatformInfoHob);
-    MemMapInitialization (PlatformInfoHob);
-    NoexecDxeInitialization (PlatformInfoHob);
-  }
-
-  InstallClearCacheCallback ();
-  AmdSevInitialize (PlatformInfoHob);
-  if (PlatformInfoHob->HostBridgeDevId == 0xffff) {
-    MiscInitializationForMicrovm (PlatformInfoHob);
-  } else {
-    MiscInitialization (PlatformInfoHob);
-    PlatformIdInitialization (PeiServices);
-  }
-
-  IntelTdxInitialize ();
-  InstallFeatureControlCallback (PlatformInfoHob);
-  if (PlatformInfoHob->SmmSmramRequire) {
-    RelocateSmBase ();
-  }
-
-  //
-  // Performed after CoCo (SEV/TDX) initialization to allow the memory
-  // used to be validated before being used.
-  //
-  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
-    if (!PlatformInfoHob->SmmSmramRequire) {
-      ReserveEmuVariableNvStore ();
+    Status = MemTypeInfoInitialization (PlatformInfoHob);
+    if (EFI_ERROR (Status)) {
+      // Failing here is okay, it just means that the variable read PPI wasn't found, so
+      // we need to return EFI_SUCCESS here and let the dispatcher dispatch the variable PEIM first
+      // and then we'll get called back to finish initialization.
+      return EFI_SUCCESS;
     }
   }
+
+  CompleteInitialization (PlatformInfoHob, PeiServices);
 
   return EFI_SUCCESS;
 }
