@@ -180,6 +180,7 @@ HelperManageabilityPayLoadDebugPrint (
 
 **/
 VOID
+EFIAPI
 HelperManageabilityDebugPrint (
   IN  VOID         *Payload,
   IN  UINT32       PayloadSize,
