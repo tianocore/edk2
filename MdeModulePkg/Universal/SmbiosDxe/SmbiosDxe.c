@@ -424,8 +424,8 @@ SmbiosAdd (
     // in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
     // which is a WORD field limited to 65,535 bytes. So the max size of 32-bit table should not exceed 65,535 bytes.
     //
-    if ((EntryPointStructure != NULL) &&
-        (EntryPointStructure->TableLength + StructureSize > SMBIOS_TABLE_MAX_LENGTH))
+    if (((EntryPointStructure != NULL) ? EntryPointStructure->TableLength : 0) +
+        StructureSize > SMBIOS_TABLE_MAX_LENGTH)
     {
       DEBUG ((DEBUG_INFO, "SmbiosAdd: Total length exceeds max 32-bit table length with type = %d size = 0x%x\n", Record->Type, StructureSize));
     } else {
