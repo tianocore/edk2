@@ -27,23 +27,26 @@ class LinuxGccToolChain(IUefiBuildPlugin):
         # GCC - The only remaining supported GCC toolchain is now "GCC", others have been deprecated then removed.
         #
         if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC":
-            # Start with AARACH64 compiler
-            ret = self._check_aarch64()
-            if ret != 0:
-                self.Logger.critical("Failed in check aarch64")
-                return ret
+            # Start with AAACH64 compiler
+            if "AARCH64" in thebuilder.env.GetValue("TARGET_ARCH", "AARCH64"):
+                ret = self._check_aarch64()
+                if ret != 0:
+                    self.Logger.critical("Failed in check aarch64")
+                    return ret
 
             # Check RISCV64 compiler
-            ret = self._check_riscv64()
-            if ret != 0:
-                self.Logger.critical("Failed in check riscv64")
-                return ret
+            if "RISCV64" in thebuilder.env.GetValue("TARGET_ARCH", "RISCV64"):
+                ret = self._check_riscv64()
+                if ret != 0:
+                    self.Logger.critical("Failed in check riscv64")
+                    return ret
 
             # Check LoongArch64 compiler
-            ret = self._check_loongarch64()
-            if ret != 0:
-                self.Logger.critical("Failed in check loongarch64")
-                return ret
+            if "LOONGARCH64" in thebuilder.env.GetValue("TARGET_ARCH", "LOONGARCH64"):
+                ret = self._check_loongarch64()
+                if ret != 0:
+                    self.Logger.critical("Failed in check loongarch64")
+                    return ret
 
         return 0
 

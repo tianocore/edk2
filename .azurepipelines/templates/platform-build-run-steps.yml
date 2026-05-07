@@ -1,6 +1,6 @@
 
 ## @file
-# File steps.yml
+# File templates/platform-build-run-steps.yml
 #
 # template file containing the steps to build
 #
@@ -41,9 +41,8 @@ parameters:
 steps:
 - bash: |
     echo "##vso[task.prependpath]${HOME}/.local/bin"
-    echo "new PATH=${PATH}"
   displayName: Set PATH
-  condition: eq('${{ parameters.tool_chain_tag }}', 'GCC')
+  condition: eq(variables['Agent.OS'], 'Linux')
 
 - checkout: self
   clean: true

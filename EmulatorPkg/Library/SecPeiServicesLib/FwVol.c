@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <PiPei.h>
+#include <Pi/PiFirmwareFile.h>
 
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
   (ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1))
@@ -158,10 +159,9 @@ Returns:
     FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FwVolHeader + FwVolHeader->HeaderLength);
   } else {
     //
-    // Length is 24 bits wide so mask upper 8 bits
     // FileLength is adjusted to FileOccupiedSize as it is 8 byte aligned.
     //
-    FileLength       = *(UINT32 *)(*FileHeader)->Size & 0x00FFFFFF;
+    FileLength       = FFS_FILE_SIZE (*FileHeader);
     FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
     FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
@@ -183,7 +183,7 @@ Returns:
       case EFI_FILE_DATA_VALID:
       case EFI_FILE_MARKED_FOR_UPDATE:
         if (CalculateHeaderChecksum (FfsFileHeader) == 0) {
-          FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+          FileLength       = FFS_FILE_SIZE (FfsFileHeader);
           FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
 
           if ((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) {
@@ -201,7 +201,7 @@ Returns:
         break;
 
       case EFI_FILE_DELETED:
-        FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+        FileLength       = FFS_FILE_SIZE (FfsFileHeader);
         FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
         FileOffset      += FileOccupiedSize;
         FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
@@ -246,12 +246,10 @@ Returns:
   UINT32                     ParsedLength;
 
   //
-  // Size is 24 bits wide so mask upper 8 bits.
-  //    Does not include FfsFileHeader header size
   // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
   //
   Section   = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
-  FileSize  = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+  FileSize  = FFS_FILE_SIZE (FfsFileHeader);
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
   *SectionData = NULL;
@@ -263,11 +261,10 @@ Returns:
     }
 
     //
-    // Size is 24 bits wide so mask upper 8 bits.
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
-    SectionLength = *(UINT32 *)Section->Size & 0x00FFFFFF;
+    SectionLength = SECTION_SIZE (Section);
     SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
 
     ParsedLength += SectionLength;

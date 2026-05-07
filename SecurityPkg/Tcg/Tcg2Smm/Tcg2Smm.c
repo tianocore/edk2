@@ -17,10 +17,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Tcg2Smm.h"
 
-EFI_SMM_VARIABLE_PROTOCOL  *mSmmVariable = NULL;
-TCG_NVS                    *mTcgNvs      = NULL;
-UINTN                      mPpSoftwareSmi;
-UINTN                      mMcSoftwareSmi;
+EFI_SMM_VARIABLE_PROTOCOL  *mSmmVariable  = NULL;
+TCG_NVS                    *mTcgNvs       = NULL;
+UINTN                      mPpSoftwareSmi = MAX_UINTN;
+UINTN                      mMcSoftwareSmi = MAX_UINTN;
 EFI_HANDLE                 mReadyToLockHandle;
 
 /**
@@ -144,6 +144,11 @@ PhysicalPresenceCallback (
   UINT32  OperationRequest;
   UINT32  RequestParameter;
 
+  if (mTcgNvs == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] mTcgNvs has not been initialized yet\n", __func__));
+    return EFI_SUCCESS;
+  }
+
   if (mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
     mTcgNvs->PhysicalPresence.ReturnCode = Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
                                              &MostRecentRequest,
@@ -233,6 +238,8 @@ InitializeTcgCommon (
   PpSwHandle         = NULL;
   McSwHandle         = NULL;
   NotifyHandle       = NULL;
+  mPpSoftwareSmi     = MAX_UINTN;
+  mMcSoftwareSmi     = MAX_UINTN;
 
   // Register a root handler to communicate the NVS region and SMI channel between MM and DXE
   Status = gMmst->MmiHandlerRegister (TpmNvsCommunciate, &gTpmNvsMmGuid, &mReadyToLockHandle);

@@ -1,11 +1,20 @@
 /** @file
 *  File managing the MMU for ARMv8 architecture
 *
-*  Copyright (c) 2011-2025, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2026, ARM Limited. All rights reserved.
 *  Copyright (c) 2016, Linaro Limited. All rights reserved.
 *  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+*  @par Glossary:
+*    - Rsi or RSI   - Realm Service Interface
+*    - IPA          - Intermediate Physical Address
+*    - RIPAS        - Realm IPA state
+*
+*  @par Reference(s):
+*   - Realm Management Monitor (RMM) Specification, version 1.0-rel0
+*     (https://developer.arm.com/documentation/den0137/)
 *
 **/
 
@@ -102,14 +111,18 @@ VOID
 SetOutputAddress (
   IN  UINTN    *Entry,
   IN  UINTN    Address,
-  IN  BOOLEAN  Lpa2Enabled
+  IN  BOOLEAN  Lpa2Enabled,
+  IN  UINT64   CcaProtectionAttribute
   )
 {
+  /*
+   * Preserve the CCA protection attribute bit.
+   */
   if (Lpa2Enabled) {
-    *Entry &= ~(TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2 | TT_UPPER_ADDRESS_MASK);
+    *Entry &= (~(TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2 | TT_UPPER_ADDRESS_MASK) | CcaProtectionAttribute);
     *Entry |= ((UINTN)Address & TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2) | (((UINTN)Address >> 50) << 8);
   } else {
-    *Entry &= ~TT_ADDRESS_MASK_BLOCK_ENTRY;
+    *Entry &= (~TT_ADDRESS_MASK_BLOCK_ENTRY | CcaProtectionAttribute);
     *Entry |= (Address & TT_ADDRESS_MASK_BLOCK_ENTRY);
   }
 }
@@ -118,13 +131,18 @@ STATIC
 UINT64
 GetOutputAddress (
   IN  UINT64   Entry,
-  IN  BOOLEAN  Lpa2Enabled
+  IN  BOOLEAN  Lpa2Enabled,
+  IN  UINT64   CcaProtectionAttribute
   )
 {
+  /*
+   * Preserve the CCA protection attribute bit.
+   */
   if (Lpa2Enabled) {
-    return (Entry & TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2) | ((Entry & TT_UPPER_ADDRESS_MASK) << (50 - 8));
+    return (Entry & TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2) | ((Entry & TT_UPPER_ADDRESS_MASK) << (50 - 8)) |
+           (Entry & CcaProtectionAttribute);
   } else {
-    return Entry & TT_ADDRESS_MASK_BLOCK_ENTRY;
+    return Entry & (TT_ADDRESS_MASK_BLOCK_ENTRY | CcaProtectionAttribute);
   }
 }
 
@@ -199,7 +217,8 @@ VOID
 FreePageTablesRecursive (
   IN  UINT64   *TranslationTable,
   IN  UINTN    Level,
-  IN  BOOLEAN  Lpa2Enabled
+  IN  BOOLEAN  Lpa2Enabled,
+  IN  UINT64   CcaProtectionAttribute
   )
 {
   UINTN  Index;
@@ -212,10 +231,12 @@ FreePageTablesRecursive (
         FreePageTablesRecursive (
           (VOID *)GetOutputAddress (
                     TranslationTable[Index],
-                    Lpa2Enabled
+                    Lpa2Enabled,
+                    CcaProtectionAttribute
                     ),
           Level + 1,
-          Lpa2Enabled
+          Lpa2Enabled,
+          CcaProtectionAttribute
           );
       }
     }
@@ -267,7 +288,8 @@ UpdateRegionMappingRecursive (
   IN  INTN     Level,
   IN  BOOLEAN  IsRootTable,
   IN  BOOLEAN  TableIsLive,
-  IN  BOOLEAN  Lpa2Enabled
+  IN  BOOLEAN  Lpa2Enabled,
+  IN  UINT64   CcaProtectionAttribute
   )
 {
   UINTN       BlockShift;
@@ -278,14 +300,18 @@ UpdateRegionMappingRecursive (
   VOID        *TranslationTable;
   EFI_STATUS  Status;
   BOOLEAN     NextTableIsLive;
+  VOID        *TablesToFree[2];
 
   ASSERT (((RegionStart | RegionEnd) & EFI_PAGE_MASK) == 0);
 
   BlockShift = (Level + 1) * BITS_PER_LEVEL + MIN_T0SZ;
   BlockMask  = MAX_UINT64 >> BlockShift;
 
+  TablesToFree[0] = NULL;
+  TablesToFree[1] = NULL;
+
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_PAGING,
     "%a(%d): %llx - %llx set %lx clr %lx\n",
     __func__,
     Level,
@@ -338,46 +364,68 @@ UpdateRegionMappingRecursive (
           return EFI_OUT_OF_RESOURCES;
         }
 
-        if (!ArmMmuEnabled ()) {
+        //
+        // Allocating a page may have split this block if a guard page
+        // was allocated in this block. Check if this is already split
+        // and if so skip the splitting logic
+        //
+        if (IsTableEntry (*Entry, Level)) {
           //
-          // Make sure we are not inadvertently hitting in the caches
-          // when populating the page tables.
+          // Don't free the page table here, we may end up recreating the
+          // large page. This mapping may extend across the block boundary,
+          // so its possible we could have two pages to free in the worst case.
           //
-          InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
-        }
-
-        ZeroMem (TranslationTable, EFI_PAGE_SIZE);
-
-        if (IsBlockEntry (*Entry, Level)) {
-          //
-          // We are splitting an existing block entry, so we have to populate
-          // the new table with the attributes of the block entry it replaces.
-          //
-          Status = UpdateRegionMappingRecursive (
-                     RegionStart & ~BlockMask,
-                     (RegionStart | BlockMask) + 1,
-                     *Entry & TT_ATTRIBUTES_MASK,
-                     0,
-                     TranslationTable,
-                     Level + 1,
-                     FALSE,
-                     FALSE,
-                     Lpa2Enabled
-                     );
-          if (EFI_ERROR (Status)) {
-            //
-            // The range we passed to UpdateRegionMappingRecursive () is block
-            // aligned, so it is guaranteed that no further pages were allocated
-            // by it, and so we only have to free the page we allocated here.
-            //
-            FreePages (TranslationTable, 1);
-            return Status;
+          if (TablesToFree[0] == NULL) {
+            TablesToFree[0] = TranslationTable;
+          } else {
+            TablesToFree[1] = TranslationTable;
           }
-        }
 
-        NextTableIsLive = FALSE;
+          TranslationTable = (VOID *)GetOutputAddress (*Entry, Lpa2Enabled, CcaProtectionAttribute);
+          NextTableIsLive  = TableIsLive;
+        } else {
+          if (!ArmMmuEnabled ()) {
+            //
+            // Make sure we are not inadvertently hitting in the caches
+            // when populating the page tables.
+            //
+            InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
+          }
+
+          ZeroMem (TranslationTable, EFI_PAGE_SIZE);
+
+          if (IsBlockEntry (*Entry, Level)) {
+            //
+            // We are splitting an existing block entry, so we have to populate
+            // the new table with the attributes of the block entry it replaces.
+            //
+            Status = UpdateRegionMappingRecursive (
+                       RegionStart & ~BlockMask,
+                       (RegionStart | BlockMask) + 1,
+                       *Entry & TT_ATTRIBUTES_MASK,
+                       0,
+                       TranslationTable,
+                       Level + 1,
+                       FALSE,
+                       FALSE,
+                       Lpa2Enabled,
+                       CcaProtectionAttribute
+                       );
+            if (EFI_ERROR (Status)) {
+              //
+              // The range we passed to UpdateRegionMappingRecursive () is block
+              // aligned, so it is guaranteed that no further pages were allocated
+              // by it, and so we only have to free the page we allocated here.
+              //
+              FreePages (TranslationTable, 1);
+              return Status;
+            }
+          }
+
+          NextTableIsLive = FALSE;
+        }
       } else {
-        TranslationTable = (VOID *)GetOutputAddress (*Entry, Lpa2Enabled);
+        TranslationTable = (VOID *)GetOutputAddress (*Entry, Lpa2Enabled, CcaProtectionAttribute);
         NextTableIsLive  = TableIsLive;
       }
 
@@ -393,7 +441,8 @@ UpdateRegionMappingRecursive (
                  Level + 1,
                  FALSE,
                  NextTableIsLive,
-                 Lpa2Enabled
+                 Lpa2Enabled,
+                 CcaProtectionAttribute
                  );
       if (EFI_ERROR (Status)) {
         if (!IsTableEntry (*Entry, Level)) {
@@ -404,7 +453,7 @@ UpdateRegionMappingRecursive (
           // possible for existing table entries, since we cannot revert the
           // modifications we made to the subhierarchy it represents.)
           //
-          FreePageTablesRecursive (TranslationTable, Level + 1, Lpa2Enabled);
+          FreePageTablesRecursive (TranslationTable, Level + 1, Lpa2Enabled, CcaProtectionAttribute);
         }
 
         return Status;
@@ -412,7 +461,7 @@ UpdateRegionMappingRecursive (
 
       if (!IsTableEntry (*Entry, Level)) {
         EntryValue = TT_TYPE_TABLE_ENTRY;
-        SetOutputAddress (&EntryValue, (UINTN)TranslationTable, Lpa2Enabled);
+        SetOutputAddress (&EntryValue, (UINTN)TranslationTable, Lpa2Enabled, CcaProtectionAttribute);
 
         ReplaceTableEntry (
           Entry,
@@ -425,12 +474,26 @@ UpdateRegionMappingRecursive (
     } else {
       EntryValue = (*Entry & AttributeClearMask) | AttributeSetMask;
       // Below clears shareability bits when LPA2 is in use
-      SetOutputAddress (&EntryValue, RegionStart, Lpa2Enabled);
+      SetOutputAddress (&EntryValue, RegionStart, Lpa2Enabled, CcaProtectionAttribute);
       EntryValue |= (Level == 3) ? TT_TYPE_BLOCK_ENTRY_LEVEL3
                                  : TT_TYPE_BLOCK_ENTRY;
 
       ReplaceTableEntry (Entry, EntryValue, RegionStart, BlockMask, FALSE);
     }
+  }
+
+  //
+  // We may have left up to two orphaned page table pages if we discovered a
+  // recursive call already split a block on either side of a misaligned region.
+  //
+  if (TablesToFree[0] != NULL) {
+    FreePages (TablesToFree[0], 1);
+    TablesToFree[0] = NULL;
+  }
+
+  if (TablesToFree[1] != NULL) {
+    FreePages (TablesToFree[1], 1);
+    TablesToFree[1] = NULL;
   }
 
   return EFI_SUCCESS;
@@ -445,7 +508,8 @@ UpdateRegionMapping (
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *RootTable,
   IN  BOOLEAN  TableIsLive,
-  IN  BOOLEAN  Lpa2Enabled
+  IN  BOOLEAN  Lpa2Enabled,
+  IN  UINT64   CcaProtectionAttribute
   )
 {
   UINTN  T0SZ;
@@ -472,7 +536,8 @@ UpdateRegionMapping (
            GetRootTableLevel (T0SZ),
            TRUE,
            TableIsLive,
-           Lpa2Enabled
+           Lpa2Enabled,
+           CcaProtectionAttribute
            );
 }
 
@@ -484,14 +549,31 @@ FillTranslationTable (
   IN  BOOLEAN                       Lpa2Enabled
   )
 {
+  UINT64  CcaProtectionAttribute;
+
+  //
+  // The CCA protection attribute corresponds to the (IPA_WIDTH - 1) bit of the
+  // Realm address space. The VA and PA for a region are expected to differ only
+  // in this bit. Derive the attribute by XORing the two addresses.
+  //
+  // NOTE: If more than one bit differs, the memory map is misconfigured.
+  //
+  CcaProtectionAttribute = MemoryRegion->VirtualBase ^ MemoryRegion->PhysicalBase;
+
+  //
+  // Ensure only one bit is set.
+  //
+  ASSERT (((CcaProtectionAttribute & (CcaProtectionAttribute - 1)) == 0));
+
   return UpdateRegionMapping (
            MemoryRegion->VirtualBase,
            MemoryRegion->Length,
-           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
+           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF | CcaProtectionAttribute,
            0,
            RootTable,
            FALSE,
-           Lpa2Enabled
+           Lpa2Enabled,
+           CcaProtectionAttribute
            );
 }
 
@@ -622,7 +704,8 @@ ArmSetMemoryAttributes (
            PageAttributeMask,
            ArmGetTTBR0BaseAddress (),
            TRUE,
-           ArmLpa2Enabled ()
+           ArmLpa2Enabled (),
+           0
            );
 }
 
@@ -867,4 +950,125 @@ ArmMmuBaseLibConstructor (
   }
 
   return RETURN_SUCCESS;
+}
+
+/**
+  Configure the protection attribute for the page tables
+  describing the memory region.
+
+  The IPA space of a Realm is divided into two halves:
+    - Protected IPA space and
+    - Unprotected IPA space.
+
+  Software in a Realm should treat the most significant bit of an
+  IPA as a protection attribute.
+
+  A Protected IPA is an address in the lower half of a Realms IPA
+  space. The most significant bit of a Protected IPA is 0.
+
+  An Unprotected IPA is an address in the upper half of a Realms
+  IPA space. The most significant bit of an Unprotected IPA is 1.
+
+  Note:
+  - Configuring the memory region as Unprotected IPA enables the
+    Realm to share the memory region with the Host.
+  - This function updates the page table entries to reflect the
+    protection attribute.
+  - A separate call to transition the memory range using the Realm
+    Service Interface (RSI) RSI_IPA_STATE_SET command is additionally
+    required and is expected to be done outside this function.
+  - The caller must ensure that this function call is invoked by code
+    executing within the Realm.
+
+    @param [in]  BaseAddress  Base address of the memory region.
+    @param [in]  Length       Length of the memory region.
+    @param [in]  IpaWidth     IPA width of the Realm.
+    @param [in]  Share        If TRUE, set the most significant
+                              bit of the IPA to configure the memory
+                              region as Unprotected IPA.
+                              If FALSE, clear the most significant
+                              bit of the IPA to configure the memory
+                              region as Protected IPA.
+
+    @retval EFI_SUCCESS            IPA protection attribute updated.
+    @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+    @retval EFI_UNSUPPORTED        RME is not supported.
+**/
+EFI_STATUS
+EFIAPI
+ArmCcaSetMemoryProtectionAttribute (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length,
+  IN  UINT64                IpaWidth,
+  IN  BOOLEAN               Share
+  )
+{
+  UINT64  Attributes;
+  UINT64  Mask;
+  UINT64  CcaProtectionAttribute;
+  UINT64  TopBits;
+  UINT64  MaxAddressBits;
+
+  if ((Length == 0) || (IpaWidth == 0) ||
+      !IS_ALIGNED (Length, EFI_PAGE_SIZE) ||
+      !IS_ALIGNED (BaseAddress, EFI_PAGE_SIZE))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!ArmHasRme ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (ArmHas52BitTgran4 ()) {
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+  } else {
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
+  }
+
+  if (IpaWidth > MaxAddressBits) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CcaProtectionAttribute = 1ULL << (IpaWidth - 1);
+
+  if (ArmLpa2Enabled ()) {
+    /*
+     * For LPA2, the top IPA bits (e.g., bits 50..51) map into upper page table
+     * attributes in a packed form. Extract those top IPA bits and move them to
+     * the encoding expected in the Attributes field.
+     *
+     * TopBits calculation: use BIT51|BIT50 to detect whether the protection bit
+     * sits in the top IPA range, then translate to the TTBR/LPA2 attribute
+     * position. (See ARM ARM: translation-table entry formats for LPA2).
+     */
+    TopBits = CcaProtectionAttribute & (BIT51 | BIT50);
+    if (TopBits != 0) {
+      CcaProtectionAttribute = ((TopBits >> 0x32) & 0x3) << 8;
+    }
+  }
+
+  if (Share) {
+    Attributes = CcaProtectionAttribute;
+  } else {
+    Attributes = 0;
+  }
+
+  if (ArmLpa2Enabled ()) {
+    Mask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2 | TT_UPPER_ADDRESS_MASK |
+             CcaProtectionAttribute);
+  } else {
+    Mask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | CcaProtectionAttribute);
+  }
+
+  return UpdateRegionMapping (
+           BaseAddress,
+           Length,
+           Attributes,
+           Mask,
+           ArmGetTTBR0BaseAddress (),
+           TRUE,
+           ArmLpa2Enabled (),
+           CcaProtectionAttribute
+           );
 }

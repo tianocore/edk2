@@ -1165,10 +1165,9 @@ ParseDnsResponse (
   Dns4TokenEntry = NULL;
   Dns6TokenEntry = NULL;
 
-  IpCount          = 0;
-  RRCount          = 0;
-  AnswerSectionNum = 0;
-  CNameTtl         = 0;
+  IpCount  = 0;
+  RRCount  = 0;
+  CNameTtl = 0;
 
   HostAddr4 = NULL;
   HostAddr6 = NULL;
@@ -1378,8 +1377,6 @@ ParseDnsResponse (
     }
   }
 
-  Status = EFI_NOT_FOUND;
-
   //
   // Get Answer name
   //
@@ -1388,7 +1385,11 @@ ParseDnsResponse (
   //
   // Processing AnswerSection.
   //
-  while (AnswerSectionNum < DnsHeader->AnswersNum) {
+  if (DnsHeader->AnswersNum == 0) {
+    Status = EFI_NOT_FOUND;
+  }
+
+  for (AnswerSectionNum = 0; AnswerSectionNum < DnsHeader->AnswersNum; AnswerSectionNum++) {
     //
     // Check whether the remaining packet length is available or not.
     //
@@ -1635,7 +1636,6 @@ ParseDnsResponse (
     // Find next one
     //
     AnswerName = (CHAR8 *)AnswerSection + sizeof (*AnswerSection) + AnswerSection->DataLength;
-    AnswerSectionNum++;
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {

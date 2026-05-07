@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (c) 2024-2026 Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -59,7 +59,27 @@ INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntim
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!if $(SECURE_BOOT_DEFAULT_KEYS) == TRUE
+INF  SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
+
+  FILE FREEFORM = 85254ea7-4759-4fc4-82d4-5eed5fb0a4a0 {
+    SECTION RAW = OvmfPkg/LoongArchVirt/Feature/SecureBoot/SecureBootKeys/PK/PK.cer
+  }
+
+  FILE FREEFORM = 6f64916e-9f7a-4c35-b952-cd041efb05a3 {
+    SECTION RAW = OvmfPkg/LoongArchVirt/Feature/SecureBoot/SecureBootKeys/KEK/KEK.cer
+  }
+
+  FILE FREEFORM = c491d352-7623-4843-accc-2791a7574421 {
+    SECTION RAW = OvmfPkg/LoongArchVirt/Feature/SecureBoot/SecureBootKeys/db/db.cer
+  }
+!endif
+!else
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
 INF  OvmfPkg/LoongArchVirt/Drivers/StableTimerDxe/TimerDxe.inf
 INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
@@ -73,7 +93,12 @@ INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 #
 INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+!if $(QEMU_PV_VARS) == TRUE
+INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 #
 # PCI
 #
@@ -182,6 +207,9 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 #
 INF ShellPkg/Application/Shell/Shell.inf
 
+INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
+
 #####################################################################################################
 [FV.FVMAIN_COMPACT]
 FvNameGuid         = af8c3fe8-9ce8-4548-884a-e3f4dd91f040
@@ -222,6 +250,7 @@ INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  OvmfPkg/LoongArchVirt/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
 #
 # DXE Phase modules

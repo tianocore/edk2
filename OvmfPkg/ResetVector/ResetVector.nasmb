@@ -37,19 +37,19 @@
 %include "PostCodes.inc"
 
 %ifdef DEBUG_PORT80
-  %include "Port80Debug.asm"
+  %include "Port80Debug.nasm.inc"
 %elifdef DEBUG_SERIAL
-  %include "SerialDebug.asm"
+  %include "SerialDebug.nasm.inc"
 %elif 0
 ; Set ^ this to 1 to enable postcodes on the qemu debug console.
 ; Disabled by default because it is incompatible with SEV-ES/SEV-SNP and TDX.
-  %include "QemuDebugCon.asm"
+  %include "QemuDebugCon.nasm.inc"
 %else
-  %include "DebugDisabled.asm"
+  %include "DebugDisabled.nasm.inc"
 %endif
 
-%include "Ia32/SearchForBfvBase.asm"
-%include "Ia32/SearchForSecEntry.asm"
+%include "Ia32/SearchForBfvBase.nasm.inc"
+%include "Ia32/SearchForSecEntry.nasm.inc"
 
 %define WORK_AREA_GUEST_TYPE          (FixedPcdGet32 (PcdOvmfWorkAreaBase))
 %define PT_ADDR(Offset)               (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
@@ -147,25 +147,25 @@
   %define IGVM_HOB_START            (FixedPcdGet32 (PcdOvmfIgvmHobBase))
   %define IGVM_HOB_SIZE             (FixedPcdGet32 (PcdOvmfIgvmHobSize))
 
-  %include "X64/IntelTdxMetadata.asm"
-  %include "Ia32/Flat32ToFlat64.asm"
-  %include "Ia32/PageTables64.asm"
-  %include "Ia32/IntelTdx.asm"
-  %include "X64/OvmfSevMetadata.asm"
-  %include "X64/IgvmMetadata.asm"
+  %include "X64/IntelTdxMetadata.nasm.inc"
+  %include "Ia32/Flat32ToFlat64.nasm.inc"
+  %include "Ia32/PageTables64.nasm.inc"
+  %include "Ia32/IntelTdx.nasm.inc"
+  %include "X64/OvmfSevMetadata.nasm.inc"
+  %include "X64/IgvmMetadata.nasm.inc"
 %endif
 
-%include "Ia32/AmdSev.asm"
+%include "Ia32/AmdSev.nasm.inc"
 
-%include "Ia16/Real16ToFlat32.asm"
-%include "Ia16/Init16.asm"
+%include "Ia16/Real16ToFlat32.nasm.inc"
+%include "Ia16/Init16.nasm.inc"
 
-%include "Main.asm"
+%include "Main.nasm.inc"
 
   %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
   %define SEV_LAUNCH_SECRET_BASE  FixedPcdGet32 (PcdSevLaunchSecretBase)
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
   %define SEV_FW_HASH_BLOCK_BASE  FixedPcdGet32 (PcdQemuHashTableBase)
   %define SEV_FW_HASH_BLOCK_SIZE  FixedPcdGet32 (PcdQemuHashTableSize)
-%include "Ia16/ResetVectorVtf0.asm"
+%include "Ia16/ResetVectorVtf0.nasm.inc"
 

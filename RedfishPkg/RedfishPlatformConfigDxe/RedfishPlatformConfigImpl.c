@@ -374,7 +374,6 @@ HiiGetRedfishAsciiString (
 
   HiiString = HiiGetRedfishString (HiiHandle, Language, StringId);
   if (HiiString == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Can not find string ID: 0x%x with %a\n", __func__, StringId, Language));
     return NULL;
   }
 

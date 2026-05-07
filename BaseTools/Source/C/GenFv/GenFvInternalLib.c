@@ -3176,7 +3176,7 @@ Returns:
         //
         // Only EFI_FFS_FILE_HEADER is needed for a pad section.
         //
-        CurrentOffset = (CurrentOffset + FfsHeaderSize + sizeof(EFI_FFS_FILE_HEADER) + FfsAlignment - 1) & ~(FfsAlignment - 1);
+        CurrentOffset = (CurrentOffset + FfsHeaderSize + sizeof(EFI_FFS_FILE_HEADER) + FfsAlignment - 1) & ~(UINTN)(FfsAlignment - 1);
         CurrentOffset -= FfsHeaderSize;
       }
     }

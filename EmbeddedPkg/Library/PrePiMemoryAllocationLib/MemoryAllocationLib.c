@@ -282,6 +282,40 @@ FreePages (
 }
 
 /**
+  Frees one or more 4KB pages that were previously allocated with one of the aligned page
+  allocation functions in the Memory Allocation Library.
+
+  Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
+  must have been allocated on a previous call to the aligned page allocation services of the Memory
+  Allocation Library.  If it is not possible to free allocated pages, then this function will
+  perform no actions.
+
+  If Buffer was not allocated with an aligned page allocation function in the Memory Allocation
+  Library, then ASSERT().
+  If Pages is zero, then ASSERT().
+
+  @param  Buffer                Pointer to the buffer of pages to free.
+  @param  Pages                 The number of 4 KB pages to free.
+
+**/
+VOID
+EFIAPI
+FreeAlignedPages (
+  IN VOID   *Buffer,
+  IN UINTN  Pages
+  )
+{
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, EFI_PAGE_SIZE));
+  ASSERT (Pages != 0);
+  // For now, we do not support the ability to free pages in the PrePei Memory Allocator.
+  // The allocated memory is lost.
+  DEBUG ((
+    DEBUG_INFO,
+    "PrePei allocator cannot free pages; allocated memory is not reclaimed.\n"
+    ));
+}
+
+/**
   Allocates a buffer of type EfiBootServicesData.
 
   Allocates the number bytes specified by AllocationSize of type EfiBootServicesData and returns a

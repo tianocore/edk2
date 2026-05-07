@@ -3,6 +3,7 @@
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -33,6 +34,18 @@ RedfishConfigOnEndOfDxe (
 {
   EFI_STATUS  Status;
 
+  //
+  // Locate Redfish Credential Protocol to get credential for
+  // accessing to Redfish service.
+  //
+  if (gCredential == NULL) {
+    Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&gCredential);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to locate Redfish Credential Protocol.\n", __func__));
+      return;
+    }
+  }
+
   Status = gCredential->StopService (gCredential, ServiceStopTypeSecureBootDisabled);
   if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
     DEBUG ((DEBUG_ERROR, "Redfish credential protocol failed to stop service on EndOfDxe: %r", Status));
@@ -60,6 +73,18 @@ RedfishConfigOnExitBootService (
   )
 {
   EFI_STATUS  Status;
+
+  //
+  // Locate Redfish Credential Protocol to get credential for
+  // accessing to Redfish service.
+  //
+  if (gCredential == NULL) {
+    Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&gCredential);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to locate Redfish Credential Protocol.\n", __func__));
+      return;
+    }
+  }
 
   Status = gCredential->StopService (gCredential, ServiceStopTypeExitBootService);
   if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
@@ -102,29 +127,15 @@ RedfishConfigDriverCommonUnload (
   This is the common code for Redfish configuration UEFI and DXE driver
   initialization.
 
-  @param[in]  ImageHandle       The firmware allocated handle for the UEFI image.
-  @param[in]  SystemTable       A pointer to the EFI System Table.
-
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval Others                An unexpected error occurred.
 **/
 EFI_STATUS
 RedfishConfigCommonInit (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+  VOID
   )
 {
   EFI_STATUS  Status;
-
-  //
-  // Locate Redfish Credential Protocol to get credential for
-  // accessing to Redfish service.
-  //
-  Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&gCredential);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: No Redfish Credential Protocol is installed on system.", __func__));
-    return Status;
-  }
 
   //
   // Create EndOfDxe Event.

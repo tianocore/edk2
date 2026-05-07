@@ -108,6 +108,10 @@ class ToolDefClassObject(object):
             if Line == "" or Line[0] == '#':
                 continue
 
+            if '#' in Line:
+                EdkLogger.error("tools_def.txt parser", FILE_PARSE_FAILURE,
+                                "tools_def.txt: Inline comments are not allowed. Line: " + str(Index + 1))
+
             if Line.startswith("!include"):
                 IncFile = Line[8:].strip()
                 Done, IncFile = self.ExpandMacros(IncFile)

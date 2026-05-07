@@ -82,6 +82,7 @@
   gEfiRamDiskProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiHiiConfigAccessProtocolGuid                 ## BY_START
   gEfiHttpBootCallbackProtocolGuid                ## SOMETIMES_PRODUCES
+  gEdkiiHttpCallbackProtocolGuid                  ## SOMETIMES_PRODUCES
   gEfiAdapterInformationProtocolGuid              ## SOMETIMES_CONSUMES
 
 [Guids]

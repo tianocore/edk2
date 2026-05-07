@@ -148,17 +148,15 @@ class SpellCheck(ICiBuildPlugin):
 
         if("ExtendWords" in pkgconfig):
             config["words"].extend(pkgconfig["ExtendWords"])
-        with open(config_file_path, "w") as o:
-            json.dump(config, o)  # output as json so compat with cspell
 
-        All_Ignores = []
-        # Parse the config for other ignores
+        # Parse the config for other ignored paths and use os separator.
         if "IgnoreFiles" in pkgconfig:
-            All_Ignores.extend(pkgconfig["IgnoreFiles"])
+            pkgfiles = [os.path.join(packagename, x).replace(os.sep, "/")
+                        for x in pkgconfig["IgnoreFiles"]]
+            config["ignorePaths"].extend(pkgfiles)
 
-        # spell check all the files
-        ignore = parse_gitignore_lines(All_Ignores, os.path.join(
-            abs_pkg_path, "nofile.txt"), abs_pkg_path)
+        with open(config_file_path, "w") as o:
+            json.dump(config, o)  # output as json to have compat with cspell
 
         # result is a list of strings like this
         #  C:\src\sp-edk2\edk2\FmpDevicePkg\FmpDevicePkg.dec:53:9 - Unknown word (Capule)
@@ -171,11 +169,6 @@ class SpellCheck(ICiBuildPlugin):
                 # didn't find pattern
                 continue
             MisspelledWordFound = True
-
-            pathinfo = path.rsplit(":", 2)  # remove the line no info
-            if(ignore(pathinfo[0])):  # check against ignore list
-                tc.LogStdOut(f"ignoring error due to ci.yaml ignore: {r}")
-                continue
 
             # real error
             EasyFix.append(word.strip().strip("()"))

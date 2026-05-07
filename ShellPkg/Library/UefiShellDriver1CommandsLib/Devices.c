@@ -91,24 +91,25 @@ GetDeviceHandleInfo (
 
   //  }
   Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (TheHandle, Devices, &HandleBuffer);
-  if (!EFI_ERROR (Status) && (Devices != NULL) && (HandleBuffer != NULL)) {
-    for (Count = 0; Count < *Devices; Count++) {
-      if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverConfigurationProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-        *Cfg = TRUE;
-      }
-
-      if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnosticsProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-        *Diag = TRUE;
-      }
-
-      if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnostics2ProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-        *Diag = TRUE;
-      }
-    }
-
-    SHELL_FREE_NON_NULL (HandleBuffer);
+  if (EFI_ERROR (Status) || (Devices == NULL) || (HandleBuffer == NULL)) {
+    return Status;
   }
 
+  for (Count = 0; Count < *Devices; Count++) {
+    if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverConfigurationProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+      *Cfg = TRUE;
+    }
+
+    if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnosticsProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+      *Diag = TRUE;
+    }
+
+    if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnostics2ProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+      *Diag = TRUE;
+    }
+  }
+
+  SHELL_FREE_NON_NULL (HandleBuffer);
   return (Status);
 }
 
@@ -117,6 +118,129 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { L"-l",   TypeValue },
   { NULL,    TypeMax   }
 };
+
+/** Main function of the 'Ls' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdDevices (
+  LIST_ENTRY  *Package
+  )
+{
+  SHELL_STATUS  ShellStatus;
+  CHAR8         *Language;
+  EFI_HANDLE    *HandleList;
+  EFI_HANDLE    *HandleListWalker;
+  CHAR16        Type;
+  BOOLEAN       Cfg;
+  BOOLEAN       Diag;
+  UINTN         Parents;
+  UINTN         Devices;
+  UINTN         Children;
+  CHAR16        *Name;
+  CONST CHAR16  *Lang;
+  BOOLEAN       SfoFlag;
+
+  ShellStatus = SHELL_SUCCESS;
+  Language    = NULL;
+  SfoFlag     = FALSE;
+
+  //
+  // if more than 0 'value' parameters  we have too many parameters
+  //
+  if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+    //
+    // error for too many parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // get the language if necessary
+  //
+  Lang = ShellCommandLineGetValue (Package, L"-l");
+  if (Lang != NULL) {
+    Language = AllocateZeroPool (StrSize (Lang));
+    if (Language == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devices");
+      return (SHELL_OUT_OF_RESOURCES);
+    }
+
+    AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
+  } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
+    ASSERT (Language == NULL);
+    //        Language = AllocateZeroPool(10);
+    //        AsciiSPrint(Language, 10, "en-us");
+  } else {
+    ASSERT (Language == NULL);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices", L"-l");
+    return (SHELL_INVALID_PARAMETER);
+  }
+
+  //
+  // Print Header
+
+  //
+  if (ShellCommandLineGetFlag (Package, L"-sfo")) {
+    ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDriver1HiiHandle, L"devices");
+    SfoFlag = TRUE;
+  } else {
+    ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_DEVICES_HEADER_LINES), gShellDriver1HiiHandle);
+  }
+
+  //
+  // loop through each handle
+  //
+  HandleList = GetHandleListByProtocol (NULL);
+  ASSERT (HandleList != NULL);
+  for (HandleListWalker = HandleList
+       ; HandleListWalker != NULL && *HandleListWalker != NULL    /*&& !EFI_ERROR(Status)*/
+       ; HandleListWalker++
+       )
+  {
+    //
+    // get all the info on each handle
+    //
+    Name = NULL;
+    GetDeviceHandleInfo (*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
+    if ((Name != NULL) && ((Parents != 0) || (Devices != 0) || (Children != 0))) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        Language,
+        SfoFlag ? STRING_TOKEN (STR_DEVICES_ITEM_LINE_SFO) : STRING_TOKEN (STR_DEVICES_ITEM_LINE),
+        gShellDriver1HiiHandle,
+        ConvertHandleToHandleIndex (*HandleListWalker),
+        Type,
+        Cfg ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
+        Diag ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
+        Parents,
+        Devices,
+        Children,
+        Name != NULL ? Name : L"<UNKNOWN>"
+        );
+    }
+
+    if (Name != NULL) {
+      FreePool (Name);
+    }
+
+    if (ShellGetExecutionBreakFlag ()) {
+      ShellStatus = SHELL_ABORTED;
+      break;
+    }
+  }
+
+  if (HandleList != NULL) {
+    FreePool (HandleList);
+  }
+
+  SHELL_FREE_NON_NULL (Language);
+  return ShellStatus;
+}
 
 /**
   Function for 'devices' command.
@@ -135,22 +259,8 @@ ShellCommandRunDevices (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  CHAR8         *Language;
-  EFI_HANDLE    *HandleList;
-  EFI_HANDLE    *HandleListWalker;
-  CHAR16        Type;
-  BOOLEAN       Cfg;
-  BOOLEAN       Diag;
-  UINTN         Parents;
-  UINTN         Devices;
-  UINTN         Children;
-  CHAR16        *Name;
-  CONST CHAR16  *Lang;
-  BOOLEAN       SfoFlag;
 
   ShellStatus = SHELL_SUCCESS;
-  Language    = NULL;
-  SfoFlag     = FALSE;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -173,103 +283,13 @@ ShellCommandRunDevices (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // if more than 0 'value' parameters  we have too many parameters
-    //
-    if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
-      //
-      // error for too many parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // get the language if necessary
-      //
-      Lang = ShellCommandLineGetValue (Package, L"-l");
-      if (Lang != NULL) {
-        Language = AllocateZeroPool (StrSize (Lang));
-        if (Language == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devices");
-          ShellCommandLineFreeVarList (Package);
-          return (SHELL_OUT_OF_RESOURCES);
-        }
 
-        AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
-      } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
-        ASSERT (Language == NULL);
-        //        Language = AllocateZeroPool(10);
-        //        AsciiSPrint(Language, 10, "en-us");
-      } else {
-        ASSERT (Language == NULL);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices", L"-l");
-        ShellCommandLineFreeVarList (Package);
-        return (SHELL_INVALID_PARAMETER);
-      }
-
-      //
-      // Print Header
-
-      //
-      if (ShellCommandLineGetFlag (Package, L"-sfo")) {
-        ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDriver1HiiHandle, L"devices");
-        SfoFlag = TRUE;
-      } else {
-        ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_DEVICES_HEADER_LINES), gShellDriver1HiiHandle);
-      }
-
-      //
-      // loop through each handle
-      //
-      HandleList = GetHandleListByProtocol (NULL);
-      ASSERT (HandleList != NULL);
-      for (HandleListWalker = HandleList
-           ; HandleListWalker != NULL && *HandleListWalker != NULL /*&& !EFI_ERROR(Status)*/
-           ; HandleListWalker++
-           )
-      {
-        //
-        // get all the info on each handle
-        //
-        Name   = NULL;
-        Status = GetDeviceHandleInfo (*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
-        if ((Name != NULL) && ((Parents != 0) || (Devices != 0) || (Children != 0))) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            Language,
-            SfoFlag ? STRING_TOKEN (STR_DEVICES_ITEM_LINE_SFO) : STRING_TOKEN (STR_DEVICES_ITEM_LINE),
-            gShellDriver1HiiHandle,
-            ConvertHandleToHandleIndex (*HandleListWalker),
-            Type,
-            Cfg ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
-            Diag ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
-            Parents,
-            Devices,
-            Children,
-            Name != NULL ? Name : L"<UNKNOWN>"
-            );
-        }
-
-        if (Name != NULL) {
-          FreePool (Name);
-        }
-
-        if (ShellGetExecutionBreakFlag ()) {
-          ShellStatus = SHELL_ABORTED;
-          break;
-        }
-      }
-
-      if (HandleList != NULL) {
-        FreePool (HandleList);
-      }
-    }
-
-    SHELL_FREE_NON_NULL (Language);
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdDevices (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

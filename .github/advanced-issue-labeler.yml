@@ -74,6 +74,8 @@ policy:
           keys: ['IntelFsp2Pkg']
         - name: 'package:intelfsp2wrapperpkg'
           keys: ['IntelFsp2WrapperPkg']
+        - name: 'package:manageabilitypkg'
+          keys: ['ManageabilityPkg']
         - name: 'package:mdemodulepkg'
           keys: ['MdeModulePkg']
         - name: 'package:mdepkg'
@@ -92,8 +94,6 @@ policy:
           keys: ['SecurityPkg']
         - name: 'package:shellpkg'
           keys: ['ShellPkg']
-        - name: 'package:signedcapsulepkg'
-          keys: ['SignedCapsulePkg']
         - name: 'package:sourceleveldebugpkg'
           keys: ['SourceLevelDebugPkg']
         - name: 'package:standalonemmpkg'

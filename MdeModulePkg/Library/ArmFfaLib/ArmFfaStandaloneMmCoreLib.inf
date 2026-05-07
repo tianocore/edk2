@@ -37,6 +37,7 @@
   HobLib
   MemoryAllocationLib
   MmServicesTableLib
+  SafeIntLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc

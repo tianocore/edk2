@@ -480,6 +480,111 @@ ConnectFromEfiVariable (
   return RetStatus;
 }
 
+/** Main function of the 'Connect' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdConnect (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS    Status;
+  SHELL_STATUS  ShellStatus;
+  CONST CHAR16  *Param1;
+  CONST CHAR16  *Param2;
+  UINTN         Count;
+  EFI_HANDLE    Handle1;
+  EFI_HANDLE    Handle2;
+  UINT64        Intermediate;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // if more than 2 'value' parameters (plus the name one) or either -r or -c with any value parameters we have too many parameters
+  //
+  Count = (gInReconnect ? 0x4 : 0x3);
+  if ((ShellCommandLineGetCount (Package) > Count) ||
+      (ShellCommandLineGetFlag (Package, L"-c") && (ShellCommandLineGetCount (Package) > 1)) ||
+      (ShellCommandLineGetFlag (Package, L"-r") && (ShellCommandLineGetCount (Package) > 2)) ||
+      (ShellCommandLineGetFlag (Package, L"-r") && ShellCommandLineGetFlag (Package, L"-c")))
+  {
+    //
+    // error for too many parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"connect");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-c")) {
+    //
+    // do the conin and conout from EFI variables
+    // if the first fails dont 'loose' the error
+    //
+    Status = ConnectFromEfiVariable ();
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_DEVICE_ERROR;
+    }
+
+    return ShellStatus;
+  }
+
+  //
+  // 0, 1, or 2 specific handles and possibly recursive
+  //
+  Param1 = ShellCommandLineGetRawValue (Package, 1);
+  Param2 = ShellCommandLineGetRawValue (Package, 2);
+  Count  = ShellCommandLineGetCount (Package);
+
+  if (Param1 != NULL) {
+    Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);
+      return SHELL_INVALID_PARAMETER;
+    }
+
+    Handle1 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+  } else {
+    Handle1 = NULL;
+  }
+
+  if (Param2 != NULL) {
+    Status = ShellConvertStringToUint64 (Param2, &Intermediate, TRUE, FALSE);
+    if (!EFI_ERROR (Status)) {
+      Handle2 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+  } else {
+    Handle2 = NULL;
+  }
+
+  if (ShellStatus != SHELL_SUCCESS) {
+    return ShellStatus;
+  }
+
+  if ((Param1 != NULL) && (Handle1 == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if ((Param2 != NULL) && (Handle2 == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if ((Handle2 != NULL) && (Handle1 != NULL) && EFI_ERROR (gBS->OpenProtocol (Handle2, &gEfiDriverBindingProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else {
+    Status = ConvertAndConnectControllers (Handle1, Handle2, ShellCommandLineGetFlag (Package, L"-r"), (BOOLEAN)(Count != 0));
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_CONNECT_NONE), gShellDriver1HiiHandle);
+      ShellStatus = SHELL_DEVICE_ERROR;
+    }
+  }
+
+  return ShellStatus;
+}
+
 /**
   Function for 'connect' command.
 
@@ -497,12 +602,6 @@ ShellCommandRunConnect (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  CONST CHAR16  *Param1;
-  CONST CHAR16  *Param2;
-  UINTN         Count;
-  EFI_HANDLE    Handle1;
-  EFI_HANDLE    Handle2;
-  UINT64        Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
   //
@@ -526,90 +625,13 @@ ShellCommandRunConnect (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // if more than 2 'value' parameters (plus the name one) or either -r or -c with any value parameters we have too many parameters
-    //
-    Count = (gInReconnect ? 0x4 : 0x3);
-    if (  (ShellCommandLineGetCount (Package) > Count)
-       || (ShellCommandLineGetFlag (Package, L"-c") && (ShellCommandLineGetCount (Package) > 1))
-       || (ShellCommandLineGetFlag (Package, L"-r") && (ShellCommandLineGetCount (Package) > 2))
-       || (ShellCommandLineGetFlag (Package, L"-r") && ShellCommandLineGetFlag (Package, L"-c"))
-          )
-    {
-      //
-      // error for too many parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"connect");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetFlag (Package, L"-c")) {
-      //
-      // do the conin and conout from EFI variables
-      // if the first fails dont 'loose' the error
-      //
-      Status = ConnectFromEfiVariable ();
-      if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_DEVICE_ERROR;
-      }
-    } else {
-      //
-      // 0, 1, or 2 specific handles and possibly recursive
-      //
-      Param1 = ShellCommandLineGetRawValue (Package, 1);
-      Param2 = ShellCommandLineGetRawValue (Package, 2);
-      Count  = ShellCommandLineGetCount (Package);
 
-      if (Param1 != NULL) {
-        Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          if (Package != NULL) {
-            ShellCommandLineFreeVarList (Package);
-          }
-
-          return (ShellStatus);
-        }
-
-        Handle1 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-      } else {
-        Handle1 = NULL;
-      }
-
-      if (Param2 != NULL) {
-        Status = ShellConvertStringToUint64 (Param2, &Intermediate, TRUE, FALSE);
-        if (!EFI_ERROR (Status)) {
-          Handle2 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
-      } else {
-        Handle2 = NULL;
-      }
-
-      if (ShellStatus == SHELL_SUCCESS) {
-        if ((Param1 != NULL) && (Handle1 == NULL)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if ((Param2 != NULL) && (Handle2 == NULL)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if ((Handle2 != NULL) && (Handle1 != NULL) && EFI_ERROR (gBS->OpenProtocol (Handle2, &gEfiDriverBindingProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param2);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          Status = ConvertAndConnectControllers (Handle1, Handle2, ShellCommandLineGetFlag (Package, L"-r"), (BOOLEAN)(Count != 0));
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_CONNECT_NONE), gShellDriver1HiiHandle);
-            ShellStatus = SHELL_DEVICE_ERROR;
-          }
-        }
-      }
-    }
-
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdConnect (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

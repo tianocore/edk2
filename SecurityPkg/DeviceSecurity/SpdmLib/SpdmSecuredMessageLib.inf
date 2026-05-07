@@ -24,7 +24,6 @@
 [Sources]
   libspdm/library/spdm_secured_message_lib/libspdm_secmes_context_data.c
   libspdm/library/spdm_secured_message_lib/libspdm_secmes_encode_decode.c
-  libspdm/library/spdm_secured_message_lib/libspdm_secmes_encode_decode.c
   libspdm/library/spdm_secured_message_lib/libspdm_secmes_key_exchange.c
   libspdm/library/spdm_secured_message_lib/libspdm_secmes_session.c
 

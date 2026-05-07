@@ -1,0 +1,46 @@
+## @file
+#  Instance of Debug Library based on FF-A console logging interface.
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmFfaConsoleDebugStandaloneMmLib
+  MODULE_UNI_FILE                = ArmFfaConsoleDebugStandaloneMmLib.uni
+  FILE_GUID                      = c02b2e92-3977-11f1-800e-1f227574e3fe
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|MM_CORE_STANDALONE MM_STANDALONE
+
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  ArmFfaConsoleDebugStandaloneMmLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  ArmSvcLib
+  BaseLib
+  BaseMemoryLib
+  PcdLib
+  PrintLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue  ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask      ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc ## CONSUMES
+

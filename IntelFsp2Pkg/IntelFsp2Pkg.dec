@@ -112,7 +112,7 @@
   #
   # Maximal Interrupt supported in IDT table.
   #
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxInterruptSupported |        34| UINT8|0x10000005
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxInterruptSupported |       255| UINT8|0x10000005
   #
   # Allows FSP-M to reserve a section of Temporary RAM for implementation specific use.
   # Reduces the amount of memory available for the PeiCore heap.

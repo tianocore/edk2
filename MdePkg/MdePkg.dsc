@@ -208,6 +208,7 @@
   MdePkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
   MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
   MdePkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
+  MdePkg/Library/ArmLib/ArmBaseLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf

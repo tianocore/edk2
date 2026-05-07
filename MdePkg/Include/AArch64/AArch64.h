@@ -36,6 +36,7 @@
 // ID_AA64PFR0 - AArch64 Processor Feature Register 0 definitions
 #define AARCH64_PFR0_FP   (0xF << 16)
 #define AARCH64_PFR0_GIC  (0xF << 24)
+#define AARCH64_PFR0_RME  (0xFULL << 52)
 
 // ID_AA64PFR2 - AArch64 Processor Feature Register 2 definitions
 #define AARCH64_PFR2_GCIE  (0xF << 12)

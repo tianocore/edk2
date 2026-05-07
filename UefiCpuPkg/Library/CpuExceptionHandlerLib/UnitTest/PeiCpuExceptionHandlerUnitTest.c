@@ -27,7 +27,7 @@ InitializeBspIdt (
 
   Idtr = AllocateZeroPool (sizeof (IA32_DESCRIPTOR));
   ASSERT (Idtr != NULL);
-  NewIdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM + sizeof (UINTN));
+  NewIdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM + sizeof (UINTN));
   ASSERT (NewIdtTable != NULL);
   //
   // Store original PeiServicePointer before new Idt table
@@ -36,7 +36,7 @@ InitializeBspIdt (
   NewIdtTable  = (UINTN *)((UINTN)NewIdtTable + sizeof (UINTN));
 
   Idtr->Base  = (UINTN)NewIdtTable;
-  Idtr->Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
+  Idtr->Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM - 1);
 
   AsmWriteIdtr (Idtr);
   return Idtr;

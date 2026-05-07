@@ -76,6 +76,7 @@ GetCommProtocol (
   EFI_STATUS    Status;
   UINT16        RequestMajorVersion;
   UINT16        RequestMinorVersion;
+  UINT32        CurrentVersion;
   UINT16        CurrentMajorVersion;
   UINT16        CurrentMinorVersion;
   ARM_SVC_ARGS  SvcArgs;
@@ -84,13 +85,13 @@ GetCommProtocol (
   RequestMinorVersion = ARM_FFA_MINOR_VERSION;
 
   Status = ArmFfaLibGetVersion (
-             RequestMajorVersion,
-             RequestMinorVersion,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
+             ARM_FFA_CREATE_VERSION (RequestMajorVersion, RequestMinorVersion),
+             &CurrentVersion
              );
   if (!EFI_ERROR (Status)) {
-    *CommProtocol = CommProtocolFfa;
+    *CommProtocol       = CommProtocolFfa;
+    CurrentMajorVersion = ARM_FFA_MAJOR_VERSION_GET (CurrentVersion);
+    CurrentMinorVersion = ARM_FFA_MINOR_VERSION_GET (CurrentVersion);
   } else {
     ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
     SvcArgs.Arg0 = ARM_FID_SPM_MM_VERSION_AARCH32;

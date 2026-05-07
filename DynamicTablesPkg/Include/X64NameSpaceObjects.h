@@ -3,6 +3,7 @@
   Defines the X64 Namespace Object.
 
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2026, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -33,26 +34,31 @@ typedef enum {
     in the X64 Namespace
 */
 typedef enum X64ObjectID {
-  EX64ObjReserved,                    ///<  0 - Reserved
-  EX64ObjFadtSciInterrupt,            ///<  1 - FADT SCI Interrupt information
-  EX64ObjFadtSciCmdInfo,              ///<  2 - FADT SCI CMD information
-  EX64ObjFadtPmBlockInfo,             ///<  3 - FADT Power management block info
-  EX64ObjFadtGpeBlockInfo,            ///<  4 - FADT GPE block info
-  EX64ObjFadtXpmBlockInfo,            ///<  5 - FADT 64-bit Power Management block info
-  EX64ObjFadtXgpeBlockInfo,           ///<  6 - FADT 64-bit GPE block info
-  EX64ObjFadtSleepBlockInfo,          ///<  7 - FADT Sleep block info
-  EX64ObjFadtResetBlockInfo,          ///<  8 - FADT Reset block info
-  EX64ObjFadtMiscInfo,                ///<  9 - FADT Legacy fields info
-  EX64ObjWsmtFlagsInfo,               ///< 10 - WSMT protection flags info
-  EX64ObjHpetInfo,                    ///< 11 - HPET device info
-  EX64ObjMadtInfo,                    ///< 12 - MADT info
-  EX64ObjLocalApicX2ApicInfo,         ///< 13 - Local APIC and X2APIC info
-  EX64ObjIoApicInfo,                  ///< 14 - IO APIC info
-  EX64ObjIntrSourceOverrideInfo,      ///< 15 - Interrupt Source Override info
-  EX64ObjLocalApicX2ApicNmiInfo,      ///< 16 - Local APIC and X2APIC NMI info
-  EX64ObjFacsInfo,                    ///< 17 - FACS info
-  EX64ObjLocalApicX2ApicAffinityInfo, ///< 18 - Local APIC and X2APIC Affinity info
-  EX64ObjMax                          ///< 19 - Maximum Object ID
+  EX64ObjReserved,                               ///<  0 - Reserved
+  EX64ObjFadtSciInterrupt,                       ///<  1 - FADT SCI Interrupt information
+  EX64ObjFadtSciCmdInfo,                         ///<  2 - FADT SCI CMD information
+  EX64ObjFadtPmBlockInfo,                        ///<  3 - FADT Power management block info
+  EX64ObjFadtGpeBlockInfo,                       ///<  4 - FADT GPE block info
+  EX64ObjFadtXpmBlockInfo,                       ///<  5 - FADT 64-bit Power Management block info
+  EX64ObjFadtXgpeBlockInfo,                      ///<  6 - FADT 64-bit GPE block info
+  EX64ObjFadtSleepBlockInfo,                     ///<  7 - FADT Sleep block info
+  EX64ObjFadtResetBlockInfo,                     ///<  8 - FADT Reset block info
+  EX64ObjFadtMiscInfo,                           ///<  9 - FADT Legacy fields info
+  EX64ObjWsmtFlagsInfo,                          ///< 10 - WSMT protection flags info
+  EX64ObjHpetInfo,                               ///< 11 - HPET device info
+  EX64ObjMadtInfo,                               ///< 12 - MADT info
+  EX64ObjLocalApicX2ApicInfo,                    ///< 13 - Local APIC and X2APIC info
+  EX64ObjIoApicInfo,                             ///< 14 - IO APIC info
+  EX64ObjIntrSourceOverrideInfo,                 ///< 15 - Interrupt Source Override info
+  EX64ObjLocalApicX2ApicNmiInfo,                 ///< 16 - Local APIC and X2APIC NMI info
+  EX64ObjFacsInfo,                               ///< 17 - FACS info
+  EX64ObjLocalApicX2ApicAffinityInfo,            ///< 18 - Local APIC and X2APIC Affinity info
+  EX64ObjIa32MachineCheckBankInfo,               ///< 19 - IA-32 Architecture Machine Check Bank info
+  EX64ObjErrSourceIa32MachineCheckExceptionInfo, ///< 20 - IA-32 Architecture Machine Check Exception Error Source info
+  EX64ObjErrSourceIa32CorrectedMachineCheckInfo, ///< 21 - IA-32 Architecture Corrected Machine Check Error Source info
+  EX64ObjErrSourceIa32DeferredMachineCheckInfo,  ///< 22 - IA-32 Architecture Deferred Machine Check Error Source info
+  EX64ObjErrSourceIa32NmiInfo,                   ///< 23 - IA-32 Architecture Non-Maskable Interrupt
+  EX64ObjMax                                     ///< 24 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -345,5 +351,87 @@ typedef struct CmX64LocalApicX2ApicAffinityInfo {
   */
   CM_OBJECT_TOKEN    ClockDomainToken;
 } CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO;
+
+/**
+  A structure that describes IA-32 Architecture Machine Check Bank.
+  Cf. ACPI 6.6, 18.3.2.1.1. IA-32 Architecture Machine Check Bank Structure
+
+  ID: EX64ObjIa32MachineCheckBankInfo
+ */
+typedef struct CmX64Ia32MachineCheckBankInfo {
+  BOOLEAN    ClearOnInit;
+  UINT8      StatusDataFormat;
+  UINT32     ControlMSRegAddress;
+  UINT64     ControlInitData;
+  UINT32     StatusMSRegAddress;
+  UINT32     AddrMSRegAddress;
+  UINT32     MiscMSRegAddress;
+} CM_X64_IA32_MACHINE_CHECK_BANK_INFO;
+
+/**
+  A structure that describes common information for Error sources
+  IA-32 Architecture Machine Check.
+  Cf. ACPI 6.6, 18.3.2.1, 18.3.2.2, 18.3.2.10
+ */
+typedef struct Ia32ErrSourceMachineCheckCommonInfo {
+  /// Error Source Common Information.
+  ERROR_SOURCE_COMMON_INFO    Common;
+
+  /// Reference Token for array of CM_X64_IA32_MACHINE_CHECK_BANK_INFO.
+  CM_ARCH_COMMON_OBJ_REF      MachineBankInfoTokenArray;
+} MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO;
+
+/**
+  A structure that describes Error sources IA-32 Architecture Machine Check
+  Exception Cf. ACPI 6.6, 18.3.2.1
+
+  ID: EX64ObjErrSourceIa32MachineCheckExceptionInfo
+ */
+typedef struct CmX64Ia32ErrSourceMachineCheckExceptionInfo {
+  MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO    MachineCheckCommon;
+
+  UINT64                                    GlobalCapInitData;
+
+  UINT64                                    GlobalControlInitData;
+} CM_X64_ERROR_SOURCE_IA32_MACHINE_CHECK_EXCEPTION_INFO;
+
+/**
+  A structure that describes Error sources IA-32 Architecture Corrected
+  Machine Check Cf. ACPI 6.6, 18.3.2.2
+
+  ID: EX64ObjErrSourceIa32CorrectedMachineCheckInfo
+ */
+typedef struct CmX64Ia32ErrSourceCorrectedMachineCheckInfo {
+  MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO                MachineCheckCommon;
+
+  EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE    NotificationInfo;
+} CM_X64_ERROR_SOURCE_IA32_CORRECTED_MACHINE_CHECK_INFO;
+
+/**
+  A structure that describes Error sources IA-32 Architecture Deferred
+  Machine Check Cf. ACPI 6.6, 18.3.2.2
+
+  ID: EX64ObjErrSourceIa32DeferredMachineCheckInfo
+ */
+typedef struct CmX64Ia32ErrSourceDeferredMachineCheckInfo {
+  MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO                MachineCheckCommon;
+
+  EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE    NotificationInfo;
+} CM_X64_ERROR_SOURCE_IA32_DEFERRED_MACHINE_CHECK_INFO;
+
+/**
+  A structure that describes Error sources IA-32 Architecture Non-Maskable Interrupt
+  Cf. ACPI 6.6, 18.3.2.3
+
+  ID: EX64ObjErrSourceIa32NmiInfo
+ */
+typedef struct CmX64Ia32ErrSourceNmiInfo {
+  /// Error Source Common Information.
+  /// For Nmi Error Source, Common->Flags and Common->Enabled fields are ignored.
+  ERROR_SOURCE_COMMON_INFO    Common;
+
+  /// The size in bytes of the NMI error data.
+  UINT32                      MaxRawDataLength;
+} CM_X64_ERROR_SOURCE_IA32_NMI_INFO;
 
 #pragma pack()

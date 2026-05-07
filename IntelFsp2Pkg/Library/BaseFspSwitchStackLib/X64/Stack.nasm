@@ -92,6 +92,20 @@ ASM_PFX(FspSwitchStack):
     push   rdx
 SkipPagetableSave:
 
+    ; Enable FSGSBASE instructions via CR4.FSGSBASE (bit 16)
+    mov     rbx, cr4  ; Save original CR4 in rbx, SwapStack() doesn't change it
+    mov     rdx, rbx
+    bts     rdx, 16   ; Set CR4.FSGSBASE
+    mov     cr4, rdx
+
+    ; Save GsBase
+    rdgsbase rdx
+    push    rdx
+
+    ; Save FsBase
+    rdfsbase rdx
+    push    rdx
+
     ; Save Segment registers
     mov     rdx, ss
     push    rdx
@@ -144,6 +158,17 @@ SkipPagetableSave:
     mov     gs, dx
     pop     rdx
     mov     ss, dx
+
+    ; Restore FsBase (CR4.FSGSBASE still set from save path)
+    pop     rdx
+    wrfsbase rdx
+
+    ; Restore GsBase
+    pop     rdx
+    wrgsbase rdx
+
+    ; Restore original CR4 (clear FSGSBASE bit)
+    mov     cr4, rbx
 
     lea     rax, [ASM_PFX(FeaturePcdGet (PcdFspSaveRestorePageTableEnable))]
     mov     al, byte [rax]

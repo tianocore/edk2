@@ -1689,7 +1689,7 @@ PeiFfsFvPpiProcessVolume (
   //
   Status = VerifyFv ((EFI_FIRMWARE_VOLUME_HEADER *)Buffer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Fail to verify FV which address is 0x%11p", Buffer));
+    DEBUG ((DEBUG_ERROR, "Fail to verify FV which address is 0x%11p\n", Buffer));
     return EFI_VOLUME_CORRUPTED;
   }
 

@@ -1235,6 +1235,8 @@ CoreFindFreePagesI (
   UINT64      DescNumberOfBytes;
   LIST_ENTRY  *Link;
   MEMORY_MAP  *Entry;
+  UINT64      ProposedStart;
+  UINT64      ProposedSize;
 
   if ((MaxAddress < EFI_PAGE_MASK) || (NumberOfPages == 0)) {
     return 0;
@@ -1324,12 +1326,17 @@ CoreFindFreePagesI (
       //
       if (DescEnd > Target) {
         if (NeedGuard) {
-          DescEnd = AdjustMemoryS (
-                      DescEnd + 1 - DescNumberOfBytes,
-                      DescNumberOfBytes,
-                      NumberOfBytes
-                      );
-          if (DescEnd == 0) {
+          ProposedStart = DescEnd + 1 - DescNumberOfBytes;
+          ProposedSize  = NumberOfBytes;
+          DescEnd       = AdjustMemoryS (
+                            &ProposedStart,
+                            DescNumberOfBytes,
+                            &ProposedSize
+                            );
+
+          // Check if there was not enough space in the descriptor for the allocation after adjusting for the guard
+          // or if the adjusted range is outside of the bin we are searching within
+          if ((DescEnd == 0) || (ProposedStart < MinAddress) || (ProposedStart + ProposedSize - 1 > MaxAddress)) {
             continue;
           }
         }

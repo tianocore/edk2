@@ -24,6 +24,7 @@
 
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation. All rights reserved.
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -354,8 +355,10 @@ typedef struct {
   } TlsGet;
   union {
     struct {
-      UINT8    Sign   : 1;
-      UINT8    Verify : 1;
+      UINT8    Sign         : 1;
+      UINT8    Verify       : 1;
+      UINT8    SignDigest   : 1;
+      UINT8    VerifyDigest : 1;
     } Services;
     UINT32    Family;
   } RsaPss;

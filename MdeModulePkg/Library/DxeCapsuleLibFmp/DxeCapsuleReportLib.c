@@ -122,7 +122,7 @@ LockVariable (
              VARIABLE_POLICY_NO_CANT_ATTR,
              VARIABLE_POLICY_TYPE_LOCK_NOW
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
     DEBUG ((
       DEBUG_ERROR,
       "DxeCapsuleLibFmp: Failed to lock variable %g %s.  Status = %r\n",

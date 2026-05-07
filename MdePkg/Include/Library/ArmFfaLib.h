@@ -172,19 +172,15 @@ ArmFfaLibGetRxTxBuffers (
 /**
   Get FF-A version
 
-  @param [in]    RequestMajorVersion          Minimal request major version
-  @param [in]    RequestMinorVersion          Minimal request minor version
-  @param [out]   CurrentMajorVersion          Current major version
-  @param [out]   CurrentMinorVersion          Current minor version
+  @param [in]    RequestVersion          Minimal request version
+  @param [out]   CurrentVersion          Current major version
 
 **/
 EFI_STATUS
 EFIAPI
 ArmFfaLibGetVersion (
-  IN  UINT16  RequestMajorVersion,
-  IN  UINT16  RequestMinorVersion,
-  OUT UINT16  *CurrentMajorVersion,
-  OUT UINT16  *CurrentMinorVersion
+  IN  UINT32  RequestVersion,
+  OUT UINT32  *CurrentVersion
   );
 
 /**
@@ -339,6 +335,26 @@ EFI_STATUS
 EFIAPI
 ArmFfaLibSpmIdGet (
   OUT UINT16  *SpmPartId
+  );
+
+/**
+  Invoked by an endpoint to yield control back to the component
+  that called it. This prevents long running transactions from
+  being caught up in the secure world. Endpoint will need to be
+  invoked with FFA_RUN after the specified timeout.
+
+  @param [in]   TimeoutUs    The timeout indicating the time in which
+                             the endpoint is required to be run in
+                             microseconds.
+
+  @return EFI_SUCCESS
+  @return Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibYield (
+  IN  UINT64  TimeoutUs
   );
 
 /**

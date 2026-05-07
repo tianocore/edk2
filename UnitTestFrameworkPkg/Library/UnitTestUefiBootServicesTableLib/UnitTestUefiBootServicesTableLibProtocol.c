@@ -586,12 +586,6 @@ UnitTestInstallProtocolInterfaceNotify (
     InitializeListHead (&Handle->Protocols);
 
     //
-    // Initialize the Key to show that the handle has been created/modified
-    //
-    gHandleDatabaseKey++;
-    Handle->Key = gHandleDatabaseKey;
-
-    //
     // Add this handle to the list global list of all handles
     // in the system
     //
@@ -603,6 +597,12 @@ UnitTestInstallProtocolInterfaceNotify (
       goto Done;
     }
   }
+
+  //
+  // Initialize/update the Key to show that the handle has been created/modified
+  //
+  gHandleDatabaseKey++;
+  Handle->Key = gHandleDatabaseKey;
 
   //
   // Each interface that is added must be unique

@@ -12,6 +12,49 @@
 #include <Library/ShellLib.h>
 
 /**
+  Print a file character to StdOut using the shell type command formatting
+  rules.
+
+  @param[in] Character          Character read from the file.
+  @param[in] CharacterIndex     Character index in the current buffer.
+  @param[in] PreviousCharacter  Previous character in the current buffer.
+  @param[in] Ascii             TRUE for ASCII mode, FALSE for UCS2 mode.
+**/
+STATIC
+VOID
+PrintTypeCharacter (
+  IN CHAR16   Character,
+  IN UINTN    CharacterIndex,
+  IN CHAR16   PreviousCharacter,
+  IN BOOLEAN  Ascii
+  )
+{
+  if ((Character == L'\r') || (Character == L'\n')) {
+    //
+    // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
+    // characters to be displayed as is.
+    //
+    if ((Character == L'\n') && ((CharacterIndex == 0) || (PreviousCharacter != L'\r'))) {
+      //
+      // In case file begin with single line Feed or Line Feed (0xA) is
+      // encountered & Carriage Return (0xD) was not previous character,
+      // print CR and LF. This is because Shell 2.0 requires carriage
+      // return with line feed for displaying each new line from left.
+      //
+      ShellPrintDefaultEx (L"\r\n");
+      return;
+    }
+  } else if ((Ascii && ((Character < 0x20) || (Character >= 0x7F))) || (!Ascii && (Character < 0x20))) {
+    //
+    // For all other characters which are not printable, display '.'
+    //
+    Character = L'.';
+  }
+
+  ShellPrintDefaultEx (L"%c", Character);
+}
+
+/**
   Display a single file to StdOut.
 
   If both Ascii and UCS2 are FALSE attempt to discover the file type.
@@ -67,39 +110,13 @@ TypeFileByHandle (
     if (Ascii) {
       LoopSize = ReadSize;
       for (LoopVar = 0; LoopVar < LoopSize; LoopVar++) {
-        //
-        // The valid range of ASCII characters is 0x20-0x7E.
-        // Display "." when there is an invalid character.
-        //
-        AsciiChar = CHAR_NULL;
         AsciiChar = ((CHAR8 *)Buffer)[LoopVar];
-        if ((AsciiChar == '\r') || (AsciiChar == '\n')) {
-          //
-          // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
-          // characters to be displayed as is.
-          //
-          if (((AsciiChar == '\n') && (LoopVar == 0)) ||
-              ((AsciiChar == '\n') && (((CHAR8 *)Buffer)[LoopVar-1] != '\r')))
-          {
-            //
-            // In case file begin with single line Feed or Line Feed (0xA) is
-            // encountered & Carriage Return (0xD) was not previous character,
-            // print CR and LF. This is because Shell 2.0 requires carriage
-            // return with line feed for displaying each new line from left.
-            //
-            ShellPrintDefaultEx (L"\r\n");
-            continue;
-          }
-        } else {
-          //
-          // For all other characters which are not printable, display '.'
-          //
-          if ((AsciiChar < 0x20) || (AsciiChar >= 0x7F)) {
-            AsciiChar = '.';
-          }
-        }
-
-        ShellPrintDefaultEx (L"%c", AsciiChar);
+        PrintTypeCharacter (
+          AsciiChar,
+          LoopVar,
+          (LoopVar == 0) ? CHAR_NULL : (CHAR16)((CHAR8 *)Buffer)[LoopVar - 1],
+          TRUE
+          );
       }
     } else {
       if (*(UINT16 *)Buffer == gUnicodeFileTag) {
@@ -113,37 +130,13 @@ TypeFileByHandle (
       }
 
       for (LoopVar = 0; LoopVar < LoopSize; LoopVar++) {
-        //
-        // An invalid range of characters is 0x0-0x1F.
-        // Display "." when there is an invalid character.
-        //
-        Ucs2Char = CHAR_NULL;
         Ucs2Char = ((CHAR16 *)Buffer)[LoopVar];
-        if ((Ucs2Char == '\r') || (Ucs2Char == '\n')) {
-          //
-          // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
-          // characters to be displayed as is.
-          //
-          if (((Ucs2Char == '\n') && (LoopVar == 0)) ||
-              ((Ucs2Char == '\n') && (((CHAR16 *)Buffer)[LoopVar-1] != '\r')))
-          {
-            //
-            // In case file begin with single line Feed or Line Feed (0xA) is
-            // encountered & Carriage Return (0xD) was not previous character,
-            // print CR and LF. This is because Shell 2.0 requires carriage
-            // return with line feed for displaying each new line from left.
-            //
-            ShellPrintDefaultEx (L"\r\n");
-            continue;
-          }
-        } else if (Ucs2Char < 0x20) {
-          //
-          // For all other characters which are not printable, display '.'
-          //
-          Ucs2Char = L'.';
-        }
-
-        ShellPrintDefaultEx (L"%c", Ucs2Char);
+        PrintTypeCharacter (
+          Ucs2Char,
+          LoopVar,
+          (LoopVar == 0) ? CHAR_NULL : ((CHAR16 *)Buffer)[LoopVar - 1],
+          FALSE
+          );
       }
     }
 
@@ -155,6 +148,160 @@ TypeFileByHandle (
   FreePool (AllocatedBuffer);
   ShellPrintDefaultEx (L"\r\n");
   return (Status);
+}
+
+/**
+  Apply the 'type' command to each entry in a file info list.
+
+  @param[in] FileList      File info list returned by ShellOpenFileMetaArg().
+  @param[in] AsciiMode     TRUE to force ASCII mode.
+  @param[in] UnicodeMode   TRUE to force UCS2 mode.
+
+  @retval SHELL_SUCCESS            All files were processed successfully.
+  @retval SHELL_NOT_FOUND          At least one entry could not be opened or
+                                   was a directory.
+  @retval SHELL_INVALID_PARAMETER  TypeFileByHandle() failed for an entry.
+**/
+STATIC
+SHELL_STATUS
+ProcessFileList (
+  IN  EFI_SHELL_FILE_INFO  *FileList,
+  IN  BOOLEAN              AsciiMode,
+  IN  BOOLEAN              UnicodeMode
+  )
+{
+  EFI_STATUS           Status;
+  SHELL_STATUS         ShellStatus;
+  EFI_SHELL_FILE_INFO  *Node;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // loop through the list and make sure we are not aborting...
+  //
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
+        ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
+        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
+        )
+  {
+    if (ShellGetExecutionBreakFlag ()) {
+      break;
+    }
+
+    //
+    // make sure the file opened ok
+    //
+    if (EFI_ERROR (Node->Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+      continue;
+    }
+
+    //
+    // make sure its not a directory
+    //
+    if (FileHandleIsDirectory (Node->Handle) == EFI_SUCCESS) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_IS_DIR), gShellLevel3HiiHandle, L"type", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+      continue;
+    }
+
+    //
+    // do it
+    //
+    Status = TypeFileByHandle (Node->Handle, AsciiMode, UnicodeMode);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TYP_ERROR), gShellLevel3HiiHandle, L"type", Node->FileName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+
+    ASSERT (ShellStatus == SHELL_SUCCESS);
+  }
+
+  return ShellStatus;
+}
+
+/** Main function of the 'Type' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdType (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS           Status;
+  CONST CHAR16         *Param;
+  SHELL_STATUS         ShellStatus;
+  UINTN                ParamCount;
+  EFI_SHELL_FILE_INFO  *FileList;
+  BOOLEAN              AsciiMode;
+  BOOLEAN              UnicodeMode;
+
+  ShellStatus = SHELL_SUCCESS;
+  ParamCount  = 0;
+  FileList    = NULL;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  AsciiMode   = ShellCommandLineGetFlag (Package, L"-a");
+  UnicodeMode = ShellCommandLineGetFlag (Package, L"-u");
+
+  if (AsciiMode && UnicodeMode) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"type", L"-a & -u");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    //
+    // we insufficient parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"type");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // get a list with each file specified by parameters
+  // if parameter is a directory then add all the files below it to the list
+  //
+  for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        ; Param != NULL
+        ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        )
+  {
+    Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_READ, &FileList);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", (CHAR16 *)Param);
+      return SHELL_NOT_FOUND;
+    }
+
+    //
+    // check that we have at least 1 file
+    //
+    if ((FileList == NULL) || IsListEmpty (&FileList->Link)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"type", Param);
+      continue;
+    }
+
+    ShellStatus = ProcessFileList (FileList, AsciiMode, UnicodeMode);
+
+    //
+    // Free the fileList
+    //
+    Status = ShellCloseFileMetaArg (&FileList);
+    ASSERT_EFI_ERROR (Status);
+    FileList = NULL;
+
+    if (ShellStatus != SHELL_SUCCESS) {
+      break;
+    }
+  }
+
+  return ShellStatus;
 }
 
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
@@ -176,21 +323,13 @@ ShellCommandRunType (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  LIST_ENTRY           *Package;
-  CHAR16               *ProblemParam;
-  CONST CHAR16         *Param;
-  SHELL_STATUS         ShellStatus;
-  UINTN                ParamCount;
-  EFI_SHELL_FILE_INFO  *FileList;
-  EFI_SHELL_FILE_INFO  *Node;
-  BOOLEAN              AsciiMode;
-  BOOLEAN              UnicodeMode;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
-  ParamCount   = 0;
-  FileList     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -213,116 +352,16 @@ ShellCommandRunType (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    }
 
-    AsciiMode   = ShellCommandLineGetFlag (Package, L"-a");
-    UnicodeMode = ShellCommandLineGetFlag (Package, L"-u");
-
-    if (AsciiMode && UnicodeMode) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"type", L"-a & -u");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      //
-      // we insufficient parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"type");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // get a list with each file specified by parameters
-      // if parameter is a directory then add all the files below it to the list
-      //
-      for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            ; Param != NULL
-            ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            )
-      {
-        Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_READ, &FileList);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", (CHAR16 *)Param);
-          ShellStatus = SHELL_NOT_FOUND;
-          break;
-        }
-
-        //
-        // make sure we completed the param parsing successfully...
-        // Also make sure that any previous action was successful
-        //
-        if (ShellStatus == SHELL_SUCCESS) {
-          //
-          // check that we have at least 1 file
-          //
-          if ((FileList == NULL) || IsListEmpty (&FileList->Link)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"type", Param);
-            continue;
-          } else {
-            //
-            // loop through the list and make sure we are not aborting...
-            //
-            for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-                  ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-                  ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-                  )
-            {
-              if (ShellGetExecutionBreakFlag ()) {
-                break;
-              }
-
-              //
-              // make sure the file opened ok
-              //
-              if (EFI_ERROR (Node->Status)) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", Node->FileName);
-                ShellStatus = SHELL_NOT_FOUND;
-                continue;
-              }
-
-              //
-              // make sure its not a directory
-              //
-              if (FileHandleIsDirectory (Node->Handle) == EFI_SUCCESS) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_IS_DIR), gShellLevel3HiiHandle, L"type", Node->FileName);
-                ShellStatus = SHELL_NOT_FOUND;
-                continue;
-              }
-
-              //
-              // do it
-              //
-              Status = TypeFileByHandle (Node->Handle, AsciiMode, UnicodeMode);
-              if (EFI_ERROR (Status)) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TYP_ERROR), gShellLevel3HiiHandle, L"type", Node->FileName);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              }
-
-              ASSERT (ShellStatus == SHELL_SUCCESS);
-            }
-          }
-        }
-
-        //
-        // Free the fileList
-        //
-        if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
-          Status = ShellCloseFileMetaArg (&FileList);
-        }
-
-        ASSERT_EFI_ERROR (Status);
-        FileList = NULL;
-      }
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdType (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   if (ShellGetExecutionBreakFlag ()) {
     return (SHELL_ABORTED);

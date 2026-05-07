@@ -120,6 +120,11 @@ SetupTPMResources (
   UINT64        TpmBaseSize;
 
   //
+  // Empty TpmBaseSize indicates no TPM found.
+  //
+  TpmBaseSize = 0;
+
+  //
   // Set Parent to suppress incorrect compiler/analyzer warnings.
   //
   Parent = 0;
@@ -200,7 +205,7 @@ SetupTPMResources (
     }
   }
 
-  if (TpmBase) {
+  if (TpmBaseSize > 0) {
     BuildResourceDescriptorHob (
       EFI_RESOURCE_MEMORY_MAPPED_IO,
       EFI_RESOURCE_ATTRIBUTE_PRESENT     |

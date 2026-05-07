@@ -25,6 +25,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaPartInfo.h>
@@ -67,6 +68,8 @@ EfiStatusToFfaStatus (
       return ARM_FFA_RET_NODATA;
     case EFI_NOT_READY:
       return ARM_FFA_RET_NOT_READY;
+    case EFI_TIMEOUT:
+      return ARM_FFA_RET_RETRY;
     default:
       return ARM_FFA_RET_NOT_SUPPORTED;
   }
@@ -136,6 +139,8 @@ FfaStatusToEfiStatus (
       return EFI_NOT_FOUND;
     case ARM_FFA_RET_NOT_READY:
       return EFI_NOT_READY;
+    case ARM_FFA_RET_RETRY:
+      return EFI_TIMEOUT;
     default:
       return EFI_UNSUPPORTED;
   }
@@ -204,19 +209,15 @@ ArmCallFfa (
 /**
   Get FF-A version.
 
-  @param [in]    RequestMajorVersion          Minimal request major version
-  @param [in]    RequestMinorVersion          Minimal request minor version
-  @param [out]   CurrentMajorVersion          Current major version
-  @param [out]   CurrentMinorVersion          Current minor version
+  @param [in]    RequestVersion          Minimal request version
+  @param [out]   CurrentVersion          Current major version
 
 **/
 EFI_STATUS
 EFIAPI
 ArmFfaLibGetVersion (
-  IN  UINT16  RequestMajorVersion,
-  IN  UINT16  RequestMinorVersion,
-  OUT UINT16  *CurrentMajorVersion,
-  OUT UINT16  *CurrentMinorVersion
+  IN  UINT32  RequestVersion,
+  OUT UINT32  *CurrentVersion
   )
 {
   EFI_STATUS    Status;
@@ -225,10 +226,7 @@ ArmFfaLibGetVersion (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_VERSION;
-  FfaArgs.Arg1 = ARM_FFA_CREATE_VERSION (
-                   RequestMajorVersion,
-                   RequestMinorVersion
-                   );
+  FfaArgs.Arg1 = RequestVersion;
 
   ArmCallFfa (&FfaArgs);
 
@@ -237,12 +235,8 @@ ArmFfaLibGetVersion (
     return Status;
   }
 
-  if (CurrentMajorVersion != NULL) {
-    *CurrentMajorVersion = ARM_FFA_MAJOR_VERSION_GET (FfaArgs.Arg0);
-  }
-
-  if (CurrentMinorVersion != NULL) {
-    *CurrentMinorVersion = ARM_FFA_MINOR_VERSION_GET (FfaArgs.Arg0);
+  if (CurrentVersion != NULL) {
+    *CurrentVersion = FfaArgs.Arg0;
   }
 
   return EFI_SUCCESS;
@@ -542,6 +536,46 @@ ErrorHandler:
   }
 
   return Status;
+}
+
+/**
+  Invoked by an endpoint to yield control back to the component
+  that called it. This prevents long running transactions from
+  being caught up in the secure world. Endpoint will need to be
+  invoked with FFA_RUN after the specified timeout.
+
+  @param [in]   TimeoutUs    The timeout indicating the time in which
+                             the endpoint is required to be run in
+                             microseconds.
+
+  @return EFI_SUCCESS
+  @return Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibYield (
+  IN  UINT64  TimeoutUs
+  )
+{
+  ARM_FFA_ARGS   FfaArgs;
+  UINT64         TimeoutNs;
+  RETURN_STATUS  ReturnStatus;
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+  ReturnStatus = SafeUint64Mult (TimeoutUs, 1000, &TimeoutNs);
+  if (ReturnStatus != RETURN_SUCCESS) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_YIELD;
+  FfaArgs.Arg2 = (UINT32)TimeoutNs;
+  FfaArgs.Arg3 = (UINT32)(TimeoutNs >> 32);
+
+  ArmCallFfa (&FfaArgs);
+
+  return FfaArgsToEfiStatus (&FfaArgs);
 }
 
 /**
@@ -1196,34 +1230,75 @@ ArmFfaLibIsFfaSupported (
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
+  UINT32      CurrentVersion;
 
   Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
+             ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
+             &CurrentVersion
              );
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
-  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
-      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
-  {
+  if (!ARM_FFA_ABI_COMPATIBLE (CurrentVersion, ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION)) {
     DEBUG ((
       DEBUG_INFO,
       "Incompatible FF-A Versions.\n" \
       "Request Version: Major=0x%x, Minor=0x%x.\n" \
-      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      "Current Version: Major=0x%x, Minor=0x%x.\n",
       ARM_FFA_MAJOR_VERSION,
       ARM_FFA_MINOR_VERSION,
-      CurrentMajorVersion,
-      CurrentMinorVersion
+      ARM_FFA_MAJOR_VERSION_GET (CurrentVersion),
+      ARM_FFA_MINOR_VERSION_GET (CurrentVersion)
       ));
     return FALSE;
   }
 
   return TRUE;
+}
+
+/**
+  Send FF-A Non-secure Resoure Info Get Command.
+
+  @param [in]   TargetId         Partition ID to query info from
+  @param [in]   Flags            Additional flags
+  @param [out]  WrittenSize      How much data was written in the transaction
+  @param [out]  RemainingSize    How much data remains to be read
+
+  @retval EFI_SUCCESS               Success, info returned in Rx/Tx buffer
+  @retval EFI_INVALID PARAMETER     Invalid parameter(s)
+  @retval Others                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibFfaNsResInfoGet (
+  IN UINT16   TargetId,
+  IN UINT64   Flags,
+  OUT UINT32  *WrittenSize,
+  OUT UINT32  *RemainingSize
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+
+  if ((WrittenSize == NULL) || (RemainingSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_NS_RES_INFO_GET;
+  FfaArgs.Arg1 = TargetId;
+  FfaArgs.Arg2 = Flags;
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *WrittenSize   = FfaArgs.Arg2 >> 32;
+  *RemainingSize = FfaArgs.Arg2;
+
+  return EFI_SUCCESS;
 }

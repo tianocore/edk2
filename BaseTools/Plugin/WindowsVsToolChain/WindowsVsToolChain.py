@@ -407,8 +407,8 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                 vc_tools_install_dir = shell_env.get_shell_var("VCToolsInstallDir")
                 if vc_tools_install_dir:
                     ia32_dll_path = os.path.join(vc_tools_install_dir, 'bin', 'Hostx64', 'x86')
-                    if os.path.exists (ia32_dll_path):
-                        shell_env.append_path(os.path.join (vc_tools_install_dir, 'bin', 'Hostx64', 'x86'))
+                    if os.path.exists(ia32_dll_path):
+                        shell_env.append_path(ia32_dll_path)
                     else:
                         self.Logger.warning("IA32 toolchain DLLs not found in expected path %s. IA32 unit tests may fail to run." % ia32_dll_path)
 
