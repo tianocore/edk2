@@ -17,7 +17,10 @@
 // and the return address so that continuously writing past the stack variables will cause
 // the stack cookie to be overwritten. Before the function returns, the stack cookie value
 // will be checked and if there is a mismatch then StackCheckLib handles the failure.
-extern VOID  *__stack_chk_guard;
+// __UINTPTR_TYPE__ will be the same bitwidth as UINTN, but is a different type that edk2 does
+// not define (e.g. on X64 this is unsigned long) and so we cannot use UINTN here. Newer versions
+// of GCC define this as uintptr_t, which is unsigned long on X64.
+extern __UINTPTR_TYPE__  __stack_chk_guard;
 
 /**
   Called when a stack cookie check fails. The return address is the failing address.
