@@ -45,16 +45,32 @@ _______________________________________________________________________________
 
     Standard ACPI Table IDs:
        0 - Reserved
-       1 - RAW
+       1 - RAW, DSDT, SSDT
        2 - FADT
-       3 - DSDT
-       4 - SSDT
-       5 - MADT
-       6 - GTDT
-       7 - DBG2
-       8 - SPCR
-       9 - MCFG
-      10 - PPTT
+       3 - MADT
+       4 - GTDT
+       5 - DBG2
+       6 - SPCR
+       7 - MCFG
+       8 - IORT
+       9 - PPTT
+      10 - SRAT
+      11 - SSDT Serial Port
+      12 - SSDT CMN
+      13 - SSDT Cpu
+      14 - SSDT Pcie
+      15 - SSDT Plic/Aplic
+      16 - PCCT
+      17 - TPM2
+      18 - WSMT
+      19 - HPET
+      20 - SSDT HPET
+      21 - SPMI
+      22 - FACS
+      23 - CEDT
+      24 - SLIT
+      25 - RHCT
+      26 - SSDT DMC
       27 - HEST
 
     Standard SMBIOS Table IDs:
