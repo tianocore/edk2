@@ -1286,6 +1286,58 @@ EXIT:
 }
 
 /**
+  Check whether an endpoint is in the Running state.
+
+  @param  Xhc     The XHCI instance.
+  @param  SlotId  The slot id.
+  @param  Dci     The device context index.
+
+  @retval TRUE    The endpoint is in the Running state.
+  @retval FALSE   The endpoint is not in the Running state.
+
+**/
+STATIC
+BOOLEAN
+EFIAPI
+XhcEndpointRunning (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  )
+{
+  DEVICE_CONTEXT  *OutputContext;
+
+  OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+  return OutputContext && OutputContext->EP[Dci - 1].EPState == 1;
+}
+
+/**
+  Check whether an endpoint is in the Halted state.
+
+  @param  Xhc     The XHCI instance.
+  @param  SlotId  The slot id.
+  @param  Dci     The device context index.
+
+  @retval TRUE    The endpoint is in the Halted state.
+  @retval FALSE   The endpoint is not in the Halted state.
+
+**/
+STATIC
+BOOLEAN
+EFIAPI
+XhcEndpointHalted (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  )
+{
+  DEVICE_CONTEXT  *OutputContext;
+
+  OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+  return OutputContext && OutputContext->EP[Dci - 1].EPState == 2;
+}
+
+/**
   Execute the transfer by polling the URB. This is a synchronous operation.
 
   @param  Xhc               The XHCI Instance.
@@ -1333,6 +1385,10 @@ XhcExecTransfer (
     ASSERT (Dci < 32);
   }
 
+  if (!CmdTransfer && XhcEndpointHalted (Xhc, SlotId, Dci)) {
+    goto DONE;
+  }
+
   if (Timeout == 0) {
     IndefiniteTimeout = TRUE;
   }
@@ -1363,9 +1419,15 @@ XhcExecTransfer (
     ElapsedTicks += TicksDelta;
   } while (IndefiniteTimeout || ElapsedTicks < TimeoutTicks);
 
+DONE:
   if (!Finished) {
-    Urb->Result = EFI_USB_ERR_TIMEOUT;
-    Status      = EFI_TIMEOUT;
+    if (XhcEndpointHalted (Xhc, SlotId, Dci)) {
+      Urb->Result = EFI_USB_ERR_STALL;
+      Status      = EFI_DEVICE_ERROR;
+    } else {
+      Urb->Result = EFI_USB_ERR_TIMEOUT;
+      Status      = EFI_TIMEOUT;
+    }
   } else if (Urb->Result != EFI_USB_NOERROR) {
     Status = EFI_DEVICE_ERROR;
   }
@@ -3475,6 +3537,22 @@ XhcStopEndpoint (
   DEBUG ((DEBUG_VERBOSE, "XhcStopEndpoint: Slot = 0x%x, Dci = 0x%x\n", SlotId, Dci));
 
   EvtTrb = NULL;
+
+  if (XhcEndpointHalted (Xhc, SlotId, Dci)) {
+    if (PendingUrb != NULL) {
+      PendingUrb->Result = EFI_USB_ERR_STALL;
+    }
+
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (!XhcEndpointRunning (Xhc, SlotId, Dci)) {
+    if (PendingUrb != NULL) {
+      PendingUrb->Result = EFI_USB_ERR_SYSTEM;
+    }
+
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // When XhcCheckUrbResult waits for the Stop_Endpoint completion, it also checks
