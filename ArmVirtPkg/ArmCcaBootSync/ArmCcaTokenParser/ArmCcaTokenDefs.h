@@ -19,7 +19,22 @@
 /** Macro defining the CCA token collection tag.
   cca-token = #6.399(cca-token-collection) ; CMW Collection
 */
-#define CCA_TOKEN_COLLECTION_TAG  (399ULL)
+#define CCA_TOKEN_COLLECTION_TAG_REV0  (399ULL)
+
+/** Macro defining the CCA token collection tag.
+  cca-token = #6.907(cca-token-CMW) ; CMW Collection
+*/
+#define CCA_TOKEN_COLLECTION_TAG_REV1  (907ULL)
+
+/** Macro defining the CoAP application/eat+cwt type.
+  CMW-CWT-element = (
+    [
+      263, ; CoAP application/eat+cwt type
+      EAT_CWT
+    ]
+  )
+*/
+#define CCA_TOKEN_COAP_TYPE  (263ULL)
 
 /** Macros defining the CCA Platform and Realm Delegated token.
   cca-token-collection = {

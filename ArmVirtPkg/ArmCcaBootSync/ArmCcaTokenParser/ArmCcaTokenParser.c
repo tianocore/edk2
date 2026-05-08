@@ -861,6 +861,8 @@ ParseToken (
   QCBORDecodeContext  Context;
   QCBORItem           Item;
   QCBORError          RetVal;
+  UINT64              TokenTag;
+  INT64               CoapTag;
 
   if ((PlatToken == NULL) || (RealmToken == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -875,7 +877,11 @@ ParseToken (
 
   // Verify that the CCA_TOKEN tag is present.
   QCBORDecode_PeekNext (&Context, &Item);
-  if (!QCBORDecode_IsTagged (&Context, &Item, CCA_TOKEN_COLLECTION_TAG)) {
+  if (QCBORDecode_IsTagged (&Context, &Item, CCA_TOKEN_COLLECTION_TAG_REV1)) {
+    TokenTag = CCA_TOKEN_COLLECTION_TAG_REV1;
+  } else if (QCBORDecode_IsTagged (&Context, &Item, CCA_TOKEN_COLLECTION_TAG_REV0)) {
+    TokenTag = CCA_TOKEN_COLLECTION_TAG_REV0;
+  } else {
     return EFI_NOT_FOUND;
   }
 
@@ -886,22 +892,65 @@ ParseToken (
     return Status;
   }
 
-  // The CCA platfrom token is the first item in the map.
-  QCBORDecode_GetByteStringInMapN (&Context, CCA_PLAT_TOKEN, PlatToken);
-  Status = GetDecodeStatus (&Context, FALSE);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  if (TokenTag == CCA_TOKEN_COLLECTION_TAG_REV0) {
+    // The CCA platfrom token is the first item in the map.
+    QCBORDecode_GetByteStringInMapN (&Context, CCA_PLAT_TOKEN, PlatToken);
+    Status = GetDecodeStatus (&Context, FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  // The next item in the map is the delegated realm token.
-  QCBORDecode_GetByteStringInMapN (
-    &Context,
-    CCA_REALM_DELEGATED_TOKEN,
-    RealmToken
-    );
-  Status = GetDecodeStatus (&Context, FALSE);
-  if (EFI_ERROR (Status)) {
-    return Status;
+    // The next item in the map is the delegated realm token.
+    QCBORDecode_GetByteStringInMapN (
+      &Context,
+      CCA_REALM_DELEGATED_TOKEN,
+      RealmToken
+      );
+
+    Status = GetDecodeStatus (&Context, FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else {
+    // Get the CCA platform token.
+    QCBORDecode_EnterArrayFromMapN (&Context, CCA_PLAT_TOKEN);
+    Status = GetDecodeStatus (&Context, FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    QCBORDecode_GetInt64 (&Context, (int64_t *)&CoapTag);
+    Status = GetDecodeStatus (&Context, FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (CoapTag != CCA_TOKEN_COAP_TYPE) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    QCBORDecode_GetByteString (&Context, PlatToken);
+    QCBORDecode_ExitArray (&Context);
+
+    // Get the the realm token.
+    QCBORDecode_EnterArrayFromMapN (&Context, CCA_REALM_DELEGATED_TOKEN);
+    Status = GetDecodeStatus (&Context, FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    QCBORDecode_GetInt64 (&Context, (int64_t *)&CoapTag);
+    Status = GetDecodeStatus (&Context, FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (CoapTag != CCA_TOKEN_COAP_TYPE) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    QCBORDecode_GetByteString (&Context, RealmToken);
+    QCBORDecode_ExitArray (&Context);
   }
 
   // Exit the Map.
