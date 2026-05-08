@@ -6246,7 +6246,7 @@ HiiConfigToBlock (
   //
   if (StrnCmp (StringPtr, L"GUID=", StrLen (L"GUID=")) != 0) {
     *Progress = StringPtr;
-    Status    = EFI_INVALID_PARAMETER;
+    Status    = EFI_NOT_FOUND;
     goto Exit;
   }
 
@@ -6298,7 +6298,7 @@ HiiConfigToBlock (
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
       *Progress = TmpPtr;
-      Status    = EFI_INVALID_PARAMETER;
+      Status    = EFI_NOT_FOUND;
       goto Exit;
     }
 
@@ -6324,7 +6324,7 @@ HiiConfigToBlock (
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&VALUE=", StrLen (L"&VALUE=")) != 0) {
       *Progress = TmpPtr;
-      Status    = EFI_INVALID_PARAMETER;
+      Status    = EFI_NOT_FOUND;
       goto Exit;
     }
 

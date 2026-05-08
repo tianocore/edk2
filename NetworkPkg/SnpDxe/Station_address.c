@@ -153,6 +153,19 @@ PxeSetStnAddr (
        Snp->Cdb->StatCode)
       );
 
+    switch (Snp->Cdb->StatCode) {
+      case PXE_STATCODE_UNSUPPORTED:
+        return EFI_UNSUPPORTED;
+
+      case PXE_STATCODE_INVALID_CDB:
+      case PXE_STATCODE_INVALID_CPB:
+      case PXE_STATCODE_INVALID_PARAMETER:
+        return EFI_INVALID_PARAMETER;
+
+      default:
+        break;
+    }
+
     //
     // UNDI command failed.  Return UNDI status to caller.
     //

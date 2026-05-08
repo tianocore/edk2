@@ -1707,7 +1707,7 @@ DxeImageVerificationHandler (
   //
   // Sanity check
   //
-  if (File == NULL) {
+  if ((File == NULL) && (FileBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
