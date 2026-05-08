@@ -230,6 +230,7 @@ MctpTransportTransmitReceive (
 
 **/
 EFI_STATUS
+EFIAPI
 AcquireTransportSession (
   IN  EFI_GUID                       *ManageabilityProtocolSpec,
   OUT MANAGEABILITY_TRANSPORT_TOKEN  **TransportToken
@@ -308,6 +309,7 @@ AcquireTransportSession (
   @retval       EFI_INVALID_PARAMETER      TransportToken is not a valid token.
 **/
 EFI_STATUS
+EFIAPI
 GetTransportCapability (
   IN MANAGEABILITY_TRANSPORT_TOKEN        *TransportToken,
   OUT MANAGEABILITY_TRANSPORT_CAPABILITY  *TransportCapability
@@ -332,6 +334,7 @@ GetTransportCapability (
 
 **/
 EFI_STATUS
+EFIAPI
 ReleaseTransportSession (
   IN MANAGEABILITY_TRANSPORT_TOKEN  *TransportToken
   )
