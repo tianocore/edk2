@@ -166,7 +166,7 @@ ASM_PFX(CommonIdtEntry):
 ;;              eflags from interrupted task
 ;;              CS from interrupted task
 ;;              EIP from interrupted task
-;;              Error code <-------------------- Only present for some exeption types
+;;              Error code <-------------------- Only present for some exception types
 ;;
 ;;
 

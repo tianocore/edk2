@@ -987,7 +987,7 @@ LibGetFileHandleFromDevicePath (
 
   //
   // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
-  // directory information and filename can be seperate. The goal is to inch
+  // directory information and filename can be separate. The goal is to inch
   // our way down each device path node and close the previous node
   //
   DevicePathNode = TempDevicePathNode;

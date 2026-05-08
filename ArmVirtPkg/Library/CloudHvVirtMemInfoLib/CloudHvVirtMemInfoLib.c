@@ -103,7 +103,7 @@ CloudHvVirtMemInfoPeiLibConstructor (
           CurBase + CurSize - 1
           ));
 
-        // We should build Hob seperately for the memory node except the first one
+        // We should build Hob separately for the memory node except the first one
         if (CurBase != MemBase) {
           BuildResourceDescriptorHob (
             EFI_RESOURCE_SYSTEM_MEMORY,

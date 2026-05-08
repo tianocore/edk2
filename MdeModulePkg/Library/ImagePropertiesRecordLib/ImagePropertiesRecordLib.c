@@ -461,7 +461,7 @@ SplitRecord (
                                                   OUT:  The size, in bytes, of the used descriptors of the split
                                                         memory map
   @param[in, out] MemoryMap                       IN:   A pointer to the buffer containing the current memory map.
-                                                        This buffer must have enough space to accomodate the "worst case"
+                                                        This buffer must have enough space to accommodate the "worst case"
                                                         scenario where every image in ImageRecordList needs a new descriptor
                                                         to describe its code and data sections.
                                                   OUT:  A pointer to the updated memory map with separated image section
