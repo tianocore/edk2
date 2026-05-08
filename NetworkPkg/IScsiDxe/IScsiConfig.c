@@ -3416,6 +3416,22 @@ IScsiFormCallback (
     return EFI_SUCCESS;
   }
 
+  if (Action == EFI_BROWSER_ACTION_DEFAULT_STANDARD) {
+    if ((QuestionId == KEY_ATTEMPT_NAME) && (Value != NULL) && (mCallbackInfo->Current != NULL)) {
+      CHAR16         TmpName[ATTEMPT_NAME_SIZE];
+      EFI_STRING_ID  StringId;
+
+      AsciiStrToUnicodeStrS (mCallbackInfo->Current->AttemptName, TmpName, ATTEMPT_NAME_SIZE);
+      StringId = HiiSetString (mCallbackInfo->RegisteredHandle, 0, TmpName, NULL);
+      if (StringId == 0) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Value->string = StringId;
+      return EFI_SUCCESS;
+    }
+  }
+
   if ((Action != EFI_BROWSER_ACTION_CHANGING) && (Action != EFI_BROWSER_ACTION_CHANGED)) {
     //
     // All other type return unsupported.
