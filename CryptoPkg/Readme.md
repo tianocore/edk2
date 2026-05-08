@@ -219,6 +219,8 @@ also configured.
 | Aes.EcbDecrypt                  |     Y      |     Y     |             |             |              |             |                 |
 | Aes.CbcEncrypt                  |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Aes.CbcDecrypt                  |     N      |     N     |             |      C      |      C       |      C      |        C        |
+| Aes.CtrEncrypt                  |     N      |     N     |             |             |      C       |      C      |                 |
+| Aes.CtrDecrypt                  |     N      |     N     |             |             |      C       |      C      |                 |
 | Arc4                            |     Y      |     Y     |             |             |              |             |                 |
 | Sm3                             |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Hkdf                            |     N      |     N     |             |      C      |      C       |      C      |        C        |
@@ -505,6 +507,8 @@ and CryptoSmm modules.
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.Init                        | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcEncrypt                  | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcDecrypt                  | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CtrEncrypt                  | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CtrDecrypt                  | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Services.Encrypt              | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Services.Decrypt              | TRUE
 ```

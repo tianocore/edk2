@@ -2,6 +2,7 @@
   This is defines the tests that will run on BaseCryptLib
 
   Copyright (c) Microsoft Corporation.<BR>
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,6 +27,7 @@ SUITE_DESC  mSuiteDesc[] = {
   { "OAEP encrypt verify tests",     "CryptoPkg.BaseCryptLib", NULL, NULL, &mOaepTestMbedTlsNum,         mOaepTestMbedTls         },
   { "Hkdf extract and expand tests", "CryptoPkg.BaseCryptLib", NULL, NULL, &mHkdfTestNum,                mHkdfTest                },
   { "Aead AES Gcm tests",            "CryptoPkg.BaseCryptLib", NULL, NULL, &mAeadAesGcmTestNum,          mAeadAesGcmTest          },
+  { "AES CTR tests",                 "CryptoPkg.BaseCryptLib", NULL, NULL, &mAesCtrTestNum,              mAesCtrTest              },
   { "X509 Verify tests",             "CryptoPkg.BaseCryptLib", NULL, NULL, &mX509TestNum,                mX509Test                },
   { "PKCS7 Attach Content tests",    "CryptoPkg.BaseCryptLib", NULL, NULL, &mPkcs7ContentTestMbedTlsNum, mPkcs7ContentTestMbedTls },
 };

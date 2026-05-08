@@ -21,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  24
+#define EDKII_CRYPTO_VERSION  25
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -4635,6 +4635,72 @@ BOOLEAN
   );
 
 /**
+  Performs AES encryption in CTR (Counter) mode on a data buffer.
+
+  KeySize must be 16, 24 or 32, otherwise FALSE is returned.
+  IvSize must be 16, otherwise FALSE is returned.
+  This function does not perform padding. Caller must ensure input data is properly formatted.
+
+  @param[in]   Key         Pointer to the encryption key.
+  @param[in]   KeySize     Size of the encryption key in bytes.
+  @param[in]   Iv          Pointer to the IV/nonce value (counter block).
+  @param[in]   IvSize      Size of the IV/nonce value in bytes.
+  @param[in]   DataIn      Pointer to the input data buffer to be encrypted.
+  @param[in]   DataInSize  Size of the input data buffer in bytes.
+  @param[out]  DataOut     Pointer to a buffer that receives the encryption output.
+  @param[out]  DataOutSize Size of the output data buffer in bytes.
+
+  @retval TRUE   AES-CTR encryption succeeded.
+  @retval FALSE  AES-CTR encryption failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_AES_CTR_ENCRYPT)(
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Iv,
+  IN   UINTN        IvSize,
+  IN   CONST UINT8  *DataIn,
+  IN   UINTN        DataInSize,
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
+  );
+
+/**
+  Performs AES decryption in CTR (Counter) mode on a data buffer.
+
+  KeySize must be 16, 24 or 32, otherwise FALSE is returned.
+  IvSize must be 16, otherwise FALSE is returned.
+  This function does not perform padding. Caller must ensure input data is properly formatted.
+
+  @param[in]   Key         Pointer to the decryption key.
+  @param[in]   KeySize     Size of the decryption key in bytes.
+  @param[in]   Iv          Pointer to the IV/nonce value (counter block).
+  @param[in]   IvSize      Size of the IV/nonce value in bytes.
+  @param[in]   DataIn      Pointer to the input data buffer to be decrypted.
+  @param[in]   DataInSize  Size of the input data buffer in bytes.
+  @param[out]  DataOut     Pointer to a buffer that receives the decryption output.
+  @param[out]  DataOutSize Size of the output data buffer in bytes.
+
+  @retval TRUE   AES-CTR decryption succeeded.
+  @retval FALSE  AES-CTR decryption failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_AES_CTR_DECRYPT)(
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Iv,
+  IN   UINTN        IvSize,
+  IN   CONST UINT8  *DataIn,
+  IN   UINTN        DataInSize,
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for CAMELLIA operations.
 
   @return  The size, in bytes, of the context buffer required for CAMELLIA operations.
@@ -6174,6 +6240,9 @@ struct _EDKII_CRYPTO_PROTOCOL {
   /// RSA PSS (Continued)
   EDKII_CRYPTO_RSA_PSS_SIGN_DIGEST                    RsaPssSignDigest;
   EDKII_CRYPTO_RSA_PSS_VERIFY_DIGEST                  RsaPssVerifyDigest;
+  /// AES CTR (Continued)
+  EDKII_AES_CTR_ENCRYPT                               AesCtrEncrypt;
+  EDKII_AES_CTR_DECRYPT                               AesCtrDecrypt;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
