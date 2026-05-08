@@ -199,7 +199,15 @@ HttpBootParseDhcp4Options (
     if (Option->OpCode == DHCP4_TAG_PAD) {
       Offset++;
     } else {
+      if (Offset + Option->Length + 2 > Length) {
+        return NULL;
+      }
+
       Offset += Option->Length + 2;
+    }
+
+    if (Offset >= Length) {
+      return NULL;
     }
 
     Option = (EFI_DHCP4_PACKET_OPTION *)(Buffer + Offset);
@@ -272,6 +280,9 @@ HttpBootParseDhcp4Packet (
 
   Offer   = &Cache4->Packet.Offer;
   Options = Cache4->OptList;
+  if (Offer->Length < sizeof (EFI_DHCP4_HEADER) + 4) {
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // Parse DHCPv4 options in this offer, and store the pointers.
@@ -353,8 +364,16 @@ HttpBootParseDhcp4Packet (
     // RFC 2132, Section 9.5 does not strictly state Bootfile name (option 67) is null
     // terminated string. So force to append null terminated character at the end of string.
     //
+    if (Options[HTTP_BOOT_DHCP4_TAG_INDEX_BOOTFILE]->Length == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Ptr8  =  (UINT8 *)&Options[HTTP_BOOT_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
     Ptr8 += Options[HTTP_BOOT_DHCP4_TAG_INDEX_BOOTFILE]->Length;
+    if (Ptr8 > (UINT8 *)Offer->Dhcp4.Option + GET_OPTION_BUFFER_LEN (Offer)) {
+      return EFI_DEVICE_ERROR;
+    }
+
     if (*(Ptr8 - 1) != '\0') {
       *Ptr8 = '\0';
     }
@@ -601,6 +620,10 @@ HttpBootDhcp4CallBack (
   }
 
   Private = (HTTP_BOOT_PRIVATE_DATA *)Context;
+
+  if (Packet->Length < sizeof (EFI_DHCP4_HEADER) + 4) {
+    return EFI_SUCCESS;
+  }
 
   //
   // Override the Maximum DHCP Message Size.
