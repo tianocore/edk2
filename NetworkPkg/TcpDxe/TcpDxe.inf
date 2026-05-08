@@ -88,8 +88,5 @@
   gEfiHashAlgorithmMD5Guid                      ## CONSUMES
   gEfiHashAlgorithmSha256Guid                   ## CONSUMES
 
-[Depex]
-  gEfiHash2ServiceBindingProtocolGuid
-
 [UserExtensions.TianoCore."ExtraFiles"]
   TcpDxeExtra.uni

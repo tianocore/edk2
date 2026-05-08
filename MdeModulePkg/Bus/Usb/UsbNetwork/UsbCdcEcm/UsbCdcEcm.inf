@@ -37,6 +37,3 @@
   gEfiDevicePathProtocolGuid
   gEfiDriverBindingProtocolGuid
   gEdkIIUsbEthProtocolGuid
-
-[Depex]
-  TRUE
