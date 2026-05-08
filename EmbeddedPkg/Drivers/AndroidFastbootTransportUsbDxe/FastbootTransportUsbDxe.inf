@@ -11,7 +11,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FastbootTransportUsbDxe
   FILE_GUID                      = f6bec3fe-88fb-11e3-ae84-e73b77561c35
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = FastbootTransportUsbEntryPoint
 
@@ -39,3 +39,6 @@
 [FixedPcd]
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbVendorId
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId
+
+[Depex]
+  gUsbDeviceProtocolGuid

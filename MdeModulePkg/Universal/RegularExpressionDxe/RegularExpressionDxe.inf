@@ -11,7 +11,7 @@
   INF_VERSION     = 0x00010018
   BASE_NAME       = RegularExpressionDxe
   FILE_GUID       = 3E197E9C-D8DC-42D3-89CE-B04FA9833756
-  MODULE_TYPE     = UEFI_DRIVER
+  MODULE_TYPE     = DXE_DRIVER
   VERSION_STRING  = 1.0
   ENTRY_POINT     = RegularExpressionDxeEntry
 
@@ -131,3 +131,6 @@
   # Not add -Wno-error=maybe-uninitialized option for XCODE
   # XCODE doesn't know this option
   XCODE:*_*_*_CC_FLAGS =
+
+[Depex]
+  TRUE

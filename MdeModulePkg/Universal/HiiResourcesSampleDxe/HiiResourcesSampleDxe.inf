@@ -16,7 +16,7 @@
   BASE_NAME                      = HiiResourcesSample
   MODULE_UNI_FILE                = HiiResourcesSample.uni
   FILE_GUID                      = D49D2EB0-44D5-4621-9FD6-1A92C9109B99
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = HiiResourcesSampleInit
   UNLOAD_IMAGE                   = HiiResourcesSampleUnload
@@ -52,3 +52,6 @@
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HiiResourcesSampleExtra.uni
+
+[Depex]
+  TRUE

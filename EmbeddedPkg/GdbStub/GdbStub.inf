@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = GdbStub
   FILE_GUID                      = 1F2CCB4F-D817-404E-98E7-80E4851FB33E
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
   ENTRY_POINT                    = GdbStubEntry
@@ -67,3 +67,6 @@
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount
+
+[Depex]
+  gEfiDebugSupportProtocolGuid
