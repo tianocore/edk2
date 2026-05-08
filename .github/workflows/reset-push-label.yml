@@ -1,0 +1,54 @@
+# This workflow removes the "push" label from a pull request when it is updated.
+#
+# A maintainer is expected to re-add the "push" label if the changes are ready to
+# be merged after the update. This is to ensure that any new changes prior to
+# merging have been reviewed by the maintainer.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Reset Push Label on PR Update
+
+on:
+  pull_request_target:
+    types: [synchronize]
+
+jobs:
+  reset-push-label:
+    name: Remove Push Label if Present
+    if: github.repository_owner == 'tianocore' && github.triggering_actor.login != 'mergify[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TIANOCORE_PR_AUTOMATION_APPLICATION_ID }}
+          private-key: ${{ secrets.TIANOCORE_PR_AUTOMATION_APPLICATION_PRIVATE_KEY }}
+
+      - name: Reset push label
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const labels = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+
+            const hasPushLabel = labels.data.some(label => label.name === 'push');
+
+            if (hasPushLabel) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'push'
+              });
+              console.log('Removed "push" label from PR #' + context.issue.number);
+            } else {
+              console.log('No "push" label found on PR #' + context.issue.number);
+            }
