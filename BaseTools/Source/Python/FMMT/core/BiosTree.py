@@ -28,9 +28,9 @@ PECOFF_TREE = 'PECOFF_TREE'
 RootType = [ROOT_TREE, ROOT_FV_TREE, ROOT_FFS_TREE, ROOT_SECTION_TREE]
 FvType = [FV_TREE, SEC_FV_TREE]
 FfsType = [FFS_TREE, FFS_PAD]
-SecType = SECTION_TREE
+SecType = [SECTION_TREE]
 ElfType = [ROOT_ELF_TREE, ELF_TREE]
-PeCoffTree = PECOFF_TREE
+PeCoffTree = [PECOFF_TREE]
 
 class BIOSTREE:
     def __init__(self, NodeName: str) -> None:
@@ -250,3 +250,4 @@ class BIOSTREE:
             TreeInfo[key].setdefault('Files',[]).append( item.ExportTree())
 
         return TreeInfo
+
