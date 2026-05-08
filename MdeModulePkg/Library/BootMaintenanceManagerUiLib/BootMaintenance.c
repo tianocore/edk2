@@ -539,7 +539,7 @@ UpdateTerminalContent (
   IN BMM_FAKE_NV_DATA  *BmmData
   )
 {
-  UINT16               Index;
+  UINTN                Index;
   BM_TERMINAL_CONTEXT  *NewTerminalContext;
   BM_MENU_ENTRY        *NewMenuEntry;
 
@@ -581,7 +581,7 @@ UpdateConsoleContent (
   IN BMM_FAKE_NV_DATA  *BmmData
   )
 {
-  UINT16               Index;
+  UINTN                Index;
   BM_CONSOLE_CONTEXT   *NewConsoleContext;
   BM_TERMINAL_CONTEXT  *NewTerminalContext;
   BM_MENU_ENTRY        *NewMenuEntry;
@@ -784,7 +784,7 @@ BootMaintRouteConfig (
   BMM_FAKE_NV_DATA                 *OldBmmData;
   BM_MENU_ENTRY                    *NewMenuEntry;
   BM_LOAD_CONTEXT                  *NewLoadContext;
-  UINT16                           Index;
+  UINTN                            Index;
   BOOLEAN                          TerminalAttChange;
   BMM_CALLBACK_DATA                *Private;
   UINTN                            Offset;
@@ -1353,7 +1353,7 @@ DiscardChangeHandler (
   IN  BMM_FAKE_NV_DATA   *CurrentFakeNVMap
   )
 {
-  UINT16  Index;
+  UINTN  Index;
 
   switch (Private->BmmPreviousPageId) {
     case FORM_BOOT_CHG_ID:
@@ -1411,7 +1411,7 @@ CleanUselessBeforeSubmit (
   IN  BMM_CALLBACK_DATA  *Private
   )
 {
-  UINT16  Index;
+  UINTN  Index;
 
   if (Private->BmmPreviousPageId != FORM_BOOT_DEL_ID) {
     for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
@@ -1451,10 +1451,17 @@ CustomizeMenus (
   // Allocate space for creation of UpdateData Buffer
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle == NULL) {
+    ASSERT (StartOpCodeHandle != NULL);
+    return;
+  }
 
   EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
+  if (EndOpCodeHandle == NULL) {
+    ASSERT (EndOpCodeHandle != NULL);
+    return;
+  }
+
   //
   // Create Hii Extend Label OpCode as the start opcode
   //
@@ -1502,7 +1509,7 @@ InitializeBmmConfig (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
 
   ASSERT (CallbackData != NULL);
 
@@ -1515,7 +1522,7 @@ InitializeBmmConfig (
     NewLoadContext = (BM_LOAD_CONTEXT *)NewMenuEntry->VariableContext;
 
     if (NewLoadContext->IsBootNext) {
-      CallbackData->BmmFakeNvData.BootNext = Index;
+      CallbackData->BmmFakeNvData.BootNext = (UINT32)Index;
       break;
     }
   }

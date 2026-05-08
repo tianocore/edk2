@@ -194,7 +194,7 @@ UpdateConCOMPage (
   )
 {
   BM_MENU_ENTRY  *NewMenuEntry;
-  UINT16         Index;
+  UINTN          Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -230,7 +230,7 @@ UpdateBootDelPage (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -285,7 +285,7 @@ UpdateDrvAddHandlePage (
   )
 {
   BM_MENU_ENTRY  *NewMenuEntry;
-  UINT16         Index;
+  UINTN          Index;
 
   CallbackData->BmmAskSaveOrNot = FALSE;
 
@@ -321,7 +321,7 @@ UpdateDrvDelPage (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -451,8 +451,8 @@ UpdateConsolePage (
   BM_MENU_ENTRY        *NewMenuEntry;
   BM_CONSOLE_CONTEXT   *NewConsoleContext;
   BM_TERMINAL_CONTEXT  *NewTerminalContext;
-  UINT16               Index;
-  UINT16               Index2;
+  UINTN                Index;
+  UINTN                Index2;
   UINT8                CheckFlags;
   UINT8                *ConsoleCheck;
   EFI_QUESTION_ID      QuestionIdBase;
@@ -484,9 +484,15 @@ UpdateConsolePage (
       QuestionIdBase     = CON_ERR_DEVICE_QUESTION_ID;
       VariableOffsetBase = CON_ERR_DEVICE_VAR_OFFSET;
       break;
+
+    default:
+      return;
   }
 
-  ASSERT (ConsoleCheck != NULL);
+  if (ConsoleCheck == NULL) {
+    ASSERT (ConsoleCheck != NULL);
+    return;
+  }
 
   for (Index = 0; ((Index < ConsoleMenu->MenuNumber) && \
                    (Index < MAX_MENU_NUMBER)); Index++)
@@ -571,7 +577,7 @@ UpdateOrderPage (
   )
 {
   BM_MENU_ENTRY    *NewMenuEntry;
-  UINT16           Index;
+  UINTN            Index;
   UINT16           OptionIndex;
   VOID             *OptionsOpCodeHandle;
   BOOLEAN          BootOptionFound;
@@ -619,10 +625,16 @@ UpdateOrderPage (
       break;
   }
 
-  ASSERT (OptionOrder != NULL);
+  if (OptionOrder == NULL ) {
+    ASSERT (OptionOrder != NULL);
+    return;
+  }
 
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (OptionsOpCodeHandle != NULL);
+  if (OptionsOpCodeHandle == NULL) {
+    ASSERT (OptionsOpCodeHandle != NULL);
+    return;
+  }
 
   NewMenuEntry = NULL;
   for (OptionIndex = 0; (OptionIndex < MAX_MENU_NUMBER && OptionOrder[OptionIndex] != 0); OptionIndex++) {
@@ -635,7 +647,7 @@ UpdateOrderPage (
       }
     }
 
-    if (BootOptionFound) {
+    if (BootOptionFound && (NewMenuEntry != NULL)) {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
         NewMenuEntry->DisplayStringToken,

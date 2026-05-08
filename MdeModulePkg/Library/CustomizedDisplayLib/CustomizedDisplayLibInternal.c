@@ -49,8 +49,8 @@ PrintBannerInfo (
   IN FORM_DISPLAY_ENGINE_FORM  *FormData
   )
 {
-  UINT8   Line;
-  UINT8   Alignment;
+  UINTN   Line;
+  UINTN   Alignment;
   CHAR16  *StrFrontPageBanner;
   UINT8   RowIdx;
   UINT8   ColumnIdx;
@@ -69,12 +69,12 @@ PrintBannerInfo (
   //
   //    for (Line = 0; Line < BANNER_HEIGHT; Line++) {
   //
-  for (Line = (UINT8)gScreenDimensions.TopRow; Line < BANNER_HEIGHT + (UINT8)gScreenDimensions.TopRow; Line++) {
+  for (Line = gScreenDimensions.TopRow; Line < BANNER_HEIGHT + gScreenDimensions.TopRow; Line++) {
     //
     //      for (Alignment = 0; Alignment < BANNER_COLUMNS; Alignment++) {
     //
-    for (Alignment = (UINT8)gScreenDimensions.LeftColumn;
-         Alignment < BANNER_COLUMNS + (UINT8)gScreenDimensions.LeftColumn;
+    for (Alignment = gScreenDimensions.LeftColumn;
+         Alignment < BANNER_COLUMNS + gScreenDimensions.LeftColumn;
          Alignment++
          )
     {
