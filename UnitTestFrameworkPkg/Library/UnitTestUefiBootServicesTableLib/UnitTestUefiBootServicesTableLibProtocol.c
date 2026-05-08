@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UnitTestUefiBootServicesTableLibProtocol.h"
 
-STATIC LIST_ENTRY  mProtocolDatabase       = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
-STATIC LIST_ENTRY  gHandleList             = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
-STATIC UINT64      gHandleDatabaseKey      = 0;
-STATIC UINTN       mEfiLocateHandleRequest = 0;
+LIST_ENTRY  mProtocolDatabase       = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
+LIST_ENTRY  gHandleList             = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
+UINT64      gHandleDatabaseKey      = 0;
+UINTN       mEfiLocateHandleRequest = 0;
 
 //
 // Helper Functions
@@ -538,7 +538,7 @@ UnitTestInstallProtocolInterfaceNotify (
   //
   // Print debug message
   //
-  UT_LOG_INFO ("InstallProtocolInterface: %g %p\n", Protocol, Interface);
+  DEBUG ((DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot   = NULL;
@@ -655,7 +655,7 @@ Done:
     // There was an error, clean up
     //
     if (Prot != NULL) {
-      UnitTestFreePool (Prot);
+      FreePool (Prot);
     }
 
     DEBUG ((DEBUG_ERROR, "InstallProtocolInterface: %g %p failed with %r\n", Protocol, Interface, Status));
