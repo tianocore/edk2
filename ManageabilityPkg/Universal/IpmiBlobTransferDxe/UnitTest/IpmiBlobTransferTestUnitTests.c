@@ -171,6 +171,178 @@ SendIpmiBadCompletion (
 **/
 UNIT_TEST_STATUS
 EFIAPI
+SendIpmiResponseTooShort (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+  VOID        *MockResponseResults = NULL;
+  UINT32      MockResponseSize     = 0;
+
+  // Too short for completion code
+  MockResponseSize = 0;
+  ResponseDataSize = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+
+  MockIpmiSubmitCommand (NULL, MockResponseSize, EFI_SUCCESS);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (10);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_PROTOCOL_ERROR);
+
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiResponseTooShortForOen (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+  VOID        *MockResponseResults = NULL;
+  UINT32      MockResponseSize     = 1;
+
+  // Only has completion code, too short for OEN
+  MockResponseResults = (UINT8 *)AllocateZeroPool (MockResponseSize);
+  ResponseDataSize    = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *(UINT8 *)MockResponseResults = 0; // Success completion code
+
+  MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, MockResponseSize, EFI_SUCCESS);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (10);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_PROTOCOL_ERROR);
+
+  FreePool (MockResponseResults);
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiResponseTooLarge (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+  VOID        *MockResponseResults = NULL;
+  UINT32      MockResponseSize     = 10;
+  UINT8       LargeResponse[]      = {
+    0x00,                         // CompletionCode
+    0xCF, 0xC2, 0x00,             // OpenBMC OEN
+    0x00, 0x00,                   // CRC (doesn't matter as we fail before check)
+    0x01, 0x02, 0x03, 0x04        // Data
+  };
+
+  // Response says 4 bytes of data, but caller only provides 2 bytes buffer
+  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (LargeResponse));
+  ResponseDataSize    = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *ResponseDataSize   = 2; // Caller buffer size
+  CopyMem (MockResponseResults, LargeResponse, sizeof (LargeResponse));
+
+  // We need valid CRC for it to reach the size check
+  UINT16  CorrectCrc = CalculateCrc16Ccitt (LargeResponse + 6, 4);
+  CopyMem (MockResponseResults + 4, &CorrectCrc, sizeof (UINT16));
+
+  MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, sizeof (LargeResponse), EFI_SUCCESS);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (*ResponseDataSize);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_BUFFER_TOO_SMALL);
+
+  FreePool (MockResponseResults);
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiSubmitCommandError (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+
+  ResponseDataSize  = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *ResponseDataSize = 10;
+
+  MockIpmiSubmitCommand (NULL, 0, EFI_DEVICE_ERROR);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (*ResponseDataSize);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_DEVICE_ERROR);
+
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
 SendIpmiNoDataResponse (
   IN UNIT_TEST_CONTEXT  Context
   )
@@ -1055,6 +1227,10 @@ SetupAndRunUnitTests (
   Status = AddTestCase (IpmiBlobTransfer, "Test Bad CRC Calculation", "BadCrc", BadCrc, NULL, NULL, NULL);
   // IpmiBlobTransferSendIpmi
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns bad completion", "SendIpmiBadCompletion", SendIpmiBadCompletion, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns response too short", "SendIpmiResponseTooShort", SendIpmiResponseTooShort, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns response too short for OEN", "SendIpmiResponseTooShortForOen", SendIpmiResponseTooShortForOen, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns response too large for buffer", "SendIpmiResponseTooLarge", SendIpmiResponseTooLarge, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns error from SubmitCommand", "SendIpmiSubmitCommandError", SendIpmiSubmitCommandError, NULL, NULL, NULL);
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns successfully with no data", "SendIpmiNoDataResponse", SendIpmiNoDataResponse, NULL, NULL, NULL);
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns successfully with bad OEN", "SendIpmiBadOenResponse", SendIpmiBadOenResponse, NULL, NULL, NULL);
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns successfully with bad CRC", "SendIpmiBadCrcResponse", SendIpmiBadCrcResponse, NULL, NULL, NULL);

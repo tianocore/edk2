@@ -91,6 +91,7 @@ CalculateCrc16Ccitt (
                                     not used.
 
   @retval EFI_SUCCESS            Successfully sends blob data.
+  @retval EFI_BUFFER_TOO_SMALL   Response buffer too small to hold the response.
   @retval EFI_OUT_OF_RESOURCES   Memory allocation fails.
   @retval EFI_PROTOCOL_ERROR     Communication errors.
   @retval EFI_CRC_ERROR          Data integrity checks fail.
@@ -178,6 +179,7 @@ IpmiBlobTransferSendIpmi (
 
   IpmiResponseData = AllocateZeroPool (IpmiResponseDataSize);
   if (IpmiResponseData == NULL) {
+    FreePool (IpmiSendData);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -206,7 +208,14 @@ IpmiBlobTransferSendIpmi (
   DEBUG_CODE_END ();
 
   if (EFI_ERROR (Status)) {
+    FreePool (IpmiResponseData);
     return Status;
+  }
+
+  if (IpmiResponseDataSize < sizeof (CompletionCode)) {
+    DEBUG ((DEBUG_ERROR, "%a: Response too short for Completion Code: %u bytes\n", __func__, IpmiResponseDataSize));
+    FreePool (IpmiResponseData);
+    return EFI_PROTOCOL_ERROR;
   }
 
   CompletionCode = *ModifiedResponseData;
@@ -220,6 +229,12 @@ IpmiBlobTransferSendIpmi (
   ModifiedResponseData  = ModifiedResponseData + sizeof (CompletionCode);
   IpmiResponseDataSize -= sizeof (CompletionCode);
 
+  if (IpmiResponseDataSize < sizeof (OpenBmcOen)) {
+    DEBUG ((DEBUG_ERROR, "%a: Response too short for OEN: %u bytes\n", __func__, IpmiResponseDataSize));
+    FreePool (IpmiResponseData);
+    return EFI_PROTOCOL_ERROR;
+  }
+
   // Check OEN code and verify it matches the OpenBMC OEN
   CopyMem (Oen, ModifiedResponseData, sizeof (OpenBmcOen));
   if (CompareMem (Oen, OpenBmcOen, sizeof (OpenBmcOen)) != 0) {
@@ -227,7 +242,11 @@ IpmiBlobTransferSendIpmi (
     return EFI_PROTOCOL_ERROR;
   }
 
-  if (IpmiResponseDataSize == sizeof (OpenBmcOen)) {
+  // Strip the OEN, we are done with it now
+  ModifiedResponseData  = ModifiedResponseData + sizeof (Oen);
+  IpmiResponseDataSize -= sizeof (Oen);
+
+  if (IpmiResponseDataSize == 0) {
     //
     // In this case, there was no response data sent. This is not an error.
     // Some messages do not require a response.
@@ -240,9 +259,12 @@ IpmiBlobTransferSendIpmi (
     return Status;
     // Now we need to validate the CRC then send the Response body back
   } else {
-    // Strip the OEN, we are done with it now
-    ModifiedResponseData  = ModifiedResponseData + sizeof (Oen);
-    IpmiResponseDataSize -= sizeof (Oen);
+    if (IpmiResponseDataSize < sizeof (Crc)) {
+      DEBUG ((DEBUG_ERROR, "%a: Response too short for CRC: %u bytes\n", __func__, IpmiResponseDataSize));
+      FreePool (IpmiResponseData);
+      return EFI_PROTOCOL_ERROR;
+    }
+
     // Then validate the Crc
     CopyMem (&Crc, ModifiedResponseData, sizeof (Crc));
     ModifiedResponseData  = ModifiedResponseData + sizeof (Crc);
@@ -250,8 +272,14 @@ IpmiBlobTransferSendIpmi (
 
     if (Crc == CalculateCrc16Ccitt (ModifiedResponseData, IpmiResponseDataSize)) {
       if ((ResponseData != NULL) && (ResponseDataSize != NULL)) {
+        if (IpmiResponseDataSize > *ResponseDataSize) {
+          DEBUG ((DEBUG_ERROR, "%a: Response too large for buffer: %u > %u\n", __func__, IpmiResponseDataSize, *ResponseDataSize));
+          FreePool (IpmiResponseData);
+          return EFI_BUFFER_TOO_SMALL;
+        }
+
         CopyMem (ResponseData, ModifiedResponseData, IpmiResponseDataSize);
-        CopyMem (ResponseDataSize, &IpmiResponseDataSize, sizeof (IpmiResponseDataSize));
+        *ResponseDataSize = IpmiResponseDataSize;
       }
 
       FreePool (IpmiResponseData);
