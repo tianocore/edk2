@@ -93,6 +93,16 @@ typedef UINT16  TCP_PORTNO;
 //
 #define MEDIA_STATE_DETECT_TIME_INTERVAL  1000000U
 
+//
+// Number of times to attempt to detect network media through SNP
+//
+#define SNP_MEDIA_DETECT_RETRY_ATTEMPTS  0
+
+//
+// Amount of time to wait for network media to be detected through SNP, in 100ns units
+//
+#define SNP_MEDIA_DETECT_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(2)
+
 #pragma pack(1)
 
 //
