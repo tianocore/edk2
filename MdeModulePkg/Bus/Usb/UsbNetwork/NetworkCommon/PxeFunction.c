@@ -175,7 +175,7 @@ UndiStart (
   } else {
     if (Nic->RateLimitingEnable == TRUE) {
       if (!EventError) {
-        gBS->SetTimer (&Nic->RateLimiter, TimerCancel, 0);
+        (VOID)gBS->SetTimer (&Nic->RateLimiter, TimerCancel, 0);
       }
 
       if (Nic->RateLimiter) {
@@ -244,7 +244,7 @@ UndiStop (
   Nic->State              = PXE_STATFLAGS_GET_STATE_STOPPED;
 
   if (Nic->RateLimitingEnable == TRUE) {
-    gBS->SetTimer (&Nic->RateLimiter, TimerCancel, 0);
+    (VOID)gBS->SetTimer (&Nic->RateLimiter, TimerCancel, 0);
     gBS->CloseEvent (&Nic->RateLimiter);
   }
 

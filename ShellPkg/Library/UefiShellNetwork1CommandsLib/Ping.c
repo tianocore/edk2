@@ -294,7 +294,7 @@ GetTimerPeriod (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->SetTimer (TimerEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (TimerEvent, TimerCancel, 0);
   gBS->CloseEvent (TimerEvent);
 
   TimerPeriod = StallCounter / RttTimerTick;
@@ -363,7 +363,7 @@ PingFreeRttTimer (
   )
 {
   if (Private->RttTimer != NULL) {
-    gBS->SetTimer (Private->RttTimer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (Private->RttTimer, TimerCancel, 0);
     gBS->CloseEvent (Private->RttTimer);
   }
 }
@@ -1493,7 +1493,7 @@ ON_STAT:
   //
   // Display the statistics in all.
   //
-  gBS->SetTimer (Private->Timer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Private->Timer, TimerCancel, 0);
 
   if (Private->TxCount != 0) {
     ShellPrintHiiDefaultEx (

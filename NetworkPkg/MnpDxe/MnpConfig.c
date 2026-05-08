@@ -1330,19 +1330,19 @@ MnpStop (
     //
     //  The system poll in on, cancel the poll timer.
     //
-    Status                          = gBS->SetTimer (MnpDeviceData->PollTimer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (MnpDeviceData->PollTimer, TimerCancel, 0);
     MnpDeviceData->EnableSystemPoll = FALSE;
   }
 
   //
   // Cancel the timeout timer.
   //
-  Status = gBS->SetTimer (MnpDeviceData->TimeoutCheckTimer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (MnpDeviceData->TimeoutCheckTimer, TimerCancel, 0);
 
   //
   // Cancel the media detect timer.
   //
-  Status = gBS->SetTimer (MnpDeviceData->MediaDetectTimer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (MnpDeviceData->MediaDetectTimer, TimerCancel, 0);
 
   //
   // Stop the simple network.

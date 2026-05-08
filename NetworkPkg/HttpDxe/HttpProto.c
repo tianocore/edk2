@@ -1305,7 +1305,7 @@ HttpConnectTcp4 (
     Status = TlsConnectSession (HttpInstance, HttpInstance->TimeoutEvent);
     HttpNotify (HttpEventTlsConnectSession, Status);
 
-    gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
+    (VOID)gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
     if (EFI_ERROR (Status)) {
       TlsCloseTxRxEvent (HttpInstance);
@@ -1402,7 +1402,7 @@ HttpConnectTcp6 (
     Status = TlsConnectSession (HttpInstance, HttpInstance->TimeoutEvent);
     HttpNotify (HttpEventTlsConnectSession, Status);
 
-    gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
+    (VOID)gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
     if (EFI_ERROR (Status)) {
       TlsCloseTxRxEvent (HttpInstance);

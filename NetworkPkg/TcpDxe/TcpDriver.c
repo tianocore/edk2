@@ -146,7 +146,7 @@ TcpDestroyTimer (
     return;
   }
 
-  gBS->SetTimer (mTcpTimer.TimerEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (mTcpTimer.TimerEvent, TimerCancel, 0);
   gBS->CloseEvent (mTcpTimer.TimerEvent);
   mTcpTimer.TimerEvent = NULL;
 }

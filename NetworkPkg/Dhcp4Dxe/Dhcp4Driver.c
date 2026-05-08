@@ -158,7 +158,7 @@ Dhcp4CloseService (
   }
 
   if (DhcpSb->Timer != NULL) {
-    gBS->SetTimer (DhcpSb->Timer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (DhcpSb->Timer, TimerCancel, 0);
     gBS->CloseEvent (DhcpSb->Timer);
 
     DhcpSb->Timer = NULL;

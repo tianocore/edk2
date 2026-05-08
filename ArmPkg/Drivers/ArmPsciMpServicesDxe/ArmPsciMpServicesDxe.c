@@ -1147,11 +1147,11 @@ CheckAllAPsStatus (
     return;
   }
 
-  gBS->SetTimer (
-         mCpuMpData.CheckAllAPsEvent,
-         TimerCancel,
-         0
-         );
+  (VOID)gBS->SetTimer (
+               mCpuMpData.CheckAllAPsEvent,
+               TimerCancel,
+               0
+               );
 
   if (mCpuMpData.FailedListIndex == 0) {
     if (mCpuMpData.FailedList != NULL) {

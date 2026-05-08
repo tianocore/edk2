@@ -359,7 +359,7 @@ Udp4CleanService (
   //
   // Cancel the TimeoutEvent timer.
   //
-  gBS->SetTimer (Udp4Service->TimeoutEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Udp4Service->TimeoutEvent, TimerCancel, 0);
 
   //
   // Close the TimeoutEvent timer.
