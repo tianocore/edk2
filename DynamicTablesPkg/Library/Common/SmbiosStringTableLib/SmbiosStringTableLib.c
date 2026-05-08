@@ -225,3 +225,35 @@ StringTableFree (
   ZeroMem (StrTable, sizeof (STRING_TABLE));
   return EFI_SUCCESS;
 }
+
+/** Allocate a zeroed buffer for a SMBIOS record, including the string area.
+
+  Per SMBIOS Specification Section 6.1.3, if the structure has no strings the
+  formatted section is followed by two null (00h) bytes.  If strings are
+  present each string is null-terminated and the set is terminated by an
+  additional null byte.  This function encapsulates that rule so callers do
+  not need to account for the terminator explicitly.
+
+  @param[in]  StructSize  Size of the fixed-size part of the SMBIOS structure.
+  @param[in]  StrTable    Optional pointer to a populated string table.
+                          If NULL, the allocation includes only the two-byte
+                          double-NULL terminator.
+                          If non-NULL, the allocation includes the full string
+                          area as returned by StringTableGetStringSetSize().
+
+  @return  Pointer to the allocated SMBIOS record buffer, or NULL on failure.
+**/
+VOID *
+EFIAPI
+AllocateSmbiosRecord (
+  IN        UINTN         StructSize,
+  IN  STRING_TABLE  *StrTable    OPTIONAL
+  )
+{
+  UINTN  StringAreaSize;
+
+  // Per SMBIOS spec Section 6.1.3: two null bytes when no strings are present;
+  // StringTableGetStringSetSize() already encodes this rule for non-empty tables.
+  StringAreaSize = (StrTable == NULL) ? 2 : StringTableGetStringSetSize (StrTable);
+  return AllocateZeroPool (StructSize + StringAreaSize);
+}

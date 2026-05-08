@@ -78,6 +78,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
   EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjPhysicalMemoryArray,            ///< 54 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,               ///< 55 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,       ///< 56 - Memory Array Mapped Address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1285,5 +1288,109 @@ typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
   /// (v2) Contains a mask of bits to set when writing the Read Ack register.
   UINT64                                    ReadAckWrite;
 } CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION_2_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.9.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Primary hardware error correction or detection method.
+  UINT16             MemoryErrorCorrection;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Number of memory devices (slots or sockets) in the array.
+  UINT16             NumberOfMemoryDevices;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
+
+/** A structure that describes a Memory Device.
+
+  SMBIOS Specification v3.9.0 Type 17
+
+  ID: EArchCommonObjMemoryDeviceInfo
+**/
+typedef struct CmArchCommonMemoryDeviceInfo {
+  /// CM Object Token uniquely identifying this Memory Device.
+  CM_OBJECT_TOKEN                            MemoryDeviceInfoToken;
+  /// CM Object Token of the Physical Memory Array containing this device.
+  CM_OBJECT_TOKEN                            PhysicalArrayToken;
+  /// Size of the device in bytes.
+  UINT64                                     Size;
+  /// Device Set number (0 = not part of a set).
+  UINT8                                      DeviceSet;
+  /// Speed of the device in MegaTransfers/second.
+  UINT32                                     Speed;
+  /// Configured speed of the device in MegaTransfers/second.
+  UINT32                                     ConfiguredMemorySpeed;
+  /// Serial Number string.
+  CHAR8                                      SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset Tag string.
+  CHAR8                                      AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Device Locator string (slot/position on board).
+  CHAR8                                      DeviceLocator[SMBIOS_MAX_STRING_SIZE];
+  /// Bank Locator string.
+  CHAR8                                      BankLocator[SMBIOS_MAX_STRING_SIZE];
+  /// Firmware version string of the memory device.
+  CHAR8                                      FirmwareVersion[SMBIOS_MAX_STRING_SIZE];
+  /// Part Number string.
+  CHAR8                                      PartNum[SMBIOS_MAX_STRING_SIZE];
+  /// 2-byte Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     ModuleManufacturerId;
+  /// 2-byte Manufacturer Product Id.
+  UINT16                                     ModuleProductId;
+  /// Minimum operating voltage in millivolts.
+  UINT16                                     MinVolt;
+  /// Maximum operating voltage in millivolts.
+  UINT16                                     MaxVolt;
+  /// Configured voltage in millivolts.
+  UINT16                                     ConfVolt;
+  /// Data width of the device in bits.
+  UINT16                                     DataWidth;
+  /// Total width of the device in bits (including ECC bits).
+  UINT16                                     TotalWidth;
+  /// Rank of the device.
+  UINT8                                      Rank;
+  /// Memory device type enumeration value.
+  MEMORY_DEVICE_TYPE                         DeviceType;
+  /// Type detail flags.
+  MEMORY_DEVICE_TYPE_DETAIL                  TypeDetail;
+  /// Memory technology enumeration value.
+  MEMORY_DEVICE_TECHNOLOGY                   DeviceTechnology;
+  /// Form factor enumeration value.
+  MEMORY_FORM_FACTOR                         FormFactor;
+  /// Operating mode capability flags.
+  MEMORY_DEVICE_OPERATING_MODE_CAPABILITY    MemoryOperatingModeCapability;
+  /// CM Object Token of the associated memory error information structure.
+  /// Set to CM_NULL_TOKEN if not present; the generator will use 0xFFFE (Not Provided).
+  CM_OBJECT_TOKEN                            MemoryErrorInfoToken;
+} CM_ARCH_COMMON_MEMORY_DEVICE_INFO;
+
+/** A structure that describes a Memory Array Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 19
+
+  ID: EArchCommonObjMemoryArrayMappedAddress
+**/
+typedef struct CmArchCommonMemoryArrayMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// CM Object Token of the associated Physical Memory Array.
+  CM_OBJECT_TOKEN         PhysMemArrayToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// Number of memory devices that form a row in the address partition.
+  UINT8                   NumMemDevices;
+} CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
 
 #pragma pack()

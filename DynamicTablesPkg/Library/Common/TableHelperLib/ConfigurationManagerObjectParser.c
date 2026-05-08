@@ -1115,6 +1115,59 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourceGenericHwVer2InfoParser[] = 
   { "ReadAckWrite",    8,                                              "0x%llx",  NULL },
 };
 
+/** A parser for EArchCommonObjPhysicalMemoryArray.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPhysicalMemoryArrayParser[] = {
+  { "PhysMemArrayToken",         sizeof (CM_OBJECT_TOKEN), "0x%p",  NULL },
+  { "Use",                       sizeof (UINT8),           "0x%x",  NULL },
+  { "Location",                  sizeof (UINT8),           "0x%x",  NULL },
+  { "MemoryErrorCorrection",     sizeof (UINT16),          "0x%x",  NULL },
+  { "MemoryErrorCorrectionType", sizeof (UINT8),           "0x%x",  NULL },
+  { "Size",                      sizeof (UINT64),          "0x%lx", NULL },
+  { "NumberOfMemoryDevices",     sizeof (UINT16),          "0x%u",  NULL },
+};
+
+/** A parser for EArchCommonObjMemoryDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceInfoParser[] = {
+  { "MemoryDeviceInfoToken",         sizeof (CM_OBJECT_TOKEN),                         "0x%p",  NULL },
+  { "PhysicalArrayToken",            sizeof (CM_OBJECT_TOKEN),                         "0x%p",  NULL },
+  { "Size",                          sizeof (UINT64),                                  "0x%lx", NULL },
+  { "DeviceSet",                     sizeof (UINT8),                                   "0x%u",  NULL },
+  { "Speed",                         sizeof (UINT32),                                  "0x%u",  NULL },
+  { "ConfiguredMemorySpeed",         sizeof (UINT32),                                  "0x%u",  NULL },
+  { "SerialNum",                     SMBIOS_MAX_STRING_SIZE,                           "%a",    NULL },
+  { "AssetTag",                      SMBIOS_MAX_STRING_SIZE,                           "%a",    NULL },
+  { "DeviceLocator",                 SMBIOS_MAX_STRING_SIZE,                           "%a",    NULL },
+  { "BankLocator",                   SMBIOS_MAX_STRING_SIZE,                           "%a",    NULL },
+  { "FirmwareVersion",               SMBIOS_MAX_STRING_SIZE,                           "%a",    NULL },
+  { "PartNum",                       SMBIOS_MAX_STRING_SIZE,                           "%a",    NULL },
+  { "ModuleManufacturerId",          sizeof (UINT16),                                  "0x%x",  NULL },
+  { "ModuleProductId",               sizeof (UINT16),                                  "0x%x",  NULL },
+  { "MinVolt",                       sizeof (UINT16),                                  "0x%u",  NULL },
+  { "MaxVolt",                       sizeof (UINT16),                                  "0x%u",  NULL },
+  { "ConfVolt",                      sizeof (UINT16),                                  "0x%u",  NULL },
+  { "DataWidth",                     sizeof (UINT16),                                  "0x%u",  NULL },
+  { "TotalWidth",                    sizeof (UINT16),                                  "0x%u",  NULL },
+  { "Rank",                          sizeof (UINT8),                                   "0x%u",  NULL },
+  { "DeviceType",                    sizeof (MEMORY_DEVICE_TYPE),                      "0x%x",  NULL },
+  { "TypeDetail",                    sizeof (MEMORY_DEVICE_TYPE_DETAIL),               "0x%x",  NULL },
+  { "DeviceTechnology",              sizeof (MEMORY_DEVICE_TECHNOLOGY),                "0x%x",  NULL },
+  { "FormFactor",                    sizeof (MEMORY_FORM_FACTOR),                      "0x%x",  NULL },
+  { "MemoryOperatingModeCapability", sizeof (MEMORY_DEVICE_OPERATING_MODE_CAPABILITY), "0x%x",  NULL },
+  { "MemoryErrorInfoToken",          sizeof (CM_OBJECT_TOKEN),                         "0x%p",  NULL },
+};
+
+/** A parser for EArchCommonObjMemoryArrayMappedAddress.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryArrayMappedAddressParser[] = {
+  { "MemoryArrayMappedAddressToken", sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "PhysMemArrayToken",             sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "StartingAddress",               sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "EndingAddress",                 sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "NumMemDevices",                 sizeof (UINT8),                "0x%u",  NULL },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1172,6 +1225,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciBridgeInfo,       CmArchCommonObjErrSourcePciBridgeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwInfo,       CmArchCommonObjErrSourceGenericHwInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,   CmArchCommonObjErrSourceGenericHwVer2InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,          CmArchCommonPhysicalMemoryArrayParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceInfo,             CmArchCommonMemoryDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,     CmArchCommonMemoryArrayMappedAddressParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
