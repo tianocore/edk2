@@ -947,16 +947,7 @@ Ip4StartAutoConfig (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    NetLibDestroyServiceChild (
-      IpSb->Controller,
-      IpSb->Image,
-      &gEfiDhcp4ServiceBindingProtocolGuid,
-      Instance->Dhcp4Handle
-      );
-
-    Instance->Dhcp4Handle = NULL;
-
-    return Status;
+    goto Error;
   }
 
   //
@@ -965,6 +956,10 @@ Ip4StartAutoConfig (
   //
   Dhcp4  = Instance->Dhcp4;
   Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
   if (Dhcp4Mode.State == Dhcp4Bound) {
     Ip4Config2OnDhcp4Complete (NULL, Instance);
 
@@ -987,25 +982,7 @@ Ip4StartAutoConfig (
 
   Status = Dhcp4->Configure (Dhcp4, &Dhcp4Mode.ConfigData);
   if (EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-           Instance->Dhcp4Handle,
-           &gEfiDhcp4ProtocolGuid,
-           IpSb->Image,
-           IpSb->Controller
-           );
-
-    NetLibDestroyServiceChild (
-      IpSb->Controller,
-      IpSb->Image,
-      &gEfiDhcp4ServiceBindingProtocolGuid,
-      Instance->Dhcp4Handle
-      );
-
-    Instance->Dhcp4 = NULL;
-
-    Instance->Dhcp4Handle = NULL;
-
-    return Status;
+    goto Error;
   }
 
   //
@@ -1036,6 +1013,29 @@ Ip4StartAutoConfig (
   DispatchDpc ();
 
   return EFI_SUCCESS;
+
+Error:
+  if (Instance->Dhcp4 != NULL) {
+    gBS->CloseProtocol (
+           Instance->Dhcp4Handle,
+           &gEfiDhcp4ProtocolGuid,
+           IpSb->Image,
+           IpSb->Controller
+           );
+
+    Instance->Dhcp4 = NULL;
+  }
+
+  NetLibDestroyServiceChild (
+    IpSb->Controller,
+    IpSb->Image,
+    &gEfiDhcp4ServiceBindingProtocolGuid,
+    Instance->Dhcp4Handle
+    );
+
+  Instance->Dhcp4Handle = NULL;
+
+  return Status;
 }
 
 /**
