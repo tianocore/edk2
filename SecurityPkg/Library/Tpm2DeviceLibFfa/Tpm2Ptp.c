@@ -19,6 +19,7 @@
 #include <Library/IoLib.h>
 
 #include <IndustryStandard/TpmPtp.h>
+#include <IndustryStandard/ArmFfaPartInfo.h>
 #include <Guid/Tpm2ServiceFfa.h>
 
 #include "Tpm2DeviceLibFfa.h"

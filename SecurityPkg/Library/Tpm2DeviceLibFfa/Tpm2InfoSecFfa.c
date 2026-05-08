@@ -8,6 +8,7 @@
 
 **/
 
+#include <IndustryStandard/ArmFfaPartInfo.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
@@ -42,9 +43,9 @@ ValidateTpmInterfaceType (
 }
 
 /**
-  This function is used to get the TPM service partition id.
+  This function is used to get the TPM service partition info.
 
-  @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
+  @param[out] PartitionInfo - Supplies the pointer to the TPM service partition info.
 
   @retval EFI_SUCCESS           The TPM command was successfully sent to the TPM
                                 and the response was copied to the Output buffer.
@@ -54,9 +55,9 @@ ValidateTpmInterfaceType (
 **/
 EFI_STATUS
 EFIAPI
-GetTpmServicePartitionId (
-  OUT UINT16  *PartitionId
+GetTpmServicePartitionInfo (
+  OUT EFI_FFA_PART_INFO_DESC  *PartitionInfo
   )
 {
-  return FfaTpm2GetServicePartitionId (PartitionId);
+  return FfaTpm2GetServicePartitionInfo (PartitionInfo);
 }
