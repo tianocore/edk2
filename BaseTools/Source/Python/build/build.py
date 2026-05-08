@@ -893,7 +893,7 @@ class Build():
     ## Add TOOLCHAIN and FAMILY declared in DSC [BuildOptions] to ToolsDefTxtDatabase.
     #
     # Loop through the set of build targets, tool chains, and archs provided on either
-    # the command line or in target.txt to discover FAMILY and TOOLCHAIN delclarations
+    # the command line or in target.txt to discover FAMILY and TOOLCHAIN declarations
     # in [BuildOptions] sections that may be within !if expressions that may use
     # $(TARGET), $(TOOLCHAIN), $(TOOLCHAIN_TAG), or $(ARCH) operands.
     #
@@ -907,30 +907,31 @@ class Build():
                 for BuildArch in self.ArchList:
                     GlobalData.gGlobalDefines['ARCH'] = BuildArch
                     dscobj = self.BuildDatabase[File, BuildArch]
-                    for KeyFamily, Key, KeyCodeBase in dscobj.BuildOptions:
-                        try:
-                            Target, ToolChain, Arch, Tool, Attr = Key.split('_')
-                        except:
-                            continue
-                        if ToolChain == TAB_STAR or Attr != TAB_TOD_DEFINES_FAMILY:
-                            continue
-                        try:
-                            Family = dscobj.BuildOptions[(KeyFamily, Key, KeyCodeBase)]
-                            Family = Family.strip().strip('=').strip()
-                        except:
-                            continue
-                        if TAB_TOD_DEFINES_FAMILY not in self.ToolDef.ToolsDefTxtDatabase:
-                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY] = {}
-                        if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY]:
-                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY][ToolChain] = Family
-                        if TAB_TOD_DEFINES_BUILDRULEFAMILY not in self.ToolDef.ToolsDefTxtDatabase:
-                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY] = {}
-                        if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY]:
-                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY][ToolChain] = Family
-                        if TAB_TOD_DEFINES_TOOL_CHAIN_TAG not in self.ToolDef.ToolsDefTxtDatabase:
-                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG] = []
-                        if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG]:
-                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG].append(ToolChain)
+                    for Group in dscobj.BuildOptions:
+                        for KeyFamily, Key, KeyCodeBase in Group:
+                            try:
+                                Target, ToolChain, Arch, Tool, Attr = Key.split('_')
+                            except:
+                                continue
+                            if ToolChain == TAB_STAR or Attr != TAB_TOD_DEFINES_FAMILY:
+                                continue
+                            try:
+                                Family = Group[(KeyFamily, Key, KeyCodeBase)]
+                                Family = Family.strip().strip('=').strip()
+                            except:
+                                continue
+                            if TAB_TOD_DEFINES_FAMILY not in self.ToolDef.ToolsDefTxtDatabase:
+                                self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY] = {}
+                            if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY]:
+                                self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY][ToolChain] = Family
+                            if TAB_TOD_DEFINES_BUILDRULEFAMILY not in self.ToolDef.ToolsDefTxtDatabase:
+                                self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY] = {}
+                            if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                                self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY][ToolChain] = Family
+                            if TAB_TOD_DEFINES_TOOL_CHAIN_TAG not in self.ToolDef.ToolsDefTxtDatabase:
+                                self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG] = []
+                            if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG]:
+                                self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG].append(ToolChain)
         GlobalData.gGlobalDefines = SavedGlobalDefines
 
     ## Load configuration
