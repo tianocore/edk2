@@ -684,6 +684,21 @@ AcpiTableProtocolReady (
   CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  *CfgMfrInfo;
   EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *TableFactoryProtocol;
   METADATA_ROOT_HANDLE                   Root;
+  EFI_ACPI_TABLE_PROTOCOL                *AcpiTableProtocol;
+
+  // Find the AcpiTable protocol
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiTableProtocolGuid,
+                  NULL,
+                  (VOID **)&AcpiTableProtocol
+                  );
+
+  // The event handler function is called at least once
+  // during installation even if the protocol is not available
+  // at that point.
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
   // Locate the Dynamic Table Factory
   Status = gBS->LocateProtocol (
