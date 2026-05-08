@@ -517,7 +517,7 @@ AtapiEnumerateDevices (
   IN  ATAPI_BLK_IO_DEV  *AtapiBlkIoDev
   )
 {
-  UINT8                    Index1;
+  UINT32                   Index1;
   UINT8                    Index2;
   UINTN                    DevicePosition;
   EFI_PEI_BLOCK_IO_MEDIA   MediaInfo;

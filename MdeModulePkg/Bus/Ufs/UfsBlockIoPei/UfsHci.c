@@ -317,7 +317,7 @@ UfsInitUtpPrdt (
   IN  UINT32      BufferSize
   )
 {
-  UINT32  PrdtIndex;
+  UINTN   PrdtIndex;
   UINT32  RemainingLen;
   UINT8   *Remaining;
   UINTN   PrdtNumber;

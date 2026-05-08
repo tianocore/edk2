@@ -881,7 +881,9 @@ GetMaxResourceConsumerDevice (
        && (Temp->ResourceUsage != PciResUsagePadding))
     {
       PPBResNode = GetMaxResourceConsumerDevice (Temp);
-      PciResNode = GetLargerConsumerDevice (PciResNode, PPBResNode);
+      if (PPBResNode != NULL) {
+        PciResNode = GetLargerConsumerDevice (PciResNode, PPBResNode);
+      }
     } else {
       PciResNode = GetLargerConsumerDevice (PciResNode, Temp);
     }
@@ -1445,6 +1447,8 @@ PciBridgeResourceAllocator (
   UINT64             PMem64Base;
   EFI_STATUS         Status;
 
+  Status = EFI_OUT_OF_RESOURCES;
+
   IoBridge = CreateResourceNode (
                Bridge,
                0,
@@ -1453,6 +1457,9 @@ PciBridgeResourceAllocator (
                PciBarTypeIo16,
                PciResUsageTypical
                );
+  if (IoBridge == NULL) {
+    goto Exit;
+  }
 
   Mem32Bridge = CreateResourceNode (
                   Bridge,
@@ -1462,6 +1469,9 @@ PciBridgeResourceAllocator (
                   PciBarTypeMem32,
                   PciResUsageTypical
                   );
+  if (Mem32Bridge == NULL) {
+    goto Exit1;
+  }
 
   PMem32Bridge = CreateResourceNode (
                    Bridge,
@@ -1471,6 +1481,9 @@ PciBridgeResourceAllocator (
                    PciBarTypePMem32,
                    PciResUsageTypical
                    );
+  if (PMem32Bridge == NULL) {
+    goto Exit2;
+  }
 
   Mem64Bridge = CreateResourceNode (
                   Bridge,
@@ -1480,6 +1493,9 @@ PciBridgeResourceAllocator (
                   PciBarTypeMem64,
                   PciResUsageTypical
                   );
+  if (Mem64Bridge == NULL) {
+    goto Exit3;
+  }
 
   PMem64Bridge = CreateResourceNode (
                    Bridge,
@@ -1489,6 +1505,9 @@ PciBridgeResourceAllocator (
                    PciBarTypePMem64,
                    PciResUsageTypical
                    );
+  if (PMem64Bridge == NULL) {
+    goto Exit4;
+  }
 
   //
   // Create resourcemap by going through all the devices subject to this root bridge
@@ -1512,7 +1531,7 @@ PciBridgeResourceAllocator (
              );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit5;
   }
 
   //
@@ -1555,17 +1574,27 @@ PciBridgeResourceAllocator (
     PMem64Bridge
     );
 
-  DestroyResourceTree (IoBridge);
-  DestroyResourceTree (Mem32Bridge);
-  DestroyResourceTree (PMem32Bridge);
+Exit5:
   DestroyResourceTree (PMem64Bridge);
-  DestroyResourceTree (Mem64Bridge);
-
-  gBS->FreePool (IoBridge);
-  gBS->FreePool (Mem32Bridge);
-  gBS->FreePool (PMem32Bridge);
   gBS->FreePool (PMem64Bridge);
+
+Exit4:
+  DestroyResourceTree (Mem64Bridge);
   gBS->FreePool (Mem64Bridge);
+
+Exit3:
+  DestroyResourceTree (PMem32Bridge);
+  gBS->FreePool (PMem32Bridge);
+
+Exit2:
+  DestroyResourceTree (Mem32Bridge);
+  gBS->FreePool (Mem32Bridge);
+
+Exit1:
+  DestroyResourceTree (IoBridge);
+  gBS->FreePool (IoBridge);
+
+Exit:
 
   return EFI_SUCCESS;
 }
@@ -2015,12 +2044,10 @@ PciHotPlugRequestNotify (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Operation == EfiPciHotPlugRequestAdd) {
-    if (ChildHandleBuffer == NULL) {
+  if (ChildHandleBuffer == NULL) {
+    if (Operation == EfiPciHotPlugRequestAdd) {
       return EFI_INVALID_PARAMETER;
-    }
-  } else if ((Operation == EfiPciHotplugRequestRemove) && (*NumberOfChildren != 0)) {
-    if (ChildHandleBuffer == NULL) {
+    } else if ((Operation == EfiPciHotplugRequestRemove) && (*NumberOfChildren != 0)) {
       return EFI_INVALID_PARAMETER;
     }
   }
