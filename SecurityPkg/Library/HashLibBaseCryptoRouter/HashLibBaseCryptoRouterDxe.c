@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
@@ -79,7 +80,7 @@ HashStart (
   ASSERT (HashCtx != NULL);
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashInit (&HashCtx[Index]);
     }
@@ -120,7 +121,7 @@ HashUpdate (
   HashCtx = (HASH_HANDLE *)HashHandle;
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
     }
@@ -214,7 +215,7 @@ HashCompleteAndExtend (
   ZeroMem (DigestList, sizeof (*DigestList));
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
       mHashInterface[Index].HashFinal (HashCtx[Index], &Digest);
@@ -234,7 +235,7 @@ HashCompleteAndExtend (
     ASSERT_EFI_ERROR (Status);
     ActivePcrBanks = ActivePcrBanks & mSupportedHashMaskCurrent;
     ZeroMem (&TcgPcrEvent2Digest, sizeof (TcgPcrEvent2Digest));
-    BufferPtr         = CopyDigestListToBuffer (&TcgPcrEvent2Digest, DigestList, ActivePcrBanks);
+    BufferPtr         = Tpm2CopyDigestListToBuffer (&TcgPcrEvent2Digest, DigestList, ActivePcrBanks);
     DigestListBinSize = (UINT32)((UINT8 *)BufferPtr - (UINT8 *)&TcgPcrEvent2Digest);
 
     //
@@ -308,7 +309,7 @@ RegisterHashInterfaceLib (
   //
   // Check allow
   //
-  HashMask     = Tpm2GetHashMaskFromAlgo (&HashInterface->HashGuid);
+  HashMask     = Tpm2GetHashMaskFromGuid (&HashInterface->HashGuid);
   Tpm2HashMask = PcdGet32 (PcdTpm2HashMask);
 
   if ((Tpm2HashMask != 0) &&

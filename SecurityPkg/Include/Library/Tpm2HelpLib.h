@@ -1,18 +1,16 @@
 /** @file
-  Implement TPM2 help.
+  Definitions for TPM2 helper functions
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c), Microsoft Corporation.
+Copyright (c) 2013 - 2024, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <IndustryStandard/UefiTcgPlatform.h>
-#include <Library/Tpm2CommandLib.h>
-#include <Library/Tpm2DeviceLib.h>
-#include <Library/Tpm2HelpLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
+#ifndef TPM2_HELP_LIB_H_
+#define TPM2_HELP_LIB_H_
+
+#include <IndustryStandard/Tpm20.h>
 
 /**
   Return size of digest.
@@ -23,12 +21,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT16
 EFIAPI
-GetHashSizeFromAlgo (
+Tpm2GetHashSizeFromAlgo (
   IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  return Tpm2GetHashSizeFromAlgo (HashAlgo);
-}
+  );
 
 /**
   Get hash mask from algorithm.
@@ -39,12 +34,9 @@ GetHashSizeFromAlgo (
 **/
 UINT32
 EFIAPI
-GetHashMaskFromAlgo (
+Tpm2GetHashMaskFromAlgo (
   IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  return Tpm2GetHashMaskFromAlgo (HashAlgo);
-}
+  );
 
 /**
   Copy AuthSessionIn to TPM2 command buffer.
@@ -56,13 +48,10 @@ GetHashMaskFromAlgo (
 **/
 UINT32
 EFIAPI
-CopyAuthSessionCommand (
+Tpm2CopyAuthSessionCommand (
   IN      TPMS_AUTH_COMMAND  *AuthSessionIn  OPTIONAL,
   OUT     UINT8              *AuthSessionOut
-  )
-{
-  return Tpm2CopyAuthSessionCommand (AuthSessionIn, AuthSessionOut);
-}
+  );
 
 /**
   Copy AuthSessionIn from TPM2 response buffer.
@@ -70,18 +59,14 @@ CopyAuthSessionCommand (
   @param [in]  AuthSessionIn   Input AuthSession data in TPM2 response buffer
   @param [out] AuthSessionOut  Output AuthSession data
 
-  @return 0    copy failed
-          else AuthSession size
+  @return AuthSession size
 **/
 UINT32
 EFIAPI
-CopyAuthSessionResponse (
+Tpm2CopyAuthSessionResponse (
   IN      UINT8               *AuthSessionIn,
   OUT     TPMS_AUTH_RESPONSE  *AuthSessionOut OPTIONAL
-  )
-{
-  return Tpm2CopyAuthSessionResponse (AuthSessionIn, AuthSessionOut);
-}
+  );
 
 /**
   Return if hash alg is supported in HashAlgorithmMask.
@@ -94,13 +79,10 @@ CopyAuthSessionResponse (
 **/
 BOOLEAN
 EFIAPI
-IsHashAlgSupportedInHashAlgorithmMask (
+Tpm2IsHashAlgSupportedInHashAlgorithmMask (
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask
-  )
-{
-  return Tpm2IsHashAlgSupportedInHashAlgorithmMask (HashAlg, HashAlgorithmMask);
-}
+  );
 
 /**
   Copy TPML_DIGEST_VALUES into a buffer
@@ -113,14 +95,11 @@ IsHashAlgSupportedInHashAlgorithmMask (
 **/
 VOID *
 EFIAPI
-CopyDigestListToBuffer (
+Tpm2CopyDigestListToBuffer (
   IN OUT VOID            *Buffer,
   IN TPML_DIGEST_VALUES  *DigestList,
   IN UINT32              HashAlgorithmMask
-  )
-{
-  return Tpm2CopyDigestListToBuffer (Buffer, DigestList, HashAlgorithmMask);
-}
+  );
 
 /**
   Copy a buffer into a TPML_DIGEST_VALUES structure.
@@ -129,21 +108,19 @@ CopyDigestListToBuffer (
   @param[in]     BufferSize         Size of Buffer.
   @param[out]    DigestList         TPML_DIGEST_VALUES.
 
-  @retval EFI_SUCCESS               Buffer was succesfully copied to DigestList.
-  @retval EFI_BAD_BUFFER_SIZE       A bad buffer size passed to the function.
-  @retval EFI_INVALID_PARAMETER     An invalid parameter passed to the function: NULL pointer or
-                                    BufferSize bigger than TPML_DIGEST_VALUES.
+  @return EFI_STATUS
+  @retval EFI_SUCCESS               Buffer was successfully copied to Digest List.
+  @retval EFI_BAD_BUFFER_SIZE       Bad buffer size passed to function.
+  @retval EFI_INVALID_PARAMETER     Invalid parameter passed to function: NULL pointer or
+                                    BufferSize bigger than TPML_DIGEST_VALUES
 **/
 EFI_STATUS
 EFIAPI
-CopyBufferToDigestList (
+Tpm2CopyBufferToDigestList (
   IN CONST  VOID                *Buffer,
   IN        UINTN               BufferSize,
   OUT       TPML_DIGEST_VALUES  *DigestList
-  )
-{
-  return Tpm2CopyBufferToDigestList (Buffer, BufferSize, DigestList);
-}
+  );
 
 /**
   Get TPML_DIGEST_VALUES data size.
@@ -154,28 +131,22 @@ CopyBufferToDigestList (
 **/
 UINT32
 EFIAPI
-GetDigestListSize (
+Tpm2GetDigestListSize (
   IN TPML_DIGEST_VALUES  *DigestList
-  )
-{
-  return Tpm2GetDigestListSize (DigestList);
-}
+  );
 
 /**
-  Get the total digest size from a hash algorithm mask.
+  Get TPML_DIGEST_VALUES data size from HashAlgorithmMask
 
-  @param[in]     HashAlgorithmMask.
+  @param[in]     DigestList    TPML_DIGEST_VALUES data.
 
-  @return Digest size in bytes.
+  @return TPML_DIGEST_VALUES data size.
 **/
 UINT32
 EFIAPI
-GetDigestListSizeFromHashAlgorithmMask (
+Tpm2GetDigestListSizeFromHashAlgorithmMask (
   IN UINT32  HashAlgorithmMask
-  )
-{
-  return Tpm2GetDigestListSizeFromHashAlgorithmMask (HashAlgorithmMask);
-}
+  );
 
 /**
   This function get digest from digest list.
@@ -184,16 +155,33 @@ GetDigestListSizeFromHashAlgorithmMask (
   @param[in]  DigestList    Digest list
   @param[out] Digest        Digest
 
-  @retval EFI_SUCCESS       Digest is found and returned.
-  @retval EFI_NOT_FOUND     Digest is not found.
+  @retval EFI_SUCCESS            Digest is found and returned.
+  @retval EFI_NOT_FOUND          Digest is not found.
+  @retval EFI_INVALID_PARAMETER  DigestList or Digest invalid.
 **/
 EFI_STATUS
 EFIAPI
-GetDigestFromDigestList (
+Tpm2GetDigestFromDigestList (
   IN TPMI_ALG_HASH       HashAlg,
   IN TPML_DIGEST_VALUES  *DigestList,
   OUT VOID               *Digest
-  )
-{
-  return Tpm2GetDigestFromDigestList (HashAlg, DigestList, Digest);
-}
+  );
+
+/**
+  Check if all hash algorithms supported in HashAlgorithmMask are
+  present in the DigestList.
+
+  @param DigestList         Digest list
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  All hash algorithms present.
+  @retval FALSE Some hash algorithms not present.
+**/
+BOOLEAN
+EFIAPI
+Tpm2IsDigestListInSyncWithHashAlgorithmMask (
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT32              HashAlgorithmMask
+  );
+
+#endif

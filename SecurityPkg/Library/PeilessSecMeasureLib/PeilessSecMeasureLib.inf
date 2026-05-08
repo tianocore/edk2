@@ -38,6 +38,7 @@
   HashLib
   PrePiLib
   Tpm2CommandLib
+  Tpm2HelpLib
 
 [Guids]
   gTcgEvent2EntryHobGuid
