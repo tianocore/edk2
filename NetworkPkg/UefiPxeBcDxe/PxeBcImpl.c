@@ -470,6 +470,10 @@ EfiPxeBcDhcp (
     Status = PxeBcDhcp4Dora (Private, Private->Dhcp4);
   }
 
+  if (Private->Signature != PXEBC_PRIVATE_DATA_SIGNATURE) {
+    return Status;
+  }
+
   //
   // Reconfigure the UDP instance with the default configuration.
   //
@@ -1005,6 +1009,10 @@ EfiPxeBcMtftp (
       Status = EFI_INVALID_PARAMETER;
 
       break;
+  }
+
+  if (Status == EFI_DEVICE_ERROR) {
+    return Status;
   }
 
   if (Status == EFI_ICMP_ERROR) {
@@ -2427,6 +2435,10 @@ EfiPxeLoadFile (
     //   2. success to get file size.
     //   3. unsupported.
     //
+    if (PxeBc->Revision != EFI_PXE_BASE_CODE_PROTOCOL_REVISION) {
+      return Status;
+    }
+
     PxeBc->Stop (PxeBc);
   } else {
     //
