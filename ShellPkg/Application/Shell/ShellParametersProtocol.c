@@ -403,29 +403,26 @@ CreatePopulateInstallShellParametersProtocol (
   //
   // Populate the 3 faked file systems...
   //
+  (*NewShellParameters)->StdIn  = &FileInterfaceStdIn;
+  (*NewShellParameters)->StdOut = &FileInterfaceStdOut;
+  (*NewShellParameters)->StdErr = &FileInterfaceStdErr;
   if (*RootShellInstance) {
-    (*NewShellParameters)->StdIn  = &FileInterfaceStdIn;
-    (*NewShellParameters)->StdOut = &FileInterfaceStdOut;
-    (*NewShellParameters)->StdErr = &FileInterfaceStdErr;
-    Status                        = gBS->InstallProtocolInterface (
-                                           &gImageHandle,
-                                           &gEfiShellParametersProtocolGuid,
-                                           EFI_NATIVE_INTERFACE,
-                                           (VOID *)(*NewShellParameters)
-                                           );
+    Status = gBS->InstallProtocolInterface (
+                    &gImageHandle,
+                    &gEfiShellParametersProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    (VOID *)(*NewShellParameters)
+                    );
   } else {
     //
     // copy from the existing ones
     //
-    (*NewShellParameters)->StdIn  = ShellInfoObject.OldShellParameters->StdIn;
-    (*NewShellParameters)->StdOut = ShellInfoObject.OldShellParameters->StdOut;
-    (*NewShellParameters)->StdErr = ShellInfoObject.OldShellParameters->StdErr;
-    Status                        = gBS->ReinstallProtocolInterface (
-                                           gImageHandle,
-                                           &gEfiShellParametersProtocolGuid,
-                                           (VOID *)ShellInfoObject.OldShellParameters,
-                                           (VOID *)(*NewShellParameters)
-                                           );
+    Status = gBS->ReinstallProtocolInterface (
+                    gImageHandle,
+                    &gEfiShellParametersProtocolGuid,
+                    (VOID *)ShellInfoObject.OldShellParameters,
+                    (VOID *)(*NewShellParameters)
+                    );
   }
 
   return (Status);
