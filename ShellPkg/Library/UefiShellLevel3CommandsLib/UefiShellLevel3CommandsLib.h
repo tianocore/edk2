@@ -138,6 +138,19 @@ ShellCommandRunGetMtc (
   );
 
 /**
+  Function for 'msr' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunMsr (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+/**
   Function for 'help' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
