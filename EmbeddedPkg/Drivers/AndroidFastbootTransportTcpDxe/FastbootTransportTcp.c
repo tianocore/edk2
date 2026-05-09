@@ -123,6 +123,7 @@ SubmitRecieveToken (
 */
 STATIC
 VOID
+EFIAPI
 ConnectionClosed (
   IN EFI_EVENT  Event,
   IN VOID       *Context
