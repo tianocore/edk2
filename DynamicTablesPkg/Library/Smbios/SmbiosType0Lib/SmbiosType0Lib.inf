@@ -1,0 +1,37 @@
+## @file
+#  SMBIOS Type0 Table Generator
+#
+#  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosType0LibArm
+  FILE_GUID      = 8f95040b-4846-4c7e-b5c1-e4565bfcfa4b
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = SmbiosType0LibConstructor
+  DESTRUCTOR     = SmbiosType0LibDestructor
+
+[Sources]
+  SmbiosType0Generator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  SmbiosStringTableLib
+  MemoryAllocationLib
