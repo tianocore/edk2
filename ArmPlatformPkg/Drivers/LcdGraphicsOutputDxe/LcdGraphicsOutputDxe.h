@@ -44,6 +44,7 @@ typedef struct {
 //
 
 VOID
+EFIAPI
 LcdGraphicsExitBootServicesEvent (
   IN EFI_EVENT  Event,
   IN VOID       *Context
