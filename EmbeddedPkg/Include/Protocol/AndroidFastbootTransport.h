@@ -42,7 +42,7 @@ extern EFI_GUID  gAndroidFastbootTransportProtocolGuid;
 */
 typedef
 EFI_STATUS
-(*FASTBOOT_TRANSPORT_START) (
+(EFIAPI *FASTBOOT_TRANSPORT_START)(
   IN EFI_EVENT  ReceiveEvent
   );
 
@@ -60,7 +60,7 @@ EFI_STATUS
 */
 typedef
 EFI_STATUS
-(*FASTBOOT_TRANSPORT_STOP) (
+(EFIAPI *FASTBOOT_TRANSPORT_STOP)(
   VOID
   );
 
@@ -85,7 +85,7 @@ EFI_STATUS
  */
 typedef
 EFI_STATUS
-(*FASTBOOT_TRANSPORT_SEND) (
+(EFIAPI *FASTBOOT_TRANSPORT_SEND)(
   IN        UINTN      BufferSize,
   IN  CONST VOID       *Buffer,
   IN        EFI_EVENT  *FatalErrorEvent
@@ -110,7 +110,7 @@ EFI_STATUS
 */
 typedef
 EFI_STATUS
-(*FASTBOOT_TRANSPORT_RECEIVE) (
+(EFIAPI *FASTBOOT_TRANSPORT_RECEIVE)(
   OUT UINTN  *BufferSize,
   OUT VOID   **Buffer
   );
