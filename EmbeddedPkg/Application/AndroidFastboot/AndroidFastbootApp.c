@@ -367,6 +367,7 @@ AcceptData (
 */
 STATIC
 VOID
+EFIAPI
 DataReady (
   IN EFI_EVENT  Event,
   IN VOID       *Context
@@ -406,6 +407,7 @@ DataReady (
 */
 STATIC
 VOID
+EFIAPI
 FatalErrorNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Context
