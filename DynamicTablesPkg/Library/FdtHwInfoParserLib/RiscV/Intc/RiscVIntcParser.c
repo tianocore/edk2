@@ -225,8 +225,13 @@ IsaStringInfoParser (
     return EFI_ABORTED;
   }
 
-  IsaStringInfo.Length = PropSize + 1;
-  AsciiStrCpyS (IsaStringInfo.IsaString, PropSize + 1, (CHAR8 *)Prop);
+  IsaStringInfo.Length = PropSize;
+  Status = AsciiStrCpyS (IsaStringInfo.IsaString, MAX_ISA_STRING_LENGTH, (CHAR8 *)Prop);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to copy ISA string\n"));
+    ASSERT (0);
+    return EFI_ABORTED;
+  }
 
   // Add the CmObj to the Configuration Manager.
   Status = AddSingleCmObj (
@@ -869,7 +874,6 @@ PlicAplicInfoParser (
 {
   PLIC_APLIC_COMMON_INFO  PlicAplicCommonInfo;
   CONST UINT32            *Prop;
-  EFI_STATUS              Status;
   UINT32                  Id;
   UINT32                  GsiBase;
   INT32                   Len;
@@ -923,7 +927,7 @@ PlicAplicInfoParser (
     GsiBase                        += PlicAplicCommonInfo.NumSources;
 
     if (FdtNodeIsCompatible (Fdt, ExtIntcNode, &PlicCompatibleInfo)) {
-      Status = PlicInfoParser (
+        PlicInfoParser (
                  FdtParserHandle,
                  ExtIntcNode,
                  &Id,
@@ -931,7 +935,7 @@ PlicAplicInfoParser (
                  NewRintcCmObjDesc
                  );
     } else if (FdtNodeIsCompatible (Fdt, ExtIntcNode, &AplicCompatibleInfo)) {
-      Status = AplicInfoParser (
+        AplicInfoParser (
                  FdtParserHandle,
                  ExtIntcNode,
                  &Id,
@@ -1090,7 +1094,6 @@ ImsicGetInfo (
   CONST UINT64  *Prop;
   INT32         Len;
   INT32         NumPhandle;
-  UINTN         NumImsicBase;
 
   if (ImsicInfo == NULL) {
     ASSERT (0);
@@ -1167,7 +1170,6 @@ ImsicGetInfo (
     return EFI_INVALID_PARAMETER;
   }
 
-  NumImsicBase = (Len / sizeof (UINT32)) / 4;
   if (ImsicInfo->HartIndexBits == 0) {
     Len = NumPhandle;
     while (Len > 0) {
@@ -1281,14 +1283,12 @@ RiscVIntcInfoParser (
 {
   CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
   EFI_STATUS         Status;
-  VOID               *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Fdt          = FdtParserHandle->Fdt;
   NewCmObjDesc = NULL;
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
