@@ -213,7 +213,7 @@ ArmCcaRhiSessionFeatures (
   }
 
   // ABI call support bitmap
-  *AbiSupportBitmap = Args->Gprs0;
+  *AbiSupportBitmap = Args->Gprs0 & ARM_CCA_RHI_SESSION_ABI_MASK;
 
   // Connection Mode support bitmap
   *ConnectionModeBitmap = Args->Gprs1 & ARM_CCA_RHI_SESSION_CONNECTION_MODE_MASK;
@@ -380,6 +380,171 @@ ArmCcaRhiSessionClose (
   if (SessionState != NULL) {
     *SessionState = Args->Gprs2;
   }
+
+exit_handler:
+  FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
+  return Status;
+}
+
+/**
+  Transmit data on previously opened communication channel.
+
+  @param[in]      SessionId     The session ID for the communication channel.
+  @param[in]      Data          Realm IPA for buffer containing data.
+  @param[in, out] DataLen       Length of data to send in bytes on input and
+                                Length of data transmitted on return.
+  @param[in]      Offset        Offset in buffer from which to send data.
+  @param[out]     SessionState  State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_PROTOCOL_ERROR      A protocol error was detected.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionSend (
+  IN      ARM_CCA_RHI_SESSION_ID     SessionId,
+  IN      UINT8                      *Data,
+  IN OUT  UINTN                      *DataLen,
+  IN      UINTN                      Offset,
+  OUT     ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
+  )
+{
+  RETURN_STATUS               Status;
+  ARM_CCA_RSI_HOST_CALL_ARGS  *Args;
+
+  if ((SessionId == 0)  ||
+      (Data == NULL)    ||
+      (DataLen == NULL) ||
+      (*DataLen == 0)   ||
+      (!IS_ALIGNED (Data, ARM_CCA_REALM_GRANULE_SIZE)))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Args = AllocateAlignedPages (
+           EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)),
+           ARM_CCA_REALM_GRANULE_SIZE
+           );
+  if (Args == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Args, sizeof (ARM_CCA_RSI_HOST_CALL_ARGS));
+  Args->Gprs0 = ARM_CCA_FID_RHI_SESSION_SEND;
+  Args->Gprs1 = SessionId;
+  Args->Gprs2 = (UINT64)(UINT64 *)Data;
+  Args->Gprs3 = *DataLen;
+  Args->Gprs4 = Offset;
+
+  Status = ArmCcaRsiHostCall (Args);
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_SEND, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = ArmCcaRhiSessionReturnCodeToEfiStatus (
+             (ARM_CCA_RHI_SESSION_RETURN_STATUS)Args->Gprs0
+             );
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_SEND, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  ASSERT (SessionId == Args->Gprs1);
+
+  if (SessionState != NULL) {
+    *SessionState = Args->Gprs2;
+  }
+
+  *DataLen = Args->Gprs3;
+
+exit_handler:
+  FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
+  return Status;
+}
+
+/**
+  Receive data on previously opened communication channel.
+
+  @param[in]      SessionId     The session ID for the communication channel.
+  @param[in]      Data          Realm IPA for buffer used to receive data.
+  @param[in, out] DataLen       Size of receiving data buffer.
+  @param[in]      Offset        Offset in buffer where received data is to be
+                                written.
+  @param[out]     SessionState  State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_PROTOCOL_ERROR      A protocol error was detected.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionReceive (
+  IN      ARM_CCA_RHI_SESSION_ID     SessionId,
+  IN      UINT8                      *Data,
+  IN OUT  UINTN                      *DataLen,
+  IN      UINTN                      Offset,
+  OUT     ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
+  )
+{
+  RETURN_STATUS               Status;
+  ARM_CCA_RSI_HOST_CALL_ARGS  *Args;
+
+  if ((SessionId == 0)  ||
+      (Data == NULL)    ||
+      (DataLen == NULL) ||
+      (*DataLen == 0)   ||
+      (!IS_ALIGNED (Data, ARM_CCA_REALM_GRANULE_SIZE)))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Args = AllocateAlignedPages (
+           EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)),
+           ARM_CCA_REALM_GRANULE_SIZE
+           );
+  if (Args == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Args, sizeof (ARM_CCA_RSI_HOST_CALL_ARGS));
+
+  Args->Gprs0 = ARM_CCA_FID_RHI_SESSION_RECEIVE;
+  Args->Gprs1 = SessionId;
+  Args->Gprs2 = (UINT64)(UINT64 *)Data;
+  Args->Gprs3 = (UINT64)*DataLen;
+  Args->Gprs4 = Offset;
+
+  Status = ArmCcaRsiHostCall (Args);
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_RECEIVE, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = ArmCcaRhiSessionReturnCodeToEfiStatus (
+             (ARM_CCA_RHI_SESSION_RETURN_STATUS)Args->Gprs0
+             );
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_RECEIVE, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  ASSERT (SessionId == Args->Gprs1);
+
+  if (SessionState != NULL) {
+    *SessionState = Args->Gprs2;
+  }
+
+  *DataLen = Args->Gprs3;
 
 exit_handler:
   FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
