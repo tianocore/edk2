@@ -139,3 +139,55 @@ ArmCcaRhiSessionClose (
   IN    ARM_CCA_RHI_SESSION_ID     SessionId,
   OUT   ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
   );
+
+/**
+  Transmit data on previously opened communication channel.
+
+  @param[in]      SessionId     The session ID for the communication channel.
+  @param[in]      Data          Realm IPA for buffer containing data.
+  @param[in, out] DataLen       Length of data to send in bytes on input and
+                                Length of data transmitted on return.
+  @param[in]      Offset        Offset in buffer from which to send data.
+  @param[out]     SessionState  State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_PROTOCOL_ERROR      A protocol error was detected.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionSend (
+  IN      ARM_CCA_RHI_SESSION_ID     SessionId,
+  IN      UINT8                      *Data,
+  IN OUT  UINTN                      *DataLen,
+  IN      UINTN                      Offset,
+  OUT     ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
+  );
+
+/**
+  Receive data on previously opened communication channel.
+
+  @param[in]      SessionId     The session ID for the communication channel.
+  @param[in]      Data          Realm IPA for buffer used to receive data.
+  @param[in, out] DataLen       Size of receiving data buffer.
+  @param[in]      Offset        Offset in buffer where received data is to be
+                                written.
+  @param[out]     SessionState  State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_PROTOCOL_ERROR      A protocol error was detected.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionReceive (
+  IN      ARM_CCA_RHI_SESSION_ID     SessionId,
+  IN      UINT8                      *Data,
+  IN OUT  UINTN                      *DataLen,
+  IN      UINTN                      Offset,
+  OUT     ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
+  );
