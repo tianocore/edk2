@@ -8,6 +8,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "GraphicsOutput.h"
+
+#include <Guid/EventGroup.h>
+
+#include <Library/PcdLib.h>
+
+#define GRAPHICS_OUTPUT_MODE_PHYSICAL  0
+#define GRAPHICS_OUTPUT_MODE_HIDPI     1
+
 CONST ACPI_ADR_DEVICE_PATH  mGraphicsOutputAdrNode = {
   {
     ACPI_DEVICE_PATH,
@@ -26,6 +34,54 @@ EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  mDefaultGraphicsDeviceInfo = {
 // So a global flag is used to remember that the driver is already started.
 //
 BOOLEAN  mDriverStarted = FALSE;
+
+/**
+  Return TRUE if the framebuffer is wider than the configured cap aspect and can
+  be cropped to a centered viewport with left/right black bars.
+
+  @param[in]  HorizontalResolution  Physical framebuffer width.
+  @param[in]  VerticalResolution    Physical framebuffer height.
+  @param[in]  CapAspectWidth        Maximum viewport aspect numerator.
+  @param[in]  CapAspectHeight       Maximum viewport aspect denominator.
+  @param[out] ViewportWidth         Cropped viewport width.
+
+  @retval TRUE   A centered capped viewport can be created.
+  @retval FALSE  No horizontal crop should be applied.
+**/
+STATIC
+BOOLEAN
+TryGetWideAspectCappedViewportWidth (
+  IN  UINT32  HorizontalResolution,
+  IN  UINT32  VerticalResolution,
+  IN  UINT32  CapAspectWidth,
+  IN  UINT32  CapAspectHeight,
+  OUT UINT32  *ViewportWidth
+  )
+{
+  UINT64  CandidateWidth;
+
+  if ((ViewportWidth == NULL) ||
+      (HorizontalResolution == 0) ||
+      (VerticalResolution == 0) ||
+      (CapAspectWidth == 0) ||
+      (CapAspectHeight == 0))
+  {
+    return FALSE;
+  }
+
+  if (((UINT64)HorizontalResolution * CapAspectHeight) <= ((UINT64)VerticalResolution * CapAspectWidth)) {
+    return FALSE;
+  }
+
+  CandidateWidth = ((UINT64)VerticalResolution * CapAspectWidth) / CapAspectHeight;
+  CandidateWidth &= ~1ULL;
+  if ((CandidateWidth == 0) || (CandidateWidth >= HorizontalResolution)) {
+    return FALSE;
+  }
+
+  *ViewportWidth = (UINT32)CandidateWidth;
+  return TRUE;
+}
 
 /**
   Returns information for an available graphics mode that the graphics device
@@ -50,12 +106,108 @@ GraphicsOutputQueryMode (
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  **Info
   )
 {
+  GRAPHICS_OUTPUT_PRIVATE_DATA                *Private;
+  CONST EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *ModeInfo;
+
   if ((This == NULL) || (Info == NULL) || (SizeOfInfo == NULL) || (ModeNumber >= This->Mode->MaxMode)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *SizeOfInfo = This->Mode->SizeOfInfo;
-  *Info       = AllocateCopyPool (*SizeOfInfo, This->Mode->Info);
+  Private = GRAPHICS_OUTPUT_PRIVATE_FROM_THIS (This);
+
+  ModeInfo = NULL;
+  if (ModeNumber == GRAPHICS_OUTPUT_MODE_PHYSICAL) {
+    ModeInfo = &Private->PhysicalModeInfo;
+  } else if ((ModeNumber == GRAPHICS_OUTPUT_MODE_HIDPI) && Private->HasHiDpiMode) {
+    ModeInfo = &Private->LogicalModeInfo;
+  }
+
+  if (ModeInfo == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+  *Info       = AllocateCopyPool (*SizeOfInfo, ModeInfo);
+  return (*Info != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
+}
+
+/**
+  Set the video device into the specified mode.
+
+  @param  This        The EFI_GRAPHICS_OUTPUT_PROTOCOL instance.
+  @param  ModeNumber  Abstraction that defines the current video mode.
+  @param  ClearScreen TRUE to clear the screen to black in physical mode.
+
+  @retval EFI_SUCCESS           The graphics mode specified by ModeNumber was selected.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_UNSUPPORTED       ModeNumber is not supported by this device.
+
+**/
+static EFI_STATUS
+GraphicsOutputSetModeInternal (
+  IN EFI_GRAPHICS_OUTPUT_PROTOCOL  *This,
+  IN UINT32                        ModeNumber,
+  IN BOOLEAN                       ClearScreen
+  )
+{
+  GRAPHICS_OUTPUT_PRIVATE_DATA                *Private;
+  CONST EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *ModeInfo;
+  UINT32                                      Scale;
+
+  Private = GRAPHICS_OUTPUT_PRIVATE_FROM_THIS (This);
+
+  ModeInfo = NULL;
+  Scale    = 1;
+  if (ModeNumber == GRAPHICS_OUTPUT_MODE_PHYSICAL) {
+    ModeInfo = &Private->PhysicalModeInfo;
+    Scale    = 1;
+  } else if ((ModeNumber == GRAPHICS_OUTPUT_MODE_HIDPI) && Private->HasHiDpiMode) {
+    ModeInfo = &Private->LogicalModeInfo;
+    Scale    = 2;
+  }
+
+  if (ModeInfo == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  This->Mode->Mode       = ModeNumber;
+  This->Mode->Info       = (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *)ModeInfo;
+  This->Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+
+  if (ModeNumber == GRAPHICS_OUTPUT_MODE_PHYSICAL) {
+    This->Mode->FrameBufferBase = Private->PhysicalFrameBufferBase;
+    This->Mode->FrameBufferSize = Private->PhysicalFrameBufferSize;
+  } else {
+    This->Mode->FrameBufferBase = 0;
+    This->Mode->FrameBufferSize = 0;
+  }
+
+  Private->FrameBufferScale = Scale;
+
+  if (ClearScreen) {
+    RETURN_STATUS                  Status;
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Black;
+
+    Black.Blue     = 0;
+    Black.Green    = 0;
+    Black.Red      = 0;
+    Black.Reserved = 0;
+
+    Status = FrameBufferBlt (
+               Private->FrameBufferBltLibConfigure,
+               &Black,
+               EfiBltVideoFill,
+               0,
+               0,
+               0,
+               0,
+               Private->PhysicalModeInfo.HorizontalResolution,
+               Private->PhysicalModeInfo.VerticalResolution,
+               0
+               );
+    return RETURN_ERROR (Status) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -78,34 +230,182 @@ GraphicsOutputSetMode (
   IN  UINT32                        ModeNumber
   )
 {
-  RETURN_STATUS                  Status;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Black;
-  GRAPHICS_OUTPUT_PRIVATE_DATA   *Private;
-
-  if (ModeNumber >= This->Mode->MaxMode) {
+  if ((This == NULL) || (ModeNumber >= This->Mode->MaxMode)) {
     return EFI_UNSUPPORTED;
   }
 
-  Private = GRAPHICS_OUTPUT_PRIVATE_FROM_THIS (This);
+  return GraphicsOutputSetModeInternal (This, ModeNumber, TRUE);
+}
 
-  Black.Blue     = 0;
-  Black.Green    = 0;
-  Black.Red      = 0;
-  Black.Reserved = 0;
+/**
+  ReadyToBoot notification.
 
-  Status = FrameBufferBlt (
-             Private->FrameBufferBltLibConfigure,
-             &Black,
-             EfiBltVideoFill,
-             0,
-             0,
-             0,
-             0,
-             This->Mode->Info->HorizontalResolution,
-             This->Mode->Info->VerticalResolution,
-             0
-             );
-  return RETURN_ERROR (Status) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+  Switch back to a mode that provides a direct framebuffer before launching the
+  OS (e.g. for users that write directly to the framebuffer).
+
+  @param  Event    The event signaled.
+  @param  Context  The event context.
+
+**/
+static VOID
+EFIAPI
+GraphicsOutputReadyToBoot (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  GRAPHICS_OUTPUT_PRIVATE_DATA  *Private;
+  EFI_STATUS                    Status;
+
+  (VOID)Event;
+
+  Private = (GRAPHICS_OUTPUT_PRIVATE_DATA *)Context;
+  if ((Private == NULL) || !Private->HasHiDpiMode) {
+    return;
+  }
+
+  if (Private->GraphicsOutput.Mode->Mode == GRAPHICS_OUTPUT_MODE_HIDPI) {
+    //
+    // Switch back to a mode that provides a direct framebuffer before
+    // launching the OS (e.g. for efifb or other direct-writes users).
+    //
+    GraphicsOutputSetModeInternal (&Private->GraphicsOutput, GRAPHICS_OUTPUT_MODE_PHYSICAL, FALSE);
+
+    //
+    // Restore the physical-mode resolution PCDs so late DXE text/graphics code
+    // sees the real framebuffer geometry after the HiDPI GOP mode is dropped.
+    //
+    Status = PcdSet32S (PcdVideoHorizontalResolution, Private->PhysicalModeInfo.HorizontalResolution);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_VERBOSE, "[%a]: PcdVideoHorizontalResolution update failed: %r\n", gEfiCallerBaseName, Status));
+    }
+
+    Status = PcdSet32S (PcdVideoVerticalResolution, Private->PhysicalModeInfo.VerticalResolution);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_VERBOSE, "[%a]: PcdVideoVerticalResolution update failed: %r\n", gEfiCallerBaseName, Status));
+    }
+
+    Status = PcdSet32S (PcdSetupVideoHorizontalResolution, Private->PhysicalModeInfo.HorizontalResolution);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_VERBOSE, "[%a]: PcdSetupVideoHorizontalResolution update failed: %r\n", gEfiCallerBaseName, Status));
+    }
+
+    Status = PcdSet32S (PcdSetupVideoVerticalResolution, Private->PhysicalModeInfo.VerticalResolution);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_VERBOSE, "[%a]: PcdSetupVideoVerticalResolution update failed: %r\n", gEfiCallerBaseName, Status));
+    }
+  }
+}
+
+/**
+  Scale a BLT buffer by 2x.
+
+  @param  Src            Pointer to the source buffer.
+  @param  SrcWidth       Source buffer width in pixels.
+  @param  SrcHeight      Source buffer height in pixels.
+  @param  SrcDeltaBytes  Source buffer stride in bytes.
+  @param  Dst            Pointer to the destination buffer.
+
+  @retval EFI_SUCCESS           The buffer was scaled successfully.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+static EFI_STATUS
+ScaleBltBuffer2x (
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Src,
+  IN  UINTN                          SrcWidth,
+  IN  UINTN                          SrcHeight,
+  IN  UINTN                          SrcDeltaBytes,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Dst
+  )
+{
+  UINTN  Row;
+  UINTN  Col;
+
+  if ((Src == NULL) || (Dst == NULL) || (SrcWidth == 0) || (SrcHeight == 0) || (SrcDeltaBytes == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Row = 0; Row < SrcHeight; Row++) {
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *SrcRow;
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *DstRow0;
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *DstRow1;
+
+    SrcRow  = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)Src + Row * SrcDeltaBytes);
+    DstRow0 = Dst + (Row * 2) * (SrcWidth * 2);
+    DstRow1 = DstRow0 + (SrcWidth * 2);
+
+    for (Col = 0; Col < SrcWidth; Col++) {
+      EFI_GRAPHICS_OUTPUT_BLT_PIXEL  P;
+      UINTN                          DstX;
+
+      P    = SrcRow[Col];
+      DstX = Col * 2;
+
+      DstRow0[DstX]     = P;
+      DstRow0[DstX + 1] = P;
+      DstRow1[DstX]     = P;
+      DstRow1[DstX + 1] = P;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Downscale a BLT buffer by 2x.
+
+  @param  Src            Pointer to the source buffer.
+  @param  SrcWidth       Source buffer width in pixels.
+  @param  SrcHeight      Source buffer height in pixels.
+  @param  SrcDeltaBytes  Source buffer stride in bytes.
+  @param  Dst            Pointer to the destination buffer.
+  @param  DstWidth       Destination buffer width in pixels.
+  @param  DstHeight      Destination buffer height in pixels.
+  @param  DstDeltaBytes  Destination buffer stride in bytes.
+
+  @retval EFI_SUCCESS           The buffer was downscaled successfully.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
+static EFI_STATUS
+DownscaleBltBuffer2x (
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Src,
+  IN  UINTN                          SrcWidth,
+  IN  UINTN                          SrcHeight,
+  IN  UINTN                          SrcDeltaBytes,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Dst,
+  IN  UINTN                          DstWidth,
+  IN  UINTN                          DstHeight,
+  IN  UINTN                          DstDeltaBytes
+  )
+{
+  UINTN  Row;
+  UINTN  Col;
+
+  if ((Src == NULL) || (Dst == NULL) || (DstWidth == 0) || (DstHeight == 0) ||
+      (SrcDeltaBytes == 0) || (DstDeltaBytes == 0))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((SrcWidth < DstWidth * 2) || (SrcHeight < DstHeight * 2)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Row = 0; Row < DstHeight; Row++) {
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *DstRow;
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *SrcRow;
+
+    DstRow = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)Dst + Row * DstDeltaBytes);
+    SrcRow = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)Src + (Row * 2) * SrcDeltaBytes);
+
+    for (Col = 0; Col < DstWidth; Col++) {
+      DstRow[Col] = SrcRow[Col * 2];
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -149,26 +449,221 @@ GraphicsOutputBlt (
   RETURN_STATUS                 Status;
   EFI_TPL                       Tpl;
   GRAPHICS_OUTPUT_PRIVATE_DATA  *Private;
+  UINT32                        Scale;
 
   Private = GRAPHICS_OUTPUT_PRIVATE_FROM_THIS (This);
+  Scale   = Private->FrameBufferScale;
+
+  if (Scale == 0) {
+    Scale = 1;
+  }
+
+  if ((Scale != 1) && (Scale != 2)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Scale == 1) {
+    Private->ViewportOffsetX = 0;
+    Private->ViewportOffsetY = 0;
+    Private->ViewportWidth   = Private->PhysicalModeInfo.HorizontalResolution;
+    Private->ViewportHeight  = Private->PhysicalModeInfo.VerticalResolution;
+  }
+
   //
   // We have to raise to TPL_NOTIFY, so we make an atomic write to the frame buffer.
   // We would not want a timer based event (Cursor, ...) to come in while we are
   // doing this operation.
   //
-  Tpl    = gBS->RaiseTPL (TPL_NOTIFY);
-  Status = FrameBufferBlt (
-             Private->FrameBufferBltLibConfigure,
-             BltBuffer,
-             BltOperation,
-             SourceX,
-             SourceY,
-             DestinationX,
-             DestinationY,
-             Width,
-             Height,
-             Delta
-             );
+  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+  if (Scale == 1) {
+    Status = FrameBufferBlt (
+               Private->FrameBufferBltLibConfigure,
+               BltBuffer,
+               BltOperation,
+               SourceX,
+               SourceY,
+               DestinationX,
+               DestinationY,
+               Width,
+               Height,
+               Delta
+               );
+  } else {
+    switch (BltOperation) {
+      case EfiBltVideoFill:
+      case EfiBltVideoToVideo:
+        Status = FrameBufferBlt (
+                   Private->FrameBufferBltLibConfigure,
+                   BltBuffer,
+                   BltOperation,
+                   SourceX * Scale + Private->ViewportOffsetX,
+                   SourceY * Scale + Private->ViewportOffsetY,
+                   DestinationX * Scale + Private->ViewportOffsetX,
+                   DestinationY * Scale + Private->ViewportOffsetY,
+                   Width * Scale,
+                   Height * Scale,
+                   Delta
+                   );
+        break;
+
+      case EfiBltBufferToVideo:
+      {
+        EFI_STATUS                     EfiStatus;
+        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Temp;
+        UINTN                          PixelSize;
+        UINTN                          SrcDeltaBytes;
+        UINTN                          TempWidth;
+        UINTN                          TempHeight;
+        UINTN                          TempSize;
+        UINTN                          TempDeltaBytes;
+        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *SrcBase;
+
+        if (BltBuffer == NULL) {
+          Status = RETURN_INVALID_PARAMETER;
+          break;
+        }
+
+        PixelSize  = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+        TempWidth  = Width * Scale;
+        TempHeight = Height * Scale;
+
+        if ((TempWidth / Scale != Width) || (TempHeight / Scale != Height)) {
+          Status = RETURN_INVALID_PARAMETER;
+          break;
+        }
+
+        SrcDeltaBytes = Delta;
+        if (SrcDeltaBytes == 0) {
+          if ((SourceX != 0) || (SourceY != 0)) {
+            Status = RETURN_INVALID_PARAMETER;
+            break;
+          }
+
+          SrcDeltaBytes = Width * PixelSize;
+        }
+
+        TempDeltaBytes = TempWidth * PixelSize;
+        TempSize       = TempHeight * TempDeltaBytes;
+        Temp           = AllocatePool (TempSize);
+        if (Temp == NULL) {
+          Status = RETURN_OUT_OF_RESOURCES;
+          break;
+        }
+
+        SrcBase   = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)BltBuffer + SourceY * SrcDeltaBytes + SourceX * PixelSize);
+        EfiStatus = ScaleBltBuffer2x (
+                      SrcBase,
+                      Width,
+                      Height,
+                      SrcDeltaBytes,
+                      Temp
+                      );
+        if (EFI_ERROR (EfiStatus)) {
+          FreePool (Temp);
+          Status = RETURN_INVALID_PARAMETER;
+          break;
+        }
+
+        Status = FrameBufferBlt (
+                   Private->FrameBufferBltLibConfigure,
+                   Temp,
+                   EfiBltBufferToVideo,
+                   0,
+                   0,
+                   DestinationX * Scale + Private->ViewportOffsetX,
+                   DestinationY * Scale + Private->ViewportOffsetY,
+                   TempWidth,
+                   TempHeight,
+                   TempDeltaBytes
+                   );
+
+        FreePool (Temp);
+        break;
+      }
+
+      case EfiBltVideoToBltBuffer:
+      {
+        EFI_STATUS                     EfiStatus;
+        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Temp;
+        UINTN                          PixelSize;
+        UINTN                          DstDeltaBytes;
+        UINTN                          TempWidth;
+        UINTN                          TempHeight;
+        UINTN                          TempSize;
+        UINTN                          TempDeltaBytes;
+        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *DstBase;
+
+        if (BltBuffer == NULL) {
+          Status = RETURN_INVALID_PARAMETER;
+          break;
+        }
+
+        PixelSize  = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+        TempWidth  = Width * Scale;
+        TempHeight = Height * Scale;
+
+        if ((TempWidth / Scale != Width) || (TempHeight / Scale != Height)) {
+          Status = RETURN_INVALID_PARAMETER;
+          break;
+        }
+
+        DstDeltaBytes = Delta;
+        if (DstDeltaBytes == 0) {
+          if ((DestinationX != 0) || (DestinationY != 0)) {
+            Status = RETURN_INVALID_PARAMETER;
+            break;
+          }
+
+          DstDeltaBytes = Width * PixelSize;
+        }
+
+        TempDeltaBytes = TempWidth * PixelSize;
+        TempSize       = TempHeight * TempDeltaBytes;
+        Temp           = AllocatePool (TempSize);
+        if (Temp == NULL) {
+          Status = RETURN_OUT_OF_RESOURCES;
+          break;
+        }
+
+        Status = FrameBufferBlt (
+                   Private->FrameBufferBltLibConfigure,
+                   Temp,
+                   EfiBltVideoToBltBuffer,
+                   SourceX * Scale + Private->ViewportOffsetX,
+                   SourceY * Scale + Private->ViewportOffsetY,
+                   0,
+                   0,
+                   TempWidth,
+                   TempHeight,
+                   TempDeltaBytes
+                   );
+        if (RETURN_ERROR (Status)) {
+          FreePool (Temp);
+          break;
+        }
+
+        DstBase   = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)BltBuffer + DestinationY * DstDeltaBytes + DestinationX * PixelSize);
+        EfiStatus = DownscaleBltBuffer2x (
+                      Temp,
+                      TempWidth,
+                      TempHeight,
+                      TempDeltaBytes,
+                      DstBase,
+                      Width,
+                      Height,
+                      DstDeltaBytes
+                      );
+        FreePool (Temp);
+        Status = EFI_ERROR (EfiStatus) ? RETURN_INVALID_PARAMETER : RETURN_SUCCESS;
+        break;
+      }
+
+      default:
+        Status = RETURN_INVALID_PARAMETER;
+        break;
+    }
+  }
+
   gBS->RestoreTPL (Tpl);
 
   return RETURN_ERROR (Status) ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
@@ -191,6 +686,17 @@ CONST GRAPHICS_OUTPUT_PRIVATE_DATA  mGraphicsOutputInstanceTemplate = {
     0,                                             // FrameBufferBase
     0                                              // FrameBufferSize
   },
+  { 0 },                                           // LogicalModeInfo
+  { 0 },                                           // PhysicalModeInfo
+  0,                                               // FrameBufferScale
+  0,                                               // ViewportOffsetX
+  0,                                               // ViewportOffsetY
+  0,                                               // ViewportWidth
+  0,                                               // ViewportHeight
+  FALSE,                                           // HasHiDpiMode
+  NULL,                                            // ReadyToBootEvent
+  0,                                               // PhysicalFrameBufferBase
+  0,                                               // PhysicalFrameBufferSize
   NULL,                                            // DevicePath
   NULL,                                            // PciIo
   0,                                               // PciAttributes
@@ -468,14 +974,93 @@ GraphicsOutputDriverBindingStart (
     goto CloseProtocols;
   }
 
-  Private->GraphicsOutputMode.FrameBufferBase = FrameBufferBase;
-  Private->GraphicsOutputMode.FrameBufferSize = GraphicsInfo->FrameBufferSize;
-  Private->GraphicsOutputMode.Info            = &GraphicsInfo->GraphicsMode;
+  Private->PhysicalFrameBufferBase = FrameBufferBase;
+  Private->PhysicalFrameBufferSize = GraphicsInfo->FrameBufferSize;
+
+  CopyMem (&Private->PhysicalModeInfo, &GraphicsInfo->GraphicsMode, sizeof (Private->PhysicalModeInfo));
+  CopyMem (&Private->LogicalModeInfo, &Private->PhysicalModeInfo, sizeof (Private->LogicalModeInfo));
+
+  Private->ViewportOffsetX = 0;
+  Private->ViewportOffsetY = 0;
+  Private->ViewportWidth   = Private->PhysicalModeInfo.HorizontalResolution;
+  Private->ViewportHeight  = Private->PhysicalModeInfo.VerticalResolution;
+  Private->HasHiDpiMode     = FALSE;
+  Private->FrameBufferScale = 1;
+  if (FeaturePcdGet (PcdFspGopBasicHiDpiSupport)) {
+    UINT32  ThresholdH;
+    UINT32  ThresholdV;
+    UINT32  ViewportWidth;
+
+    ThresholdH = PcdGet32 (PcdFspGopBasicHiDpiScaleThresholdHorizontal);
+    ThresholdV = PcdGet32 (PcdFspGopBasicHiDpiScaleThresholdVertical);
+
+    if ((Private->PhysicalModeInfo.HorizontalResolution >= ThresholdH) &&
+        (Private->PhysicalModeInfo.VerticalResolution >= ThresholdV) &&
+        ((Private->PhysicalModeInfo.HorizontalResolution % 2) == 0) &&
+        ((Private->PhysicalModeInfo.VerticalResolution % 2) == 0))
+    {
+      Private->HasHiDpiMode                         = TRUE;
+      if (FeaturePcdGet (PcdFspGopBasicHiDpiWideAspectCapSupport) &&
+          TryGetWideAspectCappedViewportWidth (
+            Private->PhysicalModeInfo.HorizontalResolution,
+            Private->PhysicalModeInfo.VerticalResolution,
+            PcdGet32 (PcdFspGopBasicHiDpiWideAspectCapWidth),
+            PcdGet32 (PcdFspGopBasicHiDpiWideAspectCapHeight),
+            &ViewportWidth
+            ))
+      {
+        Private->ViewportWidth   = ViewportWidth;
+        Private->ViewportOffsetX = (Private->PhysicalModeInfo.HorizontalResolution - ViewportWidth) / 2;
+      }
+
+      Private->LogicalModeInfo.HorizontalResolution = Private->ViewportWidth / 2;
+      Private->LogicalModeInfo.VerticalResolution   = Private->ViewportHeight / 2;
+      Private->LogicalModeInfo.PixelsPerScanLine    = Private->LogicalModeInfo.HorizontalResolution;
+      Private->LogicalModeInfo.PixelFormat          = PixelBltOnly;
+      ZeroMem (&Private->LogicalModeInfo.PixelInformation, sizeof (Private->LogicalModeInfo.PixelInformation));
+
+      DEBUG ((
+        DEBUG_INFO,
+        "[%a]: Enabling GOP 2x framebuffer scaling (threshold %ux%u, physical %ux%u, logical %ux%u)\n",
+        gEfiCallerBaseName,
+        ThresholdH,
+        ThresholdV,
+        Private->PhysicalModeInfo.HorizontalResolution,
+        Private->PhysicalModeInfo.VerticalResolution,
+        Private->LogicalModeInfo.HorizontalResolution,
+        Private->LogicalModeInfo.VerticalResolution
+        ));
+
+      if (Private->ViewportOffsetX != 0) {
+        DEBUG ((
+          DEBUG_INFO,
+          "[%a]: Centering HiDPI viewport at +%u, viewport %ux%u inside physical %ux%u\n",
+          gEfiCallerBaseName,
+          Private->ViewportOffsetX,
+          Private->ViewportWidth,
+          Private->ViewportHeight,
+          Private->PhysicalModeInfo.HorizontalResolution,
+          Private->PhysicalModeInfo.VerticalResolution
+          ));
+      }
+    }
+  }
+
+  Private->GraphicsOutputMode.MaxMode = Private->HasHiDpiMode ? 2 : 1;
 
   //
   // Fix up Mode pointer in GraphicsOutput
   //
   Private->GraphicsOutput.Mode = &Private->GraphicsOutputMode;
+
+  Status = GraphicsOutputSetModeInternal (
+             &Private->GraphicsOutput,
+             Private->HasHiDpiMode ? GRAPHICS_OUTPUT_MODE_HIDPI : GRAPHICS_OUTPUT_MODE_PHYSICAL,
+             FALSE
+             );
+  if (EFI_ERROR (Status)) {
+    goto FreeMemory;
+  }
 
   //
   // Set attributes
@@ -503,8 +1088,8 @@ GraphicsOutputDriverBindingStart (
   // Create the FrameBufferBltLib configuration.
   //
   ReturnStatus = FrameBufferBltConfigure (
-                   (VOID *)(UINTN)Private->GraphicsOutput.Mode->FrameBufferBase,
-                   Private->GraphicsOutput.Mode->Info,
+                   (VOID *)(UINTN)Private->PhysicalFrameBufferBase,
+                   &Private->PhysicalModeInfo,
                    Private->FrameBufferBltLibConfigure,
                    &Private->FrameBufferBltLibConfigureSize
                    );
@@ -512,8 +1097,8 @@ GraphicsOutputDriverBindingStart (
     Private->FrameBufferBltLibConfigure = AllocatePool (Private->FrameBufferBltLibConfigureSize);
     if (Private->FrameBufferBltLibConfigure != NULL) {
       ReturnStatus = FrameBufferBltConfigure (
-                       (VOID *)(UINTN)Private->GraphicsOutput.Mode->FrameBufferBase,
-                       Private->GraphicsOutput.Mode->Info,
+                       (VOID *)(UINTN)Private->PhysicalFrameBufferBase,
+                       &Private->PhysicalModeInfo,
                        Private->FrameBufferBltLibConfigure,
                        &Private->FrameBufferBltLibConfigureSize
                        );
@@ -541,6 +1126,28 @@ GraphicsOutputDriverBindingStart (
                   );
 
   if (!EFI_ERROR (Status)) {
+    if (Private->HasHiDpiMode) {
+      Status = gBS->CreateEventEx (
+                      EVT_NOTIFY_SIGNAL,
+                      TPL_CALLBACK,
+                      GraphicsOutputReadyToBoot,
+                      Private,
+                      &gEfiEventReadyToBootGuid,
+                      &Private->ReadyToBootEvent
+                      );
+      if (EFI_ERROR (Status)) {
+        gBS->UninstallMultipleProtocolInterfaces (
+               Private->GraphicsOutputHandle,
+               &gEfiGraphicsOutputProtocolGuid,
+               &Private->GraphicsOutput,
+               &gEfiDevicePathProtocolGuid,
+               Private->DevicePath,
+               NULL
+               );
+        goto RestorePciAttributes;
+      }
+    }
+
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiPciIoProtocolGuid,
@@ -552,6 +1159,11 @@ GraphicsOutputDriverBindingStart (
     if (!EFI_ERROR (Status)) {
       mDriverStarted = TRUE;
     } else {
+      if (Private->ReadyToBootEvent != NULL) {
+        gBS->CloseEvent (Private->ReadyToBootEvent);
+        Private->ReadyToBootEvent = NULL;
+      }
+
       gBS->UninstallMultipleProtocolInterfaces (
              Private->GraphicsOutputHandle,
              &gEfiGraphicsOutputProtocolGuid,
@@ -678,6 +1290,11 @@ GraphicsOutputDriverBindingStop (
   }
 
   Private = GRAPHICS_OUTPUT_PRIVATE_FROM_THIS (Gop);
+
+  if (Private->ReadyToBootEvent != NULL) {
+    gBS->CloseEvent (Private->ReadyToBootEvent);
+    Private->ReadyToBootEvent = NULL;
+  }
 
   Status = gBS->CloseProtocol (
                   Controller,
