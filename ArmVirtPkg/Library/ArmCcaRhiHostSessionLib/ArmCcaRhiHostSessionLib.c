@@ -56,6 +56,65 @@ STATIC CONST CHAR8  *ArmCcaRhiSessionCmds[] = {
             Args->Gprs3                                                   \
             ));
 
+/** An enum defining the RHI command return status.
+*/
+typedef enum ArmCcaRhiSessionReturnStatus {
+  RhiSessionStatusSuccess,                     ///< Success
+  RhiSessionStatusPeerNotAvailable,            ///< Peer not available
+  RhiSessionStatusInvalidStateForOperation,    ///< Invalid state for operation
+  RhiSessionStatusInvalidSessionId,            ///< Invalid Session ID
+  RhiSessionStatusConnectionTypeNotSupported,  ///< Connection type not supported
+  RhiSessionStatusAccessFailed,                ///< Buffer not readable/writable or address not granule aligned
+  RhiSessionStatusMax
+} ARM_CCA_RHI_SESSION_RETURN_STATUS;
+
+/**
+  Return EFI Status code corresponding to RHI Host Session Return Code.
+
+  @param[in]     ReturnCode    Return Code.
+
+  @retval RETURN_SUCCESS             Success.
+  @retval RETURN_NOT_FOUND           Peer not available.
+  @retval RETURN_PROTOCOL_ERROR      Invalid state for operation.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_UNSUPPORTED         The requested connection mode is not
+                                  supported.
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_ABORTED             Invalid return code.
+**/
+STATIC
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionReturnCodeToEfiStatus (
+  IN  ARM_CCA_RHI_SESSION_RETURN_STATUS  ReturnCode
+  )
+{
+  switch (ReturnCode) {
+    case RhiSessionStatusSuccess:
+      return RETURN_SUCCESS;
+
+    case RhiSessionStatusPeerNotAvailable:
+      return RETURN_NOT_FOUND;
+
+    case RhiSessionStatusInvalidStateForOperation:
+      return RETURN_PROTOCOL_ERROR;
+
+    case RhiSessionStatusInvalidSessionId:
+      return RETURN_NO_MAPPING;
+
+    case RhiSessionStatusConnectionTypeNotSupported:
+      return RETURN_UNSUPPORTED;
+
+    case RhiSessionStatusAccessFailed:
+      return RETURN_INVALID_PARAMETER;
+
+    case RhiSessionStatusMax:
+    default:
+      ASSERT (0);
+      return RETURN_ABORTED;
+  }
+}
+
 /**
   Get the RHI Host Session protocol version information.
 
