@@ -90,9 +90,9 @@ CoreRaiseTpl (
   @param  NewTpl  New, lower, task priority
 
 **/
+static
 VOID
-EFIAPI
-CoreRestoreTpl (
+LowerTplAndDispatchPendingEvents (
   IN EFI_TPL  NewTpl
   )
 {
@@ -132,6 +132,22 @@ CoreRestoreTpl (
 
     CoreDispatchEventNotifies (gEfiCurrentTpl);
   }
+}
+
+/**
+  Lowers the task priority to the previous value.   If the new
+  priority unmasks events at a higher priority, they are dispatched.
+
+  @param  NewTpl  New, lower, task priority
+
+**/
+VOID
+EFIAPI
+CoreRestoreTpl (
+  IN EFI_TPL  NewTpl
+  )
+{
+  LowerTplAndDispatchPendingEvents (NewTpl);
 
   //
   // Set the new value
