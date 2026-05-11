@@ -103,6 +103,45 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
         with open(os.path.join(OutputDir, "basetoolsbin_path_env.yaml"), "w") as f:
             f.write(content)
 
+    def CleanBuildOutputs(self, shell_env, make_cmd, make_clean_target):
+        '''Clean all build outputs.'''
+        base_tools_path = shell_env.get_shell_var("EDK_TOOLS_PATH")
+
+        # Remove the BaseToolsBuild log/temp folder.
+        # Close all file-based log handlers first so the log file is not locked.
+        build_folder = os.path.join(base_tools_path, self.GetLoggingFolderRelativeToRoot())
+        if os.path.isdir(build_folder):
+            logging.info("Removing directory: %s", build_folder)
+            root_logger = logging.getLogger()
+            for handler in list(root_logger.handlers):
+                if isinstance(handler, logging.FileHandler):
+                    handler.close()
+                    root_logger.removeHandler(handler)
+            shutil.rmtree(build_folder)
+
+        # Re-create the log folder and file handler so subsequent build output is logged.
+        os.makedirs(build_folder, exist_ok=True)
+        log_file = os.path.join(build_folder, self.GetLoggingFileName("txt") + ".txt")
+        file_handler = logging.FileHandler(log_file, mode='w')
+        file_handler.setLevel(logging.DEBUG)
+        logging.getLogger().addHandler(file_handler)
+        logging.info("Running Python version: " + str(sys.version_info))
+
+        # Do the actual clean
+        ret = RunCmd(make_cmd, make_clean_target, workingdir=base_tools_path)
+        if ret != 0:
+            logging.warning("%s %s returned %d", make_cmd, make_clean_target, ret)
+
+        # Remove output bin directories to delete stale YAML files.
+        for bin_dir in [os.path.join(base_tools_path, "Bin", "Win32"),
+                        os.path.join(base_tools_path, "Bin", "Win64"),
+                        os.path.join(base_tools_path, "Source", "C", "bin")]:
+            if os.path.isdir(bin_dir):
+                logging.info("Removing directory: %s", bin_dir)
+                shutil.rmtree(bin_dir)
+
+        logging.info("Clean complete.")
+
     def Go(self):
         logging.info("Running Python version: " + str(sys.version_info))
 
@@ -230,6 +269,8 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             # this script is BUILDING the base tools.
             shell_env.set_shell_var('HOST_ARCH', self.target_arch)
 
+            self.CleanBuildOutputs(shell_env, 'nmake.exe', 'cleanall')
+
             # Actually build the tools.
             output_stream = edk2_logging.create_output_stream()
             ret = RunCmd('nmake.exe', None,
@@ -314,9 +355,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                 shell_environment.GetEnvironment().set_shell_var("CROSS_LIB_UUID", unzip_dir)
                 shell_environment.GetEnvironment().set_shell_var("CROSS_LIB_UUID_INC", os.path.join(unzip_dir, "libuuid", "src"))
 
-            ret = RunCmd(make_command, "clean", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
-            if ret != 0:
-                raise Exception("Failed to build.")
+            self.CleanBuildOutputs(shell_env, make_command, 'clean')
 
             cpu_count = self.GetCpuThreads()
 
