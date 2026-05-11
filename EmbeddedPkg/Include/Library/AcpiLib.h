@@ -1,7 +1,7 @@
 /** @file
   Helper Library for ACPI
 
-  Copyright (c) 2014-2016, ARM Ltd. All rights reserved.
+  Copyright (c) 2014 - 2026, ARM Ltd. All rights reserved.
   Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,6 +22,7 @@
 #define ARM_GAS8(Address)   { EFI_ACPI_5_0_SYSTEM_MEMORY,  8, 0, EFI_ACPI_5_0_BYTE,      Address }
 #define ARM_GAS16(Address)  { EFI_ACPI_5_0_SYSTEM_MEMORY, 16, 0, EFI_ACPI_5_0_WORD,      Address }
 #define ARM_GAS32(Address)  { EFI_ACPI_5_0_SYSTEM_MEMORY, 32, 0, EFI_ACPI_5_0_DWORD,     Address }
+#define ARM_GAS64(Address)  { EFI_ACPI_6_3_SYSTEM_MEMORY, 64, 0, EFI_ACPI_6_3_QWORD,     Address }
 #define ARM_GASN(Address)   { EFI_ACPI_5_0_SYSTEM_MEMORY,  0, 0, EFI_ACPI_5_0_DWORD,     Address }
 
 //
