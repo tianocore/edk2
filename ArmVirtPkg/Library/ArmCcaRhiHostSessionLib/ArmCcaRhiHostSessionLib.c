@@ -222,3 +222,166 @@ exit_handler:
   FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
   return Status;
 }
+
+/**
+  Open a session with the host.
+
+  @param[in]      ConnectionMode  The requested connection mode, must be either
+                                  Blocking or Non-Blocking.
+  @param[in, out] SessionId       On first invocation, SessionId is passed as
+                                  zero and the ABI allocates a Session Id and
+                                  returns.
+                                  If the connection mode is Non-Blocking, the
+                                  SessionState may be returned as
+                                  RhiConnectionInProgress and the
+                                  caller is expected to call this function again
+                                  with the Session ID that was returned in the
+                                  first invocation.
+  @param[out]     SessionState    State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_UNSUPPORTED         The requested connection mode is not
+                                     supported.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_PROTOCOL_ERROR      A protocol error was detected.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionOpen (
+  IN      UINT64                     ConnectionMode,
+  IN OUT  ARM_CCA_RHI_SESSION_ID     *SessionId,
+  OUT     ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
+  )
+{
+  RETURN_STATUS               Status;
+  ARM_CCA_RSI_HOST_CALL_ARGS  *Args;
+
+  if (SessionId == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if ((ConnectionMode != ARM_CCA_RHI_SESSION_CONNECTION_MODE_BLOCKING) &&
+      (ConnectionMode != ARM_CCA_RHI_SESSION_CONNECTION_MODE_NON_BLOCKING))
+  {
+    return RETURN_UNSUPPORTED;
+  }
+
+  // invalid_session_id: 0 not passed on initial call or
+  // unknown SessionID passed (NON_BLOCKING)
+  if ((ConnectionMode == ARM_CCA_RHI_SESSION_CONNECTION_MODE_BLOCKING) &&
+      (*SessionId != 0))
+  {
+    return RETURN_NO_MAPPING;
+  }
+
+  Args = AllocateAlignedPages (
+           EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)),
+           ARM_CCA_REALM_GRANULE_SIZE
+           );
+  if (Args == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Args, sizeof (ARM_CCA_RSI_HOST_CALL_ARGS));
+  Args->Gprs0 = ARM_CCA_FID_RHI_SESSION_OPEN;
+  Args->Gprs1 = *SessionId;
+  Args->Gprs2 = ConnectionMode;
+
+  Status = ArmCcaRsiHostCall (Args);
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_OPEN, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = ArmCcaRhiSessionReturnCodeToEfiStatus (
+             (ARM_CCA_RHI_SESSION_RETURN_STATUS)Args->Gprs0
+             );
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_OPEN, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  if (*SessionId == 0) {
+    *SessionId = Args->Gprs1;
+  } else if (*SessionId != Args->Gprs1) {
+    Status = RETURN_PROTOCOL_ERROR;
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  if (SessionState != NULL) {
+    *SessionState = Args->Gprs2;
+  }
+
+exit_handler:
+  FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
+  return Status;
+}
+
+/**
+  Close a session with the host.
+
+  @param[in]    SessionId         Id of the session to close.
+  @param[out]   SessionState      State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionClose (
+  IN    ARM_CCA_RHI_SESSION_ID     SessionId,
+  OUT   ARM_CCA_RHI_SESSION_STATE  *SessionState   OPTIONAL
+  )
+{
+  RETURN_STATUS               Status;
+  ARM_CCA_RSI_HOST_CALL_ARGS  *Args;
+
+  if (SessionId == 0) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Args = AllocateAlignedPages (
+           EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)),
+           ARM_CCA_REALM_GRANULE_SIZE
+           );
+  if (Args == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Args, sizeof (ARM_CCA_RSI_HOST_CALL_ARGS));
+  Args->Gprs0 = ARM_CCA_FID_RHI_SESSION_CLOSE;
+  Args->Gprs1 = SessionId;
+
+  Status = ArmCcaRsiHostCall (Args);
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_CLOSE, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = ArmCcaRhiSessionReturnCodeToEfiStatus (
+             (ARM_CCA_RHI_SESSION_RETURN_STATUS)Args->Gprs0
+             );
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_CLOSE, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  ASSERT (SessionId == Args->Gprs1);
+
+  if (SessionState != NULL) {
+    *SessionState = Args->Gprs2;
+  }
+
+exit_handler:
+  FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
+  return Status;
+}

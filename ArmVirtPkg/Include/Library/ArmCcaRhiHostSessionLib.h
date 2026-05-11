@@ -42,6 +42,23 @@
 #define ARM_CCA_RHI_SESSION_CONNECTION_MODE_BLOCKING      BIT0
 #define ARM_CCA_RHI_SESSION_CONNECTION_MODE_NON_BLOCKING  BIT1
 
+/** A type defining the RHI session ID.
+*/
+typedef UINT64 ARM_CCA_RHI_SESSION_ID;
+
+/** An enum defining the RHI session states.
+*/
+typedef enum ArmCcaRhiSessionState {
+  RhiSessionStateUnconnected,                ///< Session not connected
+  RhiSessionStateConnectionInProgress,       ///< Connection in progress
+  RhiSessionStateConnectionEstablished,      ///< Connection established
+  RhiSessionStateIoInProgress,               ///< IO in progress
+  RhiSessionStateIoComplete,                 ///< IO completed
+  RhiSessionStateBufferSizeDetermined,       ///< Buffer size determined
+  RhiSessionStateConnectionCloseInProgress,  ///< Connection close in progress
+  RhiSessionStateMax
+} ARM_CCA_RHI_SESSION_STATE;
+
 /**
   Get the RHI Host Session protocol version information.
 
@@ -72,4 +89,53 @@ EFIAPI
 ArmCcaRhiSessionFeatures (
   OUT UINT64  *AbiSupportBitmap,
   OUT UINT64  *ConnectionModeBitmap
+  );
+
+/**
+  Open a session with the host.
+
+  @param[in]      ConnectionMode  The requested connection mode, must be either
+                                  Blocking or Non-Blocking.
+  @param[in, out] SessionId       On first invocation, SessionId is passed as
+                                  zero and the ABI allocates a Session Id and
+                                  returns.
+                                  If the connection mode is Non-Blocking, the
+                                  SessionState may be returned as
+                                  RhiConnectionInProgress and the
+                                  caller is expected to call this function again
+                                  with the Session ID that was returned in the
+                                  first invocation.
+  @param[out]     SessionState    State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_UNSUPPORTED         The requested connection mode is not
+                                  supported.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionOpen (
+  IN      UINT64                     ConnectionMode,
+  IN OUT  ARM_CCA_RHI_SESSION_ID     *SessionId,
+  OUT     ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
+  );
+
+/**
+  Close a session with the host.
+
+  @param[in]    SessionId         Id of the session to close.
+  @param[out]   SessionState      State of the session.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_NO_MAPPING          An invalid session ID was provided.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionClose (
+  IN    ARM_CCA_RHI_SESSION_ID     SessionId,
+  OUT   ARM_CCA_RHI_SESSION_STATE  *SessionState OPTIONAL
   );
