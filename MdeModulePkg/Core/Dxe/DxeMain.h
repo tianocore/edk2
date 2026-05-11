@@ -370,6 +370,17 @@ CoreInitializeGcdServices (
   );
 
 /**
+  Initializes TPL services support.
+
+  @retval EFI_SUCCESS            Always return success
+
+**/
+EFI_STATUS
+CoreInitializeTplServices (
+  VOID
+  );
+
+/**
   Initializes "event" support.
 
   @retval EFI_SUCCESS            Always return success

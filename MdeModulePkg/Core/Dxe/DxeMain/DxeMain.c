@@ -455,6 +455,9 @@ DxeMain (
 
   DEBUG_CODE_END ();
 
+  Status = CoreInitializeTplServices();
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Initialize the Event Services
   //
