@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/NestedInterruptTplLib.h>
+#include <Protocol/InterruptHandlerTplControl.h>
 
 #include "LocalApicTimerDxe.h"
 
@@ -31,6 +31,11 @@ EFI_TIMER_ARCH_PROTOCOL  mTimer = {
 // Pointer to the CPU Architectural Protocol instance
 //
 EFI_CPU_ARCH_PROTOCOL  *mCpu;
+
+//
+// Pointer to the interrupt handler TPL control protocol
+//
+static EDKII_INTERRUPT_HANDLER_TPL_CONTROL_PROTOCOL  *mTplControl;
 
 //
 // The notification function to call on every timer interrupt.
@@ -60,10 +65,9 @@ TimerInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  STATIC NESTED_INTERRUPT_STATE  NestedInterruptState;
-  EFI_TPL                        OriginalTPL;
+  EFI_TPL  OriginalTPL;
 
-  OriginalTPL = NestedInterruptRaiseTPL ();
+  OriginalTPL = mTplControl->RaiseTpl ();
 
   SendApicEoi ();
 
@@ -74,7 +78,7 @@ TimerInterruptHandler (
     mTimerNotifyFunction (mTimerPeriod);
   }
 
-  NestedInterruptRestoreTPL (OriginalTPL, SystemContext, &NestedInterruptState);
+  mTplControl->RestoreTpl (OriginalTPL);
 }
 
 /**
@@ -326,6 +330,16 @@ TimerDriverInitialize (
   // Find the CPU architectural protocol.
   //
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Find the TPL control protocol.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEdkiiInterruptHandlerTplControlProtocolGuid,
+                  NULL,
+                  (VOID **)&mTplControl
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //
