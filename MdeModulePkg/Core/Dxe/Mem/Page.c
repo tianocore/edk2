@@ -246,6 +246,78 @@ AllocateMemoryTypeInformationBins (
 }
 
 /**
+  Update memory type statistics upon memory allocation and free.
+
+  @param OldType                          The original memory type of the memory region.
+  @param NewType                          The new memory type of the memory region.
+  @param Start                            The starting physical address of the memory region.
+  @param NumberOfPages                    The number of pages in the memory region.
+  @param MemoryTypeInformationInitialized A pointer to a boolean that indicates whether the memory type
+                                          information bins have been initialized.
+  @param MemoryTypeStatistics             The memory type statistics array to be updated.
+  @param MemoryTypeInformation            The memory type information array to be updated.
+  @param DefaultBaseAddress               Default bin base address.
+  @param DefaultMaximumAddress            Default bin maximum address.
+**/
+VOID
+EFIAPI
+UpdateMemoryStatistics (
+  IN EFI_MEMORY_TYPE              OldType,
+  IN EFI_MEMORY_TYPE              NewType,
+  IN EFI_PHYSICAL_ADDRESS         Start,
+  IN UINTN                        NumberOfPages,
+  IN BOOLEAN                      *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
+  IN EFI_PHYSICAL_ADDRESS         DefaultBaseAddress,
+  IN EFI_PHYSICAL_ADDRESS         DefaultMaximumAddress
+  )
+{
+  ASSERT (MemoryTypeInformationInitialized != NULL);
+  ASSERT (MemoryTypeStatistics != NULL);
+  ASSERT (MemoryTypeInformation != NULL);
+
+  if ((MemoryTypeInformationInitialized == NULL) ||
+      (MemoryTypeStatistics == NULL) ||
+      (MemoryTypeInformation == NULL))
+  {
+    return;
+  }
+
+  if (!*MemoryTypeInformationInitialized) {
+    return;
+  }
+
+  //
+  // Update counters for the number of pages allocated to each memory type
+  //
+  if ((UINT32)OldType < EfiMaxMemoryType) {
+    if (((Start >= MemoryTypeStatistics[OldType].BaseAddress) && (Start <= MemoryTypeStatistics[OldType].MaximumAddress)) ||
+        ((Start >= DefaultBaseAddress) && (Start <= DefaultMaximumAddress)))
+    {
+      if (NumberOfPages > MemoryTypeStatistics[OldType].CurrentNumberOfPages) {
+        MemoryTypeStatistics[OldType].CurrentNumberOfPages = 0;
+      } else {
+        MemoryTypeStatistics[OldType].CurrentNumberOfPages -= NumberOfPages;
+      }
+    }
+  }
+
+  if ((UINT32)NewType < EfiMaxMemoryType) {
+    if (((Start >= MemoryTypeStatistics[NewType].BaseAddress) && (Start <= MemoryTypeStatistics[NewType].MaximumAddress)) ||
+        ((Start >= DefaultBaseAddress) && (Start <= DefaultMaximumAddress)))
+    {
+      MemoryTypeStatistics[NewType].CurrentNumberOfPages += NumberOfPages;
+      if ((MemoryTypeStatistics[NewType].InformationIndex < (UINTN)EfiMaxMemoryType) &&
+          (MemoryTypeStatistics[NewType].CurrentNumberOfPages > MemoryTypeInformation[MemoryTypeStatistics[NewType].InformationIndex].NumberOfPages))
+      {
+        MemoryTypeInformation[MemoryTypeStatistics[NewType].InformationIndex].NumberOfPages = (UINT32)MemoryTypeStatistics[NewType].CurrentNumberOfPages;
+      }
+    }
+  }
+}
+
+/**
   Enter critical section by gaining lock on gMemoryLock.
 
 **/
@@ -994,31 +1066,17 @@ CoreConvertPagesEx (
         return EFI_NOT_FOUND;
       }
 
-      //
-      // Update counters for the number of pages allocated to each memory type
-      //
-      if ((UINT32)Entry->Type < EfiMaxMemoryType) {
-        if (((Start >= mMemoryTypeStatistics[Entry->Type].BaseAddress) && (Start <= mMemoryTypeStatistics[Entry->Type].MaximumAddress)) ||
-            ((Start >= mDefaultBaseAddress) && (Start <= mDefaultMaximumAddress)))
-        {
-          if (NumberOfPages > mMemoryTypeStatistics[Entry->Type].CurrentNumberOfPages) {
-            mMemoryTypeStatistics[Entry->Type].CurrentNumberOfPages = 0;
-          } else {
-            mMemoryTypeStatistics[Entry->Type].CurrentNumberOfPages -= NumberOfPages;
-          }
-        }
-      }
-
-      if ((UINT32)NewType < EfiMaxMemoryType) {
-        if (((Start >= mMemoryTypeStatistics[NewType].BaseAddress) && (Start <= mMemoryTypeStatistics[NewType].MaximumAddress)) ||
-            ((Start >= mDefaultBaseAddress) && (Start <= mDefaultMaximumAddress)))
-        {
-          mMemoryTypeStatistics[NewType].CurrentNumberOfPages += NumberOfPages;
-          if (mMemoryTypeStatistics[NewType].CurrentNumberOfPages > gMemoryTypeInformation[mMemoryTypeStatistics[NewType].InformationIndex].NumberOfPages) {
-            gMemoryTypeInformation[mMemoryTypeStatistics[NewType].InformationIndex].NumberOfPages = (UINT32)mMemoryTypeStatistics[NewType].CurrentNumberOfPages;
-          }
-        }
-      }
+      UpdateMemoryStatistics (
+        Entry->Type,
+        NewType,
+        Start,
+        (UINTN)NumberOfPages,
+        &mMemoryTypeInformationInitialized,
+        mMemoryTypeStatistics,
+        gMemoryTypeInformation,
+        mDefaultBaseAddress,
+        mDefaultMaximumAddress
+        );
     }
 
     //
