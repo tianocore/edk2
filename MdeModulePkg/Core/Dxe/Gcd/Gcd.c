@@ -222,6 +222,74 @@ CleanAndError:
 }
 
 /**
+ Look for Resource Descriptor HOB with a ResourceType of System Memory
+ and an Owner GUID of gEfiMemoryTypeInformationGuid. If more than 1 is
+ found, then return NULL.
+
+  @param HobStart                         Pointer to the start of the HOB list.
+  @param MemoryTypeInformation            The memory type information array to be used to determine
+                                          the size of the memory bins.
+
+  @return Non-NULL                        The pointer to the singular MemoryTypeInformation Resource Descriptor HOB.
+  @return NULL                            No valid MemoryTypeInformation Resource Descriptor HOB found.
+**/
+EFI_HOB_RESOURCE_DESCRIPTOR *
+EFIAPI
+GetMemoryTypeInformationResourceHob (
+  IN  VOID                        **HobStart,
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation
+  )
+{
+  UINTN                        Count;
+  EFI_PEI_HOB_POINTERS         Hob;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
+  EFI_PHYSICAL_ADDRESS         BinTop;
+
+  ASSERT (HobStart != NULL);
+  ASSERT (MemoryTypeInformation != NULL);
+  if ((HobStart == NULL) || (MemoryTypeInformation == NULL)) {
+    return NULL;
+  }
+
+  //
+  // See if a Memory Type Information HOB is available
+  //
+  MemoryTypeInformationResourceHob = NULL;
+  Count                            = 0;
+  for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      continue;
+    }
+
+    ResourceHob = Hob.ResourceDescriptor;
+    if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
+      continue;
+    }
+
+    Count++;
+    if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+      continue;
+    }
+
+    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+      continue;
+    }
+
+    BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+    if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop, MemoryTypeInformation)) {
+      MemoryTypeInformationResourceHob = ResourceHob;
+    }
+  }
+
+  if (Count > 1) {
+    return NULL;
+  }
+
+  return MemoryTypeInformationResourceHob;
+}
+
+/**
   Dump the entire contents if the GCD Memory Space Map using DEBUG() macros when
   PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
 
@@ -2404,7 +2472,6 @@ CoreInitializeMemoryServices (
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *PhitResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
-  UINTN                        Count;
   EFI_PHYSICAL_ADDRESS         BaseAddress;
   UINT64                       Length;
   UINT64                       Attributes;
@@ -2415,7 +2482,6 @@ CoreInitializeMemoryServices (
   UINT32                       ReservedCodePageNumber;
   UINT64                       MinimalMemorySizeNeeded;
   EFI_PHYSICAL_ADDRESS         ResourceHobMemoryTop;
-  EFI_PHYSICAL_ADDRESS         BinTop;
   EFI_STATUS                   Status;
 
   //
@@ -2462,42 +2528,12 @@ CoreInitializeMemoryServices (
   Status                           = PopulateMemoryTypeInformation (gMemoryTypeInformation);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "No Memory Type Information HOB found, S4 resume will likely fail\n"));
-  } else {
-    //
-    // Look for Resource Descriptor HOB with a ResourceType of System Memory
-    // and an Owner GUID of gEfiMemoryTypeInformationGuid. If more than 1 is
-    // found, then set MemoryTypeInformationResourceHob to NULL.
-    //
-    Count = 0;
-    for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-      if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-        continue;
-      }
-
-      ResourceHob = Hob.ResourceDescriptor;
-      if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
-        continue;
-      }
-
-      Count++;
-      if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
-        continue;
-      }
-
-      if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
-        continue;
-      }
-
-      BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
-      if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop, gMemoryTypeInformation)) {
-        MemoryTypeInformationResourceHob = ResourceHob;
-      }
-    }
-
-    if (Count > 1) {
-      MemoryTypeInformationResourceHob = NULL;
-    }
   }
+
+  MemoryTypeInformationResourceHob = GetMemoryTypeInformationResourceHob (
+                                       HobStart,
+                                       gMemoryTypeInformation
+                                       );
 
   //
   // Include the total memory bin size needed to make sure memory bin could be allocated successfully.
