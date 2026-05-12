@@ -23,14 +23,10 @@
 
 [Sources.X64]
   X86XenHypercall.c
-
-[Sources.X64]
   X64/hypercall.nasm
 
 [Sources.AARCH64]
   ArmXenHypercall.c
-
-[Sources.AARCH64]
   AArch64/Hypercall.S
 
 [Sources]
