@@ -230,6 +230,19 @@ typedef struct {
           CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
 
 //
+// Entry in an array that keeps track of memory type statistics per memory bin
+//
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    BaseAddress;
+  EFI_PHYSICAL_ADDRESS    MaximumAddress;
+  UINT64                  CurrentNumberOfPages;
+  UINT64                  NumberOfPages;
+  UINTN                   InformationIndex;
+  BOOLEAN                 Special;
+  BOOLEAN                 Runtime;
+} EFI_MEMORY_TYPE_STATISTICS;
+
+//
 // DXE Core Global Variables
 //
 extern EFI_SYSTEM_TABLE      *gDxeCoreST;
@@ -258,6 +271,10 @@ extern EFI_GUID                   *gDxeCoreFileName;
 extern EFI_LOADED_IMAGE_PROTOCOL  *gDxeCoreLoadedImage;
 
 extern EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1];
+extern BOOLEAN                      mMemoryTypeInformationInitialized;
+extern EFI_MEMORY_TYPE_STATISTICS   mMemoryTypeStatistics[EfiMaxMemoryType + 1];
+extern EFI_PHYSICAL_ADDRESS         mDefaultMaximumAddress;
+extern EFI_PHYSICAL_ADDRESS         mDefaultBaseAddress;
 
 extern BOOLEAN                    gDispatcherRunning;
 extern EFI_RUNTIME_ARCH_PROTOCOL  gRuntimeTemplate;
@@ -279,10 +296,34 @@ CoreInitializePool (
   VOID
   );
 
+/**
+  Sets the preferred memory range to use for the Memory Type Information bins.
+  This service must be called before fist call to CoreAddMemoryDescriptor().
+
+  If the location of the Memory Type Information bins has already been
+  established or the size of the range provides is smaller than all the
+  Memory Type Information bins, then the range provides is not used.
+
+  @param  Start                             The start address of the Memory Type Information range.
+  @param  Length                            The size, in bytes, of the Memory Type Information range.
+  @param  MemoryTypeInformation             The memory type information array to be used to determine
+                                            the size of the memory bins.
+  @param  MemoryTypeInformationInitialized  A pointer to a boolean that indicates whether the memory type
+                                            information bins have been initialized.
+  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+                                            information if the provided range is used.
+  @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
+                                            provided range is used.
+**/
 VOID
+EFIAPI
 CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS  Start,
-  IN UINT64                Length
+  IN EFI_PHYSICAL_ADDRESS         Start,
+  IN UINT64                       Length,
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
+  IN BOOLEAN                      *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
   );
 
 /**
