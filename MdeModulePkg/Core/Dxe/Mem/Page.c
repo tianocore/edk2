@@ -12,19 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Pi/PiDxeCis.h>
 
 //
-// Entry for tracking the memory regions for each memory type to coalesce similar memory types
-//
-typedef struct {
-  EFI_PHYSICAL_ADDRESS    BaseAddress;
-  EFI_PHYSICAL_ADDRESS    MaximumAddress;
-  UINT64                  CurrentNumberOfPages;
-  UINT64                  NumberOfPages;
-  UINTN                   InformationIndex;
-  BOOLEAN                 Special;
-  BOOLEAN                 Runtime;
-} EFI_MEMORY_TYPE_STATISTICS;
-
-//
 // MemoryMap - The current memory map
 //
 UINTN  mMemoryMapKey = 0;
@@ -808,19 +795,32 @@ CoreLoadingFixedAddressHook (
 
 /**
   Sets the preferred memory range to use for the Memory Type Information bins.
-  This service must be called before fist call to CoreAddMemoryDescriptor().
+  This service must be called before first call to CoreAddMemoryDescriptor().
 
   If the location of the Memory Type Information bins has already been
   established or the size of the range provides is smaller than all the
   Memory Type Information bins, then the range provides is not used.
 
-  @param  Start   The start address of the Memory Type Information range.
-  @param  Length  The size, in bytes, of the Memory Type Information range.
+  @param  Start                             The start address of the Memory Type Information range.
+  @param  Length                            The size, in bytes, of the Memory Type Information range.
+  @param  MemoryTypeInformation             The memory type information array to be used to determine
+                                            the size of the memory bins.
+  @param  MemoryTypeInformationInitialized  A pointer to a boolean that indicates whether the memory type
+                                            information bins have been initialized.
+  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+                                            information if the provided range is used.
+  @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
+                                            provided range is used.
 **/
 VOID
+EFIAPI
 CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS  Start,
-  IN UINT64                Length
+  IN EFI_PHYSICAL_ADDRESS         Start,
+  IN UINT64                       Length,
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
+  IN BOOLEAN                      *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
   )
 {
   EFI_PHYSICAL_ADDRESS  Top;
@@ -828,10 +828,20 @@ CoreSetMemoryTypeInformationRange (
   UINTN                 Index;
   UINT64                Size;
 
+  if ((MemoryTypeInformation == NULL) ||
+      (MemoryTypeInformationInitialized == NULL) ||
+      (MemoryTypeStatistics == NULL) ||
+      (DefaultMaximumAddress == NULL))
+  {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid parameter(s)\n", __func__));
+    ASSERT (FALSE);
+    return;
+  }
+
   //
   // Return if Memory Type Information bin locations have already been set
   //
-  if (mMemoryTypeInformationInitialized) {
+  if (*MemoryTypeInformationInitialized) {
     DEBUG ((DEBUG_ERROR, "%a: Ignored. Bins already set.\n", __func__));
     return;
   }
@@ -840,7 +850,7 @@ CoreSetMemoryTypeInformationRange (
   // Return if size of the Memory Type Information bins is greater than Length
   //
   Top  = Start + Length;
-  Size = CalculateTotalMemoryBinSizeNeeded (&Top, gMemoryTypeInformation);
+  Size = CalculateTotalMemoryBinSizeNeeded (&Top, MemoryTypeInformation);
 
   if (Size > Length) {
     return;
@@ -850,30 +860,30 @@ CoreSetMemoryTypeInformationRange (
   // Loop through each memory type in the order specified by the
   // gMemoryTypeInformation[] array
   //
-  for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+  for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
     //
-    // Make sure the memory type in the gMemoryTypeInformation[] array is valid
+    // Make sure the memory type in the MemoryTypeInformation[] array is valid
     //
-    Type = (EFI_MEMORY_TYPE)(gMemoryTypeInformation[Index].Type);
+    Type = (EFI_MEMORY_TYPE)(MemoryTypeInformation[Index].Type);
     if ((UINT32)Type > EfiMaxMemoryType) {
       continue;
     }
 
-    if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
-      mMemoryTypeStatistics[Type].MaximumAddress = Top - 1;
-      Top                                       -= LShiftU64 (gMemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
-      mMemoryTypeStatistics[Type].BaseAddress    = Top;
+    if (MemoryTypeInformation[Index].NumberOfPages != 0) {
+      MemoryTypeStatistics[Type].MaximumAddress = Top - 1;
+      Top                                      -= LShiftU64 (MemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
+      MemoryTypeStatistics[Type].BaseAddress    = Top;
 
       //
       // If the current base address is the lowest address so far, then update
       // the default maximum address
       //
-      if (mMemoryTypeStatistics[Type].BaseAddress < mDefaultMaximumAddress) {
-        mDefaultMaximumAddress = mMemoryTypeStatistics[Type].BaseAddress - 1;
+      if (MemoryTypeStatistics[Type].BaseAddress < *DefaultMaximumAddress) {
+        *DefaultMaximumAddress = MemoryTypeStatistics[Type].BaseAddress - 1;
       }
 
-      mMemoryTypeStatistics[Type].NumberOfPages   = gMemoryTypeInformation[Index].NumberOfPages;
-      gMemoryTypeInformation[Index].NumberOfPages = 0;
+      MemoryTypeStatistics[Type].NumberOfPages   = MemoryTypeInformation[Index].NumberOfPages;
+      MemoryTypeInformation[Index].NumberOfPages = 0;
     }
   }
 
@@ -882,15 +892,15 @@ CoreSetMemoryTypeInformationRange (
   // allocations for that type should be in the default range.
   //
   for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
-    for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-      if (Type == (EFI_MEMORY_TYPE)gMemoryTypeInformation[Index].Type) {
-        mMemoryTypeStatistics[Type].InformationIndex = Index;
+    for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+      if (Type == (EFI_MEMORY_TYPE)MemoryTypeInformation[Index].Type) {
+        MemoryTypeStatistics[Type].InformationIndex = Index;
       }
     }
 
-    mMemoryTypeStatistics[Type].CurrentNumberOfPages = 0;
-    if (mMemoryTypeStatistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
-      mMemoryTypeStatistics[Type].MaximumAddress = mDefaultMaximumAddress;
+    MemoryTypeStatistics[Type].CurrentNumberOfPages = 0;
+    if (MemoryTypeStatistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
+      MemoryTypeStatistics[Type].MaximumAddress = *DefaultMaximumAddress;
     }
   }
 
@@ -901,7 +911,7 @@ CoreSetMemoryTypeInformationRange (
     Start,
     Start + Length -1
     ));
-  mMemoryTypeInformationInitialized = TRUE;
+  *MemoryTypeInformationInitialized = TRUE;
 }
 
 /**
