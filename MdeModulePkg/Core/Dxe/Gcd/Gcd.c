@@ -135,6 +135,75 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  *mGcdAllocationTypeNames[] = {
 };
 
 /**
+  Get the Memory Type Information HOB if it exists and populate gMemoryTypeInformation.
+
+  @param  MemoryTypeInformation           The pointer to the memory type information array to be populated.
+
+  @return EFI_STATUS                      On EFI_SUCCESS, gMemoryTypeInformation points to the
+                                          Memory Type Information.
+  @return EFI_NOT_FOUND                   No valid Memory Type Information HOB found.
+**/
+EFI_STATUS
+EFIAPI
+PopulateMemoryTypeInformation (
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation
+  )
+{
+  UINTN                        DataSize;
+  EFI_MEMORY_TYPE_INFORMATION  *EfiMemoryTypeInformation;
+  EFI_HOB_GUID_TYPE            *GuidHob;
+  UINTN                        Index;
+  UINT32                       Granularity;
+
+  if (MemoryTypeInformation == NULL) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  GuidHob = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
+  if (GuidHob != NULL) {
+    EfiMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
+    DataSize                 = GET_GUID_HOB_DATA_SIZE (GuidHob);
+    if ((EfiMemoryTypeInformation != NULL) && (DataSize > 0) && (DataSize <= (EfiMaxMemoryType + 1) * sizeof (EFI_MEMORY_TYPE_INFORMATION))) {
+      CopyMem (MemoryTypeInformation, EfiMemoryTypeInformation, DataSize);
+
+      for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+        //
+        // Make sure the memory type in the MemoryTypeInformation[] array is valid
+        //
+        if (MemoryTypeInformation[Index].Type > EfiMaxMemoryType) {
+          continue;
+        }
+
+        if (MemoryTypeInformation[Index].NumberOfPages != 0) {
+          if ((MemoryTypeInformation[Index].Type == EfiReservedMemoryType) ||
+              (MemoryTypeInformation[Index].Type == EfiACPIMemoryNVS) ||
+              (MemoryTypeInformation[Index].Type == EfiRuntimeServicesCode) ||
+              (MemoryTypeInformation[Index].Type == EfiRuntimeServicesData))
+          {
+            Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+          } else {
+            Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+          }
+
+          // Align the number of pages to the allocation granularity
+          MemoryTypeInformation[Index].NumberOfPages = (UINT32)RShiftU64 (ALIGN_VALUE (LShiftU64 (MemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT), Granularity), EFI_PAGE_SHIFT);
+        }
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    DEBUG ((DEBUG_ERROR, "%a: Invalid Memory Type Information HOB data\n", __func__));
+    ASSERT (FALSE);
+  }
+
+  DEBUG ((DEBUG_ERROR, "%a: No Memory Type Information HOB found\n", __func__));
+
+  return EFI_NOT_FOUND;
+}
+
+/**
   Dump the entire contents if the GCD Memory Space Map using DEBUG() macros when
   PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
 
@@ -2310,8 +2379,6 @@ CoreInitializeMemoryServices (
   )
 {
   EFI_PEI_HOB_POINTERS         Hob;
-  EFI_MEMORY_TYPE_INFORMATION  *EfiMemoryTypeInformation;
-  UINTN                        DataSize;
   BOOLEAN                      Found;
   EFI_HOB_HANDOFF_INFO_TABLE   *PhitHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
@@ -2325,11 +2392,11 @@ CoreInitializeMemoryServices (
   EFI_PHYSICAL_ADDRESS         TestedMemoryBaseAddress;
   UINT64                       TestedMemoryLength;
   EFI_PHYSICAL_ADDRESS         HighAddress;
-  EFI_HOB_GUID_TYPE            *GuidHob;
   UINT32                       ReservedCodePageNumber;
   UINT64                       MinimalMemorySizeNeeded;
   EFI_PHYSICAL_ADDRESS         ResourceHobMemoryTop;
   EFI_PHYSICAL_ADDRESS         BinTop;
+  EFI_STATUS                   Status;
 
   //
   // Point at the first HOB.  This must be the PHIT HOB.
@@ -2372,47 +2439,43 @@ CoreInitializeMemoryServices (
   // See if a Memory Type Information HOB is available
   //
   MemoryTypeInformationResourceHob = NULL;
-  GuidHob                          = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
-  if (GuidHob != NULL) {
-    EfiMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
-    DataSize                 = GET_GUID_HOB_DATA_SIZE (GuidHob);
-    if ((EfiMemoryTypeInformation != NULL) && (DataSize > 0) && (DataSize <= (EfiMaxMemoryType + 1) * sizeof (EFI_MEMORY_TYPE_INFORMATION))) {
-      CopyMem (&gMemoryTypeInformation, EfiMemoryTypeInformation, DataSize);
-
-      //
-      // Look for Resource Descriptor HOB with a ResourceType of System Memory
-      // and an Owner GUID of gEfiMemoryTypeInformationGuid. If more than 1 is
-      // found, then set MemoryTypeInformationResourceHob to NULL.
-      //
-      Count = 0;
-      for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-        if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-          continue;
-        }
-
-        ResourceHob = Hob.ResourceDescriptor;
-        if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
-          continue;
-        }
-
-        Count++;
-        if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
-          continue;
-        }
-
-        if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
-          continue;
-        }
-
-        BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
-        if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop, gMemoryTypeInformation)) {
-          MemoryTypeInformationResourceHob = ResourceHob;
-        }
+  Status                           = PopulateMemoryTypeInformation (gMemoryTypeInformation);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "No Memory Type Information HOB found, S4 resume will likely fail\n"));
+  } else {
+    //
+    // Look for Resource Descriptor HOB with a ResourceType of System Memory
+    // and an Owner GUID of gEfiMemoryTypeInformationGuid. If more than 1 is
+    // found, then set MemoryTypeInformationResourceHob to NULL.
+    //
+    Count = 0;
+    for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+      if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        continue;
       }
 
-      if (Count > 1) {
-        MemoryTypeInformationResourceHob = NULL;
+      ResourceHob = Hob.ResourceDescriptor;
+      if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
+        continue;
       }
+
+      Count++;
+      if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+        continue;
+      }
+
+      if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+        continue;
+      }
+
+      BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+      if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop, gMemoryTypeInformation)) {
+        MemoryTypeInformationResourceHob = ResourceHob;
+      }
+    }
+
+    if (Count > 1) {
+      MemoryTypeInformationResourceHob = NULL;
     }
   }
 
