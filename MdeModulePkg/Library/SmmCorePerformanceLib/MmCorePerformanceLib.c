@@ -11,7 +11,8 @@
 
   Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) Microsoft Corporation.
+  Copyright (c) Microsoft Corporation.<BR>
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -836,6 +837,11 @@ FpdtSmiHandler (
 
       if (BootRecordOffset >= mBootRecordSize) {
         Status = EFI_INVALID_PARAMETER;
+        break;
+      }
+
+      if (mSmmBootPerformanceTable == NULL) {
+        Status = EFI_NOT_FOUND;
         break;
       }
 
