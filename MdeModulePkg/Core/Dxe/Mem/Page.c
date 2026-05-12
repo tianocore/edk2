@@ -97,6 +97,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED   BOOLEAN  gLoadFixedAddressCodeMemoryReady = FALS
                                             information if the provided range is used.
   @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
                                             provided range is used.
+  @param  CreateHob                         TRUE to create Memory Type Information Resource HOB after successful
+                                            allocation. This is used for PEI Core to report the bins to DXE Core.
+                                            DXE Core must set this to FALSE because HOB creation is not supported in
+                                            DXE (nor is the information required to be passed to another entity).
 **/
 VOID
 EFIAPI
@@ -104,7 +108,8 @@ AllocateMemoryTypeInformationBins (
   IN BOOLEAN                      *MemoryTypeInformationInitialized,
   IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
   IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
+  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress,
+  IN BOOLEAN                      CreateHob
   )
 {
   UINTN                 Index;
@@ -213,6 +218,19 @@ AllocateMemoryTypeInformationBins (
   }
 
   InitializeBinStatisticsFromRange (MemoryTypeInformation, MemoryTypeStatistics, DefaultMaximumAddress);
+
+  if (CreateHob) {
+    //
+    // Create a Resource Descriptor HOB to report the Memory Type Information bins to DXE Core
+    //
+    BuildResourceDescriptorWithOwnerHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      TESTED_MEMORY_ATTRIBUTES,
+      BaseAddress,
+      RequiredSize,
+      &gEfiMemoryTypeInformationGuid
+      );
+  }
 
   *MemoryTypeInformationInitialized = TRUE;
 }
@@ -966,11 +984,13 @@ CoreAddMemoryDescriptor (
   }
 
   // Check if we need to allocate the memory bins. This function will immediately return if we have already done so.
+  // Pass FALSE to indicate we don't need to publish the HOB.
   AllocateMemoryTypeInformationBins (
     &mMemoryTypeInformationInitialized,
     gMemoryTypeInformation,
     mMemoryTypeStatistics,
-    &mDefaultMaximumAddress
+    &mDefaultMaximumAddress,
+    FALSE
     );
 }
 
