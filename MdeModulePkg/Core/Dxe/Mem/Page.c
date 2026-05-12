@@ -96,6 +96,156 @@ EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
 GLOBAL_REMOVE_IF_UNREFERENCED   BOOLEAN  gLoadFixedAddressCodeMemoryReady = FALSE;
 
 /**
+  Allocate memory bins for each memory type as specified in gMemoryTypeInformation.
+
+  If all the memory types cannot be allocated, then all previously allocated
+  memory types are freed and the function returns. If this function fails, it will log and expect to be called
+  again when more memory is added to the system.
+
+  @param  MemoryTypeInformationInitialized  A pointer to a boolean that indicates whether the memory type
+                                            information bins have been initialized.
+  @param  MemoryTypeInformation             The memory type information array to be used to determine
+                                            the size of the memory bins.
+  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+                                            information if the provided range is used.
+  @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
+                                            provided range is used.
+**/
+VOID
+EFIAPI
+AllocateMemoryTypeInformationBins (
+  IN BOOLEAN                      *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
+  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
+  )
+{
+  UINTN                 Index;
+  EFI_MEMORY_TYPE       Type;
+  EFI_PHYSICAL_ADDRESS  BaseAddress;
+  EFI_PHYSICAL_ADDRESS  LastBinAddress;
+  UINT64                RequiredSize;
+
+  ASSERT (MemoryTypeInformationInitialized != NULL);
+  ASSERT (MemoryTypeInformation != NULL);
+  ASSERT (MemoryTypeStatistics != NULL);
+  ASSERT (DefaultMaximumAddress != NULL);
+
+  if ((MemoryTypeInformationInitialized == NULL) ||
+      (MemoryTypeInformation == NULL) ||
+      (MemoryTypeStatistics == NULL) ||
+      (DefaultMaximumAddress == NULL))
+  {
+    return;
+  }
+
+  //
+  // Check to see if the statistics for the different memory types have already been established
+  //
+  if (*MemoryTypeInformationInitialized) {
+    return;
+  }
+
+  BaseAddress  = 0;
+  RequiredSize = CalculateTotalMemoryBinSizeNeeded (NULL, MemoryTypeInformation);
+  if (RequiredSize == 0) {
+    *MemoryTypeInformationInitialized = TRUE;
+    return;
+  }
+
+  // To ensure we get a contiguous range of memory for our bins, we will attempt to allocate
+  // all of the memory needed in one go. If that works, we can then carve it up into the individual bins.
+  // Our size is already aligned to the correct granularity, allocate aligned pages to ensure the base address is
+  // aligned.
+  BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAlignedPages (
+                                               EFI_SIZE_TO_PAGES ((UINTN)RequiredSize),
+                                               RUNTIME_PAGE_ALLOCATION_GRANULARITY
+                                               );
+
+  if (BaseAddress == 0) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Could not allocate contiguous pages for all memory bins. It will be attempted again when more memory is added.\n",
+      __func__
+      ));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: Allocated 0x%llx - 0x%llx for memory bins\n",
+    __func__,
+    BaseAddress,
+    BaseAddress + RequiredSize - 1
+    ));
+
+  LastBinAddress         = BaseAddress + RequiredSize;
+  *DefaultMaximumAddress = BaseAddress - 1;
+
+  //
+  // Loop through each memory type in the order specified by the gMemoryTypeInformation[] array
+  //
+  for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+    //
+    // Make sure the memory type in the gMemoryTypeInformation[] array is valid
+    //
+    Type = (EFI_MEMORY_TYPE)(MemoryTypeInformation[Index].Type);
+    if ((UINT32)Type > EfiMaxMemoryType) {
+      continue;
+    }
+
+    if (MemoryTypeInformation[Index].NumberOfPages != 0) {
+      MemoryTypeStatistics[Type].BaseAddress    = LastBinAddress - EFI_PAGES_TO_SIZE (MemoryTypeInformation[Index].NumberOfPages);
+      MemoryTypeStatistics[Type].MaximumAddress = LastBinAddress - 1;
+      LastBinAddress                            = MemoryTypeStatistics[Type].BaseAddress;
+    }
+  }
+
+  //
+  // There was enough system memory for all the the memory types were allocated.  So,
+  // those memory areas can be freed for future allocations, and all future memory
+  // allocations can occur within their respective bins
+  //
+  FreeAlignedPages (
+    (VOID *)(UINTN)BaseAddress,
+    EFI_SIZE_TO_PAGES ((UINTN)RequiredSize)
+    );
+  for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+    //
+    // Make sure the memory type in the MemoryTypeInformation[] array is valid
+    //
+    Type = (EFI_MEMORY_TYPE)(MemoryTypeInformation[Index].Type);
+    if ((UINT32)Type > EfiMaxMemoryType) {
+      continue;
+    }
+
+    if (MemoryTypeInformation[Index].NumberOfPages != 0) {
+      MemoryTypeStatistics[Type].NumberOfPages   = MemoryTypeInformation[Index].NumberOfPages;
+      MemoryTypeInformation[Index].NumberOfPages = 0;
+    }
+  }
+
+  //
+  // If the number of pages reserved for a memory type is 0, then all allocations for that type
+  // should be in the default range.
+  //
+  for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
+    for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+      if (Type == (EFI_MEMORY_TYPE)MemoryTypeInformation[Index].Type) {
+        MemoryTypeStatistics[Type].InformationIndex = Index;
+      }
+    }
+
+    MemoryTypeStatistics[Type].CurrentNumberOfPages = 0;
+    if (MemoryTypeStatistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
+      MemoryTypeStatistics[Type].MaximumAddress = mDefaultMaximumAddress;
+    }
+  }
+
+  *MemoryTypeInformationInitialized = TRUE;
+}
+
+/**
   Enter critical section by gaining lock on gMemoryLock.
 
 **/
@@ -684,10 +834,6 @@ CoreAddMemoryDescriptor (
   )
 {
   EFI_PHYSICAL_ADDRESS  End;
-  UINTN                 Index;
-  EFI_PHYSICAL_ADDRESS  BaseAddress;
-  EFI_PHYSICAL_ADDRESS  LastBinAddress;
-  UINT64                RequiredSize;
 
   if ((Start & EFI_PAGE_MASK) != 0) {
     return;
@@ -717,110 +863,13 @@ CoreAddMemoryDescriptor (
     CoreLoadingFixedAddressHook ();
   }
 
-  //
-  // Check to see if the statistics for the different memory types have already been established
-  //
-  if (mMemoryTypeInformationInitialized) {
-    return;
-  }
-
-  BaseAddress  = 0;
-  RequiredSize = CalculateTotalMemoryBinSizeNeeded (NULL, gMemoryTypeInformation);
-  if (RequiredSize == 0) {
-    mMemoryTypeInformationInitialized = TRUE;
-    return;
-  }
-
-  // To ensure we get a contiguous range of memory for our bins, we will attempt to allocate
-  // all of the memory needed in one go. If that works, we can then carve it up into the individual bins.
-  // Our size is already aligned to the correct granularity, allocate aligned pages to ensure the base address is
-  // aligned.
-  BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAlignedPages (
-                                               EFI_SIZE_TO_PAGES ((UINTN)RequiredSize),
-                                               RUNTIME_PAGE_ALLOCATION_GRANULARITY
-                                               );
-
-  if (BaseAddress == 0) {
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: Could not allocate contiguous pages for all memory bins. It will be attempted again when more memory is added.\n",
-      __func__
-      ));
-    return;
-  }
-
-  DEBUG ((
-    DEBUG_INFO,
-    "%a: Allocated 0x%llx - 0x%llx for memory bins\n",
-    __func__,
-    BaseAddress,
-    BaseAddress + RequiredSize - 1
-    ));
-
-  LastBinAddress         = BaseAddress + RequiredSize;
-  mDefaultMaximumAddress = BaseAddress - 1;
-
-  //
-  // Loop through each memory type in the order specified by the gMemoryTypeInformation[] array
-  //
-  for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-    //
-    // Make sure the memory type in the gMemoryTypeInformation[] array is valid
-    //
-    Type = (EFI_MEMORY_TYPE)(gMemoryTypeInformation[Index].Type);
-    if ((UINT32)Type > EfiMaxMemoryType) {
-      continue;
-    }
-
-    if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
-      mMemoryTypeStatistics[Type].BaseAddress    = LastBinAddress - EFI_PAGES_TO_SIZE (gMemoryTypeInformation[Index].NumberOfPages);
-      mMemoryTypeStatistics[Type].MaximumAddress = LastBinAddress - 1;
-      LastBinAddress                             = mMemoryTypeStatistics[Type].BaseAddress;
-    }
-  }
-
-  //
-  // There was enough system memory for all the the memory types were allocated.  So,
-  // those memory areas can be freed for future allocations, and all future memory
-  // allocations can occur within their respective bins
-  //
-  FreeAlignedPages (
-    (VOID *)(UINTN)BaseAddress,
-    EFI_SIZE_TO_PAGES ((UINTN)RequiredSize)
+  // Check if we need to allocate the memory bins. This function will immediately return if we have already done so.
+  AllocateMemoryTypeInformationBins (
+    &mMemoryTypeInformationInitialized,
+    gMemoryTypeInformation,
+    mMemoryTypeStatistics,
+    &mDefaultMaximumAddress
     );
-  for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-    //
-    // Make sure the memory type in the gMemoryTypeInformation[] array is valid
-    //
-    Type = (EFI_MEMORY_TYPE)(gMemoryTypeInformation[Index].Type);
-    if ((UINT32)Type > EfiMaxMemoryType) {
-      continue;
-    }
-
-    if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
-      mMemoryTypeStatistics[Type].NumberOfPages   = gMemoryTypeInformation[Index].NumberOfPages;
-      gMemoryTypeInformation[Index].NumberOfPages = 0;
-    }
-  }
-
-  //
-  // If the number of pages reserved for a memory type is 0, then all allocations for that type
-  // should be in the default range.
-  //
-  for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
-    for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-      if (Type == (EFI_MEMORY_TYPE)gMemoryTypeInformation[Index].Type) {
-        mMemoryTypeStatistics[Type].InformationIndex = Index;
-      }
-    }
-
-    mMemoryTypeStatistics[Type].CurrentNumberOfPages = 0;
-    if (mMemoryTypeStatistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
-      mMemoryTypeStatistics[Type].MaximumAddress = mDefaultMaximumAddress;
-    }
-  }
-
-  mMemoryTypeInformationInitialized = TRUE;
 }
 
 /**
