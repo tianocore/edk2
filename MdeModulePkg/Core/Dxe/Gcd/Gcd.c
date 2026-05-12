@@ -135,25 +135,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  *mGcdAllocationTypeNames[] = {
 };
 
 /**
-  Calculate total memory bin size needed.
-
-  @param BinTop                The top address of the memory bins. This is an optional parameter.
-                               When NULL, the returned size meets the alignment requirements as long as
-                               the base address selected also meets the alignment requirements. When
-                               non-NULL, then the returned BinTop value and the returned size both meet
-                               the alignment requirements. When non-NULL, this will be updated on
-                               output to the new top address of the memory bins that must be used to
-                               satisfy alignment requirements.
-
-  @return The total memory bin size needed.
-
-**/
-UINT64
-CalculateTotalMemoryBinSizeNeeded (
-  IN OUT OPTIONAL EFI_PHYSICAL_ADDRESS  *BinTop
-  );
-
-/**
   Dump the entire contents if the GCD Memory Space Map using DEBUG() macros when
   PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
 
