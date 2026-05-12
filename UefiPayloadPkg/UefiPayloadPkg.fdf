@@ -249,6 +249,11 @@ INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 !endif
 INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+!if $(OPAL_PASSWORD_ENABLE) == TRUE
+!if "X64" IN "$(ARCH)"
+INF SecurityPkg/Tcg/Opal/OpalPassword/OpalPasswordDxe.inf
+!endif
+!endif
 INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
 INF MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 INF MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
