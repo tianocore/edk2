@@ -332,6 +332,7 @@ INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
 !endif
 INF  MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
+INF  OvmfPkg/WsmtDxe/WsmtDxe.inf
 
 #
 # Variable driver stack (SMM)

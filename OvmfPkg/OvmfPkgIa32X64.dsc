@@ -883,6 +883,9 @@
   MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+!if $(SMM_REQUIRE) == TRUE
+  OvmfPkg/WsmtDxe/WsmtDxe.inf
+!endif
 
   #
   # Hash2 Protocol producer
