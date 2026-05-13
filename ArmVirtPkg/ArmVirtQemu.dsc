@@ -468,18 +468,7 @@
   #
   # PCI support
   #
-  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
-    <LibraryClasses>
-      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
-  }
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
-  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
-    <LibraryClasses>
-      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
-  }
-  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
-  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
-  OvmfPkg/Virtio10Dxe/Virtio10.inf
 
   #
   # Video support

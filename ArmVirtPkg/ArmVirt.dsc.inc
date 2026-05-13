@@ -21,9 +21,11 @@
 !if $(PLAT_XEN) == TRUE
   DEFINE ENABLE_VIRTIO           = FALSE
   DEFINE ENABLE_SCSI             = FALSE
+  DEFINE ENABLE_PCI              = FALSE
 !else
   DEFINE ENABLE_VIRTIO           = TRUE
   DEFINE ENABLE_SCSI             = TRUE
+  DEFINE ENABLE_PCI              = TRUE
 !endif
 
 # Various builds now exceed 2MB so choose 3MB as the default.
@@ -526,3 +528,21 @@ DEFINE FD_SIZE_IN_MB    = 3
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/PlatformHasAcpiLib/PlatformHasAcpiLib.inf
   }
+
+  #
+  # PCI support
+  #
+!if $(ENABLE_PCI)
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  OvmfPkg/Virtio10Dxe/Virtio10.inf
+  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
+  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+!endif
+
