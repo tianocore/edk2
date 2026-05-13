@@ -247,12 +247,6 @@
   OvmfPkg/VirtioNetDxe/VirtioNet.inf
 
   #
-  # SCSI Bus and Disk Driver
-  #
-  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
-  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
-
-  #
   # PCI support
   #
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
