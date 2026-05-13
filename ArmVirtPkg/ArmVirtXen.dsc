@@ -153,7 +153,6 @@
   }
 
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   #
   # Platform Driver
