@@ -47,6 +47,7 @@ The framework currently supports the following table generators for ARM:
 * DBG2 - Debug Port Table 2
 * DSDT - Differentiated system description table. This is essentially
          a RAW table generator.
+* EINJ - APEI Error Injection Table
 * FADT - Fixed ACPI Description Table
 * GTDT - Generic Timer Description Table
 * IORT - IO Remapping Table
