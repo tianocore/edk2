@@ -41,23 +41,11 @@
   XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
 
   ArmGenericTimerCounterLib|ArmVirtPkg/Library/XenArmGenericTimerVirtCounterLib/XenArmGenericTimerVirtCounterLib.inf
-  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-
-  # Virtio Support
-  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
-  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
 
   ArmVirtMemInfoLib|ArmVirtPkg/Library/XenVirtMemInfoLib/XenVirtMemInfoLib.inf
 
-  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
-
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
-  BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   PlatformBootManagerLib|ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
-  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]

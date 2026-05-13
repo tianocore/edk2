@@ -96,12 +96,27 @@ DEFINE FD_SIZE_IN_MB    = 3
 !include NetworkPkg/NetworkLibs.dsc.inc
 
   # ARM Architectural Libraries
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
+  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+
+  # Virtio Support
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+
+  #
+  # Misc
+  #
+  BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 
   PlatformPeiLib|ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmVirtPkg/Library/ArmVirtMemoryInitPeiLib/ArmVirtMemoryInitPeiLib.inf

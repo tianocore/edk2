@@ -41,28 +41,16 @@
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
-  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-
-  # Virtio Support
-  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
-  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
 
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/KvmtoolVirtMemInfoLib/KvmtoolVirtMemInfoLib.inf
 
-  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   VirtNorFlashDeviceLib|OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
   VirtNorFlashPlatformLib|ArmVirtPkg/Library/NorFlashKvmtoolLib/NorFlashKvmtoolLib.inf
-
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
 
   # BDS Libraries
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   PlatformBootManagerLib|ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
-
-  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
 
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
@@ -72,7 +60,6 @@
   PciHostBridgeLib|OvmfPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
   PciHostBridgeUtilityLib|ArmVirtPkg/Library/ArmVirtPciHostBridgeUtilityLib/ArmVirtPciHostBridgeUtilityLib.inf
 
-  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 
   PlatformPeiLib|ArmVirtPkg/Library/KvmtoolPlatformPeiLib/KvmtoolPlatformPeiLib.inf
