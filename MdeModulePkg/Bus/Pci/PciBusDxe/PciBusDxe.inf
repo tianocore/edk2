@@ -90,6 +90,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciScanFuncIfFunc0Absent       ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
