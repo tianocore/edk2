@@ -155,8 +155,6 @@
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
-  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-
   #
   # Platform Driver
   #

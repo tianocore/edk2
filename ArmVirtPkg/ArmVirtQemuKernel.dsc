@@ -307,8 +307,6 @@
   }
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
-  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
     <LibraryClasses>
       # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
