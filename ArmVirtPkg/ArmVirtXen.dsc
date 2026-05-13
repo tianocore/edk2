@@ -161,7 +161,6 @@
   # Platform Driver
   #
   ArmVirtPkg/XenioFdtDxe/XenioFdtDxe.inf
-  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem

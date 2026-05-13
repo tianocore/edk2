@@ -18,6 +18,12 @@
 
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
+!if $(PLAT_XEN) == TRUE
+  DEFINE ENABLE_VIRTIO           = FALSE
+!else
+  DEFINE ENABLE_VIRTIO           = TRUE
+!endif
+
 # Various builds now exceed 2MB so choose 3MB as the default.
 DEFINE FD_SIZE_IN_MB    = 3
 
@@ -450,6 +456,19 @@ DEFINE FD_SIZE_IN_MB    = 3
 !if $(PLAT_XEN) == FALSE
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+!endif
+
+  #
+  # Platform Driver
+  #
+  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+!if $(ENABLE_VIRTIO)
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 !endif
 
   #
