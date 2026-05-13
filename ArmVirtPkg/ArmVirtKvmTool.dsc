@@ -241,7 +241,6 @@
       NULL|ArmVirtPkg/Library/NorFlashKvmtoolLib/NorFlashKvmtoolLib.inf
   }
 
-  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/KvmtoolRtcFdtClientLib/KvmtoolRtcFdtClientLib.inf
