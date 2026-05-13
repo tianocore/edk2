@@ -453,6 +453,18 @@ DEFINE FD_SIZE_IN_MB    = 3
 !endif
 
   #
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
+  #
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
+  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+!if $(PLAT_CLOUD_HV) == TRUE || $(PLAT_QEMU) == TRUE  || $(PLAT_QEMU_KERNEL) == TRUE
+  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
+!endif
+
+  #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf {
