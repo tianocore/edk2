@@ -20,8 +20,10 @@
 
 !if $(PLAT_XEN) == TRUE
   DEFINE ENABLE_VIRTIO           = FALSE
+  DEFINE ENABLE_SCSI             = FALSE
 !else
   DEFINE ENABLE_VIRTIO           = TRUE
+  DEFINE ENABLE_SCSI             = TRUE
 !endif
 
 # Various builds now exceed 2MB so choose 3MB as the default.
@@ -503,6 +505,14 @@ DEFINE FD_SIZE_IN_MB    = 3
 !if $(PLAT_XEN) == FALSE
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
   MdeModulePkg/Logo/LogoDxe.inf
+!endif
+
+  #
+  # SCSI Bus and Disk Driver
+  #
+!if $(ENABLE_SCSI)
+  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 !endif
 
   #
