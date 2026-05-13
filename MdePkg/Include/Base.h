@@ -579,14 +579,27 @@ struct _LIST_ENTRY {
 
 #if defined (_M_ARM64)
 //
-// MSFT ARM variable argument list support.
+// MSVC AARCH64 and CLANGPDB AARCH64 hit this path. By default, they use the MS ABI for VA_LIST and
+// friends. However, this is against the AAPCS64 ABI and cause interop issues with GCC and CLANGDWARF.
+// These definitions coerce MSVC/CLANGPDB to use the AAPCS64 ABI.
 //
 
-typedef char *VA_LIST;
+typedef struct {
+  char    *stack;  // next stack param
+  char    *gr_top; // end of GP arg reg save area
+  char    *vr_top; // end of FP/SIMD arg reg save area
+  int     gr_offs; // offset from  gr_top to next GP register arg
+  int     vr_offs; // offset from  vr_top to next FP/SIMD register arg
+} VA_LIST;
 
-#define VA_START(Marker, Parameter)  __va_start (&Marker, &Parameter, _INT_SIZE_OF (Parameter), __alignof(Parameter), &Parameter)
-#define VA_ARG(Marker, TYPE)         (*(TYPE *) ((Marker += _INT_SIZE_OF (TYPE) + ((-(INTN)Marker) & (sizeof(TYPE) - 1))) - _INT_SIZE_OF (TYPE)))
-#define VA_END(Marker)               (Marker = (VA_LIST) 0)
+#define VA_START(Marker, Parameter)  Marker.gr_top = Marker.vr_top = NULL, \
+                                     Marker.gr_offs = Marker.vr_offs = 0,  \
+                                     __va_start (&Marker.stack, &Parameter, _INT_SIZE_OF (Parameter), __alignof (Parameter), &Parameter)
+#define VA_STACK_ARG(Marker, TYPE)   ((Marker.stack += _INT_SIZE_OF (TYPE) + ((-(INTN)Marker.stack) & (sizeof(TYPE) - 1))) - _INT_SIZE_OF (TYPE))
+#define VA_ARG(Marker, TYPE)         (*(TYPE *) ((Marker.gr_offs += _INT_SIZE_OF (TYPE)) <= 0 \
+                                     ? &Marker.gr_top[Marker.gr_offs - _INT_SIZE_OF (TYPE)] \
+                                     : VA_STACK_ARG(Marker, TYPE)))
+#define VA_END(Marker)               (Marker.stack = NULL)
 #define VA_COPY(Dest, Start)         ((void)((Dest) = (Start)))
 
 #elif defined (__GNUC__) || defined (__clang__)
