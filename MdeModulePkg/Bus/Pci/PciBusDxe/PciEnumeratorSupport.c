@@ -266,10 +266,21 @@ PciPciDeviceInfoCollector (
                  );
 
       if (EFI_ERROR (Status) && (Func == 0)) {
+        if (!FeaturePcdGet (PcdPciScanFuncIfFunc0Absent)) {
+          //
+          // Preserve default behavior for physical platforms: go to next
+          // device if there is no Function 0.
+          //
+          break;
+        }
+
         //
-        // go to next device if there is no Function 0
+        // Some virtualized PCI topologies may let a hypervisor expose
+        // selected non-zero functions to a guest while Function 0 is absent.
+        // Some platforms may require probing such functions.
+        // Keep scanning only when enabled by platform policy.
         //
-        break;
+        continue;
       }
 
       if (!EFI_ERROR (Status)) {
