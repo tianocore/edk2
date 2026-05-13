@@ -465,6 +465,19 @@ DEFINE FD_SIZE_IN_MB    = 3
 !endif
 
   #
+  # Platform Driver
+  #
+  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+!if $(PLAT_XEN) == FALSE
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  OvmfPkg/VirtioRngDxe/VirtioRng.inf
+!endif
+
+  #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf {
