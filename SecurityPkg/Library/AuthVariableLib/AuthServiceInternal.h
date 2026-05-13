@@ -180,6 +180,10 @@ CleanCertsFromDb (
   @param[in, out]   NewData       Pointer to new EFI_SIGNATURE_LIST.
   @param[in, out]   NewDataSize   Size of NewData buffer.
 
+  @retval EFI_SUCCESS            Duplicated signatures were filtered successfully.
+  @retval EFI_INVALID_PARAMETER  Input signature list data is malformed.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate scratch buffer.
+
 **/
 EFI_STATUS
 FilterSignatureList (
