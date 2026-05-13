@@ -515,6 +515,10 @@ DEFINE FD_SIZE_IN_MB    = 3
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 !endif
 
+  # Hii Database
+  #
+  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+
   #
   # ACPI Support
   #
