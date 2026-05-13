@@ -409,6 +409,15 @@ DEFINE FD_SIZE_IN_MB    = 3
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/ArmVirtGicArchLib/ArmVirtGicArchLib.inf
+  }
+  ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
+  }
+
   #
   # Architectural Protocols
   #
