@@ -435,12 +435,6 @@
   #
   # Platform Driver
   #
-  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
-  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
-  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
-  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
-  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-  OvmfPkg/VirtioRngDxe/VirtioRng.inf
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0
