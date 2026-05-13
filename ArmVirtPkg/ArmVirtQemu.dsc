@@ -27,6 +27,7 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
+  DEFINE PLAT_QEMU               = TRUE
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE QEMU_PV_VARS            = FALSE

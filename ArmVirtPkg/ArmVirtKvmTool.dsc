@@ -27,6 +27,7 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
 
+  DEFINE PLAT_KVMTOOL            = TRUE
   DEFINE ACPIVIEW_ENABLE         = TRUE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
