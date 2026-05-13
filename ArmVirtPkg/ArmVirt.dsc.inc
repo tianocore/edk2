@@ -518,3 +518,21 @@ DEFINE FD_SIZE_IN_MB    = 3
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/PlatformHasAcpiLib/PlatformHasAcpiLib.inf
   }
+
+  #
+  # PCI support
+  #
+!if $(PLAT_XEN) == FALSE
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  OvmfPkg/Virtio10Dxe/Virtio10.inf
+  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
+  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+!endif
+
