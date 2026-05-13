@@ -65,9 +65,6 @@
   DebugLib|MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
 !endif
 
-[LibraryClasses.common.UEFI_DRIVER]
-  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-
 [BuildOptions]
   #
   # We need to avoid jump tables in SEC modules, so that the PE/COFF

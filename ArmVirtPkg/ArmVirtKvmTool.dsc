@@ -103,9 +103,6 @@
   DebugLib|MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
 !endif
 
-[LibraryClasses.common.UEFI_DRIVER]
-  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
   #

@@ -72,9 +72,6 @@
 [LibraryClasses.common.DXE_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
 
-[LibraryClasses.common.UEFI_DRIVER]
-  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-
 [BuildOptions]
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
