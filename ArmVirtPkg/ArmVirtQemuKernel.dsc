@@ -305,7 +305,6 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtPL031FdtClientLib/ArmVirtPL031FdtClientLib.inf
   }
-  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
     <LibraryClasses>
