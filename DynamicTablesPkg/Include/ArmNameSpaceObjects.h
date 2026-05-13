@@ -60,6 +60,7 @@ typedef enum ArmObjectID {
   EArmObjGicItsV5Info,                                         ///< 30 - GIC ITS v5 Info
   EArmObjGicItsV5TranslateFrameInfo,                           ///< 31 - GIC ITS v5 Translate Frame Info
   EArmObjGicIwbInfo,                                           ///< 34 - GIC IWB Info
+  EArmObjBmuRegInfo,                                           ///< 35 - BMU Reg Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1054,5 +1055,21 @@ typedef struct CmArmGicIwbInfo {
   /// Unique identifier for this node.
   UINT32             Identifier;
 } CM_ARM_GIC_IWB_INFO;
+
+/** A structure that describes the BMU hardware
+    registers and interrupt.
+
+    ID: EArmObjBmuRegInfo
+*/
+typedef struct CmArmBmuRegInfo {
+  /// The Base address of BMU register space.
+  UINT64                       BaseAddress;
+
+  /// Length of the BMU registers
+  UINT64                       Length;
+
+  /// The BMU interrupt descriptor
+  CM_ARM_EXTENDED_INTERRUPT    BmuIntr;
+} CM_ARM_BMU_REG_INFO;
 
 #pragma pack()
