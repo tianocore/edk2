@@ -235,7 +235,6 @@
   }
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
-  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   #
   # Status Code Routing
   #
