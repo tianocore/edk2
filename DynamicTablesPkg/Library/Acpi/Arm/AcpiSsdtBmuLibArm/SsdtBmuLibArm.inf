@@ -1,0 +1,31 @@
+## @file
+# Ssdt BMU Table Generator
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtBmuLibArm
+  FILE_GUID      = 7f3b5aae-63c5-4efd-96c0-91937447845e
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtBmuConstructor
+  DESTRUCTOR     = AcpiSsdtBmuDestructor
+
+[Sources]
+  SsdtBmuGenerator.c
+  SsdtBmuGenerator.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
