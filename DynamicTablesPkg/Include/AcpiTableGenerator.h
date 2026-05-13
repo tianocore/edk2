@@ -99,6 +99,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
   - ERST  : The ERST generator collates the error record serialization
             instructions from the Configuration Manager and builds the ERST
             table.
+  - SSDT BMU:
+            The SSDT BMU generator collates the BMU specific information
+            from the Configuration Manager and uses the Dynamic AML CodeGen
+            API's to build the SSDT BMU table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -145,6 +149,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdMsct,                          ///< MSCT Generator
   EStdAcpiTableIdBert,                          ///< BERT Generator
   EStdAcpiTableIdErst,                          ///< ERST Generator
+  EStdAcpiTableIdSsdtBmu,                       ///< SSDT BMU Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
