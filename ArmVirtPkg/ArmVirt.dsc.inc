@@ -500,6 +500,14 @@ DEFINE FD_SIZE_IN_MB    = 3
 !endif
 
   #
+  # SCSI Bus and Disk Driver
+  #
+!if $(PLAT_XEN) == FALSE
+  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+!endif
+
+  #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf {
