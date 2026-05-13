@@ -34,5 +34,9 @@ InternalLocateProtocol (
   OUT VOID      **Interface
   )
 {
+  if (gMmst == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   return gMmst->MmLocateProtocol (Protocol, Registration, Interface);
 }

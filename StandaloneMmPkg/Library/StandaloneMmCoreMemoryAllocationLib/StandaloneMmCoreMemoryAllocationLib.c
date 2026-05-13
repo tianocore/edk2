@@ -38,6 +38,10 @@ InternalAllocatePages (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Memory;
 
+  if (mMemoryAllocationMmst == NULL) {
+    return NULL;
+  }
+
   if (Pages == 0) {
     return NULL;
   }
@@ -142,6 +146,10 @@ FreePages (
 {
   EFI_STATUS  Status;
 
+  if (mMemoryAllocationMmst == NULL) {
+    return;
+  }
+
   ASSERT (Pages != 0);
   Status = mMemoryAllocationMmst->MmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   ASSERT_EFI_ERROR (Status);
@@ -183,6 +191,10 @@ InternalAllocateAlignedPages (
   // Alignment must be a power of two or zero.
   //
   ASSERT ((Alignment & (Alignment - 1)) == 0);
+
+  if (mMemoryAllocationMmst == NULL) {
+    return NULL;
+  }
 
   if (Pages == 0) {
     return NULL;
@@ -348,6 +360,10 @@ FreeAlignedPages (
 {
   EFI_STATUS  Status;
 
+  if (mMemoryAllocationMmst == NULL) {
+    return;
+  }
+
   ASSERT (Pages != 0);
   Status = mMemoryAllocationMmst->MmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   ASSERT_EFI_ERROR (Status);
@@ -376,6 +392,10 @@ InternalAllocatePool (
   VOID        *Memory;
 
   Memory = NULL;
+
+  if (mMemoryAllocationMmst == NULL) {
+    return Memory;
+  }
 
   Status = mMemoryAllocationMmst->MmAllocatePool (MemoryType, AllocationSize, &Memory);
   if (EFI_ERROR (Status)) {
@@ -820,6 +840,10 @@ FreePool (
   )
 {
   EFI_STATUS  Status;
+
+  if (mMemoryAllocationMmst == NULL) {
+    return;
+  }
 
   Status = mMemoryAllocationMmst->MmFreePool (Buffer);
   ASSERT_EFI_ERROR (Status);
