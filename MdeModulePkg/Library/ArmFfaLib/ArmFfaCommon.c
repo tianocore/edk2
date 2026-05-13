@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -323,6 +325,13 @@ ArmFfaLibRxRelease (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RX_RELEASE;
+
+  /*
+   * Per Table 13.21: FFA_RX_RELEASE function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * PartId should be set to 0 in ARM_FID_FFA_RX_RELEASE.
+   */
+  PartId       = 0;
   FfaArgs.Arg1 = PartId;
 
   ArmCallFfa (&FfaArgs);
