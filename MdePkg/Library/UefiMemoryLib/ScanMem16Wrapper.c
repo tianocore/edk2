@@ -53,9 +53,9 @@ ScanMem16 (
   }
 
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN)Buffer & (sizeof (Value) - 1)) == 0);
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (Value)));
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
-  ASSERT ((Length & (sizeof (Value) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (Value)));
 
   return (VOID *)InternalMemScanMem16 (Buffer, Length / sizeof (Value), Value);
 }
