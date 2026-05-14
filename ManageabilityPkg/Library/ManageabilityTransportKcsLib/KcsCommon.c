@@ -685,7 +685,6 @@ KcsTransportSendCommand (
 {
   EFI_STATUS  Status;
   UINT8       *RspHeader;
-  UINT32      ExpectedResponseDataSize;
 
   if ((RequestData != NULL) && (RequestDataSize == 0)) {
     DEBUG ((DEBUG_ERROR, "%a: Mismatched values of RequestData and RequestDataSize\n", __func__));
@@ -759,24 +758,13 @@ KcsTransportSendCommand (
 
     FreePool (RspHeader);
 
-    ExpectedResponseDataSize = *ResponseDataSize;
-    Status                   = KcsTransportRead (ResponseData, ResponseDataSize);
+    Status = KcsTransportRead (ResponseData, ResponseDataSize);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "KCS response read Failed with Status(%r)\n", Status));
     }
 
     // Print out the response payloads.
     if (*ResponseDataSize != 0) {
-      if (ExpectedResponseDataSize != *ResponseDataSize) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "Expected KCS response size : %d is not matched to returned size : %d.\n",
-          ExpectedResponseDataSize,
-          *ResponseDataSize
-          ));
-        return EFI_DEVICE_ERROR;
-      }
-
       HelperManageabilityDebugPrint ((VOID *)ResponseData, (UINT32)*ResponseDataSize, "KCS Response Data:\n");
       Status = KcsCheckResponseData (ResponseData, *ResponseDataSize, AdditionalStatus);
     } else {
