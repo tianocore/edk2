@@ -383,6 +383,47 @@ KcsTransportRead (
     }
   }
 
+  //
+  // Per IPMI 2.0 Spec Figure 9-7, drain remaining bytes until
+  // BMC transitions to IDLE_STATE.
+  //
+  while (TRUE) {
+    Status = WaitStatusClear (IPMI_KCS_IBF);
+    if (EFI_ERROR (Status)) {
+      *Length = ReadLength;
+      return Status;
+    }
+
+    if (IPMI_KCS_GET_STATE (KcsRegisterRead8 (KCS_REG_STATUS)) == IpmiKcsIdleState) {
+      Status = WaitStatusSet (IPMI_KCS_OBF);
+      if (EFI_ERROR (Status)) {
+        *Length = ReadLength;
+        return Status;
+      }
+
+      KcsRegisterRead8 (KCS_REG_DATA_IN);
+      break;
+    } else if (IPMI_KCS_GET_STATE (KcsRegisterRead8 (KCS_REG_STATUS)) == IpmiKcsReadState) {
+      Status = WaitStatusSet (IPMI_KCS_OBF);
+      if (EFI_ERROR (Status)) {
+        *Length = ReadLength;
+        return Status;
+      }
+
+      KcsRegisterRead8 (KCS_REG_DATA_IN);
+      Status = WaitStatusClear (IPMI_KCS_IBF);
+      if (EFI_ERROR (Status)) {
+        *Length = ReadLength;
+        return Status;
+      }
+
+      KcsRegisterWrite8 (KCS_REG_DATA_OUT, IPMI_KCS_CONTROL_CODE_READ);
+    } else {
+      *Length = ReadLength;
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
   *Length = ReadLength;
   return EFI_SUCCESS;
 }
