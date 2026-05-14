@@ -577,7 +577,7 @@ SendSpiCmd (
       break;
 
     case FlashCycleErase:
-      if (((ByteCount % SIZE_4KB) != 0) || ((HardwareSpiAddr % SIZE_4KB) != 0)) {
+      if (!IS_ALIGNED (ByteCount, SIZE_4KB) || !IS_ALIGNED (HardwareSpiAddr, SIZE_4KB)) {
         DEBUG ((DEBUG_ERROR, "Erase and erase size must be 4KB aligned. \n"));
         ASSERT (FALSE);
         Status = EFI_INVALID_PARAMETER;
@@ -640,8 +640,8 @@ SendSpiCmd (
 
     if (FlashCycleType == FlashCycleErase) {
       if (((ByteCount / SIZE_64KB) != 0) &&
-          ((ByteCount % SIZE_64KB) == 0) &&
-          ((HardwareSpiAddr % SIZE_64KB) == 0))
+          IS_ALIGNED (ByteCount, SIZE_64KB) &&
+          IS_ALIGNED (HardwareSpiAddr, SIZE_64KB))
       {
         if (HardwareSpiAddr < SpiInstance->Component1StartAddr) {
           //
