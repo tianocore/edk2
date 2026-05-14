@@ -13,9 +13,8 @@
 //
 // Global Variables
 //
-BOOLEAN     InterruptState = FALSE;
-EFI_HANDLE  mCpuHandle     = NULL;
-BOOLEAN     mIsFlushingGCD;
+BOOLEAN     InterruptState         = FALSE;
+EFI_HANDLE  mCpuHandle             = NULL;
 BOOLEAN     mIsAllocatingPageTable = FALSE;
 UINT64      mTimerPeriod           = 0;
 
@@ -321,17 +320,6 @@ CpuSetMemoryAttributes (
   UINT64                    CacheAttributes;
   UINT64                    MemoryAttributes;
   MTRR_MEMORY_CACHE_TYPE    CurrentCacheType;
-
-  //
-  // If this function is called because GCD SetMemorySpaceAttributes () is called
-  // by RefreshGcdMemoryAttributes (), then we are just synchronizing GCD memory
-  // map with MTRR values. So there is no need to modify MTRRs, just return immediately
-  // to avoid unnecessary computing.
-  //
-  if (mIsFlushingGCD) {
-    DEBUG ((DEBUG_VERBOSE, "  Flushing GCD\n"));
-    return EFI_SUCCESS;
-  }
 
   //
   // During memory attributes updating, new pages may be allocated to setup
@@ -681,8 +669,6 @@ RefreshGcdMemoryAttributes (
   VOID
   )
 {
-  mIsFlushingGCD = TRUE;
-
   if (IsMtrrSupported ()) {
     RefreshMemoryAttributesFromMtrr ();
   }
@@ -690,8 +676,6 @@ RefreshGcdMemoryAttributes (
   if (IsPagingAndPageAddressExtensionsEnabled ()) {
     RefreshGcdMemoryAttributesFromPaging ();
   }
-
-  mIsFlushingGCD = FALSE;
 }
 
 /**
