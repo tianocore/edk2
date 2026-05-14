@@ -227,7 +227,7 @@ PciIoPollMem (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Status = PciIoMemRead (This, Width, BarIndex, Offset, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -335,7 +335,7 @@ PciIoPollIo (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Status = PciIoIoRead (This, Width, BarIndex, Offset, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -443,7 +443,7 @@ PciIoMemRead (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
@@ -521,7 +521,7 @@ PciIoMemWrite (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
@@ -599,7 +599,7 @@ PciIoIoRead (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
@@ -677,7 +677,7 @@ PciIoIoWrite (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
@@ -746,7 +746,7 @@ PciIoConfigRead (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
@@ -815,7 +815,7 @@ PciIoConfigWrite (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
+    if (!IS_ALIGNED (Offset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
@@ -915,7 +915,7 @@ PciIoCopyMem (
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
   //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
-    if (((SrcOffset & ((1 << (Width & 0x03)) - 1)) != 0) || ((DestOffset & ((1 << (Width & 0x03)) - 1)) != 0)) {
+    if (!IS_ALIGNED (SrcOffset, 1 << (Width & 0x03)) || !IS_ALIGNED (DestOffset, 1 << (Width & 0x03))) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width  = (EFI_PCI_IO_PROTOCOL_WIDTH)(Width & (~0x03));
     }
