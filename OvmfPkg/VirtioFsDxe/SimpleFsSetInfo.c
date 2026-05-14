@@ -110,7 +110,7 @@ ValidateInfoStructure (
   ASSERT (SizeByProtocolCaller >= NameFieldByteOffset);
   NameFieldBytes = SizeByProtocolCaller - NameFieldByteOffset;
   ASSERT (NameFieldBytes >= sizeof (CHAR16));
-  if (NameFieldBytes % sizeof (CHAR16) != 0) {
+  if (!IS_ALIGNED (NameFieldBytes, sizeof (CHAR16))) {
     return EFI_INVALID_PARAMETER;
   }
 
