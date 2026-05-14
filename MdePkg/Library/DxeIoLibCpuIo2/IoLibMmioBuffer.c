@@ -81,13 +81,13 @@ MmioReadBuffer16 (
 {
   UINT16  *ReturnBuffer;
 
-  ASSERT ((StartAddress & (sizeof (UINT16) - 1)) == 0);
+  ASSERT (IS_ALIGNED (StartAddress, sizeof (UINT16)));
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ASSERT ((Length & (sizeof (UINT16) - 1)) == 0);
-  ASSERT (((UINTN)Buffer & (sizeof (UINT16) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (UINT16)));
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (UINT16)));
 
   ReturnBuffer = Buffer;
 
@@ -132,13 +132,13 @@ MmioReadBuffer32 (
 {
   UINT32  *ReturnBuffer;
 
-  ASSERT ((StartAddress & (sizeof (UINT32) - 1)) == 0);
+  ASSERT (IS_ALIGNED (StartAddress, sizeof (UINT32)));
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ASSERT ((Length & (sizeof (UINT32) - 1)) == 0);
-  ASSERT (((UINTN)Buffer & (sizeof (UINT32) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (UINT32)));
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (UINT32)));
 
   ReturnBuffer = Buffer;
 
@@ -184,13 +184,13 @@ MmioReadBuffer64 (
 {
   UINT64  *ReturnBuffer;
 
-  ASSERT ((StartAddress & (sizeof (UINT64) - 1)) == 0);
+  ASSERT (IS_ALIGNED (StartAddress, sizeof (UINT64)));
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ASSERT ((Length & (sizeof (UINT64) - 1)) == 0);
-  ASSERT (((UINTN)Buffer & (sizeof (UINT64) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (UINT64)));
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (UINT64)));
 
   ReturnBuffer = Buffer;
 
@@ -276,13 +276,13 @@ MmioWriteBuffer16 (
 {
   UINT16  *ReturnBuffer;
 
-  ASSERT ((StartAddress & (sizeof (UINT16) - 1)) == 0);
+  ASSERT (IS_ALIGNED (StartAddress, sizeof (UINT16)));
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ASSERT ((Length & (sizeof (UINT16) - 1)) == 0);
-  ASSERT (((UINTN)Buffer & (sizeof (UINT16) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (UINT16)));
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (UINT16)));
 
   ReturnBuffer = (UINT16 *)Buffer;
 
@@ -329,13 +329,13 @@ MmioWriteBuffer32 (
 {
   UINT32  *ReturnBuffer;
 
-  ASSERT ((StartAddress & (sizeof (UINT32) - 1)) == 0);
+  ASSERT (IS_ALIGNED (StartAddress, sizeof (UINT32)));
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ASSERT ((Length & (sizeof (UINT32) - 1)) == 0);
-  ASSERT (((UINTN)Buffer & (sizeof (UINT32) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (UINT32)));
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (UINT32)));
 
   ReturnBuffer = (UINT32 *)Buffer;
 
@@ -382,13 +382,13 @@ MmioWriteBuffer64 (
 {
   UINT64  *ReturnBuffer;
 
-  ASSERT ((StartAddress & (sizeof (UINT64) - 1)) == 0);
+  ASSERT (IS_ALIGNED (StartAddress, sizeof (UINT64)));
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ASSERT ((Length & (sizeof (UINT64) - 1)) == 0);
-  ASSERT (((UINTN)Buffer & (sizeof (UINT64) - 1)) == 0);
+  ASSERT (IS_ALIGNED (Length, sizeof (UINT64)));
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (UINT64)));
 
   ReturnBuffer = (UINT64 *)Buffer;
 

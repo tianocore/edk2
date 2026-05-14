@@ -243,7 +243,7 @@ CpuSetMemoryAttributes (
     return EFI_SUCCESS;
   }
 
-  if ((BaseAddress & (SIZE_4KB - 1)) != 0) {
+  if (!IS_ALIGNED (BaseAddress, SIZE_4KB)) {
     // Minimum granularity is SIZE_4KB (4KB on ARM)
     DEBUG ((DEBUG_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum granularity is SIZE_4KB\n", BaseAddress, Length, EfiAttributes));
     return EFI_UNSUPPORTED;

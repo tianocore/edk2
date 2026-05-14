@@ -2735,13 +2735,13 @@ CoreTerminateMemoryMap (
         if (mMemoryTypeStatistics[Entry->Type].Runtime) {
           ASSERT (Entry->Type != EfiACPIReclaimMemory);
           ASSERT (Entry->Type != EfiACPIMemoryNVS);
-          if ((Entry->Start & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) {
+          if (!IS_ALIGNED (Entry->Start, RUNTIME_PAGE_ALLOCATION_GRANULARITY)) {
             DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
             Status =  EFI_INVALID_PARAMETER;
             goto Done;
           }
 
-          if (((Entry->End + 1) & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) {
+          if (!IS_ALIGNED (Entry->End + 1, RUNTIME_PAGE_ALLOCATION_GRANULARITY)) {
             DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ExitBootServices: A RUNTIME memory entry is not on a proper alignment.\n"));
             Status =  EFI_INVALID_PARAMETER;
             goto Done;
