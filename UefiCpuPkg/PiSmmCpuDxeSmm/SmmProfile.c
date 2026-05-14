@@ -527,7 +527,7 @@ InitProtectedMemRange (
     //
     ProtectBaseAddress = mProtectionMemRange[Index].Range.Base;
     ProtectEndAddress  = mProtectionMemRange[Index].Range.Top;
-    if (((ProtectBaseAddress & (SIZE_2MB - 1)) != 0) || ((ProtectEndAddress  & (SIZE_2MB - 1)) != 0)) {
+    if (!IS_ALIGNED (ProtectBaseAddress, SIZE_2MB) || !IS_ALIGNED (ProtectEndAddress, SIZE_2MB)) {
       //
       // Check if it is possible to create 4KB-page for not 2MB-aligned range and to create 2MB-page for 2MB-aligned range.
       // A mix of 4KB and 2MB page could save SMRAM space.
