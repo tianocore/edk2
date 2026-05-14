@@ -46,7 +46,7 @@ PeiSwitchStacks (
   //
   // Stack should be aligned with CPU_STACK_ALIGNMENT
   //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
+  ASSERT (ADDRESS_IS_ALIGNED (NewStack, CPU_STACK_ALIGNMENT));
 
   JumpBuffer.Eip               = (UINTN)EntryPoint;
   JumpBuffer.Esp               = (UINTN)NewStack - sizeof (VOID *);
