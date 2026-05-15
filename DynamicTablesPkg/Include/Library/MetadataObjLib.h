@@ -77,7 +77,7 @@ MetadataInitializeHandle (
 
 /** Free the Metadata Root.
 
-  @param[in]  Root  Root of the Metadata information to free.
+  @param[in]  RootHandle  Root of the Metadata information to free.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -86,7 +86,7 @@ MetadataInitializeHandle (
 EFI_STATUS
 EFIAPI
 MetadataFreeHandle (
-  IN METADATA_ROOT_HANDLE  Root
+  IN METADATA_ROOT_HANDLE  RootHandle
   );
 
 /** Attach some Metadata to a (Type/Token) pair.
