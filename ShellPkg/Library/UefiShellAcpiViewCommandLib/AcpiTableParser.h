@@ -10,7 +10,7 @@
 /**
   The maximum number of ACPI table parsers.
 */
-#define MAX_ACPI_TABLE_PARSERS  32
+#define MAX_ACPI_TABLE_PARSERS  128
 
 /** An invalid/NULL signature value.
 */
