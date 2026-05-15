@@ -217,7 +217,7 @@ GetMemoryPermissions (
        * 2.8 FFA_MEM_PERM_GET
        */
       *PageCount = SvcArgs.Arg3 + 1;
-      ASSERT (*PageCount > EFI_SIZE_TO_PAGES (Length));
+      ASSERT (*PageCount <= EFI_SIZE_TO_PAGES (Length));
     } else {
       *PageCount = 1;
     }
