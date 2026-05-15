@@ -13,6 +13,7 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/SerialPortLib.h>
+#include <Register/LoongArch64/Csr.h>
 
 //
 // PCI Defintions.
@@ -124,6 +125,16 @@ GetSerialRegisterBase (
   VOID           *Base;
   RETURN_STATUS  Status;
   UINT64         SerialConsoleAddress;
+  UINTN          SerialRegisterBase;
+
+  //
+  // The LoongArchVirt serial hook path uses KS1 to hand off the UART base.
+  // Reuse it here to avoid repeated FDT lookups during early debug output.
+  //
+  SerialRegisterBase = CsrRead (LOONGARCH_CSR_KS1);
+  if (SerialRegisterBase != 0) {
+    return SerialRegisterBase;
+  }
 
   Base   = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   Status = FdtSerialGetConsolePort (Base, &SerialConsoleAddress);
@@ -131,7 +142,10 @@ GetSerialRegisterBase (
     return (UINTN)0;
   }
 
-  return SerialConsoleAddress;
+  SerialRegisterBase = (UINTN)SerialConsoleAddress;
+  CsrWrite (LOONGARCH_CSR_KS1, SerialRegisterBase);
+
+  return SerialRegisterBase;
 }
 
 /**
