@@ -176,7 +176,7 @@ BaseName (
   return Str;
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArchVectorConfig (
   IN  UINTN  VectorBaseAddress
   )
@@ -197,7 +197,7 @@ ArchVectorConfig (
     ArmWriteHcr (HcrReg);
   }
 
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 VOID
@@ -429,7 +429,7 @@ InitializeCpuExceptionHandlers (
 
   ArmWriteVBar ((UINTN)VectorBase);
 
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -457,7 +457,7 @@ previously installed.
 @retval EFI_UNSUPPORTED       The interrupt specified by ExceptionType is not supported,
 or this function is not supported.
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
   IN EFI_EXCEPTION_TYPE         ExceptionType,
@@ -465,16 +465,16 @@ RegisterCpuInterruptHandler (
   )
 {
   if ((UINTN)ExceptionType > mMaxExceptionNumber) {
-    return RETURN_UNSUPPORTED;
+    return EFI_UNSUPPORTED;
   }
 
   if ((ExceptionHandler != NULL) && (mExceptionHandlers[ExceptionType] != NULL)) {
-    return RETURN_ALREADY_STARTED;
+    return EFI_ALREADY_STARTED;
   }
 
   mExceptionHandlers[ExceptionType] = ExceptionHandler;
 
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 /**
