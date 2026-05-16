@@ -56,9 +56,12 @@
   RiscV/ExceptionHandlerAsm.S | GCC
 
 [Sources.AARCH64]
+  AArch64/CpuExceptionHandlerLib.c
   AArch64/ArmExceptionLib.c
   AArch64/AArch64Exception.c
   AArch64/ExceptionSupport.S | GCC
+  CpuExceptionHelpers.h
+  SecPeiCpuExceptionHelpers.c
 
 [Packages]
   MdePkg/MdePkg.dec
