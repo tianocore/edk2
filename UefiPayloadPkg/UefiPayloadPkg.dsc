@@ -6,6 +6,8 @@
 # Copyright (c) 2014 - 2023, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # Copyright 2024 Google LLC
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.<BR>
+#
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -444,7 +446,7 @@
 
   # ARM Architectural Libraries
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
-  CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
 
   # ARM PL031 RTC Driver
