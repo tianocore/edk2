@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved. <BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -9,7 +10,7 @@
 #include <Uefi.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/UefiLib.h>
-
+#include <Library/UefiBootServicesTableLib.h>
 #include <Guid/DebugImageInfoTable.h>
 
 /**
@@ -67,4 +68,24 @@ GetImageName (
   }
 
   return NULL;
+}
+
+/**
+  Logs a message to the UEFI console output.
+
+  Outputs the provided wide-character string to the console via the
+  Simple Text Output Protocol. If the console output is unavailable,
+  the function returns without performing any action.
+
+  @param[in]  Buffer    Pointer to the null-terminated CHAR16 string to output.
+
+**/
+VOID
+LogToConsole (
+  IN CHAR16  *Buffer
+  )
+{
+  if (gST->ConOut != NULL) {
+    gST->ConOut->OutputString (gST->ConOut, Buffer);
+  }
 }
