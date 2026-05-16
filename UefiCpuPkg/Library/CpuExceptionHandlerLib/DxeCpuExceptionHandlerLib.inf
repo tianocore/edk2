@@ -59,8 +59,6 @@
 [Sources.AARCH64]
   AArch64/CpuExceptionHandlerLib.c
   AArch64/DxeCpuExceptionSupport.c
-  AArch64/ArmExceptionLib.c
-  AArch64/AArch64Exception.c
   AArch64/ExceptionSupport.S | GCC
 
 [Pcd]

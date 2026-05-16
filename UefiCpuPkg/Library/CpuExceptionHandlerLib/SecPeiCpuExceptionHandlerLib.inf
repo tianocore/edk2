@@ -58,8 +58,6 @@
 [Sources.AARCH64]
   AArch64/CpuExceptionHandlerLib.c
   AArch64/SecPeiCpuExceptionSupport.c
-  AArch64/ArmExceptionLib.c
-  AArch64/AArch64Exception.c
   AArch64/ExceptionSupport.S | GCC
 
 [Packages]
