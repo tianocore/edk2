@@ -200,6 +200,16 @@
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
   MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
 
+# Force PE/COFF sections to be aligned at 4KB boundaries so DXE Core can
+# apply page-level image protection, including NX, to IA32/X64 DXE images.
+[BuildOptions.IA32.EDKII.DXE_CORE, BuildOptions.X64.EDKII.DXE_CORE, BuildOptions.IA32.EDKII.DXE_DRIVER, BuildOptions.X64.EDKII.DXE_DRIVER, BuildOptions.IA32.EDKII.UEFI_DRIVER, BuildOptions.X64.EDKII.UEFI_DRIVER, BuildOptions.IA32.EDKII.UEFI_APPLICATION, BuildOptions.X64.EDKII.UEFI_APPLICATION]
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
+# Force PE/COFF sections to be aligned at 64KB boundaries so DXE Core can
+# apply page-level image protection, including NX, to AARCH64 DXE images.
+[BuildOptions.AARCH64.EDKII.DXE_CORE, BuildOptions.AARCH64.EDKII.DXE_DRIVER, BuildOptions.AARCH64.EDKII.UEFI_DRIVER, BuildOptions.AARCH64.EDKII.UEFI_APPLICATION]
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+
 [BuildOptions.IA32.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.X64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
 
