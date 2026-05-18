@@ -1,0 +1,35 @@
+## @file
+#  Google Test application for HMAT Generator.
+#
+#  Copyright (c) 2026, Google LLC. All rights reserved. <BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = HmatGeneratorGoogleTest
+  FILE_GUID                      = c78fdb8e-9d00-48fd-b06b-daafc7e947cf
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  HmatGeneratorGoogleTest.cpp
+  ../../../../../Test/Mock/Library/GoogleTest/Protocol/MockConfigurationManagerProtocol.cpp
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  TableHelperLib
+  CmObjHelperLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid  ## CONSUMES
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
