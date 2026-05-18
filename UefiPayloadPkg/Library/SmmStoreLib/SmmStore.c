@@ -29,6 +29,21 @@ STATIC EFI_PHYSICAL_ADDRESS  mArgComBufPhys;
  */
 STATIC SMMSTORE_INFO  *mSmmStoreInfo;
 
+#define SMMSTORE_TRIGGER_SMI_RETRY_COUNT  127
+#define SMMSTORE_CALL_RETRY_COUNT         8
+#define SMMSTORE_CALL_RETRY_STALL_US      250
+
+STATIC
+VOID
+StallBetweenCallAttempts (
+  IN UINTN  Attempt
+  )
+{
+  if ((gBS != NULL) && (gBS->Stall != NULL)) {
+    gBS->Stall ((Attempt + 1) * SMMSTORE_CALL_RETRY_STALL_US);
+  }
+}
+
 /**
   Calls into SMM to use the SMMSTOREv2 implementation for persistent storage.
 
@@ -54,17 +69,26 @@ CallSmm (
   CONST UINTN  Rax = ((SubCmd << 8) | Cmd);
   CONST UINTN  Rbx = Arg;
   UINTN        Result;
+  UINTN        Attempt;
+  BOOLEAN      SawResponse;
 
-  Result = TriggerSmi (Rax, Rbx, 5);
-  if (Result == Rax) {
-    return EFI_NO_RESPONSE;
-  } else if (Result == SMMSTORE_RET_SUCCESS) {
-    return EFI_SUCCESS;
-  } else if (Result == SMMSTORE_RET_UNSUPPORTED) {
-    return EFI_UNSUPPORTED;
+  SawResponse = FALSE;
+  for (Attempt = 0; Attempt < SMMSTORE_CALL_RETRY_COUNT; ++Attempt) {
+    Result = TriggerSmi (Rax, Rbx, SMMSTORE_TRIGGER_SMI_RETRY_COUNT);
+    if (Result == Rax) {
+      StallBetweenCallAttempts (Attempt);
+      continue;
+    } else if (Result == SMMSTORE_RET_SUCCESS) {
+      return EFI_SUCCESS;
+    } else if (Result == SMMSTORE_RET_UNSUPPORTED) {
+      return EFI_UNSUPPORTED;
+    }
+
+    SawResponse = TRUE;
+    StallBetweenCallAttempts (Attempt);
   }
 
-  return EFI_DEVICE_ERROR;
+  return SawResponse ? EFI_DEVICE_ERROR : EFI_NO_RESPONSE;
 }
 
 /**
