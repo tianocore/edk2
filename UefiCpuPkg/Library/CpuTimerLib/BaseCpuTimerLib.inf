@@ -30,6 +30,9 @@
 [Sources.LoongArch64]
   LoongArch64/CpuTimerLib.c
 
+[Sources.RISCV64]
+  RiscV64/CpuTimerLib.c
+
 [Packages]
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
@@ -41,6 +44,13 @@
 
 [LibraryClasses.LoongArch64]
   SafeIntLib
+
+[LibraryClasses.RISCV64]
+  FdtLib
+  HobLib
+
+[Guids.RISCV64]
+  gFdtHobGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
