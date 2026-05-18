@@ -320,8 +320,19 @@ PlatformBootManagerAfterConsole (
     BootLogoEnableLogo ();
   }
 
-  EfiBootManagerConnectAll ();
-  EfiBootManagerRefreshAllBootOption ();
+  if (GetBootModeHob () != BOOT_ON_S4_RESUME) {
+    EfiBootManagerConnectAll ();
+    EfiBootManagerRefreshAllBootOption ();
+  } else {
+    //
+    // Avoid a global ConnectAll()/RefreshAllBootOption() on S4 resume.
+    //
+    // Connecting removable media here makes the final DXE handle graph and memory
+    // allocation pattern depend on USB and SD presence. That can perturb the EFI
+    // memory map enough to break OS hibernation resume if devices are inserted or
+    // removed while the system is in S4.
+    //
+  }
 
   //
   // Active BOOT_ON_FLASH_UPDATE mode means that at least one capsule has been
