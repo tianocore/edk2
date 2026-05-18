@@ -29,10 +29,6 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
-[BuildOptions]
-   *_*_IA32_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
-   *_*_X64_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
-
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
