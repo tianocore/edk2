@@ -1,0 +1,41 @@
+## @file
+#  Dxe CPU Timer Library
+#
+#  Provides basic timer support.
+#
+#  Copyright (C) 2026 Qualcomm Technologies, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCpuTimerLib
+  FILE_GUID                      = 3F9A2C17-7D4E-4B89-A6C2-91E5F2D8B0AC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib | DXE_DRIVER DXE_RUNTIME_DRIVER
+  MODULE_UNI_FILE                = CpuTimerLib.uni
+  CONSTRUCTOR                    = CpuTimerLibConstructor
+
+[Sources.RISCV64]
+  RiscV64/CpuTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+
+[LibraryClasses.RISCV64]
+  FdtLib
+  HobLib
+
+[Guids.RISCV64]
+  gFdtHobGuid
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES

@@ -10,6 +10,7 @@
 #
 #  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (C) 2026 Qualcomm Technologies, Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -21,7 +22,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TimerLib
-  MODULE_UNI_FILE                = BaseCpuTimerLib.uni
+  MODULE_UNI_FILE                = CpuTimerLib.uni
 
 [Sources.IA32, Sources.X64]
   CpuTimerLib.c
@@ -29,6 +30,9 @@
 
 [Sources.LoongArch64]
   LoongArch64/CpuTimerLib.c
+
+[Sources.RISCV64]
+  RiscV64/CpuTimerLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -41,6 +45,13 @@
 
 [LibraryClasses.LoongArch64]
   SafeIntLib
+
+[LibraryClasses.RISCV64]
+  FdtLib
+  HobLib
+
+[Guids.RISCV64]
+  gFdtHobGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES

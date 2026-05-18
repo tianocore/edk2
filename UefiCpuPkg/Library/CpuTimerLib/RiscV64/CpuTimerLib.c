@@ -2,6 +2,7 @@
   RISC-V instance of Timer Library.
 
   Copyright (c) 2016 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (C) 2026 Qualcomm Technologies, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -270,13 +271,17 @@ GetTimeInNanoSecond (
   GetPerformanceCounterProperties() is invoked and mTimeBase is initialized
   before any code that depends on it.
 
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
   @retval EFI_SUCCESS   The constructor always returns success.
 
 **/
 EFI_STATUS
 EFIAPI
-BaseRiscV64CpuTimerLibConstructor (
-  VOID
+CpuTimerLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   GetPerformanceCounterProperties (NULL, NULL);
