@@ -223,6 +223,7 @@
 
 [Components.RISCV64]
   UefiCpuPkg/Library/BaseRiscVMmuLib/BaseRiscVMmuLib.inf
+  UefiCpuPkg/Library/CpuTimerLib/DxeCpuTimerLib.inf
   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
