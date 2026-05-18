@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __ABOOTIMG_H__
-#define __ABOOTIMG_H__
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -62,5 +61,3 @@ AndroidBootImgBoot (
   IN VOID   *Buffer,
   IN UINTN  BufferSize
   );
-
-#endif /* __ABOOTIMG_H__ */

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef EFI_MP_SERVICES_UNIT_TEST_COMMOM_H_
-#define EFI_MP_SERVICES_UNIT_TEST_COMMOM_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/MpServices2.h>
@@ -625,5 +624,3 @@ AddCommonTestCase (
   IN  UNIT_TEST_FRAMEWORK_HANDLE  Framework,
   IN  MP_SERVICE_UT_CONTEXT       *Context
   );
-
-#endif

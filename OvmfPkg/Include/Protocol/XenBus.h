@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __PROTOCOL_XENBUS_H__
-#define __PROTOCOL_XENBUS_H__
+#pragma once
 
 #define XENBUS_PROTOCOL_GUID \
   {0x3d3ca290, 0xb9a5, 0x11e3, {0xb7, 0x5d, 0xb8, 0xac, 0x6f, 0x7d, 0x65, 0xe6}}
@@ -402,5 +401,3 @@ struct _XENBUS_PROTOCOL {
 };
 
 extern EFI_GUID  gXenBusProtocolGuid;
-
-#endif

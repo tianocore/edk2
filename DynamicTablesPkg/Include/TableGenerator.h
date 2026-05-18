@@ -10,8 +10,7 @@
     - DT     - Device Tree
 **/
 
-#ifndef TABLE_GENERATOR_H_
-#define TABLE_GENERATOR_H_
+#pragma once
 
 /** The TABLE_GENERATOR_ID type describes the Table Generator ID
 
@@ -56,6 +55,7 @@ _______________________________________________________________________________
        8 - SPCR
        9 - MCFG
       10 - PPTT
+      27 - HEST
 
     Standard SMBIOS Table IDs:
        0 - Reserved
@@ -242,5 +242,3 @@ typedef enum TableGeneratorNameSpace {
   @return the Minor part of the revision.
 **/
 #define GET_MINOR_REVISION(Revision)  ((Revision) & MINOR_REVISION_MASK)
-
-#endif // TABLE_GENERATOR_H_

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PLATFORM_FLASH_ACCESS_LIB_H__
-#define __PLATFORM_FLASH_ACCESS_LIB_H__
+#pragma once
 
 #include <Protocol/FirmwareManagement.h>
 
@@ -91,5 +90,3 @@ PerformFlashWriteWithProgress (
   IN UINTN                                          StartPercentage,
   IN UINTN                                          EndPercentage
   );
-
-#endif

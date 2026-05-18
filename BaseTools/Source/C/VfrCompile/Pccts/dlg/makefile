@@ -114,7 +114,7 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
   SHELL := cmd.exe
   SEP := $(shell echo \)
   RM := del /f /q
@@ -162,7 +162,7 @@ main.$(OBJ_EXT) : main.c dlg.h
 set.$(OBJ_EXT) : $(SET)/set.c
 	$(CC) -c $(CFLAGS) $(SET)/set.c
 
-%.o : %.c 
+%.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 lint:

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef FirmwareVolumeBuffer_h_INCLUDED
-#define FirmwareVolumeBuffer_h_INCLUDED
+#pragma once
 
 #include "Common/UefiBaseTypes.h"
 #include "Common/PiFirmwareFile.h"
@@ -158,6 +157,3 @@ EFI_STATUS
 FvBufShrinkWrap (
   IN VOID *Fv
   );
-
-#endif // #ifndef FirmwareVolumeBuffer_h_INCLUDED
-

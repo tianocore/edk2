@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_MEMORY_LIB__
-#define __BASE_MEMORY_LIB__
+#pragma once
 
 /**
   Copies a source buffer to a destination buffer, and returns the destination buffer.
@@ -479,5 +478,3 @@ IsZeroBuffer (
   IN CONST VOID  *Buffer,
   IN UINTN       Length
   );
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __NON_DISCOVERABLE_DEVICE_H__
-#define __NON_DISCOVERABLE_DEVICE_H__
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -67,5 +66,3 @@ struct _NON_DISCOVERABLE_DEVICE {
 };
 
 extern EFI_GUID  gEdkiiNonDiscoverableDeviceProtocolGuid;
-
-#endif

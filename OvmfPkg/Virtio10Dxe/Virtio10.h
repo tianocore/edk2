@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _VIRTIO_1_0_DXE_H_
-#define _VIRTIO_1_0_DXE_H_
+#pragma once
 
 #include <Protocol/PciIo.h>
 #include <Protocol/VirtioDevice.h>
@@ -46,5 +45,3 @@ typedef struct {
 
 #define VIRTIO_1_0_FROM_VIRTIO_DEVICE(Device) \
           CR (Device, VIRTIO_1_0_DEV, VirtIo, VIRTIO_1_0_SIGNATURE)
-
-#endif // _VIRTIO_1_0_DXE_H_

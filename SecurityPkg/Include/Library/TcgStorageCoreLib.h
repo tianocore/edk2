@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_CORE_H_
-#define _TCG_CORE_H_
+#pragma once
 
 #include <IndustryStandard/TcgStorageCore.h>
 
@@ -1281,5 +1280,3 @@ TcgIsLocked (
   );
 
 #pragma pack()
-
-#endif // _TCG_CORE_H_

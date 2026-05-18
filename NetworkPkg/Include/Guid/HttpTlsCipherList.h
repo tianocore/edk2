@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HTTP_TLS_CIPHER_LIST_H__
-#define __HTTP_TLS_CIPHER_LIST_H__
+#pragma once
 
 //
 // Private Variable for HTTPS to configure Tls Cipher List.
@@ -27,5 +26,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE  L"HttpTlsCipherList"
 
 extern EFI_GUID  gEdkiiHttpTlsCipherListGuid;
-
-#endif

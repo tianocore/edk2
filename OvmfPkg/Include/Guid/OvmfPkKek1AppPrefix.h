@@ -13,8 +13,7 @@
   - https://bugzilla.tianocore.org/show_bug.cgi?id=1747
 **/
 
-#ifndef OVMF_PK_KEK1_APP_PREFIX_H_
-#define OVMF_PK_KEK1_APP_PREFIX_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -41,5 +40,3 @@
   }
 
 extern EFI_GUID  gOvmfPkKek1AppPrefixGuid;
-
-#endif /* OVMF_PK_KEK1_APP_PREFIX_H_ */

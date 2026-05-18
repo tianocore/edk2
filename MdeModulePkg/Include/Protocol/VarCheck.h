@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _VARIABLE_CHECK_H_
-#define _VARIABLE_CHECK_H_
+#pragma once
 
 #include <Uefi/UefiSpec.h>
 
@@ -115,5 +114,3 @@ struct _EDKII_VAR_CHECK_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiVarCheckProtocolGuid;
-
-#endif

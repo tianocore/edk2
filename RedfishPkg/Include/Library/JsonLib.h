@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef JSON_LIB_H_
-#define JSON_LIB_H_
+#pragma once
 
 typedef    VOID  *EDKII_JSON_VALUE;
 typedef    VOID  *EDKII_JSON_ARRAY;
@@ -944,5 +943,3 @@ EFIAPI
 JsonGetType (
   IN EDKII_JSON_VALUE  JsonValue
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _WATCHDOG_TIMER_H_
-#define _WATCHDOG_TIMER_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/DebugLib.h>
@@ -95,5 +94,3 @@ WatchdogTimerDriverGetTimerPeriod (
   IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *This,
   IN UINT64                            *TimerPeriod
   );
-
-#endif

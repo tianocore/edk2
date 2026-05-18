@@ -7,12 +7,9 @@
 
 **/
 
-#ifndef _FSP_EAS_H_
-#define _FSP_EAS_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Guid/GuidHobFspEas.h>
 #include <Guid/FspHeaderFile.h>
 #include <FspEas/FspApi.h>
-
-#endif

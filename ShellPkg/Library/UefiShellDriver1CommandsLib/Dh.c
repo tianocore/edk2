@@ -994,27 +994,142 @@ DoDecodeByProtocol (
 
       FreePool (Guids);
     }
+
+    return SHELL_SUCCESS;
+  }
+
+  if (ConvertStrToGuid (Protocol, &Guid) == EFI_SUCCESS) {
+    Name = GetStringNameFromGuid (&Guid, Language);
+    if (Name != NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Name, &Guid);
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_GUID_FOUND), gShellDriver1HiiHandle, &Guid);
+    }
+
+    SHELL_FREE_NON_NULL (Name);
+    return SHELL_SUCCESS;
+  }
+
+  Status = GetGuidFromStringName (Protocol, Language, &Guids);
+  if (Status == EFI_SUCCESS) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Protocol, Guids);
   } else {
-    if (ConvertStrToGuid (Protocol, &Guid) == EFI_SUCCESS) {
-      Name = GetStringNameFromGuid (&Guid, Language);
-      if (Name != NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Name, &Guid);
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_GUID_FOUND), gShellDriver1HiiHandle, &Guid);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_NAME_FOUND), gShellDriver1HiiHandle, Protocol);
+  }
+
+  return SHELL_SUCCESS;
+}
+
+/** Main function of the 'Dh' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdDh (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS    Status;
+  SHELL_STATUS  ShellStatus;
+  CHAR8         *Language;
+  CONST CHAR16  *Lang;
+  CONST CHAR16  *RawValue;
+  CONST CHAR16  *ProtocolVal;
+  BOOLEAN       SfoFlag;
+  BOOLEAN       DriverFlag;
+  BOOLEAN       VerboseFlag;
+  UINT64        Intermediate;
+  EFI_HANDLE    Handle;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+  Language    = NULL;
+
+  if (ShellCommandLineGetCount (Package) > 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"dh");
+    return (SHELL_INVALID_PARAMETER);
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-l")) {
+    Lang = ShellCommandLineGetValue (Package, L"-l");
+    if (Lang != NULL) {
+      Language = AllocateZeroPool (StrSize (Lang));
+      if (Language == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"dh");
+        return (SHELL_OUT_OF_RESOURCES);
       }
 
-      SHELL_FREE_NON_NULL (Name);
+      AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
     } else {
-      Status = GetGuidFromStringName (Protocol, Language, &Guids);
-      if (Status == EFI_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Protocol, Guids);
+      ASSERT (Language == NULL);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"dh", L"-l");
+      return (SHELL_INVALID_PARAMETER);
+    }
+  } else {
+    Language = AllocateZeroPool (10);
+    if (Language == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"dh");
+      return (SHELL_OUT_OF_RESOURCES);
+    }
+
+    AsciiSPrint (Language, 10, "en-us");
+  }
+
+  SfoFlag     = ShellCommandLineGetFlag (Package, L"-sfo");
+  DriverFlag  = ShellCommandLineGetFlag (Package, L"-d");
+  VerboseFlag = (BOOLEAN)(ShellCommandLineGetFlag (Package, L"-v") || ShellCommandLineGetFlag (Package, L"-verbose"));
+  RawValue    = ShellCommandLineGetRawValue (Package, 1);
+  ProtocolVal = ShellCommandLineGetValue (Package, L"-p");
+
+  if (RawValue == NULL) {
+    if (ShellCommandLineGetFlag (Package, L"-p") && (ProtocolVal == NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"dh", L"-p");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      //
+      // Print information by protocol, The ProtocolVal maybe is name or GUID or NULL.
+      //
+      ShellStatus = DoDhByProtocol (ProtocolVal, VerboseFlag, SfoFlag, Language, DriverFlag);
+    }
+  } else if ((RawValue != NULL) &&
+             (gUnicodeCollation->StriColl (gUnicodeCollation, L"decode", (CHAR16 *)RawValue) == 0))
+  {
+    if (ShellCommandLineGetFlag (Package, L"-p") && (ProtocolVal == NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"dh", L"-p");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      //
+      // Print decode informatino by protocol.
+      //
+      ShellStatus = DoDecodeByProtocol (ProtocolVal, Language);
+    }
+  } else {
+    if (ShellCommandLineGetFlag (Package, L"-p")) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"dh");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Status = ShellConvertStringToUint64 (RawValue, &Intermediate, TRUE, FALSE);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"dh", RawValue);
+        ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_NAME_FOUND), gShellDriver1HiiHandle, Protocol);
+        Handle = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+        if (Handle == NULL) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"dh", RawValue);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          //
+          // Print information by handle.
+          //
+          DoDhByHandle (Handle, VerboseFlag, SfoFlag, Language, DriverFlag, FALSE);
+        }
       }
     }
   }
 
-  return SHELL_SUCCESS;
+  SHELL_FREE_NON_NULL (Language);
+  return ShellStatus;
 }
 
 /**
@@ -1034,19 +1149,9 @@ ShellCommandRunDh (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  CHAR8         *Language;
-  CONST CHAR16  *Lang;
-  CONST CHAR16  *RawValue;
-  CONST CHAR16  *ProtocolVal;
-  BOOLEAN       SfoFlag;
-  BOOLEAN       DriverFlag;
-  BOOLEAN       VerboseFlag;
-  UINT64        Intermediate;
-  EFI_HANDLE    Handle;
 
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
-  Language    = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -1069,96 +1174,12 @@ ShellCommandRunDh (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetCount (Package) > 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"dh");
-      ShellCommandLineFreeVarList (Package);
-      return (SHELL_INVALID_PARAMETER);
-    }
 
-    if (ShellCommandLineGetFlag (Package, L"-l")) {
-      Lang = ShellCommandLineGetValue (Package, L"-l");
-      if (Lang != NULL) {
-        Language = AllocateZeroPool (StrSize (Lang));
-        if (Language == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"dh");
-          ShellCommandLineFreeVarList (Package);
-          return (SHELL_OUT_OF_RESOURCES);
-        }
-
-        AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
-      } else {
-        ASSERT (Language == NULL);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"dh", L"-l");
-        ShellCommandLineFreeVarList (Package);
-        return (SHELL_INVALID_PARAMETER);
-      }
-    } else {
-      Language = AllocateZeroPool (10);
-      if (Language == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"dh");
-        ShellCommandLineFreeVarList (Package);
-        return (SHELL_OUT_OF_RESOURCES);
-      }
-
-      AsciiSPrint (Language, 10, "en-us");
-    }
-
-    SfoFlag     = ShellCommandLineGetFlag (Package, L"-sfo");
-    DriverFlag  = ShellCommandLineGetFlag (Package, L"-d");
-    VerboseFlag = (BOOLEAN)(ShellCommandLineGetFlag (Package, L"-v") || ShellCommandLineGetFlag (Package, L"-verbose"));
-    RawValue    = ShellCommandLineGetRawValue (Package, 1);
-    ProtocolVal = ShellCommandLineGetValue (Package, L"-p");
-
-    if (RawValue == NULL) {
-      if (ShellCommandLineGetFlag (Package, L"-p") && (ProtocolVal == NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"dh", L"-p");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        //
-        // Print information by protocol, The ProtocolVal maybe is name or GUID or NULL.
-        //
-        ShellStatus = DoDhByProtocol (ProtocolVal, VerboseFlag, SfoFlag, Language, DriverFlag);
-      }
-    } else if ((RawValue != NULL) &&
-               (gUnicodeCollation->StriColl (gUnicodeCollation, L"decode", (CHAR16 *)RawValue) == 0))
-    {
-      if (ShellCommandLineGetFlag (Package, L"-p") && (ProtocolVal == NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"dh", L"-p");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        //
-        // Print decode informatino by protocol.
-        //
-        ShellStatus = DoDecodeByProtocol (ProtocolVal, Language);
-      }
-    } else {
-      if (ShellCommandLineGetFlag (Package, L"-p")) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"dh");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Status = ShellConvertStringToUint64 (RawValue, &Intermediate, TRUE, FALSE);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"dh", RawValue);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          Handle = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-          if (Handle == NULL) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"dh", RawValue);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            //
-            // Print information by handle.
-            //
-            DoDhByHandle (Handle, VerboseFlag, SfoFlag, Language, DriverFlag, FALSE);
-          }
-        }
-      }
-    }
-
-    ShellCommandLineFreeVarList (Package);
-    SHELL_FREE_NON_NULL (Language);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdDh (Package);
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

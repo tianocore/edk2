@@ -15,8 +15,7 @@
     - FID  - Function ID
 **/
 
-#ifndef ARM_FW_TRNG_DEFS_H_
-#define ARM_FW_TRNG_DEFS_H_
+#pragma once
 
 #include <IndustryStandard/ArmStdSmc.h>
 
@@ -32,5 +31,3 @@
 /** Maximum bits of entropy supported on AArch64.
 */
 #define MAX_ENTROPY_BITS  192
-
-#endif // ARM_FW_TRNG_DEFS_H_

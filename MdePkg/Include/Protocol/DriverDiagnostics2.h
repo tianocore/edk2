@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_DRIVER_DIAGNOSTICS2_H__
-#define __EFI_DRIVER_DIAGNOSTICS2_H__
+#pragma once
 
 #include <Protocol/DriverDiagnostics.h>
 
@@ -101,5 +100,3 @@ struct _EFI_DRIVER_DIAGNOSTICS2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDriverDiagnostics2ProtocolGuid;
-
-#endif

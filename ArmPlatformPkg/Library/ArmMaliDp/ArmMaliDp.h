@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef ARMMALIDP_H_
-#define ARMMALIDP_H_
+#pragma once
 
 #define DP_BASE  (FixedPcdGet64 (PcdArmMaliDpBase))
 
@@ -234,5 +233,3 @@
 // Helper layer graphics macros.
 #define FRAME_IN_SIZE(Hor, Ver)   ((Ver << DP_DE_LG_V_IN_SIZE_SHIFT) | Hor)
 #define FRAME_CMP_SIZE(Hor, Ver)  ((Ver << DP_DE_LG_V_CMP_SIZE_SHIFT) | Hor)
-
-#endif /* ARMMALIDP_H_ */

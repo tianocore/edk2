@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMBIOS_STANDARD_H__
-#define __SMBIOS_STANDARD_H__
+#pragma once
 
 ///
 /// Reference SMBIOS 2.6, chapter 3.1.2.
@@ -32,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ///
 /// Reference SMBIOS 3.6, chapter 6.1.2.
-/// Unless otherwise specified, when referring to another structure’s handle, the value
+/// Unless otherwise specified, when referring to another structure's handle, the value
 /// 0FFFFh is used to indicate that the referenced handle is not applicable or does not
 /// exist.
 ///
@@ -1816,13 +1815,22 @@ typedef enum {
 /// System Event Log - Variable Data Format Types.
 ///
 typedef enum {
-  EventLogVariableNone                       = 0x00,
-  EventLogVariableHandle                     = 0x01,
-  EventLogVariableMutilEvent                 = 0x02,
-  EventLogVariableMutilEventHandle           = 0x03,
-  EventLogVariablePOSTResultBitmap           = 0x04,
-  EventLogVariableSysManagementType          = 0x05,
-  EventLogVariableMutliEventSysManagmentType = 0x06,
+  EventLogVariableNone       = 0x00,
+  EventLogVariableHandle     = 0x01,
+  EventLogVariableMultiEvent = 0x02,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  EventLogVariableMutilEvent       = EventLogVariableMultiEvent,
+  EventLogVariableMultiEventHandle = 0x03,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  EventLogVariableMutilEventHandle            = EventLogVariableMultiEventHandle,
+  EventLogVariablePOSTResultBitmap            = 0x04,
+  EventLogVariableSysManagementType           = 0x05,
+  EventLogVariableMultiEventSysManagementType = 0x06,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  EventLogVariableMutliEventSysManagmentType = EventLogVariableMultiEventSysManagementType,
   EventLogVariableUnused                     = 0x07,
   EventLogVariableOEMAssigned                = 0x80
 } EVENT_LOG_VARIABLE_DATA;
@@ -2131,12 +2139,15 @@ typedef struct {
 /// 32-bit Memory Error Information - Error Type.
 ///
 typedef enum {
-  MemoryErrorOther            = 0x01,
-  MemoryErrorUnknown          = 0x02,
-  MemoryErrorOk               = 0x03,
-  MemoryErrorBadRead          = 0x04,
-  MemoryErrorParity           = 0x05,
-  MemoryErrorSigleBit         = 0x06,
+  MemoryErrorOther     = 0x01,
+  MemoryErrorUnknown   = 0x02,
+  MemoryErrorOk        = 0x03,
+  MemoryErrorBadRead   = 0x04,
+  MemoryErrorParity    = 0x05,
+  MemoryErrorSingleBit = 0x06,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  MemoryErrorSigleBit         = MemoryErrorSingleBit,
   MemoryErrorDoubleBit        = 0x07,
   MemoryErrorMultiBit         = 0x08,
   MemoryErrorNibble           = 0x09,
@@ -2802,7 +2813,7 @@ typedef struct {
 /// 00h - 3Fh: MCTP Host Interfaces
 ///
 typedef enum {
-  // MCTP Host Interface type indentifiers as defined in DSP0239
+  // MCTP Host Interface type identifiers as defined in DSP0239
   MCHostInterfaceTypeKCS                                 = 0x02,
   MCHostInterfaceType8250_UARTRegisterCompatible         = 0x03,
   MCHostInterfaceType16450_UARTRegisterCompatible        = 0x04,
@@ -3098,5 +3109,3 @@ typedef union {
 } SMBIOS_STRUCTURE_POINTER;
 
 #pragma pack()
-
-#endif

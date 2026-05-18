@@ -858,6 +858,7 @@ FindVariableEx (
   VARIABLE_STORE_HEADER  *VariableStoreHeader;
   VARIABLE_INDEX_TABLE   *IndexTable;
   VARIABLE_HEADER        *VariableHeader;
+  BOOLEAN                Valid;
 
   VariableStoreHeader = StoreInfo->VariableStoreHeader;
 
@@ -894,8 +895,8 @@ FindVariableEx (
       ASSERT (Index < sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]));
       Offset  += IndexTable->Index[Index];
       MaxIndex = (VARIABLE_HEADER *)((UINT8 *)IndexTable->StartPtr + Offset);
-      GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
-      if (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
+      Valid    = GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
+      if (Valid && (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS)) {
         if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
           InDeletedVariable = PtrTrack->CurrPtr;
         } else {
@@ -1062,6 +1063,7 @@ PeiGetVariable (
   EFI_STATUS              Status;
   VARIABLE_STORE_INFO     StoreInfo;
   VARIABLE_HEADER         *VariableHeader;
+  BOOLEAN                 Valid;
 
   if ((VariableName == NULL) || (VariableGuid == NULL) || (DataSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1081,7 +1083,10 @@ PeiGetVariable (
     return Status;
   }
 
-  GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader);
+  Valid = GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader);
+  if (!Valid) {
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // Get data size
@@ -1156,6 +1161,7 @@ PeiGetNextVariableName (
   VARIABLE_STORE_INFO     StoreInfo;
   VARIABLE_STORE_INFO     StoreInfoForNv;
   VARIABLE_STORE_INFO     StoreInfoForHob;
+  BOOLEAN                 Valid;
 
   if ((VariableName == NULL) || (VariableGuid == NULL) || (VariableNameSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1172,7 +1178,11 @@ PeiGetNextVariableName (
     //
     // If variable name is not NULL, get next variable
     //
-    GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader);
+    Valid = GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader);
+    if (!Valid) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
   }
 

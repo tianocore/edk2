@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __FMP_DEPENDENCY_DEVICE_LIB__
-#define __FMP_DEPENDENCY_DEVICE_LIB__
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareManagement.h>
@@ -47,5 +46,3 @@ EFIAPI
 GetFmpDependency (
   OUT UINT32  *DepexSize
   );
-
-#endif

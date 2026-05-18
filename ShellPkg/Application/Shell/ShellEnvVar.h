@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _SHELL_ENVIRONMENT_VARIABLE_HEADER_
-#define _SHELL_ENVIRONMENT_VARIABLE_HEADER_
+#pragma once
 
 typedef struct {
   LIST_ENTRY    Link;
@@ -276,5 +275,3 @@ VOID
 ShellFreeEnvVarList (
   VOID
   );
-
-#endif //_SHELL_ENVIRONMENT_VARIABLE_HEADER_

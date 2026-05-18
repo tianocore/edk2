@@ -556,7 +556,7 @@ typedef struct {
 #define  R_386_TLS_TPOFF32  37  /* GOT entry of -ve static TLS offset */
 
 /* Null relocation */
-#define  R_AARCH64_NONE        256  /* No relocation */
+#define  R_AARCH64_NONE        0  /* No relocation */
 /* Static AArch64 relocations */
  /* Static data relocations */
 #define  R_AARCH64_ABS64        257  /* S + A */

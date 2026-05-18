@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _STANDALONE_MM_H_
-#define _STANDALONE_MM_H_
+#pragma once
 
 #include <PiMm.h>
 
@@ -31,5 +30,3 @@ VOID
 // Will remove it once all the code references are removed.
 //
 typedef MM_FOUNDATION_ENTRY_POINT STANDALONE_MM_FOUNDATION_ENTRY_POINT;
-
-#endif

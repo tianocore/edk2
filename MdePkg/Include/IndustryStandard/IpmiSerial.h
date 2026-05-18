@@ -11,8 +11,7 @@
   https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html
 **/
 
-#ifndef IPMI_SERIAL_H_
-#define IPMI_SERIAL_H_
+#pragma once
 
 ///
 /// IPMI Serial Escaped Character Definition
@@ -62,5 +61,3 @@ typedef struct {
 } IPMI_SERIAL_HEADER;
 
 #pragma pack ()
-
-#endif /* IPMI_SERIAL_H_ */

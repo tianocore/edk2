@@ -403,7 +403,7 @@ CreateTabCompletionList (
     }
 
     for (FileInfo = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link); !IsNull (&FileList->Link, &FileInfo->Link); ) {
-      if (((StrCmp (FileInfo->FileName, L".") == 0) || (StrCmp (FileInfo->FileName, L"..") == 0)) ||
+      if (IsDotOrDotDot (FileInfo->FileName) ||
           ((((InputString[0] == L'c') || (InputString[0] == L'C')) && ((InputString[1] == L'd') || (InputString[1] == L'D'))) &&
            (ShellIsDirectory (FileInfo->FullName) != EFI_SUCCESS)))
       {

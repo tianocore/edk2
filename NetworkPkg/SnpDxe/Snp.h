@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SNP_H_
-#define _SNP_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -1028,5 +1027,3 @@ SnpWaitForPacketNotify (
   );
 
 #define SNP_MEM_PAGES(x)  (((x) - 1) / 4096 + 1)
-
-#endif /*  _SNP_H_  */

@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef _INTERNAL_S3_SAVE_STATE_H_
-#define _INTERNAL_S3_SAVE_STATE_H_
+#pragma once
+
 #include <PiDxe.h>
 
 #include <Protocol/S3SaveState.h>
@@ -171,5 +171,3 @@ BootScriptCompare (
   IN       EFI_S3_BOOT_SCRIPT_POSITION  Position2,
   OUT      UINTN                        *RelativePosition
   );
-
-#endif //_INTERNAL_S3_SAVE_STATE_H_

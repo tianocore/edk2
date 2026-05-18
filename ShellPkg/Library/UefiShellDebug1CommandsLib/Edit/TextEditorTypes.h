@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _EDITOR_TYPE_H_
-#define _EDITOR_TYPE_H_
+#pragma once
 
 #include "UefiShellDebug1CommandsLib.h"
 #include "EditTitleBar.h"
@@ -92,5 +91,3 @@ typedef struct {
   INT32                                MouseAccumulatorX;
   INT32                                MouseAccumulatorY;
 } EFI_EDITOR_GLOBAL_EDITOR;
-
-#endif

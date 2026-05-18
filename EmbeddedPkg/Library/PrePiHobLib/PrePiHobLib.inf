@@ -35,11 +35,13 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  PeCoffLib
   PrePiHobListPointerLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
   gEfiHobMemoryAllocStackGuid
+  gEfiMemoryTypeInformationGuid
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
@@ -51,3 +53,5 @@
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
 
+[Protocols]
+  gPeCoffLoaderProtocolGuid ## PRODUCES

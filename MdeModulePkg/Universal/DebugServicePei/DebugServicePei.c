@@ -84,7 +84,7 @@ PeiDebugAssert (
 **/
 EFI_STATUS
 EFIAPI
-DebugSerivceInitialize (
+DebugServiceInitialize (
   IN EFI_PEI_FILE_HANDLE     FileHandle,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )

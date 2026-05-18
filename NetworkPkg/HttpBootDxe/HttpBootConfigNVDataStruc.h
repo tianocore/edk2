@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HTTP_BOOT_NVDATA_STRUC_H_
-#define _HTTP_BOOT_NVDATA_STRUC_H_
+#pragma once
 
 #include <Guid/HttpBootConfigHii.h>
 
@@ -41,5 +40,3 @@ typedef struct _HTTP_BOOT_CONFIG_IFR_NVDATA {
   CHAR16    ProxyUri[URI_STR_MAX_SIZE];
 } HTTP_BOOT_CONFIG_IFR_NVDATA;
 #pragma pack()
-
-#endif

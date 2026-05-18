@@ -222,8 +222,8 @@ CreateSpdmDeviceContext (
     SpdmDeviceInfo->MaxSpdmMsgSize,
     SpdmDeviceInfo->TransportHeaderSize,
     SpdmDeviceInfo->TransportTailSize,
-    SpdmDeviceInfo->TransportEncodeMessage,
-    SpdmDeviceInfo->TransportDecodeMessage
+    (libspdm_transport_encode_message_func)SpdmDeviceInfo->TransportEncodeMessage,
+    (libspdm_transport_decode_message_func)SpdmDeviceInfo->TransportDecodeMessage
     );
 
   SpdmRegisterDeviceBufferFunc (

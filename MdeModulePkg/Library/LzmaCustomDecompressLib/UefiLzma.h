@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __UEFILZMA_H__
-#define __UEFILZMA_H__
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
@@ -32,5 +31,3 @@ typedef int ptrdiff_t;
 #define memmove  CopyMem
 
 #define _LZMA_SIZE_OPT
-
-#endif // __UEFILZMA_H__

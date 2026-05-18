@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef  _SMI_HANDLER_PROFILE_H_
-#define  _SMI_HANDLER_PROFILE_H_
+#pragma once
 
 #include <PiSmm.h>
 #include <Protocol/SmmGpiDispatch2.h>
@@ -205,5 +204,3 @@ struct _SMI_HANDLER_PROFILE_PROTOCOL {
   SMI_HANDLER_PROFILE_REGISTER_HANDLER      RegisterHandler;
   SMI_HANDLER_PROFILE_UNREGISTER_HANDLER    UnregisterHandler;
 };
-
-#endif

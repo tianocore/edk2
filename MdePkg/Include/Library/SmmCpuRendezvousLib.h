@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMM_CPU_RENDEZVOUS_H_
-#define SMM_CPU_RENDEZVOUS_H_
+#pragma once
 
 /**
   This routine wait for all AP processors to arrive in SMM.
@@ -23,5 +22,3 @@ EFIAPI
 SmmWaitForAllProcessor (
   IN  BOOLEAN  BlockingMode
   );
-
-#endif

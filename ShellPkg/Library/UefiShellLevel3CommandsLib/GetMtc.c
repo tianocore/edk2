@@ -11,6 +11,49 @@
 
 #include <Library/ShellLib.h>
 
+/** Main function of the 'Mtc' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdMtc (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS  Status;
+  UINT64      Mtc;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+    return SHELL_SUCCESS;
+  } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"getmtc");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // Get the monotonic counter count
+  //
+  Status = gBS->GetNextMonotonicCount (&Mtc);
+  if (Status == EFI_DEVICE_ERROR) {
+    return SHELL_DEVICE_ERROR;
+  } else if (Status == EFI_SECURITY_VIOLATION) {
+    return SHELL_SECURITY_VIOLATION;
+  } else if (EFI_ERROR (Status)) {
+    return SHELL_DEVICE_ERROR;
+  }
+
+  //
+  // print it...
+  //
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GET_MTC_OUTPUT), gShellLevel3HiiHandle, Mtc);
+  return SHELL_SUCCESS;
+}
+
 /**
   Function for 'getmtc' command.
 
@@ -28,7 +71,6 @@ ShellCommandRunGetMtc (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  UINT64        Mtc;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
@@ -51,41 +93,16 @@ ShellCommandRunGetMtc (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"getmtc");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // Get the monotonic counter count
-      //
-      Status = gBS->GetNextMonotonicCount (&Mtc);
-      if (Status == EFI_DEVICE_ERROR) {
-        ShellStatus = SHELL_DEVICE_ERROR;
-      } else if (Status == EFI_SECURITY_VIOLATION) {
-        ShellStatus = SHELL_SECURITY_VIOLATION;
-      } else if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_DEVICE_ERROR;
-      }
 
-      //
-      // print it...
-      //
-      if (ShellStatus == SHELL_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GET_MTC_OUTPUT), gShellLevel3HiiHandle, Mtc);
-      }
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdMtc (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

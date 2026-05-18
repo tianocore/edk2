@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_MGR_FILE_UTIL__
-#define __EFI_WIFI_MGR_FILE_UTIL__
+#pragma once
 
 #include "WifiConnectionMgrDxe.h"
 
@@ -67,5 +66,3 @@ UpdatePrivateKeyFromFile (
   IN  WIFI_MGR_PRIVATE_DATA     *Private,
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
-
-#endif

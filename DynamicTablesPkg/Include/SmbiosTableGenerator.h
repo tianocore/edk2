@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMBIOS_TABLE_GENERATOR_H_
-#define SMBIOS_TABLE_GENERATOR_H_
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 #include <Protocol/Smbios.h>
@@ -440,5 +439,3 @@ FindSmbiosHandleEx (
   );
 
 #pragma pack()
-
-#endif // SMBIOS_TABLE_GENERATOR_H_

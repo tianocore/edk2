@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __XEON_PHI_MSR_H__
-#define __XEON_PHI_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -1626,5 +1625,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_XEON_PHI_CORE_PERF_LIMIT_REASONS_REGISTER;
-
-#endif

@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_MTL_LIB_H_
-#define ARM_MTL_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -126,5 +125,3 @@ MtlReceiveMessage (
   OUT UINT32       *MessageHeader,
   OUT UINT32       *PayloadLength
   );
-
-#endif /* ARM_MTL_LIB_H_ */

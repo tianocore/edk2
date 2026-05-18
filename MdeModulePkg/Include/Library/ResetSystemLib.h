@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __RESET_SYSTEM_LIB_H__
-#define __RESET_SYSTEM_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiMultiPhase.h>
@@ -89,5 +88,3 @@ ResetSystem (
   IN UINTN           DataSize,
   IN VOID            *ResetData OPTIONAL
   );
-
-#endif

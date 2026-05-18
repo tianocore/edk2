@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_IF_H__
-#define __EFI_IP4_IF_H__
+#pragma once
 
 #define IP4_FRAME_RX_SIGNATURE   SIGNATURE_32 ('I', 'P', 'F', 'R')
 #define IP4_FRAME_TX_SIGNATURE   SIGNATURE_32 ('I', 'P', 'F', 'T')
@@ -336,5 +335,3 @@ Ip4ReceiveFrame (
   IN  IP4_FRAME_CALLBACK  CallBack,
   IN  VOID                *Context
   );
-
-#endif

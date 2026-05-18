@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef TABLE_HELPER_LIB_H_
-#define TABLE_HELPER_LIB_H_
+#pragma once
 
 #include <Library/AmlLib/AmlLib.h>
 
@@ -151,5 +150,3 @@ EFIAPI
 ParseCmObjDesc (
   IN  CONST CM_OBJ_DESCRIPTOR  *CmObjDesc
   );
-
-#endif // TABLE_HELPER_LIB_H_

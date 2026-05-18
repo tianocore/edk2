@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _PCIEXPRESS30_H_
-#define _PCIEXPRESS30_H_
+#pragma once
 
 #include <IndustryStandard/PciExpress21.h>
 
@@ -85,5 +84,3 @@ typedef struct {
 ///@}
 
 #pragma pack()
-
-#endif

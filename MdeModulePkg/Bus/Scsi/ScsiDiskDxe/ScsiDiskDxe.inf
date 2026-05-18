@@ -56,7 +56,6 @@
   gEfiEraseBlockProtocolGuid                    ## BY_START
   gEfiStorageSecurityCommandProtocolGuid        ## BY_START
   gEfiScsiIoProtocolGuid                        ## TO_START
-  gEfiScsiPassThruProtocolGuid                  ## TO_START
   gEfiExtScsiPassThruProtocolGuid               ## TO_START
 
 [Guids]

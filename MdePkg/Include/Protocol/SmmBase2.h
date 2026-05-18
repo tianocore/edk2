@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMM_BASE2_H_
-#define _SMM_BASE2_H_
+#pragma once
 
 #include <Pi/PiSmmCis.h>
 #include <Protocol/MmBase.h>
@@ -74,5 +73,3 @@ struct _EFI_SMM_BASE2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmmBase2ProtocolGuid;
-
-#endif

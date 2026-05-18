@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UFS_PASS_THRU_H_
-#define _UFS_PASS_THRU_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -995,5 +994,3 @@ extern EFI_COMPONENT_NAME_PROTOCOL     gUfsPassThruComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gUfsPassThruComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL     gUfsPassThruDriverBinding;
 extern EDKII_UFS_HC_PLATFORM_PROTOCOL  *mUfsHcPlatform;
-
-#endif

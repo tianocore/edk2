@@ -17,8 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _AUTHSERVICE_INTERNAL_H_
-#define _AUTHSERVICE_INTERNAL_H_
+#pragma once
 
 #include <Library/AuthVariableLib.h>
 #include <Library/BaseLib.h>
@@ -366,5 +365,3 @@ AuthServiceInternalUpdateVariableWithTimeStamp (
   IN UINT32    Attributes,
   IN EFI_TIME  *TimeStamp
   );
-
-#endif

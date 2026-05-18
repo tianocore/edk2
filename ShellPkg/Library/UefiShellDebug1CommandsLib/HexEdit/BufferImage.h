@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _LIB_BUFFER_IMAGE_H_
-#define _LIB_BUFFER_IMAGE_H_
+#pragma once
 
 #include "HexEditor.h"
 
@@ -262,5 +261,3 @@ UINTN
 HBufferImageGetTotalSize (
   VOID
   );
-
-#endif

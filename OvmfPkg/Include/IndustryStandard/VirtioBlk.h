@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_BLK_H_
-#define _VIRTIO_BLK_H_
+#pragma once
 
 #include <IndustryStandard/Virtio.h>
 
@@ -78,5 +77,3 @@ typedef struct {
 #define VIRTIO_BLK_S_OK      0x00
 #define VIRTIO_BLK_S_IOERR   0x01
 #define VIRTIO_BLK_S_UNSUPP  0x02
-
-#endif // _VIRTIO_BLK_H_

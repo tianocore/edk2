@@ -267,7 +267,7 @@ vfrProgram > [UINT8 Return] :
      mConstantOnlyInExpression = FALSE;
   >>
   (
-      vfrPragmaPackDefinition
+      vfrPragmaDefinition
     | vfrDataStructDefinition
     | vfrDataUnionDefinition
   )*
@@ -308,14 +308,18 @@ pragmaPackNumber :
                                                     << gCVfrVarDataTypeDB.Pack (LineNum, VFR_PACK_ASSIGN, NULL, PackNumber); >>
   ;
 
-vfrPragmaPackDefinition :
-  "\#pragma" "pack" "\("
-  {
-      pragmaPackShowDef
-    | pragmaPackStackDef
-    | pragmaPackNumber
-  }
-  "\)"
+vfrPragmaDefinition :
+  "\#pragma"
+  (
+    "pack" "\("
+    {
+        pragmaPackShowDef
+      | pragmaPackStackDef
+      | pragmaPackNumber
+    }
+    "\)"
+  | "once"                                          // Skip '#pragma once' in preprocessed output
+  )
   ;
 
   vfrDataUnionDefinition :
@@ -895,8 +899,8 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
               gCVfrVarDataTypeDB.GetDataFieldInfo(TFName, FieldOffset, FieldType, FieldSize, BitField);
               if (BitField) {
                 Mask = (1 << FieldSize) - 1;
-                Offset = FieldOffset / 8;
-                PreBits = FieldOffset % 8;
+                PreBits = FieldOffset % (1 << (FieldType + 3)); ///< Relies on field types for 8,16,32,64 bits having values 0,1,2,3
+                Offset = (FieldOffset - PreBits) / 8;
                 Mask <<= PreBits;
               }
               switch (FieldType) {
@@ -904,7 +908,7 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
                  Data_U8 = _STOU8(RD->getText(), RD->getLine());
                  if (BitField) {
                    //
-                   // Set the value to the bit fileds.
+                   // Set the value to the bit fields.
                    //
                    Value = *(UINT8*) (ByteOffset + Offset);
                    Data_U8 <<= PreBits;

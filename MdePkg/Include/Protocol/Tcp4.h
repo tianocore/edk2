@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_TCP4_PROTOCOL_H__
-#define __EFI_TCP4_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Ip4.h>
 
@@ -98,7 +97,7 @@ typedef struct {
 } EFI_TCP4_CONFIG_DATA;
 
 ///
-/// TCP4 connnection state
+/// TCP4 connection state
 ///
 typedef enum {
   Tcp4StateClosed      = 0,
@@ -341,7 +340,7 @@ EFI_STATUS
                                 - This is NULL.
                                 - ConnectionToken is NULL.
                                 - ConnectionToken->CompletionToken.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resource to initiate the activ eopen.
+  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resource to initiate the active open.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
@@ -563,5 +562,3 @@ struct _EFI_TCP4_PROTOCOL {
 
 extern EFI_GUID  gEfiTcp4ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiTcp4ProtocolGuid;
-
-#endif

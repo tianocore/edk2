@@ -16,8 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PE_IMAGE_H__
-#define __PE_IMAGE_H__
+#pragma once
 
 //
 // PE32+ Subsystem type for EFI images
@@ -97,7 +96,7 @@ typedef struct {
 // Characteristics
 //
 #define EFI_IMAGE_FILE_RELOCS_STRIPPED      BIT0     ///< 0x0001  Relocation info stripped from file.
-#define EFI_IMAGE_FILE_EXECUTABLE_IMAGE     BIT1     ///< 0x0002  File is executable  (i.e. no unresolved externel references).
+#define EFI_IMAGE_FILE_EXECUTABLE_IMAGE     BIT1     ///< 0x0002  File is executable  (i.e. no unresolved external references).
 #define EFI_IMAGE_FILE_LINE_NUMS_STRIPPED   BIT2     ///< 0x0004  Line numbers stripped from file.
 #define EFI_IMAGE_FILE_LOCAL_SYMS_STRIPPED  BIT3     ///< 0x0008  Local symbols stripped from file.
 #define EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE  BIT5     ///< 0x0020  Supports addresses > 2-GB
@@ -811,5 +810,3 @@ typedef union {
   EFI_TE_IMAGE_HEADER                *Te;
   EFI_IMAGE_OPTIONAL_HEADER_UNION    *Union;
 } EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION;
-
-#endif

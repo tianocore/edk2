@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_NVME_BLOCKIO_H_
-#define _EFI_NVME_BLOCKIO_H_
+#pragma once
 
 /**
   Reset the Block Device.
@@ -411,5 +410,3 @@ NvmeStorageSecuritySendData (
   IN UINTN                                  PayloadBufferSize,
   IN VOID                                   *PayloadBuffer
   );
-
-#endif

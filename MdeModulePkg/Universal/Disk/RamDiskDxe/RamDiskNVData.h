@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _RAM_DISK_NVDATA_H_
-#define _RAM_DISK_NVDATA_H_
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/RamDiskHii.h>
@@ -40,5 +39,3 @@ typedef struct {
   //
   UINT8     MemType;
 } RAM_DISK_CONFIGURATION;
-
-#endif

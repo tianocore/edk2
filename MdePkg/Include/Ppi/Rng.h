@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef RNG_PPI_H_
-#define RNG_PPI_H_
+#pragma once
 
 #include <Guid/Rng.h>
 
@@ -23,5 +22,3 @@
 typedef EFI_RNG_INTERFACE RNG_PPI;
 
 extern EFI_GUID  gEfiRngPpiGuid;
-
-#endif

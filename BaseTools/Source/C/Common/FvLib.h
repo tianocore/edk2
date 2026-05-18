@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_FV_LIB_H
-#define _EFI_FV_LIB_H
+#pragma once
 
 //
 // Include files
@@ -186,4 +185,3 @@ Returns:
   UINT8   The hightest set state of the file.
 
 --*/
-#endif

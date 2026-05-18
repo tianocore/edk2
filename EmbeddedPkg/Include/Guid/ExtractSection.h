@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EXTRACT_SECTION_GUID_H__
-#define __EXTRACT_SECTION_GUID_H__
+#pragma once
 
 #include <Library/ExtractGuidedSectionLib.h>
 
@@ -24,5 +23,3 @@ typedef struct {
   EFI_HOB_GUID_TYPE       Hob;
   EXTRACT_SECTION_DATA    Data;
 } EXTRACT_SECTION_HOB;
-
-#endif

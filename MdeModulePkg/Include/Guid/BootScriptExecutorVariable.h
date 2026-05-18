@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _BOOT_SCRIPT_EXECUTOR_VARIABLE_H_
-#define _BOOT_SCRIPT_EXECUTOR_VARIABLE_H_
+#pragma once
 
 #define EFI_BOOT_SCRIPT_EXECUTOR_VARIABLE_GUID \
   { \
@@ -38,5 +37,3 @@ extern EFI_GUID  gEfiBootScriptExecutorVariableGuid;
   }
 
 extern EFI_GUID  gEfiBootScriptExecutorContextGuid;
-
-#endif

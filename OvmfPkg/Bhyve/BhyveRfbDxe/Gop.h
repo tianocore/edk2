@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _GOP_H_
-#define _GOP_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/GraphicsOutput.h>
@@ -144,5 +143,3 @@ InstallVbeShim (
   IN CONST CHAR16          *CardName,
   IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
   );
-
-#endif /* _GOP_H_ */

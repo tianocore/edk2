@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_SHELL_PROTOCOL_H__
-#define __EFI_SHELL_PROTOCOL_H__
+#pragma once
 
 #include <Guid/FileInfo.h>
 
@@ -180,7 +179,7 @@ BOOLEAN
 
   @param[in] FileHandle         The file handle to be closed.
 
-  @retval EFI_SUCCESS           The file closed sucessfully.
+  @retval EFI_SUCCESS           The file closed successfully.
 **/
 typedef
 EFI_STATUS
@@ -1257,5 +1256,3 @@ enum ShellVersion {
   SHELL_MAJOR_VERSION = 2,
   SHELL_MINOR_VERSION = 2
 };
-
-#endif

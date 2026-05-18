@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __BROTLI_DECOMPRESS_INTERNAL_H__
-#define __BROTLI_DECOMPRESS_INTERNAL_H__
+#pragma once
 
 #include <PiPei.h>
 #include <Library/ExtractGuidedSectionLib.h>
@@ -43,5 +42,3 @@ BrotliUefiDecompress (
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
   );
-
-#endif

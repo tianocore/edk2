@@ -10,6 +10,8 @@
 
 **/
 
+#pragma once
+
 #ifndef __PI_FIRMWARE_FILE_H__
 #define __PI_FIRMWARE_FILE_H__
 
@@ -347,4 +349,3 @@ typedef union {
 } EFI_FILE_SECTION_POINTER;
 
 #endif
-

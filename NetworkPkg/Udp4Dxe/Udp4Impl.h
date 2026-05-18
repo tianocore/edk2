@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _UDP4_IMPL_H_
-#define _UDP4_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -684,5 +683,3 @@ EFIAPI
 Udp4NetVectorExtFree (
   VOID  *Context
   );
-
-#endif

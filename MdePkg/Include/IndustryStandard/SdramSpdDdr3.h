@@ -9,8 +9,7 @@
       http://www.jedec.org/sites/default/files/docs/4_01_02_11R21A.pdf
 **/
 
-#ifndef _SDRAM_SPD_DDR3_H_
-#define _SDRAM_SPD_DDR3_H_
+#pragma once
 
 #pragma pack (push, 1)
 
@@ -760,4 +759,3 @@ typedef struct {
 } SPD_DDR3;
 
 #pragma pack (pop)
-#endif

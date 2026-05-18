@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef TPM12_SUPPORT_H_
-#define TPM12_SUPPORT_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -30,5 +29,3 @@ EFI_STATUS
 InternalTpm12Detect (
   VOID
   );
-
-#endif // TPM12_SUPPORT_H_

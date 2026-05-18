@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PCI_HOST_BRIDGE_H_
-#define PCI_HOST_BRIDGE_H_
+#pragma once
 
 #include <UniversalPayload/PciRootBridges.h>
 
@@ -113,5 +112,3 @@ CreateRootBridgeDevicePath (
   IN     UINT32  HID,
   IN     UINT32  UID
   );
-
-#endif

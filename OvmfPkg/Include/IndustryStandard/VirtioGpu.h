@@ -18,8 +18,7 @@
 
 **/
 
-#ifndef _VIRTIO_GPU_H_
-#define _VIRTIO_GPU_H_
+#pragma once
 
 #include <IndustryStandard/Virtio.h>
 
@@ -223,5 +222,3 @@ typedef struct {
   } Pmodes[VIRTIO_GPU_MAX_SCANOUTS];
 } VIRTIO_GPU_RESP_DISPLAY_INFO;
 #pragma pack ()
-
-#endif // _VIRTIO_GPU_H_

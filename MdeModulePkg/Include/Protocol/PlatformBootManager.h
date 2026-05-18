@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PLATFORM_BOOT_MANAGER_PROTOCOL_H__
-#define __PLATFORM_BOOT_MANAGER_PROTOCOL_H__
+#pragma once
 
 #include <Library/UefiBootManagerLib.h>
 
@@ -78,5 +77,3 @@ struct _EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiPlatformBootManagerProtocolGuid;
-
-#endif /* __PLATFORM_BOOT_MANAGER_PROTOCOL_H__ */

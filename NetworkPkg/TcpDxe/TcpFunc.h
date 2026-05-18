@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _TCP_FUNC_H_
-#define _TCP_FUNC_H_
+#pragma once
 
 #include "TcpOption.h"
 
@@ -683,5 +682,3 @@ TcpDispatcher (
   IN UINT8   Request,
   IN VOID    *Data    OPTIONAL
   );
-
-#endif

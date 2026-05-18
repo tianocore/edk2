@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG2_PP_VENDOR_LIB_H_
-#define _TCG2_PP_VENDOR_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Tpm20.h>
 #include <Protocol/Tcg2Protocol.h>
@@ -119,5 +118,3 @@ Tcg2PpVendorLibGetUserConfirmationStatusFunction (
   IN UINT32  OperationRequest,
   IN UINT32  ManagementFlags
   );
-
-#endif

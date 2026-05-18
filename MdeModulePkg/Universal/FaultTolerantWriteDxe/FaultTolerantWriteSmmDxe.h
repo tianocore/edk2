@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_FTW_DXE_H__
-#define __SMM_FTW_DXE_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -187,5 +186,3 @@ FtwGetLastWrite (
   OUT VOID                              *PrivateData,
   OUT BOOLEAN                           *Complete
   );
-
-#endif

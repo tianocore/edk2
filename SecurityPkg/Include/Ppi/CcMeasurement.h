@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CC_MEASUREMENT_PPI_H_
-#define _CC_MEASUREMENT_PPI_H_
+#pragma once
 
 #include <Protocol/CcMeasurement.h>
 
@@ -74,5 +73,3 @@ struct _EDKII_CC_PPI {
 };
 
 extern EFI_GUID  gEdkiiCcPpiGuid;
-
-#endif

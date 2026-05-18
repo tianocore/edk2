@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_CONFIG_H_
-#define _ISCSI_CONFIG_H_
+#pragma once
 
 #include "IScsiConfigNVDataStruc.h"
 
@@ -215,5 +214,3 @@ ISCSI_ATTEMPT_CONFIG_NVDATA *
 IScsiConfigGetAttemptByConfigIndex (
   IN UINT8  AttemptConfigIndex
   );
-
-#endif

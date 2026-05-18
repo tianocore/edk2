@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _CPU_MP_PEI_H_
-#define _CPU_MP_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -451,5 +450,3 @@ MemoryDiscoveredPpiNotifyCallback (
   );
 
 extern EFI_PEI_NOTIFY_DESCRIPTOR  mPostMemNotifyList[];
-
-#endif

@@ -13,8 +13,7 @@ Abstract:
 
 --*/
 
-#ifndef _FW_BLOCK_SERVICE_H
-#define _FW_BLOCK_SERVICE_H
+#pragma once
 
 //
 // Fvb Protocol instance data
@@ -133,5 +132,3 @@ FvbProtocolEraseBlocks (
   ...
   )
 ;
-
-#endif

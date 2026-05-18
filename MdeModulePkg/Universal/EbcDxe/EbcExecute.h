@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EBC_EXECUTE_H_
-#define _EBC_EXECUTE_H_
+#pragma once
 
 //
 // Macros to check and set alignment
@@ -127,5 +126,3 @@ EbcExecuteInstructions (
   IN VM_CONTEXT                *VmPtr,
   IN OUT UINTN                 *InstructionCount
   );
-
-#endif // ifndef _EBC_EXECUTE_H_

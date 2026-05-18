@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PEI_SERVICES_TABLE_POINTER_LIB_UNIT_TEST_H_
-#define PEI_SERVICES_TABLE_POINTER_LIB_UNIT_TEST_H_
+#pragma once
 
 #include <Base.h>
 #include <PiPei.h>
@@ -649,5 +648,3 @@ UnitTestPeiFreePages (
   IN EFI_PHYSICAL_ADDRESS    Memory,
   IN UINTN                   Pages
   );
-
-#endif

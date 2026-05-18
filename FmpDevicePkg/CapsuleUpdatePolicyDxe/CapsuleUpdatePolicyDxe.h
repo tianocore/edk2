@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __CAPSULE_UPDATE_POLICY_DXE_H__
-#define __CAPSULE_UPDATE_POLICY_DXE_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -136,5 +135,3 @@ CapsuleUpdatePolicyInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

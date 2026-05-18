@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ESRT_MANAGEMENT_H_
-#define _ESRT_MANAGEMENT_H_
+#pragma once
 
 #include <Guid/SystemResourceTable.h>
 
@@ -127,5 +126,3 @@ struct _ESRT_MANAGEMENT_PROTOCOL {
 };
 
 extern EFI_GUID  gEsrtManagementProtocolGuid;
-
-#endif // #ifndef _ESRT_MANAGEMENT_H_

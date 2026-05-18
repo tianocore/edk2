@@ -7,14 +7,10 @@
 
 **/
 
-#ifndef __XEN_HYPERCALL_LIB_H__
-#define __XEN_HYPERCALL_LIB_H__
+#pragma once
 
 /**
-  To call when the gEfiXenInfoGuid HOB became available after the library init
-  function has already been executed.
-
-  This allow to make hypercall in the PEIM stage.
+  Initialise library.
 **/
 RETURN_STATUS
 EFIAPI
@@ -107,5 +103,3 @@ XenHypercallSchedOp (
   IN     INTN  Operation,
   IN OUT VOID  *Arguments
   );
-
-#endif

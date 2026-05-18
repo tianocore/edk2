@@ -8,8 +8,7 @@
   - linux/Documentation/devicetree/bindings/iommu/arm,smmu-v3.yaml
 **/
 
-#ifndef SMMUV3_PARSER_H_
-#define SMMUV3_PARSER_H_
+#pragma once
 
 /** CM_ARM_SMMUV3_NODE parser function.
 
@@ -55,5 +54,3 @@ ArmSmmuV3Parser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // SMMUV3_PARSER_H_

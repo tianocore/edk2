@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_ICMP_H__
-#define __EFI_IP4_ICMP_H__
+#pragma once
 
 //
 // ICMP type definitions
@@ -94,5 +93,3 @@ Ip4IcmpHandle (
   IN IP4_HEAD     *Head,
   IN NET_BUF      *Packet
   );
-
-#endif

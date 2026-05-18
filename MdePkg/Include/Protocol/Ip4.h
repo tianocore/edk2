@@ -18,8 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_PROTOCOL_H__
-#define __EFI_IP4_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/ManagedNetwork.h>
 
@@ -451,7 +450,7 @@ EFI_STATUS
   @retval  EFI_NOT_STARTED       This instance has not been started.
   @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
                                  RARP, etc.) is not finished yet.
-  @retval  EFI_INVALID_PARAMETER One or more pameters are invalid.
+  @retval  EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval  EFI_ACCESS_DENIED     The transmit completion token with the same Token.Event
                                  was already in the transmit queue.
   @retval  EFI_NOT_READY         The completion token could not be queued because the transmit
@@ -598,5 +597,3 @@ struct _EFI_IP4_PROTOCOL {
 
 extern EFI_GUID  gEfiIp4ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiIp4ProtocolGuid;
-
-#endif

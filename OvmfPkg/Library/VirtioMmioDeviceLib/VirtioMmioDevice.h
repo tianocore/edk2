@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_MMIO_DEVICE_INTERNAL_H_
-#define _VIRTIO_MMIO_DEVICE_INTERNAL_H_
+#pragma once
 
 #include <Protocol/VirtioDevice.h>
 
@@ -172,5 +171,3 @@ VirtioMmioUnmapSharedBuffer (
   IN  VIRTIO_DEVICE_PROTOCOL  *This,
   IN  VOID                    *Mapping
   );
-
-#endif // _VIRTIO_MMIO_DEVICE_INTERNAL_H_

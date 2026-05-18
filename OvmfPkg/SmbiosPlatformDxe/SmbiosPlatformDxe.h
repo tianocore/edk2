@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef SMBIOS_PLATFORM_DXE_H_
-#define SMBIOS_PLATFORM_DXE_H_
+#pragma once
 
 /**
   Install all structures from the given SMBIOS structures block
@@ -43,5 +42,3 @@ UINT8 *
 GetCloudHvSmbiosTables (
   VOID
   );
-
-#endif

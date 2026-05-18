@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef SERIAL_PORT_SBI_COMMON_H_
-#define SERIAL_PORT_SBI_COMMON_H_
+#pragma once
 
 #include <Base.h>
 #include <Library/SerialPortLib.h>
@@ -37,5 +36,3 @@ SbiDbcnWrite (
   IN  UINT8  *Buffer,
   IN  UINTN  NumberOfBytes
   );
-
-#endif /* SERIAL_PORT_SBI_COMMON_H_ */

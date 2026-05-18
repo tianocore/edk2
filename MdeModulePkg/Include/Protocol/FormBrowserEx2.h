@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FORM_BROWSER_EXTENSION2_H__
-#define __FORM_BROWSER_EXTENSION2_H__
+#pragma once
 
 #include <Protocol/FormBrowserEx.h>
 
@@ -114,5 +113,3 @@ struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiFormBrowserEx2ProtocolGuid;
-
-#endif

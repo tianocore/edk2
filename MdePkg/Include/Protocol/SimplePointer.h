@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __SIMPLE_POINTER_H__
-#define __SIMPLE_POINTER_H__
+#pragma once
 
 #define EFI_SIMPLE_POINTER_PROTOCOL_GUID \
   { \
@@ -133,5 +132,3 @@ struct _EFI_SIMPLE_POINTER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSimplePointerProtocolGuid;
-
-#endif

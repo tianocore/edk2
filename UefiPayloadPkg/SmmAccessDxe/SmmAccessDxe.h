@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SMM_ACCESS_DRIVER_H_
-#define SMM_ACCESS_DRIVER_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/SmmAccess2.h>
@@ -32,5 +31,3 @@ typedef struct {
   UINT32                      NumberRegions;
   EFI_SMRAM_DESCRIPTOR        *SmramDesc;
 } SMM_ACCESS_PRIVATE_DATA;
-
-#endif

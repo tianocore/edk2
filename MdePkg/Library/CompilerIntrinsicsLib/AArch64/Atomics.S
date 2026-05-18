@@ -32,12 +32,26 @@
         .macro          fn_start, name:req
         .section        .text.\name
         .globl          \name
+
+        /*
+         * PE targets (e.g. building with CLANGPDB) do not support ELF style
+         * .type directives
+         */
+#ifdef __ELF__
         .type           \name, %function
+#endif
 \name\():
         .endm
 
         .macro          fn_end, name:req
+
+        /*
+         * PE targets (e.g. building with CLANGPDB) do not support ELF style
+         * .size directives
+         */
+#ifdef __ELF__
         .size           \name, . - \name
+#endif
         .endm
 
         /*

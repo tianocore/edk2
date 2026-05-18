@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _SMM_PERIODIC_TIMER_DISPATCH2_H_
-#define _SMM_PERIODIC_TIMER_DISPATCH2_H_
+#pragma once
 
 #include <Pi/PiSmmCis.h>
 #include <Protocol/MmPeriodicTimerDispatch.h>
@@ -151,5 +150,3 @@ struct _EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmmPeriodicTimerDispatch2ProtocolGuid;
-
-#endif

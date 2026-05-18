@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __TIANO_DECOMPRESS_H__
-#define __TIANO_DECOMPRESS_H__
+#pragma once
 
 #include <stdio.h>
 #include <assert.h>
@@ -427,5 +426,3 @@ TDecompress (
   IN OUT VOID    *Scratch,
   IN UINT32      Version
   );
-
-#endif

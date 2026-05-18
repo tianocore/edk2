@@ -331,7 +331,10 @@ InitializePlatform (
 
   PlatformDebugDumpCmos ();
 
-  if (QemuFwCfgS3Enabled ()) {
+  if (!TdIsEnabled () &&
+      !PlatformInfoHob->SevEsIsEnabled &&
+      QemuFwCfgS3Enabled ())
+  {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
     PlatformInfoHob->S3Supported = TRUE;
     Status                       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);

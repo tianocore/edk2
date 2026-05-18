@@ -200,3 +200,45 @@ sleep (
 {
   return 0;
 }
+
+ms_time_t
+mbedtls_ms_time (
+  void
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TIME    Time;
+  ms_time_t   CalTime;
+  UINTN       Year;
+
+  //
+  // Get the current time and date information
+  //
+  Status = gRT->GetTime (&Time, NULL);
+  if (EFI_ERROR (Status) || (Time.Year < 1970)) {
+    return 0;
+  }
+
+  //
+  // Years Handling
+  // UTime should now be set to 00:00:00 on Jan 1 of the current year.
+  //
+  for (Year = 1970, CalTime = 0; Year != Time.Year; Year++) {
+    CalTime = CalTime + (time_t)(CumulativeDays[IsLeap (Year)][13] * SECSPERDAY);
+  }
+
+  //
+  // Add in number of seconds for current Month, Day, Hour, Minute, Seconds, and TimeZone adjustment
+  //
+  CalTime = CalTime +
+            (time_t)((Time.TimeZone != EFI_UNSPECIFIED_TIMEZONE) ? (Time.TimeZone * 60) : 0) +
+            (time_t)(CumulativeDays[IsLeap (Time.Year)][Time.Month] * SECSPERDAY) +
+            (time_t)(((Time.Day > 0) ? Time.Day - 1 : 0) * SECSPERDAY) +
+            (time_t)(Time.Hour * SECSPERHOUR) +
+            (time_t)(Time.Minute * 60) +
+            (time_t)Time.Second;
+
+  CalTime = CalTime*1000 + (ms_time_t)(Time.Nanosecond/1000000);
+
+  return CalTime;
+}

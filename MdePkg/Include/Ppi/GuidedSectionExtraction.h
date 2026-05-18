@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __EFI_GUIDED_SECTION_EXTRACTION_PPI_H__
-#define __EFI_GUIDED_SECTION_EXTRACTION_PPI_H__
+#pragma once
 
 //
 // Typically, protocol interface structures are identified
@@ -89,5 +88,3 @@ EFI_STATUS
 struct _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI {
   EFI_PEI_EXTRACT_GUIDED_SECTION    ExtractSection;
 };
-
-#endif

@@ -18,6 +18,7 @@ set SCRIPT_ERROR=1
 goto :EOF
 
 :main
+if /I "%1"=="VS2026" goto SetVS2026
 if /I "%1"=="VS2022" goto SetVS2022
 if /I "%1"=="VS2019" goto SetVS2019
 if /I "%1"=="VS2017" goto SetVS2017
@@ -235,6 +236,81 @@ if not defined WINSDK_PATH_FOR_RC_EXE (
 )
 
 if /I "%1"=="VS2022" goto SetWinDDK
+
+:SetWinDDK
+if not defined WINDDK3790_PREFIX (
+  set WINDDK3790_PREFIX=C:\WINDDK\3790.1830\bin\
+)
+
+if not defined IASL_PREFIX (
+  if exist "C:\ASL\" (
+    set IASL_PREFIX=C:\ASL\
+  ) else (
+      @echo.
+      @echo !!! WARNING !!! IASL_PREFIX environment variable is not set
+  )
+)
+
+:SetVS2026
+if not defined VS180COMNTOOLS (
+  @REM clear two envs so that vcvars32.bat can run successfully.
+  set VSINSTALLDIR=
+  set VCToolsVersion=
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2026\BuildTools" (
+      call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 18,19 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    ) else (
+      call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 18,19 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    )
+  ) else if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2026\BuildTools" (
+      call "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 18,19 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    ) else (
+      call "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 18,19 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    )
+  ) else (
+    if /I "%1"=="VS2026" goto ToolNotInstall
+    goto SetWinDDK
+  )
+)
+
+if defined VCToolsInstallDir (
+  if not defined VS2026_PREFIX (
+    set "VS2026_PREFIX=%VCToolsInstallDir%"
+  )
+  if not defined WINSDK10_PREFIX (
+    if defined WindowsSdkVerBinPath (
+      set "WINSDK10_PREFIX=%WindowsSdkVerBinPath%"
+    ) else if exist "%ProgramFiles(x86)%\Windows Kits\10\bin" (
+      set "WINSDK10_PREFIX=%ProgramFiles(x86)%\Windows Kits\10\bin\"
+    ) else if exist "%ProgramFiles%\Windows Kits\10\bin" (
+      set "WINSDK10_PREFIX=%ProgramFiles%\Windows Kits\10\bin\"
+    )
+  )
+)
+if not defined WINSDK_PATH_FOR_RC_EXE (
+  if defined WINSDK10_PREFIX (
+    set "WINSDK_PATH_FOR_RC_EXE=%WINSDK10_PREFIX%x86"
+  )
+)
+
+if /I "%1"=="VS2026" goto SetWinDDK
 
 :SetWinDDK
 if not defined WINDDK3790_PREFIX (

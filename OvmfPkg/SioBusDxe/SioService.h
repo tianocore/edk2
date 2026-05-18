@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __SIO_SERVICE_H__
-#define __SIO_SERVICE_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -209,5 +208,3 @@ SioCreateAllChildDevices (
   IN EFI_PCI_IO_PROTOCOL          *PciIo,
   IN EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath
   );
-
-#endif // __SIO_SERVICE_H__

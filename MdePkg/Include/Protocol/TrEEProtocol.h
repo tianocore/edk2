@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TREE_H__
-#define __TREE_H__
+#pragma once
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <IndustryStandard/Tpm20.h>
@@ -239,5 +238,3 @@ struct _EFI_TREE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiTrEEProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ARM_FFA_RX_TX_BUFFER_INFO_H_
-#define ARM_FFA_RX_TX_BUFFER_INFO_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -35,5 +34,3 @@ typedef struct ArmFfaRxTxBuffersInfo {
 } ARM_FFA_RX_TX_BUFFER_INFO;
 
 extern EFI_GUID  gArmFfaRxTxBufferInfoGuid;
-
-#endif

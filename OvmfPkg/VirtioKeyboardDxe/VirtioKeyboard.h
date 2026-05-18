@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _VIRTIO_KEYBOARD_DXE_H_
-#define _VIRTIO_KEYBOARD_DXE_H_
+#pragma once
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
@@ -205,5 +204,3 @@ VirtioKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN VOID                               *NotificationHandle
   );
-
-#endif

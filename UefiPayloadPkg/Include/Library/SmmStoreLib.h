@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SMM_STORE_LIB_H_
-#define SMM_STORE_LIB_H_
+#pragma once
 
 #include <Base.h>
 #include <Uefi/UefiBaseType.h>
@@ -193,5 +192,3 @@ EFIAPI
 SmmStoreLibDeinitialize (
   VOID
   );
-
-#endif /* SMM_STORE_LIB_H_ */

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _RAM_DISK_IMPL_H_
-#define _RAM_DISK_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -598,5 +597,3 @@ EFI_STATUS
 RamDiskPublishNfit (
   IN RAM_DISK_PRIVATE_DATA  *PrivateData
   );
-
-#endif

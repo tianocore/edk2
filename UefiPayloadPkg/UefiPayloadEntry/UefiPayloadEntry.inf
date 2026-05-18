@@ -24,7 +24,6 @@
 [Sources]
   UefiPayloadEntry.c
   LoadDxeCore.c
-  MemoryAllocation.c
   AcpiTable.c
 
 [Sources.Ia32]
@@ -40,7 +39,6 @@
 
 [Sources.AARCH64]
   AArch64/DxeHandoff.c
-  AArch64/DxeLoadFuncFit.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -61,6 +59,7 @@
   CpuLib
   StackCheckLib
   UefiCpuBaseArchSupportLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid

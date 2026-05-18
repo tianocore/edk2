@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _FSP_MEASURE_POINT_ID_H_
-#define _FSP_MEASURE_POINT_ID_H_
+#pragma once
 
 //
 // 0xD0 - 0xEF are reserved for FSP common measure point
@@ -52,5 +51,3 @@
 
 #define  FSP_PERF_ID_API_NOTIFY_END_OF_FIRMWARE_ENTRY  0xFC
 #define  FSP_PERF_ID_API_NOTIFY_END_OF_FIRMWARE_EXIT   (FSP_PERF_ID_API_NOTIFY_END_OF_FIRMWARE_ENTRY + 1)
-
-#endif

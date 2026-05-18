@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM_COMM_LIB_H_
-#define _TPM_COMM_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Tpm12.h>
 
@@ -277,5 +276,3 @@ TpmCommHashAll (
   IN        UINTN       DataLen,
   OUT       TPM_DIGEST  *Digest
   );
-
-#endif

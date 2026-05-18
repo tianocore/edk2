@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _XEN_XENBUS_XENBUSB_H
-#define _XEN_XENBUS_XENBUSB_H
+#pragma once
 
 #include "XenBusDxe.h"
 
@@ -34,5 +33,3 @@ XENSTORE_STATUS
 XenBusEnumerateBus (
   XENBUS_DEVICE  *Dev
   );
-
-#endif /* _XEN_XENBUS_XENBUSB_H */

@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __STATUS_CODE_PPI_H__
-#define __STATUS_CODE_PPI_H__
+#pragma once
 
 #define EFI_PEI_REPORT_PROGRESS_CODE_PPI_GUID \
   { 0x229832d3, 0x7a30, 0x4b36, {0xb8, 0x27, 0xf4, 0xc, 0xb7, 0xd4, 0x54, 0x36 } }
@@ -31,5 +30,3 @@ typedef struct {
 } EFI_PEI_PROGRESS_CODE_PPI;
 
 extern EFI_GUID  gEfiPeiStatusCodePpiGuid;
-
-#endif

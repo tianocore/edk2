@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef CM_OBJ_HELPER_LIB_H_
-#define CM_OBJ_HELPER_LIB_H_
+#pragma once
 
 /** Check if an ACPI table is present in the Configuration manager's ACPI table list.
 
@@ -54,5 +53,3 @@ GetProximityDomainId (
   IN        CM_OBJECT_TOKEN                       Token,
   OUT       UINT32                                *DomainId
   );
-
-#endif // CM_OBJ_HELPER_LIB_H_

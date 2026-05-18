@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __PLATFORM_TO_DRIVER_CONFIGUARTION_H__
-#define __PLATFORM_TO_DRIVER_CONFIGUARTION_H__
+#pragma once
 
 #define EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL_GUID  \
   { 0x642cd590, 0x8059, 0x4c0a, { 0xa9, 0x58, 0xc5, 0xec, 0x7, 0xd2, 0x3c, 0x4b } }
@@ -205,7 +204,7 @@ typedef enum {
   information returned by the platform, and calls Response passing
   in the arguments returned from Query. The UEFI driver must
   continuously call Query until EFI_NOT_FOUND is returned. For
-  every call to Query that returns EFI_SUCCESS a corrisponding
+  every call to Query that returns EFI_SUCCESS a corresponding
   call to Response is required passing in the same
   ContollerHandle, ChildHandle, Instance, ParameterTypeGuid,
   ParameterBlock, and ParameterBlockSize. The UEFI driver may
@@ -336,5 +335,3 @@ typedef struct {
 extern EFI_GUID  gEfiPlatformToDriverConfigurationClpGuid;
 
 extern EFI_GUID  gEfiPlatformToDriverConfigurationProtocolGuid;
-
-#endif

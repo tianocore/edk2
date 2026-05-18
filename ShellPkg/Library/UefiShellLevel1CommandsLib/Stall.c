@@ -9,6 +9,42 @@
 
 #include "UefiShellLevel1CommandsLib.h"
 
+/** Main function of the 'Stall' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdStall (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS  Status;
+  UINT64      Intermediate;
+
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"stall");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"stall");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = ShellConvertStringToUint64 (ShellCommandLineGetRawValue (Package, 1), &Intermediate, FALSE, FALSE);
+  if (EFI_ERROR (Status) || (((UINT64)(UINTN)(Intermediate)) != Intermediate)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"stall", ShellCommandLineGetRawValue (Package, 1));
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = gBS->Stall ((UINTN)Intermediate);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, L"stall");
+    return SHELL_DEVICE_ERROR;
+  }
+
+  return SHELL_SUCCESS;
+}
+
 /**
   Function for 'stall' command.
 
@@ -26,7 +62,6 @@ ShellCommandRunStall (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  UINT64        Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
 
@@ -51,29 +86,13 @@ ShellCommandRunStall (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"stall");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"stall");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Status = ShellConvertStringToUint64 (ShellCommandLineGetRawValue (Package, 1), &Intermediate, FALSE, FALSE);
-      if (EFI_ERROR (Status) || (((UINT64)(UINTN)(Intermediate)) != Intermediate)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"stall", ShellCommandLineGetRawValue (Package, 1));
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Status = gBS->Stall ((UINTN)Intermediate);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, L"stall");
-          ShellStatus = SHELL_DEVICE_ERROR;
-        }
-      }
-    }
 
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdStall (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

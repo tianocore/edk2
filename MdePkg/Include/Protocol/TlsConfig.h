@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_TLS_CONFIGURATION_PROTOCOL_H__
-#define __EFI_TLS_CONFIGURATION_PROTOCOL_H__
+#pragma once
 
 ///
 /// The EFI Configuration protocol provides a way to set and get TLS configuration.
@@ -122,5 +121,3 @@ struct _EFI_TLS_CONFIGURATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiTlsConfigurationProtocolGuid;
-
-#endif //__EFI_TLS_CONFIGURATION_PROTOCOL_H__

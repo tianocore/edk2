@@ -15,6 +15,174 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,    TypeMax  }
 };
 
+/** Mapping of Background colors.
+**/
+STATIC CONST UINTN  mClsBackgroundColorMap[] = {
+  EFI_BACKGROUND_BLACK,
+  EFI_BACKGROUND_BLUE,
+  EFI_BACKGROUND_GREEN,
+  EFI_BACKGROUND_CYAN,
+  EFI_BACKGROUND_RED,
+  EFI_BACKGROUND_MAGENTA,
+  EFI_BACKGROUND_BROWN,
+  EFI_BACKGROUND_LIGHTGRAY
+};
+
+/** Mapping of Foreground colors.
+**/
+STATIC CONST UINTN  mClsForegroundColorMap[] = {
+  EFI_BLACK,
+  EFI_BLUE,
+  EFI_GREEN,
+  EFI_CYAN,
+  EFI_RED,
+  EFI_MAGENTA,
+  EFI_BROWN,
+  EFI_LIGHTGRAY,
+  EFI_DARKGRAY,
+  EFI_LIGHTBLUE,
+  EFI_LIGHTGREEN,
+  EFI_LIGHTCYAN,
+  EFI_LIGHTRED,
+  EFI_LIGHTMAGENTA,
+  EFI_YELLOW,
+  EFI_WHITE
+};
+
+/**
+  Parse a decimal cls color argument.
+
+  @param[in]  ColorStr   Command-line argument to parse.
+  @param[in]  MaxValue   Maximum accepted value.
+  @param[in]  MaxLength  Maximum accepted string length.
+  @param[out] Color      Parsed color index.
+
+  @retval SHELL_SUCCESS            The argument is valid.
+  @retval SHELL_INVALID_PARAMETER  The argument is invalid.
+**/
+STATIC
+SHELL_STATUS
+GetClsColorIndex (
+  IN  CONST CHAR16  *ColorStr,
+  IN  UINTN         MaxValue,
+  IN  UINTN         MaxLength,
+  OUT UINTN         *Color
+  )
+{
+  ASSERT (Color != NULL);
+
+  if ((ShellStrToUintn (ColorStr) > MaxValue) || (StrLen (ColorStr) > MaxLength) || !ShellIsDecimalDigitCharacter (*ColorStr)) {
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  *Color = ShellStrToUintn (ColorStr);
+  return SHELL_SUCCESS;
+}
+
+/** Main function of the 'Cls' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdCls (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS    Status;
+  UINTN         Background;
+  UINTN         Foreground;
+  SHELL_STATUS  ShellStatus;
+  CONST CHAR16  *BackColorStr;
+  CONST CHAR16  *ForeColorStr;
+  UINTN         ColorIndex;
+
+  //
+  // Initialize variables
+  //
+  ShellStatus = SHELL_SUCCESS;
+  Background  = 0;
+  Foreground  = 0;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+    return ShellStatus;
+  } else if (ShellCommandLineGetFlag (Package, L"-sfo")) {
+    if (ShellCommandLineGetCount (Package) > 1) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Background = (gST->ConOut->Mode->Attribute >> 4) & 0x7;
+      Foreground = gST->ConOut->Mode->Attribute & 0x0F;
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel3HiiHandle, L"cls");
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_CLS_OUTPUT_SFO),
+        gShellLevel3HiiHandle,
+        gST->ConOut->Mode->Attribute,
+        Foreground,
+        Background
+        );
+    }
+
+    return ShellStatus;
+  }
+
+  //
+  // If there are 0 value parameters, clear sceen
+  //
+  BackColorStr = ShellCommandLineGetRawValue (Package, 1);
+  ForeColorStr = ShellCommandLineGetRawValue (Package, 2);
+
+  if ((BackColorStr == NULL) && (ForeColorStr == NULL)) {
+    //
+    // clear screen
+    //
+    gST->ConOut->ClearScreen (gST->ConOut);
+    return ShellStatus;
+  } else if (ShellCommandLineGetCount (Package) > 3) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (BackColorStr == NULL) {
+    return ShellStatus;
+  }
+
+  ShellStatus = GetClsColorIndex (BackColorStr, 7, 1, &ColorIndex);
+  if (ShellStatus != SHELL_SUCCESS) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", BackColorStr);
+    return ShellStatus;
+  }
+
+  Background = mClsBackgroundColorMap[ColorIndex];
+
+  if (ForeColorStr != NULL) {
+    ShellStatus = GetClsColorIndex (ForeColorStr, 15, 2, &ColorIndex);
+    if (ShellStatus != SHELL_SUCCESS) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", ForeColorStr);
+      return ShellStatus;
+    }
+
+    Foreground = mClsForegroundColorMap[ColorIndex];
+  } else {
+    //
+    // Since foreground color is not modified, so retain
+    // existing foreground color without any change to it.
+    //
+    Foreground = gST->ConOut->Mode->Attribute & 0x0F;
+  }
+
+  Status = gST->ConOut->SetAttribute (gST->ConOut, (Foreground | Background) & 0x7F);
+  ASSERT_EFI_ERROR (Status);
+  Status = gST->ConOut->ClearScreen (gST->ConOut);
+  ASSERT_EFI_ERROR (Status);
+
+  return ShellStatus;
+}
+
 /**
   Function for 'cls' command.
 
@@ -30,20 +198,14 @@ ShellCommandRunCls (
 {
   EFI_STATUS    Status;
   LIST_ENTRY    *Package;
-  UINTN         Background;
-  UINTN         Foreground;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  CONST CHAR16  *BackColorStr;
-  CONST CHAR16  *ForeColorStr;
 
   //
   // Initialize variables
   //
   ShellStatus  = SHELL_SUCCESS;
   ProblemParam = NULL;
-  Background   = 0;
-  Foreground   = 0;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -63,151 +225,11 @@ ShellCommandRunCls (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetFlag (Package, L"-sfo")) {
-      if (ShellCommandLineGetCount (Package) > 1) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Background = (gST->ConOut->Mode->Attribute >> 4) & 0x7;
-        Foreground = gST->ConOut->Mode->Attribute & 0x0F;
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel3HiiHandle, L"cls");
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_CLS_OUTPUT_SFO),
-          gShellLevel3HiiHandle,
-          gST->ConOut->Mode->Attribute,
-          Foreground,
-          Background
-          );
-      }
-    } else {
-      //
-      // If there are 0 value parameters, clear sceen
-      //
-      BackColorStr = ShellCommandLineGetRawValue (Package, 1);
-      ForeColorStr = ShellCommandLineGetRawValue (Package, 2);
 
-      if ((BackColorStr == NULL) && (ForeColorStr == NULL)) {
-        //
-        // clear screen
-        //
-        gST->ConOut->ClearScreen (gST->ConOut);
-      } else if (ShellCommandLineGetCount (Package) > 3) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        if (BackColorStr != NULL) {
-          if ((ShellStrToUintn (BackColorStr) > 7) || (StrLen (BackColorStr) > 1) || (!ShellIsDecimalDigitCharacter (*BackColorStr))) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", BackColorStr);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            switch (ShellStrToUintn (BackColorStr)) {
-              case 0:
-                Background = EFI_BACKGROUND_BLACK;
-                break;
-              case 1:
-                Background = EFI_BACKGROUND_BLUE;
-                break;
-              case 2:
-                Background = EFI_BACKGROUND_GREEN;
-                break;
-              case 3:
-                Background = EFI_BACKGROUND_CYAN;
-                break;
-              case 4:
-                Background = EFI_BACKGROUND_RED;
-                break;
-              case 5:
-                Background = EFI_BACKGROUND_MAGENTA;
-                break;
-              case 6:
-                Background = EFI_BACKGROUND_BROWN;
-                break;
-              case 7:
-                Background = EFI_BACKGROUND_LIGHTGRAY;
-                break;
-            }
-
-            if (ForeColorStr != NULL) {
-              if ((ShellStrToUintn (ForeColorStr) > 15) || (StrLen (ForeColorStr) > 2) || (!ShellIsDecimalDigitCharacter (*ForeColorStr))) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", ForeColorStr);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              } else {
-                switch (ShellStrToUintn (ForeColorStr)) {
-                  case 0:
-                    Foreground = EFI_BLACK;
-                    break;
-                  case 1:
-                    Foreground = EFI_BLUE;
-                    break;
-                  case 2:
-                    Foreground = EFI_GREEN;
-                    break;
-                  case 3:
-                    Foreground = EFI_CYAN;
-                    break;
-                  case 4:
-                    Foreground = EFI_RED;
-                    break;
-                  case 5:
-                    Foreground = EFI_MAGENTA;
-                    break;
-                  case 6:
-                    Foreground = EFI_BROWN;
-                    break;
-                  case 7:
-                    Foreground = EFI_LIGHTGRAY;
-                    break;
-                  case 8:
-                    Foreground = EFI_DARKGRAY;
-                    break;
-                  case 9:
-                    Foreground = EFI_LIGHTBLUE;
-                    break;
-                  case 10:
-                    Foreground = EFI_LIGHTGREEN;
-                    break;
-                  case 11:
-                    Foreground = EFI_LIGHTCYAN;
-                    break;
-                  case 12:
-                    Foreground = EFI_LIGHTRED;
-                    break;
-                  case 13:
-                    Foreground = EFI_LIGHTMAGENTA;
-                    break;
-                  case 14:
-                    Foreground = EFI_YELLOW;
-                    break;
-                  case 15:
-                    Foreground = EFI_WHITE;
-                    break;
-                }
-              }
-            } else {
-              //
-              // Since foreground color is not modified, so retain
-              // existing foreground color without any change to it.
-              //
-              Foreground = gST->ConOut->Mode->Attribute & 0x0F;
-            }
-
-            if (ShellStatus == SHELL_SUCCESS) {
-              Status = gST->ConOut->SetAttribute (gST->ConOut, (Foreground | Background) & 0x7F);
-              ASSERT_EFI_ERROR (Status);
-              Status = gST->ConOut->ClearScreen (gST->ConOut);
-              ASSERT_EFI_ERROR (Status);
-            }
-          }
-        }
-      }
-    }
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdCls (Package);
 
   //
   // free the command line package

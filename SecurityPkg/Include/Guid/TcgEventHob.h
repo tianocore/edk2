@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_EVENT_HOB_H_
-#define _TCG_EVENT_HOB_H_
+#pragma once
 
 ///
 /// The Global ID of a GUIDed HOB used to pass a TCG_PCR_EVENT from a TPM PEIM to a TPM DXE Driver.
@@ -59,5 +58,3 @@ extern EFI_GUID  gTpm2StartupLocalityHobGuid;
   }
 
 extern EFI_GUID  gTcg800155PlatformIdEventHobGuid;
-
-#endif

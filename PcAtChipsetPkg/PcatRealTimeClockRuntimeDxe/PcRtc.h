@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _RTC_H_
-#define _RTC_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -369,5 +368,3 @@ PcRtcAcpiTableChangeCallback (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

@@ -11,8 +11,7 @@
     - DT     - Device Tree
 **/
 
-#ifndef DYNAMIC_TABLE_FACTORY_H_
-#define DYNAMIC_TABLE_FACTORY_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -122,5 +121,3 @@ GetDtTableGenerator (
   );
 
 #pragma pack()
-
-#endif // DYNAMIC_TABLE_FACTORY_H_

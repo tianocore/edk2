@@ -9,11 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MM_SERVICES_TABLE_LIB_H__
-#define __MM_SERVICES_TABLE_LIB_H__
+#pragma once
 
 #include <PiMm.h>
 
 extern EFI_MM_SYSTEM_TABLE  *gMmst;
-
-#endif

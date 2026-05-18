@@ -315,7 +315,9 @@ INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 #
 # Hash2 Protocol producer
 #
-INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!if $(NETWORK_ENABLE) == TRUE
+  INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Network modules

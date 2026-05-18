@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_HTTP_DRIVER_H__
-#define __EFI_HTTP_DRIVER_H__
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Http11.h>
@@ -400,5 +399,3 @@ HttpServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

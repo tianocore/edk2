@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _EFI_SHELL_HEXEDIT_H_
-#define _EFI_SHELL_HEXEDIT_H_
+#pragma once
 
 #include "UefiShellDebug1CommandsLib.h"
 #include "HexEditorTypes.h"
@@ -31,5 +30,3 @@
 extern HEFI_EDITOR_GLOBAL_EDITOR  HMainEditor;
 extern BOOLEAN                    HEditorFirst;
 extern BOOLEAN                    HEditorExit;
-
-#endif // _HEDITOR_H

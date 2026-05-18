@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __BASE_PECOFF_LIB_INTERNALS__
-#define __BASE_PECOFF_LIB_INTERNALS__
+#pragma once
 
 #include <Base.h>
 #include <Library/PeCoffLib.h>
@@ -129,5 +128,3 @@ PeCoffLoaderImageAddress (
   IN     UINTN                         Address,
   IN     UINTN                         TeStrippedOffset
   );
-
-#endif

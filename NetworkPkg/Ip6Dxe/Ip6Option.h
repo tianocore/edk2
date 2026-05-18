@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_OPTION_H__
-#define __EFI_IP6_OPTION_H__
+#pragma once
 
 #define IP6_FRAGMENT_OFFSET_MASK  (~0x3)
 
@@ -252,5 +251,3 @@ Ip6IsNDOptionValid (
   IN UINT8   *Option,
   IN UINT16  OptionLen
   );
-
-#endif

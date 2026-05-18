@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef _FW_PERF_COMMON_H_
-#define _FW_PERF_COMMON_H_
+#pragma once
 
 /**
   The module Entry Point of the Firmware Performance Data Table MM driver.
@@ -31,5 +30,3 @@ EFI_STATUS
 FirmwarePerformanceCommonEntryPoint (
   VOID
   );
-
-#endif // _FW_PERF_COMMON_H_

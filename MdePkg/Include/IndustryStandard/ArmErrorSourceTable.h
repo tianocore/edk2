@@ -15,8 +15,7 @@
     - Id  : Identifier
 **/
 
-#ifndef ARM_ERROR_SOURCE_TABLE_H_
-#define ARM_ERROR_SOURCE_TABLE_H_
+#pragma once
 
 ///
 /// "AEST" Arm Error Source Table
@@ -332,7 +331,7 @@ typedef struct {
   /// Type of GIC interface that is associated with this error node.
   ///   0x0 - GIC CPU (GICC)
   ///   0x1 - GIC Distributor (GICD)
-  ///   0x2 - GIC Resistributor (GICR)
+  ///   0x2 - GIC Redistributor (GICR)
   ///   0x3 - GIC ITS (GITS)
   UINT32                       InterfaceType;
 
@@ -353,5 +352,3 @@ typedef struct {
 #define EFI_ACPI_AEST_GIC_INTERFACE_TYPE_GITS  0x3
 
 #pragma pack()
-
-#endif // ARM_ERROR_SOURCE_TABLE_H_

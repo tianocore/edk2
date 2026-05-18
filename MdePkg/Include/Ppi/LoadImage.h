@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __LOADED_IMAGE_PPI_H__
-#define __LOADED_IMAGE_PPI_H__
+#pragma once
 
 #define EFI_PEI_LOADED_IMAGE_PPI_GUID \
   { 0xc1fcd448, 0x6300, 0x4458, { 0xb8, 0x64, 0x28, 0xdf, 0x1, 0x53, 0x64, 0xbc } }
@@ -40,5 +39,3 @@ struct _EFI_PEI_LOADED_IMAGE_PPI {
 };
 
 extern EFI_GUID  gEfiPeiLoadedImagePpiGuid;
-
-#endif

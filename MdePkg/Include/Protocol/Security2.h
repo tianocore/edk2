@@ -11,7 +11,7 @@
   When both Security and Security2 Architectural Protocols are published, LoadImage must use
   them in accordance with the following rules:
     The Security2 protocol must be used on every image being loaded.
-    The Security protocol must be used after the Securiy2 protocol and only on images that
+    The Security protocol must be used after the Security2 protocol and only on images that
     have been read using Firmware Volume protocol.
 
   When only Security architectural protocol is published, LoadImage must use it on every image
@@ -22,8 +22,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_SECURITY2_H__
-#define __ARCH_PROTOCOL_SECURITY2_H__
+#pragma once
 
 ///
 /// Global ID for the Security2 Code Architectural Protocol
@@ -97,5 +96,3 @@ struct _EFI_SECURITY2_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSecurity2ArchProtocolGuid;
-
-#endif

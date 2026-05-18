@@ -6,8 +6,7 @@
  * copied from qemu.git (include/hw/uefi/var-service-api.h)
  */
 
-#ifndef QEMU_UEFI_VAR_SERVICE_API_H
-#define QEMU_UEFI_VAR_SERVICE_API_H
+#pragma once
 
 /* qom: device names */
 #define TYPE_UEFI_VARS_X64     "uefi-vars-x64"
@@ -46,5 +45,3 @@
 #define UEFI_VARS_STS_ERR_UNKNOWN          0x10
 #define UEFI_VARS_STS_ERR_NOT_SUPPORTED    0x11
 #define UEFI_VARS_STS_ERR_BAD_BUFFER_SIZE  0x12
-
-#endif /* QEMU_UEFI_VAR_SERVICE_API_H */

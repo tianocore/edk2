@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CPU_LIB_H__
-#define __CPU_LIB_H__
+#pragma once
 
 /**
   Places the CPU in a sleep state until an interrupt is received.
@@ -119,7 +118,5 @@ EFIAPI
 DisableFloatingPointUnits (
   VOID
   );
-
-#endif
 
 #endif

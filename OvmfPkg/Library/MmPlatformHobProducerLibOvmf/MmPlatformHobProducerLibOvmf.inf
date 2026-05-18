@@ -42,10 +42,8 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
-  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
 
 [Depex]
   gEfiPeiMmAccessPpiGuid

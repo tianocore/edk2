@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
-#define _SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
+#pragma once
 
 #include <Guid/EventGroup.h>
 #include <Guid/ExtendedFirmwarePerformance.h>
@@ -226,5 +225,3 @@ CreatePerformanceMeasurement (
   IN       UINT32                      Identifier,
   IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute
   );
-
-#endif

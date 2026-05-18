@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INTEL_SMRAM_SAVE_STATE_MAP_H__
-#define __INTEL_SMRAM_SAVE_STATE_MAP_H__
+#pragma once
 
 ///
 /// Default SMBASE address
@@ -180,5 +179,3 @@ typedef union {
 } SMRAM_SAVE_STATE_IOMISC;
 
 #pragma pack ()
-
-#endif

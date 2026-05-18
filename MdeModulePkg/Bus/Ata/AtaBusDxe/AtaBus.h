@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _ATA_BUS_H_
-#define _ATA_BUS_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -1065,5 +1064,3 @@ VOID
 InitiateTPerReset (
   IN   ATA_DEVICE  *AtaDevice
   );
-
-#endif

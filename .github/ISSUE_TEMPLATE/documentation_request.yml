@@ -23,8 +23,9 @@ body:
         alongside the code implementation of a particularly complex feature or module.
 
 
-        - To file an issue for a TianoCore specification, refer to [these instructions](https://github.com/tianocore-docs/edk2-TemplateSpecification/wiki/TianoCore-Documents-GitBook-Overview)
-        and reference the specifications In the [TianoCore Docs organization](https://github.com/tianocore-docs).
+        - To file an issue for a TianoCore specification, refer to
+          [these instructions](https://www.tianocore.org/tianocore-wiki.github.io/reference/specs-standards/edk_ii_documentation.html)
+          and reference the specifications In the [TianoCore Docs organization](https://github.com/tianocore-docs).
 
         - For UEFI specifications, refer to the [UEFI Forum](https://uefi.org/specifications) website.
 

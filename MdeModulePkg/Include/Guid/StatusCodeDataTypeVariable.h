@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _STATUS_CODE_DATA_TYPE_VARIABLE_H_
-#define _STATUS_CODE_DATA_TYPE_VARIABLE_H_
+#pragma once
 
 ///
 /// The Global ID used to identify a structure of type EDKII_SET_VARIABLE_STATUS.
@@ -30,5 +29,3 @@ typedef struct {
 } EDKII_SET_VARIABLE_STATUS;
 
 extern EFI_GUID  gEdkiiStatusCodeDataTypeVariableGuid;
-
-#endif // _STATUS_CODE_DATA_TYPE_VARIABLE_H_

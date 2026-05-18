@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef AMD_SMRAM_SAVE_STATE_MAP_H_
-#define AMD_SMRAM_SAVE_STATE_MAP_H_
+#pragma once
 
 ///
 /// Default SMBASE address
@@ -190,5 +189,3 @@ typedef union  {
 } AMD_SMRAM_SAVE_STATE_MAP;
 
 #pragma pack ()
-
-#endif

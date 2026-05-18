@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __EFI_EAP_PROTOCOL_H__
-#define __EFI_EAP_PROTOCOL_H__
+#pragma once
 
 #define EFI_EAP_PROTOCOL_GUID \
   { \
@@ -36,7 +35,7 @@ typedef VOID *EFI_PORT_HANDLE;
 ///@}
 
 //
-// EAP_TYPE MD5, OTP and TOEKN_CARD has been removed from UEFI2.3.1B.
+// EAP_TYPE MD5, OTP and TOKEN_CARD has been removed from UEFI2.3.1B.
 // Definitions are kept for backward compatibility.
 //
 #define EFI_EAP_TYPE_MD5         4
@@ -150,5 +149,3 @@ struct _EFI_EAP_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEapProtocolGuid;
-
-#endif

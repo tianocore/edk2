@@ -25,27 +25,30 @@ Xtoi (
   CHAR16  TempChar;
   UINTN   MaxVal;
 
-  ASSERT (Str != NULL);
+  if (Str == NULL) {
+    ASSERT (Str != NULL);
+    return 0;
+  }
 
   MaxVal = (UINTN)-1 >> 4;
   //
   // skip preceeding white space
   //
-  while (*Str != '\0' && *Str == ' ') {
+  while (*Str == ' ') {
     Str += 1;
   }
 
   //
   // skip preceeding zeros
   //
-  while (*Str != '\0' && *Str == '0') {
+  while (*Str == '0') {
     Str += 1;
   }
 
   //
   // skip preceeding white space
   //
-  if ((*Str != '\0') && ((*Str == 'x') || (*Str == 'X'))) {
+  if (((*Str == 'x') || (*Str == 'X'))) {
     Str += 1;
   }
 
@@ -98,21 +101,21 @@ LXtoi (
   //
   // skip preceeding white space
   //
-  while (*Str != '\0' && *Str == ' ') {
+  while (*Str == ' ') {
     Str += 1;
   }
 
   //
   // skip preceeding zeros
   //
-  while (*Str != '\0' && *Str == '0') {
+  while (*Str == '0') {
     Str += 1;
   }
 
   //
   // skip preceeding white space
   //
-  if ((*Str != '\0') && ((*Str == 'x') || (*Str == 'X'))) {
+  if (((*Str == 'x') || (*Str == 'X'))) {
     Str += 1;
   }
 
@@ -168,7 +171,7 @@ Atoi (
   //
   // skip preceeding white space
   //
-  while (*Str != '\0' && *Str == ' ') {
+  while (*Str == ' ') {
     Str += 1;
   }
 
@@ -217,21 +220,21 @@ AsciiXtoi (
   //
   // skip preceeding white space
   //
-  while (*Str != '\0' && *Str == ' ') {
+  while (*Str == ' ') {
     Str += 1;
   }
 
   //
   // skip preceeding zeros
   //
-  while (*Str != '\0' && *Str == '0') {
+  while (*Str == '0') {
     Str += 1;
   }
 
   //
   // skip preceeding white space
   //
-  if ((*Str != '\0') && ((*Str == 'x') || (*Str == 'X'))) {
+  if (((*Str == 'x') || (*Str == 'X'))) {
     Str += 1;
   }
 
@@ -286,7 +289,7 @@ AsciiAtoi (
   //
   // skip preceeding white space
   //
-  while (*Str != '\0' && *Str == ' ') {
+  while (*Str == ' ') {
     Str += 1;
   }
 

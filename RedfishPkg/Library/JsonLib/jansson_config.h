@@ -5,8 +5,7 @@
     SPDX-License-Identifier: BSD-2-Clause-Patent
  **/
 
-#ifndef JANSSON_CONFIG_H_
-#define JANSSON_CONFIG_H_
+#pragma once
 
 ///
 /// We don't support inline JSON on edk2
@@ -37,5 +36,3 @@
 /// Mzximum deepth is set to 2048
 ///
 #define JSON_PARSER_MAX_DEPTH  2048
-
-#endif

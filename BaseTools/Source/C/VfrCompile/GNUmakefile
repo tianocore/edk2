@@ -46,7 +46,7 @@ all: $(MAKEROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(CP) $(APPLICATION).exe $(BIN_PATH)
 endif
 
@@ -54,10 +54,11 @@ VfrCompiler.o: ../Include/Common/BuildVersion.h
 
 include $(MAKEROOT)/Makefiles/footer.makefile
 
-VfrSyntax.cpp EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h: Pccts/antlr/antlr VfrSyntax.g
-	Pccts/antlr/antlr -CC -e3 -ck 3 -k 2 -fl VfrParser.dlg -ft VfrTokens.h -o . VfrSyntax.g
+ANTLR_GEN = VfrSyntax.cpp EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h
+DLG_GEN = VfrLexer.cpp VfrLexer.h
 
-VfrLexer.cpp VfrLexer.h: Pccts/dlg/dlg VfrParser.dlg
+$(ANTLR_GEN) $(DLG_GEN) &: Pccts/antlr/antlr Pccts/dlg/dlg VfrSyntax.g
+	Pccts/antlr/antlr -CC -e3 -ck 3 -k 2 -fl VfrParser.dlg -ft VfrTokens.h -o . VfrSyntax.g
 	Pccts/dlg/dlg -C2 -i -CC -cl VfrLexer -o . VfrParser.dlg
 
 Pccts/antlr/antlr:
@@ -84,6 +85,6 @@ localClean:
 	$(MAKE) -C Pccts/antlr clean
 	$(MAKE) -C Pccts/dlg clean
 	$(RM) $(EXTRA_CLEAN_OBJECTS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(RM) $(BIN_PATH)/$(APPNAME).exe
 endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PEI_SERIAL_PORT_PPI_H__
-#define __PEI_SERIAL_PORT_PPI_H__
+#pragma once
 
 #define PEI_SERIAL_PORT_PPI \
   { \
@@ -16,5 +15,3 @@
   }
 
 extern EFI_GUID  gPeiSerialPortPpiGuid;
-
-#endif

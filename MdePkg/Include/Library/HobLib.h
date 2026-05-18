@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HOB_LIB_H__
-#define __HOB_LIB_H__
+#pragma once
 
 /**
   Returns the pointer to the HOB list.
@@ -603,5 +602,3 @@ TagMemoryAllocationHobWithGuid (
 **/
 #define GET_GUID_HOB_DATA_SIZE(HobStart) \
   (UINT16)(GET_HOB_LENGTH (HobStart) - sizeof (EFI_HOB_GUID_TYPE))
-
-#endif

@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_PP_VENDOR_LIB_H_
-#define _TCG_PP_VENDOR_LIB_H_
+#pragma once
 
 //
 // The definition of physical presence operation actions
@@ -149,5 +148,3 @@ TcgPpVendorLibGetUserConfirmationStatusFunction (
   IN UINT32  OperationRequest,
   IN UINT32  ManagementFlags
   );
-
-#endif

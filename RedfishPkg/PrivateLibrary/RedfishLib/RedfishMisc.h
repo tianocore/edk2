@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef DXE_REDFISH_MISC_LIB_H_
-#define DXE_REDFISH_MISC_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -78,5 +77,3 @@ RedfishGetAuthInfo (
   OUT  CHAR8                      **UserId,
   OUT  CHAR8                      **Password
   );
-
-#endif

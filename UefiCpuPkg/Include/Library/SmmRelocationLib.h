@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef SMM_RELOCATION_LIB_H_
-#define SMM_RELOCATION_LIB_H_
+#pragma once
 
 #include <Ppi/MpServices2.h>
 
@@ -38,5 +37,3 @@ EFIAPI
 SmmRelocationInit (
   IN EFI_PEI_MP_SERVICES2_PPI  *MpServices2
   );
-
-#endif

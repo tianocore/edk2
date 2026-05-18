@@ -18,8 +18,7 @@
 
 **/
 
-#ifndef __SMBIOS_PROTOCOL_H__
-#define __SMBIOS_PROTOCOL_H__
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 
@@ -207,5 +206,3 @@ struct _EFI_SMBIOS_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmbiosProtocolGuid;
-
-#endif // __SMBIOS_PROTOCOL_H__

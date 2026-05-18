@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_INPUT_BAR_H_
-#define _LIB_INPUT_BAR_H_
+#pragma once
 
 /**
   Initialize the input bar.
@@ -77,5 +76,3 @@ CONST CHAR16 *
 InputBarGetString (
   VOID
   );
-
-#endif

@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PI_STATUS_CODE_H__
-#define __PI_STATUS_CODE_H__
+#pragma once
 
 //
 // Required for IA32, X64, IPF, and EBC defines for CPU exception types
@@ -1216,5 +1215,3 @@ typedef struct {
 #define EFI_SW_EC_ARM_IRQ                    EXCEPT_ARM_IRQ
 #define EFI_SW_EC_ARM_FIQ                    EXCEPT_ARM_FIQ
 ///@}
-
-#endif

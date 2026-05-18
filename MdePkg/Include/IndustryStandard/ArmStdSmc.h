@@ -11,14 +11,15 @@
 *  - [2] Arm True Random Number Generator Firmware, Interface 1.0,
 *    Platform Design Document.
 *    (https://developer.arm.com/documentation/den0098/latest/)
+*  - [3] Realm Management Monitor (RMM) Specification, version 1.0-rel0
+*    (https://developer.arm.com/documentation/den0137/)
 *
 *  @par Glossary:
 *    - TRNG - True Random Number Generator
 *
 **/
 
-#ifndef ARM_STD_SMC_H_
-#define ARM_STD_SMC_H_
+#pragma once
 
 /*
  * SMC function IDs for Standard Service queries
@@ -248,4 +249,17 @@
 #define SMC_SIP_FUNCTION  (SMC64_FUNCTION   | 0x02000000)
 #define SMC_SIP_FUNCTION_ID(n)  (SMC_SIP_FUNCTION | (n))
 
-#endif // ARM_STD_SMC_H_
+/*
+ * Arm CCA FIDs for Realm Service Interface calls as specified by the
+ * Realm Management Monitor (RMM) Specification.
+ */
+#define ARM_CCA_FID_RSI_ATTESTATION_TOKEN_CONTINUE  0xC4000195
+#define ARM_CCA_FID_RSI_ATTESTATION_TOKEN_INIT      0xC4000194
+#define ARM_CCA_FID_RSI_FEATURES                    0xC4000191
+#define ARM_CCA_FID_RSI_HOST_CALL                   0xC4000199
+#define ARM_CCA_FID_RSI_IPA_STATE_GET               0xC4000198
+#define ARM_CCA_FID_RSI_IPA_STATE_SET               0xC4000197
+#define ARM_CCA_FID_RSI_MEASUREMENT_EXTEND          0xC4000193
+#define ARM_CCA_FID_RSI_MEASUREMENT_READ            0xC4000192
+#define ARM_CCA_FID_RSI_REALM_CONFIG                0xC4000196
+#define ARM_CCA_FID_RSI_VERSION                     0xC4000190

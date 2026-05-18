@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __INTERNAL_HII_LIB_H__
-#define __INTERNAL_HII_LIB_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -26,5 +25,3 @@
 #include <Library/UefiHiiServicesLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
-
-#endif

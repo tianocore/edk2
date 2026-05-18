@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __DEVICE_PATH_UTILITIES_PROTOCOL_H__
-#define __DEVICE_PATH_UTILITIES_PROTOCOL_H__
+#pragma once
 
 ///
 /// Device Path Utilities protocol
@@ -181,5 +180,3 @@ typedef struct {
 } EFI_DEVICE_PATH_UTILITIES_PROTOCOL;
 
 extern EFI_GUID  gEfiDevicePathUtilitiesProtocolGuid;
-
-#endif

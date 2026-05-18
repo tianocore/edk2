@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLATFORM_VARIABLE_CLEANUP_LIB_
-#define _PLATFORM_VARIABLE_CLEANUP_LIB_
+#pragma once
 
 #include <Guid/VarErrorFlag.h>
 
@@ -51,5 +50,3 @@ PlatformVarCleanup (
   IN VAR_ERROR_FLAG    Flag,
   IN VAR_CLEANUP_TYPE  Type
   );
-
-#endif

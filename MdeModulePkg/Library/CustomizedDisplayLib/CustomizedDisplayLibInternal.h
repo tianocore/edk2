@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CUSTOMIZED_DISPLAY_LIB_INTERNAL_H__
-#define __CUSTOMIZED_DISPLAY_LIB_INTERNAL_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -283,5 +282,3 @@ VOID
 ProcessExternedOpcode (
   IN FORM_DISPLAY_ENGINE_FORM  *FormData
   );
-
-#endif

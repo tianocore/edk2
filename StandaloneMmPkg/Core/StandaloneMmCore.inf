@@ -91,11 +91,13 @@
   gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv    ##CONSUMES
 
 #
-# This configuration fails for CLANGPDB, which does not support PIE in the GCC
-# sense. Such however is required for ARM family StandaloneMmCore
-# self-relocation, and thus the CLANGPDB toolchain is unsupported for AARCH64
-# for this module.
+# Standalone MM Core can be used as an OP-TEE trusted application and needs to do runtime
+# relocation in that scenario. It needs to be built as a position independent executable (PIE)
+# for this use case. However, PE targets do not support PIE, so only ELF targets
+# are built with these flags and support this scenario.
 #
 [BuildOptions]
-  GCC:*_*_AARCH64_CC_FLAGS = -fpie
-  GCC:*_*_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
+  GCC:*_GCC_AARCH64_CC_FLAGS = -fpie
+  GCC:*_GCC_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
+  GCC:*_CLANGDWARF_AARCH64_CC_FLAGS = -fpie
+  GCC:*_CLANGDWARF_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie

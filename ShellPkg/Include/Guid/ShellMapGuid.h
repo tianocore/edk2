@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELL_MAP_GUID_H_
-#define _SHELL_MAP_GUID_H_
+#pragma once
 
 #define SHELL_MAP_GUID \
 { \
@@ -15,5 +14,3 @@
 }
 
 extern EFI_GUID  gShellMapGuid;
-
-#endif

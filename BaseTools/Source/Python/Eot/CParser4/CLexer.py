@@ -1,6 +1,7 @@
-# Generated from C.g4 by ANTLR 4.7.1
+﻿# Generated from C.g4 by ANTLR 4.9
 from antlr4 import *
 from io import StringIO
+from typing.io import TextIO
 import sys
 
 
@@ -17,8 +18,9 @@ import sys
 #
 ##
 
-import Ecc.CodeFragment as CodeFragment
-import Ecc.FileProfile as FileProfile
+import Eot.CodeFragment as CodeFragment
+import Eot.FileProfile as FileProfile
+
 
 
 def serializedATN():
@@ -581,44 +583,43 @@ class CLexer(Lexer):
 
     grammarFileName = "C.g4"
 
-    # @param  output= sys.stdout Type: TextIO
-    def __init__(self,input=None,output= sys.stdout):
+    def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.7.1")
+        self.checkVersion("4.9")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
 
 
 
-    def printTokenInfo(self,line,offset,tokenText):
+    def printTokenInfo(self, line, offset, tokenText):
         print(str(line)+ ',' + str(offset) + ':' + str(tokenText))
 
-    def StorePredicateExpression(self,StartLine,StartOffset,EndLine,EndOffset,Text):
+    def StorePredicateExpression(self, StartLine, StartOffset, EndLine, EndOffset, Text):
         PredExp = CodeFragment.PredicateExpression(Text, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.PredicateExpressionList.append(PredExp)
 
-    def StoreEnumerationDefinition(self,StartLine,StartOffset,EndLine,EndOffset,Text):
+    def StoreEnumerationDefinition(self, StartLine, StartOffset, EndLine, EndOffset, Text):
         EnumDef = CodeFragment.EnumerationDefinition(Text, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.EnumerationDefinitionList.append(EnumDef)
 
-    def StoreStructUnionDefinition(self,StartLine,StartOffset,EndLine,EndOffset,Text):
+    def StoreStructUnionDefinition(self, StartLine, StartOffset, EndLine, EndOffset, Text):
         SUDef = CodeFragment.StructUnionDefinition(Text, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.StructUnionDefinitionList.append(SUDef)
 
-    def StoreTypedefDefinition(self,StartLine,StartOffset,EndLine,EndOffset,FromText,ToText):
+    def StoreTypedefDefinition(self, StartLine, StartOffset, EndLine, EndOffset, FromText, ToText):
         Tdef = CodeFragment.TypedefDefinition(FromText, ToText, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.TypedefDefinitionList.append(Tdef)
 
-    def StoreFunctionDefinition(self,StartLine,StartOffset,EndLine,EndOffset,ModifierText,DeclText,LeftBraceLine,LeftBraceOffset,DeclLine,DeclOffset):
+    def StoreFunctionDefinition(self, StartLine, StartOffset, EndLine, EndOffset, ModifierText, DeclText, LeftBraceLine, LeftBraceOffset, DeclLine, DeclOffset):
         FuncDef = CodeFragment.FunctionDefinition(ModifierText, DeclText, (StartLine, StartOffset), (EndLine, EndOffset), (LeftBraceLine, LeftBraceOffset), (DeclLine, DeclOffset))
         FileProfile.FunctionDefinitionList.append(FuncDef)
 
-    def StoreVariableDeclaration(self,StartLine,StartOffset,EndLine,EndOffset,ModifierText,DeclText):
+    def StoreVariableDeclaration(self, StartLine, StartOffset, EndLine, EndOffset, ModifierText, DeclText):
         VarDecl = CodeFragment.VariableDeclaration(ModifierText, DeclText, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.VariableDeclarationList.append(VarDecl)
 
-    def StoreFunctionCalling(self,StartLine,StartOffset,EndLine,EndOffset,FuncName,ParamList):
+    def StoreFunctionCalling(self, StartLine, StartOffset, EndLine, EndOffset, FuncName, ParamList):
         FuncCall = CodeFragment.FunctionCalling(FuncName, ParamList, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.FunctionCallingList.append(FuncCall)
 

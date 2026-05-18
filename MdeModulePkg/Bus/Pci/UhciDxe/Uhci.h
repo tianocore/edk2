@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_UHCI_H_
-#define _EFI_UHCI_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -207,5 +206,3 @@ UhciDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
-
-#endif

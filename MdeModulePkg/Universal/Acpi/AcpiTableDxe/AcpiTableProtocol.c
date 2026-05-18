@@ -537,7 +537,11 @@ AddTableToList (
   // Create a new list entry
   //
   CurrentTableList = AllocatePool (sizeof (EFI_ACPI_TABLE_LIST));
-  ASSERT (CurrentTableList);
+
+  if (CurrentTableList == NULL) {
+    ASSERT (CurrentTableList);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Determine table type and size
@@ -1273,7 +1277,7 @@ RemoveTableFromRsdt (
     //
     // Check if we have found the corresponding entry in both RSDT and XSDT
     //
-    if (((Rsdt == NULL) || (*CurrentRsdtEntry == (UINT32)(UINTN)Table->Table)) &&
+    if (((Rsdt == NULL) || ((CurrentRsdtEntry != NULL) && (*CurrentRsdtEntry == (UINT32)(UINTN)Table->Table))) &&
         ((Xsdt == NULL) || (CurrentTablePointer64 == (UINT64)(UINTN)Table->Table))
         )
     {
@@ -1980,6 +1984,7 @@ InstallAcpiTableFromAcpiSiliconHob (
   UINTN                                         TotalSocTablesize;
   UINT8                                         *Pointer;
   EFI_MEMORY_TYPE                               AcpiAllocateMemoryType;
+  UINTN                                         AcpiRsdpSize;
 
   DEBUG ((DEBUG_INFO, "InstallAcpiTableFromAcpiSiliconHob - Start\n"));
   //
@@ -2003,12 +2008,50 @@ InstallAcpiTableFromAcpiSiliconHob (
   //
   SiAcpiHobRsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)(AcpiSiliconHob->Rsdp);
   if (SiAcpiHobRsdp == NULL) {
-    DEBUG ((DEBUG_ERROR, "InstallAcpiTableFromAcpiSiliconHob: Fail to locate RSDP Acpi table!!\n"));
+    DEBUG ((DEBUG_ERROR, "InstallAcpiTableFromAcpiSiliconHob: Fail to locate RSDP Acpi table from AcpiSiliconHob!!\n"));
     return EFI_NOT_FOUND;
+  } else {
+    DEBUG ((DEBUG_INFO, "ACPI HOB RSDP address : 0x%016lx\n", SiAcpiHobRsdp));
   }
 
-  DEBUG ((DEBUG_INFO, "Silicon ACPI RSDP address : 0x%016lx\n", SiAcpiHobRsdp));
-  AcpiTableInstance->Rsdp3 = SiAcpiHobRsdp;
+  //
+  // Reserved the ACPI reclaim memory for new RSDP space.
+  //
+  AcpiRsdpSize = sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
+  if (mAcpiTableAllocType != AllocateAnyPages) {
+    PageAddress = 0xFFFFFFFF;
+    Status      = gBS->AllocatePages (
+                         mAcpiTableAllocType,
+                         AcpiAllocateMemoryType,
+                         EFI_SIZE_TO_PAGES (AcpiRsdpSize),
+                         &PageAddress
+                         );
+  } else {
+    Status = gBS->AllocatePool (
+                    AcpiAllocateMemoryType,
+                    AcpiRsdpSize,
+                    (VOID **)&Pointer
+                    );
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to allocate EfiACPIReclaimMemory for RSDP. Status : %r\n", Status));
+    return Status;
+  } else {
+    if (mAcpiTableAllocType != AllocateAnyPages) {
+      Pointer = (UINT8 *)(UINTN)PageAddress;
+    }
+  }
+
+  ZeroMem (Pointer, AcpiRsdpSize);
+  //
+  // Copy RSDP content from ACPI Hob to the ACPI table Instance.
+  //
+  AcpiTableInstance->Rsdp3 = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)Pointer;
+  CopyMem (AcpiTableInstance->Rsdp3, SiAcpiHobRsdp, sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER));
+  SiAcpiHobRsdp = AcpiTableInstance->Rsdp3;
+
+  DEBUG ((DEBUG_INFO, "Current ACPI RSDP address : 0x%016lx\n", SiAcpiHobRsdp));
 
   //
   // Got XSDT address from RSDP table.
@@ -2016,7 +2059,7 @@ InstallAcpiTableFromAcpiSiliconHob (
   Buffer            = (UINT8 *)(UINTN)(SiAcpiHobRsdp->XsdtAddress);
   SiCommonAcpiTable = (EFI_ACPI_DESCRIPTION_HEADER *)Buffer;
 
-  DEBUG ((DEBUG_INFO, "Silicon ACPI XSDT address : 0x%016lx\n", SiCommonAcpiTable));
+  DEBUG ((DEBUG_INFO, "ACPI HOB XSDT address : 0x%016lx\n", SiCommonAcpiTable));
 
   if (SiCommonAcpiTable->Length <= sizeof (EFI_ACPI_DESCRIPTION_HEADER)) {
     DEBUG ((DEBUG_ERROR, "XSDT length is incorrect\n"));
@@ -2068,7 +2111,10 @@ InstallAcpiTableFromAcpiSiliconHob (
 
   ZeroMem (Pointer, TotalSocTablesize);
   AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Pointer;
-
+  //
+  // Update the XsdtAddress of the AcpiTableInstance's Rsdp3 field.
+  //
+  AcpiTableInstance->Rsdp3->XsdtAddress = (UINT64)(UINTN)AcpiTableInstance->Xsdt;
   //
   // Initial XSDT table content.
   //
@@ -2162,32 +2208,41 @@ InstallAcpiTableFromAcpiSiliconHob (
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->XDsdt;
       } else if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->Dsdt != 0) {
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->Dsdt;
+      } else {
+        //
+        // The XDsdt or Dsdt not be detected, so set NeedToInstallTable to NULL to skip Dsdt installation.
+        //
+        NeedToInstallTable = NULL;
       }
 
-      //
-      // if signature can not be found from the XDsdt / Dsdt field then skip it.
-      //
-      if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
-        Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "Fail to add DSDT in the DXE Table list!\n"));
-          ASSERT_EFI_ERROR (Status);
-          break;
-        } else {
-          Status = PublishTables (AcpiTableInstance, Version);
-          if (!EFI_ERROR (Status)) {
-            //
-            // Add a new table successfully, notify registed callback
-            //
-            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
-              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+      if (NeedToInstallTable != NULL) {
+        //
+        // if signature can not be found from the XDsdt / Dsdt field then skip it.
+        //
+        if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
+          Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Fail to add DSDT in the DXE Table list!\n"));
+            ASSERT_EFI_ERROR (Status);
+            break;
+          } else {
+            Status = PublishTables (AcpiTableInstance, Version);
+            if (!EFI_ERROR (Status)) {
+              //
+              // Add a new table successfully, notify registed callback
+              //
+              if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+                SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+              }
             }
-          }
 
-          DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
+            DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
+          }
+        } else {
+          DEBUG ((DEBUG_ERROR, "The DSDT content is not correct, then skip it!\n"));
         }
       } else {
-        DEBUG ((DEBUG_ERROR, "The DSDT content is not correct, then skip it!\n"));
+        DEBUG ((DEBUG_ERROR, "The DSDT Table not initialized during PEI phase yet.\n"));
       }
 
       //
@@ -2197,29 +2252,41 @@ InstallAcpiTableFromAcpiSiliconHob (
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->XFirmwareCtrl;
       } else if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->FirmwareCtrl != 0) {
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->FirmwareCtrl;
+      } else {
+        //
+        // The XFirmwareCtrl or FirmwareCtrl not be detected, so set NeedToInstallTable to NULL to skip Facs installation.
+        //
+        NeedToInstallTable = NULL;
       }
 
-      if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
-        Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "Fail to add FACS in the DXE Table list!\n"));
-          ASSERT_EFI_ERROR (Status);
-          break;
-        } else {
-          Status = PublishTables (AcpiTableInstance, Version);
-          if (!EFI_ERROR (Status)) {
-            //
-            // Add a new table successfully, notify registed callback
-            //
-            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
-              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+      if (NeedToInstallTable != NULL) {
+        //
+        // if signature can not be found from the XFirmwareCtrl / FirmwareCtrl field then skip it.
+        //
+        if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
+          Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, FALSE, &TableKey);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Fail to add FACS in the DXE Table list!\n"));
+            ASSERT_EFI_ERROR (Status);
+            break;
+          } else {
+            Status = PublishTables (AcpiTableInstance, Version);
+            if (!EFI_ERROR (Status)) {
+              //
+              // Add a new table successfully, notify registed callback
+              //
+              if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+                SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+              }
             }
-          }
 
-          DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
+            DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
+          }
+        } else {
+          DEBUG ((DEBUG_ERROR, "The FACS content is not correct, then skip it!\n"));
         }
       } else {
-        DEBUG ((DEBUG_ERROR, "The FACS content is not correct, then skip it!\n"));
+        DEBUG ((DEBUG_ERROR, "The FACS Table not initialized during PEI phase yet.\n"));
       }
     }
   }

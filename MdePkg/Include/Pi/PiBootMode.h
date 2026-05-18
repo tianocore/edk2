@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __PI_BOOT_MODE_H__
-#define __PI_BOOT_MODE_H__
+#pragma once
 
 ///
 /// EFI boot mode
@@ -32,5 +31,3 @@ typedef UINT32 EFI_BOOT_MODE;
 #define BOOT_ON_S3_RESUME                              0x11
 #define BOOT_ON_FLASH_UPDATE                           0x12
 #define BOOT_IN_RECOVERY_MODE                          0x20
-
-#endif

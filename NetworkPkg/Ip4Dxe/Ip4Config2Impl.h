@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __IP4_CONFIG2_IMPL_H__
-#define __IP4_CONFIG2_IMPL_H__
+#pragma once
 
 #define IP4_CONFIG2_INSTANCE_SIGNATURE    SIGNATURE_32 ('I', 'P', 'C', '2')
 #define IP4_FORM_CALLBACK_INFO_SIGNATURE  SIGNATURE_32 ('I', 'F', 'C', 'I')
@@ -290,5 +289,3 @@ EFI_STATUS
 Ip4Config2DestroyDhcp4 (
   IN OUT IP4_CONFIG2_INSTANCE  *Instance
   );
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CPU_CACHE_INFO_LIB_H_
-#define _CPU_CACHE_INFO_LIB_H_
+#pragma once
 
 typedef struct {
   //
@@ -81,5 +80,3 @@ GetCpuCacheInfo (
   IN OUT CPU_CACHE_INFO  *CpuCacheInfo,
   IN OUT UINTN           *CpuCacheInfoCount
   );
-
-#endif

@@ -9,8 +9,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef CONFIGURATION_MANAGER_HELPER_H_
-#define CONFIGURATION_MANAGER_HELPER_H_
+#pragma once
 
 /** The GET_OBJECT_LIST macro expands to a function that is used to retrieve
     an object or an object list from the Configuration Manager using the
@@ -122,5 +121,3 @@ error_handler:                                                                \
   }                                                                           \
   return Status;                                                              \
 }
-
-#endif // CONFIGURATION_MANAGER_HELPER_H_

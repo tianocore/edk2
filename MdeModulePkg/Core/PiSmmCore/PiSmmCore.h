@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SMM_CORE_H_
-#define _SMM_CORE_H_
+#pragma once
 
 #include <PiSmm.h>
 
@@ -1351,5 +1350,3 @@ VOID
 SmmEntryPointMemoryManagementHook (
   VOID
   );
-
-#endif

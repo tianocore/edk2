@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef CPU_DXE_H_
-#define CPU_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -179,7 +178,7 @@ CpuGetTimerValue (
   );
 
 /**
-  Set memory cacheability attributes for given range of memeory.
+  Set memory cacheability attributes for given range of memory.
 
   @param  This                   Protocol instance structure
   @param  BaseAddress            Specifies the start address of the
@@ -202,5 +201,3 @@ CpuSetMemoryAttributes (
   IN UINT64                 Length,
   IN UINT64                 Attributes
   );
-
-#endif

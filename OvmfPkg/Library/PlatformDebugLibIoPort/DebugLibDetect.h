@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __DEBUG_IO_PORT_DETECT_H__
-#define __DEBUG_IO_PORT_DETECT_H__
+#pragma once
 
 #include <Base.h>
 
@@ -41,5 +40,3 @@ EFIAPI
 PlatformDebugLibIoPortFound (
   VOID
   );
-
-#endif

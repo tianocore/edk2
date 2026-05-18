@@ -105,9 +105,9 @@ SmmRestoreCpu (
     //
     // Setup X64 IDT table
     //
-    ZeroMem (IdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32);
+    ZeroMem (IdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM);
     X64Idtr.Base  = (UINTN)IdtEntryTable;
-    X64Idtr.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32 - 1);
+    X64Idtr.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM - 1);
     AsmWriteIdtr ((IA32_DESCRIPTOR *)&X64Idtr);
 
     //

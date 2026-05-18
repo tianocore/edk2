@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __TRANSFER_PROTOCOL_H__
-#define __TRANSFER_PROTOCOL_H__
+#pragma once
 
 #include "ProcessorContext.h"
 
@@ -365,5 +364,3 @@ typedef struct {
 } DEBUG_DATA_RESPONSE_SEARCH_SIGNATURE;
 
 #pragma pack()
-
-#endif

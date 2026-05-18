@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _BCFG_COMMAND_LIB_H_
-#define _BCFG_COMMAND_LIB_H_
+#pragma once
 
 /**
   "Constructor" for the library.
@@ -41,5 +40,3 @@ BcfgLibraryUnregisterBcfgCommand (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

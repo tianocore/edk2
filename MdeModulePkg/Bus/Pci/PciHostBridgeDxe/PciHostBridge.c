@@ -1569,6 +1569,14 @@ SubmitResources (
         RootBridge->ResAllocNode[Type].Length    = Descriptor->AddrLen;
         RootBridge->ResAllocNode[Type].Alignment = Descriptor->AddrRangeMax;
         RootBridge->ResAllocNode[Type].Status    = ResSubmitted;
+        //
+        // If the PCI root bridge does not support IO space, do not submit requested resources
+        // for allocation.
+        //
+        if ((Type == TypeIo) && (RootBridge->Io.Base > RootBridge->Io.Limit)) {
+          DEBUG ((DEBUG_INFO, " I/O: Resource not submitted. Unsupported aperture.\n"));
+          RootBridge->ResAllocNode[Type].Status = ResNone;
+        }
       }
 
       RootBridge->ResourceSubmitted = TRUE;

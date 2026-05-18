@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DRIVER_DIAGNOSTICS_H__
-#define __EFI_DRIVER_DIAGNOSTICS_H__
+#pragma once
 
 ///
 /// The global ID for the Driver Diagnostics Protocol as defined in EFI 1.1.
@@ -121,5 +120,3 @@ struct _EFI_DRIVER_DIAGNOSTICS_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDriverDiagnosticsProtocolGuid;
-
-#endif

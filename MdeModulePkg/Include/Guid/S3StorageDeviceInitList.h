@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __S3_STORAGE_DEVICE_INIT_LIST_H__
-#define __S3_STORAGE_DEVICE_INIT_LIST_H__
+#pragma once
 
 #define S3_STORAGE_DEVICE_INIT_LIST \
   { \
@@ -53,5 +52,3 @@
 // 'LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY'.
 //
 extern EFI_GUID  gS3StorageDeviceInitListGuid;
-
-#endif // __S3_STORAGE_DEVICE_INIT_LIST_H__

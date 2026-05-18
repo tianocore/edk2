@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL_H_
-#define _PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/ResetNotification.h>
 
@@ -21,5 +20,3 @@
 typedef EFI_RESET_NOTIFICATION_PROTOCOL EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL;
 
 extern EFI_GUID  gEdkiiPlatformSpecificResetFilterProtocolGuid;
-
-#endif

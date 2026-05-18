@@ -11,8 +11,7 @@
       (https://developer.arm.com/documentation/den0093/1-2eac1/)
 **/
 
-#ifndef ARM_AGDI_TABLE_H_
-#define ARM_AGDI_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -37,7 +36,7 @@ typedef struct {
   /// Signaling Mode bits [1:0]
   /// 0x0 - SDEI based signaling mode
   /// 0x1 - Interrupt based signaling mode
-  /// 0x2 - Both SDEI and Interuppt based signaling mode
+  /// 0x2 - Both SDEI and Interrupt based signaling mode
   /// Rest of the bits [7:2] are reserved
   UINT8                          Flags;
 
@@ -52,5 +51,3 @@ typedef struct {
 } EFI_ACPI_ARM_AGDI_TABLE;
 
 #pragma pack()
-
-#endif /* ARM_AGDI_TABLE_H_ */

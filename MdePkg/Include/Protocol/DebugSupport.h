@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUG_SUPPORT_H__
-#define __DEBUG_SUPPORT_H__
+#pragma once
 
 #include <IndustryStandard/PeImage.h>
 
@@ -687,7 +686,7 @@ typedef struct {
 /// register offset 16 bits, width 6 bits.
 ///
 /// If you want to register an exception hook, you can
-/// shfit the number left by 16 bits, and the exception
+/// shift the number left by 16 bits, and the exception
 /// handler will know the types.
 ///
 /// For example:
@@ -961,5 +960,3 @@ struct _EFI_DEBUG_SUPPORT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDebugSupportProtocolGuid;
-
-#endif

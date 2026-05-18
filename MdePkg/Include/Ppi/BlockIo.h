@@ -19,8 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_BLOCK_IO_H_
-#define _PEI_BLOCK_IO_H_
+#pragma once
 
 ///
 /// Global ID for EFI_PEI_RECOVERY_BLOCK_IO_PPI
@@ -228,5 +227,3 @@ struct _EFI_PEI_RECOVERY_BLOCK_IO_PPI {
 };
 
 extern EFI_GUID  gEfiPeiVirtualBlockIoPpiGuid;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _VARIABLE_ERROR_FLAG_H_
-#define _VARIABLE_ERROR_FLAG_H_
+#pragma once
 
 //
 // Before EndOfDxe, the variable indicates the last boot variable error flag,
@@ -30,5 +29,3 @@ typedef UINT8 VAR_ERROR_FLAG;
 };
 
 extern EFI_GUID  gEdkiiVarErrorFlagGuid;
-
-#endif

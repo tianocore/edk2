@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _MDEMODULE_HII_H
-#define _MDEMODULE_HII_H
+#pragma once
 
 #define NARROW_CHAR         0xFFF0
 #define WIDE_CHAR           0xFFF1
@@ -228,6 +227,3 @@ typedef struct _EFI_IFR_GUID_VAREQNAME {
 extern EFI_GUID gEfiIfrTianoGuid;
 extern EFI_GUID gEfiIfrFrameworkGuid;
 extern EFI_GUID gEdkiiIfrBitVarStoreGuid;
-
-#endif
-

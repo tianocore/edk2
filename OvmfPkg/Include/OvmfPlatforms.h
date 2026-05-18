@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __OVMF_PLATFORMS_H__
-#define __OVMF_PLATFORMS_H__
+#pragma once
 
 #include <Library/PciLib.h>
 #include <IndustryStandard/Pci22.h>
@@ -39,5 +38,3 @@
 // Common IO ports relative to the Power Management Base Address
 //
 #define ACPI_TIMER_OFFSET  0x8
-
-#endif

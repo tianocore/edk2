@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _MM_IO_TRAP_DISPATCH_H_
-#define _MM_IO_TRAP_DISPATCH_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -125,5 +124,3 @@ struct _EFI_MM_IO_TRAP_DISPATCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmIoTrapDispatchProtocolGuid;
-
-#endif

@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __PEI_PCI_CFG2_H__
-#define __PEI_PCI_CFG2_H__
+#pragma once
 
 #include <Library/BaseLib.h>
 
@@ -172,5 +171,3 @@ struct _EFI_PEI_PCI_CFG2_PPI {
 };
 
 extern EFI_GUID  gEfiPciCfg2PpiGuid;
-
-#endif

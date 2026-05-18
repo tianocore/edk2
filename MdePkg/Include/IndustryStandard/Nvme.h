@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __NVM_E_H__
-#define __NVM_E_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -588,7 +587,10 @@ typedef struct {
 //
 #define NVME_RPMB_RESULT_SUCCESS                 0x00
 #define NVME_RPMB_RESULT_GENERAL_FAILURE         0x01
-#define NVME_RPMB_RESULT_AHTHENTICATION_FAILURE  0x02
+#define NVME_RPMB_RESULT_AUTHENTICATION_FAILURE  0x02
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define NVME_RPMB_RESULT_AHTHENTICATION_FAILURE  NVME_RPMB_RESULT_AUTHENTICATION_FAILURE
 #define NVME_RPMB_RESULT_COUNTER_FAILURE         0x03
 #define NVME_RPMB_RESULT_ADDRESS_FAILURE         0x04
 #define NVME_RPMB_RESULT_WRITE_FAILURE           0x05
@@ -1223,5 +1225,3 @@ typedef struct {
 } NVME_POWER_LOSS_SIGNALING_CONFIG;
 
 #pragma pack()
-
-#endif

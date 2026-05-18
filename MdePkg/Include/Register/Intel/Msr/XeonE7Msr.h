@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __XEON_E7_MSR_H__
-#define __XEON_E7_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -351,5 +350,3 @@ typedef union {
 #define MSR_XEON_E7_C9_PMON_CTR4  0x00000FD9
 #define MSR_XEON_E7_C9_PMON_CTR5  0x00000FDB
 /// @}
-
-#endif

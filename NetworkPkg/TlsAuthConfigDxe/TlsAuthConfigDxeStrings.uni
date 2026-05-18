@@ -1,10 +1,10 @@
-/** @file
-  String definitions for TLS Authentication Configuration form.
-
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
-
-**/
+// /** @file
+// String definitions for TLS Authentication Configuration form.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
 
 #langdef en-US "English"
 

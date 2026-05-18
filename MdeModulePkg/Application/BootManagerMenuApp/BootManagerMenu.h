@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BOOT_MANAGER_MENU_H_
-#define _BOOT_MANAGER_MENU_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Guid/MdeModuleHii.h>
@@ -48,5 +47,3 @@ typedef struct _BOOT_MENU_POPUP_DATA {
   BOOT_MENU_SCREEN                MenuScreen;                    // Boot menu screen information
   BOOT_MENU_SCROLL_BAR_CONTROL    ScrollBarControl;              // Boot menu scroll bar information
 } BOOT_MENU_POPUP_DATA;
-
-#endif

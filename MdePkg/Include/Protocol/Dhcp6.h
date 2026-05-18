@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_DHCP6_PROTOCOL_H__
-#define __EFI_DHCP6_PROTOCOL_H__
+#pragma once
 
 #define EFI_DHCP6_PROTOCOL_GUID \
   { \
@@ -204,11 +203,11 @@ typedef struct {
 
 typedef struct {
   ///
-  /// Length of DUID in octects.
+  /// Length of DUID in octets.
   ///
   UINT16    Length;
   ///
-  /// Array of DUID octects.
+  /// Array of DUID octets.
   ///
   UINT8     Duid[1];
 } EFI_DHCP6_DUID;
@@ -776,5 +775,3 @@ struct _EFI_DHCP6_PROTOCOL {
 
 extern EFI_GUID  gEfiDhcp6ProtocolGuid;
 extern EFI_GUID  gEfiDhcp6ServiceBindingProtocolGuid;
-
-#endif

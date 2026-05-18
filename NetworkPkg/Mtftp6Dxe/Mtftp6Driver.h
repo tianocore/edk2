@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_MTFTP6_DRIVER_H__
-#define __EFI_MTFTP6_DRIVER_H__
+#pragma once
 
 #include <Protocol/ServiceBinding.h>
 
@@ -142,5 +141,3 @@ Mtftp6ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

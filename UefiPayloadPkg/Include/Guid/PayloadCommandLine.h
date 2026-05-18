@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PAYLOAD_COMMAND_LINE_H_
-#define PAYLOAD_COMMAND_LINE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <UniversalPayload/UniversalPayload.h>
@@ -25,4 +24,3 @@ typedef struct {
 #define UNIVERSAL_PAYLOAD_COMMAND_LINE_REVISION  1
 
 extern GUID  gEdkiiPayloadCommandLineGuid;
-#endif

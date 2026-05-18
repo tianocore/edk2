@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_ARP_PROTOCOL_H__
-#define __EFI_ARP_PROTOCOL_H__
+#pragma once
 
 #define EFI_ARP_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -372,5 +371,3 @@ struct _EFI_ARP_PROTOCOL {
 
 extern EFI_GUID  gEfiArpServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiArpProtocolGuid;
-
-#endif

@@ -12,8 +12,7 @@
   https://www.dmtf.org/sites/default/files/standards/documents/DSP0236_1.3.1.pdf
 **/
 
-#ifndef MCTP_H_
-#define MCTP_H_
+#pragma once
 
 ///
 /// Definitions of endpoint ID
@@ -135,5 +134,3 @@ typedef union {
   } Bits;
   UINT8    MessageHeader;
 } MCTP_MESSAGE_HEADER;
-
-#endif

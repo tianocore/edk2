@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef VIRTIO_FS_DXE_H_
-#define VIRTIO_FS_DXE_H_
+#pragma once
 
 #include <Base.h>                      // SIGNATURE_64()
 #include <Guid/FileInfo.h>             // EFI_FILE_INFO
@@ -540,5 +539,3 @@ VirtioFsSimpleFileWrite (
   IN OUT UINTN              *BufferSize,
   IN     VOID               *Buffer
   );
-
-#endif // VIRTIO_FS_DXE_H_

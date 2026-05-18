@@ -6,13 +6,10 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef IPMI_NET_FN_OEM_H_
-#define IPMI_NET_FN_OEM_H_
+#pragma once
 
 //
 // Net function definition for OEM/Group command
 //
 #define IPMI_NETFN_OEM        0x2E
 #define IPMI_NETFN_OEM_GROUP  0x2F
-
-#endif

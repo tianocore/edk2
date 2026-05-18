@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_COMMON_LIB_H
-#define _EFI_COMMON_LIB_H
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 #include <Common/BuildVersion.h>
@@ -469,6 +468,4 @@ size_t _filelength(int fd); // Only declare this on non-Windows systems
 #define mkdir(dir, perm) mkdir(dir, perm)
 #else
 #define mkdir(dir, perm) mkdir(dir)
-#endif
-
 #endif

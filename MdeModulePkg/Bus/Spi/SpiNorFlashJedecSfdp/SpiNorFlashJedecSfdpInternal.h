@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SPI_NOR_FLASH_INSTANCE_H_
-#define SPI_NOR_FLASH_INSTANCE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/SpiNorFlash.h>
@@ -295,5 +294,3 @@ EFI_STATUS
 InitialSpiNorFlashSfdpInstance (
   IN SPI_NOR_FLASH_INSTANCE  *Instance
   );
-
-#endif // SPI_NOR_FLASH_INSTANCE_H_

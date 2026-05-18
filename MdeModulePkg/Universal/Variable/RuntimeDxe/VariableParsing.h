@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VARIABLE_PARSING_H_
-#define _VARIABLE_PARSING_H_
+#pragma once
 
 #include <Guid/ImageAuthentication.h>
 #include "Variable.h"
@@ -343,5 +342,3 @@ UpdateVariableInfo (
   IN  BOOLEAN                 Cache,
   IN OUT VARIABLE_INFO_ENTRY  **VariableInfo
   );
-
-#endif

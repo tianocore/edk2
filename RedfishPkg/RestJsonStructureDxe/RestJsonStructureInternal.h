@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EFI_REST_JSON_STRUCTURE_INTERNAL_H_
-#define EFI_REST_JSON_STRUCTURE_INTERNAL_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
@@ -31,4 +30,3 @@ typedef struct _REST_JSON_STRUCTURE_INSTANCE {
   EFI_REST_JSON_STRUCTURE_TO_JSON              StructureToJson;               ///< C structure to JSON function
   EFI_REST_JSON_STRUCTURE_DESTORY_STRUCTURE    DestroyStructure;              ///< Destory C struture function.
 } REST_JSON_STRUCTURE_INSTANCE;
-#endif

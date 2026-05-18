@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __MEM_LIB_INTERNALS__
-#define __MEM_LIB_INTERNALS__
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseMemoryLib.h>
@@ -212,7 +211,7 @@ InternalMemScanMem32 (
 
   @param  Buffer  The pointer to the target buffer to scan.
   @param  Length  The count of 64-bit value to scan. Must be non-zero.
-  @param  Value   The calue to search for in the target buffer.
+  @param  Value   The value to search for in the target buffer.
 
   @return The pointer to the first occurrence, or NULL if not found.
 
@@ -241,5 +240,3 @@ InternalMemIsZeroBuffer (
   IN CONST VOID  *Buffer,
   IN UINTN       Length
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BOOT_MAINTENANCE_MANAGER_UI_LIB_H__
-#define __BOOT_MAINTENANCE_MANAGER_UI_LIB_H__
+#pragma once
 
 /**
   Create Time Out Menu in the page.
@@ -137,5 +136,3 @@ BmmListThirdPartyDrivers (
   IN DRIVER_SPECIAL_HANDLER  SpecialHandlerFn,
   IN VOID                    *StartOpCodeHandle
   );
-
-#endif

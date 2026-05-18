@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FSP_TEMP_RAM_EXIT_PPI_H_
-#define _FSP_TEMP_RAM_EXIT_PPI_H_
+#pragma once
 
 ///
 /// Global ID for the FSP_TEMP_RAM_EXIT_PPI.
@@ -48,5 +47,3 @@ struct _FSP_TEMP_RAM_EXIT_PPI {
 };
 
 extern EFI_GUID  gFspTempRamExitPpiGuid;
-
-#endif // _FSP_TEMP_RAM_EXIT_PPI_H_

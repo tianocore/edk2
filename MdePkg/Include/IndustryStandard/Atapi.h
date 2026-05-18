@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ATAPI_H_
-#define _ATAPI_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -250,7 +249,7 @@ typedef struct {
 } ATAPI_IDENTIFY_DATA;
 
 ///
-/// Standard Quiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
+/// Standard Inquiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8    peripheral_type;
@@ -457,7 +456,10 @@ typedef union {
   UINT16                       Data16[6];
   ATAPI_TEST_UNIT_READY_CMD    TestUnitReady;
   ATAPI_READ10_CMD             Read10;
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
   ATAPI_REQUEST_SENSE_CMD      RequestSence;
+  ATAPI_REQUEST_SENSE_CMD      RequestSense;
   ATAPI_INQUIRY_CMD            Inquiry;
   ATAPI_MODE_SENSE_CMD         ModeSense;
   ATAPI_READ_FORMAT_CAP_CMD    ReadFormatCapacity;
@@ -846,5 +848,3 @@ typedef union {
 //
 #define ATA_CTLREG_SRST   BIT2                                ///< Software Reset.
 #define ATA_CTLREG_IEN_L  BIT1                                ///< Interrupt Enable #.
-
-#endif

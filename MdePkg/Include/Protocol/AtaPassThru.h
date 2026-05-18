@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __ATA_PASS_THROUGH_H__
-#define __ATA_PASS_THROUGH_H__
+#pragma once
 
 #define EFI_ATA_PASS_THRU_PROTOCOL_GUID \
   { \
@@ -466,5 +465,3 @@ struct _EFI_ATA_PASS_THRU_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiAtaPassThruProtocolGuid;
-
-#endif

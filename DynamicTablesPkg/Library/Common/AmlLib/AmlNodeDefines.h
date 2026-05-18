@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_NODE_DEFINES_H_
-#define AML_NODE_DEFINES_H_
+#pragma once
 
 #include <AmlEncoding/Aml.h>
 #include <IndustryStandard/Acpi.h>
@@ -179,5 +178,3 @@ typedef AML_DATA_NODE *AML_DATA_NODE_HANDLE;
           (IS_AML_NODE_VALID (Node)                                        && \
            IsListEmpty ((CONST LIST_ENTRY*)Node)                           && \
            (((CONST AML_NODE_HEADER*)Node)->Parent == NULL))
-
-#endif // AML_NODE_DEFINES_H_

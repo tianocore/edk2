@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_UEFI_HTTP_BOOT_COM_NAME_H__
-#define __EFI_UEFI_HTTP_BOOT_COM_NAME_H__
+#pragma once
 
 /**
   Retrieves a Unicode string that is the user-readable name of the EFI Driver.
@@ -89,5 +88,3 @@ HttpBootDxeComponentNameGetControllerName (
   IN  CHAR8                         *Language,
   OUT CHAR16                        **ControllerName
   );
-
-#endif

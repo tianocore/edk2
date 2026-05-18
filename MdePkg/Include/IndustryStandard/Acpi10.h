@@ -6,8 +6,7 @@ Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_1_0_H_
-#define _ACPI_1_0_H_
+#pragma once
 
 #include <IndustryStandard/AcpiAml.h>
 
@@ -385,7 +384,10 @@ typedef struct {
 #define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_MODE_MASK               BIT1
 #define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_POLARITY_MASK           BIT2
 #define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARABLE_MASK           BIT3
-#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLITY_MASK     BIT4
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABILITY_MASK    BIT4
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLITY_MASK  EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABILITY_MASK
 
 //
 // Ensure proper structure formats
@@ -662,5 +664,3 @@ typedef struct {
 #define EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'S', 'D', 'T')
 
 #pragma pack()
-
-#endif

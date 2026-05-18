@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_NETWORK_INTERFACE_IDENTIFER_H__
-#define __EFI_NETWORK_INTERFACE_IDENTIFER_H__
+#pragma once
 
 //
 // GUID retired from UEFI Specification 2.1b
@@ -21,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 //
-// GUID intruduced in UEFI Specification 2.1b
+// GUID introduced in UEFI Specification 2.1b
 //
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_GUID_31 \
   { \
@@ -106,5 +105,3 @@ struct undiconfig_table {
 
 extern EFI_GUID  gEfiNetworkInterfaceIdentifierProtocolGuid;
 extern EFI_GUID  gEfiNetworkInterfaceIdentifierProtocolGuid_31;
-
-#endif

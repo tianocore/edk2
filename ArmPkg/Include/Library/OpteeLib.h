@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef OPTEE_LIB_H_
-#define OPTEE_LIB_H_
+#pragma once
 
 /*
  * The 'Trusted OS Call UID' is supposed to return the following UUID for
@@ -116,5 +115,3 @@ EFIAPI
 OpteeInvokeFunction (
   IN OUT OPTEE_INVOKE_FUNCTION_ARG  *InvokeFunctionArg
   );
-
-#endif // OPTEE_LIB_H_

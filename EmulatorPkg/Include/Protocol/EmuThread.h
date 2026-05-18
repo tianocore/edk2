@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EMU_THREAD_THUNK__
-#define __EMU_THREAD_THUNK__
+#pragma once
 
 typedef struct _EMU_THREAD_THUNK_PROTOCOL EMU_THREAD_THUNK_PROTOCOL;
 
@@ -82,5 +81,3 @@ struct _EMU_THREAD_THUNK_PROTOCOL {
 };
 
 extern EFI_GUID  gEmuThreadThunkProtocolGuid;
-
-#endif

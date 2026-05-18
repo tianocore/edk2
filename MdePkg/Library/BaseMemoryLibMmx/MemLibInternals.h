@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __MEM_LIB_INTERNALS__
-#define __MEM_LIB_INTERNALS__
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseMemoryLib.h>
@@ -241,5 +240,3 @@ InternalMemIsZeroBuffer (
   IN CONST VOID  *Buffer,
   IN UINTN       Length
   );
-
-#endif

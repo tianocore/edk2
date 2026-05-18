@@ -1,5 +1,5 @@
 /** @file
-  This is a sample to demostrate the usage of the Unit Test Library that
+  This is a sample to demonstrate the usage of the Unit Test Library that
   supports the host execution environments.
 
   Copyright (c) Microsoft Corporation.<BR>

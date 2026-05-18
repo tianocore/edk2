@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __I2C_MASTER_H__
-#define __I2C_MASTER_H__
+#pragma once
 
 #include <Pi/PiI2c.h>
 
@@ -182,5 +181,3 @@ struct _EFI_I2C_MASTER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiI2cMasterProtocolGuid;
-
-#endif //  __I2C_MASTER_H__

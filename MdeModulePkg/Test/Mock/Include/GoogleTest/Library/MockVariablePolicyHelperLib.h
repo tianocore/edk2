@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_VARIABLE_POLICY_HELPER_LIB_H_
-#define MOCK_VARIABLE_POLICY_HELPER_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -77,5 +76,3 @@ struct MockVariablePolicyHelperLib {
      IN        UINT8                           VarStateValue)
     );
 };
-
-#endif

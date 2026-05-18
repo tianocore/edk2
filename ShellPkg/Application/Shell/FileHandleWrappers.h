@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELL_FILE_HANDLE_WRAPPERS_HEADER_
-#define _SHELL_FILE_HANDLE_WRAPPERS_HEADER_
+#pragma once
 
 typedef struct {
   LIST_ENTRY    Link;
@@ -82,5 +81,3 @@ CreateFileInterfaceFile (
   IN CONST EFI_FILE_PROTOCOL  *Template,
   IN CONST BOOLEAN            Unicode
   );
-
-#endif //_SHELL_FILE_HANDLE_WRAPPERS_HEADER_

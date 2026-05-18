@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __HOB_LIST_GUID_H__
-#define __HOB_LIST_GUID_H__
+#pragma once
 
 //
 // The HOB List Table shall be stored in memory of type
@@ -24,5 +23,3 @@
   }
 
 extern EFI_GUID  gEfiHobListGuid;
-
-#endif

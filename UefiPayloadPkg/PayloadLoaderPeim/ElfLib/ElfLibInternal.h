@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef EFI_LIB_INTERNAL_H_
-#define EFI_LIB_INTERNAL_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -104,5 +103,3 @@ EFI_STATUS
 LoadElf64Image (
   IN    ELF_IMAGE_CONTEXT  *ElfCt
   );
-
-#endif

@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_MTFTP4_PROTOCOL_H__
-#define __EFI_MTFTP4_PROTOCOL_H__
+#pragma once
 
 #define EFI_MTFTP4_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -52,7 +51,7 @@ typedef struct _EFI_MTFTP4_TOKEN     EFI_MTFTP4_TOKEN;
 #define EFI_MTFTP4_ERRORCODE_REQUEST_DENIED       8
 
 //
-// MTFTP4 pacekt definitions
+// MTFTP4 packet definitions
 //
 #pragma pack(1)
 
@@ -199,7 +198,7 @@ EFI_STATUS
   IN EFI_MTFTP4_PROTOCOL  *This,
   IN EFI_MTFTP4_TOKEN     *Token,
   IN UINT16               PacketLen,
-  IN EFI_MTFTP4_PACKET    *Paket
+  IN EFI_MTFTP4_PACKET    *Packet
   );
 
 /**
@@ -572,5 +571,3 @@ struct _EFI_MTFTP4_TOKEN {
 
 extern EFI_GUID  gEfiMtftp4ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiMtftp4ProtocolGuid;
-
-#endif

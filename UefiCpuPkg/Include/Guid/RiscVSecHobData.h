@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef RISCV_SEC_HOB_DATA_
-#define RISCV_SEC_HOB_DATA_
+#pragma once
 
 #include <PiPei.h>
 
@@ -18,5 +17,3 @@ typedef struct {
   UINTN    BootHartId;
   VOID     *FdtPointer;
 } RISCV_SEC_HANDOFF_DATA;
-
-#endif /* RISCV_SEC_HOB_DATA_ */

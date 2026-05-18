@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_CONFIGURATION_MANAGER_PROTOCOL_H_
-#define MOCK_CONFIGURATION_MANAGER_PROTOCOL_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -32,5 +31,3 @@ struct MockConfigurationManagerProtocol {
 extern "C" {
   extern EDKII_CONFIGURATION_MANAGER_PROTOCOL  *gConfigurationManagerProtocol;
 }
-
-#endif // MOCK_CONFIGURATION_MANAGER_PROTOCOL_H_

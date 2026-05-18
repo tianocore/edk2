@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DHCP4_OPTION_H__
-#define __EFI_DHCP4_OPTION_H__
+#pragma once
 
 ///
 /// DHCP option tags (types)
@@ -223,5 +222,3 @@ DhcpBuild (
   IN  EFI_DHCP4_PACKET_OPTION  *AppendList[]   OPTIONAL,
   OUT EFI_DHCP4_PACKET         **NewPacket
   );
-
-#endif

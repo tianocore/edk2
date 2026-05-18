@@ -2,6 +2,7 @@
   HEST table parser
 
   Copyright (c) 2024, Arm Limited.
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -16,9 +17,9 @@
 #include "AcpiView.h"
 
 STATIC ACPI_DESCRIPTION_HEADER_INFO  mAcpiHdrInfo;
-STATIC UINT32                        *mHestErrorSourceCount;
-STATIC UINT16                        *mHestErrorSourceType;
-STATIC UINT8                         *mHestIA32HardwareBankCount;
+STATIC CONST UINT32                  *mHestErrorSourceCount;
+STATIC CONST UINT16                  *mHestErrorSourceType;
+STATIC CONST UINT8                   *mHestIA32HardwareBankCount;
 
 /**
   An String array for Error Notification Structure's type.
@@ -550,8 +551,6 @@ DumpIA32ArchMachineCheckErrorBankStructure (
     *Offset +=
       sizeof (EFI_ACPI_6_5_IA32_ARCHITECTURE_MACHINE_CHECK_ERROR_BANK_STRUCTURE);
   }
-
-  *mHestIA32HardwareBankCount = 0;
 
   return EFI_SUCCESS;
 }

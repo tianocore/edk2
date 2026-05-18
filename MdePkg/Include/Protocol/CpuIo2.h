@@ -21,8 +21,7 @@
 
 **/
 
-#ifndef __CPU_IO2_H__
-#define __CPU_IO2_H__
+#pragma once
 
 #define EFI_CPU_IO2_PROTOCOL_GUID \
   { \
@@ -132,5 +131,3 @@ struct _EFI_CPU_IO2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiCpuIo2ProtocolGuid;
-
-#endif

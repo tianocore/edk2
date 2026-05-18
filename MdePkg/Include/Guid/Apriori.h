@@ -1,6 +1,6 @@
 /** @file
   GUID used as an FV filename for A Priori file. The A Priori file contains a
-  list of FV filenames that the DXE dispatcher will schedule reguardless of
+  list of FV filenames that the DXE dispatcher will schedule regardless of
   the dependency grammar.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __APRIORI_GUID_H__
-#define __APRIORI_GUID_H__
+#pragma once
 
 #define EFI_APRIORI_GUID \
   { \
@@ -20,5 +19,3 @@
   }
 
 extern EFI_GUID  gAprioriGuid;
-
-#endif

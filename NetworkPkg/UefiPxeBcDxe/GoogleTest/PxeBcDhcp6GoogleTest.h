@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PXE_BC_DHCP6_GOOGLE_TEST_H_
-#define PXE_BC_DHCP6_GOOGLE_TEST_H_
+#pragma once
 
 //
 // Minimal includes needed to compile
@@ -64,5 +63,3 @@ PxeBcRequestBootService (
   IN  PXEBC_PRIVATE_DATA  *Private,
   IN  UINT32              Index
   );
-
-#endif // PXE_BC_DHCP6_GOOGLE_TEST_H_

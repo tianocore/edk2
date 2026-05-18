@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DHCP4_IMPL_H__
-#define __EFI_DHCP4_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -199,5 +198,3 @@ SetElapsedTime (
   IN     UINT16         *Elapsed,
   IN     DHCP_PROTOCOL  *Instance
   );
-
-#endif

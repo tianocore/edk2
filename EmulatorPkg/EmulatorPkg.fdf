@@ -14,16 +14,16 @@
 # relocated in place (works, but not a great idea).
 #
 BaseAddress   = 0x102000000|gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress   #The base address of the FLASH Device.
-Size          = 0x005a0000|gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize  #The size in bytes of the FLASH Device
+Size          = 0x00ca0000|gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize  #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
-NumBlocks     = 0x5a
+NumBlocks     = 0xca
 
-0x00000000|0x00580000
+0x00000000|0x00c80000
 gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase|gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize
 FV = FvRecovery
 
-0x00580000|0x0000c000
+0x00c80000|0x0000c000
 gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
@@ -64,11 +64,11 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x0058c000|0x00002000
+0x00c8c000|0x00002000
 #NV_EVENT_LOG
 gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase|gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize
 
-0x0058e000|0x00002000
+0x00c8e000|0x00002000
 gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
@@ -82,7 +82,7 @@ DATA = {
   0xE0, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x00590000|0x00010000
+0x00c90000|0x00010000
 #NV_FTW_SPARE
 gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
@@ -178,7 +178,6 @@ INF  EmulatorPkg/EmuBusDriverDxe/EmuBusDriverDxe.inf
 INF  EmulatorPkg/EmuGopDxe/EmuGopDxe.inf
 INF  EmulatorPkg/EmuSimpleFileSystemDxe/EmuSimpleFileSystemDxe.inf
 INF  EmulatorPkg/EmuBlockIoDxe/EmuBlockIoDxe.inf
-INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
@@ -201,7 +200,9 @@ INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 #
 # Hash2 Protocol producer
 #
+!if $(NETWORK_ENABLE) == TRUE
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Secure Boot Key Enroll
@@ -213,7 +214,7 @@ INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.in
 #
 # Network stack drivers
 #
-!if $(NETWORK_SUPPORT)
+!if $(NETWORK_ENABLE)
 INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 !endif
 !include NetworkPkg/Network.fdf.inc

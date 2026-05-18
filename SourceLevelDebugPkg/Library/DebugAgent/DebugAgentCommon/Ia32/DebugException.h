@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DEBUG_EXCEPTION_H_
-#define _DEBUG_EXCEPTION_H_
+#pragma once
 
 #define DEBUG_EXCEPT_DIVIDE_ERROR     0
 #define DEBUG_EXCEPT_DEBUG            1
@@ -26,5 +25,3 @@
 #define DEBUG_EXCEPT_ALIGNMENT_CHECK  17
 #define DEBUG_EXCEPT_MACHINE_CHECK    18
 #define DEBUG_EXCEPT_SIMD             19
-
-#endif

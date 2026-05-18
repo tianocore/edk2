@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMBUS_LIB__
-#define __SMBUS_LIB__
+#pragma once
 
 /**
   Macro that converts SMBUS slave address, SMBUS command, SMBUS data length,
@@ -486,5 +485,3 @@ SmBusBlockProcessCall (
   OUT VOID           *ReadBuffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
   );
-
-#endif

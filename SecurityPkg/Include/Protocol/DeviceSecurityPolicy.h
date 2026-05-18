@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef EDKII_DEVICE_SECURITY_POLICY_PROTOCOL_H_
-#define EDKII_DEVICE_SECURITY_POLICY_PROTOCOL_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/DeviceSecurity.h>
@@ -129,5 +128,3 @@ struct _EDKII_DEVICE_SECURITY_POLICY_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiDeviceSecurityPolicyProtocolGuid;
-
-#endif

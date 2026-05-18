@@ -12,8 +12,7 @@
   https://www.jedec.org/system/files/docs/JESD220F.pdf
 --*/
 
-#ifndef __UFS_H__
-#define __UFS_H__
+#pragma once
 
 #include <Base.h>
 
@@ -1018,5 +1017,3 @@ typedef enum {
 } UFS_ATTR_IDN;
 
 #pragma pack()
-
-#endif

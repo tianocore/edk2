@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_MGR_MISC_H__
-#define __EFI_WIFI_MGR_MISC_H__
+#pragma once
 
 /**
   Empty function for event process function.
@@ -257,5 +256,3 @@ VOID
 WifiMgrFreeToken (
   IN   WIFI_MGR_MAC_CONFIG_TOKEN  *ConfigToken
   );
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SD_BLOCK_IO_H_
-#define _SD_BLOCK_IO_H_
+#pragma once
 
 /**
   Reset the Block Device.
@@ -247,5 +246,3 @@ SdEraseBlocks (
   IN OUT EFI_ERASE_BLOCK_TOKEN     *Token,
   IN     UINTN                     Size
   );
-
-#endif

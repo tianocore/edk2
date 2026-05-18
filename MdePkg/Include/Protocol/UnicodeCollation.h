@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UNICODE_COLLATION_H__
-#define __UNICODE_COLLATION_H__
+#pragma once
 
 #define EFI_UNICODE_COLLATION_PROTOCOL2_GUID \
   { \
@@ -166,5 +165,3 @@ struct _EFI_UNICODE_COLLATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiUnicodeCollation2ProtocolGuid;
-
-#endif

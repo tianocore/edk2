@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _USB_ENUMERATION_H_
-#define _USB_ENUMERATION_H_
+#pragma once
 
 //
 // Advance the byte and bit to the next bit, adjust byte accordingly.
@@ -193,5 +192,3 @@ UsbRootHubEnumeration (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_MENU_BAR_H_
-#define _LIB_MENU_BAR_H_
+#pragma once
 
 #define SCAN_CONTROL_E  5
 #define SCAN_CONTROL_F  6
@@ -108,5 +107,3 @@ EFI_STATUS
 MenuBarDispatchControlHotKey (
   IN CONST EFI_KEY_DATA  *KeyData
   );
-
-#endif

@@ -11,8 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef SEV_MEMORY_ACCEPTANCE_H_
-#define SEV_MEMORY_ACCEPTANCE_H_
+#pragma once
 
 #define OVMF_SEV_MEMORY_ACCEPTANCE_PROTOCOL_GUID \
   {0xc5a010fe, \
@@ -39,5 +38,3 @@ typedef
 struct _OVMF_SEV_MEMORY_ACCEPTANCE_PROTOCOL {
   OVMF_SEV_ALLOW_UNACCEPTED_MEMORY    AllowUnacceptedMemory;
 };
-
-#endif

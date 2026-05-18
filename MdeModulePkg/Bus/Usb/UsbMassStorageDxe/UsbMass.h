@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USBMASS_H_
-#define _EFI_USBMASS_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Scsi.h>
@@ -182,5 +181,3 @@ struct _USB_MASS_DEVICE {
   USB_BOOT_INQUIRY_DATA       InquiryData;
   BOOLEAN                     Cdb16Byte;
 };
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EMMC_HCI_H_
-#define _EMMC_HCI_H_
+#pragma once
 
 //
 // EMMC Host Controller MMIO Register Offset
@@ -334,5 +333,3 @@ VOID
 EmmcPeimFreeTrb (
   IN EMMC_TRB  *Trb
   );
-
-#endif

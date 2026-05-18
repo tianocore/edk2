@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __S3_SAVE_STATE_H__
-#define __S3_SAVE_STATE_H__
+#pragma once
 
 #define EFI_S3_SAVE_STATE_PROTOCOL_GUID \
     { 0xe857caf6, 0xc046, 0x45dc, { 0xbe, 0x3f, 0xee, 0x7, 0x65, 0xfb, 0xa8, 0x87 }}
@@ -117,7 +116,7 @@ EFI_STATUS
   @param[in]      Label               Points to the label which will be inserted in the boot script table.
 
   @retval    EFI_SUCCESS              The label already exists or was inserted.
-  @retval    EFI_NOT_FOUND            The label did not already exist and CreateifNotFound was FALSE.
+  @retval    EFI_NOT_FOUND            The label did not already exist and CreateIfNotFound was FALSE.
   @retval    EFI_INVALID_PARAMETER    The Label is NULL or points to an empty string.
   @retval    EFI_INVALID_PARAMETER    The Position is not a valid position in the boot script table.
   @retval    EFI_OUT_OF_RESOURCES     There is insufficient memory to store the boot script.
@@ -165,5 +164,3 @@ struct _EFI_S3_SAVE_STATE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiS3SaveStateProtocolGuid;
-
-#endif // __S3_SAVE_STATE_H__

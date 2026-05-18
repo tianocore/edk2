@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_IBFT_H_
-#define _ISCSI_IBFT_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/IScsiBootFirmwareTable.h>
@@ -29,5 +28,3 @@ VOID
 IScsiPublishIbft (
   IN VOID
   );
-
-#endif

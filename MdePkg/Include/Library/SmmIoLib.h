@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _SMM_IO_LIB_H_
-#define _SMM_IO_LIB_H_
+#pragma once
 
 /**
   This function check if the MMIO resource is valid per processor architecture and
@@ -31,5 +30,3 @@ SmmIsMmioValid (
   IN UINT64                Length,
   IN EFI_GUID              *Owner  OPTIONAL
   );
-
-#endif

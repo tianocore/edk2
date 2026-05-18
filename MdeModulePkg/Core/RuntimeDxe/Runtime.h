@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _RUNTIME_H_
-#define _RUNTIME_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/LoadedImage.h>
@@ -123,5 +122,3 @@ RuntimeDriverInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

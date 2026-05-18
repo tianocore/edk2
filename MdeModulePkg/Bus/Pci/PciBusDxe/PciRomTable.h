@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_ROM_TABLE_H_
-#define _EFI_PCI_ROM_TABLE_H_
+#pragma once
 
 /**
   Add the Rom Image to internal database for later PCI light enumeration.
@@ -44,5 +43,3 @@ BOOLEAN
 PciRomGetImageMapping (
   IN  PCI_IO_DEVICE  *PciIoDevice
   );
-
-#endif

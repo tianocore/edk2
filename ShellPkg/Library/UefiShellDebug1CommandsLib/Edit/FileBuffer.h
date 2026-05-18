@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_FILE_BUFFER_H_
-#define _LIB_FILE_BUFFER_H_
+#pragma once
 
 #include "TextEditorTypes.h"
 
@@ -236,5 +235,3 @@ VOID
 FileBufferSetModified (
   VOID
   );
-
-#endif

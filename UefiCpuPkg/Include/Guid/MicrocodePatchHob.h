@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _MICROCODE_PATCH_HOB_H_
-#define _MICROCODE_PATCH_HOB_H_
+#pragma once
 
 extern EFI_GUID  gEdkiiMicrocodePatchHobGuid;
 
@@ -40,5 +39,3 @@ typedef struct {
   //
   UINT64    ProcessorSpecificPatchOffset[0];
 } EDKII_MICROCODE_PATCH_HOB;
-
-#endif

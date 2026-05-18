@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PI_MMCIS_H_
-#define _PI_MMCIS_H_
+#pragma once
 
 #include <Pi/PiMultiPhase.h>
 #include <Protocol/MmCpuIo.h>
@@ -338,5 +337,3 @@ struct _EFI_MM_SYSTEM_TABLE {
   EFI_MM_INTERRUPT_REGISTER           MmiHandlerRegister;
   EFI_MM_INTERRUPT_UNREGISTER         MmiHandlerUnRegister;
 };
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef NV_VARIABLE_INFO_GUID_H_
-#define NV_VARIABLE_INFO_GUID_H_
+#pragma once
 
 //
 // NV variable hob info GUID
@@ -20,5 +19,3 @@ typedef struct {
   UINT32    VariableStoreBase;
   UINT32    VariableStoreSize;
 } NV_VARIABLE_INFO;
-
-#endif

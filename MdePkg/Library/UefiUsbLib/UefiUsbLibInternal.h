@@ -9,8 +9,7 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _UEFI_USB_LIB_INTERNAL_H_
-#define _UEFI_USB_LIB_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -21,5 +20,3 @@
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <IndustryStandard/Usb.h>
-
-#endif

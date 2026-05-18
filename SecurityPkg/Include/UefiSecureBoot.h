@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef UEFI_SECURE_BOOT_H_
-#define UEFI_SECURE_BOOT_H_
+#pragma once
 
 #pragma pack (push, 1)
 
@@ -90,5 +89,3 @@ typedef struct {
   CONST VOID      *PkPtr;
 } SECURE_BOOT_PAYLOAD_INFO;
 #pragma pack (pop)
-
-#endif // UEFI_SECURE_BOOT_H_

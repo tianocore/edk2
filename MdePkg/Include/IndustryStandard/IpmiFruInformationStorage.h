@@ -14,8 +14,7 @@
       https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/ipmi-platform-mgt-fru-info-storage-def-v1-0-rev-1-3-spec-update.pdf
 **/
 
-#ifndef _IPMI_FRU_INFORMATION_STORAGE_H_
-#define _IPMI_FRU_INFORMATION_STORAGE_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -83,4 +82,3 @@ typedef struct {
 } IPMI_SYSTEM_UUID_SUB_RECORD_WITH_CHECKSUM;
 
 #pragma pack()
-#endif

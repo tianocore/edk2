@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __XEN_H__
-#define __XEN_H__
+#pragma once
 
 #include <PiPei.h>
 
@@ -35,5 +34,3 @@ typedef struct {
   UINT32                  E820EntriesCount;
 } EFI_XEN_OVMF_INFO;
 #pragma pack()
-
-#endif /* __XEN_H__ */

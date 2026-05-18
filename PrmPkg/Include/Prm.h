@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PRM_H_
-#define PRM_H_
+#pragma once
 
 #include <Uefi.h>
 #include <PrmContextBuffer.h>
@@ -48,5 +47,3 @@ EFI_STATUS
   IN VOID                 *ParameterBuffer  OPTIONAL,
   IN PRM_CONTEXT_BUFFER   *ContextBuffer  OPTIONAL
   );
-
-#endif

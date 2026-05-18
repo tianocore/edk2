@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USB_BUS_H_
-#define _EFI_USB_BUS_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -753,5 +752,3 @@ extern EFI_USB_IO_PROTOCOL           mUsbIoProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL   mUsbBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   mUsbBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  mUsbBusComponentName2;
-
-#endif

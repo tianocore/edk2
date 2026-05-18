@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MM_CPU_DRIVER_H_
-#define MM_CPU_DRIVER_H_
+#pragma once
 
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmConfiguration.h>
@@ -30,14 +29,13 @@ extern EFI_MM_CPU_PROTOCOL  mMmCpuState;
 //
 // MM event handling specific declarations
 //
-extern EFI_MM_COMMUNICATE_HEADER      *gGuidedEventContext;
 extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 
 /**
   The PI Standalone MM entry point for the CPU driver.
 
-  @param  [in] EventId            The event Id.
-  @param  [in] CommBufferAddr     Address of the communication buffer.
+  @param  [in] MmHandlerContext     Arm specific Mm handler context.
+  @param  [in] CommBufferAddr       Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
   @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
@@ -47,8 +45,8 @@ extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 **/
 EFI_STATUS
 PiMmStandaloneMmCpuDriverEntry (
-  IN UINTN  EventId,
-  IN UINTN  CommBufferAddr
+  IN CONST ARM_MM_HANDLER_CONTEXT  *MmHandlerContext,
+  IN UINTN                         CommBufferAddr
   );
 
 /**
@@ -75,5 +73,3 @@ PiMmCpuTpFwRootMmiHandler (
   IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
-
-#endif /* MM_CPU_DRIVER_H_ */

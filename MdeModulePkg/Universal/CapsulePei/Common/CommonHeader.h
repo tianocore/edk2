@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CAPSULE_COMMON_HEADER_
-#define _CAPSULE_COMMON_HEADER_
+#pragma once
 
 //
 // 8 extra pages for PF handler.
@@ -111,5 +110,3 @@ CapsuleDataCoalesce (
   IN OUT VOID                    **MemoryBase,
   IN OUT UINTN                   *MemorySize
   );
-
-#endif

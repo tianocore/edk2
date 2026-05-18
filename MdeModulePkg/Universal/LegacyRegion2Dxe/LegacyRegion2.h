@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DUMMY_LEGACY_REGION2_H__
-#define __DUMMY_LEGACY_REGION2_H__
+#pragma once
 
 #include <Protocol/LegacyRegion2.h>
 #include <Library/DebugLib.h>
@@ -165,5 +164,3 @@ LegacyRegionGetInfo (
   OUT UINT32                        *DescriptorCount,
   OUT EFI_LEGACY_REGION_DESCRIPTOR  **Descriptor
   );
-
-#endif

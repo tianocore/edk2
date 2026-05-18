@@ -8,8 +8,7 @@
   - linux/Documentation/devicetree/bindings/arm/psci.yaml
 **/
 
-#ifndef ARM_BOOT_ARCH_PARSER_H_
-#define ARM_BOOT_ARCH_PARSER_H_
+#pragma once
 
 /** CM_ARM_BOOT_ARCH_INFO parser function.
 
@@ -41,5 +40,3 @@ ArmBootArchInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // ARM_BOOT_ARCH_PARSER_H_

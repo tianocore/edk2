@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCI_PLATFORM_DXE_H_
-#define _PCI_PLATFORM_DXE_H_
+#pragma once
+
 #include <PiDxe.h>
 
 #include <IndustryStandard/Pci.h>
@@ -16,5 +16,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Pci22.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciPlatform.h>
-
-#endif

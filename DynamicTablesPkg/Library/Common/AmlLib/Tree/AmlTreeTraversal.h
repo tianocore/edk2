@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_TREE_TRAVERSAL_H_
-#define AML_TREE_TRAVERSAL_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 
@@ -133,5 +132,3 @@ EFIAPI
 AmlGetPreviousNode (
   IN  CONST  AML_NODE_HEADER  *Node
   );
-
-#endif // AML_TREE_TRAVERSAL_H_

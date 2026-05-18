@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _SHELL_COMMAND_LIB_
-#define _SHELL_COMMAND_LIB_
+#pragma once
 
 #include <Uefi.h>
 
@@ -791,5 +790,3 @@ ShellSortFileList (
   OUT EFI_SHELL_FILE_INFO      **Duplicates OPTIONAL,
   IN     SHELL_SORT_FILE_LIST  Order
   );
-
-#endif //_SHELL_COMMAND_LIB_

@@ -9,12 +9,9 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_SCMI_H_
-#define ARM_SCMI_H_
+#pragma once
 
 /* As per SCMI specification, maximum allowed ASCII string length
    for various return values/parameters of a SCMI message.
 */
 #define SCMI_MAX_STR_LEN  16
-
-#endif /* ARM_SCMI_H_ */

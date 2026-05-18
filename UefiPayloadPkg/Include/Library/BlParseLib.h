@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef BOOTLOADER_PARSE_LIB_
-#define BOOTLOADER_PARSE_LIB_
+#pragma once
 
 #include <PiPei.h>
 #include <Guid/GraphicsInfoHob.h>
@@ -28,7 +27,7 @@ typedef RETURN_STATUS \
   );
 
 typedef VOID \
-(*BL_CAPSULE_CALLBACK) (
+(EFIAPI *BL_CAPSULE_CALLBACK)(
   EFI_PHYSICAL_ADDRESS  BaseAddress,
   UINT64                Length
   );
@@ -183,5 +182,3 @@ EFIAPI
 ParseCapsules (
   IN BL_CAPSULE_CALLBACK  CapsuleCallback
   );
-
-#endif

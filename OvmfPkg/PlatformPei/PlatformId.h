@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PLATFORM_PEI_PLATFORMID_H__
-#define __PLATFORM_PEI_PLATFORMID_H__
+#pragma once
 
 /**
  * Reads opt/org.tianocode/sp800155evt/%d from 0 to the first positive integer
@@ -22,5 +21,3 @@ VOID
 PlatformIdInitialization (
   IN CONST EFI_PEI_SERVICES  **PeiServices
   );
-
-#endif // __PLATFORM_PEI_PLATFORMID_H__

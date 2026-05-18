@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __BASE_PE_COFF_LIB_H__
-#define __BASE_PE_COFF_LIB_H__
+#pragma once
 
 //
 // Return status codes from the PE/COFF Loader services
@@ -144,5 +143,3 @@ PeCoffLoaderGetEntryPoint (
   OUT VOID  **BaseOfImage
   )
 ;
-
-#endif

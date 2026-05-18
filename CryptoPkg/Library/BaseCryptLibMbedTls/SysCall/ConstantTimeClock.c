@@ -77,3 +77,11 @@ gettimeofday (
   tv->tv_usec = 0;
   return 0;
 }
+
+ms_time_t
+mbedtls_ms_time (
+  void
+  )
+{
+  return 0;
+}

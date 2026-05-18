@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_TLS_IMPL_H__
-#define __EFI_TLS_IMPL_H__
+#pragma once
 
 //
 // Libraries
@@ -301,5 +300,3 @@ TlsConfigurationGetData (
   IN OUT VOID                            *Data  OPTIONAL,
   IN OUT UINTN                           *DataSize
   );
-
-#endif

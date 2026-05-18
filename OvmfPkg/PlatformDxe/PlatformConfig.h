@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _PLATFORM_CONFIG_H_
-#define _PLATFORM_CONFIG_H_
+#pragma once
 
 #include <Base.h>
 
@@ -52,5 +51,3 @@ PlatformConfigLoad (
 
 extern CHAR16  mVariableName[];
 extern CHAR16  mHiiFormName[];
-
-#endif // _PLATFORM_CONFIG_H_

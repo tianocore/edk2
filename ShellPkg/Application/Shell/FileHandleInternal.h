@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FILE_HANDLE_INTERNAL_HEADER_
-#define _FILE_HANDLE_INTERNAL_HEADER_
+#pragma once
 
 /**
   Move the cursor position one character backward.
@@ -54,5 +53,3 @@ PrintCommandHistory (
   IN CONST UINTN  TotalRows,
   IN CONST UINTN  StartColumn
   );
-
-#endif //_FILE_HANDLE_INTERNAL_HEADER_

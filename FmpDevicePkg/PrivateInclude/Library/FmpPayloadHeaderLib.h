@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _FMP_PAYLOAD_HEADER_LIB_H__
-#define _FMP_PAYLOAD_HEADER_LIB_H__
+#pragma once
 
 /**
   Returns the FMP Payload Header size in bytes.
@@ -79,5 +78,3 @@ GetFmpPayloadHeaderLowestSupportedVersion (
   IN  CONST UINTN  FmpPayloadSize,
   OUT UINT32       *LowestSupportedVersion
   );
-
-#endif

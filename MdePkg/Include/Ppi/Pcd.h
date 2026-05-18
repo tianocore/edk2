@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCD_PPI_H__
-#define __PCD_PPI_H__
+#pragma once
 
 #define PCD_PPI_GUID \
   { 0x6e81c58, 0x4ad7, 0x44bc, { 0x83, 0x90, 0xf1, 0x2, 0x65, 0xf7, 0x24, 0x80 } }
@@ -790,5 +789,3 @@ typedef struct {
 } PCD_PPI;
 
 extern EFI_GUID  gPcdPpiGuid;
-
-#endif

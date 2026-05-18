@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef STANDALONE_MM_MMU_LIB_
-#define STANDALONE_MM_MMU_LIB_
+#pragma once
 
 EFI_STATUS
 ArmSetMemoryRegionNoExec (
@@ -32,5 +31,3 @@ ArmClearMemoryRegionReadOnly (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   );
-
-#endif /* STANDALONE_MM_MMU_LIB_ */

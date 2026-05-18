@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_DHCP6_IMPL_H__
-#define __EFI_DHCP6_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -616,5 +615,3 @@ EfiDhcp6Parse (
   IN OUT UINT32                *OptionCount,
   OUT EFI_DHCP6_PACKET_OPTION  *PacketOptionList[]  OPTIONAL
   );
-
-#endif

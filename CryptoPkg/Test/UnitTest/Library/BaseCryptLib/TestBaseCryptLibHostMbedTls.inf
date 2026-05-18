@@ -1,0 +1,54 @@
+## @file
+# Host-based UnitTest for BaseCryptLibMbedTls
+#
+# Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BaseCryptLibUnitTestHost
+  FILE_GUID      = ab0bc736-2552-4a3c-a2c5-eb106b8a75d1
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UnitTestMain.c
+  UnitTestMainHost.c
+  BaseCryptLibUnitTestsMbedTls.c
+  TestBaseCryptLib.h
+  HashTests.c
+  HmacTests.c
+  BlockCipherTests.c
+  RsaTests.c
+  RsaPkcs7Tests.c
+  Pkcs5Pbkdf2Tests.c
+  AuthenticodeTests.c
+  TSTests.c
+  RandTests.c
+  Pkcs7EkuTests.c
+  Pkcs7AttachedContentTest.c
+  OaepEncryptTests.c
+  RsaPssTests.c
+  ParallelhashTests.c
+  HkdfTests.c
+  AeadAesGcmTests.c
+  X509Tests.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseCryptLib
+  UnitTestLib
+  MmServicesTableLib
+  SynchronizationLib

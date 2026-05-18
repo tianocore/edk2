@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VIRTUAL_KEYBOARD_H_
-#define _VIRTUAL_KEYBOARD_H_
+#pragma once
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/DevicePath.h>
@@ -533,5 +532,3 @@ VirtualKeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   OUT EFI_KEY_DATA                       *KeyData
   );
-
-#endif /* _VIRTUAL_KEYBOARD_H_ */

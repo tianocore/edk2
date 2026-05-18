@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EXPRESSION_H_
-#define _EXPRESSION_H_
+#pragma once
 
 /**
   Get the expression list count.
@@ -256,5 +255,3 @@ IdToForm (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN UINT16                FormId
   );
-
-#endif // _EXPRESSION_H

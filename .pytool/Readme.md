@@ -4,7 +4,7 @@ This file focuses on information for those working with the `.pytools` directory
 directly or interested in lower-level details about how CI works.
 
 If you just want to get started building code, visit
-[Build Instructions](https://github.com/tianocore/tianocore.github.io/wiki/Build-Instruction)
+[Build Instructions](https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/build_instructions.html)
 on the TianoCore wiki.
 
 ## Basic Status
@@ -29,7 +29,6 @@ on the TianoCore wiki.
 | PcAtChipsetPkg       | :heavy_check_mark: | :heavy_check_mark: |
 | SecurityPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | ShellPkg             | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
-| SignedCapsulePkg     |
 | SourceLevelDebugPkg  |
 | StandaloneMmPkg      | :heavy_check_mark: | :heavy_check_mark: |
 | UefiCpuPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 2 binary modules not being built by DSC
@@ -86,8 +85,10 @@ per package configuration which comes from this file.
 
 The EDKII Tools environment (and by extension the ci) is designed to support
 easily and consistently running locally and in a cloud ci environment.  To do
-that a few steps should be followed.  Details of EDKII Tools can be found in the
-[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
+that a few steps should be followed. These steps are detailed on the
+[How to Build With Stuart](https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/how_to_build_with_stuart.html)
+page. Details of EDKII Tools can be found in the
+[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).
 
 ### Running CI
 

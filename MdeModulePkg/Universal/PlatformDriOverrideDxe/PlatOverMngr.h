@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLAT_OVER_MNGR_H_
-#define _PLAT_OVER_MNGR_H_
+#pragma once
 
 #include <Guid/PlatDriOverrideHii.h>
 
@@ -57,5 +56,3 @@ typedef struct {
 //
 #define QUESTION_ID_OFFSET        0x0500
 #define DRIVER_ORDER_QUESTION_ID  (VAR_OFFSET (DriOrder) + QUESTION_ID_OFFSET)
-
-#endif

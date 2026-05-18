@@ -8,11 +8,13 @@
 
 **/
 
-#include <Uefi/UefiBaseType.h>
+#include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <IndustryStandard/IgvmData.h>
 
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
@@ -46,7 +48,11 @@ DetectPreValidatedOverLap (
   OUT   SNP_PRE_VALIDATED_RANGE  *OverlapRange
   )
 {
-  UINTN  i;
+  EFI_HOB_GUID_TYPE  *Hob;
+  EFI_IGVM_DATA_HOB  *IgvmData;
+  UINT64             IgvmStart;
+  UINT64             IgvmEnd;
+  UINTN              i;
 
   //
   // Check if the specified address range exist in pre-validated array.
@@ -57,6 +63,26 @@ DetectPreValidatedOverLap (
     {
       OverlapRange->StartAddress = mPreValidatedRange[i].StartAddress;
       OverlapRange->EndAddress   = mPreValidatedRange[i].EndAddress;
+      return TRUE;
+    }
+  }
+
+  //
+  // Check if the specified address range exist in igvm data hobs ranges.
+  //
+  for (Hob = GetFirstGuidHob (&gEfiIgvmDataHobGuid);
+       Hob != NULL;
+       Hob = GetNextGuidHob (&gEfiIgvmDataHobGuid, GET_NEXT_HOB (Hob)))
+  {
+    IgvmData  = (VOID *)(Hob + 1);
+    IgvmStart = IgvmData->Address;
+    IgvmEnd   = ALIGN_VALUE (IgvmData->Address + IgvmData->Length, 4096);
+
+    if ((IgvmStart < EndAddress) &&
+        (StartAddress < IgvmEnd))
+    {
+      OverlapRange->StartAddress = IgvmStart;
+      OverlapRange->EndAddress   = IgvmEnd;
       return TRUE;
     }
   }

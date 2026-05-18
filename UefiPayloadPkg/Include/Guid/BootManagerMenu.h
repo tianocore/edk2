@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_H_
-#define UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_H_
+#pragma once
 
 #include <Uefi.h>
 #include <UniversalPayload/UniversalPayload.h>
@@ -24,4 +23,3 @@ typedef struct {
 #define UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_REVISION  1
 
 extern GUID  gEdkiiBootManagerMenuFileGuid;
-#endif

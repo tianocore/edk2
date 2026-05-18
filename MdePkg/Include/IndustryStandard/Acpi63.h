@@ -8,8 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_6_3_H_
-#define _ACPI_6_3_H_
+#pragma once
 
 #include <IndustryStandard/Acpi62.h>
 
@@ -1653,13 +1652,13 @@ typedef struct {
 #define EFI_ACPI_6_3_SECURE_DEVICES_TABLE_REVISION  0x01
 
 ///
-/// Secure Devcice types
+/// Secure Device types
 ///
 #define EFI_ACPI_6_3_SDEV_TYPE_PCIE_ENDPOINT_DEVICE   0x01
 #define EFI_ACPI_6_3_SDEV_TYPE_ACPI_NAMESPACE_DEVICE  0x00
 
 ///
-/// Secure Devcice flags
+/// Secure Device flags
 ///
 #define EFI_ACPI_6_3_SDEV_FLAG_ALLOW_HANDOFF  BIT0
 
@@ -3002,5 +3001,3 @@ typedef struct {
 #define EFI_ACPI_6_3_XEN_PROJECT_TABLE_SIGNATURE  SIGNATURE_32('X', 'E', 'N', 'V')
 
 #pragma pack()
-
-#endif

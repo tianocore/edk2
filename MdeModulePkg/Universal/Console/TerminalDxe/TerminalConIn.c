@@ -2123,7 +2123,14 @@ UnicodeToEfiKey (
     }
 
     if (UnicodeChar == DEL) {
-      if (TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
+      //
+      // Modern terminal emulators (xterm, gnome-terminal, etc.) send DEL (0x7f)
+      // for Backspace. Both TtyTerm and VtUtf8 should interpret this as
+      // CHAR_BACKSPACE for proper Backspace functionality in serial console mode.
+      //
+      if ((TerminalDevice->TerminalType == TerminalTypeTtyTerm) ||
+          (TerminalDevice->TerminalType == TerminalTypeVtUtf8))
+      {
         Key.ScanCode    = SCAN_NULL;
         Key.UnicodeChar = CHAR_BACKSPACE;
       } else {

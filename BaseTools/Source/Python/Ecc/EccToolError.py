@@ -43,9 +43,6 @@ ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_2 = 5009
 ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3 = 5010
 
 ERROR_INCLUDE_FILE_CHECK_ALL = 6000
-ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_1 = 6001
-ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_2 = 6002
-ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_3 = 6003
 ERROR_INCLUDE_FILE_CHECK_DATA = 6004
 ERROR_INCLUDE_FILE_CHECK_NAME = 6005
 
@@ -62,7 +59,6 @@ ERROR_DECLARATION_DATA_TYPE_CHECK_NESTED_STRUCTURE = 7008
 ERROR_NAMING_CONVENTION_CHECK_ALL = 8000
 ERROR_NAMING_CONVENTION_CHECK_DEFINE_STATEMENT = 8001
 ERROR_NAMING_CONVENTION_CHECK_TYPEDEF_STATEMENT = 8002
-ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT = 8003
 ERROR_NAMING_CONVENTION_CHECK_PATH_NAME = 8004
 ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME = 8005
 ERROR_NAMING_CONVENTION_CHECK_FUNCTION_NAME = 8006
@@ -141,9 +137,6 @@ gEccErrorMessage = {
     ERROR_C_FUNCTION_LAYOUT_CHECK_NO_STATIC : "There should be no use of STATIC for functions",
 
     ERROR_INCLUDE_FILE_CHECK_ALL : "",
-    ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_1 : "All include file contents should be guarded by a #ifndef statement.",
-    ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_2 : "The #ifndef must be the first line of code following the file header comment",
-    ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_3 : "The #endif must appear on the last line in the file",
     ERROR_INCLUDE_FILE_CHECK_DATA : "Include files should contain only public or only private data and cannot contain code or define data variables",
     ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the include file with same names",
 
@@ -160,7 +153,6 @@ gEccErrorMessage = {
     ERROR_NAMING_CONVENTION_CHECK_ALL : "",
     ERROR_NAMING_CONVENTION_CHECK_DEFINE_STATEMENT : "Only capital letters are allowed to be used for #define declarations",
     ERROR_NAMING_CONVENTION_CHECK_TYPEDEF_STATEMENT : "Only capital letters are allowed to be used for typedef declarations",
-    ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT : "The #ifndef at the start of an include file should have one postfix underscore, and no prefix underscore character '_'",
     ERROR_NAMING_CONVENTION_CHECK_PATH_NAME : """Path name does not follow the rules: 1. First character should be upper case 2. Must contain lower case characters 3. No white space characters""",
     ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME : """Variable name does not follow the rules: 1. First character should be upper case 2. Must contain lower case characters 3. No white space characters 4. Global variable name must start with a 'g'""",
     ERROR_NAMING_CONVENTION_CHECK_FUNCTION_NAME : """Function name does not follow the rules: 1. First character should be upper case 2. Must contain lower case characters 3. No white space characters""",

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _WINDOWS_UX_CAPSULE_GUID_H_
-#define _WINDOWS_UX_CAPSULE_GUID_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -36,5 +35,3 @@ typedef struct {
   }
 
 extern EFI_GUID  gWindowsUxCapsuleGuid;
-
-#endif

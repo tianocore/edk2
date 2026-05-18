@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_PHYSICAL_ADDRESS
 GetSmmProfileData (
-  IN OUT  UINT64  *Size
+  IN OUT  UINTN  *Size
   )
 {
   EFI_PEI_HOB_POINTERS  SmmProfileDataHob;
@@ -45,7 +45,7 @@ GetSmmProfileData (
     return 0;
   }
 
-  *Size = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
+  *Size = (UINTN)SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
 
   return SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
 }

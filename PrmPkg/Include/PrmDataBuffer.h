@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_DATA_BUFFER_H_
-#define PRM_DATA_BUFFER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -47,5 +46,3 @@ typedef struct {
 } PRM_DATA_BUFFER;
 
 #pragma pack(pop)
-
-#endif

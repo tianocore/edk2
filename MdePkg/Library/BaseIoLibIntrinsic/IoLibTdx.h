@@ -5,8 +5,7 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef IOLIB_TDX_H_
-#define IOLIB_TDX_H_
+#pragma once
 
 /**
   Check if it is Tdx guest.
@@ -406,5 +405,3 @@ TdIoWriteFifo32 (
   IN      UINTN  Count,
   IN      VOID   *Buffer
   );
-
-#endif

@@ -14,8 +14,7 @@ Abstract:
 
 **/
 
-#ifndef _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
-#define _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -184,5 +183,3 @@ EFI_STATUS
 TryRunningQemuKernel (
   VOID
   );
-
-#endif // _PLATFORM_SPECIFIC_BDS_PLATFORM_H_

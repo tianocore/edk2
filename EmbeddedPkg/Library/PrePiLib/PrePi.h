@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PI_PEI_H_
-#define _PI_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -36,5 +35,3 @@
 //
 #define GET_GUID_HOB_DATA(GuidHob)       ((VOID *) (((UINT8 *) &((GuidHob)->Name)) + sizeof (EFI_GUID)))
 #define GET_GUID_HOB_DATA_SIZE(GuidHob)  (((GuidHob)->Header).HobLength - sizeof (EFI_HOB_GUID_TYPE))
-
-#endif

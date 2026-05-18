@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef ARM_MM_SVC_H_
-#define ARM_MM_SVC_H_
+#pragma once
 
 /*
  * SPM_MM FIDs to allow the secure partition to initialise itself, handle
@@ -62,5 +61,3 @@
 
 #define ARM_SPM_MM_MINOR_VERSION_GET(version) \
   (((version) >> ARM_SPM_MM_MINOR_VERSION_SHIFT) & ARM_SPM_MM_VERSION_MASK)
-
-#endif // ARM_MM_SVC_H_

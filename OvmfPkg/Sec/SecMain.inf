@@ -84,7 +84,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
 

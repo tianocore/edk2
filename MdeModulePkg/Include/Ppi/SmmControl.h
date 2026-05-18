@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef _SMM_CONTROL_PPI_H_
-#define _SMM_CONTROL_PPI_H_
+#pragma once
 
 #define PEI_SMM_CONTROL_PPI_GUID \
   { 0x61c68702, 0x4d7e, 0x4f43, 0x8d, 0xef, 0xa7, 0x43, 0x5, 0xce, 0x74, 0xc5 }
@@ -84,5 +83,3 @@ struct _PEI_SMM_CONTROL_PPI {
 };
 
 extern EFI_GUID  gPeiSmmControlPpiGuid;
-
-#endif

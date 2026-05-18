@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_UEFI_BOOT_SERVICES_TABLE_LIB_H_
-#define MOCK_UEFI_BOOT_SERVICES_TABLE_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -102,5 +101,3 @@ struct MockUefiBootServicesTableLib {
      IN  EFI_HANDLE  ControllerHandle)
     );
 };
-
-#endif // MOCK_UEFI_BOOT_SERVICES_TABLE_LIB_H_

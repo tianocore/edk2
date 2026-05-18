@@ -332,22 +332,17 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax   }
 };
 
-/**
-  Function for 'drvdiag' command.
+/** Main function of the 'DrvDiag' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDrvDiag (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDrvDiag (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS          Status;
-  LIST_ENTRY          *Package;
-  CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
   DRV_DIAG_TEST_MODE  Mode;
   CHAR8               *Language;
@@ -361,8 +356,129 @@ ShellCommandRunDrvDiag (
   UINT64              Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
   Mode        = TestModeMax;
   Language    = NULL;
+
+  //
+  // if more than 3 'value' parameters (plus the name one) or we have any 2 mode flags
+  //
+  if (  (ShellCommandLineGetCount (Package) > 4)
+     || (ShellCommandLineGetFlag (Package, L"-s") && ShellCommandLineGetFlag (Package, L"-e"))
+     || (ShellCommandLineGetFlag (Package, L"-s") && ShellCommandLineGetFlag (Package, L"-m"))
+     || (ShellCommandLineGetFlag (Package, L"-e") && ShellCommandLineGetFlag (Package, L"-m"))
+        )
+  {
+    //
+    // error for too many parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drvdiag");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (  (ShellCommandLineGetFlag (Package, L"-s"))
+            || (ShellCommandLineGetFlag (Package, L"-e"))
+            || (ShellCommandLineGetFlag (Package, L"-m"))
+               )
+  {
+    //
+    // Run the appropriate test
+    //
+    if (ShellCommandLineGetFlag (Package, L"-s")) {
+      Mode =   TestModeStandard;
+    } else if (ShellCommandLineGetFlag (Package, L"-e")) {
+      Mode = TestModeExtended;
+    } else if (ShellCommandLineGetFlag (Package, L"-m")) {
+      Mode = TestModeManufacturing;
+    } else {
+      ASSERT (FALSE);
+    }
+  } else {
+    //
+    // Do a listing of what's available to test
+    //
+    Mode = TestModeList;
+  }
+
+  Lang = ShellCommandLineGetValue (Package, L"-l");
+  if (ShellCommandLineGetFlag (Package, L"-l") && (Lang == NULL)) {
+    ASSERT (Language == NULL);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvdiag", L"-l");
+    return (SHELL_INVALID_PARAMETER);
+  } else if (Lang != NULL) {
+    Language = AllocateZeroPool (StrSize (Lang));
+    if (Language == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drvdiag");
+      return (SHELL_OUT_OF_RESOURCES);
+    }
+
+    AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
+  }
+
+  DriverHandleStr     = ShellCommandLineGetRawValue (Package, 1);
+  ControllerHandleStr = ShellCommandLineGetRawValue (Package, 2);
+  ChildHandleStr      = ShellCommandLineGetRawValue (Package, 3);
+
+  if ((DriverHandleStr != NULL) && !EFI_ERROR (ShellConvertStringToUint64 (DriverHandleStr, &Intermediate, TRUE, FALSE))) {
+    Handle1 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+  } else {
+    Handle1 = NULL;
+  }
+
+  if ((ControllerHandleStr != NULL) && !EFI_ERROR (ShellConvertStringToUint64 (ControllerHandleStr, &Intermediate, TRUE, FALSE))) {
+    Handle2 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+  } else {
+    Handle2 = NULL;
+  }
+
+  if ((ChildHandleStr != NULL) && !EFI_ERROR (ShellConvertStringToUint64 (ChildHandleStr, &Intermediate, TRUE, FALSE))) {
+    Handle3 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+  } else {
+    Handle3 = NULL;
+  }
+
+  Status = DoDiagnostics (
+             Mode,
+             Language,
+             ShellCommandLineGetFlag (Package, L"-c"),
+             Handle1,
+             Handle2,
+             Handle3
+             );
+
+  if (ShellStatus == SHELL_SUCCESS) {
+    if (Status == EFI_SECURITY_VIOLATION) {
+      ShellStatus = SHELL_SECURITY_VIOLATION;
+    } else if (Status == EFI_INVALID_PARAMETER) {
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (Status == EFI_NOT_FOUND) {
+      ShellStatus = SHELL_NOT_FOUND;
+    } else if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+  }
+
+  SHELL_FREE_NON_NULL (Language);
+  return ShellStatus;
+}
+
+/**
+  Function for 'drvdiag' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDrvDiag (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -385,108 +501,13 @@ ShellCommandRunDrvDiag (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // if more than 3 'value' parameters (plus the name one) or we have any 2 mode flags
-    //
-    if (  (ShellCommandLineGetCount (Package) > 4)
-       || (ShellCommandLineGetFlag (Package, L"-s") && ShellCommandLineGetFlag (Package, L"-e"))
-       || (ShellCommandLineGetFlag (Package, L"-s") && ShellCommandLineGetFlag (Package, L"-m"))
-       || (ShellCommandLineGetFlag (Package, L"-e") && ShellCommandLineGetFlag (Package, L"-m"))
-          )
-    {
-      //
-      // error for too many parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drvdiag");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (  (ShellCommandLineGetFlag (Package, L"-s"))
-              || (ShellCommandLineGetFlag (Package, L"-e"))
-              || (ShellCommandLineGetFlag (Package, L"-m"))
-                 )
-    {
-      //
-      // Run the appropriate test
-      //
-      if (ShellCommandLineGetFlag (Package, L"-s")) {
-        Mode =   TestModeStandard;
-      } else if (ShellCommandLineGetFlag (Package, L"-e")) {
-        Mode = TestModeExtended;
-      } else if (ShellCommandLineGetFlag (Package, L"-m")) {
-        Mode = TestModeManufacturing;
-      } else {
-        ASSERT (FALSE);
-      }
-    } else {
-      //
-      // Do a listing of what's available to test
-      //
-      Mode = TestModeList;
-    }
 
-    Lang = ShellCommandLineGetValue (Package, L"-l");
-    if (ShellCommandLineGetFlag (Package, L"-l") && (Lang == NULL)) {
-      ASSERT (Language == NULL);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvdiag", L"-l");
-      ShellCommandLineFreeVarList (Package);
-      return (SHELL_INVALID_PARAMETER);
-    } else if (Lang != NULL) {
-      Language = AllocateZeroPool (StrSize (Lang));
-      if (Language == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drvdiag");
-        ShellCommandLineFreeVarList (Package);
-        return (SHELL_OUT_OF_RESOURCES);
-      }
-
-      AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
-    }
-
-    DriverHandleStr     = ShellCommandLineGetRawValue (Package, 1);
-    ControllerHandleStr = ShellCommandLineGetRawValue (Package, 2);
-    ChildHandleStr      = ShellCommandLineGetRawValue (Package, 3);
-
-    if ((DriverHandleStr != NULL) && !EFI_ERROR (ShellConvertStringToUint64 (DriverHandleStr, &Intermediate, TRUE, FALSE))) {
-      Handle1 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-    } else {
-      Handle1 = NULL;
-    }
-
-    if ((ControllerHandleStr != NULL) && !EFI_ERROR (ShellConvertStringToUint64 (ControllerHandleStr, &Intermediate, TRUE, FALSE))) {
-      Handle2 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-    } else {
-      Handle2 = NULL;
-    }
-
-    if ((ChildHandleStr != NULL) && !EFI_ERROR (ShellConvertStringToUint64 (ChildHandleStr, &Intermediate, TRUE, FALSE))) {
-      Handle3 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-    } else {
-      Handle3 = NULL;
-    }
-
-    Status = DoDiagnostics (
-               Mode,
-               Language,
-               ShellCommandLineGetFlag (Package, L"-c"),
-               Handle1,
-               Handle2,
-               Handle3
-               );
-
-    SHELL_FREE_NON_NULL (Language);
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
 
-  if (ShellStatus == SHELL_SUCCESS) {
-    if (Status == EFI_SECURITY_VIOLATION) {
-      ShellStatus = SHELL_SECURITY_VIOLATION;
-    } else if (Status == EFI_INVALID_PARAMETER) {
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (Status == EFI_NOT_FOUND) {
-      ShellStatus = SHELL_NOT_FOUND;
-    } else if (EFI_ERROR (Status)) {
-      ShellStatus = SHELL_NOT_FOUND;
-    }
-  }
+  ShellStatus = MainCmdDrvDiag (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

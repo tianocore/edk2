@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __VIRTUAL_MEMORY__
-#define __VIRTUAL_MEMORY__
+#pragma once
 
 #include <IndustryStandard/PageTable.h>
 #include <Library/BaseLib.h>
@@ -167,5 +166,3 @@ InternalMemEncryptSevCreateIdentityMap1G (
   IN    PHYSICAL_ADDRESS  PhysicalAddress,
   IN    UINTN             Length
   );
-
-#endif

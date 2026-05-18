@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_METRONOME_H__
-#define __ARCH_PROTOCOL_METRONOME_H__
+#pragma once
 
 ///
 /// Global ID for the Metronome Architectural Protocol
@@ -70,5 +69,3 @@ struct _EFI_METRONOME_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMetronomeArchProtocolGuid;
-
-#endif

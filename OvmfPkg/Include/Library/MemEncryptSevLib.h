@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _MEM_ENCRYPT_SEV_LIB_H_
-#define _MEM_ENCRYPT_SEV_LIB_H_
+#pragma once
 
 #include <Base.h>
 #include <WorkArea.h>
@@ -253,5 +252,3 @@ MemEncryptSevSnpPreValidateSystemRam (
   IN PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN             NumPages
   );
-
-#endif // _MEM_ENCRYPT_SEV_LIB_H_

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _PCATCHIPSET_TOKEN_SPACE_GUID_H_
-#define _PCATCHIPSET_TOKEN_SPACE_GUID_H_
+#pragma once
 
 #define PCATCHIPSET_TOKEN_SPACE_GUID \
   { \
@@ -15,5 +14,3 @@
   }
 
 extern EFI_GUID  gPcAtChipsetPkgTokenSpaceGuid;
-
-#endif

@@ -39,7 +39,6 @@
   RiscVSbiLib
   RiscVMmuLib
   CacheMaintenanceLib
-  TimerLib
 
 [Sources]
   CpuDxe.c

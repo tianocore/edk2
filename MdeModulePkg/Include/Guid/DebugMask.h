@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUG_MASK_H__
-#define __DEBUG_MASK_H__
+#pragma once
 
 ///
 /// Protocol GUID for DXE Phase Debug Mask support
@@ -64,5 +63,3 @@ extern EFI_GUID  gEfiDebugMaskProtocolGuid;
 #define DEBUG_MASK_VARIABLE_NAME  L"EFIDebug"
 
 extern EFI_GUID  gEfiGenericVariableGuid;
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MIPI_SYST_LIB_H_
-#define MIPI_SYST_LIB_H_
+#pragma once
 
 /**
   Invoke initialization function in Mipi Sys-T module to initialize Mipi Sys-T handle.
@@ -62,5 +61,3 @@ MipiSystWriteCatalog (
   IN  UINT32  Severity,
   IN  UINT64  CatId
   );
-
-#endif // MIPI_SYST_LIB_H_

@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DEVICE_PATH_PROTOCOL_H__
-#define __EFI_DEVICE_PATH_PROTOCOL_H__
+#pragma once
 
 #include <Guid/PcAnsi.h>
 #include <IndustryStandard/Bluetooth.h>
@@ -1393,5 +1392,3 @@ typedef union {
 #define END_INSTANCE_DEVICE_PATH_SUBTYPE  0x01
 
 extern EFI_GUID  gEfiDevicePathProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef  _MTRR_LIB_H_
-#define  _MTRR_LIB_H_
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -383,5 +382,3 @@ MtrrGetMemoryAttributesInMtrrSettings (
   OUT      MTRR_MEMORY_RANGE  *Ranges,
   IN OUT   UINTN              *RangeCount
   );
-
-#endif // _MTRR_LIB_H_

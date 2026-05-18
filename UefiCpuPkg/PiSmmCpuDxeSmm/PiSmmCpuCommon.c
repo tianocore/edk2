@@ -138,10 +138,10 @@ InitializeSmmIdt (
   IA32_DESCRIPTOR  DxeIdtr;
 
   //
-  // There are 32 (not 255) entries in it since only processor
-  // generated exceptions will be handled.
+  // Populate 255 entries to ensure that a known state occurs
+  // for all possible exception vectors.
   //
-  gcSmiIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
+  gcSmiIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM) - 1;
   //
   // Allocate page aligned IDT, because it might be set as read only.
   //
@@ -500,7 +500,7 @@ GetSmBase (
   UINTN              HobIndex;
   UINTN              SortBuffer;
   UINTN              ProcessorIndex;
-  UINT64             PrevProcessorIndex;
+  UINTN              PrevProcessorIndex;
   EFI_HOB_GUID_TYPE  *FirstSmmBaseGuidHob;
 
   SmmBaseHobData     = NULL;
@@ -626,7 +626,7 @@ GetMpInformation (
   MP_INFORMATION2_HOB_DATA   **MpInfo2Hobs;
   UINTN                      SortBuffer;
   UINTN                      ProcessorIndex;
-  UINT64                     PrevProcessorIndex;
+  UINTN                      PrevProcessorIndex;
   MP_INFORMATION2_ENTRY      *MpInformation2Entry;
   EFI_PROCESSOR_INFORMATION  *ProcessorInfo;
 

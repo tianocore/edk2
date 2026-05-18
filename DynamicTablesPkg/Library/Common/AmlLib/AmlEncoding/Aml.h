@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_H_
-#define AML_H_
+#pragma once
 
 #include <AmlDefines.h>
 #include <AmlInclude.h>
@@ -372,5 +371,3 @@ AmlComputePkgLength (
   IN  UINT32  Length,
   OUT UINT32  *PkgLen
   );
-
-#endif // AML_H_

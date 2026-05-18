@@ -2,14 +2,13 @@
   ACPI 6.4 definitions from the ACPI Specification Revision 6.4 Jan, 2021.
 
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2021, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, ARM Ltd. All rights reserved.<BR>
   Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_6_4_H_
-#define ACPI_6_4_H_
+#pragma once
 
 #include <IndustryStandard/Acpi63.h>
 
@@ -2411,6 +2410,31 @@ typedef struct {
 } EFI_ACPI_6_4_EINJ_TRIGGER_ACTION_TABLE;
 
 ///
+/// EINJ Vendor Error Type Extension
+///
+typedef struct {
+  UINT32    Length;
+  UINT32    SBDF;
+  UINT16    VendorID;
+  UINT16    DeviceID;
+  UINT8     RevID;
+  UINT8     Reserved[3];
+} EFI_ACPI_6_4_VENDOR_ERROR_TYPE_EXTENSION_STRUCTURE;
+
+///
+/// EINJ Set Error Type With Address
+///
+typedef struct {
+  UINT32    ErrorType;
+  UINT32    VendorStructureOffset;
+  UINT32    Flags;
+  UINT32    ProcessorId;
+  UINT64    MemAddr;
+  UINT64    MemAddrRange;
+  UINT32    PcieSBDF;
+} EFI_ACPI_6_4_SET_ERROR_TYPE_WITH_ADDRESS;
+
+///
 /// Platform Communications Channel Table (PCCT)
 ///
 typedef struct {
@@ -2827,7 +2851,7 @@ typedef struct {
   UINT8     Reserved[3];
   UINT32    RecordCount;
   // UINT8   PhatVersionElement[];
-} EFI_ACPI_6_4_PHAT_FIRMWARE_VERISON_DATA_RECORD;
+} EFI_ACPI_6_4_PHAT_FIRMWARE_VERSION_DATA_RECORD;
 
 #define EFI_ACPI_6_4_PHAT_FIRMWARE_VERSION_DATA_RECORD_REVISION  0x01
 
@@ -3324,5 +3348,3 @@ typedef struct {
 #define EFI_ACPI_6_4_XEN_PROJECT_TABLE_SIGNATURE  SIGNATURE_32('X', 'E', 'N', 'V')
 
 #pragma pack()
-
-#endif

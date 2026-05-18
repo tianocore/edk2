@@ -8,8 +8,7 @@
     - ARM Architecture Reference Manual ARMv8 (D.a)
 **/
 
-#ifndef PPTT_PARSER_H_
-#define PPTT_PARSER_H_
+#pragma once
 
 #if defined (MDE_CPU_AARCH64)
 
@@ -34,5 +33,3 @@
 #define PPTT_ARM_CACHE_LINE_SIZE_MIN  (1 << 4)
 
 #endif // if defined (MDE_CPU_AARCH64)
-
-#endif // PPTT_PARSER_H_

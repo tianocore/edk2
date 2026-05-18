@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PAGE_TABLES_H_
-#define PAGE_TABLES_H_
+#pragma once
 
 #define SYS_CODE64_SEL  0x38
 
@@ -202,5 +201,3 @@ BOOLEAN
 IsNullDetectionEnabled (
   VOID
   );
-
-#endif

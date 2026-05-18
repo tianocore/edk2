@@ -21,8 +21,7 @@
   - Desc : Descriptor
 **/
 
-#ifndef __IO_REMAPPING_TABLE_H__
-#define __IO_REMAPPING_TABLE_H__
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -281,5 +280,3 @@ typedef struct {
 } EFI_ACPI_6_0_IO_REMAPPING_RMR_NODE;
 
 #pragma pack()
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef VARIABLE_RUNTIME_CACHE_INFO_H_
-#define VARIABLE_RUNTIME_CACHE_INFO_H_
+#pragma once
 
 #define VARIABLE_RUNTIME_CACHE_INFO_HOB_REVISION  1
 
@@ -57,5 +56,3 @@ typedef struct {
 } VARIABLE_RUNTIME_CACHE_INFO;
 
 extern EFI_GUID  gEdkiiVariableRuntimeCacheInfoHobGuid;
-
-#endif

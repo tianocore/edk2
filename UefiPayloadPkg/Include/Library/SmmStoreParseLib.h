@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SMM_STORE_PARSE_LIB_H_
-#define SMM_STORE_PARSE_LIB_H_
+#pragma once
 
 #include <Guid/SmmStoreInfoGuid.h>
 
@@ -25,5 +24,3 @@ EFIAPI
 ParseSmmStoreInfo (
   OUT SMMSTORE_INFO  *SmmStoreInfo
   );
-
-#endif // SMM_STORE_PARSE_LIB_H_

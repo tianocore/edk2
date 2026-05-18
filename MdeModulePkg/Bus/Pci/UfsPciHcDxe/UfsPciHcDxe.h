@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _EFI_UFS_HOST_CONTROLLER_H_
-#define _EFI_UFS_HOST_CONTROLLER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -499,5 +498,3 @@ UfsHcMmioWrite (
   IN     UINTN                                     Count,
   IN OUT VOID                                      *Buffer
   );
-
-#endif

@@ -1087,6 +1087,7 @@ EfiDhcp4Stop (
 
   DhcpSb->DhcpState    = Dhcp4Stopped;
   DhcpSb->ServiceState = DHCP_UNCONFIGED;
+  DhcpSb->IoStatus     = EFI_NOT_STARTED;
 
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;

@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __Q35_MCH_ICH9_H__
-#define __Q35_MCH_ICH9_H__
+#pragma once
 
 #include <Library/PciLib.h>
 #include <Uefi/UefiBaseType.h>
@@ -123,5 +122,3 @@
 #define ICH9_SMI_EN_GBL_SMI_EN  BIT0
 
 #define ICH9_ROOT_COMPLEX_BASE  0xFED1C000
-
-#endif

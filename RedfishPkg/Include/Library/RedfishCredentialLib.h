@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef REDFISH_CREDENTIAL_LIB_H_
-#define REDFISH_CREDENTIAL_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -89,5 +88,3 @@ LibStopRedfishService (
   IN     EDKII_REDFISH_CREDENTIAL_PROTOCOL           *This,
   IN     EDKII_REDFISH_CREDENTIAL_STOP_SERVICE_TYPE  ServiceStopType
   );
-
-#endif

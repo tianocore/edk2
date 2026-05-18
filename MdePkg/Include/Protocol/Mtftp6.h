@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __EFI_MTFTP6_PROTOCOL_H__
-#define __EFI_MTFTP6_PROTOCOL_H__
+#pragma once
 
 #define EFI_MTFTP6_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -497,10 +496,10 @@ EFI_STATUS
                                  - This is NULL.
                                  - MtftpConfigData.StationIp is neither zero nor one
                                    of the configured IP addresses in the underlying IPv6 driver.
-                                 - MtftpCofigData.ServerIp is not a valid IPv6 unicast address.
+                                 - MtftpConfigData.ServerIp is not a valid IPv6 unicast address.
   @retval  EFI_ACCESS_DENIED     - The configuration could not be changed at this time because there
                                    is some MTFTP background operation in progress.
-                                 - MtftpCofigData.LocalPort is already in use.
+                                 - MtftpConfigData.LocalPort is already in use.
   @retval  EFI_NO_MAPPING        The underlying IPv6 driver was responsible for choosing a source
                                  address for this instance, but no source address was available for use.
   @retval  EFI_OUT_OF_RESOURCES  The EFI MTFTPv6 Protocol driver instance data could not be
@@ -814,5 +813,3 @@ struct _EFI_MTFTP6_PROTOCOL {
 
 extern EFI_GUID  gEfiMtftp6ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiMtftp6ProtocolGuid;
-
-#endif

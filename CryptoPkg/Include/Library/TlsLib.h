@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TLS_LIB_H__
-#define __TLS_LIB_H__
+#pragma once
 
 /**
   Initializes the OpenSSL library.
@@ -968,5 +967,3 @@ TlsGetExportKey (
   OUT    VOID        *KeyBuffer,
   IN     UINTN       KeyBufferLen
   );
-
-#endif // __TLS_LIB_H__

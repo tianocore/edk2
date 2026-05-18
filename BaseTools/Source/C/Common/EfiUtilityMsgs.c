@@ -403,12 +403,12 @@ PrintMessage (
                        );
     }
     if (Cptr != NULL) {
-      strcpy (Line, ": ");
-      strncat (Line, Cptr, MAX_LINE_LEN - strlen (Line) - 1);
       if (LineNumber != 0) {
-        sprintf (Line2, "(%u)", (unsigned) LineNumber);
-        strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
+        snprintf(Line, MAX_LINE_LEN, ": %s(%u)", Cptr, (unsigned) LineNumber);
+      } else {
+        snprintf(Line, MAX_LINE_LEN, ": %s", Cptr);
       }
+
     }
   } else {
     //
@@ -421,7 +421,8 @@ PrintMessage (
       strncpy (Line, Cptr, MAX_LINE_LEN - 1);
       Line[MAX_LINE_LEN - 1] = 0;
       if (LineNumber != 0) {
-        sprintf (Line2, "(%u)", (unsigned) LineNumber);
+        snprintf (Line2, MAX_LINE_LEN, "(%u)", (unsigned) LineNumber);
+
         strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
       }
     } else {
@@ -448,7 +449,8 @@ PrintMessage (
   strncat (Line, ": ", MAX_LINE_LEN - strlen (Line) - 1);
   strncat (Line, Type, MAX_LINE_LEN - strlen (Line) - 1);
   if (MessageCode != 0) {
-    sprintf (Line2, " %04u", (unsigned) MessageCode);
+    snprintf (Line2, MAX_LINE_LEN, " %04u", (unsigned) MessageCode);
+
     strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
   }
   fprintf (stdout, "%s", Line);
@@ -464,7 +466,8 @@ PrintMessage (
   // Print formatted message if provided
   //
   if (MsgFmt != NULL) {
-    vsprintf (Line2, MsgFmt, List);
+    vsnprintf (Line2, MAX_LINE_LEN, MsgFmt, List);
+
     fprintf (stdout, "  %s\n", Line2);
   }
 
@@ -489,7 +492,8 @@ PrintSimpleMessage (
   // Print formatted message if provided
   //
   if (MsgFmt != NULL) {
-    vsprintf (Line, MsgFmt, List);
+    vsnprintf (Line, MAX_LINE_LEN, MsgFmt, List);
+
     fprintf (stdout, "%s\n", Line);
   }
 }

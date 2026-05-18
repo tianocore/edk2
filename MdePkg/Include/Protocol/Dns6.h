@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __EFI_DNS6_PROTOCOL_H__
-#define __EFI_DNS6_PROTOCOL_H__
+#pragma once
 
 #define EFI_DNS6_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -422,8 +421,8 @@ EFI_STATUS
 
   @param[in]  This                Pointer to EFI_DNS6_PROTOCOL instance.
   @param[in]  DeleteFlag          If FALSE, this function is to add one entry to the
-                                  DNS Cahce. If TRUE, this function will delete
-                                  matching DNS Cache entry.
+                                  DNS cache. If TRUE, this function will delete
+                                  matching DNS cache entry.
   @param[in]  Override            If TRUE, the maching DNS cache entry will be
                                   overwritten with the supplied parameter. If FALSE,
                                   EFI_ACCESS_DENIED will be returned if the entry to
@@ -529,5 +528,3 @@ struct _EFI_DNS6_PROTOCOL {
 
 extern EFI_GUID  gEfiDns6ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiDns6ProtocolGuid;
-
-#endif

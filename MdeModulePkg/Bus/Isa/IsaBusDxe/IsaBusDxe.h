@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _ISA_BUS_H_
-#define _ISA_BUS_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/IsaHc.h>
@@ -36,5 +35,3 @@ typedef struct {
 #define ISA_BUS_CHILD_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('_', 'i', 's', 'c')
 
 extern EFI_DRIVER_BINDING_PROTOCOL  gIsaBusDriverBinding;
-
-#endif

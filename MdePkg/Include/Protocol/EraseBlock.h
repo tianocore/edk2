@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_ERASE_BLOCK_PROTOCOL_H__
-#define __EFI_ERASE_BLOCK_PROTOCOL_H__
+#pragma once
 
 #define EFI_ERASE_BLOCK_PROTOCOL_GUID \
   { \
@@ -95,5 +94,3 @@ struct _EFI_ERASE_BLOCK_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEraseBlockProtocolGuid;
-
-#endif

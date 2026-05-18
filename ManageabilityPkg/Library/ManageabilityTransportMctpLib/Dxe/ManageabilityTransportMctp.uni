@@ -1,0 +1,13 @@
+// /** @file
+// MCTP instance of Manageability Transport Library
+//
+// Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "MCTP instance of Manageability Transport Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "MCTP Manageability Transport library implementation."
+

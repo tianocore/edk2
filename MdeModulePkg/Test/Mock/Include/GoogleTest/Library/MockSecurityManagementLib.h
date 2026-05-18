@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_SECURITY_MANAGEMENT_LIB_H_
-#define MOCK_SECURITY_MANAGEMENT_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -50,5 +49,3 @@ struct MockSecurityManagementLib {
      IN  BOOLEAN                         BootPolicy)
     );
 };
-
-#endif // MOCK_SECURITY_MANAGEMENT_LIB_H_

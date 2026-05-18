@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_RUNTIME_H__
-#define __ARCH_PROTOCOL_RUNTIME_H__
+#pragma once
 
 ///
 /// Global ID for the Runtime Architectural Protocol
@@ -118,5 +117,3 @@ struct _EFI_RUNTIME_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiRuntimeArchProtocolGuid;
-
-#endif

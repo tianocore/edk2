@@ -91,22 +91,17 @@ GetFfaCompatibility (
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
+  UINT32      CurrentVersion;
 
   Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
+             ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
+             &CurrentVersion
              );
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
 
-  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
-      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
-  {
+  if (!ARM_FFA_ABI_COMPATIBLE (CurrentVersion, ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION)) {
     DEBUG ((
       DEBUG_INFO,
       "Incompatible FF-A Versions for MM_COMM.\n" \
@@ -114,8 +109,8 @@ GetFfaCompatibility (
       "Current Version: Major=0x%x, Minor>=0x%x.\n",
       ARM_FFA_MAJOR_VERSION,
       ARM_FFA_MINOR_VERSION,
-      CurrentMajorVersion,
-      CurrentMinorVersion
+      ARM_FFA_MAJOR_VERSION_GET (CurrentVersion),
+      ARM_FFA_MINOR_VERSION_GET (CurrentVersion)
       ));
     return EFI_UNSUPPORTED;
   }
@@ -123,8 +118,8 @@ GetFfaCompatibility (
   DEBUG ((
     DEBUG_INFO,
     "FF-A Version for MM_COMM: Major=0x%x, Minor=0x%x\n",
-    CurrentMajorVersion,
-    CurrentMinorVersion
+    ARM_FFA_MAJOR_VERSION_GET (CurrentVersion),
+    ARM_FFA_MINOR_VERSION_GET (CurrentVersion)
     ));
 
   return EFI_SUCCESS;
@@ -142,13 +137,7 @@ InitializeFfaCommunication (
   )
 {
   EFI_STATUS              Status;
-  VOID                    *TxBuffer;
-  UINT64                  TxBufferSize;
-  VOID                    *RxBuffer;
-  UINT64                  RxBufferSize;
-  EFI_FFA_PART_INFO_DESC  *StmmPartInfo;
-  UINT32                  Count;
-  UINT32                  Size;
+  EFI_FFA_PART_INFO_DESC  StmmPartInfo;
 
   Status = ArmFfaLibPartitionIdGet (&mPartId);
   if (EFI_ERROR (Status)) {
@@ -160,58 +149,24 @@ InitializeFfaCommunication (
     return Status;
   }
 
-  Status = ArmFfaLibGetRxTxBuffers (
-             &TxBuffer,
-             &TxBufferSize,
-             &RxBuffer,
-             &RxBufferSize
-             );
+  Status = ArmFfaLibGetPartitionInfo (&gEfiMmCommunication2ProtocolGuid, &StmmPartInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "Failed to get Rx/Tx Buffer. Status: %r\n",
-      Status
-      ));
-    return Status;
-  }
-
-  Status = ArmFfaLibPartitionInfoGet (
-             &gEfiMmCommunication2ProtocolGuid,
-             FFA_PART_INFO_FLAG_TYPE_DESC,
-             &Count,
-             &Size
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Failed to get Stmm(%g) partition Info. Status: %r\n",
+      "Failed to get partition Info(%g). Status: %r\n",
       &gEfiMmCommunication2ProtocolGuid,
       Status
       ));
     return Status;
   }
 
-  if ((Count != 1) || (Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((
-      DEBUG_ERROR,
-      "Invalid partition Info(%g). Count: %d, Size: %d\n",
-      &gEfiMmCommunication2ProtocolGuid,
-      Count,
-      Size
-      ));
-    goto ErrorHandler;
-  }
-
-  StmmPartInfo = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-
-  if ((StmmPartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
+  if ((StmmPartInfo.PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
     Status = EFI_UNSUPPORTED;
     DEBUG ((DEBUG_ERROR, "StandaloneMm doesn't receive DIRECT_MSG_REQ...\n"));
     goto ErrorHandler;
   }
 
-  mStMmPartId = StmmPartInfo->PartitionId;
+  mStMmPartId = StmmPartInfo.PartitionId;
 
 ErrorHandler:
   ArmFfaLibRxRelease (mPartId);
@@ -381,7 +336,6 @@ MmCommunicationPeimCommon (
   EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
   EFI_STATUS                    Status;
   UINTN                         BufferSize;
-  UINTN                         HeaderSize;
 
   //
   // Check parameters
@@ -400,7 +354,6 @@ MmCommunicationPeimCommon (
   {
     // This is a v3 header
     CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)CommBuffer;
-    HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
     BufferSize          = CommunicateHeaderV3->BufferSize;
   } else {
     // This is a v1 header, do some checks
@@ -428,9 +381,6 @@ MmCommunicationPeimCommon (
       *CommSize = (UINTN)PcdGet64 (PcdMmBufferSize);
       return EFI_BAD_BUFFER_SIZE;
     }
-
-    HeaderSize =  sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
 
     // CommBuffer is a mandatory parameter. Hence, Rely on
     // MessageLength + Header to ascertain the

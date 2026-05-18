@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef TDX_MAILBOX_LIB_H_
-#define TDX_MAILBOX_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Uefi/UefiBaseType.h>
@@ -72,5 +71,3 @@ EFIAPI
 MpSerializeEnd (
   VOID
   );
-
-#endif

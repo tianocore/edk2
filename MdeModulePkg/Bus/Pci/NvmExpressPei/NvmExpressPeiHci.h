@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _NVM_EXPRESS_PEI_HCI_H_
-#define _NVM_EXPRESS_PEI_HCI_H_
+#pragma once
 
 //
 // NVME host controller registers operation definitions
@@ -140,5 +139,3 @@ VOID
 NvmeFreeDmaResource (
   IN PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private
   );
-
-#endif

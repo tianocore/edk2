@@ -10,8 +10,7 @@
 *    https://developer.arm.com/documentation/den0094/c/
 **/
 
-#ifndef GENERIC_WATCHDOG_H_
-#define GENERIC_WATCHDOG_H_
+#pragma once
 
 // Refresh Frame:
 #define GENERIC_WDOG_REFRESH_REG  ((UINTN)PcdGet64 (PcdGenericWatchdogRefreshBase) + 0x000)
@@ -30,5 +29,3 @@
 
 #define GENERIC_WDOG_IID_ARCH_REV_SHIFT  16
 #define GENERIC_WDOG_IID_ARCH_REV_MASK   0xF
-
-#endif // GENERIC_WATCHDOG_H_

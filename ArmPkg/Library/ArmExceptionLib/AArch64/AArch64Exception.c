@@ -35,7 +35,7 @@ ArchVectorConfig (
 
   // Round down sp by 16 bytes alignment
   RegisterEl0Stack (
-    (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFUL)
+    (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFULL)
     );
 
   if (ArmReadCurrentEL () == AARCH64_EL2) {

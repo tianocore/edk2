@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __ANDROID_FASTBOOT_PLATFORM_H__
-#define __ANDROID_FASTBOOT_PLATFORM_H__
+#pragma once
 
 extern EFI_GUID  gAndroidFastbootPlatformProtocolGuid;
 
@@ -135,5 +134,3 @@ typedef struct _FASTBOOT_PLATFORM_PROTOCOL {
   FASTBOOT_PLATFORM_GETVAR         GetVar;
   FASTBOOT_PLATFORM_OEM_COMMAND    DoOemCommand;
 } FASTBOOT_PLATFORM_PROTOCOL;
-
-#endif

@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __GHCB_H__
-#define __GHCB_H__
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseLib.h>
@@ -289,5 +288,3 @@ typedef struct {
   UINT16                     X87Fcw;
 } SEV_ES_SAVE_AREA;
 #pragma pack ()
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SERIALIZE_VARIABLES_LIB__
-#define __SERIALIZE_VARIABLES_LIB__
+#pragma once
 
 /**
   Callback function for each variable
@@ -208,5 +207,3 @@ SerializeVariablesToBuffer (
   OUT    VOID        *Buffer,
   IN OUT UINTN       *Size
   );
-
-#endif

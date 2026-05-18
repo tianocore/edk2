@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLAT_VAR_CLEANUP_
-#define _PLAT_VAR_CLEANUP_
+#pragma once
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -98,5 +97,3 @@ typedef struct {
 } VARIABLE_CLEANUP_HII_PRIVATE_DATA;
 
 #define VARIABLE_CLEANUP_HII_PRIVATE_FROM_THIS(a)  CR (a, VARIABLE_CLEANUP_HII_PRIVATE_DATA, ConfigAccess, VARIABLE_CLEANUP_HII_PRIVATE_SIGNATURE)
-
-#endif

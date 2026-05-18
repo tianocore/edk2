@@ -14,7 +14,7 @@
   PLATFORM_VERSION               = 0.90
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/UefiCpu
-  SUPPORTED_ARCHITECTURES        = IA32|X64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -72,6 +72,7 @@
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   HobLib|MdeModulePkg/Library/BaseHobLibNull/BaseHobLibNull.inf
   MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 
 [LibraryClasses.common.SEC]
   PlatformSecLib|UefiCpuPkg/Library/PlatformSecLibNull/PlatformSecLibNull.inf
@@ -126,17 +127,11 @@
 #
 
 [Components]
-  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-  UefiCpuPkg/CpuIoPei/CpuIoPei.inf
   UefiCpuPkg/Library/SecPeiDxeTimerLibUefiCpu/SecPeiDxeTimerLibUefiCpu.inf
-  UefiCpuPkg/Application/Cpuid/Cpuid.inf
-  UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
-  UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
-  UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
-  UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
   UefiCpuPkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLib.inf
 
 [Components.IA32, Components.X64]
+  UefiCpuPkg/Application/Cpuid/Cpuid.inf
   UefiCpuPkg/CpuDxe/CpuDxe.inf
   UefiCpuPkg/CpuFeatures/CpuFeaturesPei.inf {
     <LibraryClasses>
@@ -146,13 +141,18 @@
     <LibraryClasses>
       NULL|UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
   }
+  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+  UefiCpuPkg/CpuIoPei/CpuIoPei.inf
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
   UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
   UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
+  UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
   UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
+  UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
+  UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
@@ -173,6 +173,7 @@
   UefiCpuPkg/Library/SmmCpuSyncLib/SmmCpuSyncLib.inf
   UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
+  UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
   UefiCpuPkg/SecCore/SecCore.inf
@@ -234,6 +235,7 @@
 
 [Components.LOONGARCH64]
   UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
+  UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
 [BuildOptions]

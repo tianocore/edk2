@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_STREAM_H_
-#define AML_STREAM_H_
+#pragma once
 
 #include <AmlInclude.h>
 
@@ -447,5 +446,3 @@ AmlStreamCpyS (
   IN  AML_STREAM  *Stream,
   IN  UINT32      Size
   );
-
-#endif // AML_STREAM_H_

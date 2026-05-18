@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SMM_CPU_PLATFORM_HOOK_LIB_H__
-#define __SMM_CPU_PLATFORM_HOOK_LIB_H__
+#pragma once
 
 ///
 /// SMM Page Size Type
@@ -134,5 +133,3 @@ EFIAPI
 IsCpuSyncAlwaysNeeded (
   VOID
   );
-
-#endif

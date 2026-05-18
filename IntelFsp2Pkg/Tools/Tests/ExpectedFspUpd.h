@@ -1,5 +1,4 @@
-#ifndef __FSPUPD_H__
-#define __FSPUPD_H__
+#pragma once
 
 #include <FspEas.h>
 
@@ -12,5 +11,3 @@
 #define FSPS_UPD_SIGNATURE  0x535F4450554D4551                     /* 'QEMUPD_S' */
 
 #pragma pack()
-
-#endif

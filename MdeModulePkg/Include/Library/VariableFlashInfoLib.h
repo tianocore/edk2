@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef VARIABLE_FLASH_INFO_LIB_H_
-#define VARIABLE_FLASH_INFO_LIB_H_
+#pragma once
 
 /**
   Get the base address and size for the NV storage area used for UEFI variable storage.
@@ -64,5 +63,3 @@ GetVariableFlashFtwWorkingInfo (
   OUT EFI_PHYSICAL_ADDRESS  *BaseAddress,
   OUT UINT64                *Length
   );
-
-#endif

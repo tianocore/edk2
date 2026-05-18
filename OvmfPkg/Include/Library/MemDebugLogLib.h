@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _MEM_DEBUG_LOG_LIB_H_
-#define _MEM_DEBUG_LOG_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Base.h>
@@ -210,5 +209,3 @@ EFIAPI
 MemDebugLogEnabled (
   VOID
   );
-
-#endif // _MEM_DEBUG_LOG_LIB_H_

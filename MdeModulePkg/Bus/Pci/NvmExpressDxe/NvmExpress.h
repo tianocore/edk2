@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _EFI_NVM_EXPRESS_H_
-#define _EFI_NVM_EXPRESS_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -778,5 +777,3 @@ VOID
 NvmeUnregisterShutdownNotification (
   VOID
   );
-
-#endif

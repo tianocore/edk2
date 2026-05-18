@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_VARIABLE_COMMON_H_
-#define _SMM_VARIABLE_COMMON_H_
+#pragma once
 
 #include <Guid/VariableFormat.h>
 #include <Protocol/VarCheck.h>
@@ -147,5 +146,3 @@ typedef struct {
   UINTN      TotalVolatileStorageSize;
   BOOLEAN    AuthenticatedVariableUsage;
 } SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO;
-
-#endif // _SMM_VARIABLE_COMMON_H_

@@ -64,6 +64,7 @@
   PrintLib
   BaseMemoryLib
   CacheMaintenanceLib
+  VariablePolicyHelperLib
 
 [LibraryClasses.X64]
   UefiLib
@@ -81,7 +82,7 @@
 [Protocols.X64]
   ## UNDEFINED ## NOTIFY
   ## SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid
+  gEdkiiVariablePolicyProtocolGuid
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset        ## CONSUMES

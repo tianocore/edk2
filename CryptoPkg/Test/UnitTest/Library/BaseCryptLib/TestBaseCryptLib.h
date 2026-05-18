@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CRYPTEST_H__
-#define __CRYPTEST_H__
+#pragma once
 
 #include <PiPei.h>
 #include <Uefi.h>
@@ -101,6 +100,27 @@ extern TEST_DESC  mEcTest[];
 extern UINTN      mX509TestNum;
 extern TEST_DESC  mX509Test[];
 
+extern UINTN      mPkcs7ContentTestNum;
+extern TEST_DESC  mPkcs7ContentTest[];
+
+//
+// Test Case only for MbedTls.
+//
+extern UINTN      mPkcs7EkuTestMbedTlsNum;
+extern TEST_DESC  mPkcs7EkuTestMbedTls[];
+
+extern UINTN      mRsaTestMbedTlsNum;
+extern TEST_DESC  mRsaTestMbedTls[];
+
+extern UINTN      mPkcs7TestMbedTlsNum;
+extern TEST_DESC  mPkcs7TestMbedTls[];
+
+extern UINTN      mOaepTestMbedTlsNum;
+extern TEST_DESC  mOaepTestMbedTls[];
+
+extern UINTN      mPkcs7ContentTestMbedTlsNum;
+extern TEST_DESC  mPkcs7ContentTestMbedTls[];
+
 /** Creates a framework you can use */
 EFI_STATUS
 EFIAPI
@@ -147,5 +167,3 @@ EFIAPI
 UefiTestMain (
   VOID
   );
-
-#endif

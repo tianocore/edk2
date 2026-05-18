@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __EFI_IPSE_CCONFIG_PROTOCOL_H__
-#define __EFI_IPSE_CCONFIG_PROTOCOL_H__
+#pragma once
 
 #define EFI_IPSEC_CONFIG_PROTOCOL_GUID \
   { \
@@ -792,5 +791,3 @@ struct _EFI_IPSEC_CONFIG_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiIpSecConfigProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef UNIVERSAL_PAYLOAD_SERIAL_PORT_PARENT_DEVICE_INFO_
-#define UNIVERSAL_PAYLOAD_SERIAL_PORT_PARENT_DEVICE_INFO_
+#pragma once
 
 extern GUID  gUniversalPayloadSerialPortParentDeviceInfoGuid;
 
@@ -24,5 +23,3 @@ typedef struct {
 #pragma pack()
 
 #define UNIVERSAL_PAYLOAD_SERIAL_PORT_PARENT_DEVICE_INFO_REVISION  1
-
-#endif // UNIVERSAL_PAYLOAD_SERIAL_PORT_PARENT_DEVICE_INFO_

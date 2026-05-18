@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _DXE_CPUIO2_LIB_INTERNAL_H_
-#define _DXE_CPUIO2_LIB_INTERNAL_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -161,5 +160,3 @@ MmioWriteWorker (
   IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
   IN      UINT64                     Data
   );
-
-#endif

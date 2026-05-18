@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __XEON_D_MSR_H__
-#define __XEON_D_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -1243,5 +1242,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_XEON_D_IA32_L3_QOS_CFG_REGISTER;
-
-#endif

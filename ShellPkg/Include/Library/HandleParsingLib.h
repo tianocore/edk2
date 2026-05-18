@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __HANDLE_PARSING_LIB__
-#define __HANDLE_PARSING_LIB__
+#pragma once
 
 #include <Uefi.h>
 
@@ -398,5 +397,3 @@ GetAllMappingGuids (
   OUT EFI_GUID  *Guids,
   IN OUT UINTN  *Count
   );
-
-#endif // __HANDLE_PARSING_LIB__

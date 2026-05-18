@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _LIB_DISK_IMAGE_H_
-#define _LIB_DISK_IMAGE_H_
+#pragma once
 
 #include "HexEditor.h"
 
@@ -85,5 +84,3 @@ HDiskImageSave (
   IN UINTN   Offset,
   IN UINTN   Size
   );
-
-#endif

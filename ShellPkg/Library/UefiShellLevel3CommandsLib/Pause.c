@@ -14,6 +14,52 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax  }
 };
 
+/** Main function of the 'Pause' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdPause (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS             Status;
+  SHELL_STATUS           ShellStatus;
+  SHELL_PROMPT_RESPONSE  *Resp;
+
+  ShellStatus = SHELL_SUCCESS;
+  Resp        = NULL;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+    return ShellStatus;
+  } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"pause");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (!ShellCommandLineGetFlag (Package, L"-q")) {
+    Status = ShellPromptForResponseHii (ShellPromptResponseTypeQuitContinue, STRING_TOKEN (STR_PAUSE_PROMPT), gShellLevel3HiiHandle, (VOID **)&Resp);
+  } else {
+    Status = ShellPromptForResponse (ShellPromptResponseTypeQuitContinue, NULL, (VOID **)&Resp);
+  }
+
+  if (EFI_ERROR (Status) || (Resp == NULL) || (*Resp == ShellPromptResponseQuit)) {
+    ShellCommandRegisterExit (TRUE, 0);
+    ShellStatus = SHELL_ABORTED;
+  }
+
+  if (Resp != NULL) {
+    FreePool (Resp);
+  }
+
+  return ShellStatus;
+}
+
 /**
   Function for 'pause' command.
 
@@ -27,15 +73,13 @@ ShellCommandRunPause (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS             Status;
-  LIST_ENTRY             *Package;
-  CHAR16                 *ProblemParam;
-  SHELL_STATUS           ShellStatus;
-  SHELL_PROMPT_RESPONSE  *Resp;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
-  Resp         = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -63,37 +107,16 @@ ShellCommandRunPause (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"pause");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      if (!ShellCommandLineGetFlag (Package, L"-q")) {
-        Status = ShellPromptForResponseHii (ShellPromptResponseTypeQuitContinue, STRING_TOKEN (STR_PAUSE_PROMPT), gShellLevel3HiiHandle, (VOID **)&Resp);
-      } else {
-        Status = ShellPromptForResponse (ShellPromptResponseTypeQuitContinue, NULL, (VOID **)&Resp);
-      }
 
-      if (EFI_ERROR (Status) || (Resp == NULL) || (*Resp == ShellPromptResponseQuit)) {
-        ShellCommandRegisterExit (TRUE, 0);
-        ShellStatus = SHELL_ABORTED;
-      }
-
-      if (Resp != NULL) {
-        FreePool (Resp);
-      }
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdPause (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

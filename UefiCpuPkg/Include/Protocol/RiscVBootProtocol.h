@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef RISCV_BOOT_PROTOCOL_H_
-#define RISCV_BOOT_PROTOCOL_H_
+#pragma once
 
 typedef struct _RISCV_EFI_BOOT_PROTOCOL RISCV_EFI_BOOT_PROTOCOL;
 
@@ -30,5 +29,3 @@ typedef struct _RISCV_EFI_BOOT_PROTOCOL {
   UINT64                 Revision;
   EFI_GET_BOOT_HARTID    GetBootHartId;
 } RISCV_EFI_BOOT_PROTOCOL;
-
-#endif

@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __SPI_CONFIGURATION_PROTOCOL_H__
-#define __SPI_CONFIGURATION_PROTOCOL_H__
+#pragma once
 
 ///
 /// Global ID for the SPI Configuration Protocol
@@ -154,7 +153,7 @@ typedef struct _EFI_SPI_BUS {
 
   ///
   /// Address of the routine which controls the clock used by the SPI bus for
-  /// this SPI peripheral. The SPI host co ntroller's clock routine is called
+  /// this SPI peripheral. The SPI host controller's clock routine is called
   /// when this value is set to NULL.
   ///
   EFI_SPI_CLOCK                     Clock;
@@ -291,5 +290,3 @@ typedef struct _EFI_SPI_CONFIGURATION_PROTOCOL {
 } EFI_SPI_CONFIGURATION_PROTOCOL;
 
 extern EFI_GUID  gEfiSpiConfigurationProtocolGuid;
-
-#endif // __SPI_CONFIGURATION_PROTOCOL_H__

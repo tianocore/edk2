@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _SMM_READY_TO_BOOT_H_
-#define _SMM_READY_TO_BOOT_H_
+#pragma once
 
 #define EDKII_SMM_READY_TO_BOOT_PROTOCOL_GUID \
   { \
@@ -19,5 +18,3 @@
   }
 
 extern EFI_GUID  gEdkiiSmmReadyToBootProtocolGuid;
-
-#endif

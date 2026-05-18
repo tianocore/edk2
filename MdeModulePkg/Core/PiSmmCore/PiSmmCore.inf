@@ -86,7 +86,6 @@
   gEfiSmmIoTrapDispatch2ProtocolGuid            ## SOMETIMES_CONSUMES
   gEfiSmmUsbDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
   gEdkiiSmmMemoryAttributeProtocolGuid          ## CONSUMES
-  gEfiSmmSxDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES

@@ -5,8 +5,7 @@ Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _FILE_EXPLORER_H_
-#define _FILE_EXPLORER_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
@@ -228,5 +227,3 @@ VOID
 LibGetDevicePath (
   IN UINT16  KeyValue
   );
-
-#endif

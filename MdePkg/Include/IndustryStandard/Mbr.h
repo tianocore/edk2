@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MBR_H_
-#define _MBR_H_
+#pragma once
 
 #define MBR_SIGNATURE  0xaa55
 
@@ -50,5 +49,3 @@ typedef struct {
 } MASTER_BOOT_RECORD;
 
 #pragma pack()
-
-#endif

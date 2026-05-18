@@ -54,11 +54,13 @@ UpdateMmFoundationPeCoffPermissions (
   EFI_IMAGE_SECTION_HEADER  SectionHeader;
   RETURN_STATUS             Status;
   EFI_PHYSICAL_ADDRESS      Base;
+  UINT64                    SectionAlignment;
   UINTN                     Size;
   UINTN                     ReadSize;
   UINTN                     Index;
 
   ASSERT (ImageContext != NULL);
+  SectionAlignment = ImageContext->SectionAlignment;
 
   //
   // Iterate over the sections
@@ -126,10 +128,10 @@ UpdateMmFoundationPeCoffPermissions (
     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
       Base = ImageBase + SectionHeader.VirtualAddress;
 
-      TextUpdater (Base, SectionHeader.Misc.VirtualSize);
+      TextUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
 
       if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_WRITE) != 0) {
-        ReadWriteUpdater (Base, SectionHeader.Misc.VirtualSize);
+        ReadWriteUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
         DEBUG ((
           DEBUG_INFO,
           "%a: Mapping section %d of image at 0x%lx with RW-XN permissions\n",

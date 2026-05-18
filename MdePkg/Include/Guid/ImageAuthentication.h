@@ -8,8 +8,7 @@
   GUIDs defined in UEFI 2.5 spec.
 **/
 
-#ifndef __IMAGE_AUTHTICATION_H__
-#define __IMAGE_AUTHTICATION_H__
+#pragma once
 
 #include <Guid/GlobalVariable.h>
 #include <Protocol/Hash.h>
@@ -20,12 +19,12 @@
   }
 
 ///
-/// Varialbe name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
+/// Variable name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
 /// for the authorized signature database.
 ///
 #define EFI_IMAGE_SECURITY_DATABASE  L"db"
 ///
-/// Varialbe name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
+/// Variable name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
 /// for the forbidden signature database.
 ///
 #define EFI_IMAGE_SECURITY_DATABASE1  L"dbx"
@@ -381,5 +380,3 @@ extern EFI_GUID  gEfiCertX509Sha512Guid;
 extern EFI_GUID  gEfiCertPkcs7Guid;
 extern EFI_GUID  gEfiCertSm3Guid;
 extern EFI_GUID  gEfiCertX509Sm3Guid;
-
-#endif

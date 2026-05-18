@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ARM_CACHE_H_
-#define ARM_CACHE_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -107,5 +106,3 @@ typedef enum {
 } CLIDR_CACHE_TYPE;
 
 #define CLIDR_GET_CACHE_TYPE(x, level)  ((x >> (3 * (level))) & 0b111)
-
-#endif /* ARM_CACHE_H_ */

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PEI_REPORT_STATUS_CODE_ROUTER_H__
-#define __PEI_REPORT_STATUS_CODE_ROUTER_H__
+#pragma once
 
 #include <Ppi/ReportStatusCodeHandler.h>
 #include <Ppi/StatusCode.h>
@@ -96,5 +95,3 @@ ReportDispatcher (
   IN CONST EFI_GUID              *CallerId OPTIONAL,
   IN CONST EFI_STATUS_CODE_DATA  *Data OPTIONAL
   );
-
-#endif

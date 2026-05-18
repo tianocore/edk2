@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __EFI_EAP_MANAGEMENT_PROTOCOL_H__
-#define __EFI_EAP_MANAGEMENT_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Eap.h>
 
@@ -113,7 +112,7 @@ typedef struct _EFI_EAPOL_SUPPLICANT_PAE_CONFIGURATION {
 ///
 typedef struct _EFI_EAPOL_SUPPLICANT_PAE_STATISTICS {
   ///
-  /// The number of EAPOL frames of any type that have been received by this Supplican.
+  /// The number of EAPOL frames of any type that have been received by this Supplicant.
   ///
   UINTN    EapolFramesReceived;
   ///
@@ -392,5 +391,3 @@ struct _EFI_EAP_MANAGEMENT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEapManagementProtocolGuid;
-
-#endif

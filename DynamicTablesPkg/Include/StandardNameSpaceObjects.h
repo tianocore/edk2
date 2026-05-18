@@ -10,8 +10,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef STANDARD_NAMESPACE_OBJECTS_H_
-#define STANDARD_NAMESPACE_OBJECTS_H_
+#pragma once
 
 #include <AcpiTableGenerator.h>
 #include <SmbiosTableGenerator.h>
@@ -208,5 +207,3 @@ typedef struct CmStdObjSmbiosTableInfo {
 } CM_STD_OBJ_SMBIOS_TABLE_INFO;
 
 #pragma pack()
-
-#endif // STANDARD_NAMESPACE_OBJECTS_H_

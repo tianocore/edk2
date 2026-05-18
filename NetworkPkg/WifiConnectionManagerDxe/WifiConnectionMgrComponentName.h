@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_COMPONENT_NAME__
-#define __EFI_WIFI_COMPONENT_NAME__
+#pragma once
 
 /**
   Retrieves a Unicode string that is the user-readable name of the EFI Driver.
@@ -89,5 +88,3 @@ WifiMgrDxeComponentNameGetControllerName (
   IN  CHAR8                         *Language,
   OUT CHAR16                        **ControllerName
   );
-
-#endif

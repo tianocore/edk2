@@ -26,6 +26,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PlatformFvbLib.h>
+#include <Library/IoLib.h>
 #include "Fvb.h"
 
 #define EFI_AUTHENTICATED_VARIABLE_GUID \
@@ -572,10 +573,10 @@ ValidateFvHeader (
   // Length of FvBlock cannot be 2**64-1
   // HeaderLength cannot be an odd number
   //
-  if ((FwVolHeader->Revision != EFI_FVH_REVISION) ||
-      (FwVolHeader->Signature != EFI_FVH_SIGNATURE) ||
-      (FwVolHeader->FvLength != EMU_FVB_SIZE) ||
-      (FwVolHeader->HeaderLength != EMU_FV_HEADER_LENGTH)
+  if ((MmioRead8 ((UINTN)(&FwVolHeader->Revision)) != EFI_FVH_REVISION) ||
+      (MmioRead32 ((UINTN)(&FwVolHeader->Signature)) != EFI_FVH_SIGNATURE) ||
+      (MmioRead64 ((UINTN)(&FwVolHeader->FvLength)) != EMU_FVB_SIZE) ||
+      (MmioRead16 ((UINTN)(&FwVolHeader->HeaderLength)) != EMU_FV_HEADER_LENGTH)
       )
   {
     DEBUG ((DEBUG_INFO, "EMU Variable FVB: Basic FV headers were invalid\n"));

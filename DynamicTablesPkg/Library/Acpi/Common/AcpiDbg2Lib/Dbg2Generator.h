@@ -8,8 +8,7 @@
   - Microsoft Debug Port Table 2 (DBG2) Specification - December 10, 2015.
 **/
 
-#ifndef DBG2_GENERATOR_H_
-#define DBG2_GENERATOR_H_
+#pragma once
 
 /**
   Initialise the serial port to the specified settings.
@@ -52,5 +51,3 @@ Dbg2InitializePort (
   IN OUT UINT8                               *DataBits,
   IN OUT EFI_STOP_BITS_TYPE                  *StopBits
   );
-
-#endif // DBG2_GENERATOR_H_

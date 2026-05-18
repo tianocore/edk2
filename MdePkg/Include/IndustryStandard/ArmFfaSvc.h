@@ -11,13 +11,12 @@
     - FF-A - Firmware Framework for Arm A-profile
 
   @par Reference(s):
-    - FF-A Version 1.2 [https://developer.arm.com/documentation/den0077/latest/]
+    - FF-A Version 1.3 [https://developer.arm.com/documentation/den0077/o/?lang=en]
     - FF-A Memory Management Protocol Version 1.2 [https://developer.arm.com/documentation/den0140/latest]
 
 **/
 
-#ifndef ARM_FFA_SVC_H_
-#define ARM_FFA_SVC_H_
+#pragma once
 
 #define ARM_FID_FFA_ERROR            0x84000060
 #define ARM_FID_FFA_SUCCESS_AARCH32  0x84000061
@@ -50,6 +49,9 @@
 #define ARM_FID_FFA_MSG_SEND_DIRECT_RESP_AARCH64  0xC4000070
 #define ARM_FID_FFA_MSG_SEND_DIRECT_REQ2          0xC400008D
 #define ARM_FID_FFA_MSG_SEND_DIRECT_RESP2         0xC400008E
+
+/* ARM FF-A v1.3 IDs */
+#define ARM_FID_FFA_NS_RES_INFO_GET  0xC400008F
 
 #define ARM_FID_FFA_NOTIFICATION_BITMAP_CREATE     0x8400007D
 #define ARM_FID_FFA_NOTIFICATION_BITMAP_DESTROY    0x8400007E
@@ -110,6 +112,15 @@
 #define ARM_FFA_CREATE_VERSION(major, minor)  \
   (((major) << ARM_FFA_MAJOR_VERSION_SHIFT) | \
    ((minor) << ARM_FFA_MINOR_VERSION_SHIFT))
+
+#define ARM_FFA_ABI_COMPATIBLE(version, major, minor) \
+  ((BOOLEAN)(((ARM_FFA_MAJOR_VERSION_GET(version)) == major) && \
+             ((ARM_FFA_MINOR_VERSION_GET(version)) >= minor)))
+
+#define ARM_FFA_ABI_MINIMUM(version, major, minor) \
+  ((BOOLEAN)(((ARM_FFA_MAJOR_VERSION_GET(version)) < major) ? FALSE :  \
+              (((ARM_FFA_MAJOR_VERSION_GET(version)) > major) ? TRUE : \
+                ((ARM_FFA_MINOR_VERSION_GET(version)) >= minor))))
 
 #define ARM_FFA_FEATURES_ID_TYPE_SHIFT     31
 #define ARM_FFA_FEATURES_ID_TYPE_MASK      1
@@ -182,13 +193,13 @@
      ARM_FFA_SET_MEM_ATTR_DATA_PERM_SHIFT))
 
 /*
- * macro used in FFA_MSG_DIRECT_REQ/REQ2
- * See FF-A spec Chapther 15.2 FFA_MSG_SEND_DIRECT_REQ and
- * 15.4 FFA_MSG_SEND_DIRECT_REQ2
+ * macro used for partition information
+ * See FF-A spec Chapter 6.1 Partition identification
  */
-#define ARM_FFA_SOURCE_EP_SHIFT    16
-#define ARM_FFA_DEST_EP_SHIFT      0
-#define ARM_FFA_PARTITION_ID_MASK  0xffff
+#define ARM_FFA_SOURCE_EP_SHIFT          16
+#define ARM_FFA_DEST_EP_SHIFT            0
+#define ARM_FFA_PARTITION_ID_MASK        0xffff
+#define ARM_FFA_PARTITION_ID_TYPE_SHIFT  15
 
 #define GET_SOURCE_PARTITION_ID(PackedId) \
   ((PackedId >> ARM_FFA_SOURCE_EP_SHIFT) & ARM_FFA_PARTITION_ID_MASK)
@@ -199,6 +210,9 @@
 #define PACK_PARTITION_ID_INFO(SourceId, DestId)                          \
   (((SourceId & ARM_FFA_PARTITION_ID_MASK) << ARM_FFA_SOURCE_EP_SHIFT) |  \
    ((DestId & ARM_FFA_PARTITION_ID_MASK) << ARM_FFA_DEST_EP_SHIFT))
+
+#define ARM_FFA_IS_SECURE_PARTITION_ID(PartId) \
+  (((PartId) & (1 << ARM_FFA_PARTITION_ID_TYPE_SHIFT)) != 0)
 
 #define IS_FID_FFA_ERROR(fid) \
   (fid == ARM_FID_FFA_ERROR)
@@ -237,5 +251,3 @@
 
 /** Query notifications features. */
 #define ARM_FFA_FEATURE_NOTIFICATIONS  0x4U
-
-#endif // ARM_FFA_SVC_H_

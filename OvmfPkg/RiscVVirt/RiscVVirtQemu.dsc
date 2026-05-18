@@ -35,12 +35,13 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
-  DEFINE TTY_TERMINAL            = FALSE
-  DEFINE SECURE_BOOT_ENABLE      = FALSE
-  DEFINE QEMU_PV_VARS            = FALSE
-  DEFINE TPM2_ENABLE             = FALSE
-  DEFINE TPM2_CONFIG_ENABLE      = FALSE
-  DEFINE DEBUG_ON_SERIAL_PORT    = TRUE
+  DEFINE TTY_TERMINAL             = FALSE
+  DEFINE SECURE_BOOT_ENABLE       = FALSE
+  DEFINE SECURE_BOOT_DEFAULT_KEYS = FALSE
+  DEFINE QEMU_PV_VARS             = FALSE
+  DEFINE TPM2_ENABLE              = FALSE
+  DEFINE TPM2_CONFIG_ENABLE       = FALSE
+  DEFINE DEBUG_ON_SERIAL_PORT     = TRUE
 
   #
   # Shell can be useful for debugging but should not be enabled for production
@@ -322,7 +323,6 @@
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
 !if $(TPM2_ENABLE) == TRUE
-  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterPei.inf
@@ -338,6 +338,9 @@
     <LibraryClasses>
       TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
   }
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+!endif
 !endif
 !else
   UefiCpuPkg/SecCore/SecCoreNative.inf {

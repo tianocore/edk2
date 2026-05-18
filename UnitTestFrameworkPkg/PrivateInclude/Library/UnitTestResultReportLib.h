@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __UNIT_TEST_RESULT_REPORT_LIB_H__
-#define __UNIT_TEST_RESULT_REPORT_LIB_H__
+#pragma once
 
 #include <UnitTestFrameworkTypes.h>
 
@@ -23,5 +22,3 @@ EFIAPI
 OutputUnitTestFrameworkReport (
   IN UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle
   );
-
-#endif

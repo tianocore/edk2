@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USB_MOUSE_H_
-#define _EFI_USB_MOUSE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -460,5 +459,3 @@ ParseMouseReportDescriptor (
   IN  UINT8          *ReportDescriptor,
   IN  UINTN          ReportSize
   );
-
-#endif

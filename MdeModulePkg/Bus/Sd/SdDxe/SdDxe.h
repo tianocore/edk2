@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SD_DXE_H_
-#define _SD_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Sd.h>
@@ -470,5 +469,3 @@ SdGetCid (
   IN     UINT16     Rca,
   OUT SD_CID        *Cid
   );
-
-#endif

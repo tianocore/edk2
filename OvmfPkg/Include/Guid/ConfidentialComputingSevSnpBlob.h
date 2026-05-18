@@ -6,8 +6,7 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
  **/
 
-#ifndef CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB_H_
-#define CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -31,5 +30,3 @@ typedef PACKED struct {
 } CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION;
 
 extern EFI_GUID  gConfidentialComputingSevSnpBlobGuid;
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __USB_H__
-#define __USB_H__
+#pragma once
 
 //
 // Subset of Class and Subclass definitions from USB Specs
@@ -81,7 +80,7 @@
 #define USB_DEV_SYNCH_FRAME_REQ_TYPE  0x82
 
 //
-// USB standard descriptors and reqeust
+// USB standard descriptors and request
 //
 #pragma pack(1)
 
@@ -393,5 +392,3 @@ typedef struct hid_descriptor {
 } EFI_USB_HID_DESCRIPTOR;
 
 #pragma pack()
-
-#endif

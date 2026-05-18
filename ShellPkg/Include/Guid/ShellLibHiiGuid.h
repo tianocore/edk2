@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELLLIB_HII_GUID_H_
-#define _SHELLLIB_HII_GUID_H_
+#pragma once
 
 #define HANDLE_PARSING_HII_GUID \
   { \
@@ -81,5 +80,3 @@ extern EFI_GUID  gShellNetwork2HiiGuid;
 extern EFI_GUID  gShellTftpHiiGuid;
 extern EFI_GUID  gShellHttpHiiGuid;
 extern EFI_GUID  gShellBcfgHiiGuid;
-
-#endif

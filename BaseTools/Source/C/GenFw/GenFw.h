@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _GEN_FW_H_
-#define _GEN_FW_H_
+#pragma once
 
 //
 // Action for this tool.
@@ -43,8 +42,6 @@ IsElfHeader (
 
 BOOLEAN
 ConvertElf (
-  UINT8  **FileBuffer,
-  UINT32 *FileLength
+  UINT8   **FileBuffer,
+  UINT32  *FileLength
   );
-
-#endif

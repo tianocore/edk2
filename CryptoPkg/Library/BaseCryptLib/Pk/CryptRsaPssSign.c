@@ -3,8 +3,10 @@
 
   This file implements following APIs which provide basic capabilities for RSA:
   1) RsaPssSign
+  2) RsaPssSignDigest
 
 Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -173,6 +175,131 @@ _Exit:
 
   if (EvpVerifyCtx != NULL) {
     EVP_MD_CTX_destroy (EvpVerifyCtx);
+  }
+
+  return Result;
+}
+
+/**
+  Carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme
+  over a precomputed message digest.
+
+  This function carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme defined in
+  RFC 8017.
+  Mask generation function is the same as the message digest algorithm.
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If RsaContext is NULL, then return FALSE.
+  If Digest is NULL, then return FALSE.
+  If DigestSize is not one of SHA-256, SHA-384 or SHA-512 digest sizes, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      Digest       Pointer to the precomputed message digest.
+  @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPssSignDigest (
+  IN      VOID         *RsaContext,
+  IN      CONST UINT8  *Digest,
+  IN      UINTN        DigestSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  BOOLEAN       Result;
+  UINTN         RsaSigSize;
+  EVP_PKEY      *EvpRsaKey;
+  EVP_PKEY_CTX  *EvpSignCtx;
+  CONST EVP_MD  *HashAlg;
+
+  Result     = FALSE;
+  EvpRsaKey  = NULL;
+  EvpSignCtx = NULL;
+  HashAlg    = NULL;
+
+  if (RsaContext == NULL) {
+    return FALSE;
+  }
+
+  if ((Digest == NULL) || (DigestSize == 0) || (DigestSize > INT_MAX) || (DigestSize > MAX_UINT16)) {
+    return FALSE;
+  }
+
+  RsaSigSize = RSA_size (RsaContext);
+  if (*SigSize < RsaSigSize) {
+    *SigSize = RsaSigSize;
+    return FALSE;
+  }
+
+  if (Signature == NULL) {
+    return FALSE;
+  }
+
+  HashAlg = GetEvpMD ((UINT16)DigestSize);
+  if (HashAlg == NULL) {
+    return FALSE;
+  }
+
+  EvpRsaKey = EVP_PKEY_new ();
+  if (EvpRsaKey == NULL) {
+    goto _Exit;
+  }
+
+  EVP_PKEY_set1_RSA (EvpRsaKey, RsaContext);
+
+  EvpSignCtx = EVP_PKEY_CTX_new (EvpRsaKey, NULL);
+  if (EvpSignCtx == NULL) {
+    goto _Exit;
+  }
+
+  Result = EVP_PKEY_sign_init (EvpSignCtx) > 0;
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_rsa_padding (EvpSignCtx, RSA_PKCS1_PSS_PADDING) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_signature_md (EvpSignCtx, HashAlg) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_rsa_mgf1_md (EvpSignCtx, HashAlg) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_rsa_pss_saltlen (EvpSignCtx, (INT32)DigestSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_sign (
+               EvpSignCtx,
+               Signature,
+               SigSize,
+               Digest,
+               (UINT32)DigestSize
+               ) > 0;
+  }
+
+_Exit:
+  if (EvpSignCtx != NULL) {
+    EVP_PKEY_CTX_free (EvpSignCtx);
+  }
+
+  if (EvpRsaKey != NULL) {
+    EVP_PKEY_free (EvpRsaKey);
   }
 
   return Result;

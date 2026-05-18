@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __PVSCSI_H_
-#define __PVSCSI_H_
+#pragma once
 
 //
 // Device offsets and constants
@@ -182,5 +181,3 @@ typedef struct {
   UINT32    Pad[2];
 } PVSCSI_RING_CMP_DESC;
 #pragma pack ()
-
-#endif // __PVSCSI_H_

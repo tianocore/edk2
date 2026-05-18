@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef BASE_ARCH_LIB_SUPPORT_H
-#define BASE_ARCH_LIB_SUPPORT_H
+#pragma once
 
 #include <Base.h>
 
@@ -26,5 +25,3 @@ UINT8
 ArchGetPhysicalAddressBits (
   VOID
   );
-
-#endif

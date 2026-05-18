@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef CC_EVENT_HOB_H_
-#define CC_EVENT_HOB_H_
+#pragma once
 
 //
 // The Global ID of a GUIDed HOB used to pass a CC_EVENT from SEC to a CC DXE Driver.
@@ -18,5 +17,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   { 0x20f8fd36, 0x6d00, 0x40fb, { 0xb7, 0x04, 0xd1, 0x2c, 0x15, 0x3c, 0x62, 0xeb } }
 
 extern EFI_GUID  gCcEventEntryHobGuid;
-
-#endif

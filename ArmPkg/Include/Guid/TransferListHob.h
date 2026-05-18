@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef ARM_TRANSFER_LIST_HOB_H__
-#define ARM_TRANSFER_LIST_HOB_H__
+#pragma once
 
 #define ARM_TRANSFER_LIST_HOB_GUID  {\
           0xebe7bae8, 0xfe18, 0x43c5, \
@@ -19,5 +18,3 @@
         }
 
 extern EFI_GUID  gArmTransferListHobGuid;
-
-#endif

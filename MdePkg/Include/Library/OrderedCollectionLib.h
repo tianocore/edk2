@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __ORDERED_COLLECTION_LIB__
-#define __ORDERED_COLLECTION_LIB__
+#pragma once
 
 #include <Base.h>
 
@@ -404,5 +403,3 @@ OrderedCollectionDelete (
   IN     ORDERED_COLLECTION_ENTRY  *Entry,
   OUT    VOID                      **UserStruct OPTIONAL
   );
-
-#endif

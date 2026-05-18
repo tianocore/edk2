@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_SAFE_INT_LIB_H_
-#define MOCK_SAFE_INT_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -997,5 +996,3 @@ struct MockSafeIntLib {
     )
     );
 };
-
-#endif

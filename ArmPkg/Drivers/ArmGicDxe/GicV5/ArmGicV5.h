@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef ARMGICV5_H_
-#define ARMGICV5_H_
+#pragma once
 
 #define GICV5_IRS_CONFIG_FRAME_SIZE  SIZE_64KB
 
@@ -182,5 +181,3 @@ EFIAPI
 ArmGicV5AcknowledgeInterrupt (
   VOID
   );
-
-#endif // ARMGICV5_H_

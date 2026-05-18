@@ -9,9 +9,6 @@
 
 **/
 
-#ifndef _ACPI_H_
-#define _ACPI_H_
+#pragma once
 
 #include <IndustryStandard/Acpi66.h>
-
-#endif

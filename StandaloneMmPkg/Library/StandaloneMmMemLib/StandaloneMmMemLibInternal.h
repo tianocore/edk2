@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef STANDALONE_MM_MEM_LIB_INTERNAL_H_
-#define STANDALONE_MM_MEM_LIB_INTERNAL_H_
+#pragma once
 
 #include <PiMm.h>
 
@@ -56,5 +55,3 @@ MmMemLibIsValidNonMmramRange (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );
-
-#endif

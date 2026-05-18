@@ -11,8 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
-#define IDT_ENTRY_COUNT  32
-
 typedef struct _X64_IDT_TABLE {
   //
   // Reserved 4 bytes preceding PeiService and IdtTable,
@@ -20,7 +18,7 @@ typedef struct _X64_IDT_TABLE {
   //
   UINT32                     Reserved;
   CONST EFI_PEI_SERVICES     **PeiService;
-  X64_IDT_GATE_DESCRIPTOR    IdtTable[IDT_ENTRY_COUNT];
+  X64_IDT_GATE_DESCRIPTOR    IdtTable[X86_CPU_INTERRUPT_NUM];
 } X64_IDT_TABLE;
 
 //
@@ -66,7 +64,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR  gGdt = {
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR  gLidtDescriptor = {
-  sizeof (X64_IDT_GATE_DESCRIPTOR) * IDT_ENTRY_COUNT - 1,
+  sizeof (X64_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM - 1,
   0
 };
 
@@ -319,7 +317,7 @@ HandOffToDxeCore (
 
     Status = PeiServicesAllocatePages (
                EfiBootServicesData,
-               EFI_SIZE_TO_PAGES (sizeof (X64_IDT_TABLE) + SizeOfTemplate * IDT_ENTRY_COUNT),
+               EFI_SIZE_TO_PAGES (sizeof (X64_IDT_TABLE) + SizeOfTemplate * X86_CPU_INTERRUPT_NUM),
                &VectorAddress
                );
     ASSERT_EFI_ERROR (Status);
@@ -333,7 +331,7 @@ HandOffToDxeCore (
 
     VectorAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)(IdtTableForX64 + 1);
     IdtTable      = IdtTableForX64->IdtTable;
-    for (Index = 0; Index < IDT_ENTRY_COUNT; Index++) {
+    for (Index = 0; Index < X86_CPU_INTERRUPT_NUM; Index++) {
       IdtTable[Index].Ia32IdtEntry.Bits.GateType   =  0x8e;
       IdtTable[Index].Ia32IdtEntry.Bits.Reserved_0 =  0;
       IdtTable[Index].Ia32IdtEntry.Bits.Selector   =  SYS_CODE64_SEL;

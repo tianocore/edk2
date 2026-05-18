@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_APPLICATION_ENTRY_POINT_H__
-#define __UEFI_APPLICATION_ENTRY_POINT_H__
+#pragma once
 
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented
@@ -20,7 +19,7 @@ extern CONST UINT32  _gUefiDriverRevision;
   This function is the entry point for a UEFI Application. This function must call
   ProcessLibraryConstructorList(), ProcessModuleEntryPointList(), and ProcessLibraryDestructorList().
   The return value from ProcessModuleEntryPointList() is returned.
-  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevison,
+  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevision,
   then return EFI_INCOMPATIBLE_VERSION.
 
   @param  ImageHandle  The image handle of the UEFI Application.
@@ -139,5 +138,3 @@ ProcessModuleEntryPointList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

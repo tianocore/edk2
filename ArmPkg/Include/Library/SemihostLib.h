@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SEMIHOSTING_LIB_H_
-#define SEMIHOSTING_LIB_H_
+#pragma once
 
 /*
  *
@@ -128,5 +127,3 @@ UINT32
 SemihostSystem (
   IN CHAR8  *CommandLine
   );
-
-#endif // SEMIHOSTING_LIB_H_

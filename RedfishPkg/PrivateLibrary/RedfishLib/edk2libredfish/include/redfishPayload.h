@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef LIBREDFISH_REDFISH_PAYLOAD_H_
-#define LIBREDFISH_REDFISH_PAYLOAD_H_
+#pragma once
 
 #include <Include/Library/RedfishCrtLib.h>
 #include <Library/JsonLib.h>
@@ -103,5 +102,3 @@ getPayloadByIndex (
   size_t                index,
   EFI_HTTP_STATUS_CODE  **StatusCode
   );
-
-#endif

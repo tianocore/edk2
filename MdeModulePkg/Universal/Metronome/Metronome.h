@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _METRONOME_H_
-#define _METRONOME_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/Metronome.h>
@@ -47,5 +46,3 @@ WaitForTick (
   IN EFI_METRONOME_ARCH_PROTOCOL  *This,
   IN UINT32                       TickNumber
   );
-
-#endif

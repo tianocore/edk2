@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __DRIVER_SUPPORTED_EFI_VERSION_H__
-#define __DRIVER_SUPPORTED_EFI_VERSION_H__
+#pragma once
 
 #define EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL_GUID  \
   { 0x5c198761, 0x16a8, 0x4e69, { 0x97, 0x2c, 0x89, 0xd6, 0x79, 0x54, 0xf8, 0x1d } }
@@ -35,5 +34,3 @@ typedef struct _EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL {
 } EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL;
 
 extern EFI_GUID  gEfiDriverSupportedEfiVersionProtocolGuid;
-
-#endif

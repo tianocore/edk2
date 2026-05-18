@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FV_LIB_H_
-#define _FV_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Pi/PiFirmwareVolume.h>
@@ -100,5 +99,3 @@ FfsFindSectionData (
   OUT VOID                **SectionData,
   OUT UINTN               *SectionDataSize
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __VLAN_CONFIG_NV_DATA_H__
-#define __VLAN_CONFIG_NV_DATA_H__
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/VlanConfigHii.h>
@@ -36,5 +35,3 @@ typedef struct {
   UINT8     Priority;
   UINT8     VlanList[MAX_VLAN_NUMBER];
 } VLAN_CONFIGURATION;
-
-#endif

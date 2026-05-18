@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef RANDOM_TEST_H_
-#define RANDOM_TEST_H_
+#pragma once
 
 #include "CpuPageTableLibUnitTest.h"
 
@@ -53,5 +52,3 @@ GetEntryFromPageTable (
   IN     UINT64       Address,
   OUT    UINTN        *Level
   );
-
-#endif

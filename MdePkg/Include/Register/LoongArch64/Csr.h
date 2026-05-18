@@ -9,8 +9,7 @@
     - CSR     - CPU Status Register
 **/
 
-#ifndef LOONGARCH_CSR_H_
-#define LOONGARCH_CSR_H_
+#pragma once
 
 #include <Base.h>
 
@@ -259,5 +258,3 @@
 #define CSR_TLBIDX_SIZE       CSR_TLBIDX_PS_SHIFT
 #define CSR_TLBREHI_PS_SHIFT  0x0
 #define CSR_TLBREHI_PS        0x3f
-
-#endif

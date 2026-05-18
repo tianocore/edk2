@@ -69,7 +69,7 @@ MmVirtualAddressChangeEvent (
                                       This parameter is optional and may be NULL.
 
   @retval EFI_SUCCESS                 The message was successfully posted.
-  @retval EFI_INVALID_PARAMETER       The CommBuffer was NULL.
+  @retval EFI_INVALID_PARAMETER       The CommBuffer was NULL or CommSize was invalid.
   @retval EFI_BAD_BUFFER_SIZE         The buffer is too large for the MM implementation.
                                       If this error is returned, the MessageLength field
                                       in the CommBuffer header or the integer pointed by
@@ -111,8 +111,14 @@ ProcessCommunicationBuffer (
     BufferSize = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
   }
 
+  if (BufferSize > EFI_PAGES_TO_SIZE (mMmCommonBuffer.NumberOfPages)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if (CommSize != NULL) {
-    ASSERT (*CommSize == BufferSize);
+    if (*CommSize != BufferSize) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   CommonBufferStatus = (MM_COMM_BUFFER_STATUS *)(UINTN)mMmCommonBuffer.Status;

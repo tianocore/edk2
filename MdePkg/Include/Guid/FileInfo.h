@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FILE_INFO_H__
-#define __FILE_INFO_H__
+#pragma once
 
 #define EFI_FILE_INFO_ID \
   { \
@@ -57,10 +56,8 @@ typedef struct {
 /// Whenever code needs to know the size of the EFI_FILE_INFO data structure, it needs to
 /// be the size of the data structure without the FileName field.  The following macro
 /// computes this size correctly no matter how big the FileName array is declared.
-/// This is required to make the EFI_FILE_INFO data structure ANSI compilant.
+/// This is required to make the EFI_FILE_INFO data structure ANSI compliant.
 ///
 #define SIZE_OF_EFI_FILE_INFO  OFFSET_OF (EFI_FILE_INFO, FileName)
 
 extern EFI_GUID  gEfiFileInfoGuid;
-
-#endif

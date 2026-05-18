@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EMU_MAGIC_PAGE_LIB_H__
-#define __EMU_MAGIC_PAGE_LIB_H__
+#pragma once
 
 #include <PiPei.h>
 #include <Library/PcdLib.h>
@@ -28,5 +27,3 @@ typedef struct {
 } EMU_MAGIC_PAGE_LAYOUT;
 
 #define EMU_MAGIC_PAGE()  ((EMU_MAGIC_PAGE_LAYOUT *)((UINTN)PcdGet64 (PcdPeiServicesTablePage)))
-
-#endif

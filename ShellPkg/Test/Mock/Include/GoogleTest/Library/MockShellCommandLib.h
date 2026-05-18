@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_SHELL_COMMAND_LIB_H_
-#define MOCK_SHELL_COMMAND_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -265,5 +264,3 @@ struct MockShellCommandLib {
      IN     SHELL_SORT_FILE_LIST  Order)
     );
 };
-
-#endif

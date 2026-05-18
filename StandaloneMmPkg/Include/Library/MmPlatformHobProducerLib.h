@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef MM_PLATFORM_HOB_PRODUCER_LIB_H_
-#define MM_PLATFORM_HOB_PRODUCER_LIB_H_
+#pragma once
 
 /**
   Create the platform specific HOBs needed by the Standalone MM environment.
@@ -51,5 +50,3 @@ CreateMmPlatformHob (
   IN      VOID   *Buffer,
   IN  OUT UINTN  *BufferSize
   );
-
-#endif

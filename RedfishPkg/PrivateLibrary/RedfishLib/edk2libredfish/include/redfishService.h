@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef LIBREDFISH_REDFISH_SERVICE_H_
-#define LIBREDFISH_REDFISH_SERVICE_H_
+#pragma once
 
 #include <IndustryStandard/Http11.h>
 
@@ -199,5 +198,3 @@ void
 cleanupServiceEnumerator (
   redfishService  *service
   );
-
-#endif

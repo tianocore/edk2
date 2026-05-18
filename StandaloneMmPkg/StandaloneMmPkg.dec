@@ -20,9 +20,6 @@
 
 [LibraryClasses]
 
-  ##  @libraryclass  Defines a set of helper methods.
-  FvLib|Include/Library/FvLib.h
-
   ##  @libraryclass  Defines a set of interfaces that provides services for
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h

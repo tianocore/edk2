@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __FW_CFG_H__
-#define __FW_CFG_H__
+#pragma once
 
 #include <Base.h>
 
@@ -92,5 +91,3 @@ typedef struct {
   UINT64    Address;
 } FW_CFG_DMA_ACCESS;
 #pragma pack ()
-
-#endif

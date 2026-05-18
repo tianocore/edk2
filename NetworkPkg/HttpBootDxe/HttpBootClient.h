@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_HTTP_H__
-#define __EFI_HTTP_BOOT_HTTP_H__
+#pragma once
 
 #define HTTP_BOOT_BLOCK_SIZE                   32000
 #define HTTP_USER_AGENT_EFI_HTTP_BOOT          "UefiHttpBoot/1.0"
@@ -146,5 +145,3 @@ VOID
 HttpBootFreeCacheList (
   IN     HTTP_BOOT_PRIVATE_DATA  *Private
   );
-
-#endif

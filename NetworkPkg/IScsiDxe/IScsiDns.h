@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_DNS_H_
-#define _ISCSI_DNS_H_
+#pragma once
 
 /**
   Retrieve the host address using the EFI_DNS4_PROTOCOL.
@@ -49,5 +48,3 @@ IScsiDns6 (
   IN     EFI_HANDLE                   Controller,
   IN OUT ISCSI_SESSION_CONFIG_NVDATA  *NvData
   );
-
-#endif

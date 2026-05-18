@@ -143,7 +143,7 @@ SbiSetTimer (
 }
 
 /**
-  Reset the system using SRST SBI extenion
+  Reset the system using SRST SBI extension
 
   @param[in]  ResetType            The SRST System Reset Type.
   @param[in]  ResetReason          The SRST System Reset Reason.

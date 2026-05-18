@@ -1,0 +1,46 @@
+## @file
+#  Instance of PLDM Protocol Library in DXE phase.
+#
+#  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PldmProtocolLib
+  MODULE_UNI_FILE                = PldmProtocolLib.uni
+  FILE_GUID                      = 5B1173E8-6A5A-468B-BDA4-02303530C55C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PldmProtocolLib|DXE_RUNTIME_DRIVER DXE_DRIVER DXE_CORE UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = PldmProtocolLibConstructor
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources]
+  PldmProtocolLib.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  ManageabilityTransportHelperLib
+  UefiBootServicesTableLib
+
+[Guids]
+  gManageabilityProtocolPldmGuid
+
+[Protocols]
+  gEdkiiPldmProtocolGuid          ## ALWAYS_CONSUMES
+
+[FixedPcd]
+  gManageabilityPkgTokenSpaceGuid.PcdPldmSourceTerminusId
+  gManageabilityPkgTokenSpaceGuid.PcdPldmDestinationEndpointId
+

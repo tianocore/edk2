@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _PAGE_TABLE_LIB_H_
-#define _PAGE_TABLE_LIB_H_
+#pragma once
 
 #include <IndustryStandard/PeImage.h>
 #include <Protocol/MemoryAttribute.h>
@@ -164,5 +163,3 @@ VOID
 InstallEfiMemoryAttributeProtocol (
   IN EFI_HANDLE  Handle
   );
-
-#endif

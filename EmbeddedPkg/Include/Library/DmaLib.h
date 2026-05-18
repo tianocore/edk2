@@ -31,8 +31,7 @@
 
 **/
 
-#ifndef __DMA_LIB_H__
-#define __DMA_LIB_H__
+#pragma once
 
 typedef enum {
   ///
@@ -167,5 +166,3 @@ DmaAllocateAlignedBuffer (
   IN  UINTN            Alignment,
   OUT VOID             **HostAddress
   );
-
-#endif

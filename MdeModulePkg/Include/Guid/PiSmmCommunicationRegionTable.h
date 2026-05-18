@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PI_SMM_COMMUNICATION_REGION_TABLE_H_
-#define _PI_SMM_COMMUNICATION_REGION_TABLE_H_
+#pragma once
 
 #define EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_GUID  {\
   0x4e28ca50, 0xd582, 0x44ac, {0xa1, 0x1f, 0xe3, 0xd5, 0x65, 0x26, 0xdb, 0x34} \
@@ -53,5 +52,3 @@ typedef struct {
 #define EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_VERSION  0x00000001
 
 extern EFI_GUID  gEdkiiPiSmmCommunicationRegionTableGuid;
-
-#endif

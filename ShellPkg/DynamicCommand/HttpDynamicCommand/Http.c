@@ -187,7 +187,7 @@ EFI_HII_HANDLE  mHttpHiiHandle;
   @param[out] Value     UINT16 value.
 
   @retval     TRUE      The value was returned.
-  @retval     FALSE     A parsing error occured.
+  @retval     FALSE     A parsing error occurred.
 **/
 STATIC
 BOOLEAN
@@ -785,7 +785,7 @@ Error:
   @param[out] Value     UINT16 value
 
   @retval     TRUE      The value was returned.
-  @retval     FALSE     A parsing error occured.
+  @retval     FALSE     A parsing error occurred.
 **/
 STATIC
 BOOLEAN

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef INTERNAL_TRACE_HUB_API_H_
-#define INTERNAL_TRACE_HUB_API_H_
+#pragma once
 
 /**
   Count the total number of Trace Hub debug instance in the system.
@@ -33,5 +32,3 @@ PackThDebugInstance (
   IN OUT TRACEHUB_DEBUG_INFO_HOB  *ThPtr,
   IN     UINT32                   Count
   );
-
-#endif // INTERNAL_TRACE_HUB_API_H_

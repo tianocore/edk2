@@ -4,8 +4,7 @@
 
 **/
 
-#ifndef _VIRT_MM_COMM_DXE_H_
-#define _VIRT_MM_COMM_DXE_H_
+#pragma once
 
 /* communication buffer */
 
@@ -49,5 +48,3 @@ VirtMmHwPioTransfer (
   UINT32   BufferSize,
   BOOLEAN  ToDevice
   );
-
-#endif /* _VIRT_MM_COMM_DXE_H_ */

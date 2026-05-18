@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef MM_COMMUNICATION_DXE_H_
-#define MM_COMMUNICATION_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -138,5 +137,3 @@ MmVirtualAddressChangeEvent (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
-#define SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
+#pragma once
 
 /**
   Registers a callback to perform library actions needed at exit boot services.
@@ -52,5 +51,3 @@ SmmPerformanceLibExitBootServicesCallback (
   IN VOID            *Interface,
   IN EFI_HANDLE      Handle
   );
-
-#endif // SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_

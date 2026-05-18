@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef EFI_REST_JSON_STRUCTURE_PROTOCOL_H_
-#define EFI_REST_JSON_STRUCTURE_PROTOCOL_H_
+#pragma once
 
 ///
 /// GUID definitions
@@ -158,5 +157,3 @@ struct _EFI_REST_JSON_STRUCTURE_PROTOCOL {
   EFI_REST_JSON_STRUCTURE_TO_JSON              ToJson;           ///< The function to convert C structure to JSON
   EFI_REST_JSON_STRUCTURE_DESTORY_STRUCTURE    DestoryStructure; ///< Destory C structure.
 };
-
-#endif

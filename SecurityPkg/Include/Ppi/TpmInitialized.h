@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_TPM_INITIALIZED_PPI_H_
-#define _PEI_TPM_INITIALIZED_PPI_H_
+#pragma once
 
 ///
 /// Global ID for the PEI_TPM_INITIALIZED_PPI which always uses a NULL interface.
@@ -30,5 +29,3 @@ extern EFI_GUID  gPeiTpmInitializedPpiGuid;
   }
 
 extern EFI_GUID  gPeiTpmInitializationDonePpiGuid;
-
-#endif

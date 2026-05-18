@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef SVSM_MSR_H_
-#define SVSM_MSR_H_
+#pragma once
 
 /**
   Secure VM Service Module CAA register
@@ -31,5 +30,3 @@ typedef union {
 
   UINT64    Uint64;
 } MSR_SVSM_CAA_REGISTER;
-
-#endif

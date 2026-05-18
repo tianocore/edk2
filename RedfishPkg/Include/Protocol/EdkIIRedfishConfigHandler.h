@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_CONFIG_HANDLER_H_
-#define EDKII_REDFISH_CONFIG_HANDLER_H_
+#pragma once
 
 typedef struct _EDKII_REDFISH_CONFIG_HANDLER_PROTOCOL EDKII_REDFISH_CONFIG_HANDLER_PROTOCOL;
 
@@ -73,5 +72,3 @@ struct _EDKII_REDFISH_CONFIG_HANDLER_PROTOCOL {
 };
 
 extern EFI_GUID  gdkIIRedfishConfigHandlerProtocolGuid;
-
-#endif

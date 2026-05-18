@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _CPU_MP2_PEI_H_
-#define _CPU_MP2_PEI_H_
+#pragma once
 
 #include "CpuMpPei.h"
 #include <Ppi/MpServices2.h>
@@ -372,5 +371,3 @@ PeiStartupAllCPUs2 (
   IN  UINTN                     TimeoutInMicroSeconds,
   IN  VOID                      *ProcedureArgument      OPTIONAL
   );
-
-#endif

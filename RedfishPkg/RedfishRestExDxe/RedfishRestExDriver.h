@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef EFI_REDFISH_RESTEX_DRIVER_H_
-#define EFI_REDFISH_RESTEX_DRIVER_H_
+#pragma once
 
 ///
 /// Libraries classes
@@ -660,5 +659,3 @@ RedfishRestExServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

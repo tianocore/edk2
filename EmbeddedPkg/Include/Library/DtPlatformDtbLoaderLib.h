@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef __DT_PLATFORM_DTB_LOADER_LIB_H__
-#define __DT_PLATFORM_DTB_LOADER_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -29,5 +28,3 @@ DtPlatformLoadDtb (
   OUT   VOID   **Dtb,
   OUT   UINTN  *DtbSize
   );
-
-#endif

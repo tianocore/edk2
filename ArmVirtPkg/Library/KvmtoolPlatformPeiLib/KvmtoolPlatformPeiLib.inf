@@ -26,6 +26,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmCcaInitPeiLib
   DebugLib
   HobLib
   FdtLib

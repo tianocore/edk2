@@ -48,7 +48,8 @@ GetRootTranslationTableInfo (
   OUT UINTN  *RootTableEntryCount
   )
 {
-  *RootTableLevel      = (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  *RootTableLevel = (T0SZ < MIN_T0SZ) ? -1 : (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  ASSERT (*RootTableLevel >= 0 || ArmLpa2Enabled ());
   *RootTableEntryCount = TT_ENTRY_COUNT >> (INTN)(T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
 }
 
@@ -241,7 +242,7 @@ GetNextEntryAttribute (
 
       // Increase the level number and scan the sub-level table
       GetNextEntryAttribute (
-        (UINT64 *)GetOutputAddress (Entry, ArmGetTCR () & TCR_DS),
+        (UINT64 *)GetOutputAddress (Entry, ArmLpa2Enabled ()),
         TT_ENTRY_COUNT,
         TableLevel + 1,
         (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL (TableLevel))),
@@ -329,7 +330,7 @@ SyncCacheConfig (
   GetRootTranslationTableInfo (T0SZ, &TableLevel, &TableCount);
 
   // First Attribute of the Page Tables
-  PageAttribute = GetFirstPageAttribute (FirstLevelTableAddress, TableLevel, ArmGetTCR () & TCR_DS);
+  PageAttribute = GetFirstPageAttribute (FirstLevelTableAddress, TableLevel, ArmLpa2Enabled ());
 
   // We scan from the start of the memory map (ie: at the address 0x0)
   BaseAddressGcdRegion = 0x0;
@@ -458,7 +459,7 @@ GetMemoryRegionRec (
   EntryType  = *BlockEntry & TT_TYPE_MASK;
 
   if ((TableLevel < 3) && (EntryType == TT_TYPE_TABLE_ENTRY)) {
-    NextTranslationTable = (UINT64 *)GetOutputAddress (*BlockEntry, ArmGetTCR () & TCR_DS);
+    NextTranslationTable = (UINT64 *)GetOutputAddress (*BlockEntry, ArmLpa2Enabled ());
 
     // The entry is a page table, so we go to the next level
     Status = GetMemoryRegionRec (

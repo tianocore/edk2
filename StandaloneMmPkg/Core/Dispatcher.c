@@ -377,9 +377,6 @@ MmGetDepexSectionAndPreProccess (
       //
       DriverEntry->DepexProtocolError = TRUE;
     } else {
-      //
-      // If no Depex assume depend on all architectural protocols
-      //
       DriverEntry->Depex              = NULL;
       DriverEntry->Dependent          = TRUE;
       DriverEntry->DepexProtocolError = FALSE;

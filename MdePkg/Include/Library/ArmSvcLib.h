@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef ARM_SVC_LIB_H_
-#define ARM_SVC_LIB_H_
+#pragma once
 
 /**
  * The size of the SVC arguments are different between AArch64 and AArch32.
@@ -52,5 +51,3 @@ VOID
 ArmCallSvc (
   IN OUT ARM_SVC_ARGS  *Args
   );
-
-#endif // ARM_SVC_LIB_H_

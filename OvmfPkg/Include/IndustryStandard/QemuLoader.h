@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef QEMU_LOADER_H_
-#define QEMU_LOADER_H_
+#pragma once
 
 #include <Base.h>
 #include <IndustryStandard/QemuFwCfg.h>
@@ -102,5 +101,3 @@ typedef struct {
   } Command;
 } QEMU_LOADER_ENTRY;
 #pragma pack ()
-
-#endif

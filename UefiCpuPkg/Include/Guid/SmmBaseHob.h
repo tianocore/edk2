@@ -39,8 +39,7 @@
 
 **/
 
-#ifndef SMM_BASE_HOB_H_
-#define SMM_BASE_HOB_H_
+#pragma once
 
 #define SMM_BASE_HOB_DATA_GUID \
   { \
@@ -71,5 +70,3 @@ typedef struct {
 #pragma pack()
 
 extern EFI_GUID  gSmmBaseHobGuid;
-
-#endif

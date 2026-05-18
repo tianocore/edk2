@@ -20,7 +20,6 @@
   Ip6OptionGoogleTest.h
   Ip6DxeGoogleTest.cpp
   Ip6OptionGoogleTest.cpp
-  Ip6OptionGoogleTest.h
 
 [Packages]
   MdePkg/MdePkg.dec

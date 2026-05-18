@@ -4,8 +4,7 @@
 
 **/
 
-#ifndef _UFS_PCI_HOST_CONTROLLER_PEI_H_
-#define _UFS_PCI_HOST_CONTROLLER_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -52,5 +51,3 @@ GetUfsHcMmioBar (
   IN     UINT8                          ControllerId,
   OUT UINTN                             *MmioBar
   );
-
-#endif

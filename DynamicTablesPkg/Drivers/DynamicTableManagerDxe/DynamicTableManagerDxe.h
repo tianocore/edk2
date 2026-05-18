@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef DYNAMIC_TABLE_MANAGER_DXE_H_
-#define DYNAMIC_TABLE_MANAGER_DXE_H_
+#pragma once
 
 #include <AcpiTableGenerator.h>
 
@@ -93,5 +92,3 @@ SmbiosProtocolReady (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
-
-#endif // DYNAMIC_TABLE_MANAGER_DXE_H_

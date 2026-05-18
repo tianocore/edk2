@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DXE_MAIN_H_
-#define _DXE_MAIN_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -2803,5 +2802,3 @@ EFI_STATUS
 CoreInitializeHandleServices (
   VOID
   );
-
-#endif

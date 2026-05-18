@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _MP_LIB_H_
-#define _MP_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -838,7 +837,7 @@ GetProcessorNumber (
   );
 
 /**
-  This funtion will try to invoke platform specific microcode shadow logic to
+  This function will try to invoke platform specific microcode shadow logic to
   relocate microcode update patches into memory.
 
   @param[in, out] CpuMpData  The pointer to CPU MP Data structure.
@@ -1011,5 +1010,3 @@ ApplyRoProtection (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 Length
   );
-
-#endif

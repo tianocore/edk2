@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HTTP_BOOT_CONFIG_H_
-#define _HTTP_BOOT_CONFIG_H_
+#pragma once
 
 #include "HttpBootConfigNVDataStruc.h"
 
@@ -68,5 +67,3 @@ EFI_STATUS
 HttpBootConfigFormUnload (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   );
-
-#endif

@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MODULE_ENTRY_POINT_H__
-#define __MODULE_ENTRY_POINT_H__
+#pragma once
 
 ///
 /// Declare the PI Specification Revision that this driver requires to execute
@@ -143,5 +142,3 @@ EFIAPI
 ProcessModuleUnloadList (
   IN EFI_HANDLE  ImageHandle
   );
-
-#endif

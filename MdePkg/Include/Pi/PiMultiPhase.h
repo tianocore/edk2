@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PI_MULTIPHASE_H__
-#define __PI_MULTIPHASE_H__
+#pragma once
 
 #include <Pi/PiFirmwareVolume.h>
 #include <Pi/PiFirmwareFile.h>
@@ -255,7 +254,7 @@ VOID
 
   @param[in] ProcedureArgument    The pointer to private data buffer.
 
-  @retval EFI_SUCCESS             Excutive the procedure successfully
+  @retval EFI_SUCCESS             Excecuted the procedure successfully
 
 **/
 typedef
@@ -265,5 +264,3 @@ EFI_STATUS
   );
 
 extern EFI_GUID  gEfiMmCommunicateHeaderV3Guid;
-
-#endif

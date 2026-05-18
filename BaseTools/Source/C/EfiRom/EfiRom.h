@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_ROM_H__
-#define __EFI_ROM_H__
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -112,6 +111,8 @@ static STRING_LOOKUP  mMachineTypes[] = {
   { IMAGE_FILE_MACHINE_X64, "X64" },
   { IMAGE_FILE_MACHINE_EBC, "EBC" },
   { IMAGE_FILE_MACHINE_ARM64, "AA64" },
+  { IMAGE_FILE_MACHINE_LOONGARCH64, "LOONGARCH64" },
+  { IMAGE_FILE_MACHINE_RISCV64, "RISCV64" },
   { 0, NULL }
 };
 
@@ -348,5 +349,3 @@ Returns:
 
 --*/
 ;
-
-#endif

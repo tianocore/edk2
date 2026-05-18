@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EDB_COMMAND_H_
-#define _EFI_EDB_COMMAND_H_
+#pragma once
 
 typedef enum {
   EdbWidthUint8,
@@ -111,5 +110,3 @@ EDB_COMMAND_DEFINE (DebuggerExtPciCFGW);
 EDB_COMMAND_DEFINE (DebuggerExtPciCFGD);
 
 extern EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[];
-
-#endif

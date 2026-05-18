@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SEC_MIGRATION_H__
-#define __SEC_MIGRATION_H__
+#pragma once
 
 #include <Base.h>
 
@@ -80,7 +79,7 @@ RepublishSecPpis (
   Disables the use of Temporary RAM.
 
   If present, this service is invoked by the PEI Foundation after
-  the EFI_PEI_PERMANANT_MEMORY_INSTALLED_PPI is installed.
+  the EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI is installed.
 
   @retval EFI_SUCCESS  Dummy function, alway return this value.
 
@@ -154,5 +153,3 @@ typedef struct {
   FIRMWARE_SEC_PERFORMANCE            FirmwareSecPerformance;
   SEC_PLATFORM_INFORMATION_CONTEXT    Context;
 } SEC_PLATFORM_INFORMATION_CONTEXT_HOB;
-
-#endif

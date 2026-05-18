@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef USB_RNDIS_H_
-#define USB_RNDIS_H_
+#pragma once
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -582,5 +581,3 @@ typedef struct {
 } PACKET_LIST;
 
 #pragma pack()
-
-#endif

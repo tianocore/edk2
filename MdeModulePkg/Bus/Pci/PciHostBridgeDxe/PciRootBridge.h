@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCI_ROOT_BRIDGE_H_
-#define _PCI_ROOT_BRIDGE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
@@ -568,4 +567,3 @@ RootBridgeIoConfiguration (
 ;
 
 extern EFI_CPU_IO2_PROTOCOL  *mCpuIo;
-#endif

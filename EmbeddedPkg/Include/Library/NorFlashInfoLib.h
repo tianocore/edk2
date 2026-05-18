@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef __NOR_FLASH_ID_LIB_H__
-#define __NOR_FLASH_ID_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -87,5 +86,3 @@ EFIAPI
 NorFlashPrintInfo (
   IN     NOR_FLASH_INFO  *Info
   );
-
-#endif

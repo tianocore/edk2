@@ -116,22 +116,19 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 APRIORI PEI {
-!if $(DEBUG_TO_MEM)
-  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
-!endif
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
 
 #
 #  PEI Phase modules
 #
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
-!if $(DEBUG_TO_MEM)
-INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
-!endif
 INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
@@ -261,7 +258,9 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 #
 # Hash2 Protocol producer
 #
-INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!if $(NETWORK_ENABLE) == TRUE
+  INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Network modules
@@ -272,7 +271,9 @@ INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   }
 !endif
 !include NetworkPkg/Network.fdf.inc
+!if $(NETWORK_ENABLE) == TRUE
   INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+!endif
 
 #
 # Usb Support

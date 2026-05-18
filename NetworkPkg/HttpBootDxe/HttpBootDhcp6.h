@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_DHCP6_H__
-#define __EFI_HTTP_BOOT_DHCP6_H__
+#pragma once
 
 #define HTTP_BOOT_OFFER_MAX_NUM            16
 #define HTTP_BOOT_DHCP6_OPTION_MAX_NUM     16
@@ -165,5 +164,3 @@ EFI_STATUS
 HttpBootSetIp6Address (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   );
-
-#endif

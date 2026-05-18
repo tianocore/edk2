@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_H_
-#define _MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -45,5 +44,3 @@ typedef struct {
 #define EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION  0x01
 
 #pragma pack()
-
-#endif

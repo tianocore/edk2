@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TERMINAL_H_
-#define _TERMINAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -1455,5 +1454,3 @@ KeyNotifyProcessHandler (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
-
-#endif

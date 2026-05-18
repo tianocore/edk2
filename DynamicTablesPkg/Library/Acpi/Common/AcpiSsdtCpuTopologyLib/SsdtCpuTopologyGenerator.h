@@ -15,8 +15,7 @@
     - ETM - Embedded Trace Macrocell.
 **/
 
-#ifndef SSDT_CPU_TOPOLOGY_GENERATOR_H_
-#define SSDT_CPU_TOPOLOGY_GENERATOR_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -397,5 +396,3 @@ CreateAmlPsdNode (
   IN  CM_OBJECT_TOKEN                                     PsdToken,
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   );
-
-#endif // SSDT_CPU_TOPOLOGY_GENERATOR_H_

@@ -15,15 +15,9 @@ from __future__ import absolute_import
 import re
 import Common.LongFilePathOs as os
 import sys
-if sys.version_info.major == 3:
-    import antlr4 as antlr
-    from Ecc.CParser4.CLexer import CLexer
-    from Ecc.CParser4.CParser import CParser
-else:
-    import antlr3 as antlr
-    antlr.InputStream = antlr.StringStream
-    from Ecc.CParser3.CLexer import CLexer
-    from Ecc.CParser3.CParser import CParser
+import antlr4 as antlr
+from Ecc.CParser4.CLexer import CLexer
+from Ecc.CParser4.CParser import CParser
 
 
 from Ecc import FileProfile

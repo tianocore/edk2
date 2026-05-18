@@ -9,8 +9,7 @@
   GUID defined in PI 1.2.1 spec.
 **/
 
-#ifndef __EFI_VECTOR_HANDOFF_TABLE_H__
-#define __EFI_VECTOR_HANDOFF_TABLE_H__
+#pragma once
 
 #include <Ppi/VectorHandoffInfo.h>
 
@@ -26,5 +25,3 @@
   { 0x996ec11c, 0x5397, 0x4e73, { 0xb5, 0x8f, 0x82, 0x7e, 0x52, 0x90, 0x6d, 0xef }}
 
 extern EFI_GUID  gEfiVectorHandoffTableGuid;
-
-#endif

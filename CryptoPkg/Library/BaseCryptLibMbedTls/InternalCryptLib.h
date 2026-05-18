@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef INTERNAL_CRYPT_LIB_H_
-#define INTERNAL_CRYPT_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -70,5 +69,3 @@ WrapPkcs7Data (
   OUT UINT8        **WrapData,
   OUT UINTN        *WrapDataSize
   );
-
-#endif

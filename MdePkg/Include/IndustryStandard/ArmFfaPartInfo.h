@@ -21,8 +21,7 @@
 
 **/
 
-#ifndef ARM_FFA_PART_INFO_H_
-#define ARM_FFA_PART_INFO_H_
+#pragma once
 
 /** Partition info flags used in FFA_PARTITION_INFO_GET
  *  See FF-A spec chapter 13.8 FFA_PARTITION_INFO_GET
@@ -33,7 +32,8 @@
 #define FFA_PART_INFO_FLAG_TYPE_DESC   0
 
 #define FFA_PART_INFO_IDX_MASK        0xffff
-#define FFA_PART_INFO_START_TAG_MASK  0xffff
+#define FFA_PART_INFO_TAG_MASK        0xffff
+#define FFA_PART_INFO_DESC_SIZE_MASK  0xffff
 
 /** macro used in FFA_PARTITION_INFO_GET_REGS request
  *  See FF-A spec chapter 13.9 FFA_PARTITION_INFO_GET_REGS
@@ -47,6 +47,7 @@
 #define FFA_PART_INFO_METADATA_LAST_IDX_SHIFT     0
 #define FFA_PART_INFO_METADATA_CURRENT_IDX_SHIFT  16
 #define FFA_PART_INFO_METADATA_TAG_SHIFT          32
+#define FFA_PART_INFO_METADATA_DESC_SIZE_SHIFT    48
 
 /** Partition properties values in EFI_FFA_PART_INFO_DESC->PartitionProps
  *  See FF-A spec chapter 6.2 partition discovery.
@@ -95,5 +96,3 @@ typedef struct {
   /// UUID of partition
   UINT32          PartitionUuid[4];
 } EFI_FFA_PART_INFO_DESC;
-
-#endif

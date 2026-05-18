@@ -6,12 +6,12 @@
 
 Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_CRYPT_LIB_H__
-#define __BASE_CRYPT_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -1374,6 +1374,64 @@ AesCbcDecrypt (
   OUT  UINT8        *Output
   );
 
+/**
+  Performs AES encryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block data
+  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
+
+  @retval TRUE   AES encryption succeeded.
+  @retval FALSE  AES encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AesEncrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  );
+
+/**
+  Performs AES decryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
+
+  @retval TRUE   AES decryption succeeded.
+  @retval FALSE  AES decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AesDecrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  );
+
 // =====================================================================================
 //    Authenticated Encryption with Associated Data (AEAD) Cryptography Primitive
 // =====================================================================================
@@ -1459,6 +1517,105 @@ AeadAesGcmDecrypt (
   IN   UINTN        TagSize,
   OUT  UINT8        *DataOut,
   OUT  UINTN        *DataOutSize
+  );
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for CAMELLIA operations.
+
+  @return  The size, in bytes, of the context buffer required for CAMELLIA operations.
+
+**/
+UINTN
+EFIAPI
+CamelliaGetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory as Camellia context for subsequent use.
+
+  This function initializes user-supplied memory pointed by CamelliaContext as
+  CAMELLIA context.
+  In addition, it sets up all CAMELLIA key materials for subsequent
+  encryption and decryption operations.
+  There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
+
+  @param[out]  CamelliaContext  Pointer to CAMELLIA context being initialized.
+  @param[in]   Key              Pointer to the user-supplied CAMELLIA key.
+  @param[in]   KeyLength        Length of CAMELLIA key in bits.
+
+  @retval TRUE   CAMELLIA context initialization succeeded.
+  @retval FALSE  CAMELLIA context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+CamelliaInit (
+  OUT  VOID         *CamelliaContext,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeyLength
+  );
+
+/**
+  Performs CAMELLIA encryption on single block (128 bits)
+
+  This function performs CAMELLIA encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  CamelliaContext should be already correctly initialized by CamelliaInit().
+  Behavior with invalid Camellia context is undefined.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   CamelliaContext  Pointer to the CAMELLIA context.
+  @param[in]   Input            Pointer to the buffer containing single block data
+  @param[out]  Output           Pointer to a buffer that receives the CAMELLIA encryption output.
+
+  @retval TRUE   CAMELLIA encryption succeeded.
+  @retval FALSE  CAMELLIA encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CamelliaEncrypt (
+  IN   VOID         *CamelliaContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  );
+
+/**
+  Performs CAMELLIA decryption on single block (128 bits)
+
+  This function performs CAMELLIA decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  CamelliaContext should be already correctly initialized by CamelliaInit().
+  Behavior with invalid CAMELLIA context is undefined.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   CamelliaContext  Pointer to the CAMELLIA context.
+  @param[in]   Input            Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output           Pointer to a buffer that receives the CAMELLIA decryption output.
+
+  @retval TRUE   CAMELLIA decryption succeeded.
+  @retval FALSE  CAMELLIA decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CamelliaDecrypt (
+  IN   VOID         *CamelliaContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
   );
 
 // =====================================================================================
@@ -1757,6 +1914,73 @@ RsaPssVerify (
   IN  UINTN        SigSize,
   IN  UINT16       DigestLen,
   IN  UINT16       SaltLen
+  );
+
+/**
+  Carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme
+  over a precomputed message digest.
+
+  This function carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme defined in
+  RFC 8017.
+  Mask generation function is the same as the message digest algorithm.
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If RsaContext is NULL, then return FALSE.
+  If Digest is NULL, then return FALSE.
+  If DigestSize is not one of SHA-256, SHA-384 or SHA-512 digest sizes, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      Digest       Pointer to the precomputed message digest.
+  @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPssSignDigest (
+  IN      VOID         *RsaContext,
+  IN      CONST UINT8  *Digest,
+  IN      UINTN        DigestSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+/**
+  Verifies an RSA-PSS signature over a precomputed message digest.
+
+  If RsaContext is NULL, then return FALSE.
+  If Digest is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If DigestSize is not one of SHA-256, SHA-384 or SHA-512 digest sizes,
+  then return FALSE.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  Digest       Pointer to the message digest.
+  @param[in]  DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[in]  Signature    Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+**/
+BOOLEAN
+EFIAPI
+RsaPssVerifyDigest (
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Digest,
+  IN  UINTN        DigestSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
   );
 
 /**
@@ -3444,6 +3668,26 @@ BigNumSub (
   );
 
 /**
+  Calculate BnRes = BnA * BnB.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA * BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumMul (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  );
+
+/**
   Calculate remainder: BnRes = BnA % BnB.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -3526,6 +3770,28 @@ BigNumDiv (
   );
 
 /**
+  Divide two Big Numbers and obtain the quotient and the remainder.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnResQ  The result, such that BnA / BnB.
+  @param[out]  BnResR  The result, such that BnA % BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumDiv2 (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnResQ,
+  OUT VOID       *BnResR
+  );
+
+/**
   Multiply two Big Numbers modulo BnM.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -3544,6 +3810,24 @@ BigNumMulMod (
   IN CONST VOID  *BnA,
   IN CONST VOID  *BnB,
   IN CONST VOID  *BnM,
+  OUT VOID       *BnRes
+  );
+
+/**
+  Computes the greatest common divisor (GCD) of two BIGNUM values.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result, such that GCD(BnA, BnB).
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumGcd (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
   OUT VOID       *BnRes
   );
 
@@ -3727,6 +4011,42 @@ BigNumContextFree (
   );
 
 /**
+  Marks the start of a temporary BIGNUM allocation frame.
+  Must be paired with BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+BigNumContextStart (
+  IN VOID  *BnCtx
+  );
+
+/**
+  Ends the current BN_CTX allocation frame and releases all temporary BIGNUMs.
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+BigNumContextEnd (
+  IN VOID  *BnCtx
+  );
+
+/**
+  Returns a temporary BIGNUM from the given BN_CTX.
+  The returned BIGNUM is managed by the context and must not be freed manually.
+  Must be called between BigNumContextStart() and BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID *
+EFIAPI
+BigNumContextGet (
+  IN VOID  *BnCtx
+  );
+
+/**
   Set Big Number to a given value.
 
   @param[in]   Bn     Big number to set.
@@ -3784,6 +4104,26 @@ EcGroupInit (
   );
 
 /**
+  Create a new EC_GROUP over a prime field GF(p).
+
+  @param[in] BnPrime    Group prime number.
+  @param[in] BnA        A coefficient.
+  @param[in] BnB        B coefficient.
+  @param[in] BnCtx      BN context.
+
+  @retval EcGroup object  On success.
+  @retval NULL            On failure.
+**/
+VOID *
+EFIAPI
+EcGroupInitGFp (
+  IN VOID  *BnPrime,
+  IN VOID  *BnA,
+  IN VOID  *BnB,
+  IN VOID  *BnCtx        OPTIONAL
+  );
+
+/**
   Get EC curve parameters. While elliptic curve equation is Y^2 mod P = (X^3 + AX + B) Mod P.
   This function will set the provided Big Number objects  to the corresponding
   values. The caller needs to make sure all the "out" BigNumber parameters
@@ -3836,6 +4176,26 @@ VOID
 EFIAPI
 EcGroupFree (
   IN VOID  *EcGroup
+  );
+
+/**
+  Set the generator for an EC_GROUP.
+
+  @param[in]  EcGroup           The EC_GROUP object.
+  @param[in]  EcPointGenerator  The generator point G.
+  @param[in]  BnOrder           The order of the generator.
+  @param[in]  BnCoFactor        The cofactor of the group.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcGroupSetGenerator (
+  IN VOID        *EcGroup,
+  IN CONST VOID  *EcPointGenerator,
+  IN CONST VOID  *BnOrder,
+  IN CONST VOID  *BnCoFactor            OPTIONAL
   );
 
 /**
@@ -3956,6 +4316,64 @@ EcPointMul (
   OUT VOID       *EcPointResult,
   IN CONST VOID  *EcPoint,
   IN CONST VOID  *BnPScalar,
+  IN VOID        *BnCtx
+  );
+
+/**
+  Variable EC point multiplication. EcPointResult = BnGScalar * G + EcPoint * BnPScalar.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+  @param[in]  EcPoint          EC Point.
+  @param[in]  BnPScalar        P Scalar.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointMul2 (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  IN CONST VOID  *EcPoint,
+  IN CONST VOID  *BnPScalar,
+  IN VOID        *BnCtx
+  );
+
+/**
+  Compute a linear combination of multiple EC points.
+
+  This function calculates:
+    EcPointResult = BnGScalar * G + Σ (EcPoints[i] * BnPScalars[i])
+
+  where G is the generator of the EC_GROUP, and Q[i] are arbitrary points.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+                               May be NULL if not used.
+  @param[in]  Count            The number of EcPoints and P scalars.
+  @param[in]  EcPoints         EC Points.
+  @param[in]  BnPScalars       P Scalars.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointsMul (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  UINTN          Count,
+  IN CONST VOID  *EcPoints[],
+  IN CONST VOID  *BnPScalars[],
   IN VOID        *BnCtx
   );
 
@@ -4302,5 +4720,3 @@ EcDsaVerify (
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );
-
-#endif // __BASE_CRYPT_LIB_H__

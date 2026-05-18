@@ -57,7 +57,7 @@
 !endif
 
 !if $(CRYPTO_TEST_TYPE) IN "MBEDTLS"
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf {
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHostMbedTls.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/UnitTestHostBaseCryptLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibSm3.inf

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DPC_LIB_H_
-#define _DPC_LIB_H_
+#pragma once
 
 #include <Protocol/Dpc.h>
 
@@ -49,5 +48,3 @@ EFIAPI
 DispatchDpc (
   VOID
   );
-
-#endif

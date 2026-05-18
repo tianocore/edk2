@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_DT_PLATFORM_DTB_LOADER_LIB_H_
-#define MOCK_DT_PLATFORM_DTB_LOADER_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -27,5 +26,3 @@ struct MockDtPlatformDtbLoaderLib {
      OUT   UINTN  *DtbSize)
     );
 };
-
-#endif

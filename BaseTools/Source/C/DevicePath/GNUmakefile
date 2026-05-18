@@ -13,7 +13,7 @@ OBJECTS = DevicePath.o UefiDevicePathLib.o DevicePathFromText.o  DevicePathUtili
 
 include $(MAKEROOT)/Makefiles/app.makefile
 
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 GCCVERSION := $(shell for /f "tokens=1 delims=." %%a in ("$(shell $(CC) -dumpversion)") do echo %%a)
 else
 GCCVERSION := $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
