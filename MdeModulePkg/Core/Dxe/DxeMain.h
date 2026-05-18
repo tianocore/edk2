@@ -2813,11 +2813,13 @@ CoreInitializeHandleServices (
                                the alignment requirements. When non-NULL, this will be updated on
                                output to the new top address of the memory bins that must be used to
                                satisfy alignment requirements.
+  @param MemoryTypeInformation The memory type information array.
 
   @return The total memory bin size needed.
 
 **/
 UINT64
 CalculateTotalMemoryBinSizeNeeded (
-  IN OUT OPTIONAL EFI_PHYSICAL_ADDRESS  *BinTop
+  IN OUT OPTIONAL EFI_PHYSICAL_ADDRESS  *BinTop,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation
   );
