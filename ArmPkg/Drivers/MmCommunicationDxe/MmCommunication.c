@@ -5,6 +5,9 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <PiDxe.h>
+
 #include <Library/ArmLib.h>
 #include <Library/ArmFfaLib.h>
 #include <Library/ArmSmcLib.h>
@@ -23,6 +26,8 @@
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/MmCommunicate.h>
+
+#define COMM_BUFFER_ATTRS (EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME)
 
 //
 // Partition ID if FF-A support is enabled
@@ -692,6 +697,7 @@ MmCommunication2Initialize (
 {
   EFI_STATUS  Status;
   UINTN       Index;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
 
   // Initialize to make mm communication
   Status = InitializeCommunication ();
@@ -708,83 +714,75 @@ MmCommunication2Initialize (
 
   ASSERT (mNsCommBuffMemRegion.Length != 0);
 
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeReserved,
+  Status = gDS->GetMemorySpaceDescriptor (
                   mNsCommBuffMemRegion.PhysicalBase,
-                  mNsCommBuffMemRegion.Length,
-                  EFI_MEMORY_WB |
-                  EFI_MEMORY_XP |
-                  EFI_MEMORY_RUNTIME
+                  &GcdDescriptor
                   );
-  if (EFI_ERROR (Status) && (Status != EFI_ACCESS_DENIED)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "MmCommunicateInitialize: "
-      "Failed to add MM-NS Buffer Memory Space - %r\n",
-      Status
-      ));
-    goto ReturnErrorStatus;
-  } else if (Status == EFI_ACCESS_DENIED) {
-    Status = gDS->FreeMemorySpace (
-                    mNsCommBuffMemRegion.PhysicalBase,
-                    mNsCommBuffMemRegion.Length
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "MmCommunicateInitialize: "
-        "Failed to free existing MM-NS Buffer Memory Space - %r\n",
-        Status
-        ));
-      goto ReturnErrorStatus;
-    }
 
-    Status = gDS->RemoveMemorySpace (
-                    mNsCommBuffMemRegion.PhysicalBase,
-                    mNsCommBuffMemRegion.Length
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "MmCommunicateInitialize: "
-        "Failed to remove existing MM-NS Buffer Memory Space - %r\n",
-        Status
-        ));
-      goto ReturnErrorStatus;
-    }
-
-    // Try to add the memory space again
+  if (EFI_ERROR (Status) || (GcdDescriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent)) {
+    // if this doesn't exist, add it ourselves
     Status = gDS->AddMemorySpace (
                     EfiGcdMemoryTypeReserved,
                     mNsCommBuffMemRegion.PhysicalBase,
                     mNsCommBuffMemRegion.Length,
-                    EFI_MEMORY_WB |
-                    EFI_MEMORY_XP |
-                    EFI_MEMORY_RUNTIME
+                    COMM_BUFFER_ATTRS
                     );
-    if (EFI_ERROR (Status)) {
+     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "MmCommunicateInitialize: "
-        "Failed to add MM-NS Buffer Memory Space (second attempt) - %r\n",
+        "%a: "
+        "Failed to add MM-NS Buffer Memory Space - %r\n",
+        __func__,
         Status
         ));
       goto ReturnErrorStatus;
     }
+  } else if (!(GcdDescriptor.BaseAddress <= mNsCommBuffMemRegion.PhysicalBase &&
+               (GcdDescriptor.BaseAddress + GcdDescriptor.Length) >=
+               (mNsCommBuffMemRegion.PhysicalBase + mNsCommBuffMemRegion.Length)))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Existing GCD memory space does not completely cover MM-NS Buffer Memory Space\n",
+      __func__
+      ));
+    ASSERT (FALSE);
+    goto ReturnErrorStatus;
+  } else if (GcdDescriptor.GcdMemoryType != EfiGcdMemoryTypeReserved) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Existing GCD memory space is not EfiGcdMemoryTypeReserved for the MM-NS Buffer Memory Space\n",
+      __func__
+      ));
+    ASSERT_EFI_ERROR (Status);
+    goto ReturnErrorStatus;
+  }
+  else if ((GcdDescriptor.Capabilities & (COMM_BUFFER_ATTRS)) !=
+             (COMM_BUFFER_ATTRS))
+  {
+    // set the capabilities if we need to. If we fail, still try setting the attributes
+    // the worst case is it will error there.
+    Status = gDS->SetMemorySpaceCapabilities (
+                    mNsCommBuffMemRegion.PhysicalBase,
+                    mNsCommBuffMemRegion.Length,
+                    COMM_BUFFER_ATTRS
+                    );
+    ASSERT_EFI_ERROR (Status);
   }
 
   Status = gDS->SetMemorySpaceAttributes (
                   mNsCommBuffMemRegion.PhysicalBase,
                   mNsCommBuffMemRegion.Length,
-                  EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME
+                  COMM_BUFFER_ATTRS
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "MmCommunicateInitialize: "
-      "Failed to set MM-NS Buffer Memory attributes\n"
+      "%a: "
+      "Failed to set MM-NS Buffer Memory attributes\n",
+      __func__
       ));
-    goto CleanAddedMemorySpace;
+    goto ReturnErrorStatus;
   }
 
   // Install the communication protocol
@@ -799,10 +797,11 @@ MmCommunication2Initialize (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "MmCommunicationInitialize: "
-      "Failed to install MM communication protocol\n"
+      "%a: "
+      "Failed to install MM communication protocol\n",
+      __func__
       ));
-    goto CleanAddedMemorySpace;
+    goto ReturnErrorStatus;
   }
 
   // Register notification callback when virtual address is associated
@@ -852,12 +851,6 @@ UninstallProtocol:
          mMmCommunicateHandle,
          &gEfiMmCommunication2ProtocolGuid,
          &mMmCommunication2
-         );
-
-CleanAddedMemorySpace:
-  gDS->RemoveMemorySpace (
-         mNsCommBuffMemRegion.PhysicalBase,
-         mNsCommBuffMemRegion.Length
          );
 
 ReturnErrorStatus:
