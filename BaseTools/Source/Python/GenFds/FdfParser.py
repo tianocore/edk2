@@ -2210,7 +2210,6 @@ class FdfParser:
     def _GetFvAttributes(self, FvObj):
         IsWordToken = False
         while self._GetNextWord():
-            IsWordToken = True
             name = self._Token
             if name not in {"ERASE_POLARITY", "MEMORY_MAPPED", \
                            "STICKY_WRITE", "LOCK_CAP", "LOCK_STATUS", "WRITE_ENABLED_CAP", \
@@ -2219,7 +2218,7 @@ class FdfParser:
                            "READ_LOCK_STATUS", "WRITE_LOCK_CAP", "WRITE_LOCK_STATUS", \
                            "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT", "FvUsedSizeEnable"}:
                 self._UndoToken()
-                return False
+                return IsWordToken
 
             if not self._IsToken(TAB_EQUAL_SPLIT):
                 raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
@@ -2228,6 +2227,7 @@ class FdfParser:
                 raise Warning.Expected("TRUE/FALSE (1/0)", self.FileName, self.CurrentLineNumber)
 
             FvObj.FvAttributeDict[name] = self._Token
+            IsWordToken = True
 
         return IsWordToken
 
