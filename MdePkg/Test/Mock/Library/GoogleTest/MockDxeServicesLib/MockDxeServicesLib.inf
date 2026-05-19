@@ -1,0 +1,28 @@
+## @file MockDxeServicesLib.inf
+#  Mock implementation of the DXE Services Library.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockDxeServicesLib
+  FILE_GUID                      = 7B3254E7-DD34-4151-9228-25012DF7DF90
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeServicesLib
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+[Sources]
+  MockDxeServicesLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc

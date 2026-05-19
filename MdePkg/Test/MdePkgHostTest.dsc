@@ -56,5 +56,6 @@
   MdePkg/Test/Mock/Library/GoogleTest/MockDevicePathLib/MockDevicePathLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockReportStatusCodeLib/MockReportStatusCodeLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockSerialPortLib/MockSerialPortLib.inf
+  MdePkg/Test/Mock/Library/GoogleTest/MockDxeServicesLib/MockDxeServicesLib.inf
 
   MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
