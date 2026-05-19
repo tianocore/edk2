@@ -8,6 +8,43 @@
 
 #include "CapsuleApp.h"
 
+/**
+  Check if a device path contains network-related nodes (MAC, IPv4, IPv6, URI).
+  Network boot options should be skipped when searching for an EFI System Partition
+  to write capsule-on-disk data.
+
+  @param[in] DevicePath  The device path to check.
+
+  @retval TRUE   The device path contains a network node.
+  @retval FALSE  The device path does not contain a network node.
+**/
+STATIC
+BOOLEAN
+IsNetworkBootDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
+
+  if (DevicePath == NULL) {
+    return FALSE;
+  }
+
+  for (Node = DevicePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+    if (DevicePathType (Node) == MESSAGING_DEVICE_PATH) {
+      if ((DevicePathSubType (Node) == MSG_MAC_ADDR_DP) ||
+          (DevicePathSubType (Node) == MSG_IPv4_DP) ||
+          (DevicePathSubType (Node) == MSG_IPv6_DP) ||
+          (DevicePathSubType (Node) == MSG_URI_DP))
+      {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
 EFI_GUID  mCapsuleOnDiskBootOptionGuid = {
   0x4CC29BB7, 0x2413, 0x40A2, { 0xB0, 0x6D, 0x25, 0x3E, 0x37, 0x10, 0xF5, 0x32 }
 };
@@ -475,6 +512,16 @@ GetUpdateFileSystem (
     if (((BootOptionBuffer[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) ||
         (DevicePathType (DevicePath) == BBS_DEVICE_PATH))
     {
+      continue;
+    }
+
+    //
+    // Skip network boot options (MAC/IPv4/IPv6/URI) - they cannot have
+    // an EFI System Partition and attempting to connect them causes
+    // unnecessary network boot attempts (HTTP, PXE).
+    //
+    if (IsNetworkBootDevicePath (DevicePath)) {
+      DEBUG ((DEBUG_INFO, "CapsuleOnDisk: Skip network boot option\n"));
       continue;
     }
 
