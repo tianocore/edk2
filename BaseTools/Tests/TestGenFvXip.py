@@ -828,5 +828,162 @@ INF  TestXipRebasePkg/TestDxeDriver/TestDxeDriver.inf
                     peim1_xip, peim2_xip, dxe_xip, expect_rebase)
 
 
+class TestFdfParserPe32KeywordOrder(unittest.TestCase):
+    """Test that the FDF parser accepts PE32 section keywords in any order.
+
+    The keywords Align, Xip, and RELOCS_STRIPPED/RELOCS_RETAINED should be
+    accepted in any permutation within a PE32 section statement in a [Rule].
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up environment for FdfParser imports."""
+        import tempfile
+        cls._tmpdir = tempfile.mkdtemp(prefix='fdf_parser_test_')
+        # Set WORKSPACE so the parser doesn't crash
+        os.environ.setdefault('WORKSPACE', cls._tmpdir)
+        from GenFds.GenFdsGlobalVariable import GenFdsGlobalVariable
+        GenFdsGlobalVariable.WorkSpaceDir = cls._tmpdir
+        from Common import GlobalData
+        GlobalData.gFdfParser = None
+        GlobalData.gWorkspace = cls._tmpdir
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmpdir, ignore_errors=True)
+
+    def _parse_rule(self, pe32_section_line):
+        """Parse a [Rule] with the given PE32 section line and return the EfiSection."""
+        import tempfile
+        from GenFds.FdfParser import FdfParser
+        from Common import GlobalData
+
+        fdf_content = (
+            "[Rule.Common.PEIM]\n"
+            "  FILE PEIM = $(NAMED_GUID) {\n"
+            "    " + pe32_section_line + "\n"
+            "  }\n"
+        )
+        fdf_path = os.path.join(self._tmpdir, 'test_order.fdf')
+        with open(fdf_path, 'w') as f:
+            f.write(fdf_content)
+
+        parser = FdfParser(fdf_path)
+        # Manually set up parser state for rule parsing
+        parser.CurrentLineNumber = 3
+        parser.CurrentOffsetWithinLine = 4
+        # Re-read the profile to refresh file lines
+        parser.Profile.FileLinesList = fdf_content.splitlines(True)
+
+        # Create a RuleComplexFile as the container object
+        from GenFds.RuleComplexFile import RuleComplexFile
+        obj = RuleComplexFile()
+        obj.FvFileType = 'PEIM'
+        obj.KeepReloc = None
+        obj.SectionList = []
+
+        result = parser._GetEfiSection(obj)
+        self.assertTrue(result, f"Parser failed to parse: {pe32_section_line}")
+        self.assertEqual(len(obj.SectionList), 1)
+        return obj.SectionList[0]
+
+    # (pe32_line, expected_alignment, expected_xip, expected_keep_reloc, description)
+    TEST_CASES = [
+        # Align before Xip (original supported order)
+        ('PE32 PE32 Align=8 Xip=TRUE',
+         '8', 'TRUE', None,
+         'Align then Xip'),
+        # Xip before Align (previously caused stack trace)
+        ('PE32 PE32 Xip=TRUE Align=8',
+         '8', 'TRUE', None,
+         'Xip then Align'),
+        # Align before RELOCS_STRIPPED
+        ('PE32 PE32 Align=16 RELOCS_STRIPPED',
+         '16', None, False,
+         'Align then RELOCS_STRIPPED'),
+        # RELOCS_STRIPPED before Align
+        ('PE32 PE32 RELOCS_STRIPPED Align=16',
+         '16', None, False,
+         'RELOCS_STRIPPED then Align'),
+        # Xip before RELOCS_STRIPPED
+        ('PE32 PE32 Xip=TRUE RELOCS_STRIPPED',
+         None, 'TRUE', False,
+         'Xip then RELOCS_STRIPPED'),
+        # RELOCS_STRIPPED before Xip
+        ('PE32 PE32 RELOCS_STRIPPED Xip=TRUE',
+         None, 'TRUE', False,
+         'RELOCS_STRIPPED then Xip'),
+        # All three: Align, Xip, RELOCS_STRIPPED
+        ('PE32 PE32 Align=16 Xip=TRUE RELOCS_STRIPPED',
+         '16', 'TRUE', False,
+         'Align then Xip then RELOCS_STRIPPED'),
+        # All three: Xip, Align, RELOCS_STRIPPED
+        ('PE32 PE32 Xip=TRUE Align=16 RELOCS_STRIPPED',
+         '16', 'TRUE', False,
+         'Xip then Align then RELOCS_STRIPPED'),
+        # All three: RELOCS_STRIPPED, Align, Xip
+        ('PE32 PE32 RELOCS_STRIPPED Align=16 Xip=TRUE',
+         '16', 'TRUE', False,
+         'RELOCS_STRIPPED then Align then Xip'),
+        # All three: RELOCS_STRIPPED, Xip, Align
+        ('PE32 PE32 RELOCS_STRIPPED Xip=TRUE Align=16',
+         '16', 'TRUE', False,
+         'RELOCS_STRIPPED then Xip then Align'),
+        # All three: Xip, RELOCS_STRIPPED, Align
+        ('PE32 PE32 Xip=TRUE RELOCS_STRIPPED Align=16',
+         '16', 'TRUE', False,
+         'Xip then RELOCS_STRIPPED then Align'),
+        # All three: Align, RELOCS_STRIPPED, Xip
+        ('PE32 PE32 Align=16 RELOCS_STRIPPED Xip=TRUE',
+         '16', 'TRUE', False,
+         'Align then RELOCS_STRIPPED then Xip'),
+        # Xip=FALSE
+        ('PE32 PE32 Xip=FALSE Align=8',
+         '8', 'FALSE', None,
+         'Xip=FALSE then Align'),
+        # RELOCS_RETAINED variant
+        ('PE32 PE32 Xip=TRUE RELOCS_RETAINED Align=8',
+         '8', 'TRUE', True,
+         'Xip then RELOCS_RETAINED then Align'),
+        # Only Xip (no Align, no Reloc)
+        ('PE32 PE32 Xip=TRUE',
+         None, 'TRUE', None,
+         'Xip only'),
+        # Only Align (no Xip, no Reloc)
+        ('PE32 PE32 Align=32',
+         '32', None, None,
+         'Align only'),
+        # Only RELOCS_STRIPPED (no Align, no Xip)
+        ('PE32 PE32 RELOCS_STRIPPED',
+         None, None, False,
+         'RELOCS_STRIPPED only'),
+    ]
+
+    def test_pe32_keyword_order(self) -> None:
+        """Parameterized test verifying PE32 section keywords in any order."""
+        for (pe32_line, exp_align, exp_xip, exp_keep_reloc, desc) in self.TEST_CASES:
+            with self.subTest(desc):
+                section = self._parse_rule(pe32_line)
+                self.assertEqual(section.SectionType, 'PE32')
+                if exp_align is not None:
+                    self.assertEqual(section.Alignment, exp_align)
+                else:
+                    self.assertIn(section.Alignment, (None, ''))
+                if exp_xip is not None:
+                    self.assertEqual(section.Xip, exp_xip)
+                else:
+                    self.assertFalse(
+                        hasattr(section, 'Xip') and section.Xip,
+                        f"Expected no Xip but got {getattr(section, 'Xip', None)}"
+                    )
+                if exp_keep_reloc is not None:
+                    self.assertEqual(section.KeepReloc, exp_keep_reloc)
+                else:
+                    self.assertIsNone(
+                        getattr(section, 'KeepReloc', None),
+                        f"Expected no KeepReloc but got {section.KeepReloc}"
+                    )
+
+
 if __name__ == '__main__':
     unittest.main()
