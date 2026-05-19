@@ -985,5 +985,120 @@ class TestFdfParserPe32KeywordOrder(unittest.TestCase):
                     )
 
 
+class TestFdfParserFvKeywordOrder(unittest.TestCase):
+    """Test that the FDF parser accepts [FV] keywords in any order.
+
+    FvForceRebase, FvBaseAddress, FvAlignment, and FV attributes like
+    ERASE_POLARITY, MEMORY_MAPPED should be accepted in any order.
+    Previously, FvForceRebase between two FV attributes (e.g. between
+    ERASE_POLARITY and MEMORY_MAPPED) caused a Python stack trace.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up environment for FdfParser imports."""
+        import tempfile
+        cls._tmpdir = tempfile.mkdtemp(prefix='fdf_fv_parser_test_')
+        os.environ.setdefault('WORKSPACE', cls._tmpdir)
+        from GenFds.GenFdsGlobalVariable import GenFdsGlobalVariable
+        GenFdsGlobalVariable.WorkSpaceDir = cls._tmpdir
+        from Common import GlobalData
+        GlobalData.gFdfParser = None
+        GlobalData.gWorkspace = cls._tmpdir
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmpdir, ignore_errors=True)
+
+    def _parse_fv_section(self, fv_body):
+        """Parse an [FV] section and return the FV object."""
+        from GenFds.FdfParser import FdfParser
+        from Common import GlobalData
+
+        fdf_content = (
+            "[FV.TESTFV]\n"
+            + fv_body + "\n"
+        )
+        fdf_path = os.path.join(self._tmpdir, 'test_fv_order.fdf')
+        with open(fdf_path, 'w') as f:
+            f.write(fdf_content)
+
+        parser = FdfParser(fdf_path)
+        parser.Profile.FileLinesList = fdf_content.splitlines(True)
+        # Position parser at start of FV body (line 2, offset 0)
+        parser.CurrentLineNumber = 2
+        parser.CurrentOffsetWithinLine = 0
+
+        # Create FV object and parse the attributes/keywords
+        from GenFds.Fv import FV
+        fv_obj = FV(Name='TESTFV')
+
+        # Use the same while loop the real parser uses
+        while True:
+            parser._GetSetStatements(fv_obj)
+            if not (parser._GetBlockStatement(fv_obj) or
+                    parser._GetFvBaseAddress(fv_obj) or
+                    parser._GetFvForceRebase(fv_obj) or
+                    parser._GetFvAlignment(fv_obj) or
+                    parser._GetFvAttributes(fv_obj) or
+                    parser._GetFvNameGuid(fv_obj) or
+                    parser._GetFvExtEntryStatement(fv_obj) or
+                    parser._GetFvNameString(fv_obj)):
+                break
+
+        return fv_obj
+
+    # (fv_body, expected_attrs, expected_force_rebase, description)
+    TEST_CASES = [
+        # FvForceRebase after all attributes (original working order)
+        ("ERASE_POLARITY = 1\nMEMORY_MAPPED = TRUE\nFvForceRebase = TRUE\n",
+         {'ERASE_POLARITY': '1', 'MEMORY_MAPPED': 'TRUE'}, True,
+         'FvForceRebase after all attributes'),
+        # FvForceRebase before all attributes
+        ("FvForceRebase = TRUE\nERASE_POLARITY = 1\nMEMORY_MAPPED = TRUE\n",
+         {'ERASE_POLARITY': '1', 'MEMORY_MAPPED': 'TRUE'}, True,
+         'FvForceRebase before all attributes'),
+        # FvForceRebase between ERASE_POLARITY and MEMORY_MAPPED
+        ("ERASE_POLARITY = 1\nFvForceRebase = TRUE\nMEMORY_MAPPED = TRUE\n",
+         {'ERASE_POLARITY': '1', 'MEMORY_MAPPED': 'TRUE'}, True,
+         'FvForceRebase between attributes (previously crashed)'),
+        # FvForceRebase=FALSE between attributes
+        ("ERASE_POLARITY = 1\nFvForceRebase = FALSE\nMEMORY_MAPPED = TRUE\n",
+         {'ERASE_POLARITY': '1', 'MEMORY_MAPPED': 'TRUE'}, False,
+         'FvForceRebase=FALSE between attributes'),
+        # Multiple attributes, FvForceRebase in the middle
+        ("ERASE_POLARITY = 1\nSTICKY_WRITE = TRUE\nFvForceRebase = TRUE\n"
+         "MEMORY_MAPPED = TRUE\nLOCK_CAP = TRUE\n",
+         {'ERASE_POLARITY': '1', 'STICKY_WRITE': 'TRUE',
+          'MEMORY_MAPPED': 'TRUE', 'LOCK_CAP': 'TRUE'}, True,
+         'FvForceRebase in middle of many attributes'),
+        # FvBaseAddress between attributes
+        ("ERASE_POLARITY = 1\nFvBaseAddress = 0x00800000\nMEMORY_MAPPED = TRUE\n",
+         {'ERASE_POLARITY': '1', 'MEMORY_MAPPED': 'TRUE'}, None,
+         'FvBaseAddress between attributes'),
+        # FvAlignment between attributes
+        ("ERASE_POLARITY = 1\nFvAlignment = 16\nMEMORY_MAPPED = TRUE\n",
+         {'ERASE_POLARITY': '1', 'MEMORY_MAPPED': 'TRUE'}, None,
+         'FvAlignment between attributes'),
+        # All interleaved: attr, FvForceRebase, attr, FvBaseAddress, attr
+        ("ERASE_POLARITY = 1\nFvForceRebase = TRUE\nSTICKY_WRITE = TRUE\n"
+         "FvBaseAddress = 0x00800000\nMEMORY_MAPPED = TRUE\n",
+         {'ERASE_POLARITY': '1', 'STICKY_WRITE': 'TRUE', 'MEMORY_MAPPED': 'TRUE'}, True,
+         'Multiple keywords interleaved with attributes'),
+    ]
+
+    def test_fv_keyword_order(self) -> None:
+        """Parameterized test verifying FV keywords accepted in any order."""
+        for (fv_body, exp_attrs, exp_force_rebase, desc) in self.TEST_CASES:
+            with self.subTest(desc):
+                fv_obj = self._parse_fv_section(fv_body)
+                for attr_name, attr_val in exp_attrs.items():
+                    self.assertIn(attr_name, fv_obj.FvAttributeDict,
+                                  f"Missing attribute {attr_name}")
+                    self.assertEqual(fv_obj.FvAttributeDict[attr_name], attr_val)
+                if exp_force_rebase is not None:
+                    self.assertEqual(fv_obj.FvForceRebase, exp_force_rebase)
+
+
 if __name__ == '__main__':
     unittest.main()
