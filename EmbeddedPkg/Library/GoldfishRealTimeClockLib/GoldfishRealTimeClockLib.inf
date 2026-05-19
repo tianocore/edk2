@@ -1,0 +1,31 @@
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = GoldfishRealTimeClockLib
+  FILE_GUID                      = D065956E-D64E-46AB-A70F-C4E7015B77A9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  GoldfishRealTimeClockLib.c
+  GoldfishRealTimeClock.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  TimerLib
+  TimeBaseLib
+  UefiRuntimeLib
+  PcdLib
+  DxeServicesTableLib
+  BaseMemoryLib
+  HobLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+  gFdtHobGuid
