@@ -66,5 +66,6 @@
   MdePkg/Test/Mock/Library/GoogleTest/MockPciExpressLib/MockPciExpressLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockPciLib/MockPciLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockPerformanceLib/MockPerformanceLib.inf
+  MdePkg/Test/Mock/Library/GoogleTest/MockSmmMemLib/MockSmmMemLib.inf
 
   MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
