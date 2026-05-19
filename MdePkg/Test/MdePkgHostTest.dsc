@@ -61,5 +61,6 @@
   MdePkg/Test/Mock/Library/GoogleTest/MockIoLib/MockIoLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockMemoryAllocationLib/MockMemoryAllocationLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockMmServicesTableLib/MockMmServicesTableLib.inf
+  MdePkg/Test/Mock/Library/GoogleTest/MockPcdLib/MockPcdLib.inf
 
   MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
