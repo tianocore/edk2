@@ -1,4 +1,5 @@
 #
+#  Copyright (c) 2026, Alexey Laurentsyeu <alex@paidbsd.org>
 #  Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
 #  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
@@ -141,6 +142,9 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 APRIORI PEI {
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
 
@@ -151,6 +155,12 @@ INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+!if $(DEBUG_TO_MEM)
+INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
+!if $(CC_MEASUREMENT_ENABLE) == TRUE
+  INF  OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf
+!endif
 INF  OvmfPkg/Bhyve/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
@@ -206,7 +216,10 @@ INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+
 INF  PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+#INF  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+
 INF  OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
 INF  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
 INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
@@ -219,10 +232,12 @@ INF  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
 INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
+INF  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+INF  OvmfPkg/VirtioKeyboardDxe/VirtioKeyboard.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  OvmfPkg/IgvmSecureBootDxe/IgvmSecureBootDxe.inf
 !endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
@@ -249,10 +264,12 @@ INF  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
-
+INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
 
 INF  OvmfPkg/SioBusDxe/SioBusDxe.inf
+!if $(SOURCE_DEBUG_ENABLE) == FALSE
 INF  MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
+!endif
 INF  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 INF  MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
 
@@ -262,16 +279,21 @@ INF  OvmfPkg/Bhyve/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  OvmfPkg/Bhyve/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/Bhyve/AcpiTables/AcpiTables.inf
-INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
 INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
-
-!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
+INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
+
+#
+# Hash2 Protocol producer
+#
+!if $(NETWORK_ENABLE) == TRUE
+  INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Network modules
@@ -282,11 +304,15 @@ INF MdeModulePkg/Logo/LogoDxe.inf
   }
 !endif
 !include NetworkPkg/Network.fdf.inc
+!if $(NETWORK_ENABLE) == TRUE
   INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+!endif
 
 #
 # Usb Support
 #
+INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
 INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
@@ -296,6 +322,8 @@ INF  OvmfPkg/PlatformDxe/Platform.inf
 INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
 INF  OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 INF  OvmfPkg/Bhyve/BhyveRfbDxe/BhyveRfbDxe.inf
+INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+INF  OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE
 INF  OvmfPkg/Bhyve/SmmAccess/SmmAccess2Dxe.inf
@@ -327,9 +355,28 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 
 #
+# EFI_CC_MEASUREMENT_PROTOCOL
+#
+!if $(CC_MEASUREMENT_ENABLE) == TRUE
+INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
+!endif
+
+#
 # TPM support
 #
 !include OvmfPkg/Include/Fdf/OvmfTpmDxe.fdf.inc
+
+!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/MorLock.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfOptHw.fdf.inc
+
+#
+# Smbios Measurement support
+#
+!if $(TPM2_ENABLE) == TRUE || $(CC_MEASUREMENT_ENABLE) == TRUE
+INF MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
+!endif
 
 ################################################################################
 
