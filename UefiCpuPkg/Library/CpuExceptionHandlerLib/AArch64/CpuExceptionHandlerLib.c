@@ -3,23 +3,24 @@
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Uefi.h>
-#include <Library/UefiLib.h>
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-
-#include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DebugSupport.h>
-#include <Protocol/LoadedImage.h>
+
+#include <CpuExceptionSupport.h>
+#include <ExceptionSupport.h>
 
 //
 // Maximum number of characters to print to serial (UINT8s) and to console if
@@ -27,7 +28,14 @@
 //
 #define MAX_PRINT_CHARS  100
 
-STATIC CHAR8  *gExceptionTypeString[] = {
+UINTN                   mMaxExceptionNumber                           = MAX_AARCH64_EXCEPTION;
+EFI_EXCEPTION_CALLBACK  mExceptionHandlers[MAX_AARCH64_EXCEPTION + 1] = { 0 };
+PHYSICAL_ADDRESS        mExceptionVectorAlignmentMask                 = ARM_VECTOR_TABLE_ALIGNMENT;
+
+#define EL0_STACK_SIZE  EFI_PAGES_TO_SIZE(2)
+STATIC UINTN  mNewStackBase[EL0_STACK_SIZE / sizeof (UINTN)];
+
+STATIC CHAR8  *mExceptionTypeString[] = {
   "Synchronous",
   "IRQ",
   "FIQ",
@@ -36,13 +44,17 @@ STATIC CHAR8  *gExceptionTypeString[] = {
 
 STATIC BOOLEAN  mRecursiveException;
 
-CHAR8 *
-GetImageName (
-  IN  UINTN  FaultAddress,
-  OUT UINTN  *ImageBase,
-  OUT UINTN  *PeCoffSizeOfHeaders
-  );
+/**
+  Decodes and logs the fault cause of an Instruction or Data Abort
+  by mapping the Fault Status Code bits [5:0] of the ISS field to
+  a human-readable description.
 
+  @param[in]  AbortType  Null-terminated string identifying the abort
+                         type (e.g., "Instruction Abort", "Data Abort").
+  @param[in]  Iss        The Instruction Specific Syndrome (ISS) field
+                         extracted from ESR_ELx. Bits [5:0] are used as
+                         the Fault Status Code (IFSC/DFSC).
+**/
 STATIC
 VOID
 DescribeInstructionOrDataAbort (
@@ -124,6 +136,17 @@ DescribeInstructionOrDataAbort (
   DEBUG ((DEBUG_ERROR, "\n%a: %a\n", AbortType, AbortCause));
 }
 
+/**
+  Decodes and logs the cause of an AArch64 exception by inspecting the
+  Exception Class (EC) field of the Exception Syndrome Register (ESR_ELx).
+  For Instruction and Data Aborts, delegates to
+  DescribeInstructionOrDataAbort () for further ISS decoding.
+
+  @param[in]  Esr  The 64-bit value of ESR_ELx captured at the time of
+                   the exception. Bits [31:26] are used as the Exception
+                   Class (EC) and bits [24:0] as the Instruction Specific
+                   Syndrome (ISS).
+**/
 STATIC
 VOID
 DescribeExceptionSyndrome (
@@ -156,6 +179,18 @@ DescribeExceptionSyndrome (
   DEBUG ((DEBUG_ERROR, "\n %a \n", Message));
 }
 
+/**
+  Returns a pointer to the filename component of a full file path by
+  scanning backwards for the last '/' or '\\' path separator.
+  If no separator is found, the original string is returned as-is.
+
+  @param[in]  FullName  Null-terminated ASCII string containing the full
+                        file path to extract the base name from.
+
+  @retval  Pointer to the base filename within FullName. This is not a
+           newly allocated string — the returned pointer references
+           memory within the original FullName buffer.
+**/
 STATIC
 CONST CHAR8 *
 BaseName (
@@ -176,16 +211,82 @@ BaseName (
 }
 
 /**
-  This is the default action to take on an unexpected exception
+  Register EL0 stack and perform architecture specific configuration to ensure
+  exceptions are routed to correct EL.
 
-  Since this is exception context don't do anything crazy like try to allocate memory.
+  @param[in]  VectorBaseAddress  Base address of the exception vector table
+                                 to be configured.
 
-  @param  ExceptionType    Type of the exception
-  @param  SystemContext    Register state at the time of the Exception
+  @retval  EFI_SUCCESS  Vector environment configured successfully.
+**/
+EFI_STATUS
+ArchVectorConfig (
+  IN  UINTN  VectorBaseAddress
+  )
+{
+  UINTN  HcrReg;
 
+  // Round down sp by 16 bytes alignment
+  RegisterEl0Stack (
+    (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFULL)
+    );
+
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    HcrReg = ArmReadHcr ();
+
+    // Trap General Exceptions. All exceptions that would be routed to EL1 are routed to EL2
+    HcrReg |= ARM_HCR_TGE;
+
+    ArmWriteHcr (HcrReg);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Common C-level exception handler dispatched from ASM exception entry points.
+  Invokes a registered handler for the given ExceptionType if one exists,
+  otherwise dumps the CPU context. Asserts on unknown exception types.
+
+  @param[in]      ExceptionType  AArch64 exception type or interrupt vector number.
+  @param[in,out]  SystemContext  Saved CPU context at the time of the exception.
 **/
 VOID
-DefaultExceptionHandler (
+EFIAPI
+CommonCExceptionHandler (
+  IN     EFI_EXCEPTION_TYPE  ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
+  )
+{
+  if ((UINTN)ExceptionType <= mMaxExceptionNumber) {
+    if (mExceptionHandlers[ExceptionType]) {
+      mExceptionHandlers[ExceptionType](ExceptionType, SystemContext);
+      return;
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "Unknown exception type %d\n", ExceptionType));
+    ASSERT (FALSE);
+  }
+
+  DumpCpuContext (ExceptionType, SystemContext);
+}
+
+//
+// CpuExceptionHandler Implementation
+//
+
+/**
+  Dumps the full AArch64 CPU context to serial and ConOut on an unexpected
+  exception, then asserts and halts. Detects recursive calls and short-circuits
+  to a minimal serial write followed by CpuDeadLoop ().
+
+  Do not allocate memory or perform complex operations from within this function.
+
+  @param[in]      ExceptionType  AArch64 exception type or interrupt vector number.
+  @param[in,out]  SystemContext  Saved CPU context at the time of the exception.
+**/
+VOID
+DumpCpuContext (
   IN     EFI_EXCEPTION_TYPE  ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
@@ -203,7 +304,7 @@ DefaultExceptionHandler (
 
   mRecursiveException = TRUE;
 
-  CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
+  CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Exception at 0x%016lx\n", mExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
   SerialPortWrite ((UINT8 *)Buffer, CharCount);
 
   // Prepare a unicode buffer for ConOut, if applicable, in case the buffer
@@ -332,10 +433,122 @@ DefaultExceptionHandler (
   // Attempt to print that we had a synchronous exception to ConOut.  We do
   // this after the serial logging as ConOut's logging is more complex and we
   // aren't guaranteed to succeed.
-  if (gST->ConOut != NULL) {
-    gST->ConOut->OutputString (gST->ConOut, UnicodeBuffer);
-  }
+  LogToConsole (UnicodeBuffer);
 
   ASSERT (FALSE);
   CpuDeadLoop ();
+}
+
+/**
+Initializes all CPU exceptions entries and provides the default exception handlers.
+
+Caller should try to get an array of interrupt and/or exception vectors that are in use and need to
+persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3 specification.
+If caller cannot get reserved vector list or it does not exists, set VectorInfo to NULL.
+If VectorInfo is not NULL, the exception vectors will be initialized per vector attribute accordingly.
+
+@param[in]  VectorInfo    Pointer to reserved vector list.
+
+@retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized
+                              with default exception handlers.
+@retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
+@retval EFI_UNSUPPORTED       This function is not supported.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlers (
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
+  )
+{
+  UINT64  VectorBase;
+
+  // use VBAR to point to where our exception handlers are
+
+  // The vector table must be aligned for the architecture.  If this
+  // assertion fails ensure the appropriate FFS alignment is in effect,
+  // which can be accomplished by ensuring the proper Align=X statement
+  // in the platform packaging rules.  For AArch64 Align=4K is required.
+  // Align=Auto can be used but this is known to cause an issue with
+  // populating the reset vector area for encapsulated FVs.
+  ASSERT (((UINTN)ExceptionHandlersStart & mExceptionVectorAlignmentMask) == 0);
+
+  VectorBase = (UINT64)(UINTN)ExceptionHandlersStart;
+
+  // call the architecture-specific routine to prepare for the new vector
+  // configuration to take effect
+  ArchVectorConfig ((UINTN)VectorBase);
+
+  ArmWriteVBar ((UINTN)VectorBase);
+
+  return EFI_SUCCESS;
+}
+
+/**
+Registers a function to be called from the processor exception handler. (On AArch64 this only
+provides exception handlers, not interrupt handling which is provided through the Hardware Interrupt
+Protocol.)
+
+This function registers and enables the handler specified by ExceptionHandler for a processor
+interrupt or exception type specified by ExceptionType. If ExceptionHandler is NULL, then the
+handler for the processor interrupt or exception type specified by ExceptionType is uninstalled.
+The installed handler is called once for each processor interrupt or exception.
+NOTE: This function should be invoked after InitializeCpuExceptionHandlers() is invoked,
+otherwise EFI_UNSUPPORTED returned.
+
+@param[in]  ExceptionType     Defines which interrupt or exception to hook.
+@param[in]  ExceptionHandler  A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
+when a processor interrupt occurs. If this parameter is NULL, then the handler
+will be uninstalled.
+
+@retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
+@retval EFI_ALREADY_STARTED   ExceptionHandler is not NULL, and a handler for ExceptionType was
+previously installed.
+@retval EFI_INVALID_PARAMETER ExceptionHandler is NULL, and a handler for ExceptionType was not
+previously installed.
+@retval EFI_UNSUPPORTED       The interrupt specified by ExceptionType is not supported,
+or this function is not supported.
+**/
+EFI_STATUS
+EFIAPI
+RegisterCpuInterruptHandler (
+  IN EFI_EXCEPTION_TYPE         ExceptionType,
+  IN EFI_CPU_INTERRUPT_HANDLER  ExceptionHandler
+  )
+{
+  if ((UINTN)ExceptionType > mMaxExceptionNumber) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((ExceptionHandler != NULL) && (mExceptionHandlers[ExceptionType] != NULL)) {
+    return EFI_ALREADY_STARTED;
+  }
+
+  mExceptionHandlers[ExceptionType] = ExceptionHandler;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Setup separate stacks for certain exception handlers.
+  If the input Buffer and BufferSize are both NULL, use global variable if possible.
+
+  @param[in]       Buffer        Point to buffer used to separate exception stack.
+  @param[in, out]  BufferSize    On input, it indicates the byte size of Buffer.
+                                 If the size is not enough, the return status will
+                                 be EFI_BUFFER_TOO_SMALL, and output BufferSize
+                                 will be the size it needs.
+
+  @retval EFI_SUCCESS             The stacks are assigned successfully.
+  @retval EFI_UNSUPPORTED         This function is not supported.
+  @retval EFI_BUFFER_TOO_SMALL    This BufferSize is too small.
+**/
+EFI_STATUS
+EFIAPI
+InitializeSeparateExceptionStacks (
+  IN     VOID   *Buffer,
+  IN OUT UINTN  *BufferSize
+  )
+{
+  return EFI_SUCCESS;
 }
