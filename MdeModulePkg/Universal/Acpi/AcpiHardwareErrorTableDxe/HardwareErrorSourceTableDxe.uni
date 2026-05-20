@@ -1,0 +1,14 @@
+// /** @file
+// This module install ACPI Hardware Error Source Table (HEST).
+//
+// Copyright (c) 2024, Ventana Micro Systems, Inc.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Installs ACPI Hardware Error Source Table (HEST)"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module installs the ACPI Hardware Error Source Table (HEST)"
+
