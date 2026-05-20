@@ -1009,6 +1009,7 @@
 !endif
   }
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+  FmpDevicePkg/DetectTestKeyDxe/DetectTestKeyDxe.inf
 !endif
 
 
