@@ -10,8 +10,7 @@ This Protocol is introduced in UEFI Specification 2.5
 
 **/
 
-#ifndef __EFI_IP4CONFIG2_PROTOCOL_H__
-#define __EFI_IP4CONFIG2_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Ip4.h>
 
@@ -179,7 +178,7 @@ typedef struct {
   @param[in]   This               Pointer to the EFI_IP4_CONFIG2_PROTOCOL instance.
   @param[in]   DataType           The type of data to set.
   @param[in]   DataSize           Size of the buffer pointed to by Data in bytes.
-  @param[in]   Data               The data buffer to set. The type ofthe data buffer is associated
+  @param[in]   Data               The data buffer to set. The type of the data buffer is associated
                                   with the DataType.
 
   @retval EFI_SUCCESS             The specified configuration data for the EFI IPv4 network stack is set
@@ -312,5 +311,3 @@ struct _EFI_IP4_CONFIG2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiIp4Config2ProtocolGuid;
-
-#endif

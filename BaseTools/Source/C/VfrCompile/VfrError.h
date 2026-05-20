@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VFRERROR_H_
-#define _VFRERROR_H_
+#pragma once
 
 #include "Common/UefiBaseTypes.h"
 
@@ -33,7 +32,7 @@ typedef enum {
   VFR_RETURN_GET_NVVARSTORE_ERROR,
   VFR_RETURN_QVAR_REUSE,
   VFR_RETURN_FLAGS_UNSUPPORTED,
-  VFR_RETURN_ERROR_ARRARY_NUM,
+  VFR_RETURN_ERROR_ARRAY_NUM,
   VFR_RETURN_DATA_STRING_ERROR,
   VFR_RETURN_DEFAULT_VALUE_REDEFINED,
   VFR_RETURN_CONSTANT_ONLY,
@@ -103,5 +102,3 @@ private:
 #define CHECK_ERROR_RETURN(f, v) do { EFI_VFR_RETURN_CODE r; if ((r = (f)) != (v)) { return r; } } while (0)
 
 extern CVfrErrorHandle gCVfrErrorHandle;
-
-#endif

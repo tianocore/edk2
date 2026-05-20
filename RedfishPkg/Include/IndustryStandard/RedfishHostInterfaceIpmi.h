@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef REDFISH_HOST_INTERFACE_IPMI_H_
-#define REDFISH_HOST_INTERFACE_IPMI_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/IpmiNetFnGroupExtension.h>
@@ -47,5 +46,3 @@ typedef struct {
 } IPMI_BOOTSTRAP_CREDENTIALS_RESULT_RESPONSE;
 
 #pragma pack()
-
-#endif

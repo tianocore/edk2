@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef PLATFORM_BM_H_
-#define PLATFORM_BM_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -43,11 +42,9 @@ EnableQuietBoot (
   Simple Text Out screens will now be synced up with all non video output
   devices
 
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+  @retval EFI_SUCCESS     Devices are back in text mode and synced up.
 **/
 EFI_STATUS
 DisableQuietBoot (
   VOID
   );
-
-#endif // PLATFORM_BM_H_

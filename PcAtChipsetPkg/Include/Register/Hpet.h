@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __HPET_REGISTER_H__
-#define __HPET_REGISTER_H__
+#pragma once
 
 ///
 /// HPET General Register Offsets
@@ -96,5 +95,3 @@ typedef union {
 } HPET_TIMER_MSI_ROUTE_REGISTER;
 
 #pragma pack()
-
-#endif

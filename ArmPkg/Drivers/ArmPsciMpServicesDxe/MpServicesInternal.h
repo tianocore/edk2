@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MP_SERVICES_INTERNAL_H_
-#define MP_SERVICES_INTERNAL_H_
+#pragma once
 
 #include <Protocol/Cpu.h>
 #include <Protocol/MpService.h>
@@ -341,5 +340,3 @@ ReadyToBootSignaled (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
-
-#endif /* MP_SERVICES_INTERNAL_H_ */

@@ -187,7 +187,7 @@ EFI_HII_HANDLE  mHttpHiiHandle;
   @param[out] Value     UINT16 value.
 
   @retval     TRUE      The value was returned.
-  @retval     FALSE     A parsing error occured.
+  @retval     FALSE     A parsing error occurred.
 **/
 STATIC
 BOOLEAN
@@ -785,7 +785,7 @@ Error:
   @param[out] Value     UINT16 value
 
   @retval     TRUE      The value was returned.
-  @retval     FALSE     A parsing error occured.
+  @retval     FALSE     A parsing error occurred.
 **/
 STATIC
 BOOLEAN
@@ -1216,7 +1216,7 @@ SavePortion (
   }
 
   if (Context->ContentDownloaded == 0) {
-    ShellPrintEx (-1, -1, L"%s       0 Kb", HTTP_PROGR_FRAME);
+    ShellPrintDefaultEx (L"%s       0 Kb", HTTP_PROGR_FRAME);
   }
 
   Context->ContentDownloaded += DownloadLen;
@@ -1237,14 +1237,14 @@ SavePortion (
       //
       // Update downloaded size, there is no length info available.
       //
-      ShellPrintEx (-1, -1, L"%s", HTTP_KB);
-      ShellPrintEx (-1, -1, L"%7d Kb", NbOfKb);
+      ShellPrintDefaultEx (L"%s", HTTP_KB);
+      ShellPrintDefaultEx (L"%7d Kb", NbOfKb);
     }
 
     return EFI_SUCCESS;
   }
 
-  ShellPrintEx (-1, -1, L"%s", HTTP_PROGRESS_DEL);
+  ShellPrintDefaultEx (L"%s", HTTP_PROGRESS_DEL);
 
   Status = StrCpyS (Progress, HTTP_PROGRESS_MESSAGE_SIZE, HTTP_PROGR_FRAME);
   if (EFI_ERROR (Status)) {
@@ -1266,7 +1266,7 @@ SavePortion (
     NbOfKb
     );
 
-  ShellPrintEx (-1, -1, L"%s", Progress);
+  ShellPrintDefaultEx (L"%s", Progress);
 
   return EFI_SUCCESS;
 }
@@ -1690,7 +1690,7 @@ GetResponse (
     if (!EFI_ERROR (gRT->GetTime (&EndTime, NULL))) {
       ElapsedSeconds = EfiTimeToEpoch (&EndTime) - EfiTimeToEpoch (&StartTime);
       Print (
-        L",%a%Lus\n",
+        L",%a%Lus",
         ElapsedSeconds ? " " : " < ",
         ElapsedSeconds > 1 ? (UINT64)ElapsedSeconds : 1
         );
@@ -1815,6 +1815,10 @@ DownloadFile (
                     Context->Uri,
                     StrLen (Context->Uri)
                     );
+    if (DownloadUrl == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
 
     PRINT_HII (STRING_TOKEN (STR_HTTP_DOWNLOADING), DownloadUrl);
 

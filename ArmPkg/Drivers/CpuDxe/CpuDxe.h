@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef CPU_DXE_H_
-#define CPU_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -99,7 +98,7 @@ CpuSetMemoryAttributes (
 
 EFI_STATUS
 InitializeExceptions (
-  IN EFI_CPU_ARCH_PROTOCOL  *Cpu
+  VOID
   );
 
 EFI_STATUS
@@ -142,5 +141,3 @@ UINT64
 RegionAttributeToGcdAttribute (
   IN UINTN  PageAttributes
   );
-
-#endif // CPU_DXE_H_

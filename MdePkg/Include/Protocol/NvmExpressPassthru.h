@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _UEFI_NVM_EXPRESS_PASS_THRU_H_
-#define _UEFI_NVM_EXPRESS_PASS_THRU_H_
+#pragma once
 
 #define EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL_GUID \
   { \
@@ -279,5 +278,3 @@ struct _EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiNvmExpressPassThruProtocolGuid;
-
-#endif

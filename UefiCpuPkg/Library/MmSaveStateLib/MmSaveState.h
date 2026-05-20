@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MM_SAVESTATE_H_
-#define MM_SAVESTATE_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Protocol/MmCpu.h>
@@ -80,7 +79,7 @@ MmSaveStateGetRegisterIndex (
 
   @retval EFI_SUCCESS           The register was read from Save State.
   @retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
-  @retval EFI_INVALID_PARAMTER  This or Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER This or Buffer is NULL.
 
 **/
 EFI_STATUS
@@ -90,5 +89,3 @@ MmSaveStateReadRegisterByIndex (
   IN UINTN  Width,
   OUT VOID  *Buffer
   );
-
-#endif

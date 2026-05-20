@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ARMPLATFORMLIB_H_
-#define _ARMPLATFORMLIB_H_
+#pragma once
 
 //
 // The package level header files this module uses
@@ -92,5 +91,3 @@ ArmPlatformGetPlatformPpiList (
   OUT UINTN                   *PpiListSize,
   OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
   );
-
-#endif

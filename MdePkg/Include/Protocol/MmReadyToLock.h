@@ -5,7 +5,7 @@
   code when the system is preparing to lock certain resources and interfaces
   in anticipation of the invocation of 3rd party extensible modules.
   This protocol is an MM counterpart of the DXE MM Ready to Lock Protocol.
-  This protocol prorogates resource locking notification into MM environment.
+  This protocol propagates resource locking notification into MM environment.
   This protocol is installed after installation of the MM End of DXE Protocol.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef _MM_READY_TO_LOCK_H_
-#define _MM_READY_TO_LOCK_H_
+#pragma once
 
 #define EFI_MM_READY_TO_LOCK_PROTOCOL_GUID \
   { \
@@ -22,5 +21,3 @@
   }
 
 extern EFI_GUID  gEfiMmReadyToLockProtocolGuid;
-
-#endif

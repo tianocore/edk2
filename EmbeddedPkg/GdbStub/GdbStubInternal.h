@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __GDB_STUB_INTERNAL__
-#define __GDB_STUB_INTERNAL__
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -88,8 +87,6 @@ extern CONST CHAR8  mHexToStr[];
 #define REG_SIZE  32
 #elif defined (MDE_CPU_X64)
 #define REG_SIZE  64
-#elif defined (MDE_CPU_ARM)
-#define REG_SIZE  32
 #endif
 
 #define GDB_SERIAL_DEV_SIGNATURE  SIGNATURE_32 ('g', 'd', 'b', 's')
@@ -322,7 +319,7 @@ SendNotSupported (
   VOID
   );
 
-/** ‘p n’
+/** 'p n'
  Reads the n-th register's value into an output buffer and sends it as a packet
  @param     SystemContext       Register content at time of the exception
  @param     InBuffer            This is the input buffer received from gdb server
@@ -333,7 +330,7 @@ ReadNthRegister (
   IN    CHAR8               *InBuffer
   );
 
-/** ‘g’
+/** 'g'
  Reads the general registers into an output buffer  and sends it as a packet
  @param     SystemContext           Register content at time of the exception
  **/
@@ -343,7 +340,7 @@ ReadGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext
   );
 
-/** ‘P n...=r...’
+/** 'P n...=r...'
  Writes the new value of n-th register received into the input buffer to the n-th register
  @param     SystemContext       Register content at time of the exception
  @param     InBuffer            This is the input buffer received from gdb server
@@ -355,7 +352,7 @@ WriteNthRegister (
   IN    CHAR8               *InBuffer
   );
 
-/** ‘G XX...’
+/** 'G XX...'
  Writes the new values received into the input buffer to the general registers
  @param     SystemContext               Register content at time of the exception
  @param     InBuffer                    Pointer to the input buffer received from gdb server
@@ -368,7 +365,7 @@ WriteGeneralRegisters (
   IN    CHAR8               *InBuffer
   );
 
-/** ‘m addr,length ’
+/** 'm addr,length '
  Find the Length of the area to read and the start address. Finally, pass them to
  another function, TransferFromMemToOutBufAndSend, that will read from that memory space and
  send it as a packet.
@@ -381,7 +378,7 @@ ReadFromMemory (
   IN  CHAR8  *PacketData
   );
 
-/** ‘M addr,length :XX...’
+/** 'M addr,length :XX...'
  Find the Length of the area in bytes to write and the start address. Finally, pass them to
  another function, TransferFromInBufToMem, that will write to that memory space the info in
  the input buffer.
@@ -394,7 +391,7 @@ WriteToMemory (
   IN CHAR8  *PacketData
   );
 
-/** ‘c [addr ]’
+/** 'c [addr ]'
  Continue. addr is Address to resume. If addr is omitted, resume at current
  Address.
 
@@ -409,7 +406,7 @@ ContinueAtAddress (
   IN  CHAR8               *PacketData
   );
 
-/** ‘s [addr ]’
+/** 's [addr ]'
  Single step. addr is the Address at which to resume. If addr is omitted, resume
  at same Address.
 
@@ -444,10 +441,10 @@ RemoveSingleStep (
   );
 
 /**
-  ‘Z1, [addr], [length]’
-  ‘Z2, [addr], [length]’
-  ‘Z3, [addr], [length]’
-  ‘Z4, [addr], [length]’
+  'Z1, [addr], [length]'
+  'Z2, [addr], [length]'
+  'Z3, [addr], [length]'
+  'Z4, [addr], [length]'
 
   Insert hardware breakpoint/watchpoint at address addr of size length
 
@@ -463,10 +460,10 @@ InsertBreakPoint (
   );
 
 /**
-  ‘z1, [addr], [length]’
-  ‘z2, [addr], [length]’
-  ‘z3, [addr], [length]’
-  ‘z4, [addr], [length]’
+  'z1, [addr], [length]'
+  'z2, [addr], [length]'
+  'z3, [addr], [length]'
+  'z4, [addr], [length]'
 
   Remove hardware breakpoint/watchpoint at address addr of size length
 
@@ -713,5 +710,3 @@ ValidateException (
   IN  EFI_EXCEPTION_TYPE     ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif

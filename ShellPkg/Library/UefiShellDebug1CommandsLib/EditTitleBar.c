@@ -143,19 +143,19 @@ MainTitleBarRefresh (
   // the space for file name is 20 characters
   //
   if (StrLen (FileNameTmp) <= 20) {
-    ShellPrintEx (-1, -1, L"%s   ", FileNameTmp);
+    ShellPrintDefaultEx (L"%s   ", FileNameTmp);
     for (TempInteger = StrLen (FileNameTmp); TempInteger < 20; TempInteger++) {
-      ShellPrintEx (-1, -1, L" ");
+      ShellPrintDefaultEx (L" ");
     }
   } else {
     for (TempInteger = 0; TempInteger < 17; TempInteger++) {
-      ShellPrintEx (-1, -1, L"%c", FileNameTmp[TempInteger]);
+      ShellPrintDefaultEx (L"%c", FileNameTmp[TempInteger]);
     }
 
     //
     // print "..."
     //
-    ShellPrintEx (-1, -1, L"...   ");
+    ShellPrintDefaultEx (L"...   ");
   }
 
   //
@@ -165,18 +165,18 @@ MainTitleBarRefresh (
     case FileTypeAscii:
     case FileTypeUnicode:
       if (FileType == FileTypeAscii) {
-        ShellPrintEx (-1, -1, L"     ASCII     ");
+        ShellPrintDefaultEx (L"     ASCII     ");
       } else {
-        ShellPrintEx (-1, -1, L"     UNICODE   ");
+        ShellPrintDefaultEx (L"     UNICODE   ");
       }
 
       //
       // print read-only field for text files
       //
       if (ReadOnly) {
-        ShellPrintEx (-1, -1, L"ReadOnly   ");
+        ShellPrintDefaultEx (L"ReadOnly   ");
       } else {
-        ShellPrintEx (-1, -1, L"           ");
+        ShellPrintDefaultEx (L"           ");
       }
 
       break;
@@ -185,7 +185,7 @@ MainTitleBarRefresh (
       //
       // Print the offset.
       //
-      ShellPrintEx (-1, -1, L"Offset %X | Size %X", Offset, Size);
+      ShellPrintDefaultEx (L"Offset %X | Size %X", Offset, Size);
     case FileTypeFileBuffer:
       break;
     default:
@@ -196,7 +196,7 @@ MainTitleBarRefresh (
   // print modified field
   //
   if (Modified) {
-    ShellPrintEx (-1, -1, L"Modified");
+    ShellPrintDefaultEx (L"Modified");
   }
 
   //

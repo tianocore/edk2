@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_HII_SERVICES_LIB_H__
-#define __UEFI_HII_SERVICES_LIB_H__
+#pragma once
 
 #include <Protocol/HiiFont.h>
 #include <Protocol/HiiString.h>
@@ -42,5 +41,3 @@ extern EFI_HII_DATABASE_PROTOCOL  *gHiiDatabase;
 /// The pointer to the UEFI HII Config Rounting Protocol.
 ///
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL  *gHiiConfigRouting;
-
-#endif

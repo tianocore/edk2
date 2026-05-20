@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_IOMMU_H__
-#define __PEI_IOMMU_H__
+#pragma once
 
 //
 // for EFI_ALLOCATE_TYPE
@@ -196,5 +195,3 @@ struct _EDKII_IOMMU_PPI {
 /// IOMMU PPI GUID variable.
 ///
 extern EFI_GUID  gEdkiiIoMmuPpiGuid;
-
-#endif

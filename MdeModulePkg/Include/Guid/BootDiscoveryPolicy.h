@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef BOOT_DISCOVERY_POLICY_UI_LIB_H_
-#define BOOT_DISCOVERY_POLICY_UI_LIB_H_
+#pragma once
 
 #define BDP_CONNECT_MINIMAL  0 /* Do not connect any additional devices */
 #define BDP_CONNECT_NET      1
@@ -19,5 +18,3 @@
 
 #define BOOT_DISCOVERY_POLICY_VAR      L"BootDiscoveryPolicy"
 #define BOOT_DISCOVERY_POLICY_OLD_VAR  L"BootDiscoveryPolicyOld"
-
-#endif

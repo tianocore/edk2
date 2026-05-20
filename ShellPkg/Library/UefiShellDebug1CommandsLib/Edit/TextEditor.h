@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _EFI_EDIT_H_
-#define _EFI_EDIT_H_
+#pragma once
 
 #include "TextEditorTypes.h"
 
@@ -22,5 +21,3 @@
 extern EFI_EDITOR_GLOBAL_EDITOR  MainEditor;
 extern BOOLEAN                   EditorFirst;
 extern BOOLEAN                   EditorExit;
-
-#endif // _EFI_EDIT_H_

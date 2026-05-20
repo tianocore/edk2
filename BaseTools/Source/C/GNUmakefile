@@ -1,55 +1,27 @@
 ## @file
 #  GNU/Linux makefile for C tools build.
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2025, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-ifndef HOST_ARCH
-  #
-  # If HOST_ARCH is not defined, then we use 'uname -m' to attempt
-  # try to figure out the appropriate HOST_ARCH.
-  #
-  uname_m = $(shell uname -m)
-  $(info Attempting to detect HOST_ARCH from 'uname -m': $(uname_m))
-  ifneq (,$(strip $(filter $(uname_m), x86_64 amd64)))
-    HOST_ARCH=X64
-  endif
-  ifeq ($(patsubst i%86,IA32,$(uname_m)),IA32)
-    HOST_ARCH=IA32
-  endif
-  ifneq (,$(findstring aarch64,$(uname_m)))
-    HOST_ARCH=AARCH64
-  else ifneq (,$(findstring arm64,$(uname_m)))
-    HOST_ARCH=AARCH64
-  else ifneq (,$(findstring arm,$(uname_m)))
-    HOST_ARCH=ARM
-  endif
-  ifneq (,$(findstring riscv64,$(uname_m)))
-    HOST_ARCH=RISCV64
-  endif
-  ifneq (,$(findstring loongarch64,$(uname_m)))
-    HOST_ARCH=LOONGARCH64
-  endif
-  ifndef HOST_ARCH
-    $(info Could not detected HOST_ARCH from uname results)
-    $(error HOST_ARCH is not defined!)
-  endif
-  $(info Detected HOST_ARCH of $(HOST_ARCH) using uname.)
+ifeq (Windows, $(findstring Windows,$(OS)))
+  SHELL := cmd.exe
+  MAKEROOT := $(shell echo %CD%)
+else
+  MAKEROOT := .
 endif
 
-export HOST_ARCH
-
-MAKEROOT = .
-
 include Makefiles/header.makefile
+
+export PYTHON_COMMAND
+export HOST_ARCH
 
 all: makerootdir subdirs
 	@echo Finished building BaseTools C Tools with HOST_ARCH=$(HOST_ARCH)
 
 LIBRARIES = Common
-VFRAUTOGEN = VfrCompile/VfrLexer.h
 APPLICATIONS = \
   BrotliCompress \
   VfrCompile \
@@ -67,11 +39,11 @@ APPLICATIONS = \
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
 $(LIBRARIES): $(MAKEROOT)/libs
-$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin $(VFRAUTOGEN)
+$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin
 
 .PHONY: outputdirs
 makerootdir:
-	-mkdir -p $(MAKEROOT)
+	-$(MD) $(MAKEROOT)
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: $(SUBDIRS)
@@ -82,15 +54,12 @@ $(SUBDIRS):
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 	-$(MAKE) -C $(@:-clean=) clean
 
-$(VFRAUTOGEN): VfrCompile/VfrSyntax.g
-	$(MAKE) -C VfrCompile VfrLexer.h
-
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 
 clean: localClean
 
 localClean:
-	rm -f $(MAKEROOT)/bin/*
-	-rmdir $(MAKEROOT)/libs $(MAKEROOT)/bin
+	$(RM) $(MAKEROOT)/bin/*
+	-$(RD) $(MAKEROOT)/libs $(MAKEROOT)/bin
 
 include Makefiles/footer.makefile

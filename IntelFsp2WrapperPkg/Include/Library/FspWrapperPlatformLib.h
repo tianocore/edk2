@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __FSP_WRAPPER_PLATFORM_LIB_H__
-#define __FSP_WRAPPER_PLATFORM_LIB_H__
+#pragma once
 
 /**
   This function overrides the default configurations in the FSP-M UPD data region.
@@ -77,4 +76,14 @@ CallFspWrapperResetSystem (
   IN EFI_STATUS  FspStatusResetType
   );
 
-#endif
+/**
+  This function overrides the default configurations in the FSP-I UPD data region.
+
+  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data structure.
+
+**/
+VOID
+EFIAPI
+UpdateFspiUpdData (
+  IN OUT VOID  *FspUpdRgnPtr
+  );

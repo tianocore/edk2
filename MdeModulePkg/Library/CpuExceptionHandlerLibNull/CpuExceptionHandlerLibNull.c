@@ -102,5 +102,5 @@ InitializeSeparateExceptionStacks (
   IN OUT UINTN  *BufferSize
   )
 {
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;
 }

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _VIRTIO_RNG_DXE_H_
-#define _VIRTIO_RNG_DXE_H_
+#pragma once
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
@@ -38,5 +37,3 @@ typedef struct {
 
 #define VIRTIO_ENTROPY_SOURCE_FROM_RNG(RngPointer) \
           CR (RngPointer, VIRTIO_RNG_DEV, Rng, VIRTIO_RNG_SIG)
-
-#endif

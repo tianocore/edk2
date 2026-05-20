@@ -1,0 +1,72 @@
+[
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Tianocore GitHub Pull Request Dashboard"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "// List of tianocore repos to include in results\r\n$repos=repo:tianocore/edk2 repo:tianocore/edk2-platforms repo:tianocore/containers repo:tianocore/edk2-non-osi repo:tianocore/edk2-test repo:tianocore/edk2-basetools repo:tianocore/edk2-libc repo:tianocore/edk2-pytool-library repo:tianocore/edk2-pytool-extensions repo:tianocore/edk2-edkrepo repo:tianocore/edk2-edkrepo-manifest"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "#### All Open Pull Requests"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open type:pr"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "#### My Open Pull Requests\r\n\r\nDescription: PRs that you have open right now."
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open type:pr author:@me"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "#### Pull Requests that Requested My Review\r\n\r\nDescription: PRs that are requesting your review.\r\n\r\n- **You**: Review these as soon as possible."
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open type:pr review-requested:@me"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "#### All Approved PRs\r\n\r\nDescription: These are the PRs that have been approved by at least one reviewer.\r\n\r\n- **Maintainers**: Check if they should have the ``push`` label added.\r\n"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open type:pr review:approved"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "#### All Stale PRs\r\n\r\nDescription: PRs that have had no activity in the last 60 days. They will be closed 7 days after being marked stale if no activity occurs. Leaving a comment will mark them as active.\r\n\r\n- **All**: Review this list and determine whether removing the `stale` label is appropriate. If not, leave a comment to mark the PR as active."
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:pr archived:false label:stale"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "#### All Pull Requests with the Push Label\r\n\r\nDescriptions: PRs that have the `push` label. These PRs are ready to be merged.\r\n\r\n- **Maintainers**: Review these PRs to verify none are \"stuck\" and need further attention to be merged."
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:pr archived:false label:push"
+  }
+]

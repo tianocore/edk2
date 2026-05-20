@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __STATUS_CODE_HANDLER_MM_H__
-#define __STATUS_CODE_HANDLER_MM_H__
+#pragma once
 
 #include <Protocol/MmReportStatusCodeHandler.h>
 
@@ -126,4 +125,16 @@ StatusCodeHandlerCommonEntry (
   VOID
   );
 
-#endif
+/**
+  Check if the status code is using serial port.
+
+  This function determines whether the status code reporting mechanism
+  is configured to use the serial port.
+
+  @retval TRUE   Status code is using the serial port.
+  @retval FALSE  Status code is not using the serial port.
+**/
+BOOLEAN
+IsStatusCodeUsingSerialPort (
+  VOID
+  );

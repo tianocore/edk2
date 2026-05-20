@@ -525,7 +525,7 @@ SmmFtwReady (
   @param[in]  ImageHandle       The firmware allocated handle for the UEFI image.
   @param[in]  SystemTable       A pointer to the EFI system table.
 
-  @retval     EFI_SUCCESS       This funtion always return EFI_SUCCESS.
+  @retval     EFI_SUCCESS       This function always return EFI_SUCCESS.
 
 **/
 EFI_STATUS

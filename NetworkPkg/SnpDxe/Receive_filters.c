@@ -32,41 +32,46 @@ PxeRecvFilterEnable (
   EFI_MAC_ADDRESS  *MCastAddressList
   )
 {
-  Snp->Cdb.OpCode    = PXE_OPCODE_RECEIVE_FILTERS;
-  Snp->Cdb.OpFlags   = PXE_OPFLAGS_RECEIVE_FILTER_ENABLE;
-  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
+  Snp->Cdb->OpCode    = PXE_OPCODE_RECEIVE_FILTERS;
+  Snp->Cdb->OpFlags   = PXE_OPFLAGS_RECEIVE_FILTER_ENABLE;
+  Snp->Cdb->CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb->DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
   }
 
   if ((EnableFlags & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
   }
 
   if (MCastAddressCount != 0) {
-    Snp->Cdb.CPBsize = (UINT16)(MCastAddressCount * sizeof (EFI_MAC_ADDRESS));
-    Snp->Cdb.CPBaddr = (UINT64)(UINTN)Snp->Cpb;
-    CopyMem (Snp->Cpb, MCastAddressList, Snp->Cdb.CPBsize);
+    Snp->Cdb->CPBsize = (UINT16)(MCastAddressCount * sizeof (EFI_MAC_ADDRESS));
+    Snp->Cdb->CPBaddr = (UINT64)(UINTN)Snp->Cpb;
+    CopyMem (Snp->Cpb, MCastAddressList, Snp->Cdb->CPBsize);
   }
 
   //
@@ -74,20 +79,20 @@ PxeRecvFilterEnable (
   //
   DEBUG ((DEBUG_NET, "\nsnp->undi.receive_filters()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
       (DEBUG_ERROR,
        "\nsnp->undi.receive_filters()  %xh:%xh\n",
-       Snp->Cdb.StatFlags,
-       Snp->Cdb.StatCode)
+       Snp->Cdb->StatFlags,
+       Snp->Cdb->StatCode)
       );
 
-    switch (Snp->Cdb.StatCode) {
+    switch (Snp->Cdb->StatCode) {
       case PXE_STATCODE_INVALID_CDB:
       case PXE_STATCODE_INVALID_CPB:
       case PXE_STATCODE_INVALID_PARAMETER:
@@ -122,40 +127,45 @@ PxeRecvFilterDisable (
   BOOLEAN     ResetMCastList
   )
 {
-  Snp->Cdb.OpCode    = PXE_OPCODE_RECEIVE_FILTERS;
-  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
 
-  Snp->Cdb.OpFlags = (UINT16)((DisableFlags != 0) ? PXE_OPFLAGS_RECEIVE_FILTER_DISABLE : PXE_OPFLAGS_NOT_USED);
+  Snp->Cdb->OpCode    = PXE_OPCODE_RECEIVE_FILTERS;
+  Snp->Cdb->CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb->DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+
+  Snp->Cdb->OpFlags = (UINT16)((DisableFlags != 0) ? PXE_OPFLAGS_RECEIVE_FILTER_DISABLE : PXE_OPFLAGS_NOT_USED);
 
   if (ResetMCastList) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_RESET_MCAST_LIST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_RESET_MCAST_LIST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_UNICAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_UNICAST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
   }
 
   if ((DisableFlags & EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST) != 0) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
   }
 
   //
@@ -163,17 +173,17 @@ PxeRecvFilterDisable (
   //
   DEBUG ((DEBUG_NET, "\nsnp->undi.receive_filters()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
       (DEBUG_ERROR,
        "\nsnp->undi.receive_filters()  %xh:%xh\n",
-       Snp->Cdb.StatFlags,
-       Snp->Cdb.StatCode)
+       Snp->Cdb->StatFlags,
+       Snp->Cdb->StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -196,36 +206,41 @@ PxeRecvFilterRead (
   SNP_DRIVER  *Snp
   )
 {
-  Snp->Cdb.OpCode  = PXE_OPCODE_RECEIVE_FILTERS;
-  Snp->Cdb.OpFlags = PXE_OPFLAGS_RECEIVE_FILTER_READ;
-  Snp->Cdb.CPBsize = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize  = (UINT16)(Snp->Mode.MaxMCastFilterCount * sizeof (EFI_MAC_ADDRESS));
-  Snp->Cdb.CPBaddr = PXE_CPBADDR_NOT_USED;
-  if (Snp->Cdb.DBsize == 0) {
-    Snp->Cdb.DBaddr = (UINT64)(UINTN)NULL;
-  } else {
-    Snp->Cdb.DBaddr = (UINT64)(UINTN)Snp->Db;
-    ZeroMem (Snp->Db, Snp->Cdb.DBsize);
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
   }
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->OpCode  = PXE_OPCODE_RECEIVE_FILTERS;
+  Snp->Cdb->OpFlags = PXE_OPFLAGS_RECEIVE_FILTER_READ;
+  Snp->Cdb->CPBsize = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->DBsize  = (UINT16)(Snp->Mode.MaxMCastFilterCount * sizeof (EFI_MAC_ADDRESS));
+  Snp->Cdb->CPBaddr = PXE_CPBADDR_NOT_USED;
+  if (Snp->Cdb->DBsize == 0) {
+    Snp->Cdb->DBaddr = (UINT64)(UINTN)NULL;
+  } else {
+    Snp->Cdb->DBaddr = (UINT64)(UINTN)Snp->Db;
+    ZeroMem (Snp->Db, Snp->Cdb->DBsize);
+  }
+
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   DEBUG ((DEBUG_NET, "\nsnp->undi.receive_filters()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
     DEBUG (
       (DEBUG_ERROR,
        "\nsnp->undi.receive_filters()  %xh:%xh\n",
-       Snp->Cdb.StatFlags,
-       Snp->Cdb.StatCode)
+       Snp->Cdb->StatFlags,
+       Snp->Cdb->StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -236,27 +251,27 @@ PxeRecvFilterRead (
   //
   Snp->Mode.ReceiveFilterSetting = 0;
 
-  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_UNICAST) != 0) {
+  if ((Snp->Cdb->StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_UNICAST) != 0) {
     Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_UNICAST;
   }
 
-  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_BROADCAST) != 0) {
+  if ((Snp->Cdb->StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_BROADCAST) != 0) {
     Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
   }
 
-  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_PROMISCUOUS) != 0) {
+  if ((Snp->Cdb->StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_PROMISCUOUS) != 0) {
     Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
   }
 
-  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_ALL_MULTICAST) != 0) {
+  if ((Snp->Cdb->StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_ALL_MULTICAST) != 0) {
     Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
   }
 
-  if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST) != 0) {
+  if ((Snp->Cdb->StatFlags & PXE_STATFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST) != 0) {
     Snp->Mode.ReceiveFilterSetting |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
   }
 
-  CopyMem (Snp->Mode.MCastFilter, Snp->Db, Snp->Cdb.DBsize);
+  CopyMem (Snp->Mode.MCastFilter, Snp->Db, Snp->Cdb->DBsize);
 
   //
   // Count number of active entries in multicast filter list.

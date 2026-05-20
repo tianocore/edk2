@@ -2,13 +2,23 @@
   ACPI 3.0 definitions from the ACPI Specification Revision 3.0b October 10, 2006
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_3_0_H_
-#define _ACPI_3_0_H_
+#pragma once
 
 #include <IndustryStandard/Acpi20.h>
+
+///
+/// _CSD Revision for ACPI 3.0
+///
+#define EFI_ACPI_3_0_AML_CSD_REVISION  0
+
+///
+/// _CSD NumEntries for ACPI 3.0
+///
+#define EFI_ACPI_3_0_AML_CSD_NUM_ENTRIES  6
 
 //
 // Define for Descriptor
@@ -733,5 +743,3 @@ typedef struct {
 #define EFI_ACPI_3_0_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE  SIGNATURE_32('i', 'B', 'F', 'T')
 
 #pragma pack()
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_MTFTP4_OPTION_H__
-#define __EFI_MTFTP4_OPTION_H__
+#pragma once
 
 #define MTFTP4_SUPPORTED_OPTIONS  5
 #define MTFTP4_OPCODE_LEN         2
@@ -106,5 +105,3 @@ Mtftp4ParseOptionOack (
   );
 
 extern CHAR8  *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS];
-
-#endif

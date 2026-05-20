@@ -2,7 +2,7 @@ from __future__ import print_function
 ## @file
 # Utility functions and classes for BaseTools unit tests
 #
-#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2025, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -17,6 +17,7 @@ import random
 import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 import codecs
 
@@ -24,7 +25,6 @@ TestsDir = os.path.realpath(os.path.split(sys.argv[0])[0])
 BaseToolsDir = os.path.realpath(os.path.join(TestsDir, '..'))
 CSourceDir = os.path.join(BaseToolsDir, 'Source', 'C')
 PythonSourceDir = os.path.join(BaseToolsDir, 'Source', 'Python')
-TestTempDir = os.path.join(TestsDir, 'TestTempDir')
 
 if PythonSourceDir not in sys.path:
     #
@@ -45,7 +45,7 @@ def MakeTheTestSuite(localItems):
 
 def GetBaseToolsPaths():
     if sys.platform in ('win32', 'win64'):
-        return [ os.path.join(BaseToolsDir, 'Bin', sys.platform.title()) ]
+        return [ os.path.join(BaseToolsDir, 'Bin', x) for x in ('Win32', 'Win64') ]
     else:
         uname = os.popen('uname -sm').read().strip()
         for char in (' ', '/'):
@@ -172,11 +172,7 @@ class BaseToolsTest(unittest.TestCase):
             os.environ['PATH'] = \
                 os.path.pathsep.join((os.environ['PATH'], binPath))
 
-        self.testDir = TestTempDir
-        if not os.path.exists(self.testDir):
-            os.mkdir(self.testDir)
-        else:
-            self.cleanOutDir(self.testDir)
+        self.testDir = tempfile.mkdtemp()
 
     def tearDown(self):
         self.RemoveFileOrDir(self.testDir)

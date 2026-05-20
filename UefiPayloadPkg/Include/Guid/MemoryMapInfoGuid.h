@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef MEMORY_MAP_INFO_GUID_H_
-#define MEMORY_MAP_INFO_GUID_H_
+#pragma once
 
 #include <Library/PcdLib.h>
 
@@ -32,5 +31,3 @@ typedef struct {
   MEMORY_MAP_ENTRY    Entry[0];
 } MEMORY_MAP_INFO;
 #pragma pack()
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __NON_DISCOVERABLE_DEVICE_GUID_H__
-#define __NON_DISCOVERABLE_DEVICE_GUID_H__
+#pragma once
 
 #define EDKII_NON_DISCOVERABLE_AHCI_DEVICE_GUID \
   { 0xC7D35798, 0xE4D2, 0x4A93, {0xB1, 0x45, 0x54, 0x88, 0x9F, 0x02, 0x58, 0x4B } }
@@ -47,5 +46,3 @@ extern EFI_GUID  gEdkiiNonDiscoverableSdhciDeviceGuid;
 extern EFI_GUID  gEdkiiNonDiscoverableUfsDeviceGuid;
 extern EFI_GUID  gEdkiiNonDiscoverableUhciDeviceGuid;
 extern EFI_GUID  gEdkiiNonDiscoverableXhciDeviceGuid;
-
-#endif

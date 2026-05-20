@@ -20,10 +20,6 @@
   VERSION_STRING  = 1.0
   LIBRARY_CLASS   = CapsuleUpdatePolicyLib
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   CapsuleUpdatePolicyLibOnProtocol.c
 

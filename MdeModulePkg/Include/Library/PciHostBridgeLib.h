@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PCI_HOST_BRIDGE_LIB_H__
-#define __PCI_HOST_BRIDGE_LIB_H__
+#pragma once
 
 //
 // (Base > Limit) indicates an aperture is not available.
@@ -112,5 +111,3 @@ PciHostBridgeResourceConflict (
   EFI_HANDLE  HostBridgeHandle,
   VOID        *Configuration
   );
-
-#endif

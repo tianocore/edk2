@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UFS_PASS_THRU_H_
-#define _UFS_PASS_THRU_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -27,7 +26,8 @@
 #include <Library/PcdLib.h>
 #include <Library/TimerLib.h>
 
-#include "UfsPassThruHci.h"
+#include <IndustryStandard/Ufs.h>
+#include <IndustryStandard/UfsHci.h>
 
 #define UFS_PASS_THRU_SIG  SIGNATURE_32 ('U', 'F', 'S', 'P')
 
@@ -994,5 +994,3 @@ extern EFI_COMPONENT_NAME_PROTOCOL     gUfsPassThruComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gUfsPassThruComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL     gUfsPassThruDriverBinding;
 extern EDKII_UFS_HC_PLATFORM_PROTOCOL  *mUfsHcPlatform;
-
-#endif

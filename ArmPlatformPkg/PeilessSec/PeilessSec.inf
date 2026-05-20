@@ -20,10 +20,6 @@
   PeilessSec.h
   PeilessSec.c
 
-[Sources.ARM]
-  Arm/ArchPeilessSec.c
-  Arm/ModuleEntryPoint.S
-
 [Sources.AArch64]
   AArch64/ArchPeilessSec.c
   AArch64/ModuleEntryPoint.S
@@ -34,6 +30,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -44,6 +41,7 @@
   DebugLib
   HobLib
   MemoryInitPeiLib
+  PeilessSecMeasureLib
   PerformanceLib
   PlatformPeiLib
   PrePiHobListPointerLib
@@ -51,6 +49,8 @@
   PrintLib
   SerialPortLib
   TimerLib
+  StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gArmMpCoreInfoPpiGuid
@@ -58,6 +58,7 @@
 [Guids]
   gArmMpCoreInfoGuid
   gEfiFirmwarePerformanceGuid
+  gArmTransferListHobGuid
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
@@ -69,7 +70,6 @@
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
-  gArmTokenSpaceGuid.PcdVFPEnabled
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
 [Pcd]

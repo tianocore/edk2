@@ -2,6 +2,8 @@
 Implementation of SMM CPU Services Protocol.
 
 Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -405,7 +407,7 @@ InitializeSmmCpuServices (
   @param This          A pointer to the EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL instance.
   @param BlockingMode  Blocking mode or non-blocking mode.
 
-  @retval EFI_SUCCESS  All avaiable APs arrived.
+  @retval EFI_SUCCESS  All available APs arrived.
   @retval EFI_TIMEOUT  Wait for all APs until timeout.
 
 **/
@@ -433,7 +435,7 @@ SmmCpuRendezvous (
 
   if ((mSmmMpSyncData->EffectiveSyncMode != MmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
-    // There are some APs outside SMM, Wait for all avaiable APs to arrive.
+    // There are some APs outside SMM, Wait for all available APs to arrive.
     //
     SmmWaitForApArrival ();
     Status = mSmmMpSyncData->AllApArrivedWithException ? EFI_SUCCESS : EFI_TIMEOUT;

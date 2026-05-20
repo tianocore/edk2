@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef IP6_OPTION_HEADER_GOOGLE_TEST_H_
-#define IP6_OPTION_HEADER_GOOGLE_TEST_H_
+#pragma once
 
 #include <Uefi.h>
 #include "../Ip6Impl.h"
@@ -36,5 +35,3 @@ Ip6IsOptionValid (
   IN UINT16       OptionLen,
   IN UINT32       Pointer
   );
-
-#endif // __IP6_OPTION_HEADER_GOOGLE_TEST_H__

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_DRIVER_CONFIGURATION_H__
-#define __EFI_DRIVER_CONFIGURATION_H__
+#pragma once
 
 #include <Protocol/DriverConfiguration2.h>
 
@@ -155,5 +154,3 @@ struct _EFI_DRIVER_CONFIGURATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDriverConfigurationProtocolGuid;
-
-#endif

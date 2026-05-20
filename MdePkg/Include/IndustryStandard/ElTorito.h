@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ELTORITO_H_
-#define _ELTORITO_H_
+#pragma once
 
 //
 // CDROM_VOLUME_DESCRIPTOR.Types, defined in ISO 9660
@@ -126,7 +125,7 @@ typedef union {
   /// Section Header Entry
   ///
   struct {
-    UINT8     Indicator;     ///< 90 - Header, more header follw, 91 - Final Header
+    UINT8     Indicator;     ///< 90 - Header, more header follow, 91 - Final Header
     UINT8     PlatformId;
     UINT16    SectionEntries; ///< Number of section entries following this header
     CHAR8     Id[28];
@@ -134,5 +133,3 @@ typedef union {
 } ELTORITO_CATALOG;
 
 #pragma pack()
-
-#endif

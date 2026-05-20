@@ -34,6 +34,7 @@
   IoLib
   DebugLib
   PcdLib
+  PrintLib
 
 [Pcd]
   gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter

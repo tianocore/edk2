@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __SMM_LIB_H__
-#define __SMM_LIB_H__
+#pragma once
 
 /**
   Triggers an SMI at boot time.
@@ -76,5 +75,3 @@ EFIAPI
 ClearSmi (
   VOID
   );
-
-#endif

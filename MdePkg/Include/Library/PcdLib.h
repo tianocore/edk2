@@ -19,8 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCD_LIB_H__
-#define __PCD_LIB_H__
+#pragma once
 
 /**
   Retrieves a token number based on a token name.
@@ -1392,7 +1391,7 @@ LibPcdCallbackOnSet (
   );
 
 /**
-  Disable a notification function that was established with LibPcdCallbackonSet().
+  Disable a notification function that was established with LibPcdCallbackOnSet().
 
   Disable a notification function that was previously established with LibPcdCallbackOnSet().
   If NotificationFunction is NULL, then ASSERT().
@@ -1672,5 +1671,3 @@ EFIAPI
 LibPcdGetSku (
   VOID
   );
-
-#endif

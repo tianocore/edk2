@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_TIME_STAMP_PROTOCOL_H__
-#define __EFI_TIME_STAMP_PROTOCOL_H__
+#pragma once
 
 #define EFI_TIMESTAMP_PROTOCOL_GUID \
   { 0xafbfde41, 0x2e6e, 0x4262, {0xba, 0x65, 0x62, 0xb9, 0x23, 0x6e, 0x54, 0x95 } }
@@ -66,7 +65,7 @@ UINT64
 
   @retval      EFI_SUCCESS             The properties were successfully retrieved.
   @retval      EFI_DEVICE_ERROR        An error occurred trying to retrieve the properties of the timestamp
-                                       counter subsystem. Properties is not pedated.
+                                       counter subsystem. Properties is not updated.
   @retval      EFI_INVALID_PARAMETER   Properties is NULL.
 
 **/
@@ -87,5 +86,3 @@ struct _EFI_TIMESTAMP_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiTimestampProtocolGuid;
-
-#endif

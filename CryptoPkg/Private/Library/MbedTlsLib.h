@@ -6,7 +6,4 @@
 
 **/
 
-#ifndef MBEDTLS_LIB_H_
-#define MBEDTLS_LIB_H_
-
-#endif
+#pragma once

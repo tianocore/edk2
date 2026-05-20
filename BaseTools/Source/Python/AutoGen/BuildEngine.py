@@ -330,7 +330,6 @@ class BuildRule:
         else:
             EdkLogger.error("build", PARAMETER_MISSING, ExtraData="No rule file or string given")
 
-        self.SupportedToolChainFamilyList = SupportedFamily
         self.RuleDatabase = tdict(True, 4)  # {FileExt, ModuleType, Arch, Family : FileBuildRule object}
         self.Ext2FileType = {}  # {ext : file-type}
         self.FileTypeList = set()
@@ -343,7 +342,6 @@ class BuildRule:
         self._ArchList = set()
         self._FamilyList = []
         self._TotalToolChainFamilySet = set()
-        self._RuleObjectList = [] # FileBuildRule object list
         self._FileVersion = ""
 
         self.Parse()

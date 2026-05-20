@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __GOLDMONT_PLUS_MSR_H__
-#define __GOLDMONT_PLUS_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -260,5 +259,3 @@ typedef union {
 #define MSR_GOLDMONT_PLUS_LASTBRANCH_INFO_29  0x00000DDD
 #define MSR_GOLDMONT_PLUS_LASTBRANCH_INFO_30  0x00000DDE
 #define MSR_GOLDMONT_PLUS_LASTBRANCH_INFO_31  0x00000DDF
-
-#endif

@@ -9,13 +9,16 @@
 #
 
 [Defines]
+
+  #
+  # Shell can be useful for debugging but should not be enabled for production
+  #
+  DEFINE BUILD_SHELL             = TRUE
+
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
-!if $(TARGET) != NOOPT
-  DEFINE FD_SIZE_IN_MB    = 2
-!else
-  DEFINE FD_SIZE_IN_MB    = 3
-!endif
+# Various builds now exceed 2MB so choose 3MB as the default.
+DEFINE FD_SIZE_IN_MB    = 3
 
 !if $(FD_SIZE_IN_MB) == 2
   DEFINE FD_SIZE          = 0x200000
@@ -27,11 +30,14 @@
 !endif
 
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION]
-  GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_CLANGDWARF_*_DLINK_FLAGS = -z common-page-size=0x1000
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x1000
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
-  GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
-  GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
+  GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x10000
+  GCC:*_CLANGDWARF_*_DLINK_FLAGS = -z common-page-size=0x10000
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE
@@ -61,12 +67,13 @@
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
-  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
-  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
+
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
 
@@ -92,10 +99,7 @@
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
-  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
-  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
-  ArmGicArchLib|ArmVirtPkg/Library/ArmVirtGicArchLib/ArmVirtGicArchLib.inf
-  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
 
@@ -118,7 +122,7 @@
   DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
 
   # Flattened Device Tree (FDT) access library
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
+  FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 
   # PCI Libraries
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
@@ -164,9 +168,17 @@
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+!if $(QEMU_PV_VARS) == TRUE
+  MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
+!endif
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+
+  ArmCcaLib|ArmVirtPkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
 
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -182,8 +194,7 @@
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
 
-  # ARM platforms have SEC modules with standard entry points, so we can generically link StackCheckLib
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLibNull/ArmCcaInitPeiLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -228,7 +239,6 @@
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
-  DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
 
@@ -255,21 +265,7 @@
 !endif
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
-[LibraryClasses.AARCH64.DXE_RUNTIME_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-
-[LibraryClasses.ARM.DXE_RUNTIME_DRIVER]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/RuntimeCryptLib.inf
-
-[LibraryClasses.AARCH64]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-
-[LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
-  MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
-  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
@@ -290,7 +286,6 @@
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
-[PcdsFeatureFlag.AARCH64]
   #
   # Activate AcpiSdtProtocol
   #
@@ -396,49 +391,8 @@
   #
   MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
-  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
-  ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
-  ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
-  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
-  ShellPkg/Application/Shell/Shell.inf {
-    <LibraryClasses>
-      ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
-      NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
-!if $(ACPIVIEW_ENABLE) == TRUE
-      NULL|ShellPkg/Library/UefiShellAcpiViewCommandLib/UefiShellAcpiViewCommandLib.inf
-!endif
-      NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
-!if $(NETWORK_IP6_ENABLE) == TRUE
-      NULL|ShellPkg/Library/UefiShellNetwork2CommandsLib/UefiShellNetwork2CommandsLib.inf
-!endif
-      HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
-      PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-      BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
+!include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-      gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
-  }
-
-[Components.AARCH64]
   #
   # ACPI Support
   #

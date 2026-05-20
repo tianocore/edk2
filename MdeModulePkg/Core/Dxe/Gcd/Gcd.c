@@ -26,7 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                        EFI_RESOURCE_ATTRIBUTE_16_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_32_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_64_BIT_IO           | \
-                                       EFI_RESOURCE_ATTRIBUTE_PERSISTENT          )
+                                       EFI_RESOURCE_ATTRIBUTE_PERSISTENT          | \
+                                       EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE     )
 
 #define TESTED_MEMORY_ATTRIBUTES  (EFI_RESOURCE_ATTRIBUTE_PRESENT     |     \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
@@ -93,6 +94,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY  mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,            TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE,           EFI_MEMORY_MORE_RELIABLE, TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,         EFI_MEMORY_SP,            TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_HOT_PLUGGABLE,           EFI_MEMORY_HOT_PLUGGABLE, TRUE  },
   { 0,                                              0,                        FALSE }
 };
 
@@ -151,8 +153,18 @@ CoreDumpGcdMemorySpaceMap (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            Index;
 
+  // The compiler is not smart enough to compile out the whole function if DEBUG_GCD is not enabled, so we end up
+  // looping through the GCD every time it gets updated, which wastes a lot of needless cycles if we aren't going to
+  // print it. So shortcircuit and jump out if we don't need to print it.
+  if (!DebugPrintLevelEnabled (DEBUG_GCD)) {
+    return;
+  }
+
   Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-  ASSERT (Status == EFI_SUCCESS && MemorySpaceMap != NULL);
+  if (!((Status == EFI_SUCCESS) && (MemorySpaceMap != NULL))) {
+    ASSERT ((Status == EFI_SUCCESS) && (MemorySpaceMap != NULL));
+    return;
+  }
 
   if (InitialMap) {
     DEBUG ((DEBUG_GCD, "GCD:Initial GCD Memory Space Map\n"));
@@ -197,8 +209,18 @@ CoreDumpGcdIoSpaceMap (
   EFI_GCD_IO_SPACE_DESCRIPTOR  *IoSpaceMap;
   UINTN                        Index;
 
+  // The compiler is not smart enough to compile out the whole function if DEBUG_GCD is not enabled, so we end up
+  // looping through the GCD every time it gets updated, which wastes a lot of needless cycles if we aren't going to
+  // print it. So shortcircuit and jump out if we don't need to print it.
+  if (!DebugPrintLevelEnabled (DEBUG_GCD)) {
+    return;
+  }
+
   Status = CoreGetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
-  ASSERT (Status == EFI_SUCCESS && IoSpaceMap != NULL);
+  if (!((Status == EFI_SUCCESS) && (IoSpaceMap != NULL))) {
+    ASSERT ((Status == EFI_SUCCESS) && (IoSpaceMap != NULL));
+    return;
+  }
 
   if (InitialMap) {
     DEBUG ((DEBUG_GCD, "GCD:Initial GCD I/O Space Map\n"));
@@ -676,7 +698,7 @@ ConverToCpuArchAttributes (
 {
   UINT64  CpuArchAttributes;
 
-  CpuArchAttributes = Attributes & EFI_MEMORY_ATTRIBUTE_MASK;
+  CpuArchAttributes = Attributes & EFI_MEMORY_ACCESS_MASK;
 
   if ((Attributes & EFI_MEMORY_UC) == EFI_MEMORY_UC) {
     CpuArchAttributes |= EFI_MEMORY_UC;
@@ -754,13 +776,14 @@ CoreConvertSpace (
     Map = &mGcdIoSpaceMap;
   } else {
     ASSERT (FALSE);
+    return EFI_NOT_FOUND;
   }
 
   //
   // Search for the list of descriptors that cover the range BaseAddress to BaseAddress+Length
   //
   Status = CoreSearchGcdMapEntry (BaseAddress, Length, &StartLink, &EndLink, Map);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || ((StartLink == NULL) || (EndLink == NULL))) {
     Status = EFI_UNSUPPORTED;
 
     goto Done;
@@ -974,12 +997,12 @@ CoreConvertSpace (
       // Set attributes operation
       //
       case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
-        if (CpuArchAttributes == 0) {
+        if ((CpuArchAttributes == 0) && (Attributes != 0)) {
           //
           // Keep original CPU arch attributes when caller just calls
           // SetMemorySpaceAttributes() with none CPU arch attributes (for example, RUNTIME).
           //
-          Attributes |= (Entry->Attributes & (EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ATTRIBUTE_MASK));
+          Attributes |= (Entry->Attributes & (EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ACCESS_MASK));
         }
 
         Entry->Attributes = Attributes;
@@ -1168,6 +1191,7 @@ CoreAllocateSpace (
     Map = &mGcdIoSpaceMap;
   } else {
     ASSERT (FALSE);
+    return EFI_NOT_FOUND;
   }
 
   Found     = FALSE;
@@ -1335,6 +1359,12 @@ CoreAllocateSpace (
   // Convert/Insert the list of descriptors from StartLink to EndLink
   //
   Link = StartLink;
+  if ((Link == NULL) || (EndLink == NULL)) {
+    ASSERT (Link != NULL);
+    ASSERT (EndLink != NULL);
+    goto Done;
+  }
+
   while (Link != EndLink->ForwardLink) {
     Entry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
     CoreInsertGcdMapEntry (Link, Entry, *BaseAddress, Length, TopEntry, BottomEntry);
@@ -2258,6 +2288,7 @@ CoreInitializeMemoryServices (
   EFI_HOB_GUID_TYPE            *GuidHob;
   UINT32                       ReservedCodePageNumber;
   UINT64                       MinimalMemorySizeNeeded;
+  EFI_PHYSICAL_ADDRESS         ResourceHobMemoryTop;
 
   //
   // Point at the first HOB.  This must be the PHIT HOB.
@@ -2379,7 +2410,17 @@ CoreInitializeMemoryServices (
       continue;
     }
 
-    if (PhitHob->EfiFreeMemoryTop > (ResourceHob->PhysicalStart + ResourceHob->ResourceLength)) {
+    //
+    // Check for potential overflow before addition
+    //
+    if (ResourceHob->PhysicalStart > MAX_UINT64 - ResourceHob->ResourceLength) {
+      ASSERT (FALSE);
+      ResourceHobMemoryTop = MAX_UINT64;
+    } else {
+      ResourceHobMemoryTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+    }
+
+    if (PhitHob->EfiFreeMemoryTop > ResourceHobMemoryTop) {
       continue;
     }
 
@@ -2403,8 +2444,14 @@ CoreInitializeMemoryServices (
     //
     Attributes  = PhitResourceHob->ResourceAttribute;
     BaseAddress = PageAlignAddress (PhitHob->EfiMemoryTop);
-    Length      = PageAlignLength (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - BaseAddress);
-    FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
+
+    if (BaseAddress > ResourceHobMemoryTop) {
+      Length = 0;
+    } else {
+      Length = PageAlignLength (ResourceHobMemoryTop - BaseAddress);
+      FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
+    }
+
     if (Length < MinimalMemorySizeNeeded) {
       //
       // If that range is not large enough to intialize the DXE Core, then
@@ -2480,7 +2527,17 @@ CoreInitializeMemoryServices (
         continue;
       }
 
-      if ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength) > (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS) {
+      //
+      // Check for potential overflow before addition
+      //
+      if (ResourceHob->PhysicalStart > MAX_UINT64 - ResourceHob->ResourceLength) {
+        ASSERT (FALSE);
+        ResourceHobMemoryTop = MAX_UINT64;
+      } else {
+        ResourceHobMemoryTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+      }
+
+      if (ResourceHobMemoryTop > (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS) {
         continue;
       }
 
@@ -2495,7 +2552,7 @@ CoreInitializeMemoryServices (
       // Skip Resource Descriptor HOBs that are not large enough to initilize the DXE Core
       //
       TestedMemoryBaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
-      TestedMemoryLength      = PageAlignLength (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - TestedMemoryBaseAddress);
+      TestedMemoryLength      = PageAlignLength (ResourceHobMemoryTop - TestedMemoryBaseAddress);
       FindLargestFreeRegion (&TestedMemoryBaseAddress, &TestedMemoryLength, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
       if (TestedMemoryLength < MinimalMemorySizeNeeded) {
         continue;
@@ -2608,7 +2665,11 @@ CoreInitializeGcdServices (
   // Get the number of address lines in the I/O and Memory space for the CPU
   //
   CpuHob = GetFirstHob (EFI_HOB_TYPE_CPU);
-  ASSERT (CpuHob != NULL);
+  if (CpuHob == NULL) {
+    ASSERT (CpuHob != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   SizeOfMemorySpace = CpuHob->SizeOfMemorySpace;
   SizeOfIoSpace     = CpuHob->SizeOfIoSpace;
 
@@ -2616,7 +2677,10 @@ CoreInitializeGcdServices (
   // Initialize the GCD Memory Space Map
   //
   Entry = AllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdMemorySpaceMapEntryTemplate);
-  ASSERT (Entry != NULL);
+  if (Entry == NULL) {
+    ASSERT (Entry != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Entry->EndAddress = LShiftU64 (1, SizeOfMemorySpace) - 1;
 
@@ -2628,7 +2692,10 @@ CoreInitializeGcdServices (
   // Initialize the GCD I/O Space Map
   //
   Entry = AllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdIoSpaceMapEntryTemplate);
-  ASSERT (Entry != NULL);
+  if (Entry == NULL) {
+    ASSERT (Entry != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Entry->EndAddress = LShiftU64 (1, SizeOfIoSpace) - 1;
 
@@ -2666,6 +2733,12 @@ CoreInitializeGcdServices (
 
           if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
             GcdMemoryType = EfiGcdMemoryTypePersistent;
+          }
+
+          // Mark special purpose memory as system memory, if it was system memory in the HOB
+          // However, if this is also marked as persistent, let persistent take precedence
+          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) {
+            GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
           }
 
           break;
@@ -2848,7 +2921,10 @@ CoreInitializeGcdServices (
                  (UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart),
                  *HobStart
                  );
-  ASSERT (NewHobList != NULL);
+  if (NewHobList == NULL) {
+    ASSERT (NewHobList != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   *HobStart = NewHobList;
   gHobList  = NewHobList;

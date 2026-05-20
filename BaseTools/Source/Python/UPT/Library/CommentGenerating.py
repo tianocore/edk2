@@ -16,7 +16,6 @@ CommentGenerating
 from Library.StringUtils import GetSplitValueList
 from Library.DataType import TAB_SPACE_SPLIT
 from Library.DataType import TAB_INF_GUIDTYPE_VAR
-from Library.DataType import USAGE_ITEM_NOTIFY
 from Library.DataType import ITEM_UNDEFINED
 from Library.DataType import TAB_HEADER_COMMENT
 from Library.DataType import TAB_BINARY_HEADER_COMMENT
@@ -42,18 +41,6 @@ def GenTailCommentLines (TailCommentLines, LeadingSpaceNum = 0):
     (END_OF_LINE + LeadingSpaceNum * TAB_SPACE_SPLIT + TAB_SPACE_SPLIT*2 + TAB_SPECIAL_COMMENT + \
      TAB_SPACE_SPLIT).join(GetSplitValueList(TailCommentLines, END_OF_LINE))
 
-    return CommentStr
-
-## GenGenericComment
-#
-# @param CommentLines:   Generic comment Text, maybe Multiple Lines
-#
-def GenGenericComment (CommentLines):
-    if not CommentLines:
-        return ''
-    CommentLines = CommentLines.rstrip(END_OF_LINE)
-    CommentStr = TAB_SPECIAL_COMMENT + TAB_SPACE_SPLIT + (END_OF_LINE + TAB_COMMENT_SPLIT + TAB_SPACE_SPLIT).join\
-    (GetSplitValueList(CommentLines, END_OF_LINE)) + END_OF_LINE
     return CommentStr
 
 ## GenGenericCommentF
@@ -162,57 +149,6 @@ def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryH
         Content += CommChar * 2 + '\r\n'
 
     return Content
-
-
-## GenInfPcdTailComment
-#  Generate Pcd tail comment for Inf, this would be one line comment
-#
-# @param Usage:            Usage type
-# @param TailCommentText:  Comment text for tail comment
-#
-def GenInfPcdTailComment (Usage, TailCommentText):
-    if (Usage == ITEM_UNDEFINED) and (not TailCommentText):
-        return ''
-
-    CommentLine = TAB_SPACE_SPLIT.join([Usage, TailCommentText])
-    return GenTailCommentLines(CommentLine)
-
-## GenInfProtocolPPITailComment
-#  Generate Protocol/PPI tail comment for Inf
-#
-# @param Usage:            Usage type
-# @param TailCommentText:  Comment text for tail comment
-#
-def GenInfProtocolPPITailComment (Usage, Notify, TailCommentText):
-    if (not Notify) and (Usage == ITEM_UNDEFINED) and (not TailCommentText):
-        return ''
-
-    if Notify:
-        CommentLine = USAGE_ITEM_NOTIFY + " ## "
-    else:
-        CommentLine = ''
-
-    CommentLine += TAB_SPACE_SPLIT.join([Usage, TailCommentText])
-    return GenTailCommentLines(CommentLine)
-
-## GenInfGuidTailComment
-#  Generate Guid tail comment for Inf
-#
-# @param Usage:            Usage type
-# @param TailCommentText:  Comment text for tail comment
-#
-def GenInfGuidTailComment (Usage, GuidTypeList, VariableName, TailCommentText):
-    GuidType = GuidTypeList[0]
-    if (Usage == ITEM_UNDEFINED) and (GuidType == ITEM_UNDEFINED) and \
-        (not TailCommentText):
-        return ''
-
-    FirstLine = Usage + " ## " + GuidType
-    if GuidType == TAB_INF_GUIDTYPE_VAR:
-        FirstLine += ":" + VariableName
-
-    CommentLine = TAB_SPACE_SPLIT.join([FirstLine, TailCommentText])
-    return GenTailCommentLines(CommentLine)
 
 ## GenDecGuidTailComment
 #

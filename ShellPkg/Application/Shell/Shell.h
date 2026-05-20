@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SHELL_INTERNAL_HEADER_
-#define _SHELL_INTERNAL_HEADER_
+#pragma once
 
 #include <Uefi.h>
 
@@ -382,5 +381,3 @@ VOID
 RestoreBufferList (
   IN OUT LIST_ENTRY  *OldBufferList
   );
-
-#endif //_SHELL_INTERNAL_HEADER_

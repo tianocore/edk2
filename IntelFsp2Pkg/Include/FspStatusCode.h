@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FSP_STATUS_CODE_H_
-#define _FSP_STATUS_CODE_H_
+#pragma once
 
 //
 // FSP API - 4 BITS
@@ -16,6 +15,7 @@
 #define FSP_STATUS_CODE_MEMORY_INIT                   0xD000
 #define FSP_STATUS_CODE_TEMP_RAM_EXIT                 0xB000
 #define FSP_STATUS_CODE_SILICON_INIT                  0x9000
+#define FSP_STATUS_CODE_FSPSMM_INIT                   0x7000
 #define FSP_STATUS_CODE_POST_PCIE_ENUM_NOTIFICATION   0x6000
 #define FSP_STATUS_CODE_READY_TO_BOOT_NOTIFICATION    0x4000
 #define FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION  0x2000
@@ -36,5 +36,3 @@
 //
 #define FSP_STATUS_CODE_API_ENTRY  0x0000
 #define FSP_STATUS_CODE_API_EXIT   0x007F
-
-#endif

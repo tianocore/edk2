@@ -7,11 +7,8 @@
 
 **/
 
-#ifndef REDFISH_COMMON_H_
-#define REDFISH_COMMON_H_
+#pragma once
 
 #ifndef IS_EMPTY_STRING
 #define IS_EMPTY_STRING(a)  ((a) == NULL || (a)[0] == '\0')
-#endif
-
 #endif

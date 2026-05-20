@@ -8,18 +8,20 @@
 
 **/
 
-#ifndef PRM_H_
-#define PRM_H_
+#pragma once
 
 #include <Uefi.h>
 #include <PrmContextBuffer.h>
 
-#if defined (_MSC_VER)
-#define PRM_EXPORT_API  __declspec(dllexport)
-#elif defined (__GNUC__)
-#define PRM_EXPORT_API  __attribute__ ((visibility ("default")))
+#if defined (_MSC_EXTENSIONS)
+#define PRM_EXPORT_API         __declspec(dllexport)
+#define PRM_EXPORT_DESCRIPTOR  __declspec(dllexport)
+#elif defined (__GNUC__) || defined (__clang__)
+#define PRM_EXPORT_API
+#define PRM_EXPORT_DESCRIPTOR  __attribute__((used)) __attribute__((section(".prmexportdescriptor")))
 #else
 #define PRM_EXPORT_API
+#define PRM_EXPORT_DESCRIPTOR
 #endif
 
 #define PRM_HANDLER_NAME_MAXIMUM_LENGTH  128
@@ -45,5 +47,3 @@ EFI_STATUS
   IN VOID                 *ParameterBuffer  OPTIONAL,
   IN PRM_CONTEXT_BUFFER   *ContextBuffer  OPTIONAL
   );
-
-#endif

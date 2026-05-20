@@ -1,25 +1,17 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef ARM_LIB_H_
-#define ARM_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
-
-#ifdef MDE_CPU_ARM
-  #include <Arm/AArch32.h>
-#elif defined (MDE_CPU_AARCH64)
-  #include <AArch64/AArch64.h>
-#else
-  #error "Unknown chipset."
-#endif
+#include <AArch64/AArch64.h>
 
 #define EFI_MEMORY_CACHETYPE_MASK  (EFI_MEMORY_UC | EFI_MEMORY_WC |  \
                                      EFI_MEMORY_WT | EFI_MEMORY_WB | \
@@ -58,21 +50,6 @@ typedef VOID (*CACHE_OPERATION)(
 typedef VOID (*LINE_OPERATION)(
   UINTN
   );
-
-//
-// ARM Processor Mode
-//
-typedef enum {
-  ARM_PROCESSOR_MODE_USER       = 0x10,
-  ARM_PROCESSOR_MODE_FIQ        = 0x11,
-  ARM_PROCESSOR_MODE_IRQ        = 0x12,
-  ARM_PROCESSOR_MODE_SUPERVISOR = 0x13,
-  ARM_PROCESSOR_MODE_ABORT      = 0x17,
-  ARM_PROCESSOR_MODE_HYP        = 0x1A,
-  ARM_PROCESSOR_MODE_UNDEFINED  = 0x1B,
-  ARM_PROCESSOR_MODE_SYSTEM     = 0x1F,
-  ARM_PROCESSOR_MODE_MASK       = 0x1F
-} ARM_PROCESSOR_MODE;
 
 //
 // ARM Cpu IDs
@@ -156,7 +133,7 @@ ArmInstructionCacheLineLength (
   VOID
   );
 
-UINTN
+UINT32
 EFIAPI
 ArmCacheWritebackGranule (
   VOID
@@ -342,20 +319,8 @@ ArmUpdateTranslationTableEntry (
 
 VOID
 EFIAPI
-ArmSetDomainAccessControl (
-  IN  UINT32  Domain
-  );
-
-VOID
-EFIAPI
 ArmSetTTBR0 (
   IN  VOID  *TranslationTableBase
-  );
-
-VOID
-EFIAPI
-ArmSetTTBCR (
-  IN  UINT32  Bits
   );
 
 VOID *
@@ -367,30 +332,6 @@ ArmGetTTBR0BaseAddress (
 BOOLEAN
 EFIAPI
 ArmMmuEnabled (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmEnableBranchPrediction (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmDisableBranchPrediction (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmSetLowVectors (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmSetHighVectors (
   VOID
   );
 
@@ -470,6 +411,12 @@ ArmCallWFI (
 UINTN
 EFIAPI
 ArmReadMpidr (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadAidr (
   VOID
   );
 
@@ -699,6 +646,18 @@ ArmHasGicSystemRegisters (
   VOID
   );
 
+/**
+  Check whether the CPU supports the GICv5 system register interface
+
+  @return   Whether GICv5 System Register Interface is supported
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicV5SystemRegisters (
+  VOID
+  );
+
 /** Checks if CCIDX is implemented.
 
    @retval TRUE  CCIDX is implemented.
@@ -710,7 +669,6 @@ ArmHasCcidx (
   VOID
   );
 
-#ifdef MDE_CPU_AARCH64
 ///
 /// AArch64-only ID Register Helper functions
 ///
@@ -719,7 +677,7 @@ ArmHasCcidx (
   Checks whether the CPU implements the Virtualization Host Extensions.
 
   @retval TRUE  FEAT_VHE is implemented.
-  @retval FALSE FEAT_VHE is not mplemented.
+  @retval FALSE FEAT_VHE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -731,7 +689,7 @@ ArmHasVhe (
   Checks whether the CPU implements the Trace Buffer Extension.
 
   @retval TRUE  FEAT_TRBE is implemented.
-  @retval FALSE FEAT_TRBE is not mplemented.
+  @retval FALSE FEAT_TRBE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -743,7 +701,7 @@ ArmHasTrbe (
   Checks whether the CPU implements the Embedded Trace Extension.
 
   @retval TRUE  FEAT_ETE is implemented.
-  @retval FALSE FEAT_ETE is not mplemented.
+  @retval FALSE FEAT_ETE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -751,25 +709,26 @@ ArmHasEte (
   VOID
   );
 
-#endif // MDE_CPU_AARCH64
-
-#ifdef MDE_CPU_ARM
-///
-/// AArch32-only ID Register Helper functions
-///
-
 /**
-  Check whether the CPU supports the Security extensions
+  Checks whether the CPU supports 52-bit addressing with 4KiB translation
+  granule size
 
-  @return   Whether the Security extensions are implemented
-
+  @retval TRUE   52-bit addressing is implemented.
+  @retval FALSE  52-bit addressing is not implemented.
 **/
 BOOLEAN
 EFIAPI
-ArmHasSecurityExtensions (
+ArmHas52BitTgran4 (
   VOID
   );
 
-#endif // MDE_CPU_ARM
+/** Checks if RME is implemented.
 
-#endif // ARM_LIB_H_
+   @retval TRUE  RME is implemented.
+   @retval FALSE RME is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasRme (
+  VOID
+  );

@@ -18,8 +18,7 @@
 
 **/
 
-#ifndef __EFI_IP6_PROTOCOL_H__
-#define __EFI_IP6_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/ManagedNetwork.h>
 
@@ -615,7 +614,7 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred. The EFI IPv6
                                  Protocol driver instance is not opened.
   @retval EFI_UNSUPPORTED        Default protocol specified through
-                                 Ip6ConfigData.DefaulProtocol isn't supported.
+                                 Ip6ConfigData.DefaultProtocol isn't supported.
 
 **/
 typedef
@@ -672,7 +671,7 @@ EFI_STATUS
   the destination IPv6 address arithmetically. The gateway address must be on the same subnet as the
   configured station address.
 
-  The default route is added with Destination and PrefixLegth both set to all zeros. The
+  The default route is added with Destination and Prefixlength both set to all zeros. The
   default route matches all destination IPv6 addresses that do not match any other routes.
 
   All EFI IPv6 Protocol instances share a routing table.
@@ -942,5 +941,3 @@ struct _EFI_IP6_PROTOCOL {
 
 extern EFI_GUID  gEfiIp6ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiIp6ProtocolGuid;
-
-#endif

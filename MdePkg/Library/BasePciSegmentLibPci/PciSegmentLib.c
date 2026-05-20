@@ -19,6 +19,18 @@
   and the segment should be 0.
 
   @param  A The address to validate.
+            Layout of this address parameter is as follows:
+
+            PCI Register: Bits 0..11
+            PCI Function  Bits 12..14
+            PCI Device  Bits 15..19
+            PCI Bus Bits 20..27
+            Reserved  Bits 28..31.  Must be 0.
+            PCI Segment Bits 32..47
+            Reserved  Bits 48..63.  Must be 0.
+
+            | Reserved (MBZ) | Segment | Reserved (MBZ) |     Bus     | Device | Function | Register |
+            63             48  47    32  31           28 27         20 19    15 14      12 11         0
   @param  M Additional bits to assert to be zero.
 
 **/
@@ -1094,7 +1106,7 @@ PciSegmentBitFieldAndThenOr32 (
   Size into the buffer specified by Buffer. This function only allows the PCI
   configuration registers from a single PCI function to be read. Size is
   returned. When possible 32-bit PCI configuration read cycles are used to read
-  from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit
+  from StartAddress to StartAddress + Size. Due to alignment restrictions, 8-bit
   and 16-bit PCI configuration read cycles may be used at the beginning and the
   end of the range.
 
@@ -1192,7 +1204,7 @@ PciSegmentReadBuffer (
   Size from the buffer specified by Buffer. This function only allows the PCI
   configuration registers from a single PCI function to be written. Size is
   returned. When possible 32-bit PCI configuration write cycles are used to
-  write from StartAdress to StartAddress + Size. Due to alignment restrictions,
+  write from StartAddress to StartAddress + Size. Due to alignment restrictions,
   8-bit and 16-bit PCI configuration write cycles may be used at the beginning
   and the end of the range.
 

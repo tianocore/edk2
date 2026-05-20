@@ -17,8 +17,6 @@
   PI_SPECIFICATION_VERSION       = 0x00010032
   ENTRY_POINT                    = StandaloneMmMain
 
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
-
 [Sources]
   StandaloneMmCore.c
   StandaloneMmCore.h
@@ -55,6 +53,7 @@
   StandaloneMmCoreEntryPoint
   HobPrintLib
   ImagePropertiesRecordLib
+  PerformanceLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -63,6 +62,8 @@
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiMmConfigurationProtocolGuid               ## CONSUMES
   gEfiMmEndOfPeiProtocol                        ## PRODUCES
+  gEfiMmEntryNotifyProtocolGuid                 ## PRODUCES
+  gEfiMmExitNotifyProtocolGuid                  ## PRODUCES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
@@ -81,19 +82,22 @@
   gMmCommBufferHobGuid
   gEfiSmmSmramMemoryGuid
   gEdkiiPiSmmMemoryAttributesTableGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+  gEfiMmCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
   gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered    ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv    ##CONSUMES
 
 #
-# This configuration fails for CLANGPDB, which does not support PIE in the GCC
-# sense. Such however is required for ARM family StandaloneMmCore
-# self-relocation, and thus the CLANGPDB toolchain is unsupported for ARM and
-# AARCH64 for this module.
+# Standalone MM Core can be used as an OP-TEE trusted application and needs to do runtime
+# relocation in that scenario. It needs to be built as a position independent executable (PIE)
+# for this use case. However, PE targets do not support PIE, so only ELF targets
+# are built with these flags and support this scenario.
 #
 [BuildOptions]
-  GCC:*_*_ARM_CC_FLAGS = -fpie
-  GCC:*_*_ARM_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
-  GCC:*_*_AARCH64_CC_FLAGS = -fpie
-  GCC:*_*_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
+  GCC:*_GCC_AARCH64_CC_FLAGS = -fpie
+  GCC:*_GCC_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
+  GCC:*_CLANGDWARF_AARCH64_CC_FLAGS = -fpie
+  GCC:*_CLANGDWARF_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie

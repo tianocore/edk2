@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SECUREBOOT_CONFIG_NV_DATA_H__
-#define __SECUREBOOT_CONFIG_NV_DATA_H__
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/SecureBootConfigHii.h>
@@ -138,5 +137,3 @@ typedef struct {
   UINT32          ListCount;         // The count of signature list.
   UINT32          CheckedDataCount;  // The count of checked signature data.
 } SECUREBOOT_CONFIGURATION;
-
-#endif

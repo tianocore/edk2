@@ -1,13 +1,12 @@
 /** @file
-  Internal data structure defintions for Base UEFI Decompress Library.
+  Internal data structure definitions for Base UEFI Decompress Library.
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_UEFI_DECOMPRESS_LIB_INTERNALS_H__
-#define __BASE_UEFI_DECOMPRESS_LIB_INTERNALS_H__
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseLib.h>
@@ -230,7 +229,7 @@ Decode (
   @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
                       This is an optional parameter that may be NULL if the
                       required scratch buffer size is 0.
-  @param  Version     1 for UEFI Decompress algoruthm, 2 for Tiano Decompess algorithm.
+  @param  Version     1 for UEFI Decompress algorithm, 2 for Tiano Decompress algorithm.
 
   @retval  RETURN_SUCCESS Decompression completed successfully, and
                           the uncompressed buffer is returned in Destination.
@@ -245,5 +244,3 @@ UefiTianoDecompress (
   IN OUT VOID    *Scratch,
   IN UINT32      Version
   );
-
-#endif

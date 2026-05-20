@@ -23,13 +23,14 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = X64
 #
 
 [Sources]
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgDxe.c
+  QemuFwCfgCache.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,11 +43,16 @@
   DebugLib
   IoLib
   MemoryAllocationLib
-  MemEncryptSevLib
-  MemEncryptTdxLib
+  HobLib
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+
+[Guids]
+  gOvmfFwCfgInfoHobGuid
 
 [Depex]
   gEdkiiIoMmuProtocolGuid OR gIoMmuAbsentProtocolGuid

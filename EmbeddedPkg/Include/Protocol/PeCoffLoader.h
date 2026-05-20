@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PE_COFF_LOADER_H__
-#define __PE_COFF_LOADER_H__
+#pragma once
 
 // Needed for PE_COFF_LOADER_IMAGE_CONTEXT
 #include <Library/PeCoffLib.h>
@@ -216,5 +215,3 @@ struct _PE_COFF_LOADER_PROTOCOL {
 };
 
 extern EFI_GUID  gPeCoffLoaderProtocolGuid;
-
-#endif

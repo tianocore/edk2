@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_XHCI_H_
-#define _EFI_XHCI_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -752,5 +751,3 @@ UINT64
 XhcGetElapsedTicks (
   IN OUT UINT64  *PreviousTick
   );
-
-#endif

@@ -7,11 +7,11 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __OVMF_WORK_AREA_H__
-#define __OVMF_WORK_AREA_H__
+#pragma once
 
 #include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tpm20.h>
+#include <Library/BaseLib.h>
 
 //
 // Confidential computing work area header definition. Any change
@@ -49,11 +49,13 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
 
   UINT64    EncryptionMask;
 
+  // Flags:
+  // - BIT0 - VC: Indicator that the VC handler was called. It is used
+  //   during the SevFeature detection in OvmfPkg/ResetVector/Ia32/AmdSev.asm
+  // - BIT1 - CSFW_NO: Indicator that the SEV-SNP cache line evication
+  //   mitigation is not needed.
   //
-  // Indicator that the VC handler is called. It is used during the SevFeature
-  // detection in OvmfPkg/ResetVector/Ia32/AmdSev.c
-  //
-  UINT8     ReceivedVc;
+  UINT8     Flags;
   UINT8     Reserved[7];
 
   // Used by SEC to generate Page State Change requests. This should be
@@ -62,6 +64,9 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   //
   UINT8     WorkBuffer[1024];
 } SEC_SEV_ES_WORK_AREA;
+
+#define SEV_ES_WORK_AREA_FLAG_VC       BIT0
+#define SEV_ES_WORK_AREA_FLAG_CSFW_NO  BIT1
 
 //
 // The SEV work area definition.
@@ -85,6 +90,11 @@ typedef struct _TDX_MEASUREMENTS_DATA {
   UINT8     CfvImgHashValue[SHA384_DIGEST_SIZE];
 } TDX_MEASUREMENTS_DATA;
 
+#define MAILBOX_GDT_SIZE  (sizeof(IA32_SEGMENT_DESCRIPTOR) * 5)
+typedef struct _MAILBOX_GDT {
+  IA32_DESCRIPTOR    Gdtr;
+  UINT8              Data[MAILBOX_GDT_SIZE];
+} MAILBOX_GDT;
 //
 // The TDX work area definition
 //
@@ -98,6 +108,7 @@ typedef struct _SEC_TDX_WORK_AREA {
 typedef struct _TDX_WORK_AREA {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
   SEC_TDX_WORK_AREA                          SecTdxWorkArea;
+  MAILBOX_GDT                                MailboxGdt;
 } TDX_WORK_AREA;
 
 //
@@ -109,5 +120,3 @@ typedef union {
   SEV_WORK_AREA                              SevWorkArea;
   TDX_WORK_AREA                              TdxWorkArea;
 } OVMF_WORK_AREA;
-
-#endif

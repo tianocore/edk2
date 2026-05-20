@@ -9,6 +9,7 @@
 
 #include <Base.h>
 #include <PiPei.h>
+#include <Library/TdxHelperLib.h>
 
 /**
   In Tdx guest, some information need to be passed from host VMM to guest

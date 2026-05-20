@@ -1939,7 +1939,7 @@ FindFile (
     }
 
     CopyMem ((VOID *)&PreviousFile, (VOID *)File, sizeof (UDF_FILE_INFO));
-    if ((*FilePath != L'\0') && (*FilePath == L'\\')) {
+    if ((*FilePath == L'\\')) {
       FilePath++;
     }
   }

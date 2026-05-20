@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __GUID_SECTION_EXTRACTION_PROTOCOL_H__
-#define __GUID_SECTION_EXTRACTION_PROTOCOL_H__
+#pragma once
 
 //
 // The protocol interface structures are identified by associating
@@ -128,5 +127,3 @@ EFI_STATUS
 struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {
   EFI_EXTRACT_GUIDED_SECTION    ExtractSection;
 };
-
-#endif

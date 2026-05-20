@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EDID_ACTIVE_H__
-#define __EDID_ACTIVE_H__
+#pragma once
 
 #define EFI_EDID_ACTIVE_PROTOCOL_GUID \
   { \
@@ -42,5 +41,3 @@ typedef struct {
 } EFI_EDID_ACTIVE_PROTOCOL;
 
 extern EFI_GUID  gEfiEdidActiveProtocolGuid;
-
-#endif

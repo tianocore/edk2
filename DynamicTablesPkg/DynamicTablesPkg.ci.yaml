@@ -2,6 +2,7 @@
 # CI configuration for DynamicTablesPkg
 #
 # Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+# Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -37,7 +38,7 @@
 
     ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
     "HostUnitTestCompilerPlugin": {
-        "DscPath": "" # Don't support this test
+        "DscPath": "Test/DynamicTablesPkgHostTest.dsc"
     },
 
     ## options defined .pytool/Plugin/CharEncodingCheck
@@ -53,7 +54,8 @@
             "EmbeddedPkg/EmbeddedPkg.dec",
             "DynamicTablesPkg/DynamicTablesPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "MdePkg/MdePkg.dec"
+            "MdePkg/MdePkg.dec",
+            "SecurityPkg/SecurityPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
@@ -97,17 +99,22 @@
         "ExtendWords": [
            "ARMHB",                  # ARMHB000
            "ARMHC",                  # ARMHC600
+           "ARMHD",                  # ARMHD620
            "ARMLTD",
            "AMLDBG",
            "EISAID",
            "cacheablity",
+           "cavium",
            "CCIDX",
            "CCSIDR",
+           "cfmws",
            "countof",
            "deviceid",
            "EArch",
            "edynamic",
+           "eventq",
            "EOBJECT",
+           "gerror",
            "invoc",
            "ITARGETSR",
            "GTBLOCK",
@@ -115,6 +122,7 @@
            "lless",
            "MPIDR",
            "NAMESPACEID",
+           "NUVIA",
            "PASID",
            "PERIPHBASE",
            "phandle",
@@ -122,8 +130,11 @@
            "Rdword",
            "Roadmap",
            "ROOTNODEBASE",
+           "sapic",
            "ssdtcmn",
+           "ssdtdmc",
            "ssdtserialporttemplate",
+           "SMCCC",
            "SMMUV",
            "ssdtpcieosctemplate",
            "SSDTPC",
@@ -131,7 +142,17 @@
            "TABLEEX",
            "TNSID",
            "Vatos",
-           "WBINVD"
+           "WBINVD",
+           "xapic",
+           "aplic",
+           "aplics",
+           "eriscv",
+           "gmode",
+           "imsic",
+           "imsics",
+           "plics",
+           "rintc",
+           "smcbios"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
                                      # should be ignore

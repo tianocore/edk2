@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __PCD_INFO_PPI_H__
-#define __PCD_INFO_PPI_H__
+#pragma once
 
 extern EFI_GUID  gGetPcdInfoPpiGuid;
 
@@ -94,5 +93,3 @@ struct _GET_PCD_INFO_PPI {
   ///
   GET_PCD_INFO_PPI_GET_SKU        GetSku;
 };
-
-#endif

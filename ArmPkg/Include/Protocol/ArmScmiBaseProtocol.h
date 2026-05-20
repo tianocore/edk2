@@ -9,8 +9,7 @@
     (https://developer.arm.com/documentation/den0056/)
 **/
 
-#ifndef ARM_SCMI_BASE_PROTOCOL_H_
-#define ARM_SCMI_BASE_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/ArmScmi.h>
 
@@ -164,5 +163,3 @@ typedef enum {
   ScmiMessageIdBaseDiscoverImplementationVersion = 0x5,
   ScmiMessageIdBaseDiscoverListProtocols         = 0x6
 } SCMI_MESSAGE_ID_BASE;
-
-#endif /* ARM_SCMI_BASE_PROTOCOL_H_ */

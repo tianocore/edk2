@@ -10,8 +10,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef DYNAMIC_PLAT_REPO_H_
-#define DYNAMIC_PLAT_REPO_H_
+#pragma once
 
 #include <Protocol/ConfigurationManagerProtocol.h>
 
@@ -24,6 +23,8 @@ typedef VOID *DYNAMIC_PLATFORM_REPOSITORY_INFO;
 
   @param [in]  This       This dynamic platform repository.
   @param [in]  CmObjDesc  CmObj to add. The data is copied.
+  @param [in]  NewToken   Token for this object. If CM_NULL_TOKEN, then
+                          a new token is generated.
   @param [out] Token      If not NULL, token allocated to this CmObj.
 
   @retval EFI_SUCCESS           Success.
@@ -35,6 +36,7 @@ EFIAPI
 DynPlatRepoAddObject (
   IN        DYNAMIC_PLATFORM_REPOSITORY_INFO  *This,
   IN  CONST CM_OBJ_DESCRIPTOR                 *CmObjDesc,
+  IN        CM_OBJECT_TOKEN                   NewToken,
   OUT       CM_OBJECT_TOKEN                   *Token OPTIONAL
   );
 
@@ -110,5 +112,3 @@ EFIAPI
 DynamicPlatRepoShutdown (
   IN  DYNAMIC_PLATFORM_REPOSITORY_INFO  *DynPlatRepo
   );
-
-#endif // DYNAMIC_PLAT_REPO_H_

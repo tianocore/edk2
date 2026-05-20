@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_PLATFORM_PK_PROTECTION_LIB_H_
-#define MOCK_PLATFORM_PK_PROTECTION_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -24,5 +23,3 @@ struct MockPlatformPKProtectionLib {
     ()
     );
 };
-
-#endif

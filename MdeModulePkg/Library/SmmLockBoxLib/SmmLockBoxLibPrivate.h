@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_LOCK_BOX_LIB_PRIVATE_H_
-#define _SMM_LOCK_BOX_LIB_PRIVATE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -67,5 +66,3 @@ EFI_STATUS
 SmmLockBoxMmDestructor (
   VOID
   );
-
-#endif

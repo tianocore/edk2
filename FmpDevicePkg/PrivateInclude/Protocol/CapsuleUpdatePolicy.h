@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __CAPSULE_UPDATE_POLICY_H__
-#define __CAPSULE_UPDATE_POLICY_H__
+#pragma once
 
 #define EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL_GUID \
   { \
@@ -128,5 +127,3 @@ struct _EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiCapsuleUpdatePolicyProtocolGuid;
-
-#endif

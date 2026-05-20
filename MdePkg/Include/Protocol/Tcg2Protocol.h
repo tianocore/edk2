@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG2_PROTOCOL_H__
-#define __TCG2_PROTOCOL_H__
+#pragma once
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <IndustryStandard/Tpm20.h>
@@ -331,5 +330,3 @@ typedef struct tdEFI_TCG2_FINAL_EVENTS_TABLE {
 } EFI_TCG2_FINAL_EVENTS_TABLE;
 
 #define EFI_TCG2_FINAL_EVENTS_TABLE_VERSION  1
-
-#endif

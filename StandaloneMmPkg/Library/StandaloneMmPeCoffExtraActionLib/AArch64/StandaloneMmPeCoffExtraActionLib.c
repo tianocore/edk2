@@ -42,6 +42,7 @@ UpdatePeCoffPermissions (
   EFI_IMAGE_SECTION_HEADER             SectionHeader;
   PE_COFF_LOADER_IMAGE_CONTEXT         TmpContext;
   EFI_PHYSICAL_ADDRESS                 Base;
+  UINT64                               SectionAlignment;
 
   //
   // We need to copy ImageContext since PeCoffLoaderGetImageInfo ()
@@ -73,6 +74,8 @@ UpdatePeCoffPermissions (
       ));
     return RETURN_SUCCESS;
   }
+
+  SectionAlignment = TmpContext.SectionAlignment;
 
   if (TmpContext.SectionAlignment < EFI_PAGE_SIZE) {
     //
@@ -164,7 +167,15 @@ UpdatePeCoffPermissions (
 
     Base = TmpContext.ImageAddress + SectionHeader.VirtualAddress;
 
-    if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
+    if (SectionHeader.Misc.VirtualSize == 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Skipping section %d of image at 0x%lx with size 0\n",
+        __func__,
+        Index,
+        Base
+        ));
+    } else if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
       if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_WRITE) == 0) {
         DEBUG ((
           DEBUG_INFO,
@@ -174,7 +185,7 @@ UpdatePeCoffPermissions (
           Base,
           SectionHeader.Misc.VirtualSize
           ));
-        ReadOnlyUpdater (Base, SectionHeader.Misc.VirtualSize);
+        ReadOnlyUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
       } else {
         DEBUG ((
           DEBUG_WARN,
@@ -194,8 +205,8 @@ UpdatePeCoffPermissions (
         Base,
         SectionHeader.Misc.VirtualSize
         ));
-      ReadOnlyUpdater (Base, SectionHeader.Misc.VirtualSize);
-      NoExecUpdater (Base, SectionHeader.Misc.VirtualSize);
+      ReadOnlyUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
+      NoExecUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
     }
 
     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);

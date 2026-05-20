@@ -9,8 +9,7 @@
 *
 **/
 
-#ifndef OEM_MISC_LIB_H_
-#define OEM_MISC_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/SmBios.h>
@@ -86,7 +85,7 @@ OemGetCpuFreq (
 
   @param ProcessorIndex  Index of the processor to get the information for.
   @param ProcessorStatus Processor status.
-  @param ProcessorCharacteristics Processor characteritics.
+  @param ProcessorCharacteristics Processor characteristics.
   @param MiscProcessorData        Miscellaneous processor information.
 
   @return  TRUE on success, FALSE on failure.
@@ -267,5 +266,3 @@ EFIAPI
 OemGetEmbeddedControllerFirmwareRelease (
   VOID
   );
-
-#endif // OEM_MISC_LIB_H_

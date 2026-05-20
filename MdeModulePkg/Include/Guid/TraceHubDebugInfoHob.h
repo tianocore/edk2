@@ -6,8 +6,7 @@ Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef TRACE_HUB_DEBUG_INFO_HOB_H_
-#define TRACE_HUB_DEBUG_INFO_HOB_H_
+#pragma once
 
 #define TRACEHUB_DEBUG_INFO_HOB_REVISION  1
 
@@ -20,5 +19,3 @@ typedef struct {
 } TRACEHUB_DEBUG_INFO_HOB;
 
 extern GUID  gTraceHubDebugInfoHobGuid;
-
-#endif // TRACE_HUB_DEBUG_INFO_HOB_H_

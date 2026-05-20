@@ -7,12 +7,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB_PEIM_H_
-#define _PEI_USB_PEIM_H_
+#pragma once
 
 #include <PiPei.h>
 
-#include <Ppi/UsbHostController.h>
 #include <Ppi/Usb2HostController.h>
 #include <Ppi/UsbIo.h>
 
@@ -51,7 +49,6 @@ typedef struct {
   UINT8                                 IsHub;
   UINT8                                 DownStreamPortNo;
   UINTN                                 AllocateAddress;
-  PEI_USB_HOST_CONTROLLER_PPI           *UsbHcPpi;
   PEI_USB2_HOST_CONTROLLER_PPI          *Usb2HcPpi;
   UINT8                                 ConfigurationData[1024];
   EFI_USB_CONFIG_DESCRIPTOR             *ConfigDesc;
@@ -238,7 +235,6 @@ PeiUsbPortReset (
   Send reset signal over the given root hub port.
 
   @param  PeiServices       Describes the list of possible PEI Services.
-  @param  UsbHcPpi          The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi         The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
   @param  PortNum           The port to be reset.
   @param  RetryIndex        The retry times.
@@ -247,10 +243,7 @@ PeiUsbPortReset (
 VOID
 ResetRootPort (
   IN EFI_PEI_SERVICES              **PeiServices,
-  IN PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi,
   IN PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi,
   IN UINT8                         PortNum,
   IN UINT8                         RetryIndex
   );
-
-#endif

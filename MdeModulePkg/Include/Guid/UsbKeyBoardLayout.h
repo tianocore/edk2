@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __USB_KEYBOARD_LAYOUT_GUID_H__
-#define __USB_KEYBOARD_LAYOUT_GUID_H__
+#pragma once
 
 //
 // GUID for USB keyboard HII package list.
@@ -27,5 +26,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern EFI_GUID  gUsbKeyboardLayoutPackageGuid;
 extern EFI_GUID  gUsbKeyboardLayoutKeyGuid;
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_PLATFORM_CONFIG_DXE_H_
-#define EDKII_REDFISH_PLATFORM_CONFIG_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -131,5 +130,3 @@ CHAR8 *
 StrToAsciiStr (
   IN  EFI_STRING  UnicodeString
   );
-
-#endif

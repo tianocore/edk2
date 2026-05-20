@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __ATA_PASS_THROUGH_H__
-#define __ATA_PASS_THROUGH_H__
+#pragma once
 
 #define EFI_ATA_PASS_THRU_PROTOCOL_GUID \
   { \
@@ -270,6 +269,10 @@ EFI_STATUS
   If PortMultiplierPort is the port multiplier port number of the last ATA device on the port of
   the ATA controller, then EFI_NOT_FOUND is returned.
 
+  When port multiplier is not connected to the Port, GetNextDevice() may either return
+  EFI_SUCCESS and set PortMultiplierPort to 0xFFFF or return EFI_NOT_FOUND (in which case the
+  PortMultiplierPort value is undefined).
+
   @param[in]     This                A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in]     Port                The port number present on the ATA controller.
   @param[in,out] PortMultiplierPort  On input, a pointer to the port multiplier port number of an
@@ -462,5 +465,3 @@ struct _EFI_ATA_PASS_THRU_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiAtaPassThruProtocolGuid;
-
-#endif

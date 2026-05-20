@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FV_REPORT_PEI_H__
-#define __FV_REPORT_PEI_H__
+#pragma once
 
 #include <PiPei.h>
 
@@ -118,5 +117,3 @@ typedef struct {
   HASH_FINAL_METHOD     HashFinal;
   HASH_ALL_METHOD       HashAll;
 } HASH_ALG_INFO;
-
-#endif //__FV_REPORT_PEI_H__

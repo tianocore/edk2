@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PERFORMANCE_MEASUREMENT_H_
-#define _PERFORMANCE_MEASUREMENT_H_
+#pragma once
 
 //
 // GUID for Performance measurement Protocol
@@ -68,5 +67,3 @@ struct _EDKII_PERFORMANCE_MEASUREMENT_PROTOCOL {
 
 extern EFI_GUID  gEdkiiPerformanceMeasurementProtocolGuid;
 extern EFI_GUID  gEdkiiSmmPerformanceMeasurementProtocolGuid;
-
-#endif // _PERFORMANCE_MEASUREMENT_H_

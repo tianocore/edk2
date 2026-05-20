@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __I2C_BUS_CONFIGURATION_MANAGEMENT_H__
-#define __I2C_BUS_CONFIGURATION_MANAGEMENT_H__
+#pragma once
 
 #define EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL_GUID \
   { 0x55b71fb5, 0x17c6, 0x410e, { 0xb5, 0xbd, 0x5f, 0xa2, 0xe3, 0xd4, 0x46, 0x6b }}
@@ -123,7 +122,7 @@ typedef struct _EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL EFI_I2C_BUS_CONFIG
   @param[in]  Event           Event to signal when the transaction is complete
   @param[out] I2cStatus       Buffer to receive the transaction status.
 
-  @return  When Event is NULL, EnableI2cBusConfiguration operates synchrouously
+  @return  When Event is NULL, EnableI2cBusConfiguration operates synchronously
   and returns the I2C completion status as its return value.  In this case it is
   recommended to use NULL for I2cStatus.  The values returned from
   EnableI2cBusConfiguration are:
@@ -160,5 +159,3 @@ struct _EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL {
 /// Reference to variable defined in the .DEC file
 ///
 extern EFI_GUID  gEfiI2cBusConfigurationManagementProtocolGuid;
-
-#endif //  __I2C_BUS_CONFIGURATION_MANAGEMENT_H__

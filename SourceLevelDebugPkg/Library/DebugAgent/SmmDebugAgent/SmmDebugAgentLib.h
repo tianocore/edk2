@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SMM_DEBUG_AGENT_LIB_H_
-#define _SMM_DEBUG_AGENT_LIB_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -15,5 +14,3 @@
 #include <Library/SmmServicesTableLib.h>
 
 #include "DebugAgent.h"
-
-#endif

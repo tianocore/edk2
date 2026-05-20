@@ -9,12 +9,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PHYSICAL_PRESENCE_DATA_GUID_H__
-#define __PHYSICAL_PRESENCE_DATA_GUID_H__
+#pragma once
 
 #define EFI_PHYSICAL_PRESENCE_DATA_GUID \
   { \
     0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }\
+  }
+
+#define EFI_PHYSICAL_PRESENCE_ACPI_GUID \
+  { \
+    0x3DDDFAA6, 0x361B, 0x4eb4, { 0xA4, 0x24, 0x8D, 0x10, 0x08, 0x9D, 0x16, 0x53 }\
   }
 
 #define PHYSICAL_PRESENCE_VARIABLE  L"PhysicalPresence"
@@ -70,5 +74,4 @@ typedef struct {
 #define FLAG_RESET_TRACK         BIT3
 
 extern EFI_GUID  gEfiPhysicalPresenceGuid;
-
-#endif
+extern EFI_GUID  gEfiPhysicalPresenceAcpiGuid;

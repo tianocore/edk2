@@ -33,64 +33,17 @@ __memset (
 // implementation of memset(), which may conflict with this one if this
 // object was pulled into the link due to the definitions below. So make
 // our memset() 'weak' to let the other implementation take precedence.
+// PE targets (i.e. building with CLANGPDB) have different name mangling
+// and as such don't recognize __memset here, so we provide a weak alias
+// that simply calls the internal __memset implementation.
 //
-__attribute__ ((__weak__, __alias__ ("__memset")))
+__attribute__ ((__weak__))
 void *
 memset (
   void    *dest,
   int     c,
   size_t  n
-  );
-
-#ifdef __arm__
-
-void
-__aeabi_memset (
-  void    *dest,
-  size_t  n,
-  int     c
   )
 {
-  __memset (dest, c, n);
+  return __memset (dest, c, n);
 }
-
-__attribute__ ((__alias__ ("__aeabi_memset")))
-void
-__aeabi_memset4 (
-  void    *dest,
-  size_t  n,
-  int     c
-  );
-
-__attribute__ ((__alias__ ("__aeabi_memset")))
-void
-__aeabi_memset8 (
-  void    *dest,
-  size_t  n,
-  int     c
-  );
-
-void
-__aeabi_memclr (
-  void    *dest,
-  size_t  n
-  )
-{
-  __memset (dest, 0, n);
-}
-
-__attribute__ ((__alias__ ("__aeabi_memclr")))
-void
-__aeabi_memclr4 (
-  void    *dest,
-  size_t  n
-  );
-
-__attribute__ ((__alias__ ("__aeabi_memclr")))
-void
-__aeabi_memclr8 (
-  void    *dest,
-  size_t  n
-  );
-
-#endif

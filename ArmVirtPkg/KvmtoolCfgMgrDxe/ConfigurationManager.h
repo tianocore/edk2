@@ -9,8 +9,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef CONFIGURATION_MANAGER_H_
-#define CONFIGURATION_MANAGER_H_
+#pragma once
 
 ///
 /// C array containing the compiled AML template.
@@ -63,7 +62,7 @@ typedef EFI_STATUS (*CM_OBJECT_HANDLER_PROC) (
 ///
 /// The number of ACPI tables to install
 ///
-#define PLAT_ACPI_TABLE_COUNT  10
+#define PLAT_ACPI_TABLE_COUNT  11
 
 ///
 /// A structure describing the platform configuration
@@ -121,5 +120,3 @@ typedef struct PlatformRepositoryInfo {
   ///
   HW_INFO_PARSER_HANDLE                           FdtParserHandle;
 } EDKII_PLATFORM_REPOSITORY_INFO;
-
-#endif // CONFIGURATION_MANAGER_H_

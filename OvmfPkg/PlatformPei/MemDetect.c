@@ -29,6 +29,7 @@ Module Name:
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
+#include <Library/MemDebugLogLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
@@ -125,18 +126,6 @@ AddressWidthInitialization (
 
   PlatformAddressWidthInitialization (PlatformInfoHob);
 
-  //
-  // If DXE is 32-bit, then we're done; PciBusDxe will degrade 64-bit MMIO
-  // resources to 32-bit anyway. See DegradeResource() in
-  // "PciResourceSupport.c".
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return;
-  }
-
- #endif
-
   if (PlatformInfoHob->PcdPciMmio64Size == 0) {
     if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
       DEBUG ((
@@ -194,16 +183,6 @@ GetPeiMemoryCap (
   UINT64   MemoryCap;
 
   //
-  // If DXE is 32-bit, then just return the traditional 64 MB cap.
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return SIZE_64MB;
-  }
-
- #endif
-
-  //
   // Dependent on physical address width, PEI memory allocations can be
   // dominated by the page tables built for 64-bit DXE. So we key the cap off
   // of those.
@@ -249,6 +228,11 @@ GetPeiMemoryCap (
     ASSERT (PlatformInfoHob->PhysMemAddressWidth <= 40);
     ASSERT (TotalPages <= 0x404);
   }
+
+  //
+  // Add Memory Debug Log Buffer Pages (which can large)
+  //
+  TotalPages += MemDebugLogPages ();
 
   //
   // With 32k stacks and 4096 vcpus this lands at 128 MB (far away

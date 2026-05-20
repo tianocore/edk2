@@ -57,7 +57,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
   @param[in] ImageHandle     Image handle this driver.
   @param[in] SystemTable     Pointer to SystemTable.
 
-  @retval EFI_SUCESS     This function always complete successfully.
+  @retval EFI_SUCCESS    This function always complete successfully.
 
 **/
 EFI_STATUS

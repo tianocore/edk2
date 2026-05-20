@@ -2,6 +2,7 @@
   USB Mass Storage Driver that manages USB Mass Storage Device and produces Block I/O Protocol.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2024 - 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -106,6 +107,10 @@ UsbMassReadBlocks (
   EFI_STATUS          Status;
   EFI_TPL             OldTpl;
   UINTN               TotalBlock;
+  INT8                ResetRetryCount;
+  VOID                *OriginalBuffer;
+  EFI_LBA             OriginalLba;
+  UINTN               OriginalBufferSize;
 
   //
   // Raise TPL to TPL_CALLBACK to serialize all its operations
@@ -115,65 +120,79 @@ UsbMassReadBlocks (
   UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Media   = &UsbMass->BlockIoMedia;
 
-  //
-  // If it is a removable media, such as CD-Rom or Usb-Floppy,
-  // need to detect the media before each read/write. While some of
-  // Usb-Flash is marked as removable media.
-  //
-  if (Media->RemovableMedia) {
-    Status = UsbBootDetectMedia (UsbMass);
-    if (EFI_ERROR (Status)) {
+  ResetRetryCount    = 3;
+  OriginalBuffer     = Buffer;
+  OriginalBufferSize = BufferSize;
+  OriginalLba        = Lba;
+
+  while (ResetRetryCount >= 0) {
+    Buffer     = OriginalBuffer;
+    Lba        = OriginalLba;
+    BufferSize = OriginalBufferSize;
+
+    //
+    // If it is a removable media, such as CD-Rom or Usb-Floppy,
+    // need to detect the media before each read/write. While some of
+    // Usb-Flash is marked as removable media.
+    //
+    if (Media->RemovableMedia) {
+      Status = UsbBootDetectMedia (UsbMass);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+    }
+
+    if (!(Media->MediaPresent)) {
+      Status = EFI_NO_MEDIA;
       goto ON_EXIT;
     }
-  }
 
-  if (!(Media->MediaPresent)) {
-    Status = EFI_NO_MEDIA;
-    goto ON_EXIT;
-  }
+    if (MediaId != Media->MediaId) {
+      Status = EFI_MEDIA_CHANGED;
+      goto ON_EXIT;
+    }
 
-  if (MediaId != Media->MediaId) {
-    Status = EFI_MEDIA_CHANGED;
-    goto ON_EXIT;
-  }
+    if (BufferSize == 0) {
+      Status = EFI_SUCCESS;
+      goto ON_EXIT;
+    }
 
-  if (BufferSize == 0) {
-    Status = EFI_SUCCESS;
-    goto ON_EXIT;
-  }
+    if (Buffer == NULL) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
 
-  if (Buffer == NULL) {
-    Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
-  }
+    //
+    // BufferSize must be a multiple of the intrinsic block size of the device.
+    //
+    if ((BufferSize % Media->BlockSize) != 0) {
+      Status = EFI_BAD_BUFFER_SIZE;
+      goto ON_EXIT;
+    }
 
-  //
-  // BufferSize must be a multiple of the intrinsic block size of the device.
-  //
-  if ((BufferSize % Media->BlockSize) != 0) {
-    Status = EFI_BAD_BUFFER_SIZE;
-    goto ON_EXIT;
-  }
+    TotalBlock = BufferSize / Media->BlockSize;
 
-  TotalBlock = BufferSize / Media->BlockSize;
+    //
+    // Make sure the range to read is valid.
+    //
+    if (Lba + TotalBlock - 1 > Media->LastBlock) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
 
-  //
-  // Make sure the range to read is valid.
-  //
-  if (Lba + TotalBlock - 1 > Media->LastBlock) {
-    Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
-  }
+    if (UsbMass->Cdb16Byte) {
+      Status = UsbBootReadWriteBlocks16 (UsbMass, FALSE, Lba, TotalBlock, Buffer);
+    } else {
+      Status = UsbBootReadWriteBlocks (UsbMass, FALSE, (UINT32)Lba, TotalBlock, Buffer);
+    }
 
-  if (UsbMass->Cdb16Byte) {
-    Status = UsbBootReadWriteBlocks16 (UsbMass, FALSE, Lba, TotalBlock, Buffer);
-  } else {
-    Status = UsbBootReadWriteBlocks (UsbMass, FALSE, (UINT32)Lba, TotalBlock, Buffer);
-  }
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
-    UsbMassReset (This, TRUE);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
+      UsbMassReset (This, TRUE);
+      ResetRetryCount--;
+    } else {
+      break;
+    }
   }
 
 ON_EXIT:

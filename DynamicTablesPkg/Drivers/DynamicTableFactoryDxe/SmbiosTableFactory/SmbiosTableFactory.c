@@ -12,6 +12,7 @@
 #include <IndustryStandard/SmBios.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 
 // Module specific include files.
@@ -23,6 +24,112 @@
 #include "DynamicTableFactory.h"
 
 extern EDKII_DYNAMIC_TABLE_FACTORY_INFO  TableFactoryInfo;
+
+/** Add a new entry to the SMBIOS table Map.
+
+  @param [in]  Smbios         SMBIOS Protocol pointer.
+  @param [in]  SmbiosHandle   SMBIOS Handle to be added.
+  @param [in]  CmObjectToken  CmObjectToken of the CM_OBJECT used to build the SMBIOS Table
+  @param [in]  GeneratorId    Smbios Table Generator Id.
+
+  @retval EFI_SUCCESS               Successfully added/generated the handle.
+  @retval EFI_OUT_OF_RESOURCES      Failure to add/generate the handle.
+**/
+EFI_STATUS
+EFIAPI
+AddSmbiosHandle (
+  IN EFI_SMBIOS_PROTOCOL        *Smbios,
+  IN SMBIOS_HANDLE              *SmbiosHandle,
+  IN CM_OBJECT_TOKEN            CmObjectToken,
+  IN SMBIOS_TABLE_GENERATOR_ID  GeneratorId
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Index;
+
+  Status = EFI_OUT_OF_RESOURCES;
+
+  for (Index = 0; Index < FixedPcdGet16 (PcdMaxSmbiosHandleMapEntries); Index++) {
+    if (TableFactoryInfo.SmbiosHandleMap[Index].SmbiosTblHandle == SMBIOS_HANDLE_PI_RESERVED) {
+      TableFactoryInfo.SmbiosHandleMap[Index].SmbiosTblHandle   = *SmbiosHandle;
+      TableFactoryInfo.SmbiosHandleMap[Index].SmbiosCmToken     = CmObjectToken;
+      TableFactoryInfo.SmbiosHandleMap[Index].SmbiosGeneratorId = GeneratorId;
+      Status                                                    = EFI_SUCCESS;
+      break;
+    }
+  }
+
+  return Status;
+}
+
+/** Return a pointer to the SMBIOS table Map.
+
+  @param [in]  GeneratorId  The CmObjectToken to look up an SMBIOS Handle.
+
+  @retval SMBIOS_HANDLE_MAP  Pointer to the SMBIOS Handle Map if the
+                             CmObjectToken is found.
+  @retval NULL               if CmObjectToken is not found.
+**/
+SMBIOS_HANDLE_MAP *
+EFIAPI
+FindSmbiosHandle (
+  CM_OBJECT_TOKEN  CmObjectToken
+  )
+{
+  UINTN              Index;
+  SMBIOS_HANDLE_MAP  *SmbiosHandleMap;
+
+  SmbiosHandleMap = NULL;
+  for (Index = 0; Index < FixedPcdGet16 (PcdMaxSmbiosHandleMapEntries); Index++) {
+    if (TableFactoryInfo.SmbiosHandleMap[Index].SmbiosCmToken == CmObjectToken) {
+      SmbiosHandleMap = &TableFactoryInfo.SmbiosHandleMap[Index];
+      break;
+    }
+  }
+
+  return SmbiosHandleMap;
+}
+
+/** Find and return SMBIOS handle based on associated CM object token.
+
+  @param [in]  GeneratorId     SMBIOS generator ID used to build the SMBIOS Table.
+  @param [in]  CmObjectToken   Token of the CM_OBJECT used to build the SMBIOS Table.
+
+  @return  SMBIOS handle of the table associated with SmbiosGeneratorId and
+           CmObjectToken if found. Otherwise, returns SMBIOS_HANDLE_INVALID.
+**/
+SMBIOS_HANDLE
+EFIAPI
+FindSmbiosHandleEx (
+  IN  SMBIOS_TABLE_GENERATOR_ID  GeneratorId,
+  IN  CM_OBJECT_TOKEN            CmObjToken
+  )
+{
+  SMBIOS_HANDLE_MAP  *HandleMap;
+
+  if (CmObjToken == CM_NULL_TOKEN) {
+    return SMBIOS_HANDLE_INVALID;
+  }
+
+  HandleMap = FindSmbiosHandle (CmObjToken);
+  if (HandleMap == NULL) {
+    return SMBIOS_HANDLE_INVALID;
+  }
+
+  if (HandleMap->SmbiosGeneratorId != GeneratorId) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Expect ID %d but get %d\n",
+      __func__,
+      GeneratorId,
+      HandleMap->SmbiosGeneratorId
+      ));
+    ASSERT (FALSE);
+    return SMBIOS_HANDLE_INVALID;
+  }
+
+  return HandleMap->SmbiosTblHandle;
+}
 
 /** Return a pointer to the SMBIOS table generator.
 

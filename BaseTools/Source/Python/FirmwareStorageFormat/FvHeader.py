@@ -4,7 +4,6 @@
 # Copyright (c) 2021-, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-from ast import Str
 from struct import *
 from ctypes import *
 from FirmwareStorageFormat.Common import *

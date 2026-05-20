@@ -61,6 +61,19 @@ define RemoveFirmwareSymbolFile
   end
 end
 
+add-auto-load-safe-path .
+set auto-load local-gdbinit on
+set breakpoint pending on
+
+set confirm off
+set output-radix 16
+b SecGdbScriptBreak
+command
+silent
+source Host.gdb
+c
+end
+
 if gInXcode == 1
   # in Xcode the program is already running. Issuing a run command
   # will cause a fatal debugger error. The break point script that

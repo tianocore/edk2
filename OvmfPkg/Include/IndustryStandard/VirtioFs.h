@@ -14,8 +14,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef VIRTIO_FS_H_
-#define VIRTIO_FS_H_
+#pragma once
 
 #include <IndustryStandard/Virtio.h>
 
@@ -450,5 +449,3 @@ typedef struct {
   UINT32    Padding;
 } VIRTIO_FS_FUSE_RENAME2_REQUEST;
 #pragma pack ()
-
-#endif // VIRTIO_FS_H_

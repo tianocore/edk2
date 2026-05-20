@@ -14,11 +14,9 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/DebugSupport.h> // for MAX_AARCH64_EXCEPTION
 
-UINTN                   gMaxExceptionNumber                                   = MAX_AARCH64_EXCEPTION;
-EFI_EXCEPTION_CALLBACK  gExceptionHandlers[MAX_AARCH64_EXCEPTION + 1]         = { 0 };
-EFI_EXCEPTION_CALLBACK  gDebuggerExceptionHandlers[MAX_AARCH64_EXCEPTION + 1] = { 0 };
-PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask                         = ARM_VECTOR_TABLE_ALIGNMENT;
-UINTN                   gDebuggerNoHandlerValue                               = 0; // todo: define for AArch64
+UINTN                   gMaxExceptionNumber                           = MAX_AARCH64_EXCEPTION;
+EFI_EXCEPTION_CALLBACK  gExceptionHandlers[MAX_AARCH64_EXCEPTION + 1] = { 0 };
+PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask                 = ARM_VECTOR_TABLE_ALIGNMENT;
 
 #define EL0_STACK_SIZE  EFI_PAGES_TO_SIZE(2)
 STATIC UINTN  mNewStackBase[EL0_STACK_SIZE / sizeof (UINTN)];
@@ -37,7 +35,7 @@ ArchVectorConfig (
 
   // Round down sp by 16 bytes alignment
   RegisterEl0Stack (
-    (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFUL)
+    (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFULL)
     );
 
   if (ArmReadCurrentEL () == AARCH64_EL2) {

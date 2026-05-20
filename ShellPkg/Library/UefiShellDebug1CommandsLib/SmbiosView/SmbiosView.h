@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SMBIOS_VIEW_H_
-#define _SMBIOS_VIEW_H_
+#pragma once
 
 #define STRUCTURE_TYPE_RANDOM   (UINT8) 0xFE
 #define STRUCTURE_TYPE_INVALID  (UINT8) 0xFF
@@ -119,5 +118,3 @@ GetShowTypeString (
 extern UINT8  gShowType;
 
 extern UINTN  mSmbios64BitTableLength;
-
-#endif

@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_PKCS7_VERIFY_PROTOCOL_H__
-#define __EFI_PKCS7_VERIFY_PROTOCOL_H__
+#pragma once
 
 #include <Guid/ImageAuthentication.h>
 
@@ -28,7 +27,7 @@ typedef struct _EFI_PKCS7_VERIFY_PROTOCOL EFI_PKCS7_VERIFY_PROTOCOL;
 
 /**
   Processes a buffer containing binary DER-encoded PKCS7 signature.
-  The signed data content may be embedded within the buffer or separated. Funtion
+  The signed data content may be embedded within the buffer or separated. Function
   verifies the signature of the content is valid and signing certificate was not
   revoked and is contained within a list of trusted signers.
 
@@ -218,5 +217,3 @@ struct _EFI_PKCS7_VERIFY_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPkcs7VerifyProtocolGuid;
-
-#endif

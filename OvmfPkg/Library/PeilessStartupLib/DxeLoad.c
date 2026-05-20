@@ -43,14 +43,6 @@ HandOffToDxeCore (
   UINTN  PageTables;
 
   //
-  // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
-  //
-  if (IsNullDetectionEnabled ()) {
-    ClearFirst4KPage (GetHobList ());
-    BuildMemoryAllocationHob (0, EFI_PAGES_TO_SIZE (1), EfiBootServicesData);
-  }
-
-  //
   // Allocate 128KB for the Stack
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));

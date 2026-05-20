@@ -39,6 +39,7 @@
 [Guids]
   gUefiAcpiBoardInfoGuid
   gUplPciSegmentInfoHobGuid
+  gUniversalPayloadPciRootBridgeInfoGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration

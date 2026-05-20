@@ -1404,6 +1404,10 @@ GetHIDevicePath (
   NonHIDevicePathNodeCount = 0;
 
   HIDevicePath = AllocateZeroPool (sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  if (HIDevicePath == NULL) {
+    return NULL;
+  }
+
   SetDevicePathEndNode (HIDevicePath);
 
   Node.DevPath.Type      = END_DEVICE_PATH_TYPE;

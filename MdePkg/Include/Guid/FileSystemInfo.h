@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FILE_SYSTEM_INFO_H__
-#define __FILE_SYSTEM_INFO_H__
+#pragma once
 
 #define EFI_FILE_SYSTEM_INFO_ID \
   { \
@@ -46,12 +45,10 @@ typedef struct {
 ///
 /// The VolumeLabel field of the EFI_FILE_SYSTEM_INFO data structure is variable length.
 /// Whenever code needs to know the size of the EFI_FILE_SYSTEM_INFO data structure, it needs
-/// to be the size of the data structure without the VolumeLable field.  The following macro
-/// computes this size correctly no matter how big the VolumeLable array is declared.
-/// This is required to make the EFI_FILE_SYSTEM_INFO data structure ANSI compilant.
+/// to be the size of the data structure without the VolumeLabel field.  The following macro
+/// computes this size correctly no matter how big the VolumeLabel array is declared.
+/// This is required to make the EFI_FILE_SYSTEM_INFO data structure ANSI compliant.
 ///
 #define SIZE_OF_EFI_FILE_SYSTEM_INFO  OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)
 
 extern EFI_GUID  gEfiFileSystemInfoGuid;
-
-#endif

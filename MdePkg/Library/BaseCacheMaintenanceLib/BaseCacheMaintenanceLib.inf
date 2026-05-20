@@ -25,7 +25,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources.IA32]
@@ -36,9 +36,6 @@
 
 [Sources.EBC]
   EbcCache.c
-
-[Sources.ARM]
-  ArmCache.c
 
 [Sources.AARCH64]
   ArmCache.c

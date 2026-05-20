@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TPM_INSTANCE_GUID_H__
-#define __TPM_INSTANCE_GUID_H__
+#pragma once
 
 #define TPM_DEVICE_INTERFACE_NONE  \
   { 0x00000000, 0x0000, 0x0000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
@@ -26,5 +25,3 @@ extern EFI_GUID  gEfiTpmDeviceInstanceTpm20DtpmGuid;
   { 0x7f4158d3, 0x74d, 0x456d, { 0x8c, 0xb2, 0x1, 0xf9, 0xc8, 0xf7, 0x9d, 0xaa } }
 
 extern EFI_GUID  gEfiTpmDeviceSelectedGuid;
-
-#endif

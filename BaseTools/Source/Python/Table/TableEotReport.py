@@ -13,7 +13,6 @@ import Common.EdkLogger as EdkLogger
 import Common.LongFilePathOs as os, time
 from Table.Table import Table
 from Common.StringUtils import ConvertToSqlString2
-import Eot.EotToolError as EotToolError
 import Eot.EotGlobalData as EotGlobalData
 
 ## TableReport
@@ -63,9 +62,3 @@ class TableEotReport(Table):
                      % (self.Table, self.ID, ModuleID, ModuleName, ModuleGuid, SourceFileID, SourceFileFullPath, \
                         ItemName, ItemType, ItemMode, GuidName, GuidMacro, GuidValue, BelongsToFunction, Enabled)
         Table.Insert(self, SqlCommand)
-
-    def GetMaxID(self):
-        SqlCommand = """select max(ID) from %s""" % self.Table
-        self.Cur.execute(SqlCommand)
-        for Item in self.Cur:
-            return Item[0]

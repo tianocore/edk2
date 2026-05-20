@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_HTTP_H__
-#define __EFI_HTTP_BOOT_HTTP_H__
+#pragma once
 
 #define HTTP_BOOT_BLOCK_SIZE                   32000
 #define HTTP_USER_AGENT_EFI_HTTP_BOOT          "UefiHttpBoot/1.0"
@@ -87,6 +86,21 @@ HttpBootCreateHttpIo (
   );
 
 /**
+  This function establishes a connection through a proxy server
+
+  @param[in]       Private         The pointer to the driver's private data.
+
+  @retval EFI_SUCCESS              Connection successful.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootConnectProxy (
+  IN     HTTP_BOOT_PRIVATE_DATA  *Private
+  );
+
+/**
   This function download the boot file by using UEFI HTTP protocol.
 
   @param[in]       Private         The pointer to the driver's private data.
@@ -131,5 +145,3 @@ VOID
 HttpBootFreeCacheList (
   IN     HTTP_BOOT_PRIVATE_DATA  *Private
   );
-
-#endif

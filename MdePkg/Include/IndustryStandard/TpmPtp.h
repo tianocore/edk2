@@ -5,10 +5,13 @@
 Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
+  @par Reference(s)
+    - TCG PC Client Platform TPM Profile (PTP) Specification
+      (https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/)
+
 **/
 
-#ifndef _TPM_PTP_H_
-#define _TPM_PTP_H_
+#pragma once
 
 //
 // PTP FIFO definition
@@ -354,14 +357,45 @@ typedef union {
 ///
 /// InterfaceVersion
 ///
-#define PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO  0x0
-#define PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB   0x1
+#define PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO    0x0
+#define PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB     0x1
+#define PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB_V2  0x2
 
 ///
 /// InterfaceSelector
 ///
 #define PTP_INTERFACE_IDENTIFIER_INTERFACE_SELECTOR_FIFO  0x0
 #define PTP_INTERFACE_IDENTIFIER_INTERFACE_SELECTOR_CRB   0x1
+
+///
+/// CapLocality
+/// ref Table 19, 20 in TCG PC Client Platform TPM Profile (PTP) Specification
+///
+#define PTP_CAP_LOCALITY_ZERO_ONLY  0x0
+#define PTP_CAP_LOCALITY_FIVE       0x1
+
+///
+/// CapCRB
+/// ref Table 19, 20 in TCG PC Client Platform TPM Profile (PTP) Specification
+///
+#define PTP_CAP_CRB_INTEREFACE_NOT_SUPPORTED  0x0
+#define PTP_CAP_CRB_INTEREFACE_SUPPORTED      0x1
+
+///
+/// CapFIFO
+/// ref Table 20 in TCG PC Client Platform TPM Profile (PTP) Specification
+///
+#define PTP_CAP_FIFO_INTERFACE_NOT_SUPPORTED  0x0
+#define PTP_CAP_FIFO_INTERFACE_SUPPORTED      0x1
+
+///
+/// CapDataXferSizeSupport
+/// ref Table 20 in TCG PC Client Platform TPM Profile (PTP) Specification
+///
+#define PTP_CAP_DATA_XFER_SIZE_4_BYTES   0x0
+#define PTP_CAP_DATA_XFER_SIZE_8_BYTES   0x1
+#define PTP_CAP_DATA_XFER_SIZE_32_BYTES  0x2
+#define PTP_CAP_DATA_XFER_SIZE_64_BYTES  0x3
 
 //
 // Define bits of Locality State Register
@@ -511,5 +545,3 @@ typedef union {
 #define PTP_TIMEOUT_B  (2000 * 1000)               // 2s
 #define PTP_TIMEOUT_C  (200 * 1000)                // 200ms
 #define PTP_TIMEOUT_D  (30 * 1000)                 // 30ms
-
-#endif

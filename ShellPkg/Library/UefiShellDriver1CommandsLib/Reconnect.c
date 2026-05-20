@@ -69,23 +69,27 @@ ShellCommandRunReconnect (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"reconnect", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"reconnect", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    ShellStatus = ShellCommandRunDisconnect (ImageHandle, SystemTable);
-    if (ShellStatus == SHELL_SUCCESS) {
-      if (ShellCommandLineGetFlag (Package, L"-r")) {
-        ConnectAllConsoles ();
-      }
 
-      ShellStatus = ShellCommandRunConnect (ImageHandle, SystemTable);
-    }
+    gInReconnect = FALSE;
+    return ShellStatus;
   }
 
+  ShellStatus = ShellCommandRunDisconnect (ImageHandle, SystemTable);
+  if (ShellStatus == SHELL_SUCCESS) {
+    if (ShellCommandLineGetFlag (Package, L"-r")) {
+      ConnectAllConsoles ();
+    }
+
+    ShellStatus = ShellCommandRunConnect (ImageHandle, SystemTable);
+  }
+
+  ShellCommandLineFreeVarList (Package);
   gInReconnect = FALSE;
 
   return (ShellStatus);

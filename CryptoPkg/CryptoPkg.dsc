@@ -6,6 +6,7 @@
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -20,7 +21,7 @@
   PLATFORM_GUID                  = E1063286-6C8C-4c25-AEF0-67A9A5B6E6B6
   PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
-  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -83,6 +84,12 @@
   DEFINE  SMM_FULL_GUID       = 1930CE7E-6598-48ED-8AB1-EBE7E85EC254
   DEFINE  SMM_STD_ACCEL_GUID  = 828959D3-CEA6-4B79-B1FC-5AFA0D7F2144
   DEFINE  SMM_FULL_ACCEL_GUID = C1760694-AB3A-4532-8C6D-52D8F86EB1AA
+  DEFINE  MM_STANDALONE_CRYPTO_GUID     = 4E14BAAE-8AA0-4F28-B1F0-53215E4DEA81
+  DEFINE  MM_STANDALONE_STD_GUID        = FB88FFE8-C6E3-4752-8E85-0865DF7CDB1F
+  DEFINE  MM_STANDALONE_FULL_GUID       = 4A6F4C6E-6207-4801-9706-B9429936A38C
+  DEFINE  MM_STANDALONE_STD_ACCEL_GUID  = 9EF13BFA-912E-4589-8D6A-3ECCF1156B5E
+  DEFINE  MM_STANDALONE_FULL_ACCEL_GUID = 0A13116A-D6BF-4E4A-90DC-615C4C0A711D
+
 
 !if $(CRYPTO_SERVICES) == TARGET_UNIT_TESTS
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
@@ -115,17 +122,12 @@
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-
-[LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+[LibraryClasses.AARCH64]
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
 
 [LibraryClasses.common.SEC]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
-  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -162,6 +164,15 @@
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
 
+[LibraryClasses.common.MM_STANDALONE]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+  MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+  StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+  MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
+
 [LibraryClasses.common.UEFI_APPLICATION]
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -175,6 +186,9 @@
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
 #
 ################################################################################
+
+!include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
+
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
@@ -212,6 +226,7 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Family                        | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Bn.Family                                | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Ec.Family                                | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Camellia.Family                          | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
 
 #
@@ -277,6 +292,7 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Services.Encrypt              | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Services.Decrypt              | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Hkdf.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Camellia.Family                          | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
 
 ###################################################################################################
@@ -304,7 +320,7 @@
 # available services.
 #
 !if $(CRYPTO_SERVICES) == TARGET_UNIT_TESTS
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # Target based unit tests
   #
@@ -313,11 +329,6 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-    <BuildOptions>
-      MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
   }
 
 [Components.IA32, Components.X64, Components.AARCH64]
@@ -329,10 +340,8 @@
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
     <BuildOptions>
-      MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+      MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+      CLANGPDB: *_*_*_DLINK_FLAGS = /ALIGN:4096
   }
 
 [Components.RISCV64]
@@ -377,6 +386,7 @@
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibOnProtocolPpi/StandaloneMmCryptLib.inf
   #
   # Build verification of target-based unit tests
   #
@@ -422,7 +432,7 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   }
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # CryptoPei with OpensslLib instance with all services
   #
@@ -445,7 +455,11 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibAccel.inf
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
+      MSFT:*_*_IA32_DLINK_XIPFLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_X64_DLINK_XIPFLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
 
   #
@@ -459,7 +473,12 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_IA32_DLINK_XIPFLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_XIPFLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
 !endif
 
@@ -488,7 +507,7 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   }
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # CryptoDxe with OpensslLib instance with all services
   #
@@ -513,6 +532,8 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
   #
   # CryptoDxe with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services.
@@ -526,6 +547,9 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
   #
   # CryptoSmm with OpensslLib instance with no SSL or EC services
@@ -566,6 +590,8 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
   #
   # CryptoSmm with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services
@@ -579,6 +605,66 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
+  }
+  #
+  # CryptoStandaloneMm with OpensslLib instance with no SSL or EC services
+  #
+  CryptoPkg/Driver/CryptoStandaloneMm.inf {
+    <Defines>
+      FILE_GUID = $(MM_STANDALONE_CRYPTO_GUID)
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+  }
+  #
+  # CryptoStandaloneMm with OpensslLib instance with no SSL services
+  #
+  CryptoPkg/Driver/CryptoStandaloneMm.inf {
+    <Defines>
+      FILE_GUID = $(MM_STANDALONE_STD_GUID)
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  }
+  #
+  # CryptoStandaloneMm with OpensslLib instance with no all services
+  #
+  CryptoPkg/Driver/CryptoStandaloneMm.inf {
+    <Defines>
+      FILE_GUID = $(MM_STANDALONE_FULL_GUID)
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  }
+  #
+  # CryptoStandaloneMm with IA32/X64/AARCH64 performance optimized OpensslLib instance with no EC services
+  # IA32/X64 assembly optimizations required larger alignments
+  #
+  CryptoPkg/Driver/CryptoStandaloneMm.inf {
+    <Defines>
+      FILE_GUID = $(MM_STANDALONE_STD_ACCEL_GUID)
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibAccel.inf
+    <BuildOptions>
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
+  }
+  #
+  # CryptoStandaloneMm with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services
+  # IA32/X64 assembly optimizations required larger alignments
+  #
+  CryptoPkg/Driver/CryptoStandaloneMm.inf {
+    <Defines>
+      FILE_GUID = $(MM_STANDALONE_FULL_ACCEL_GUID)
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+    <BuildOptions>
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
 !endif
 

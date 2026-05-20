@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _MM_STANDBY_BUTTON_DISPATCH_H_
-#define _MM_STANDBY_BUTTON_DISPATCH_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -108,5 +107,3 @@ struct _EFI_MM_STANDBY_BUTTON_DISPATCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmStandbyButtonDispatchProtocolGuid;
-
-#endif

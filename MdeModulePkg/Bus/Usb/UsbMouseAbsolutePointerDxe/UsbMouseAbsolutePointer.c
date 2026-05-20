@@ -160,7 +160,11 @@ USBMouseAbsolutePointerDriverBindingStart (
   }
 
   UsbMouseAbsolutePointerDevice = AllocateZeroPool (sizeof (USB_MOUSE_ABSOLUTE_POINTER_DEV));
-  ASSERT (UsbMouseAbsolutePointerDevice != NULL);
+  if (UsbMouseAbsolutePointerDevice == NULL) {
+    ASSERT (UsbMouseAbsolutePointerDevice != NULL);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
 
   UsbMouseAbsolutePointerDevice->UsbIo     = UsbIo;
   UsbMouseAbsolutePointerDevice->Signature = USB_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE;
@@ -631,7 +635,11 @@ InitializeUsbMouseDevice (
   }
 
   ReportDesc = AllocateZeroPool (MouseHidDesc->HidClassDesc[0].DescriptorLength);
-  ASSERT (ReportDesc != NULL);
+  if (ReportDesc == NULL) {
+    ASSERT (ReportDesc != NULL);
+    FreePool (Buf);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Status = UsbGetReportDescriptor (
              UsbIo,
@@ -663,7 +671,7 @@ InitializeUsbMouseDevice (
 
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxX = 1024;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxY = 1024;
-  UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxZ = 0;
+  UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxZ = 1024;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinX = 0;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinY = 0;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinZ = 0;
@@ -847,7 +855,7 @@ OnMouseInterruptComplete (
     UsbMouseAbsolutePointerDevice->State.CurrentZ =
       MIN (
         MAX (
-          (INT64)UsbMouseAbsolutePointerDevice->State.CurrentZ + *((INT8 *)Data + 1),
+          (INT64)UsbMouseAbsolutePointerDevice->State.CurrentZ + *((INT8 *)Data + 3),
           (INT64)UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinZ
           ),
         (INT64)UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxZ

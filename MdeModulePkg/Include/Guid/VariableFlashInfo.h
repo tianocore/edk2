@@ -35,8 +35,7 @@
 
 **/
 
-#ifndef VARIABLE_FLASH_INFO_H_
-#define VARIABLE_FLASH_INFO_H_
+#pragma once
 
 #define VARIABLE_FLASH_INFO_HOB_GUID \
   { 0x5d11c653, 0x8154, 0x4ac3, { 0xa8, 0xc2, 0xfb, 0xa2, 0x89, 0x20, 0xfc, 0x90 }}
@@ -107,5 +106,3 @@ typedef struct {
 } VARIABLE_FLASH_INFO;
 
 #pragma pack (pop)
-
-#endif

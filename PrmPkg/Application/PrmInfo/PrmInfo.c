@@ -127,13 +127,10 @@ PrintMmioRuntimeRangeInfo (
   }
 
   RuntimeMmioRangeCount = (UINTN)RuntimeMmioRanges->Count;
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_RUNTIME_MMIO_COUNT), mPrmInfoHiiHandle, RuntimeMmioRangeCount);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_RUNTIME_MMIO_COUNT), mPrmInfoHiiHandle, RuntimeMmioRangeCount);
 
   for (RuntimeMmioRangeIndex = 0; RuntimeMmioRangeIndex < RuntimeMmioRangeCount; RuntimeMmioRangeIndex++) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_PRMINFO_RUNTIME_MMIO_INFO),
       mPrmInfoHiiHandle,
       RuntimeMmioRangeIndex,
@@ -205,16 +202,13 @@ GatherPrmHandlerInfo (
     ASSERT_EFI_ERROR (Status);
 
     if (PrintInformation) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_PRMINFO_MODULE_NAME),
         mPrmInfoHiiHandle,
         (CHAR8 *)((UINTN)CurrentImageAddress + CurrentImageExportDirectory->Name)
         );
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_MODULE_GUID), mPrmInfoHiiHandle, CurrentModuleGuid);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_MODULE_VERSION), mPrmInfoHiiHandle, MajorVersion, MinorVersion);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_MODULE_GUID), mPrmInfoHiiHandle, CurrentModuleGuid);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_MODULE_VERSION), mPrmInfoHiiHandle, MajorVersion, MinorVersion);
     }
 
     // It is currently valid for a PRM module not to use a context buffer
@@ -233,11 +227,11 @@ GatherPrmHandlerInfo (
       if (CurrentPrmModuleRuntimeMmioRanges != NULL) {
         PrintMmioRuntimeRangeInfo (CurrentPrmModuleRuntimeMmioRanges);
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_MMIO_RANGES), mPrmInfoHiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_NO_MMIO_RANGES), mPrmInfoHiiHandle);
       }
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_COUNT), mPrmInfoHiiHandle, HandlerCount);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_COUNT), mPrmInfoHiiHandle, HandlerCount);
     }
 
     for (HandlerIndex = 0; HandlerIndex < HandlerCount; HandlerIndex++) {
@@ -248,8 +242,8 @@ GatherPrmHandlerInfo (
       CurrentHandlerContext.Name       = (CHAR8 *)CurrentExportDescriptorStruct->PrmHandlerExportDescriptors[HandlerIndex].PrmHandlerName;
 
       if (PrintInformation) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_NAME), mPrmInfoHiiHandle, CurrentHandlerContext.Name);
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_GUID), mPrmInfoHiiHandle, CurrentHandlerContext.Guid);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_NAME), mPrmInfoHiiHandle, CurrentHandlerContext.Name);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_GUID), mPrmInfoHiiHandle, CurrentHandlerContext.Guid);
       }
 
       Status =  GetExportEntryAddress (
@@ -263,11 +257,11 @@ GatherPrmHandlerInfo (
         CurrentHandlerContext.Handler = (PRM_HANDLER *)(UINTN)CurrentHandlerPhysicalAddress;
 
         if (PrintInformation) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_PA), mPrmInfoHiiHandle, CurrentHandlerPhysicalAddress);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_PA), mPrmInfoHiiHandle, CurrentHandlerPhysicalAddress);
         }
       } else {
         if (PrintInformation) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_PA_ERROR), mPrmInfoHiiHandle, Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_PA_ERROR), mPrmInfoHiiHandle, Status);
         }
       }
 
@@ -282,17 +276,14 @@ GatherPrmHandlerInfo (
 
       if (PrintInformation) {
         if (CurrentHandlerContext.StaticDataBuffer != NULL) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_PRMINFO_STATIC_DATA_BUFFER),
             mPrmInfoHiiHandle,
             (UINTN)CurrentHandlerContext.StaticDataBuffer
             );
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_STATIC_BUFFER), mPrmInfoHiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_NO_STATIC_BUFFER), mPrmInfoHiiHandle);
         }
       }
 
@@ -391,13 +382,13 @@ PrintExecutionTime (
   }
 
   if (Sec > 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_SECS), mPrmInfoHiiHandle, Sec, MilliSec, MicroSec, NanoSec);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_SECS), mPrmInfoHiiHandle, Sec, MilliSec, MicroSec, NanoSec);
   } else if (MilliSec > 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_MILLI_SECS), mPrmInfoHiiHandle, MilliSec, MicroSec, NanoSec);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_MILLI_SECS), mPrmInfoHiiHandle, MilliSec, MicroSec, NanoSec);
   } else if (MicroSec > 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_USECS), mPrmInfoHiiHandle, MicroSec, NanoSec);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_USECS), mPrmInfoHiiHandle, MicroSec, NanoSec);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NANO_SECS), mPrmInfoHiiHandle, NanoSec);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_NANO_SECS), mPrmInfoHiiHandle, NanoSec);
   }
 }
 
@@ -450,17 +441,14 @@ ExecutePrmHandlerByGuid (
     HandlerFound = TRUE;
     Status       = PopulateContextBuffer (HandlerContext->StaticDataBuffer, HandlerContext->Guid, &CurrentContextBuffer);
     if (!EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_PRMINFO_MODULE_NAME),
         mPrmInfoHiiHandle,
         HandlerContext->ModuleName
         );
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_NAME_HL), mPrmInfoHiiHandle, HandlerContext->Name);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_GUID), mPrmInfoHiiHandle, HandlerContext->Guid);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_NAME_HL), mPrmInfoHiiHandle, HandlerContext->Name);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_GUID), mPrmInfoHiiHandle, HandlerContext->Guid);
 
       StartTime = 0;
       EndTime   = 0;
@@ -474,20 +462,20 @@ ExecutePrmHandlerByGuid (
       }
 
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_ERR_STATUS), mPrmInfoHiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_ERR_STATUS), mPrmInfoHiiHandle, Status);
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_SUCC_STATUS), mPrmInfoHiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_SUCC_STATUS), mPrmInfoHiiHandle, Status);
       }
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_EXEC_TIME), mPrmInfoHiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_EXEC_TIME), mPrmInfoHiiHandle);
       if ((StartTime == 0) && (EndTime == 0)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_UNKNOWN), mPrmInfoHiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_UNKNOWN), mPrmInfoHiiHandle);
       } else {
         PrintExecutionTime (GetTimeInNanoSecond (EndTime - StartTime));
       }
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
     } else {
       DEBUG ((
         DEBUG_ERROR,
@@ -546,7 +534,7 @@ ParseParameterList (
   Status = ShellCommandLineParseEx (mParamList, &Package, &ProblemParam, FALSE, FALSE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_GEN_PROBLEM), mPrmInfoHiiHandle, APPLICATION_NAME, ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_GEN_PROBLEM), mPrmInfoHiiHandle, APPLICATION_NAME, ProblemParam);
       ReturnStatus = EFI_INVALID_PARAMETER;
       FreePool (ProblemParam);
     } else {
@@ -556,7 +544,7 @@ ParseParameterList (
 
     goto Done;
   } else if (Package == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_ARG), mPrmInfoHiiHandle, APPLICATION_NAME);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_NO_ARG), mPrmInfoHiiHandle, APPLICATION_NAME);
     ReturnStatus = EFI_INVALID_PARAMETER;
     goto Done;
   }
@@ -573,13 +561,13 @@ ParseParameterList (
   }
 
   if (ArgumentCount == 1) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_ARG), mPrmInfoHiiHandle, APPLICATION_NAME);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_NO_ARG), mPrmInfoHiiHandle, APPLICATION_NAME);
     ReturnStatus = EFI_INVALID_PARAMETER;
     goto Done;
   }
 
   if (ArgumentCount > 6) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_TOO_MANY), mPrmInfoHiiHandle, APPLICATION_NAME);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_TOO_MANY), mPrmInfoHiiHandle, APPLICATION_NAME);
     ReturnStatus = EFI_INVALID_PARAMETER;
     goto Done;
   }
@@ -589,7 +577,7 @@ ParseParameterList (
   //
   if (ShellCommandLineGetFlag (Package, L"-b")) {
     if (ArgumentCount <= 2) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_PARAM_INV), mPrmInfoHiiHandle, APPLICATION_NAME, L"-b");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_PARAM_INV), mPrmInfoHiiHandle, APPLICATION_NAME, L"-b");
       ReturnStatus = EFI_INVALID_PARAMETER;
       goto Done;
     } else {
@@ -609,13 +597,13 @@ ParseParameterList (
       } else {
         Status = StrToGuid (HandlerGuidStr, &HandlerGuid);
         if (EFI_ERROR (Status) || (HandlerGuidStr[GUID_STRING_LENGTH] != L'\0')) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_GUID_INV), mPrmInfoHiiHandle, APPLICATION_NAME, HandlerGuidStr);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_GUID_INV), mPrmInfoHiiHandle, APPLICATION_NAME, HandlerGuidStr);
           ReturnStatus = EFI_INVALID_PARAMETER;
           goto Done;
         }
       }
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_VALUE), mPrmInfoHiiHandle, APPLICATION_NAME, L"-t");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_NO_VALUE), mPrmInfoHiiHandle, APPLICATION_NAME, L"-t");
       ReturnStatus = EFI_INVALID_PARAMETER;
       goto Done;
     }
@@ -623,7 +611,7 @@ ParseParameterList (
 
   Status = DiscoverPrmModules (&mPrmModuleCount, &mPrmHandlerCount);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_DISCOVERY_FAILED), mPrmInfoHiiHandle, APPLICATION_NAME);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_DISCOVERY_FAILED), mPrmInfoHiiHandle, APPLICATION_NAME);
     DEBUG ((
       DEBUG_ERROR,
       "%a - %a: An error occurred during PRM module discovery (%r)\n",
@@ -636,10 +624,10 @@ ParseParameterList (
   }
 
   if (PrintHandlerInfo) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LIST_TITLE), mPrmInfoHiiHandle);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_MODULES_FOUND), mPrmInfoHiiHandle, mPrmModuleCount);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLERS_FOUND), mPrmInfoHiiHandle, mPrmHandlerCount);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LIST_TITLE), mPrmInfoHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_MODULES_FOUND), mPrmInfoHiiHandle, mPrmModuleCount);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLERS_FOUND), mPrmInfoHiiHandle, mPrmHandlerCount);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
   }
 
   GatherPrmHandlerInfo (PrintHandlerInfo);
@@ -647,7 +635,7 @@ ParseParameterList (
   if (HandlerGuidStr != NULL) {
     Status = ExecutePrmHandlerByGuid (&HandlerGuid);
     if (Status == EFI_NOT_FOUND) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_NOT_FOUND), mPrmInfoHiiHandle, APPLICATION_NAME, HandlerGuid);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PRMINFO_HANDLER_NOT_FOUND), mPrmInfoHiiHandle, APPLICATION_NAME, HandlerGuid);
     }
   }
 

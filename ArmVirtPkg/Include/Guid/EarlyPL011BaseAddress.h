@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EARLY_PL011_BASE_ADDRESS_H__
-#define __EARLY_PL011_BASE_ADDRESS_H__
+#pragma once
 
 #define EARLY_PL011_BASE_ADDRESS_GUID  {\
           0xB199DEA9, 0xFD5C, 0x4A84, \
@@ -28,5 +27,3 @@ typedef struct {
   //
   UINT64    DebugAddress;
 } EARLY_PL011_BASE_ADDRESS;
-
-#endif

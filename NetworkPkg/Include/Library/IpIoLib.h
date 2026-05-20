@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _IP_IO_H_
-#define _IP_IO_H_
+#pragma once
 
 #include <Protocol/Ip4.h>
 #include <Protocol/Ip6.h>
@@ -600,5 +599,3 @@ IpIoRefreshNeighbor (
   IN EFI_IP_ADDRESS  *Neighbor,
   IN UINT32          Timeout
   );
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SMBIOS_QUERY_TABLE_H_
-#define _SMBIOS_QUERY_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 
@@ -846,5 +845,3 @@ DisplayMCHostInterfaceType (
   IN UINT8  Key,
   IN UINT8  Option
   );
-
-#endif

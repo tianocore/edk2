@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EFI_MEMORY_ATTRIBUTE_H_
-#define EFI_MEMORY_ATTRIBUTE_H_
+#pragma once
 
 #define EFI_MEMORY_ATTRIBUTE_PROTOCOL_GUID \
   { \
@@ -138,5 +137,3 @@ struct _EFI_MEMORY_ATTRIBUTE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMemoryAttributeProtocolGuid;
-
-#endif

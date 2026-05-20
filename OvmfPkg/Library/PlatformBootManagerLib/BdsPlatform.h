@@ -14,8 +14,7 @@ Abstract:
 
 **/
 
-#ifndef _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
-#define _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -52,7 +51,6 @@ Abstract:
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/DxeSmmReadyToLock.h>
-#include <Protocol/LoadedImage.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
@@ -185,5 +183,3 @@ EFI_STATUS
 TryRunningQemuKernel (
   VOID
   );
-
-#endif // _PLATFORM_SPECIFIC_BDS_PLATFORM_H_

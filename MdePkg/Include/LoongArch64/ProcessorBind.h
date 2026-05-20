@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PROCESSOR_BIND_H_
-#define PROCESSOR_BIND_H_
+#pragma once
 
 //
 // Define the processor type so other code can make processor based choices
@@ -115,6 +114,4 @@ typedef INT64 INTN;
 
 #ifndef __USER_LABEL_PREFIX__
 #define __USER_LABEL_PREFIX__
-#endif
-
 #endif

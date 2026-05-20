@@ -21,7 +21,7 @@
   LIBRARY_CLASS                  = BaseLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources]
@@ -55,11 +55,13 @@
   DivS64x64Remainder.c
   ARShiftU64.c
   BitField.c
+  ConvertGuidUuid.c
   CpuDeadLoop.c
   Cpu.c
   LinkedList.c
   SafeString.c
   String.c
+  Unaligned.c
   FilePaths.c
   BaseLibInternals.h
 
@@ -193,7 +195,6 @@
   Ia32/InternalSwitchStack.c | MSFT
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
-  Unaligned.c
   X86WriteIdtr.c
   X86WriteGdtr.c
   X86Thunk.c
@@ -212,6 +213,7 @@
   X86PatchInstruction.c
   X86SpeculationBarrier.c
   IntelTdxNull.c
+  X64/SevProbe.c
 
 [Sources.X64]
   X64/Thunk16.nasm
@@ -298,10 +300,10 @@
   X64/TdCall.nasm
   X64/TdVmcall.nasm
   X64/TdProbe.c
+  X64/SevProbe.c
 
   X64/Non-existing.c
   Math64.c
-  Unaligned.c
   X86WriteIdtr.c
   X86WriteGdtr.c
   X86Thunk.c
@@ -330,46 +332,21 @@
   X64/XSetBv.nasm
   X64/VmgExit.nasm
   X64/VmgExitSvsm.nasm
-  ChkStkGcc.c  | GCC
+  X64/ReadFsBase.nasm
+  X64/WriteFsBase.nasm
+  X64/FsGsBase.c
 
 [Sources.EBC]
   Ebc/CpuBreakpoint.c
   Ebc/SetJumpLongJump.c
   Ebc/SwitchStack.c
   Ebc/SpeculationBarrier.c
-  Unaligned.c
   Math64.c
   IntelTdxNull.c
-
-[Sources.ARM]
-  Arm/InternalSwitchStack.c
-  Arm/Unaligned.c
-  Math64.c                   | MSFT
-
-  Arm/SwitchStack.asm        | MSFT
-  Arm/SetJumpLongJump.asm    | MSFT
-  Arm/DisableInterrupts.asm  | MSFT
-  Arm/EnableInterrupts.asm   | MSFT
-  Arm/GetInterruptsState.asm | MSFT
-  Arm/CpuPause.asm           | MSFT
-  Arm/CpuBreakpoint.asm      | MSFT
-  Arm/MemoryFence.asm        | MSFT
-  Arm/SpeculationBarrier.asm | MSFT
-
-  Arm/Math64.S                  | GCC
-  Arm/SwitchStack.S             | GCC
-  Arm/EnableInterrupts.S        | GCC
-  Arm/DisableInterrupts.S       | GCC
-  Arm/GetInterruptsState.S      | GCC
-  Arm/SetJumpLongJump.S         | GCC
-  Arm/CpuBreakpoint.S           | GCC
-  Arm/MemoryFence.S             | GCC
-  Arm/SpeculationBarrier.S      | GCC
-  IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.AARCH64]
-  Arm/InternalSwitchStack.c
-  Arm/Unaligned.c
+  AArch64/InternalSwitchStack.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC
@@ -394,10 +371,10 @@
   AArch64/ArmReadCntPctReg.asm      | MSFT
   AArch64/ArmReadIdAA64Isar0Reg.asm     | MSFT
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.RISCV64]
   Math64.c
-  Unaligned.c
   RiscV64/InternalSwitchStack.c
   RiscV64/CpuBreakpoint.c
   RiscV64/GetInterruptState.c
@@ -416,10 +393,10 @@
   RiscV64/RiscVMmu.S                | GCC
   RiscV64/SpeculationBarrier.S      | GCC
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.LOONGARCH64]
   Math64.c
-  Unaligned.c
   LoongArch64/Csr.c
   LoongArch64/InternalSwitchStack.c
   LoongArch64/AsmCsr.S              | GCC
@@ -437,6 +414,7 @@
   LoongArch64/Cpucfg.S              | GCC
   LoongArch64/ReadStableCounter.S   | GCC
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -453,8 +431,10 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength      ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   ## SOMETIMES_CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask   ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType       ## SOMETIMES_CONSUMES
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask   ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList  ## CONSUMES

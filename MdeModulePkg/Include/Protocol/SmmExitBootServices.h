@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _SMM_EXIT_BOOT_SERVICES_H_
-#define _SMM_EXIT_BOOT_SERVICES_H_
+#pragma once
 
 #define EDKII_SMM_EXIT_BOOT_SERVICES_PROTOCOL_GUID \
   { \
@@ -19,5 +18,3 @@
   }
 
 extern EFI_GUID  gEdkiiSmmExitBootServicesProtocolGuid;
-
-#endif

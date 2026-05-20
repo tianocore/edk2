@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __NON_DISCOVERABLE_PCI_DEVICE_IO_H__
-#define __NON_DISCOVERABLE_PCI_DEVICE_IO_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -116,5 +115,3 @@ InitializePciIoProtocol (
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2;
-
-#endif

@@ -11,8 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __PLATFORM_BM_PRINT_SC_LIB__
-#define __PLATFORM_BM_PRINT_SC_LIB__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -31,5 +30,3 @@ EFIAPI
 PlatformBmPrintScRegisterHandler (
   VOID
   );
-
-#endif // __PLATFORM_BM_PRINT_SC_LIB__

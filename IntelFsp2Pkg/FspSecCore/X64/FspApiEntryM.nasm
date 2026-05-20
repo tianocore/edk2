@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2022 - 2025, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
     DEFAULT REL
@@ -140,6 +140,41 @@ ASM_PFX(FspApiCommonContinue):
   mov    rdx, cr0
   push   rdx
 SkipPagetableSave:
+
+  ; Enable FSGSBASE instructions via CR4.FSGSBASE (bit 16)
+  mov     rbx, cr4           ; Save original CR4 in rbx
+  mov     rdx, rbx
+  bts     rdx, 16            ; Set CR4.FSGSBASE
+  mov     cr4, rdx
+
+  ; Save GsBase
+  rdgsbase rdx
+  push    rdx
+
+  ; Save FsBase
+  rdfsbase rdx
+  push    rdx
+
+  ; Restore original CR4
+  mov     cr4, rbx
+
+  ; Save Segment registers
+  mov     rdx, ss
+  push    rdx
+  mov     rdx, gs
+  push    rdx
+  mov     rdx, fs
+  push    rdx
+  mov     rdx, es
+  push    rdx
+  mov     rdx, ds
+  push    rdx
+  mov     rdx, cs
+  push    rdx
+
+  ; Reserve 16 bytes for GDT save/restore
+  sub     rsp, 16
+  sgdt    [rsp]
 
   ; Reserve 16 bytes for IDT save/restore
   sub     rsp, 16

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _TEST_BASE_SAFE_INT_LIB_H_
-#define _TEST_BASE_SAFE_INT_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Uefi.h>
@@ -119,5 +118,3 @@ EFIAPI
 TestSafeIntnMult (
   IN UNIT_TEST_CONTEXT  Context
   );
-
-#endif

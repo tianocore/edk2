@@ -329,10 +329,7 @@ RunTftp (
     if ((Status == EFI_VOLUME_CORRUPTED) &&
         (ProblemParam != NULL))
     {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PROBLEM),
         mTftpHiiHandle,
         L"tftp",
@@ -351,10 +348,7 @@ RunTftp (
   //
   ParamCount = ShellCommandLineGetCount (CheckPackage);
   if (ParamCount > 4) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_TOO_MANY),
       mTftpHiiHandle,
       L"tftp"
@@ -363,10 +357,7 @@ RunTftp (
   }
 
   if (ParamCount < 3) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_TOO_FEW),
       mTftpHiiHandle,
       L"tftp"
@@ -382,10 +373,7 @@ RunTftp (
   ValueStr = ShellCommandLineGetRawValue (CheckPackage, 1);
   Status   = NetLibStrToIp4 (ValueStr, &Mtftp4ConfigData.ServerIp);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_PARAM_INV),
       mTftpHiiHandle,
       L"tftp",
@@ -395,7 +383,11 @@ RunTftp (
   }
 
   RemoteFilePath = ShellCommandLineGetRawValue (CheckPackage, 2);
-  ASSERT (RemoteFilePath != NULL);
+  if (RemoteFilePath == NULL) {
+    ASSERT (RemoteFilePath != NULL);
+    goto Error;
+  }
+
   FilePathSize        = StrLen (RemoteFilePath) + 1;
   AsciiRemoteFilePath = AllocatePool (FilePathSize);
   if (AsciiRemoteFilePath == NULL) {
@@ -457,10 +449,7 @@ RunTftp (
     }
 
     if (Mtftp4ConfigData.TimeoutValue == 0) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PARAM_INV),
         mTftpHiiHandle,
         L"tftp",
@@ -477,10 +466,7 @@ RunTftp (
     }
 
     if ((BlockSize < MTFTP_MIN_BLKSIZE) || (BlockSize > MTFTP_MAX_BLKSIZE)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PARAM_INV),
         mTftpHiiHandle,
         L"tftp",
@@ -497,10 +483,7 @@ RunTftp (
     }
 
     if ((WindowSize < MTFTP_MIN_WINDOWSIZE) || (WindowSize > MTFTP_MAX_WINDOWSIZE)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PARAM_INV),
         mTftpHiiHandle,
         L"tftp",
@@ -522,10 +505,7 @@ RunTftp (
                        &Handles
                        );
   if (EFI_ERROR (Status) || (HandleCount == 0)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_TFTP_ERR_NO_NIC),
       mTftpHiiHandle
       );
@@ -540,10 +520,7 @@ RunTftp (
 
     Status = GetNicName (ControllerHandle, NicNumber, NicName);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_TFTP_ERR_NIC_NAME),
         mTftpHiiHandle,
         NicNumber,
@@ -568,10 +545,7 @@ RunTftp (
                (VOID **)&Mtftp4
                );
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_TFTP_ERR_OPEN_PROTOCOL),
         mTftpHiiHandle,
         NicName,
@@ -582,10 +556,7 @@ RunTftp (
 
     Status = Mtftp4->Configure (Mtftp4, &Mtftp4ConfigData);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_TFTP_ERR_CONFIGURE),
         mTftpHiiHandle,
         NicName,
@@ -596,10 +567,7 @@ RunTftp (
 
     Status = GetFileSize (Mtftp4, AsciiRemoteFilePath, &FileSize);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_TFTP_ERR_FILE_SIZE),
         mTftpHiiHandle,
         RemoteFilePath,
@@ -611,10 +579,7 @@ RunTftp (
 
     Status = DownloadFile (Mtftp4, RemoteFilePath, AsciiRemoteFilePath, FileSize, BlockSize, WindowSize);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_TFTP_ERR_DOWNLOAD),
         mTftpHiiHandle,
         RemoteFilePath,
@@ -637,10 +602,7 @@ NextHandle:
   }
 
   if ((UserNicName != NULL) && (!NicFound)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_TFTP_ERR_NIC_NOT_FOUND),
       mTftpHiiHandle,
       UserNicName
@@ -685,10 +647,7 @@ StringToUint16 (
 
   Val = ShellStrToUintn (ValueStr);
   if (Val > MAX_UINT16) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_PARAM_INV),
       mTftpHiiHandle,
       L"tftp",
@@ -1025,10 +984,7 @@ DownloadFile (
     Mtftp4Token.OptionCount++;
   }
 
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_TFTP_DOWNLOADING),
     mTftpHiiHandle,
     FilePath
@@ -1050,10 +1006,7 @@ DownloadFile (
              0
              );
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL),
       mTftpHiiHandle,
       L"tftp",
@@ -1063,10 +1016,7 @@ DownloadFile (
   }
 
   Status = Mtftp4->ReadFile (Mtftp4, &Mtftp4Token);
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_GEN_CRLF),
     mTftpHiiHandle
     );
@@ -1136,19 +1086,13 @@ CheckPacket (
   Status = ShellWriteFile (mFileHandle, &DownloadLen, Packet->Data.Data);
   if (EFI_ERROR (Status)) {
     if (Context->DownloadedNbOfBytes > 0) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_CRLF),
         mTftpHiiHandle
         );
     }
 
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_TFTP_ERR_WRITE),
       mTftpHiiHandle,
       mLocalFilePath,
@@ -1158,7 +1102,7 @@ CheckPacket (
   }
 
   if (Context->DownloadedNbOfBytes == 0) {
-    ShellPrintEx (-1, -1, L"%s       0 Kb", mTftpProgressFrame);
+    ShellPrintDefaultEx (L"%s       0 Kb", mTftpProgressFrame);
   }
 
   Context->DownloadedNbOfBytes += DownloadLen;
@@ -1172,7 +1116,7 @@ CheckPacket (
     return EFI_SUCCESS;
   }
 
-  ShellPrintEx (-1, -1, L"%s", mTftpProgressDelete);
+  ShellPrintDefaultEx (L"%s", mTftpProgressDelete);
 
   Status = StrCpyS (Progress, TFTP_PROGRESS_MESSAGE_SIZE, mTftpProgressFrame);
   if (EFI_ERROR (Status)) {
@@ -1193,7 +1137,7 @@ CheckPacket (
     );
   Context->LastReportedNbOfBytes = Context->DownloadedNbOfBytes;
 
-  ShellPrintEx (-1, -1, L"%s", Progress);
+  ShellPrintDefaultEx (L"%s", Progress);
 
   return EFI_SUCCESS;
 }

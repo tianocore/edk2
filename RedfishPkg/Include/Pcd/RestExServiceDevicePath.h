@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef REST_EX_SERVICE_DEVICE_PATH_H_
-#define REST_EX_SERVICE_DEVICE_PATH_H_
+#pragma once
 
 #include <Protocol/DevicePath.h>
 
@@ -37,5 +36,3 @@ typedef struct {
   //
   EFI_DEVICE_PATH_PROTOCOL    DevicePath[MAX_DEVICE_PATH_NODE];
 } REST_EX_SERVICE_DEVICE_PATH_DATA;
-
-#endif

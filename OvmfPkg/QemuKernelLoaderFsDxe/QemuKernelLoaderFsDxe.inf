@@ -29,7 +29,9 @@
   BaseMemoryLib
   DebugLib
   DevicePathLib
+  HobLib
   MemoryAllocationLib
+  PrintLib
   QemuFwCfgLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
@@ -40,6 +42,7 @@
   gEfiFileSystemInfoGuid
   gEfiFileSystemVolumeLabelInfoIdGuid
   gQemuKernelLoaderFsMediaGuid
+  gEfiIgvmDataHobGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid                ## PRODUCES

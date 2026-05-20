@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __SHELL_LIB__
-#define __SHELL_LIB__
+#pragma once
 
 #include <Uefi.h>
 #include <Guid/FileInfo.h>
@@ -968,6 +967,16 @@ ShellPrintHiiEx (
   ...
   );
 
+/** Macro aliasing the ShellPrintEx() function and providing default parameters for
+    the Col and Row position.
+**/
+#define ShellPrintDefaultEx(...)  ShellPrintEx(-1, -1, __VA_ARGS__)
+
+/** Macro aliasing the ShellPrintHiiEx() function and providing default parameters for
+    the Col and Row position + Language.
+**/
+#define ShellPrintHiiDefaultEx(...)  ShellPrintHiiEx(-1, -1, NULL, __VA_ARGS__)
+
 /**
   Function to determine if a given filename represents a directory.
 
@@ -1428,4 +1437,14 @@ ShellPrintHelp (
   IN BOOLEAN       PrintCommandText
   );
 
-#endif // __SHELL_LIB__
+/** Check whther the input name is L"." or L"..".
+
+  @param[in]  Name  Name to check.
+
+  @return TRUE if the input name matches L"." or L"..".
+**/
+BOOLEAN
+EFIAPI
+IsDotOrDotDot (
+  CONST CHAR16  *Name
+  );

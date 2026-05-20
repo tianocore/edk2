@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef SMBASE_H_
-#define SMBASE_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h> // EFI_STATUS
 #include <Uefi/UefiSpec.h>     // EFI_BOOT_SERVICES
@@ -42,5 +41,3 @@ SmbaseRelocate (
   IN UINTN    Smbase,
   IN UINT32   PenAddress
   );
-
-#endif // SMBASE_H_

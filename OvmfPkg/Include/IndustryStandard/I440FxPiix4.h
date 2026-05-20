@@ -11,8 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __I440FX_PIIX4_H__
-#define __I440FX_PIIX4_H__
+#pragma once
 
 #include <Library/PciLib.h>
 
@@ -50,5 +49,3 @@
 // IO ports
 //
 #define PIIX4_CPU_HOTPLUG_BASE  0xAF00
-
-#endif

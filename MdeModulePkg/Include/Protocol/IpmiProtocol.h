@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _IPMI_PROTOCOL_H_
-#define _IPMI_PROTOCOL_H_
+#pragma once
 
 typedef struct _IPMI_PROTOCOL IPMI_PROTOCOL;
 
@@ -61,5 +60,3 @@ struct _IPMI_PROTOCOL {
 
 extern EFI_GUID  gIpmiProtocolGuid;
 extern EFI_GUID  gSmmIpmiProtocolGuid;
-
-#endif

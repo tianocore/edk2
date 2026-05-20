@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FORM_DISPLAY_H__
-#define __FORM_DISPLAY_H__
+#pragma once
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
@@ -696,8 +695,8 @@ RefreshTimeOutProcess (
 /**
   Record the highlight menu and top of screen menu info.
 
-  @param  Highlight               The menu opton which is highlight.
-  @param  TopOfScreen             The menu opton which is at the top of the form.
+  @param  Highlight               The menu option which is highlight.
+  @param  TopOfScreen             The menu option which is at the top of the form.
   @param  SkipValue               The skip line info for the top of screen menu.
 
 **/
@@ -734,5 +733,3 @@ CreatePopup (
   IN  EFI_STRING_ID            Message,
   OUT EFI_HII_POPUP_SELECTION  *UserSelection OPTIONAL
   );
-
-#endif

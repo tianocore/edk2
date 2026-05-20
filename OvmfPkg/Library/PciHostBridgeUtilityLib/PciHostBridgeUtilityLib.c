@@ -444,6 +444,12 @@ PciHostBridgeUtilityGetRootBridgesHostProvided (
   PCI_ROOT_BRIDGE_APERTURE  PMem;
   PCI_ROOT_BRIDGE_APERTURE  PMemAbove4G;
 
+  ZeroMem (&Io, sizeof (Io));
+  ZeroMem (&Mem, sizeof (Mem));
+  ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
+  ZeroMem (&PMem, sizeof (PMem));
+  ZeroMem (&PMemAbove4G, sizeof (PMemAbove4G));
+
   //
   // Initialize the Hardware Info list head to start with an empty but valid
   // list head.

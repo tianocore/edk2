@@ -49,7 +49,9 @@
             "ArmPkg/ArmPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "MdePkg/MdePkg.dec"
+            "MdePkg/MdePkg.dec",
+            "SecurityPkg/SecurityPkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
@@ -91,9 +93,42 @@
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors
                                      # in matching files
         "ExtendWords": [
+            "afsel",
+            "ctsen",
+            "dataen",
+            "daten",
+            "deassert",
+            "hbackporch",
             "hdlcd",
+            "hsync",
             "icdsgir",
-            "primecells"
+            "inten",
+            "jedec",
+            "pcell",
+            "primecells",
+            "pxclk",
+            "resen",
+            "rtsen",
+            "tpidrurw",
+            "uartcr",
+            "uartdmacr",
+            "uartdr",
+            "uartecr",
+            "uartfbrd",
+            "uartfr",
+            "uartibrd",
+            "uarticr",
+            "uartifls",
+            "uartilpr",
+            "uartimsc",
+            "uartris",
+            "vbackporch",
+            "vsync",
+            "vsyncwidth",
+            "wdogmis",
+            "wdogris",
+            "wsvga",
+            "wsxga"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [    # Standard Plugin defined paths that
             "*.asm", "*.s"          # should be ignore

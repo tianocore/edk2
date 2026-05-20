@@ -43,7 +43,7 @@ ParseAcpiDsdt (
   // As per 19.6.29 in the version 6.4 of the ACPI spec, a revision less than 2
   // restricts integers to 32 bit width. This may not be intended, raise a
   // warning
- #if defined (MDE_CPU_AARCH64) || defined (MDE_CPU_ARM)
+ #if defined (MDE_CPU_AARCH64)
   if (AcpiTableRevision < 2) {
     IncrementWarningCount ();
     Print (

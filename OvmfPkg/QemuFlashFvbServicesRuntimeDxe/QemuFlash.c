@@ -259,6 +259,14 @@ QemuFlashInitialize (
   VOID
   )
 {
+  //
+  // The SNP model does not provide for QEMU flash device support, so exit
+  // early before attempting to initialize any QEMU flash device support.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
+
   mFlashBase   = (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFdBaseAddress);
   mFdBlockSize = PcdGet32 (PcdOvmfFirmwareBlockSize);
   ASSERT (PcdGet32 (PcdOvmfFirmwareFdSize) % mFdBlockSize == 0);

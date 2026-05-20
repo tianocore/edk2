@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HTTP_BOOT_HII_GUID_H__
-#define __HTTP_BOOT_HII_GUID_H__
+#pragma once
 
 #define HTTP_BOOT_CONFIG_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gHttpBootConfigGuid;
-
-#endif

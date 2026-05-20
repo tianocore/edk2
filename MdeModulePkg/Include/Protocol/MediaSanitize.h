@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef MEDIA_SANITIZE_PROTOCOL_H_
-#define MEDIA_SANITIZE_PROTOCOL_H_
+#pragma once
 
 #define MEDIA_SANITIZE_PROTOCOL_GUID \
   { \
@@ -169,5 +168,3 @@ struct _MEDIA_SANITIZE_PROTOCOL {
 };
 
 extern EFI_GUID  gMediaSanitizeProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_PARSER_H_
-#define AML_PARSER_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <Stream/AmlStream.h>
@@ -68,5 +67,3 @@ AmlParseVariableArguments (
   IN  AML_STREAM       *FStream,
   IN  LIST_ENTRY       *NameSpaceRefList
   );
-
-#endif // AML_PARSER_H_

@@ -8,12 +8,9 @@
 
 **/
 
-#ifndef __QEMU_RAMFB_H__
-#define __QEMU_RAMFB_H__
+#pragma once
 
 #define QEMU_RAMFB_GUID \
 {0x557423a1, 0x63ab, 0x406c, {0xbe, 0x7e, 0x91, 0xcd, 0xbc, 0x08, 0xc4, 0x57}}
 
 extern EFI_GUID  gQemuRamfbGuid;
-
-#endif

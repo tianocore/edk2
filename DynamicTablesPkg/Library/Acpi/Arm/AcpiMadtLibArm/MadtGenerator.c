@@ -84,16 +84,18 @@ GET_OBJECT_LIST (
 /** This function updates the GIC CPU Interface Information in the
     EFI_ACPI_6_5_GIC_STRUCTURE structure.
 
-  @param [in]  Gicc       Pointer to GIC CPU Interface structure.
-  @param [in]  GicCInfo   Pointer to the GIC CPU Interface Information.
-  @param [in]  MadtRev    MADT table revision.
+  @param [in]  Gicc         Pointer to GIC CPU Interface structure.
+  @param [in]  GicCInfo     Pointer to the GIC CPU Interface Information.
+  @param [in]  MadtRev      MADT table revision.
+  @param [in]  GicRPresent  TRUE if MADT also contains any GICR structures.
 **/
 STATIC
 VOID
 AddGICC (
   IN        EFI_ACPI_6_5_GIC_STRUCTURE  *CONST  Gicc,
   IN  CONST CM_ARM_GICC_INFO            *CONST  GicCInfo,
-  IN  CONST UINT8                               MadtRev
+  IN  CONST UINT8                               MadtRev,
+  IN  CONST BOOLEAN                             GicRPresent
   )
 {
   ASSERT (Gicc != NULL);
@@ -129,7 +131,11 @@ AddGICC (
   // UINT32 VGICMaintenanceInterrupt
   Gicc->VGICMaintenanceInterrupt = GicCInfo->VGICMaintenanceInterrupt;
   // UINT64 GICRBaseAddress
-  Gicc->GICRBaseAddress = GicCInfo->GICRBaseAddress;
+  if (!GicRPresent) {
+    Gicc->GICRBaseAddress = GicCInfo->GICRBaseAddress;
+  } else {
+    Gicc->GICRBaseAddress = 0;
+  }
 
   // UINT64 MPIDR
   Gicc->MPIDR = GicCInfo->MPIDR;
@@ -209,6 +215,8 @@ IsAcpiUidEqual (
   @param [in]  GicCInfo             Pointer to the GIC CPU Information list.
   @param [in]  GicCCount            Count of GIC CPU Interfaces.
   @param [in]  MadtRev              MADT table revision.
+  @param [in]  GicRPresent          TRUE if MADT also contains any GICR
+                                    structures.
 
   @retval EFI_SUCCESS               GIC CPU Interface Information was added
                                     successfully.
@@ -222,7 +230,8 @@ AddGICCList (
   IN  EFI_ACPI_6_5_GIC_STRUCTURE  *Gicc,
   IN  CONST CM_ARM_GICC_INFO      *GicCInfo,
   IN        UINT32                GicCCount,
-  IN  CONST UINT8                 MadtRev
+  IN  CONST UINT8                 MadtRev,
+  IN  CONST BOOLEAN               GicRPresent
   )
 {
   BOOLEAN  IsAcpiProcUidDuplicated;
@@ -243,7 +252,7 @@ AddGICCList (
   }
 
   while (GicCCount-- != 0) {
-    AddGICC (Gicc++, GicCInfo++, MadtRev);
+    AddGICC (Gicc++, GicCInfo++, MadtRev, GicRPresent);
   }
 
   return EFI_SUCCESS;
@@ -667,7 +676,8 @@ BuildMadtTable (
              (EFI_ACPI_6_5_GIC_STRUCTURE *)((UINT8 *)Madt + GicCOffset),
              GicCInfo,
              GicCCount,
-             Madt->Header.Revision
+             Madt->Header.Revision,
+             GicRedistCount != 0
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -743,10 +753,10 @@ FreeMadtTableResources (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
+  ASSERT (Table != NULL);
 
   if ((Table == NULL) || (*Table == NULL)) {
     DEBUG ((DEBUG_ERROR, "ERROR: MADT: Invalid Table Pointer\n"));
-    ASSERT ((Table != NULL) && (*Table != NULL));
     return EFI_INVALID_PARAMETER;
   }
 

@@ -1,5 +1,5 @@
 /** @file
-  Create the NULL function to pass build in IA32/IPF/ARM/EBC.
+  Create the NULL function to pass build in IA32/IPF/EBC.
 
 Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

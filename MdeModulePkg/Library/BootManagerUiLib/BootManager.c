@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "BootManager.h"
+#include <Protocol/LoadedImage.h>
 
 UINT16    mKeyInput;
 EFI_GUID  mBootManagerGuid = BOOT_MANAGER_FORMSET_GUID;
@@ -493,6 +494,9 @@ UpdateBootManager (
   BOOLEAN                       IsLegacyOption;
   BOOLEAN                       NeedEndOp;
   UINTN                         MaxLen;
+  EFI_STATUS                    Status;
+  EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
 
   DeviceType = (UINT16)-1;
 
@@ -537,6 +541,25 @@ UpdateBootManager (
   EndLabel->Number       = LABEL_BOOT_OPTION_END;
   mKeyInput              = 0;
   NeedEndOp              = FALSE;
+
+  //
+  // Get UiApp FilePath
+  //
+  Status = gBS->HandleProtocol (
+                  gImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&LoadedImage
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  DevicePath = DevicePathFromHandle (LoadedImage->DeviceHandle);
+  ASSERT (DevicePath != NULL);
+
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 LoadedImage->FilePath
+                 );
+
   for (Index = 0; Index < BootOptionCount; Index++) {
     //
     // At this stage we are creating a menu entry, thus the Keys are reproduceable
@@ -547,6 +570,13 @@ UpdateBootManager (
     // Don't display hidden boot options, but retain inactive ones.
     //
     if ((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) {
+      continue;
+    }
+
+    //
+    // Don't display UiApp within the boot options
+    //
+    if (CompareMem (DevicePath, BootOption[Index].FilePath, GetDevicePathSize (DevicePath)) == 0) {
       continue;
     }
 

@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef CC_MEASUREMENT_PROTOCOL_H_
-#define CC_MEASUREMENT_PROTOCOL_H_
+#pragma once
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 
@@ -33,9 +32,10 @@ typedef struct {
 //
 // EFI_CC Type/SubType definition
 //
-#define EFI_CC_TYPE_NONE  0
-#define EFI_CC_TYPE_SEV   1
-#define EFI_CC_TYPE_TDX   2
+#define EFI_CC_TYPE_NONE   0
+#define EFI_CC_TYPE_SEV    1
+#define EFI_CC_TYPE_TDX    2
+#define EFI_CC_TYPE_APTEE  3
 
 typedef struct {
   UINT8    Type;
@@ -319,5 +319,3 @@ typedef struct {
 //
 #define EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
 #define EFI_CC_EVENTLOG_ACPI_TABLE_REVISION   1
-
-#endif

@@ -18,7 +18,7 @@
   @param[in]  Completion  A value between 1 and 100 indicating the current
                           completion progress of the firmware update
 
-  @retval EFI_SUCESS             The capsule update progress was updated.
+  @retval EFI_SUCCESS            The capsule update progress was updated.
   @retval EFI_INVALID_PARAMETER  Completion is greater than 100%.
 **/
 EFI_STATUS

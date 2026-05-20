@@ -1,0 +1,56 @@
+# Actions that should occur when a GitHub issue is assigned.
+#
+# Currently this will remove the `state:needs-owner` label when the issue is assigned to an owner.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+name: React to Issue Assignment
+
+on:
+  issues:
+    types: assigned
+
+jobs:
+  adjust-labels:
+    name: Adjust Issue Labels
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Remove Labels
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # All labels here will be removed if present in the issue
+          LABELS_TO_REMOVE=("state:needs-owner")
+
+          # Gather issue context information
+          ISSUE_NUMBER=$(jq --raw-output .issue.number "$GITHUB_EVENT_PATH")
+          OWNER=$(jq --raw-output .repository.owner.login "$GITHUB_EVENT_PATH")
+          REPO=$(jq --raw-output .repository.name "$GITHUB_EVENT_PATH")
+          LABELS=$(curl -s \
+                        -H "Accept: application/vnd.github+json" \
+                        -H "Authorization: Bearer $GITHUB_TOKEN" \
+                        -H "X-GitHub-Api-Version: 2022-11-28" \
+                        https://api.github.com/repos/$OWNER/$REPO/issues/$ISSUE_NUMBER/labels | jq -r '.[].name')
+
+          # Remove labels
+          for LABEL in "${LABELS_TO_REMOVE[@]}"; do
+            if echo "$LABELS" | grep -q "$LABEL"; then
+              curl -X DELETE \
+                   -s \
+                   -H "Accept: application/vnd.github+json" \
+                   -H "Authorization: Bearer $GITHUB_TOKEN" \
+                   -H "X-GitHub-Api-Version: 2022-11-28" \
+                   https://api.github.com/repos/$OWNER/$REPO/issues/$ISSUE_NUMBER/labels/"$LABEL" > /dev/null
+              echo "$LABEL removed from issue #$ISSUE_NUMBER"
+            else
+              echo "$LABEL not found on issue #$ISSUE_NUMBER"
+            fi
+          done

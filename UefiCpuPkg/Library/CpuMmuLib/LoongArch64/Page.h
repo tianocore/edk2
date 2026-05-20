@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PAGE_H_
-#define PAGE_H_
+#pragma once
 
 #define INVALID_PAGE  0
 
@@ -22,12 +21,3 @@
 #define PTE_PPN_MASK              0xFFFFFFFFF000ULL
 #define PTE_PPN_SHIFT             EFI_PAGE_SHIFT
 #define LOONGARCH_MMU_PAGE_SHIFT  EFI_PAGE_SHIFT
-
-//
-// For coding convenience, define the maximum valid
-// LoongArch exception.
-// Since UEFI V2.11, it will be present in DebugSupport.h.
-//
-#define MAX_LOONGARCH_EXCEPTION  64
-
-#endif // PAGE_H_

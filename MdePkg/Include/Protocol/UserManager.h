@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __USER_MANAGER_H__
-#define __USER_MANAGER_H__
+#pragma once
 
 ///
 /// Global ID for the User Manager Protocol
@@ -614,5 +613,3 @@ extern EFI_GUID  gEfiUserCredentialClassSecureCardGuid;
 extern EFI_GUID  gEfiUserInfoAccessSetupAdminGuid;
 extern EFI_GUID  gEfiUserInfoAccessSetupNormalGuid;
 extern EFI_GUID  gEfiUserInfoAccessSetupRestrictedGuid;
-
-#endif

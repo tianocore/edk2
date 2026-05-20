@@ -29,20 +29,6 @@ class Identification(object):
     def GetFileName(self, FileFullPath, FileRelativePath):
         pass
 
-    ## GetFileName
-    #
-    # Reserved
-    #
-    def GetFileFullPath(self, FileName, FileRelativePath):
-        pass
-
-    ## GetFileName
-    #
-    # Reserved
-    #
-    def GetFileRelativePath(self, FileName, FileFullPath):
-        pass
-
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another

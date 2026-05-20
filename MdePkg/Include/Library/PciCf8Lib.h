@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCI_CF8_LIB_H__
-#define __PCI_CF8_LIB_H__
+#pragma once
 
 /**
   Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
@@ -1083,5 +1082,3 @@ PciCf8WriteBuffer (
   IN      UINTN  Size,
   IN      VOID   *Buffer
   );
-
-#endif

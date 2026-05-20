@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef CPU_DXE_H_
-#define CPU_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
@@ -26,13 +25,6 @@
 #include <Protocol/Cpu.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
-
-//
-// For coding convenience, define the maximum valid
-// LoongArch exception.
-// Since UEFI V2.11, it will be present in DebugSupport.h.
-//
-#define MAX_LOONGARCH_EXCEPTION  64
 
 /*
   This function flushes the range of addresses from Start to Start+Length
@@ -284,5 +276,3 @@ EFIAPI
 EfiAttributeConverse (
   IN UINTN  EfiAttributes
   );
-
-#endif // CPU_DXE_H_

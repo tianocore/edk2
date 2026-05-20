@@ -1,6 +1,7 @@
 /** @file
   HII Config Access protocol implementation of SecureBoot configuration module.
 
+Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -14,6 +15,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseCryptLib.h>
 #include <Library/SecureBootVariableLib.h>
 #include <Library/SecureBootVariableProvisionLib.h>
+
+EFI_STATUS
+FormatHelpInfo (
+  IN     SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData,
+  IN     EFI_SIGNATURE_LIST              *ListEntry,
+  IN     EFI_SIGNATURE_DATA              *DataEntry,
+  OUT EFI_STRING_ID                      *StringId
+  );
 
 CHAR16  mSecureBootStorageName[] = L"SECUREBOOT_CONFIGURATION";
 
@@ -350,7 +359,7 @@ CheckX509Certificate (
   //
   Status = ReadFileContent (X509FileContext->FHandle, (VOID **)&X509Data, &X509DataSize, 0);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Error occured while reading the file.\n"));
+    DEBUG ((DEBUG_ERROR, "Error occurred while reading the file.\n"));
     goto ON_EXIT;
   }
 
@@ -358,7 +367,7 @@ CheckX509Certificate (
   // Parse the public key context.
   //
   if (RsaGetPublicKeyFromX509 (X509Data, X509DataSize, &X509PubKey) == FALSE) {
-    DEBUG ((DEBUG_ERROR, "Error occured while parsing the pubkey from certificate.\n"));
+    DEBUG ((DEBUG_ERROR, "Error occurred while parsing the pubkey from certificate.\n"));
     Status = EFI_INVALID_PARAMETER;
     *Error = Unsupported_Type;
     goto ON_EXIT;
@@ -1789,8 +1798,7 @@ LoadPeImage (
   // Note the size of FileHeader field is constant for both IA32 and X64 arch
   //
   if (  (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32)
-     || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_EBC)
-     || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_ARMTHUMB_MIXED))
+     || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_EBC))
   {
     //
     // 32-bits Architecture
@@ -2096,30 +2104,35 @@ HashPeImageByType (
 {
   UINT8                     Index;
   WIN_CERTIFICATE_EFI_PKCS  *PkcsCertData;
+  UINT32                    PkcsCertSize;
 
   PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *)(mImageBase + mSecDataDir->Offset);
+  PkcsCertSize = mSecDataDir->SizeOfCert;
+
+  //
+  // Check the Hash algorithm in PE/COFF Authenticode.
+  //    According to PKCS#7 Definition:
+  //        SignedData ::= SEQUENCE {
+  //            version Version,
+  //            digestAlgorithms DigestAlgorithmIdentifiers,
+  //            contentInfo ContentInfo,
+  //            .... }
+  //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm in PE/COFF hashing
+  //    This field has the fixed offset (+32) in final Authenticode ASN.1 data.
+  //    Fixed offset (+32) is calculated based on two bytes of length encoding.
+  //
+  if ((PkcsCertSize > 1) && ((*(PkcsCertData->CertData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE)) {
+    //
+    // Only support two bytes of Long Form of Length Encoding.
+    //
+    return EFI_BAD_BUFFER_SIZE;
+  }
 
   for (Index = 0; Index < HASHALG_MAX; Index++) {
-    //
-    // Check the Hash algorithm in PE/COFF Authenticode.
-    //    According to PKCS#7 Definition:
-    //        SignedData ::= SEQUENCE {
-    //            version Version,
-    //            digestAlgorithms DigestAlgorithmIdentifiers,
-    //            contentInfo ContentInfo,
-    //            .... }
-    //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm in PE/COFF hashing
-    //    This field has the fixed offset (+32) in final Authenticode ASN.1 data.
-    //    Fixed offset (+32) is calculated based on two bytes of length encoding.
-    //
-    if ((*(PkcsCertData->CertData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) {
-      //
-      // Only support two bytes of Long Form of Length Encoding.
-      //
+    if (PkcsCertSize < 32 + mHash[Index].OidLength) {
       continue;
     }
 
-    //
     if (CompareMem (PkcsCertData->CertData + 32, mHash[Index].OidValue, mHash[Index].OidLength) == 0) {
       break;
     }
@@ -2619,55 +2632,46 @@ UpdateDeletePage (
   GuidIndex    = 0;
 
   while ((ItemDataSize > 0) && (ItemDataSize >= CertList->SignatureListSize)) {
-    if (CompareGuid (&CertList->SignatureType, &gEfiCertRsa2048Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_RSA2048_SHA256_GUID);
-    } else if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_PCKS7_GUID);
-    } else if (CompareGuid (&CertList->SignatureType, &gEfiCertSha1Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_SHA1_GUID);
-    } else if (CompareGuid (&CertList->SignatureType, &gEfiCertSha256Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_SHA256_GUID);
-    } else if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Sha256Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_X509_SHA256_GUID);
-    } else if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Sha384Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_X509_SHA384_GUID);
-    } else if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Sha512Guid)) {
-      Help = STRING_TOKEN (STR_CERT_TYPE_X509_SHA512_GUID);
-    } else {
-      //
-      // The signature type is not supported in current implementation.
-      //
+    if (CompareGuid (&CertList->SignatureType, &gEfiCertRsa2048Guid) ||
+        CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid) ||
+        CompareGuid (&CertList->SignatureType, &gEfiCertSha1Guid) ||
+        CompareGuid (&CertList->SignatureType, &gEfiCertSha256Guid) ||
+        CompareGuid (&CertList->SignatureType, &gEfiCertX509Sha256Guid) ||
+        CompareGuid (&CertList->SignatureType, &gEfiCertX509Sha384Guid) ||
+        CompareGuid (&CertList->SignatureType, &gEfiCertX509Sha512Guid)
+        )
+    {
+      CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+      for (Index = 0; Index < CertCount; Index++) {
+        Cert = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList
+                                      + sizeof (EFI_SIGNATURE_LIST)
+                                      + CertList->SignatureHeaderSize
+                                      + Index * CertList->SignatureSize);
+        //
+        // Display GUID and help
+        //
+        GuidToString (&Cert->SignatureOwner, GuidStr, 100);
+        GuidID = HiiSetString (PrivateData->HiiHandle, 0, GuidStr, NULL);
+
+        Status = FormatHelpInfo (PrivateData, CertList, Cert, &Help);
+        if (!EFI_ERROR (Status)) {
+          HiiCreateCheckBoxOpCode (
+            StartOpCodeHandle,
+            (EFI_QUESTION_ID)(QuestionIdBase + GuidIndex++),
+            0,
+            0,
+            GuidID,
+            Help,
+            EFI_IFR_FLAG_CALLBACK,
+            0,
+            NULL
+            );
+        }
+      }
+
       ItemDataSize -= CertList->SignatureListSize;
       CertList      = (EFI_SIGNATURE_LIST *)((UINT8 *)CertList + CertList->SignatureListSize);
-      continue;
     }
-
-    CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
-    for (Index = 0; Index < CertCount; Index++) {
-      Cert = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList
-                                    + sizeof (EFI_SIGNATURE_LIST)
-                                    + CertList->SignatureHeaderSize
-                                    + Index * CertList->SignatureSize);
-      //
-      // Display GUID and help
-      //
-      GuidToString (&Cert->SignatureOwner, GuidStr, 100);
-      GuidID = HiiSetString (PrivateData->HiiHandle, 0, GuidStr, NULL);
-      HiiCreateCheckBoxOpCode (
-        StartOpCodeHandle,
-        (EFI_QUESTION_ID)(QuestionIdBase + GuidIndex++),
-        0,
-        0,
-        GuidID,
-        Help,
-        EFI_IFR_FLAG_CALLBACK,
-        0,
-        NULL
-        );
-    }
-
-    ItemDataSize -= CertList->SignatureListSize;
-    CertList      = (EFI_SIGNATURE_LIST *)((UINT8 *)CertList + CertList->SignatureListSize);
   }
 
 ON_EXIT:

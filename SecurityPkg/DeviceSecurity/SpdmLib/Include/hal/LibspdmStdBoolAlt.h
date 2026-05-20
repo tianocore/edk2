@@ -7,10 +7,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef LIBSPDM_STDBOOL_ALT_H
-#define LIBSPDM_STDBOOL_ALT_H
+#pragma once
 
+// In C23, bool is a built-in type
+#if __STDC_VERSION__ < 202311L
 typedef BOOLEAN bool;
+#endif
 
 #ifndef true
 #define true  TRUE
@@ -19,5 +21,3 @@ typedef BOOLEAN bool;
 #ifndef false
 #define false  FALSE
 #endif
-
-#endif /* LIBSPDM_STDBOOL_ALT */

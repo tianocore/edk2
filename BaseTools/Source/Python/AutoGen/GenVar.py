@@ -28,7 +28,6 @@ class VariableMgr(object):
         self.DefaultStoreMap = DefaultStoreMap
         self.SkuIdMap = SkuIdMap
         self.VpdRegionSize = 0
-        self.VpdRegionOffset = 0
         self.NVHeaderBuff = None
         self.VarDefaultBuff = None
         self.VarDeltaBuff = None
@@ -38,9 +37,6 @@ class VariableMgr(object):
 
     def SetVpdRegionMaxSize(self, maxsize):
         self.VpdRegionSize = maxsize
-
-    def SetVpdRegionOffset(self, vpdoffset):
-        self.VpdRegionOffset = vpdoffset
 
     def PatchNVStoreDefaultMaxSize(self, maxsize):
         if not self.NVHeaderBuff:

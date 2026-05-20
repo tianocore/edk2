@@ -281,7 +281,7 @@ BOpt_FreeMenu (
   @param CallbackData The BMM context data.
 
   @return EFI_NOT_FOUND Fail to find "BootOrder" variable.
-  @return EFI_SUCESS    Success build boot option menu.
+  @return EFI_SUCCESS   Success build boot option menu.
 
 **/
 EFI_STATUS
@@ -669,7 +669,7 @@ BOpt_GetDriverOptionNumber (
 
   @param CallbackData The BMM context data.
 
-  @retval EFI_SUCESS           The functin completes successfully.
+  @retval EFI_SUCCESS          The function completes successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
   @retval EFI_NOT_FOUND        Fail to get "DriverOrder" variable.
 

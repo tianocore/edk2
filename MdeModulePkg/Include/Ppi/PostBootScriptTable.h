@@ -9,12 +9,9 @@
 
 **/
 
-#ifndef _PEI_POST_BOOT_SCRIPT_TABLE_H_
-#define _PEI_POST_BOOT_SCRIPT_TABLE_H_
+#pragma once
 
 #define PEI_POST_BOOT_SCRIPT_TABLE_PPI_GUID  \
   {0x88c9d306, 0x900, 0x4eb5, 0x82, 0x60, 0x3e, 0x2d, 0xbe, 0xda, 0x1f, 0x89};
 
 extern EFI_GUID  gPeiPostScriptTablePpiGuid;
-
-#endif

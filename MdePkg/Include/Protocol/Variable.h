@@ -25,8 +25,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_VARIABLE_ARCH_H__
-#define __ARCH_PROTOCOL_VARIABLE_ARCH_H__
+#pragma once
 
 ///
 /// Global ID for the Variable Architectural Protocol
@@ -35,5 +34,3 @@
   { 0x1e5668e2, 0x8481, 0x11d4, {0xbc, 0xf1, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
 
 extern EFI_GUID  gEfiVariableArchProtocolGuid;
-
-#endif

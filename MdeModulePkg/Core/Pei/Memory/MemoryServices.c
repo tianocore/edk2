@@ -555,6 +555,7 @@ PeiAllocatePages (
   EFI_PHYSICAL_ADDRESS  *FreeMemoryTop;
   EFI_PHYSICAL_ADDRESS  *FreeMemoryBottom;
   UINTN                 RemainingPages;
+  UINTN                 RemainingMemory;
   UINTN                 Granularity;
   UINTN                 Padding;
 
@@ -612,10 +613,11 @@ PeiAllocatePages (
 
   //
   // Check to see if on correct boundary for the memory type.
-  // If not aligned, make the allocation aligned.
+  // If not aligned, make the allocation aligned and that we are not trying to allocate page 0, which is used for
+  // null detection.
   //
   Padding = *(FreeMemoryTop) & (Granularity - 1);
-  if ((UINTN)(*FreeMemoryTop - *FreeMemoryBottom) < Padding) {
+  if (((UINTN)(*FreeMemoryTop - *FreeMemoryBottom) < Padding) || (*(FreeMemoryTop) - Padding == 0)) {
     DEBUG ((DEBUG_ERROR, "AllocatePages failed: Out of space after padding.\n"));
     return EFI_OUT_OF_RESOURCES;
   }
@@ -636,24 +638,18 @@ PeiAllocatePages (
   //
   // Verify that there is sufficient memory to satisfy the allocation.
   //
-  RemainingPages = (UINTN)(*FreeMemoryTop - *FreeMemoryBottom) >> EFI_PAGE_SHIFT;
+  RemainingMemory = (UINTN)(*FreeMemoryTop - *FreeMemoryBottom);
+  RemainingPages  = (UINTN)(RShiftU64 (RemainingMemory, EFI_PAGE_SHIFT));
   //
-  // The number of remaining pages needs to be greater than or equal to that of the request pages.
+  // The number of remaining pages needs to be greater than or equal to that of
+  // the request pages. In addition, there should be enough space left to hold a
+  // Memory Allocation HOB.
   //
   Pages = ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (Granularity));
-  if (RemainingPages < Pages) {
-    //
-    // Try to find free memory by searching memory allocation HOBs.
-    //
-    Status = FindFreeMemoryFromMemoryAllocationHob (MemoryType, Pages, Granularity, Memory);
-    if (!EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    DEBUG ((DEBUG_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64)Pages));
-    DEBUG ((DEBUG_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64)RemainingPages));
-    return EFI_OUT_OF_RESOURCES;
-  } else {
+  if ((RemainingPages > Pages) ||
+      ((RemainingPages == Pages) &&
+       ((RemainingMemory & EFI_PAGE_MASK) >= sizeof (EFI_HOB_MEMORY_ALLOCATION))))
+  {
     //
     // Update the PHIT to reflect the memory usage
     //
@@ -674,6 +670,18 @@ PeiAllocatePages (
       );
 
     return EFI_SUCCESS;
+  } else {
+    //
+    // Try to find free memory by searching memory allocation HOBs.
+    //
+    Status = FindFreeMemoryFromMemoryAllocationHob (MemoryType, Pages, Granularity, Memory);
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    DEBUG ((DEBUG_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64)Pages));
+    DEBUG ((DEBUG_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64)RemainingPages));
+    return EFI_OUT_OF_RESOURCES;
   }
 }
 

@@ -52,6 +52,7 @@
   FspSwitchStackLib
   FspCommonLib
   FspSecPlatformLib
+  StackCheckLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                              ## PRODUCES

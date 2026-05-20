@@ -42,6 +42,7 @@
   BaseMemoryLib
   CpuLib
   DebugLib
+  HobLib
   LocalApicLib
   MmServicesTableLib
   PcdLib
@@ -52,6 +53,9 @@
 [Protocols]
   gEfiMmCpuIoProtocolGuid                                           ## CONSUMES
   gEfiSmmCpuServiceProtocolGuid                                     ## CONSUMES
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid                                      ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress                ## CONSUMES

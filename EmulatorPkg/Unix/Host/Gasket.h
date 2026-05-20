@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _GASKET_H_
-#define _GASKET_H_
+#pragma once
 
 //
 // EMU_THUNK_PROTOCOL gaskets (EFIAPI to UNIX ABI)
@@ -200,7 +199,7 @@ ReverseGasketUint64Uint64 (
   );
 
 //
-// Gasket functions for EFI_EMU_UGA_IO_PROTOCOL
+// Gasket functions for EFI_EMU_GRAPHICS_WINDOW_PROTOCOL
 //
 
 EFI_STATUS
@@ -243,10 +242,10 @@ GasketX11RegisterKeyNotify (
 EFI_STATUS
 EFIAPI
 GasketX11Blt (
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL    *GraphicsWindows,
-  IN  EFI_UGA_PIXEL                   *BltBuffer OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION           BltOperation,
-  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS  *Args
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL       *GraphicsWindows,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS     *Args
   );
 
 EFI_STATUS
@@ -621,5 +620,3 @@ GasketSnpReceive (
   OUT EFI_MAC_ADDRESS  *DestAddr   OPTIONAL,
   OUT UINT16           *Protocol   OPTIONAL
   );
-
-#endif

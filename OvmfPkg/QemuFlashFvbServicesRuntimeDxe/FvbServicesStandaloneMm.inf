@@ -1,0 +1,78 @@
+## @file
+#  Component description file for QEMU Flash Firmware Volume Block MM driver
+#  module.
+#
+#  This Standalone MM driver implements and produces the MM Firmware Volue Block Protocol
+#  for a QEMU flash device.
+#
+#  Copyright (C) 2015, Red Hat, Inc.
+#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = FvbServicesStandaloneMm
+  FILE_GUID                      = 834DA76A-4EA1-41C7-9601-FE7A7C564757
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = FvbInitializeStandaloneMm
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  FvbInfo.c
+  FwBlockService.c
+  FwBlockService.h
+  FwBlockServiceStandaloneMm.c
+  QemuFlash.c
+  QemuFlash.h
+  QemuFlashSmm.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  MemEncryptSevLib
+  PcdLib
+  MmServicesTableLib
+  StandaloneMmDriverEntryPoint
+
+[Guids]
+
+[Protocols]
+  gEfiSmmFirmwareVolumeBlockProtocolGuid        # PROTOCOL ALWAYS_PRODUCED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Depex]
+  TRUE

@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _VIRTIO_1_0_NET_H_
-#define _VIRTIO_1_0_NET_H_
+#pragma once
 
 #include <IndustryStandard/Virtio10.h>
 #include <IndustryStandard/Virtio095Net.h>
@@ -22,5 +21,3 @@ typedef struct {
   UINT16            NumBuffers;
 } VIRTIO_1_0_NET_REQ;
 #pragma pack ()
-
-#endif // _VIRTIO_1_0_NET_H_

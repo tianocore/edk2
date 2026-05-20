@@ -2,13 +2,12 @@
   AML Lib.
 
   Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_LIB_H_
-#define AML_LIB_H_
+#pragma once
 
 /**
   @mainpage Dynamic AML Generation
@@ -150,6 +149,17 @@ typedef struct {
   AML_METHOD_PARAM_DATA    Data;
   UINTN                    DataSize;
 } AML_METHOD_PARAM;
+
+/** structure to hold Notify method parameter types.
+  NotifyObject -  Notify Object parameter.
+                  Only NameString, Local and Arg types are supported.
+  NotifyValue  -  Notify Value parameter.
+                  Must be an integer value.
+**/
+typedef struct {
+  AML_METHOD_PARAM    NotifyObject;
+  UINT8               NotifyValue;
+} AML_NOTIFY_PARAM;
 
 /** Parse the definition block.
 
@@ -1832,7 +1842,7 @@ AmlAddIntegerToNamedPackage (
   Added integer, string, ArgObj and LocalObj support.
 
   Example 1:
-    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode);
+    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode, &NewObjectNode);
     is equivalent to the following ASL code:
       MET0 ();
 
@@ -1846,7 +1856,7 @@ AmlAddIntegerToNamedPackage (
     Param[2].Type = AmlMethodParamTypeArg;
     Param[3].Data.Local = 2;
     Param[3].Type = AmlMethodParamTypeLocal;
-    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode);
+    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode, &NewObjectNode);
 
     is equivalent to the following ASL code:
       MET0 (0x100, "TEST", Arg0, Local2);
@@ -1858,7 +1868,7 @@ AmlAddIntegerToNamedPackage (
     Param[1].Data.Integer = 0x100;
     Param[1].Type = AmlMethodParamTypeInteger;
     AmlCodeGenMethodRetNameString ("MET2", NULL, 2, TRUE, 0, ParentNode, &MethodNode);
-    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode);
+    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode, &NewObjectNode);
 
     is equivalent to the following ASL code:
     Method (MET2, 2, Serialized)
@@ -1866,12 +1876,13 @@ AmlAddIntegerToNamedPackage (
       MET3 (Arg0, 0x0100)
     }
 
-  @param [in] MethodNameString  The method name to be called or invoked.
-  @param [in] NumArgs           Number of arguments to be passed,
-                                0 to 7 are permissible values.
-  @param [in] Parameters        Contains the parameter data.
-  @param [in] ParentNode        The parent node to which the method invocation
-                                nodes are attached.
+  @param [in]  MethodNameString  The method name to be called or invoked.
+  @param [in]  NumArgs           Number of arguments to be passed,
+                                 0 to 7 are permissible values.
+  @param [in]  Parameters        Contains the parameter data.
+  @param [in]  ParentNode        The parent node to which the method invocation
+                                 nodes are attached.
+  @param [out] NewObjectNode     If success, contains the created node.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -1880,10 +1891,11 @@ AmlAddIntegerToNamedPackage (
 EFI_STATUS
 EFIAPI
 AmlCodeGenInvokeMethod (
-  IN  CONST CHAR8             *MethodNameString,
-  IN        UINT8             NumArgs,
-  IN        AML_METHOD_PARAM  *Parameters   OPTIONAL,
-  IN        AML_NODE_HANDLE   ParentNode
+  IN  CONST CHAR8                   *MethodNameString,
+  IN        UINT8                   NumArgs,
+  IN        AML_METHOD_PARAM        *Parameters     OPTIONAL,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
 /** Create a _PSD node.
@@ -1919,4 +1931,441 @@ AmlCreatePsdNode (
   OUT AML_OBJECT_NODE_HANDLE  *NewPsdNode   OPTIONAL
   );
 
-#endif // AML_LIB_H_
+/** Create a _CST node.
+
+  AmlCreateCstNode ("_CST", 0, 1, ParentNode, &CstNode) is
+  equivalent of the following ASL code:
+    Name (_CST, Package (
+                  0   // Count
+                  ))
+
+  This function doesn't define any CST state. As shown above, the count
+  of _CST state is set to 0.
+  The AmlAddCstState () function allows to add CST states.
+
+  Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States)
+
+  @param [in]  CstNameString  The new CST 's object name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "_CST", "DEV0.CSTP", etc.
+                              The input string is copied.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewCstNode     If success, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCstNode (
+  IN  CONST CHAR8                   *CstNameString,
+  IN        AML_NODE_HANDLE         ParentNode   OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewCstNode   OPTIONAL
+  );
+
+/** Add an _CST state to a CST node created using AmlCreateCstNode.
+
+  AmlAddCstState increments the Count of CST states in the CST node by one,
+  and adds the following package:
+  Package {
+    Register  // Buffer (Resource Descriptor)
+    Type      // Integer (BYTE)
+    Latency   // Integer (WORD)
+    Power     // Integer (DWORD)
+  }
+
+  Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States).
+
+  @param [in]  CstInfo                    CstInfo object
+  @param [in]  CstNode                    Cst node created with the function
+                                          AmlCreateCstNode to which the new CST
+                                          state is appended.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddCstState (
+  IN  AML_CST_INFO            *CstInfo,
+  IN  AML_OBJECT_NODE_HANDLE  CstNode
+  );
+
+/** Create a _CSD node.
+
+  Generates and optionally appends the following node:
+
+  Name (_CSD, Package()
+  {
+    Package () {
+      NumEntries,    // Integer
+      Revision,      // Integer (BYTE)
+      Domain,        // Integer (DWORD)
+      CoordType,     // Integer (DWORD)
+      NumProcessors, // Integer (DWORD)
+      Index          // Integer (DWORD)
+    }
+    Package () {
+      NumEntries,    // Integer
+      Revision,      // Integer (BYTE)
+      Domain,        // Integer (DWORD)
+      CoordType,     // Integer (DWORD)
+      NumProcessors, // Integer (DWORD)
+      Index          // Integer (DWORD)
+    }
+    ...
+  })
+  Cf. ACPI 6.5, s8.4.1.2 _CSD (C-State Dependency).
+
+  @ingroup CodeGenApis
+
+  @param [in]  CsdInfo      CsdInfo object
+  @param [in]  NumEntries   Number of packages to be created.
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewCsdNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCsdNode (
+  IN  AML_CSD_INFO            *CsdInfo,
+  IN  UINT32                  NumEntries,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewCsdNode   OPTIONAL
+  );
+
+/** Create _PCT node
+
+  Generates and optionally appends the following node:
+  Name (_PCT, Package()
+  {
+    ControlRegister   // Buffer (Resource Descriptor (Register))
+    StatusRegister    // Buffer (Resource Descriptor (Register))
+  })
+
+  Cf. ACPI 6.5, s8.4.5.1 _PCT (Processor Control).
+
+  @ingroup CodeGenApis
+
+  @param [in]  PctInfo      PctInfo object
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPctNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePctNode (
+  IN  AML_PCT_INFO            *PctInfo,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPctNode   OPTIONAL
+  );
+
+/** Create _PSS node
+
+  Generates and optionally appends the following node:
+  Name (_PSS, Package()
+  {
+    Package () {
+      CoreFrequency     // Integer (DWORD)
+      Power             // Integer (DWORD)
+      Latency           // Integer (DWORD)
+      BusMasterLatency  // Integer (DWORD)
+      Control           // Integer (DWORD)
+      Status            // Integer (DWORD)
+    }
+    Package () {
+      CoreFrequency     // Integer (DWORD)
+      Power             // Integer (DWORD)
+      Latency           // Integer (DWORD)
+      BusMasterLatency  // Integer (DWORD)
+      Control           // Integer (DWORD)
+      Status            // Integer (DWORD)
+    }
+    ...
+  })
+
+  Cf. ACPI 6.5, s8.4.5.2 _PSS (Processor Supported Performance States).
+
+  @ingroup CodeGenApis
+
+  @param [in]  PssInfo      Array of PssInfo object
+  @param [in]  NumPackages  Number of packages to be created.
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPssNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePssNode (
+  IN  AML_PSS_INFO            *PssInfo,
+  IN  UINT32                  NumPackages,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPssNode   OPTIONAL
+  );
+
+/** Code generation for the IRQ Descriptor.
+
+  The Resource Data effectively created is an IRQ Resource
+  Data. Cf ACPI 6.5 specification:
+   - s6.4.2.1 "IRQ Descriptor"
+   - s19.6.66 "IRQ (Interrupt Resource Descriptor Macro)"
+
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param  [in]  IsEdgeTriggered The interrupt is edge triggered or
+                                level triggered.
+  @param  [in]  IsActiveLow     The interrupt is active-high or active-low.
+  @param  [in]  IsShared        The interrupt can be shared with other
+                                devices or not (Exclusive).
+  @param  [in]  IrqList         List of IRQ numbers. Must be non-NULL.
+  @param  [in]  IrqCount        Number of IRQs in IrqList. Must be > 0 and <= 16.
+  @param  [in]  NameOpNode      NameOp object node defining a named object.
+                                If provided, append the new resource data node
+                                to the list of resource data elements of this node.
+  @param  [out] NewRdNode       If provided and success, contain the created node.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval various               Other errors as indicated.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdIrq (
+  IN  BOOLEAN                 IsEdgeTriggered,
+  IN  BOOLEAN                 IsActiveLow,
+  IN  BOOLEAN                 IsShared,
+  IN  UINT8                   *IrqList,
+  IN  UINT8                   IrqCount,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the UARTSerialBusV2() ASL macro.
+
+  The Resource Data effectively created is a UART Serial Bus Connection
+  Resource Descriptor Resource Data.
+  Cf ACPI 6.5:
+   - s19.6.143 UARTSerialBusV2
+     (UART Serial Bus Connection Resource Descriptor Version 2 Macro)
+   - s6.4.3.8.2.3 UART Serial Bus Connection Resource Descriptor
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in]  InitialBaudRate           Initial baud rate.
+  @param [in]  BitsPerByte               Number of bits per byte.
+                                         Optional, default is 8.
+  @param [in]  StopBits                  Number of stop bits.
+                                         Optional, default is 1.
+  @param [in]  LinesInUse                Number of lines in use.
+  @param [in]  IsBigEndian               Indicates whether the bit transfer is big-endian.
+                                         Optional, default is FALSE (little-endian).
+  @param [in]  Parity                    Parity format used.
+                                          Optional, default is no parity.
+  @param [in]  FlowControl               Flow control protocol used.
+                                          Optional, default is no flow control.
+  @param [in]  ReceiveBufferSize         Size of the receive buffer.
+  @param [in]  TransmitBufferSize        Size of the transmit buffer.
+  @param [in]  ResourceSource            Name of source resource used.
+  @param [in]  ResourceSourceLength      Length of the Resource Source.
+  @param [in]  ResourceSourceIndex       Resource Source index.
+                                         Optional, default is 0.
+  @param [in]  ResourceUsage             Resource usage, TRUE for consumer,
+                                         FALSE for producer.
+                                         Optional, default is TRUE (consumer).
+  @param [in]  IsShared                  Indicates whether the resource is shared.
+                                         Optional, default is FALSE (exclusive).
+  @param [in]  VendorDefinedData         Vendor defined data.
+                                         Optional, can be NULL.
+  @param [in]  VendorDefinedDataLength   Length of the vendor defined data.
+  @param [in]  NameOpNode                NameOp object node defining a named object.
+                                         If provided, append the new resource data
+                                         node to the list of resource data elements
+                                         of this node.
+  @param [out] NewRdNode                 If provided and success,
+                                         contain the created node.
+
+  @retval EFI_SUCCESS                   The function completed successfully.
+  @retval EFI_INVALID_PARAMETER         Invalid parameter.
+  @retval various                       Various failure values of called functions.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdUartSerialBusV2 (
+  IN  UINT32                  InitialBaudRate,
+  IN  UINT8                   *BitsPerByte OPTIONAL,
+  IN  UINT8                   *StopBits OPTIONAL,
+  IN  UINT8                   LinesInUse,
+  IN  BOOLEAN                 *IsBigEndian OPTIONAL,
+  IN  UINT8                   *Parity OPTIONAL,
+  IN  UINT8                   *FlowControl OPTIONAL,
+  IN  UINT16                  ReceiveBufferSize,
+  IN  UINT16                  TransmitBufferSize,
+  IN  CHAR8                   *ResourceSource,
+  IN  UINT16                  ResourceSourceLength,
+  IN  UINT8                   *ResourceSourceIndex OPTIONAL,
+  IN  BOOLEAN                 *ResourceUsage OPTIONAL,
+  IN  BOOLEAN                 *IsShared OPTIONAL,
+  IN  UINT8                   *VendorDefinedData OPTIONAL,
+  IN  UINT16                  VendorDefinedDataLength,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode OPTIONAL
+  );
+
+/** AML code generation to create a method with Notify call.
+
+  Example 1:
+    AmlCodeGenMethodNotifyList ("_L01", FALSE, 0, 0, NULL, ParentNode, NewObjectNode);
+    is equivalent to the following ASL code:
+    Method (_L01, 0, NotSerialize)
+    {
+    }
+
+  Example 2:
+    AML_METHOD_PARAM  Notify[2];
+    Notify[0].NotifyObject.Type = AmlMethodParamTypeString;
+    Notify[0].NotifyObject.Data.Buffer = (VOID*)"XCD0";
+    Notify[0].NotifyObject.DataSize = 4;
+    Notify[0].NotifyValue = 2;
+    Notify[1].NotifyObject.Type = AmlMethodParamTypeString;
+    Notify[1].NotifyObject.Data.Buffer = (VOID*)"XCD1";
+    Notify[1].NotifyObject.DataSize = 4;
+    Notify[1].NotifyValue = 2;
+    AmlCodeGenMethodNotifyList ("_L02", FALSE, 0, 2, Notify, ParentNode, NewObjectNode);
+
+    is equivalent to the following ASL code:
+    Method (_L02, 0, NotSerialize)
+    {
+      Notify ("XCD0", 2)
+      Notify ("XCD1", 2)
+    }
+
+  Ref : ACPI 6.6, s19.6.95 Notify (Notify Object of Event):
+  Object must be a reference to a device, processor, or thermal zone object.
+
+  Note:
+  This code cannot validate whether the referenced object is a valid device,
+  processor, or thermal zone object.
+  It assumes that NameString, Local, and Arg objects reference valid device,
+  processor, or thermal zone objects.
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  NotifyParamCount     Number of Notify parameters
+  @param [in]  NotifyParameters     Array of Notify parameters
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodNotifyList (
+  IN  CONST CHAR8             *MethodNameString,
+  IN  BOOLEAN                 IsSerialized,
+  IN  UINT8                   SyncLevel,
+  IN  UINT32                  NotifyParamCount,
+  IN  AML_NOTIFY_PARAM        *NotifyParameters  OPTIONAL,
+  IN  AML_NODE_HANDLE         ParentNode        OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode    OPTIONAL
+  );
+
+/** AML code generation to Return Method invocation.
+
+  This method is a subset implementation of MethodInvocation
+  defined in the ACPI specification 6.5,
+  section 20.2.5 "Term Objects Encoding".
+  Added integer, string, ArgObj and LocalObj support.
+
+  Example 1:
+    AmlCodeGenReturnInvokeMethod ("MET0", 0, NULL, ParentNode, &NewObjectNode);
+    is equivalent to the following ASL code:
+      Return (MET0 () )
+
+  Example 2:
+    AML_METHOD_PARAM  Param[4];
+    Param[0].Data.Integer = 0x100;
+    Param[0].Type = AmlMethodParamTypeInteger;
+    Param[1].Data.Buffer = "TEST";
+    Param[1].Type = AmlMethodParamTypeString;
+    Param[2].Data.Arg = 0;
+    Param[2].Type = AmlMethodParamTypeArg;
+    Param[3].Data.Local = 2;
+    Param[3].Type = AmlMethodParamTypeLocal;
+    AmlCodeGenReturnInvokeMethod ("MET0", 4, Param, ParentNode, &NewObjectNode);
+
+    is equivalent to the following ASL code:
+      Return (MET0 (0x100, "TEST", Arg0, Local2) )
+
+  Example 3:
+    AML_METHOD_PARAM  Param[2];
+    Param[0].Data.Arg = 0;
+    Param[0].Type = AmlMethodParamTypeArg;
+    Param[1].Data.Integer = 0x100;
+    Param[1].Type = AmlMethodParamTypeInteger;
+    AmlCodeGenMethodRetNameString ("MET2", NULL, 2, TRUE, 0,
+      ParentNode, &MethodNode);
+    AmlCodeGenReturnInvokeMethod ("MET3", 2, Param, MethodNode, &NewObjectNode);
+
+    is equivalent to the following ASL code:
+    Method (MET2, 2, Serialized)
+    {
+      Return (MET3 (Arg0, 0x0100) )
+    }
+
+  @param [in] MethodNameString  The method name to be returned.
+  @param [in] NumArgs           Number of arguments to be passed,
+                                0 to 7 are permissible values.
+  @param [in] Parameters        Contains the parameter data.
+  @param [in] ParentNode        The parent node to which the method return
+                                nodes are attached.
+  @param [out] NewObjectNode     If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+ **/
+EFI_STATUS
+EFIAPI
+AmlCodeGenReturnInvokeMethod (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN        UINT8                   NumArgs,
+  IN        AML_METHOD_PARAM        *Parameters     OPTIONAL,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode OPTIONAL
+  );

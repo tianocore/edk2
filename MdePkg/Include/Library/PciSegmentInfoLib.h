@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __PCI_SEGMENT_INFO_LIB__
-#define __PCI_SEGMENT_INFO_LIB__
+#pragma once
 
 typedef struct {
   UINT16    SegmentNumber;              ///< Segment number.
@@ -32,5 +31,3 @@ EFIAPI
 GetPciSegmentInfo (
   UINTN  *Count
   );
-
-#endif

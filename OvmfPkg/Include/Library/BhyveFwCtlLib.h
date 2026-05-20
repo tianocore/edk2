@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _BHYVE_FW_CTL_LIB_
-#define _BHYVE_FW_CTL_LIB_
+#pragma once
 
 /**
   Sysctl-like interface to read host information via a dot-separated
@@ -43,5 +42,3 @@ BhyveFwCtlGet (
   OUT  VOID         *Item,
   IN OUT  UINTN     *Size
   );
-
-#endif /* _BHYVE_FW_CTL_LIB_ */

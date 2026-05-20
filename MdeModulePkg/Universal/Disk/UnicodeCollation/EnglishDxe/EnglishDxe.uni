@@ -2,8 +2,8 @@
 // English module that provides Unicode Collation supports.
 //
 // This driver installs Unicode ISO 639-2 Collation and
-// RFC 4646 Unicode Collation 2 protocols based on feature flags
-// PcdUnicodeCollationSupport & PcdUnicodeCollation2Support respectively.
+// RFC 4646 Unicode Collation 2 protocols based on feature flag
+// PcdUnicodeCollation2Support respectively.
 // It allows code running in the boot services environment to perform lexical
 // comparison functions on Unicode strings for English languages.
 //
@@ -16,5 +16,5 @@
 
 #string STR_MODULE_ABSTRACT             #language en-US "Provides Unicode Collation support"
 
-#string STR_MODULE_DESCRIPTION          #language en-US "This driver installs Unicode ISO 639-2 Collation and RFC 4646 Unicode Collation 2 protocols based on feature flags PcdUnicodeCollationSupport & PcdUnicodeCollation2Support respectively. It allows code running in the boot services environment to perform lexical comparison functions on Unicode strings for English languages."
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver installs Unicode ISO 639-2 Collation and RFC 4646 Unicode Collation 2 protocols based on feature flag PcdUnicodeCollation2Support. It allows code running in the boot services environment to perform lexical comparison functions on Unicode strings for English languages."
 

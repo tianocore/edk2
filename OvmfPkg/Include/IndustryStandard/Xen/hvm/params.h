@@ -38,7 +38,7 @@
 #define HVM_PARAM_BUFIOREQ_PFN     6
 #define HVM_PARAM_BUFIOREQ_EVTCHN  26
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+#if defined (MDE_CPU_X64)
 
 /* Expose Viridian interfaces to this HVM guest? */
 #define HVM_PARAM_VIRIDIAN  9

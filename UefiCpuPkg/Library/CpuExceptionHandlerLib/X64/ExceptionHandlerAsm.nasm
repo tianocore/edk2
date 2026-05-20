@@ -4,13 +4,21 @@
 ;
 ; Module Name:
 ;
-;   ExceptionHandlerAsm.Asm
+;   ExceptionHandlerAsm.nasm
 ;
 ; Abstract:
 ;
 ;   x64 CPU Exception Handler
 ;
 ; Notes:
+;
+; This module uses the build options SEC_PEI_NO_ABSOLUTE_RELOCS_IN_TEXT and
+; SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT to work around Xcode’s linker, which
+; disallows absolute references in .text. For SEC/PEI the IDT stubs are
+; emitted into .data (which Xcode accepts). In SMM/DXE, however, .data is
+; not executable, so the IDT stubs remain in .text and are initially patched
+; by GetTemplateAddressMap(). The SMM/DXE method cannot be applied to SEC/PEI
+; because .text cannot be modified in place when the module runs XIP.
 ;
 ;------------------------------------------------------------------------------
 %include "Nasm.inc"
@@ -49,7 +57,9 @@ extern ASM_PFX(CommonExceptionHandler)
 SECTION .data
 
 DEFAULT REL
+%ifndef SEC_PEI_NO_ABSOLUTE_RELOCS_IN_TEXT
 SECTION .text
+%endif
 
 ALIGN   8
 
@@ -57,9 +67,9 @@ ALIGN   8
 AsmIdtVectorBegin:
 %assign Vector 0
 %rep  256
-    push    strict dword %[Vector] ; This instruction pushes sign-extended 8-byte value on stack
+    push    strict qword %[Vector]
     push    rax
-%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+%ifdef SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
 %else
     mov     rax, ASM_PFX(CommonInterruptEntry)
@@ -70,16 +80,19 @@ AsmIdtVectorBegin:
 AsmIdtVectorEnd:
 
 HookAfterStubHeaderBegin:
-    push    strict dword 0      ; 0 will be fixed
+    push    strict qword 0      ; 0 will be fixed
 VectorNum:
     push    rax
-%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+%ifdef SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0 ;     mov     rax, HookAfterStubHeaderEnd
 JmpAbsoluteAddress:
 %else
     mov     rax, HookAfterStubHeaderEnd
 %endif
     jmp     rax
+
+SECTION .text
+
 HookAfterStubHeaderEnd:
     mov     rax, rsp
     and     sp,  0xfff0        ; make sure 16-byte aligned for exception context
@@ -465,7 +478,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
     lea     rax, [HookAfterStubHeaderBegin]
     mov     qword [rcx + 0x10], rax
 
-%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+%ifdef SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT
 ; Fix up CommonInterruptEntry address
     lea    rax, [ASM_PFX(CommonInterruptEntry)]
     lea    rcx, [AsmIdtVectorBegin]

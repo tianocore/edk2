@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SATA_CONTROLLER_H_
-#define _SATA_CONTROLLER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -18,6 +17,7 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/IdeControllerInit.h>
+#include <Protocol/DevicePath.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -541,5 +541,3 @@ SataControllerComponentNameGetControllerName (
   IN CHAR8                        *Language,
   OUT CHAR16                      **ControllerName
   );
-
-#endif

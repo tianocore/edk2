@@ -38,7 +38,6 @@
   PeCoffGetEntryPointLib
   RiscVSbiLib
   RiscVMmuLib
-  RiscVFpuLib
   CacheMaintenanceLib
 
 [Sources]
@@ -62,7 +61,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency             ## CONSUMES
 
 [Depex]
   TRUE

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef HTTP_IO_LIB_H_
-#define HTTP_IO_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Http11.h>
 
@@ -325,5 +324,3 @@ HttpIoSendChunkedTransfer (
   IN  HTTP_IO_SEND_CHUNK_PROCESS  *SendChunkProcess,
   IN  EFI_HTTP_MESSAGE            *RequestMessage
   );
-
-#endif

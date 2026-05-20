@@ -9,8 +9,7 @@
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
 **/
 
-#ifndef ARM_GICC_PARSER_H_
-#define ARM_GICC_PARSER_H_
+#pragma once
 
 /* According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23.
 */
@@ -64,5 +63,3 @@ ArmGicCInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // ARM_GICC_PARSER_H_

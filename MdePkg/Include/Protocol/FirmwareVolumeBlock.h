@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FIRMWARE_VOLUME_BLOCK_H__
-#define __FIRMWARE_VOLUME_BLOCK_H__
+#pragma once
 
 //
 // EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL is defined in PI 1.0 spec and its GUID value
@@ -348,5 +347,3 @@ struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
 
 extern EFI_GUID  gEfiFirmwareVolumeBlockProtocolGuid;
 extern EFI_GUID  gEfiFirmwareVolumeBlock2ProtocolGuid;
-
-#endif

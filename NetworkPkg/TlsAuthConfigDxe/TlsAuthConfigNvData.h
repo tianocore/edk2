@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TLS_AUTH_CONFIG_NV_DATA_H__
-#define __TLS_AUTH_CONFIG_NV_DATA_H__
+#pragma once
 
 #include <Guid/TlsAuthConfigHii.h>
 
@@ -38,5 +37,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct {
   CHAR16    CertGuid[TLS_AUTH_CONFIG_GUID_STORAGE_SIZE];
 } TLS_AUTH_CONFIG_IFR_NVDATA;
-
-#endif

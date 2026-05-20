@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __FW_CFG_H__
-#define __FW_CFG_H__
+#pragma once
 
 #include <Base.h>
 
@@ -37,8 +36,7 @@
 #define FW_CFG_DMA_CTL_WRITE   BIT4
 
 //
-// The fw_cfg registers can be found at these IO Ports, on the IO-mapped
-// platforms (Ia32 and X64).
+// The fw_cfg registers can be found at these IO Ports
 //
 #define FW_CFG_IO_SELECTOR     0x510
 #define FW_CFG_IO_DATA         0x511
@@ -93,5 +91,3 @@ typedef struct {
   UINT64    Address;
 } FW_CFG_DMA_ACCESS;
 #pragma pack ()
-
-#endif

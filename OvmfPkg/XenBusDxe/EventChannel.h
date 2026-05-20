@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __XENBUS_EVENT_CHANNEL_H
-#define __XENBUS_EVENT_CHANNEL_H
+#pragma once
 
 #include "XenBusDxe.h"
 
@@ -79,5 +78,3 @@ XenBusEventChannelClose (
   IN XENBUS_PROTOCOL  *This,
   IN evtchn_port_t    Port
   );
-
-#endif

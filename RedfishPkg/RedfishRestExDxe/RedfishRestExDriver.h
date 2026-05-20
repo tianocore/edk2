@@ -5,13 +5,13 @@
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef EFI_REDFISH_RESTEX_DRIVER_H_
-#define EFI_REDFISH_RESTEX_DRIVER_H_
+#pragma once
 
 ///
 /// Libraries classes
@@ -23,6 +23,7 @@
 #include <Library/HttpIoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/NetLib.h>
+#include <Library/RedfishPlatformWantedDeviceLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -658,5 +659,3 @@ RedfishRestExServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

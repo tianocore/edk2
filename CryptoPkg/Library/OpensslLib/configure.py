@@ -24,11 +24,9 @@ def openssl_configure(openssldir, target, ec = True):
         'no-autoload-config',
         'no-bf',
         'no-blake2',
-        'no-camellia',
         'no-capieng',
         'no-cast',
         'no-chacha',
-        'no-cmac',
         'no-cmp',
         'no-cms',
         'no-ct',
@@ -53,6 +51,8 @@ def openssl_configure(openssldir, target, ec = True):
         'no-module',
         'no-md4',
         'no-mdc2',
+        'no-ml-dsa',
+        'no-ml-kem',
         'no-multiblock',
         'no-nextprotoneg',
         'no-pic',
@@ -62,6 +62,7 @@ def openssl_configure(openssldir, target, ec = True):
         'no-padlockeng',
         'no-poly1305',
         'no-posix-io',
+        'no-quic',
         'no-rc2',
         'no-rc4',
         'no-rc5',
@@ -72,6 +73,7 @@ def openssl_configure(openssldir, target, ec = True):
         'no-shared',
         'no-siphash',
         'no-siv',
+        'no-slh-dsa',
         'no-sm2',
         'no-sm4',
         'no-sock',
@@ -90,7 +92,7 @@ def openssl_configure(openssldir, target, ec = True):
         'disable-legacy',
     ]
     if not ec:
-        cmdline += [ 'no-ec', ]
+        cmdline += [ 'no-ec', 'no-camellia', 'no-cmac' ]
     print('')
     print(f'# -*-  configure openssl for {target} (ec={ec})  -*-')
     rc = subprocess.run(cmdline, cwd = openssldir,
@@ -254,7 +256,6 @@ def sources_filter_fn(filename):
         '/store/',
         '/storemgmt/',
         '/encode_decode/encode',
-        '/pkcs12/',
         'statem_srvr.c',
         'extensions_srvr.c',
         'defltprov.c',
@@ -355,7 +356,7 @@ def main():
         defines = {}
         for asm in [ 'UEFI-IA32-MSFT', 'UEFI-IA32-GCC',
                      'UEFI-X64-MSFT', 'UEFI-X64-GCC',
-                     'UEFI-AARCH64-GCC']:
+                     'UEFI-AARCH64-ELF', 'UEFI-AARCH64-PE']:
             (uefi, arch, cc) = asm.split('-')
             archcc = f'{arch}-{cc}'
 
@@ -367,7 +368,13 @@ def main():
             openssl_run_make(openssldir, 'distclean')
 
             srclist = libcrypto_sources(cfg, archcc) + libssl_sources(cfg, archcc)
-            sources[archcc] = list(map(lambda x: f'{x} | {cc}', filter(is_asm, srclist)))
+            if arch in ['AARCH64']:
+                featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStylePe'
+            else:
+                featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm'
+            if cc == 'GCC' or cc == 'ELF':
+                featureflagexp = '!' + featureflagexp
+            sources[archcc] = list(map(lambda x: f'{x} ||||{featureflagexp}', filter(is_asm, srclist)))
             update_MSFT_asm_format(archcc, sources[archcc])
             sources[arch] = list(filter(lambda x: not is_asm(x), srclist))
             defines[arch] = cfg['unified_info']['defines']['libcrypto']
@@ -377,7 +384,7 @@ def main():
         x64accel = sources['X64'] + sources['X64-MSFT'] + sources['X64-GCC']
         update_inf(inf, ia32accel, 'IA32', defines['IA32'])
         update_inf(inf, x64accel, 'X64', defines['X64'])
-        aarch64accel = sources['AARCH64'] + sources['AARCH64-GCC']
+        aarch64accel = sources['AARCH64'] + sources['AARCH64-ELF'] + sources['AARCH64-PE']
         update_inf(inf, aarch64accel, 'AARCH64', defines['AARCH64'])
 
     # noaccel - ec enabled

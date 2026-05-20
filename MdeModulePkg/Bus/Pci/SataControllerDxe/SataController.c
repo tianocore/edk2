@@ -287,9 +287,35 @@ SataControllerSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS           Status;
-  EFI_PCI_IO_PROTOCOL  *PciIo;
-  PCI_TYPE00           PciData;
+  EFI_STATUS                Status;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  PCI_TYPE00                PciData;
+  EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
+
+  //
+  // Attempt to open DevicePath Protocol
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID *)&ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ///
+  /// Close the protocol because we don't use it here
+  ///
+  gBS->CloseProtocol (
+         Controller,
+         &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   //
   // Attempt to open PCI I/O Protocol

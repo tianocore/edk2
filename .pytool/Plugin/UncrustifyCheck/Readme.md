@@ -104,6 +104,23 @@ plugin execution.
 By default, files in paths matched in a .gitignore file or a recognized git submodule are excluded. If this option
 is `True`, the plugin will not attempt to recognize these files and exclude them.
 
+### `UNCRUSTIFY_IN_PLACE=TRUE`
+
+This command supports any uncrustify changes to be made in-place to the files in the workspace. This is useful for
+formatting any failing code before submitting a PR. Since this is an option for a local developer to use that would
+modify their files, it must be explicitly specified as a CLI argument or set as an environment variable.
+
+_NOTE:_ This is _not_ an option in the config `yaml`. It is an option passed directly into the tool based on local
+        developer need.
+
+#### Example Usage
+
+In this example, Uncrustify would format files in `UefiCpuPkg` without running any other plugins or building any code.
+
+```bash
+stuart_ci_build -c .pytool/CISettings.py -p UefiCpuPkg -t NO-TARGET UNCRUSTIFY_IN_PLACE=TRUE --disable-all UncrustifyCheck=run
+```
+
 ## High-Level Plugin Operation
 
 This plugin generates two main sets of temporary files:
@@ -125,3 +142,19 @@ indicates a formatting issue was found and the test is marked failed (unless `Au
 The test case log will contain a report of which files failed to format properly, allowing the user to run Uncrustify
 against the file locally to fix the issue. If the `OutputFileDiffs` configuration option is set to `True`, the plugin
 will output diff chunks for all code formatting issues in the test case log.
+
+## Disabling Uncrustify for Code Sections
+
+Due to the number of scenarios presented to Uncrustify, there may be cases when it simply does not format the code as
+expected. While the Uncrustify plugin allows the file to be ignored, in the case where only a small section of code
+needs to be ignored, the following comments can be used to disable Uncrustify processing for a section of code.
+
+```c
+// BEGIN_UNCRUSTIFY_DISABLE
+// Core ignored by Uncrustify...
+// END_UNCRUSTIFY_DISABLE
+```
+
+These marker values are defined in the Uncrustify configuration file used by this plugin.
+
+See: [.pytool/Plugin/UncrustifyCheck/uncrustify.cfg](https://github.com/tianocore/edk2/blob/master/.pytool/Plugin/UncrustifyCheck/uncrustify.cfg).

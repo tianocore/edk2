@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef MICROCODE_LIB_H_
-#define MICROCODE_LIB_H_
+#pragma once
 
 #include <Register/Intel/Microcode.h>
 #include <Ppi/ShadowMicrocode.h>
@@ -116,5 +115,3 @@ IsValidMicrocode (
   IN UINTN                       MicrocodeCpuIdCount,
   IN BOOLEAN                     VerifyChecksum
   );
-
-#endif

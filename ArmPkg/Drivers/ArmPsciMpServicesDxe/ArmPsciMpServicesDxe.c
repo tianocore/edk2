@@ -887,7 +887,9 @@ EnableDisableAP (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (GetApState (CpuData) != CpuStateIdle) {
+  if ((GetApState (CpuData) != CpuStateIdle) &&
+      (GetApState (CpuData) != CpuStateFinished))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -1331,7 +1333,7 @@ MpServicesInitialize (
   ASSERT (gApStacksBase != NULL);
 
   for (Index = 0; Index < mCpuMpData.NumberOfProcessors; Index++) {
-    if (GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ()) == CoreInfo[Index].Mpidr) {
+    if (GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ()) == GET_MPIDR_AFFINITY_BITS (CoreInfo[Index].Mpidr)) {
       IsBsp = TRUE;
     } else {
       IsBsp = FALSE;

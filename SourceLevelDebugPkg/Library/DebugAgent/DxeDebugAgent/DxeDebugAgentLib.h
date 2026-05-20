@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DXE_CORE_DEBUG_AGENT_LIB_H_
-#define _DXE_CORE_DEBUG_AGENT_LIB_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -30,5 +29,3 @@ VOID
 InstallSerialIo (
   VOID
   );
-
-#endif

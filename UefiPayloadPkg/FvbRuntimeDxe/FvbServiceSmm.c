@@ -20,7 +20,7 @@
   @param[in]  InstanceNum   The instance number which can be used as a ID
                             to locate this FwhInstance in other functions.
 
-  @retval     EFI_SUCESS    Installed successfully.
+  @retval     EFI_SUCCESS   Installed successfully.
   @retval     Else          Did not install successfully.
 
 **/
@@ -122,7 +122,7 @@ InstallFvbProtocol (
   @param[in]  ImageHandle       The firmware allocated handle for the UEFI image.
   @param[in]  SystemTable       A pointer to the EFI system table.
 
-  @retval     EFI_SUCCESS       This funtion always return EFI_SUCCESS.
+  @retval     EFI_SUCCESS       This function always return EFI_SUCCESS.
                                 It will ASSERT on errors.
 
 **/

@@ -400,3 +400,19 @@ PostFspsHobProcess (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Post FSP-I HOB process.
+
+  @param[in] FspHobList  Pointer to the HOB data structure produced by FSP.
+
+  @return If platform process the FSP hob list successfully.
+**/
+EFI_STATUS
+EFIAPI
+PostFspiHobProcess (
+  IN VOID  *FspHobList
+  )
+{
+  return EFI_SUCCESS;
+}

@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MP_HANDOFF_H_
-#define MP_HANDOFF_H_
+#pragma once
 
 #define MP_HANDOFF_GUID \
   { \
@@ -56,4 +55,3 @@ typedef struct {
   UINT32    WaitLoopExecutionMode;
   UINT32    StartupSignalValue;
 } MP_HAND_OFF_CONFIG;
-#endif

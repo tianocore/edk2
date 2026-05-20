@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef __EFI_FIRMWARE_MANAGEMENT_PROTOCOL_H__
-#define __EFI_FIRMWARE_MANAGEMENT_PROTOCOL_H__
+#pragma once
 
 #define EFI_FIRMWARE_MANAGEMENT_PROTOCOL_GUID \
   { \
@@ -351,7 +350,10 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be completed due to an image corruption.
+                                 If the image is able to be read, the Image buffer will be updated
+                                 with the retrieved image contents.
+  @retval EFI_DEVICE_ERROR       The image could not be read.
 
 **/
 typedef
@@ -555,5 +557,3 @@ struct _EFI_FIRMWARE_MANAGEMENT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiFirmwareManagementProtocolGuid;
-
-#endif

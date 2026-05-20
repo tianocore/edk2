@@ -6,14 +6,14 @@
 
 **/
 
-#ifndef REGS_SPI_H_
-#define REGS_SPI_H_
+#pragma once
 
 #define R_SPI_BASE                        0x10         ///< 32-bit Memory Base Address Register
 #define B_SPI_BAR0_MASK                   0x0FFF
 #define R_SPI_BCR                         0xDC          ///< BIOS Control  Register
 #define B_SPI_BCR_SRC                     (BIT3 | BIT2) ///< SPI Read Configuration (SRC)
-#define V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS  0x04          ///< Prefetch Disable, Cache Disable
+#define N_SPI_BCR_SRC                     2             ///< SPI Read Configuration bit position
+#define V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS  0x01          ///< Prefetch Disable, Cache Disable
 #define B_SPI_BCR_SYNC_SS                 BIT8
 #define B_SPI_BCR_BIOSWE                  BIT0         ///< Write Protect Disable (WPD)
 
@@ -116,5 +116,3 @@
 //
 #define R_SPI_FCBA_FLCOMP        0x00          ///< Flash Components Register
 #define B_SPI_FLCOMP_COMP1_MASK  0x0F          ///< Flash Component 1 Density
-
-#endif

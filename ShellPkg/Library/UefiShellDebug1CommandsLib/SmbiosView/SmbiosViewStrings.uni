@@ -5,6 +5,7 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
 // Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -279,7 +280,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_CPU_SOCKET_UNPOPULATED         #language en-US "CPU Socket Unpopulated\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_CPU_ENABLED                    #language en-US "CPU Enabled\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_CPU_DISABLED_BY_USER           #language en-US "CPU Disabled by User via BIOS Setup\r\n"
-#string STR_SMBIOSVIEW_PRINTINFO_CPU_DIABLED_BY_BIOS            #language en-US "CPU Disabled By BIOS (POST Error)\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_CPU_DISABLED_BY_BIOS           #language en-US "CPU Disabled By BIOS (POST Error)\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_CPU_IDLE                       #language en-US "CPU is Idle, waiting to be enabled\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_OTHERS                         #language en-US "Others\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_RESERVED                       #language en-US "Reserved\r\n"
@@ -387,6 +388,8 @@
 #string STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_NOT_REPLACE       #language en-US "Power supply is not hot replaceable\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE                      #language en-US "BIOS ROM Size:  %d KB\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_EXTENDED_BIOS_SIZE             #language en-US "Extended BIOS ROM Size:  %d %s\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_NUM_CONTAINED_OBJECTS_HANDLES  #language en-US "Number of Contained Object Handles: %d\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_CONTAINED_OBJECTS_HANDLE       #language en-US "  Contained Object Handle: 0x%x\r\n"
 #string STR_SMBIOSVIEW_QUERYTABLE_NO_INFO                       #language en-US "No Info"
 #string STR_SMBIOSVIEW_QUERYTABLE_RSVD_BITS_SET                 #language en-US "\r\nIt also has reserved bits set 1 --- reserved bits: 0x%x"
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_WAKEUP_TYPE            #language en-US "System Wakeup Type:"

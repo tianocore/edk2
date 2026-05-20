@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_DRIVER_H_
-#define _OPAL_DRIVER_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -612,5 +611,3 @@ OpalEfiDriverComponentName2GetControllerName (
   CHAR8                         *Language,
   CHAR16                        **ControllerName
   );
-
-#endif //_OPAL_DRIVER_H_

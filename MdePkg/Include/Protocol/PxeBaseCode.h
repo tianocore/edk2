@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PXE_BASE_CODE_PROTOCOL_H__
-#define __PXE_BASE_CODE_PROTOCOL_H__
+#pragma once
 
 ///
 /// PXE Base Code protocol.
@@ -34,7 +33,7 @@ typedef EFI_PXE_BASE_CODE_PROTOCOL EFI_PXE_BASE_CODE;
 ///
 /// Default IP TTL and ToS.
 ///
-#define DEFAULT_TTL  16
+#define DEFAULT_TTL  64
 #define DEFAULT_ToS  0
 
 ///
@@ -153,8 +152,6 @@ typedef UINT16 EFI_PXE_BASE_CODE_UDP_PORT;
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE  0x0006
 #elif defined (MDE_CPU_X64)
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE  0x0007
-#elif defined (MDE_CPU_ARM)
-#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE  0x000A
 #elif defined (MDE_CPU_AARCH64)
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE  0x000B
 #elif defined (MDE_CPU_RISCV64)
@@ -929,5 +926,3 @@ struct _EFI_PXE_BASE_CODE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPxeBaseCodeProtocolGuid;
-
-#endif

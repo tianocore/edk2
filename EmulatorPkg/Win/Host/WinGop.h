@@ -14,8 +14,7 @@ Abstract:
 
 **/
 
-#ifndef _WIN_GOP_H_
-#define _WIN_GOP_H_
+#pragma once
 
 #include "WinHost.h"
 
@@ -197,5 +196,3 @@ GopPrivateDestroyQ (
   IN  GRAPHICS_PRIVATE_DATA  *Private,
   IN GOP_QUEUE_FIXED         *Queue
   );
-
-#endif

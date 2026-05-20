@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __IVY_BRIDGE_MSR_H__
-#define __IVY_BRIDGE_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -2769,5 +2768,3 @@ typedef union {
   @note MSR_IVY_BRIDGE_C14_PMON_BOX_FILTER1 is defined as MSR_C14_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_IVY_BRIDGE_C14_PMON_BOX_FILTER1  0x00000EDA
-
-#endif

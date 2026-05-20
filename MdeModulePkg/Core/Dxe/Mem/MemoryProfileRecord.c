@@ -549,7 +549,9 @@ RegisterDxeCore (
       //
       // Find Dxe Core HOB
       //
-      break;
+      if (CompareGuid (&DxeCoreHob.MemoryAllocationModule->ModuleName, &gEfiCallerIdGuid)) {
+        break;
+      }
     }
 
     DxeCoreHob.Raw = GET_NEXT_HOB (DxeCoreHob);
@@ -1274,8 +1276,11 @@ CoreUpdateProfileFree (
       }
     }
 
-    ASSERT (DriverInfoData != NULL);
-    ASSERT (AllocInfoData != NULL);
+    if ((DriverInfoData == NULL) || (AllocInfoData == NULL)) {
+      ASSERT (DriverInfoData != NULL);
+      ASSERT (AllocInfoData != NULL);
+      return EFI_NOT_FOUND;
+    }
 
     Found = TRUE;
 

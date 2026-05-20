@@ -479,12 +479,12 @@ ReportStatusCodeEx (
   Returns TRUE if status codes of type EFI_PROGRESS_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
+  bit of PcdReportStatusCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is set.
+                  PcdReportStatusCodePropertyMask is set.
   @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is clear.
+                  PcdReportStatusCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -500,12 +500,12 @@ ReportProgressCodeEnabled (
   Returns TRUE if status codes of type EFI_ERROR_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
+  bit of PcdReportStatusCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is set.
+                  PcdReportStatusCodePropertyMask is set.
   @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is clear.
+                  PcdReportStatusCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -521,12 +521,12 @@ ReportErrorCodeEnabled (
   Returns TRUE if status codes of type EFI_DEBUG_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
+  bit of PcdReportStatusCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is set.
+                  PcdReportStatusCodePropertyMask is set.
   @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is clear.
+                  PcdReportStatusCodePropertyMask is clear.
 
 **/
 BOOLEAN

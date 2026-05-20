@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_UEFI_BOOT_SERVICES_TABLE_LIB_H_
-#define MOCK_UEFI_BOOT_SERVICES_TABLE_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -73,6 +72,32 @@ struct MockUefiBootServicesTableLib {
      IN CONST EFI_GUID    *EventGroup OPTIONAL,
      OUT EFI_EVENT        *Event)
     );
-};
 
-#endif // MOCK_UEFI_BOOT_SERVICES_TABLE_LIB_H_
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_LocateDevicePath,
+    (IN EFI_GUID                      *Protocol,
+     IN OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath,
+     OUT EFI_HANDLE                   *Device)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_OpenProtocol,
+    (IN  EFI_HANDLE  UserHandle,
+     IN  EFI_GUID    *Protocol,
+     OUT VOID        **Interface OPTIONAL,
+     IN  EFI_HANDLE  ImageHandle,
+     IN  EFI_HANDLE  ControllerHandle,
+     IN  UINT32      Attributes)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_CloseProtocol,
+    (IN  EFI_HANDLE  UserHandle,
+     IN  EFI_GUID    *Protocol,
+     IN  EFI_HANDLE  AgentHandle,
+     IN  EFI_HANDLE  ControllerHandle)
+    );
+};

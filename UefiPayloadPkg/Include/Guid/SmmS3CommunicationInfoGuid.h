@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PAYLOAD_S3_COMMUNICATION_GUID_H_
-#define PAYLOAD_S3_COMMUNICATION_GUID_H_
+#pragma once
 
 extern EFI_GUID  gS3CommunicationGuid;
 
@@ -50,5 +49,3 @@ typedef struct {
 } PLD_TO_BL_SMM_INFO;
 
 #pragma pack()
-
-#endif

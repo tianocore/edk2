@@ -32,6 +32,7 @@
   CpuLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  TimerLib
 
 [LibraryClasses.RISCV64]
   RiscVSbiLib
@@ -42,7 +43,6 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride           ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
 
 [Protocols]
   gEfiCpuArchProtocolGuid       ## CONSUMES

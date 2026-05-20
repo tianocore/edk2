@@ -102,11 +102,6 @@ PlatformQemuUc32BaseInitialization (
   }
 }
 
-typedef VOID (*E820_SCAN_CALLBACK) (
-  EFI_E820_ENTRY64       *E820Entry,
-  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  );
-
 STATIC
 EFI_STATUS
 PlatformScanE820Tdx (
@@ -162,8 +157,13 @@ PlatformGetFirstNonAddressCB (
 }
 
 /**
-  Store the low (below 4G) memory size in
-  PlatformInfoHob->LowMemory
+  Store the low memory size in PlatformInfoHob->LowMemory.
+
+  The first memory block with base address zero is considered "low memory".
+  Traditionally this has been all memory below 4G.  When running under SVSM
+  there are multiple memory blocks below 4G though, because SVSM caves out a
+  chunk of memory for itself.  Only the first of these blocks is considered
+  low memory.
 **/
 STATIC
 VOID
@@ -172,21 +172,16 @@ PlatformGetLowMemoryCB (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64  Candidate;
-
   if (E820Entry->Type != EfiAcpiAddressRangeMemory) {
     return;
   }
 
-  Candidate = E820Entry->BaseAddr + E820Entry->Length;
-  if (Candidate >= BASE_4GB) {
+  if (E820Entry->BaseAddr != 0) {
     return;
   }
 
-  if (PlatformInfoHob->LowMemory < Candidate) {
-    DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __func__, Candidate));
-    PlatformInfoHob->LowMemory = (UINT32)Candidate;
-  }
+  DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __func__, E820Entry->Length));
+  PlatformInfoHob->LowMemory = (UINT32)E820Entry->Length;
 }
 
 /**
@@ -206,7 +201,9 @@ PlatformAddHobCB (
 
   switch (E820Entry->Type) {
     case EfiAcpiAddressRangeMemory:
-      if (Base >= BASE_4GB) {
+      if (End <= PlatformInfoHob->LowMemory) {
+        // nothing, handled by PlatformGetLowMemoryCB()
+      } else {
         //
         // Round up the start address, and round down the end address.
         //
@@ -222,6 +219,22 @@ PlatformAddHobCB (
     case EfiAcpiAddressRangeReserved:
       BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_RESERVED, 0, Base, End - Base);
       DEBUG ((DEBUG_INFO, "%a: Reserved [0x%Lx, 0x%Lx)\n", __func__, Base, End));
+      break;
+    case EfiAcpiAddressRangeSoftReserved:
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_SYSTEM_MEMORY,
+        EFI_RESOURCE_ATTRIBUTE_PRESENT |
+        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+        EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+        EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+        EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+        EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+        EFI_RESOURCE_ATTRIBUTE_TESTED |
+        EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,
+        Base,
+        End - Base
+        );
+      DEBUG ((DEBUG_INFO, "%a: SoftReserved [0x%Lx, 0x%Lx)\n", __func__, Base, End));
       break;
     default:
       DEBUG ((
@@ -372,6 +385,10 @@ PlatformScanE820 (
   UINTN                 FwCfgSize;
   EFI_E820_ENTRY64      E820Entry;
   UINTN                 Processed;
+
+  if (PlatformIgvmMemoryMapCheck ()) {
+    return PlatformIgvmScanE820 (Callback, PlatformInfoHob);
+  }
 
   if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
     return PlatformScanE820Pvh (Callback, PlatformInfoHob);
@@ -556,7 +573,8 @@ PlatformGetFirstNonAddress (
       break;
     case EFI_SUCCESS:
       if (FwCfgPciMmio64Mb <= 0x1000000) {
-        PlatformInfoHob->PcdPciMmio64Size = LShiftU64 (FwCfgPciMmio64Mb, 20);
+        PlatformInfoHob->PcdPciMmio64Size     = LShiftU64 (FwCfgPciMmio64Mb, 20);
+        PlatformInfoHob->PcdPciMmio64Override = TRUE;
         break;
       }
 
@@ -795,8 +813,10 @@ PlatformDynamicMmioWindow (
   AddrSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
   MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 3);
 
-  if ((PlatformInfoHob->PcdPciMmio64Size < MmioSpace) &&
-      (PlatformInfoHob->PcdPciMmio64Base + MmioSpace < AddrSpace))
+  if (PlatformInfoHob->PcdPciMmio64Override) {
+    DEBUG ((DEBUG_INFO, "%a: using fwcfg override for mmio window\n", __func__));
+  } else if ((PlatformInfoHob->PcdPciMmio64Size < MmioSpace) &&
+             (PlatformInfoHob->PcdPciMmio64Base + MmioSpace < AddrSpace))
   {
     DEBUG ((DEBUG_INFO, "%a: using dynamic mmio window\n", __func__));
     DEBUG ((DEBUG_INFO, "%a:   Addr Space 0x%Lx (%Ld GB)\n", __func__, AddrSpace, RShiftU64 (AddrSpace, 30)));
@@ -994,7 +1014,7 @@ PlatformSetupPagingLevel (
   }
 
   Status = QemuFwCfgParseUint32 (
-             "opt/org.tianocode/PagingLevel",
+             "opt/org.tianocore/PagingLevel",
              FALSE,
              &PagingLevel
              );
@@ -1237,6 +1257,8 @@ PlatformQemuInitializeRam (
   EFI_STATUS     Status;
 
   DEBUG ((DEBUG_INFO, "%a called\n", __func__));
+
+  PlatformIgvmParamReserve ();
 
   //
   // Determine total memory size available
@@ -1497,6 +1519,20 @@ PlatformQemuInitializeRamForS3 (
       BuildMemoryAllocationHob (
         (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
         (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
+        PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+        );
+    }
+
+    if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize) != 0) {
+      //
+      // Reserve the Early Memory Debug Log buffer
+      //
+      // Since this memory range will be used on S3 resume, it must be
+      // reserved as ACPI NVS.
+      //
+      BuildMemoryAllocationHob (
+        (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
+        (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize),
         PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
         );
     }

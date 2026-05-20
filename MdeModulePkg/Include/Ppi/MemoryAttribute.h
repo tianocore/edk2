@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef EDKII_MEMORY_ATTRIBUTE_PPI_H_
-#define EDKII_MEMORY_ATTRIBUTE_PPI_H_
+#pragma once
 
 #include <Uefi/UefiSpec.h>
 
@@ -79,5 +78,3 @@ struct _EDKII_MEMORY_ATTRIBUTE_PPI {
 };
 
 extern EFI_GUID  gEdkiiMemoryAttributePpiGuid;
-
-#endif

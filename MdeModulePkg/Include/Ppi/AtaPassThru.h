@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EDKII_ATA_PASS_THRU_PPI_H_
-#define _EDKII_ATA_PASS_THRU_PPI_H_
+#pragma once
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/AtaPassThru.h>
@@ -141,6 +140,10 @@ EFI_STATUS
   If PortMultiplierPort is the port multiplier port number of the last ATA device
   on the port of the ATA controller, then EFI_NOT_FOUND is returned.
 
+  When port multiplier is not connected to the Port, GetNextDevice() may either return
+  EFI_SUCCESS and set PortMultiplierPort to 0xFFFF or return EFI_NOT_FOUND (in which case the
+  PortMultiplierPort value is undefined).
+
   @param[in]     This                  The PPI instance pointer.
   @param[in]     Port                  The port number present on the ATA controller.
   @param[in,out] PortMultiplierPort    On input, a pointer to the port multiplier
@@ -208,5 +211,3 @@ struct _EDKII_PEI_ATA_PASS_THRU_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiAtaPassThruPpiGuid;
-
-#endif

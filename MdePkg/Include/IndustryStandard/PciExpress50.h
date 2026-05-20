@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCIEXPRESS50_H_
-#define _PCIEXPRESS50_H_
+#pragma once
 
 #include <IndustryStandard/PciExpress40.h>
 
@@ -131,6 +130,19 @@ typedef struct {
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_32_0;
 ///@}
 
-#pragma pack()
+/// Alternate Protocol Negotiation Extended Capability Structure
+///
+/// Based on section 7.9.21 of PCI Express Base Specification 5.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ALTERNATE_PROTOCOL_ID    0x002B
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ALTERNATE_PROTOCOL_VER1  0x1
 
-#endif
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
+  UINT32                                      AltProtocolCapability;
+  UINT32                                      AltProtocolStatus;
+  UINT32                                      AltProtocolControl;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ALTERNATE_PROTOCOL;
+///@}
+
+#pragma pack()

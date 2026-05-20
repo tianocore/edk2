@@ -6,8 +6,7 @@ Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UEFI_RUNTIME_LIB__
-#define __UEFI_RUNTIME_LIB__
+#pragma once
 
 /**
   This function allows the caller to determine if UEFI ExitBootServices() has been called.
@@ -229,7 +228,7 @@ EfiGetVariable (
                            As output, returns the name of variable. The name
                            string is Null-Terminated Unicode string.
   @param  VendorGuid       As input, supplies the last VendorGuid that was returned by
-                           GetNextVriableName().
+                           GetNextVariableName().
                            As output, returns the VendorGuid of the current variable.
 
   @retval  EFI_SUCCESS           The function completed successfully.
@@ -396,7 +395,7 @@ EfiConvertPointer (
   ConvertPointer().  See the UEFI Specification for details.
   For IPF, this function interprets Address as a pointer to an EFI_PLABEL structure
   and both the EntryPoint and GP fields of an EFI_PLABEL are converted from physical
-  to virtiual addressing.  Since IPF allows the GP to point to an address outside
+  to virtual addressing.  Since IPF allows the GP to point to an address outside
   a PE/COFF image, the physical to virtual offset for the EntryPoint field is used
   to adjust the GP field.  The UEFI Runtime Service ConvertPointer() is used to convert
   EntryPoint and the status code for this conversion is always returned.   If the convertion
@@ -492,7 +491,7 @@ EfiConvertList (
                                 ScatterGatherList. The CapsuleHeaderArray must
                                 have the capsules in the same order as the ScatterGatherList.
   @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
-                                CaspuleHeaderArray.
+                                CapsuleHeaderArray.
   @param  ScatterGatherList     Physical pointer to a set of
                                 EFI_CAPSULE_BLOCK_DESCRIPTOR that describes the
                                 location in physical memory of a set of capsules. See Related
@@ -543,7 +542,7 @@ EfiUpdateCapsule (
                                 being passed into update capsule. The capsules are assumed to
                                 stored in contiguous virtual memory.
   @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
-                                CaspuleHeaderArray.
+                                CapsuleHeaderArray.
   @param  MaximumCapsuleSize     On output the maximum size that UpdateCapsule() can
                                 support as an argument to UpdateCapsule() via
                                 CapsuleHeaderArray and ScatterGatherList.
@@ -611,5 +610,3 @@ EfiQueryVariableInfo (
   OUT UINT64  *RemainingVariableStorageSize,
   OUT UINT64  *MaximumVariableSize
   );
-
-#endif

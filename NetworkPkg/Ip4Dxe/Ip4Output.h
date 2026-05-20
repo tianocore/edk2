@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_OUTPUT_H__
-#define __EFI_IP4_OUTPUT_H__
+#pragma once
 
 /**
   The default callback function for system generated packet.
@@ -116,5 +115,3 @@ Ip4PrependHead (
   );
 
 extern UINT16  mIp4Id;
-
-#endif

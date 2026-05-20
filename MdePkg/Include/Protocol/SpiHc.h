@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __SPI_HC_PROTOCOL_H__
-#define __SPI_HC_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/SpiConfiguration.h>
 #include <Protocol/SpiIo.h>
@@ -43,7 +42,7 @@ typedef struct _EFI_SPI_HC_PROTOCOL EFI_SPI_HC_PROTOCOL;
                             describing the SPI peripheral whose chip select pin
                             is to be manipulated. The routine may access the
                             ChipSelectParameter field to gain sufficient
-                            context to complete the operati on.
+                            context to complete the operation.
   @param[in] PinValue       The value to be applied to the chip select line of
                             the SPI peripheral.
 
@@ -175,7 +174,7 @@ struct _EFI_SPI_HC_PROTOCOL {
   UINT32                             FrameSizeSupportMask;
 
   ///
-  /// Maximum transfer size in bytes: 1 - Oxffffffff
+  /// Maximum transfer size in bytes: 1 - 0xffffffff
   ///
   UINT32                             MaximumTransferBytes;
 
@@ -198,5 +197,3 @@ struct _EFI_SPI_HC_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSpiHcProtocolGuid;
-
-#endif // __SPI_HC_PROTOCOL_H__

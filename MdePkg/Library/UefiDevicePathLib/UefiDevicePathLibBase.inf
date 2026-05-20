@@ -68,7 +68,6 @@
   gEfiPersistentVirtualCdGuid
 
 [Protocols]
-  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiDebugPortProtocolGuid                     ## UNDEFINED
 
 [Pcd]

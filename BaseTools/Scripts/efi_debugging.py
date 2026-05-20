@@ -33,6 +33,7 @@ import os
 import uuid
 import struct
 import re
+import zlib
 from ctypes import c_char, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p
 from ctypes import ARRAY, sizeof
 from ctypes import Structure, LittleEndianStructure
@@ -345,7 +346,6 @@ image_machine_dict = {
     0x0200: "IPF",
     0x0EBC: "EBC",
     0x8664: "X64",
-    0x01c2: "ARM",
     0xAA64: "AArch64",
     0x5032: "RISC32",
     0x5064: "RISC64",
@@ -1770,8 +1770,10 @@ class EfiConfigurationTable:
     def __init__(self, file, gST_addr=None):
         self._file = file
         if gST_addr is None:
-            # ToDo add code to search for gST via EFI_SYSTEM_TABLE_POINTER
-            return
+            # search for gST via EFI_SYSTEM_TABLE_POINTER
+            system_table_pointer = self._get_system_table_pointer()
+            if not system_table_pointer is None:
+                gST_addr = system_table_pointer.EfiSystemTableBase
 
         gST = self._ctype_read(EFI_SYSTEM_TABLE, gST_addr)
         self.read_efi_config_table(gST.NumberOfTableEntries,
@@ -1795,6 +1797,35 @@ class EfiConfigurationTable:
 
         data = self._file.read(sizeof(ctype_struct))
         return ctype_struct.from_buffer(bytearray(data))
+
+    def _get_system_table_pointer(self):
+        start_addr = 0x0
+        end_addr = 0xf0000000
+        alignment = 0x00400000
+        # The translation of "IBI SYST" for the signature of EFI_SYSTEM_TABLE
+        efi_system_table_signature = 0x5453595320494249
+
+        system_table_pointer = None
+
+        current_addr = start_addr
+        while current_addr < end_addr:
+            try:
+                self._file.seek(current_addr)
+                data = self._file.read(sizeof(EFI_SYSTEM_TABLE_POINTER))
+            except:
+                current_addr = current_addr + alignment
+                continue
+
+            system_table_pointer = EFI_SYSTEM_TABLE_POINTER.from_buffer(bytearray(data))
+            if system_table_pointer.Signature == efi_system_table_signature:
+                buf1 = bytearray(system_table_pointer)[:16]
+                crc32_value = zlib.crc32(buf1)
+                crc32_value = zlib.crc32(b'\0' * (sizeof(EFI_SYSTEM_TABLE_POINTER) - len(buf1)), crc32_value)
+                if crc32_value == system_table_pointer.Crc32:
+                    break
+            system_table_pointer = None
+            current_addr = current_addr + alignment
+        return system_table_pointer
 
     @ classmethod
     def read_efi_config_table(cls, table_cnt, table_ptr, ctype_read):

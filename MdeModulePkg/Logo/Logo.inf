@@ -19,12 +19,6 @@
   MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
-#
-
 [Binaries]
   BIN|Logo.bmp|*
 

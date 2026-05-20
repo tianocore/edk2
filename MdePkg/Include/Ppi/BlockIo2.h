@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_BLOCK_IO2_H_
-#define _PEI_BLOCK_IO2_H_
+#pragma once
 
 #include <Ppi/BlockIo.h>
 #include <Protocol/DevicePath.h>
@@ -213,5 +212,3 @@ struct _EFI_PEI_RECOVERY_BLOCK_IO2_PPI {
 };
 
 extern EFI_GUID  gEfiPeiVirtualBlockIo2PpiGuid;
-
-#endif

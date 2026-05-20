@@ -28,8 +28,7 @@
 
 **/
 
-#ifndef SMM_CPU_SYNC_LIB_H_
-#define SMM_CPU_SYNC_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -286,5 +285,3 @@ SmmCpuSyncReleaseBsp (
   IN     UINTN                 CpuIndex,
   IN     UINTN                 BspIndex
   );
-
-#endif

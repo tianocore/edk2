@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PEI_MM_VARIABLE_LIB_H_
-#define PEI_MM_VARIABLE_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Uefi/UefiSpec.h>
@@ -18,11 +17,13 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <Guid/SmmVariableCommon.h>
 
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/MmCommunication.h>
+#include <Ppi/MmCommunication3.h>
 
 #include <Protocol/SmmVariable.h>
 #include <Protocol/MmCommunication.h>
@@ -130,5 +131,3 @@ PeiMmGetNextVariableName (
   IN OUT CHAR16                              *VariableName,
   IN OUT EFI_GUID                            *VariableGuid
   );
-
-#endif /* PEI_MM_VARIABLE_LIB_H_ */

@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __DISK_INFO_H__
-#define __DISK_INFO_H__
+#pragma once
 
 ///
 /// Global ID for EFI_DISK_INFO_PROTOCOL
@@ -217,5 +216,3 @@ extern EFI_GUID  gEfiDiskInfoAhciInterfaceGuid;
 extern EFI_GUID  gEfiDiskInfoNvmeInterfaceGuid;
 extern EFI_GUID  gEfiDiskInfoUfsInterfaceGuid;
 extern EFI_GUID  gEfiDiskInfoSdMmcInterfaceGuid;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELL_MAN_FILE_PARSER_HEADER_
-#define _SHELL_MAN_FILE_PARSER_HEADER_
+#pragma once
 
 /**
   This function returns the help information for the specified command. The help text
@@ -73,5 +72,3 @@ ManFileFindSections (
   OUT UINTN             *HelpSize,
   IN BOOLEAN            Ascii
   );
-
-#endif //_SHELL_MAN_FILE_PARSER_HEADER_

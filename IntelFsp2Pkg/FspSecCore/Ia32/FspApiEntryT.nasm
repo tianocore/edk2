@@ -185,6 +185,16 @@ endstruc
 global ASM_PFX(LoadUpdPointerToECX)
 ASM_PFX(LoadUpdPointerToECX):
   ;
+  ; Inputs:
+  ;   esp -> stack with FsptUpdDataPtr parameter
+  ; Outputs:
+  ;   eax -> Address of FspInfoHeader
+  ;   ecx -> Address of FSP-T UPD structure
+  ; Register Usage:
+  ;   ebp is used for return address.
+  ;   All others reserved.
+  ;
+
   ; esp + 4 is input UPD parameter
   ; If esp + 4 is NULL the default UPD should be used
   ; ecx will be the UPD region that should be used
@@ -600,6 +610,7 @@ ASM_PFX(TempRamInitApi):
   SAVE_EDX
 
   CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
+  mov       esi, eax                     ; eax contains FspInfoHeader address after previous call
   SAVE_ECX                               ; save UPD param to slot 3 in xmm6
 
   mov       edx, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))

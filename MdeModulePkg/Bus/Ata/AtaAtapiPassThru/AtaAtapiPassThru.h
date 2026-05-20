@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __ATA_ATAPI_PASS_THRU_H__
-#define __ATA_ATAPI_PASS_THRU_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -1293,5 +1292,3 @@ AtaPioDataInOut (
   IN     UINT64                 Timeout,
   IN     ATA_NONBLOCK_TASK      *Task
   );
-
-#endif

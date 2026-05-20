@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ARM_MONITOR_LIB_H_
-#define ARM_MONITOR_LIB_H_
+#pragma once
 
 /** The size of the SMC arguments is different between AArch64 and AArch32.
 
@@ -23,7 +22,6 @@ typedef struct {
   UINTN    Arg5;
   UINTN    Arg6;
   UINTN    Arg7;
- #ifdef MDE_CPU_AARCH64
   UINTN    Arg8;
   UINTN    Arg9;
   UINTN    Arg10;
@@ -34,7 +32,6 @@ typedef struct {
   UINTN    Arg15;
   UINTN    Arg16;
   UINTN    Arg17;
- #endif
 } ARM_MONITOR_ARGS;
 
 /** Monitor call.
@@ -50,5 +47,3 @@ EFIAPI
 ArmMonitorCall (
   IN OUT ARM_MONITOR_ARGS  *Args
   );
-
-#endif // ARM_MONITOR_LIB_H_

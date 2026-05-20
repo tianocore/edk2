@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLATFORM_BM_H
-#define _PLATFORM_BM_H
+#pragma once
 
 #include <PiDxe.h>
 
@@ -60,7 +59,7 @@ typedef struct {
   EMU_VENDOR_DEVICE_PATH_NODE    EmuBus;
   EMU_VENDOR_DEVICE_PATH_NODE    EmuGraphicsWindow;
   EFI_DEVICE_PATH_PROTOCOL       End;
-} EMU_PLATFORM_UGA_DEVICE_PATH;
+} EMU_PLATFORM_GRAPHICS_WINDOW_DEVICE_PATH;
 
 //
 // Platform BDS Functions
@@ -85,5 +84,3 @@ VOID
 PlatformBdsConnectSequence (
   VOID
   );
-
-#endif // _PLATFORM_BM_H

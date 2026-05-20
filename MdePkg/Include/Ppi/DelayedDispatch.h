@@ -1,21 +1,21 @@
 /** @file
-    EFI Delayed Dispatch PPI as defined in the PI 1.7 Specification
+    EFI Delayed Dispatch PPI as defined in the PI 1.8A Specification
 
     Provide timed event service in PEI
 
     Copyright (c) 2020, American Megatrends International LLC. All rights reserved.
+    Copyright (c) Microsoft Corporation.
     SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __DELAYED_DISPATCH_PPI_H__
-#define __DELAYED_DISPATCH_PPI_H__
+#pragma once
 
 ///
 /// Global ID for EFI_DELAYED_DISPATCH_PPI_GUID
 ///
 #define EFI_DELAYED_DISPATCH_PPI_GUID \
   { \
-    0x869c711d, 0x649c, 0x44fe, { 0x8b, 0x9e, 0x2c, 0xbb, 0x29, 0x11, 0xc3, 0xe6} } \
+    0x869c711d, 0x649c, 0x44fe, { 0x8b, 0x9e, 0x2c, 0xbb, 0x29, 0x11, 0xc3, 0xe6} \
   }
 
 /**
@@ -31,8 +31,8 @@
 typedef
 VOID
 (EFIAPI *EFI_DELAYED_DISPATCH_FUNCTION)(
-  IN OUT UINT64 *Context,
-  OUT UINT32 *NewDelay
+  IN OUT UINT64  *Context,
+  OUT UINT32     *NewDelay
   );
 
 ///
@@ -44,13 +44,11 @@ typedef  struct _EFI_DELAYED_DISPATCH_PPI EFI_DELAYED_DISPATCH_PPI;
 /**
 Register a callback to be called after a minimum delay has occurred.
 
-This service is the single member function of the EFI_DELAYED_DISPATCH_PPI
-
-  @param This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
-  @param Function       Function to call back
-  @param Context        Context data
-  @param UniqueId       UniqueId
-  @param Delay          Delay interval
+  @param[in] This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
+  @param[in] Function       Function to call back
+  @param[in] Context        Context data
+  @param[in] DelayedGroupId Delayed dispatch request ID the caller will wait on
+  @param[in] Delay          Delay interval
 
   @retval EFI_SUCCESS               Function successfully loaded
   @retval EFI_INVALID_PARAMETER     One of the Arguments is not supported
@@ -62,17 +60,18 @@ EFI_STATUS
 (EFIAPI *EFI_DELAYED_DISPATCH_REGISTER)(
   IN  EFI_DELAYED_DISPATCH_PPI      *This,
   IN  EFI_DELAYED_DISPATCH_FUNCTION  Function,
-  IN  UINT64                     Context,
-  IN  EFI_GUID                   *UniqueId  OPTIONAL,
-  OUT UINT32                     Delay
+  IN  UINT64                         Context,
+  IN  EFI_GUID                       *DelayedGroupId  OPTIONAL,
+  IN  UINT32                         Delay
   );
 
 /**
-Function invoked by a PEIM to wait until all specified UniqueId events have been dispatched. The other events
-will continue to dispatch while this process is being paused
+  Wait on a registered Delayed Dispatch unit that has a DelayedGroupId. Continue
+  to dispatch all registered delayed dispatch entries until *ALL* entries with
+  DelayedGroupId have completed.
 
-  @param This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
-  @param UniqueId       Delayed dispatch request ID the caller will wait on
+  @param[in] This            The Delayed Dispatch PPI pointer.
+  @param[in] DelayedGroupId  Delayed dispatch request ID the caller will wait on
 
   @retval EFI_SUCCESS               Function successfully invoked
   @retval EFI_INVALID_PARAMETER     One of the Arguments is not supported
@@ -82,8 +81,8 @@ will continue to dispatch while this process is being paused
 typedef
 EFI_STATUS
 (EFIAPI *EFI_DELAYED_DISPATCH_WAIT_ON_EVENT)(
-  IN EFI_DELAYED_DISPATCH_PPI  *This,
-  IN EFI_GUID                  UniqueId
+  IN  EFI_DELAYED_DISPATCH_PPI  *This,
+  IN  EFI_GUID                  DelayedGroupId
   );
 
 ///
@@ -98,5 +97,3 @@ struct _EFI_DELAYED_DISPATCH_PPI {
 };
 
 extern EFI_GUID  gEfiPeiDelayedDispatchPpiGuid;
-
-#endif

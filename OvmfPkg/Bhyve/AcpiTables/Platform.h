@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _Platform_h_INCLUDED_
-#define _Platform_h_INCLUDED_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
@@ -69,4 +68,3 @@
         0xCF9                           /* I/O Port */                  \
 }
 #define FACP_RESET_VAL   0x6
-#endif

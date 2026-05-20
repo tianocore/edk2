@@ -5,18 +5,17 @@ Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  PI Version 1.7
+  PI Version 1.8.A
 
 **/
 
-#ifndef __PI_DXECIS_H__
-#define __PI_DXECIS_H__
+#pragma once
 
 #include <Uefi/UefiMultiPhase.h>
 #include <Pi/PiMultiPhase.h>
 
 ///
-/// Global Coherencey Domain types - Memory type.
+/// Global Coherency Domain types - Memory type.
 ///
 typedef enum {
   ///
@@ -65,7 +64,7 @@ typedef enum {
 } EFI_GCD_MEMORY_TYPE;
 
 ///
-/// Global Coherencey Domain types - IO type.
+/// Global Coherency Domain types - IO type.
 ///
 typedef enum {
   ///
@@ -691,8 +690,8 @@ EFI_STATUS
 // DXE Services Table
 //
 #define DXE_SERVICES_SIGNATURE            0x565245535f455844ULL
-#define DXE_SPECIFICATION_MAJOR_REVISION  1
-#define DXE_SPECIFICATION_MINOR_REVISION  70
+#define DXE_SPECIFICATION_MAJOR_REVISION  PI_SPECIFICATION_MAJOR_REVISION
+#define DXE_SPECIFICATION_MINOR_REVISION  PI_SPECIFICATION_MINOR_REVISION
 #define DXE_SERVICES_REVISION             ((DXE_SPECIFICATION_MAJOR_REVISION<<16) | (DXE_SPECIFICATION_MINOR_REVISION))
 
 typedef struct {
@@ -736,5 +735,3 @@ typedef struct {
 } DXE_SERVICES;
 
 typedef DXE_SERVICES EFI_DXE_SERVICES;
-
-#endif

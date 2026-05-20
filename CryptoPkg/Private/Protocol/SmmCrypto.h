@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EDKII_SMM_CRYPTO_PROTOCOL_H__
-#define __EDKII_SMM_CRYPTO_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Crypto.h>
 
@@ -17,5 +16,3 @@
 typedef EDKII_CRYPTO_PROTOCOL EDKII_SMM_CRYPTO_PROTOCOL;
 
 extern GUID  gEdkiiSmmCryptoProtocolGuid;
-
-#endif

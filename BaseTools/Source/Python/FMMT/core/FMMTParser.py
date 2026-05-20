@@ -33,6 +33,18 @@ class FMMTParser:
         if rootTree.type == ROOT_TREE or rootTree.type == ROOT_FV_TREE or rootTree.type == ROOT_FFS_TREE or rootTree.type == ROOT_SECTION_TREE:
             logger.debug('Encapsulated successfully!')
         # If current node do not have Header, just add Data.
+        elif rootTree.type == PECOFF_TREE:
+            if hasattr(rootTree.Data, 'Data') and rootTree.Data.Data:
+                self.FinalData += rootTree.Data.Data
+                # Handle padding if needed
+                if hasattr(rootTree.Data, 'PadData') and rootTree.Data.PadData:
+                    self.FinalData += rootTree.Data.PadData
+                # Add parent padding if this is final child
+                if rootTree.isFinalChild():
+                    ParTree = rootTree.Parent
+                    if ParTree and ParTree.type != 'ROOT' and hasattr(ParTree.Data, 'PadData'):
+                        self.FinalData += ParTree.Data.PadData
+            rootTree.Child = []  # Clear children since we've processed the PE/COFF data
         elif rootTree.type == BINARY_DATA or rootTree.type == FFS_FREE_SPACE:
             self.FinalData += rootTree.Data.Data
             rootTree.Child = []

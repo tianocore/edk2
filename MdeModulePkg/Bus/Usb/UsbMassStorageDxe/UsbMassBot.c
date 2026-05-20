@@ -449,8 +449,7 @@ UsbBotExecCommand (
 
   @param  Context               The context of the BOT protocol, that is,
                                 USB_BOT_PROTOCOL.
-  @param  ExtendedVerification  If FALSE, just issue Bulk-Only Mass Storage Reset request.
-                                If TRUE, additionally reset parent hub port.
+  @param  ExtendedVerification  ExtendedVerification is ignored in this implementation.
 
   @retval EFI_SUCCESS           The device is reset.
   @retval Others                Failed to reset the device..
@@ -469,16 +468,6 @@ UsbBotResetDevice (
   UINT32                  Timeout;
 
   UsbBot = (USB_BOT_PROTOCOL *)Context;
-
-  if (ExtendedVerification) {
-    //
-    // If we need to do strictly reset, reset its parent hub port
-    //
-    Status = UsbBot->UsbIo->UsbPortReset (UsbBot->UsbIo);
-    if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
-    }
-  }
 
   //
   // Issue a class specific Bulk-Only Mass Storage Reset request,

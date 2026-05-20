@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __PC_ANSI_H__
-#define __PC_ANSI_H__
+#pragma once
 
 #define EFI_PC_ANSI_GUID \
   { \
@@ -48,5 +47,3 @@ extern EFI_GUID gEfiVT100PlusGuid;
 extern EFI_GUID gEfiVTUTF8Guid;
 extern EFI_GUID gEfiUartDevicePathGuid;
 extern EFI_GUID gEfiSasDevicePathGuid;
-
-#endif

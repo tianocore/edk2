@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_NVDATASTRUC_H_
-#define _ISCSI_NVDATASTRUC_H_
+#pragma once
 
 #include <Guid/IScsiConfigHii.h>
 
@@ -228,5 +227,3 @@ typedef struct _ISCSI_CONFIG_IFR_NVDATA {
   KEYWORD_STR    Keyword[ISCSI_MAX_ATTEMPTS_NUM];
 } ISCSI_CONFIG_IFR_NVDATA;
 #pragma pack()
-
-#endif

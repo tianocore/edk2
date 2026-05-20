@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __HARDWARE_INFO_PCI_HOST_BRIDGE_LIB_H__
-#define __HARDWARE_INFO_PCI_HOST_BRIDGE_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>
@@ -252,5 +251,3 @@ HardwareInfoPciHostBridgeGet (
   OUT       PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G              OPTIONAL,
   OUT       PCI_ROOT_BRIDGE_APERTURE  *PcieConfig               OPTIONAL
   );
-
-#endif // __HARDWARE_INFO_PCI_HOST_BRIDGE_LIB_H__

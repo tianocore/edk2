@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CAPSULE_LIB_H__
-#define __CAPSULE_LIB_H__
+#pragma once
 
 //
 // BOOLEAN Variable to indicate whether system is in the capsule on disk state.
@@ -24,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param  CapsuleHeader    Pointer to the UEFI capsule image to be checked.
 
-  @retval EFI_SUCESS       Input capsule is supported by firmware.
+  @retval EFI_SUCCESS      Input capsule is supported by firmware.
   @retval EFI_UNSUPPORTED  Input capsule is not supported by the firmware.
 **/
 EFI_STATUS
@@ -41,7 +40,7 @@ SupportCapsuleImage (
 
   @param  CapsuleHeader    Pointer to the UEFI capsule image to be processed.
 
-  @retval EFI_SUCESS       Capsule Image processed successfully.
+  @retval EFI_SUCCESS      Capsule Image processed successfully.
   @retval EFI_UNSUPPORTED  Capsule image is not supported by the firmware.
 **/
 EFI_STATUS
@@ -156,5 +155,3 @@ EFIAPI
 CoDRemoveTempFile (
   UINTN  MaxRetry
   );
-
-#endif

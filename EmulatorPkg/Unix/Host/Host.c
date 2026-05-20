@@ -47,7 +47,7 @@ EMU_SYSTEM_MEMORY  *gSystemMemory;
 UINTN                        mImageContextModHandleArraySize = 0;
 IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray    = NULL;
 
-EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
+EFI_PEI_PPI_DESCRIPTOR  *mPpiList;
 
 int  gInXcode = 0;
 
@@ -93,9 +93,7 @@ main (
   UINTN                 Index;
   UINTN                 Index1;
   UINTN                 Index2;
-  UINTN                 PeiIndex;
   CHAR8                 *FileName;
-  BOOLEAN               Done;
   EFI_PEI_FILE_HANDLE   FileHandle;
   VOID                  *SecFile;
   CHAR16                *MemorySizeStr;
@@ -168,7 +166,7 @@ main (
 
   // EmuSecLibConstructor ();
 
-  gPpiList = GetThunkPpiList ();
+  mPpiList = GetThunkPpiList ();
 
   //
   // Allocate space for gSystemMemory Array
@@ -232,7 +230,7 @@ main (
   }
 
   Index2 = 0;
-  for (Done = FALSE, Index = 0, PeiIndex = 0, SecFile = NULL;
+  for (Index = 0, SecFile = NULL;
        FirmwareVolumesStr[Index2] != 0;
        Index++)
   {
@@ -286,7 +284,6 @@ main (
       if (!EFI_ERROR (Status)) {
         Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile);
         if (!EFI_ERROR (Status)) {
-          PeiIndex = Index;
           printf (" contains SEC Core");
         }
       }
@@ -550,7 +547,6 @@ SecLoadFromCore (
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  TopOfMemory;
   VOID                  *TopOfStack;
   EFI_PHYSICAL_ADDRESS  PeiCoreEntryPoint;
   EFI_SEC_PEI_HAND_OFF  *SecCoreData;
@@ -559,7 +555,6 @@ SecLoadFromCore (
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
   //
-  TopOfMemory  = LargestRegion + LargestRegionSize;
   PeiStackSize = (UINTN)RShiftU64 ((UINT64)STACK_SIZE, 1);
 
   //
@@ -571,11 +566,10 @@ SecLoadFromCore (
   // |  Stack    |
   // |-----------| <---- TemporaryRamBase
   //
-  TopOfStack  = (VOID *)(LargestRegion + PeiStackSize);
-  TopOfMemory = LargestRegion + PeiStackSize;
+  TopOfStack = (VOID *)(LargestRegion + PeiStackSize);
 
   //
-  // Reservet space for storing PeiCore's parament in stack.
+  // Reserve space for storing PeiCore's parament in stack.
   //
   TopOfStack = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
@@ -608,7 +602,7 @@ SecLoadFromCore (
   PeiSwitchStacks (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)PeiCoreEntryPoint,
     SecCoreData,
-    (VOID *)gPpiList,
+    (VOID *)mPpiList,
     TopOfStack
     );
   //
@@ -1118,9 +1112,7 @@ DlLoadImage (
  #endif
 }
 
-#ifdef __APPLE__
 __attribute__ ((noinline))
-#endif
 VOID
 SecGdbScriptBreak (
   char               *FileName,
@@ -1129,6 +1121,17 @@ SecGdbScriptBreak (
   int                AddSymbolFlag
   )
 {
+  volatile UINTN  Index;
+
+  //
+  // Disable inline and have this function do some work to prevent
+  // optimizing this function away. It must always be in symbol table to
+  // set breakpoint for gdb script to run, load symbols, and set pending
+  // breakpoints.
+  //
+  for (Index = 0; Index < 1; Index++) {
+  }
+
   return;
 }
 
@@ -1217,9 +1220,9 @@ GdbScriptRemoveImage (
   FILE  *GdbTempFile;
 
   //
-  // Need to skip .PDB files created from VC++
+  // Need to skip images which dont have pdb area and .PDB files created from VC++
   //
-  if (IsPdbFile (ImageContext->PdbPointer)) {
+  if ((ImageContext->PdbPointer == NULL) || (IsPdbFile (ImageContext->PdbPointer))) {
     return;
   }
 

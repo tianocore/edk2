@@ -3,15 +3,14 @@
 
   PCI Root Bridge I/O protocol is used by PCI Bus Driver to perform PCI Memory, PCI I/O,
   and PCI Configuration cycles on a PCI Root Bridge. It also provides services to perform
-  defferent types of bus mastering DMA.
+  different types of bus mastering DMA.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCI_ROOT_BRIDGE_IO_H__
-#define __PCI_ROOT_BRIDGE_IO_H__
+#pragma once
 
 #include <Library/BaseLib.h>
 
@@ -363,7 +362,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The set of attributes specified by Attributes for the resource
                                 range specified by ResourceBase and ResourceLength
                                 were set on the PCI root bridge, and the actual resource range is
-                                returned in ResuourceBase and ResourceLength.
+                                returned in ResourceBase and ResourceLength.
   @retval EFI_UNSUPPORTED       A bit is set in Attributes that is not supported by the PCI Root
                                 Bridge.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the attributes on the
@@ -432,5 +431,3 @@ struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPciRootBridgeIoProtocolGuid;
-
-#endif

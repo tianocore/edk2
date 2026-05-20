@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __BROTLI_DECOMPRESS_UEFI_SUP_H__
-#define __BROTLI_DECOMPRESS_UEFI_SUP_H__
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -39,5 +38,3 @@ VOID
 BrDummyFree (
   IN VOID  *Ptr
   );
-
-#endif

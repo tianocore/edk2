@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_PEI_SERVICES_LIB_H_
-#define MOCK_PEI_SERVICES_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -185,5 +184,3 @@ struct MockPeiServicesLib {
      IN VOID            *ResetData OPTIONAL)
     );
 };
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FIRMWARE_FILE_SYSTEM3_GUID_H__
-#define __FIRMWARE_FILE_SYSTEM3_GUID_H__
+#pragma once
 
 ///
 /// The firmware volume header contains a data field for the file system GUID
@@ -20,5 +19,3 @@
   { 0x5473c07a, 0x3dcb, 0x4dca, { 0xbd, 0x6f, 0x1e, 0x96, 0x89, 0xe7, 0x34, 0x9a }}
 
 extern EFI_GUID  gEfiFirmwareFileSystem3Guid;
-
-#endif // __FIRMWARE_FILE_SYSTEM3_GUID_H__

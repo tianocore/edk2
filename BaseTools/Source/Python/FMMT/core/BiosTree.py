@@ -23,12 +23,14 @@ SECTION_TREE = 'SECTION'
 SEC_FV_TREE = 'SEC_FV_IMAGE'
 BINARY_DATA = 'BINARY'
 ELF_TREE = 'ELF'
+PECOFF_TREE = 'PECOFF_TREE'
 
 RootType = [ROOT_TREE, ROOT_FV_TREE, ROOT_FFS_TREE, ROOT_SECTION_TREE]
 FvType = [FV_TREE, SEC_FV_TREE]
-FfsType = FFS_TREE
+FfsType = [FFS_TREE, FFS_PAD]
 SecType = SECTION_TREE
 ElfType = [ROOT_ELF_TREE, ELF_TREE]
+PeCoffTree = PECOFF_TREE
 
 class BIOSTREE:
     def __init__(self, NodeName: str) -> None:
@@ -218,6 +220,14 @@ class BIOSTREE:
             TreeInfo[key]["Size"] = hex(self.Data.Size)
             TreeInfo[key]["Offset"] = hex(self.Data.HOffset)
             TreeInfo[key]["FilesNum"] = len(self.Child)
+        elif self.type == FFS_PAD:
+            key = str(self.Data.Name)
+            TreeInfo[key] = collections.OrderedDict()
+            TreeInfo[key]["Name"] = key
+            TreeInfo[key]["UiName"] = 'Ffs_pad'
+            TreeInfo[key]["Type"] = self.type
+            TreeInfo[key]["Size"] = hex(self.Data.Size)
+            TreeInfo[key]["Offset"] = hex(self.Data.HOffset)
         elif self.type == SECTION_TREE and self.Data.Type == 0x02:
             key = str(self.Data.Name)
             TreeInfo[key] = collections.OrderedDict()

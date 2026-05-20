@@ -7,10 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef LIBSPDM_STD_DEF_ALT_H
-#define LIBSPDM_STD_DEF_ALT_H
+#pragma once
 
 typedef UINTN size_t;
 #define offsetof(type, member)  OFFSET_OF(type,member)
-
-#endif /* LIBSPDM_STDDEF_ALT */

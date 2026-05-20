@@ -2,6 +2,7 @@
 # Ssdt Cpu Topology Table Generator
 #
 #  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -20,10 +21,16 @@
   SsdtCpuTopologyGenerator.c
   SsdtCpuTopologyGenerator.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmSsdtCpuTopologyGenerator.c
 
-[Packages.ARM, Packages.AARCH64]
+[Sources.X64]
+  X64/X64SsdtCpuTopologyGenerator.c
+
+[Sources.RISCV64]
+  RiscV/RiscVSsdtCpuTopologyGenerator.c
+
+[Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [Packages]
@@ -36,3 +43,5 @@
   AcpiHelperLib
   AmlLib
   BaseLib
+  CmObjHelperLib
+  MetadataHandlerLib

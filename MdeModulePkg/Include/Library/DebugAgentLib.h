@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUG_AGENT_LIB_H__
-#define __DEBUG_AGENT_LIB_H__
+#pragma once
 
 #define DEBUG_AGENT_INIT_PREMEM_SEC           1
 #define DEBUG_AGENT_INIT_POSTMEM_SEC          2
@@ -21,6 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEBUG_AGENT_INIT_DXE_LOAD             10
 #define DEBUG_AGENT_INIT_DXE_UNLOAD           11
 #define DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64  12
+#define DEBUG_AGENT_INIT_REINITIALIZE         13
+#define DEBUG_AGENT_INIT_DXE_CORE_LATE        14
 
 //
 // Context for DEBUG_AGENT_INIT_POSTMEM_SEC
@@ -92,5 +93,3 @@ EFIAPI
 SaveAndSetDebugTimerInterrupt (
   IN BOOLEAN  EnableStatus
   );
-
-#endif

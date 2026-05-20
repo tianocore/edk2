@@ -88,7 +88,7 @@
   gPeiPostScriptTablePpiGuid                    ## SOMETIMES_PRODUCES
   gEfiEndOfPeiSignalPpiGuid                     ## SOMETIMES_PRODUCES
   gEfiPeiSmmCommunicationPpiGuid                ## SOMETIMES_CONSUMES
-  gEdkiiPeiMpServices2PpiGuid                   ## SOMETIMES_CONSUMES
+  gEfiPeiMpServices2PpiGuid                     ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES

@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PI_I2C_H__
-#define __PI_I2C_H__
+#pragma once
 
 ///
 /// A 10-bit slave address is or'ed with the following value enabling the
@@ -297,5 +296,3 @@ typedef struct {
   ///
   EFI_I2C_OPERATION    Operation[1];
 } EFI_I2C_REQUEST_PACKET;
-
-#endif //  __PI_I2C_H__

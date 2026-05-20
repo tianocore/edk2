@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PXE_BASE_CODE_CALLBACK_H_
-#define _PXE_BASE_CODE_CALLBACK_H_
+#pragma once
 
 ///
 /// Call Back Definitions.
@@ -27,7 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION  0x00010000
 
 ///
-/// EFI 1.1 Revision Number defintion.
+/// EFI 1.1 Revision Number definition.
 ///
 #define EFI_PXE_BASE_CODE_CALLBACK_INTERFACE_REVISION  \
         EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION
@@ -119,5 +118,3 @@ struct _EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPxeBaseCodeCallbackProtocolGuid;
-
-#endif

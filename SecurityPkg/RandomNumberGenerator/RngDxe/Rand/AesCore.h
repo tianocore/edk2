@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __AES_CORE_H__
-#define __AES_CORE_H__
+#pragma once
 
 /**
   Encrypts one single block data (128 bits) with AES algorithm.
@@ -27,5 +26,3 @@ AesEncrypt (
   IN  UINT8  *InData,
   OUT UINT8  *OutData
   );
-
-#endif // __AES_CORE_H__

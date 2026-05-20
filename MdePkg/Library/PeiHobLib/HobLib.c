@@ -865,3 +865,82 @@ BuildMemoryAllocationHob (
   //
   ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }
+
+/**
+  Returns the next instance of the memory allocation HOB with the matched GUID from
+  the starting HOB.
+
+  This function searches the first instance of a HOB from the starting HOB pointer.
+  Such HOB should satisfy two conditions:
+  Its HOB type is EFI_HOB_TYPE_MEMORY_ALLOCATION and its GUID Name equals to input Guid.
+  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
+
+  If Guid is NULL, then ASSERT().
+  If HobStart is NULL, then ASSERT().
+
+  @param  Guid          The GUID to match with in the HOB list.
+  @param  HobStart      The starting HOB pointer to search from.
+
+  @retval !NULL  The next instance of the Memory Allocation HOB with matched GUID from the starting HOB.
+  @retval NULL   NULL is returned if the matching Memory Allocation HOB is not found.
+
+**/
+VOID *
+EFIAPI
+GetNextMemoryAllocationGuidHob (
+  IN CONST EFI_GUID  *Guid,
+  IN CONST VOID      *HobStart
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (Guid != NULL);
+  ASSERT (HobStart != NULL);
+
+  for (Hob.Raw = (UINT8 *)HobStart; (Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL;
+       Hob.Raw = GET_NEXT_HOB (Hob))
+  {
+    if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, Guid)) {
+      return Hob.Raw;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Search the HOB list for the Memory Allocation HOB with a matching base address
+  and set the Name GUID. If there does not exist such Memory Allocation HOB in the
+  HOB list, it will return NULL.
+
+  If Guid is NULL, then ASSERT().
+
+  @param BaseAddress  BaseAddress of Memory Allocation HOB to set Name to Guid.
+  @param Guid         Pointer to the GUID to set in the matching Memory Allocation GUID.
+
+  @retval !NULL  The instance of the tagged Memory Allocation HOB with matched base address.
+  @retval NULL   NULL is returned if the matching Memory Allocation HOB is not found.
+
+**/
+VOID *
+EFIAPI
+TagMemoryAllocationHobWithGuid (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN CONST EFI_GUID        *Guid
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (Guid != NULL);
+
+  for (Hob.Raw = GetHobList (); (Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL;
+       Hob.Raw = GET_NEXT_HOB (Hob))
+  {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == BaseAddress) {
+      CopyGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, Guid);
+      return Hob.Raw;
+    }
+  }
+
+  return NULL;
+}

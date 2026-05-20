@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_PROFILE_H_
-#define _SMM_PROFILE_H_
+#pragma once
 
 #include "SmmProfileInternal.h"
 
@@ -148,5 +147,3 @@ extern BOOLEAN  mSetupDebugTrap;
 // SMI command port.
 //
 extern UINT32  mSmiCommandPort;
-
-#endif // _SMM_PROFILE_H_

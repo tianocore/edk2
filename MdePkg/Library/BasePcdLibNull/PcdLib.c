@@ -723,7 +723,7 @@ LibPcdCallbackOnSet (
 }
 
 /**
-  Disable a notification function that was established with LibPcdCallbackonSet().
+  Disable a notification function that was established with LibPcdCallbackOnSet().
 
   Disable a notification function that was previously established with LibPcdCallbackOnSet().
 

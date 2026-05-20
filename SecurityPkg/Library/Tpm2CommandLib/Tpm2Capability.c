@@ -532,14 +532,11 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
   EFI_STATUS          Status;
   TPML_PCR_SELECTION  Pcrs;
   UINTN               Index;
-  UINT8               ActivePcrBankCount;
 
   //
   // Get supported PCR
   //
   Status = Tpm2GetCapabilityPcrs (&Pcrs);
-  DEBUG ((DEBUG_INFO, "Supported PCRs - Count = %08x\n", Pcrs.count));
-  ActivePcrBankCount = 0;
   //
   // If error, assume that we have at least SHA-1 (and return the error.)
   //
@@ -547,7 +544,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
     DEBUG ((DEBUG_ERROR, "GetSupportedAndActivePcrs - Tpm2GetCapabilityPcrs fail!\n"));
     *TpmHashAlgorithmBitmap = HASH_ALG_SHA1;
     *ActivePcrBanks         = HASH_ALG_SHA1;
-    ActivePcrBankCount      = 1;
   }
   //
   // Otherwise, process the return data to determine what algorithms are supported
@@ -564,7 +560,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
           if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
             DEBUG ((DEBUG_VERBOSE, "GetSupportedAndActivePcrs - HASH_ALG_SHA1 active.\n"));
             *ActivePcrBanks |= HASH_ALG_SHA1;
-            ActivePcrBankCount++;
           }
 
           break;
@@ -574,7 +569,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
           if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
             DEBUG ((DEBUG_VERBOSE, "GetSupportedAndActivePcrs - HASH_ALG_SHA256 active.\n"));
             *ActivePcrBanks |= HASH_ALG_SHA256;
-            ActivePcrBankCount++;
           }
 
           break;
@@ -584,7 +578,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
           if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
             DEBUG ((DEBUG_VERBOSE, "GetSupportedAndActivePcrs - HASH_ALG_SHA384 active.\n"));
             *ActivePcrBanks |= HASH_ALG_SHA384;
-            ActivePcrBankCount++;
           }
 
           break;
@@ -594,7 +587,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
           if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
             DEBUG ((DEBUG_VERBOSE, "GetSupportedAndActivePcrs - HASH_ALG_SHA512 active.\n"));
             *ActivePcrBanks |= HASH_ALG_SHA512;
-            ActivePcrBankCount++;
           }
 
           break;
@@ -604,7 +596,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
           if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
             DEBUG ((DEBUG_VERBOSE, "GetSupportedAndActivePcrs - HASH_ALG_SM3_256 active.\n"));
             *ActivePcrBanks |= HASH_ALG_SM3_256;
-            ActivePcrBankCount++;
           }
 
           break;
@@ -616,7 +607,6 @@ Tpm2GetCapabilitySupportedAndActivePcrs (
     }
   }
 
-  DEBUG ((DEBUG_INFO, "GetSupportedAndActivePcrs - Count = %08x\n", ActivePcrBankCount));
   return Status;
 }
 
@@ -734,9 +724,9 @@ Tpm2TestParms (
           Buffer += sizeof (UINT16);
           break;
         case TPM_ALG_XOR:
-          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.hashAlg));
+          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor_.hashAlg));
           Buffer += sizeof (UINT16);
-          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.kdf));
+          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor_.kdf));
           Buffer += sizeof (UINT16);
           break;
         default:
@@ -761,7 +751,7 @@ Tpm2TestParms (
           Buffer += sizeof (UINT16);
           break;
         case TPM_ALG_XOR:
-          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.xor));
+          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.xor_));
           Buffer += sizeof (UINT16);
           break;
         case TPM_ALG_NULL:

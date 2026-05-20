@@ -244,3 +244,14 @@ SetPcdFlashNvStorageBaseAddresses (
                 );
   ASSERT_RETURN_ERROR (PcdStatus);
 }
+
+VOID
+UpdateQemuFlashVariablesEnable (
+  VOID
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
+}

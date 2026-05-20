@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CUSTOMIZED_DISPLAY_LIB_INTERNAL_H__
-#define __CUSTOMIZED_DISPLAY_LIB_INTERNAL_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -129,7 +128,7 @@ PrintFramework (
   );
 
 /**
-  Validate the input screen diemenstion info.
+  Validate the input screen dimension info.
 
   @param  FormData               The input form data info.
 
@@ -138,7 +137,7 @@ PrintFramework (
 
 **/
 EFI_STATUS
-ScreenDiemensionInfoValidate (
+ScreenDimensionInfoValidate (
   IN FORM_DISPLAY_ENGINE_FORM  *FormData
   );
 
@@ -283,5 +282,3 @@ VOID
 ProcessExternedOpcode (
   IN FORM_DISPLAY_ENGINE_FORM  *FormData
   );
-
-#endif

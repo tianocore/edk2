@@ -73,6 +73,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "EmulatorPkg",
                 "IntelFsp2Pkg",
                 "IntelFsp2WrapperPkg",
+                "ManageabilityPkg",
                 "MdePkg",
                 "MdeModulePkg",
                 "NetworkPkg",
@@ -81,7 +82,6 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "UefiCpuPkg",
                 "FmpDevicePkg",
                 "ShellPkg",
-                "SignedCapsulePkg",
                 "StandaloneMmPkg",
                 "FatPkg",
                 "CryptoPkg",
@@ -90,7 +90,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "OvmfPkg",
                 "RedfishPkg",
                 "SourceLevelDebugPkg",
-                "UefiPayloadPkg"
+                "UefiPayloadPkg",
+                "TcgTpmPkg"
                 )
 
     def GetArchitecturesSupported(self):
@@ -98,7 +99,6 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         return (
                 "IA32",
                 "X64",
-                "ARM",
                 "AARCH64",
                 "RISCV64",
                 "LOONGARCH64")
@@ -187,8 +187,6 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         '''
         rs = []
         rs.append(RequiredSubmodule(
-            "ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3", False))
-        rs.append(RequiredSubmodule(
             "CryptoPkg/Library/OpensslLib/openssl", False))
         rs.append(RequiredSubmodule(
             "UnitTestFrameworkPkg/Library/CmockaLib/cmocka", False))
@@ -212,6 +210,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "CryptoPkg/Library/MbedTlsLib/mbedtls", False))
         rs.append(RequiredSubmodule(
             "SecurityPkg/DeviceSecurity/SpdmLib/libspdm", False))
+        rs.append(RequiredSubmodule(
+            "TcgTpmPkg/Library/TpmLib/TPM", False))
         return rs
 
     def GetName(self):

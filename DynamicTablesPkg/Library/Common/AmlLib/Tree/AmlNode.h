@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_NODE_H_
-#define AML_NODE_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <IndustryStandard/Acpi.h>
@@ -214,5 +213,3 @@ EFIAPI
 AmlNodeGetName (
   IN  CONST AML_OBJECT_NODE  *ObjectNode
   );
-
-#endif // AML_NODE_H_

@@ -5,12 +5,11 @@ Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  PI Version 1.7.
+  PI Version 1.8.A
 
 **/
 
-#ifndef __PI_PEICIS_H__
-#define __PI_PEICIS_H__
+#pragma once
 
 #include <Uefi/UefiMultiPhase.h>
 #include <Pi/PiMultiPhase.h>
@@ -314,7 +313,7 @@ EFI_STATUS
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  Instance         This instance of the firmware volume to find.
                            The value 0 is the Boot Firmware Volume (BFV).
-  @param  VolumeHandle     On exit, points to the next volumn handle or NULL if it does not exist.
+  @param  VolumeHandle     On exit, points to the next volume handle or NULL if it does not exist.
 
   @retval EFI_SUCCESS           The volume was found.
   @retval EFI_NOT_FOUND         The volume was not found.
@@ -846,8 +845,8 @@ EFI_STATUS
 //
 // PEI Specification Revision information
 //
-#define PEI_SPECIFICATION_MAJOR_REVISION  1
-#define PEI_SPECIFICATION_MINOR_REVISION  70
+#define PEI_SPECIFICATION_MAJOR_REVISION  PI_SPECIFICATION_MAJOR_REVISION
+#define PEI_SPECIFICATION_MINOR_REVISION  PI_SPECIFICATION_MINOR_REVISION
 ///
 /// Specification inconsistency here:
 /// In the PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But
@@ -859,7 +858,7 @@ EFI_STATUS
 #define PEI_SERVICES_SIGNATURE  0x5652455320494550ULL
 ///
 /// Specification inconsistency here:
-/// In the PI1.0 specification, there is a typo error in PEI_SERVICES_REVISION. In the specification the defintion is
+/// In the PI1.0 specification, there is a typo error in PEI_SERVICES_REVISION. In the specification the definition is
 /// #define ((PEI_SPECIFICATION_MAJOR_REVISION<<16) |(PEI_SPECIFICATION_MINOR_REVISION))
 /// and it should be as follows:
 ///
@@ -1052,5 +1051,3 @@ VOID
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
   );
-
-#endif

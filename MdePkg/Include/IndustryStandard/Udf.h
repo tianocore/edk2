@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UDF_H__
-#define __UDF_H__
+#pragma once
 
 #define UDF_BEA_IDENTIFIER   "BEA01"
 #define UDF_NSR2_IDENTIFIER  "NSR02"
@@ -19,10 +18,13 @@
 #define UDF_VRS_START_OFFSET      ((UINT64)(16ULL << UDF_LOGICAL_SECTOR_SHIFT))
 
 typedef enum {
-  UdfPrimaryVolumeDescriptor          = 1,
-  UdfAnchorVolumeDescriptorPointer    = 2,
-  UdfVolumeDescriptorPointer          = 3,
-  UdfImplemenationUseVolumeDescriptor = 4,
+  UdfPrimaryVolumeDescriptor           = 1,
+  UdfAnchorVolumeDescriptorPointer     = 2,
+  UdfVolumeDescriptorPointer           = 3,
+  UdfImplementationUseVolumeDescriptor = 4,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  UdfImplemenationUseVolumeDescriptor = UdfImplementationUseVolumeDescriptor,
   UdfPartitionDescriptor              = 5,
   UdfLogicalVolumeDescriptor          = 6,
   UdfUnallocatedSpaceDescriptor       = 7,
@@ -137,5 +139,3 @@ typedef struct {
 } UDF_LOGICAL_VOLUME_DESCRIPTOR;
 
 #pragma pack()
-
-#endif

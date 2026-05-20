@@ -99,7 +99,7 @@ SetLocalApicBaseAddress (
 {
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
-  ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
+  ASSERT (IS_ALIGNED (BaseAddress, SIZE_4KB));
 
   if (!LocalApicBaseAddressMsrSupported ()) {
     //
@@ -656,7 +656,7 @@ ProgramVirtualWireMode (
   WriteLocalApicReg (XAPIC_LVT_LINT0_OFFSET, Lint.Uint32);
 
   //
-  // Program the LINT0 vector entry as NMI. Not masked, edge, active high.
+  // Program the LINT1 vector entry as NMI. Not masked, edge, active high.
   //
   Lint.Uint32                = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
   Lint.Bits.DeliveryMode     = LOCAL_APIC_DELIVERY_MODE_NMI;
@@ -724,7 +724,7 @@ GetApicTimerCurrentCount (
   @param DivideValue   The divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
                        If it is 0, then use the current divide value in the DCR.
   @param InitCount     The initial count value.
-  @param PeriodicMode  If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
+  @param PeriodicMode  If TRUE, timer mode is periodic. Othewise, timer mode is one-shot.
   @param Vector        The timer interrupt vector number.
 **/
 VOID
@@ -782,7 +782,7 @@ InitializeApicTimer (
   This function will ASSERT if the local APIC is not software enabled.
 
   @param DivideValue   Return the divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
-  @param PeriodicMode  Return the timer mode. If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
+  @param PeriodicMode  Return the timer mode. If TRUE, timer mode is periodic. Othewise, timer mode is one-shot.
   @param Vector        Return the timer interrupt vector number.
 **/
 VOID

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EDKII_NVME_PASS_THRU_PPI_H_
-#define _EDKII_NVME_PASS_THRU_PPI_H_
+#pragma once
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/NvmExpressPassthru.h>
@@ -151,5 +150,3 @@ struct _EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiNvmExpressPassThruPpiGuid;
-
-#endif

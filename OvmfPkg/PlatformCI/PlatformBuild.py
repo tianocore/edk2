@@ -32,9 +32,9 @@ class CommonPlatform():
         ArchCsv: csv string containing all architectures to build
         '''
         dsc = "OvmfPkg"
-        if "IA32" in ArchCsv.upper().split(","):
-            dsc += "Ia32"
-        if "X64" in ArchCsv.upper().split(","):
+        if ArchCsv.upper() == "IA32,X64":
+            dsc += "Ia32X64"
+        else:
             dsc += "X64"
         dsc += ".dsc"
         return dsc

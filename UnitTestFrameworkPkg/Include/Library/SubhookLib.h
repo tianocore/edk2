@@ -6,10 +6,7 @@
 
 **/
 
-#ifndef SUBHOOK_LIB_H_
-#define SUBHOOK_LIB_H_
+#pragma once
 
 #define SUBHOOK_STATIC
 #include <subhook.h>
-
-#endif

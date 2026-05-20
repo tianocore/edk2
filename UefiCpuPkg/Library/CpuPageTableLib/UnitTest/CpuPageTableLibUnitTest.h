@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef CPU_PAGE_TABLE_SUPPORT_H_
-#define CPU_PAGE_TABLE_SUPPORT_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,7 +102,7 @@ IsPageTableValid (
   );
 
 /**
-  Get max physical adrress supported by specific page mode
+  Get max physical address supported by specific page mode
 
   @param[in]  Mode           The paging mode.
 
@@ -113,5 +112,3 @@ UINT64
 GetMaxAddress (
   IN PAGING_MODE  Mode
   );
-
-#endif

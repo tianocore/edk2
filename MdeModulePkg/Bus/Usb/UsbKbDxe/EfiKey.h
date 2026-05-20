@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USB_KB_H_
-#define _EFI_USB_KB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -614,5 +613,3 @@ KeyNotifyProcessHandler (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
-
-#endif

@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _MEMORY_OVERWRITE_CONTROL_DATA_GUID_H_
-#define _MEMORY_OVERWRITE_CONTROL_DATA_GUID_H_
+#pragma once
 
 #define MEMORY_ONLY_RESET_CONTROL_GUID \
   { \
@@ -66,5 +65,3 @@
 #define MOR_DISABLE_AUTO_DETECT_VALUE(mor)  (((UINT8)(mor) & MOR_DISABLEAUTODETECT_BIT_MASK) >> MOR_DISABLEAUTODETECT_BIT_OFFSET)
 
 extern EFI_GUID  gEfiMemoryOverwriteControlDataGuid;
-
-#endif

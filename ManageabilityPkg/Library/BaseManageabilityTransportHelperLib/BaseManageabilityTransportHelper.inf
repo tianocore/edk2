@@ -1,0 +1,44 @@
+## @file
+# Null instance of Manageability Transport Helper Library
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = BaseManageabilityTransportHelper
+  MODULE_UNI_FILE                = BaseManageabilityTransportHelper.uni
+  FILE_GUID                      = 52F2DE11-A8FC-4A06-B8C6-10DCF4A7397C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ManageabilityTransportHelperLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  BaseManageabilityTransportHelper.c
+  BaseManageabilityTransportIpmiHelper.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+
+[Guids]
+  gManageabilityTransportKcsGuid
+  gManageabilityTransportSmbusI2cGuid
+  gManageabilityTransportPciVdmGuid
+  gManageabilityTransportSerialGuid
+  gManageabilityTransportMctpGuid
+  gManageabilityProtocolIpmiGuid
+  gManageabilityProtocolMctpGuid
+  gManageabilityProtocolPldmGuid
+

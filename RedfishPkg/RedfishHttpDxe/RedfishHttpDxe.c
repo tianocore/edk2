@@ -2,7 +2,8 @@
   RedfishHttpDxe produces EdkIIRedfishHttpProtocol
   for EDK2 Redfish Feature driver to do HTTP operations.
 
-  Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -255,18 +256,16 @@ ReportHttpError (
   //
   AsciiSPrint (ErrorMsg, sizeof (ErrorMsg), REDFISH_HTTP_ERROR_REPORT, HttpMethodToString (Method), (HttpStatusCode == NULL ? HTTP_STATUS_UNSUPPORTED_STATUS : *HttpStatusCode), Uri);
   DEBUG ((DEBUG_ERROR, "%a\n", ErrorMsg));
+
   //
-  // TODO:
-  // Below PI status code is approved by PIWG and wait for specification published.
-  // We will uncomment below report status code after PI status code get published.
-  // REF: https://bugzilla.tianocore.org/show_bug.cgi?id=4483
+  // Report this failure via status code and BMC has chance to capture the error.
   //
-  // REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
-  //  EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-  //  EFI_COMPUTING_UNIT_MANAGEABILITY | EFI_MANAGEABILITY_EC_REDFISH_COMMUNICATION_ERROR,
-  //  ErrorMsg,
-  //  AsciiStrSize (ErrorMsg)
-  //  );
+  REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+    EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+    EFI_COMPUTING_UNIT_MANAGEABILITY | EFI_MANAGEABILITY_EC_REDFISH_COMMUNICATION_ERROR,
+    ErrorMsg,
+    AsciiStrSize (ErrorMsg)
+    );
 }
 
 /**
@@ -401,7 +400,7 @@ RedfishCreateRedfishService (
 
       Status = Base64Encode (
                  (CONST UINT8 *)BasicAuthString,
-                 BasicAuthStrSize,
+                 AsciiStrLen (BasicAuthString),
                  EncodedAuthString,
                  &EncodedAuthStrSize
                  );
@@ -413,7 +412,7 @@ RedfishCreateRedfishService (
 
         Status = Base64Encode (
                    (CONST UINT8 *)BasicAuthString,
-                   BasicAuthStrSize,
+                   AsciiStrLen (BasicAuthString),
                    EncodedAuthString,
                    &EncodedAuthStrSize
                    );

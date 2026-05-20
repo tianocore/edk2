@@ -11,15 +11,36 @@
 #include <Library/BaseLib.h>
 #include <Library/CpuLib.h>
 #include <Register/LoongArch64/Csr.h>
+#include <Protocol/DebugSupport.h>
+#include "ExceptionCommon.h"
 
 #define RSIZE                 8           // 64 bit mode register size
 #define GP_REG_CONTEXT_SIZE   32 * RSIZE  // General-purpose registers size
 #define FP_REG_CONTEXT_SIZE   34 * RSIZE  // Floating-point registers size
 #define CSR_REG_CONTEXT_SIZE  9  * RSIZE  // CSR registers size
 
-ASM_GLOBAL ASM_PFX(ExceptionEntry)
 ASM_GLOBAL ASM_PFX(ExceptionEntryStart)
 ASM_GLOBAL ASM_PFX(ExceptionEntryEnd)
+ASM_GLOBAL ASM_PFX(PatchAbsAddressInException)
+
+//
+// This function must be called after the exception vector code copied.
+// It patchs the the exception vector address variable, which located at
+// the end of exception vector code.
+//
+// a0, CPU exception entry point (4K alignment)
+//
+ASM_PFX(PatchAbsAddressInException):
+  la.pcrel  $t0, ExceptionEntryStart
+  la.pcrel  $t1, ExceptionEntryAddress
+  la.pcrel  $t2, ExceptionEntry
+
+  sub.d     $t0, $t1, $t0 // Offset
+  add.d     $t0, $t0, $a0 // The location of ExceptionEntryAddress after copying the vector.
+  st.d      $t2, $t0, 0x0
+  dbar      0
+
+  jirl      $zero, $ra, 0
 
 ASM_PFX(ExceptionEntry):
   move    $s0, $a0
@@ -108,7 +129,7 @@ PopRegs:
   fld.d  $fs7, $sp, 31 * RSIZE
 
   ld.d        $t0, $sp, 32 * RSIZE
-  movgr2fcsr  $r0, $t0             // Pop the fcsr0 register.
+  movgr2fcsr  $fcsr0, $t0          // Pop the fcsr0 register.
 
   //
   // Pop the fcc0-fcc7 registers.
@@ -250,7 +271,7 @@ ASM_PFX(ExceptionEntryStart):
 
   csrrd   $t0, LOONGARCH_CSR_EUEN
   andi    $t0, $t0, CSR_EUEN_FPEN
-  beqz    $t0, PushRegDone
+  beqz    $t0, ExcVectorDispatcher
 
   fst.d  $fa0, $sp, 0 * RSIZE
   fst.d  $fa1, $sp, 1 * RSIZE
@@ -285,7 +306,7 @@ ASM_PFX(ExceptionEntryStart):
   fst.d  $fs6, $sp, 30 * RSIZE
   fst.d  $fs7, $sp, 31 * RSIZE
 
-  movfcsr2gr  $t3, $r0
+  movfcsr2gr  $t3, $fcsr0
   st.d        $t3, $sp, 32 * RSIZE  // Push the FCSR0 register.
 
   //
@@ -312,56 +333,140 @@ ASM_PFX(ExceptionEntryStart):
   // Push exception context down
   //
 
-PushRegDone:
-  //
-  // Process IPI only when mailbox3 is NULL and mailbox0 is no-NULL.
-  //
-  li.d      $t0, LOONGARCH_IOCSR_MBUF0
-  iocsrrd.d $a0, $t0
-  beqz      $a0, EntryConmmonHanlder
-
-  li.d      $t0, LOONGARCH_IOCSR_MBUF3
-  iocsrrd.d $t1, $t0
-  bnez      $t1, EntryConmmonHanlder
-
+ExcVectorDispatcher:
   csrrd     $t0, LOONGARCH_CSR_ESTAT
-  srli.d    $t0, $t0, 12
-  andi      $t0, $t0, 0x1
-  beqz      $t0, EntryConmmonHanlder
+  li.d      $t1, CSR_ESTAT_EXC
+  and       $t1, $t0, $t1
+  srli.d    $t1, $t1, CSR_ESTAT_EXC_SHIFT
+  beqz      $t1, IntVectorDispatcher // If Ecode is 0, it indicates that an interrupt has occurred.
+  b         EntryCommonHandler       // Currently, other exception should be handled using C code.
 
-  //
-  // Clean up current processor mailbox 0 and mailbox 3.
-  //
-  li.d      $t0, LOONGARCH_IOCSR_MBUF0
-  iocsrwr.d $zero, $t0
-  li.d      $t0, LOONGARCH_IOCSR_MBUF3
-  iocsrwr.d $zero, $t0
+IntVectorDispatcher:
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_TIMER
+  andi      $t1, $t1, BIT0
+  bnez      $t1, TimerVector
 
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IPI
+  andi      $t1, $t1, BIT0
+  bnez      $t1, IpiVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_PMC
+  andi      $t1, $t1, BIT0
+  bnez      $t1, PmcVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP7
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP6
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP5
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP4
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP3
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP2
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP1
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP0
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_SIP1
+  andi      $t1, $t1, BIT0
+  bnez      $t1, SwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_SIP0
+  andi      $t1, $t1, BIT0
+  bnez      $t1, SwIpVector
+
+  b         EntryCommonHandler // Never shouldn't be here, go to the C code to dump the context.
+
+TimerVector:
+PmcVector:
+HwIpVector:
+SwIpVector:
+  b         EntryCommonHandler // Timer, PMC, HWINT, SWINT should be handled using C code.
+
+IpiVector:
   //
-  // Clear IPI interrupt.
+  // Get the IPI vector.
   //
   li.d      $t0, LOONGARCH_IOCSR_IPI_STATUS
   iocsrrd.w $t1, $t0
+
+  //
+  // SMP_BOOT_CPU vector, fast path.
+  //
+  andi      $t1, $t1, SMP_BOOT_CPU
+  beqz      $t1, EntryCommonHandler
+
+  //
+  // Clear current IPI interrupt bit.
+  //
   li.d      $t0, LOONGARCH_IOCSR_IPI_CLEAR
   iocsrwr.w $t1, $t0
 
   //
-  // Only kernel stage BSP calls IPI without parameters. Clean up the PIE and make sure
-  // global interrupts are turned off for the current processor when jumping to the kernel.
+  // Get the resume vector.
+  //
+TryReadResumeVector:
+  li.d      $t0, LOONGARCH_IOCSR_MBUF0
+  iocsrrd.w $a0, $t0
+  bnez      $a0, ReadRealResumeVector
+  b         TryReadResumeVector
+ReadRealResumeVector:
+  iocsrrd.d $a0, $t0
+
+  //
+  // Clean up current processor mailbox 0.
+  //
+  li.d      $t0, LOONGARCH_IOCSR_MBUF0
+  iocsrwr.d $zero, $t0
+
+  //
+  // The SMP_BOOT_CPU vector should never be returned. Clean up the PIE and ensure that
+  // global interrupts are turned off for the current processor for handover.
   //
   csrwr     $a0, LOONGARCH_CSR_ERA         // Update ERA
   li.w      $t0, BIT2                      // IE
   csrxchg   $zero, $t0, LOONGARCH_CSR_PRMD // Clean PIE
 
   //
-  // Return this exception and jump to kernel using ERA.
+  // Use ERA to jump to next stage.
   //
   ertn
 
-EntryConmmonHanlder:
-  addi.d  $sp, $sp, -(GP_REG_CONTEXT_SIZE + CSR_REG_CONTEXT_SIZE)
-  move    $a0, $sp
-  la.abs  $ra, ExceptionEntry
+  //
+  // End of IpiVector fast path.
+  //
+
+EntryCommonHandler:
+  addi.d   $sp, $sp, -(GP_REG_CONTEXT_SIZE + CSR_REG_CONTEXT_SIZE)
+  move     $a0, $sp
+  la.pcrel $t0, ExceptionEntryAddress
+  ld.d     $ra, $t0, 0x0
+
   jirl    $zero, $ra, 0
+
+  //
+  // The following address require patching the runtime address after code copying.
+  //
+ExceptionEntryAddress:
+  .dword  0x0
 ASM_PFX(ExceptionEntryEnd):
 .end

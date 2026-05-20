@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __SMM_VARIABLE_H__
-#define __SMM_VARIABLE_H__
+#pragma once
 
 #define EFI_SMM_VARIABLE_PROTOCOL_GUID \
   { \
@@ -29,5 +28,3 @@ struct _EFI_SMM_VARIABLE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmmVariableProtocolGuid;
-
-#endif

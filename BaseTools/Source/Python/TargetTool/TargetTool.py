@@ -46,7 +46,6 @@ class TargetTool():
             return self.ConvertTextFileToDict(filename, '#', '=')
         else:
             raise ParseError('LoadTargetTxtFile() : No Target.txt file exists.')
-            return 1
 
 #
 # Convert a text file to a dictionary
@@ -199,7 +198,7 @@ def RangeCheckCallback(option, opt_str, value, parser):
 def MyOptionParser():
     parser = OptionParser(version=__version__, prog="TargetTool.exe", usage=__usage__, description=__copyright__)
     parser.add_option("-a", "--arch", action="append", dest="TARGET_ARCH",
-        help="ARCHS is one of list: IA32, X64, ARM, AARCH64 or EBC, which replaces target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option. 0 will clear this setting in target.txt and can't combine with other value.")
+        help="ARCHS is one of list: IA32, X64, AARCH64 or EBC, which replaces target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option. 0 will clear this setting in target.txt and can't combine with other value.")
     parser.add_option("-p", "--platform", action="callback", type="string", dest="DSCFILE", callback=SingleCheckCallback,
         help="Specify a DSC file, which replace target.txt's ACTIVE_PLATFORM definition. 0 will clear this setting in target.txt and can't combine with other value.")
     parser.add_option("-c", "--tooldef", action="callback", type="string", dest="TOOL_DEFINITION_FILE", callback=SingleCheckCallback,

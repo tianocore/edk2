@@ -27,9 +27,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 
 #include "FwBlockService.h"
 #include "QemuFlash.h"
@@ -976,7 +974,6 @@ FvbInitialize (
   EFI_PHYSICAL_ADDRESS        BaseAddress;
   UINTN                       Length;
   UINTN                       NumOfBlocks;
-  RETURN_STATUS               PcdStatus;
 
   if (EFI_ERROR (QemuFlashInitialize ())) {
     //
@@ -1129,7 +1126,8 @@ FvbInitialize (
   //
   InstallVirtualAddressChangeHandler ();
 
-  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
+  // Abstract dynamic PCD set to support Standalone MM
+  UpdateQemuFlashVariablesEnable ();
+
   return EFI_SUCCESS;
 }

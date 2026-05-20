@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PERFORMANCE_DATA_H__
-#define __PERFORMANCE_DATA_H__
+#pragma once
 
 #define PERFORMANCE_PROPERTY_REVISION  0x1
 
@@ -332,5 +331,3 @@ extern EFI_GUID  gPerformanceProtocolGuid;
 extern EFI_GUID  gSmmPerformanceProtocolGuid;
 extern EFI_GUID  gPerformanceExProtocolGuid;
 extern EFI_GUID  gSmmPerformanceExProtocolGuid;
-
-#endif

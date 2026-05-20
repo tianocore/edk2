@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUG_SUPPORT_H__
-#define __DEBUG_SUPPORT_H__
+#pragma once
 
 #include <IndustryStandard/PeImage.h>
 
@@ -680,23 +679,23 @@ typedef struct {
   UINT32    STVAL;
 } EFI_SYSTEM_CONTEXT_RISCV64;
 
-//
-// LoongArch processor exception types.
-//
-// The exception types is located in the CSR ESTAT
-// register offset 16 bits, width 6 bits.
-//
-// If you want to register an exception hook, you can
-// shfit the number left by 16 bits, and the exception
-// handler will know the types.
-//
-// For example:
-// mCpu->CpuRegisterInterruptHandler (
-//         mCpu,
-//         (EXCEPT_LOONGARCH_PPI << CSR_ESTAT_EXC_SHIFT),
-//         PpiExceptionHandler
-//         );
-//
+///
+/// LoongArch processor exception types.
+///
+/// The exception types is located in the CSR ESTAT
+/// register offset 16 bits, width 6 bits.
+///
+/// If you want to register an exception hook, you can
+/// shift the number left by 16 bits, and the exception
+/// handler will know the types.
+///
+/// For example:
+/// mCpu->CpuRegisterInterruptHandler (
+///         mCpu,
+///         (EXCEPT_LOONGARCH_PPI << CSR_ESTAT_EXC_SHIFT),
+///         PpiExceptionHandler
+///         );
+///
 #define EXCEPT_LOONGARCH_INT   0
 #define EXCEPT_LOONGARCH_PIL   1
 #define EXCEPT_LOONGARCH_PIS   2
@@ -716,11 +715,22 @@ typedef struct {
 #define EXCEPT_LOONGARCH_SXD   16
 #define EXCEPT_LOONGARCH_ASXD  17
 #define EXCEPT_LOONGARCH_FPE   18
-#define EXCEPT_LOONGARCH_TBR   64 // For code only, there is no such type in the ISA spec, the TLB refill is defined for an independent exception.
+#define EXCEPT_LOONGARCH_WPE   19
+#define EXCEPT_LOONGARCH_BTD   20
+#define EXCEPT_LOONGARCH_BTE   21
+#define EXCEPT_LOONGARCH_GSPR  22
+#define EXCEPT_LOONGARCH_HVC   23
+#define EXCEPT_LOONGARCH_GCXC  24
 
-//
-// LoongArch processor Interrupt types.
-//
+///
+/// For coding convenience, define the maximum valid
+/// LoongArch exception.
+///
+#define MAX_LOONGARCH_EXCEPTION  64
+
+///
+/// LoongArch processor Interrupt types.
+///
 #define EXCEPT_LOONGARCH_INT_SIP0   0
 #define EXCEPT_LOONGARCH_INT_SIP1   1
 #define EXCEPT_LOONGARCH_INT_IP0    2
@@ -735,11 +745,11 @@ typedef struct {
 #define EXCEPT_LOONGARCH_INT_TIMER  11
 #define EXCEPT_LOONGARCH_INT_IPI    12
 
-//
-// For coding convenience, define the maximum valid
-// LoongArch interrupt.
-//
-#define MAX_LOONGARCH_INTERRUPT  14
+///
+/// For coding convenience, define the maximum valid
+/// LoongArch interrupt.
+///
+#define MAX_LOONGARCH_INTERRUPT  16
 
 typedef struct {
   UINT64    R0;
@@ -838,7 +848,6 @@ typedef enum {
   IsaX64     = IMAGE_FILE_MACHINE_X64,            ///< 0x8664
   IsaIpf     = IMAGE_FILE_MACHINE_IA64,           ///< 0x0200
   IsaEbc     = IMAGE_FILE_MACHINE_EBC,            ///< 0x0EBC
-  IsaArm     = IMAGE_FILE_MACHINE_ARMTHUMB_MIXED, ///< 0x01c2
   IsaAArch64 = IMAGE_FILE_MACHINE_ARM64           ///< 0xAA64
 } EFI_INSTRUCTION_SET_ARCHITECTURE;
 
@@ -951,5 +960,3 @@ struct _EFI_DEBUG_SUPPORT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDebugSupportProtocolGuid;
-
-#endif

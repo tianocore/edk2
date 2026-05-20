@@ -163,18 +163,6 @@ GetFirstNonAddress (
   FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
 
   //
-  // If DXE is 32-bit, then we're done; PciBusDxe will degrade 64-bit MMIO
-  // resources to 32-bit anyway. See DegradeResource() in
-  // "PciResourceSupport.c".
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return FirstNonAddress;
-  }
-
- #endif
-
-  //
   // Otherwise, in order to calculate the highest address plus one, we must
   // consider the 64-bit PCI host aperture too. Fetch the default size.
   //
@@ -296,16 +284,6 @@ GetPeiMemoryCap (
   UINT32   Pml4Entries;
   UINT32   PdpEntries;
   UINTN    TotalPages;
-
-  //
-  // If DXE is 32-bit, then just return the traditional 64 MB cap.
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return SIZE_64MB;
-  }
-
- #endif
 
   //
   // Dependent on physical address width, PEI memory allocations can be

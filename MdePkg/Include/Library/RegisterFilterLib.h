@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef REGISTER_FILTER_LIB_H_
-#define REGISTER_FILTER_LIB_H_
+#pragma once
 
 typedef enum {
   FilterWidth8,
@@ -58,7 +57,7 @@ FilterAfterIoRead (
   );
 
 /**
-  Filter IO Write operation before wirte IO port.
+  Filter IO Write operation before write IO port.
   It is used to filter IO operation.
 
   It will return the flag to decide whether require read write IO port.
@@ -81,7 +80,7 @@ FilterBeforeIoWrite (
   );
 
 /**
-Trace IO Write operation after wirte IO port.
+Trace IO Write operation after write IO port.
 It is used to trace IO operation.
 
 @param[in]       Width    Signifies the width of the I/O operation.
@@ -138,7 +137,7 @@ FilterAfterMmIoRead (
 /**
   Filter memory IO before write operation
 
-  It will return the flag to decide whether require wirte real MMIO.
+  It will return the flag to decide whether require write real MMIO.
   It can be used for emulation environment.
 
   @param[in]       Width    Signifies the width of the memory I/O operation.
@@ -240,5 +239,3 @@ FilterAfterMsrWrite (
   IN UINT32  Index,
   IN UINT64  *Value
   );
-
-#endif // REGISTER_FILTER_LIB_H_

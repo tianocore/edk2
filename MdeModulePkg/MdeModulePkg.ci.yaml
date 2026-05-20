@@ -85,6 +85,7 @@
             "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
             "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
             "gEfiPeiMmCommunicationPpiGuid=gEfiPeiSmmCommunicationPpiGuid",
+            "gUiAppFileGuid=UiApp",
         ]
     },
 

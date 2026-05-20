@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_ROUTE_H__
-#define __EFI_IP4_ROUTE_H__
+#pragma once
 
 #include "Ip4Common.h"
 
@@ -222,5 +221,3 @@ EFI_STATUS
 Ip4BuildEfiRouteTable (
   IN IP4_PROTOCOL  *IpInstance
   );
-
-#endif

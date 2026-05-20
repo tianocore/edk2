@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_DNS_H__
-#define __EFI_HTTP_DNS_H__
+#pragma once
 
 /**
   Retrieve the host address using the EFI_DNS4_PROTOCOL.
@@ -48,5 +47,3 @@ HttpDns6 (
   IN     CHAR16         *HostName,
   OUT EFI_IPv6_ADDRESS  *IpAddress
   );
-
-#endif

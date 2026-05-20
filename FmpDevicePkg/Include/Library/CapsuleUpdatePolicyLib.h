@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __CAPSULE_UPDATE_POLICY_LIB__
-#define __CAPSULE_UPDATE_POLICY_LIB__
+#pragma once
 
 /**
   Determine if the system power state supports a capsule update.
@@ -99,5 +98,3 @@ EFIAPI
 IsLockFmpDeviceAtLockEventGuidRequired (
   VOID
   );
-
-#endif

@@ -1,5 +1,5 @@
 /** @file
-  This file contains the boot script defintions that are shared between the
+  This file contains the boot script definitions that are shared between the
   Boot Script Executor PPI and the Boot Script Save Protocol.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PI_S3_BOOT_SCRIPT_H_
-#define _PI_S3_BOOT_SCRIPT_H_
+#pragma once
 
 // *******************************************
 // EFI Boot Script Opcode definitions
@@ -49,5 +48,3 @@ typedef enum {
   EfiBootScriptWidthFillUint64,
   EfiBootScriptWidthMaximum
 } EFI_BOOT_SCRIPT_WIDTH;
-
-#endif

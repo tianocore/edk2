@@ -197,6 +197,65 @@ ScsiDiskDriverBindingSupported (
 }
 
 /**
+ Check whether the SCSI disk is write protected.
+
+ @param[in]  ScsiDiskDevice         The SCSI disk device.
+ @param[out] WriteProtectionEnabled A pointer to a Boolean that will be set to TRUE if the disk is write protected,
+                                    FALSE otherwise.
+
+ @retval EFI_SUCCESS                The operation completed successfully.
+ @retval other                      An error occurred while executing the SCSI command.
+ */
+STATIC
+EFI_STATUS
+IsWriteProtected (
+  IN OUT SCSI_DISK_DEV  *ScsiDiskDevice,
+  OUT BOOLEAN           *WriteProtectionEnabled
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET  CommandPacket;
+  UINT8                            Cdb[6];
+  UINT8                            DataBuffer[64];
+
+  if ((ScsiDiskDevice == NULL) || (ScsiDiskDevice->ScsiIo == NULL) || (WriteProtectionEnabled == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Initialize SCSI REQUEST_PACKET and 6-byte Cdb
+  //
+  ZeroMem (&CommandPacket, sizeof (CommandPacket));
+  ZeroMem (Cdb, sizeof (Cdb));
+
+  // Initialize output parameter to default value
+  *WriteProtectionEnabled = FALSE;
+
+  Cdb[0] = ATA_CMD_MODE_SENSE6;
+  Cdb[1] = BIT3;                         // Setting the bit for Disable Block Descriptor
+  Cdb[2] = ATA_PAGE_CODE_RETURN_ALL_PAGES;
+  Cdb[4] = sizeof (DataBuffer);
+
+  CommandPacket.Timeout          = SCSI_DISK_TIMEOUT;
+  CommandPacket.Cdb              = Cdb;
+  CommandPacket.CdbLength        = (UINT8)sizeof (Cdb);
+  CommandPacket.InDataBuffer     = &DataBuffer;
+  CommandPacket.InTransferLength = sizeof (DataBuffer);
+
+  Status = ScsiDiskDevice->ScsiIo->ExecuteScsiCommand (ScsiDiskDevice->ScsiIo, &CommandPacket, NULL);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Mode Sense 6 Byte Command returns the Write Protection status in the 3rd byte
+  // Bit 7 of the 3rd byte indicates the Write Protection status
+  // See SCSI Block Commands - 3 section 6.3.1 and SCSI-2 Spec, 8.3.3.
+  *WriteProtectionEnabled = (DataBuffer[2] & BIT7) != 0;
+  return EFI_SUCCESS;
+}
+
+/**
   Start this driver on ControllerHandle.
 
   This service is called by the EFI boot service ConnectController(). In order
@@ -234,6 +293,7 @@ ScsiDiskDriverBindingStart (
   CHAR8                 VendorStr[VENDOR_IDENTIFICATION_LENGTH + 1];
   CHAR8                 ProductStr[PRODUCT_IDENTIFICATION_LENGTH + 1];
   CHAR16                DeviceStr[VENDOR_IDENTIFICATION_LENGTH + PRODUCT_IDENTIFICATION_LENGTH + 2];
+  BOOLEAN               WriteProtectionEnabled = FALSE;
 
   MustReadCapacity = TRUE;
 
@@ -277,6 +337,7 @@ ScsiDiskDriverBindingStart (
   ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt           = 1;
   ScsiDiskDevice->BlockLimitsVpdSupported           = FALSE;
   ScsiDiskDevice->Handle                            = Controller;
+  ScsiDiskDevice->FuaMode                           = TRUE;
   InitializeListHead (&ScsiDiskDevice->AsyncTaskQueue);
 
   ScsiIo->GetDeviceType (ScsiIo, &(ScsiDiskDevice->DeviceType));
@@ -295,6 +356,17 @@ ScsiDiskDriverBindingStart (
     case EFI_SCSI_TYPE_WLUN:
       MustReadCapacity = FALSE;
       break;
+  }
+
+  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+    Status = IsWriteProtected (ScsiDiskDevice, &WriteProtectionEnabled);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "ScsiDisk: IsWriteProtected() fails. Status = %r\n", Status));
+    }
+
+    if (WriteProtectionEnabled) {
+      ScsiDiskDevice->BlkIo.Media->ReadOnly = TRUE;
+    }
   }
 
   //
@@ -2466,6 +2538,18 @@ ScsiDiskDetectMedia (
     }
   }
 
+  //
+  // Get FUA Mode
+  //
+  for (Retry = 0; Retry < MaxRetry; Retry++) {
+    if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+      Status = ScsiDiskFuaMode (ScsiDiskDevice);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+    }
+  }
+
   if (ScsiDiskDevice->BlkIo.Media->MediaId != OldMedia.MediaId) {
     //
     // Media change information got from the device
@@ -2535,8 +2619,8 @@ ScsiDiskInquiryDevice (
   EFI_SCSI_SENSE_DATA                    *SenseDataArray;
   UINTN                                  NumberOfSenseKeys;
   EFI_STATUS                             Status;
-  UINT8                                  MaxRetry;
-  UINT8                                  Index;
+  UINTN                                  MaxRetry;
+  UINTN                                  Index;
   EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE  *SupportedVpdPages;
   EFI_SCSI_BLOCK_LIMITS_VPD_PAGE         *BlockLimits;
   UINTN                                  PageLength;
@@ -4329,6 +4413,95 @@ BackOff:
 }
 
 /**
+  Get FUA Mode for the storage.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+
+  @return  EFI_STATUS is returned by calling ScsiDiskFuaMode().
+**/
+EFI_STATUS
+ScsiDiskFuaMode (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
+  )
+{
+  UINT8       HostAdapterStatus;
+  UINT8       TargetStatus;
+  UINT8       SenseDataLength;
+  UINT8       Buffer[CACHE_MODE_PAGE_LEN];
+  UINT32      BufferLength;
+  EFI_STATUS  ReturnStatus;
+  BOOLEAN     DpoFua;
+  BOOLEAN     WriteCaching;
+
+  SenseDataLength = 0;
+  BufferLength    = CACHE_MODE_PAGE_LEN;
+  DpoFua          = TRUE;
+  WriteCaching    = TRUE;
+  //
+  // Execute Mode Sense Command here to get the support of FUA
+  // through Mode page. FUA support locates in Mode parameter
+  // header that can be gotten through any Mode page.
+  // Here, Caching Mode Page (08) is used.
+  //
+  ReturnStatus = ScsiModeSense10Command (
+                   ScsiDiskDevice->ScsiIo,
+                   SCSI_DISK_TIMEOUT,
+                   NULL,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   Buffer,
+                   &BufferLength,
+                   1,                      // Not return any block descriptors
+                   0x10,                   // Default threshold values
+                   0x08                    // Caching Mode Page (08h)
+                   );
+  if (ReturnStatus != EFI_SUCCESS) {
+    //
+    // Mode Sense Command fails
+    //
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Page code locates at the byte 8(bit0 to bit5),
+  // byte 0 after the 8 bytes Mode parameter header(10).
+  //
+  if ((Buffer[8] & 0x08) != 0x08) {
+    //
+    // Return page is not right
+    //
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // DPOFUA locates at the byte 3(bit4) in
+  // the Mode parameter header(10).
+  //
+  if ((Buffer[3] & 0x10) == 0x00) {
+    //
+    // 'DPOFUA' is disabled
+    //
+    DpoFua = FALSE;
+  }
+
+  //
+  // Caching Mode locates at the byte 10(bit2),
+  // byte 2 after the 8 bytes Mode parameter header(10).
+  //
+  if ((Buffer[10] & 0x04) == 0x00) {
+    //
+    // 'write through' cache is enabled.
+    //
+    WriteCaching = FALSE;
+  }
+
+  ScsiDiskDevice->FuaMode = DpoFua || WriteCaching;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Submit Write(10) Command.
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
@@ -4382,7 +4555,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      ScsiDiskDevice->FuaMode
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4629,7 +4803,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      ScsiDiskDevice->FuaMode
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -5851,27 +6026,15 @@ DetermineInstallBlockIo (
   IN  EFI_HANDLE  ChildHandle
   )
 {
-  EFI_SCSI_PASS_THRU_PROTOCOL      *ScsiPassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *ExtScsiPassThru;
 
   //
-  // Firstly, check if ExtScsiPassThru Protocol parent handle exists. If existence,
+  // Check if ExtScsiPassThru Protocol parent handle exists. If it does,
   // check its attribute, logic or physical.
   //
   ExtScsiPassThru = (EFI_EXT_SCSI_PASS_THRU_PROTOCOL *)GetParentProtocol (&gEfiExtScsiPassThruProtocolGuid, ChildHandle);
   if (ExtScsiPassThru != NULL) {
-    if ((ExtScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
-      return TRUE;
-    }
-  }
-
-  //
-  // Secondly, check if ScsiPassThru Protocol parent handle exists. If existence,
-  // check its attribute, logic or physical.
-  //
-  ScsiPassThru = (EFI_SCSI_PASS_THRU_PROTOCOL *)GetParentProtocol (&gEfiScsiPassThruProtocolGuid, ChildHandle);
-  if (ScsiPassThru != NULL) {
-    if ((ScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
+    if ((ExtScsiPassThru->Mode->Attributes & EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
       return TRUE;
     }
   }

@@ -49,9 +49,6 @@ def GetTypedefFuncPointerPattern():
 def GetDB():
     return EccGlobalData.gDb
 
-def GetConfig():
-    return EccGlobalData.gConfig
-
 def PrintErrorMsg(ErrorType, Msg, TableName, ItemId):
     Msg = Msg.replace('\n', '').replace('\r', '')
     MsgPartList = Msg.split()
@@ -480,18 +477,6 @@ def GetFunctionList():
         FuncObjList.append(FuncObj)
 
     return FuncObjList
-
-def GetFileModificationTimeFromDB(FullFileName):
-    TimeValue = 0.0
-    Db = GetDB()
-    SqlStatement = """ select TimeStamp
-                       from File
-                       where FullPath = \'%s\'
-                   """ % (FullFileName)
-    ResultSet = Db.TblFile.Exec(SqlStatement)
-    for Result in ResultSet:
-        TimeValue = Result[0]
-    return TimeValue
 
 def CollectSourceCodeDataIntoDB(RootDir):
     FileObjList = []
@@ -2182,44 +2167,6 @@ def CheckHeaderFileData(FullFileName, AllTypedefFun=[]):
 
     return ErrorMsgList
 
-def CheckHeaderFileIfndef(FullFileName):
-    ErrorMsgList = []
-
-    FileID = GetTableID(FullFileName, ErrorMsgList)
-    if FileID < 0:
-        return ErrorMsgList
-
-    Db = GetDB()
-    FileTable = 'Identifier' + str(FileID)
-    SqlStatement = """ select Value, StartLine
-                       from %s
-                       where Model = %d order by StartLine
-                   """ % (FileTable, DataClass.MODEL_IDENTIFIER_MACRO_IFNDEF)
-    ResultSet = Db.TblFile.Exec(SqlStatement)
-    if len(ResultSet) == 0:
-        PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_1, '', 'File', FileID)
-        return ErrorMsgList
-    for Result in ResultSet:
-        SqlStatement = """ select Value, EndLine
-                       from %s
-                       where EndLine < %d
-                   """ % (FileTable, Result[1])
-        ResultSet = Db.TblFile.Exec(SqlStatement)
-        for Result in ResultSet:
-            if not Result[0].startswith('/*') and not Result[0].startswith('//'):
-                PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_2, '', 'File', FileID)
-        break
-
-    SqlStatement = """ select Value
-                       from %s
-                       where StartLine > (select max(EndLine) from %s where Model = %d)
-                   """ % (FileTable, FileTable, DataClass.MODEL_IDENTIFIER_MACRO_ENDIF)
-    ResultSet = Db.TblFile.Exec(SqlStatement)
-    for Result in ResultSet:
-        if not Result[0].startswith('/*') and not Result[0].startswith('//'):
-            PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_3, '', 'File', FileID)
-    return ErrorMsgList
-
 def CheckDoxygenCommand(FullFileName):
     ErrorMsgList = []
 
@@ -2235,7 +2182,7 @@ def CheckDoxygenCommand(FullFileName):
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT, DataClass.MODEL_IDENTIFIER_FUNCTION_HEADER)
     ResultSet = Db.TblFile.Exec(SqlStatement)
     DoxygenCommandList = ['bug', 'todo', 'example', 'file', 'attention', 'param', 'post', 'pre', 'retval',
-                          'return', 'sa', 'since', 'test', 'note', 'par', 'endcode', 'code']
+                          'return', 'sa', 'since', 'test', 'note', 'par', 'endcode', 'code', 'endverbatim', 'verbatim']
     for Result in ResultSet:
         CommentStr = Result[0]
         CommentPartList = CommentStr.split()

@@ -65,7 +65,10 @@ def DeleteFfs(inputfile: str, TargetFfs_name: str, outputfile: str, Fv_name: str
     if Fv_name:
         FindNum = len(FmmtParser.WholeFvTree.Findlist)
         for index in range(FindNum-1, -1, -1):
-            if FmmtParser.WholeFvTree.Findlist[index].Parent.key != Fv_name and FmmtParser.WholeFvTree.Findlist[index].Parent.Data.Name != Fv_name:
+            parent = FmmtParser.WholeFvTree.Findlist[index].Parent
+            if parent is None or parent.Data is None:
+                continue
+            if parent.key != Fv_name and parent.Data.Name != Fv_name:
                 FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     Status = False
     if FmmtParser.WholeFvTree.Findlist != []:
@@ -152,7 +155,10 @@ def ReplaceFfs(inputfile: str, Ffs_name: str, newffsfile: str, outputfile: str, 
     if Fv_name:
         FindNum = len(FmmtParser.WholeFvTree.Findlist)
         for index in range(FindNum-1, -1, -1):
-            if FmmtParser.WholeFvTree.Findlist[index].Parent.key != Fv_name and FmmtParser.WholeFvTree.Findlist[index].Parent.Data.Name != Fv_name:
+            parent = FmmtParser.WholeFvTree.Findlist[index].Parent
+            if parent is None or parent.Data is None:
+                continue
+            if parent.key != Fv_name and parent.Data.Name != Fv_name:
                 FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     if FmmtParser.WholeFvTree.Findlist != []:
         for TargetFfs in FmmtParser.WholeFvTree.Findlist:
@@ -184,7 +190,10 @@ def ExtractFfs(inputfile: str, Ffs_name: str, outputfile: str, Fv_name: str=None
     if Fv_name:
         FindNum = len(FmmtParser.WholeFvTree.Findlist)
         for index in range(FindNum-1, -1, -1):
-            if FmmtParser.WholeFvTree.Findlist[index].Parent.key != Fv_name and FmmtParser.WholeFvTree.Findlist[index].Parent.Data.Name != Fv_name:
+            parent = FmmtParser.WholeFvTree.Findlist[index].Parent
+            if parent is None or parent.Data is None:
+                continue
+            if parent.key != Fv_name and parent.Data.Name != Fv_name:
                 FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     if FmmtParser.WholeFvTree.Findlist != []:
         TargetNode = FmmtParser.WholeFvTree.Findlist[0]

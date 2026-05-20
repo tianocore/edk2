@@ -6,6 +6,7 @@
 Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2025 Qualcomm Technologies, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -106,6 +107,10 @@ XhcCmdTransfer (
     Status = EFI_SUCCESS;
   }
 
+  //
+  // Do not free URB data, since `XhcCreateCmdTrb` does not allocate any data
+  // and the `Data` field is not used in command transfers.
+  //
   XhcFreeUrb (Xhc, Urb);
 
 ON_EXIT:
@@ -183,6 +188,9 @@ XhcCreateUrb (
 
 /**
   Free an allocated URB.
+  The `Data` field of the URB is not owned by the URB and is not freed here.
+  The caller is which allocates `Data` is responsible for freeing it.
+  Freeing `Data` must be done AFTER calling `XhcFreeUrb`, since this function may unmap the `DataMap` field.
 
   @param  Xhc                   The XHCI device.
   @param  Urb                   The URB to free.
@@ -1387,6 +1395,7 @@ XhciDelAsyncIntTransfer (
   LIST_ENTRY              *Entry;
   LIST_ENTRY              *Next;
   URB                     *Urb;
+  VOID                    *UrbData;
   EFI_USB_DATA_DIRECTION  Direction;
   EFI_STATUS              Status;
 
@@ -1411,8 +1420,16 @@ XhciDelAsyncIntTransfer (
       }
 
       RemoveEntryList (&Urb->UrbList);
-      FreePool (Urb->Data);
+      //
+      // For `XhciDelAsyncIntTransfer`, the URB is created through `XhciInsertAsyncIntTransfer`
+      // and allocates and manages its own data buffer, so free it here.
+      //
+      UrbData = Urb->Data;
       XhcFreeUrb (Xhc, Urb);
+      if (UrbData != NULL) {
+        FreePool (UrbData);
+      }
+
       return EFI_SUCCESS;
     }
   }
@@ -1434,6 +1451,7 @@ XhciDelAllAsyncIntTransfers (
   LIST_ENTRY  *Entry;
   LIST_ENTRY  *Next;
   URB         *Urb;
+  VOID        *UrbData;
   EFI_STATUS  Status;
 
   BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
@@ -1449,8 +1467,15 @@ XhciDelAllAsyncIntTransfers (
     }
 
     RemoveEntryList (&Urb->UrbList);
-    FreePool (Urb->Data);
+    //
+    // For `XhciDelAllAsyncIntTransfers`, the URB is created through `XhciInsertAsyncIntTransfer`
+    // and allocates and manages its own data buffer, so free it here.
+    //
+    UrbData = Urb->Data;
     XhcFreeUrb (Xhc, Urb);
+    if (UrbData != NULL) {
+      FreePool (UrbData);
+    }
   }
 }
 
@@ -1630,6 +1655,17 @@ XhcMonitorAsyncRequests (
   Xhc = (USB_XHCI_INSTANCE *)Context;
 
   BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+    //
+    // Save values passed into the callback.
+    // `XhcUpdateAsyncRequest` must be called before the callback
+    // since the callback may free the URB, leading to a fault.
+    // However, the callback depends on values of the URB *before*
+    // `XhcUpdateAsyncRequest` is called, so we must save a copy.
+    //
+    UINTN   cbCompleted;
+    UINT32  cbResult;
+    VOID    *cbContext;
+
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     //
@@ -1682,6 +1718,19 @@ XhcMonitorAsyncRequests (
     }
 
     //
+    // Store values of URB before `XhcUpdateAsyncRequest`, since the callback depends on these values.
+    //
+    cbCompleted = Urb->Completed;
+    cbResult    = Urb->Result;
+    cbContext   = Urb->Context;
+
+    //
+    // The update call must occur before the callback since the callback
+    // may remove and free the URB, leading to a fault.
+    //
+    XhcUpdateAsyncRequest (Xhc, Urb);
+
+    //
     // Leave error recovery to its related device driver. A
     // common case of the error recovery is to re-submit the
     // interrupt transfer which is linked to the head of the
@@ -1693,19 +1742,17 @@ XhcMonitorAsyncRequests (
     //
     if (Urb->Callback != NULL) {
       //
-      // Restore the old TPL, USB bus maybe connect device in
-      // his callback. Some drivers may has a lower TPL restriction.
+      // Restore the previous TPL. The USB bus may connect a device in its callback,
+      // and some drivers require a lower TPL to run correctly.
       //
       gBS->RestoreTPL (OldTpl);
-      (Urb->Callback)(ProcBuf, Urb->Completed, Urb->Context, Urb->Result);
+      (Urb->Callback)(ProcBuf, cbCompleted, cbContext, cbResult);
       OldTpl = gBS->RaiseTPL (XHC_TPL);
     }
 
     if (ProcBuf != NULL) {
       gBS->FreePool (ProcBuf);
     }
-
-    XhcUpdateAsyncRequest (Xhc, Urb);
   }
   gBS->RestoreTPL (OldTpl);
 }
@@ -2809,6 +2856,60 @@ XhcDisableSlotCmd64 (
 }
 
 /**
+  Get the bInterval from descriptor and calculate the value to be used to initialize
+  the interval field of the endpoint context.
+
+  Refer to XHCI 1.1 spec section 6.2.3.6, tables 61 & 65
+
+  @param EpType       The endpoint type (only USB_ENDPOINT_ISO or USB_ENDPOINT_INTERRUPT).
+  @param DeviceSpeed  The connected device's speed.
+  @param Interval     The interval value from the descriptor.
+
+  @retval The calculated interval value to be applied to the endpoint context.
+
+**/
+static UINT8
+CalculateInterval (
+  UINT8  EpType,
+  UINT8  DeviceSpeed,
+  UINT8  Interval
+  )
+{
+  UINT8  OriginalInterval = Interval;
+
+  if ((EpType == USB_ENDPOINT_ISO) && (DeviceSpeed == EFI_USB_SPEED_FULL)) {
+    ASSERT (Interval >= 1 && Interval <= 16);
+    Interval = Interval + 2;
+  } else if ((EpType == USB_ENDPOINT_INTERRUPT) && ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW))) {
+    ASSERT (Interval != 0);
+    Interval = (UINT8)HighBitSet32 ((UINT32)Interval) + 3;
+  } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
+    ASSERT (Interval != 0);
+
+    //
+    // Some devices incorrectly report full-speed bInterval values in
+    // their high/super-speed interrupt endpoint descriptors.  Try to
+    // adjust those assuming they were expressed in units of ms with an
+    // upper limit of 128ms.
+    //
+    if (Interval > 16) {
+      Interval = (UINT8)HighBitSet32 ((UINT32)Interval*8);
+
+      DEBUG ((
+        DEBUG_WARN,
+        "EpDesc->Interval (%u) out of range. Adjusted to %u\n",
+        OriginalInterval,
+        Interval
+        ));
+    } else {
+      Interval = Interval - 1;
+    }
+  }
+
+  return Interval;
+}
+
+/**
   Initialize endpoint context in input context.
 
   @param Xhc            The XHCI Instance.
@@ -2838,7 +2939,6 @@ XhcInitializeEndpointContext (
   UINT8                    Dci;
   UINT8                    MaxDci;
   EFI_PHYSICAL_ADDRESS     PhyAddr;
-  UINT8                    Interval;
   TRANSFER_RING            *EndpointTransferRing;
 
   MaxDci = 0;
@@ -2848,7 +2948,7 @@ XhcInitializeEndpointContext (
     MaxDci = 1;
   }
 
-  EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
+  EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
   for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
     while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
       EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
@@ -2914,19 +3014,7 @@ XhcInitializeEndpointContext (
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
 
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context.
-        // Refer to XHCI 1.1 spec section 6.2.3.6.
-        //
-        if (DeviceSpeed == EFI_USB_SPEED_FULL) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval + 2;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval - 1;
-        }
+        InputContext->EP[Dci-1].Interval = CalculateInterval (USB_ENDPOINT_ISO, DeviceSpeed, EpDesc->Interval);
 
         //
         // Do not support isochronous transfer now.
@@ -2945,23 +3033,9 @@ XhcInitializeEndpointContext (
 
         InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
         InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context
-        //
-        if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
-          Interval = EpDesc->Interval;
-          //
-          // Calculate through the bInterval field of Endpoint descriptor.
-          //
-          ASSERT (Interval != 0);
-          InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32 ((UINT32)Interval) + 3;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          //
-          // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
-          //
-          InputContext->EP[Dci-1].Interval         = Interval - 1;
+        InputContext->EP[Dci-1].Interval         = CalculateInterval (USB_ENDPOINT_INTERRUPT, DeviceSpeed, EpDesc->Interval);
+
+        if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
           InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
           InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
@@ -3041,7 +3115,6 @@ XhcInitializeEndpointContext64 (
   UINT8                    Dci;
   UINT8                    MaxDci;
   EFI_PHYSICAL_ADDRESS     PhyAddr;
-  UINT8                    Interval;
   TRANSFER_RING            *EndpointTransferRing;
 
   MaxDci = 0;
@@ -3051,7 +3124,7 @@ XhcInitializeEndpointContext64 (
     MaxDci = 1;
   }
 
-  EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
+  EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
   for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
     while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
       EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
@@ -3117,19 +3190,7 @@ XhcInitializeEndpointContext64 (
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
 
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context.
-        // Refer to XHCI 1.1 spec section 6.2.3.6.
-        //
-        if (DeviceSpeed == EFI_USB_SPEED_FULL) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval + 2;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval - 1;
-        }
+        InputContext->EP[Dci-1].Interval = CalculateInterval (USB_ENDPOINT_ISO, DeviceSpeed, EpDesc->Interval);
 
         //
         // Do not support isochronous transfer now.
@@ -3148,23 +3209,9 @@ XhcInitializeEndpointContext64 (
 
         InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
         InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context
-        //
-        if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
-          Interval = EpDesc->Interval;
-          //
-          // Calculate through the bInterval field of Endpoint descriptor.
-          //
-          ASSERT (Interval != 0);
-          InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32 ((UINT32)Interval) + 3;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          //
-          // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
-          //
-          InputContext->EP[Dci-1].Interval         = Interval - 1;
+        InputContext->EP[Dci-1].Interval         = CalculateInterval (USB_ENDPOINT_INTERRUPT, DeviceSpeed, EpDesc->Interval);
+
+        if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
           InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
           InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
@@ -3260,7 +3307,7 @@ XhcSetConfigCmd (
 
   MaxDci = 0;
 
-  IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
+  IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)ConfigDesc + ConfigDesc->Length);
   for (Index = 0; Index < ConfigDesc->NumInterfaces; Index++) {
     while ((IfDesc->DescriptorType != USB_DESC_TYPE_INTERFACE) || (IfDesc->AlternateSetting != 0)) {
       IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
@@ -3353,7 +3400,7 @@ XhcSetConfigCmd64 (
 
   MaxDci = 0;
 
-  IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
+  IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)ConfigDesc + ConfigDesc->Length);
   for (Index = 0; Index < ConfigDesc->NumInterfaces; Index++) {
     while ((IfDesc->DescriptorType != USB_DESC_TYPE_INTERFACE) || (IfDesc->AlternateSetting != 0)) {
       IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
@@ -3644,7 +3691,7 @@ XhcSetInterface (
   IfDescActive = NULL;
   IfDescSet    = NULL;
 
-  IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
+  IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)ConfigDesc + ConfigDesc->Length);
   while ((UINTN)IfDesc < ((UINTN)ConfigDesc + ConfigDesc->TotalLength)) {
     if ((IfDesc->DescriptorType == USB_DESC_TYPE_INTERFACE) && (IfDesc->Length >= sizeof (USB_INTERFACE_DESCRIPTOR))) {
       if (IfDesc->InterfaceNumber == (UINT8)Request->Index) {
@@ -3851,7 +3898,7 @@ XhcSetInterface64 (
   IfDescActive = NULL;
   IfDescSet    = NULL;
 
-  IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
+  IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)ConfigDesc + ConfigDesc->Length);
   while ((UINTN)IfDesc < ((UINTN)ConfigDesc + ConfigDesc->TotalLength)) {
     if ((IfDesc->DescriptorType == USB_DESC_TYPE_INTERFACE) && (IfDesc->Length >= sizeof (USB_INTERFACE_DESCRIPTOR))) {
       if (IfDesc->InterfaceNumber == (UINT8)Request->Index) {

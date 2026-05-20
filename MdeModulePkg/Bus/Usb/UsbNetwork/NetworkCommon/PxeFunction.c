@@ -760,7 +760,7 @@ UndiReceiveFilter (
           Cdb->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
         }
 
-        if ((Cdb->CPBsize == 0)) {
+        if (Cdb->CPBsize == 0) {
           Cdb->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
         }
       }

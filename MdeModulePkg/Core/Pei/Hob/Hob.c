@@ -1,7 +1,7 @@
 /** @file
   This module provide Hand-Off Block manipulation.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @retval EFI_SUCCESS                  Get the pointer of HOB List
   @retval EFI_NOT_AVAILABLE_YET        the HOB List is not yet published
-  @retval EFI_INVALID_PARAMETER        HobList is NULL (in debug mode)
+  @retval EFI_INVALID_PARAMETER        HobList is NULL
 
 **/
 EFI_STATUS
@@ -32,13 +32,9 @@ PeiGetHobList (
   //
   // Only check this parameter in debug mode
   //
-
-  DEBUG_CODE_BEGIN ();
   if (HobList == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  DEBUG_CODE_END ();
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
@@ -201,10 +197,8 @@ PeiInstallSecHobData (
   @param MemoryBegin     - Start Memory Address.
   @param MemoryLength    - Length of Memory.
 
-  @return EFI_SUCCESS Always success to initialize HOB.
-
 **/
-EFI_STATUS
+VOID
 PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
@@ -232,6 +226,4 @@ PeiCoreBuildHobHandoffInfoTable (
   Hob->EfiFreeMemoryTop    = MemoryBegin + MemoryLength;
   Hob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)(HobEnd + 1);
   Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
-
-  return EFI_SUCCESS;
 }

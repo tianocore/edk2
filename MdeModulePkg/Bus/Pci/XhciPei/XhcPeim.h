@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _RECOVERY_XHC_H_
-#define _RECOVERY_XHC_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -368,5 +367,3 @@ IoMmuAllocateAlignedBuffer (
   OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
   OUT VOID                  **Mapping
   );
-
-#endif

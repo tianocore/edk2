@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __RNG_LIB_H__
-#define __RNG_LIB_H__
+#pragma once
 
 /**
   Generates a 16-bit random number.
@@ -93,5 +92,3 @@ EFIAPI
 GetRngGuid (
   GUID  *RngGuid
   );
-
-#endif // __RNG_LIB_H__

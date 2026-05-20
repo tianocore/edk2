@@ -27,12 +27,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BaseCryptLib|PEIM PEI_CORE
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64
-#
-
 [Sources]
   InternalCryptLib.h
   Hash/CryptMd5.c
@@ -49,6 +43,7 @@
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcmNull.c
+  Cipher/CryptCamellia.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1OaepNull.c

@@ -12,8 +12,7 @@
   - linux kernel code
 **/
 
-#ifndef PCI_CONFIG_SPACE_PARSER_H_
-#define PCI_CONFIG_SPACE_PARSER_H_
+#pragma once
 
 /** Read LEN bits at OFF offsets bits of the ADDR.
 
@@ -139,5 +138,3 @@ PciConfigInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // PCI_CONFIG_SPACE_PARSER_H_

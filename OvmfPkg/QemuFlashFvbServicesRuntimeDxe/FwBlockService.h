@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef _FW_BLOCK_SERVICE_H
-#define _FW_BLOCK_SERVICE_H
+#pragma once
 
 typedef struct {
   UINTN                         FvBase;
@@ -194,4 +193,7 @@ SetPcdFlashNvStorageBaseAddresses (
   VOID
   );
 
-#endif
+VOID
+UpdateQemuFlashVariablesEnable (
+  VOID
+  );

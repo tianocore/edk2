@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _IMAGE_H_
-#define _IMAGE_H_
+#pragma once
 
 //
 // Private Data Types
@@ -19,5 +18,3 @@ typedef struct {
   VOID       *Source;
   UINTN      SourceSize;
 } IMAGE_FILE_HANDLE;
-
-#endif

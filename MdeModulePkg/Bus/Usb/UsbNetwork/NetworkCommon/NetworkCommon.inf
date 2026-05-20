@@ -2,6 +2,7 @@
 #   This is Usb Network Common driver for DXE phase.
 #
 # Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -43,6 +44,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUsbNetworkRateLimiting
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingCredit
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkPeriodicTimerInterval
 
 [Depex]
   TRUE

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PRM_PECOFF_LIB_H_
-#define PRM_PECOFF_LIB_H_
+#pragma once
 
 #include <Base.h>
 #include <PrmExportDescriptor.h>
@@ -107,5 +106,3 @@ GetExportEntryAddress (
   IN  EFI_IMAGE_EXPORT_DIRECTORY  *ImageExportDirectory,
   OUT EFI_PHYSICAL_ADDRESS        *ExportPhysicalAddress
   );
-
-#endif

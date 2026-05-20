@@ -3,13 +3,13 @@
 
   Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  (c) Copyright 2025 HP Development Company, L.P.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_DRIVER_H__
-#define __EFI_HTTP_DRIVER_H__
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Http11.h>
@@ -26,6 +26,8 @@
 #include <Library/NetLib.h>
 #include <Library/HttpLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
 
 //
 // UEFI Driver Model Protocols
@@ -64,6 +66,7 @@
 // Driver Version
 //
 #define HTTP_DRIVER_VERSION  0xa
+#define URI_STR_MAX_SIZE     255
 
 //
 // Protocol instances
@@ -396,5 +399,3 @@ HttpServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DRIVER_HEALTH_VFR_H_
-#define _DRIVER_HEALTH_VFR_H_
+#pragma once
+
 #include <Guid/HiiPlatformSetupFormset.h>
 
 #define DRIVER_HEALTH_MANAGER_FORMSET_GUID    { 0xcfb3b000, 0x0b63, 0x444b, { 0xb1, 0xd1, 0x12, 0xd5, 0xd9, 0x5d, 0xc4, 0xfc } }
@@ -22,5 +22,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define QUESTION_ID_REFRESH_CONFIGURE  0x0002
 
 #define QUESTION_ID_DRIVER_HEALTH_BASE  0x0003
-
-#endif

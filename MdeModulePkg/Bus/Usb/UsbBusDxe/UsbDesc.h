@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _USB_DESCRIPTOR_H_
-#define _USB_DESCRIPTOR_H_
+#pragma once
 
 #define USB_MAX_INTERFACE_SETTING  256
 
@@ -223,5 +222,3 @@ UsbIoClearFeature (
   IN  UINT16               Feature,
   IN  UINT16               Index
   );
-
-#endif

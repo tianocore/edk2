@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCI_HOST_RESOURCE_H_
-#define _PCI_HOST_RESOURCE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -41,5 +40,3 @@ typedef struct {
   UINT64               Alignment;
   RES_STATUS           Status;
 } PCI_RES_NODE;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_DRIVER_OVERRRIDE_H_
-#define _EFI_PCI_DRIVER_OVERRRIDE_H_
+#pragma once
 
 #define DRIVER_OVERRIDE_SIGNATURE  SIGNATURE_32 ('d', 'r', 'o', 'v')
 
@@ -76,5 +75,3 @@ GetDriver (
   IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *This,
   IN OUT EFI_HANDLE                             *DriverImageHandle
   );
-
-#endif

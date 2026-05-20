@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PL011UARTCLOCKLIB_H__
-#define __PL011UARTCLOCKLIB_H__
+#pragma once
 
 /**
 
@@ -21,5 +20,3 @@ EFIAPI
 PL011UartClockGetFreq (
   VOID
   );
-
-#endif

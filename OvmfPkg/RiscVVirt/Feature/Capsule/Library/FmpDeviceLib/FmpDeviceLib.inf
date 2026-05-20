@@ -1,0 +1,40 @@
+## @file
+#  Provides firmware device specific services to support updates of a firmware
+#  image stored in a firmware device.
+#
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, Ventana Micro Systems Inc. All Rights Reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 1.30
+  BASE_NAME       = FmpDeviceLib
+  FILE_GUID       = BCBACAC2-1D1D-4C14-89A3-5E27496B702D
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = FmpDeviceLib|DXE_DRIVER UEFI_DRIVER
+
+[Sources]
+  FmpDeviceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PlatformFlashAccessLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion
+
+
+

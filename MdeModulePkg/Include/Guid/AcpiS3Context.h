@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ACPI_S3_DATA_H_
-#define _ACPI_S3_DATA_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 
@@ -61,5 +60,3 @@ typedef struct {
 extern EFI_GUID  gEfiAcpiS3ContextGuid;
 
 extern EFI_GUID  gEfiAcpiVariableGuid;
-
-#endif

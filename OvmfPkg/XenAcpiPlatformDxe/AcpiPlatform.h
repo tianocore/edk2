@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef ACPI_PLATFORM_H_
-#define ACPI_PLATFORM_H_
+#pragma once
 
 #include <Protocol/AcpiTable.h> // EFI_ACPI_TABLE_PROTOCOL
 
@@ -23,5 +22,3 @@ EFIAPI
 InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiTable
   );
-
-#endif

@@ -14,7 +14,6 @@
 #include <Library/DebugLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrintLib.h>
-#include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -128,7 +127,7 @@ DescribeInstructionOrDataAbort (
 STATIC
 VOID
 DescribeExceptionSyndrome (
-  IN UINT32  Esr
+  IN UINT64  Esr
   )
 {
   CHAR8  *Message;
@@ -157,7 +156,6 @@ DescribeExceptionSyndrome (
   DEBUG ((DEBUG_ERROR, "\n %a \n", Message));
 }
 
-#ifndef MDEPKG_NDEBUG
 STATIC
 CONST CHAR8 *
 BaseName (
@@ -176,8 +174,6 @@ BaseName (
 
   return Str;
 }
-
-#endif
 
 /**
   This is the default action to take on an unexpected exception

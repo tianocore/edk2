@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _USB_MOUSE_ABSOLUTE_POINTER_H_
-#define _USB_MOUSE_ABSOLUTE_POINTER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -460,5 +459,3 @@ ParseMouseReportDescriptor (
   IN  UINT8                           *ReportDescriptor,
   IN  UINTN                           ReportSize
   );
-
-#endif

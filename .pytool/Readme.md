@@ -4,12 +4,12 @@ This file focuses on information for those working with the `.pytools` directory
 directly or interested in lower-level details about how CI works.
 
 If you just want to get started building code, visit
-[Build Instructions](https://github.com/tianocore/tianocore.github.io/wiki/Build-Instruction)
+[Build Instructions](https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/build_instructions.html)
 on the TianoCore wiki.
 
 ## Basic Status
 
-| Package              | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
+| Package              | Windows VS2022 (IA32/X64)| Ubuntu GCC (IA32/X64/AARCH64) | Known Issues |
 | :----                | :-----                   | :----                             | :---         |
 | ArmPkg               |                    | :heavy_check_mark: |
 | ArmPlatformPkg       |                    | :heavy_check_mark: |
@@ -29,7 +29,6 @@ on the TianoCore wiki.
 | PcAtChipsetPkg       | :heavy_check_mark: | :heavy_check_mark: |
 | SecurityPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | ShellPkg             | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
-| SignedCapsulePkg     |
 | SourceLevelDebugPkg  |
 | StandaloneMmPkg      | :heavy_check_mark: | :heavy_check_mark: |
 | UefiCpuPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 2 binary modules not being built by DSC
@@ -48,7 +47,7 @@ located [here](https://github.com/tianocore/edk2-pytool-library) and
 [here](https://github.com/tianocore/edk2-pytool-extensions)).
 
 The primary execution flows can be found in the
-`.azurepipelines/Windows-VS2019.yml` and `.azurepipelines/Ubuntu-GCC5.yml`
+`.azurepipelines/Windows-VS.yml` and `.azurepipelines/Ubuntu-GCC.yml`
 files. These YAML files are consumed by the Azure Dev Ops Build Pipeline and
 dictate what server resources should be used, how they should be configured, and
 what processes should be run on them. An overview of this schema can be found
@@ -86,8 +85,10 @@ per package configuration which comes from this file.
 
 The EDKII Tools environment (and by extension the ci) is designed to support
 easily and consistently running locally and in a cloud ci environment.  To do
-that a few steps should be followed.  Details of EDKII Tools can be found in the
-[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
+that a few steps should be followed. These steps are detailed on the
+[How to Build With Stuart](https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/how_to_build_with_stuart.html)
+page. Details of EDKII Tools can be found in the
+[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).
 
 ### Running CI
 
@@ -272,7 +273,7 @@ few standard scopes.
 * PatchCheck tests as plugins
 * MacOS/xcode support
 * Clang/LLVM support
-* Visual Studio AARCH64 and ARM support
+* Visual Studio AARCH64 support
 * BaseTools C tools CI/PR and binary release process
 * BaseTools Python tools CI/PR process
 * Extensible private/closed source platform reporting

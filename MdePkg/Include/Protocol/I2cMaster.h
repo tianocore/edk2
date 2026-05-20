@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __I2C_MASTER_H__
-#define __I2C_MASTER_H__
+#pragma once
 
 #include <Pi/PiI2c.h>
 
@@ -58,7 +57,7 @@ EFI_STATUS
 
   This routine must be called at or below TPL_NOTIFY.
 
-  The I2C controller is reset.  The caller must call SetBusFrequench() after
+  The I2C controller is reset.  The caller must call SetBusFrequency() after
   calling Reset().
 
   @param[in]     This       Pointer to an EFI_I2C_MASTER_PROTOCOL structure.
@@ -182,5 +181,3 @@ struct _EFI_I2C_MASTER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiI2cMasterProtocolGuid;
-
-#endif //  __I2C_MASTER_H__

@@ -24,7 +24,9 @@ DEC_OBJ = \
   brotli\c\dec\bit_reader.obj \
   brotli\c\dec\decode.obj \
   brotli\c\dec\huffman.obj \
-  brotli\c\dec\state.obj
+  brotli\c\dec\prefix.obj \
+  brotli\c\dec\state.obj \
+  brotli\c\dec\static_init.obj
 ENC_OBJ = \
   brotli\c\enc\command.obj \
   brotli\c\enc\compound_dictionary.obj \
@@ -46,6 +48,8 @@ ENC_OBJ = \
   brotli\c\enc\memory.obj \
   brotli\c\enc\metablock.obj \
   brotli\c\enc\static_dict.obj \
+  brotli\c\enc\static_dict_lut.obj \
+  brotli\c\enc\static_init.obj \
   brotli\c\enc\utf8_util.obj
 
 OBJECTS = \

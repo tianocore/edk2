@@ -38,10 +38,14 @@
   FspWrapperPlatformLib
   PeiServicesLib
   FspWrapperPlatformMultiPhaseLib
+  HobLib
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid
   gEdkiiPeiVariablePpiGuid
+
+[Guids]
+  gFspHobGuid       ## CONSUMES
 
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress       ## CONSUMES

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USB_MOUSE_H_
-#define _EFI_USB_MOUSE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -402,7 +401,7 @@ InitializeUsbMouseDevice (
   @param  Data             A pointer to a buffer that is filled with key data which is
                            retrieved via asynchronous interrupt transfer.
   @param  DataLength       Indicates the size of the data buffer.
-  @param  Context          Pointing to USB_KB_DEV instance.
+  @param  Context          Pointing to USB_MOUSE_DEV instance.
   @param  Result           Indicates the result of the asynchronous interrupt transfer.
 
   @retval EFI_SUCCESS      Asynchronous interrupt transfer is handled successfully.
@@ -460,5 +459,3 @@ ParseMouseReportDescriptor (
   IN  UINT8          *ReportDescriptor,
   IN  UINTN          ReportSize
   );
-
-#endif

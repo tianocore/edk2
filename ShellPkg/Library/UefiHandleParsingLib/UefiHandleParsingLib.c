@@ -4,6 +4,7 @@
   Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -299,6 +300,9 @@ LoadedImageProtocolDumpInformation (
 
     SHELL_FREE_NON_NULL (Temp);
     SHELL_FREE_NON_NULL (FileName);
+    if (RetVal == NULL) {
+      return NULL;
+    }
   }
 
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_LI_DUMP_MAIN), NULL);
@@ -309,24 +313,25 @@ LoadedImageProtocolDumpInformation (
   PdbFileName = PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
   DataType    = ConvertMemoryType (LoadedImage->ImageDataType);
   CodeType    = ConvertMemoryType (LoadedImage->ImageCodeType);
-
-  RetVal = CatSPrint (
-             RetVal,
-             Temp,
-             LoadedImage->Revision,
-             LoadedImage->ParentHandle,
-             LoadedImage->SystemTable,
-             LoadedImage->DeviceHandle,
-             FilePath,
-             PdbFileName,
-             LoadedImage->LoadOptionsSize,
-             LoadedImage->LoadOptions,
-             LoadedImage->ImageBase,
-             LoadedImage->ImageSize,
-             CodeType,
-             DataType,
-             LoadedImage->Unload
-             );
+  if ((PdbFileName != NULL) && (DataType != NULL) && (CodeType != NULL) && (FilePath != NULL)) {
+    RetVal = CatSPrint (
+               RetVal,
+               Temp,
+               LoadedImage->Revision,
+               LoadedImage->ParentHandle,
+               LoadedImage->SystemTable,
+               LoadedImage->DeviceHandle,
+               FilePath,
+               PdbFileName,
+               LoadedImage->LoadOptionsSize,
+               LoadedImage->LoadOptions,
+               LoadedImage->ImageBase,
+               LoadedImage->ImageSize,
+               CodeType,
+               DataType,
+               LoadedImage->Unload
+               );
+  }
 
   SHELL_FREE_NON_NULL (Temp);
   SHELL_FREE_NON_NULL (FilePath);
@@ -389,6 +394,10 @@ GraphicsOutputProtocolDumpInformation (
   }
 
   Fmt = ConvertPixelFormat (GraphicsOutput->Mode->Info->PixelFormat);
+  if (Fmt == NULL) {
+    SHELL_FREE_NON_NULL (Temp);
+    return NULL;
+  }
 
   RetVal = CatSPrint (
              NULL,
@@ -409,6 +418,9 @@ GraphicsOutputProtocolDumpInformation (
              );
 
   SHELL_FREE_NON_NULL (Temp);
+  if (RetVal == NULL) {
+    goto EXIT;
+  }
 
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_GOP_RES_LIST_MAIN), NULL);
   if (Temp == NULL) {
@@ -509,6 +521,9 @@ EdidDiscoveredProtocolDumpInformation (
 
   RetVal = CatSPrint (NULL, Temp, EdidDiscovered->SizeOfEdid);
   SHELL_FREE_NON_NULL (Temp);
+  if (RetVal == NULL) {
+    return NULL;
+  }
 
   if (EdidDiscovered->SizeOfEdid != 0) {
     Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_EDID_DISCOVERED_DATA), NULL);
@@ -575,6 +590,9 @@ EdidActiveProtocolDumpInformation (
 
   RetVal = CatSPrint (NULL, Temp, EdidActive->SizeOfEdid);
   SHELL_FREE_NON_NULL (Temp);
+  if (RetVal == NULL) {
+    return NULL;
+  }
 
   if (EdidActive->SizeOfEdid != 0) {
     Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_EDID_ACTIVE_DATA), NULL);
@@ -790,6 +808,9 @@ TxtOutProtocolDumpInformation (
 
   Size   = (Dev->Mode->MaxMode + 1) * 80;
   RetVal = AllocateZeroPool (Size);
+  if (RetVal == NULL) {
+    return NULL;
+  }
 
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_TXT_OUT_DUMP_HEADER), NULL);
   if (Temp != NULL) {
@@ -801,6 +822,11 @@ TxtOutProtocolDumpInformation (
   // Dump TextOut Info
   //
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_TXT_OUT_DUMP_LINE), NULL);
+  if (Temp == NULL) {
+    FreePool (RetVal);
+    return NULL;
+  }
+
   for (Index = 0; Index < Dev->Mode->MaxMode; Index++) {
     Status  = Dev->QueryMode (Dev, Index, &Col, &Row);
     NewSize = Size - StrSize (RetVal);
@@ -1056,6 +1082,10 @@ BusSpecificDriverOverrideProtocolDumpInformation (
                        ConvertHandleToHandleIndex (ImageHandle),
                        ConvertDevicePathToText (LoadedImage->FilePath, TRUE, TRUE)
                        );
+        if (TempRetVal == NULL) {
+          break;
+        }
+
         StrnCatGrow (&RetVal, &Size, TempRetVal, 0);
         SHELL_FREE_NON_NULL (TempRetVal);
       }
@@ -1287,6 +1317,11 @@ PciIoProtocolDumpInformation (
              Pci.Hdr.ClassCode[1],
              Pci.Hdr.ClassCode[2]
              );
+  if (RetVal == NULL) {
+    FreePool (GetString);
+    return NULL;
+  }
+
   for (Index = 0; Index < sizeof (Pci); Index++) {
     if ((Index % 0x10) == 0) {
       TempRetVal = CatSPrint (RetVal, L"\r\n       %02x", *((UINT8 *)(&Pci) + Index));
@@ -1435,6 +1470,10 @@ AdapterInformationDumpInformation (
     }
 
     RetVal = CatSPrint (NULL, TempStr);
+    if (RetVal == NULL) {
+      goto ERROR_EXIT;
+    }
+
     SHELL_FREE_NON_NULL (TempStr);
 
     for (GuidIndex = 0; GuidIndex < InfoTypesBufferCount; GuidIndex++) {
@@ -1726,6 +1765,10 @@ FirmwareManagementDumpInformation (
     }
 
     RetVal = CatSPrint (NULL, TempStr, ImageInfoSize);
+    if (RetVal == NULL) {
+      goto ERROR_EXIT;
+    }
+
     SHELL_FREE_NON_NULL (TempStr);
 
     //
@@ -1823,37 +1866,65 @@ FirmwareManagementDumpInformation (
       } else {
         AttributeSettingStr = CatSPrint (NULL, L"(");
 
+        if (AttributeSettingStr == NULL) {
+          goto ERROR_EXIT;
+        }
+
         if ((AttributeSetting & IMAGE_ATTRIBUTE_IMAGE_UPDATABLE) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_IMAGE_UPDATABLE");
+          if (TempRetVal == NULL) {
+            goto ERROR_EXIT;
+          }
+
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
 
         if ((AttributeSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_RESET_REQUIRED");
+          if (TempRetVal == NULL) {
+            goto ERROR_EXIT;
+          }
+
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
 
         if ((AttributeSetting & IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED");
+          if (TempRetVal == NULL) {
+            goto ERROR_EXIT;
+          }
+
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
 
         if ((AttributeSetting & IMAGE_ATTRIBUTE_IN_USE) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_IN_USE");
+          if (TempRetVal == NULL) {
+            goto ERROR_EXIT;
+          }
+
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
 
         if ((AttributeSetting & IMAGE_ATTRIBUTE_UEFI_IMAGE) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_UEFI_IMAGE");
+          if (TempRetVal == NULL) {
+            goto ERROR_EXIT;
+          }
+
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
 
         TempRetVal = CatSPrint (AttributeSettingStr, L" )");
+        if (TempRetVal == NULL) {
+          goto ERROR_EXIT;
+        }
+
         SHELL_FREE_NON_NULL (AttributeSettingStr);
         AttributeSettingStr = TempRetVal;
       }
@@ -1958,7 +2029,7 @@ FirmwareManagementDumpInformation (
           if (ImageInfoV1[Index].ImageId == ImageInfoV1[Index1].ImageId) {
             Found = TRUE;
             //
-            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            // At least one match found indicating presence of non unique ImageId values so no more comparisons needed
             //
             goto ENDLOOP;
           }
@@ -1966,7 +2037,7 @@ FirmwareManagementDumpInformation (
           if (ImageInfoV2[Index].ImageId == ImageInfoV2[Index1].ImageId) {
             Found = TRUE;
             //
-            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            // At least one match found indicating presence of non unique ImageId values so no more comparisons needed
             //
             goto ENDLOOP;
           }
@@ -1974,7 +2045,7 @@ FirmwareManagementDumpInformation (
           if (ImageInfo[Index].ImageId == ImageInfo[Index1].ImageId) {
             Found = TRUE;
             //
-            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            // At least one match found indicating presence of non unique ImageId values so no more comparisons needed
             //
             goto ENDLOOP;
           }
@@ -2178,16 +2249,13 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_TAPE_IO),             &gEfiTapeIoProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_DISK_IO),             &gEfiDiskIoProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_BLK_IO),              &gEfiBlockIoProtocolGuid,                          BlockIoProtocolDumpInformation                   },
-  { STRING_TOKEN (STR_UC),                  &gEfiUnicodeCollationProtocolGuid,                 NULL                                             },
   { STRING_TOKEN (STR_UC2),                 &gEfiUnicodeCollation2ProtocolGuid,                NULL                                             },
   { STRING_TOKEN (STR_PCIRB_IO),            &gEfiPciRootBridgeIoProtocolGuid,                  PciRootBridgeIoDumpInformation                   },
   { STRING_TOKEN (STR_PCI_IO),              &gEfiPciIoProtocolGuid,                            PciIoProtocolDumpInformation                     },
-  { STRING_TOKEN (STR_SCSI_PT),             &gEfiScsiPassThruProtocolGuid,                     NULL                                             },
   { STRING_TOKEN (STR_SCSI_IO),             &gEfiScsiIoProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_SCSI_PT_EXT),         &gEfiExtScsiPassThruProtocolGuid,                  NULL                                             },
   { STRING_TOKEN (STR_ISCSI),               &gEfiIScsiInitiatorNameProtocolGuid,               NULL                                             },
   { STRING_TOKEN (STR_USB_IO),              &gEfiUsbIoProtocolGuid,                            UsbIoProtocolDumpInformation                     },
-  { STRING_TOKEN (STR_USB_HC),              &gEfiUsbHcProtocolGuid,                            NULL                                             },
   { STRING_TOKEN (STR_USB_HC2),             &gEfiUsb2HcProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_DEBUG_SUPPORT),       &gEfiDebugSupportProtocolGuid,                     DebugSupportProtocolDumpInformation              },
   { STRING_TOKEN (STR_DEBUG_PORT),          &gEfiDebugPortProtocolGuid,                        NULL                                             },
@@ -2210,7 +2278,6 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_TCPV4),               &gEfiTcp4ProtocolGuid,                             NULL                                             },
   { STRING_TOKEN (STR_IPV4_SB),             &gEfiIp4ServiceBindingProtocolGuid,                NULL                                             },
   { STRING_TOKEN (STR_IPV4),                &gEfiIp4ProtocolGuid,                              NULL                                             },
-  { STRING_TOKEN (STR_IPV4_CFG),            &gEfiIp4ConfigProtocolGuid,                        NULL                                             },
   { STRING_TOKEN (STR_IPV4_CFG2),           &gEfiIp4Config2ProtocolGuid,                       NULL                                             },
   { STRING_TOKEN (STR_UDPV4_SB),            &gEfiUdp4ServiceBindingProtocolGuid,               NULL                                             },
   { STRING_TOKEN (STR_UDPV4),               &gEfiUdp4ProtocolGuid,                             NULL                                             },
@@ -2237,9 +2304,6 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_SHELL_INTERFACE),     &gEfiShellInterfaceGuid,                           NULL                                             },
   { STRING_TOKEN (STR_SHELL_ENV2),          &gEfiShellEnvironment2Guid,                        NULL                                             },
   { STRING_TOKEN (STR_SHELL_ENV),           &gEfiShellEnvironment2Guid,                        NULL                                             },
-  { STRING_TOKEN (STR_DEVICE_IO),           &gEfiDeviceIoProtocolGuid,                         NULL                                             },
-  { STRING_TOKEN (STR_UGA_DRAW),            &gEfiUgaDrawProtocolGuid,                          NULL                                             },
-  { STRING_TOKEN (STR_UGA_IO),              &gEfiUgaIoProtocolGuid,                            NULL                                             },
   { STRING_TOKEN (STR_ESP),                 &gEfiPartTypeSystemPartGuid,                       NULL                                             },
   { STRING_TOKEN (STR_GPT_NBR),             &gEfiPartTypeLegacyMbrGuid,                        NULL                                             },
   { STRING_TOKEN (STR_DRIVER_CONFIG),       &gEfiDriverConfigurationProtocolGuid,              NULL                                             },
@@ -2848,7 +2912,11 @@ GetStringNameFromHandle (
                   );
   if (!EFI_ERROR (Status)) {
     BestLang = GetBestLanguageForDriver (CompNameStruct->SupportedLanguages, Language, FALSE);
-    Status   = CompNameStruct->GetDriverName (CompNameStruct, BestLang, &RetVal);
+    if (BestLang == NULL) {
+      return (NULL);
+    }
+
+    Status = CompNameStruct->GetDriverName (CompNameStruct, BestLang, &RetVal);
     if (BestLang != NULL) {
       FreePool (BestLang);
       BestLang = NULL;
@@ -2869,7 +2937,11 @@ GetStringNameFromHandle (
                   );
   if (!EFI_ERROR (Status)) {
     BestLang = GetBestLanguageForDriver (CompNameStruct->SupportedLanguages, Language, FALSE);
-    Status   = CompNameStruct->GetDriverName (CompNameStruct, BestLang, &RetVal);
+    if (BestLang == NULL) {
+      return (NULL);
+    }
+
+    Status = CompNameStruct->GetDriverName (CompNameStruct, BestLang, &RetVal);
     if (BestLang != NULL) {
       FreePool (BestLang);
     }
@@ -3689,7 +3761,7 @@ ParseHandleDatabaseForChildDevices (
   @param[in] ProtocolGuid The guid of the protocol to get handles for.  If NULL
                           then the function will return all handles.
 
-  @retval NULL            A memory allocation failed.
+  @retval NULL            Could not get handles or memory allocation failed.
   @return                 A NULL terminated list of handles.
 **/
 EFI_HANDLE *
@@ -3699,45 +3771,43 @@ GetHandleListByProtocol (
   )
 {
   EFI_HANDLE  *HandleList;
-  UINTN       Size;
+  EFI_HANDLE  *OriginalHandleList;
+  UINTN       OriginalHandleCount;
   EFI_STATUS  Status;
 
-  Size       = 0;
-  HandleList = NULL;
-
-  //
-  // We cannot use LocateHandleBuffer since we need that NULL item on the ends of the list!
-  //
-  if (ProtocolGuid == NULL) {
-    Status = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleList = AllocateZeroPool (Size + sizeof (EFI_HANDLE));
-      if (HandleList == NULL) {
-        return (NULL);
-      }
-
-      Status                               = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleList);
-      HandleList[Size/sizeof (EFI_HANDLE)] = NULL;
+  OriginalHandleList = NULL;
+  Status             = gBS->LocateHandleBuffer (
+                              (ProtocolGuid == NULL) ? AllHandles : ByProtocol,
+                              (EFI_GUID *)ProtocolGuid,
+                              NULL,
+                              &OriginalHandleCount,
+                              &OriginalHandleList
+                              );
+  if (EFI_ERROR (Status)) {
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: LocateHandleBuffer %a failed: %r\n",
+        __func__,
+        (ProtocolGuid == NULL) ? "AllHandles" : "ByProtocol",
+        Status
+        ));
     }
-  } else {
-    Status = gBS->LocateHandle (ByProtocol, (EFI_GUID *)ProtocolGuid, NULL, &Size, HandleList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleList = AllocateZeroPool (Size + sizeof (EFI_HANDLE));
-      if (HandleList == NULL) {
-        return (NULL);
-      }
 
-      Status                               = gBS->LocateHandle (ByProtocol, (EFI_GUID *)ProtocolGuid, NULL, &Size, HandleList);
-      HandleList[Size/sizeof (EFI_HANDLE)] = NULL;
-    }
+    return NULL;
   }
 
-  if (EFI_ERROR (Status)) {
-    if (HandleList != NULL) {
-      FreePool (HandleList);
+  // create new list with one more slot for the NULL terminator
+  HandleList = ReallocatePool (
+                 OriginalHandleCount * sizeof (EFI_HANDLE),
+                 (OriginalHandleCount + 1) * sizeof (EFI_HANDLE),
+                 OriginalHandleList
+                 );
+  if (HandleList == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: reallocate failed\n", __func__));
+    if (OriginalHandleList != NULL) {
+      FreePool (OriginalHandleList);
     }
-
-    return (NULL);
   }
 
   return (HandleList);

@@ -188,7 +188,7 @@ TlsNew (
   //
   // This retains compatibility with previous version of OpenSSL.
   //
-  SSL_set_security_level (TlsConn->Ssl, 0);
+  SSL_set_security_level (TlsConn->Ssl, 3);
 
   //
   // Initialize the created SSL Object
@@ -257,7 +257,7 @@ TlsNew (
   //
   X509_STORE_set_flags (
     X509Store,
-    X509_V_FLAG_PARTIAL_CHAIN | X509_V_FLAG_NO_CHECK_TIME
+    X509_V_FLAG_PARTIAL_CHAIN
     );
   return (VOID *)TlsConn;
 }

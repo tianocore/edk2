@@ -15,8 +15,8 @@
   PLATFORM_GUID                  = DFFED32B-DFFE-D32B-DFFE-D32BDFFED32B
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/ArmVirtCloudHv-$(ARCH)
-  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
+  OUTPUT_DIRECTORY               = Build/ArmVirtCloudHv-AARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtCloudHv.fdf
@@ -28,11 +28,16 @@
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
+# This comes at the beginning of includes to pick all relevant defines early on.
+!include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
+
+# This comes at the end of includes to pick all relevant components without any
+# unintentional overrides.
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
@@ -56,10 +61,12 @@
 
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
+  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common.PEIM]
+  PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/CloudHvVirtMemInfoLib/CloudHvVirtMemInfoPeiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
@@ -81,15 +88,10 @@
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 [PcdsFixedAtBuild.common]
-!if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-!endif
-
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
@@ -155,7 +157,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
-[PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
   # presence of the 32-bit entry point anyway (because many AARCH64 systems
@@ -279,7 +280,10 @@
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/ArmVirtGicArchLib/ArmVirtGicArchLib.inf
+  }
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
@@ -358,7 +362,6 @@
   # ACPI Support
   #
   ArmVirtPkg/CloudHvPlatformHasAcpiDtDxe/CloudHvHasAcpiDtDxe.inf
-[Components.AARCH64]
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   ArmVirtPkg/CloudHvAcpiPlatformDxe/CloudHvAcpiPlatformDxe.inf {
     <LibraryClasses>

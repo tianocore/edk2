@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DEFER_3RD_PARTY_IMAGE_LOAD_H_
-#define _DEFER_3RD_PARTY_IMAGE_LOAD_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Guid/EventGroup.h>
@@ -85,5 +84,3 @@ VOID
 Defer3rdPartyImageLoadInitialize (
   VOID
   );
-
-#endif

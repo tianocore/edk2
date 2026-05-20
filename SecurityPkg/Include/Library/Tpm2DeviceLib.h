@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM2_DEVICE_LIB_H_
-#define _TPM2_DEVICE_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -109,5 +108,3 @@ EFIAPI
 Tpm2RegisterTpm2DeviceLib (
   IN TPM2_DEVICE_INTERFACE  *Tpm2Device
   );
-
-#endif

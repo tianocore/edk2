@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_VIEW_COMMAND_LIB_H_
-#define ACPI_VIEW_COMMAND_LIB_H_
+#pragma once
 
 /**
   Dump a buffer to a file. Print error message if a file cannot be created.
@@ -42,5 +41,3 @@ ShellCommandRunAcpiView (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif // UEFI_SHELL_ACPIVIEW_COMMAND_LIB_H_

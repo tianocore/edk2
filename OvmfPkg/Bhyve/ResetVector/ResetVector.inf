@@ -12,7 +12,7 @@
   INF_VERSION                    = 1.29
   BASE_NAME                      = ResetVector
   FILE_GUID                      = 1BA0062E-C779-4582-8566-336AE8F78F09
-  MODULE_TYPE                    = SEC
+  MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.1
 
 #

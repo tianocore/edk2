@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FDT_HW_INFO_PARSER_H_
-#define FDT_HW_INFO_PARSER_H_
+#pragma once
 
 #include <FdtHwInfoParserInclude.h>
 
@@ -86,5 +85,3 @@ ArchFdtHwInfoMainDispatcher (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // FDT_HW_INFO_PARSER_H_

@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef _FDT_LOAD_LIB_H_
-#define _FDT_LOAD_LIB_H_
+#pragma once
 
 /**
   Load and Install FDT from Semihosting
@@ -38,5 +37,3 @@ EFI_STATUS
 InstallFdtFromFv (
   IN  CONST EFI_GUID  *FileName
   );
-
-#endif

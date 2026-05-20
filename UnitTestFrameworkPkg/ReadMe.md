@@ -34,7 +34,22 @@ GoogleTest requires less overhead to register test suites and test cases compare
 There are also a number of tools that layer on top of GoogleTest that improve developer productivity.
 One example is the VS Code extension
 [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
-that may be used to implement, run, and debug unit tests implemented using GoogleTest.
+that may be used to implement, run, and debug unit tests implemented using GoogleTest. The following
+is an example of the C++ TestMate JSON configuration to find unit tests and configure the environment
+for unit test execution.
+
+```json
+"testMate.cpp.test.advancedExecutables": [
+    {
+        "pattern": "Build/**/*Test*",
+        "cwd": "${absDirpath}",
+        "env": {
+            "GTEST_CATCH_EXCEPTIONS": "0",
+            "ASAN_OPTIONS": "detect_leaks=0",
+        }
+    }
+],
+```
 
 If a component can be tested with host-based unit tests, then GoogleTest is recommended. The MdePkg
 contains a port of the BaseSafeIntLib unit tests in the GoogleTest style so the differences between
@@ -52,23 +67,24 @@ reviewed. The paths to the SecureBootVariableLib unit tests are:
 
 ## Framework and GoogleTest Feature Comparison
 
-| Feature                     | Framework | GoogleTest |
-|:----------------------------|:---------:|:----------:|
-| Host Based Unit Tests       |    YES    |    YES     |
-| Target Based Unit Tests     |    YES    |     NO     |
-| Unit Test Source Language   |     C     |    C++     |
-| Register Test Suite         |    YES    |    Auto    |
-| Register Test Case          |    YES    |    Auto    |
-| Expected Assert Tests       |    YES    |    YES     |
-| Setup/Teardown Hooks        |    YES    |    YES     |
-| Value-Parameterized Tests   |    NO     |    YES     |
-| Typed Tests                 |    NO     |    YES     |
-| Type-Parameterized Tests    |    NO     |    YES     |
-| Timeout Support             |    NO     |    YES     |
-| Mocking Support             |   Cmocka  |   gMock    |
-| JUNIT XML Reports           |    YES    |    YES     |
-| Execute subset of tests     |    NO     |    YES     |
-| VS Code Extensions          |    NO     |    YES     |
+| Feature                   | Framework | GoogleTest |
+| :------------------------ | :-------: | :--------: |
+| Host Based Unit Tests     |    YES    |    YES     |
+| Target Based Unit Tests   |    YES    |     NO     |
+| Unit Test Source Language |     C     |    C++     |
+| Register Test Suite       |    YES    |    Auto    |
+| Register Test Case        |    YES    |    Auto    |
+| Expected Assert Tests     |    YES    |    YES     |
+| Setup/Teardown Hooks      |    YES    |    YES     |
+| Value-Parameterized Tests |    NO     |    YES     |
+| Typed Tests               |    NO     |    YES     |
+| Type-Parameterized Tests  |    NO     |    YES     |
+| Timeout Support           |    NO     |    YES     |
+| Mocking Support           |  Cmocka   |   gMock    |
+| JUNIT XML Reports         |    YES    |    YES     |
+| Execute subset of tests   |    NO     |    YES     |
+| VS Code Extensions        |    NO     |    YES     |
+| Address Sanitizer         |  Cmocka   |    YES     |
 
 ## Framework Libraries
 
@@ -124,7 +140,7 @@ you should be good to go.
 
 See this example in `SampleUnitTestUefiShell.inf`...
 
-```
+```inf
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -139,7 +155,7 @@ See this example in `SampleUnitTestUefiShell.inf`...
 Also, if you want your test to automatically be picked up by the Test Runner plugin, you will need
 to make sure that the module `BASE_NAME` contains the word `Test`...
 
-```
+```inf
 [Defines]
   BASE_NAME      = SampleUnitTestUefiShell
 ```
@@ -151,7 +167,7 @@ section so that the unit tests will be built.
 
 See this example in `UnitTestFrameworkPkg.dsc`...
 
-```
+```inf
 [Components]
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestUefiShell.inf
 ```
@@ -160,7 +176,7 @@ Also, based on the type of tests that are being created, the associated DSC incl
 UnitTestFrameworkPkg for Host or Target based tests should also be included at the top of the DSC
 file.
 
-```
+```inf
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
 ```
 
@@ -170,7 +186,7 @@ they should be added in the \<LibraryClasses\> sub-section for the INF file in t
 
 See this example in `SecurityPkgHostTest.dsc`...
 
-```
+```inf
 [Components]
   SecurityPkg/Library/SecureBootVariableLib/UnitTest/SecureBootVariableLibUnitTest.inf {
     <LibraryClasses>
@@ -326,7 +342,7 @@ Beyond that, if you're writing host-based tests and want to take a dependency on
 leverage the `cmocka.h` interface and write tests with all the features of the Cmocka framework.
 
 Documentation for Cmocka can be found here:
-https://api.cmocka.org/
+<https://api.cmocka.org/>
 
 ## GoogleTest Libraries
 
@@ -345,16 +361,16 @@ the following tables.
 
 #### Custom Actions
 
-| Action Name | Similar gMock Generic Action | Usage |
-|:--- |:--- |:--- |
-| `SetArgBuffer()` | `SetArgPointee()` | Used to set a buffer output argument (such as UINT8*, VOID*, a structure pointer, etc.) with data in an expect call. Can be used in an `EXPECT_CALL()` |
+| Action Name      | Similar gMock Generic Action | Usage                                                                                                                                                  |
+| :--------------- | :--------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SetArgBuffer()` | `SetArgPointee()`            | Used to set a buffer output argument (such as UINT8*, VOID*, a structure pointer, etc.) with data in an expect call. Can be used in an `EXPECT_CALL()` |
 
 #### Custom Matchers
 
-| Matcher Name | Similar gMock Generic Matcher | Usage |
-|:--- |:--- |:--- |
-| `BufferEq()` | `Pointee(Eq())` | Used to compare two buffer pointer types (such as UINT8*, VOID*, a structure pointer, etc.). Can be used in an `EXPECT_CALL()`, `EXPECT_THAT()`, or anywhere else a matcher to compare two buffers is needed. |
-| `Char16StrEq()` | `Pointee(Eq())` | Used to compare two CHAR16* strings. Can be used in an `EXPECT_CALL()`, `EXPECT_THAT()`, or anywhere else a matcher to compare two CHAR16* strings is needed. |
+| Matcher Name    | Similar gMock Generic Matcher | Usage                                                                                                                                                                                                         |
+| :-------------- | :---------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `BufferEq()`    | `Pointee(Eq())`               | Used to compare two buffer pointer types (such as UINT8*, VOID*, a structure pointer, etc.). Can be used in an `EXPECT_CALL()`, `EXPECT_THAT()`, or anywhere else a matcher to compare two buffers is needed. |
+| `Char16StrEq()` | `Pointee(Eq())`               | Used to compare two CHAR16*strings. Can be used in an `EXPECT_CALL()`, `EXPECT_THAT()`, or anywhere else a matcher to compare two CHAR16* strings is needed.                                                  |
 
 ### FunctionMockLib
 
@@ -370,6 +386,7 @@ the mock functions, and the other two macros are related to creating an interfac
 to contain the mock functions and connect them into the gMock framework.
 
 The macros used to create the interface are...
+
 1. `MOCK_INTERFACE_DECLARATION(MOCK)`
 2. `MOCK_INTERFACE_DEFINITION(MOCK)`
 
@@ -392,6 +409,7 @@ MOCK_INTERFACE_DEFINITION(MockUefiLib);
 ```
 
 The macros used to create the mock functions are...
+
 1. `MOCK_FUNCTION_DECLARATION(RET_TYPE, FUNC, ARGS)`
 2. `MOCK_FUNCTION_DEFINITION(MOCK, FUNC, NUM_ARGS, CALL_TYPE)`
 3. `MOCK_FUNCTION_INTERNAL_DECLARATION(RET_TYPE, FUNC, ARGS)`
@@ -485,8 +503,8 @@ function to be compiled into the test application and then hooked to during a
 test.
 
 This library is mainly a wrapper around the
-[subhook](https://github.com/Zeex/subhook) header and source files. It is
-important to note that the use of the mock function macros and the creation
+[subhook](https://github.com/tianocore/edk2-subhook) header and source files. It
+is important to note that the use of the mock function macros and the creation
 of mock functions requires no knowledge about the SubhookLib. The SubhookLib
 library is entirely hidden and encapsulated within FunctionMockLib, and it
 is only mentioned here to provide a complete explanation on all the libraries
@@ -521,9 +539,9 @@ module being tested and use run-time replacement.
 The below table shows which macros to use in these two use cases. However, note that
 for the creation of the interface, the same macros are used in both cases.
 
-| Mock Function Use Case | Mock Interface Macros | Mock Function Macros |
-|:--- |:--- |:--- |
-| External mock functions | `MOCK_INTERFACE_DECLARATION`</br>`MOCK_INTERFACE_DEFINITION` | `MOCK_FUNCTION_DECLARATION`</br>`MOCK_FUNCTION_DEFINITION` |
+| Mock Function Use Case  | Mock Interface Macros                                        | Mock Function Macros                                                         |
+| :---------------------- | :----------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| External mock functions | `MOCK_INTERFACE_DECLARATION`</br>`MOCK_INTERFACE_DEFINITION` | `MOCK_FUNCTION_DECLARATION`</br>`MOCK_FUNCTION_DEFINITION`                   |
 | Internal mock functions | `MOCK_INTERFACE_DECLARATION`</br>`MOCK_INTERFACE_DEFINITION` | `MOCK_FUNCTION_INTERNAL_DECLARATION`</br>`MOCK_FUNCTION_INTERNAL_DEFINITION` |
 
 #### FunctionMockLib Mocks - External mock function
@@ -564,19 +582,19 @@ in header files. The name of the header file is determined by the interface
 (such as a library or a protocol) that is being created for the mock functions.
 The rules for naming the file are shown in the table below.
 
-| Interface Type | Header File Name |
-| :--- | :--- |
-| Library | Mock\<LibraryName\>Lib.h |
+| Interface Type                     | Header File Name                    |
+| :--------------------------------- | :---------------------------------- |
+| Library                            | Mock\<LibraryName\>Lib.h            |
 | Global Table (e.g. gRT, gBS, etc.) | Mock\<GlobalTableLibraryName\>Lib.h |
-| Protocol | Mock\<ProtocolName\>Protocol.h |
+| Protocol                           | Mock\<ProtocolName\>Protocol.h      |
 
 The below table shows examples for file names with each of the above cases.
 
-| Interface Type | Interface Name | Header File Name |
-| :--- | :--- | :--- |
-| Library | UefiLib | MockUefiLib.h |
+| Interface Type                     | Interface Name              | Header File Name                  |
+| :--------------------------------- | :-------------------------- | :-------------------------------- |
+| Library                            | UefiLib                     | MockUefiLib.h                     |
 | Global Table (e.g. gRT, gBS, etc.) | UefiRuntimeServicesTableLib | MockUefiRuntimeServicesTableLib.h |
-| Protocol | EFI_USB_IO_PROTOCOL | MockEfiUsbIoProtocol.h |
+| Protocol                           | EFI_USB_IO_PROTOCOL         | MockEfiUsbIoProtocol.h            |
 
 Once the header file name is known, the file needs to be created in the proper
 location. For internal mock functions, the location is simply the same
@@ -586,19 +604,19 @@ package where the library, global table, or protocol that is being mocked is
 declared. The exact location depends on the interface type and is shown in the
 below table.
 
-| Interface Type | Header File Location |
-| :--- | :--- |
-| Library | \<PackageName\>/Test/Mock/Include/GoogleTest/Library |
-| Global Table (e.g. gRT, gBS, etc.) | \<PackageName\>/Test/Mock/Include/GoogleTest/Library |
-| Protocol | \<PackageName\>/Test/Mock/Include/GoogleTest/Protocol |
+| Interface Type                     | Header File Location                                  |
+| :--------------------------------- | :---------------------------------------------------- |
+| Library                            | \<PackageName\>/Test/Mock/Include/GoogleTest/Library  |
+| Global Table (e.g. gRT, gBS, etc.) | \<PackageName\>/Test/Mock/Include/GoogleTest/Library  |
+| Protocol                           | \<PackageName\>/Test/Mock/Include/GoogleTest/Protocol |
 
 The below table shows examples for file locations with each of the above cases.
 
-| Interface Type | Interface Name | Header File Location |
-| :--- | :--- | :--- |
-| Library | UefiLib | MdePkg/Test/Mock/Include/GoogleTest/Library/MockUefiLib.h |
+| Interface Type                     | Interface Name              | Header File Location                                                          |
+| :--------------------------------- | :-------------------------- | :---------------------------------------------------------------------------- |
+| Library                            | UefiLib                     | MdePkg/Test/Mock/Include/GoogleTest/Library/MockUefiLib.h                     |
 | Global Table (e.g. gRT, gBS, etc.) | UefiRuntimeServicesTableLib | MdePkg/Test/Mock/Include/GoogleTest/Library/MockUefiRuntimeServicesTableLib.h |
-| Protocol | EFI_USB_IO_PROTOCOL | MdePkg/Test/Mock/Include/GoogleTest/Protocol/MockEfiUsbIoProtocol.h |
+| Protocol                           | EFI_USB_IO_PROTOCOL         | MdePkg/Test/Mock/Include/GoogleTest/Protocol/MockEfiUsbIoProtocol.h           |
 
 Now that the file location is known, the contents can be added to it. After the
 standard `#ifndef` for a header file is added at the top of the file, the
@@ -661,11 +679,11 @@ case of global tables and protocols, to eliminate possible function
 name collisions, the names are adjusted slightly in the mock
 declarations as shown in the below table.
 
-| Mock Function Use Case | Design Function Name | Mock Function Name |
-| :--- | :--- | :--- |
-| Library | GetVariable2 | GetVariable2  |
-| Global Table (e.g. gRT, gBS, etc.) | gRT->GetVariable | gRT_GetVariable |
-| Protocol | UsbIoProtocol->UsbPortReset | UsbIoProtocol_UsbPortReset |
+| Mock Function Use Case             | Design Function Name        | Mock Function Name         |
+| :--------------------------------- | :-------------------------- | :------------------------- |
+| Library                            | GetVariable2                | GetVariable2               |
+| Global Table (e.g. gRT, gBS, etc.) | gRT->GetVariable            | gRT_GetVariable            |
+| Protocol                           | UsbIoProtocol->UsbPortReset | UsbIoProtocol_UsbPortReset |
 
 Lastly, when creating mock functions, there are two limitations to be
 aware of in gMock that extend into FunctionMockLib.
@@ -685,19 +703,19 @@ in source files. The name of the source file is determined by the interface
 The rules for naming the file align with the naming of the file for declarations
 and are shown in the table below.
 
-| Interface Type | Source File Name |
-| :--- | :--- |
-| Library | Mock\<LibraryName\>Lib.cpp |
+| Interface Type                     | Source File Name                      |
+| :--------------------------------- | :------------------------------------ |
+| Library                            | Mock\<LibraryName\>Lib.cpp            |
 | Global Table (e.g. gRT, gBS, etc.) | Mock\<GlobalTableLibraryName\>Lib.cpp |
-| Protocol | Mock\<ProtocolName\>Protocol.cpp |
+| Protocol                           | Mock\<ProtocolName\>Protocol.cpp      |
 
 The below table shows examples for file names with each of the above cases.
 
-| Interface Type | Interface Name | Source File Name |
-| :--- | :--- | :--- |
-| Library | UefiLib | MockUefiLib.cpp |
+| Interface Type                     | Interface Name              | Source File Name                    |
+| :--------------------------------- | :-------------------------- | :---------------------------------- |
+| Library                            | UefiLib                     | MockUefiLib.cpp                     |
 | Global Table (e.g. gRT, gBS, etc.) | UefiRuntimeServicesTableLib | MockUefiRuntimeServicesTableLib.cpp |
-| Protocol | EFI_USB_IO_PROTOCOL | MockEfiUsbIoProtocol.cpp |
+| Protocol                           | EFI_USB_IO_PROTOCOL         | MockEfiUsbIoProtocol.cpp            |
 
 Once the source file name is known, the file needs to be created in the proper
 location. The location of the source file is aligned with the location for the
@@ -708,19 +726,19 @@ package where the library, global table, or protocol that is being mocked is
 declared. The exact location depends on the interface type and is shown in the
 below table.
 
-| Interface Type | Source File Location |
-| :--- | :--- |
-| Library | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<LibraryName\>Lib |
+| Interface Type                     | Source File Location                                                           |
+| :--------------------------------- | :----------------------------------------------------------------------------- |
+| Library                            | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<LibraryName\>Lib            |
 | Global Table (e.g. gRT, gBS, etc.) | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<GlobalTableLibraryName\>Lib |
-| Protocol | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<ProtocolName\>Protocol |
+| Protocol                           | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<ProtocolName\>Protocol      |
 
 The below table shows examples for file locations with each of the above cases.
 
-| Interface Type | Interface Name | Source File Location |
-| :--- | :--- | :--- |
-| Library | UefiLib | MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.cpp |
+| Interface Type                     | Interface Name              | Source File Location                                                                                    |
+| :--------------------------------- | :-------------------------- | :------------------------------------------------------------------------------------------------------ |
+| Library                            | UefiLib                     | MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.cpp                                         |
 | Global Table (e.g. gRT, gBS, etc.) | UefiRuntimeServicesTableLib | MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.cpp |
-| Protocol | EFI_USB_IO_PROTOCOL | MdePkg/Test/Mock/Library/GoogleTest/MockEfiUsbIoProtocol/MockEfiUsbIoProtocol.cpp |
+| Protocol                           | EFI_USB_IO_PROTOCOL         | MdePkg/Test/Mock/Library/GoogleTest/MockEfiUsbIoProtocol/MockEfiUsbIoProtocol.cpp                       |
 
 Now that the file location is known, the contents can be added to it. At the top
 of the file, the header file containing the mock function declarations is always
@@ -839,7 +857,7 @@ the `GoogleTestLib`, and the `[BuildOptions]` will need to append the `/EHsc`
 compilation flag to all MSFT builds to enable proper use of the C++ exception
 handler. Below is the complete `MockUefiLib.inf` as an example.
 
-```
+```inf
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MockUefiLib
@@ -874,7 +892,7 @@ if no test uses it yet, this created INF file needs to be added into the
 which this INF file resides. For example, the above `MockUefiLib.inf` would
 need to be added to the `MdePkg/Test/MdePkgHostTest.dsc` file as shown below.
 
-```
+```inf
 [Components]
   MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.inf
 ```
@@ -892,7 +910,7 @@ locate the mock function header file. For example, if `MockUefiLib.inf` were
 the first mock added to the `MdePkg`, then the below snippet would need to be
 added to the `MdePkg.dec` file.
 
-```
+```inf
 [Includes]
   Test/Mock/Include
 ```
@@ -912,7 +930,7 @@ mock function definitions file be added to the `[Sources]` section, the
 Below is a minimal contrived example for a `MyModuleGoogleTest.inf` that uses a
 `MockMyModuleInternalFunctions.cpp` source file for its internal mock functions.
 
-```
+```inf
 [Defines]
   INF_VERSION         = 0x00010017
   BASE_NAME           = MyModuleGoogleTest
@@ -974,7 +992,7 @@ you should be good to go.
 
 See this example in `SampleGoogleTestHost.inf`...
 
-```
+```inf
 [Packages]
   MdePkg/MdePkg.dec
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
@@ -988,7 +1006,7 @@ See this example in `SampleGoogleTestHost.inf`...
 Also, if you want your test to automatically be picked up by the Test Runner plugin, you will need
 to make sure that the module `BASE_NAME` contains the word `Test`...
 
-```
+```inf
 [Defines]
   BASE_NAME      = SampleGoogleTestHost
 ```
@@ -1000,29 +1018,31 @@ section so that the unit tests will be built.
 
 See this example in `UnitTestFrameworkPkgHostTest.dsc`...
 
-```
+```inf
 [Components]
   UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTest/SampleGoogleTestHost.inf
 ```
 
 Also, based on the type of tests that are being created, the associated DSC include file from the
 UnitTestFrameworkPkg for Host or Target based tests should also be included at the top of the DSC
-file.
+file. This provides the default defines and library class mappings requires for unit testing.
 
-```
+```inf
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 ```
+
+ > **NOTE**: DSC files for host based unit tests must **not** include default mappings from packages such as `MdePkg/MdeLibs.dsc.inc`. This DSC files provides default defines and  library mappings for firmware builds that may not be compatible with host based unit test builds. Instead, the DSC file for host based unit tests must provide all the settings required for host based unit tests.
 
 Lastly, in the case that the test build has specific dependent libraries associated with it,
 they should be added in the \<LibraryClasses\> sub-section for the INF file in the
 `[Components]` section of the DSC file. Note that it is within this sub-section where you can
-control whether the design or mock version of a component is linked into the test exectuable.
+control whether the design or mock version of a component is linked into the test executable.
 
 See this example in `SecurityPkgHostTest.dsc` where the `SecureBootVariableLib` design is
 being tested using mock versions of `UefiRuntimeServicesTableLib`, `PlatformPKProtectionLib`,
 and `UefiLib`...
 
-```
+```inf
 [Components]
   SecurityPkg/Library/SecureBootVariableLib/GoogleTest/SecureBootVariableLibGoogleTest.inf {
     <LibraryClasses>
@@ -1245,7 +1265,7 @@ uses the same test fixture and makes use of its `RtServicesMock`, `Status`, and
 `SecureBootMode` variables.
 
 ```cpp
-TEST_F(SetSecureBootModeTest, PropogateModeToSetVar) {
+TEST_F(SetSecureBootModeTest, PropagateModeToSetVar) {
   EXPECT_CALL(RtServicesMock,
     gRT_SetVariable(
       Char16StrEq(EFI_CUSTOM_MODE_NAME),
@@ -1312,7 +1332,7 @@ If you are trying to iterate on a single test, a convenient pattern is to build 
 the following command will build only the SafeIntLib host-based test from the MdePkg...
 
 ```bash
-stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2017 -p MdePkg -t NOOPT BUILDMODULE=MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.inf
+stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -p MdePkg -t NOOPT BUILDMODULE=MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.inf
 ```
 
 ### Hooking BaseLib
@@ -1337,7 +1357,7 @@ symbolic debugging to be enabled.
 You can run a build by adding the `BLD_*_UNIT_TESTING_DEBUG=TRUE` parameter to enable this build option.
 
 ```bash
-stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -p MdePkg -t NOOPT BLD_*_UNIT_TESTING_DEBUG=TRUE
+stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -p MdePkg -t NOOPT BLD_*_UNIT_TESTING_DEBUG=TRUE
 ```
 
 ## Building and Running Host-Based Tests
@@ -1361,16 +1381,25 @@ After that, the following commands will set up the build and run the host-based 
 
 ```bash
 # Setup repo for building
-# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.>
-stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019
+# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC, VS2022, etc.>
+stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 
 # Update all binary dependencies
-# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.>
-stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019
+# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC, VS2022, etc.>
+stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 
 # Build and run the tests
-# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.> -t NOOPT [-p <Package Name>]
-stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p MdePkg
+# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC, VS2022, etc.> -t NOOPT [-p <Package Name>]
+stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg
+```
+
+#### Disabling Address Sanitizer
+
+By default, the address sanitizer feature is enabled for all host based unit test builds.  It can be disabled for
+development/debug purposes by setting the DSC define `UNIT_TESTING_ADDRESS_SANITIZER_ENABLE` to `FALSE`.
+
+```bash
+stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg BLD_*_UNIT_TESTING_ADDRESS_SANITIZER_ENABLE=FALSE
 ```
 
 ### Evaluating the Results
@@ -1378,7 +1407,7 @@ stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p Mde
 In your immediate output, any build failures will be highlighted. You can see these below as "WARNING" and "ERROR" messages.
 
 ```text
-(edk_env) PS C:\_uefi\edk2> stuart_ci_build -c .\.pytool\CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p MdePkg
+(edk_env) PS C:\_uefi\edk2> stuart_ci_build -c .\.pytool\CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg
 
 SECTION - Init SDE
 SECTION - Loading Plugins
@@ -1413,7 +1442,7 @@ ERROR - Error
 If a test fails, you can run it manually to get more details...
 
 ```text
-(edk_env) PS C:\_uefi\edk2> .\Build\MdePkg\HostTest\NOOPT_VS2019\X64\TestBaseSafeIntLibHost.exe
+(edk_env) PS C:\_uefi\edk2> .\Build\MdePkg\HostTest\NOOPT_VS2022\X64\TestBaseSafeIntLibHost.exe
 
 Int Safe Lib Unit Test Application v0.1
 ---------------------------------------------------------
@@ -1446,7 +1475,7 @@ A sample of this output looks like:
 ```xml
 <!--
   Excerpt taken from:
-  Build\MdePkg\HostTest\NOOPT_VS2019\X64\TestBaseSafeIntLibHost.exe.Int Safe Conversions Test Suite.X64.result.xml
+  Build\MdePkg\HostTest\NOOPT_VS2022\X64\TestBaseSafeIntLibHost.exe.Int Safe Conversions Test Suite.X64.result.xml
   -->
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
@@ -1463,13 +1492,33 @@ c:\_uefi\MdePkg\Test\UnitTest\Library\BaseSafeIntLib\TestBaseSafeIntLib.c:35: er
     </testcase>
 ```
 
+### Manually Running Unit Test Executables
+
+The host based unit test executed using `stuart_ci_build` sets up the environment to run host based unit tests
+including environment variable settings. If host based unit test executable are run manually either from a
+shell or using VS Code extensions such as `C++ TestMate`, then the environment must be setup correctly.
+
+#### Windows Environment Variable Settings
+
+```bash
+set GTEST_CATCH_EXCEPTIONS=0
+set ASAN_OPTIONS=detect_leaks=0
+```
+
+#### Linux Environment Variable Settings
+
+```bash
+export GTEST_CATCH_EXCEPTIONS=0
+export ASAN_OPTIONS=detect_leaks=0
+```
+
 ### XML Reporting Mode
 
 Unit test applications using Framework are built using Cmocka that requires the
 following environment variables to be set to generate structured XML output
 rather than text:
 
-```
+```bash
 CMOCKA_MESSAGE_OUTPUT=xml
 CMOCKA_XML_FILE=<absolute or relative path to output file>
 ```
@@ -1477,7 +1526,7 @@ CMOCKA_XML_FILE=<absolute or relative path to output file>
 Unit test applications using GoogleTest require the following environment
 variable to be set to generate structured XML output rather than text:
 
-```
+```bash
 GTEST_OUTPUT=xml:<absolute or relative path to output file>
 ```
 
@@ -1490,39 +1539,42 @@ Host based Unit Tests will automatically enable coverage data.
 For Windows, this is primarily leveraged for pipeline builds, but this can be leveraged locally using the
 OpenCppCoverage windows tool to parse coverage data to cobertura xml format.
 
-- Windows Prerequisite
+* Windows Prerequisite
+
   ```bash
   Download and install https://github.com/OpenCppCoverage/OpenCppCoverage/releases
   python -m pip install --upgrade -r ./pip-requirements.txt
-  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=VS2019 -p MdeModulePkg
+  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=VS2022 -p MdeModulePkg
   Open Build/coverage.xml
   ```
 
-  - How to see code coverage data on IDE Visual Studio
-    ```
-    Open Visual Studio VS2019 or above version
+  * How to see code coverage data on IDE Visual Studio
+
+    ```bash
+    Open Visual Studio VS2022 or above version
     Click "Tools" -> "OpenCppCoverage Settings"
     Fill your execute file into "Program to run:"
     Click "Tools" -> "Run OpenCppCoverage"
     ```
 
-
 For Linux, this is primarily leveraged for pipeline builds, but this can be leveraged locally using the
 lcov linux tool, and parsed using the lcov_cobertura python tool to parse it to cobertura xml format.
 
-- Linux Prerequisite
+* Linux Prerequisite
+
   ```bash
   sudo apt-get install -y lcov
   python -m pip install --upgrade -r ./pip-requirements.txt
-  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=GCC5 -p MdeModulePkg
+  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=GCC -p MdeModulePkg
   Open Build/coverage.xml
   ```
-  - How to see code coverage data on IDE Visual Studio Code
-    ```
+
+  * How to see code coverage data on IDE Visual Studio Code
+
+    ```bash
     Download plugin "Coverage Gutters"
     Press Hot Key "Ctrl + Shift + P" and click option "Coverage Gutters: Display Coverage"
     ```
-
 
 ### Important Note
 
@@ -1552,12 +1604,12 @@ We will continue trying to make these as similar as possible.
 
 ## Unit Test Location/Layout Rules
 
-Code/Test                                   | Location
----------                                   | --------
-Host-Based Unit Tests for a Library/Protocol/PPI/GUID Interface   | If what's being tested is an interface (e.g. a library with a public header file, like DebugLib) and the test is agnostic to a specific implementation, then the test should be scoped to the parent package.<br/>Example: `MdePkg/Test/UnitTest/[Library/Protocol/Ppi/Guid]/`<br/><br/>A real-world example of this is the BaseSafeIntLib test in MdePkg.<br/>`MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf`
-Host-Based Unit Tests for a Library/Driver (PEI/DXE/SMM) implementation   | If what's being tested is a specific implementation (e.g. BaseDebugLibSerialPort for DebugLib), then the test should be scoped to the implementation directory itself, in a UnitTest (or GoogleTest) subdirectory.<br/><br/>Module Example: `MdeModulePkg/Universal/EsrtFmpDxe/UnitTest/`<br/>Library Example: `MdePkg/Library/BaseMemoryLib/UnitTest/`<br/>Library Example (GoogleTest): `SecurityPkg/Library/SecureBootVariableLib/GoogleTest/`
-Host-Based Tests for a Functionality or Feature   | If you're writing a functional test that operates at the module level (i.e. if it's more than a single file or library), the test should be located in the package-level Tests directory under the HostFuncTest subdirectory.<br/>For example, if you were writing a test for the entire FMP Device Framework, you might put your test in:<br/>`FmpDevicePkg/Test/HostFuncTest/FmpDeviceFramework`<br/><br/>If the feature spans multiple packages, it's location should be determined by the package owners related to the feature.
-Non-Host-Based (PEI/DXE/SMM/Shell) Tests for a Functionality or Feature   | Similar to Host-Based, if the feature is in one package, should be located in the `*Pkg/Test/[Shell/Dxe/Smm/Pei]Test` directory.<br/><br/>If the feature spans multiple packages, it's location should be determined by the package owners related to the feature.<br/><br/>USAGE EXAMPLES<br/>PEI Example: MP_SERVICE_PPI. Or check MTRR configuration in a notification function.<br/> SMM Example: a test in a protocol callback function. (It is different with the solution that SmmAgent+ShellApp)<br/>DXE Example: a test in a UEFI event call back to check SPI/SMRAM status. <br/> Shell Example: the SMM handler audit test has a shell-based app that interacts with an SMM handler to get information. The SMM paging audit test gathers information about both DXE and SMM. And the SMM paging functional test actually forces errors into SMM via a DXE driver.
+| Code/Test                                                               | Location                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Host-Based Unit Tests for a Library/Protocol/PPI/GUID Interface         | If what's being tested is an interface (e.g. a library with a public header file, like DebugLib) and the test is agnostic to a specific implementation, then the test should be scoped to the parent package.<br/>Example: `MdePkg/Test/UnitTest/[Library/Protocol/Ppi/Guid]/`<br/><br/>A real-world example of this is the BaseSafeIntLib test in MdePkg.<br/>`MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Host-Based Unit Tests for a Library/Driver (PEI/DXE/SMM) implementation | If what's being tested is a specific implementation (e.g. BaseDebugLibSerialPort for DebugLib), then the test should be scoped to the implementation directory itself, in a UnitTest (or GoogleTest) subdirectory.<br/><br/>Module Example: `MdeModulePkg/Universal/EsrtFmpDxe/UnitTest/`<br/>Library Example: `MdePkg/Library/BaseMemoryLib/UnitTest/`<br/>Library Example (GoogleTest): `SecurityPkg/Library/SecureBootVariableLib/GoogleTest/`                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Host-Based Tests for a Functionality or Feature                         | If you're writing a functional test that operates at the module level (i.e. if it's more than a single file or library), the test should be located in the package-level Tests directory under the HostFuncTest subdirectory.<br/>For example, if you were writing a test for the entire FMP Device Framework, you might put your test in:<br/>`FmpDevicePkg/Test/HostFuncTest/FmpDeviceFramework`<br/><br/>If the feature spans multiple packages, it's location should be determined by the package owners related to the feature.                                                                                                                                                                                                                                                                                                                                          |
+| Non-Host-Based (PEI/DXE/SMM/Shell) Tests for a Functionality or Feature | Similar to Host-Based, if the feature is in one package, should be located in the `*Pkg/Test/[Shell/Dxe/Smm/Pei]Test` directory.<br/><br/>If the feature spans multiple packages, it's location should be determined by the package owners related to the feature.<br/><br/>USAGE EXAMPLES<br/>PEI Example: MP_SERVICE_PPI. Or check MTRR configuration in a notification function.<br/> SMM Example: a test in a protocol callback function. (It is different with the solution that SmmAgent+ShellApp)<br/>DXE Example: a test in a UEFI event call back to check SPI/SMRAM status. <br/> Shell Example: the SMM handler audit test has a shell-based app that interacts with an SMM handler to get information. The SMM paging audit test gathers information about both DXE and SMM. And the SMM paging functional test actually forces errors into SMM via a DXE driver. |
 
 ### Example Directory Tree
 
@@ -1632,12 +1684,12 @@ Non-Host-Based (PEI/DXE/SMM/Shell) Tests for a Functionality or Feature   | Simi
 
 We don't know if these types will exist or be applicable yet, but if you write a support library or module that matches the following, please make sure they live in the correct place.
 
-Code/Test                                   | Location
----------                                   | --------
-Host-Based Library Implementations                 | Host-Based Implementations of common libraries (eg. MemoryAllocationLibHost) should live in the same package that declares the library interface in its .DEC file in the `*Pkg/HostLibrary` directory. Should have 'Host' in the name.
-Host-Based Mocks and Stubs  | Mock and Stub libraries should live in the `UefiTestFrameworkPkg/StubLibrary` with either 'Mock' or 'Stub' in the library name.
+| Code/Test                          | Location                                                                                                                                                                                                                               |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Host-Based Library Implementations | Host-Based Implementations of common libraries (eg. MemoryAllocationLibHost) should live in the same package that declares the library interface in its .DEC file in the `*Pkg/HostLibrary` directory. Should have 'Host' in the name. |
+| Host-Based Mocks and Stubs         | Mock and Stub libraries should live in the `UefiTestFrameworkPkg/StubLibrary` with either 'Mock' or 'Stub' in the library name.                                                                                                        |
 
-### If still in doubt...
+### If still in doubt
 
 Hop on GitHub and ask @corthon, @mdkinney, or @spbrogan. ;)
 

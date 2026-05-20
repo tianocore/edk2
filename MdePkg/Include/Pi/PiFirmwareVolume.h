@@ -9,6 +9,8 @@
 
 **/
 
+#pragma once
+
 #ifndef __PI_FIRMWAREVOLUME_H__
 #define __PI_FIRMWAREVOLUME_H__
 

@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef HW_INFO_PARSER_LIB_H_
-#define HW_INFO_PARSER_LIB_H_
+#pragma once
 
 #include <ConfigurationManagerObject.h>
 
@@ -25,6 +24,8 @@ typedef VOID *HW_INFO_PARSER_HANDLE;
   @param  [in]  Context       A pointer to the caller's context provided in
                               HwInfoParserInit ().
   @param  [in]  CmObjDesc     CM_OBJ_DESCRIPTOR containing the CmObj(s) to add.
+  @param  [in]  NewToken      Token for this object. If CM_NULL_TOKEN, then
+                              a new token is generated.
   @param  [out] Token         If provided and success, contain the token
                               generated for the CmObj.
 
@@ -37,6 +38,7 @@ EFI_STATUS
   IN        HW_INFO_PARSER_HANDLE   ParserHandle,
   IN        VOID                  *Context,
   IN  CONST CM_OBJ_DESCRIPTOR     *CmObjDesc,
+  IN  CONST CM_OBJECT_TOKEN        NewToken,
   OUT       CM_OBJECT_TOKEN       *Token OPTIONAL
   );
 
@@ -95,5 +97,3 @@ EFIAPI
 HwInfoParserShutdown (
   IN  HW_INFO_PARSER_HANDLE  ParserHandle
   );
-
-#endif // HW_INFO_PARSER_LIB_H_

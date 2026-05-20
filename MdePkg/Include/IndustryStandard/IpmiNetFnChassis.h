@@ -11,8 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_CHASSIS_H_
-#define _IPMI_NET_FN_CHASSIS_H_
+#pragma once
 
 #pragma pack (1)
 //
@@ -379,9 +378,14 @@ typedef struct {
   UINT8                               BootInfoTimeStamp[4];
 } IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_6;
 
+//
+//  Constant definitions for the boot initiator mailbox (parameter 7)
+//
+#define IPMI_BOOT_INITIATOR_MAILBOX_BLOCK_DATA_SIZE  16
+
 typedef struct {
   UINT8    SetSelector;
-  UINT8    BlockData[16];
+  UINT8    BlockData[IPMI_BOOT_INITIATOR_MAILBOX_BLOCK_DATA_SIZE];
 } IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_7;
 
 typedef union {
@@ -459,4 +463,3 @@ typedef struct {
 //  Constants and Structure definitions for "Get POH Counter" command to follow here
 //
 #pragma pack()
-#endif

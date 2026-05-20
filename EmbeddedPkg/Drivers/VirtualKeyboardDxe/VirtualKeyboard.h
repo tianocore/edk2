@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VIRTUAL_KEYBOARD_H_
-#define _VIRTUAL_KEYBOARD_H_
+#pragma once
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/DevicePath.h>
@@ -43,7 +42,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gVirtualKeyboardComponentName2;
 #define KEYBOARD_TIMEOUT               65536         // 0.07s
 #define KEYBOARD_WAITFORVALUE_TIMEOUT  1000000       // 1s
 #define KEYBOARD_BAT_TIMEOUT           4000000       // 4s
-#define KEYBOARD_TIMER_INTERVAL        500000        // 0.5s
+#define KEYBOARD_TIMER_INTERVAL        500000        // 0.05s
 
 #define QUEUE_MAX_COUNT  32
 
@@ -533,5 +532,3 @@ VirtualKeyboardReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   OUT EFI_KEY_DATA                       *KeyData
   );
-
-#endif /* _VIRTUAL_KEYBOARD_H_ */

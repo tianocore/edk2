@@ -371,6 +371,10 @@ HFileImageSave (
   // set status string
   //
   Str = CatSPrint (NULL, L"%d Lines Written", NumLines);
+  if (Str == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   StatusBarSetStatusString (Str);
   FreePool (Str);
 

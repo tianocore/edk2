@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _CACHE_AS_RAM_LIB_H_
-#define _CACHE_AS_RAM_LIB_H_
+#pragma once
 
 /**
   This function disable CAR.
@@ -19,5 +18,3 @@ EFIAPI
 DisableCacheAsRam (
   IN BOOLEAN  DisableCar
   );
-
-#endif

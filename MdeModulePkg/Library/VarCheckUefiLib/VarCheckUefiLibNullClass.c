@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef
 EFI_STATUS
 (EFIAPI *INTERNAL_VAR_CHECK_FUNCTION)(
-  IN VAR_CHECK_VARIABLE_PROPERTY    *Propery,
+  IN VAR_CHECK_VARIABLE_PROPERTY    *Property,
   IN UINTN                          DataSize,
   IN VOID                           *Data
   );
@@ -36,7 +36,7 @@ typedef struct {
 /**
   Internal check for load option.
 
-  @param[in] VariablePropery    Pointer to variable property.
+  @param[in] VariableProperty   Pointer to variable property.
   @param[in] DataSize           Data size.
   @param[in] Data               Pointer to data buffer.
 
@@ -47,7 +47,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 InternalVarCheckLoadOption (
-  IN VAR_CHECK_VARIABLE_PROPERTY  *VariablePropery,
+  IN VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty,
   IN UINTN                        DataSize,
   IN VOID                         *Data
   )
@@ -102,7 +102,7 @@ InternalVarCheckLoadOption (
 /**
   Internal check for key option.
 
-  @param[in] VariablePropery    Pointer to variable property.
+  @param[in] VariableProperty   Pointer to variable property.
   @param[in] DataSize           Data size.
   @param[in] Data               Pointer to data buffer.
 
@@ -113,7 +113,7 @@ InternalVarCheckLoadOption (
 EFI_STATUS
 EFIAPI
 InternalVarCheckKeyOption (
-  IN VAR_CHECK_VARIABLE_PROPERTY  *VariablePropery,
+  IN VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty,
   IN UINTN                        DataSize,
   IN VOID                         *Data
   )
@@ -128,7 +128,7 @@ InternalVarCheckKeyOption (
 /**
   Internal check for device path.
 
-  @param[in] VariablePropery    Pointer to variable property.
+  @param[in] VariableProperty   Pointer to variable property.
   @param[in] DataSize           Data size.
   @param[in] Data               Pointer to data buffer.
 
@@ -139,7 +139,7 @@ InternalVarCheckKeyOption (
 EFI_STATUS
 EFIAPI
 InternalVarCheckDevicePath (
-  IN VAR_CHECK_VARIABLE_PROPERTY  *VariablePropery,
+  IN VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty,
   IN UINTN                        DataSize,
   IN VOID                         *Data
   )
@@ -154,7 +154,7 @@ InternalVarCheckDevicePath (
 /**
   Internal check for ASCII string.
 
-  @param[in] VariablePropery    Pointer to variable property.
+  @param[in] VariableProperty   Pointer to variable property.
   @param[in] DataSize           Data size.
   @param[in] Data               Pointer to data buffer.
 
@@ -165,7 +165,7 @@ InternalVarCheckDevicePath (
 EFI_STATUS
 EFIAPI
 InternalVarCheckAsciiString (
-  IN VAR_CHECK_VARIABLE_PROPERTY  *VariablePropery,
+  IN VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty,
   IN UINTN                        DataSize,
   IN VOID                         *Data
   )
@@ -191,7 +191,7 @@ InternalVarCheckAsciiString (
 /**
   Internal check for size array.
 
-  @param[in] VariablePropery    Pointer to variable property.
+  @param[in] VariableProperty   Pointer to variable property.
   @param[in] DataSize           Data size.
   @param[in] Data               Pointer to data buffer.
 
@@ -202,12 +202,12 @@ InternalVarCheckAsciiString (
 EFI_STATUS
 EFIAPI
 InternalVarCheckSizeArray (
-  IN VAR_CHECK_VARIABLE_PROPERTY  *VariablePropery,
+  IN VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty,
   IN UINTN                        DataSize,
   IN VOID                         *Data
   )
 {
-  if ((DataSize % VariablePropery->MinSize) != 0) {
+  if ((DataSize % VariableProperty->MinSize) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 

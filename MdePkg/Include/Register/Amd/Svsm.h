@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef SVSM_H_
-#define SVSM_H_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -98,4 +97,27 @@ typedef union {
   UINT64    Uint64;
 } SVSM_FUNCTION;
 
-#endif
+/// SVSM Guest Protocols
+/// @{
+#define SVSM_PROTOCOL_CORE         0
+#define SVSM_PROTOCOL_ATTESTATION  1
+#define SVSM_PROTOCOL_VTPM         2
+/// @}
+
+/// SVSM Core Protocol calls
+/// @{
+#define SVSM_CORE_REMAP_CA        0
+#define SVSM_CORE_PVALIDATE       1
+#define SVSM_CORE_CREATE_VCPU     2
+#define SVSM_CORE_DELETE_VCPU     3
+#define SVSM_CORE_DEPOSIT_MEM     4
+#define SVSM_CORE_WITHDRAW_MEM    5
+#define SVSM_CORE_QUERY_PROTOCOL  6
+#define SVSM_CORE_CONFIGURE_VTOM  7
+/// @}
+
+/// SVSM vTPM Protocol calls
+/// @{
+#define SVSM_VTPM_QUERY  0
+#define SVSM_VTPM_CMD    1
+/// @}

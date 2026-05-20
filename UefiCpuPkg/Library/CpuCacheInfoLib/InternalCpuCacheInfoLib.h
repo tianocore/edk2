@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _INTERNAL_CPU_CACHE_INFO_LIB_H_
-#define _INTERNAL_CPU_CACHE_INFO_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Register/Cpuid.h>
@@ -104,8 +103,8 @@ typedef struct {
 } CPUID_CACHE_DATA;
 
 typedef union {
-  EDKII_PEI_MP_SERVICES2_PPI    *Ppi;
-  EFI_MP_SERVICES_PROTOCOL      *Protocol;
+  EFI_PEI_MP_SERVICES2_PPI    *Ppi;
+  EFI_MP_SERVICES_PROTOCOL    *Protocol;
 } MP_SERVICES;
 
 typedef struct {
@@ -128,13 +127,13 @@ typedef struct {
 #define MAX_NUM_OF_PACKAGE  100
 
 /**
-  Get EDKII_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL pointer.
+  Get EFI_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL pointer.
 
-  @param[out] MpServices    A pointer to the buffer where EDKII_PEI_MP_SERVICES2_PPI or
+  @param[out] MpServices    A pointer to the buffer where EFI_PEI_MP_SERVICES2_PPI or
                             EFI_MP_SERVICES_PROTOCOL is stored
 
-  @retval EFI_SUCCESS       EDKII_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL interface is returned
-  @retval EFI_NOT_FOUND     EDKII_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL interface is not found
+  @retval EFI_SUCCESS       EFI_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL interface is returned
+  @retval EFI_NOT_FOUND     EFI_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL interface is not found
 **/
 EFI_STATUS
 CpuCacheInfoGetMpServices (
@@ -192,5 +191,3 @@ UINT32
 CpuCacheInfoGetNumberOfProcessors (
   IN MP_SERVICES  MpServices
   );
-
-#endif

@@ -97,6 +97,9 @@ TerminalConInReset (
 
   if (!EFI_ERROR (Status)) {
     Status = TerminalDevice->SerialIo->SetControl (TerminalDevice->SerialIo, EFI_SERIAL_DATA_TERMINAL_READY|EFI_SERIAL_REQUEST_TO_SEND);
+    if (Status == EFI_UNSUPPORTED) {
+      Status = EFI_SUCCESS;
+    }
   }
 
   return Status;
@@ -757,7 +760,8 @@ RawFiFoRemoveOneKey (
     return FALSE;
   }
 
-  *Output = TerminalDevice->RawFiFo->Data[Head];
+  *Output                             = TerminalDevice->RawFiFo->Data[Head];
+  TerminalDevice->RawFiFo->Data[Head] = 0;
 
   TerminalDevice->RawFiFo->Head = (UINT8)((Head + 1) % (RAW_FIFO_MAX_NUMBER + 1));
 
@@ -878,6 +882,7 @@ EfiKeyFiFoForNotifyRemoveOneKey (
   }
 
   CopyMem (Output, &EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
+  ZeroMem (&EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
 
   EfiKeyFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
@@ -1029,6 +1034,7 @@ EfiKeyFiFoRemoveOneKey (
   }
 
   CopyMem (Output, &TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
+  ZeroMem (&TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
 
   TerminalDevice->EfiKeyFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
@@ -1139,7 +1145,8 @@ UnicodeFiFoRemoveOneKey (
   Head = TerminalDevice->UnicodeFiFo->Head;
   ASSERT (Head < FIFO_MAX_NUMBER + 1);
 
-  *Output = TerminalDevice->UnicodeFiFo->Data[Head];
+  *Output                                 = TerminalDevice->UnicodeFiFo->Data[Head];
+  TerminalDevice->UnicodeFiFo->Data[Head] = 0;
 
   TerminalDevice->UnicodeFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 }
@@ -2116,7 +2123,14 @@ UnicodeToEfiKey (
     }
 
     if (UnicodeChar == DEL) {
-      if (TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
+      //
+      // Modern terminal emulators (xterm, gnome-terminal, etc.) send DEL (0x7f)
+      // for Backspace. Both TtyTerm and VtUtf8 should interpret this as
+      // CHAR_BACKSPACE for proper Backspace functionality in serial console mode.
+      //
+      if ((TerminalDevice->TerminalType == TerminalTypeTtyTerm) ||
+          (TerminalDevice->TerminalType == TerminalTypeVtUtf8))
+      {
         Key.ScanCode    = SCAN_NULL;
         Key.UnicodeChar = CHAR_BACKSPACE;
       } else {

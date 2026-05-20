@@ -1,0 +1,35 @@
+## @file
+#  Creates ACPI FACS tables for AMD platforms.
+#
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION       = 1.30
+  BASE_NAME         = AcpiFacsLib
+  FILE_GUID         = A159F551-FE6D-44FF-82B1-947F466215D4
+  MODULE_TYPE       = DXE_DRIVER
+  VERSION_STRING    = 1.0
+  LIBRARY_CLASS     = NULL|DXE_DRIVER
+  CONSTRUCTOR       = AcpiFacsLibConstructor
+  DESTRUCTOR        = AcpiFacsLibDestructor
+
+[Sources]
+  FacsGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiLib
+
+[Guids]
+  gEfiAcpiTableGuid
+  gEfiEventReadyToBootGuid

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef SSDT_PCIE_SUPPORT_LIB_H_
-#define SSDT_PCIE_SUPPORT_LIB_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -71,5 +70,3 @@ GeneratePciSlots (
   IN            UINT32                                Uid,
   IN  OUT       AML_OBJECT_NODE_HANDLE                PciNode
   );
-
-#endif // SSDT_PCIE_SUPPORT_LIB_H_

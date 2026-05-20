@@ -230,7 +230,7 @@ GetWakeupBuffer (
           WakeupBufferEnd = BASE_1MB;
         }
 
-        while (WakeupBufferEnd > WakeupBufferSize) {
+        while (WakeupBufferEnd > (UINT64)WakeupBufferSize) {
           //
           // Wakeup buffer should be aligned on 4KB
           //
@@ -290,7 +290,7 @@ GetWakeupBuffer (
   @retval 0       Cannot find free memory below 4GB.
 **/
 UINTN
-AllocateCodeBuffer (
+AllocateCodePage (
   IN UINTN  BufferSize
   )
 {
@@ -439,11 +439,24 @@ InitMpGlobalData (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
 
   BuildMicrocodeCacheHob (CpuMpData);
   SaveCpuMpData (CpuMpData);
-  PrepareApLoopCode (CpuMpData);
+
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  if (!EFI_ERROR (Status) && (BootMode == BOOT_ON_S3_RESUME)) {
+    //
+    // Only allocate the AP loop code buffer on S3 resume.
+    // This allocates ACPI NVS memory which is a RT visible memory type that
+    // remains fragmented against the overall EfiACPIMemoryNVS memory bucket
+    // allocated by the DXE Core.
+    //
+    PrepareApLoopCode (CpuMpData);
+  }
 
   ///
   /// Install Notify
@@ -728,7 +741,7 @@ MpInitLibEnableDisableAP (
 }
 
 /**
-  This funtion will try to invoke platform specific microcode shadow logic to
+  This function will try to invoke platform specific microcode shadow logic to
   relocate microcode update patches into memory.
 
   @param[in, out] CpuMpData  The pointer to CPU MP Data structure.
@@ -819,31 +832,21 @@ AllocateApLoopCodeBuffer (
 }
 
 /**
-  Remove Nx protection for the range specific by BaseAddress and Length.
+  Determine the Paging Mode that the system is currently
+  using.
 
-  The PEI implementation uses CpuPageTableLib to change the attribute.
-  The DXE implementation uses gDS to change the attribute.
-
-  @param[in] BaseAddress  BaseAddress of the range.
-  @param[in] Length       Length of the range.
-**/
-VOID
-RemoveNxprotection (
-  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN UINTN                 Length
+  @retval PAGING_MODE
+ **/
+PAGING_MODE
+DetermineCurrentPagingMode (
+  VOID
   )
 {
-  EFI_STATUS                  Status;
-  UINTN                       PageTable;
-  EFI_PHYSICAL_ADDRESS        Buffer;
-  UINTN                       BufferSize;
-  IA32_MAP_ATTRIBUTE          MapAttribute;
-  IA32_MAP_ATTRIBUTE          MapMask;
   PAGING_MODE                 PagingMode;
   IA32_CR4                    Cr4;
   BOOLEAN                     Page5LevelSupport;
-  UINT32                      RegEax;
   BOOLEAN                     Page1GSupport;
+  UINT32                      RegEax;
   CPUID_EXTENDED_CPU_SIG_EDX  RegEdx;
 
   if (sizeof (UINTN) == sizeof (UINT64)) {
@@ -877,12 +880,36 @@ RemoveNxprotection (
     PagingMode = PagingPae;
   }
 
+  return PagingMode;
+}
+
+/**
+  Remove Nx protection for the range specific by BaseAddress and Length.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+RemoveNxProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 PageTable;
+  EFI_PHYSICAL_ADDRESS  Buffer;
+  UINTN                 BufferSize;
+  IA32_MAP_ATTRIBUTE    MapAttribute;
+  IA32_MAP_ATTRIBUTE    MapMask;
+  PAGING_MODE           PagingMode;
+
   MapAttribute.Uint64 = 0;
   MapMask.Uint64      = 0;
   MapMask.Bits.Nx     = 1;
   PageTable           = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
   BufferSize          = 0;
 
+  PagingMode = DetermineCurrentPagingMode ();
   //
   // Get required buffer size for changing the pagetable.
   //
@@ -902,4 +929,53 @@ RemoveNxprotection (
 
   ASSERT_EFI_ERROR (Status);
   AsmWriteCr3 (PageTable);
+}
+
+/**
+  Add ReadOnly protection to the range specified by BaseAddress and Length.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+ApplyRoProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 PageTable;
+  EFI_PHYSICAL_ADDRESS  Buffer;
+  UINTN                 BufferSize;
+  IA32_MAP_ATTRIBUTE    MapAttribute;
+  IA32_MAP_ATTRIBUTE    MapMask;
+  PAGING_MODE           PagingMode;
+
+  MapAttribute.Uint64    = 0;
+  MapMask.Uint64         = 0;
+  MapMask.Bits.ReadWrite = 1;
+  PageTable              = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
+  BufferSize             = 0;
+
+  PagingMode = DetermineCurrentPagingMode ();
+  //
+  // Get required buffer size for changing the pagetable.
+  //
+  Status = PageTableMap (&PageTable, PagingMode, 0, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    //
+    // Allocate required Buffer.
+    //
+    Status = PeiServicesAllocatePages (
+               EfiBootServicesData,
+               EFI_SIZE_TO_PAGES (BufferSize),
+               &Buffer
+               );
+    ASSERT_EFI_ERROR (Status);
+    Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  }
+
+  ASSERT_EFI_ERROR (Status);
+  AsmWriteCr3 (PageTable);
+  return;
 }

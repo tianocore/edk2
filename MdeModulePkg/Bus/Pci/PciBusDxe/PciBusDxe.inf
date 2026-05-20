@@ -2,6 +2,7 @@
 #  The PCI bus driver will probe all PCI devices and allocate MMIO and IO space for these devices.
 #  Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting.
 #
+#  Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 #  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -17,16 +18,6 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = PciBusEntryPoint
-
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
-#
-#  DRIVER_BINDING                =  gPciBusDriverBinding
-#  COMPONENT_NAME                =  gPciBusComponentName
-#  COMPONENT_NAME2               =  gPciBusComponentName2
-#
 
 [Sources]
   PciLib.c
@@ -104,9 +95,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsRetryIntervalUs       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds        ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef RNGDXE_INTERNALS_H_
-#define RNGDXE_INTERNALS_H_
+#pragma once
 
 #include <Protocol/Rng.h>
 
@@ -134,5 +133,3 @@ GenerateEntropy (
   IN UINTN   Length,
   OUT UINT8  *Entropy
   );
-
-#endif // RNGDXE_INTERNALS_H_

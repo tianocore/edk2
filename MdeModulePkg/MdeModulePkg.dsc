@@ -16,7 +16,7 @@
   PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/MdeModule
-  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -92,6 +92,7 @@
   PlatformBootManagerLib|MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   PciHostBridgeLib|MdeModulePkg/Library/PciHostBridgeLibNull/PciHostBridgeLibNull.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  TdxMeasurementLib|MdeModulePkg/Library/TdxMeasurementLibNull/TdxMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
@@ -99,7 +100,6 @@
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
   FmpAuthenticationLib|MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
@@ -108,10 +108,6 @@
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf
   SpiHcPlatformLib|MdeModulePkg/Library/BaseSpiHcPlatformLibNull/BaseSpiHcPlatformLibNull.inf
-
-# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-[LibraryClasses.common.SEC]
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
@@ -185,8 +181,10 @@
   VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   VarCheckHiiLib|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibStandaloneMm.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
 
 [LibraryClasses.EBC, LibraryClasses.RISCV64, LibraryClasses.LOONGARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -235,6 +233,7 @@
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  MdeModulePkg/Bus/Pci/CxlDxe/CxlDxe.inf
   MdeModulePkg/Bus/Pci/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupportDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
@@ -251,7 +250,6 @@
   MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-  MdeModulePkg/Bus/Pci/UhciPei/UhciPei.inf
   MdeModulePkg/Bus/Pci/EhciPei/EhciPei.inf
   MdeModulePkg/Bus/Pci/XhciPei/XhciPei.inf
   MdeModulePkg/Bus/Pci/IdeBusPei/IdeBusPei.inf
@@ -324,6 +322,7 @@
   MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  MdeModulePkg/Library/TdxMeasurementLibNull/TdxMeasurementLibNull.inf
   MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
@@ -461,7 +460,7 @@
   MdeModulePkg/Universal/EbcDxe/EbcDebugger.inf
   MdeModulePkg/Universal/EbcDxe/EbcDebuggerConfig.inf
 
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   MdeModulePkg/Library/BrotliCustomDecompressLib/BrotliCustomDecompressLib.inf
   MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
@@ -505,7 +504,9 @@
   MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationProfileLib.inf
   MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationLib.inf
   MdeModulePkg/Library/SmmCorePerformanceLib/SmmCorePerformanceLib.inf
+  MdeModulePkg/Library/SmmCorePerformanceLib/StandaloneMmCorePerformanceLib.inf
   MdeModulePkg/Library/SmmPerformanceLib/SmmPerformanceLib.inf
+  MdeModulePkg/Library/SmmPerformanceLib/StandaloneMmPerformanceLib.inf
   MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
@@ -531,6 +532,14 @@
 
 [Components.X64]
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
+
+[Components.AARCH64]
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
+  MdeModulePkg/Library/ArmFfaConsoleDebugLib/ArmFfaConsoleDebugStandaloneMmLib.inf
 
 [BuildOptions]
 

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __ISA_HC_PPI_H__
-#define __ISA_HC_PPI_H__
+#pragma once
 
 #define EFI_ISA_HC_PPI_GUID \
   { \
@@ -109,5 +108,3 @@ struct _EFI_ISA_HC_PPI {
 };
 
 extern EFI_GUID  gEfiIsaHcPpiGuid;
-
-#endif

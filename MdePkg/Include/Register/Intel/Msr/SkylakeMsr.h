@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __SKYLAKE_MSR_H__
-#define __SKYLAKE_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -683,7 +682,7 @@ typedef union {
     /// platform devices are processor cores, SOC, memory, add-on or
     /// peripheral devices that get powered directly from the platform power
     /// delivery means. The energy units are specified in the
-    /// MSR_RAPL_POWER_UNIT.Enery_Status_Unit.
+    /// MSR_RAPL_POWER_UNIT.Energy_Status_Unit.
     ///
     UINT32    TotalEnergy : 32;
     UINT32    Reserved    : 32;
@@ -3729,5 +3728,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_SKYLAKE_IA32_L3_QOS_MASK_REGISTER;
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_PEI_FIRMWARE_VOLUME_INFO_H__
-#define __EFI_PEI_FIRMWARE_VOLUME_INFO_H__
+#pragma once
 
 #define EFI_PEI_FIRMWARE_VOLUME_INFO_PPI_GUID \
 { 0x49edb1c1, 0xbf21, 0x4761, { 0xbb, 0x12, 0xeb, 0x0, 0x31, 0xaa, 0xbb, 0x39 } }
@@ -55,5 +54,3 @@ struct _EFI_PEI_FIRMWARE_VOLUME_INFO_PPI {
 };
 
 extern EFI_GUID  gEfiPeiFirmwareVolumeInfoPpiGuid;
-
-#endif

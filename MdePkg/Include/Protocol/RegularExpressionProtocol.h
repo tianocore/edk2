@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __REGULAR_EXPRESSION_PROTOCOL_H__
-#define __REGULAR_EXPRESSION_PROTOCOL_H__
+#pragma once
 
 #define EFI_REGULAR_EXPRESSION_PROTOCOL_GUID \
   { \
@@ -133,7 +132,7 @@ EFI_STATUS
                                  SyntaxTypeis not supported by this driver.
   @retval EFI_DEVICE_ERROR       The regular expression string matching
                                  failed due to a hardware or firmware error.
-  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCountis
+  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCount is
                                  NULL.
 
 **/
@@ -171,5 +170,3 @@ extern EFI_GUID  gEfiRegexSyntaxTypeEcma262Guid;
 // For regular expression rules specified in the Perl standard:
 //
 extern EFI_GUID  gEfiRegexSyntaxTypePerlGuid;
-
-#endif

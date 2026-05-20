@@ -20,10 +20,6 @@
   LIBRARY_CLASS                  = PciExpressLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = PciExpressLibInitialize
 
-#
-#  VALID_ARCHITECTURES           = ARM AARCH64 RISCV64
-#
-
 [Sources]
   PciExpressLib.c
 

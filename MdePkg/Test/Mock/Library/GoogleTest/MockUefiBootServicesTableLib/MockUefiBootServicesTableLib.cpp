@@ -13,6 +13,9 @@ MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CloseEvent, 1, EFIAP
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_HandleProtocol, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_LocateProtocol, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CreateEventEx, 6, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_LocateDevicePath, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_OpenProtocol, 6, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CloseProtocol, 4, EFIAPI);
 
 static EFI_BOOT_SERVICES  LocalBs = {
   { 0, 0, 0, 0, 0 },    // EFI_TABLE_HEADER
@@ -36,7 +39,7 @@ static EFI_BOOT_SERVICES  LocalBs = {
   NULL,                 // VOID
   NULL,                 // EFI_REGISTER_PROTOCOL_NOTIFY
   NULL,                 // EFI_LOCATE_HANDLE
-  NULL,                 // EFI_LOCATE_DEVICE_PATH
+  gBS_LocateDevicePath, // EFI_LOCATE_DEVICE_PATH
   NULL,                 // EFI_INSTALL_CONFIGURATION_TABLE
   NULL,                 // EFI_IMAGE_LOAD
   NULL,                 // EFI_IMAGE_START
@@ -48,8 +51,8 @@ static EFI_BOOT_SERVICES  LocalBs = {
   NULL,                 // EFI_SET_WATCHDOG_TIMER
   NULL,                 // EFI_CONNECT_CONTROLLER
   NULL,                 // EFI_DISCONNECT_CONTROLLER
-  NULL,                 // EFI_OPEN_PROTOCOL
-  NULL,                 // EFI_CLOSE_PROTOCOL
+  gBS_OpenProtocol,     // EFI_OPEN_PROTOCOL
+  gBS_CloseProtocol,    // EFI_CLOSE_PROTOCOL
   NULL,                 // EFI_OPEN_PROTOCOL_INFORMATION
   NULL,                 // EFI_PROTOCOLS_PER_HANDLE
   NULL,                 // EFI_LOCATE_HANDLE_BUFFER

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _UDP6_DRIVER_H_
-#define _UDP6_DRIVER_H_
+#pragma once
 
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ServiceBinding.h>
@@ -171,5 +170,3 @@ Udp6ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

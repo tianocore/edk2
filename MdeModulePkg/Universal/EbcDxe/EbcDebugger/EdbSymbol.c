@@ -1268,7 +1268,11 @@ EdbLoadCodBySymbolByIec (
         // get function name, function name is followed by char 0x09.
         //
         FieldBuffer = AsciiStrGetNewTokenField (LineBuffer, Char);
-        ASSERT (FieldBuffer != NULL);
+        if (FieldBuffer == NULL) {
+          ASSERT (FieldBuffer != NULL);
+          break;
+        }
+
         if (AsciiStriCmp (FieldBuffer, Name) == 0) {
           BufferStart   = FieldBuffer;
           CodParseState = EdbEbcCodParseStateSymbolStart;
@@ -1773,7 +1777,7 @@ FindSymbolStr (
   Get line number and offset from this line in code file.
 
   @param  Line            - Line buffer in code file
-  @param  Offset          - Offset to functin entry
+  @param  Offset          - Offset to function entry
 
   @return Line number
 
@@ -1867,7 +1871,7 @@ typedef enum {
   Get line number from this code file.
 
   @param  Entry           - Symbol entry
-  @param  FuncOffset      - Offset to functin entry
+  @param  FuncOffset      - Offset to function entry
   @param  SearchType      - Search type for the code
 
   @return Line number
@@ -2045,7 +2049,7 @@ EdbGetSourceStrFromCodeByLine (
   Get source string from this code file.
 
   @param  Entry           - Symbol entry
-  @param  FuncOffset      - Offset to functin entry
+  @param  FuncOffset      - Offset to function entry
   @param  FuncEnd         - Function end
 
   @retval Funtion start

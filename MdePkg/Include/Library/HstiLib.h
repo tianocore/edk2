@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __HSTI_LIB_H__
-#define __HSTI_LIB_H__
+#pragma once
 
 /**
   Publish HSTI table in AIP protocol.
@@ -148,5 +147,3 @@ HstiLibSetErrorString (
   IN CHAR16  *ImplementationID  OPTIONAL,
   IN CHAR16  *ErrorString
   );
-
-#endif

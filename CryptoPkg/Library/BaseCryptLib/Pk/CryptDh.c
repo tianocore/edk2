@@ -163,8 +163,13 @@ DhSetParameter (
   return TRUE;
 
 Error:
-  BN_free (BnP);
-  BN_free (BnG);
+  if (BnP != NULL) {
+    BN_free (BnP);
+  }
+
+  if (BnG != NULL) {
+    BN_free (BnG);
+  }
 
   return FALSE;
 }

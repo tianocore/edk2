@@ -19,7 +19,7 @@
   UNLOAD_IMAGE                   = RedfishHttpDriverUnload
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 RISCV64
 #
 
 [Sources]
@@ -35,9 +35,6 @@
   MdeModulePkg/MdeModulePkg.dec
   NetworkPkg/NetworkPkg.dec
   RedfishPkg/RedfishPkg.dec
-
-[LibraryClasses.ARM]
-  ArmSoftFloatLib
 
 [LibraryClasses]
   BaseLib

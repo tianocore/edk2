@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __BASE_SYNCHRONIZATION_LIB_INTERNALS__
-#define __BASE_SYNCHRONIZATION_LIB_INTERNALS__
+#pragma once
 
 #include <Base.h>
 #include <Library/SynchronizationLib.h>
@@ -137,5 +136,3 @@ UINTN
 InternalGetSpinLockProperties (
   VOID
   );
-
-#endif

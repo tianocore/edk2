@@ -1,5 +1,5 @@
 /** @file
-  This file defines the Legacy SPI SMM Controler Protocol.
+  This file defines the Legacy SPI SMM Controller Protocol.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LEGACY_SPI_SMM_CONTROLLER_PROTOCOL_H__
-#define __LEGACY_SPI_SMM_CONTROLLER_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/LegacySpiController.h>
 
@@ -26,5 +25,3 @@ typedef
 EFI_LEGACY_SPI_SMM_CONTROLLER_PROTOCOL;
 
 extern EFI_GUID  gEfiLegacySpiSmmControllerProtocolGuid;
-
-#endif // __LEGACY_SPI_SMM_CONTROLLER_PROTOCOL_H__

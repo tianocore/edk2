@@ -26,6 +26,6 @@
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS   == /c /EHsc /Zi /DSUBHOOK_STATIC /Od
-  GCC:*_*_IA32_CC_FLAGS == -g -c -O0 -m32
-  GCC:*_*_X64_CC_FLAGS  == -g -c -O0 -m64
+  MSFT:*_*_*_CC_FLAGS   == /c /Zi /DSUBHOOK_STATIC /Od
+  GCC:*_*_IA32_CC_FLAGS == -g -c -O0 -m32 -DSUBHOOK_STATIC
+  GCC:*_*_X64_CC_FLAGS  == -g -c -O0 -m64 -DSUBHOOK_STATIC

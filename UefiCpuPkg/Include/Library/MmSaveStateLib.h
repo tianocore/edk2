@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MM_SAVE_STATE_LIB_H_
-#define MM_SAVE_STATE_LIB_H_
+#pragma once
 
 #include <Protocol/MmCpu.h>
 #include <Uefi/UefiBaseType.h>
@@ -32,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                         from the save state.
 
   @retval EFI_SUCCESS           The register was read from Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
   @retval EFI_UNSUPPORTED       This function does not support reading Register.
   @retval EFI_NOT_FOUND         If desired Register not found.
 **/
@@ -58,7 +57,7 @@ MmSaveStateReadRegister (
   @param[in] Buffer    Upon entry, this holds the new CPU register value.
 
   @retval EFI_SUCCESS           The register was written to Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
   @retval EFI_UNSUPPORTED       This function does not support writing Register.
   @retval EFI_NOT_FOUND         If desired Register not found.
 **/
@@ -70,5 +69,3 @@ MmSaveStateWriteRegister (
   IN UINTN                       Width,
   IN CONST VOID                  *Buffer
   );
-
-#endif

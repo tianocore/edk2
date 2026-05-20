@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_NVDIMM_LABEL_PROTOCOL_H__
-#define __EFI_NVDIMM_LABEL_PROTOCOL_H__
+#pragma once
 
 #define EFI_NVDIMM_LABEL_PROTOCOL_GUID \
   { \
@@ -112,17 +111,6 @@ typedef struct {
 /// EFI_NVDIMM_LABEL_FLAGS_LOCAL flag is set as the complete label set is local to a single NVDIMM Label Storage Area.
 ///
 #define EFI_NVDIMM_LABEL_FLAGS_LOCAL  0x00000002
-
-///
-/// This reserved flag is utilized on older implementations and has been deprecated.
-/// Do not use.
-//
-#define EFI_NVDIMM_LABEL_FLAGS_RESERVED  0x00000004
-
-///
-/// When set, the label set is being updated.
-///
-#define EFI_NVDIMM_LABEL_FLAGS_UPDATING  0x00000008
 
 ///
 /// When set, the SPALocationCookie in the namespace label is valid and should match the
@@ -357,5 +345,3 @@ struct _EFI_NVDIMM_LABEL_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiNvdimmLabelProtocolGuid;
-
-#endif

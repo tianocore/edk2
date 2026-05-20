@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __PROCESSOR_BIND_H__
-#define __PROCESSOR_BIND_H__
+#pragma once
 
 ///
 /// Define the processor type so other code can make processor based choices
@@ -179,9 +178,16 @@ typedef INT64 INTN;
 ///
 #define ASM_GLOBAL  .globl
 
+// PE targets (i.e. building with CLANGPDB) do not support the ELF style .type directive
+  #ifdef __ELF__
+#define _ASM_TYPE(Name)  .type Name, %function
+  #else
+#define _ASM_TYPE(Name)
+  #endif // __ELF__
+
 #define GCC_ASM_EXPORT(func__)  \
-         .global  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    ;\
-         .type ASM_PFX(func__), %function
+         .global  ASM_PFX(func__)    ;\
+         _ASM_TYPE(ASM_PFX(func__))
 
 #define GCC_ASM_IMPORT(func__)  \
          .extern  _CONCATENATE (__USER_LABEL_PREFIX__, func__)
@@ -236,6 +242,4 @@ typedef INT64 INTN;
 
 #ifndef __USER_LABEL_PREFIX__
 #define __USER_LABEL_PREFIX__
-#endif
-
 #endif

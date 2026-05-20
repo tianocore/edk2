@@ -8,6 +8,19 @@
 #include <AsmMacroLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
+  // Check if register assignment at handoff matches spec
+  MOV64 (x4, 0x14a0fb10b)
+  // Check if x1 holds TransferList signature
+  cmp   x1, x4
+  b.ne  _SkipTransferList
+
+  // Skip TransferList init if x2 is not equal to 0
+  cbnz  x2, _SkipTransferList
+
+  // Set the TransferList Base Address from register x3
+  mov   x10, x3
+
+_SkipTransferList:
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
@@ -47,7 +60,8 @@ ASM_PFX(MainEntryPoint):
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
   MOV64 (x2, FixedPcdGet64(PcdFvBaseAddress))
   ldr   x0, [x2, #8]
-
+  // Pass the TransferList Base Address
+  mov   x1, x10
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x3, =ASM_PFX(CEntryPoint)

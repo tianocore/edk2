@@ -20,10 +20,6 @@
   LIBRARY_CLASS                  = HobLib|MM_STANDALONE
   CONSTRUCTOR                    = HobLibConstructor
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   StandaloneMmHobLib.c
 

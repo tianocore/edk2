@@ -13,7 +13,7 @@
 #include "Platform.h"
 
 /**
-  Notification function called when EDKII_PEI_MP_SERVICES2_PPI becomes available.
+  Notification function called when EFI_PEI_MP_SERVICES2_PPI becomes available.
 
   @param[in] PeiServices      Indirect reference to the PEI Services Table.
   @param[in] NotifyDescriptor Address of the notification descriptor data
@@ -32,8 +32,8 @@ OnMpServices2Available (
   IN VOID                       *Ppi
   )
 {
-  EDKII_PEI_MP_SERVICES2_PPI  *MpServices2;
-  EFI_STATUS                  Status;
+  EFI_PEI_MP_SERVICES2_PPI  *MpServices2;
+  EFI_STATUS                Status;
 
   DEBUG ((DEBUG_INFO, "%a: %a\n", gEfiCallerBaseName, __func__));
 
@@ -52,13 +52,13 @@ OnMpServices2Available (
 
 //
 // Notification object for registering the callback, for when
-// EDKII_PEI_MP_SERVICES2_PPI becomes available.
+// EFI_PEI_MP_SERVICES2_PPI becomes available.
 //
 STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMpServices2Notify = {
   EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK |   // Flags
   EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-  &gEdkiiPeiMpServices2PpiGuid,              // Guid
-  OnMpServices2Available                     // Notify
+  &gEfiPeiMpServices2PpiGuid,              // Guid
+  OnMpServices2Available                   // Notify
 };
 
 VOID

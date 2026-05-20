@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VOLINFO_H_
-#define _VOLINFO_H_ 1
+#pragma once
 
 #define PI_SPECIFICATION_VERSION  0x00010000
 
@@ -27,5 +26,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define OPENSSL_COMMAND_FORMAT_STRING       "%s sha1 -out %s %s"
 #define EXTRACT_COMMAND_FORMAT_STRING       "%s -d -o %s %s"
-
-#endif

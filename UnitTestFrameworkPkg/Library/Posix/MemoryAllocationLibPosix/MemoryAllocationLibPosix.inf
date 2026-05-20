@@ -16,12 +16,16 @@
   MODULE_TYPE     = UEFI_DRIVER
   VERSION_STRING  = 1.0
   LIBRARY_CLASS   = MemoryAllocationLib|HOST_APPLICATION
+  LIBRARY_CLASS   = HostMemoryAllocationBelowAddressLib|HOST_APPLICATION
 
 [Sources]
   MemoryAllocationLibPosix.c
+  AllocateBelowAddress.c
+  WinInclude.h
 
 [Packages]
   MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [LibraryClasses]
-  BaseLib
+  DebugLib

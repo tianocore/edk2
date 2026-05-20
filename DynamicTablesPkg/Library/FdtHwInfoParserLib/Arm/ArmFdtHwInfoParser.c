@@ -5,12 +5,15 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/FdtLib.h>
 #include "FdtHwInfoParser.h"
 #include "Arm/BootArch/ArmBootArchParser.h"
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
 #include "Pci/PciConfigSpaceParser.h"
 #include "Serial/SerialPortParser.h"
+#include "Arm/Iort/RootComplexParser.h"
+#include "Arm/Iort/SmmuV3Parser.h"
 
 /** Ordered table of parsers/dispatchers.
 
@@ -26,7 +29,9 @@ STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
   ArmGenericTimerInfoParser,
   ArmGicDispatcher,
   PciConfigInfoParser,
-  SerialPortDispatcher
+  SerialPortDispatcher,
+  ArmPciRootComplexParser,
+  ArmSmmuV3Parser
 };
 
 /** Main dispatcher: sequentially call the parsers/dispatchers
@@ -59,7 +64,7 @@ ArchFdtHwInfoMainDispatcher (
   EFI_STATUS  Status;
   UINT32      Index;
 
-  if (fdt_check_header (FdtParserHandle->Fdt) < 0) {
+  if (FdtCheckHeader (FdtParserHandle->Fdt) < 0) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }

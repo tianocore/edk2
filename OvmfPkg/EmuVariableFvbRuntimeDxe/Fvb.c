@@ -26,6 +26,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PlatformFvbLib.h>
+#include <Library/IoLib.h>
 #include "Fvb.h"
 
 #define EFI_AUTHENTICATED_VARIABLE_GUID \
@@ -572,10 +573,10 @@ ValidateFvHeader (
   // Length of FvBlock cannot be 2**64-1
   // HeaderLength cannot be an odd number
   //
-  if ((FwVolHeader->Revision != EFI_FVH_REVISION) ||
-      (FwVolHeader->Signature != EFI_FVH_SIGNATURE) ||
-      (FwVolHeader->FvLength != EMU_FVB_SIZE) ||
-      (FwVolHeader->HeaderLength != EMU_FV_HEADER_LENGTH)
+  if ((MmioRead8 ((UINTN)(&FwVolHeader->Revision)) != EFI_FVH_REVISION) ||
+      (MmioRead32 ((UINTN)(&FwVolHeader->Signature)) != EFI_FVH_SIGNATURE) ||
+      (MmioRead64 ((UINTN)(&FwVolHeader->FvLength)) != EMU_FVB_SIZE) ||
+      (MmioRead16 ((UINTN)(&FwVolHeader->HeaderLength)) != EMU_FV_HEADER_LENGTH)
       )
   {
     DEBUG ((DEBUG_INFO, "EMU Variable FVB: Basic FV headers were invalid\n"));
@@ -692,6 +693,8 @@ InitializeFvAndVariableStoreHeaders (
   //
   Fv           = (EFI_FIRMWARE_VOLUME_HEADER *)Ptr;
   Fv->Checksum = CalculateCheckSum16 (Ptr, Fv->HeaderLength);
+
+  DEBUG ((DEBUG_INFO, "EMU Variable FVB: Initialized FV using template structure\n"));
 }
 
 /**
@@ -717,6 +720,7 @@ FvbInitialize (
   EFI_HANDLE            Handle;
   EFI_PHYSICAL_ADDRESS  Address;
   RETURN_STATUS         PcdStatus;
+  VOID                  *Template;
 
   DEBUG ((DEBUG_INFO, "EMU Variable FVB Started\n"));
 
@@ -778,8 +782,15 @@ FvbInitialize (
   // Initialize the main FV header and variable store header
   //
   if (Initialize) {
-    SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
-    InitializeFvAndVariableStoreHeaders (Ptr);
+    Template = (VOID *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+    Status   = ValidateFvHeader (Template);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "EMU Variable FVB: Initialized FV from ROM template.\n"));
+      CopyMem (Ptr, Template, EMU_FVB_SIZE);
+    } else {
+      SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
+      InitializeFvAndVariableStoreHeaders (Ptr);
+    }
   }
 
   PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINTN)Ptr);

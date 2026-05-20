@@ -22,12 +22,11 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
-
-[FeaturePcd.ARM, FeaturePcd.AARCH64]
-  gArmTokenSpaceGuid.PcdFfaEnable
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   ArmLib
+  ArmFfaLib
   CacheMaintenanceLib
   MemoryAllocationLib
 

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_UEFI_HTTP_BOOT_DHCP4_H__
-#define __EFI_UEFI_HTTP_BOOT_DHCP4_H__
+#pragma once
 
 #define HTTP_BOOT_DHCP4_OPTION_MAX_NUM   16
 #define HTTP_BOOT_DHCP4_OPTION_MAX_SIZE  312
@@ -33,8 +32,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_IA32
 #elif defined (MDE_CPU_X64)
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_X64
-#elif defined (MDE_CPU_ARM)
-#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_ARM
 #elif defined (MDE_CPU_AARCH64)
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_AARCH64
 #elif defined (MDE_CPU_RISCV64)
@@ -252,5 +249,3 @@ HttpBootRegisterIp4Dns (
   IN UINTN                   DataLength,
   IN VOID                    *DnsServerData
   );
-
-#endif

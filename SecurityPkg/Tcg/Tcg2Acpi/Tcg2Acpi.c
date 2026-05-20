@@ -151,7 +151,7 @@ AssignOpRegion (
       Tcg2AcpiCommunicateBufferHob = GET_GUID_HOB_DATA (GuidHob);
       MemoryAddress                = Tcg2AcpiCommunicateBufferHob->Tcg2AcpiCommunicateBuffer;
       ASSERT (MemoryAddress != 0);
-      ASSERT (EFI_PAGES_TO_SIZE (Tcg2AcpiCommunicateBufferHob->Pages) >= Size);
+      ASSERT (EFI_PAGES_TO_SIZE ((UINTN)Tcg2AcpiCommunicateBufferHob->Pages) >= Size);
 
       ZeroMem ((VOID *)(UINTN)MemoryAddress, Size);
       OpRegion->RegionOffset = (UINT32)(UINTN)MemoryAddress;

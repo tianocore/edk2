@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EXTRACT_GUIDED_SECTION_H__
-#define __EXTRACT_GUIDED_SECTION_H__
+#pragma once
 
 /**
   Examines a GUIDed section and returns the size of the decoded buffer and the
@@ -275,5 +274,3 @@ ExtractGuidedSectionGetHandlers (
   OUT        EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER  *GetInfoHandler   OPTIONAL,
   OUT        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    *DecodeHandler    OPTIONAL
   );
-
-#endif

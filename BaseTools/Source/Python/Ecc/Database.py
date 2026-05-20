@@ -78,7 +78,6 @@ class Database(object):
         self.Conn.execute("PRAGMA page_size=4096")
         self.Conn.execute("PRAGMA synchronous=OFF")
         # to avoid non-ascii character conversion error
-        self.Conn.text_factory = str
         self.Cur = self.Conn.cursor()
 
         self.TblDataModel = TableDataModel(self.Cur)
@@ -205,59 +204,6 @@ class Database(object):
                                    FileID, -1, Pcd.StartLine, Pcd.StartColumn, Pcd.EndLine, Pcd.EndColumn)
 
         EdkLogger.verbose("Insert information from file %s ... DONE!" % File.FullPath)
-
-    ## UpdateIdentifierBelongsToFunction
-    #
-    # Update the field "BelongsToFunction" for each Identifier
-    #
-    #
-    def UpdateIdentifierBelongsToFunction_disabled(self):
-        EdkLogger.verbose("Update 'BelongsToFunction' for Identifiers started ...")
-
-        SqlCommand = """select ID, BelongsToFile, StartLine, EndLine, Model from Identifier"""
-        EdkLogger.debug(4, "SqlCommand: %s" %SqlCommand)
-        self.Cur.execute(SqlCommand)
-        Records = self.Cur.fetchall()
-        for Record in Records:
-            IdentifierID = Record[0]
-            BelongsToFile = Record[1]
-            StartLine = Record[2]
-            EndLine = Record[3]
-            Model = Record[4]
-
-            #
-            # Check whether an identifier belongs to a function
-            #
-            EdkLogger.debug(4, "For common identifiers ... ")
-            SqlCommand = """select ID from Function
-                        where StartLine < %s and EndLine > %s
-                        and BelongsToFile = %s""" % (StartLine, EndLine, BelongsToFile)
-            EdkLogger.debug(4, "SqlCommand: %s" %SqlCommand)
-            self.Cur.execute(SqlCommand)
-            IDs = self.Cur.fetchall()
-            for ID in IDs:
-                SqlCommand = """Update Identifier set BelongsToFunction = %s where ID = %s""" % (ID[0], IdentifierID)
-                EdkLogger.debug(4, "SqlCommand: %s" %SqlCommand)
-                self.Cur.execute(SqlCommand)
-
-            #
-            # Check whether the identifier is a function header
-            #
-            EdkLogger.debug(4, "For function headers ... ")
-            if Model == DataClass.MODEL_IDENTIFIER_COMMENT:
-                SqlCommand = """select ID from Function
-                        where StartLine = %s + 1
-                        and BelongsToFile = %s""" % (EndLine, BelongsToFile)
-                EdkLogger.debug(4, "SqlCommand: %s" %SqlCommand)
-                self.Cur.execute(SqlCommand)
-                IDs = self.Cur.fetchall()
-                for ID in IDs:
-                    SqlCommand = """Update Identifier set BelongsToFunction = %s, Model = %s where ID = %s""" % (ID[0], DataClass.MODEL_IDENTIFIER_FUNCTION_HEADER, IdentifierID)
-                    EdkLogger.debug(4, "SqlCommand: %s" %SqlCommand)
-                    self.Cur.execute(SqlCommand)
-
-        EdkLogger.verbose("Update 'BelongsToFunction' for Identifiers ... DONE")
-
 
     ## UpdateIdentifierBelongsToFunction
     #

@@ -7,14 +7,14 @@
 
 **/
 
-#ifndef BOOTLOADER_PARSE_LIB_
-#define BOOTLOADER_PARSE_LIB_
+#pragma once
 
 #include <PiPei.h>
 #include <Guid/GraphicsInfoHob.h>
 #include <Guid/MemoryMapInfoGuid.h>
 #include <Guid/SerialPortInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
+#include <Guid/FirmwareInfoGuid.h>
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/SmbiosTable.h>
 
@@ -24,6 +24,12 @@ typedef RETURN_STATUS \
 (*BL_MEM_INFO_CALLBACK) (
   MEMORY_MAP_ENTRY  *MemoryMapEntry,
   VOID              *Param
+  );
+
+typedef VOID \
+(EFIAPI *BL_CAPSULE_CALLBACK)(
+  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  UINT64                Length
   );
 
 /**
@@ -148,4 +154,31 @@ ParseMiscInfo (
   VOID
   );
 
-#endif
+/**
+  Parse firmware information passed in by bootloader
+
+  @param  FwInfo   Information about current firmware.
+
+  @retval RETURN_INVALID_PARAMETER  The parameter is NULL.
+  @retval RETURN_SUCCESS            Successfully parsed information.
+  @retval RETURN_NOT_FOUND          The information is missing.
+**/
+RETURN_STATUS
+EFIAPI
+ParseFirmwareInfo (
+  OUT FIRMWARE_INFO  *FwInfo
+  );
+
+/**
+  Parse update capsules passed in by bootloader
+
+  @param  CapsuleCallback   The callback routine invoked for each capsule.
+
+  @retval RETURN_SUCCESS    Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND  Failed to look up the information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseCapsules (
+  IN BL_CAPSULE_CALLBACK  CapsuleCallback
+  );

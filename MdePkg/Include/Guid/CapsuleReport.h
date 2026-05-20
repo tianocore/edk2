@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _CAPSULE_REPORT_GUID_H__
-#define _CAPSULE_REPORT_GUID_H__
+#pragma once
 
 //
 // This is the GUID for capsule result variable.
@@ -118,5 +117,3 @@ typedef struct {
 } EFI_CAPSULE_RESULT_VARIABLE_JSON;
 
 extern EFI_GUID  gEfiCapsuleReportGuid;
-
-#endif

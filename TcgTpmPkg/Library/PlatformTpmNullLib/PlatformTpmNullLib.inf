@@ -1,0 +1,42 @@
+## @file
+#  NULL instance library of the PlatformTpmLib used in TpmLib.
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformTpmNullLib
+  FILE_GUID                      = 14992892-1dc5-11ef-b21c-97fa7f4b3198
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = PlatformTpmLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  Clock.c
+  Entropy.c
+  EPS.c
+  ExtraData.c
+  Failure.c
+  Init.c
+  NVMem.c
+  Unique.c
+  VendorInfo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  TcgTpmPkg/TcgTpmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib

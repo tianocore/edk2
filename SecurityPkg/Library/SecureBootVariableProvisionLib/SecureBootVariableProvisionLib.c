@@ -46,7 +46,6 @@ SecureBootFetchData (
   OUT EFI_SIGNATURE_LIST  **SigListOut
   )
 {
-  EFI_SIGNATURE_LIST            *EfiSig;
   EFI_STATUS                    Status;
   VOID                          *Buffer;
   VOID                          *RsaPubKey;
@@ -57,7 +56,6 @@ SecureBootFetchData (
   SECURE_BOOT_CERTIFICATE_INFO  *NewCertInfo;
 
   KeyIndex      = 0;
-  EfiSig        = NULL;
   *SigListOut   = NULL;
   *SigListsSize = 0;
   CertInfo      = AllocatePool (sizeof (SECURE_BOOT_CERTIFICATE_INFO));
@@ -82,10 +80,6 @@ SecureBootFetchData (
       RsaPubKey = NULL;
       if (RsaGetPublicKeyFromX509 (Buffer, Size, &RsaPubKey) == FALSE) {
         DEBUG ((DEBUG_ERROR, "%a: Invalid key format: %d\n", __func__, KeyIndex));
-        if (EfiSig != NULL) {
-          FreePool (EfiSig);
-        }
-
         FreePool (Buffer);
         Status = EFI_INVALID_PARAMETER;
         break;
@@ -162,7 +156,7 @@ EnrollFromDefault (
   DataSize = 0;
   Status   = GetVariable2 (DefaultName, &gEfiGlobalVariableGuid, &Data, &DataSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "error: GetVariable (\"%s): %r\n", DefaultName, Status));
+    DEBUG ((DEBUG_ERROR, "Error: GetVariable (\"%s\"): %r\n", DefaultName, Status));
     return Status;
   }
 

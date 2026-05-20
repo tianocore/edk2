@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __ACPI_TABLE_H___
-#define __ACPI_TABLE_H___
+#pragma once
 
 #define EFI_ACPI_TABLE_PROTOCOL_GUID \
   { 0xffe06bdd, 0x6107, 0x46a6, { 0x7b, 0xb2, 0x5a, 0x9c, 0x7e, 0xc5, 0x27, 0x5c }}
@@ -117,5 +116,3 @@ struct _EFI_ACPI_TABLE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiAcpiTableProtocolGuid;
-
-#endif

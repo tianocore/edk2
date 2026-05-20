@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FMP_DEVICE_LIB__
-#define __FMP_DEVICE_LIB__
+#pragma once
 
 #include <Protocol/FirmwareManagement.h>
 
@@ -604,5 +603,3 @@ EFIAPI
 FmpDeviceLock (
   VOID
   );
-
-#endif

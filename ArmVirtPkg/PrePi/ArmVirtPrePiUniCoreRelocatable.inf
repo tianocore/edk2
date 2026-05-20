@@ -19,14 +19,8 @@
   FdtParser.c
   PrePi.c
   PrePi.h
-
-[Sources.AArch64]
-  AArch64/ArchPrePi.c
-  AArch64/ModuleEntryPoint.S
-
-[Sources.ARM]
-  Arm/ArchPrePi.c
-  Arm/ModuleEntryPoint.S
+  ArchPrePi.c
+  ModuleEntryPoint.S
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -39,6 +33,7 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   DebugLib
   FdtLib
   ArmLib
@@ -54,6 +49,7 @@
   PlatformPeiLib
   MemoryInitPeiLib
   CacheMaintenanceLib
+  StackCheckLib
 
 [Guids]
   gArmMpCoreInfoGuid
@@ -63,8 +59,6 @@
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
-
-  gArmTokenSpaceGuid.PcdVFPEnabled
 
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvSize

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_MP_PROTOCOL_H_
-#define _SMM_MP_PROTOCOL_H_
+#pragma once
 
 //
 // SMM MP Protocol function prototypes.
@@ -218,14 +217,14 @@ SmmMpSetStartupProcedure (
   via the use of a token, this function can be used to check for completion of the procedure on the AP.
   The function takes the token that was passed into the DispatchProcedure call. If the procedure
   is complete, and therefore it is now possible to run another procedure on the same AP, this function
-  returns EFI_SUCESS. In this case the status returned by the procedure that executed on the AP is
+  returns EFI_SUCCESS. In this case the status returned by the procedure that executed on the AP is
   returned in the token's Status field. If the procedure has not yet completed, then this function
   returns EFI_NOT_READY.
 
   When a non-blocking execution of a procedure is invoked with BroadcastProcedure, via the
   use of a token, this function can be used to check for completion of the procedure on all the
   broadcast APs. The function takes the token that was passed into the BroadcastProcedure
-  call. If the procedure is complete on all broadcast APs this function returns EFI_SUCESS. In this
+  call. If the procedure is complete on all broadcast APs this function returns EFI_SUCCESS. In this
   case the Status field in the token passed into the function reflects the overall result of the
   invocation, which may be EFI_SUCCESS, if all executions succeeded, or the first observed failure.
   If the procedure has not yet completed on the broadcast APs, the function returns
@@ -279,5 +278,3 @@ SmmMpWaitForProcedure (
   IN CONST EFI_MM_MP_PROTOCOL  *This,
   IN       MM_COMPLETION       Token
   );
-
-#endif

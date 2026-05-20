@@ -31,9 +31,7 @@
 [Sources.common]
   ArmPlatformLibQemu.c
   IdMap.S
-
-[Sources.AArch64]
-  AArch64/ArmPlatformHelper.S
+  ArmPlatformHelper.S
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MM_COMM_BUFFER_H_
-#define MM_COMM_BUFFER_H_
+#pragma once
 
 ///
 /// The GUID of the MM Communication buffer HOB.
@@ -47,6 +46,9 @@ typedef struct {
   ///
   BOOLEAN    IsCommBufferValid;
 
+  /// For padding purpose
+  UINT8      Reserved[7];
+
   ///
   /// The return status when returning from MM to non-MM.
   ///
@@ -59,5 +61,3 @@ typedef struct {
 } MM_COMM_BUFFER_STATUS;
 
 extern EFI_GUID  gMmCommBufferHobGuid;
-
-#endif

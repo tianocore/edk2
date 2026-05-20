@@ -15,12 +15,6 @@
 
   ENTRY_POINT                    = InitializeMemory
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM
-#
-
 [Sources]
   MemoryInitPeim.c
 
@@ -56,10 +50,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

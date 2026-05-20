@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_CREDENTIAL_H_
-#define EDKII_REDFISH_CREDENTIAL_H_
+#pragma once
 
 typedef struct _EDKII_REDFISH_CREDENTIAL_PROTOCOL EDKII_REDFISH_CREDENTIAL_PROTOCOL;
 
@@ -96,5 +95,3 @@ struct _EDKII_REDFISH_CREDENTIAL_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkIIRedfishCredentialProtocolGuid;
-
-#endif

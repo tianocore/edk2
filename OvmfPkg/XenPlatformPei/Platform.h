@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _PLATFORM_PEI_H_INCLUDED_
-#define _PLATFORM_PEI_H_INCLUDED_
+#pragma once
 
 #include <IndustryStandard/E820.h>
 #include <Library/PlatformInitLib.h>
@@ -138,5 +137,3 @@ extern EFI_BOOT_MODE  mBootMode;
 extern UINT8  mPhysMemAddressWidth;
 
 extern UINT16  mHostBridgeDevId;
-
-#endif // _PLATFORM_PEI_H_INCLUDED_

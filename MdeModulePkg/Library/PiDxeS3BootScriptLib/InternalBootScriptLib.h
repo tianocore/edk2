@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __INTERNAL_BOOT_SCRIPT_LIB__
-#define __INTERNAL_BOOT_SCRIPT_LIB__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -99,5 +98,3 @@ extern SCRIPT_TABLE_PRIVATE_DATA  *mS3BootScriptTablePtr;
 /// The opcode indicate the end of the boot script table.
 ///
 #define S3_BOOT_SCRIPT_LIB_TERMINATE_OPCODE  0xFF
-
-#endif //__INTERNAL_BOOT_SCRIPT_LIB__

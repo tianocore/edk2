@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EXTENDED_FIRMWARE_PERFORMANCE_H__
-#define __EXTENDED_FIRMWARE_PERFORMANCE_H__
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -250,5 +249,3 @@ typedef struct {
 } FPDT_PEI_EXT_PERF_HEADER;
 
 extern EFI_GUID  gEdkiiFpdtExtendedFirmwarePerformanceGuid;
-
-#endif

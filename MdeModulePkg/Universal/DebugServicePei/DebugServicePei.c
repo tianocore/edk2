@@ -78,13 +78,13 @@ PeiDebugAssert (
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
 
-  @retval EFI_SUCESS  The entry point of Debug Service PEIM executes successfully.
+  @retval EFI_SUCCESS The entry point of Debug Service PEIM executes successfully.
   @retval Others      Some error occurs during the execution of this function.
 
 **/
 EFI_STATUS
 EFIAPI
-DebugSerivceInitialize (
+DebugServiceInitialize (
   IN EFI_PEI_FILE_HANDLE     FileHandle,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )

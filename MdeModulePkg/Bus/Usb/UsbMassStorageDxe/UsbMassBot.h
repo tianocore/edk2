@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USBMASS_BOT_H_
-#define _EFI_USBMASS_BOT_H_
+#pragma once
 
 extern USB_MASS_TRANSPORT  mUsbBotTransport;
 
@@ -183,5 +182,3 @@ EFI_STATUS
 UsbBotCleanUp (
   IN  VOID  *Context
   );
-
-#endif

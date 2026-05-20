@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PI_MMCIS_H_
-#define _PI_MMCIS_H_
+#pragma once
 
 #include <Pi/PiMultiPhase.h>
 #include <Protocol/MmCpuIo.h>
@@ -18,12 +17,9 @@ typedef struct _EFI_MM_SYSTEM_TABLE EFI_MM_SYSTEM_TABLE;
 ///
 /// The Management Mode System Table (MMST) signature
 ///
-#define MM_MMST_SIGNATURE  SIGNATURE_32 ('S', 'M', 'S', 'T')
-///
-/// The Management Mode System Table (MMST) revision is 1.6
-///
-#define MM_SPECIFICATION_MAJOR_REVISION  1
-#define MM_SPECIFICATION_MINOR_REVISION  60
+#define MM_MMST_SIGNATURE                SIGNATURE_32 ('S', 'M', 'S', 'T')
+#define MM_SPECIFICATION_MAJOR_REVISION  PI_SPECIFICATION_MAJOR_REVISION
+#define MM_SPECIFICATION_MINOR_REVISION  PI_SPECIFICATION_MINOR_REVISION
 #define EFI_MM_SYSTEM_TABLE_REVISION     ((MM_SPECIFICATION_MAJOR_REVISION<<16) | (MM_SPECIFICATION_MINOR_REVISION))
 
 /**
@@ -341,5 +337,3 @@ struct _EFI_MM_SYSTEM_TABLE {
   EFI_MM_INTERRUPT_REGISTER           MmiHandlerRegister;
   EFI_MM_INTERRUPT_UNREGISTER         MmiHandlerUnRegister;
 };
-
-#endif

@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 TPM_INSTANCE_ID  mTpmInstanceId[TPM_DEVICE_MAX + 1] = TPM_INSTANCE_ID_LIST;
 
-TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateDate;
-TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDateTemplate = {
+TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateData;
+TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDataTemplate = {
   TCG2_CONFIG_PRIVATE_DATA_SIGNATURE,
   {
     Tcg2ExtractConfig,
@@ -297,12 +297,12 @@ SaveTcg2PCRBanksRequest (
   EFI_STATUS  Status;
 
   if (Enable) {
-    mTcg2ConfigPrivateDate->PCRBanksDesired |= (0x1 << PCRBankIndex);
+    mTcg2ConfigPrivateData->PCRBanksDesired |= (0x1 << PCRBankIndex);
   } else {
-    mTcg2ConfigPrivateDate->PCRBanksDesired &= ~(0x1 << PCRBankIndex);
+    mTcg2ConfigPrivateData->PCRBanksDesired &= ~(0x1 << PCRBankIndex);
   }
 
-  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateDate->PCRBanksDesired);
+  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateData->PCRBanksDesired);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     Status = EFI_SUCCESS;
   } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE) {

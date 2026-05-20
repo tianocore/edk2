@@ -596,7 +596,7 @@ UsbHubInit (
     }
   }
 
-  if (Index == NumEndpoints) {
+  if ((Index == NumEndpoints) || (EpDesc == NULL)) {
     DEBUG ((DEBUG_ERROR, "UsbHubInit: no interrupt endpoint found for hub %d\n", HubDev->Address));
     return EFI_DEVICE_ERROR;
   }

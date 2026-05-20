@@ -7,6 +7,7 @@
 
 import git
 import logging
+import os
 import re
 
 from collections import OrderedDict
@@ -218,19 +219,26 @@ def add_reviewers_to_pr(
 
     # The current PR reviewers do not need to be requested again.
     current_pr_requested_reviewers = [
-        r.login.strip() for r in pr.get_review_requests()[0]
+        r.login.strip() for r in pr.get_review_requests()[0] if r
     ]
-    current_pr_reviewed_reviewers = [r.user.login.strip() for r in pr.get_reviews()]
+    current_pr_reviewed_reviewers = [
+        r.user.login.strip() for r in pr.get_reviews() if r and r.user
+    ]
     current_pr_reviewers = list(
         set(current_pr_requested_reviewers + current_pr_reviewed_reviewers)
     )
 
     # A user can only be added if they are a collaborator of the repository.
-    repo_collaborators = [c.login.strip() for c in repo_gh.get_collaborators()]
-    non_collaborators = [u for u in user_names if u not in repo_collaborators]
+    repo_collaborators = [c.login.strip().lower() for c in repo_gh.get_collaborators() if c]
+    non_collaborators = [u for u in user_names if u.lower() not in repo_collaborators]
 
-    excluded_pr_reviewers = [pr_author] + current_pr_reviewers + non_collaborators
-    new_pr_reviewers = [u for u in user_names if u not in excluded_pr_reviewers]
+    excluded_pr_reviewers = {
+        e.lower()
+        for e in [pr_author] + current_pr_reviewers + non_collaborators
+    }
+    new_pr_reviewers = [
+        u for u in user_names if u.lower() not in excluded_pr_reviewers
+    ]
 
     # Notify the admins of the repository if non-collaborators are requested.
     if non_collaborators:
@@ -243,14 +251,15 @@ def add_reviewers_to_pr(
             # If a comment has already been made for these non-collaborators,
             # do not make another comment.
             if (
-                comment.user.login == "tianocore-assign-reviewers[bot]"
+                comment.user
+                and comment.user.login == "tianocore-assign-reviewers[bot]"
                 and "WARNING: Cannot add some reviewers" in comment.body
                 and all(u in comment.body for u in non_collaborators)
             ):
                 break
         else:
             repo_admins = [
-                a.login for a in repo_gh.get_collaborators(permission="admin")
+                a.login for a in repo_gh.get_collaborators(permission="admin") if a
             ]
 
             leave_pr_comment(
@@ -283,3 +292,35 @@ def add_reviewers_to_pr(
         pr.create_review_request(reviewers=new_pr_reviewers)
 
     return new_pr_reviewers
+
+
+def set_github_output(key: str, value: str):
+    """Set a GitHub workflow output variable.
+
+    This function writes to the GITHUB_OUTPUT file to set an output variable
+    that can be used by subsequent steps in a GitHub workflow.
+
+    Args:
+        key (str): The output variable name.
+        value (str): The output variable value.
+    """
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a') as f:
+            f.write(f"{key}={value}\n")
+
+
+def set_github_env(key: str, value: str):
+    """Set a GitHub workflow environment variable.
+
+    This function writes to the GITHUB_ENV file to set an environment variable
+    that will be available to subsequent steps in a GitHub workflow.
+
+    Args:
+        key (str): The environment variable name.
+        value (str): The environment variable value.
+    """
+    github_env = os.environ.get('GITHUB_ENV')
+    if github_env:
+        with open(github_env, 'a') as f:
+            f.write(f"{key}<<EOF\n{value}\nEOF\n")

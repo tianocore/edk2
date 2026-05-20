@@ -253,6 +253,7 @@ SynchronousRequest (
   EFI_PHYSICAL_ADDRESS     RequestDeviceAddress;
   EFI_STATUS               Status;
   EFI_STATUS               UnmapStatus;
+  EFI_TPL                  CurrentTpl;
 
   BlockSize = Dev->BlockIoMedia.BlockSize;
 
@@ -365,6 +366,8 @@ SynchronousRequest (
     goto UnmapDataBuffer;
   }
 
+  CurrentTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
   VirtioPrepare (&Dev->Ring, &Indices);
 
   //
@@ -438,6 +441,7 @@ SynchronousRequest (
     Status = EFI_DEVICE_ERROR;
   }
 
+  gBS->RestoreTPL (CurrentTpl);
   Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, StatusMapping);
 
 UnmapDataBuffer:

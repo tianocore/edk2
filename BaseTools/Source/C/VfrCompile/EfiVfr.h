@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFIVFR_H_
-#define _EFIVFR_H_
+#pragma once
 
 #include "Common/UefiBaseTypes.h"
 #include "Common/UefiInternalFormRepresentation.h"
@@ -40,5 +39,3 @@ typedef enum {
   GREATER_THAN,
   GREATER_EQUAL
 } EFI_COMPARE_TYPE;
-
-#endif

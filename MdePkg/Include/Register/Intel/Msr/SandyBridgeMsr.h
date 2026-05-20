@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __SANDY_BRIDGE_MSR_H__
-#define __SANDY_BRIDGE_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -4615,5 +4614,3 @@ typedef union {
   @note MSR_SANDY_BRIDGE_C7_PMON_CTR3 is defined as MSR_C7_PMON_CTR3 in SDM.
 **/
 #define MSR_SANDY_BRIDGE_C7_PMON_CTR3  0x00000DF9
-
-#endif

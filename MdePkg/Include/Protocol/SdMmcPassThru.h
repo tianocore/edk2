@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __SD_MMC_PASS_THRU_H__
-#define __SD_MMC_PASS_THRU_H__
+#pragma once
 
 #define EFI_SD_MMC_PASS_THRU_PROTOCOL_GUID \
   { \
@@ -254,5 +253,3 @@ struct _EFI_SD_MMC_PASS_THRU_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSdMmcPassThruProtocolGuid;
-
-#endif

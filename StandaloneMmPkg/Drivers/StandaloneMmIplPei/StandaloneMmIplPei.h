@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef STANDALONE_MM_IPL_PEI_H_
-#define STANDALONE_MM_IPL_PEI_H_
+#pragma once
 
 #include <StandaloneMm.h>
 #include <Guid/MmCommBuffer.h>
@@ -21,8 +20,11 @@
 #include <Library/PeCoffLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Ppi/MmAccess.h>
 #include <Ppi/MmControl.h>
 #include <Ppi/MmCommunication.h>
+#include <Ppi/MmCommunication3.h>
+#include <Ppi/MmCoreFvLocationPpi.h>
 #include <Protocol/MmCommunication.h>
 #include <Library/MmPlatformHobProducerLib.h>
 
@@ -46,6 +48,24 @@ Communicate (
   IN CONST EFI_PEI_MM_COMMUNICATION_PPI  *This,
   IN OUT VOID                            *CommBuffer,
   IN OUT UINTN                           *CommSize
+  );
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_PEI_MM_COMMUNICATE3 instance.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into MMRAM.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+**/
+EFI_STATUS
+EFIAPI
+Communicate3 (
+  IN CONST EFI_PEI_MM_COMMUNICATION3_PPI  *This,
+  IN OUT VOID                             *CommBuffer
   );
 
 /**
@@ -142,4 +162,16 @@ BuildMmProfileDataHobInPeiHobList (
   VOID
   );
 
-#endif
+/**
+
+  Builds a Handoff Information Table HOB.
+
+  @param Hob       - Pointer to handoff information table HOB.
+  @param HobEnd    - End of the HOB list.
+
+**/
+VOID
+CreateMmHobHandoffInfoTable (
+  IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
+  IN VOID                        *HobEnd
+  );

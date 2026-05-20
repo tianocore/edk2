@@ -1,13 +1,12 @@
 /** @file
 *
-*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
+*  Copyright (c) 2011-2025, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
-#ifndef AARCH64_MMU_H_
-#define AARCH64_MMU_H_
+#pragma once
 
 //
 // Memory Attribute Indirection register Definitions
@@ -48,6 +47,9 @@
 #define TT_ADDRESS_MASK_BLOCK_ENTRY        (0xFFFFFFFFFULL << 12)
 #define TT_ADDRESS_MASK_DESCRIPTION_TABLE  (0xFFFFFFFFFULL << 12)
 
+#define TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2        (0x3FFFFFFFFFULL << 12)
+#define TT_ADDRESS_MASK_DESCRIPTION_TABLE_LPA2  (0x3FFFFFFFFFULL << 12)
+
 #define TT_TYPE_MASK                0x3
 #define TT_TYPE_TABLE_ENTRY         0x3
 #define TT_TYPE_BLOCK_ENTRY         0x1
@@ -67,11 +69,16 @@
 
 #define TT_NS  BIT5
 #define TT_AF  BIT10
+#define TT_NG  BIT11
 
+// Valid for !FEAT_LPA2 (52-bit output address)
 #define TT_SH_NON_SHAREABLE    (0x0 << 8)
 #define TT_SH_OUTER_SHAREABLE  (0x2 << 8)
 #define TT_SH_INNER_SHAREABLE  (0x3 << 8)
 #define TT_SH_MASK             (0x3 << 8)
+
+// Valid for FEAT_LPA2 (52-bit output address)
+#define TT_UPPER_ADDRESS_MASK  (0x3 << 8)
 
 #define TT_PXN_MASK  BIT53
 #define TT_UXN_MASK  BIT54                              // EL1&0
@@ -100,6 +107,7 @@
 #define TCR_PS_4TB    (3UL << 16)
 #define TCR_PS_16TB   (4UL << 16)
 #define TCR_PS_256TB  (5UL << 16)
+#define TCR_PS_4PB    (6UL << 16)
 
 #define TCR_TG0_4KB  (0UL << 14)
 #define TCR_TG1_4KB  (2UL << 30)
@@ -110,12 +118,18 @@
 #define TCR_IPS_4TB    (3ULL << 32)
 #define TCR_IPS_16TB   (4ULL << 32)
 #define TCR_IPS_256TB  (5ULL << 32)
+#define TCR_IPS_4PB    (6ULL << 32)
+
+#define TCR_IPS_MASK  (7ULL << 32)
 
 #define TCR_EPD1  (1UL << 23)
 
 #define TTBR_ASID_FIELD  (48)
 #define TTBR_ASID_MASK   (0xFF << TTBR_ASID_FIELD)
 #define TTBR_BADDR_MASK  (0xFFFFFFFFFFFF )                     // The width of this field depends on the values in TxSZ. Addr occupies bottom 48bits
+
+#define TCR_DS       (1ULL << 59)
+#define TCR_DS_NVHE  (1ULL << 32)
 
 #define TCR_EL1_T0SZ_FIELD   (0)
 #define TCR_EL1_EPD0_FIELD   (7)
@@ -185,11 +199,10 @@
 #define TCR_PASZ_42BITS_4TB    (0x3UL)
 #define TCR_PASZ_44BITS_16TB   (0x4UL)
 #define TCR_PASZ_48BITS_256TB  (0x5UL)
+#define TCR_PASZ_52BITS_4PB    (0x6UL)
 
 // The value written to the T*SZ fields are defined as 2^(64-T*SZ). So a 39Bit
 // Virtual address range for 512GB of virtual space sets T*SZ to 25
 #define INPUT_ADDRESS_SIZE_TO_TXSZ(a)  (64 - a)
 
 // Uses LPAE Page Table format
-
-#endif // AARCH64_MMU_H_

@@ -3,8 +3,10 @@
 
   This file implements following APIs which provide basic capabilities for RSA:
   1) RsaPssSign
+  2) RsaPssSignDigest
 
 Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -129,6 +131,98 @@ RsaPssSign (
           MdAlg,
           (UINT32)DigestLen,
           HashValue,
+          Signature
+          );
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  *SigSize = ((mbedtls_rsa_context *)RsaContext)->len;
+  return TRUE;
+}
+
+/**
+  Carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme
+  over a precomputed message digest.
+
+  If RsaContext is NULL, then return FALSE.
+  If Digest is NULL, then return FALSE.
+  If DigestSize is not one of SHA-256, SHA-384 or SHA-512 digest sizes, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      Digest       Pointer to the precomputed message digest.
+  @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPssSignDigest (
+  IN      VOID         *RsaContext,
+  IN      CONST UINT8  *Digest,
+  IN      UINTN        DigestSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  INT32              Ret;
+  mbedtls_md_type_t  MdAlg;
+
+  if (RsaContext == NULL) {
+    return FALSE;
+  }
+
+  if (mbedtls_rsa_complete ((mbedtls_rsa_context *)RsaContext) != 0) {
+    return FALSE;
+  }
+
+  if ((Digest == NULL) || (DigestSize == 0) || (DigestSize > INT_MAX) || (DigestSize > MAX_UINT16)) {
+    return FALSE;
+  }
+
+  switch (DigestSize) {
+    case SHA256_DIGEST_SIZE:
+      MdAlg = MBEDTLS_MD_SHA256;
+      break;
+
+    case SHA384_DIGEST_SIZE:
+      MdAlg = MBEDTLS_MD_SHA384;
+      break;
+
+    case SHA512_DIGEST_SIZE:
+      MdAlg = MBEDTLS_MD_SHA512;
+      break;
+
+    default:
+      return FALSE;
+  }
+
+  if (Signature == NULL) {
+    *SigSize = MBEDTLS_MPI_MAX_SIZE;
+    return FALSE;
+  }
+
+  Ret = mbedtls_rsa_set_padding (RsaContext, MBEDTLS_RSA_PKCS_V21, MdAlg);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  Ret = mbedtls_rsa_rsassa_pss_sign (
+          RsaContext,
+          MbedtlsRand,
+          NULL,
+          MdAlg,
+          (UINT32)DigestSize,
+          Digest,
           Signature
           );
   if (Ret != 0) {

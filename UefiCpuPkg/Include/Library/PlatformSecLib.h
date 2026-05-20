@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PLATFORM_SEC_LIB_H__
-#define __PLATFORM_SEC_LIB_H__
+#pragma once
 
 /**
   A developer supplied function to perform platform specific operations.
@@ -60,5 +59,3 @@ EFIAPI
 SecPlatformDisableTemporaryMemory (
   VOID
   );
-
-#endif

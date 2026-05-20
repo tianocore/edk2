@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _INTERNAL_BM_H_
-#define _INTERNAL_BM_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -44,6 +43,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/RamDisk.h>
 #include <Protocol/DeferredImageLoad.h>
 #include <Protocol/PlatformBootManager.h>
+#include <Protocol/VariablePolicy.h>
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
@@ -69,8 +69,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DxeServicesLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CapsuleLib.h>
-#include <Library/PerformanceLib.h>
 #include <Library/HiiLib.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 #if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
   #if defined (MDE_CPU_EBC)
@@ -466,5 +466,3 @@ BmGetNextLoadOptionBuffer (
   OUT EFI_DEVICE_PATH_PROTOCOL           **FullPath,
   OUT UINTN                              *FileSize
   );
-
-#endif // _INTERNAL_BM_H_

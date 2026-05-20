@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM20_H_
-#define _TPM20_H_
+#pragma once
 
 #include <IndustryStandard/Tpm12.h>
 
@@ -1248,7 +1247,7 @@ typedef union {
   TPMI_AES_KEY_BITS    aes;
   TPMI_SM4_KEY_BITS    SM4;
   TPM_KEY_BITS         sym;
-  TPMI_ALG_HASH     xor;
+  TPMI_ALG_HASH        xor_;
 } TPMU_SYM_KEY_BITS;
 
 // Table 123 - TPMU_SYM_MODE Union
@@ -1321,7 +1320,7 @@ typedef struct {
 // Table 136 - TPMU_SCHEME_KEYEDHASH Union
 typedef union {
   TPMS_SCHEME_HMAC    hmac;
-  TPMS_SCHEME_XOR  xor;
+  TPMS_SCHEME_XOR     xor_;
 } TPMU_SCHEME_KEYEDHASH;
 
 // Table 137 - TPMT_KEYEDHASH_SCHEME Structure
@@ -1809,5 +1808,3 @@ typedef struct {
 #define HASH_ALG_SHA384   0x00000004
 #define HASH_ALG_SHA512   0x00000008
 #define HASH_ALG_SM3_256  0x00000010
-
-#endif

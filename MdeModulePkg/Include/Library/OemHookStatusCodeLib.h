@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __OEM_HOOK_STATUSCODE_LIB__
-#define __OEM_HOOK_STATUSCODE_LIB__
+#pragma once
 
 /**
 
@@ -68,5 +67,3 @@ OemHookStatusCodeReport (
   IN EFI_GUID               *CallerId  OPTIONAL,
   IN EFI_STATUS_CODE_DATA   *Data      OPTIONAL
   );
-
-#endif // __OEM_HOOK_STATUSCODE_LIB__

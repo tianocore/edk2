@@ -15,11 +15,8 @@
 
 **/
 
-#ifndef LIBREDFISH_REDFISH_H_
-#define LIBREDFISH_REDFISH_H_
+#pragma once
 
 #include <redfishService.h>
 #include <redfishPayload.h>
 #include <redpath.h>
-
-#endif

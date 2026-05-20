@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_COMMUNICATION_PPI_H_
-#define _SMM_COMMUNICATION_PPI_H_
+#pragma once
 
 #define EFI_PEI_SMM_COMMUNICATION_PPI_GUID \
   { \
@@ -52,5 +51,3 @@ struct _EFI_PEI_SMM_COMMUNICATION_PPI {
 };
 
 extern EFI_GUID  gEfiPeiSmmCommunicationPpiGuid;
-
-#endif

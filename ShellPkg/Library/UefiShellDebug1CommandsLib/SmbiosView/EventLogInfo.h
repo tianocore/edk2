@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SMBIOS_EVENT_LOG_INFO_H_
-#define _SMBIOS_EVENT_LOG_INFO_H_
+#pragma once
 
 #define END_OF_LOG  0xFF
 
@@ -102,5 +101,3 @@ DisplaySysEventLogData (
   UINT8   *LogData,
   UINT16  LogAreaLength
   );
-
-#endif

@@ -8,9 +8,6 @@
 
 **/
 
-#ifndef REDFISH_CRT_STRING_H_
-#define REDFISH_CRT_STRING_H_
+#pragma once
 
 #include <Library/RedfishCrtLib.h>
-
-#endif

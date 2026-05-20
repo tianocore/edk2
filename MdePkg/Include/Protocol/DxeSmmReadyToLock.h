@@ -22,13 +22,10 @@
 
 **/
 
-#ifndef _DXE_SMM_READY_TO_LOCK_H_
-#define _DXE_SMM_READY_TO_LOCK_H_
+#pragma once
 
 #include <Protocol/DxeMmReadyToLock.h>
 
 #define EFI_DXE_SMM_READY_TO_LOCK_PROTOCOL_GUID  EFI_DXE_MM_READY_TO_LOCK_PROTOCOL_GUID
 
 extern EFI_GUID  gEfiDxeSmmReadyToLockProtocolGuid;
-
-#endif

@@ -7,12 +7,12 @@
 
 **/
 
-#ifndef PRM_DATA_BUFFER_H_
-#define PRM_DATA_BUFFER_H_
+#pragma once
 
 #include <Uefi.h>
 
-#define PRM_DATA_BUFFER_HEADER_SIGNATURE  SIGNATURE_32('P','R','M','D')
+#define PRM_DATA_BUFFER_HEADER_SIGNATURE                 SIGNATURE_32('P','R','M','S')
+#define PRM_ACPI_PARAMETER_DATA_BUFFER_HEADER_SIGNATURE  SIGNATURE_32('P','R','M','P')
 
 #pragma pack(push, 1)
 
@@ -46,5 +46,3 @@ typedef struct {
 } PRM_DATA_BUFFER;
 
 #pragma pack(pop)
-
-#endif

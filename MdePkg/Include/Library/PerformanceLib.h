@@ -6,11 +6,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PERFORMANCE_LIB_H__
-#define __PERFORMANCE_LIB_H__
+#pragma once
 
 ///
-/// Performance library propery mask bits
+/// Performance library property mask bits
 ///
 #define PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED  0x00000001
 
@@ -139,7 +138,7 @@ EndPerformanceMeasurement (
 
   @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
                                   0, then the first performance measurement log entry is retrieved.
-                                  On exit, the key of the next performance lof entry entry.
+                                  On exit, the key of the next performance log entry.
   @param  Handle                  Pointer to environment specific context used to identify the component
                                   being measured.
   @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component
@@ -515,7 +514,7 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  Begin Macro to measure the performance of evnent signal behavior in any module.
+  Begin Macro to measure the performance of event signal behavior in any module.
   The event guid will be passed with this macro.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
@@ -531,7 +530,7 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  End Macro to measure the performance of evnent signal behavior in any module.
+  End Macro to measure the performance of event signal behavior in any module.
   The event guid will be passed with this macro.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
@@ -765,5 +764,3 @@ LogPerformanceMeasurement (
   PERF_CODE_BEGIN ();          \
   Expression                   \
   PERF_CODE_END ()
-
-#endif

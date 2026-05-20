@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCI_PLATFORM_H_
-#define _PCI_PLATFORM_H_
+#pragma once
 
 ///
 /// This file must be included because the EFI_PCI_PLATFORM_PROTOCOL uses
@@ -334,5 +333,3 @@ struct _EFI_PCI_PLATFORM_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPciPlatformProtocolGuid;
-
-#endif

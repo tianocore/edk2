@@ -160,7 +160,8 @@ PerformanceDescribeLevels (
   EFI_STATUS    Status;
   UINT32        PayloadLength;
   SCMI_COMMAND  Cmd;
-  UINT32        *MessageParams;
+  UINT32        *MessageParams1;
+  UINT32        *MessageParams2;
   UINT32        LevelIndex;
   UINT32        RequiredSize;
   UINT32        LevelNo;
@@ -169,7 +170,7 @@ PerformanceDescribeLevels (
 
   PERF_DESCRIBE_LEVELS  *Levels;
 
-  Status = ScmiCommandGetPayload (&MessageParams);
+  Status = ScmiCommandGetPayload (&MessageParams1);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -177,13 +178,14 @@ PerformanceDescribeLevels (
   LevelIndex   = 0;
   RequiredSize = 0;
 
-  *MessageParams++ = DomainId;
+  MessageParams2 = MessageParams1 + 1;
 
   Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = ScmiMessageIdPerformanceDescribeLevels;
 
   do {
-    *MessageParams = LevelIndex;
+    *MessageParams1 = DomainId;
+    *MessageParams2 = LevelIndex;
 
     // Note, PayloadLength is an IN/OUT parameter.
     PayloadLength = sizeof (DomainId) + sizeof (LevelIndex);

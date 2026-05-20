@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _COMMPS2_H_
-#define _COMMPS2_H_
+#pragma once
 
 #include "Ps2Mouse.h"
 
@@ -385,5 +384,3 @@ EFI_STATUS
 WaitOutputFull (
   IN UINTN  Timeout
   );
-
-#endif

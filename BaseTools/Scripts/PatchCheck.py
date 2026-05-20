@@ -97,7 +97,7 @@ class EmailAddressCheck:
 class CommitMessageCheck:
     """Checks the contents of a git commit message."""
 
-    def __init__(self, subject, message, author_email):
+    def __init__(self, subject, message, author_email, updated_packages):
         self.ok = True
         self.ignore_multi_package = False
 
@@ -117,15 +117,16 @@ class CommitMessageCheck:
 
         self.check_contributed_under()
         if not MergifyMerge:
+            self.check_ci_options_format()
+            self.check_subject(updated_packages)
             self.check_signed_off_by()
             self.check_misc_signatures()
             self.check_overall_format()
             if not PatchCheckConf.ignore_change_id:
                 self.check_change_id_format()
-            self.check_ci_options_format()
         self.report_message_result()
 
-    url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
+    url = 'https://www.tianocore.org/tianocore-wiki.github.io/development/contribution-guides/commit_message_format.html'
 
     def report_message_result(self):
         if Verbose.level < Verbose.NORMAL:
@@ -209,6 +210,23 @@ class CommitMessageCheck:
 
         return sigs
 
+    def check_subject(self, updated_packages):
+        if updated_packages:
+            num_found = 0
+            for package in updated_packages:
+                current_package_re = r"(Revert \"|^|, ?)" + re.escape(package) + r"([ ,:\/])"
+                if re.search(current_package_re, self.subject):
+                    num_found += 1
+
+            if self.ignore_multi_package and len(updated_packages) > 3:
+                if not re.search(r'^Global:', self.subject):
+                    self.error("Subject line does not start with 'Global:' for > 3 package multi-package commit!")
+            elif num_found != len(updated_packages):
+                self.error("Subject line not in \"package,package: description\" format!")
+
+        if self.subject.endswith('.'):
+            self.error("Subject line should not end with a period")
+
     def check_signed_off_by(self):
         sob='Signed-off-by'
         if self.msg.find(sob) < 0:
@@ -254,26 +272,29 @@ class CommitMessageCheck:
             self.error('Empty commit message!')
             return
 
-        if count >= 1 and re.search(self.cve_re, lines[0]):
+        if re.search(self.cve_re, lines[0]):
             #
             # If CVE-xxxx-xxxxx is present in subject line, then limit length of
             # subject line to 92 characters
             #
-            if len(lines[0].rstrip()) >= 93:
-                self.error(
-                    'First line of commit message (subject line) is too long (%d >= 93).' %
-                    (len(lines[0].rstrip()))
-                    )
+            maxlength = 92
+        elif lines[0].find(':') > 55:
+            #
+            # If we need to enumerate lots of packages, ensure to leave room for
+            # a very short description at the end (after the ':').
+            #
+            maxlength = lines[0].find(':') + 20
         else:
             #
-            # If CVE-xxxx-xxxxx is not present in subject line, then limit
-            # length of subject line to 75 characters
+            # Otherwise, limit the length of subject line to 75 characters
             #
-            if len(lines[0].rstrip()) >= 76:
-                self.error(
-                    'First line of commit message (subject line) is too long (%d >= 76).' %
-                    (len(lines[0].rstrip()))
-                    )
+            maxlength = 75
+
+        if len(lines[0].rstrip()) > maxlength:
+            self.error(
+                'First line of commit message (subject line) is too long (%d > %d).' %
+                (len(lines[0].rstrip()), maxlength)
+            )
 
         if count >= 1 and len(lines[0].strip()) == 0:
             self.error('First line of commit message (subject line) ' +
@@ -293,6 +314,7 @@ class CommitMessageCheck:
                 not lines[i].startswith('Reported-by:') and
                 not lines[i].startswith('Suggested-by:') and
                 not lines[i].startswith('Signed-off-by:') and
+                not lines[i].startswith('Co-authored-by:') and
                 not lines[i].startswith('Cc:')):
                 #
                 # Print a warning if body line is longer than 75 characters
@@ -485,7 +507,7 @@ class GitDiffCheck:
         lines = [ msg ]
         if self.filename is not None:
             lines.append('File: ' + self.filename)
-        lines.append('Line: ' + line)
+        lines.append('Line ' + str(self.line_num) + ': ' + line)
 
         self.error(*lines)
 
@@ -539,7 +561,7 @@ class GitDiffCheck:
     def format_error(self, err):
         self.format_ok = False
         err = 'Patch format error: ' + err
-        err2 = 'Line: ' + self.lines[self.line_num].rstrip()
+        err2 = 'Line ' + str(self.line_num) + ': ' + self.lines[self.line_num].rstrip()
         self.error(err, err2)
 
     def error(self, *err):
@@ -561,14 +583,14 @@ class CheckOnePatch:
     patch content.
     """
 
-    def __init__(self, name, patch):
+    def __init__(self, name, patch, updated_packages=None):
         self.patch = patch
         self.find_patch_pieces()
 
         email_check = EmailAddressCheck(self.author_email, 'Author')
         email_ok = email_check.ok
 
-        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email)
+        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email, updated_packages)
         msg_ok = msg_check.ok
         self.ignore_multi_package = msg_check.ignore_multi_package
 
@@ -695,7 +717,8 @@ class CheckGitCommits:
             email = self.read_committer_email_address_from_git(commit)
             self.ok &= EmailAddressCheck(email, 'Committer').ok
             patch = self.read_patch_from_git(commit)
-            check_patch = CheckOnePatch(commit, patch)
+            updated_packages = self.get_parent_packages (dec_files, commit, 'ADM')
+            check_patch = CheckOnePatch(commit, patch, updated_packages)
             self.ok &= check_patch.ok
             ignore_multi_package = check_patch.ignore_multi_package
             if PatchCheckConf.ignore_multi_package:
@@ -730,7 +753,7 @@ class CheckGitCommits:
             for dec_file in dec_files:
                 if os.path.commonpath([dec_file, file]):
                     dec_found = True
-                    parents.add(dec_file)
+                    parents.add(dec_file.split('/')[0])
             if not dec_found and os.path.dirname (file):
                 # No DEC file found and file is in a subdir
                 # Covers BaseTools, .github, .azurepipelines, .pytool

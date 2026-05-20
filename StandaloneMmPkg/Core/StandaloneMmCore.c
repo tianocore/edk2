@@ -1,18 +1,13 @@
 /** @file
   MM Core Main Entry Point
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2025, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "StandaloneMmCore.h"
-
-EFI_STATUS
-MmDispatcher (
-  VOID
-  );
 
 //
 // Globals used to initialize the protocol
@@ -270,7 +265,9 @@ MmReadyToLockHandler (
   // Display any drivers that were not dispatched because dependency expression
   // evaluated to false if this is a debug build
   //
-  // MmDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_BEGIN ();
+  MmDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_END ();
 
   return Status;
 }
@@ -303,7 +300,7 @@ MmEndOfPeiHandler (
 
   DEBUG ((DEBUG_INFO, "MmEndOfPeiHandler\n"));
   //
-  // Install MM EndOfDxe protocol
+  // Install MM EndOfPei protocol
   //
   MmHandle = NULL;
   Status   = MmInstallProtocolInterface (
@@ -451,15 +448,16 @@ MmCorePrepareCommunicationBuffer (
   mInternalCommBufferCopy = NULL;
 
   GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
-  ASSERT (GuidHob != NULL);
   if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to find MM Communication Buffer HOB\n"));
+    DEBUG ((DEBUG_ERROR, "Only Root MMI Handlers will be supported!\n"));
     return;
   }
 
   mMmCommunicationBuffer = (MM_COMM_BUFFER *)GET_GUID_HOB_DATA (GuidHob);
   DEBUG ((
     DEBUG_INFO,
-    "MM Communication Buffer is at %x, number of pages is %x\n",
+    "MM Communication Buffer is at 0x%x, number of pages is %d\n",
     mMmCommunicationBuffer->PhysicalStart,
     mMmCommunicationBuffer->NumberOfPages
     ));
@@ -506,12 +504,15 @@ MmEntryPoint (
   IN CONST EFI_MM_ENTRY_CONTEXT  *MmEntryContext
   )
 {
-  EFI_STATUS                 Status;
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  MM_COMM_BUFFER_STATUS      *CommunicationStatus;
-  UINTN                      BufferSize;
-
-  DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER     *LegacyCommunicateHeader;
+  MM_COMM_BUFFER_STATUS         *CommunicationStatus;
+  UINTN                         BufferSize;
+  EFI_HANDLE                    MmHandle;
+  EFI_GUID                      *CommGuid;
+  UINTN                         CommGuidOffset;
+  UINTN                         CommHeaderSize;
 
   //
   // Update MMST using the context
@@ -519,9 +520,22 @@ MmEntryPoint (
   CopyMem (&gMmCoreMmst.MmStartupThisAp, MmEntryContext, sizeof (EFI_MM_ENTRY_CONTEXT));
 
   //
-  // Call platform hook before Mm Dispatch
+  // Install a protocol to notify BeforeMmDispatch.
   //
-  // PlatformHookBeforeMmDispatch ();
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmEntryNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmEntryNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // Check to see if this is a Synchronous MMI sent through the MM Communication
@@ -533,8 +547,22 @@ MmEntryPoint (
       //
       // Synchronous MMI for MM Core or request from Communicate protocol
       //
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
-      BufferSize        = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+      CommGuid = &((EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)mMmCommunicationBuffer->PhysicalStart)->HeaderGuid;
+      //
+      // Check if the signature matches EFI_MM_COMMUNICATE_HEADER_V3 definition
+      //
+      if (CompareGuid (CommGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+        CommGuidOffset    = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageGuid);
+        CommHeaderSize    = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+        BufferSize        = CommunicateHeader->BufferSize;
+      } else {
+        LegacyCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+        CommGuidOffset          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, HeaderGuid);
+        CommHeaderSize          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        BufferSize              = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + LegacyCommunicateHeader->MessageLength;
+      }
+
       if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
         //
         // Shadow the data from MM Communication Buffer to internal buffer
@@ -549,16 +577,15 @@ MmEntryPoint (
           EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages) - BufferSize
           );
 
-        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
-        BufferSize        = CommunicateHeader->MessageLength;
-        Status            = MmiManage (
-                              &CommunicateHeader->HeaderGuid,
-                              NULL,
-                              CommunicateHeader->Data,
-                              &BufferSize
-                              );
+        BufferSize -= CommHeaderSize;
+        Status      = MmiManage (
+                        (EFI_GUID *)((UINT8 *)mInternalCommBufferCopy + CommGuidOffset),
+                        NULL,
+                        (UINT8 *)mInternalCommBufferCopy + CommHeaderSize,
+                        &BufferSize
+                        );
 
-        BufferSize = BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        BufferSize = BufferSize + CommHeaderSize;
         if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
           //
           // Copy the data back to MM Communication Buffer
@@ -574,18 +601,19 @@ MmEntryPoint (
         }
 
         //
-        // Update CommunicationBuffer, BufferSize and ReturnStatus
-        // Communicate service finished, reset the pointer to CommBuffer to NULL
+        // Update ReturnBufferSize and ReturnStatus
+        // Communicate service finished, reset IsCommBufferValid to FALSE
         //
-        CommunicationStatus->ReturnBufferSize = BufferSize;
-        CommunicationStatus->ReturnStatus     = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+        CommunicationStatus->IsCommBufferValid = FALSE;
+        CommunicationStatus->ReturnBufferSize  = BufferSize;
+        CommunicationStatus->ReturnStatus      = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
       } else {
         DEBUG ((DEBUG_ERROR, "Input buffer size is larger than the size of MM Communication Buffer\n"));
         ASSERT (FALSE);
       }
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "No valid communication buffer, no Synchronous MMI will be processed\n"));
+    DEBUG ((DEBUG_INFO, "No valid communication buffer, no Synchronous MMI will be processed\n"));
   }
 
   //
@@ -594,10 +622,26 @@ MmEntryPoint (
   MmiManage (NULL, NULL, NULL, NULL);
 
   //
+  // Install a protocol to notify AfterMmDispatch.
+  //
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmExitNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmExitNotifyProtocolGuid,
+      NULL
+      );
+  }
+
+  //
   // TBD: Do not use private data structure ?
   //
-
-  DEBUG ((DEBUG_INFO, "MmEntryPoint Done\n"));
 }
 
 /** Register the MM Entry Point provided by the MM Core with the
@@ -663,13 +707,7 @@ MigrateMemoryAllocationHobs (
   Hob.Raw             = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobStart);
   while (Hob.Raw != NULL) {
     MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
-    if ((MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) &&
-        (MmIsBufferOutsideMmValid (
-           MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress,
-           MemoryAllocationHob->AllocDescriptor.MemoryLength
-           ))
-        )
-    {
+    if (MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) {
       if (!IsZeroGuid (&MemoryAllocationHob->AllocDescriptor.Name)) {
         MemoryInMmram = AllocatePages (EFI_SIZE_TO_PAGES (MemoryAllocationHob->AllocDescriptor.MemoryLength));
         if (MemoryInMmram != NULL) {
@@ -703,30 +741,81 @@ MigrateMemoryAllocationHobs (
   }
 }
 
-/** Returns the HOB list size.
+/**
+  This function is responsible for validating the input HOB list and
+  initializing a new HOB list in MMRAM based on the input HOB list.
 
-  @param [in]  HobStart   Pointer to the start of the HOB list.
+  @param [in]  HobStart          Pointer to the start of the HOB list.
+  @param [in]  MmramRanges       Pointer to the Mmram ranges.
+  @param [in]  MmramRangeCount   Count of Mmram ranges.
 
-  @retval Size of the HOB list.
+  @retval Pointer to the new location of hob list in MMRAM.
 **/
-UINTN
-GetHobListSize (
-  IN VOID  *HobStart
+VOID *
+InitializeMmHobList (
+  IN VOID                  *HobStart,
+  IN EFI_MMRAM_DESCRIPTOR  *MmramRanges,
+  IN UINTN                 MmramRangeCount
   )
 {
+  VOID                  *MmHobStart;
+  UINTN                 HobSize;
+  EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  MmramBase;
+  EFI_PHYSICAL_ADDRESS  MmramEnd;
+  EFI_PHYSICAL_ADDRESS  ResourceHobBase;
+  EFI_PHYSICAL_ADDRESS  ResourceHobEnd;
 
   ASSERT (HobStart != NULL);
 
   Hob.Raw = (UINT8 *)HobStart;
   while (!END_OF_HOB_LIST (Hob)) {
     Hob.Raw = GET_NEXT_HOB (Hob);
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      ResourceHobBase = Hob.ResourceDescriptor->PhysicalStart;
+      ResourceHobEnd  = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+
+      for (Index = 0; Index < MmramRangeCount; Index++) {
+        MmramBase = MmramRanges[Index].PhysicalStart;
+        MmramEnd  = MmramRanges[Index].PhysicalStart + MmramRanges[Index].PhysicalSize;
+
+        if ((MmramBase < ResourceHobEnd) && (MmramEnd > ResourceHobBase)) {
+          //
+          // The Resource HOB is to describe the accessible non-Mmram range.
+          // All Resource HOB should not overlapp with any Mmram range.
+          //
+          DEBUG ((
+            DEBUG_ERROR,
+            "The resource HOB range [0x%lx, 0x%lx] overlaps with MMRAM range\n",
+            ResourceHobBase,
+            ResourceHobEnd
+            ));
+          CpuDeadLoop ();
+        }
+      }
+    }
   }
 
   //
   // Need plus END_OF_HOB_LIST
   //
-  return (UINTN)Hob.Raw - (UINTN)HobStart + sizeof (EFI_HOB_GENERIC_HEADER);
+  HobSize = (UINTN)Hob.Raw - (UINTN)HobStart + sizeof (EFI_HOB_GENERIC_HEADER);
+  DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
+
+  MmHobStart = AllocatePool (HobSize);
+  DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
+  ASSERT (MmHobStart != NULL);
+  CopyMem (MmHobStart, HobStart, HobSize);
+
+  DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
+  Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
+  ASSERT_EFI_ERROR (Status);
+
+  MigrateMemoryAllocationHobs (MmHobStart);
+
+  return MmHobStart;
 }
 
 /**
@@ -750,22 +839,13 @@ StandaloneMmMain (
 {
   EFI_STATUS                      Status;
   UINTN                           Index;
-  VOID                            *MmHobStart;
-  UINTN                           HobSize;
   VOID                            *Registration;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
   UINTN                           MmramRangeCount;
-  EFI_HOB_FIRMWARE_VOLUME         *BfvHob;
-
-  ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
-
-  DEBUG_CODE (
-    PrintHobList (HobStart, NULL);
-    );
 
   //
   // Extract the MMRAM ranges from the MMRAM descriptor HOB
@@ -800,25 +880,22 @@ StandaloneMmMain (
   }
 
   //
-  // No need to initialize memory service.
-  // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
-  // so that the library linked with StandaloneMmCore can use AllocatePool() in
-  // the constructor.
+  // Initialize memory service using free MMRAM
+  //
+  DEBUG ((DEBUG_INFO, "MmInitializeMemoryServices\n"));
+  MmInitializeMemoryServices (MmramRangeCount, MmramRanges);
+  mMemoryAllocationMmst = &gMmCoreMmst;
 
-  DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
   //
   // Install HobList
   //
-  HobSize = GetHobListSize (HobStart);
-  DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
-  MmHobStart = AllocatePool (HobSize);
-  DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
-  ASSERT (MmHobStart != NULL);
-  CopyMem (MmHobStart, HobStart, HobSize);
-  Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
-  ASSERT_EFI_ERROR (Status);
-  MigrateMemoryAllocationHobs (MmHobStart);
-  gHobList = MmHobStart;
+  gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
+
+  ProcessLibraryConstructorList (gHobList, &gMmCoreMmst);
+
+  DEBUG_CODE (
+    PrintHobList (gHobList, NULL);
+    );
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
@@ -833,20 +910,14 @@ StandaloneMmMain (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Get Boot Firmware Volume address from the BFV Hob
+  // Dispatch Standalone FVs
   //
-  BfvHob = GetFirstHob (EFI_HOB_TYPE_FV);
-  if (BfvHob != NULL) {
-    DEBUG ((DEBUG_INFO, "BFV address - 0x%x\n", BfvHob->BaseAddress));
-    DEBUG ((DEBUG_INFO, "BFV size    - 0x%x\n", BfvHob->Length));
+  MmDispatchFvs ();
+  if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
     //
-    // Dispatch standalone BFV
+    // Free shadowed standalone FVs
     //
-    if (BfvHob->BaseAddress != 0) {
-      DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", BfvHob->BaseAddress));
-      MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BfvHob->BaseAddress, 0);
-      MmDispatcher ();
-    }
+    MmFreeShadowedFvs ();
   }
 
   //

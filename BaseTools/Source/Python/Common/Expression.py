@@ -917,7 +917,7 @@ class ValueExpressionEx(ValueExpression):
                                 TmpList.append('0x%02x' % ((TmpValue >> I * 8) & 0xff))
                             PcdValue = '{' + ', '.join(TmpList) + '}'
                     except:
-                        if PcdValue.strip().startswith('{'):
+                        if PcdValue.strip().startswith('{') and PcdValue.strip().endswith('}'):
                             PcdValueList = SplitPcdValueString(PcdValue.strip()[1:-1])
                             LabelDict = {}
                             NewPcdValueList = []
@@ -969,8 +969,8 @@ class ValueExpressionEx(ValueExpression):
                                 NewPcdValueList.append(Item)
 
                             AllPcdValueList = []
+                            Size = 0
                             for Item in NewPcdValueList:
-                                Size = 0
                                 ValueStr = ''
                                 TokenSpaceGuidName = ''
                                 if Item.startswith(TAB_GUID) and Item.endswith(')'):
@@ -1027,6 +1027,8 @@ class ValueExpressionEx(ValueExpression):
 
                             if Size > 0:
                                 PcdValue = '{' + ', '.join(AllPcdValueList) + '}'
+                            else:
+                                raise BadExpression("PCD with value '%s' cannot be used. Please provide a valid value of at least one byte." % (self.PcdValue))
                         else:
                             raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 

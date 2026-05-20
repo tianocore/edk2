@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef REDFISH_DEBUG_LIB_H_
-#define REDFISH_DEBUG_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/DebugLib.h>
@@ -176,5 +175,3 @@ DumpBuffer (
   IN  UINT8  *Buffer,
   IN  UINTN  BufferSize
   );
-
-#endif

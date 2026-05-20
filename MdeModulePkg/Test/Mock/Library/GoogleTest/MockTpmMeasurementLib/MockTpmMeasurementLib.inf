@@ -1,0 +1,28 @@
+## @file MockTpmMeasurementlib.inf
+# Google Test mocks for TpmMeasurementlib
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010015
+  BASE_NAME                      = MockTpmMeasurementlib
+  FILE_GUID                      = 7348C3D5-3DC7-4F58-82F6-2D3C2ED303FA
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmMeasurementlib
+
+[sources]
+  MockTpmMeasurementLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc

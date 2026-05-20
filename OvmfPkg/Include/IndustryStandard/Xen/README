@@ -3,8 +3,7 @@ modification that are described in this README.
 
 The modifications that needed to be done are:
 - Use of ZeroMem() or SetMem() instead of memset().
-- If a struct is using a 64bit field, then a #pragma(4) might be needed
-  for IA32, like in io/blkif.h.
+- Drop any i386 references as OVMF Xen support is only for x64.
 - Replace the types with the ones used in UEFI.
 
 
@@ -33,5 +32,4 @@ s/([^a-zA-Z0-9_]|^)char([^a-zA-Z0-9_]|$)/\1CHAR8\2/g
 s/([^a-zA-Z0-9_]|^)unsigned long([^a-zA-Z0-9_]|$)/\1UINTN\2/g
 s/([^a-zA-Z0-9_]|^)long([^a-zA-Z0-9_]|$)/\1INTN\2/g
 
-s/__i386__/MDE_CPU_IA32/g
 s/__x86_64__/MDE_CPU_X64/g

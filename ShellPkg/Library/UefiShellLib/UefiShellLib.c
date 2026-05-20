@@ -3553,7 +3553,7 @@ ShellPromptForResponse (
   switch (Type) {
     case ShellPromptResponseTypeQuitContinue:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3565,7 +3565,7 @@ ShellPromptForResponse (
         break;
       }
 
-      ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+      ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
       if ((Key.UnicodeChar == L'Q') || (Key.UnicodeChar == L'q')) {
         *Resp = ShellPromptResponseQuit;
       } else {
@@ -3575,7 +3575,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeYesNoCancel:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3594,7 +3594,7 @@ ShellPromptForResponse (
           break;
         }
 
-        ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+        ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
           case L'y':
@@ -3614,7 +3614,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeYesNoAllCancel:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3634,7 +3634,7 @@ ShellPromptForResponse (
         }
 
         if ((Key.UnicodeChar <= 127) && (Key.UnicodeChar >= 32)) {
-          ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+          ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         }
 
         switch (Key.UnicodeChar) {
@@ -3661,7 +3661,7 @@ ShellPromptForResponse (
     case ShellPromptResponseTypeEnterContinue:
     case ShellPromptResponseTypeAnyKeyContinue:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3681,7 +3681,7 @@ ShellPromptForResponse (
             break;
           }
 
-          ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+          ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
           if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
             *Resp = ShellPromptResponseContinue;
             break;
@@ -3699,7 +3699,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeYesNo:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3718,7 +3718,7 @@ ShellPromptForResponse (
           break;
         }
 
-        ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+        ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
           case L'y':
@@ -3734,7 +3734,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeFreeform:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       while (1) {
@@ -3749,7 +3749,7 @@ ShellPromptForResponse (
           break;
         }
 
-        ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+        ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
           break;
         }
@@ -3785,7 +3785,7 @@ ShellPromptForResponse (
     }
   }
 
-  ShellPrintEx (-1, -1, L"\r\n");
+  ShellPrintDefaultEx (L"\r\n");
   return (Status);
 }
 
@@ -3820,7 +3820,10 @@ ShellPromptForResponseHii (
 
   Prompt = HiiGetString (HiiFormatHandle, HiiFormatStringId, NULL);
   Status = ShellPromptForResponse (Type, Prompt, Response);
-  FreePool (Prompt);
+  if (Prompt != NULL) {
+    FreePool (Prompt);
+  }
+
   return (Status);
 }
 
@@ -3889,6 +3892,10 @@ InternalShellIsHexOrDecimalNumber (
     Hex = TRUE;
   } else {
     Hex = FALSE;
+  }
+
+  if ((*String == CHAR_NULL) && LeadingZero) {
+    return (TRUE);
   }
 
   //
@@ -4006,9 +4013,10 @@ InternalShellStrHexToUint64 (
   IN CONST BOOLEAN  StopAtSpace
   )
 {
-  UINT64  Result;
+  UINT64   Result;
+  BOOLEAN  LeadingZero;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (*String == CHAR_NULL) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4022,12 +4030,14 @@ InternalShellStrHexToUint64 (
   //
   // Ignore leading Zeros after the spaces
   //
+  LeadingZero = FALSE;
   while (*String == L'0') {
     String++;
+    LeadingZero = TRUE;
   }
 
   if (CharToUpper (*String) == L'X') {
-    if (*(String - 1) != L'0') {
+    if (!LeadingZero) {
       return 0;
     }
 
@@ -4035,16 +4045,16 @@ InternalShellStrHexToUint64 (
     // Skip the 'X'
     //
     String++;
+
+    //
+    // there is a space where there should't be
+    //
+    if (*String == L' ') {
+      return (EFI_INVALID_PARAMETER);
+    }
   }
 
   Result = 0;
-
-  //
-  // there is a space where there should't be
-  //
-  if (*String == L' ') {
-    return (EFI_INVALID_PARAMETER);
-  }
 
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
     //
@@ -4110,7 +4120,7 @@ InternalShellStrDecimalToUint64 (
 {
   UINT64  Result;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (*String == CHAR_NULL) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4228,15 +4238,17 @@ ShellConvertStringToUint64 (
     Status = InternalShellStrDecimalToUint64 (Walker, &RetVal, StopAtSpace);
   }
 
-  if ((Value == NULL) && !EFI_ERROR (Status)) {
-    return (EFI_NOT_FOUND);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (Value != NULL) {
-    *Value = RetVal;
+  if (Value == NULL) {
+    return EFI_NOT_FOUND;
   }
 
-  return (Status);
+  *Value = RetVal;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -4367,6 +4379,7 @@ ShellFileHandleReadLine (
 {
   EFI_STATUS  Status;
   CHAR16      CharBuffer;
+  UINTN       BufferLength;
   UINTN       CharSize;
   UINTN       CountSoFar;
   UINT64      OriginalFilePosition;
@@ -4443,8 +4456,9 @@ ShellFileHandleReadLine (
     return (EFI_BUFFER_TOO_SMALL);
   }
 
-  while (Buffer[StrLen (Buffer)-1] == L'\r') {
-    Buffer[StrLen (Buffer)-1] = CHAR_NULL;
+  BufferLength = StrLen (Buffer);
+  while ((BufferLength != 0) && (Buffer[--BufferLength] == L'\r')) {
+    Buffer[BufferLength] = CHAR_NULL;
   }
 
   return (Status);
@@ -4501,9 +4515,9 @@ ShellPrintHelp (
   // Print this out to the console
   //
   if (PrintCommandText) {
-    ShellPrintEx (-1, -1, L"%H%-14s%N- %s\r\n", CommandToGetHelpOn, OutText);
+    ShellPrintDefaultEx (L"%H%-14s%N- %s\r\n", CommandToGetHelpOn, OutText);
   } else {
-    ShellPrintEx (-1, -1, L"%N%s\r\n", OutText);
+    ShellPrintDefaultEx (L"%N%s\r\n", OutText);
   }
 
   SHELL_FREE_NON_NULL (OutText);
@@ -4589,4 +4603,19 @@ InternalShellStripQuotes (
   }
 
   return EFI_SUCCESS;
+}
+
+/** Check whther the input name is L"." or L"..".
+
+  @param[in]  Name  Name to check.
+
+  @return TRUE if the input name matches L"." or L"..".
+**/
+BOOLEAN
+EFIAPI
+IsDotOrDotDot (
+  CONST CHAR16  *Name
+  )
+{
+  return (StrCmp (Name, L".") == 0) || (StrCmp (Name, L"..") == 0);
 }

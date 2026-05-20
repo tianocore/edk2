@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMM_LEGACY_BOOT_H_
-#define _SMM_LEGACY_BOOT_H_
+#pragma once
 
 #define EDKII_SMM_LEGACY_BOOT_PROTOCOL_GUID \
   { \
@@ -18,5 +17,3 @@
   }
 
 extern EFI_GUID  gEdkiiSmmLegacyBootProtocolGuid;
-
-#endif

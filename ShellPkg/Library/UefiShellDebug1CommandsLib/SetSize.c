@@ -49,7 +49,7 @@ ShellCommandRunSetSize (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setsize", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setsize", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -57,13 +57,17 @@ ShellCommandRunSetSize (
     }
   } else {
     if (ShellCommandLineGetCount (Package) < 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setsize");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setsize");
       ShellStatus = SHELL_INVALID_PARAMETER;
       NewSize     = 0;
     } else {
       Temp1 = ShellCommandLineGetRawValue (Package, 1);
-      if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SIZE_NOT_SPEC), gShellDebug1HiiHandle, L"setsize");
+      if (Temp1 == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setsize");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        NewSize     = 0;
+      } else if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SIZE_NOT_SPEC), gShellDebug1HiiHandle, L"setsize");
         ShellStatus = SHELL_INVALID_PARAMETER;
         NewSize     = 0;
       } else {
@@ -78,22 +82,22 @@ ShellCommandRunSetSize (
       }
 
       if (EFI_ERROR (Status) && (LoopVar == 2)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_SPEC), gShellDebug1HiiHandle, L"setsize");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_SPEC), gShellDebug1HiiHandle, L"setsize");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"setsize", ShellCommandLineGetRawValue (Package, LoopVar));
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"setsize", ShellCommandLineGetRawValue (Package, LoopVar));
         ShellStatus = SHELL_INVALID_PARAMETER;
         break;
       } else {
         Status = FileHandleSetSize (FileHandle, NewSize);
         if (Status == EFI_VOLUME_FULL) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VOLUME_FULL), gShellDebug1HiiHandle, L"setsize");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VOLUME_FULL), gShellDebug1HiiHandle, L"setsize");
           ShellStatus = SHELL_VOLUME_FULL;
         } else if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SET_SIZE_FAIL), gShellDebug1HiiHandle, L"setsize", ShellCommandLineGetRawValue (Package, LoopVar));
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_SIZE_FAIL), gShellDebug1HiiHandle, L"setsize", ShellCommandLineGetRawValue (Package, LoopVar));
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SET_SIZE_DONE), gShellDebug1HiiHandle, ShellCommandLineGetRawValue (Package, LoopVar));
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_SIZE_DONE), gShellDebug1HiiHandle, ShellCommandLineGetRawValue (Package, LoopVar));
         }
 
         ShellCloseFile (&FileHandle);

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef CONFORMANCE_PROFILES_TABLE_GUID_H_
-#define CONFORMANCE_PROFILES_TABLE_GUID_H_
+#pragma once
 
 //
 // This table allows the platform to advertise its UEFI specification conformance
@@ -63,5 +62,3 @@ typedef struct {
 
 extern EFI_GUID  gEfiConfProfilesTableGuid;
 extern EFI_GUID  gEfiConfProfilesUefiSpecGuid;
-
-#endif

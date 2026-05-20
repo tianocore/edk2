@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/PlatformLogo.h>
-#include <Protocol/UgaDraw.h>
 #include <Protocol/BootLogo.h>
 #include <Protocol/BootLogo2.h>
 #include <Library/BaseLib.h>
@@ -47,9 +46,6 @@ BootLogoEnableLogo (
   UINT32                                 Instance;
   EFI_IMAGE_INPUT                        Image;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL          *Blt;
-  EFI_UGA_DRAW_PROTOCOL                  *UgaDraw;
-  UINT32                                 ColorDepth;
-  UINT32                                 RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL           *GraphicsOutput;
   EFI_BOOT_LOGO_PROTOCOL                 *BootLogo;
   EDKII_BOOT_LOGO2_PROTOCOL              *BootLogo2;
@@ -68,22 +64,10 @@ BootLogoEnableLogo (
     return EFI_UNSUPPORTED;
   }
 
-  UgaDraw = NULL;
   //
   // Try to open GOP first
   //
   Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
-  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
-    GraphicsOutput = NULL;
-    //
-    // Open GOP failed, try to open UGA
-    //
-    Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&UgaDraw);
-    if (EFI_ERROR (Status)) {
-      UgaDraw = NULL;
-    }
-  }
-
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
@@ -109,16 +93,8 @@ BootLogoEnableLogo (
   //
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
 
-  if (GraphicsOutput != NULL) {
-    SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
-    SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
-    ASSERT (UgaDraw != NULL);
-    Status = UgaDraw->GetMode (UgaDraw, &SizeOfX, &SizeOfY, &ColorDepth, &RefreshRate);
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
-  }
+  SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
+  SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
 
   Blt           = NULL;
   NumberOfLogos = 0;
@@ -206,34 +182,18 @@ BootLogoEnableLogo (
     DestY += OffsetY;
 
     if ((DestX >= 0) && (DestY >= 0)) {
-      if (GraphicsOutput != NULL) {
-        Status = GraphicsOutput->Blt (
-                                   GraphicsOutput,
-                                   Blt,
-                                   EfiBltBufferToVideo,
-                                   0,
-                                   0,
-                                   (UINTN)DestX,
-                                   (UINTN)DestY,
-                                   Image.Width,
-                                   Image.Height,
-                                   Image.Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-                                   );
-      } else {
-        ASSERT (UgaDraw != NULL);
-        Status = UgaDraw->Blt (
-                            UgaDraw,
-                            (EFI_UGA_PIXEL *)Blt,
-                            EfiUgaBltBufferToVideo,
-                            0,
-                            0,
-                            (UINTN)DestX,
-                            (UINTN)DestY,
-                            Image.Width,
-                            Image.Height,
-                            Image.Width * sizeof (EFI_UGA_PIXEL)
-                            );
-      }
+      Status = GraphicsOutput->Blt (
+                                 GraphicsOutput,
+                                 Blt,
+                                 EfiBltBufferToVideo,
+                                 0,
+                                 0,
+                                 (UINTN)DestX,
+                                 (UINTN)DestY,
+                                 Image.Width,
+                                 Image.Height,
+                                 Image.Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                                 );
 
       //
       // Report displayed Logo information.
@@ -307,33 +267,18 @@ BootLogoEnableLogo (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->Blt (
-                                 GraphicsOutput,
-                                 LogoBlt,
-                                 EfiBltVideoToBltBuffer,
-                                 LogoDestX,
-                                 LogoDestY,
-                                 0,
-                                 0,
-                                 LogoWidth,
-                                 LogoHeight,
-                                 LogoWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-                                 );
-    } else {
-      Status = UgaDraw->Blt (
-                          UgaDraw,
-                          (EFI_UGA_PIXEL *)LogoBlt,
-                          EfiUgaVideoToBltBuffer,
-                          LogoDestX,
-                          LogoDestY,
-                          0,
-                          0,
-                          LogoWidth,
-                          LogoHeight,
-                          LogoWidth * sizeof (EFI_UGA_PIXEL)
-                          );
-    }
+    Status = GraphicsOutput->Blt (
+                               GraphicsOutput,
+                               LogoBlt,
+                               EfiBltVideoToBltBuffer,
+                               LogoDestX,
+                               LogoDestY,
+                               0,
+                               0,
+                               LogoWidth,
+                               LogoHeight,
+                               LogoWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                               );
   }
 
   if (!EFI_ERROR (Status)) {
@@ -368,7 +313,7 @@ BootLogoEnableLogo (
   Use SystemTable Conout to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non video output devices
 
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+  @retval EFI_SUCCESS     GOP devices are back in text mode and synced up.
 
 **/
 EFI_STATUS
@@ -411,11 +356,8 @@ BootLogoUpdateProgress (
 {
   EFI_STATUS                     Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL   *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL          *UgaDraw;
   UINT32                         SizeOfX;
   UINT32                         SizeOfY;
-  UINT32                         ColorDepth;
-  UINT32                         RefreshRate;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Color;
   UINTN                          BlockHeight;
   UINTN                          BlockWidth;
@@ -428,40 +370,13 @@ BootLogoUpdateProgress (
     return EFI_INVALID_PARAMETER;
   }
 
-  UgaDraw = NULL;
-  Status  = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
-  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
-    GraphicsOutput = NULL;
-
-    Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiUgaDrawProtocolGuid, (VOID **)&UgaDraw);
-    if (EFI_ERROR (Status)) {
-      UgaDraw = NULL;
-    }
-  }
-
+  Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
 
-  SizeOfX = 0;
-  SizeOfY = 0;
-  if (GraphicsOutput != NULL) {
-    SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
-    SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if (UgaDraw != NULL) {
-    Status = UgaDraw->GetMode (
-                        UgaDraw,
-                        &SizeOfX,
-                        &SizeOfY,
-                        &ColorDepth,
-                        &RefreshRate
-                        );
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
-  } else {
-    return EFI_UNSUPPORTED;
-  }
+  SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
+  SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
 
   BlockWidth  = SizeOfX / 100;
   BlockHeight = SizeOfY / 50;
@@ -477,71 +392,37 @@ BootLogoUpdateProgress (
     //
     SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
 
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->Blt (
-                                 GraphicsOutput,
-                                 &Color,
-                                 EfiBltVideoFill,
-                                 0,
-                                 0,
-                                 0,
-                                 PosY - EFI_GLYPH_HEIGHT - 1,
-                                 SizeOfX,
-                                 SizeOfY - (PosY - EFI_GLYPH_HEIGHT - 1),
-                                 SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-                                 );
-    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
-      Status = UgaDraw->Blt (
-                          UgaDraw,
-                          (EFI_UGA_PIXEL *)&Color,
-                          EfiUgaVideoFill,
-                          0,
-                          0,
-                          0,
-                          PosY - EFI_GLYPH_HEIGHT - 1,
-                          SizeOfX,
-                          SizeOfY - (PosY - EFI_GLYPH_HEIGHT - 1),
-                          SizeOfX * sizeof (EFI_UGA_PIXEL)
-                          );
-    } else {
-      return EFI_UNSUPPORTED;
-    }
+    Status = GraphicsOutput->Blt (
+                               GraphicsOutput,
+                               &Color,
+                               EfiBltVideoFill,
+                               0,
+                               0,
+                               0,
+                               PosY - EFI_GLYPH_HEIGHT - 1,
+                               SizeOfX,
+                               SizeOfY - (PosY - EFI_GLYPH_HEIGHT - 1),
+                               SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                               );
   }
 
   //
   // Show progress by drawing blocks
   //
   for (Index = PreviousValue; Index < BlockNum; Index++) {
-    PosX = Index * BlockWidth;
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->Blt (
-                                 GraphicsOutput,
-                                 &ProgressColor,
-                                 EfiBltVideoFill,
-                                 0,
-                                 0,
-                                 PosX,
-                                 PosY,
-                                 BlockWidth - 1,
-                                 BlockHeight,
-                                 (BlockWidth) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-                                 );
-    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
-      Status = UgaDraw->Blt (
-                          UgaDraw,
-                          (EFI_UGA_PIXEL *)&ProgressColor,
-                          EfiUgaVideoFill,
-                          0,
-                          0,
-                          PosX,
-                          PosY,
-                          BlockWidth - 1,
-                          BlockHeight,
-                          (BlockWidth) * sizeof (EFI_UGA_PIXEL)
-                          );
-    } else {
-      return EFI_UNSUPPORTED;
-    }
+    PosX   = Index * BlockWidth;
+    Status = GraphicsOutput->Blt (
+                               GraphicsOutput,
+                               &ProgressColor,
+                               EfiBltVideoFill,
+                               0,
+                               0,
+                               PosX,
+                               PosY,
+                               BlockWidth - 1,
+                               BlockHeight,
+                               (BlockWidth) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                               );
   }
 
   PrintXY (

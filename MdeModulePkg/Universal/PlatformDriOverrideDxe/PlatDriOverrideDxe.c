@@ -6,9 +6,9 @@
   drivers to controllers.
 
   The main flow:
-  1. It dynamicly locate all controller device path.
-  2. It dynamicly locate all drivers which support binding protocol.
-  3. It export and dynamicly update two menu to let user select the
+  1. It dynamically locate all controller device path.
+  2. It dynamically locate all drivers which support binding protocol.
+  3. It export and dynamically update two menu to let user select the
      mapping between drivers to controllers.
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
@@ -421,6 +421,8 @@ UpdateDeviceSelectPage (
                                  &mDevicePathHandleBuffer
                                  );
   if (EFI_ERROR (Status) || (DevicePathHandleCount == 0)) {
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+    HiiFreeOpCodeHandle (EndOpCodeHandle);
     return EFI_SUCCESS;
   }
 
@@ -614,6 +616,7 @@ GetDriverBindingHandleFromImageHandle (
   @param  FakeNvData     Pointer to PLAT_OVER_MNGR_DATA.
 
   @retval EFI_SUCCESS    Always returned.
+  @retval EFI_NOT_FOUND  Handles supporting loaded image protocol.
 
 **/
 EFI_STATUS
@@ -708,6 +711,8 @@ UpdateBindingDriverSelectPage (
                                   &mDriverImageHandleBuffer
                                   );
   if (EFI_ERROR (Status) || (DriverImageHandleCount == 0)) {
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+    HiiFreeOpCodeHandle (EndOpCodeHandle);
     return EFI_NOT_FOUND;
   }
 
@@ -1220,9 +1225,17 @@ PlatOverMngrExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gPlatformOverridesManagerGuid, mVariableName, Private->DriverHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    if (ConfigRequestHdr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      FreePool (ConfigRequestHdr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     AllocatedRequest = TRUE;
     BufferSize       = sizeof (PLAT_OVER_MNGR_DATA);
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
@@ -1337,7 +1350,11 @@ PlatOverMngrRouteConfig (
   @param  Value          A pointer to the data being sent to the original exporting driver.
   @param  ActionRequest  On return, points to the action requested by the callback function.
 
-  @retval EFI_SUCCESS    Always returned.
+  @retval EFI_SUCCESS           Changes were completed successfully.
+  @retval EFI_UNSUPPORTED       An action is being passed that is not supported.
+  @retval EFI_DEVICE_ERROR      Changed failed to be commited.
+  @retval EFI_NOT_FOUND         Unable to get data from Hii.
+  @retval EFI_INVALID_PARMETER  Input parameters are invalid.
 
 **/
 EFI_STATUS
@@ -1364,6 +1381,10 @@ PlatOverMngrCallback (
     return EFI_UNSUPPORTED;
   }
 
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
   if (!HiiGetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *)FakeNvData)) {
@@ -1371,10 +1392,6 @@ PlatOverMngrCallback (
   }
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if (Value == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
-
     if (KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS) {
       UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
       //

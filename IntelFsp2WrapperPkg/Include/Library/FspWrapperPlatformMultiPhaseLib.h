@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef FSP_WRAPPER_PLATFORM_MULTI_PHASE_LIB_H_
-#define FSP_WRAPPER_PLATFORM_MULTI_PHASE_LIB_H_
+#pragma once
 
 /**
   FSP Wrapper Platform MultiPhase Handler
@@ -26,5 +25,3 @@ FspWrapperPlatformMultiPhaseHandler (
   IN UINT8     ComponentIndex,
   IN UINT32    PhaseIndex
   );
-
-#endif //FSP_WRAPPER_PLATFORM_MULTI_PHASE_LIB_H_

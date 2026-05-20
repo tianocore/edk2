@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __FSP_WRAPPER_API_LIB_H__
-#define __FSP_WRAPPER_API_LIB_H__
+#pragma once
 
 #include <FspEas.h>
 
@@ -78,4 +77,15 @@ CallFspSiliconInit (
   IN VOID  *FspsUpdDataPtr
   );
 
-#endif
+/**
+  Call FSP API - FspSmmInit.
+
+  @param[in] FspiUpdDataPtr     Pointer to the FSPI_UPD data structure.
+
+  @return EFI status returned by FspSmmInit API.
+**/
+EFI_STATUS
+EFIAPI
+CallFspSmmInit (
+  IN VOID  *FspiUpdDataPtr
+  );

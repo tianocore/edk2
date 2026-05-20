@@ -5,8 +5,7 @@ Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PLATFORM_BOOT_MANAGER_H_
-#define PLATFORM_BOOT_MANAGER_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/LoadedImage.h>
@@ -26,6 +25,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PrintLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Library/BootLogoLib.h>
+#include <Library/CapsuleLib.h>
+#include <Library/HobLib.h>
 #include <Protocol/SmmAccess2.h>
 
 typedef struct {
@@ -98,7 +99,7 @@ PlatformBootManagerEnableQuietBoot (
   Use SystemTable Conout to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non video output devices
 
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+  @retval EFI_SUCCESS     Devices are back in text mode and synced up.
 
 **/
 EFI_STATUS
@@ -128,5 +129,3 @@ PlatformBootManagerShowProgress (
   IN UINTN                          Progress,
   IN UINTN                          PreviousValue
   );
-
-#endif // _PLATFORM_BOOT_MANAGER_H

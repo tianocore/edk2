@@ -36,8 +36,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MP_SERVICE_PROTOCOL_H_
-#define _MP_SERVICE_PROTOCOL_H_
+#pragma once
 
 ///
 /// Global ID for the EFI_MP_SERVICES_PROTOCOL.
@@ -84,7 +83,7 @@ typedef struct _EFI_MP_SERVICES_PROTOCOL EFI_MP_SERVICES_PROTOCOL;
 #define PROCESSOR_HEALTH_STATUS_BIT  0x00000004
 
 ///
-/// Structure that describes the pyhiscal location of a logical CPU.
+/// Structure that describes the physical location of a logical CPU.
 ///
 typedef struct {
   ///
@@ -670,5 +669,3 @@ struct _EFI_MP_SERVICES_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMpServiceProtocolGuid;
-
-#endif

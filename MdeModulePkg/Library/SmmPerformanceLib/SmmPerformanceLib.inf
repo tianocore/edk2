@@ -7,6 +7,7 @@
 #  it does not log any performance information.
 #
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -30,6 +31,8 @@
 #
 
 [Sources]
+  SmmPerformanceLibInternal.h
+  SmmPerformanceLibInternal.c
   SmmPerformanceLib.c
 
 
@@ -40,7 +43,7 @@
 
 [LibraryClasses]
   PcdLib
-  SmmServicesTableLib
+  MmServicesTableLib
   DebugLib
   BaseMemoryLib
 

@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ONIGURUMA_UEFI_PORT_H
-#define ONIGURUMA_UEFI_PORT_H
+#pragma once
 
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
@@ -32,12 +31,13 @@
 typedef UINTN   size_t;
 typedef UINT32  uint32_t;
 typedef INTN    intptr_t;
+typedef INT64   ptrdiff_t;
 
 #ifndef offsetof
 #define offsetof  OFFSET_OF
 #endif
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_ARM) || defined (MDE_CPU_EBC)
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_EBC)
 #define SIZEOF_VOIDP  4
 #else
 #define SIZEOF_VOIDP  8
@@ -107,15 +107,12 @@ realloc (
   size_t  size
   );
 
-#if !defined (MDE_CPU_ARM)
 void *
 memcpy (
   void          *dest,
   const void    *src,
   unsigned int  count
   );
-
-#endif
 
 void *
 memset (
@@ -130,5 +127,3 @@ free (
   );
 
 #define exit(n)  ASSERT(FALSE);
-
-#endif // !ONIGURUMA_UEFI_PORT_H

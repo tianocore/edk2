@@ -34,70 +34,7 @@ FV = SECFV
 
 ################################################################################
 
-[FD.MEMFD]
-BaseAddress   = $(MEMFD_BASE_ADDRESS)
-Size          = 0xE00000
-ErasePolarity = 1
-BlockSize     = 0x10000
-NumBlocks     = 0xE0
-
-0x000000|0x006000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
-
-0x006000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
-
-0x007000|0x001000
-gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
-
-0x008000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
-
-0x009000|0x002000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
-
-0x00B000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
-
-0x00C000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
-
-0x00D000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
-
-0x00E000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
-
-0x00F000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize
-
-0x010000|0x000C00
-gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase|gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
-
-0x010C00|0x000400
-gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
-
-0x011000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
-
-0x012000|0x00E000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
-
-0x020000|0x0E0000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
-FV = PEIFV
-
-0x100000|0xD00000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
-FV = DXEFV
-
-##########################################################################################
-# Set the SEV-ES specific work area PCDs (used for all forms of SEV since the
-# the SEV STATUS MSR is now saved in the work area)
-#
-SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase = $(MEMFD_BASE_ADDRESS) +  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
-SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize - gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
-##########################################################################################
+!include OvmfPkg/Include/Fdf/MemFd.fdf.inc
 
 ################################################################################
 
@@ -159,6 +96,9 @@ APRIORI PEI {
 #
 #  PEI Phase modules
 #
+!if $(DEBUG_TO_MEM)
+INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
@@ -228,15 +168,6 @@ INF  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
 INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-!if $(PVSCSI_ENABLE) == TRUE
-INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
-!endif
-!if $(MPT_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
-!endif
-!if $(LSI_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
-!endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -248,6 +179,7 @@ INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF  MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
+INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
 INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
@@ -321,6 +253,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 !include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfOptHw.fdf.inc
 
 ################################################################################
 
@@ -436,7 +369,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.SEC.RESET_VECTOR]
+[Rule.Common.USER_DEFINED.RESET_VECTOR]
   FILE RAW = $(NAMED_GUID) {
     RAW BIN   Align = 16   |.bin
   }

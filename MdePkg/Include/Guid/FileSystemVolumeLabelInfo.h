@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __FILE_SYSTEM_VOLUME_LABEL_INFO_H__
-#define __FILE_SYSTEM_VOLUME_LABEL_INFO_H__
+#pragma once
 
 #define EFI_FILE_SYSTEM_VOLUME_LABEL_ID \
   { \
@@ -27,5 +26,3 @@ typedef struct {
         OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)
 
 extern EFI_GUID  gEfiFileSystemVolumeLabelInfoIdGuid;
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __FRAMEBUFFER_BLT_LIB__
-#define __FRAMEBUFFER_BLT_LIB__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -83,5 +82,3 @@ FrameBufferBlt (
   IN     UINTN                              Height,
   IN     UINTN                              Delta
   );
-
-#endif

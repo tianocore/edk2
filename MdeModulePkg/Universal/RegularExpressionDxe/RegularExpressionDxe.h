@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __REGULAR_EXPRESSIONDXE_H__
-#define __REGULAR_EXPRESSIONDXE_H__
+#pragma once
 
 #include "oniguruma/src/oniguruma.h"
 
@@ -121,5 +120,3 @@ RegularExpressionGetInfo (
   IN OUT UINTN                            *RegExSyntaxTypeListSize,
   OUT    EFI_REGEX_SYNTAX_TYPE            *RegExSyntaxTypeList
   );
-
-#endif

@@ -5,8 +5,7 @@
 
  **/
 
-#ifndef _PL111LCD_H__
-#define _PL111LCD_H__
+#pragma once
 
 /**********************************************************************
  *
@@ -108,7 +107,7 @@
 #define PL111_CTRL_LCD_16BPP_565  (6 << 1)
 #define PL111_CTRL_LCD_12BPP_444  (7 << 1)
 #define PL111_CTRL_LCD_BPP(Bpp)  ((Bpp) << 1)
-#define PL111_CTRL_LCD_EN  1
+#define PL111_CTRL_LCD_EN  1U
 
 /**********************************************************************/
 
@@ -139,5 +138,3 @@
 // Register: PL111_REG_LCD_TIMING_3
 #define PL111_BIT_MASK_LEE  0x00010000
 #define PL111_BIT_MASK_LED  0x0000007F
-
-#endif /* _PL111LCD_H__ */

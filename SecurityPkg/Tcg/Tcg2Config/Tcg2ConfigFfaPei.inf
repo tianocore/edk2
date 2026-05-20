@@ -1,0 +1,53 @@
+## @file
+#  Set TPM device type
+#
+#  This module initializes TPM device type based on CRB over FF-A interface
+#
+# Copyright (c) 2025, Arm Ltd. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = Tcg2ConfigFfaPei
+  FILE_GUID                      = ae8c4c50-2cd7-11f0-9e39-a7fbc471b972
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Tcg2ConfigFfaPeimEntryPoint
+
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  Tcg2ConfigFfaPeim.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  ArmFfaLib
+  BaseLib
+  BaseMemoryLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PcdLib
+  HobLib
+
+[Guids]
+  gTpm2ServiceFfaGuid                 ## SOMETIMES_CONSUMES
+  gEfiTpmDeviceInstanceNoneGuid       ## SOMETIMES_CONSUMES
+  gEfiTpmDeviceSelectedGuid           ## SOMETIMES_PRODUCES
+
+[Ppis]
+  gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid

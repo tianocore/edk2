@@ -207,10 +207,9 @@ ClockDescribeRates (
   Cmd.ProtocolId = ScmiProtocolIdClock;
   Cmd.MessageId  = ScmiMessageIdClockDescribeRates;
 
-  *MessageParams++ = ClockId;
-
   do {
-    *MessageParams = RateIndex;
+    MessageParams[0] = ClockId;
+    MessageParams[1] = RateIndex;
 
     // Set Payload length, note PayloadLength is a IN/OUT parameter.
     PayloadLength = sizeof (ClockId) + sizeof (RateIndex);

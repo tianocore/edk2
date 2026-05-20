@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef PEI_MIGRATE_TEMP_RAM_PPI_H_
-#define PEI_MIGRATE_TEMP_RAM_PPI_H_
+#pragma once
 
 #define EFI_PEI_MIGRATE_TEMP_RAM_PPI_GUID \
   { \
@@ -19,5 +18,3 @@
   }
 
 extern EFI_GUID  gEdkiiPeiMigrateTempRamPpiGuid;
-
-#endif

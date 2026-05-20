@@ -40,4 +40,5 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs   ## SOMETIMES_CONSUMES
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = -D _CRT_SECURE_NO_WARNINGS
+  MSFT:*_*_*_CC_FLAGS     = -D _CRT_SECURE_NO_WARNINGS
+  CLANGPDB:*_*_*_CC_FLAGS = -D _CRT_SECURE_NO_WARNINGS

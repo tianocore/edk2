@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SD_H__
-#define __SD_H__
+#pragma once
 
 //
 // SD command index
@@ -171,5 +170,3 @@ typedef struct {
 } SD_SCR;
 
 #pragma pack()
-
-#endif

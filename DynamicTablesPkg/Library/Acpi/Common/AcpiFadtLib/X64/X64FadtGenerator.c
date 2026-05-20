@@ -244,8 +244,8 @@ FadtArchUpdate (
       ));
   } else {
     CopyMem (
-      &Fadt->XPm1aCntBlk,
-      &XpmBlockInfo->XPm1aCntBlk,
+      &Fadt->XPm1aEvtBlk,
+      &XpmBlockInfo->XPm1aEvtBlk,
       sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE)
       );
     CopyMem (

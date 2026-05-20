@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef CPUCFG_H_
-#define CPUCFG_H_
+#pragma once
 
 /**
   CPUCFG REG0 Information
@@ -140,7 +139,7 @@ typedef union {
     ///
     UINT32    FP       : 1;
     ///
-    /// [Bit 1] Sigle-Precision. A value of 1 indicates the processor supports sigle-precision
+    /// [Bit 1] Single-Precision. A value of 1 indicates the processor supports single-precision
     /// floating-point numbers.
     ///
     UINT32    FP_SP    : 1;
@@ -562,4 +561,3 @@ typedef union {
   ///
   UINT32    Uint32;
 } CPUCFG_CACHE_INFO_DATA;
-#endif

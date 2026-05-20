@@ -50,10 +50,11 @@
   PrintLib
   HiiLib
   TcgPpVendorLib
+  VariablePolicyHelperLib
 
 [Protocols]
   gEfiTcgProtocolGuid                   ## SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid        ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid        ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES ## HII

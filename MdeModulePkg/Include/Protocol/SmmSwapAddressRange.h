@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_SWAP_ADDRESS_RANGE_H__
-#define __SMM_SWAP_ADDRESS_RANGE_H__
+#pragma once
 
 #include <Protocol/SwapAddressRange.h>
 
@@ -30,5 +29,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef EFI_SWAP_ADDRESS_RANGE_PROTOCOL EFI_SMM_SWAP_ADDRESS_RANGE_PROTOCOL;
 
 extern EFI_GUID  gEfiSmmSwapAddressRangeProtocolGuid;
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MODULE_ENTRY_POINT_H__
-#define __MODULE_ENTRY_POINT_H__
+#pragma once
 
 ///
 /// Declare the PI Specification Revision that this driver requires to execute correctly.
@@ -35,7 +34,7 @@ extern CONST UINT8  _gDriverUnloadImageCount;
   from ProcessModuleEntryPointList() is returned. If _gDriverUnloadImageCount is greater
   than zero, then an unload handler must be registered for this image and the unload handler
   must invoke ProcessModuleUnloadList().
-  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevison,
+  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevision,
   then return EFI_INCOMPATIBLE_VERSION.
 
 
@@ -178,5 +177,3 @@ EFIAPI
 ProcessModuleUnloadList (
   IN EFI_HANDLE  ImageHandle
   );
-
-#endif

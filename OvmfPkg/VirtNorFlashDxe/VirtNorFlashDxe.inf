@@ -17,8 +17,6 @@
   ENTRY_POINT                    = NorFlashInitialise
 
 [Sources.common]
-  VirtNorFlash.c
-  VirtNorFlash.h
   VirtNorFlashDxe.c
   VirtNorFlashFvb.c
 
@@ -39,6 +37,7 @@
   UefiDriverEntryPoint
   UefiLib
   UefiRuntimeLib
+  VirtNorFlashDeviceLib
   VirtNorFlashPlatformLib
 
 [Guids]

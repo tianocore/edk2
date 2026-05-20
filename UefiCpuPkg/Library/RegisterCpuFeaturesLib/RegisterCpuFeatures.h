@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _REGISTER_CPU_FEATURES_H_
-#define _REGISTER_CPU_FEATURES_H_
+#pragma once
+
 #include <PiPei.h>
 #include <PiDxe.h>
 #include <Ppi/MpServices2.h>
@@ -64,8 +64,8 @@ typedef struct {
 } PROGRAM_CPU_REGISTER_FLAGS;
 
 typedef union {
-  EFI_MP_SERVICES_PROTOCOL      *Protocol;
-  EDKII_PEI_MP_SERVICES2_PPI    *Ppi;
+  EFI_MP_SERVICES_PROTOCOL    *Protocol;
+  EFI_PEI_MP_SERVICES2_PPI    *Ppi;
 } MP_SERVICES;
 
 typedef struct {
@@ -264,5 +264,3 @@ MP_SERVICES
 GetMpService (
   VOID
   );
-
-#endif

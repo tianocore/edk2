@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __DEBUG_COMMUNICATION_LIB_H__
-#define __DEBUG_COMMUNICATION_LIB_H__
+#pragma once
 
 typedef VOID *DEBUG_PORT_HANDLE;
 
@@ -139,5 +138,3 @@ EFIAPI
 DebugPortPollBuffer (
   IN DEBUG_PORT_HANDLE  Handle
   );
-
-#endif

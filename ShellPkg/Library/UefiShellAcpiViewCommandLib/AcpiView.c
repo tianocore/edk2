@@ -23,7 +23,7 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
   #include "Arm/SbbrValidator.h"
 #endif
 
@@ -192,25 +192,16 @@ AcpiView (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS               Status;
-  UINTN                    Index;
-  EFI_CONFIGURATION_TABLE  *EfiConfigurationTable;
-  BOOLEAN                  FoundAcpiTable;
-  UINTN                    OriginalAttribute;
-  UINTN                    PrintAttribute;
-  EREPORT_OPTION           ReportOption;
-  UINT8                    *RsdpPtr;
-  UINT32                   RsdpLength;
-  UINT8                    RsdpRevision;
-  PARSE_ACPI_TABLE_PROC    RsdpParserProc;
-  BOOLEAN                  Trace;
-  SELECTED_ACPI_TABLE      *SelectedTable;
-
-  //
-  // set local variables to suppress incorrect compiler/analyzer warnings
-  //
-  EfiConfigurationTable = NULL;
-  OriginalAttribute     = 0;
+  EFI_STATUS             Status;
+  UINTN                  OriginalAttribute;
+  UINTN                  PrintAttribute;
+  EREPORT_OPTION         ReportOption;
+  UINT8                  *RsdpPtr;
+  UINT32                 RsdpLength;
+  UINT8                  RsdpRevision;
+  PARSE_ACPI_TABLE_PROC  RsdpParserProc;
+  BOOLEAN                Trace;
+  SELECTED_ACPI_TABLE    *SelectedTable;
 
   // Reset Table counts
   mTableCount    = 0;
@@ -223,60 +214,12 @@ AcpiView (
   // Retrieve the user selection of ACPI table to process
   GetSelectedAcpiTable (&SelectedTable);
 
-  // Search the table for an entry that matches the ACPI Table Guid
-  FoundAcpiTable = FALSE;
-  for (Index = 0; Index < SystemTable->NumberOfTableEntries; Index++) {
-    if (CompareGuid (
-          &gEfiAcpiTableGuid,
-          &(SystemTable->ConfigurationTable[Index].VendorGuid)
-          ))
-    {
-      EfiConfigurationTable = &SystemTable->ConfigurationTable[Index];
-      FoundAcpiTable        = TRUE;
-      break;
-    }
-  }
+  Status = EfiGetSystemConfigurationTable (
+             &gEfiAcpiTableGuid,
+             (VOID **)&RsdpPtr
+             );
 
-  if (FoundAcpiTable) {
-    RsdpPtr = (UINT8 *)EfiConfigurationTable->VendorTable;
-
-    // The RSDP revision is 1 byte starting at offset 15
-    RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
-
-    if (RsdpRevision < 2) {
-      Print (
-        L"ERROR: RSDP version less than 2 is not supported.\n"
-        );
-      return EFI_UNSUPPORTED;
-    }
-
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-    if (GetMandatoryTableValidate ()) {
-      ArmSbbrResetTableCounts ();
-    }
-
- #endif
-
-    // The RSDP length is 4 bytes starting at offset 20
-    RsdpLength = *(UINT32 *)(RsdpPtr + RSDP_LENGTH_OFFSET);
-
-    Trace = ProcessTableReportOptions (RSDP_TABLE_INFO, RsdpPtr, RsdpLength);
-
-    Status = GetParser (RSDP_TABLE_INFO, &RsdpParserProc);
-    if (EFI_ERROR (Status)) {
-      Print (
-        L"ERROR: No registered parser found for RSDP.\n"
-        );
-      return Status;
-    }
-
-    RsdpParserProc (
-      Trace,
-      RsdpPtr,
-      RsdpLength,
-      RsdpRevision
-      );
-  } else {
+  if (EFI_ERROR (Status)) {
     IncrementErrorCount ();
     Print (
       L"ERROR: Failed to find ACPI Table Guid in System Configuration Table.\n"
@@ -284,7 +227,44 @@ AcpiView (
     return EFI_NOT_FOUND;
   }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+  // The RSDP revision is 1 byte starting at offset 15
+  RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
+
+  if (RsdpRevision < 2) {
+    Print (
+      L"ERROR: RSDP version less than 2 is not supported.\n"
+      );
+    return EFI_UNSUPPORTED;
+  }
+
+ #if defined (MDE_CPU_AARCH64)
+  if (GetMandatoryTableValidate ()) {
+    ArmSbbrResetTableCounts ();
+  }
+
+ #endif
+
+  // The RSDP length is 4 bytes starting at offset 20
+  RsdpLength = *(UINT32 *)(RsdpPtr + RSDP_LENGTH_OFFSET);
+
+  Trace = ProcessTableReportOptions (RSDP_TABLE_INFO, RsdpPtr, RsdpLength);
+
+  Status = GetParser (RSDP_TABLE_INFO, &RsdpParserProc);
+  if (EFI_ERROR (Status)) {
+    Print (
+      L"ERROR: No registered parser found for RSDP.\n"
+      );
+    return Status;
+  }
+
+  RsdpParserProc (
+    Trace,
+    RsdpPtr,
+    RsdpLength,
+    RsdpRevision
+    );
+
+ #if defined (MDE_CPU_AARCH64)
   if (GetMandatoryTableValidate ()) {
     ArmSbbrReqsValidate ((ARM_SBBR_VERSION)GetMandatoryTableSpec ());
   }

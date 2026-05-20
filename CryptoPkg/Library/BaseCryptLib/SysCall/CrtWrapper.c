@@ -425,6 +425,25 @@ strtoul (
   return 0;
 }
 
+char *
+strpbrk (
+  const char  *s,
+  const char  *accept
+  )
+{
+  int  i;
+
+  for ( ; *s != '\0'; s++) {
+    for (i = 0; accept[i] != '\0'; i++) {
+      if (*s == accept[i]) {
+        return (char *)s;
+      }
+    }
+  }
+
+  return NULL;
+}
+
 /* Convert character to lowercase */
 int
 tolower (
@@ -460,7 +479,10 @@ qsort (
   // Use CRT-style malloc to cover BS and RT memory allocation.
   //
   Buffer = malloc (width);
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return;
+  }
 
   //
   // Re-use PerformQuickSort() function Implementation in EDKII BaseSortLib.

@@ -167,7 +167,7 @@ PcdDxeInit (
   // to lock the variables referenced by DynamicHii PCDs with RO property set in *.dsc.
   //
   EfiCreateProtocolNotifyEvent (
-    &gEdkiiVariableLockProtocolGuid,
+    &gEdkiiVariablePolicyProtocolGuid,
     TPL_CALLBACK,
     VariableLockCallBack,
     NULL,
@@ -310,7 +310,7 @@ DxePcdSetSku (
   }
 
   SkuIdTable = (SKU_ID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SkuIdTableOffset);
-  for (Index = 0; Index < SkuIdTable[0]; Index++) {
+  for (Index = 0; Index < (UINTN)SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
       DEBUG ((DEBUG_INFO, "PcdDxe - SkuId is found in SkuId table.\n"));
       Status = UpdatePcdDatabase (SkuId, TRUE);
@@ -419,7 +419,7 @@ DxePcdGet64 (
 
   @param[in]  TokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 VOID *
@@ -623,7 +623,7 @@ DxePcdGet64Ex (
   @param[in]  Guid The token space for the token number.
   @param[in]  ExTokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 VOID *
@@ -1245,7 +1245,10 @@ GetDistinctTokenSpace (
   BOOLEAN   Match;
 
   DistinctTokenSpace = AllocateZeroPool (*ExMapTableSize * sizeof (EFI_GUID *));
-  ASSERT (DistinctTokenSpace != NULL);
+  if (DistinctTokenSpace == NULL) {
+    ASSERT (DistinctTokenSpace != NULL);
+    return NULL;
+  }
 
   TsIdx                     = 0;
   OldGuidIndex              = ExMapTable[0].ExGuidIndex;
@@ -1329,6 +1332,11 @@ DxePcdGetNextTokenSpace (
                                  (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
                                  (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset)
                                  );
+
+      if (PeiTokenSpaceTable == NULL) {
+        return EFI_NOT_FOUND;
+      }
+
       CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID *) * PeiTokenSpaceTableSize);
       TmpTokenSpaceBufferCount = PeiTokenSpaceTableSize;
       FreePool (PeiTokenSpaceTable);
@@ -1341,6 +1349,9 @@ DxePcdGetNextTokenSpace (
                                  (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
                                  (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset)
                                  );
+      if (DxeTokenSpaceTable == NULL) {
+        return EFI_NOT_FOUND;
+      }
 
       //
       // Make sure EFI_GUID in DxeTokenSpaceTable does not exist in PeiTokenSpaceTable

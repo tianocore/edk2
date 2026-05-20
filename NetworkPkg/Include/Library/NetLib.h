@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _NET_LIB_H_
-#define _NET_LIB_H_
+#pragma once
 
 #include <Protocol/Ip6.h>
 
@@ -2081,7 +2080,8 @@ NetbufQueAppend (
   @param[out]  Dest            The destination of the data to copy to.
 
   @return       The length of the actual copied data, or 0 if the offset
-                specified exceeds the total size of net buffer queue.
+                specified exceeds the total size of net buffer queue, or
+                a NetBuf pointer is NULL.
 
 **/
 UINT32
@@ -2270,5 +2270,3 @@ EFIAPI
 NetLibCreateDnsQName (
   IN  CHAR16  *DomainName
   );
-
-#endif

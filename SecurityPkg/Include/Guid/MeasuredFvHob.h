@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MEASURED_FV_HOB_H_
-#define _MEASURED_FV_HOB_H_
+#pragma once
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 
@@ -26,5 +25,3 @@ typedef struct {
   UINT32                        Num;
   EFI_PLATFORM_FIRMWARE_BLOB    MeasuredFvBuf[1];
 } MEASURED_HOB_DATA;
-
-#endif

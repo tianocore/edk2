@@ -11,7 +11,6 @@
 #include <Library/ShellLib.h>
 #include <Library/IoLib.h>
 #include <Protocol/PciRootBridgeIo.h>
-#include <Protocol/DeviceIo.h>
 
 typedef enum {
   ShellMmMemory,
@@ -450,7 +449,7 @@ ShellCommandRunMm (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
@@ -459,15 +458,15 @@ ShellCommandRunMm (
     }
   } else {
     if (ShellCommandLineGetCount (Package) < 2) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mm");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mm");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } else if (ShellCommandLineGetCount (Package) > 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } else if (ShellCommandLineGetFlag (Package, L"-w") && (ShellCommandLineGetValue (Package, L"-w") == NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"mm", L"-w");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"mm", L"-w");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     } else {
@@ -479,7 +478,7 @@ ShellCommandRunMm (
            || ShellCommandLineGetFlag (Package, L"-pcie")
               )
         {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -490,7 +489,7 @@ ShellCommandRunMm (
            || ShellCommandLineGetFlag (Package, L"-pcie")
               )
         {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -500,7 +499,7 @@ ShellCommandRunMm (
            || ShellCommandLineGetFlag (Package, L"-pcie")
               )
         {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -509,7 +508,7 @@ ShellCommandRunMm (
         if (ShellCommandLineGetFlag (Package, L"-pcie")
             )
         {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
         }
@@ -532,21 +531,27 @@ ShellCommandRunMm (
     }
 
     if ((Size != 1) && (Size != 2) && (Size != 4) && (Size != 8)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"mm", Temp, L"-w");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"mm", Temp, L"-w");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
 
-    Temp   = ShellCommandLineGetRawValue (Package, 1);
+    Temp = ShellCommandLineGetRawValue (Package, 1);
+    if (Temp == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", L"NULL");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+
     Status = ShellConvertStringToUint64 (Temp, &Address, TRUE, FALSE);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
 
     if ((Address & (Size - 1)) != 0) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_NOT_ALIGNED), gShellDebug1HiiHandle, L"mm", Address);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_NOT_ALIGNED), gShellDebug1HiiHandle, L"mm", Address);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -557,13 +562,13 @@ ShellCommandRunMm (
     HasPciRootBridgeIo = ShellMmLocateIoProtocol (AccessType, Address, &CpuIo, &PciRootBridgeIo);
     if ((AccessType == ShellMmPci) || (AccessType == ShellMmPciExpress)) {
       if (!HasPciRootBridgeIo) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"mm");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"mm");
         ShellStatus = SHELL_NOT_FOUND;
         goto Done;
       }
 
       if (PciRootBridgeIo == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_PCIE_ADDRESS_RANGE), gShellDebug1HiiHandle, L"mm", Address);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_PCIE_ADDRESS_RANGE), gShellDebug1HiiHandle, L"mm", Address);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -576,13 +581,13 @@ ShellCommandRunMm (
     if (Temp != NULL) {
       Status = ShellConvertStringToUint64 (Temp, &Value, TRUE, FALSE);
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Value > mShellMmMaxNumber[Size]) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -596,17 +601,17 @@ ShellCommandRunMm (
     //
     if (!Interactive) {
       if (!gEfiShellProtocol->BatchIsActive ()) {
-        ShellPrintHiiEx (-1, -1, NULL, mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
+        ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
       }
 
       ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
 
       if (!gEfiShellProtocol->BatchIsActive ()) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
       }
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
-      ShellPrintEx (-1, -1, L"\r\n");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
+      ShellPrintDefaultEx (L"\r\n");
       goto Done;
     }
 
@@ -616,10 +621,10 @@ ShellCommandRunMm (
     Complete = FALSE;
     do {
       ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
-      ShellPrintHiiEx (-1, -1, NULL, mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
-      ShellPrintEx (-1, -1, L" > ");
+      ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
+      ShellPrintDefaultEx (L" > ");
       //
       // wait user input to modify
       //
@@ -646,14 +651,14 @@ ShellCommandRunMm (
           {
             ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Buffer);
           } else {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");
             continue;
           }
         }
       }
 
       Address += Size;
-      ShellPrintEx (-1, -1, L"\r\n");
+      ShellPrintDefaultEx (L"\r\n");
     } while (!Complete);
   }
 

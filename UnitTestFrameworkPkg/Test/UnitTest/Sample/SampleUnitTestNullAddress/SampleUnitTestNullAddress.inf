@@ -1,0 +1,31 @@
+## @file
+# Sample UnitTest built for execution on a Host machine.
+# This test case dereferences a NULL pointer that is caught by a sanitizer.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = SampleUnitTestNullAddress
+  FILE_GUID      = FDD2EFA0-74BE-4628-A860-A60EF81B9023
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleUnitTestNullAddress.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UnitTestLib

@@ -24,6 +24,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+#include <Library/MemDebugLogLib.h>
 
 #include "Write.h"
 
@@ -114,6 +115,13 @@ DebugPrintMarker (
     AsciiVSPrint (Buffer, sizeof (Buffer), Format, VaListMarker);
   } else {
     AsciiBSPrint (Buffer, sizeof (Buffer), Format, BaseListMarker);
+  }
+
+  //
+  // Send string to Memory Debug Log if enabled
+  //
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite ((CHAR8 *)Buffer, AsciiStrLen (Buffer));
   }
 
   //
@@ -211,6 +219,13 @@ DebugAssert (
   // Generate the ASSERT() message in Ascii format
   //
   AsciiSPrint (Buffer, sizeof (Buffer), "ASSERT [%a] %a(%d): %a\n", gEfiCallerBaseName, FileName, LineNumber, Description);
+
+  //
+  // Send string to Memory Debug Log if enabled
+  //
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite ((CHAR8 *)Buffer, AsciiStrLen (Buffer));
+  }
 
   //
   // Send the print string to the Console Output device

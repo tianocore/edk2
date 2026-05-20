@@ -1,5 +1,5 @@
 /** @file
-  Definitions based on NVMe spec. version 2.0c.
+  Definitions based on NVMe spec. version 2.1.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
@@ -11,11 +11,11 @@
   NVMe Specification 1.4
   NVMe Specification 2.0
   NVMe Specification 2.0c
+  NVMe Specification 2.1
 
 **/
 
-#ifndef __NVM_E_H__
-#define __NVM_E_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -368,6 +368,13 @@ typedef struct {
 } NVME_SANICAP;
 
 //
+// Power Loss Signaling Information
+// (ref. spec. v2.1 Figure 312).
+//
+#define PLS_EMERGENCY_POWER_FAIL  BIT0
+#define PLS_FORCED_QUIESCENCE     BIT1
+
+//
 //  Identify Controller Data
 //
 typedef struct {
@@ -391,7 +398,8 @@ typedef struct {
   UINT32               Oaes;        /* Optional Async Events Supported */
   UINT32               Ctratt;      /* Controller Attributes */
   UINT16               Rrls;        /* Read Recovery Levels Supported */
-  UINT8                Rsvd1[9];    /* Reserved as of NVM Express 1.4c Spec */
+  UINT8                Rsvd1[8];    /* Reserved as of NVM Express 1.4c Spec */
+  UINT8                Plsi;        /* Power Loss Signaling Information */
   UINT8                Cntrltype;   /* Controller Type */
   UINT8                Fguid[16];   /* FRU Globally Unique Identifier */
   UINT16               Crdt1;       /* Command Retry Delay Time 1 */
@@ -579,7 +587,10 @@ typedef struct {
 //
 #define NVME_RPMB_RESULT_SUCCESS                 0x00
 #define NVME_RPMB_RESULT_GENERAL_FAILURE         0x01
-#define NVME_RPMB_RESULT_AHTHENTICATION_FAILURE  0x02
+#define NVME_RPMB_RESULT_AUTHENTICATION_FAILURE  0x02
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define NVME_RPMB_RESULT_AHTHENTICATION_FAILURE  NVME_RPMB_RESULT_AUTHENTICATION_FAILURE
 #define NVME_RPMB_RESULT_COUNTER_FAILURE         0x03
 #define NVME_RPMB_RESULT_ADDRESS_FAILURE         0x04
 #define NVME_RPMB_RESULT_WRITE_FAILURE           0x05
@@ -749,6 +760,12 @@ typedef struct {
   UINT32    Rsvd1 : 23;
   UINT32    Sv    : 1;        /* Save */
 } NVME_ADMIN_SET_FEATURES;
+
+//
+// Feature Identifier
+// (ref. spec. v2.1 Figure 32).
+//
+#define POWER_LOSS_SIGNALING_CONFIG_FID  0x1B  // Power Loss Signaling Config
 
 //
 // NvmExpress Admin Sanitize Command
@@ -1183,7 +1200,7 @@ typedef struct {
   //
   UINT32    BlockEraseEstimatedTimeWithNodmm;
   //
-  // Indicates  the number of seconds required to complete a Crypto Erase sanitize operation and the associated additional media modification after the Crypto Erase sanitize operation in the background.
+  // Indicates the number of seconds required to complete a Crypto Erase sanitize operation and the associated additional media modification after the Crypto Erase sanitize operation in the background.
   // The No-Deallocate After Sanitize bit was set to ?1? in the Sanitize command that requested the Crypto Erase sanitize operation.
   // The No-Deallocate Modifies Media After Sanitize field is set to 10b.
   //
@@ -1191,6 +1208,20 @@ typedef struct {
   UINT8     Reserved[480];
 } NVME_SANITIZE_STATUS_INFO_LOG;
 
-#pragma pack()
+//
+// Power Loss Signaling Config
+// (ref. spec. v2.1 Figure 414).
+//
+#define PLS_NOT_ENABLED                   0x0 // Power Loss Signaling Not Enabled
+#define PLS_EMERGENCY_POWER_FAIL_ENABLED  0x1 // Power Loss Signaling with Emergency Power Fail Enabled
+#define PLS_FORCED_QUIESCENCE_ENABLED     0x2 // Power Loss Signaling with Forced Quiescence Enabled
 
-#endif
+typedef struct {
+  //
+  // Indicates the Power Loss Signaling mode of operation
+  //
+  UINT32    Plsm     : 2;     /* Power Loss Signaling Mode */
+  UINT32    Reserved : 30;
+} NVME_POWER_LOSS_SIGNALING_CONFIG;
+
+#pragma pack()

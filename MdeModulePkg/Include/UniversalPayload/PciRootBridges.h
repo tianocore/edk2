@@ -8,8 +8,7 @@
     - Universal Payload Specification 0.75 (https://universalpayload.github.io/documentation/)
 **/
 
-#ifndef UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_H_
-#define UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_H_
+#pragma once
 
 #include <UniversalPayload/UniversalPayload.h>
 
@@ -87,5 +86,3 @@ typedef struct {
 #define UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_REVISION  1
 
 extern GUID  gUniversalPayloadPciRootBridgeInfoGuid;
-
-#endif // UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_H_

@@ -7,10 +7,10 @@
 
 **/
 
-#ifndef __PRE_PI_LIB_H__
-#define __PRE_PI_LIB_H__
+#pragma once
 
 #include <Guid/ExtractSection.h>
+#include <Pi/PiPeiCis.h>
 
 /**
   This service enables discovery of additional firmware volumes.
@@ -786,5 +786,3 @@ EFIAPI
 DecompressFirstFv (
   VOID
   );
-
-#endif

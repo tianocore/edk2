@@ -619,6 +619,8 @@
 "  -w     - Performs a warm boot.\r\n"
 "  -c     - Performs a cold boot.\r\n"
 "  string - Describes a reason for the reset.\r\n"
+"  -fwui  - If the system firmware supports it, perform a reset back\r\n"
+"           to the firmware user interface (FW UI)"
 ".SH DESCRIPTION\r\n"
 " \r\n"
 "NOTES:\r\n"

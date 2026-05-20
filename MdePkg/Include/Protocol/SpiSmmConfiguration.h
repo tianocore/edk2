@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SPI_SMM_CONFIGURATION_PROTOCOL_H__
-#define __SPI_SMM_CONFIGURATION_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/SpiConfiguration.h>
 
@@ -26,5 +25,3 @@ typedef
 EFI_SPI_SMM_CONFIGURATION_PROTOCOL;
 
 extern EFI_GUID  gEfiSpiSmmConfigurationProtocolGuid;
-
-#endif // __SPI_SMM_CONFIGURATION_H__

@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _SMM_IO_TRAP_DISPATCH2_H_
-#define _SMM_IO_TRAP_DISPATCH2_H_
+#pragma once
 
 #include <Protocol/MmIoTrapDispatch.h>
 
@@ -42,5 +41,3 @@ typedef EFI_MM_IO_TRAP_DISPATCH_REGISTER EFI_SMM_IO_TRAP_DISPATCH2_REGISTER;
 typedef EFI_MM_IO_TRAP_DISPATCH_UNREGISTER EFI_SMM_IO_TRAP_DISPATCH2_UNREGISTER;
 
 extern EFI_GUID  gEfiSmmIoTrapDispatch2ProtocolGuid;
-
-#endif

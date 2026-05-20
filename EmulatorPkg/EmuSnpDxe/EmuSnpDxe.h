@@ -12,8 +12,7 @@ Abstract:
 
 -**/
 
-#ifndef _EMU_SNP_H_
-#define _EMU_SNP_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -476,5 +475,3 @@ EmuSnpWaitForPacketNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Private
   );
-
-#endif // _EMU_SNP_H_

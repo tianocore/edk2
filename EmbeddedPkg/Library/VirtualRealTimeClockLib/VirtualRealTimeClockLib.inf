@@ -32,6 +32,5 @@
   TimeBaseLib
   UefiRuntimeLib
 
-# Current usage of this library expects GCC in a UNIX-like shell environment with the date command
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS = -DBUILD_EPOCH=`printenv SOURCE_DATE_EPOCH || date +%s`
+  *_*_*_CC_FLAGS = -DBUILD_EPOCH=$(SOURCE_DATE_EPOCH)

@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Dxe
 
-  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -103,6 +103,15 @@ EDKII_PLATFORM_REPOSITORY_INFO  mKvmtoolPlatRepositoryInfo = {
       EFI_ACPI_6_3_DEBUG_PORT_2_TABLE_SIGNATURE,
       EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION,
       CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdDbg2),
+      NULL
+    },
+    //
+    // SSDT Serial Port Table
+    //
+    {
+      EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+      0, // Unused
+      CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdtSerialPort),
       NULL
     },
     //
@@ -434,6 +443,8 @@ GetDeviceIdMappingArray (
   @param  [in]  Context       A pointer to the caller's context provided in
                               HwInfoParserInit ().
   @param  [in]  CmObjDesc     CM_OBJ_DESCRIPTOR containing the CmObj(s) to add.
+  @param  [in]  NewToken      Token for this object. If CM_NULL_TOKEN, then
+                              a new token is generated.
   @param  [out] Token         If provided and success, contain the token
                               generated for the CmObj.
 
@@ -447,6 +458,7 @@ HwInfoAdd (
   IN        HW_INFO_PARSER_HANDLE  ParserHandle,
   IN        VOID                   *Context,
   IN  CONST CM_OBJ_DESCRIPTOR      *CmObjDesc,
+  IN  CONST CM_OBJECT_TOKEN        NewToken,
   OUT       CM_OBJECT_TOKEN        *Token OPTIONAL
   )
 {
@@ -475,6 +487,7 @@ HwInfoAdd (
   Status = DynPlatRepoAddObject (
              PlatformRepo->DynamicPlatformRepo,
              CmObjDesc,
+             NewToken,
              Token
              );
   if (EFI_ERROR (Status)) {
@@ -632,6 +645,7 @@ GetStandardNameSpaceObject (
   EFI_STATUS                      Status;
   EDKII_PLATFORM_REPOSITORY_INFO  *PlatformRepo;
   UINTN                           AcpiTableCount;
+  BOOLEAN                         PciSupportPresent;
   CM_OBJ_DESCRIPTOR               CmObjDesc;
 
   if ((This == NULL) || (CmObject == NULL)) {
@@ -640,8 +654,9 @@ GetStandardNameSpaceObject (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status       = EFI_NOT_FOUND;
-  PlatformRepo = This->PlatRepoInfo;
+  Status            = EFI_NOT_FOUND;
+  PlatformRepo      = This->PlatRepoInfo;
+  PciSupportPresent = TRUE;
 
   switch (GET_CM_OBJECT_ID (CmObjectId)) {
     case EStdObjCfgMgrInfo:
@@ -658,12 +673,12 @@ GetStandardNameSpaceObject (
       AcpiTableCount = ARRAY_SIZE (PlatformRepo->CmAcpiTableList);
 
       //
-      // Get Pci config space information.
+      // Get Pci interrupt map information.
       //
       Status = DynamicPlatRepoGetObject (
                  PlatformRepo->DynamicPlatformRepo,
                  CREATE_CM_ARCH_COMMON_OBJECT_ID (
-                   EArchCommonObjPciConfigSpaceInfo
+                   EArchCommonObjPciInterruptMapInfo
                    ),
                  CM_NULL_TOKEN,
                  &CmObjDesc
@@ -674,31 +689,50 @@ GetStandardNameSpaceObject (
         // present, Kvmtool was launched without the PCIe option.
         // Therefore, reduce the table count by 3.
         //
-        AcpiTableCount -= 3;
+        AcpiTableCount   -= 3;
+        PciSupportPresent = FALSE;
       } else if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
         return Status;
       }
 
-      //
-      // Get the Gic version.
-      //
-      Status = DynamicPlatRepoGetObject (
-                 PlatformRepo->DynamicPlatformRepo,
-                 CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
-                 CM_NULL_TOKEN,
-                 &CmObjDesc
-                 );
-      if (EFI_ERROR (Status)) {
-        ASSERT_EFI_ERROR (Status);
-        return Status;
-      }
+      if (PciSupportPresent) {
+        //
+        // Get the Gic version.
+        //
+        Status = DynamicPlatRepoGetObject (
+                   PlatformRepo->DynamicPlatformRepo,
+                   CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
+                   CM_NULL_TOKEN,
+                   &CmObjDesc
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          return Status;
+        }
 
-      if (((CM_ARM_GICD_INFO *)CmObjDesc.Data)->GicVersion < 3) {
-        //
-        // IORT is only required for GicV3/4
-        //
-        AcpiTableCount -= 1;
+        if (((CM_ARM_GICD_INFO *)CmObjDesc.Data)->GicVersion < 3) {
+          //
+          // IORT is only required for GicV3/4
+          //
+          AcpiTableCount -= 1;
+        } else {
+          //
+          // Check if we have support for ITS.
+          //
+          Status = DynamicPlatRepoGetObject (
+                     PlatformRepo->DynamicPlatformRepo,
+                     CREATE_CM_ARM_OBJECT_ID (EArmObjGicItsInfo),
+                     CM_NULL_TOKEN,
+                     &CmObjDesc
+                     );
+          if (EFI_ERROR (Status)) {
+            //
+            // IORT is only required for GicV3/4 if ITS is present.
+            //
+            AcpiTableCount -= 1;
+          }
+        }
       }
 
       Status = HandleCmObject (

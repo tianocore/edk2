@@ -243,7 +243,7 @@ CheckDevice (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  Pointer to SystemTable.
 
-  @retval EFI_SUCESS       Driver has loaded successfully.
+  @retval EFI_SUCCESS      Driver has loaded successfully.
   @retval EFI_UNSUPPORTED  PCI resource allocation has been disabled.
   @retval EFI_UNSUPPORTED  There is no 64-bit PCI MMIO aperture.
   @return                  Error codes from lower level functions.

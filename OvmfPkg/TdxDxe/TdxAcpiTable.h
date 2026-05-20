@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef TDX_ACPI_TABLE_H_
-#define TDX_ACPI_TABLE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -18,6 +17,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <WorkArea.h>
+
 #include <IndustryStandard/IntelTdx.h>
 #include <IndustryStandard/Acpi.h>
 
@@ -41,7 +42,7 @@ AsmGetRelocationMap (
 EFI_PHYSICAL_ADDRESS
 EFIAPI
 RelocateMailbox (
-  VOID
+  EFI_PHYSICAL_ADDRESS  *ResetVector
   );
 
 /**
@@ -56,5 +57,3 @@ AlterAcpiTable (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

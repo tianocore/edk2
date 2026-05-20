@@ -35,6 +35,7 @@
   FdtLib
   MemoryAllocationLib
   PcdLib
+  PrePiLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress

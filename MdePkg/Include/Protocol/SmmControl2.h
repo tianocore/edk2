@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef _SMM_CONTROL2_H_
-#define _SMM_CONTROL2_H_
+#pragma once
 
 #include <Protocol/MmControl.h>
 
@@ -30,5 +29,3 @@ typedef EFI_MM_ACTIVATE EFI_SMM_ACTIVATE2;
 
 typedef EFI_MM_DEACTIVATE EFI_SMM_DEACTIVATE2;
 extern EFI_GUID  gEfiSmmControl2ProtocolGuid;
-
-#endif

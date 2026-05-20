@@ -54,7 +54,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         ret = RunCmd("git", "config --file .gitmodules --get-regexp path", workingdir=self.GetWorkspaceRoot(), outstream=result)
         # Cmd output is expected to look like:
         # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
         if ret == 0:
             for line in result.getvalue().splitlines():
                 _, _, path = line.partition(" ")
@@ -123,10 +122,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
-        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="IA32,X64",
-            help="Optional - CSV of architecture to build.  IA32 will use IA32 for Pei & Dxe. "
+        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="X64",
+            help="Optional - CSV of architecture to build. "
             "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
-            "X64 for DXE. default is IA32,X64")
+            "X64 for DXE. Default is X64")
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
@@ -207,6 +206,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -global isa-debugcon.iobase=0x402"                        # debug messages out thru virtual io port
         args += " -net none"                                                # turn off network
         args += " -smp 4"
+        args += " -cpu IvyBridge,+rdrand"                                   # IvyBridge is the first CPU that supported
+                                                                            # RDRAND, which is required for dynamic
+                                                                            # stack cookies
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
         # Provides Rng services to the Guest VM
         args += " -device virtio-rng-pci"
@@ -221,6 +223,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             args += " -global driver=cfi.pflash01,property=secure,value=on"
             args += " -drive if=pflash,format=raw,unit=0,file=" + os.path.join(OutputPath_FV, "OVMF_CODE.fd") + ",readonly=on"
             args += " -drive if=pflash,format=raw,unit=1,file=" + os.path.join(OutputPath_FV, "OVMF_VARS.fd")
+            if (self.env.GetBuildValue("STANDALONE_MM_ENABLE") == "1"):
+                # We will not support S3 in standalone MM mode
+                args += " -global ICH9-LPC.disable_s3=1"
+                # Make MMRAM bigger as it will need to hold the FV where the MM core is at
+                args += " -global mch.extended-tseg-mbytes=32"
         else:
             args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
 

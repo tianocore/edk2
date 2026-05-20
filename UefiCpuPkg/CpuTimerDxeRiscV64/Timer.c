@@ -10,6 +10,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseRiscVSbiLib.h>
 #include <Library/UefiLib.h>
+#include <Library/TimerLib.h>
 #include "Timer.h"
 
 //
@@ -86,8 +87,8 @@ RiscVIsSstcEnabled (
 /**
   Timer Interrupt Handler.
 
-  @param InterruptType    The type of interrupt that occured
-  @param SystemContext    A pointer to the system context when the interrupt occured
+  @param InterruptType    The type of interrupt that occurred
+  @param SystemContext    A pointer to the system context when the interrupt occurred
 **/
 VOID
 EFIAPI
@@ -114,7 +115,7 @@ TimerInterruptHandler (
     mTimerNotifyFunction (
       DivU64x32 (
         EFI_TIMER_PERIOD_SECONDS (PeriodStart - mLastPeriodStart),
-        PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+        GetPerformanceCounterProperties (NULL, NULL)
         )
       );
   }
@@ -129,7 +130,7 @@ TimerInterruptHandler (
   PeriodStart     += DivU64x32 (
                        MultU64x32 (
                          mTimerPeriod,
-                         PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+                         GetPerformanceCounterProperties (NULL, NULL)
                          ),
                        1000000u
                        );  // convert to tick
@@ -232,7 +233,7 @@ TimerDriverSetTimerPeriod (
   PeriodStart     += DivU64x32 (
                        MultU64x32 (
                          mTimerPeriod,
-                         PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+                         GetPerformanceCounterProperties (NULL, NULL)
                          ),
                        1000000u
                        ); // convert to tick
@@ -303,7 +304,7 @@ TimerDriverGenerateSoftInterrupt (
 
   @retval EFI_SUCCESS            Timer Architectural Protocol created
   @retval EFI_OUT_OF_RESOURCES   Not enough resources available to initialize driver.
-  @retval EFI_DEVICE_ERROR       A device error occured attempting to initialize the driver.
+  @retval EFI_DEVICE_ERROR       A device error occurred attempting to initialize the driver.
 
 **/
 EFI_STATUS

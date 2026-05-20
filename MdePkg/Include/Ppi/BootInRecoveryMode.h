@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __BOOT_IN_RECOVERY_MODE_PPI_H__
-#define __BOOT_IN_RECOVERY_MODE_PPI_H__
+#pragma once
 
 #define EFI_PEI_BOOT_IN_RECOVERY_MODE_PPI \
   { \
@@ -19,5 +18,3 @@
   }
 
 extern EFI_GUID  gEfiPeiBootInRecoveryModePpiGuid;
-
-#endif

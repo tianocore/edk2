@@ -1,0 +1,72 @@
+[
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "# Tianocore GitHub Issue Dashboard\r\n\r\nThis notebook displays issues in [Tianocore](https://www.tianocore.org/) GitHub repositories."
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "// List of tianocore repos to include in results\r\n$repos=repo:tianocore/edk2 repo:tianocore/edk2-platforms repo:tianocore/containers repo:tianocore/edk2-non-osi repo:tianocore/edk2-test repo:tianocore/edk2-basetools repo:tianocore/edk2-libc repo:tianocore/edk2-pytool-library repo:tianocore/edk2-pytool-extensions repo:tianocore/edk2-edkrepo repo:tianocore/edk2-edkrepo-manifest"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "📬 All Open Issues"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:issue archived:false"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "🔎 All Untriaged Issues"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:issue archived:false label:state:needs-triage"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "❓ All Open Issues Without An Owner"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:issue archived:false label:state:needs-owner"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "⏲️ All Open Issues Marked Stale"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:issue archived:false label:state:stale"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "❗All High Priority Issues"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:issue archived:false label:priority:high"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "🗒️ Issues That Need Maintainer Feedback"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repos is:open is:issue archived:false label:state:needs-maintainer-feedback"
+  }
+]

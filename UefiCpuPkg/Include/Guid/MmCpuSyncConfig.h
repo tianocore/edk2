@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef MM_CPU_SYNC_CONFIG_H_
-#define MM_CPU_SYNC_CONFIG_H_
+#pragma once
 
 ///
 /// The GUID of the MmCpuSyncConfig GUIDed HOB.
@@ -49,5 +48,3 @@ typedef struct {
 } MM_CPU_SYNC_CONFIG;
 
 extern EFI_GUID  gMmCpuSyncConfigHobGuid;
-
-#endif

@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CPU_LIB_H__
-#define __CPU_LIB_H__
+#pragma once
 
 /**
   Places the CPU in a sleep state until an interrupt is received.
@@ -42,7 +41,7 @@ CpuFlushTlb (
   VOID
   );
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64) || defined (MDE_CPU_LOONGARCH64)
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64) || defined (MDE_CPU_LOONGARCH64) || defined (MDE_CPU_RISCV64)
 
 /**
   Initialize the CPU floating point units.
@@ -119,7 +118,5 @@ EFIAPI
 DisableFloatingPointUnits (
   VOID
   );
-
-#endif
 
 #endif

@@ -192,7 +192,7 @@ RegisterPeriodicCallback (
   IN EFI_PERIODIC_CALLBACK       PeriodicCallback
   )
 {
-  return ManageIdtEntryTable (PeriodicCallback, SYSTEM_TIMER_VECTOR);
+  return ManageIdtEntryTable ((CALLBACK_FUNC)PeriodicCallback, SYSTEM_TIMER_VECTOR);
 }
 
 /**
@@ -221,7 +221,7 @@ RegisterExceptionCallback (
   IN EFI_EXCEPTION_TYPE          ExceptionType
   )
 {
-  return ManageIdtEntryTable (ExceptionCallback, ExceptionType);
+  return ManageIdtEntryTable ((CALLBACK_FUNC)ExceptionCallback, ExceptionType);
 }
 
 /**
@@ -262,17 +262,24 @@ InvalidateInstructionCache (
 **/
 VOID
 InterruptDistrubutionHub (
-  EFI_EXCEPTION_TYPE       ExceptionType,
-  EFI_SYSTEM_CONTEXT_IA32  *ContextRecord
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  ContextRecord
   )
 {
-  if (IdtEntryTable[ExceptionType].RegisteredCallback != NULL) {
-    if (ExceptionType != SYSTEM_TIMER_VECTOR) {
-      IdtEntryTable[ExceptionType].RegisteredCallback (ExceptionType, ContextRecord);
-    } else {
-      OrigVector = IdtEntryTable[ExceptionType].OrigVector;
-      IdtEntryTable[ExceptionType].RegisteredCallback (ContextRecord);
-    }
+  EFI_EXCEPTION_CALLBACK  ExceptionCallback;
+  EFI_PERIODIC_CALLBACK   PeriodicCallback;
+
+  if (IdtEntryTable[ExceptionType].RegisteredCallback == NULL) {
+    return;
+  }
+
+  if (ExceptionType == SYSTEM_TIMER_VECTOR) {
+    OrigVector       = IdtEntryTable[ExceptionType].OrigVector;
+    PeriodicCallback = (EFI_PERIODIC_CALLBACK)IdtEntryTable[ExceptionType].RegisteredCallback;
+    PeriodicCallback (ContextRecord);
+  } else {
+    ExceptionCallback = (EFI_EXCEPTION_CALLBACK)IdtEntryTable[ExceptionType].RegisteredCallback;
+    ExceptionCallback (ExceptionType, ContextRecord);
   }
 }
 

@@ -213,7 +213,7 @@ CalculateUsbDebugPortBar (
   //
   // Get Pointer To Capability List
   //
-  CapabilityPtr = PciRead8 (PcdGet32 (PcdUsbEhciPciAddress) + PCI_CAPBILITY_POINTER_OFFSET);
+  CapabilityPtr = PciRead8 (PcdGet32 (PcdUsbEhciPciAddress) + PCI_CAPABILITY_POINTER_OFFSET);
 
   //
   // Find Capability ID 0xA, Which Is For Debug Port

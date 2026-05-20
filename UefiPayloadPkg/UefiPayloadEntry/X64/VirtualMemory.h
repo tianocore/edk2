@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VIRTUAL_MEMORY_H_
-#define _VIRTUAL_MEMORY_H_
+#pragma once
 
 #define SYS_CODE64_SEL  0x38
 
@@ -149,14 +148,17 @@ typedef union {
 
 #define PAGING_PAE_INDEX_MASK  0x1FF
 
-#define PAGING_4K_ADDRESS_MASK_64  0x000FFFFFFFFFF000ull
-#define PAGING_2M_ADDRESS_MASK_64  0x000FFFFFFFE00000ull
-#define PAGING_1G_ADDRESS_MASK_64  0x000FFFFFC0000000ull
+#define PAGING_4K_ADDRESS_MASK_64    0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64    0x000FFFFFFFE00000ull
+#define PAGING_1G_ADDRESS_MASK_64    0x000FFFFFC0000000ull
+#define PAGING_512G_ADDRESS_MASK_64  0x000FF80000000000ull
+#define PAGING_256T_ADDRESS_MASK_64  0x000F800000000000ull
 
 #define PAGING_L1_ADDRESS_SHIFT  12
 #define PAGING_L2_ADDRESS_SHIFT  21
 #define PAGING_L3_ADDRESS_SHIFT  30
 #define PAGING_L4_ADDRESS_SHIFT  39
+#define PAGING_L5_ADDRESS_SHIFT  48
 
 #define PAGING_PML4E_NUMBER  4
 
@@ -293,13 +295,13 @@ IsNullDetectionEnabled (
   Prevent the memory pages used for page table from been overwritten.
 
   @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] LevelOfPaging     Level of paging.
 
 **/
 VOID
 EnablePageTableProtection (
-  IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
+  IN  UINTN  PageTableBase,
+  IN  UINT8  LevelOfPaging
   );
 
 /**
@@ -323,5 +325,3 @@ VOID *
 AllocatePageTableMemory (
   IN UINTN  Pages
   );
-
-#endif

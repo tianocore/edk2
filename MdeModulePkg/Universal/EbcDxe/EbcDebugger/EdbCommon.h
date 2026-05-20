@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EDB_COMMON_H_
-#define _EFI_EDB_COMMON_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -235,5 +234,3 @@ typedef struct _EFI_DEBUGGER_PRIVATE_DATA {
   BOOLEAN                                EnablePageBreak;
   EFI_EVENT                              BreakEvent;
 } EFI_DEBUGGER_PRIVATE_DATA;
-
-#endif

@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _SMM_MEM_LIB_H_
-#define _SMM_MEM_LIB_H_
+#pragma once
 
 /**
   This function check if the buffer is valid per processor architecture and not overlap with SMRAM.
@@ -128,5 +127,3 @@ SmmSetMem (
   IN UINTN  Length,
   IN UINT8  Value
   );
-
-#endif

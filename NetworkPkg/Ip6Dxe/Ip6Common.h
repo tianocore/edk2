@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_COMMON_H__
-#define __EFI_IP6_COMMON_H__
+#pragma once
 
 #define IP6_LINK_EQUAL(Mac1, Mac2)  (CompareMem ((Mac1), (Mac2), sizeof (EFI_MAC_ADDRESS)) == 0)
 
@@ -307,5 +306,3 @@ EFI_IP6_HEADER *
 Ip6NtohHead (
   IN OUT EFI_IP6_HEADER  *Head
   );
-
-#endif

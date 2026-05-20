@@ -650,6 +650,7 @@ DriverCallback (
 
       EndOpCodeHandle = HiiAllocateOpCodeHandle ();
       if (EndOpCodeHandle == NULL) {
+        HiiFreeOpCodeHandle (StartOpCodeHandle);
         return EFI_OUT_OF_RESOURCES;
       }
 
@@ -1260,7 +1261,7 @@ OpalDiskInitialize (
   TCG_RESULT    TcgResult;
   OPAL_SESSION  Session;
   UINT8         ActiveDataRemovalMechanism;
-  UINT32        RemovalMechanishLists[ResearvedMechanism];
+  UINT32        RemovalMechanishLists[ReservedMechanism];
 
   ZeroMem (&Dev->OpalDisk, sizeof (OPAL_DISK));
   Dev->OpalDisk.Sscp           = Dev->Sscp;

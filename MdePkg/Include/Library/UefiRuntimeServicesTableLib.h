@@ -15,12 +15,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_RUNTIME_SERVICES_TABLE_LIB_H__
-#define __UEFI_RUNTIME_SERVICES_TABLE_LIB_H__
+#pragma once
 
 ///
 /// Cached copy of the EFI Runtime Services Table
 ///
 extern EFI_RUNTIME_SERVICES  *gRT;
-
-#endif

@@ -67,8 +67,7 @@
 
 **/
 
-#ifndef _INCOMPATIBLE_PCI_DEVICE_SUPPORT_H_
-#define _INCOMPATIBLE_PCI_DEVICE_SUPPORT_H_
+#pragma once
 
 ///
 /// Global ID for EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL
@@ -163,5 +162,3 @@ struct _EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiIncompatiblePciDeviceSupportProtocolGuid;
-
-#endif

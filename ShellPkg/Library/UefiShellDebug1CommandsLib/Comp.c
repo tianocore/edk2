@@ -54,36 +54,36 @@ PrintDifferentPoint (
 {
   UINTN  Index;
 
-  ShellPrintEx (-1, -1, L"%s: %s\r\n  %08x:", FileTag, FileName, Address);
+  ShellPrintDefaultEx (L"%s: %s\r\n  %08x:", FileTag, FileName, Address);
 
   //
   // Print data in hex-format.
   //
   for (Index = 0; Index < BufferSize; Index++) {
-    ShellPrintEx (-1, -1, L" %02x", Buffer[Index]);
+    ShellPrintDefaultEx (L" %02x", Buffer[Index]);
   }
 
   if (BufferSize < DifferentBytes) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_END_OF_FILE), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_COMP_END_OF_FILE), gShellDebug1HiiHandle);
   }
 
-  ShellPrintEx (-1, -1, L"    *");
+  ShellPrintDefaultEx (L"    *");
 
   //
   // Print data in char-format.
   //
   for (Index = 0; Index < BufferSize; Index++) {
     if ((Buffer[Index] >= 0x20) && (Buffer[Index] <= 0x7E)) {
-      ShellPrintEx (-1, -1, L"%c", Buffer[Index]);
+      ShellPrintDefaultEx (L"%c", Buffer[Index]);
     } else {
       //
       // Print dots for control characters
       //
-      ShellPrintEx (-1, -1, L".");
+      ShellPrintDefaultEx (L".");
     }
   }
 
-  ShellPrintEx (-1, -1, L"*\r\n");
+  ShellPrintDefaultEx (L"*\r\n");
 }
 
 /**
@@ -265,7 +265,7 @@ ShellCommandRunComp (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"comp", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"comp", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -273,36 +273,48 @@ ShellCommandRunComp (
     }
   } else {
     if (ShellCommandLineGetCount (Package) > 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"comp");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"comp");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount (Package) < 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"comp");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"comp");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       TempParam = ShellCommandLineGetRawValue (Package, 1);
-      ASSERT (TempParam != NULL);
+      if (TempParam == NULL) {
+        ASSERT (TempParam != NULL);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"comp", TempParam);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Exit;
+      }
+
       FileName1 = ShellFindFilePath (TempParam);
       if (FileName1 == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         Status = ShellOpenFileByName (FileName1, &FileHandle1, EFI_FILE_MODE_READ, 0);
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
           ShellStatus = SHELL_NOT_FOUND;
         }
       }
 
       TempParam = ShellCommandLineGetRawValue (Package, 2);
-      ASSERT (TempParam != NULL);
+      if (TempParam == NULL) {
+        ASSERT (TempParam != NULL);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"comp", TempParam);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Exit;
+      }
+
       FileName2 = ShellFindFilePath (TempParam);
       if (FileName2 == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         Status = ShellOpenFileByName (FileName2, &FileHandle2, EFI_FILE_MODE_READ, 0);
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
           ShellStatus = SHELL_NOT_FOUND;
         }
       }
@@ -316,7 +328,7 @@ ShellCommandRunComp (
         if (ShellCommandLineGetFlag (Package, L"-n")) {
           TempParam = ShellCommandLineGetValue (Package, L"-n");
           if (TempParam == NULL) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"comp", L"-n");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"comp", L"-n");
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TempParam, L"all") == 0) {
@@ -324,7 +336,7 @@ ShellCommandRunComp (
             } else {
               Status = ShellConvertStringToUint64 (TempParam, &DifferentCount, FALSE, TRUE);
               if (EFI_ERROR (Status) || (DifferentCount == 0)) {
-                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"comp", TempParam, L"-n");
+                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"comp", TempParam, L"-n");
                 ShellStatus = SHELL_INVALID_PARAMETER;
               }
             }
@@ -334,12 +346,12 @@ ShellCommandRunComp (
         if (ShellCommandLineGetFlag (Package, L"-s")) {
           TempParam = ShellCommandLineGetValue (Package, L"-s");
           if (TempParam == NULL) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"comp", L"-s");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"comp", L"-s");
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             Status = ShellConvertStringToUint64 (TempParam, &DifferentBytes, FALSE, TRUE);
             if (EFI_ERROR (Status) || (DifferentBytes == 0)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"comp", TempParam, L"-s");
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"comp", TempParam, L"-s");
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
               if (DifferentBytes > MAX (Size1, Size2)) {
@@ -367,7 +379,7 @@ ShellCommandRunComp (
       }
 
       if (ShellStatus == SHELL_SUCCESS) {
-        while (DiffPointNumber < DifferentCount) {
+        while ((UINT64)DiffPointNumber < DifferentCount) {
           DataSizeFromFile1 = 1;
           DataSizeFromFile2 = 1;
           OneByteFromFile1  = 0;
@@ -435,7 +447,7 @@ ShellCommandRunComp (
               ((DataSizeFromFile1 == 0) && (DataSizeFromFile2 == 0))
               )
           {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_DIFFERENCE_POINT), gShellDebug1HiiHandle, ++DiffPointNumber);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_COMP_DIFFERENCE_POINT), gShellDebug1HiiHandle, ++DiffPointNumber);
             PrintDifferentPoint (FileName1, L"File1", DataFromFile1, InsertPosition1, DiffPointAddress, DifferentBytes);
             PrintDifferentPoint (FileName2, L"File2", DataFromFile2, InsertPosition2, DiffPointAddress, DifferentBytes);
 
@@ -488,10 +500,10 @@ ShellCommandRunComp (
         FileBufferUninit (&FileBuffer2);
 
         if (DiffPointNumber == 0) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
         } else {
           ShellStatus = SHELL_NOT_EQUAL;
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_FAIL), gShellDebug1HiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_COMP_FOOTER_FAIL), gShellDebug1HiiHandle);
         }
       }
     }
@@ -499,6 +511,7 @@ ShellCommandRunComp (
     ShellCommandLineFreeVarList (Package);
   }
 
+Exit:
   SHELL_FREE_NON_NULL (FileName1);
   SHELL_FREE_NON_NULL (FileName2);
 

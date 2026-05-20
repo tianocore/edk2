@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef CONFIDENTIAL_COMPUTING_GUEST_ATTR_H_
-#define CONFIDENTIAL_COMPUTING_GUEST_ATTR_H_
+#pragma once
 
 //
 // Confidential computing guest type
@@ -44,5 +43,3 @@ typedef enum {
 #define CC_GUEST_IS_TDX(x)   _CC_GUEST_IS_TDX((x) & CCAttrTypeMask)
 #define _CC_GUEST_IS_SEV(x)  ((x) == CCAttrAmdSev || (x) == CCAttrAmdSevEs || (x) == CCAttrAmdSevSnp)
 #define CC_GUEST_IS_SEV(x)   _CC_GUEST_IS_SEV((x) & CCAttrTypeMask)
-
-#endif

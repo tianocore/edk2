@@ -11,25 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-
-typedef int time_t;
-
-//
-// Structures Definitions
-//
-struct tm {
-  int     tm_sec;    /* seconds after the minute [0-60] */
-  int     tm_min;    /* minutes after the hour [0-59] */
-  int     tm_hour;   /* hours since midnight [0-23] */
-  int     tm_mday;   /* day of the month [1-31] */
-  int     tm_mon;    /* months since January [0-11] */
-  int     tm_year;   /* years since 1900 */
-  int     tm_wday;   /* days since Sunday [0-6] */
-  int     tm_yday;   /* days since January 1 [0-365] */
-  int     tm_isdst;  /* Daylight Savings Time flag */
-  long    tm_gmtoff; /* offset from CUT in seconds */
-  char    *tm_zone;  /* timezone abbreviation */
-};
+#include <CrtLibSupport.h>
 
 //
 // -- Time Management Routines --
@@ -195,4 +177,68 @@ _time64 (
   )
 {
   return time (t);
+}
+
+long  timezone;
+
+int
+gettimeofday (
+  struct timeval   *tv,
+  struct timezone  *tz
+  )
+{
+  tv->tv_sec  = (long)time (NULL);
+  tv->tv_usec = 0;
+  return 0;
+}
+
+/**sleep function. **/
+unsigned int
+sleep (
+  unsigned int  seconds
+  )
+{
+  return 0;
+}
+
+ms_time_t
+mbedtls_ms_time (
+  void
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TIME    Time;
+  ms_time_t   CalTime;
+  UINTN       Year;
+
+  //
+  // Get the current time and date information
+  //
+  Status = gRT->GetTime (&Time, NULL);
+  if (EFI_ERROR (Status) || (Time.Year < 1970)) {
+    return 0;
+  }
+
+  //
+  // Years Handling
+  // UTime should now be set to 00:00:00 on Jan 1 of the current year.
+  //
+  for (Year = 1970, CalTime = 0; Year != Time.Year; Year++) {
+    CalTime = CalTime + (time_t)(CumulativeDays[IsLeap (Year)][13] * SECSPERDAY);
+  }
+
+  //
+  // Add in number of seconds for current Month, Day, Hour, Minute, Seconds, and TimeZone adjustment
+  //
+  CalTime = CalTime +
+            (time_t)((Time.TimeZone != EFI_UNSPECIFIED_TIMEZONE) ? (Time.TimeZone * 60) : 0) +
+            (time_t)(CumulativeDays[IsLeap (Time.Year)][Time.Month] * SECSPERDAY) +
+            (time_t)(((Time.Day > 0) ? Time.Day - 1 : 0) * SECSPERDAY) +
+            (time_t)(Time.Hour * SECSPERHOUR) +
+            (time_t)(Time.Minute * 60) +
+            (time_t)Time.Second;
+
+  CalTime = CalTime*1000 + (ms_time_t)(Time.Nanosecond/1000000);
+
+  return CalTime;
 }

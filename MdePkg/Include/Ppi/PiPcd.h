@@ -18,8 +18,7 @@
   PI Version 1.2 Vol 3.
 **/
 
-#ifndef __PI_PCD_PPI_H__
-#define __PI_PCD_PPI_H__
+#pragma once
 
 extern EFI_GUID  gEfiPeiPcdPpiGuid;
 
@@ -422,5 +421,3 @@ typedef struct {
   EFI_PEI_PCD_PPI_GET_NEXT_TOKEN          GetNextToken;
   EFI_PEI_PCD_PPI_GET_NEXT_TOKEN_SPACE    GetNextTokenSpace;
 } EFI_PEI_PCD_PPI;
-
-#endif

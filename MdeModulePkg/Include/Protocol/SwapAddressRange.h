@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_SWAP_ADDRESS_RANGE_PROTOCOL_H_
-#define _EFI_SWAP_ADDRESS_RANGE_PROTOCOL_H_
+#pragma once
 
 #define EFI_SWAP_ADDRESS_RANGE_PROTOCOL_GUID \
   { \
@@ -160,5 +159,3 @@ struct _EFI_SWAP_ADDRESS_RANGE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSwapAddressRangeProtocolGuid;
-
-#endif

@@ -5,12 +5,11 @@ Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  PI Version 1.6
+  PI Version 1.9
 
 **/
 
-#ifndef __PI_HOB_H__
-#define __PI_HOB_H__
+#pragma once
 
 //
 // HobType of EFI_HOB_GENERIC_HEADER.
@@ -291,6 +290,7 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 
 #define EFI_RESOURCE_ATTRIBUTE_ENCRYPTED        0x04000000
 #define EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE  0x08000000
+#define EFI_RESOURCE_ATTRIBUTE_HOT_PLUGGABLE    0x10000000
 //
 // Physical memory relative reliability attribute. This
 // memory provides higher reliability relative to other
@@ -507,5 +507,3 @@ typedef union {
   EFI_HOB_UEFI_CAPSULE                   *Capsule;
   UINT8                                  *Raw;
 } EFI_PEI_HOB_POINTERS;
-
-#endif

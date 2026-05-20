@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef TDX_VIRTUAL_MEMORY_
-#define TDX_VIRTUAL_MEMORY_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -177,5 +176,3 @@ typedef struct {
   UINTN    Offset;
   UINTN    FreePages;
 } PAGE_TABLE_POOL;
-
-#endif

@@ -51,6 +51,7 @@ PopEfikeyBufHead (
     CopyMem (KeyData, &Queue->Buffer[Queue->Head], sizeof (EFI_KEY_DATA));
   }
 
+  ZeroMem (&Queue->Buffer[Queue->Head], sizeof (EFI_KEY_DATA));
   Queue->Head = (Queue->Head + 1) % KEYBOARD_EFI_KEY_MAX_COUNT;
   return EFI_SUCCESS;
 }

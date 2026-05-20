@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_BUS_COMPONENT_NAME_H_
-#define _EFI_PCI_BUS_COMPONENT_NAME_H_
+#pragma once
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gPciBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gPciBusComponentName2;
@@ -140,5 +139,3 @@ PciBusComponentNameGetControllerName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif

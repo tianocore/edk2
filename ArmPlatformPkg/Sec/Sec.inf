@@ -18,12 +18,6 @@
   Sec.h
   Sec.c
 
-[Sources.ARM]
-  Arm/ArchSec.c
-  Arm/Exception.S
-  Arm/ModuleEntryPoint.S
-  Arm/SwitchStack.S
-
 [Sources.AARCH64]
   AArch64/ArchSec.c
   AArch64/Exception.S
@@ -47,9 +41,12 @@
   DebugLib
   PrintLib
   SerialPortLib
+  StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
+  gArmTransferListPpiGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
@@ -57,7 +54,6 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
-  gArmTokenSpaceGuid.PcdVFPEnabled
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize

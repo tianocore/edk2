@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_PROTO_H_
-#define _ISCSI_PROTO_H_
+#pragma once
 
 //
 // RFC 1982 Serial Number Arithmetic, SERIAL_BITS = 32
@@ -1032,5 +1031,3 @@ VOID
 IScsiSessionAbort (
   IN OUT ISCSI_SESSION  *Session
   );
-
-#endif

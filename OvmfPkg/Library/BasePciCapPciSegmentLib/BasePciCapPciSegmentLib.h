@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __BASE_PCI_CAP_PCI_SEGMENT_LIB_H__
-#define __BASE_PCI_CAP_PCI_SEGMENT_LIB_H__
+#pragma once
 
 #include <Library/DebugLib.h>
 
@@ -37,5 +36,3 @@ typedef struct {
 
 #define SEGMENT_DEV_FROM_PCI_CAP_DEV(PciDevice) \
   CR (PciDevice, SEGMENT_DEV, BaseDevice, SEGMENT_DEV_SIG)
-
-#endif // __BASE_PCI_CAP_PCI_SEGMENT_LIB_H__

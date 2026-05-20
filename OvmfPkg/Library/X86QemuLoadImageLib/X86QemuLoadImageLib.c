@@ -19,8 +19,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/QemuLoadImageLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/OvmfLoadedX86LinuxKernel.h>
@@ -51,6 +53,25 @@ STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH  mKernelDevicePath = {
       { sizeof (KERNEL_FILE_DEVPATH)      }
     },
     L"kernel",
+  },  {
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
+  }
+};
+
+STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH  mShimDevicePath = {
+  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP,
+      { sizeof (VENDOR_DEVICE_PATH)       }
+    },
+    QEMU_KERNEL_LOADER_FS_MEDIA_GUID
+  },  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP,
+      { sizeof (KERNEL_FILE_DEVPATH)      }
+    },
+    L"shim",
   },  {
     END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
     { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
@@ -339,11 +360,7 @@ QemuLoadKernelImage (
   UINTN                      CommandLineSize;
   CHAR8                      *CommandLine;
   UINTN                      InitrdSize;
-
-  //
-  // Redundant assignment to work around GCC48/GCC49 limitations.
-  //
-  CommandLine = NULL;
+  BOOLEAN                    Shim;
 
   //
   // Load the image. This should call back into the QEMU EFI loader file system.
@@ -351,11 +368,35 @@ QemuLoadKernelImage (
   Status = gBS->LoadImage (
                   FALSE,                    // BootPolicy: exact match required
                   gImageHandle,             // ParentImageHandle
-                  (EFI_DEVICE_PATH_PROTOCOL *)&mKernelDevicePath,
+                  (EFI_DEVICE_PATH_PROTOCOL *)&mShimDevicePath,
                   NULL,                     // SourceBuffer
                   0,                        // SourceSize
                   &KernelImageHandle
                   );
+  if (Status == EFI_SUCCESS) {
+    Shim = TRUE;
+    DEBUG ((DEBUG_INFO, "%a: booting via shim\n", __func__));
+  } else {
+    Shim = FALSE;
+    if (Status == EFI_SECURITY_VIOLATION) {
+      gBS->UnloadImage (KernelImageHandle);
+    }
+
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_INFO, "%a: LoadImage(shim): %r\n", __func__, Status));
+      return Status;
+    }
+
+    Status = gBS->LoadImage (
+                    FALSE,                  // BootPolicy: exact match required
+                    gImageHandle,           // ParentImageHandle
+                    (EFI_DEVICE_PATH_PROTOCOL *)&mKernelDevicePath,
+                    NULL,                   // SourceBuffer
+                    0,                      // SourceSize
+                    &KernelImageHandle
+                    );
+  }
+
   switch (Status) {
     case EFI_SUCCESS:
       break;
@@ -377,13 +418,51 @@ QemuLoadKernelImage (
     // Fall through
     //
     case EFI_ACCESS_DENIED:
-    //
-    // We are running with UEFI secure boot enabled, and the image failed to
-    // authenticate. For compatibility reasons, we fall back to the legacy
-    // loader in this case.
-    //
-    // Fall through
-    //
+      //
+      // We are running with UEFI secure boot enabled, and the image failed to
+      // authenticate. For compatibility reasons, we fall back to the legacy
+      // loader in this case (unless disabled via fw_cfg).
+      //
+    {
+      EFI_STATUS  RetStatus;
+      BOOLEAN     Enabled = TRUE;
+
+      AsciiPrint (
+        "OVMF: Secure boot image verification failed.  Consider using the '-shim'\n"
+        "OVMF: command line switch for qemu (available in version 10.0 + newer).\n"
+        "\n"
+        );
+      if (PcdGet64 (PcdConfidentialComputingGuestAttr)) {
+        AsciiPrint (
+          "OVMF: Running in confidential VM, not using insecure legacy linux kernel loader.\n"
+          );
+        return EFI_ACCESS_DENIED;
+      }
+
+      RetStatus = QemuFwCfgParseBool (
+                    "opt/org.tianocore/EnableLegacyLoader",
+                    &Enabled
+                    );
+      if (EFI_ERROR (RetStatus)) {
+        Enabled = FALSE;
+      }
+
+      if (!Enabled) {
+        AsciiPrint (
+          "OVMF: Fallback to insecure legacy linux kernel loader is disabled.\n"
+          "\n"
+          );
+        return EFI_ACCESS_DENIED;
+      } else {
+        AsciiPrint (
+          "OVMF: Using legacy linux kernel loader (insecure and deprecated).\n"
+          "\n"
+          );
+        //
+        // Fall through
+        //
+      }
+    }
     case EFI_UNSUPPORTED:
       //
       // The image is not natively supported or cross-type supported. Let's try
@@ -460,9 +539,16 @@ QemuLoadKernelImage (
 
   if (InitrdSize > 0) {
     //
-    // Append ' initrd=initrd' in UTF-16.
+    // Prefix ' initrd=initrd' in UTF-16.
     //
-    KernelLoadedImage->LoadOptionsSize += sizeof (L" initrd=initrd") - 2;
+    KernelLoadedImage->LoadOptionsSize += sizeof (L"initrd=initrd ") - 2;
+  }
+
+  if (Shim) {
+    //
+    // Prefix 'kernel ' in UTF-16.
+    //
+    KernelLoadedImage->LoadOptionsSize += sizeof (L"kernel ") - 2;
   }
 
   if (KernelLoadedImage->LoadOptionsSize == 0) {
@@ -485,9 +571,10 @@ QemuLoadKernelImage (
     UnicodeSPrintAsciiFormat (
       KernelLoadedImage->LoadOptions,
       KernelLoadedImage->LoadOptionsSize,
-      "%a%a",
-      (CommandLineSize == 0) ?  "" : CommandLine,
-      (InitrdSize == 0)      ?  "" : " initrd=initrd"
+      "%a%a%a",
+      (Shim == FALSE)        ?  "" : "kernel ",
+      (InitrdSize == 0)      ?  "" : "initrd=initrd ",
+      (CommandLineSize == 0) ?  "" : CommandLine
       );
     DEBUG ((
       DEBUG_INFO,
@@ -554,36 +641,6 @@ QemuStartKernelImage (
                   NULL,              // ExitDataSize
                   NULL               // ExitData
                   );
- #ifdef MDE_CPU_IA32
-  if (Status == EFI_UNSUPPORTED) {
-    EFI_HANDLE  KernelImageHandle;
-
-    //
-    // On IA32, EFI_UNSUPPORTED means that the image's machine type is X64 while
-    // we are expecting a IA32 one, and the StartImage () boot service is unable
-    // to handle it, either because the image does not have the special .compat
-    // PE/COFF section that Linux specifies for mixed mode capable images, or
-    // because we are running without the support code for that. So load the
-    // image again, using the legacy loader, and unload the normally loaded
-    // image before starting the legacy one.
-    //
-    Status = QemuLoadLegacyImage (&KernelImageHandle);
-    if (EFI_ERROR (Status)) {
-      //
-      // Note: no change to (*ImageHandle), the caller will release it.
-      //
-      return Status;
-    }
-
-    //
-    // Swap in the legacy-loaded image.
-    //
-    QemuUnloadKernelImage (*ImageHandle);
-    *ImageHandle = KernelImageHandle;
-    return QemuStartLegacyImage (KernelImageHandle);
-  }
-
- #endif
   return Status;
 }
 
@@ -631,10 +688,9 @@ QemuUnloadKernelImage (
   }
 
   //
-  // We are unloading a normal, non-legacy loaded image, either on behalf of
-  // an external caller, or called from QemuStartKernelImage() on IA32, while
-  // switching from the normal to the legacy method to load and start a X64
-  // image.
+  // We are unloading a normal, non-legacy loaded image, on behalf of an external
+  // caller while switching from the normal to the legacy method to load and
+  // start a X64 image.
   //
   if (KernelLoadedImage->LoadOptions != NULL) {
     FreePool (KernelLoadedImage->LoadOptions);

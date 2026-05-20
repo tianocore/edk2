@@ -23,23 +23,23 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources]
   CapsuleService.c
   CapsuleService.h
 
-[Sources.Ia32, Sources.EBC, Sources.ARM, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
+[Sources.Ia32, Sources.EBC, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
   SaveLongModeContext.c
 
-[Sources.Ia32, Sources.X64, Sources.ARM, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
+[Sources.Ia32, Sources.X64, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
   CapsuleCache.c
 
 [Sources.Ia32, Sources.X64, Sources.EBC, Sources.RISCV64, Sources.LOONGARCH64]
   CapsuleReset.c
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/CapsuleReset.c
 
 [Sources.EBC]
@@ -64,6 +64,7 @@
   PrintLib
   BaseMemoryLib
   CacheMaintenanceLib
+  VariablePolicyHelperLib
 
 [LibraryClasses.X64]
   UefiLib
@@ -81,7 +82,7 @@
 [Protocols.X64]
   ## UNDEFINED ## NOTIFY
   ## SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid
+  gEdkiiVariablePolicyProtocolGuid
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset        ## CONSUMES

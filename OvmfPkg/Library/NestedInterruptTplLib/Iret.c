@@ -38,22 +38,6 @@ DisableInterruptsOnIret (
   Rflags.Bits.IF                         = 0;
   SystemContext.SystemContextX64->Rflags = Rflags.UintN;
 
- #elif defined (MDE_CPU_IA32)
-
-  IA32_EFLAGS32  Eflags;
-
-  //
-  // Get flags from system context.
-  //
-  Eflags.UintN = SystemContext.SystemContextIa32->Eflags;
-  ASSERT (Eflags.Bits.IF);
-
-  //
-  // Clear interrupts-enabled flag.
-  //
-  Eflags.Bits.IF                          = 0;
-  SystemContext.SystemContextIa32->Eflags = Eflags.UintN;
-
  #else
 
   #error "Unsupported CPU"

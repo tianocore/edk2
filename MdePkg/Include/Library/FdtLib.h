@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef FDT_LIB_H_
-#define FDT_LIB_H_
+#pragma once
 
 /* Error codes: informative error codes */
 #define FDT_ERR_NOTFOUND  1
@@ -181,12 +180,32 @@ typedef struct {
 
 #define FdtGetHeader(Fdt, Field) \
   (Fdt32ToCpu (((const FDT_HEADER *)(Fdt))->Field))
-#define FdtTotalSize(Fdt)  (FdtGetHeader ((Fdt), TotalSize))
+#define FdtMagic(Fdt)            (FdtGetHeader ((Fdt), Magic))
+#define FdtTotalSize(Fdt)        (FdtGetHeader ((Fdt), TotalSize))
+#define FdtOffsetDtStruct(Fdt)   (FdtGetHeader ((Fdt), OffsetDtStruct))
+#define FdtOffsetDtStrings(Fdt)  (FdtGetHeader ((Fdt), OffsetDtStrings))
+#define FdtOffsetMemRsvmap(Fdt)  (FdtGetHeader ((Fdt), OffsetMemRsvmap))
+#define FdtVersion(Fdt)          (FdtGetHeader ((Fdt), Version))
+#define FdtLastCompVersion(Fdt)  (FdtGetHeader ((Fdt), LastCompVersion))
+#define FdtBootCpuidPhys(Fdt)    (FdtGetHeader ((Fdt), BootCpuidPhys))
+#define FdtSizeDtStrings(Fdt)    (FdtGetHeader ((Fdt), SizeDtStrings))
+#define FdtSizeDtStruct(Fdt)     (FdtGetHeader ((Fdt), SizeDtStruct))
 
 #define FdtForEachSubnode(Node, Fdt, Parent) \
   for (Node = FdtFirstSubnode (Fdt, Parent); \
        Node >= 0;                            \
        Node = FdtNextSubnode (Fdt, Node))
+
+#define FdtSetPropString(Fdt, NodeOffset, Name, String) \
+  FdtSetProp ((Fdt), (NodeOffset), (Name), (String), AsciiStrLen (String) + 1)
+
+#define FdtSetPropEmpty(Fdt, NodeOffset, Name) \
+  FdtSetProp ((Fdt), (NodeOffset), (Name), NULL, 0)
+
+#define FdtForEachPropertyOffset(Property, Fdt, Node)   \
+  for (Property = FdtFirstPropertyOffset(Fdt, Node);    \
+       Property >= 0;                                   \
+       Property = FdtNextPropertyOffset(Fdt, Property))
 
 /**
   Convert UINT16 data of the FDT blob to little-endian
@@ -421,6 +440,24 @@ FdtSubnodeOffsetNameLen (
   );
 
 /**
+  Returns a offset of first node which matches the given name.
+
+  @param[in] Fdt             The pointer to FDT blob.
+  @param[in] ParentOffset    The offset to the node which start find under.
+  @param[in] Name            The name to search the node with the name.
+
+  @return The offset to node offset with given node name.
+
+ **/
+INT32
+EFIAPI
+FdtSubnodeOffset (
+  IN CONST VOID   *Fdt,
+  IN INT32        ParentOffset,
+  IN CONST CHAR8  *Name
+  );
+
+/**
   Returns the number of memory reserve map entries.
 
   @param[in] Fdt             The pointer to FDT blob.
@@ -483,7 +520,7 @@ FdtParentOffset (
 **/
 INT32
 EFIAPI
-FdtNodeOffsetByPropertyValue (
+FdtNodeOffsetByPropValue (
   IN CONST VOID   *Fdt,
   IN INT32        StartOffset,
   IN CONST CHAR8  *PropertyName,
@@ -538,6 +575,49 @@ FdtStringListContains (
 CONST FDT_PROPERTY *
 EFIAPI
 FdtGetProperty (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  );
+
+/**
+  Returns a property with the given name from the given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return The property to the structure of the found property. Since the data
+          come from FDT blob, it's encoding with big-endian.
+
+**/
+FDT_PROPERTY *
+EFIAPI
+FdtGetPropertyW (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  );
+
+/**
+  Returns the value of a given property.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return Pointer to the value of the property.
+          Since the data comes from the FDT blob, it's encoded as big-endian.
+          NULL on error, with error-code stored at Length (if non-NULL).
+
+**/
+CONST VOID *
+EFIAPI
+FdtGetProp (
   IN CONST VOID   *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
@@ -650,6 +730,22 @@ FdtAddSubnode (
   );
 
 /**
+  Delete a node (subtree)
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the node (subtree) to delete.
+
+  @return  Zero for successfully, otherwise failed.
+
+ **/
+INT32
+EFIAPI
+FdtDelNode (
+  IN VOID   *Fdt,
+  IN INT32  NodeOffset
+  );
+
+/**
   Add or modify a property in the given node.
 
   @param[in] Fdt            The pointer to FDT blob.
@@ -663,7 +759,7 @@ FdtAddSubnode (
 **/
 INT32
 EFIAPI
-FdtSetProperty (
+FdtSetProp (
   IN VOID         *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
@@ -769,7 +865,7 @@ FdtPathOffset (
   Returns the name of a given node.
 
   @param[in] Fdt            The pointer to FDT blob.
-  @param[in] NodeOffse      Offset of node to check.
+  @param[in] NodeOffset     Offset of node to check.
   @param[in] Length         The pointer to an integer variable (will be overwritten) or NULL.
 
   @return The pointer to the node's name.
@@ -778,9 +874,28 @@ FdtPathOffset (
 CONST CHAR8 *
 EFIAPI
 FdtGetName (
-  IN VOID   *Fdt,
-  IN INT32  NodeOffset,
-  IN INT32  *Length
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset,
+  IN INT32       *Length
+  );
+
+/**
+  Determine the full path of a node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+  @param[in] Buffer         The pointer to allocate a pool for FDT blob.
+  @param[in] BufferSize     The BufferSize to the pool size.
+
+  @return 0 on success, or negative error code.
+**/
+INT32
+EFIAPI
+FdtGetPath (
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset,
+  IN VOID        *Buffer,
+  IN UINT32      BufferSize
   );
 
 /**
@@ -846,12 +961,54 @@ FdtSizeCells (
   IN INT32       NodeOffset
   );
 
+/**
+  Retrieve the phandle of a given node
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+
+  @return Phandle of the node at NodeOffset, or 0 on error.
+**/
+UINT32
+EFIAPI
+FdtGetPhandle (
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset
+  );
+
+/**
+  Find and return the highest phandle in a tree. The value returned in Phandle
+  is only valid if the function returns success.
+
+  @param[in]  Fdt            The pointer to FDT blob.
+  @param[out] Phandle        The return location for the highest Phandle value found in the tree
+
+  @return 0 on success or a negative error code on failure
+**/
+INT32
+EFIAPI
+FdtFindMaxPhandle (
+  IN CONST VOID  *Fdt,
+  OUT UINT32     *Phandle
+  );
+
+/**
+  Applies a DT overlay on a base DT.
+
+  @param[in,out] Fdt        The pointer to FDT blob.
+  @param[in]     Fdto       The pointer to FDT overlay blob.
+
+  @return 0 on success, or negative error code on failure.
+**/
+INT32
+EFIAPI
+FdtOverlayApply (
+  IN OUT VOID  *Fdt,
+  IN     VOID  *Fdto
+  );
+
 /* Debug functions. */
-CONST
-CHAR8
-*
+CONST CHAR8 *
 FdtStrerror (
   IN INT32  ErrVal
   );
-
-#endif /* FDT_LIB_H_ */

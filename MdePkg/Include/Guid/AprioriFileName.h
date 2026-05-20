@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __PEI_APRIORI_FILE_NAME_H__
-#define __PEI_APRIORI_FILE_NAME_H__
+#pragma once
 
 #define PEI_APRIORI_FILE_NAME_GUID \
   { 0x1b45cc0a, 0x156a, 0x428a, { 0x62, 0XAF, 0x49, 0x86, 0x4d, 0xa0, 0xe6, 0xe6 } }
@@ -32,5 +31,3 @@ typedef struct {
 } PEI_APRIORI_FILE_CONTENTS;
 
 extern EFI_GUID  gPeiAprioriFileNameGuid;
-
-#endif

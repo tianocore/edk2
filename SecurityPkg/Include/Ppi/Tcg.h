@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_PPI_H_
-#define _TCG_PPI_H_
+#pragma once
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 
@@ -61,5 +60,3 @@ struct _EDKII_TCG_PPI {
 };
 
 extern EFI_GUID  gEdkiiTcgPpiGuid;
-
-#endif

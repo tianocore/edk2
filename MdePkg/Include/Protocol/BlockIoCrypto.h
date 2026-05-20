@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __BLOCK_IO_CRYPTO_H__
-#define __BLOCK_IO_CRYPTO_H__
+#pragma once
 
 #include <Protocol/BlockIo.h>
 
@@ -168,7 +167,7 @@ typedef struct {
   up to the platform firmware or driver to implement.
 
   @param[in]  This                 Pointer to the EFI_BLOCK_IO_CRYPTO_PROTOCOL instance.
-  @param[in]  ExtendedVerification Indicates that the driver may perform a more exhausive
+  @param[in]  ExtendedVerification Indicates that the driver may perform a more exhaustive
                                    verification operation of the device during reset.
 
   @retval EFI_SUCCESS              The block device was reset.
@@ -519,5 +518,3 @@ struct _EFI_BLOCK_IO_CRYPTO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBlockIoCryptoProtocolGuid;
-
-#endif

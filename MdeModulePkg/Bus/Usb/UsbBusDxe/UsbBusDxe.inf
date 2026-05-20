@@ -18,16 +18,6 @@
 
   ENTRY_POINT                    = UsbBusDriverEntryPoint
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
-#
-#  DRIVER_BINDING                =  mUsbBusDriverBinding
-#  COMPONENT_NAME                =  mUsbBusComponentName
-#  COMPONENT_NAME2               =  mUsbBusComponentName2
-#
-
 [Sources]
   UsbDesc.c
   UsbEnumer.c
@@ -62,7 +52,6 @@
   ## BY_START
   gEfiDevicePathProtocolGuid
   gEfiUsb2HcProtocolGuid                        ## TO_START
-  gEfiUsbHcProtocolGuid                         ## TO_START
 
 # [Event]
 #

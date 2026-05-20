@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_H_
-#define _PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_H_
+#pragma once
 
 //
 // This file must be included because EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
@@ -72,7 +71,7 @@ typedef UINT64 EFI_RESOURCE_ALLOCATION_STATUS;
 #define EFI_RESOURCE_NOT_SATISFIED  0xFFFFFFFFFFFFFFFFULL
 
 ///
-/// This  enum is used to specify the phase of the PCI enumaeration process.
+/// This  enum is used to specify the phase of the PCI enumeration process.
 ///
 typedef enum {
   ///
@@ -418,5 +417,3 @@ struct _EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPciHostBridgeResourceAllocationProtocolGuid;
-
-#endif

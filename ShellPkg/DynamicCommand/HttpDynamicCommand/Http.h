@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _HTTP_H_
-#define _HTTP_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -89,5 +88,3 @@ EFI_HII_HANDLE
 InitializeHiiPackage (
   IN EFI_HANDLE  ImageHandle
   );
-
-#endif // _HTTP_H_

@@ -2,14 +2,14 @@
   ACPI 6.5 definitions from the ACPI Specification Revision 6.5 Aug, 2022.
 
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2024, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_6_5_H_
-#define ACPI_6_5_H_
+#pragma once
 
 #include <IndustryStandard/Acpi64.h>
 
@@ -17,6 +17,25 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
+
+///
+/// _STA bit definitions ACPI 6.5 s6.3.7
+///
+#define ACPI_AML_STA_DEVICE_STATUS_PRESET       0x1
+#define ACPI_AML_STA_DEVICE_STATUS_ENABLED      0x2
+#define ACPI_AML_STA_DEVICE_STATUS_UI           0x4
+#define ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING  0x8
+#define ACPI_AML_STA_DEVICE_STATUS_BATTERY      0x10
+
+///
+/// _CSD Revision for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_CSD_REVISION  0
+
+///
+/// _CSD NumEntries for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_CSD_NUM_ENTRIES  6
 
 ///
 /// _PSD Revision for ACPI 6.5
@@ -773,7 +792,7 @@ typedef struct {
 
 //
 // SRAT structure types.
-// All other values between 0x06 an 0xFF are reserved and
+// All other values between 0x07 and 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_6_5_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
@@ -782,6 +801,7 @@ typedef struct {
 #define EFI_ACPI_6_5_GICC_AFFINITY                        0x03
 #define EFI_ACPI_6_5_GIC_ITS_AFFINITY                     0x04
 #define EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY           0x05
+#define EFI_ACPI_6_5_GENERIC_PORT_AFFINITY                0x06
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -922,6 +942,18 @@ typedef struct {
 ///
 #define EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ENABLED                     BIT0
 #define EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
+
+///
+/// Generic Port Affinity Structure
+///
+typedef EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY_STRUCTURE EFI_ACPI_6_5_GENERIC_PORT_AFFINITY_STRUCTURE;
+
+///
+/// Generic Port Affinity Structure Flags. All other bits are reserved
+/// and must be 0.
+///
+#define EFI_ACPI_6_5_GENERIC_PORT_AFFINITY_STRUCTURE_ENABLED                     BIT0
+#define EFI_ACPI_6_5_GENERIC_PORT_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
 
 ///
 /// System Locality Distance Information Table (SLIT).
@@ -2519,6 +2551,31 @@ typedef struct {
 } EFI_ACPI_6_5_EINJ_TRIGGER_ACTION_TABLE;
 
 ///
+/// EINJ Vendor Error Type Extension
+///
+typedef struct {
+  UINT32    Length;
+  UINT32    SBDF;
+  UINT16    VendorID;
+  UINT16    DeviceID;
+  UINT8     RevID;
+  UINT8     Reserved[3];
+} EFI_ACPI_6_5_VENDOR_ERROR_TYPE_EXTENSION_STRUCTURE;
+
+///
+/// EINJ Set Error Type With Address
+///
+typedef struct {
+  UINT32    ErrorType;
+  UINT32    VendorStructureOffset;
+  UINT32    Flags;
+  UINT32    ProcessorId;
+  UINT64    MemAddr;
+  UINT64    MemAddrRange;
+  UINT32    PcieSBDF;
+} EFI_ACPI_6_5_SET_ERROR_TYPE_WITH_ADDRESS;
+
+///
 /// Platform Communications Channel Table (PCCT)
 ///
 typedef struct {
@@ -2935,7 +2992,7 @@ typedef struct {
   UINT8     Reserved[3];
   UINT32    RecordCount;
   // UINT8   PhatVersionElement[];
-} EFI_ACPI_6_5_PHAT_FIRMWARE_VERISON_DATA_RECORD;
+} EFI_ACPI_6_5_PHAT_FIRMWARE_VERSION_DATA_RECORD;
 
 #define EFI_ACPI_6_5_PHAT_FIRMWARE_VERSION_DATA_RECORD_REVISION  0x01
 
@@ -3347,5 +3404,3 @@ typedef struct {
 #define EFI_ACPI_MEMORY_SYSTEM_RESOURCE_PARTITIONING_AND_MONITORING_TABLE_SIGNATURE  SIGNATURE_32('M', 'P', 'A', 'M')
 
 #pragma pack()
-
-#endif

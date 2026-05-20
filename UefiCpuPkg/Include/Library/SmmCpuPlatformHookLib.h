@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SMM_CPU_PLATFORM_HOOK_LIB_H__
-#define __SMM_CPU_PLATFORM_HOOK_LIB_H__
+#pragma once
 
 ///
 /// SMM Page Size Type
@@ -115,4 +114,22 @@ SmmCpuPlatformHookBeforeMmiHandler (
   VOID
   );
 
-#endif
+/**
+  This function determines whether the first CPU Synchronization should be executed unconditionally
+  when a SMI occurs.
+
+  If the function returns true, it indicates that there is no need to check the system configuration
+  and status, and the first CPU Synchronization should be executed unconditionally.
+
+  If the function returns false, it indicates that the first CPU Synchronization is not executed
+  unconditionally, and the decision to synchronize should be based on the system configuration and status.
+
+  @retval TRUE   The first CPU Synchronization is executed unconditionally.
+  @retval FALSE  The first CPU Synchronization is not executed unconditionally.
+
+**/
+BOOLEAN
+EFIAPI
+IsCpuSyncAlwaysNeeded (
+  VOID
+  );

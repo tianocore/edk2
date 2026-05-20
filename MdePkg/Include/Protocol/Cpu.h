@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_CPU_H__
-#define __ARCH_PROTOCOL_CPU_H__
+#pragma once
 
 #include <Protocol/DebugSupport.h>
 
@@ -282,5 +281,3 @@ struct _EFI_CPU_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiCpuArchProtocolGuid;
-
-#endif

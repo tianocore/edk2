@@ -8,8 +8,7 @@
   GUID defined in UEFI 2.0 spec.
 **/
 
-#ifndef __EFI_WIN_CERTIFICATE_H__
-#define __EFI_WIN_CERTIFICATE_H__
+#pragma once
 
 //
 // _WIN_CERTIFICATE.wCertificateType
@@ -116,5 +115,3 @@ typedef struct {
 } WIN_CERTIFICATE_EFI_PKCS1_15;
 
 extern EFI_GUID  gEfiCertTypeRsa2048Sha256Guid;
-
-#endif

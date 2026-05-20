@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __JSON_CAPSULE_GUID_H__
-#define __JSON_CAPSULE_GUID_H__
+#pragma once
 
 //
 // The address reported in the table entry identified by EFI_JSON_CAPSULE_DATA_TABLE_GUID will be
@@ -92,5 +91,3 @@ extern EFI_GUID  gEfiJsonConfigDataTableGuid;
 extern EFI_GUID  gEfiJsonCapsuleDataTableGuid;
 extern EFI_GUID  gEfiJsonCapsuleResultTableGuid;
 extern EFI_GUID  gEfiJsonCapsuleIdGuid;
-
-#endif

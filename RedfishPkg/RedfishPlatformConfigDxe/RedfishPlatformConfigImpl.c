@@ -2,7 +2,7 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -374,7 +374,6 @@ HiiGetRedfishAsciiString (
 
   HiiString = HiiGetRedfishString (HiiHandle, Language, StringId);
   if (HiiString == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Can not find string ID: 0x%x with %a\n", __func__, StringId, Language));
     return NULL;
   }
 
@@ -508,12 +507,16 @@ GetSupportedSchema (
   }
 
   if (Count == 0) {
+    FreePool (SupportedLanguages);
+
     return EFI_NOT_FOUND;
   }
 
   SupportedSchema->Count      = Count;
   SupportedSchema->SchemaList = AllocatePool (sizeof (CHAR8 *) * Count);
   if (SupportedSchema->SchemaList == NULL) {
+    FreePool (SupportedLanguages);
+
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -538,6 +541,8 @@ GetSupportedSchema (
 
     ++Index;
   }
+
+  FreePool (SupportedLanguages);
 
   return EFI_SUCCESS;
 }
@@ -1510,7 +1515,7 @@ BuildXUefiRedfishStringDatabase (
   UINTN                       TotalStringsAdded;
   UINTN                       NumberPackageStrings;
 
-  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-UEFI-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-UEFI-redfish string database, HII Formset GUID - %g.\n", __func__, &FormsetPrivate->Guid));
 
   BufferSize = 0;
   Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
@@ -1635,8 +1640,14 @@ LoadFormset (
   //
   ZeroMem (&ZeroGuid, sizeof (ZeroGuid));
   Status = CreateFormSetFromHiiHandle (HiiHandle, &ZeroGuid, HiiFormSet);
-  if (EFI_ERROR (Status) || IsListEmpty (&HiiFormSet->FormListHead)) {
-    DEBUG ((DEBUG_ERROR, "%a: Formset not found by HII handle - %g\n", __func__, FormsetPrivate->Guid));
+  if (EFI_ERROR (Status)) {
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_ERROR, "%a: Cannot create formset from HII handle (0x%x): %r\n", __func__, HiiHandle, Status));
+    }
+
+    goto ErrorExit;
+  } else if (IsListEmpty (&HiiFormSet->FormListHead)) {
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: there is no form in HII handle: 0x%x\n", __func__, HiiHandle));
     Status = EFI_NOT_FOUND;
     goto ErrorExit;
   }
@@ -1656,7 +1667,7 @@ LoadFormset (
   Status                        = GetSupportedSchema (FormsetPrivate->HiiHandle, &FormsetPrivate->SupportedSchema);
   if (EFI_ERROR (Status)) {
     if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
-      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-UEFI-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-UEFI-redfish configuration found on the formset - %g\n", __func__, &FormsetPrivate->Guid));
       //
       // If there is no x-UEFI-redfish language in this form-set, we don't add formset
       // since we don't need to build menu path for attribute registry.
@@ -1834,7 +1845,10 @@ LoadFormsetList (
   //
   Status = LoadFormset (HiiHandle, FormsetPrivate);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Formset is not loaded for edk2 redfish: %r\n", __func__, Status));
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_ERROR, "%a: Formset is not loaded for edk2 redfish: %r\n", __func__, Status));
+    }
+
     FreePool (FormsetPrivate);
     return Status;
   }
@@ -2086,7 +2100,7 @@ ProcessPendingList (
       //
       FormsetPrivate = GetFormsetPrivateByHiiHandle (Target->HiiHandle, FormsetList);
       if (FormsetPrivate != NULL) {
-        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset: %g is removed because driver release HII resource it already\n", __func__, FormsetPrivate->Guid));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset: %g is removed because driver release HII resource it already\n", __func__, &FormsetPrivate->Guid));
         RemoveEntryList (&FormsetPrivate->Link);
         ReleaseFormset (FormsetPrivate);
         FreePool (FormsetPrivate);
@@ -2111,7 +2125,9 @@ ProcessPendingList (
       Status = LoadFormsetList (Target->HiiHandle, FormsetList);
       if (EFI_ERROR (Status)) {
         if (Status == EFI_UNSUPPORTED) {
-          DEBUG ((DEBUG_ERROR, "  The formset has no x-UEFI-redfish configurations.\n"));
+          DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  The formset has no x-UEFI-redfish configurations.\n"));
+        } else if (Status == EFI_NOT_FOUND) {
+          DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  There is no formset or form on HII handle: 0x%x.\n", Target->HiiHandle));
         } else {
           DEBUG ((DEBUG_ERROR, "  load formset from HII handle: 0x%x failed: %r\n", Target->HiiHandle, Status));
         }

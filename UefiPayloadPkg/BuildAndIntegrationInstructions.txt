@@ -49,7 +49,7 @@ B. HOW TO BUILD
    <ToolChain> is the EDK II build environment on your host. Tested with VS2015x86 toolchain.
    <Bootloader> could be "SBL" for Slim Bootloader and "COREBOOT" for coreboot.
 
-   Refer to https://github.com/tianocore/tianocore.github.io/wiki/UDK2018-How-to-Build for
+   Refer to https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/build_instructions.html for
    details about EDK II build steps.
 
    NOTE: Pure 32bit UEFI payload support could be added if required later.

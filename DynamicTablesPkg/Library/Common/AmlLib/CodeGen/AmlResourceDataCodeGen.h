@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_RESOURCE_DATA_CODE_GEN_H_
-#define AML_RESOURCE_DATA_CODE_GEN_H_
+#pragma once
 
 /** Code generation for the "Interrupt ()" ASL function.
 
@@ -146,5 +145,3 @@ AmlCodeGenEndTag (
   IN  AML_OBJECT_NODE  *ParentNode  OPTIONAL,
   OUT AML_DATA_NODE    **NewRdNode   OPTIONAL
   );
-
-#endif // AML_RESOURCE_DATA_CODE_GEN_H_

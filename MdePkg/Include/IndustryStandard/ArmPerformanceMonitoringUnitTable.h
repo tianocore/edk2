@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ARM_PERFORMANCE_MONITORING_UNIT_TABLE_H_
-#define ARM_PERFORMANCE_MONITORING_UNIT_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -65,5 +64,3 @@ typedef struct {
 } EFI_ACPI_ARM_PERFORMANCE_MONITORING_UNIT_NODE;
 
 #pragma pack()
-
-#endif

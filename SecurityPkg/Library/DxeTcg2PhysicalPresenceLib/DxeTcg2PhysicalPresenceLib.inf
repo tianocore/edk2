@@ -50,10 +50,11 @@
   HobLib
   Tpm2CommandLib
   Tcg2PpVendorLib
+  VariablePolicyHelperLib
 
 [Protocols]
   gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid       ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid       ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags       ## SOMETIMES_CONSUMES

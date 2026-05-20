@@ -109,17 +109,6 @@ def PreProcess(Filename, MergeMultipleLines = True, LineNo = -1):
 
     return Lines
 
-## AddToGlobalMacro() method
-#
-#  Add a macro to EotGlobalData.gMACRO
-#
-#  @param  Name: Name of the macro
-#  @param  Value: Value of the macro
-#
-def AddToGlobalMacro(Name, Value):
-    Value = ReplaceMacro(Value, EotGlobalData.gMACRO, True)
-    EotGlobalData.gMACRO[Name] = Value
-
 ## AddToSelfMacro() method
 #
 #  Parse a line of macro definition and add it to a macro set
@@ -237,139 +226,6 @@ def GetAllIncludeFiles(Db):
                     IncludeFileList.append(Item)
 
     return IncludeFileList
-
-## GetAllSourceFiles() method
-#
-#  Find all source files
-#
-#  @param  Db: Eot database
-#
-#  @return SourceFileList: A list of source files
-#
-def GetAllSourceFiles(Db):
-    SourceFileList = []
-    SqlCommand = """select distinct Value1 from Inf where Model = %s order by Value1""" % MODEL_EFI_SOURCE_FILE
-    RecordSet = Db.TblInf.Exec(SqlCommand)
-
-    for Record in RecordSet:
-        SourceFileList.append(Record[0])
-
-    return SourceFileList
-
-## GetAllFiles() method
-#
-#  Find all files, both source files and include files
-#
-#  @param  Db: Eot database
-#
-#  @return FileList: A list of files
-#
-def GetAllFiles(Db):
-    FileList = []
-    IncludeFileList = GetAllIncludeFiles(Db)
-    SourceFileList = GetAllSourceFiles(Db)
-    for Item in IncludeFileList:
-        if os.path.isfile(Item) and Item not in FileList:
-            FileList.append(Item)
-    for Item in SourceFileList:
-        if os.path.isfile(Item) and Item not in FileList:
-            FileList.append(Item)
-
-    return FileList
-
-## ParseConditionalStatement() method
-#
-#  Parse conditional statement
-#
-#  @param Line: One line to be parsed
-#  @param Macros: A set of all macro
-#  @param StatusSet: A set of all status
-#
-#  @retval True: Find keyword of conditional statement
-#  @retval False: Not find keyword of conditional statement
-#
-def ParseConditionalStatement(Line, Macros, StatusSet):
-    NewLine = Line.upper()
-    if NewLine.find(TAB_IF_EXIST.upper()) > -1:
-        IfLine = Line[NewLine.find(TAB_IF_EXIST) + len(TAB_IF_EXIST) + 1:].strip()
-        IfLine = ReplaceMacro(IfLine, EotGlobalData.gMACRO, True)
-        IfLine = ReplaceMacro(IfLine, Macros, True)
-        IfLine = IfLine.replace("\"", '')
-        IfLine = IfLine.replace("(", '')
-        IfLine = IfLine.replace(")", '')
-        Status = os.path.exists(os.path.normpath(IfLine))
-        StatusSet.append([Status])
-        return True
-    if NewLine.find(TAB_IF_DEF.upper()) > -1:
-        IfLine = Line[NewLine.find(TAB_IF_DEF) + len(TAB_IF_DEF) + 1:].strip()
-        Status = False
-        if IfLine in Macros or IfLine in EotGlobalData.gMACRO:
-            Status = True
-        StatusSet.append([Status])
-        return True
-    if NewLine.find(TAB_IF_N_DEF.upper()) > -1:
-        IfLine = Line[NewLine.find(TAB_IF_N_DEF) + len(TAB_IF_N_DEF) + 1:].strip()
-        Status = False
-        if IfLine not in Macros and IfLine not in EotGlobalData.gMACRO:
-            Status = True
-        StatusSet.append([Status])
-        return True
-    if NewLine.find(TAB_IF.upper()) > -1:
-        IfLine = Line[NewLine.find(TAB_IF) + len(TAB_IF) + 1:].strip()
-        Status = ParseConditionalStatementMacros(IfLine, Macros)
-        StatusSet.append([Status])
-        return True
-    if NewLine.find(TAB_ELSE_IF.upper()) > -1:
-        IfLine = Line[NewLine.find(TAB_ELSE_IF) + len(TAB_ELSE_IF) + 1:].strip()
-        Status = ParseConditionalStatementMacros(IfLine, Macros)
-        StatusSet[-1].append(Status)
-        return True
-    if NewLine.find(TAB_ELSE.upper()) > -1:
-        Status = False
-        for Item in StatusSet[-1]:
-            Status = Status or Item
-        StatusSet[-1].append(not Status)
-        return True
-    if NewLine.find(TAB_END_IF.upper()) > -1:
-        StatusSet.pop()
-        return True
-
-    return False
-
-## ParseConditionalStatement() method
-#
-#  Parse conditional statement with Macros
-#
-#  @param Line: One line to be parsed
-#  @param Macros: A set of macros
-#
-#  @return Line: New line after replacing macros
-#
-def ParseConditionalStatementMacros(Line, Macros):
-    if Line.upper().find('DEFINED(') > -1 or Line.upper().find('EXIST') > -1:
-        return False
-    Line = ReplaceMacro(Line, EotGlobalData.gMACRO, True)
-    Line = ReplaceMacro(Line, Macros, True)
-    Line = Line.replace("&&", "and")
-    Line = Line.replace("||", "or")
-    return eval(Line)
-
-## GetConditionalStatementStatus() method
-#
-#  1. Assume the latest status as True
-#  2. Pop the top status of status set, previous status
-#  3. Compare the latest one and the previous one and get new status
-#
-#  @param StatusSet: A set of all status
-#
-#  @return Status: The final status
-#
-def GetConditionalStatementStatus(StatusSet):
-    Status = True
-    for Item in StatusSet:
-        Status = Status and Item[-1]
-
-    return Status
 
 ## SearchBelongsToFunction() method
 #
@@ -818,47 +674,6 @@ def ParseMapFile(Files):
                 continue
 
     return AllMaps
-
-## ConvertGuid
-#
-#  Convert a GUID to a GUID with all upper letters
-#
-#  @param guid:  The GUID to be converted
-#
-#  @param newGuid: The GUID with all upper letters.
-#
-def ConvertGuid(guid):
-    numList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-    newGuid = ''
-    if guid.startswith('g'):
-        guid = guid[1:]
-    for i in guid:
-        if i.upper() == i and i not in numList:
-            newGuid = newGuid + ('_' + i)
-        else:
-            newGuid = newGuid + i.upper()
-    if newGuid.startswith('_'):
-        newGuid = newGuid[1:]
-    if newGuid.endswith('_'):
-        newGuid = newGuid[:-1]
-
-    return newGuid
-
-## ConvertGuid2() method
-#
-#  Convert a GUID to a GUID with new string instead of old string
-#
-#  @param guid: The GUID to be converted
-#  @param old: Old string to be replaced
-#  @param new: New string to replace the old one
-#
-#  @param newGuid: The GUID after replacement
-#
-def ConvertGuid2(guid, old, new):
-    newGuid = ConvertGuid(guid)
-    newGuid = newGuid.replace(old, new)
-
-    return newGuid
 
 ##
 #

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __PVSCSI_DXE_H_
-#define __PVSCSI_DXE_H_
+#pragma once
 
 #include <Library/DebugLib.h>
 #include <Protocol/ScsiPassThruExt.h>
@@ -68,5 +67,3 @@ typedef struct {
 
 #define PVSCSI_DMA_BUF_DEV_ADDR(Dev, MemberName) \
   (Dev->DmaBufDmaDesc.DeviceAddress + OFFSET_OF(PVSCSI_DMA_BUFFER, MemberName))
-
-#endif // __PVSCSI_DXE_H_

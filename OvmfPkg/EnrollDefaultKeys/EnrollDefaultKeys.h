@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ENROLL_DEFAULT_KEYS_H_
-#define ENROLL_DEFAULT_KEYS_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -124,13 +123,23 @@ typedef struct {
 extern CONST UINT8  mMicrosoftKek[];
 extern CONST UINTN  mSizeOfMicrosoftKek;
 
+extern CONST UINT8  mMicrosoftKek2023[];
+extern CONST UINTN  mSizeOfMicrosoftKek2023;
+
 extern CONST UINT8  mMicrosoftPca[];
 extern CONST UINTN  mSizeOfMicrosoftPca;
 
 extern CONST UINT8  mMicrosoftUefiCa[];
 extern CONST UINTN  mSizeOfMicrosoftUefiCa;
 
+extern CONST UINT8  mMicrosoftUefiCa2023[];
+extern CONST UINTN  mSizeOfMicrosoftUefiCa2023;
+
+extern CONST UINT8  mMicrosoftUefiOpRom2023[];
+extern CONST UINTN  mSizeOfMicrosoftUefiOpRom2023;
+
+extern CONST UINT8  mWindowsUefi2023[];
+extern CONST UINTN  mSizeOfWindowsUefi2023;
+
 extern CONST UINT8  mSha256OfDevNull[];
 extern CONST UINTN  mSizeOfSha256OfDevNull;
-
-#endif /* ENROLL_DEFAULT_KEYS_H_ */

@@ -976,7 +976,7 @@ EndList
                 self.Error = 'No DSC file change, skip to create UPD TXT file'
                 return 256
 
-            TxtFd = open(UpdTxtFile, "w")
+            TxtFd = open(UpdTxtFile, "w", newline="\r\n")
             TxtFd.write("%s\n"   % (__copyright_txt__ % date.today().year))
 
             NextOffset = 0
@@ -1421,16 +1421,16 @@ EndList
 
         for item in range(len(UpdRegionCheck)):
             if UpdRegionCheck[item] == 'FSPT':
-                HeaderFd = open(os.path.join(FvDir, HeaderTFileName), "w")
+                HeaderFd = open(os.path.join(FvDir, HeaderTFileName), "w", newline="\r\n")
                 FileBase = os.path.basename(os.path.join(FvDir, HeaderTFileName))
             elif UpdRegionCheck[item] == 'FSPM':
-                HeaderFd = open(os.path.join(FvDir, HeaderMFileName), "w")
+                HeaderFd = open(os.path.join(FvDir, HeaderMFileName), "w", newline="\r\n")
                 FileBase = os.path.basename(os.path.join(FvDir, HeaderMFileName))
             elif UpdRegionCheck[item] == 'FSPS':
-                HeaderFd = open(os.path.join(FvDir, HeaderSFileName), "w")
+                HeaderFd = open(os.path.join(FvDir, HeaderSFileName), "w", newline="\r\n")
                 FileBase = os.path.basename(os.path.join(FvDir, HeaderSFileName))
             elif UpdRegionCheck[item] == 'FSPI':
-                HeaderFd = open(os.path.join(FvDir, HeaderIFileName), "w")
+                HeaderFd = open(os.path.join(FvDir, HeaderIFileName), "w", newline="\r\n")
                 FileBase = os.path.basename(os.path.join(FvDir, HeaderIFileName))
             FileName = FileBase.replace(".", "_").upper()
             HeaderFd.write("%s\n"   % (__copyright_h__ % date.today().year))
@@ -1489,7 +1489,7 @@ EndList
             HeaderFd.write("#endif\n")
             HeaderFd.close()
 
-        HeaderFd = open(HeaderFile, "w")
+        HeaderFd = open(HeaderFile, "w", newline="\r\n")
         FileBase = os.path.basename(HeaderFile)
         FileName = FileBase.replace(".", "_").upper()
         HeaderFd.write("%s\n"   % (__copyright_h__ % date.today().year))
@@ -1625,7 +1625,7 @@ EndList
 
         Error = 0
         OptionDict = {}
-        BsfFd      = open(BsfFile, "w")
+        BsfFd      = open(BsfFile, "w", newline="\r\n")
         BsfFd.write("%s\n" % (__copyright_bsf__ % date.today().year))
         BsfFd.write("%s\n" % self._GlobalDataDef)
         BsfFd.write("StructDef\n")

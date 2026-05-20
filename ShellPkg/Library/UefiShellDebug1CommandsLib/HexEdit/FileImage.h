@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _LIB_FILE_IMAGE_H_
-#define _LIB_FILE_IMAGE_H_
+#pragma once
 
 #include "HexEditor.h"
 
@@ -73,5 +72,3 @@ EFI_STATUS
 HFileImageSave (
   IN CHAR16  *FileName
   );
-
-#endif

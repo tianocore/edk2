@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -183,6 +184,13 @@ CoreDispatchEventNotifies (
     // Notify this event
     //
     ASSERT (Event->NotifyFunction != NULL);
+
+    if ((Event->Type & EVT_NOTIFY_SIGNAL) != 0) {
+      if (!IsZeroGuid (&Event->EventGroup) && !CompareGuid (&Event->EventGroup, &gIdleLoopEventGuid)) {
+        DEBUG ((DEBUG_EVENT, "Run Event Group Notify: %g (%p)\n", &Event->EventGroup, Event->NotifyFunction));
+      }
+    }
+
     Event->NotifyFunction (Event, Event->NotifyContext);
 
     //
@@ -483,16 +491,20 @@ CoreCreateEventInternal (
     InsertTailList (&gRuntime->EventHead, &IEvent->RuntimeData.Link);
   }
 
-  CoreAcquireEventLock ();
+  if ((Type & EVT_NOTIFY_SIGNAL) != 0) {
+    if (!IsZeroGuid (&IEvent->EventGroup) && !CompareGuid (&IEvent->EventGroup, &gIdleLoopEventGuid)) {
+      DEBUG ((DEBUG_EVENT, "Register Event Group Notify: %g (%p)\n", &IEvent->EventGroup, IEvent->NotifyFunction));
+    }
 
-  if ((Type & EVT_NOTIFY_SIGNAL) != 0x00000000) {
     //
     // The Event's NotifyFunction must be queued whenever the event is signaled
     //
-    InsertHeadList (&gEventSignalQueue, &IEvent->SignalLink);
-  }
+    CoreAcquireEventLock ();
 
-  CoreReleaseEventLock ();
+    InsertHeadList (&gEventSignalQueue, &IEvent->SignalLink);
+
+    CoreReleaseEventLock ();
+  }
 
   //
   // Done

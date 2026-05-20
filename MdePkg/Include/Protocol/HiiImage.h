@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __HII_IMAGE_H__
-#define __HII_IMAGE_H__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -110,7 +109,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND          The image specified by ImageId is not
                                  available. Or The specified PackageList is not in the database.
 
-  @retval EFI_INVALID_PARAMETER  The Image or Langugae was NULL.
+  @retval EFI_INVALID_PARAMETER  The Image or Language was NULL.
   @retval EFI_OUT_OF_RESOURCES   The bitmap could not be retrieved because there was not
                                  enough memory.
 
@@ -342,5 +341,3 @@ struct _EFI_HII_IMAGE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHiiImageProtocolGuid;
-
-#endif

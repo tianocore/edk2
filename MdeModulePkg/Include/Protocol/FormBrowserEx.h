@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FORM_BROWSER_EXTENSION_H__
-#define __FORM_BROWSER_EXTENSION_H__
+#pragma once
 
 #define FORM_BROWSER_EXTENSION_PROTOCOL_GUID  \
   { 0x1f73b18d, 0x4630, 0x43c1, { 0xa1, 0xde, 0x6f, 0x80, 0x85, 0x5d, 0x7d, 0xa4 } }
@@ -144,5 +143,3 @@ struct _EDKII_FORM_BROWSER_EXTENSION_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiFormBrowserExProtocolGuid;
-
-#endif

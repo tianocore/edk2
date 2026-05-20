@@ -72,19 +72,3 @@ class TableDataModel(Table):
             Description = Item[0]
             self.Insert(CrossIndex, Name, Description)
         EdkLogger.verbose("Initialize table DataModel ... DONE!")
-
-    ## Get CrossIndex
-    #
-    # Get a model's cross index from its name
-    #
-    # @param ModelName:    Name of the model
-    # @retval CrossIndex:  CrossIndex of the model
-    #
-    def GetCrossIndex(self, ModelName):
-        CrossIndex = -1
-        SqlCommand = """select CrossIndex from DataModel where name = '""" + ModelName + """'"""
-        self.Cur.execute(SqlCommand)
-        for Item in self.Cur:
-            CrossIndex = Item[0]
-
-        return CrossIndex

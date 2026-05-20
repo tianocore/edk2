@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EMU_THUNK_LIB_H__
-#define __EMU_THUNK_LIB_H__
+#pragma once
 
 #include <Protocol/EmuThunk.h>
 
@@ -29,5 +28,3 @@ GetIoThunkInstance (
   IN  EFI_GUID  *Protocol,
   IN  UINTN     Instance
   );
-
-#endif

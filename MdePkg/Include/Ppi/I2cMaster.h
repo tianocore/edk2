@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __I2C_MASTER_PPI_H__
-#define __I2C_MASTER_PPI_H__
+#pragma once
 
 #include <Pi/PiI2c.h>
 
@@ -98,5 +97,3 @@ struct _EFI_PEI_I2C_MASTER_PPI {
 };
 
 extern EFI_GUID  gEfiPeiI2cMasterPpiGuid;
-
-#endif

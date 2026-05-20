@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_DEBUG1_COMMANDS_LIB_H_
-#define _UEFI_SHELL_DEBUG1_COMMANDS_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -50,6 +49,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 #include <Library/HandleParsingLib.h>
+#include <Library/SafeIntLib.h>
 
 extern        EFI_HII_HANDLE  gShellDebug1HiiHandle;
 
@@ -239,6 +239,19 @@ ShellCommandRunPci (
   );
 
 /**
+  Function for 'cxl' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunCxl (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+/**
   Function for 'smbiosview' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -372,5 +385,3 @@ ReadFileIntoBuffer (
   OUT UINTN        *BufferSize OPTIONAL,
   OUT BOOLEAN      *ReadOnly
   );
-
-#endif

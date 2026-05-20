@@ -15,7 +15,7 @@
   PLATFORM_VERSION        = 1.00
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/UnitTestFrameworkPkg
-  SUPPORTED_ARCHITECTURES = IA32|X64|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES = IA32|X64|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS           = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -23,7 +23,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [PcdsPatchableInModule]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1F
 
 [Components]
   UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf

@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __KMS_H__
-#define __KMS_H__
+#pragma once
 
 #define EFI_KMS_PROTOCOL_GUID \
   { \
@@ -920,7 +919,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER      This is NULL, ClientId is required but it is NULL,
                                      KeyAttributesCount is NULL, or KeyAttributes
                                      is NULL, or KeyIdentifierSize is NULL, or
-                                     KeyIdentifer is NULL.
+                                     KeyIdentifier is NULL.
   @retval EFI_NOT_FOUND              The KeyIdentifier could not be found. On return the
                                      KeyAttributesCount contains the number of attributes
                                      processed. Individual structures will reflect the status of the
@@ -1002,7 +1001,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER      This is NULL, ClientId is required but it is NULL,
                                      KeyAttributesCount is NULL, or
                                      KeyAttributes is NULL, or KeyIdentifierSize
-                                     is NULL, or KeyIdentifer is NULL.
+                                     is NULL, or KeyIdentifier is NULL.
   @retval EFI_NOT_FOUND              The KeyIdentifier could not be found or the attribute
                                      could not be found. On return the KeyAttributesCount
                                      contains the number of attributes processed. Individual
@@ -1332,5 +1331,3 @@ extern EFI_GUID  gEfiKmsFormatRsasha12048Guid;
 extern EFI_GUID  gEfiKmsFormatRsasha2562048Guid;
 extern EFI_GUID  gEfiKmsFormatRsasha2563072Guid;
 extern EFI_GUID  gEfiKmsProtocolGuid;
-
-#endif

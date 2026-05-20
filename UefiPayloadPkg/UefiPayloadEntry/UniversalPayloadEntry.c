@@ -4,7 +4,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
+#include <Guid/MemoryTypeInformation.h>
 #include "UefiPayloadEntry.h"
 
 #define MEMORY_ATTRIBUTE_MASK  (EFI_RESOURCE_ATTRIBUTE_PRESENT             |        \
@@ -34,6 +34,15 @@ VOID
 PrintHob (
   IN CONST VOID  *HobStart
   );
+
+EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
+  { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory)   },
+  { EfiACPIMemoryNVS,       FixedPcdGet32 (PcdMemoryTypeEfiACPIMemoryNVS)       },
+  { EfiReservedMemoryType,  FixedPcdGet32 (PcdMemoryTypeEfiReservedMemoryType)  },
+  { EfiRuntimeServicesData, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesData) },
+  { EfiRuntimeServicesCode, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesCode) },
+  { EfiMaxMemoryType,       0                                                   }
+};
 
 /**
   Some bootloader may pass a pcd database, and UPL also contain a PCD database.
@@ -481,6 +490,17 @@ _ModuleEntryPoint (
   // Build HOB based on information from Bootloader
   Status = BuildHobs (BootloaderParameter, &DxeFv);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Create Memory Type Information HOB
+  //
+  if (GetFirstGuidHob (&gEfiMemoryTypeInformationGuid) == NULL) {
+    BuildGuidDataHob (
+      &gEfiMemoryTypeInformationGuid,
+      mDefaultMemoryTypeInformation,
+      sizeof (mDefaultMemoryTypeInformation)
+      );
+  }
 
   FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);

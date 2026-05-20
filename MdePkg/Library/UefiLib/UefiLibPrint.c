@@ -65,7 +65,11 @@ InternalPrint (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   Return = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
@@ -199,7 +203,11 @@ AsciiInternalPrint (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   Return = UnicodeVSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 
@@ -344,20 +352,14 @@ InternalPrintGraphic (
   EFI_STATUS                       Status;
   UINT32                           HorizontalResolution;
   UINT32                           VerticalResolution;
-  UINT32                           ColorDepth;
-  UINT32                           RefreshRate;
   EFI_HII_FONT_PROTOCOL            *HiiFont;
   EFI_IMAGE_OUTPUT                 *Blt;
   EFI_FONT_DISPLAY_INFO            FontInfo;
   EFI_HII_ROW_INFO                 *RowInfoArray;
   UINTN                            RowInfoArraySize;
   EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Sto;
   EFI_HANDLE                       ConsoleHandle;
-  UINTN                            Width;
-  UINTN                            Height;
-  UINTN                            Delta;
 
   HorizontalResolution = 0;
   VerticalResolution   = 0;
@@ -373,21 +375,6 @@ InternalPrintGraphic (
                   &gEfiGraphicsOutputProtocolGuid,
                   (VOID **)&GraphicsOutput
                   );
-
-  UgaDraw = NULL;
-  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
-    //
-    // If no GOP available, try to open UGA Draw protocol if supported.
-    //
-    GraphicsOutput = NULL;
-
-    Status = gBS->HandleProtocol (
-                    ConsoleHandle,
-                    &gEfiUgaDrawProtocolGuid,
-                    (VOID **)&UgaDraw
-                    );
-  }
-
   if (EFI_ERROR (Status)) {
     goto Error;
   }
@@ -405,8 +392,6 @@ InternalPrintGraphic (
   if (GraphicsOutput != NULL) {
     HorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
     VerticalResolution   = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else if ((UgaDraw != NULL) && FeaturePcdGet (PcdUgaConsumeSupport)) {
-    UgaDraw->GetMode (UgaDraw, &HorizontalResolution, &VerticalResolution, &ColorDepth, &RefreshRate);
   } else {
     goto Error;
   }
@@ -419,7 +404,11 @@ InternalPrintGraphic (
   }
 
   Blt = (EFI_IMAGE_OUTPUT *)AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
-  ASSERT (Blt != NULL);
+
+  if (Blt == NULL) {
+    ASSERT (Blt != NULL);
+    goto Error;
+  }
 
   Blt->Width  = (UINT16)(HorizontalResolution);
   Blt->Height = (UINT16)(VerticalResolution);
@@ -466,73 +455,6 @@ InternalPrintGraphic (
     if (EFI_ERROR (Status)) {
       goto Error;
     }
-  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
-    ASSERT (UgaDraw != NULL);
-
-    //
-    // Ensure Width * Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) doesn't overflow.
-    //
-    if (Blt->Width > DivU64x32 (MAX_UINTN, Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
-      goto Error;
-    }
-
-    Blt->Image.Bitmap = AllocateZeroPool ((UINT32)Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-    ASSERT (Blt->Image.Bitmap != NULL);
-
-    //
-    //  StringToImage only support blt'ing image to device using GOP protocol. If GOP is not supported in this platform,
-    //  we ask StringToImage to print the string to blt buffer, then blt to device using UgaDraw.
-    //
-    Status = HiiFont->StringToImage (
-                        HiiFont,
-                        EFI_HII_IGNORE_IF_NO_GLYPH | EFI_HII_OUT_FLAG_CLIP |
-                        EFI_HII_OUT_FLAG_CLIP_CLEAN_X | EFI_HII_OUT_FLAG_CLIP_CLEAN_Y |
-                        EFI_HII_IGNORE_LINE_BREAK,
-                        Buffer,
-                        &FontInfo,
-                        &Blt,
-                        PointX,
-                        PointY,
-                        &RowInfoArray,
-                        &RowInfoArraySize,
-                        NULL
-                        );
-
-    if (!EFI_ERROR (Status)) {
-      ASSERT (RowInfoArray != NULL);
-      //
-      // Explicit Line break characters are ignored, so the updated parameter RowInfoArraySize by StringToImage will
-      // always be 1 or 0 (if there is no valid Unicode Char can be printed). ASSERT here to make sure.
-      //
-      ASSERT (RowInfoArraySize <= 1);
-
-      if (RowInfoArraySize != 0) {
-        Width  = RowInfoArray[0].LineWidth;
-        Height = RowInfoArray[0].LineHeight;
-        Delta  = Blt->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
-      } else {
-        Width  = 0;
-        Height = 0;
-        Delta  = 0;
-      }
-
-      Status = UgaDraw->Blt (
-                          UgaDraw,
-                          (EFI_UGA_PIXEL *)Blt->Image.Bitmap,
-                          EfiUgaBltBufferToVideo,
-                          PointX,
-                          PointY,
-                          PointX,
-                          PointY,
-                          Width,
-                          Height,
-                          Delta
-                          );
-    } else {
-      goto Error;
-    }
-
-    FreePool (Blt->Image.Bitmap);
   } else {
     goto Error;
   }
@@ -625,7 +547,11 @@ PrintXY (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   PrintNum = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
@@ -703,7 +629,11 @@ AsciiPrintXY (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   PrintNum = UnicodeSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 

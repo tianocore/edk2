@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB_LIB_H_
-#define _PEI_USB_LIB_H_
+#pragma once
+
 //
 // Standard device request and request type
 // By [Spec-USB20/Chapter-9.4]
@@ -134,5 +134,3 @@ PeiUsbClearEndpointHalt (
   IN PEI_USB_IO_PPI    *UsbIoPpi,
   IN UINT8             EndpointAddress
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ARP_DRIVER_H_
-#define _ARP_DRIVER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -326,5 +325,3 @@ ArpComponentNameGetControllerName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif

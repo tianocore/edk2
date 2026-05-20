@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UGA_H_
-#define __UGA_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -60,8 +59,6 @@ typedef struct {
 extern EFI_DRIVER_BINDING_PROTOCOL  gEmuGopDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gEmuGopComponentName;
 
-#define EMU_UGA_CLASS_NAME  L"EmuGopWindow"
-
 #define GOP_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('G', 'o', 'p', 'N')
 typedef struct {
   UINT64                               Signature;
@@ -83,7 +80,7 @@ typedef struct {
   GOP_MODE_DATA                        *ModeData;
 
   //
-  // UGA Private Data knowing when to start hardware
+  // Private Data knowing when to start hardware
   //
   BOOLEAN                              HardwareNeedsStarting;
 
@@ -178,5 +175,3 @@ GopPrivateBreakCallbackFunction (
   IN VOID          *Context,
   IN EFI_KEY_DATA  *KeyData
   );
-
-#endif

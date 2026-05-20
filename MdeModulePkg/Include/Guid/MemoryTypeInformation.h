@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef __MEMORY_TYPE_INFORMATION_GUID_H__
-#define __MEMORY_TYPE_INFORMATION_GUID_H__
+#pragma once
 
 #define EFI_MEMORY_TYPE_INFORMATION_GUID \
   { 0x4c19049f,0x4137,0x4dd3, { 0x9c,0x10,0x8b,0x97,0xa8,0x3f,0xfd,0xfa } }
@@ -30,5 +29,3 @@ typedef struct {
   UINT32    Type;           ///< EFI memory type defined in UEFI specification.
   UINT32    NumberOfPages;  ///< The pages of this type memory.
 } EFI_MEMORY_TYPE_INFORMATION;
-
-#endif

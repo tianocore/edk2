@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PI_SMM_CORE_PRIVATE_DATA_H_
-#define _PI_SMM_CORE_PRIVATE_DATA_H_
+#pragma once
 
 ///
 /// Define values for the communications buffer used when gEfiEventDxeDispatchGuid is
@@ -115,5 +114,3 @@ typedef struct {
   UINT64                   PiSmmCoreImageSize;
   EFI_PHYSICAL_ADDRESS     PiSmmCoreEntryPoint;
 } SMM_CORE_PRIVATE_DATA;
-
-#endif

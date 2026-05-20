@@ -10,8 +10,8 @@
 
 **/
 
-#ifndef __EFI_SUPER_IO_PROTOCOL_H__
-#define __EFI_SUPER_IO_PROTOCOL_H__
+#pragma once
+
 #include <IndustryStandard/Acpi.h>
 
 #define EFI_SIO_PROTOCOL_GUID \
@@ -165,5 +165,3 @@ struct _EFI_SIO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSioProtocolGuid;
-
-#endif // __EFI_SUPER_IO_PROTOCOL_H__

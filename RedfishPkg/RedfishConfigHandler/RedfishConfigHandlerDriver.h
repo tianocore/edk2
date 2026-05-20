@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EFI_REDFISH_CONFIG_HANDLER_DRIVER_H_
-#define EFI_REDFISH_CONFIG_HANDLER_DRIVER_H_
+#pragma once
 
 #include "RedfishConfigHandlerCommon.h"
 
@@ -158,5 +157,3 @@ RedfishConfigDriverBindingStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   );
-
-#endif

@@ -59,7 +59,7 @@ HttpUtilitiesDxeUnload (
                     EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Exit;
     }
 
     //
@@ -72,11 +72,16 @@ HttpUtilitiesDxeUnload (
                     NULL
                     );
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Exit;
     }
   }
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+Exit:
+  gBS->FreePool (HandleBuffer);
+
+  return Status;
 }
 
 /**

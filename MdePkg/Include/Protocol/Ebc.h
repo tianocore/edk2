@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_EBC_PROTOCOL_H__
-#define __EFI_EBC_PROTOCOL_H__
+#pragma once
 
 #define EFI_EBC_INTERPRETER_PROTOCOL_GUID \
   { \
@@ -255,7 +254,7 @@ EFI_STATUS
   the processor instruction cache following creation of thunks.
 
   @param  This       A pointer to the EFI_EBC_PROTOCOL instance.
-  @param  Flush      Pointer to a function of type EBC_ICACH_FLUSH.
+  @param  Flush      Pointer to a function of type EBC_ICACHE_FLUSH.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -304,5 +303,3 @@ struct _EFI_EBC_PROTOCOL {
 // Extern the global EBC protocol GUID
 //
 extern EFI_GUID  gEfiEbcProtocolGuid;
-
-#endif

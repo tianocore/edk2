@@ -11,8 +11,7 @@
     - DT     - Device Tree
 **/
 
-#ifndef DYNAMIC_TABLE_FACTORY_H_
-#define DYNAMIC_TABLE_FACTORY_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -49,6 +48,13 @@ typedef struct DynamicTableFactoryInfo {
         CustomDtTableGeneratorList[FixedPcdGet16 (
                                  PcdMaxCustomDTGenerators
                                  )];
+
+  /// An array for holding a map of SMBIOS handles and the CM Object
+  /// token used to build the SMBIOS record.
+  SMBIOS_HANDLE_MAP
+        SmbiosHandleMap[FixedPcdGet16 (
+                      PcdMaxSmbiosHandleMapEntries
+                      )];
 } EDKII_DYNAMIC_TABLE_FACTORY_INFO;
 
 /** Return a pointer to the ACPI table generator.
@@ -115,5 +121,3 @@ GetDtTableGenerator (
   );
 
 #pragma pack()
-
-#endif // DYNAMIC_TABLE_FACTORY_H_

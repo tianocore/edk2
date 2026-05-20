@@ -2,6 +2,7 @@
   SPCR Table Generator
 
   Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -14,6 +15,7 @@
 #include <IndustryStandard/DebugPort2Table.h>
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <Library/AcpiLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/AcpiTable.h>
@@ -34,6 +36,8 @@ Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
   - EArchCommonObjConsolePortInfo
+  - EArchCommonObjSpcrInfo (OPTIONAL)
+
 
 NOTE: This implementation ignores the possibility that the Serial settings may
       be modified from the UEFI Shell.  A more complex handler would be needed
@@ -42,6 +46,14 @@ NOTE: This implementation ignores the possibility that the Serial settings may
 */
 
 #pragma pack(1)
+
+/** Valid SPCR interrupt types
+*/
+#define SPCR_VALID_INTERRUPT_TYPES  \
+  (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC)
 
 /** A string representing the name of the SPCR port.
 */
@@ -60,11 +72,11 @@ NOTE: This implementation ignores the possibility that the Serial settings may
   Note: fields marked "{Template}" will be updated dynamically.
 */
 STATIC
-EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  AcpiSpcr = {
+EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  AcpiSpcr = {
   ACPI_HEADER (
     EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
-    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
-    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4,
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4
     ),
   0, // {Template}: Serial Port Subtype
   {
@@ -89,7 +101,10 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  AcpiSpcr = {
   0x00,
   0x00000000,
   0x00,
-  EFI_ACPI_RESERVED_DWORD
+  0, // {Template}: UART Clock Frequency
+  0, // {Template}: Precise Baud Rate
+  sizeof (NAME_STR_SPCR_PORT),
+  OFFSET_OF (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4, NameSpaceString)
 };
 
 #pragma pack()
@@ -102,6 +117,187 @@ GET_OBJECT_LIST (
   EArchCommonObjConsolePortInfo,
   CM_ARCH_COMMON_SERIAL_PORT_INFO
   )
+
+/** This macro expands to a function that retrieves the Serial
+  Terminal and Interrupt Information from the Configuration Manager.
+  This object is optional.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjSpcrInfo,
+  CM_ARCH_COMMON_SPCR_INFO
+  )
+
+/** Validate the Serial Port Terminal Interrupt Information.
+
+  @param [in]  SerialPortInfo Pointer to the Serial Port Information.
+  @param [in]  SpcrInfo       Pointer to the SPCR additional Information.
+
+  @retval EFI_SUCCESS           The information is valid.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ValidateSerialTerminalInterruptInfo (
+  IN  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo,
+  IN  CM_ARCH_COMMON_SPCR_INFO         *SpcrInfo
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((SerialPortInfo == NULL) || (SpcrInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = EFI_SUCCESS;
+  if ((SpcrInfo->TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT100) &&
+      (SpcrInfo->TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT100_PLUS) &&
+      (SpcrInfo->TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT_UTF8) &&
+      (SpcrInfo->TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SPCR: Invalid terminal type %d for serial terminal.\n",
+      SpcrInfo->TerminalType
+      ));
+    Status |= EFI_INVALID_PARAMETER;
+  }
+
+  if ((SerialPortInfo->PortSubtype == EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550) &&
+      (SerialPortInfo->AccessSize > EFI_ACPI_6_3_UNDEFINED))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SPCR: Access size must be %d for legacy 16550 UART.\n",
+      EFI_ACPI_6_3_UNDEFINED
+      ));
+    Status |= EFI_INVALID_PARAMETER;
+  }
+
+  if (SerialPortInfo->PortSubtype == EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS) {
+    if ((SerialPortInfo->AccessSize <= EFI_ACPI_6_3_UNDEFINED) ||
+        (SerialPortInfo->AccessSize >= EFI_ACPI_6_3_QWORD))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Access size must be > %d and < %d for 16550 with GAS.\n",
+        EFI_ACPI_6_3_UNDEFINED,
+        EFI_ACPI_6_3_QWORD
+        ));
+      Status |= EFI_INVALID_PARAMETER;
+    }
+  }
+
+  if (SpcrInfo->InterruptType != 0) {
+    // Check that reserved bits [5:7] are zero
+    if ((SpcrInfo->InterruptType & ~(SPCR_VALID_INTERRUPT_TYPES)) != 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Reserved bits [5:7] must be zero in interrupt type (0x%02x).\n",
+        SpcrInfo->InterruptType
+        ));
+      Status |= EFI_INVALID_PARAMETER;
+    }
+
+    if ((((SpcrInfo->InterruptType) &
+          (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC)) != 0) &&
+        (SpcrInfo->InterruptType !=
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: %d GIC interrupt type cannot be combined with others.\n",
+        SpcrInfo->InterruptType
+        ));
+      Status |= EFI_INVALID_PARAMETER;
+    }
+
+    if ((SpcrInfo->InterruptType &
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC) != 0)
+    {
+      if ((SpcrInfo->InterruptType &
+           ~(EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 |
+             EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC)) != 0)
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: %d Invalid APIC interrupt type.\n",
+          SpcrInfo->InterruptType
+          ));
+        Status |= EFI_INVALID_PARAMETER;
+      }
+    }
+
+    if ((SpcrInfo->InterruptType &
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC) != 0)
+    {
+      if ((SpcrInfo->InterruptType &
+           ~(EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 | \
+             EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC)) != 0)
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: %d Invalid SAPIC interrupt type.\n",
+          SpcrInfo->InterruptType
+          ));
+        Status |= EFI_INVALID_PARAMETER;
+      }
+    }
+
+    if ((SpcrInfo->InterruptType & EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259) != 0) {
+      // For legacy devices, only GSIs below 32 are used.
+      // Valid IRQs: 2-7, 9-12, 14-15. Reserved: 0-1, 8, 13, 16-255.
+      if (!(((SerialPortInfo->Interrupt >= 2) && (SerialPortInfo->Interrupt <= 7)) ||
+            ((SerialPortInfo->Interrupt >= 9) && (SerialPortInfo->Interrupt <= 12)) ||
+            ((SerialPortInfo->Interrupt >= 14) && (SerialPortInfo->Interrupt <= 15))))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: Invalid IRQ %d for 8259 interrupt type.\n",
+          SerialPortInfo->Interrupt
+          ));
+        Status |= EFI_INVALID_PARAMETER;
+      }
+    }
+  }
+
+  return Status;
+}
+
+/** Update the SPCR table with the terminal interrupt type and terminal information.
+
+  @param [in, out] SpcrTable  Pointer to the SPCR table.
+  @param [in]      SpcrInfo   Pointer to the Serial Terminal Interrupt Information.
+  @param [in]      SerialPortInfo Pointer to the Serial Port Information.
+
+  @retval EFI_SUCCESS           The information was updated successfully.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+UpdateTerminalInterruptTypeInfo (
+  IN OUT EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  *SpcrTable,
+  IN     CM_ARCH_COMMON_SPCR_INFO                          *SpcrInfo,
+  IN     CM_ARCH_COMMON_SERIAL_PORT_INFO                   *SerialPortInfo
+  )
+{
+  if ((SpcrTable == NULL) || (SpcrInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SpcrTable->InterruptType = SpcrInfo->InterruptType;
+  SpcrTable->TerminalType  = SpcrInfo->TerminalType;
+
+  if ((SpcrInfo->InterruptType &
+       EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259) != 0)
+  {
+    SpcrTable->Irq = (SerialPortInfo->Interrupt & MAX_UINT8);
+  }
+
+  return EFI_SUCCESS;
+}
 
 /** Free any resources allocated for constructing the tables.
 
@@ -204,6 +400,9 @@ BuildSpcrTableEx (
   CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
   UINT32                           SerialPortCount;
   EFI_ACPI_DESCRIPTION_HEADER      **TableList;
+  UINT32                           Size;
+  CM_ARCH_COMMON_SPCR_INFO         *SpcrInfo;
+  UINT32                           SpcrInfoCount;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -253,6 +452,37 @@ BuildSpcrTableEx (
     return EFI_NOT_FOUND;
   }
 
+  SpcrInfo      = NULL;
+  SpcrInfoCount = 0;
+  Status        = GetEArchCommonObjSpcrInfo (
+                    CfgMgrProtocol,
+                    CM_NULL_TOKEN,
+                    &SpcrInfo,
+                    &SpcrInfoCount
+                    );
+
+  if (!EFI_ERROR (Status)) {
+    Status = ValidateSerialTerminalInterruptInfo (
+               SerialPortInfo,
+               SpcrInfo
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Invalid serial terminal interrupt information. Status = %r\n",
+        Status
+        ));
+      return Status;
+    }
+  } else {
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "SPCR: Continue with default interrupt type (0x%x) and terminal type (0x%x).\n",
+      EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
+      EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI
+      ));
+  }
+
   // Validate the SerialPort info. Only one SPCR port can be described.
   // If platform provides description for multiple SPCR ports, use the
   // first SPCR port information.
@@ -280,13 +510,19 @@ BuildSpcrTableEx (
     return Status;
   }
 
+  if (AcpiTableInfo->AcpiTableRevision < EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
+    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE);
+  } else {
+    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4) + sizeof (NAME_STR_SPCR_PORT);
+  }
+
   // Build SPCR table.
   Status = AddAcpiHeader (
              CfgMgrProtocol,
              This,
              (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiSpcr,
              AcpiTableInfo,
-             sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE)
+             Size
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -332,6 +568,12 @@ BuildSpcrTableEx (
     // and some ConfigurationManager implementations
     // may not be providing this field data
     AcpiSpcr.BaseAddress.AccessSize = EFI_ACPI_6_3_DWORD;
+    if (SerialPortInfo->PortSubtype == EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550) {
+      AcpiSpcr.BaseAddress.AddressSpaceId    = EFI_ACPI_6_3_SYSTEM_IO;
+      AcpiSpcr.BaseAddress.RegisterBitWidth  = 8;
+      AcpiSpcr.BaseAddress.RegisterBitOffset = 0;
+      AcpiSpcr.BaseAddress.AccessSize        = EFI_ACPI_6_3_UNDEFINED;
+    }
   } else {
     AcpiSpcr.BaseAddress.AccessSize = SerialPortInfo->AccessSize;
   }
@@ -340,6 +582,12 @@ BuildSpcrTableEx (
   AcpiSpcr.GlobalSystemInterrupt = SerialPortInfo->Interrupt;
 
   switch (SerialPortInfo->BaudRate) {
+    case 0:
+      // Baud rate 0 indicates that the OS should rely on the current UART
+      // configuration until the full driver is initialized.
+      AcpiSpcr.BaudRate =
+        EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_AS_IS;
+      break;
     case 9600:
       AcpiSpcr.BaudRate =
         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_9600;
@@ -357,15 +605,44 @@ BuildSpcrTableEx (
         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_115200;
       break;
     default:
-      Status = EFI_UNSUPPORTED;
+      if (AcpiTableInfo->AcpiTableRevision < EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
+        Status = EFI_UNSUPPORTED;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: Invalid Baud Rate %ld, Status = %r\n",
+          SerialPortInfo->BaudRate,
+          Status
+          ));
+        goto error_handler;
+      }
+
+      AcpiSpcr.BaudRate        = 0;
+      AcpiSpcr.PreciseBaudRate = (UINT32)SerialPortInfo->BaudRate;
+      break;
+  } // switch
+
+  if (AcpiTableInfo->AcpiTableRevision > EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION) {
+    // UartClockFrequency supported on revision 3 and higher
+    AcpiSpcr.UartClockFrequency = SerialPortInfo->Clock;
+
+    AsciiStrCpyS (AcpiSpcr.NameSpaceString, sizeof (NAME_STR_SPCR_PORT), NAME_STR_SPCR_PORT);
+  }
+
+  if (SpcrInfoCount != 0) {
+    Status = UpdateTerminalInterruptTypeInfo (
+               &AcpiSpcr,
+               SpcrInfo,
+               SerialPortInfo
+               );
+    if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SPCR: Invalid Baud Rate %ld, Status = %r\n",
-        SerialPortInfo->BaudRate,
+        "ERROR: SPCR: Failed to update interrupt terminal type info. Status = %r\n",
         Status
         ));
       goto error_handler;
-  } // switch
+    }
+  }
 
   TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiSpcr;
 
@@ -415,7 +692,7 @@ ACPI_TABLE_GENERATOR  SpcrGenerator = {
   // ACPI Table Signature
   EFI_ACPI_6_3_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION,
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4,
   // Minimum supported ACPI Table Revision
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION,
   // Creator ID

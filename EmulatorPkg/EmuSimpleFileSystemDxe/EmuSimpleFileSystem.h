@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EMU_SIMPLE_FILE_SYSTEM_H_
-#define _EMU_SIMPLE_FILE_SYSTEM_H_
+#pragma once
 
 #include "PiDxe.h"
 
@@ -67,5 +66,3 @@ typedef struct {
       EfiFile, \
       EMU_EFI_FILE_PRIVATE_SIGNATURE \
       )
-
-#endif

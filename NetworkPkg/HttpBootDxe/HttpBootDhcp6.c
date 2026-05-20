@@ -931,6 +931,82 @@ ON_EXIT:
 }
 
 /**
+  Retry DHCPv6 when EFI_NO_MAPPING is returned, by waiting for Duplicate Address
+  Detection (DAD) to complete and restarting the DHCPv6 process.
+
+  This function stops the current DHCP6 session and waits for DAD to complete
+  based on the value returned by Ip6Config->GetData(), then retries Dhcp6->Start().
+
+  @param[in]  Dhcp6     The pointer to the EFI_DHCP6_PROTOCOL instance.
+  @param[in]  Ip6Cfg    The pointer to the EFI_IP6_CONFIG_PROTOCOL instance.
+
+  @retval EFI_SUCCESS           DHCPv6 process restarted successfully after DAD.
+  @retval EFI_DEVICE_ERROR      Failed during DAD timer wait or DHCP restart.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate timer resources.
+  @retval Others                Underlying protocol errors.
+
+**/
+EFI_STATUS
+HandleDhcp6NoMappingRetry (
+  IN EFI_DHCP6_PROTOCOL       *Dhcp6,
+  IN EFI_IP6_CONFIG_PROTOCOL  *Ip6Cfg
+  )
+{
+  EFI_STATUS                                Status;
+  EFI_STATUS                                TimerStatus;
+  EFI_EVENT                                 Timer = NULL;
+  UINT64                                    GetMappingTimeOut;
+  UINTN                                     DataSize;
+  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS  DadXmits;
+
+  //
+  // IP6 Linklocal address is not available for use, so stop current Dhcp process
+  // and wait for duplicate address detection to finish.
+  //
+  Dhcp6->Stop (Dhcp6);
+
+  //
+  // Get Duplicate Address Detection Transmits count.
+  //
+  DataSize = sizeof (EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS);
+  Status   = Ip6Cfg->GetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeDupAddrDetectTransmits,
+                       &DataSize,
+                       &DadXmits
+                       );
+  if (EFI_ERROR (Status)) {
+    Dhcp6->Configure (Dhcp6, NULL);
+    return Status;
+  }
+
+  Status = gBS->CreateEvent (EVT_TIMER, TPL_CALLBACK, NULL, NULL, &Timer);
+  if (EFI_ERROR (Status)) {
+    Dhcp6->Configure (Dhcp6, NULL);
+    return Status;
+  }
+
+  GetMappingTimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + HTTP_BOOT_DAD_ADDITIONAL_DELAY;
+  Status            = gBS->SetTimer (Timer, TimerRelative, GetMappingTimeOut);
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (Timer);
+    Dhcp6->Configure (Dhcp6, NULL);
+    return Status;
+  }
+
+  do {
+    TimerStatus = gBS->CheckEvent (Timer);
+    if (!EFI_ERROR (TimerStatus)) {
+      Status = Dhcp6->Start (Dhcp6);
+    }
+  } while (TimerStatus == EFI_NOT_READY);
+
+  gBS->CloseEvent (Timer);
+
+  return Status;
+}
+
+/**
   Start the S.A.R.R DHCPv6 process to acquire the IPv6 address and other Http boot information.
 
   @param[in]  Private           Pointer to HTTP_BOOT private data.
@@ -953,9 +1029,13 @@ HttpBootDhcp6Sarr (
   UINT8                     Buffer[HTTP_BOOT_DHCP6_OPTION_MAX_SIZE];
   EFI_STATUS                Status;
   UINT32                    Random;
+  EFI_IP6_CONFIG_PROTOCOL   *Ip6Cfg;
 
   Dhcp6 = Private->Dhcp6;
   ASSERT (Dhcp6 != NULL);
+
+  ASSERT (Private->UsingIpv6);
+  Ip6Cfg = Private->Ip6Config;
 
   //
   // Build options list for the request packet.
@@ -1013,6 +1093,10 @@ HttpBootDhcp6Sarr (
   // Start DHCPv6 S.A.R.R. process to acquire IPv6 address.
   //
   Status = Dhcp6->Start (Dhcp6);
+  if (Status == EFI_NO_MAPPING) {
+    Status = HandleDhcp6NoMappingRetry (Dhcp6, Ip6Cfg);
+  }
+
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }

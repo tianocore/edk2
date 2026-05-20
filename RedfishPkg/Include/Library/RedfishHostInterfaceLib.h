@@ -3,13 +3,13 @@
 
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
   Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef REDFISH_HOST_INTERFACE_LIB_H_
-#define REDFISH_HOST_INTERFACE_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/RedfishHostInterface.h>
@@ -74,4 +74,15 @@ RedfishPlatformHostInterfaceNotification (
   OUT EFI_GUID  **InformationReadinessGuid
   );
 
-#endif
+/**
+  Get USB Serial Number.
+
+  @param[OUT] SerialNumber      Pointer to retrieve complete serial number.
+
+  @retval EFI_SUCCESS         Serial number is returned.
+  @retval Others              Failed to get the serial number.
+**/
+EFI_STATUS
+RedfishPlatformHostInterfaceSerialNumber (
+  OUT CHAR8  **SerialNumber
+  );

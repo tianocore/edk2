@@ -143,7 +143,7 @@ SbiSetTimer (
 }
 
 /**
-  Reset the system using SRST SBI extenion
+  Reset the system using SRST SBI extension
 
   @param[in]  ResetType            The SRST System Reset Type.
   @param[in]  ResetReason          The SRST System Reset Reason.
@@ -166,65 +166,4 @@ SbiSystemReset (
           );
 
   return TranslateError (Ret.Error);
-}
-
-/**
-  Get firmware context of the calling hart.
-
-  @param[out] FirmwareContext      The firmware context pointer.
-**/
-VOID
-EFIAPI
-GetFirmwareContext (
-  OUT EFI_RISCV_FIRMWARE_CONTEXT  **FirmwareContext
-  )
-{
-  *FirmwareContext = (EFI_RISCV_FIRMWARE_CONTEXT *)RiscVGetSupervisorScratch ();
-}
-
-/**
-  Set firmware context of the calling hart.
-
-  @param[in] FirmwareContext       The firmware context pointer.
-**/
-VOID
-EFIAPI
-SetFirmwareContext (
-  IN EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext
-  )
-{
-  RiscVSetSupervisorScratch ((UINT64)FirmwareContext);
-}
-
-/**
-  Get pointer to OpenSBI Firmware Context
-
-  Get the pointer of firmware context through OpenSBI FW Extension SBI.
-
-  @param    FirmwareContextPtr   Pointer to retrieve pointer to the
-                                 Firmware Context.
-**/
-VOID
-EFIAPI
-GetFirmwareContextPointer (
-  IN OUT EFI_RISCV_FIRMWARE_CONTEXT  **FirmwareContextPtr
-  )
-{
-  GetFirmwareContext (FirmwareContextPtr);
-}
-
-/**
-  Set the pointer to OpenSBI Firmware Context
-
-  Set the pointer of firmware context through OpenSBI FW Extension SBI.
-
-  @param    FirmwareContextPtr   Pointer to Firmware Context.
-**/
-VOID
-EFIAPI
-SetFirmwareContextPointer (
-  IN EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContextPtr
-  )
-{
-  SetFirmwareContext (FirmwareContextPtr);
 }

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _IP6_NV_DATA_H_
-#define _IP6_NV_DATA_H_
+#pragma once
 
 #include <Guid/Ip6ConfigHii.h>
 
@@ -58,5 +57,3 @@ typedef struct {
   CHAR16    DnsAddress[ADDRESS_STR_MAX_SIZE];             ///< DNS server address
 } IP6_CONFIG_IFR_NVDATA;
 #pragma pack()
-
-#endif

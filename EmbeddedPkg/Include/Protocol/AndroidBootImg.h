@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __ANDROID_BOOTIMG_PROTOCOL_H__
-#define __ANDROID_BOOTIMG_PROTOCOL_H__
+#pragma once
 
 //
 // Protocol interface structure
@@ -37,5 +36,3 @@ struct _ANDROID_BOOTIMG_PROTOCOL {
 };
 
 extern EFI_GUID  gAndroidBootImgProtocolGuid;
-
-#endif /* __ANDROID_BOOTIMG_PROTOCOL_H__ */

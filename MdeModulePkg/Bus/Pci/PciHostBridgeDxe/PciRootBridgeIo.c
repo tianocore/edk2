@@ -1238,6 +1238,16 @@ RootBridgeIoPciAccess (
     }
   }
 
+  //
+  // If the access was a PCI write, it might have side effects that impact how
+  // the PCI device decodes its MMIO regions. Issue a barrier to ensure that
+  // subsequent MMIO accesses to those regions will not be reordered, and will
+  // not arrive before the PCI write.
+  //
+  if (!Read) {
+    MemoryFence ();
+  }
+
   return EFI_SUCCESS;
 }
 

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __WIFI_CONNECTION_MANAGER_HII_GUID_H__
-#define __WIFI_CONNECTION_MANAGER_HII_GUID_H__
+#pragma once
 
 #define WIFI_CONNECTION_MANAGER_CONFIG_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gWifiConfigGuid;
-
-#endif

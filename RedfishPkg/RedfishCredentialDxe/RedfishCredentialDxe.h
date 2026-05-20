@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_CREDENTIAL_DXE_H_
-#define EDKII_REDFISH_CREDENTIAL_DXE_H_
+#pragma once
 
 #include <RedfishCommon.h>
 #include <Protocol/EdkIIRedfishCredential2.h>
@@ -52,5 +51,3 @@ typedef struct {
   EDKII_REDFISH_CREDENTIAL2_PROTOCOL    RedfishCredential2Protocol;
   LIST_ENTRY                            RedfishServiceList;
 } REDFISH_CREDENTIAL_PRIVATE;
-
-#endif

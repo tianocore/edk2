@@ -1,6 +1,6 @@
 /** @file
 
-  The defintions are required both by Source code and Vfr file.
+  The definitions are required both by Source code and Vfr file.
   The PLAT_OVER_MNGR_DATA structure, form guid and Ifr question ID are defined.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLAT_OVER_MNGR_H_
-#define _PLAT_OVER_MNGR_H_
+#pragma once
 
 #include <Guid/PlatDriOverrideHii.h>
 
@@ -57,5 +56,3 @@ typedef struct {
 //
 #define QUESTION_ID_OFFSET        0x0500
 #define DRIVER_ORDER_QUESTION_ID  (VAR_OFFSET (DriOrder) + QUESTION_ID_OFFSET)
-
-#endif

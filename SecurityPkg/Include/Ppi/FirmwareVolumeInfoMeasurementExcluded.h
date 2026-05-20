@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_H__
-#define __EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_H__
+#pragma once
 
 #define EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI_GUID \
  { 0x6e056ff9, 0xc695, 0x4364, { 0x9e, 0x2c, 0x61, 0x26, 0xf5, 0xce, 0xea, 0xae } }
@@ -26,5 +25,3 @@ typedef struct {
 } EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI;
 
 extern EFI_GUID  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;
-
-#endif

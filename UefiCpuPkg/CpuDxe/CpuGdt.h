@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _CPU_GDT_H_
-#define _CPU_GDT_H_
+#pragma once
 
 //
 // Local structure definitions
@@ -63,5 +62,3 @@ typedef
 #else
   #error CPU type not supported for CPU GDT initialization!
 #endif
-
-#endif // _CPU_GDT_H_

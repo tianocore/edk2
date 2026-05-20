@@ -227,6 +227,7 @@ Ip6ConfigStartStatefulAutoConfig (
 
   if (Instance->Dhcp6SbNotifyEvent != NULL) {
     gBS->CloseEvent (Instance->Dhcp6SbNotifyEvent);
+    Instance->Dhcp6SbNotifyEvent = NULL;
   }
 
   Status = gBS->OpenProtocol (
@@ -989,7 +990,7 @@ Ip6ConfigSetManualAddress (
     for (Index1 = 0; Index1 < NewAddressCount; Index1++, NewAddress++) {
       if (NetIp6IsLinkLocalAddr (&NewAddress->Address)    ||
           !NetIp6IsValidUnicast (&NewAddress->Address)    ||
-          (NewAddress->PrefixLength > 128)
+          (NewAddress->PrefixLength > IP6_PREFIX_MAX)
           )
       {
         //

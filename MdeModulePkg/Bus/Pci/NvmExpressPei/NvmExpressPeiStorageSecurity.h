@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _NVM_EXPRESS_PEI_STORAGE_SECURITY_H_
-#define _NVM_EXPRESS_PEI_STORAGE_SECURITY_H_
+#pragma once
 
 /**
   Gets the count of storage security devices that one specific driver detects.
@@ -236,5 +235,3 @@ NvmeStorageSecuritySendData (
   IN UINTN                               PayloadBufferSize,
   IN VOID                                *PayloadBuffer
   );
-
-#endif

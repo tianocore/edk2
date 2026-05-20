@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef USB_CDC_ECM_H_
-#define USB_CDC_ECM_H_
+#pragma once
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -207,5 +206,3 @@ GetUsbEthStatistic (
   IN  UINT16                       FeatureSelector,
   OUT VOID                         *Statistic
   );
-
-#endif

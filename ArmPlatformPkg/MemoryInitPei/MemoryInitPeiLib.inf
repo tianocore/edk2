@@ -23,6 +23,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   DebugLib
@@ -47,10 +48,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

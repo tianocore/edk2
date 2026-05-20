@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __REPUBLISH_SEC_PPI_H__
-#define __REPUBLISH_SEC_PPI_H__
+#pragma once
 
 #include <Pi/PiPeiCis.h>
 
@@ -50,5 +49,3 @@ struct _REPUBLISH_SEC_PPI_PPI {
 };
 
 extern EFI_GUID  gRepublishSecPpiPpiGuid;
-
-#endif

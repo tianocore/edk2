@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __IP6_CONFIG_IMPL_H__
-#define __IP6_CONFIG_IMPL_H__
+#pragma once
 
 #define IP6_CONFIG_INSTANCE_SIGNATURE     SIGNATURE_32 ('I', 'P', '6', 'C')
 #define IP6_FORM_CALLBACK_INFO_SIGNATURE  SIGNATURE_32 ('I', 'F', 'C', 'I')
@@ -302,5 +301,3 @@ EFI_STATUS
 Ip6ConfigDestroyDhcp6 (
   IN OUT IP6_CONFIG_INSTANCE  *Instance
   );
-
-#endif

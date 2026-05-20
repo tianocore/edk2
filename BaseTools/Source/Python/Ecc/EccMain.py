@@ -63,7 +63,7 @@ class Ecc(object):
         self.ParseOption()
         EdkLogger.info(time.strftime("%H:%M:%S, %b.%d %Y ", time.localtime()) + "[00:00]" + "\n")
 
-        WorkspaceDir = os.path.normcase(os.path.normpath(os.environ["WORKSPACE"]))
+        WorkspaceDir = os.path.normpath(os.environ["WORKSPACE"])
         os.environ["WORKSPACE"] = WorkspaceDir
 
         # set multiple workspace

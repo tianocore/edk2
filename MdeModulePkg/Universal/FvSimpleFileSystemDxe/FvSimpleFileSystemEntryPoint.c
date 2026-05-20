@@ -256,7 +256,6 @@ InitializeUnicodeCollationSupportWorker (
   UINTN                           Index;
   EFI_HANDLE                      *Handles;
   EFI_UNICODE_COLLATION_PROTOCOL  *Uci;
-  BOOLEAN                         Iso639Language;
   CHAR8                           *Language;
   CHAR8                           *BestLanguage;
 
@@ -271,7 +270,6 @@ InitializeUnicodeCollationSupportWorker (
     return Status;
   }
 
-  Iso639Language = (BOOLEAN)(ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
   GetEfiGlobalVariable2 (VariableName, (VOID **)&Language, NULL);
 
   ReturnStatus = EFI_UNSUPPORTED;
@@ -297,7 +295,7 @@ InitializeUnicodeCollationSupportWorker (
     //
     BestLanguage = GetBestLanguage (
                      Uci->SupportedLanguages,
-                     Iso639Language,
+                     FALSE,
                      (Language == NULL) ? "" : Language,
                      DefaultLanguage,
                      NULL
@@ -350,18 +348,6 @@ InitializeUnicodeCollationSupport (
              L"PlatformLang",
              (CONST CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
              );
-  //
-  // If the attempt to use Unicode Collation 2 Protocol fails, then we fall back
-  // on the ISO 639-2 Unicode Collation Protocol.
-  //
-  if (EFI_ERROR (Status)) {
-    Status = InitializeUnicodeCollationSupportWorker (
-               AgentHandle,
-               &gEfiUnicodeCollationProtocolGuid,
-               L"Lang",
-               (CONST CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLang)
-               );
-  }
 
   return Status;
 }
@@ -450,7 +436,10 @@ FvSimpleFileSystemDriverStart (
   // Create an instance
   //
   Instance = AllocateZeroPool (sizeof (FV_FILESYSTEM_INSTANCE));
-  ASSERT (Instance != NULL);
+  if (Instance == NULL) {
+    ASSERT (Instance != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Instance->Root       = NULL;
   Instance->FvProtocol = FvProtocol;

@@ -60,15 +60,15 @@ def _match_path_and_rule(
     return result
 
 
-def _parse_pattern(line: str) -> Tuple[str]:
+def _parse_pattern(line: str) -> Tuple[bool, str, str]:
     """Parses a given pattern line.
 
     Args:
         line (str): The line string that contains the rule.
 
     Returns:
-        Tuple[str]: The parsed sign, file pattern, and rule pattern from the
-                    line.
+        Tuple[bool, str, str]: The parsed sign, file pattern,
+                               and rule pattern from the line.
     """
     sep_char = ':'
     esc_char = '\\'

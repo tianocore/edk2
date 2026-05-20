@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MP_LIB_H_
-#define MP_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Guid/ProcessorResourceHob.h>
@@ -346,5 +345,3 @@ VOID
 EnableDebugAgent (
   VOID
   );
-
-#endif

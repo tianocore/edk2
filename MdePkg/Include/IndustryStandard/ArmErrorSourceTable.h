@@ -15,8 +15,7 @@
     - Id  : Identifier
 **/
 
-#ifndef ARM_ERROR_SOURCE_TABLE_H_
-#define ARM_ERROR_SOURCE_TABLE_H_
+#pragma once
 
 ///
 /// "AEST" Arm Error Source Table
@@ -161,11 +160,11 @@ typedef struct {
   UINT8     Reserved1[3];
 } EFI_ACPI_AEST_INTERRUPT_STRUCT;
 
-// AEST Interrupt node - interrupt type defintions.
+// AEST Interrupt node - interrupt type definitions.
 #define EFI_ACPI_AEST_INTERRUPT_TYPE_FAULT_HANDLING  0x0
 #define EFI_ACPI_AEST_INTERRUPT_TYPE_ERROR_RECOVERY  0x1
 
-// AEST Interrupt node - interrupt flag defintions.
+// AEST Interrupt node - interrupt flag definitions.
 #define EFI_ACPI_AEST_INTERRUPT_FLAG_TRIGGER_TYPE_EDGE   0
 #define EFI_ACPI_AEST_INTERRUPT_FLAG_TRIGGER_TYPE_LEVEL  BIT0
 
@@ -332,7 +331,7 @@ typedef struct {
   /// Type of GIC interface that is associated with this error node.
   ///   0x0 - GIC CPU (GICC)
   ///   0x1 - GIC Distributor (GICD)
-  ///   0x2 - GIC Resistributor (GICR)
+  ///   0x2 - GIC Redistributor (GICR)
   ///   0x3 - GIC ITS (GITS)
   UINT32                       InterfaceType;
 
@@ -353,5 +352,3 @@ typedef struct {
 #define EFI_ACPI_AEST_GIC_INTERFACE_TYPE_GITS  0x3
 
 #pragma pack()
-
-#endif // ARM_ERROR_SOURCE_TABLE_H_

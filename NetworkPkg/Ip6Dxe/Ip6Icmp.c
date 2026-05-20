@@ -467,14 +467,14 @@ Ip6GetPrefix (
   UINT8  Mask;
   UINT8  Value;
 
-  ASSERT ((Prefix != NULL) && (PrefixLength < IP6_PREFIX_MAX));
+  ASSERT ((Prefix != NULL) && (PrefixLength <= IP6_PREFIX_MAX));
 
   if (PrefixLength == 0) {
     ZeroMem (Prefix, sizeof (EFI_IPv6_ADDRESS));
     return;
   }
 
-  if (PrefixLength >= IP6_PREFIX_MAX) {
+  if (PrefixLength > IP6_PREFIX_MAX) {
     return;
   }
 

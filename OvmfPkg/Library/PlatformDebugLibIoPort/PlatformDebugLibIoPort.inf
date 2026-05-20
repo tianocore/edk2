@@ -16,11 +16,11 @@
   FILE_GUID                      = DF934DA3-CD31-49FE-AF50-B3C87C79325F
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = DebugLib|PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION MM_CORE_STANDALONE MM_STANDALONE
   CONSTRUCTOR                    = PlatformDebugLibIoPortConstructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = X64 EBC
 #
 
 [Sources]
@@ -40,6 +40,7 @@
   PrintLib
   BaseLib
   DebugPrintErrorLevelLib
+  MemDebugLogLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES

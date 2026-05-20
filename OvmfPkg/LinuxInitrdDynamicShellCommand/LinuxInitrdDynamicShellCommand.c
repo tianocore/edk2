@@ -266,10 +266,7 @@ RunInitrd (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PROBLEM),
         mLinuxInitrdShellCommandHiiHandle,
         L"initrd",
@@ -281,10 +278,7 @@ RunInitrd (
       ASSERT (FALSE);
     }
   } else if (IsOtherInitrdDevicePathAlreadyInstalled ()) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_ALREADY_INSTALLED),
       mLinuxInitrdShellCommandHiiHandle,
       L"initrd"
@@ -292,10 +286,7 @@ RunInitrd (
     ShellStatus = SHELL_UNSUPPORTED;
   } else {
     if (ShellCommandLineGetCount (Package) > 2) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_TOO_MANY),
         mLinuxInitrdShellCommandHiiHandle,
         L"initrd"
@@ -306,10 +297,7 @@ RunInitrd (
         FreeInitrdFile ();
         UninstallLoadFile2Protocol ();
       } else {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_GEN_TOO_FEW),
           mLinuxInitrdShellCommandHiiHandle,
           L"initrd"
@@ -322,10 +310,7 @@ RunInitrd (
 
       Filename = ShellFindFilePath (Param);
       if (Filename == NULL) {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_GEN_FIND_FAIL),
           mLinuxInitrdShellCommandHiiHandle,
           L"initrd",
@@ -346,10 +331,7 @@ RunInitrd (
         }
 
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL),
             mLinuxInitrdShellCommandHiiHandle,
             L"initrd",

@@ -12,7 +12,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/$(PLATFORM_NAME)
-  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64
+  SUPPORTED_ARCHITECTURES        = X64|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -40,11 +40,7 @@
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
-# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-[LibraryClasses.common.SEC]
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-
-[LibraryClasses.IA32, LibraryClasses.X64]
+[LibraryClasses.X64]
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
 
 [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
@@ -144,12 +140,29 @@
   #
   $(PLATFORM_PACKAGE)/Application/PrmInfo/PrmInfo.inf
 
-[Components.IA32, Components.X64]
+[Components.X64]
   #
-  # PRM Sample Modules for IA32 and X64
+  # PRM Sample Modules for X64
   #
   $(PLATFORM_PACKAGE)/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf
 
 [BuildOptions]
 # Force deprecated interfaces off
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
+#
+# PRM Modules are DXE_RUNTIME_DRIVER modules. Platforms that build PRM Modules should
+# ensure sections are page aligned to 4K for X64 and 64K for AARCH64 so paging protections
+# can be applied to the memory ranges.
+#
+[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+  MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+  XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+  XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+
+[BuildOptions.X64.EDKII.DXE_RUNTIME_DRIVER]
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
+[BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000

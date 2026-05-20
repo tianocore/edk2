@@ -27,6 +27,7 @@
   @retval EFI_NOT_FOUND        The requested descriptors does not exist.
 
 **/
+STATIC
 EFI_STATUS
 SearchGcdMemorySpaces (
   IN EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap,

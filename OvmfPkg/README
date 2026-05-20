@@ -10,7 +10,7 @@ http://www.tianocore.org/ovmf/
 === STATUS ===
 
 Current capabilities:
-* IA32 and X64 architectures
+* X64 architecture (optionally with IA32 SEC/PEI)
 * QEMU (version 1.7.1 or later, with 1.7 or later machine types)
   - Video, keyboard, IDE, CD-ROM, serial
   - Runs UEFI shell
@@ -28,19 +28,19 @@ Current capabilities:
 Pre-requisites:
 * Build environment capable of build the edk2 MdeModulePkg.
 * A properly configured ASL compiler:
-  - Intel ASL compiler: Available from http://www.acpica.org
-  - Microsoft ASL compiler: Available from http://www.acpi.info
-* NASM: http://www.nasm.us/
+  - Intel ASL compiler: Available from
+    https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/download.html
+  - Microsoft ASL compiler: Available from
+    https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/microsoft-asl-compiler
+* NASM: https://www.nasm.us/
 
 Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
                              PEI arch   DXE arch   UEFI interfaces
-* OvmfPkg/OvmfPkgIa32.dsc      IA32       IA32           IA32
 * OvmfPkg/OvmfPkgIa32X64.dsc   IA32       X64            X64
 * OvmfPkg/OvmfPkgX64.dsc       X64        X64            X64
 
 Update Conf/target.txt TARGET_ARCH based on the .dsc file:
                              TARGET_ARCH
-* OvmfPkg/OvmfPkgIa32.dsc     IA32
 * OvmfPkg/OvmfPkgIa32X64.dsc  IA32 X64
 * OvmfPkg/OvmfPkgX64.dsc      X64
 
@@ -54,16 +54,16 @@ these binary outputs:
   - This file is not built separately any longer, starting with svn r13520.
 
 If you are new to building in edk2 or looking for the latest build
-instructions, visit https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions
+instructions, visit <https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/build_instructions.html>
 
 More OVMF-specific build information can be found at:
 
-https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
+[How to Build OVMF](https://www.tianocore.org/tianocore-wiki.github.io/development/tutorials-howto/how_to_build_ovmf.html)
 
 === RUNNING OVMF on QEMU ===
 
 * Be sure to use qemu-system-x86_64, if you are using an X64 firmware.
-  (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
+  (qemu-system-x86_64 works for the IA32 SEC/PEI as well, of course.)
 * Use OVMF for QEMU firmware (3 options available)
   - Option 1: Use QEMU -pflash parameter
     * QEMU/OVMF will use emulated flash, and fully support UEFI variables
@@ -116,9 +116,6 @@ $ OvmfPkg/build.sh -a X64 qemu
 
 And to run a 64-bit UEFI bootable ISO image:
 $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
-
-To build a 32-bit OVMF without debug messages using GCC 4.8:
-$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC48
 
 === Secure Boot ===
 
@@ -212,6 +209,46 @@ can be used on Windows.
 
   -global ICH9-LPC.disable_s3=1 \
 
+=== Standalone MM Support ===
+
+Standalone MM (Management Mode) in UEFI is a secure execution environment
+provided by the CPU and related silicon, designed to improve security and
+portability compared to Traditional MM. It operates independently of the DXE
+(Driver Execution Environment) phase, ensuring better isolation and reducing
+vulnerabilities.
+
+Standalone MM leverages the same hardware capabilities as Traditional MM but
+revises the software model to address security challenges. It uses Management
+Mode RAM (MMRAM) for executing drivers and protocols securely, and its
+initialization and runtime phases are distinct from Traditional MM.
+
+Due to the nature of Standalone MM, there are some limitations, requirements and
+considerations when using it in OVMF:
+
+* The Standalone MM driver must be built with `-D STANDALONE_MM_ENABLE` flag.
+* For X64, Standalone MM does not currently support S3 resume or LockBox
+  functionality. While LockBox functionality could be supported in the future
+  with unblock memory enabled during the DXE phase, S3 resume support is not
+  planned.
+* On OVMF, Standalone MM does not support CPU hotplugging at this time; however,
+  this feature may be enabled in the future.
+* Similar to SMM, Standalone MM requires a pflash-backed variable store.
+* Standalone MM framework copies the entire Firmware Volume (FV) containing the
+  Standalone MM core into MMRAM. As a result, MMRAM must have sufficient
+  capacity to accommodate this operation alongside the runtime-loaded drivers.
+
+* Example QEMU launching command for Standalone MM based Q35 machine type:
+
+  $ qemu-system-x86_64 \
+  -debugcon stdio \
+  -smp 4 -cpu IvyBridge,+rdrand \
+  -machine q35,smm=on --accel tcg,thread=single \
+  -global driver=cfi.pflash01,property=secure,value=on \
+  -drive if=pflash,format=raw,unit=0,file=OVMF_CODE.fd,readonly=on \
+  -drive if=pflash,format=raw,unit=1,file=OVMF_VARS.fd \
+  -global ICH9-LPC.disable_s3=1 \
+  -global mch.extended-tseg-mbytes=32
+
 === Network Support ===
 
 OVMF provides a UEFI network stack by default. Its lowest level driver is the
@@ -240,21 +277,16 @@ longer.)
   basic virtio-net driver, located in OvmfPkg/VirtioNetDxe.
 
 * Also independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC
-  driver (from the BootUtil distribution) can be embedded in the OVMF image at
-  build time:
+  driver can be embedded in the OVMF image at build time:
 
-  - Download BootUtil:
+  - Download Intel Ethernet Adapter Driver Pack:
     - Navigate to
-      https://downloadcenter.intel.com/download/19186/Ethernet-Intel-Ethernet-Connections-Boot-Utility-Preboot-Images-and-EFI-Drivers
-    - Click the download link for "PREBOOT.EXE".
+      https://www.intel.com/content/www/us/en/download/15084/intel-ethernet-adapter-complete-driver-pack.html
+    - Select version 23.5.2 and click the download link for "23_5_2.zip".
     - Accept the Intel Software License Agreement that appears.
-    - Unzip "PREBOOT.EXE" into a separate directory (this works with the
-      "unzip" utility on platforms different from Windows as well).
+    - Unzip "23_5_2.zip" into a separate directory.
     - Copy the "APPS/EFI/EFIx64/E3522X2.EFI" driver binary to
       "Intel3.5/EFIX64/E3522X2.EFI" in your WORKSPACE.
-    - Intel have stopped distributing an IA32 driver binary (which used to
-      match the filename pattern "E35??E2.EFI"), thus this method will only
-      work for the IA32X64 and X64 builds of OVMF.
 
   - Include the driver in OVMF during the build:
     - Add "-D E1000_ENABLE" to your build command (only when building
@@ -264,11 +296,11 @@ longer.)
 * When a matching iPXE driver is configured for a NIC as described above, it
   takes priority over other drivers that could possibly drive the card too:
 
-                         | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
-    ---------------------+------------------------------------------------
-    iPXE                 |   x       x        x       x           x
-    VirtioNetDxe         |                                        x
-    Intel BootUtil (X64) |   x
+                            | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
+    ------------------------+------------------------------------------------
+    iPXE                    |   x       x        x       x           x
+    VirtioNetDxe            |                                        x
+    Intel E3522X2.EFI (X64) |   x
 
 === HTTPS Boot ===
 
@@ -286,7 +318,7 @@ and encrypted connection.
   connections will be accepted.
 
 * By default, there is no trusted certificate. The user has to import the
-  certificates either manually with "Tls Auth Configuration" utility in the
+  certificates either manually with "TLS Auth Configuration" utility in the
   firmware UI or through the fw_cfg entry, etc/edk2/https/cacerts.
 
   -fw_cfg name=etc/edk2/https/cacerts,file=<certdb>

@@ -22,7 +22,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -58,7 +58,7 @@
   X64/IsZeroBuffer.nasm
   MemLibGuid.c
 
-[Defines.ARM, Defines.AARCH64]
+[Defines.AARCH64]
   #
   # The ARM implementations of this library may perform unaligned accesses, and
   # may use DC ZVA instructions that are only allowed when the MMU and D-cache
@@ -67,23 +67,14 @@
   #
   LIBRARY_CLASS = BaseMemoryLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
-[Sources.ARM]
-  Arm/ScanMem.S       |GCC
-  Arm/SetMem.S        |GCC
-  Arm/CopyMem.S       |GCC
-  Arm/CompareMem.S    |GCC
-  Arm/CompareGuid.S   |GCC
-
 [Sources.AARCH64]
   AArch64/ScanMem.S
   AArch64/SetMem.S
   AArch64/CopyMem.S
   AArch64/CompareMem.S
   AArch64/CompareGuid.S
-
-[Sources.ARM, Sources.AARCH64]
-  Arm/ScanMemGeneric.c
-  Arm/MemLibGuid.c
+  AArch64/ScanMemGeneric.c
+  AArch64/MemLibGuid.c
 
 [Sources]
   ScanMem64Wrapper.c

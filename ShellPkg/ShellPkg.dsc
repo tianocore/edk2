@@ -16,7 +16,7 @@
   PLATFORM_VERSION               = 1.02
   DSC_SPECIFICATION              = 0x00010006
   OUTPUT_DIRECTORY               = Build/Shell
-  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -65,9 +65,7 @@
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
 
-# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-[LibraryClasses.common.SEC]
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF

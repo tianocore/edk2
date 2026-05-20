@@ -41,32 +41,85 @@ RetrieveMultiSegmentInfoFromHob (
   OUT UINTN                               *NumberOfRootBridges
   )
 {
-  UINTN  Size;
-  UINT8  Index;
+  UINTN             Size;
+  UINT8             IndexForExistingSegments;
+  UINT8             NumberOfExistingSegments;
+  UINT8             IndexForRb;
+  PCI_SEGMENT_INFO  *pPciSegments;
 
   if (PciRootBridgeInfo == NULL) {
     mPciSegments = NULL;
     return;
   }
 
+  IndexForExistingSegments = 0;
+  NumberOfExistingSegments = 0;
+  IndexForRb               = 0;
+  Size                     = PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO);
+
   *NumberOfRootBridges = PciRootBridgeInfo->Count;
 
-  Size         = PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO);
-  mPciSegments = (PCI_SEGMENT_INFO *)AllocatePool (Size);
-  ASSERT (mPciSegments != NULL);
-  ZeroMem (mPciSegments, PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO));
+  pPciSegments = (PCI_SEGMENT_INFO *)AllocatePool (Size);
+  if (pPciSegments == NULL) {
+    ASSERT (pPciSegments != NULL);
+    return;
+  }
+
+  ZeroMem (pPciSegments, PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO));
 
   //
-  // Create all root bridges with PciRootBridgeInfoHob
+  // RBs may share the same Segment number, but mPciSegments should not have duplicate segment data.
+  // 1. if RB Segment is same with existing one, update StartBus and EndBus of existing one
+  // 2. if RB Segment is different from all existing ones, add it to the existing Segments data buffer.
+  // pPciSegments is local temporary data buffer that will be freed later (size depends on numbers of RB)
+  // mPciSegments is global data that will be updated with the pPciSegments for caller to utilize. (size depends on numbers of different PciSegments)
   //
-  for (Index = 0; Index < PciRootBridgeInfo->Count; Index++) {
-    if (UplSegmentInfo->SegmentInfo[Index].SegmentNumber == (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment)) {
-      mPciSegments[Index].BaseAddress = UplSegmentInfo->SegmentInfo[Index].BaseAddress;
+  NumberOfExistingSegments       = 1;
+  pPciSegments[0].BaseAddress    = UplSegmentInfo->SegmentInfo[0].BaseAddress;
+  pPciSegments[0].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[0].Segment);
+  pPciSegments[0].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[0].Bus.Base;
+  pPciSegments[0].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[0].Bus.Limit;
+  for (IndexForRb = 1; IndexForRb < PciRootBridgeInfo->Count; IndexForRb++) {
+    for (IndexForExistingSegments = 0; IndexForExistingSegments < NumberOfExistingSegments; IndexForExistingSegments++) {
+      if (pPciSegments[IndexForExistingSegments].SegmentNumber == PciRootBridgeInfo->RootBridge[IndexForRb].Segment) {
+        if (pPciSegments[IndexForExistingSegments].StartBusNumber > PciRootBridgeInfo->RootBridge[IndexForRb].Bus.Base) {
+          pPciSegments[IndexForExistingSegments].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[IndexForRb].Bus.Base;
+        }
+
+        if (pPciSegments[IndexForExistingSegments].EndBusNumber < PciRootBridgeInfo->RootBridge[IndexForRb].Bus.Limit) {
+          pPciSegments[IndexForExistingSegments].EndBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[IndexForRb].Bus.Limit;
+        }
+
+        break;  // breaking after a match found
+      }
     }
 
-    mPciSegments[Index].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment);
-    mPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
-    mPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
+    if (IndexForExistingSegments >= NumberOfExistingSegments) {
+      //
+      // No match found, add it to segments data buffer
+      //
+      pPciSegments[NumberOfExistingSegments].BaseAddress    = UplSegmentInfo->SegmentInfo[IndexForRb].BaseAddress;
+      pPciSegments[NumberOfExistingSegments].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[IndexForRb].Segment);
+      pPciSegments[NumberOfExistingSegments].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[IndexForRb].Bus.Base;
+      pPciSegments[NumberOfExistingSegments].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[IndexForRb].Bus.Limit;
+      NumberOfExistingSegments++;
+    }
+  }
+
+  //
+  // Prepare data for returning to caller
+  //
+  *NumberOfRootBridges = NumberOfExistingSegments;
+  Size                 = NumberOfExistingSegments * sizeof (PCI_SEGMENT_INFO);
+  mPciSegments         = (PCI_SEGMENT_INFO *)AllocatePool (Size);
+  if (mPciSegments == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  CopyMem (&mPciSegments[0], &pPciSegments[0], Size);
+  if (pPciSegments != NULL) {
+    FreePool (pPciSegments);
   }
 
   return;

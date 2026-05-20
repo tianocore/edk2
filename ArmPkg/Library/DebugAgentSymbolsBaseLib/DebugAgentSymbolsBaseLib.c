@@ -141,7 +141,7 @@ GetFfsFile (
           return EFI_SUCCESS;
         }
 
-        FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+        FileLength       = FFS_FILE_SIZE (FfsFileHeader);
         FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
 
         FileOffset   += FileOccupiedSize;
@@ -149,7 +149,7 @@ GetFfsFile (
         break;
 
       case EFI_FILE_DELETED:
-        FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+        FileLength       = FFS_FILE_SIZE (FfsFileHeader);
         FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
         FileOffset      += FileOccupiedSize;
         FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
@@ -180,7 +180,7 @@ GetImageContext (
   VOID                             *CodeViewEntryPointer;
 
   Section      = (EFI_COMMON_SECTION_HEADER *)(FfsHeader + 1);
-  SectionSize  = *(UINT32 *)(FfsHeader->Size) & 0x00FFFFFF;
+  SectionSize  = FFS_FILE_SIZE (FfsHeader);
   SectionSize -= sizeof (EFI_FFS_FILE_HEADER);
   ParsedLength = 0;
   EfiImage     = NULL;
@@ -196,7 +196,7 @@ GetImageContext (
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
-    SectionLength = *(UINT32 *)Section->Size & 0x00FFFFFF;
+    SectionLength = SECTION_SIZE (Section);
     SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
     ASSERT (SectionLength != 0);
     ParsedLength += SectionLength;

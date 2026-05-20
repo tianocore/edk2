@@ -4,7 +4,7 @@
   Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
-#include <gtest/gtest.h>
+#include <Library/GoogleTestLib.h>
 
 extern "C" {
   #include <Uefi.h>
@@ -161,7 +161,7 @@ TEST_F (Dhcp6AppendOptionTest, ValidDataExpectSuccess) {
   Packet->Length = sizeof (EFI_DHCP6_HEADER);
   OriginalLength = Packet->Length;
 
-  UntrustedDuid = (EFI_DHCP6_DUID *)AllocateZeroPool (sizeof (EFI_DHCP6_DUID));
+  UntrustedDuid = (EFI_DHCP6_DUID *)AllocateZeroPool (OFFSET_OF (EFI_DHCP6_DUID, Duid) + sizeof (Duid));
   ASSERT_NE (UntrustedDuid, (EFI_DHCP6_DUID *)NULL);
 
   UntrustedDuid->Length = NTOHS (sizeof (Duid));
@@ -746,8 +746,9 @@ TEST_F (Dhcp6SeekStsOptionTest, SeekIATAOptionExpectFail) {
   UINT32        SearchPattern       = SEARCH_PATTERN;
   UINT16        SearchPatternLength = SEARCH_PATTERN_LEN;
   UINT16        *Len                = NULL;
-  EFI_DHCP6_IA  Ia                  = { 0 };
+  EFI_DHCP6_IA  Ia;
 
+  ZeroMem (&Ia, sizeof (Ia));
   Ia.Descriptor.Type                = DHCPV6_OPTION_IA_TA;
   Ia.IaAddressCount                 = 1;
   Ia.IaAddress[0].PreferredLifetime = 0xDEADBEEF;
@@ -763,7 +764,7 @@ TEST_F (Dhcp6SeekStsOptionTest, SeekIATAOptionExpectFail) {
              Dhcp6SeekStsOptionTest::Packet,
              &Option,
              Dhcp6OptStatusCode,
-             SearchPatternLength,
+             HTONS (SearchPatternLength),
              (UINT8 *)&SearchPattern
              );
   ASSERT_EQ (Status, EFI_SUCCESS);
@@ -800,8 +801,9 @@ TEST_F (Dhcp6SeekStsOptionTest, SeekIANAOptionExpectSuccess) {
   UINT8         *Option             = NULL;
   UINT32        SearchPattern       = SEARCH_PATTERN;
   UINT16        SearchPatternLength = SEARCH_PATTERN_LEN;
-  EFI_DHCP6_IA  Ia                  = { 0 };
+  EFI_DHCP6_IA  Ia;
 
+  ZeroMem (&Ia, sizeof (Ia));
   Ia.Descriptor.Type                = DHCPV6_OPTION_IA_NA;
   Ia.IaAddressCount                 = 1;
   Ia.IaAddress[0].PreferredLifetime = 0x11111111;
@@ -815,7 +817,7 @@ TEST_F (Dhcp6SeekStsOptionTest, SeekIANAOptionExpectSuccess) {
              Dhcp6SeekStsOptionTest::Packet,
              &Option,
              Dhcp6OptStatusCode,
-             SearchPatternLength,
+             HTONS (SearchPatternLength),
              (UINT8 *)&SearchPattern
              );
   ASSERT_EQ (Status, EFI_SUCCESS);

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _NVME_DISKINFO_H_
-#define _NVME_DISKINFO_H_
+#pragma once
 
 /**
   Initialize the installation of DiskInfo protocol.
@@ -117,5 +116,3 @@ NvmExpressDiskInfoWhichIde (
   OUT UINT32                  *IdeChannel,
   OUT UINT32                  *IdeDevice
   );
-
-#endif

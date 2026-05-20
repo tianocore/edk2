@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LEGACY_SPI_FLASH_PROTOCOL_H__
-#define __LEGACY_SPI_FLASH_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/SpiNorFlash.h>
 
@@ -191,5 +190,3 @@ struct _EFI_LEGACY_SPI_FLASH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiLegacySpiFlashProtocolGuid;
-
-#endif // __LEGACY_SPI_FLASH_PROTOCOL_H__

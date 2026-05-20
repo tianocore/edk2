@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef INTERNAL_SMM_RELOCATION_LIB_H_
-#define INTERNAL_SMM_RELOCATION_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -123,5 +122,3 @@ VOID
 EFIAPI
 SmmInitFixupAddress (
   );
-
-#endif

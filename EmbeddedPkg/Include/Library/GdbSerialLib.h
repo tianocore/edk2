@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __GDB_SERIAL_LIB_H__
-#define __GDB_SERIAL_LIB_H__
+#pragma once
 
 /**
   Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
@@ -90,5 +89,3 @@ VOID
 GdbPutString (
   IN CHAR8  *String
   );
-
-#endif

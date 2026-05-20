@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef EFI_REST_EX_PROTOCOL_H_
-#define EFI_REST_EX_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/Http.h>
 
@@ -387,5 +386,3 @@ struct _EFI_REST_EX_PROTOCOL {
 
 extern EFI_GUID  gEfiRestExServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiRestExProtocolGuid;
-
-#endif

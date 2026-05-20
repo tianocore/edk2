@@ -21,6 +21,7 @@
 
 [Sources]
   UnitTestMain.c
+  UnitTestMainHost.c
   BaseCryptLibUnitTests.c
   TestBaseCryptLib.h
   HashTests.c
@@ -34,6 +35,7 @@
   DhTests.c
   RandTests.c
   Pkcs7EkuTests.c
+  Pkcs7AttachedContentTest.c
   OaepEncryptTests.c
   RsaPssTests.c
   ParallelhashTests.c

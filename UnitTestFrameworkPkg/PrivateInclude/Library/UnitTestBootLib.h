@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __UNIT_TEST_BOOT_LIB_H__
-#define __UNIT_TEST_BOOT_LIB_H__
+#pragma once
 
 /**
   Set the boot manager to boot from a specific device on the next boot. This
@@ -27,5 +26,3 @@ EFIAPI
 SetBootNextDevice (
   VOID
   );
-
-#endif

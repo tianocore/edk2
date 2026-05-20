@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_VLANCONFIG_PROTOCOL_H__
-#define __EFI_VLANCONFIG_PROTOCOL_H__
+#pragma once
 
 #define EFI_VLAN_CONFIG_PROTOCOL_GUID \
   { \
@@ -130,5 +129,3 @@ struct _EFI_VLAN_CONFIG_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiVlanConfigProtocolGuid;
-
-#endif

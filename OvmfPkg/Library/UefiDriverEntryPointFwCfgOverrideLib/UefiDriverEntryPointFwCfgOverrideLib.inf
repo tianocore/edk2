@@ -31,12 +31,14 @@
   DebugLib
   QemuFwCfgSimpleParserLib
   UefiBootServicesTableLib
+  StackCheckLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName
+  gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideDefaultValue
 
 #
 # For UEFI drivers, these architectural protocols defined in PI 1.0 spec need

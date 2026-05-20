@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SEC_H_
-#define SEC_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -23,6 +22,7 @@
 #include <Library/SerialPortLib.h>
 
 #include <Ppi/TemporaryRamSupport.h>
+#include <Library/ArmTransferListLib.h>
 
 /**
   Helper function to switch to a different stack. Implemented in assembler as
@@ -50,5 +50,3 @@ PeiCommonExceptionEntry (
   IN UINT32  Entry,
   IN UINTN   LR
   );
-
-#endif

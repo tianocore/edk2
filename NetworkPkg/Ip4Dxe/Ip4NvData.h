@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _IP4_NV_DATA_H_
-#define _IP4_NV_DATA_H_
+#pragma once
 
 #include <Guid/Ip4Config2Hii.h>
 
@@ -40,5 +39,3 @@ typedef struct {
   CHAR16    GatewayAddress[IP4_STR_MAX_SIZE];        ///< Gateway address
   CHAR16    DnsAddress[ADDRESS_STR_MAX_SIZE];        ///< DNS server address
 } IP4_CONFIG2_IFR_NVDATA;
-
-#endif

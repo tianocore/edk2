@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UNIT_TEST_LIB_H__
-#define __UNIT_TEST_LIB_H__
+#pragma once
 
 ///
 /// Unit Test Status
@@ -840,5 +839,3 @@ UnitTestLog (
   IN  CONST CHAR8  *Format,
   ...
   );
-
-#endif

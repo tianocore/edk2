@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef BASE_RISCV_MMU_LIB_H_
-#define BASE_RISCV_MMU_LIB_H_
+#pragma once
 
 /**
   The API to flush all local TLBs.
@@ -64,5 +63,3 @@ EFIAPI
 RiscVConfigureMmu (
   VOID
   );
-
-#endif /* BASE_RISCV_MMU_LIB_H_ */

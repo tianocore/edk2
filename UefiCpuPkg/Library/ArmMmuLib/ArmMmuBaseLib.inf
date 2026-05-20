@@ -1,0 +1,35 @@
+#/** @file
+#
+#  Copyright (c) 2016 Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmMmuBaseLib
+  FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmMmuLib
+  CONSTRUCTOR                    = ArmMmuBaseLibConstructor
+
+[Sources.AARCH64]
+  ArmMmuLibInternal.h
+  AArch64/ArmMmuLibCore.c
+  AArch64/ArmMmuLibReplaceEntry.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  CacheMaintenanceLib
+  HobLib
+  MemoryAllocationLib
+
+[Guids]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid

@@ -38,6 +38,13 @@
   !ifdef $(DB_DEFAULT_FILE3)
     SECTION RAW = $(DB_DEFAULT_FILE3)
   !endif
+  !ifdef $(DB_DEFAULT_FILE4)
+    SECTION RAW = $(DB_DEFAULT_FILE4)
+  !endif
+  !ifdef $(DB_DEFAULT_FILE5)
+    SECTION RAW = $(DB_DEFAULT_FILE5)
+  !endif
+
     SECTION UI = "DB Default"
   }
 

@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PARTITION_H_
-#define _PARTITION_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
@@ -479,5 +478,3 @@ EFI_STATUS
   IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   );
-
-#endif

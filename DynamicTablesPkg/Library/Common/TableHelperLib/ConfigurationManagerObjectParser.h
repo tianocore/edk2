@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef CONFIGURATION_MANAGER_OBJECT_PARSER_H_
-#define CONFIGURATION_MANAGER_OBJECT_PARSER_H_
+#pragma once
 
 #define OUTPUT_FIELD_COLUMN_WIDTH  32
 
@@ -84,5 +83,3 @@ typedef struct CmObjParserArray {
   /// Count of items
   UINTN                  ItemCount;
 } CM_OBJ_PARSER_ARRAY;
-
-#endif // CONFIGURATION_MANAGER_OBJECT_PARSER_H_

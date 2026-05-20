@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FWVOL_BLOCK_H_
-#define _FWVOL_BLOCK_H_
+#pragma once
 
 #define FVB_DEVICE_SIGNATURE  SIGNATURE_32('_','F','V','B')
 
@@ -217,5 +216,3 @@ FwVolBlockGetBlockSize (
   IN OUT    UINTN                               *BlockSize,
   IN OUT    UINTN                               *NumberOfBlocks
   );
-
-#endif

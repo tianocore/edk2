@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __NEHALEM_MSR_H__
-#define __NEHALEM_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -7081,5 +7080,3 @@ typedef union {
   @note MSR_NEHALEM_M1_PMON_ADDR_MASK is defined as MSR_M1_PMON_ADDR_MASK in SDM.
 **/
 #define MSR_NEHALEM_M1_PMON_ADDR_MASK  0x00000E5E
-
-#endif

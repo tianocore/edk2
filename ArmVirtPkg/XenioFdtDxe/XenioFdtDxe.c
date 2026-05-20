@@ -56,7 +56,7 @@ InitializeXenioFdtDxe (
 
   ASSERT (AddressCells == 2);
   ASSERT (SizeCells == 2);
-  ASSERT (RegSize == 2 * sizeof (UINT64));
+  ASSERT (RegSize >= 2 * sizeof (UINT64));
 
   //
   // Retrieve the reg base from this node and wire it up to the

@@ -87,6 +87,10 @@ FitIsHobNeed (
     }
 
     if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION) {
+      if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSmbios3TableGuid)) {
+        return FALSE;
+      }
+
       if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSerialPortInfoGuid)) {
         return FALSE;
       }
@@ -140,7 +144,7 @@ CustomFdtNodeParser (
       DEBUG ((DEBUG_INFO, "  Found upl-custom node (%08X)", CustomNode));
       PropertyPtr = FdtGetProperty (FdtBase, CustomNode, "hoblistptr", &TempLen);
       Data64      = (UINT64 *)(PropertyPtr->Data);
-      CHobList    = (UINTN)Fdt64ToCpu (*Data64);
+      CHobList    = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data64));
       DEBUG ((DEBUG_INFO, "  Found hob list node (%08X)", CustomNode));
       DEBUG ((DEBUG_INFO, " -pointer  %016lX\n", CHobList));
     }

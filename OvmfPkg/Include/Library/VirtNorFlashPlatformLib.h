@@ -6,8 +6,7 @@
 
  **/
 
-#ifndef __VIRT_NOR_FLASH_PLATFORM_LIB__
-#define __VIRT_NOR_FLASH_PLATFORM_LIB__
+#pragma once
 
 typedef struct {
   UINTN    DeviceBaseAddress;       // Start address of the Device Base Address (DBA)
@@ -26,5 +25,3 @@ VirtNorFlashPlatformGetDevices (
   OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
   OUT UINT32                      *Count
   );
-
-#endif /* __VIRT_NOR_FLASH_PLATFORM_LIB__ */

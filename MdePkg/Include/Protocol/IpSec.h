@@ -18,8 +18,7 @@
 
 **/
 
-#ifndef __EFI_IPSEC_PROTOCOL_H__
-#define __EFI_IPSEC_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/IpSecConfig.h>
 
@@ -214,4 +213,3 @@ struct _EFI_IPSEC2_PROTOCOL {
 
 extern EFI_GUID  gEfiIpSecProtocolGuid;
 extern EFI_GUID  gEfiIpSec2ProtocolGuid;
-#endif

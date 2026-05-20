@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_PHYSICAL_ADDRESS
 GetSmmProfileData (
-  IN OUT  UINT64  *Size
+  IN OUT  UINTN  *Size
   )
 {
   EFI_PEI_HOB_POINTERS  SmmProfileDataHob;
@@ -45,7 +45,7 @@ GetSmmProfileData (
     return 0;
   }
 
-  *Size = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
+  *Size = (UINTN)SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
 
   return SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
 }
@@ -125,11 +125,14 @@ BuildMemoryMapFromResDescHobs (
   EFI_PEI_HOB_POINTERS  Hob;
   UINTN                 Count;
   UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  MaxPhysicalAddress;
+  EFI_PHYSICAL_ADDRESS  ResourceHobEnd;
 
   ASSERT (MemoryRegion != NULL && MemoryRegionCount != NULL);
 
   *MemoryRegion      = NULL;
   *MemoryRegionCount = 0;
+  MaxPhysicalAddress = LShiftU64 (1, mPhysicalAddressBits);
 
   //
   // Get the count.
@@ -138,6 +141,13 @@ BuildMemoryMapFromResDescHobs (
   Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
   while (Hob.Raw != NULL) {
     if ((Hob.ResourceDescriptor->ResourceAttribute & MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
+      ResourceHobEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+
+      ASSERT (ResourceHobEnd <= MaxPhysicalAddress);
+      if (ResourceHobEnd > MaxPhysicalAddress) {
+        CpuDeadLoop ();
+      }
+
       //
       // Resource HOBs describe all accessible non-smram regions.
       // Logging attribute range is treated as not present. Not-present ranges are not included in this memory map.

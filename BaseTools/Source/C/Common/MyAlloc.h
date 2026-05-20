@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MYALLOC_H_
-#define _MYALLOC_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,6 +157,5 @@ MyFree (
 #define alloc_check(final)
 
 #endif /* USE_MYALLOC */
-#endif /* _MYALLOC_H_ */
 
 /* eof - MyAlloc.h */

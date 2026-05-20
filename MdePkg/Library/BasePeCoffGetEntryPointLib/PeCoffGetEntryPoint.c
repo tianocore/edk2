@@ -363,7 +363,7 @@ PeCoffSearchImageBase (
       if ((Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) &&
           ((Hdr.Te->Machine == IMAGE_FILE_MACHINE_I386)  || (Hdr.Te->Machine == IMAGE_FILE_MACHINE_IA64) ||
            (Hdr.Te->Machine == IMAGE_FILE_MACHINE_EBC)   || (Hdr.Te->Machine == IMAGE_FILE_MACHINE_X64)  ||
-           (Hdr.Te->Machine == IMAGE_FILE_MACHINE_ARM64) || (Hdr.Te->Machine == IMAGE_FILE_MACHINE_ARMTHUMB_MIXED))
+           (Hdr.Te->Machine == IMAGE_FILE_MACHINE_ARM64))
           )
       {
         break;

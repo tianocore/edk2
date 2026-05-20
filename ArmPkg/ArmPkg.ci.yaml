@@ -22,9 +22,6 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3",
-            "Library/ArmSoftFloatLib/ArmSoftFloatLib.c",
-            "Library/CompilerIntrinsicsLib",
             "Universal/Smbios/SmbiosMiscDxe"
         ]
     },
@@ -50,9 +47,12 @@
             "ArmPlatformPkg/ArmPlatformPkg.dec",
             "ArmPkg/ArmPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
+            "FmpDevicePkg/FmpDevicePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "MdePkg/MdePkg.dec",
-            "ShellPkg/ShellPkg.dec"
+            "ShellPkg/ShellPkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
@@ -85,16 +85,15 @@
 
     ## options defined .pytool/Plugin/LibraryClassCheck
     "LibraryClassCheck": {
-        "IgnoreHeaderFile": []
+        "IgnoreHeaderFile": [
+          "Include/Library/ArmMmHandlerContext.h"
+        ],
+        "skip": True
     },
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
         "AuditOnly": True,
-        "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3/**"
-        ],                           # use gitignore syntax to ignore errors
-                                     # in matching files
         "ExtendWords": [
           "api's",
           "ackintid",

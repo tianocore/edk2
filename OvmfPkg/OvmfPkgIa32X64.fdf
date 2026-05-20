@@ -60,43 +60,7 @@ FV = SECFV
 
 ################################################################################
 
-[FD.MEMFD]
-BaseAddress   = $(MEMFD_BASE_ADDRESS)
-Size          = 0xF80000
-ErasePolarity = 1
-BlockSize     = 0x10000
-NumBlocks     = 0xF8
-
-0x000000|0x006000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
-
-0x006000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
-
-0x007000|0x001000
-gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
-
-0x008000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
-
-0x010000|0x010000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
-
-0x020000|0x0E0000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
-FV = PEIFV
-
-0x100000|0xE80000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
-FV = DXEFV
-
-##########################################################################################
-# Set the SEV-ES specific work area PCDs (used for all forms of SEV since the
-# the SEV STATUS MSR is now saved in the work area)
-#
-SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase = $(MEMFD_BASE_ADDRESS) +  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
-SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize - gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
-##########################################################################################
+!include OvmfPkg/Include/Fdf/MemFd.fdf.inc
 
 ################################################################################
 
@@ -158,6 +122,9 @@ APRIORI PEI {
 #
 #  PEI Phase modules
 #
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
@@ -234,15 +201,7 @@ INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
-!if $(PVSCSI_ENABLE) == TRUE
-INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
-!endif
-!if $(MPT_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
-!endif
-!if $(LSI_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
-!endif
+INF  OvmfPkg/VirtioKeyboardDxe/VirtioKeyboard.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
@@ -258,6 +217,7 @@ INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF  MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
+INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
 INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
@@ -298,7 +258,9 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 #
 # Hash2 Protocol producer
 #
-INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!if $(NETWORK_ENABLE) == TRUE
+  INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Network modules
@@ -309,7 +271,9 @@ INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   }
 !endif
 !include NetworkPkg/Network.fdf.inc
+!if $(NETWORK_ENABLE) == TRUE
   INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+!endif
 
 #
 # Usb Support
@@ -339,6 +303,7 @@ INF  OvmfPkg/CpuHotplugSmm/CpuHotplugSmm.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
+INF  MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
 
 #
 # Variable driver stack (SMM)
@@ -367,6 +332,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 !include OvmfPkg/Include/Fdf/MorLock.fdf.inc
 !include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfOptHw.fdf.inc
 
 ################################################################################
 
@@ -482,7 +448,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
-[Rule.Common.SEC.RESET_VECTOR]
+[Rule.Common.USER_DEFINED.RESET_VECTOR]
   FILE RAW = $(NAMED_GUID) {
     RAW BIN   Align = 16   |.bin
   }

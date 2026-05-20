@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __RAM_DISK_PROTOCOL_H__
-#define __RAM_DISK_PROTOCOL_H__
+#pragma once
 
 //
 // EFI RAM Disk Protocol GUID value
@@ -96,5 +95,3 @@ struct _EFI_RAM_DISK_PROTOCOL {
 /// RAM Disk Protocol GUID variable.
 ///
 extern EFI_GUID  gEfiRamDiskProtocolGuid;
-
-#endif

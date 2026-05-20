@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EHCI_MEM_H_
-#define _EFI_EHCI_MEM_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Pci22.h>
@@ -81,5 +80,3 @@ UsbHcGetPciAddressForHostMem (
   IN VOID            *Mem,
   IN UINTN           Size
   );
-
-#endif

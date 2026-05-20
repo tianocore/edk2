@@ -14,7 +14,6 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
-#include <Library/PlatformInitLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <WorkArea.h>
 
@@ -69,10 +68,20 @@ QemuFwCfgProbe (
   BOOLEAN  CcGuest;
 
   // Use direct Io* calls for probing to avoid recursion.
-  IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)QemuFwCfgItemSignature);
-  IoReadFifo8 (FW_CFG_IO_DATA, sizeof Signature, &Signature);
-  IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)QemuFwCfgItemInterfaceVersion);
-  IoReadFifo8 (FW_CFG_IO_DATA, sizeof Revision, &Revision);
+  QemuFwCfgSelectItem (QemuFwCfgItemSignature);
+  if ( InternalQemuFwCfgCacheReading ()) {
+    InternalQemuFwCfgCacheReadBytes (sizeof Signature, &Signature);
+  } else {
+    IoReadFifo8 (FW_CFG_IO_DATA, sizeof Signature, &Signature);
+  }
+
+  QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
+  if ( InternalQemuFwCfgCacheReading ()) {
+    InternalQemuFwCfgCacheReadBytes (sizeof Revision, &Revision);
+  } else {
+    IoReadFifo8 (FW_CFG_IO_DATA, sizeof Revision, &Revision);
+  }
+
   CcGuest = QemuFwCfgIsCcGuest ();
 
   *Supported    = FALSE;
@@ -111,8 +120,8 @@ QemuFwCfgGetPlatformInfo (
 
   if (!PlatformInfoHob->QemuFwCfgChecked) {
     QemuFwCfgProbe (
-      &PlatformInfoHob->QemuFwCfgSupported,
-      &PlatformInfoHob->QemuFwCfgDmaSupported
+      &PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgSupported,
+      &PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgDmaSupported
       );
     PlatformInfoHob->QemuFwCfgChecked = TRUE;
   }
@@ -145,7 +154,7 @@ InternalQemuFwCfgIsAvailable (
 {
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = QemuFwCfgGetPlatformInfo ();
 
-  return PlatformInfoHob->QemuFwCfgSupported;
+  return PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgSupported;
 }
 
 /**
@@ -162,7 +171,7 @@ InternalQemuFwCfgDmaIsAvailable (
 {
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = QemuFwCfgGetPlatformInfo ();
 
-  return PlatformInfoHob->QemuFwCfgDmaSupported;
+  return PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgDmaSupported;
 }
 
 /**
@@ -241,4 +250,53 @@ InternalQemuFwCfgDmaBytes (
   // After a read, the caller will want to use Buffer.
   //
   MemoryFence ();
+}
+
+/**
+  Get the pointer to the QEMU_FW_CFG_WORK_AREA. This data is used as the
+  workarea to record the onging fw_cfg item and offset.
+  @retval   QEMU_FW_CFG_WORK_AREA  Pointer to the QEMU_FW_CFG_WORK_AREA
+  @retval   NULL                QEMU_FW_CFG_WORK_AREA doesn't exist
+**/
+QEMU_FW_CFG_WORK_AREA *
+InternalQemuFwCfgCacheGetWorkArea (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE      *GuidHob;
+  EFI_HOB_PLATFORM_INFO  *PlatformHobinfo;
+
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  if (GuidHob == NULL) {
+    return NULL;
+  }
+
+  PlatformHobinfo = (EFI_HOB_PLATFORM_INFO *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
+  return &(PlatformHobinfo->QemuFwCfgWorkArea);
+}
+
+/**
+ OVMF reads configuration data from QEMU via fw_cfg.
+ For Td-Guest VMM is out of TCB and the configuration data is untrusted.
+ From the security perpective the configuration data shall be measured
+ before it is consumed.
+ This function reads the fw_cfg items and cached them. In the meanwhile these
+ fw_cfg items are measured as well. This is to avoid changing the order when
+ reading the fw_cfg process, which depends on multiple factors(depex, order in
+ the Firmware volume).
+ @retval  RETURN_SUCCESS   - Successfully cache with measurement
+ @retval  Others           - As the error code indicates
+ */
+RETURN_STATUS
+EFIAPI
+QemuFwCfgInitCache (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  if (EFI_ERROR (InternalQemuFwCfgInitCache (PlatformInfoHob))) {
+    return RETURN_ABORTED;
+  }
+
+  DEBUG ((DEBUG_INFO, "QemuFwCfgInitCache Pass!!!\n"));
+  return RETURN_SUCCESS;
 }

@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FAULT_TOLERANT_WRITE_H_
-#define _FAULT_TOLERANT_WRITE_H_
+#pragma once
 
 #define EDKII_FAULT_TOLERANT_WRITE_GUID \
   { \
@@ -44,5 +43,3 @@ typedef struct {
 // but the target buffer has not been writen in target block from spare block.
 //
 extern EFI_GUID  gEdkiiFaultTolerantWriteGuid;
-
-#endif

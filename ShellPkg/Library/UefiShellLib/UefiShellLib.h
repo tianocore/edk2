@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_LIB_INTERNAL_H_
-#define _UEFI_SHELL_LIB_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -84,5 +83,3 @@ InternalShellStripQuotes (
   IN  CONST CHAR16  *OriginalString,
   OUT CHAR16        **CleanString
   );
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FW_BLOCK_SERVICE_H
-#define _FW_BLOCK_SERVICE_H
+#pragma once
 
 //
 // BugBug: Add documentation here for data structure!!!!
@@ -208,5 +207,3 @@ FvbProtocolEraseBlocks (
   ...
   )
 ;
-
-#endif

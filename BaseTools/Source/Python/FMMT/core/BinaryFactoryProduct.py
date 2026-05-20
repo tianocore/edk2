@@ -2,9 +2,9 @@
 # This file is used to implement of the various bianry parser.
 #
 # Copyright (c) 2021-, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-from re import T
 import copy
 import os
 import sys
@@ -110,6 +110,9 @@ class SectionProduct(BinaryProduct):
             Sec_Fv_Tree.Data.Data = Section_Tree.Data.Data[Sec_Fv_Tree.Data.Header.HeaderLength:]
             Section_Tree.insertChild(Sec_Fv_Tree)
             Fv_count += 1
+        elif Section_Tree.Data.Type == EFI_SECTION_PE32 or Section_Tree.Data.Type == EFI_SECTION_TE:
+            if Section_Tree.Parent.Parent.type == FV_TREE or Section_Tree.Parent.Parent.type == ROOT_FV_TREE or Section_Tree.Parent.Parent.type == ROOT_FFS_TREE:
+                self.ParserPeCoff(Section_Tree, b'')
 
     def ParserSection(self, ParTree, Whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
         Rel_Offset = 0
@@ -138,9 +141,6 @@ class SectionProduct(BinaryProduct):
             if (Rel_Offset+Section_Info.HeaderLength+len(Section_Info.Data) != Data_Size):
                 Pad_Size = GetPadSize(Section_Info.Size, SECTION_COMMON_ALIGNMENT)
                 Section_Info.PadData = Pad_Size * b'\x00'
-            if Section_Info.Header.Type == 0x02:
-                Section_Info.DOffset = Section_Offset + Section_Info.ExtHeader.DataOffset + Rel_Whole_Offset
-                Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.ExtHeader.DataOffset: Rel_Offset+Section_Info.Size]
             if Section_Info.Header.Type == 0x14:
                 ParTree.Data.Version = Section_Info.ExtHeader.GetVersionString()
             if Section_Info.Header.Type == 0x15:
@@ -152,6 +152,20 @@ class SectionProduct(BinaryProduct):
             Rel_Offset += Section_Info.Size + Pad_Size
             Section_Tree.Data = Section_Info
             ParTree.insertChild(Section_Tree)
+
+    def ParserPeCoff(self, ParTree, Whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        SectionTypeList = [EFI_SECTION_PE32, EFI_SECTION_TE]
+        if ParTree.Data.Type in SectionTypeList:
+            # Find Pe Image
+            PeCoff_Info = PeCoffNode(ParTree.Data.Data, ParTree.Data.DOffset, ParTree.Data.Size-ParTree.Data.HeaderLength)
+            original_size = len(PeCoff_Info.Data) if hasattr(PeCoff_Info, 'Data') else 0
+            original_section_size = ParTree.Data.Size
+            if PeCoff_Info.IfRebase:
+                PeCoff_Info.PeCoffRebase()
+            PeCoff_Tree = BIOSTREE(PeCoff_Info.Name)
+            PeCoff_Tree.type = PECOFF_TREE
+            PeCoff_Tree.Data = PeCoff_Info
+            ParTree.insertChild(PeCoff_Tree)
 
 class FfsProduct(BinaryProduct):
     # ParserFFs / GetSection
@@ -182,17 +196,28 @@ class FfsProduct(BinaryProduct):
             if (Rel_Offset+Section_Info.HeaderLength+len(Section_Info.Data) != Data_Size):
                 Pad_Size = GetPadSize(Section_Info.Size, SECTION_COMMON_ALIGNMENT)
                 Section_Info.PadData = Pad_Size * b'\x00'
-            if Section_Info.Header.Type == 0x02:
-                Section_Info.DOffset = Section_Offset + Section_Info.ExtHeader.DataOffset + Rel_Whole_Offset
-                Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.ExtHeader.DataOffset: Rel_Offset+Section_Info.Size]
             # If Section is Version or UI type, it saves the version and UI info of its parent Ffs.
             if Section_Info.Header.Type == 0x14:
                 ParTree.Data.Version = Section_Info.ExtHeader.GetVersionString()
             if Section_Info.Header.Type == 0x15:
                 ParTree.Data.UiName = Section_Info.ExtHeader.GetUiString()
             if Section_Info.Header.Type == 0x19:
+                if ParTree.Data.IsFsp:
+                    ParTree.Parent.Data.ImageSize = Bytes2Val(Section_Info.Data[24:28])
+                    ParTree.Parent.Data.BaseAddress = Bytes2Val(Section_Info.Data[28:32])
+                    print(f'ParTree.Parent.Data.ImageSize : {hex(ParTree.Parent.Data.ImageSize)}')
+                    print(f'ParTree.Parent.Data.BaseAddress : {hex(ParTree.Parent.Data.BaseAddress)}')
+                elif ParTree.Data.IsVtf:
+                    TargetFv = ParTree.Parent
+                    offset = 0
+                    while TargetFv:
+                        offset += TargetFv.Data.Size
+                        TargetFv = TargetFv.NextRel
+                    ParTree.Parent.Data.BaseAddress = 0x100000000 - offset
                 if Section_Info.Data.replace(b'\x00', b'') == b'':
                     Section_Info.IsPadSection = True
+            if Section_Info.Header.Type == EFI_SECTION_PE32 or Section_Info.Header.Type == EFI_SECTION_TE:
+                ParTree.Data.PeCoffSecIndex = len(ParTree.Child)
             Section_Offset += Section_Info.Size + Pad_Size
             Rel_Offset += Section_Info.Size + Pad_Size
             Section_Tree.Data = Section_Info

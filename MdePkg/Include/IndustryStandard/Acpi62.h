@@ -3,13 +3,23 @@
 
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_6_2_H_
-#define _ACPI_6_2_H_
+#pragma once
 
 #include <IndustryStandard/Acpi61.h>
+
+///
+/// _CSD Revision for ACPI 6.2
+///
+#define EFI_ACPI_6_2_AML_CSD_REVISION  0
+
+///
+/// _CSD NumEntries for ACPI 6.2
+///
+#define EFI_ACPI_6_2_AML_CSD_NUM_ENTRIES  6
 
 //
 // Large Item Descriptor Name
@@ -2991,5 +3001,3 @@ typedef struct {
 #define EFI_ACPI_6_2_XEN_PROJECT_TABLE_SIGNATURE  SIGNATURE_32('X', 'E', 'N', 'V')
 
 #pragma pack()
-
-#endif

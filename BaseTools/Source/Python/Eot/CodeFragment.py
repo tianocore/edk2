@@ -41,24 +41,6 @@ class PP_Directive :
         self.StartPos = Begin
         self.EndPos = End
 
-## The description of assignment expression and start & end position
-#
-#
-class AssignmentExpression :
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #   @param  Str         The message to record
-    #   @param  Begin       The start position tuple.
-    #   @param  End         The end position tuple.
-    #
-    def __init__(self, Lvalue, Op, Exp, Begin, End):
-        self.Name = Lvalue
-        self.Operator = Op
-        self.Value = Exp
-        self.StartPos = Begin
-        self.EndPos = End
-
 ## The description of predicate expression and start & end position
 #
 #

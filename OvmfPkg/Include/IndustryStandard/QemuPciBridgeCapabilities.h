@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __QEMU_PCI_BRIDGE_CAPABILITIES_H__
-#define __QEMU_PCI_BRIDGE_CAPABILITIES_H__
+#pragma once
 
 #include <IndustryStandard/Pci23.h>
 
@@ -50,5 +49,3 @@ typedef struct {
   UINT64                            Prefetchable64BitMmio;
 } QEMU_PCI_BRIDGE_CAPABILITY_RESOURCE_RESERVATION;
 #pragma pack ()
-
-#endif

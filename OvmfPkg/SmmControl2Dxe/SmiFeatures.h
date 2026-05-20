@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __SMI_FEATURES_H__
-#define __SMI_FEATURES_H__
+#pragma once
 
 #include <Protocol/S3SaveState.h>
 
@@ -36,5 +35,3 @@ VOID
 SaveSmiFeatures (
   VOID
   );
-
-#endif

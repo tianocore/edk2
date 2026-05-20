@@ -58,7 +58,7 @@ if __name__ == '__main__':
   parser.add_argument (
            '-a', '--arch', dest = 'Arch', nargs = '+', action = 'append',
            required = True,
-           help = '''ARCHS is one of list: IA32, X64, IPF, ARM, AARCH64 or EBC,
+           help = '''ARCHS is one of list: IA32, X64, IPF, AARCH64 or EBC,
                      which overrides target.txt's TARGET_ARCH definition. To
                      specify more archs, please repeat this option.'''
            )

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EMMC_H__
-#define __EMMC_H__
+#pragma once
 
 //
 // EMMC command index
@@ -287,5 +286,3 @@ typedef struct {
 } EMMC_EXT_CSD;
 
 #pragma pack()
-
-#endif

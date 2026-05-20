@@ -1,0 +1,42 @@
+## @file
+#  The CPU specific programming for Standalone MM environment.
+#
+#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StandaloneMmCpuFeaturesLib
+  MODULE_UNI_FILE                = StandaloneMmCpuFeaturesLib.uni
+  FILE_GUID                      = 74B868F6-7DC6-4CDE-86B1-27E9A7CEBFCC
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = SmmCpuFeaturesLib
+  CONSTRUCTOR                    = StandalonMmCpuFeaturesLibConstructor
+
+[Sources]
+  SmmCpuFeaturesLib.c
+  StandaloneMmCpuFeaturesLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemEncryptSevLib
+  PcdLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase

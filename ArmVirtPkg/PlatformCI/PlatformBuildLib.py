@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
+import shutil
 import logging
 import io
 
@@ -56,7 +57,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         ret = RunCmd("git", "config --file .gitmodules --get-regexp path", workingdir=self.GetWorkspaceRoot(), outstream=result)
         # Cmd output is expected to look like:
         # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
         if ret == 0:
             for line in result.getvalue().splitlines():
                 _, _, path = line.partition(" ")
@@ -93,8 +93,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         if GetHostInfo().os.upper() == "LINUX" and ActualToolChainTag.upper().startswith("GCC"):
             if "AARCH64" in self.ActualArchitectures:
                 scopes += ("gcc_aarch64_linux",)
-            if "ARM" in self.ActualArchitectures:
-                scopes += ("gcc_arm_linux",)
         return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
@@ -167,8 +165,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if GetHostInfo().os.upper() == "LINUX" and ActualToolChainTag.upper().startswith("GCC"):
             if "AARCH64" == Arch:
                 scopes += ("gcc_aarch64_linux",)
-            elif "ARM" == Arch:
-                scopes += ("gcc_arm_linux",)
         return scopes
 
     def GetName(self):
@@ -206,7 +202,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def FlashRomImage(self):
         VirtualDrive = os.path.join(self.env.GetValue(
             "BUILD_OUTPUT_BASE"), "VirtualDrive")
-        os.makedirs(VirtualDrive, exist_ok=True)
+        VirtualDriveBoot = os.path.join(VirtualDrive, "EFI", "BOOT")
+        os.makedirs(VirtualDriveBoot, exist_ok=True)
         OutputPath_FV = os.path.join(
             self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
         Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
@@ -217,17 +214,23 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
             fvfile.write(additional)
 
-        # QEMU must be on that path
+        # copy shell to VirtualDrive
+        for arch in self.env.GetValue("TARGET_ARCH").split():
+            src = os.path.join(self.env.GetValue(
+                "BUILD_OUTPUT_BASE"), arch, "Shell.efi")
+            dst = os.path.join(VirtualDriveBoot,
+                f'BOOT{"AA64" if arch == "AARCH64" else arch}.EFI')
+            if os.path.exists(src):
+                logging.info("copy %s -> %s", src, dst)
+                shutil.copyfile(src, dst)
+
+        # QEMU must be on the path
 
         # Unique Command and Args parameters per ARCH
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
             cmd = "qemu-system-aarch64"
             args = "-M virt"
-            args += " -cpu cortex-a57"                                          # emulate cpu
-        elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
-            cmd = "qemu-system-arm"
-            args = "-M virt,highmem=off"
-            args += " -cpu cortex-a15"                                          # emulate cpu
+            args += " -cpu neoverse-n2"                                         # emulate cpu
         else:
             raise NotImplementedError()
 

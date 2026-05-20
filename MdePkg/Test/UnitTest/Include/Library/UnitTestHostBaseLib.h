@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __UNIT_TEST_HOST_BASE_LIB_H__
-#define __UNIT_TEST_HOST_BASE_LIB_H__
+#pragma once
 
 /**
   Prototype of service with no parameters and no return value.
@@ -569,7 +568,7 @@ typedef struct {
 
 ///
 /// Data structure that contains pointers structures of common services and CPU
-/// architctuire specific services.  Support for additional CPU architectures
+/// architecture specific services.  Support for additional CPU architectures
 /// can be added to the end of this structure.
 ///
 typedef struct {
@@ -578,5 +577,3 @@ typedef struct {
 } UNIT_TEST_HOST_BASE_LIB;
 
 extern UNIT_TEST_HOST_BASE_LIB  gUnitTestHostBaseLib;
-
-#endif

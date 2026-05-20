@@ -13,6 +13,7 @@
 #include <Guid/MmCpuSyncConfig.h>
 #include <Guid/MmProfileData.h>
 #include <Guid/MmUnblockRegion.h>
+#include <Guid/MmStatusCodeUseSerial.h>
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -117,10 +118,9 @@ MmIplBuildFvHob (
   EFI_HOB_FIRMWARE_VOLUME  *FvHob;
   UINT16                   HobLength;
 
-  ASSERT (Hob != NULL);
-
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_FIRMWARE_VOLUME), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (Hob, EFI_HOB_TYPE_FV, sizeof (EFI_HOB_FIRMWARE_VOLUME));
 
     FvHob              = (EFI_HOB_FIRMWARE_VOLUME *)Hob;
@@ -153,10 +153,9 @@ MmIplBuildMmAcpiS3EnableHob (
   MM_ACPI_S3_ENABLE  *MmAcpiS3Enable;
   UINT16             HobLength;
 
-  ASSERT (Hob != NULL);
-
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_ACPI_S3_ENABLE), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
 
     GuidHob = (EFI_HOB_GUID_TYPE *)Hob;
@@ -191,12 +190,11 @@ MmIplBuildMmCpuSyncConfigHob (
   MM_CPU_SYNC_CONFIG  *MmSyncModeInfoHob;
   UINT16              HobLength;
 
-  ASSERT (Hob != NULL);
-
   GuidHob = (EFI_HOB_GUID_TYPE *)(UINTN)Hob;
 
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_CPU_SYNC_CONFIG), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (GuidHob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
 
     CopyGuid (&GuidHob->Name, &gMmCpuSyncConfigHobGuid);
@@ -205,6 +203,43 @@ MmIplBuildMmCpuSyncConfigHob (
     MmSyncModeInfoHob->RelaxedApMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == MmCpuSyncModeRelaxedAp);
     MmSyncModeInfoHob->Timeout       = PcdGet64 (PcdCpuSmmApSyncTimeout);
     MmSyncModeInfoHob->Timeout2      = PcdGet64 (PcdCpuSmmApSyncTimeout2);
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
+  Builds MM Status Code Use Serial HOB.
+
+  This function builds MM Status Code Use Serial HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]       Hob            The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The available size of the HOB buffer when as input.
+                                  The used size of when as output.
+
+**/
+VOID
+MmIplBuildMmStatusCodeUseSerialHob (
+  IN UINT8      *Hob,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_HOB_GUID_TYPE          *GuidHob;
+  MM_STATUS_CODE_USE_SERIAL  *MmStatusCodeUseSerial;
+  UINT16                     HobLength;
+
+  HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_STATUS_CODE_USE_SERIAL), 8);
+  if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
+    MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    GuidHob = (EFI_HOB_GUID_TYPE *)Hob;
+    CopyGuid (&GuidHob->Name, &gMmStatusCodeUseSerialHobGuid);
+
+    MmStatusCodeUseSerial                      = (MM_STATUS_CODE_USE_SERIAL *)(GuidHob + 1);
+    MmStatusCodeUseSerial->StatusCodeUseSerial = PcdGetBool (PcdStatusCodeUseSerial);
   }
 
   *HobBufferSize = HobLength;
@@ -240,6 +275,7 @@ MmIplCopyGuidHob (
 
   while (GuidHob != NULL) {
     if (*HobBufferSize >= UsedSize + GuidHob->HobLength) {
+      ASSERT (HobBuffer != NULL);
       CopyMem (HobBuffer + UsedSize, GuidHob, GuidHob->HobLength);
     }
 
@@ -285,13 +321,13 @@ MmIplBuildMmCoreModuleHob (
   UINT16                            HobLength;
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *MmCoreModuleHob;
 
-  ASSERT (Hob != NULL);
   ASSERT (ADDRESS_IS_ALIGNED (Base, EFI_PAGE_SIZE));
   ASSERT (IS_ALIGNED (Length, EFI_PAGE_SIZE));
   ASSERT (EntryPoint >= Base && EntryPoint < Base + Length);
 
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (Hob, EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
     MmCoreModuleHob = (EFI_HOB_MEMORY_ALLOCATION_MODULE *)Hob;
@@ -389,6 +425,7 @@ MmIplBuildMmProfileHobs (
     // Build memory allocation HOB
     //
     ASSERT (Hob.MemoryAllocation->Header.HobLength == ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION), 8));
+    ASSERT (HobBuffer != NULL);
     CopyMem (HobBuffer, Hob.Raw, Hob.MemoryAllocation->Header.HobLength);
 
     //
@@ -568,6 +605,49 @@ MemoryRegionBaseAddressCompare (
 }
 
 /**
+  The routine returns TRUE when CPU supports it (CPUID[7,0].ECX.BIT[16] is set) and
+  the max physical address bits is bigger than 48. Because 4-level paging can support
+  to address physical address up to 2^48 - 1, there is no need to enable 5-level paging
+  with max physical address bits <= 48.
+
+  @retval TRUE  5-level paging enabling is needed.
+  @retval FALSE 5-level paging enabling is not needed.
+**/
+BOOLEAN
+MmIplIs5LevelPagingNeeded (
+  VOID
+  )
+{
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX               VirPhyAddressSize;
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  ExtFeatureEcx;
+  UINT32                                       MaxExtendedFunctionId;
+
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunctionId, NULL, NULL, NULL);
+  if (MaxExtendedFunctionId >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+  } else {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
+
+  AsmCpuidEx (
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
+    NULL,
+    NULL,
+    &ExtFeatureEcx.Uint32,
+    NULL
+    );
+
+  if ((VirPhyAddressSize.Bits.PhysicalAddressBits > 4 * 9 + 12) &&
+      (ExtFeatureEcx.Bits.FiveLevelPage == 1))
+  {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/**
   Calculate the maximum support address.
 
   @return the maximum support address.
@@ -595,6 +675,18 @@ MmIplCalculateMaximumSupportAddress (
     } else {
       PhysicalAddressBits = 36;
     }
+  }
+
+  //
+  // 4-level paging supports translating 48-bit linear addresses to 52-bit physical addresses.
+  // Since linear addresses are sign-extended, the linear-address space of 4-level paging is:
+  // [0, 2^47-1] and [0xffff8000_00000000, 0xffffffff_ffffffff].
+  // So only [0, 2^47-1] linear-address range maps to the identical physical-address range when
+  // 5-Level paging is disabled.
+  //
+  ASSERT (PhysicalAddressBits <= 52);
+  if (!MmIplIs5LevelPagingNeeded () && (PhysicalAddressBits > 47)) {
+    PhysicalAddressBits = 47;
   }
 
   return PhysicalAddressBits;
@@ -750,6 +842,46 @@ GetRemainingHobSize (
 }
 
 /**
+  Check if FV HOB was created.
+
+  Check if FV HOB was created on HOB list,
+  if yes, skip building MM Core FV HOB,
+  if No, continue to build MM Core FV HOB
+
+  @param[in]      HobList     HOB list.
+  @param[in]      HobSize     HOB size.
+
+  @retval TRUE    Skip building MM Core FV HOB.
+          FALSE   Continue to build MM Core FV HOB.
+**/
+BOOLEAN
+IsFvHobExist  (
+  IN UINT8  *HobList,
+  IN UINTN  HobSize
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  if ((HobList == NULL) || (HobSize == 0)) {
+    return FALSE;
+  }
+
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  Hob.Raw = HobList;
+  while ((UINTN)(Hob.Raw - HobList) < HobSize) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_FV) {
+      return TRUE;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return FALSE;
+}
+
+/**
   Create the MM foundation specific HOB list which StandaloneMm Core needed.
 
   This function build the MM foundation specific HOB list needed by StandaloneMm Core
@@ -838,11 +970,16 @@ CreateMmFoundationHobList (
   UsedSize += HobLength;
 
   //
-  // BFV address for StandaloneMm Core
+  // Skip to report FV that contains MmCore when Platform reports FV
   //
-  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
-  MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
-  UsedSize += HobLength;
+  if (!IsFvHobExist (PlatformHobList, PlatformHobSize)) {
+    //
+    // BFV address for StandaloneMm Core
+    //
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
+    UsedSize += HobLength;
+  }
 
   //
   // Build MM ACPI S3 Enable HOB
@@ -856,6 +993,13 @@ CreateMmFoundationHobList (
   //
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplBuildMmCpuSyncConfigHob (FoundationHobList + UsedSize, &HobLength);
+  UsedSize += HobLength;
+
+  //
+  // Build MM Status Code Use Serial HOB
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplBuildMmStatusCodeUseSerialHob (FoundationHobList + UsedSize, &HobLength);
   UsedSize += HobLength;
 
   //
@@ -882,9 +1026,12 @@ CreateMmFoundationHobList (
   //
   // Build ACPI variable HOB
   //
-  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
-  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiAcpiVariableGuid, FALSE);
-  UsedSize += HobLength;
+  if (PcdGetBool (PcdAcpiS3Enable)) {
+    // Only check on this variable when S3 needs it.
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiAcpiVariableGuid, FALSE);
+    UsedSize += HobLength;
+  }
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     //
@@ -929,4 +1076,34 @@ CreateMmFoundationHobList (
 
   *FoundationHobSize = UsedSize;
   return Status;
+}
+
+/**
+
+  Builds a Handoff Information Table HOB.
+
+  @param Hob       - Pointer to handoff information table HOB.
+  @param HobEnd    - End of the HOB list.
+
+**/
+VOID
+CreateMmHobHandoffInfoTable (
+  IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
+  IN VOID                        *HobEnd
+  )
+{
+  ASSERT ((Hob != NULL) && (HobEnd != NULL));
+
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = (UINT16)sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
+
+  Hob->Version  = EFI_HOB_HANDOFF_TABLE_VERSION;
+  Hob->BootMode = GetBootModeHob ();
+
+  Hob->EfiMemoryTop        = 0;
+  Hob->EfiMemoryBottom     = 0;
+  Hob->EfiFreeMemoryTop    = 0;
+  Hob->EfiFreeMemoryBottom = 0;
+  Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 }

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef REDFISH_HTTP_LIB_H_
-#define REDFISH_HTTP_LIB_H_
+#pragma once
 
 #include <Protocol/EdkIIRedfishHttpProtocol.h>
 
@@ -322,5 +321,3 @@ RedfishHttpDeleteResourceEx (
   IN  CHAR8             *ContentType OPTIONAL,
   OUT REDFISH_RESPONSE  *Response
   );
-
-#endif

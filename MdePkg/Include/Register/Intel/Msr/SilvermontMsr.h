@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __SILVERMONT_MSR_H__
-#define __SILVERMONT_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -1573,5 +1572,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_SILVERMONT_PP0_POWER_LIMIT_REGISTER;
-
-#endif

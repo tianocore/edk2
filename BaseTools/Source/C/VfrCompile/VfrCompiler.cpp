@@ -594,9 +594,13 @@ CVfrCompiler::PreProcess (
   VOID
   )
 {
-  FILE    *pVfrFile      = NULL;
   UINT32  CmdLen         = 0;
   CHAR8   *PreProcessCmd = NULL;
+  FILE    *pVfrFile      = NULL;
+  FILE    *pPipe         = NULL;
+  FILE    *pOutFile      = NULL;
+  int     RetVal         = -1;
+  char    ReadBuf[256];
 
   if (!IS_RUN_STATUS(STATUS_INITIALIZED)) {
     goto Fail;
@@ -612,8 +616,9 @@ CVfrCompiler::PreProcess (
   }
   fclose (pVfrFile);
 
+  // Safely calculate command length
   CmdLen = strlen (mPreProcessCmd) + strlen (mPreProcessOpt) +
-           strlen (mOptions.VfrFileName) + strlen (mOptions.PreprocessorOutputFileName);
+           strlen (mOptions.VfrFileName) + 20; // Extra space for spaces and null terminator
   if (mOptions.CPreprocessorOptions != NULL) {
     CmdLen += strlen (mOptions.CPreprocessorOptions);
   }
@@ -621,38 +626,82 @@ CVfrCompiler::PreProcess (
     CmdLen += strlen (mOptions.IncludePaths);
   }
 
-  PreProcessCmd = new CHAR8[CmdLen + 10];
+  PreProcessCmd = new CHAR8[CmdLen];
   if (PreProcessCmd == NULL) {
     DebugError (NULL, 0, 4001, "Resource: memory can't be allocated", NULL);
     goto Fail;
   }
-  strcpy (PreProcessCmd, mPreProcessCmd), strcat (PreProcessCmd, " ");
-  strcat (PreProcessCmd, mPreProcessOpt), strcat (PreProcessCmd, " ");
-  if (mOptions.IncludePaths != NULL) {
-    strcat (PreProcessCmd, mOptions.IncludePaths), strcat (PreProcessCmd, " ");
-  }
-  if (mOptions.CPreprocessorOptions != NULL) {
-    strcat (PreProcessCmd, mOptions.CPreprocessorOptions), strcat (PreProcessCmd, " ");
-  }
-  strcat (PreProcessCmd, mOptions.VfrFileName), strcat (PreProcessCmd, " > ");
-  strcat (PreProcessCmd, mOptions.PreprocessorOutputFileName);
 
-  if (system (PreProcessCmd) != 0) {
+  // Safely build command string for popen
+  // Quote VfrFileName to mitigate command injection
+  snprintf(PreProcessCmd, CmdLen, "%s %s %s %s \"%s\"",
+           mPreProcessCmd,
+           mPreProcessOpt,
+           mOptions.IncludePaths ? mOptions.IncludePaths : "",
+           mOptions.CPreprocessorOptions ? mOptions.CPreprocessorOptions : "",
+           mOptions.VfrFileName);
+
+  //
+  // Execute the command via a pipe and redirect its output to the destination file.
+  // Using popen allows capturing output. We quote the filename to mitigate
+  // command injection, although popen still invokes a shell.
+  //
+  #ifdef _WIN32
+    pPipe = _popen(PreProcessCmd, "r");
+  #else
+    pPipe = popen(PreProcessCmd, "r");
+  #endif
+
+  if (pPipe == NULL) {
     DebugError (NULL, 0, 0003, "Error parsing file", "failed to spawn C preprocessor on VFR file %s\n", PreProcessCmd);
     goto Fail;
   }
 
-  delete[] PreProcessCmd;
+  pOutFile = fopen(mOptions.PreprocessorOutputFileName, "w");
+  if (pOutFile == NULL) {
+    DebugError(NULL, 0, 0001, "Error opening output file for writing", mOptions.PreprocessorOutputFileName);
+    #ifdef _WIN32
+      _pclose(pPipe);
+    #else
+      pclose(pPipe);
+    #endif
+    goto Fail;
+  }
+
+  while (fgets(ReadBuf, sizeof(ReadBuf), pPipe) != NULL) {
+    fputs(ReadBuf, pOutFile);
+  }
+
+  fclose(pOutFile);
+  pOutFile = NULL;
+
+  #ifdef _WIN32
+    RetVal = _pclose(pPipe);
+  #else
+    RetVal = pclose(pPipe);
+  #endif
+  pPipe = NULL;
+
+  if (RetVal != 0) {
+    DebugError (NULL, 0, 0003, "Error parsing file", "C preprocessor returned non-zero exit status for VFR file %s\n", mOptions.VfrFileName);
+    goto Fail;
+  }
+
+  if (PreProcessCmd != NULL) {
+    delete[] PreProcessCmd;
+  }
 
 Out:
   SET_RUN_STATUS (STATUS_PREPROCESSED);
   return;
 
 Fail:
+  if (PreProcessCmd != NULL) {
+    delete[] PreProcessCmd;
+  }
   if (!IS_RUN_STATUS(STATUS_DEAD)) {
     SET_RUN_STATUS (STATUS_FAILED);
   }
-  delete[] PreProcessCmd;
 }
 
 extern UINT8 VfrParserStart (IN FILE *, IN INPUT_INFO_TO_SYNTAX *);

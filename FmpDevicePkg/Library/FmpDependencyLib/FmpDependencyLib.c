@@ -81,7 +81,7 @@ GrowDepexStack (
 
   if (mDepexEvaluationStack != NULL) {
     //
-    // Copy to Old Stack to the New Stack
+    // Copy from Old Stack to the New Stack
     //
     CopyMem (
       NewStack,

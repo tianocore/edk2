@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_LOCK_BOX_GUID_H_
-#define _SMM_LOCK_BOX_GUID_H_
+#pragma once
 
 #define EFI_SMM_LOCK_BOX_COMMUNICATION_GUID \
   {0x2a3cfebd, 0x27e8, 0x4d0a, {0x8b, 0x79, 0xd6, 0x88, 0xc2, 0xa3, 0xe1, 0xc0}}
@@ -62,5 +61,3 @@ typedef struct {
 } EFI_SMM_LOCK_BOX_PARAMETER_RESTORE_ALL_IN_PLACE;
 
 extern EFI_GUID  gEfiSmmLockBoxCommunicationGuid;
-
-#endif

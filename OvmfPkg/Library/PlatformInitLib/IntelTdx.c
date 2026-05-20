@@ -186,10 +186,13 @@ PlatformTdxPublishRamRegions (
     // work area. We ought to prevent DXE from serving allocation requests
     // such that they would overlap the work area.
     //
+    // Since this memory range will be used by the Reset Vector on Maibox
+    // wakeup again, it must be reserved as ACPI NVS.
+    //
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
       (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
-      EfiBootServicesData
+      EfiACPIMemoryNVS
       );
   }
 }

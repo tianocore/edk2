@@ -17,7 +17,7 @@ ASM_GLOBAL ASM_PFX(SetTlbRebaseAddress)
 #/**
 #  Set the exception base address for LoongArch.
 #
-#  @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or qeual to 4K .
+#  @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or equal to 4K .
 #**/
 ASM_PFX(SetExceptionBaseAddress):
   csrrd   $t0, LOONGARCH_CSR_ECFG
@@ -32,7 +32,7 @@ ASM_PFX(SetExceptionBaseAddress):
 #/**
 #  Set the TlbRebase address for LoongArch.
 #
-#  @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or qeual to 4K .
+#  @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or equal to 4K .
 #**/
 ASM_PFX(SetTlbRebaseAddress):
   move    $t0, $a0

@@ -41,9 +41,12 @@ SMM_DEFAULT_SMBASE: equ 0x3_0000
 ; Field offsets in FIRST_SMI_HANDLER_CONTEXT, which resides at
 ; SMM_DEFAULT_SMBASE.
 ;
-ApicIdGate:      equ  0 ; UINT64
-NewSmbase:       equ  8 ; UINT32
-AboutToLeaveSmm: equ 12 ; UINT8
+ApicIdGate:              equ  0 ; UINT64
+NewSmbase:               equ  8 ; UINT32
+FeatureControlHighValue: equ 12 ; UINT32
+FeatureControlLowValue:  equ 16 ; UINT32
+FeatureControl:          equ 20 ; UINT8
+AboutToLeaveSmm:         equ 21 ; UINT8
 
 ;
 ; SMRAM Save State Map field offsets, per the AMD (not Intel) layout that QEMU
@@ -59,6 +62,11 @@ SaveStateSmbase64: equ 0xFF00 ; UINT32
 CPUID_SIGNATURE:         equ 0x00
 CPUID_EXTENDED_TOPOLOGY: equ 0x0B
 CPUID_VERSION_INFO:      equ 0x01
+
+;
+; MSR constants, from "MdePkg/Include/Register/Intel/ArchitecturalMsr.h".
+;
+MSR_IA32_FEATURE_CONTROL: equ 0x0000003A
 
 GLOBAL ASM_PFX (mFirstSmiHandler)     ; UINT8[]
 GLOBAL ASM_PFX (mFirstSmiHandlerSize) ; UINT16
@@ -141,6 +149,18 @@ UpdateSmbase:
   ; Save it to the SMBASE field whose address we calculated in EBX.
   ;
   mov dword [ds : dword ebx], eax
+
+  ;
+  ; Set MSR_IA32_FEATURE_CONTROL if requested.
+  ;
+  cmp byte [ds : dword (SMM_DEFAULT_SMBASE + FeatureControl)], 0
+  je NoFeatureControl
+  mov ecx, MSR_IA32_FEATURE_CONTROL
+  mov edx, dword [ds : dword (SMM_DEFAULT_SMBASE + FeatureControlHighValue)]
+  mov eax, dword [ds : dword (SMM_DEFAULT_SMBASE + FeatureControlLowValue)]
+  wrmsr
+
+NoFeatureControl:
   ;
   ; Set AboutToLeaveSmm.
   ;

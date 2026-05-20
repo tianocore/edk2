@@ -139,12 +139,6 @@ class Table(object):
     def SetEndFlag(self):
         pass
 
-    def IsIntegral(self):
-        Result = self.Exec("select min(ID) from %s" % (self.Table))
-        if Result[0][0] != -1:
-            return False
-        return True
-
     def GetAll(self):
         return self.Exec("select * from %s where ID > 0 order by ID" % (self.Table))
 
@@ -194,20 +188,4 @@ class TableDataModel(Table):
             Description = Item[0]
             self.Insert(CrossIndex, Name, Description)
         EdkLogger.verbose("Initialize table DataModel ... DONE!")
-
-    ## Get CrossIndex
-    #
-    # Get a model's cross index from its name
-    #
-    # @param ModelName:    Name of the model
-    # @retval CrossIndex:  CrossIndex of the model
-    #
-    def GetCrossIndex(self, ModelName):
-        CrossIndex = -1
-        SqlCommand = """select CrossIndex from DataModel where name = '""" + ModelName + """'"""
-        self.Cur.execute(SqlCommand)
-        for Item in self.Cur:
-            CrossIndex = Item[0]
-
-        return CrossIndex
 

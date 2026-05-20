@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _VIRTIO_0_9_5_NET_H_
-#define _VIRTIO_0_9_5_NET_H_
+#pragma once
 
 #include <IndustryStandard/Virtio095.h>
 
@@ -87,5 +86,3 @@ typedef struct {
 //
 #define VIRTIO_NET_S_LINK_UP   BIT0
 #define VIRTIO_NET_S_ANNOUNCE  BIT1
-
-#endif // _VIRTIO_0_9_5_NET_H_

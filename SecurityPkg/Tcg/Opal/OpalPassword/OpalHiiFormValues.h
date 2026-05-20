@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_HII_FORM_VALUES_H_
-#define _OPAL_HII_FORM_VALUES_H_
+#pragma once
 
 // ID's for various forms that will be used by HII
 #define FORMID_VALUE_MAIN_MENU            0x01
@@ -109,5 +108,3 @@ typedef struct {
 
 // {BBF1ACD2-28D8-44ea-A291-58A237FEDF1A}
 #define SETUP_VARIABLE_GUID  { 0xbbf1acd2, 0x28d8, 0x44ea, { 0xa2, 0x91, 0x58, 0xa2, 0x37, 0xfe, 0xdf, 0x1a } }
-
-#endif //_HII_FORM_VALUES_H_

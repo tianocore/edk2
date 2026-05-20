@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef QEMU_FW_CFG_SIMPLE_PARSER_LIB_H_
-#define QEMU_FW_CFG_SIMPLE_PARSER_LIB_H_
+#pragma once
 
 #include <Base.h>
 
@@ -124,5 +123,3 @@ QemuFwCfgParseUintn (
   IN  BOOLEAN      ParseAsHex,
   OUT UINTN        *Value
   );
-
-#endif // QEMU_FW_CFG_SIMPLE_PARSER_LIB_H_

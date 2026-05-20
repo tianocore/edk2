@@ -6,11 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLDEBUG_SUPPORT_H_
-#define _PLDEBUG_SUPPORT_H_
+#pragma once
 
 #include "Ia32/DebugSupport.h"
 
 #define EFI_ISA  IsaIa32
-
-#endif

@@ -18,7 +18,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
-import encodings.ascii
 
 from optparse import OptionParser
 from Common import EdkLogger

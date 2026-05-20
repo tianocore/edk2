@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _MM_COMMUNICATION_H_
-#define _MM_COMMUNICATION_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -82,5 +81,3 @@ struct _EFI_MM_COMMUNICATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmCommunicationProtocolGuid;
-
-#endif

@@ -71,7 +71,6 @@
   PrintLib
   PeCoffGetEntryPointLib
   PeCoffExtraActionLib
-  MemoryAllocationLib
 
 [Guids]
   ## PRODUCES ## SystemTable

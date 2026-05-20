@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_CPUIO_PPI_H__
-#define __PEI_CPUIO_PPI_H__
+#pragma once
 
 #define EFI_PEI_CPU_IO_PPI_INSTALLED_GUID \
   { 0xe6af1f7b, 0xfc3f, 0x46da, {0xa8, 0x28, 0xa3, 0xb4, 0x57, 0xa4, 0x42, 0x82 } }
@@ -418,5 +417,3 @@ struct _EFI_PEI_CPU_IO_PPI {
 };
 
 extern EFI_GUID  gEfiPeiCpuIoPpiInstalledGuid;
-
-#endif

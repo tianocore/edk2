@@ -32,7 +32,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64
 #
 
 [Sources]
@@ -41,9 +41,6 @@
 
 [Sources.IA32, Sources.X64, Sources.EBC, Sources.AARCH64]
   PeCoffLoaderEx.c
-
-[Sources.ARM]
-  Arm/PeCoffLoaderEx.c
 
 [Sources.RISCV64]
   RiscV/PeCoffLoaderEx.c
@@ -58,4 +55,5 @@
   DebugLib
   PeCoffExtraActionLib
   BaseMemoryLib
+  SafeIntLib
 

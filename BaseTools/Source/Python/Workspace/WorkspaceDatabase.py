@@ -132,15 +132,6 @@ class WorkspaceDatabase(object):
                                     )
             return BuildObject
 
-    # placeholder for file format conversion
-    class TransformObjectFactory:
-        def __init__(self, WorkspaceDb):
-            self.WorkspaceDb = WorkspaceDb
-
-        # key = FilePath, Arch
-        def __getitem__(self, Key):
-            pass
-
     ## Constructor of WorkspaceDatabase
     #
     # @param DbPath             Path of database file
@@ -156,7 +147,6 @@ class WorkspaceDatabase(object):
 
         # conversion object for build or file format conversion purpose
         self.BuildObject = WorkspaceDatabase.BuildObjectFactory(self)
-        self.TransformObject = WorkspaceDatabase.TransformObjectFactory(self)
 
 
     ## Summarize all packages in the database

@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SEC_PLATFORM_INFORMATION_PPI_H__
-#define __SEC_PLATFORM_INFORMATION_PPI_H__
+#pragma once
 
 #include <Pi/PiPeiCis.h>
 
@@ -134,5 +133,3 @@ struct _EFI_SEC_PLATFORM_INFORMATION_PPI {
 };
 
 extern EFI_GUID  gEfiSecPlatformInformationPpiGuid;
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _FSP_GLOBAL_DATA_H_
-#define _FSP_GLOBAL_DATA_H_
+#pragma once
 
 #include <FspEas.h>
 
@@ -100,5 +99,3 @@ typedef struct  {
 } FSP_GLOBAL_DATA;
 
 #pragma pack()
-
-#endif

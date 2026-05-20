@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_LIB__
-#define __BASE_LIB__
+#pragma once
 
 //
 // Definitions for architecture-specific types
@@ -76,26 +75,6 @@ typedef struct {
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  8
 
 #endif // defined (MDE_CPU_EBC)
-
-#if defined (MDE_CPU_ARM)
-
-typedef struct {
-  UINT32    R3;  ///< A copy of R13.
-  UINT32    R4;
-  UINT32    R5;
-  UINT32    R6;
-  UINT32    R7;
-  UINT32    R8;
-  UINT32    R9;
-  UINT32    R10;
-  UINT32    R11;
-  UINT32    R12;
-  UINT32    R14;
-} BASE_LIBRARY_JUMP_BUFFER;
-
-#define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  4
-
-#endif // defined (MDE_CPU_ARM)
 
 #if defined (MDE_CPU_AARCH64)
 typedef struct {
@@ -377,7 +356,7 @@ typedef struct {
 /*
  * Set the exception base address for LoongArch.
  *
- * @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or qeual to 4K .
+ * @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or equal to 4K .
  */
 VOID
 SetExceptionBaseAddress (
@@ -387,7 +366,7 @@ SetExceptionBaseAddress (
 /*
  * Set the TlbRebase address for LoongArch.
  *
- * @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or qeual to 4K .
+ * @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or equal to 4K .
  */
 VOID
 SetTlbRebaseAddress (
@@ -2987,7 +2966,7 @@ InitializeListHead (
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
-  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If ListHead was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
@@ -3016,7 +2995,7 @@ InsertHeadList (
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
-  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If ListHead was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
@@ -3040,11 +3019,11 @@ InsertTailList (
   Retrieves the first node of a doubly linked list.
 
   Returns the first node of a doubly linked list.  List must have been
-  initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
+  initialized with INITIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
   If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
-  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If List was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
@@ -3066,12 +3045,12 @@ GetFirstNode (
   Retrieves the next node of a doubly linked list.
 
   Returns the node of a doubly linked list that follows Node.
-  List must have been initialized with INTIALIZE_LIST_HEAD_VARIABLE()
+  List must have been initialized with INITIALIZE_LIST_HEAD_VARIABLE()
   or InitializeListHead().  If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If List was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and List contains more than
   PcdMaximumLinkedListLength nodes, then ASSERT().
@@ -3094,12 +3073,12 @@ GetNextNode (
   Retrieves the previous node of a doubly linked list.
 
   Returns the node of a doubly linked list that precedes Node.
-  List must have been initialized with INTIALIZE_LIST_HEAD_VARIABLE()
+  List must have been initialized with INITIALIZE_LIST_HEAD_VARIABLE()
   or InitializeListHead().  If List is empty, then List is returned.
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If List was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and List contains more than
   PcdMaximumLinkedListLength nodes, then ASSERT().
@@ -3125,7 +3104,7 @@ GetPreviousNode (
   zero nodes, this function returns TRUE. Otherwise, it returns FALSE.
 
   If ListHead is NULL, then ASSERT().
-  If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If ListHead was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
@@ -3150,11 +3129,11 @@ IsListEmpty (
 
   Returns TRUE if Node is equal to List.  Returns FALSE if Node is one of the
   nodes in the doubly linked list specified by List.  List must have been
-  initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
+  initialized with INITIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(),
+  If List was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(),
   then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
@@ -3181,11 +3160,11 @@ IsNull (
 
   Returns TRUE if Node is the last node in the doubly linked list specified by
   List. Otherwise, FALSE is returned. List must have been initialized with
-  INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
+  INITIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
 
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
-  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
+  If List was not initialized with INITIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
@@ -3214,7 +3193,7 @@ IsNodeAtEnd (
   Otherwise, the location of the FirstEntry node is swapped with the location
   of the SecondEntry node in a doubly linked list. SecondEntry must be in the
   same double linked list as FirstEntry and that double linked list must have
-  been initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
+  been initialized with INITIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead().
   SecondEntry is returned after the nodes are swapped.
 
   If FirstEntry is NULL, then ASSERT().
@@ -3859,7 +3838,7 @@ DivS64x64Remainder (
 UINT16
 EFIAPI
 ReadUnaligned16 (
-  IN CONST UINT16  *Buffer
+  IN CONST VOID  *Buffer
   );
 
 /**
@@ -3880,7 +3859,7 @@ ReadUnaligned16 (
 UINT16
 EFIAPI
 WriteUnaligned16 (
-  OUT UINT16  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT16  Value
   );
 
@@ -3900,7 +3879,7 @@ WriteUnaligned16 (
 UINT32
 EFIAPI
 ReadUnaligned24 (
-  IN CONST UINT32  *Buffer
+  IN CONST VOID  *Buffer
   );
 
 /**
@@ -3921,7 +3900,7 @@ ReadUnaligned24 (
 UINT32
 EFIAPI
 WriteUnaligned24 (
-  OUT UINT32  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT32  Value
   );
 
@@ -3941,7 +3920,7 @@ WriteUnaligned24 (
 UINT32
 EFIAPI
 ReadUnaligned32 (
-  IN CONST UINT32  *Buffer
+  IN CONST VOID  *Buffer
   );
 
 /**
@@ -3962,7 +3941,7 @@ ReadUnaligned32 (
 UINT32
 EFIAPI
 WriteUnaligned32 (
-  OUT UINT32  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT32  Value
   );
 
@@ -3982,7 +3961,7 @@ WriteUnaligned32 (
 UINT64
 EFIAPI
 ReadUnaligned64 (
-  IN CONST UINT64  *Buffer
+  IN CONST VOID  *Buffer
   );
 
 /**
@@ -4003,7 +3982,7 @@ ReadUnaligned64 (
 UINT64
 EFIAPI
 WriteUnaligned64 (
-  OUT UINT64  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT64  Value
   );
 
@@ -4715,6 +4694,101 @@ BitFieldCountOnes64 (
   IN       UINTN   EndBit
   );
 
+/*******************************************************************************
+
+  UUID (Universally Unique IDentifier), as defined in RFC4122
+  (https://datatracker.ietf.org/doc/html/rfc4122#section-4.1), is a 128-bit number
+  used to uniquely identify information in computer systems.
+
+  UUIDs contains 5 fields:
+  - time_low: 32 bits
+  - time_mid: 16 bits
+  - time_hi_and_version: 16 bits
+  - clock_seq_hi_and_reserved: 8 bits
+  - clock_seq_low: 8 bits
+  - node: 8 bits * 6
+
+  Each field encoded with the Most Significant Byte first (known as network byte
+  order, or big-endian).
+
+  GUID (Globally Unique Identifier), on the other hand, is a 128-bit number used
+  in UEFI environments, which is similar to UUID but has a different byte order
+  in memory. See https://uefi.org/specs/UEFI/2.11/Apx_A_GUID_and_Time_Formats.html
+
+  GUID also contains 5 fields:
+  - TimeLow: 32 bits
+  - TimeMid: 16 bits
+  - TimeHiAndVersion: 16 bits
+  - ClockSeqHighAndReserved: 16 bits
+  - ClockSeqLow: 8 bits
+  - Node: 8 bits * 6
+
+  TimeLow, TimeMid, TimeHighAndVersion fields in the EFI are encoded with the Least
+  Significant Byte first (also known as little-endian).
+
+  Example:
+  Consider the same string representation/registry format for MM communication v2:
+  "378daedc-f06b-4446-8314-40ab933c87a3"
+
+  In UUID format, it is represented as:
+  - Data fields:
+    - time_low: 0x37 0x8d 0xae 0xdc (0x378daedc in big-endian)
+    - time_mid: 0xf0 0x6b (0xf06b in big-endian)
+    - time_hi_and_version: 0x44 0x46 (0x4446 in big-endian)
+    - clock_seq_hi_and_reserved: 0x83
+    - clock_seq_low: 0x14
+    - node: 0x00, 0xab, 0x93, 0x3c, 0x87, 0xa3
+  - Byte representation in memory:
+    - 37 8d ae dc f0 6b 44 46 83 14 40 ab 93 3c 87 a3
+
+  However, in GUID format, it is represented as:
+  - Data fields:
+    - TimeLow: 0xdc 0xae 0x8d 0x37 (0x378daedc in little-endian)
+    - TimeMid: 0x6b 0xf0 (0xf06b in little-endian)
+    - TimeHiAndVersion: 0x46 0x44 (0x4446 in little-endian)
+    - ClockSeqHighAndReserved: 0x83
+    - ClockSeqLow: 0x14
+    - Node: 0x00, 0xab, 0x93, 0x3c, 0x87, 0xa3
+  - Byte representation in memory:
+    - dc ae 8d 37 6b f0 46 44 83 14 40 ab 93 3c 87 a3
+
+*******************************************************************************/
+
+/**
+  This function converts a GUID in UEFI format to a UUID in RFC4122 format.
+
+  The conversion is done by swapping the byte order of the TimeLow, TimeMid, and
+  TimeHiAndVersion fields, while keeping the ClockSeq and Node fields unchanged.
+
+  @param [in] FromGuid  GUID in format to be converted to UUID RFC4122 format.
+  @param [out] ToUuid   Pointer to a GUID structure that will hold the converted
+                        UUID in RFC4122 format.
+**/
+VOID
+EFIAPI
+ConvertGuidToUuid (
+  IN   GUID  *FromGuid,
+  OUT  GUID  *ToUuid
+  );
+
+/**
+  This function converts a UUID in RFC4122 format to a GUID in UEFI format.
+
+  The conversion is done by swapping the byte order of the time_low, time_mid, and
+  time_hi_and_version fields, while keeping the ClockSeq and Node fields unchanged.
+  This function is symmetric to ConvertGuidToUuid.
+
+  @param [in] FromUuid  UUID in RFC4122 format to be converted to GUID in UEFI format.
+  @param [out] ToGuid   Pointer to a GUID structure that will hold the converted
+                        GUID in UEFI format.
+**/
+VOID
+EFIAPI
+ConvertUuidToGuid (
+  IN   GUID  *FromUuid,
+  OUT  GUID  *ToGuid
+  );
+
 //
 // Base Library Checksum Functions
 //
@@ -5321,6 +5395,18 @@ TdIsEnabled (
   VOID
   );
 
+/**
+  Probe if running as some kind of SEV guest.
+
+  @return FALSE   Not running as a guest under any kind of SEV
+  @return TRUE    Running as a guest under any kind of SEV
+**/
+BOOLEAN
+EFIAPI
+SevGuestIsEnabled (
+  VOID
+  );
+
 #if defined (MDE_CPU_X64)
 //
 // The page size for the PVALIDATE instruction
@@ -5403,6 +5489,42 @@ AsmRmpAdjust (
   IN      UINT64  Rax,
   IN      UINT64  Rcx,
   IN      UINT64  Rdx
+  );
+
+/**
+  Reads the current value of the FS segment base address.
+
+  Reads and returns the current value of the FS segment base address using
+  the RDFSBASE instruction. This function is only available on X64.
+
+  Note: The function requires that CPUID.(EAX=7,ECX=0):EBX.FSGSBASE=1
+  and CR4.FSGSBASE=1.
+
+  @return The current value of the FS segment base address.
+**/
+UINT64
+EFIAPI
+AsmReadFsBase (
+  VOID
+  );
+
+/**
+  Writes a value to the FS segment base address.
+
+  Writes FsBase to the FS segment base address register using the WRFSBASE
+  instruction. This function is only available on X64.
+
+  Note: The function requires that CPUID.(EAX=7,ECX=0):EBX.FSGSBASE=1
+  and CR4.FSGSBASE=1.
+
+  @param  FsBase  The value to write to the FS segment base address.
+
+  @return  FsBase
+**/
+UINT64
+EFIAPI
+AsmWriteFsBase (
+  IN      UINT64  FsBase
   );
 
 #endif
@@ -8058,4 +8180,3 @@ PatchInstructionX86 (
   );
 
 #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
-#endif // !defined (__BASE_LIB__)

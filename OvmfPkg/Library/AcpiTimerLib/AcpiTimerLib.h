@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_TIMER_LIB_INTERNAL_H_
-#define _ACPI_TIMER_LIB_INTERNAL_H_
+#pragma once
 
 /**
   Internal function to read the current tick counter of ACPI.
@@ -19,5 +18,3 @@ UINT32
 InternalAcpiGetTimerTick (
   VOID
   );
-
-#endif // _ACPI_TIMER_LIB_INTERNAL_H_

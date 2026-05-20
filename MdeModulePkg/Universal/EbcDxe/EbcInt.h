@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EBC_INT_H_
-#define _EBC_INT_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -254,5 +253,3 @@ EFIAPI
 EbcAllocatePoolForThunk (
   IN UINTN  AllocationSize
   );
-
-#endif // #ifndef _EBC_INT_H_

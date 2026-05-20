@@ -11,7 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef __GNUC__
+#define RUNTIME_FUNCTION  _WINNT_DUP_RUNTIME_FUNCTION
 #include <windows.h>
+#undef RUNTIME_FUNCTION
 #include <io.h>
 #endif
 #include <assert.h>
@@ -388,7 +390,8 @@ FindPrmHandler (
   PrmHandler = (PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT *)(PrmExport + 1);
 
   for (HandlerNum = 0; HandlerNum < PrmExport->NumberPrmHandlers; HandlerNum++) {
-    strcpy(mExportSymName[mExportSymNum], PrmHandler->PrmHandlerName);
+    snprintf(mExportSymName[mExportSymNum], PRM_HANDLER_NAME_MAXIMUM_LENGTH, "%s", PrmHandler->PrmHandlerName);
+
     mExportSymNum ++;
     PrmHandler += 1;
 
@@ -800,6 +803,11 @@ ParseNoteSection (
       Prop2 = GNU_PROPERTY_X86_FEATURE_1_IBT;
       break;
 
+    case EM_RISCV64:
+      Prop0 = GNU_PROPERTY_RISCV64_FEATURE_1_AND;
+      Prop2 = GNU_PROPERTY_RISCV64_FEATURE_1_FCFI;
+      break;
+
     default:
       return;
     }
@@ -1050,7 +1058,8 @@ ScanSections64 (
           //
           FindPrmHandler(Sym->st_value);
 
-          strcpy(mExportSymName[mExportSymNum], (CHAR8*)SymName);
+          snprintf(mExportSymName[mExportSymNum], PRM_HANDLER_NAME_MAXIMUM_LENGTH, "%s", (CHAR8*)SymName);
+
           mExportRVA[mExportSymNum] = (UINT32)(Sym->st_value);
           mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
           mExportSymNum ++;
@@ -1061,20 +1070,22 @@ ScanSections64 (
       //
       // Second Get PrmHandler
       //
-      for (SymIndex = 0; SymIndex < SymNum; SymIndex++) {
-        UINT32   ExpIndex;
-        Sym = (Elf_Sym *)(Symtab + SymIndex * shdr->sh_entsize);
-        SymName = GetSymName(Sym);
-        if (SymName == NULL) {
-            continue;
-        }
-
-        for (ExpIndex = 0; ExpIndex < (mExportSymNum -1); ExpIndex++) {
-          if (strcmp((CHAR8*)SymName, mExportSymName[ExpIndex]) != 0) {
-            continue;
+      if (mExportSymNum > 0) {
+        for (SymIndex = 0; SymIndex < SymNum; SymIndex++) {
+          UINT32   ExpIndex;
+          Sym = (Elf_Sym *)(Symtab + SymIndex * shdr->sh_entsize);
+          SymName = GetSymName(Sym);
+          if (SymName == NULL) {
+              continue;
           }
-          mExportRVA[ExpIndex] = (UINT32)(Sym->st_value);
-          mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
+
+          for (ExpIndex = 0; ExpIndex < (mExportSymNum -1); ExpIndex++) {
+            if (strcmp((CHAR8*)SymName, mExportSymName[ExpIndex]) != 0) {
+              continue;
+            }
+            mExportRVA[ExpIndex] = (UINT32)(Sym->st_value);
+            mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
+          }
         }
       }
 
@@ -1397,6 +1408,16 @@ WriteSections64 (
           }
 
           //
+          // We can ignore R_*_NONE relocations (which always have numeric
+          // value 0x0).  They are used to indicate that the symbol is not
+          // defined in the current module, but in a shared library that may be
+          // used when building modules for inclusion in host-based unit tests.
+          //
+          if (ELF_R_TYPE(Rel->r_info) == 0x0) {
+            continue;
+          }
+
+          //
           // Skip error on EM_RISCV64 and EM_LOONGARCH because no symbol name is built
           // from RISC-V and LoongArch toolchain.
           //
@@ -1482,9 +1503,18 @@ WriteSections64 (
               - (SecOffset - SecShdr->sh_addr));
             VerboseMsg ("Relocation:  0x%08X", *(UINT32 *)Targ);
             break;
+          case R_X86_64_REX_GOTPCRELX:
+            //
+            // This is a relaxable GOTPCREL relocation, and the linker may have
+            // applied this relaxation without updating the relocation type.
+            // In the position independent code model, only transformations
+            // from MOV to LEA are possible for REX-prefixed instructions.
+            //
+            if (Targ[-2] == 0x8d) { // LEA
+              break;
+            }
           case R_X86_64_GOTPCREL:
           case R_X86_64_GOTPCRELX:
-          case R_X86_64_REX_GOTPCRELX:
             VerboseMsg ("R_X86_64_GOTPCREL family");
             VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
               (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
@@ -1968,6 +1998,7 @@ WriteRelocations64 (
           } else if (mEhdr->e_machine == EM_AARCH64) {
 
             switch (ELF_R_TYPE(Rel->r_info)) {
+            case R_AARCH64_NONE:
             case R_AARCH64_ADR_PREL_LO21:
             case R_AARCH64_CONDBR19:
             case R_AARCH64_LD_PREL_LO19:
@@ -2375,6 +2406,10 @@ WriteExport64 (
   UINT16                              Index;
   UINT8                               *Tdata = NULL;
 
+  if (mExportSymNum == 0) {
+    Error (NULL, 0, 3000, "Invalid", "--prm option set but no export symbols were found in %s", mInImageName);
+    exit(EXIT_FAILURE);
+  }
   ExportDir = (EFI_IMAGE_EXPORT_DIRECTORY*)(mCoffFile + mExportOffset);
   ExportDir->Characteristics = 0;
   ExportDir->TimeDateStamp = 0;

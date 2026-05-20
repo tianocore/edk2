@@ -33,6 +33,7 @@
   LoadLinuxLib
   PrintLib
   QemuFwCfgLib
+  QemuFwCfgSimpleParserLib
   ReportStatusCodeLib
   UefiBootServicesTableLib
 
@@ -43,3 +44,6 @@
 
 [Guids]
   gQemuKernelLoaderFsMediaGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr

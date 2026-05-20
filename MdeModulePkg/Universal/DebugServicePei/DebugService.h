@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __DEBUG_SERVICE_H__
-#define __DEBUG_SERVICE_H__
+#pragma once
 
 #include <Ppi/Debug.h>
 
@@ -47,5 +46,3 @@ PeiDebugAssert (
   IN UINTN        LineNumber,
   IN CONST CHAR8  *Description
   );
-
-#endif

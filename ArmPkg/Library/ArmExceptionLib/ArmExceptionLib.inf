@@ -1,17 +1,11 @@
 ## @file
-# Instance of CpuExceptionHandlerLib Library for ARM/AArch64 architectures
+# Instance of CpuExceptionHandlerLib Library for AArch64 architectures
 #
 # This library instance is used for modules that will implement exception
 # handlers in-place (by programming VBAR).  The exception handlers will be
 # generated with alignment as required by the processor architecture.  The
 # alignment must be propagated into the parent FFS/FV through FDF build rules
 # for the relevant module types (i.e. Align=Auto).
-#
-# Note that using this library instance can cause growth to the size of the FV
-# due to the padding added by the build tools to meet the vector alignment
-# requirements and may not be desirable for space-sensitive FVs (uncompressed /
-# XIP components).  The alternative library instance, ArmRelocateExceptionLib
-# should be considered for these applications.
 #
 #  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  Copyright (c) 2016 HP Development Company, L.P.
@@ -31,10 +25,6 @@
 [Sources.common]
   ArmExceptionLib.c
 
-[Sources.Arm]
-  Arm/ArmException.c
-  Arm/ExceptionSupport.S   | GCC
-
 [Sources.AARCH64]
   AArch64/AArch64Exception.c
   AArch64/ExceptionSupport.S
@@ -53,5 +43,3 @@
   MemoryAllocationLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress

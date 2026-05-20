@@ -13,19 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Base.h>
 #include <Library/DebugLib.h>
 
-/* Convert character to lowercase */
-int
-tolower (
-  int  c
-  )
-{
-  if (('A' <= (c)) && ((c) <= 'Z')) {
-    return (c - ('A' - 'a'));
-  }
-
-  return (c);
-}
-
 /* Compare first n bytes of string s1 with string s2, ignoring case */
 int
 strncasecmp (

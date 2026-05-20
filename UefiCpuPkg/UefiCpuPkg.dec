@@ -2,7 +2,7 @@
 # This Package provides UEFI compatible CPU modules and libraries.
 #
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
-# Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -24,6 +24,11 @@
   ##                 CPU features.
   ##
   RegisterCpuFeaturesLib|Include/Library/RegisterCpuFeaturesLib.h
+
+  ##  @libraryclass  Defines some common architecture-level fundamental routines which
+  ##                 are supported at different architectures.
+  ##
+  UefiCpuBaseArchSupportLib|Include/Library/BaseArchLibSupport.h
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
@@ -74,9 +79,10 @@
   ## @libraryclass   Provides functions for SMM Relocation Operation.
   SmmRelocationLib|Include/Library/SmmRelocationLib.h
 
+## @libraryclass   Provides functions for AmdSysCallLib
+  AmdSysCallLib|Include/Library/AmdSysCallLib.h
+
 [LibraryClasses.RISCV64]
-  ##  @libraryclass  Provides function to initialize the FPU.
-  RiscVFpuLib|Include/Library/BaseRiscVFpuLib.h
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
   ##
   RiscVMmuLib|Include/Library/BaseRiscVMmuLib.h
@@ -84,6 +90,11 @@
 [LibraryClasses.LoongArch64]
   ##  @libraryclass  Provides functions for the memory management unit.
   CpuMmuLib|Include/Library/CpuMmuLib.h
+
+[LibraryClasses.AARCH64]
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
 
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
@@ -122,6 +133,9 @@
   # Include/Guid/MmAcpiS3Enable.h
   gMmAcpiS3EnableHobGuid         = { 0xe7402821, 0x2654, 0x4c1b, { 0x99, 0x0e, 0x04, 0x8f, 0x8d, 0x82, 0xcf, 0x67 }}
 
+[Guids.AARCH64]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
+
 [Protocols]
   ## Include/Protocol/SmmCpuService.h
   gEfiSmmCpuServiceProtocolGuid   = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
@@ -143,6 +157,11 @@
 #
 
 [Ppis]
+  #
+  # The EDK II PEI MP Services 2 PPI has been replaced by the PEI MP Services 2 PPI
+  # in the MdePkg. The following definition is only present for backwards compatibility
+  # and will be removed in the future.
+  #
   gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
 
   ## Include/Ppi/ShadowMicrocode.h
@@ -261,6 +280,14 @@
   #
   # @Prompt BSP Broadcast Method for the first-time wakeup of APs
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|TRUE|BOOLEAN|0x30002007
+
+  ## The max mapping address in page table before Temp Ram Exit.
+  # After physical memory is initialized and before Temp Ram Exit, the physical memory is in UC state.
+  # The PCD controls the page table max mapping address in physical memory before Temp Ram Exit
+  # because creating a big page table in UC physical memory to cover the entire memory space
+  # is slow. The value of 0xFFFFFFFFFFFFFFFF, then firmware will map entire physical address space.
+  # @Prompt Configure max mapping address in page table before Temp Ram Exit.
+  gUefiCpuPkgTokenSpaceGuid.PcdMaxMappingAddressBeforeTempRamExit|0xFFFFFFFFFFFFFFFF|UINT64|0x30002008
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
@@ -408,7 +435,7 @@
   ## This PCD indicates whether CPU processor trace is enabled on BSP only when CPU processor trace is enabled.<BR><BR>
   #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
   #  TRUE  - CPU processor trace is enabled on BSP only.<BR>
-  #  FASLE - CPU processor trace is enabled on all CPU.<BR>
+  #  FALSE - CPU processor trace is enabled on all CPU.<BR>
   # @Prompt Enable CPU processor trace only on BSP.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly|FALSE|BOOLEAN|0x60000019
 
@@ -416,7 +443,7 @@
   #  CYC/TSC timing packets will be generated to collect performance data if this PCD is TRUE.
   #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
   #  TRUE  - Performance collecting will be enabled in processor trace.<BR>
-  #  FASLE - Performance collecting will be disabled in processor trace.<BR>
+  #  FALSE - Performance collecting will be disabled in processor trace.<BR>
   # @Prompt Enable performance collecting when processor trace is enabled.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTracePerformanceCollecting|FALSE|BOOLEAN|0x60000020
 

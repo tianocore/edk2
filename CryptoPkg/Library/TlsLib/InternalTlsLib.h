@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INTERNAL_TLS_LIB_H__
-#define __INTERNAL_TLS_LIB_H__
+#pragma once
 
 #undef _WIN32
 #undef _WIN64
@@ -25,6 +24,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
+///
+/// TLS Minimum security level
+#define MIN_SECURITY_LEVEL  2
+///
+
+///
+/// TLS Maximum security level
+#define MAX_SECURITY_LEVEL  5
+///
+
 typedef struct {
   //
   // Main SSL Connection which is created by a server or a client
@@ -41,4 +50,8 @@ typedef struct {
   BIO    *OutBio;
 } TLS_CONNECTION;
 
-#endif
+/* This is a context that we pass to callbacks */
+typedef struct {
+  BIO      *BioDebug;
+  INT32    Ack;
+} TLS_EXT_CTX;

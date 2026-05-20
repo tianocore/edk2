@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BOOT_MAINT_H_
-#define _BOOT_MAINT_H_
+#pragma once
 
 #include "FormGuid.h"
 
@@ -396,7 +395,7 @@ BOpt_GetBootOptions (
 
   @param CallbackData The BMM context data.
 
-  @return EFI_SUCESS The functin completes successfully.
+  @return EFI_SUCCESS          The function completes successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
 
 
@@ -1325,5 +1324,3 @@ extern EFI_IFR_GUID_LABEL  *mStartLabel;
 extern EFI_IFR_GUID_LABEL  *mEndLabel;
 extern BMM_CALLBACK_DATA   gBootMaintenancePrivate;
 extern BMM_CALLBACK_DATA   *mBmmCallbackInfo;
-
-#endif

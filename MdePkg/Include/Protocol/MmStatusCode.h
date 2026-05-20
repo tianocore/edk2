@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _MM_STATUS_CODE_H__
-#define _MM_STATUS_CODE_H__
+#pragma once
 
 #define EFI_MM_STATUS_CODE_PROTOCOL_GUID \
   { \
@@ -53,5 +52,3 @@ struct _EFI_MM_STATUS_CODE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmStatusCodeProtocolGuid;
-
-#endif

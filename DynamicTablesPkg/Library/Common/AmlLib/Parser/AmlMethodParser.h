@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_METHOD_PARSER_H_
-#define AML_METHOD_PARSER_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <Stream/AmlStream.h>
@@ -184,5 +183,3 @@ AmlGetMethodInvocationArgCount (
   OUT       BOOLEAN          *IsMethodInvocation,
   OUT       UINT8            *ArgCount
   );
-
-#endif // AML_METHOD_PARSER_H_

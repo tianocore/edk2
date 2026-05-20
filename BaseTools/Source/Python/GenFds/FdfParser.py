@@ -13,7 +13,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from re import compile, DOTALL
-from string import hexdigits
 from uuid import UUID
 
 from Common.BuildToolError import *
@@ -1537,7 +1536,6 @@ class FdfParser:
 
             if self._IsToken(TAB_VALUE_SPLIT):
                 pcdPair = self._GetNextPcdSettings()
-                Obj.BaseAddressPcd = pcdPair
                 self.Profile.PcdDict[pcdPair] = Obj.BaseAddress
                 self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
@@ -1554,7 +1552,6 @@ class FdfParser:
             Size = self._Token
             if self._IsToken(TAB_VALUE_SPLIT):
                 pcdPair = self._GetNextPcdSettings()
-                Obj.SizePcd = pcdPair
                 self.Profile.PcdDict[pcdPair] = Size
                 self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
@@ -2392,9 +2389,6 @@ class FdfParser:
         if not ffsInf.InfFileName.endswith('.inf'):
             raise Warning.Expected(".inf file path", self.FileName, self.CurrentLineNumber)
 
-        ffsInf.CurrentLineNum = self.CurrentLineNumber
-        ffsInf.CurrentLineContent = self._CurrentLine()
-
         #Replace $(SAPCE) with real space
         ffsInf.InfFileName = ffsInf.InfFileName.replace('$(SPACE)', ' ')
 
@@ -2651,8 +2645,6 @@ class FdfParser:
             self._GetRAWData(FfsFileObj)
 
         else:
-            FfsFileObj.CurrentLineNum = self.CurrentLineNumber
-            FfsFileObj.CurrentLineContent = self._CurrentLine()
             FfsFileObj.FileName = self._Token.replace('$(SPACE)', ' ')
             self._VerifyFile(FfsFileObj.FileName)
 
@@ -3227,8 +3219,6 @@ class FdfParser:
             if not self._GetNextToken():
                 raise Warning.Expected("file name", self.FileName, self.CurrentLineNumber)
 
-            CapsuleObj.CreateFile = self._Token
-
         self._GetCapsuleStatements(CapsuleObj)
         self.Profile.CapsuleDict[CapsuleObj.UiCapsuleName] = CapsuleObj
         return True
@@ -3571,7 +3561,7 @@ class FdfParser:
         if self._Token.upper() not in {
                 SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM,
                 SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER,
-                SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_DXE_SMM_DRIVER,
+                SUP_MODULE_DXE_SMM_DRIVER,
                 SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_UEFI_DRIVER,
                 SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION,
                 TAB_DEFAULT, SUP_MODULE_BASE,
@@ -3580,7 +3570,6 @@ class FdfParser:
                 EDK_COMPONENT_TYPE_PIC_PEIM,
                 EDK_COMPONENT_TYPE_RELOCATABLE_PEIM, "PE32_PEIM",
                 EDK_COMPONENT_TYPE_BS_DRIVER, EDK_COMPONENT_TYPE_RT_DRIVER,
-                EDK_COMPONENT_TYPE_SAL_RT_DRIVER,
                 EDK_COMPONENT_TYPE_APPLICATION, "ACPITABLE",
                 SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE,
                 SUP_MODULE_MM_CORE_STANDALONE}:

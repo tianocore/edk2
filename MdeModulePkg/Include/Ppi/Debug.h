@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EDKII_DEBUG_PPI_H__
-#define __EDKII_DEBUG_PPI_H__
+#pragma once
 
 #include <Pi/PiPeiCis.h>
 
@@ -70,5 +69,3 @@ struct _EDKII_DEBUG_PPI {
 };
 
 extern EFI_GUID  gEdkiiDebugPpiGuid;
-
-#endif

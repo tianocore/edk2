@@ -75,50 +75,6 @@ def GenDefines(String, Arch, Defines):
             return -1
     return 1
 
-## GetLibraryClassesWithModuleType
-#
-# Get Library Class definition when no module type defined
-#
-# @param Lines:             The content to be parsed
-# @param Key:               Reserved
-# @param KeyValues:         To store data after parsing
-# @param CommentCharacter:  Comment char, used to ignore comment content
-#
-def GetLibraryClassesWithModuleType(Lines, Key, KeyValues, CommentCharacter):
-    NewKey = SplitModuleType(Key)
-    Lines = Lines.split(DataType.TAB_SECTION_END, 1)[1]
-    LineList = Lines.splitlines()
-    for Line in LineList:
-        Line = CleanString(Line, CommentCharacter)
-        if Line != '' and Line[0] != CommentCharacter:
-            KeyValues.append([CleanString(Line, CommentCharacter), NewKey[1]])
-
-    return True
-
-## GetDynamics
-#
-# Get Dynamic Pcds
-#
-# @param Lines:             The content to be parsed
-# @param Key:               Reserved
-# @param KeyValues:         To store data after parsing
-# @param CommentCharacter:  Comment char, used to ignore comment content
-#
-def GetDynamics(Lines, Key, KeyValues, CommentCharacter):
-    #
-    # Get SkuId Name List
-    #
-    SkuIdNameList = SplitModuleType(Key)
-
-    Lines = Lines.split(DataType.TAB_SECTION_END, 1)[1]
-    LineList = Lines.splitlines()
-    for Line in LineList:
-        Line = CleanString(Line, CommentCharacter)
-        if Line != '' and Line[0] != CommentCharacter:
-            KeyValues.append([CleanString(Line, CommentCharacter), SkuIdNameList[1]])
-
-    return True
-
 ## SplitModuleType
 #
 # Split ModuleType out of section defien to get key
@@ -337,29 +293,6 @@ def CleanString2(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyl
 
     return Line, Comment
 
-## GetMultipleValuesOfKeyFromLines
-#
-# Parse multiple strings to clean comment and spaces
-# The result is saved to KeyValues
-#
-# @param Lines:             The content to be parsed
-# @param Key:               Reserved
-# @param KeyValues:         To store data after parsing
-# @param CommentCharacter:  Comment char, used to ignore comment content
-#
-def GetMultipleValuesOfKeyFromLines(Lines, Key, KeyValues, CommentCharacter):
-    if Key:
-        pass
-    if KeyValues:
-        pass
-    Lines = Lines.split(DataType.TAB_SECTION_END, 1)[1]
-    LineList = Lines.split('\n')
-    for Line in LineList:
-        Line = CleanString(Line, CommentCharacter)
-        if Line != '' and Line[0] != CommentCharacter:
-            KeyValues += [Line]
-    return True
-
 ## GetDefineValue
 #
 # Parse a DEFINE statement to get defined value
@@ -374,133 +307,6 @@ def GetDefineValue(String, Key, CommentCharacter):
         pass
     String = CleanString(String)
     return String[String.find(Key + ' ') + len(Key + ' ') : ]
-
-## GetSingleValueOfKeyFromLines
-#
-# Parse multiple strings as below to get value of each definition line
-# Key1 = Value1
-# Key2 = Value2
-# The result is saved to Dictionary
-#
-# @param Lines:                The content to be parsed
-# @param Dictionary:           To store data after parsing
-# @param CommentCharacter:     Comment char, be used to ignore comment content
-# @param KeySplitCharacter:    Key split char, between key name and key value.
-#                              Key1 = Value1, '=' is the key split char
-# @param ValueSplitFlag:       Value split flag, be used to decide if has
-#                              multiple values
-# @param ValueSplitCharacter:  Value split char, be used to split multiple
-#                              values. Key1 = Value1|Value2, '|' is the value
-#                              split char
-#
-def GetSingleValueOfKeyFromLines(Lines, Dictionary, CommentCharacter, KeySplitCharacter, \
-                                 ValueSplitFlag, ValueSplitCharacter):
-    Lines = Lines.split('\n')
-    Keys = []
-    Value = ''
-    DefineValues = ['']
-    SpecValues = ['']
-
-    for Line in Lines:
-        #
-        # Handle DEFINE and SPEC
-        #
-        if Line.find(DataType.TAB_INF_DEFINES_DEFINE + ' ') > -1:
-            if '' in DefineValues:
-                DefineValues.remove('')
-            DefineValues.append(GetDefineValue(Line, DataType.TAB_INF_DEFINES_DEFINE, CommentCharacter))
-            continue
-        if Line.find(DataType.TAB_INF_DEFINES_SPEC + ' ') > -1:
-            if '' in SpecValues:
-                SpecValues.remove('')
-            SpecValues.append(GetDefineValue(Line, DataType.TAB_INF_DEFINES_SPEC, CommentCharacter))
-            continue
-
-        #
-        # Handle Others
-        #
-        LineList = Line.split(KeySplitCharacter, 1)
-        if len(LineList) >= 2:
-            Key = LineList[0].split()
-            if len(Key) == 1 and Key[0][0] != CommentCharacter:
-                #
-                # Remove comments and white spaces
-                #
-                LineList[1] = CleanString(LineList[1], CommentCharacter)
-                if ValueSplitFlag:
-                    Value = list(map(lambda x: x.strip(), LineList[1].split(ValueSplitCharacter)))
-                else:
-                    Value = CleanString(LineList[1], CommentCharacter).splitlines()
-
-                if Key[0] in Dictionary:
-                    if Key[0] not in Keys:
-                        Dictionary[Key[0]] = Value
-                        Keys.append(Key[0])
-                    else:
-                        Dictionary[Key[0]].extend(Value)
-                else:
-                    Dictionary[DataType.TAB_INF_DEFINES_MACRO][Key[0]] = Value[0]
-
-    if DefineValues == []:
-        DefineValues = ['']
-    if SpecValues == []:
-        SpecValues = ['']
-    Dictionary[DataType.TAB_INF_DEFINES_DEFINE] = DefineValues
-    Dictionary[DataType.TAB_INF_DEFINES_SPEC] = SpecValues
-
-    return True
-
-## The content to be parsed
-#
-# Do pre-check for a file before it is parsed
-# Check $()
-# Check []
-#
-# @param FileName:       Used for error report
-# @param FileContent:    File content to be parsed
-# @param SupSectionTag:  Used for error report
-#
-def PreCheck(FileName, FileContent, SupSectionTag):
-    if SupSectionTag:
-        pass
-    LineNo = 0
-    IsFailed = False
-    NewFileContent = ''
-    for Line in FileContent.splitlines():
-        LineNo = LineNo + 1
-        #
-        # Clean current line
-        #
-        Line = CleanString(Line)
-        #
-        # Remove commented line
-        #
-        if Line.find(DataType.TAB_COMMA_SPLIT) == 0:
-            Line = ''
-        #
-        # Check $()
-        #
-        if Line.find('$') > -1:
-            if Line.find('$(') < 0 or Line.find(')') < 0:
-                Logger.Error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=Logger.IS_RAISE_ERROR)
-        #
-        # Check []
-        #
-        if Line.find('[') > -1 or Line.find(']') > -1:
-            #
-            # Only get one '[' or one ']'
-            #
-            if not (Line.find('[') > -1 and Line.find(']') > -1):
-                Logger.Error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=Logger.IS_RAISE_ERROR)
-        #
-        # Regenerate FileContent
-        #
-        NewFileContent = NewFileContent + Line + '\r\n'
-
-    if IsFailed:
-        Logger.Error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=Logger.IS_RAISE_ERROR)
-
-    return NewFileContent
 
 ## CheckFileType
 #
@@ -666,20 +472,6 @@ def GetHelpTextList(HelpTextClassList):
                 List.extend(HelpText.String.split('\n'))
     return List
 
-## Get String Array Length
-#
-# Get String Array Length
-#
-# @param String: the source string
-#
-def StringArrayLength(String):
-    if String.startswith('L"'):
-        return (len(String) - 3 + 1) * 2
-    elif String.startswith('"'):
-        return (len(String) - 2 + 1)
-    else:
-        return len(String.split()) + 1
-
 ## RemoveDupOption
 #
 # Remove Dup Option
@@ -706,27 +498,6 @@ def RemoveDupOption(OptionString, Which="/I", Against=None):
         else:
             ValueList.append(Val)
     return " ".join(OptionList)
-
-## Check if the string is HexDgit
-#
-# Return true if all characters in the string are digits and there is at
-# least one character
-# or valid Hexs (started with 0x, following by hexdigit letters)
-# , false otherwise.
-# @param string: input string
-#
-def IsHexDigit(Str):
-    try:
-        int(Str, 10)
-        return True
-    except ValueError:
-        if len(Str) > 2 and Str.upper().startswith('0X'):
-            try:
-                int(Str, 16)
-                return True
-            except ValueError:
-                return False
-    return False
 
 ## Check if the string is HexDgit and its integer value within limit of UINT32
 #

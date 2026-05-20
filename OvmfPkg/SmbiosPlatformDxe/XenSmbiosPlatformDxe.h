@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef XEN_SMBIOS_PLATFORM_DXE_H_
-#define XEN_SMBIOS_PLATFORM_DXE_H_
+#pragma once
 
 #include <IndustryStandard/SmBios.h> // SMBIOS_TABLE_ENTRY_POINT
 
@@ -24,5 +23,3 @@ SMBIOS_TABLE_ENTRY_POINT *
 GetXenSmbiosTables (
   VOID
   );
-
-#endif

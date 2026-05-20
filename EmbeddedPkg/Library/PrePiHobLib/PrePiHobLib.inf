@@ -35,11 +35,13 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  PeCoffLib
   PrePiHobListPointerLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
   gEfiHobMemoryAllocStackGuid
+  gEfiMemoryTypeInformationGuid
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
@@ -47,11 +49,9 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
 
+[Protocols]
+  gPeCoffLoaderProtocolGuid ## PRODUCES

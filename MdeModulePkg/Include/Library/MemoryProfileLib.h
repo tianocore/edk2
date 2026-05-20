@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _MEMORY_PROFILE_LIB_H_
-#define _MEMORY_PROFILE_LIB_H_
+#pragma once
 
 #include <Guid/MemoryProfile.h>
 
@@ -43,5 +42,3 @@ MemoryProfileLibRecord (
   IN UINTN                  Size,
   IN CHAR8                  *ActionString OPTIONAL
   );
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MP_PERF_H_
-#define MP_PERF_H_
+#pragma once
 
 //
 // The list of all MP procedures that need to be perf-logged.
@@ -79,5 +78,3 @@ MpPerfEnd (
   IN UINTN  CpuIndex,
   IN UINTN  MpProcedureId
   );
-
-#endif

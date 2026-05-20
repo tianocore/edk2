@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FUNCTION_MOCK_LIB_H_
-#define FUNCTION_MOCK_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/SubhookLib.h>
@@ -127,5 +126,3 @@
   MOCK :: ~ MOCK () {                      \
     MOCK :: Instance = NULL;               \
   }
-
-#endif // FUNCTION_MOCK_LIB_H_

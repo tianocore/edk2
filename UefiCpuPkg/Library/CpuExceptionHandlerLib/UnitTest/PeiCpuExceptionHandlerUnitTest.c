@@ -27,7 +27,7 @@ InitializeBspIdt (
 
   Idtr = AllocateZeroPool (sizeof (IA32_DESCRIPTOR));
   ASSERT (Idtr != NULL);
-  NewIdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM + sizeof (UINTN));
+  NewIdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM + sizeof (UINTN));
   ASSERT (NewIdtTable != NULL);
   //
   // Store original PeiServicePointer before new Idt table
@@ -36,7 +36,7 @@ InitializeBspIdt (
   NewIdtTable  = (UINTN *)((UINTN)NewIdtTable + sizeof (UINTN));
 
   Idtr->Base  = (UINTN)NewIdtTable;
-  Idtr->Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
+  Idtr->Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM - 1);
 
   AsmWriteIdtr (Idtr);
   return Idtr;
@@ -137,19 +137,19 @@ MpServicesUnitTestWhoAmI (
 }
 
 /**
-  Get EDKII_PEI_MP_SERVICES2_PPI pointer.
+  Get EFI_PEI_MP_SERVICES2_PPI pointer.
 
-  @param[out] MpServices    Pointer to the buffer where EDKII_PEI_MP_SERVICES2_PPI is stored
+  @param[out] MpServices    Pointer to the buffer where EFI_PEI_MP_SERVICES2_PPI is stored
 
-  @retval EFI_SUCCESS       EDKII_PEI_MP_SERVICES2_PPI interface is returned
-  @retval EFI_NOT_FOUND     EDKII_PEI_MP_SERVICES2_PPI interface is not found
+  @retval EFI_SUCCESS       EFI_PEI_MP_SERVICES2_PPI interface is returned
+  @retval EFI_NOT_FOUND     EFI_PEI_MP_SERVICES2_PPI interface is not found
 **/
 EFI_STATUS
 GetMpServices (
   OUT MP_SERVICES  *MpServices
   )
 {
-  return PeiServicesLocatePpi (&gEdkiiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
+  return PeiServicesLocatePpi (&gEfiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
 }
 
 /**

@@ -329,7 +329,16 @@ RegisterPciDevice (
     // or loaded from device in the previous round of bus enumeration
     //
     if (HasEfiImage) {
-      ProcessOpRomImage (PciIoDevice);
+      //
+      // Try to searching native OpRom first
+      //
+      Status = ProcessOpRomImage (PciIoDevice, TRUE);
+      //
+      // If the native OpRom is not found, try to searching foreign OpRom
+      //
+      if (Status == EFI_NOT_FOUND) {
+        ProcessOpRomImage (PciIoDevice, FALSE);
+      }
     }
   }
 

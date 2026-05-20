@@ -582,7 +582,6 @@ class UserExtensionsXml(object):
         self.BinaryDescriptionList = []
         self.BinaryCopyrightList = []
         self.BinaryLicenseList = []
-        self.LangDefsList = []
         self.DefineDict = {}
         self.BuildOptionDict = {}
         self.IncludesDict = {}

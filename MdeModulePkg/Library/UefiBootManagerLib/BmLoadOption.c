@@ -9,8 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalBm.h"
 
-#include <Library/VariablePolicyHelperLib.h>
-
 GLOBAL_REMOVE_IF_UNREFERENCED
 CHAR16  *mBmLoadOptionName[] = {
   L"Driver",
@@ -438,6 +436,10 @@ EfiBootManagerSortLoadOptionVariable (
   UINT16                        *OptionOrder;
 
   LoadOption = EfiBootManagerGetLoadOptions (&LoadOptionCount, OptionType);
+
+  if (LoadOptionCount == 0) {
+    return;
+  }
 
   //
   // Insertion sort algorithm

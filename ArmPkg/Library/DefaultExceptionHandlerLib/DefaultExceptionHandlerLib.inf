@@ -19,9 +19,6 @@
 [Sources.common]
   DefaultExceptionHandlerUefi.c
 
-[Sources.ARM]
-  Arm/DefaultExceptionHandler.c
-
 [Sources.AARCH64]
   AArch64/DefaultExceptionHandler.c
 
@@ -35,7 +32,6 @@
   PrintLib
   DebugLib
   PeCoffGetEntryPointLib
-  ArmDisassemblerLib
   SerialPortLib
   UefiBootServicesTableLib
 

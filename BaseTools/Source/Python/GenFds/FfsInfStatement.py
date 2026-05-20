@@ -65,8 +65,6 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.PiSpecVersion = '0x00000000'
         self.InfModule = None
         self.FinalTargetSuffixMap = {}
-        self.CurrentLineNum = None
-        self.CurrentLineContent = None
         self.FileName = None
         self.InfFileName = None
         self.OverrideGuid = None
@@ -151,7 +149,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #
     def __InfParse__(self, Dict = None, IsGenFfs=False):
 
-        GenFdsGlobalVariable.VerboseLogger( " Begine parsing INf file : %s" %self.InfFileName)
+        GenFdsGlobalVariable.VerboseLogger( " Begin parsing INF file : %s" %self.InfFileName)
 
         self.InfFileName = self.InfFileName.replace('$(WORKSPACE)', '')
         if len(self.InfFileName) > 1 and self.InfFileName[0] == '\\' and self.InfFileName[1] == '\\':
@@ -169,7 +167,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             if not os.path.exists(InfPath):
                 InfPath = GenFdsGlobalVariable.ReplaceWorkspaceMacro(InfPath)
                 if not os.path.exists(InfPath):
-                    EdkLogger.error("GenFds", GENFDS_ERROR, "Non-existant Module %s !" % (self.InfFileName))
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "Non-existent Module %s !" % (self.InfFileName))
 
         self.CurrentArch = self.GetCurrentArch()
         #
@@ -365,7 +363,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             os.makedirs(self.OutputPath)
 
         self.EfiOutputPath, self.EfiDebugPath = self.__GetEFIOutPutPath__()
-        GenFdsGlobalVariable.VerboseLogger( "ModuelEFIPath: " + self.EfiOutputPath)
+        GenFdsGlobalVariable.VerboseLogger( "ModuleEFIPath: " + self.EfiOutputPath)
 
     ## PatchEfiFile
     #
@@ -1130,5 +1128,3 @@ class FfsInfStatement(FfsInfStatementClassObject):
             EdkLogger.error("GenFds", FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the file been locked or using by other applications." %UniVfrOffsetFileName, None)
 
         fStringIO.close ()
-
-

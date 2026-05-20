@@ -187,7 +187,11 @@ TlsSetSessionData (
       }
 
       Status = TlsSetVerifyHost (Instance->TlsConn, TlsVerifyHost->Flags, TlsVerifyHost->HostName);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
 
+      Status = TlsSetServerName (Instance->TlsConn, Instance->Service->TlsCtx, TlsVerifyHost->HostName);
       break;
     case EfiTlsSessionID:
       if (DataSize != sizeof (EFI_TLS_SESSION_ID)) {

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PEILESSSEC_H_
-#define PEILESSSEC_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -19,11 +18,14 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/PeilessSecMeasureLib.h>
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/TimerLib.h>
+#include <Library/ArmTransferListLib.h>
+#include <Guid/TransferListHob.h>
 
 #include <Ppi/ArmMpCoreInfo.h>
 #include <Ppi/GuidedSectionExtraction.h>
@@ -72,5 +74,3 @@ VOID
 ArchInitialize (
   VOID
   );
-
-#endif /* PEILESSSEC_H_ */

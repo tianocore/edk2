@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef NVME_MEDIA_SANITIZE_H_
-#define NVME_MEDIA_SANITIZE_H_
+#pragma once
 
 #define NVME_NO_DEALLOCATE_AFTER_SANITZE  0x1
 
@@ -187,5 +186,3 @@ NvmExpressMediaFormat (
   IN UINT32                   LbaSize,
   IN UINT32                   SecureEraseAction
   );
-
-#endif

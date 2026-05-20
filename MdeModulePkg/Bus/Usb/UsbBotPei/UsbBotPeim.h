@@ -7,13 +7,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB_BOT_PEIM_H_
-#define _PEI_USB_BOT_PEIM_H_
+#pragma once
 
 #include <PiPei.h>
 
 #include <Ppi/UsbIo.h>
-#include <Ppi/UsbHostController.h>
 #include <Ppi/BlockIo.h>
 #include <Ppi/BlockIo2.h>
 
@@ -335,5 +333,3 @@ PeiAtapiCommand (
   IN  EFI_USB_DATA_DIRECTION  Direction,
   IN  UINT16                  TimeOutInMilliSeconds
   );
-
-#endif

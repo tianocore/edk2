@@ -173,7 +173,6 @@ MmiManage (
   BOOLEAN      WillReturn;
   EFI_STATUS   Status;
 
-  mMmiManageCallingDepth++;
   WillReturn   = FALSE;
   Status       = EFI_NOT_FOUND;
   ReturnStatus = Status;
@@ -198,6 +197,7 @@ MmiManage (
     Head = &MmiEntry->MmiHandlers;
   }
 
+  mMmiManageCallingDepth++;
   for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     MmiHandler = CR (Link, MMI_HANDLER, Link, MMI_HANDLER_SIGNATURE);
 

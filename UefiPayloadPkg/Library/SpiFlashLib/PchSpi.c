@@ -144,10 +144,10 @@ SaveAndDisableSpiPrefetchCache (
 
   BiosCtlSave = MmioRead8 (PchSpiBase + R_SPI_BCR) & B_SPI_BCR_SRC;
 
-  MmioAndThenOr32 (
+  MmioAndThenOr8 (
     PchSpiBase + R_SPI_BCR, \
-    (UINT32)(~B_SPI_BCR_SRC), \
-    (UINT32)(V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS <<  B_SPI_BCR_SRC)
+    (UINT8)(~B_SPI_BCR_SRC), \
+    (UINT8)(V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS <<  N_SPI_BCR_SRC)
     );
 
   return BiosCtlSave;

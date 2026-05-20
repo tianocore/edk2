@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _NVM_EXPRESS_PEI_BLOCKIO_H_
-#define _NVM_EXPRESS_PEI_BLOCKIO_H_
+#pragma once
 
 //
 // Nvme device for EFI_PEI_BLOCK_DEVICE_TYPE
@@ -255,5 +254,3 @@ NvmeBlockIoPeimReadBlocks2 (
   IN  UINTN                           BufferSize,
   OUT VOID                            *Buffer
   );
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef REDFISH_PLATFORM_CONFIG_H_
-#define REDFISH_PLATFORM_CONFIG_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -31,5 +30,3 @@ typedef struct {
   VOID                                      *Registration; ///< Protocol notification registration.
   EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL    *Protocol;
 } REDFISH_PLATFORM_CONFIG_LIB_PRIVATE;
-
-#endif

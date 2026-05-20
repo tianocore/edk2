@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __REAL_TIME_CLOCK_LIB__
-#define __REAL_TIME_CLOCK_LIB__
+#pragma once
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
@@ -119,5 +118,3 @@ LibRtcInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

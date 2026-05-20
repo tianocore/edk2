@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __STATUS_CODE_HANDLER_PEI_H__
-#define __STATUS_CODE_HANDLER_PEI_H__
+#pragma once
 
 #include <Ppi/ReportStatusCodeHandler.h>
 
@@ -111,5 +110,3 @@ MemoryStatusCodeReportWorker (
   IN CONST EFI_GUID              *CallerId,
   IN CONST EFI_STATUS_CODE_DATA  *Data OPTIONAL
   );
-
-#endif

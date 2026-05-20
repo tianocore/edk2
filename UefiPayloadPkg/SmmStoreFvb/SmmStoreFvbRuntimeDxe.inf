@@ -1,0 +1,63 @@
+## @file
+#  This is the component description file for SmmStore module.
+#
+#  Copyright (c) 2022, 9elements GmbH.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmStoreFvbRuntimeDxe
+  FILE_GUID                      = A0402FCA-6B25-4CEA-B7DD-C08F99714B29
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmStoreInitialize
+
+[Sources.common]
+  SmmStoreFvbRuntimeDxe.c
+  SmmStoreFvbRuntime.h
+  SmmStoreFvbRuntime.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+  SmmStoreLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+
+[Guids]
+  gEfiSystemNvDataFvGuid
+  gEfiVariableGuid                  ## PRODUCES ## PROTOCOL
+  gEfiAuthenticatedVariableGuid
+  gEfiEventVirtualAddressChangeGuid
+  gEdkiiNvVarStoreFormattedGuid     ## PRODUCES ## PROTOCOL
+
+[Protocols]
+  gEfiDevicePathProtocolGuid          ## BY_START
+  gEfiFirmwareVolumeBlockProtocolGuid ## BY_START
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+
+[Depex]
+  TRUE

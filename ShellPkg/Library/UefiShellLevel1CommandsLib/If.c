@@ -99,7 +99,11 @@ IsValidProfile (
   CONST CHAR16  *TempLocation;
 
   ProfilesString = ShellGetEnvironmentVariable (L"profiles");
-  ASSERT (ProfilesString != NULL);
+  if (ProfilesString == NULL) {
+    ASSERT (ProfilesString != NULL);
+    return (FALSE);
+  }
+
   TempLocation = StrStr (ProfilesString, String);
   if ((TempLocation != NULL) && (*(TempLocation-1) == L';') && (*(TempLocation+StrLen (String)) == L';')) {
     return (TRUE);
@@ -411,7 +415,7 @@ ProcessStatement (
       OperationResult                             = ShellIsHexOrDecimalNumber (StatementWalker, FALSE, FALSE);
     } else {
       Status = EFI_INVALID_PARAMETER;
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"isint");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"isint");
     }
   } else if ((!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"exists", &Match)) && Match) ||
              (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"exist", &Match)) && Match))
@@ -427,7 +431,7 @@ ProcessStatement (
     } else if ((StatementWalker[0] == CHAR_NULL) && (StartParameterNumber+1 == EndParameterNumber)) {
       OperationResult = (BOOLEAN)(ShellFileExists (gEfiShellParametersProtocol->Argv[++StartParameterNumber]) == EFI_SUCCESS);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"exist(s)");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"exist(s)");
       Status = EFI_INVALID_PARAMETER;
     }
   } else if (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"available", &Match)) && Match) {
@@ -440,7 +444,7 @@ ProcessStatement (
       //
       OperationResult = (BOOLEAN)(ShellIsFileInPath (StatementWalker) == EFI_SUCCESS);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"available");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"available");
       Status = EFI_INVALID_PARAMETER;
     }
   } else if (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"profile", &Match)) && Match) {
@@ -453,11 +457,11 @@ ProcessStatement (
       StatementWalker[StrLen (StatementWalker)-1] = CHAR_NULL;
       OperationResult                             = IsValidProfile (StatementWalker);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"profile");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"profile");
       Status = EFI_INVALID_PARAMETER;
     }
   } else if (StartParameterNumber+1 >= EndParameterNumber) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[StartParameterNumber]);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[StartParameterNumber]);
     Status = EFI_INVALID_PARAMETER;
   } else {
     //
@@ -481,11 +485,11 @@ ProcessStatement (
           Compare1         = StrnCatGrow (&Compare1, NULL, HexString, 0);
           StatementWalker += StrLen (StatementWalker) + 1;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
           Status = EFI_INVALID_PARAMETER;
         }
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
         Status = EFI_INVALID_PARAMETER;
       }
     } else if (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"pierror", &Match)) && Match) {
@@ -498,11 +502,11 @@ ProcessStatement (
           Compare1         = StrnCatGrow (&Compare1, NULL, HexString, 0);
           StatementWalker += StrLen (StatementWalker) + 1;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
           Status = EFI_INVALID_PARAMETER;
         }
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
         Status = EFI_INVALID_PARAMETER;
       }
     } else if (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"oemerror", &Match)) && Match) {
@@ -515,17 +519,17 @@ ProcessStatement (
           Compare1         = StrnCatGrow (&Compare1, NULL, HexString, 0);
           StatementWalker += StrLen (StatementWalker) + 1;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
           Status = EFI_INVALID_PARAMETER;
         }
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
         Status = EFI_INVALID_PARAMETER;
       }
     } else {
       ASSERT (Compare1 == NULL);
       if (EndParameterNumber - StartParameterNumber > 2) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_STARTING), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[StartParameterNumber+2]);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_STARTING), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[StartParameterNumber+2]);
         Status = EFI_INVALID_PARAMETER;
       } else {
         //
@@ -563,7 +567,7 @@ ProcessStatement (
     } else if (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"ule", &Match)) && Match) {
       BinOp = OperatorUnsignedLessOrEqual;
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_INVALID_BINOP), gShellLevel1HiiHandle, StatementWalker);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_INVALID_BINOP), gShellLevel1HiiHandle, StatementWalker);
       Status = EFI_INVALID_PARAMETER;
     }
 
@@ -582,11 +586,11 @@ ProcessStatement (
           Compare2         = StrnCatGrow (&Compare2, NULL, HexString, 0);
           StatementWalker += StrLen (StatementWalker) + 1;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
           Status = EFI_INVALID_PARAMETER;
         }
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"efierror");
         Status = EFI_INVALID_PARAMETER;
       }
 
@@ -603,11 +607,11 @@ ProcessStatement (
           Compare2         = StrnCatGrow (&Compare2, NULL, HexString, 0);
           StatementWalker += StrLen (StatementWalker) + 1;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
           Status = EFI_INVALID_PARAMETER;
         }
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"pierror");
         Status = EFI_INVALID_PARAMETER;
       }
     } else if (!EFI_ERROR (IsNextFragment ((CONST CHAR16 **)(&StatementWalker), L"oemerror", &Match)) && Match) {
@@ -620,11 +624,11 @@ ProcessStatement (
           Compare2         = StrnCatGrow (&Compare2, NULL, HexString, 0);
           StatementWalker += StrLen (StatementWalker) + 1;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
           Status = EFI_INVALID_PARAMETER;
         }
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_IN), gShellLevel1HiiHandle, L"oemerror");
         Status = EFI_INVALID_PARAMETER;
       }
     } else {
@@ -882,12 +886,12 @@ ShellCommandRunIf (
   ASSERT_EFI_ERROR (Status);
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"if");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"if");
     return (SHELL_UNSUPPORTED);
   }
 
   if (gEfiShellParametersProtocol->Argc < 3) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"if");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"if");
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -895,17 +899,18 @@ ShellCommandRunIf (
   // Make sure that an End exists.
   //
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  if (CurrentScriptFile == NULL) {
+    return (SHELL_INVALID_PARAMETER);
+  }
+
   if (!MoveToTag (GetNextNode, L"endif", L"if", NULL, CurrentScriptFile, TRUE, TRUE, FALSE)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
       gShellLevel1HiiHandle,
       L"EndIf",
       L"If",
       CurrentScriptFile != NULL
-                    && CurrentScriptFile->CurrentCommand != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
         ? CurrentScriptFile->CurrentCommand->Line : 0
       );
     return (SHELL_DEVICE_ERROR);
@@ -978,12 +983,12 @@ ShellCommandRunIf (
       // we are at the then
       //
       if (CurrentParameter+1 != gEfiShellParametersProtocol->Argc) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TEXT_AFTER_THEN), gShellLevel1HiiHandle, L"if");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TEXT_AFTER_THEN), gShellLevel1HiiHandle, L"if");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         Status = PerformResultOperation (CurrentValue);
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_AFTER_BAD), gShellLevel1HiiHandle, L"if", gEfiShellParametersProtocol->Argv[CurrentParameter]);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_AFTER_BAD), gShellLevel1HiiHandle, L"if", gEfiShellParametersProtocol->Argv[CurrentParameter]);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }
@@ -994,16 +999,13 @@ ShellCommandRunIf (
       //
       if (!BuildNextStatement (CurrentParameter, &EndParameter, &Ending)) {
         CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
           gShellLevel1HiiHandle,
           L"Then",
           L"If",
           CurrentScriptFile != NULL
-                        && CurrentScriptFile->CurrentCommand != NULL
+                               && CurrentScriptFile->CurrentCommand != NULL
             ? CurrentScriptFile->CurrentCommand->Line : 0
           );
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -1013,7 +1015,7 @@ ShellCommandRunIf (
         //
         Status = ProcessStatement (&CurrentValue, CurrentParameter, EndParameter, PreviousEnding, CaseInsensitive, ForceString);
         if (EFI_ERROR (Status)) {
-          //          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_STARTING), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[CurrentParameter]);
+          //          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_STARTING), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[CurrentParameter]);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           //
@@ -1022,7 +1024,7 @@ ShellCommandRunIf (
           if (((Ending == EndTagOr) && CurrentValue) || ((Ending == EndTagAnd) && !CurrentValue)) {
             Status = PerformResultOperation (CurrentValue);
             if (EFI_ERROR (Status)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SYNTAX_AFTER_BAD), gShellLevel1HiiHandle, L"if", gEfiShellParametersProtocol->Argv[CurrentParameter]);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SYNTAX_AFTER_BAD), gShellLevel1HiiHandle, L"if", gEfiShellParametersProtocol->Argv[CurrentParameter]);
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
 
@@ -1066,60 +1068,54 @@ ShellCommandRunElse (
   ASSERT_EFI_ERROR (Status);
 
   if (gEfiShellParametersProtocol->Argc > 1) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"if");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"if");
     return (SHELL_INVALID_PARAMETER);
   }
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"Else");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"Else");
     return (SHELL_UNSUPPORTED);
   }
 
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  if (CurrentScriptFile == NULL) {
+    return (SHELL_INVALID_PARAMETER);
+  }
 
   if (!MoveToTag (GetPreviousNode, L"if", L"endif", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
       gShellLevel1HiiHandle,
       L"If",
       L"Else",
       CurrentScriptFile != NULL
-                    && CurrentScriptFile->CurrentCommand != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
         ? CurrentScriptFile->CurrentCommand->Line : 0
       );
     return (SHELL_DEVICE_ERROR);
   }
 
   if (!MoveToTag (GetPreviousNode, L"if", L"else", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
       gShellLevel1HiiHandle,
       L"If",
       L"Else",
       CurrentScriptFile != NULL
-                    && CurrentScriptFile->CurrentCommand != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
         ? CurrentScriptFile->CurrentCommand->Line : 0
       );
     return (SHELL_DEVICE_ERROR);
   }
 
   if (!MoveToTag (GetNextNode, L"endif", L"if", NULL, CurrentScriptFile, FALSE, FALSE, FALSE)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
       gShellLevel1HiiHandle,
       L"EndIf",
       "Else",
       CurrentScriptFile != NULL
-                    && CurrentScriptFile->CurrentCommand != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
         ? CurrentScriptFile->CurrentCommand->Line : 0
       );
     return (SHELL_DEVICE_ERROR);
@@ -1148,27 +1144,28 @@ ShellCommandRunEndIf (
   ASSERT_EFI_ERROR (Status);
 
   if (gEfiShellParametersProtocol->Argc > 1) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"if");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"if");
     return (SHELL_INVALID_PARAMETER);
   }
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"Endif");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"Endif");
     return (SHELL_UNSUPPORTED);
   }
 
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  if (CurrentScriptFile == NULL) {
+    return (SHELL_INVALID_PARAMETER);
+  }
+
   if (!MoveToTag (GetPreviousNode, L"if", L"endif", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
       gShellLevel1HiiHandle,
       L"If",
       L"EndIf",
       CurrentScriptFile != NULL
-                    && CurrentScriptFile->CurrentCommand != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
         ? CurrentScriptFile->CurrentCommand->Line : 0
       );
     return (SHELL_DEVICE_ERROR);

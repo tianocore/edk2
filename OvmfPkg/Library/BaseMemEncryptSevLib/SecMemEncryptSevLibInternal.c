@@ -162,6 +162,31 @@ MemEncryptSevEsDebugVirtualizationIsEnabled (
 }
 
 /**
+  Returns a boolean to indicate whether the SEV-SNP cache line eviction
+  mitigation is needed.
+
+  @retval TRUE           Cache line eviction mitigation required
+  @retval FALSE          Cache line eviction migigation not required
+
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpDoCoherencyMitigation (
+  VOID
+  )
+{
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+
+  SevEsWorkArea = GetSevEsWorkArea ();
+  if (SevEsWorkArea == NULL) {
+    return FALSE;
+  }
+
+  return MemEncryptSevSnpIsEnabled () &&
+         ((SevEsWorkArea->Flags & SEV_ES_WORK_AREA_FLAG_CSFW_NO) == 0);
+}
+
+/**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM
   Save State Map.
 

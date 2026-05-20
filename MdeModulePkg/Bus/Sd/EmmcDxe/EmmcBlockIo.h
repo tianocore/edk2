@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _EMMC_BLOCK_IO_H_
-#define _EMMC_BLOCK_IO_H_
+#pragma once
 
 /**
   Reset the Block Device.
@@ -498,5 +497,3 @@ EmmcEraseBlocks (
   IN OUT EFI_ERASE_BLOCK_TOKEN     *Token,
   IN     UINTN                     Size
   );
-
-#endif

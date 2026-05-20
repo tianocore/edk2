@@ -120,7 +120,20 @@ _ModuleEntryPoint (
                 FixedPcdGetPtr (PcdEntryPointOverrideFwCfgVarName),
                 &Enabled
                 );
-  if (!RETURN_ERROR (RetStatus) && !Enabled) {
+
+  if (RETURN_ERROR (RetStatus)) {
+    Enabled = AsciiStrCmp (FixedPcdGetPtr (PcdEntryPointOverrideDefaultValue), "yes") == 0;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "EntryPointFwCfgOverride: %a = %a (%a)\n",
+    FixedPcdGetPtr (PcdEntryPointOverrideFwCfgVarName),
+    Enabled ? "enabled" : "disabled",
+    RETURN_ERROR (RetStatus) ? "default" : "fw_cfg"
+    ));
+
+  if (!Enabled) {
     //
     // The QEMU fw_cfg variable tells us not to load this image.  So abort.
     //

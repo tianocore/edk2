@@ -148,15 +148,15 @@ mktime (
   struct tm  *t
   )
 {
-  EFI_TIME  Time = {
-    .Year     = (UINT16)t->tm_year,
-    .Month    = (UINT8)t->tm_mon,
-    .Day      = (UINT8)t->tm_mday,
-    .Hour     = (UINT8)t->tm_hour,
-    .Minute   = (UINT8)t->tm_min,
-    .Second   = (UINT8)t->tm_sec,
-    .TimeZone = EFI_UNSPECIFIED_TIMEZONE,
-  };
+  EFI_TIME  Time;
+
+  Time.Year     = (UINT16)t->tm_year;
+  Time.Month    = (UINT8)t->tm_mon;
+  Time.Day      = (UINT8)t->tm_mday;
+  Time.Hour     = (UINT8)t->tm_hour;
+  Time.Minute   = (UINT8)t->tm_min;
+  Time.Second   = (UINT8)t->tm_sec;
+  Time.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
 
   return CalculateTimeT (&Time);
 }

@@ -2,8 +2,8 @@
 #  English module that provides Unicode Collation supports.
 #
 #  This driver installs Unicode ISO 639-2 Collation and
-#  RFC 4646 Unicode Collation 2 protocols based on feature flags
-#  PcdUnicodeCollationSupport & PcdUnicodeCollation2Support respectively.
+#  RFC 4646 Unicode Collation 2 protocols based on feature flag
+#  PcdUnicodeCollation2Support.
 #  It allows code running in the boot services environment to perform lexical
 #  comparison functions on Unicode strings for English languages.
 #
@@ -43,11 +43,9 @@
   PcdLib
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport     ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support    ## CONSUMES
 
 [Protocols]
-  gEfiUnicodeCollationProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport      ## SOMETIMES_PRODUCES
   gEfiUnicodeCollation2ProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support    ## PRODUCES
 
 [UserExtensions.TianoCore."ExtraFiles"]

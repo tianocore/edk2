@@ -14,12 +14,6 @@
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = DynamicTableFactoryDxeInitialize
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = ARM AARCH64
-#
-
 [Sources]
   AcpiTableFactory/AcpiTableFactory.c
   DeviceTreeTableFactory/DeviceTreeTableFactory.c
@@ -35,6 +29,7 @@
 [LibraryClasses]
   BaseLib
   MemoryAllocationLib
+  MetadataHandlerLib
   PrintLib
   TableHelperLib
   UefiBootServicesTableLib
@@ -44,6 +39,7 @@
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomACPIGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxSmbiosHandleMapEntries
 
 [Protocols]
   gEdkiiDynamicTableFactoryProtocolGuid         # PRODUCES
