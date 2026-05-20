@@ -63,7 +63,7 @@ MetadataInitializeHandle (
 
 /** Free the Metadata Root.
 
-  @param[in]  Root  Root of the Metadata information to free.
+  @param[in]  RootHandle  Root of the Metadata information to free.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -72,12 +72,30 @@ MetadataInitializeHandle (
 EFI_STATUS
 EFIAPI
 MetadataFreeHandle (
-  IN METADATA_ROOT_HANDLE  Root
+  IN METADATA_ROOT_HANDLE  RootHandle
   )
 {
+  METADATA_ROOT   *Root;
+  METADATA_ENTRY  *Entry;
+  UINT32          Index;
+
+  Root = (METADATA_ROOT *)RootHandle;
+
   if (Root == NULL) {
     ASSERT (Root != NULL);
     return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < MetadataTypeMax; Index++) {
+    while (!IsListEmpty (&Root->MetadataList[Index].List)) {
+      Entry = (METADATA_ENTRY *)GetFirstNode (&Root->MetadataList[Index].List);
+      RemoveEntryList (&Entry->List);
+      if (Entry->Metadata != NULL) {
+        FreePool (Entry->Metadata);
+      }
+
+      FreePool (Entry);
+    }
   }
 
   FreePool (Root);
