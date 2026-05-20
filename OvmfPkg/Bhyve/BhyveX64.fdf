@@ -164,9 +164,6 @@ INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
 INF  OvmfPkg/Bhyve/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
-!if $(SMM_REQUIRE) == TRUE
-INF  OvmfPkg/Bhyve/SmmAccess/SmmAccessPei.inf
-!endif
 
 !include OvmfPkg/Include/Fdf/OvmfTpmPei.fdf.inc
 
@@ -197,9 +194,6 @@ APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
-!if $(SMM_REQUIRE) == FALSE
-  INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
-!endif
 }
 
 #
@@ -325,34 +319,13 @@ INF  OvmfPkg/Bhyve/BhyveRfbDxe/BhyveRfbDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf
 
-!if $(SMM_REQUIRE) == TRUE
-INF  OvmfPkg/Bhyve/SmmAccess/SmmAccess2Dxe.inf
-INF  OvmfPkg/Bhyve/SmmControl2Dxe/SmmControl2Dxe.inf
-INF  UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
-INF  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
-INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
-INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
-INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
-INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
-
 #
-# Variable driver stack (SMM)
-#
-INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf
-INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
-INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
-INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-
-!else
-
-#
-# Variable driver stack (non-SMM)
+# Variable driver stack
 #
 INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-!endif
 
 #
 # EFI_CC_MEASUREMENT_PROTOCOL
@@ -501,19 +474,4 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
 [Rule.Common.USER_DEFINED.RESET_VECTOR]
   FILE RAW = $(NAMED_GUID) {
     RAW BIN   Align = 16   |.bin
-  }
-
-[Rule.Common.SMM_CORE]
-  FILE SMM_CORE = $(NAMED_GUID) {
-    PE32     PE32           $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI       STRING="$(MODULE_NAME)" Optional
-    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
-
-[Rule.Common.DXE_SMM_DRIVER]
-  FILE SMM = $(NAMED_GUID) {
-    SMM_DEPEX    SMM_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
-    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
-    UI       STRING="$(MODULE_NAME)" Optional
-    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
