@@ -57,6 +57,311 @@ RsaFree (
 }
 
 /**
+  Install one of the n, e, d components of an RSA key.
+
+  @param[in, out]  RsaKey     OpenSSL RSA object.
+  @param[in]       KeyTag     One of RsaKeyN, RsaKeyE, RsaKeyD.
+  @param[in]       BigNumber  Octet integer buffer to install.
+  @param[in]       BnSize     Size of BigNumber in bytes.
+
+  @retval  TRUE   Component installed.
+  @retval  FALSE  Allocation or RSA_set0_key failed; RsaKey is unchanged.
+
+**/
+STATIC
+BOOLEAN
+RsaSetKeyNED (
+  IN OUT  RSA          *RsaKey,
+  IN      RSA_KEY_TAG  KeyTag,
+  IN      CONST UINT8  *BigNumber,
+  IN      UINTN        BnSize
+  )
+{
+  BIGNUM        *PassN;
+  BIGNUM        *PassE;
+  BIGNUM        *PassD;
+  const BIGNUM  *CurN;
+  const BIGNUM  *CurE;
+  const BIGNUM  *CurD;
+  BOOLEAN       Result;
+
+  PassN  = NULL;
+  PassE  = NULL;
+  PassD  = NULL;
+  Result = FALSE;
+
+  //
+  // Allocate the slot being set. BN_bin2bn allocates a fresh BIGNUM when
+  // its destination argument is NULL, so no RSA-owned BIGNUM is touched.
+  //
+  switch (KeyTag) {
+    case RsaKeyN:
+      PassN = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassN == NULL) {
+        goto Exit;
+      }
+
+      break;
+    case RsaKeyE:
+      PassE = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassE == NULL) {
+        goto Exit;
+      }
+
+      break;
+    case RsaKeyD:
+      PassD = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassD == NULL) {
+        goto Exit;
+      }
+
+      break;
+    default:
+      goto Exit;
+  }
+
+  //
+  // Snapshot the current RSA state. Per the OpenSSL API contract the
+  // BIGNUMs that CurN, CurE, CurD point to are owned by RsaKey and must
+  // not be modified by the caller.
+  //
+  RSA_get0_key (RsaKey, &CurN, &CurE, &CurD);
+
+  //
+  // For each slot we are not setting:
+  //   - leave PassX as NULL when RSA already has a value there
+  //     (RSA_set0_key treats NULL as "preserve the current value in
+  //     RsaKey"), or
+  //   - install a fresh BIGNUM via BN_new() (which returns a BIGNUM with
+  //     value 0) when RSA has NULL there.
+  //
+  if ((PassN == NULL) && (CurN == NULL)) {
+    PassN = BN_new ();
+    if (PassN == NULL) {
+      goto Exit;
+    }
+  }
+
+  if ((PassE == NULL) && (CurE == NULL)) {
+    PassE = BN_new ();
+    if (PassE == NULL) {
+      goto Exit;
+    }
+  }
+
+  if ((PassD == NULL) && (CurD == NULL)) {
+    PassD = BN_new ();
+    if (PassD == NULL) {
+      goto Exit;
+    }
+  }
+
+  //
+  // Atomic install. On success ownership of every non-NULL argument
+  // transfers to RsaKey; on failure no ownership transfers and the
+  // RSA object is left unchanged.
+  //
+  if (RSA_set0_key (RsaKey, PassN, PassE, PassD) == 0) {
+    goto Exit;
+  }
+
+  //
+  // Ownership transferred to RsaKey. Null our handles so cleanup is a no-op.
+  //
+  PassN  = NULL;
+  PassE  = NULL;
+  PassD  = NULL;
+  Result = TRUE;
+
+Exit:
+  BN_free (PassN);
+  BN_free (PassE);
+  BN_clear_free (PassD);
+  return Result;
+}
+
+/**
+  Install one of the p, q factors of an RSA key. See RsaSetKeyNED() for the
+  shared invariants; the only difference is the setter used and the slot set.
+
+  @param[in, out]  RsaKey     OpenSSL RSA object.
+  @param[in]       KeyTag     One of RsaKeyP, RsaKeyQ.
+  @param[in]       BigNumber  Octet integer buffer to install.
+  @param[in]       BnSize     Size of BigNumber in bytes.
+
+  @retval  TRUE   Component installed.
+  @retval  FALSE  Allocation or RSA_set0_factors failed; RsaKey is unchanged.
+
+**/
+STATIC
+BOOLEAN
+RsaSetKeyFactors (
+  IN OUT  RSA          *RsaKey,
+  IN      RSA_KEY_TAG  KeyTag,
+  IN      CONST UINT8  *BigNumber,
+  IN      UINTN        BnSize
+  )
+{
+  BIGNUM        *PassP;
+  BIGNUM        *PassQ;
+  const BIGNUM  *CurP;
+  const BIGNUM  *CurQ;
+  BOOLEAN       Result;
+
+  PassP  = NULL;
+  PassQ  = NULL;
+  Result = FALSE;
+
+  switch (KeyTag) {
+    case RsaKeyP:
+      PassP = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassP == NULL) {
+        goto Exit;
+      }
+
+      break;
+    case RsaKeyQ:
+      PassQ = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassQ == NULL) {
+        goto Exit;
+      }
+
+      break;
+    default:
+      goto Exit;
+  }
+
+  RSA_get0_factors (RsaKey, &CurP, &CurQ);
+
+  if ((PassP == NULL) && (CurP == NULL)) {
+    PassP = BN_new ();
+    if (PassP == NULL) {
+      goto Exit;
+    }
+  }
+
+  if ((PassQ == NULL) && (CurQ == NULL)) {
+    PassQ = BN_new ();
+    if (PassQ == NULL) {
+      goto Exit;
+    }
+  }
+
+  if (RSA_set0_factors (RsaKey, PassP, PassQ) == 0) {
+    goto Exit;
+  }
+
+  PassP  = NULL;
+  PassQ  = NULL;
+  Result = TRUE;
+
+Exit:
+  BN_clear_free (PassP);
+  BN_clear_free (PassQ);
+  return Result;
+}
+
+/**
+  Install one of the dp, dq, qInv CRT parameters of an RSA key. See
+  RsaSetKeyNED() for the shared invariants.
+
+  @param[in, out]  RsaKey     OpenSSL RSA object.
+  @param[in]       KeyTag     One of RsaKeyDp, RsaKeyDq, RsaKeyQInv.
+  @param[in]       BigNumber  Octet integer buffer to install.
+  @param[in]       BnSize     Size of BigNumber in bytes.
+
+  @retval  TRUE   Component installed.
+  @retval  FALSE  Allocation or RSA_set0_crt_params failed; RsaKey is unchanged.
+
+**/
+STATIC
+BOOLEAN
+RsaSetKeyCrtParams (
+  IN OUT  RSA          *RsaKey,
+  IN      RSA_KEY_TAG  KeyTag,
+  IN      CONST UINT8  *BigNumber,
+  IN      UINTN        BnSize
+  )
+{
+  BIGNUM        *PassDp;
+  BIGNUM        *PassDq;
+  BIGNUM        *PassQInv;
+  const BIGNUM  *CurDp;
+  const BIGNUM  *CurDq;
+  const BIGNUM  *CurQInv;
+  BOOLEAN       Result;
+
+  PassDp   = NULL;
+  PassDq   = NULL;
+  PassQInv = NULL;
+  Result   = FALSE;
+
+  switch (KeyTag) {
+    case RsaKeyDp:
+      PassDp = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassDp == NULL) {
+        goto Exit;
+      }
+
+      break;
+    case RsaKeyDq:
+      PassDq = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassDq == NULL) {
+        goto Exit;
+      }
+
+      break;
+    case RsaKeyQInv:
+      PassQInv = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
+      if (PassQInv == NULL) {
+        goto Exit;
+      }
+
+      break;
+    default:
+      goto Exit;
+  }
+
+  RSA_get0_crt_params (RsaKey, &CurDp, &CurDq, &CurQInv);
+
+  if ((PassDp == NULL) && (CurDp == NULL)) {
+    PassDp = BN_new ();
+    if (PassDp == NULL) {
+      goto Exit;
+    }
+  }
+
+  if ((PassDq == NULL) && (CurDq == NULL)) {
+    PassDq = BN_new ();
+    if (PassDq == NULL) {
+      goto Exit;
+    }
+  }
+
+  if ((PassQInv == NULL) && (CurQInv == NULL)) {
+    PassQInv = BN_new ();
+    if (PassQInv == NULL) {
+      goto Exit;
+    }
+  }
+
+  if (RSA_set0_crt_params (RsaKey, PassDp, PassDq, PassQInv) == 0) {
+    goto Exit;
+  }
+
+  PassDp   = NULL;
+  PassDq   = NULL;
+  PassQInv = NULL;
+  Result   = TRUE;
+
+Exit:
+  BN_clear_free (PassDp);
+  BN_clear_free (PassDq);
+  BN_clear_free (PassQInv);
+  return Result;
+}
+
+/**
   Sets the tag-designated key component into the established RSA context.
 
   This function sets the tag-designated RSA key component into the established
@@ -87,16 +392,7 @@ RsaSetKey (
   IN      UINTN        BnSize
   )
 {
-  RSA     *RsaKey;
-  BIGNUM  *BnN;
-  BIGNUM  *BnE;
-  BIGNUM  *BnD;
-  BIGNUM  *BnP;
-  BIGNUM  *BnQ;
-  BIGNUM  *BnDp;
-  BIGNUM  *BnDq;
-  BIGNUM  *BnQInv;
-  BIGNUM  *AllocatedBn[3];
+  RSA  *RsaKey;
 
   //
   // Check input parameters.
@@ -105,25 +401,7 @@ RsaSetKey (
     return FALSE;
   }
 
-  BnN    = NULL;
-  BnE    = NULL;
-  BnD    = NULL;
-  BnP    = NULL;
-  BnQ    = NULL;
-  BnDp   = NULL;
-  BnDq   = NULL;
-  BnQInv = NULL;
-
-  AllocatedBn[0] = NULL;
-  AllocatedBn[1] = NULL;
-  AllocatedBn[2] = NULL;
-  //
-  // Retrieve the components from RSA object.
-  //
   RsaKey = (RSA *)RsaContext;
-  RSA_get0_key (RsaKey, (const BIGNUM **)&BnN, (const BIGNUM **)&BnE, (const BIGNUM **)&BnD);
-  RSA_get0_factors (RsaKey, (const BIGNUM **)&BnP, (const BIGNUM **)&BnQ);
-  RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnDp, (const BIGNUM **)&BnDq, (const BIGNUM **)&BnQInv);
 
   //
   // Set RSA Key Components by converting octet string to OpenSSL BN representation.
@@ -137,87 +415,14 @@ RsaSetKey (
     case RsaKeyN:
     case RsaKeyE:
     case RsaKeyD:
-      if (BnN == NULL) {
-        BnN            = BN_new ();
-        AllocatedBn[0] = BnN;
-      }
-
-      if (BnE == NULL) {
-        BnE            = BN_new ();
-        AllocatedBn[1] = BnE;
-      }
-
-      if (BnD == NULL) {
-        BnD            = BN_new ();
-        AllocatedBn[2] = BnD;
-      }
-
-      if ((BnN == NULL) || (BnE == NULL) || (BnD == NULL)) {
-        return FALSE;
-      }
-
-      switch (KeyTag) {
-        case RsaKeyN:
-          BnN = BN_bin2bn (BigNumber, (UINT32)BnSize, BnN);
-          break;
-        case RsaKeyE:
-          BnE = BN_bin2bn (BigNumber, (UINT32)BnSize, BnE);
-          break;
-        case RsaKeyD:
-          BnD = BN_bin2bn (BigNumber, (UINT32)BnSize, BnD);
-          break;
-        default:
-          return FALSE;
-      }
-
-      if (RSA_set0_key (RsaKey, BN_dup (BnN), BN_dup (BnE), BN_dup (BnD)) == 0) {
-        return FALSE;
-      }
-
-      BN_free (AllocatedBn[0]);
-      BN_free (AllocatedBn[1]);
-      BN_clear_free (AllocatedBn[2]);
-
-      break;
+      return RsaSetKeyNED (RsaKey, KeyTag, BigNumber, BnSize);
 
     //
     // RSA Secret Prime Factor of Modulus (p and q)
     //
     case RsaKeyP:
     case RsaKeyQ:
-      if (BnP == NULL) {
-        BnP            = BN_new ();
-        AllocatedBn[0] = BnP;
-      }
-
-      if (BnQ == NULL) {
-        BnQ            = BN_new ();
-        AllocatedBn[1] = BnQ;
-      }
-
-      if ((BnP == NULL) || (BnQ == NULL)) {
-        return FALSE;
-      }
-
-      switch (KeyTag) {
-        case RsaKeyP:
-          BnP = BN_bin2bn (BigNumber, (UINT32)BnSize, BnP);
-          break;
-        case RsaKeyQ:
-          BnQ = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQ);
-          break;
-        default:
-          return FALSE;
-      }
-
-      if (RSA_set0_factors (RsaKey, BN_dup (BnP), BN_dup (BnQ)) == 0) {
-        return FALSE;
-      }
-
-      BN_clear_free (AllocatedBn[0]);
-      BN_clear_free (AllocatedBn[1]);
-
-      break;
+      return RsaSetKeyFactors (RsaKey, KeyTag, BigNumber, BnSize);
 
     //
     // p's CRT Exponent (== d mod (p - 1)),  q's CRT Exponent (== d mod (q - 1)),
@@ -226,54 +431,11 @@ RsaSetKey (
     case RsaKeyDp:
     case RsaKeyDq:
     case RsaKeyQInv:
-      if (BnDp == NULL) {
-        BnDp           = BN_new ();
-        AllocatedBn[0] = BnDp;
-      }
-
-      if (BnDq == NULL) {
-        BnDq           = BN_new ();
-        AllocatedBn[1] = BnDq;
-      }
-
-      if (BnQInv == NULL) {
-        BnQInv         = BN_new ();
-        AllocatedBn[2] = BnQInv;
-      }
-
-      if ((BnDp == NULL) || (BnDq == NULL) || (BnQInv == NULL)) {
-        return FALSE;
-      }
-
-      switch (KeyTag) {
-        case RsaKeyDp:
-          BnDp = BN_bin2bn (BigNumber, (UINT32)BnSize, BnDp);
-          break;
-        case RsaKeyDq:
-          BnDq = BN_bin2bn (BigNumber, (UINT32)BnSize, BnDq);
-          break;
-        case RsaKeyQInv:
-          BnQInv = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQInv);
-          break;
-        default:
-          return FALSE;
-      }
-
-      if (RSA_set0_crt_params (RsaKey, BN_dup (BnDp), BN_dup (BnDq), BN_dup (BnQInv)) == 0) {
-        return FALSE;
-      }
-
-      BN_clear_free (AllocatedBn[0]);
-      BN_clear_free (AllocatedBn[1]);
-      BN_clear_free (AllocatedBn[2]);
-
-      break;
+      return RsaSetKeyCrtParams (RsaKey, KeyTag, BigNumber, BnSize);
 
     default:
       return FALSE;
   }
-
-  return TRUE;
 }
 
 /**
