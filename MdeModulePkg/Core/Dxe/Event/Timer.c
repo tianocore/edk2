@@ -190,7 +190,10 @@ CoreTimerTick (
   IN UINT64  Duration
   )
 {
-  IEVENT  *Event;
+  EFI_TPL  OriginalTPL;
+  IEVENT   *Event;
+
+  OriginalTPL = CoreRaiseTpl (TPL_HIGH_LEVEL);
 
   //
   // Check runtiem flag in case there are ticks while exiting boot services
@@ -215,6 +218,18 @@ CoreTimerTick (
   }
 
   CoreReleaseLock (&mEfiSystemTimeLock);
+
+  //
+  // Restore the original TPL but without re-enabling interrupts. This is the
+  // responsibility of the caller, which will do so implicitly by returning
+  // from the timer ISR in an architecture-specific manner (IRET, ERET, etc).
+  //
+  // Re-enabling interrupts before that leaves a window where the timer
+  // interrupt, which has been re-armed at this point, may fire again
+  // immediately, resulting in unbounded recursion if the interrupts are
+  // arriving at a higher rate than they can be serviced.
+  //
+  CoreRestoreTplWithInterruptsMasked (OriginalTPL);
 }
 
 /**
