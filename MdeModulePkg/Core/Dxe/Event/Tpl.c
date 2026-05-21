@@ -164,3 +164,35 @@ CoreRestoreTpl (
     CoreSetInterruptState (TRUE);
   }
 }
+
+/**
+  Lowers the task priority from TPL_HIGH_LEVEL to the previous value.
+  If the new priority unmasks events at a higher priority, they are
+  dispatched with interrupts enabled. Upon return, interrupts will be
+  disabled.
+
+  @param  NewTpl  New, lower, task priority
+
+**/
+VOID
+EFIAPI
+CoreRestoreTplWithInterruptsMasked (
+  IN EFI_TPL  NewTpl
+  )
+{
+  ASSERT (gEfiCurrentTpl == TPL_HIGH_LEVEL);
+
+  InternalCoreRestoreTpl (NewTpl);
+
+  //
+  // Disable interrupts before setting the TPL to its final value. This is
+  // crucial to ensure that reentrant calls into this function (due to nested
+  // timer interrupts) are bounded by the number of distinct TPL levels.
+  //
+  CoreSetInterruptState (FALSE);
+
+  //
+  // Set the new value
+  //
+  gEfiCurrentTpl = NewTpl;
+}

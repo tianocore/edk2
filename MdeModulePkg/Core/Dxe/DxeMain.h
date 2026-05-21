@@ -582,6 +582,21 @@ CoreRestoreTpl (
   );
 
 /**
+  Lowers the task priority from TPL_HIGH_LEVEL to the previous value.
+  If the new priority unmasks events at a higher priority, they are
+  dispatched with interrupts enabled. Upon return, interrupts will be
+  disabled.
+
+  @param  NewTpl  New, lower, task priority
+
+**/
+VOID
+EFIAPI
+CoreRestoreTplWithInterruptsMasked (
+  IN EFI_TPL  NewTpl
+  );
+
+/**
   Introduces a fine-grained stall.
 
   @param  Microseconds           The number of microseconds to stall execution.
