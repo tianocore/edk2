@@ -297,6 +297,22 @@ ProcessPciHost (
     //
     Status = MapMmioMemory (*IoBase + IoTranslation, *IoSize, EFI_MEMORY_UC);
     ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (*Mmio32Size != 0) {
+    Status = MapMmioMemory (*Mmio32Base, *Mmio32Size, EFI_MEMORY_UC);
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (*Mmio64Size != 0) {
+    Status = MapMmioMemory (*Mmio64Base, *Mmio64Size, EFI_MEMORY_UC);
+    ASSERT_EFI_ERROR (Status);
   }
 
   return Status;
