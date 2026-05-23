@@ -3,6 +3,7 @@
 #  Component description file for ArmVirtGicArchLib module
 #
 #  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -24,15 +25,18 @@
   BaseLib
   DebugLib
   PcdLib
+  MemoryMapLib
   UefiBootServicesTableLib
 
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 [Protocols]
+  gEfiCpuArchProtocolGuid
   gFdtClientProtocolGuid                                ## CONSUMES
 
 [Pcd]
@@ -41,4 +45,4 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
 
 [Depex]
-  gFdtClientProtocolGuid
+  gFdtClientProtocolGuid AND gEfiCpuArchProtocolGuid

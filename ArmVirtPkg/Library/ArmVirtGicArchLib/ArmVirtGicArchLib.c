@@ -2,6 +2,7 @@
   NULL library class implementation to discover the GIC for DT based virt platforms
 
   Copyright (c) 2015 - 2016, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -13,6 +14,7 @@
 #include <Library/ArmGicLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryMapLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -31,6 +33,7 @@ ArmVirtGicArchLibConstructor (
   UINTN                GicRevision;
   EFI_STATUS           Status;
   UINT64               DistBase, CpuBase, RedistBase;
+  UINT64               DistSize, CpuSize, RedistSize;
   RETURN_STATUS        PcdStatus;
 
   Status = gBS->LocateProtocol (
@@ -84,10 +87,14 @@ ArmVirtGicArchLibConstructor (
       // RegProp[0..1] == { GICD base, GICD size }
       DistBase = SwapBytes64 (Reg[0]);
       ASSERT (DistBase < MAX_UINTN);
+      DistSize = SwapBytes64 (Reg[1]);
+      ASSERT (DistSize < MAX_UINTN);
 
       // RegProp[2..3] == { GICR base, GICR size }
       RedistBase = SwapBytes64 (Reg[2]);
       ASSERT (RedistBase < MAX_UINTN);
+      RedistSize = SwapBytes64 (Reg[3]);
+      ASSERT (RedistSize < MAX_UINTN);
 
       PcdStatus = PcdSet64S (PcdGicDistributorBase, DistBase);
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -96,10 +103,37 @@ ArmVirtGicArchLibConstructor (
 
       DEBUG ((
         DEBUG_INFO,
-        "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
+        "Found GIC v3 Distributor @ 0x%Lx, Len 0x%Lx\n",
         DistBase,
-        RedistBase
+        DistSize
         ));
+
+      DEBUG ((
+        DEBUG_INFO,
+        "Found GIC v3 Redistributor @ 0x%Lx, Len 0x%Lx\n",
+        RedistBase,
+        RedistSize
+        ));
+
+      Status = MapMmioMemory (
+                 DistBase,
+                 DistSize,
+                 (EFI_MEMORY_UC | EFI_MEMORY_XP)
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return (RETURN_STATUS)Status;
+      }
+
+      Status = MapMmioMemory (
+                 RedistBase,
+                 RedistSize,
+                 (EFI_MEMORY_UC | EFI_MEMORY_XP)
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return (RETURN_STATUS)Status;
+      }
 
       break;
 
@@ -112,9 +146,13 @@ ArmVirtGicArchLibConstructor (
       ASSERT ((RegSize == 32) || (RegSize == 64));
 
       DistBase = SwapBytes64 (Reg[0]);
+      DistSize = SwapBytes64 (Reg[1]);
       CpuBase  = SwapBytes64 (Reg[2]);
+      CpuSize  = SwapBytes64 (Reg[3]);
       ASSERT (DistBase < MAX_UINTN);
       ASSERT (CpuBase < MAX_UINTN);
+      ASSERT (DistSize < MAX_UINTN);
+      ASSERT (CpuSize < MAX_UINTN);
 
       PcdStatus = PcdSet64S (PcdGicDistributorBase, DistBase);
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -122,6 +160,26 @@ ArmVirtGicArchLibConstructor (
       ASSERT_RETURN_ERROR (PcdStatus);
 
       DEBUG ((DEBUG_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
+
+      Status = MapMmioMemory (
+                 DistBase,
+                 DistSize,
+                 (EFI_MEMORY_UC | EFI_MEMORY_XP)
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return (RETURN_STATUS)Status;
+      }
+
+      Status = MapMmioMemory (
+                 CpuBase,
+                 CpuSize,
+                 (EFI_MEMORY_UC | EFI_MEMORY_XP)
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return (RETURN_STATUS)Status;
+      }
 
       break;
 
