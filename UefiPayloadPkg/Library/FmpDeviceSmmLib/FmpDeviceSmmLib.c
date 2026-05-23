@@ -65,6 +65,12 @@ typedef struct {
 #define REGION_MANIFEST_VERSION        1
 #define SMMSTORE_FLASH_RETRY_COUNT     4
 #define SMMSTORE_FLASH_RETRY_STALL_US  500
+#define INTEL_DESCRIPTOR_SIGNATURE     0x0ff0a55a
+#define INTEL_DESCRIPTOR_SIGNATURE_OFF 0x10
+#define INTEL_DESCRIPTOR_FLMAP0_OFF    0x14
+#define INTEL_DESCRIPTOR_REGION_BIOS   1
+#define INTEL_DESCRIPTOR_REGION_MASK   0x7fff
+#define INTEL_DESCRIPTOR_REGION_SCALE  0x1000
 
 typedef struct {
   UINT32    Signature;
@@ -558,6 +564,198 @@ FindFmapRegion (
 
     *RegionOffset = (UINTN)FmapHeader->Base + Areas[Index].Offset;
     *RegionSize   = Areas[Index].Size;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+STATIC
+UINT32
+ReadLe32 (
+  IN CONST UINT8  *Data
+  )
+{
+  return (UINT32)Data[0] |
+         ((UINT32)Data[1] << 8) |
+         ((UINT32)Data[2] << 16) |
+         ((UINT32)Data[3] << 24);
+}
+
+/**
+  Locate the BIOS region by parsing an Intel flash descriptor.
+
+  @param[in]  Image       Buffer containing at least the flash descriptor.
+  @param[in]  ImageSize   Size of Image, in bytes.
+  @param[in]  FlashSize   Total flash size to validate descriptor bounds.
+  @param[out] BiosOffset  Absolute flash offset of the BIOS region.
+  @param[out] BiosSize    Size of the BIOS region.
+
+  @retval EFI_SUCCESS     BIOS region found.
+  @retval EFI_NOT_FOUND   Descriptor or BIOS region is absent/invalid.
+**/
+STATIC
+EFI_STATUS
+FindIntelDescriptorBiosRegion (
+  IN  CONST UINT8  *Image,
+  IN  UINTN        ImageSize,
+  IN  UINTN        FlashSize,
+  OUT UINTN        *BiosOffset,
+  OUT UINTN        *BiosSize
+  )
+{
+  UINT32  Flmap0;
+  UINT32  Flreg;
+  UINTN   Frba;
+  UINTN   FlregOffset;
+  UINTN   BaseField;
+  UINTN   LimitField;
+  UINTN   RegionBase;
+  UINTN   RegionLimit;
+  UINTN   RegionSize;
+
+  if ((Image == NULL) || (BiosOffset == NULL) || (BiosSize == NULL)) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (ImageSize < (INTEL_DESCRIPTOR_FLMAP0_OFF + sizeof (UINT32))) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (ReadLe32 (Image + INTEL_DESCRIPTOR_SIGNATURE_OFF) != INTEL_DESCRIPTOR_SIGNATURE) {
+    return EFI_NOT_FOUND;
+  }
+
+  Flmap0      = ReadLe32 (Image + INTEL_DESCRIPTOR_FLMAP0_OFF);
+  Frba        = ((Flmap0 >> 16) & 0xff) << 4;
+  FlregOffset = Frba + (INTEL_DESCRIPTOR_REGION_BIOS * sizeof (UINT32));
+
+  if ((FlregOffset + sizeof (UINT32)) > ImageSize) {
+    return EFI_NOT_FOUND;
+  }
+
+  Flreg      = ReadLe32 (Image + FlregOffset);
+  BaseField  = Flreg & INTEL_DESCRIPTOR_REGION_MASK;
+  LimitField = (Flreg >> 16) & INTEL_DESCRIPTOR_REGION_MASK;
+
+  if ((BaseField == INTEL_DESCRIPTOR_REGION_MASK) || (LimitField == 0) || (LimitField < BaseField)) {
+    return EFI_NOT_FOUND;
+  }
+
+  RegionBase  = BaseField * INTEL_DESCRIPTOR_REGION_SCALE;
+  RegionLimit = (LimitField * INTEL_DESCRIPTOR_REGION_SCALE) |
+                (INTEL_DESCRIPTOR_REGION_SCALE - 1);
+  RegionSize  = RegionLimit - RegionBase + 1;
+
+  if ((RegionBase >= FlashSize) || (RegionSize > (FlashSize - RegionBase))) {
+    return EFI_NOT_FOUND;
+  }
+
+  *BiosOffset = RegionBase;
+  *BiosSize   = RegionSize;
+  return EFI_SUCCESS;
+}
+
+/**
+  Locate a BIOS-region fallback for scoped capsule flashing.
+
+  Prefer the existing SI_BIOS FMAP region used by most Intel boards. Apollo Lake
+  IFWI images do not expose SI_BIOS in FMAP, so fall back to the Intel flash
+  descriptor BIOS region. Non-IFD platforms naturally fail this lookup and keep
+  the legacy behavior.
+
+  @param[in]  BlockSize   SMMSTORE block size.
+  @param[in]  FlashSize   Total flash size.
+  @param[in]  Image       Capsule firmware image.
+  @param[in]  ImageSize   Capsule firmware image size.
+  @param[in]  FmapHeader  Optional capsule FMAP header.
+  @param[in]  FmapAreas   Optional capsule FMAP areas.
+  @param[out] BiosOffset  Absolute flash offset of the fallback region.
+  @param[out] BiosSize    Size of the fallback region.
+  @param[out] Source      Human-readable fallback source.
+
+  @retval EFI_SUCCESS     Fallback region found.
+  @retval EFI_NOT_FOUND   No suitable fallback region found.
+**/
+STATIC
+EFI_STATUS
+FindBiosFallbackRegion (
+  IN  UINTN              BlockSize,
+  IN  UINTN              FlashSize,
+  IN  CONST UINT8        *Image,
+  IN  UINTN              ImageSize,
+  IN  CONST FMAP_HEADER  *FmapHeader OPTIONAL,
+  IN  CONST FMAP_AREA    *FmapAreas OPTIONAL,
+  OUT UINTN              *BiosOffset,
+  OUT UINTN              *BiosSize,
+  OUT CONST CHAR8        **Source
+  )
+{
+  EFI_STATUS   Status;
+  CONST CHAR8  SiBiosName[16] = "SI_BIOS";
+  UINTN        DescriptorSize;
+  VOID         *Descriptor;
+
+  if ((Image == NULL) || (BiosOffset == NULL) || (BiosSize == NULL) || (Source == NULL)) {
+    return EFI_NOT_FOUND;
+  }
+
+  if ((FmapHeader != NULL) && (FmapAreas != NULL)) {
+    Status = FindFmapRegion (
+               FmapHeader,
+               FmapAreas,
+               FmapHeader->AreaCount,
+               SiBiosName,
+               BiosOffset,
+               BiosSize
+               );
+    if (!EFI_ERROR (Status) &&
+        (*BiosSize != 0) &&
+        (*BiosOffset < ImageSize) &&
+        (*BiosSize <= (ImageSize - *BiosOffset)))
+    {
+      *Source = "SI_BIOS";
+      return EFI_SUCCESS;
+    }
+  }
+
+  DescriptorSize = MIN (BlockSize, FlashSize);
+  Descriptor     = NULL;
+  if (DescriptorSize >= (INTEL_DESCRIPTOR_FLMAP0_OFF + sizeof (UINT32))) {
+    Descriptor = AllocatePool (DescriptorSize);
+  }
+
+  if (Descriptor != NULL) {
+    Status = ReadFlashRange (BlockSize, FlashSize, 0, DescriptorSize, Descriptor);
+    if (!EFI_ERROR (Status)) {
+      Status = FindIntelDescriptorBiosRegion (
+                 Descriptor,
+                 DescriptorSize,
+                 FlashSize,
+                 BiosOffset,
+                 BiosSize
+                 );
+      if (!EFI_ERROR (Status) &&
+          (*BiosSize != 0) &&
+          (*BiosOffset < ImageSize) &&
+          (*BiosSize <= (ImageSize - *BiosOffset)))
+      {
+        FreePool (Descriptor);
+        *Source = "live Intel descriptor";
+        return EFI_SUCCESS;
+      }
+    }
+
+    FreePool (Descriptor);
+  }
+
+  Status = FindIntelDescriptorBiosRegion (Image, ImageSize, FlashSize, BiosOffset, BiosSize);
+  if (!EFI_ERROR (Status) &&
+      (*BiosSize != 0) &&
+      (*BiosOffset < ImageSize) &&
+      (*BiosSize <= (ImageSize - *BiosOffset)))
+  {
+    *Source = "capsule Intel descriptor";
     return EFI_SUCCESS;
   }
 
@@ -1658,6 +1856,7 @@ FmpDeviceSetImageWithStatus (
   UINTN                        BaseImageSize;
   BOOLEAN                      UseManifest;
   BOOLEAN                      UseBiosRegion;
+  BOOLEAN                      TriedBiosFallback;
   UINTN                        BiosOffset;
   UINTN                        BiosSize;
   CONST FMAP_HEADER            *FmapHeader;
@@ -1693,13 +1892,14 @@ FmpDeviceSetImageWithStatus (
 
   //
   // Discover optional manifest and FMAP. If anything looks off, fall back to
-  // legacy full-flash behavior.
+  // a BIOS-region update where possible, then legacy full-flash behavior.
   //
   BaseImageSize      = ImageSize;
   ManifestEntryCount = 0;
   ManifestEntries    = NULL;
   UseManifest        = FALSE;
   UseBiosRegion      = FALSE;
+  TriedBiosFallback  = FALSE;
   BiosOffset         = 0;
   BiosSize           = 0;
   FmapHeader         = NULL;
@@ -1741,26 +1941,69 @@ FmpDeviceSetImageWithStatus (
   }
 
   if ((ManifestEntryCount > 0) && (FmapHeader != NULL) && (FmapHeader->AreaCount > 0)) {
-    UseManifest = TRUE;
-  } else if ((ManifestEntryCount == 0) && (FmapHeader != NULL)) {
     //
-    // No manifest; attempt BIOS-only update using FMAP region. On Intel
-    // platforms this typically corresponds to the IFD BIOS region exposed
-    // to firmware as "SI_BIOS".
+    // Apollo Lake IFWI images do not expose the whole BIOS region in FMAP, so a
+    // valid COREBOOT manifest would miss boot partitions outside the OBB. If
+    // there is no SI_BIOS FMAP region but an Intel descriptor is present, use
+    // the descriptor BIOS region instead.
     //
-    CONST CHAR8  SiBiosName[16] = "SI_BIOS";
+    CONST CHAR8  *BiosRegionSource;
 
-    if (!EFI_ERROR (FindFmapRegion (FmapHeader, FmapAreas, FmapHeader->AreaCount, SiBiosName, &BiosOffset, &BiosSize))) {
-      if ((BiosSize != 0) && ((BiosOffset + BiosSize) <= BaseImageSize)) {
-        UseBiosRegion = TRUE;
-        DEBUG ((
-          DEBUG_INFO,
-          "%a(): no manifest, using SI_BIOS (0x%x+0x%x)\n",
-          __func__,
-          (UINT32)BiosOffset,
-          (UINT32)BiosSize
-          ));
-      }
+    if (!EFI_ERROR (FindBiosFallbackRegion (
+                      BlockSize,
+                      BaseImageSize,
+                      (CONST UINT8 *)Image,
+                      BaseImageSize,
+                      FmapHeader,
+                      FmapAreas,
+                      &BiosOffset,
+                      &BiosSize,
+                      &BiosRegionSource
+                      )) &&
+        (AsciiStrCmp (BiosRegionSource, "SI_BIOS") != 0))
+    {
+      UseBiosRegion     = TRUE;
+      TriedBiosFallback = TRUE;
+      DEBUG ((
+        DEBUG_INFO,
+        "%a(): using %a BIOS region instead of FMAP manifest (0x%x+0x%x)\n",
+        __func__,
+        BiosRegionSource,
+        (UINT32)BiosOffset,
+        (UINT32)BiosSize
+        ));
+    } else {
+      UseManifest = TRUE;
+    }
+  } else {
+    //
+    // If there is no manifest or the FMAP cannot be parsed, attempt a BIOS-only
+    // fallback using FMAP or Intel descriptor metadata.
+    //
+    CONST CHAR8  *BiosRegionSource;
+
+    TriedBiosFallback = TRUE;
+    if (!EFI_ERROR (FindBiosFallbackRegion (
+                      BlockSize,
+                      BaseImageSize,
+                      (CONST UINT8 *)Image,
+                      BaseImageSize,
+                      FmapHeader,
+                      FmapAreas,
+                      &BiosOffset,
+                      &BiosSize,
+                      &BiosRegionSource
+                      )))
+    {
+      UseBiosRegion = TRUE;
+      DEBUG ((
+        DEBUG_INFO,
+        "%a(): using %a BIOS region fallback (0x%x+0x%x)\n",
+        __func__,
+        BiosRegionSource,
+        (UINT32)BiosOffset,
+        (UINT32)BiosSize
+        ));
     }
   }
 
@@ -1876,8 +2119,8 @@ FmpDeviceSetImageWithStatus (
       // Manifest regions no longer match the current flash layout; fall back to
       // flashing the full BIOS region from the new image.
       //
-      CONST CHAR8  SiBiosName[16] = "SI_BIOS";
       CHAR8        RegionName[17];
+      CONST CHAR8  *BiosRegionSource;
 
       UseManifest   = FALSE;
       UseBiosRegion = FALSE;
@@ -1897,19 +2140,30 @@ FmpDeviceSetImageWithStatus (
           ));
       }
 
-      if (!EFI_ERROR (FindFmapRegion (FmapHeader, FmapAreas, FmapHeader->AreaCount, SiBiosName, &BiosOffset, &BiosSize))) {
-        if ((BiosSize != 0) && ((BiosOffset + BiosSize) <= BaseImageSize)) {
-          UseBiosRegion = TRUE;
-          DEBUG ((
-            DEBUG_WARN,
-            "%a(): flashing SI_BIOS instead (0x%x+0x%x)\n",
-            __func__,
-            (UINT32)BiosOffset,
-            (UINT32)BiosSize
-            ));
-        }
+      TriedBiosFallback = TRUE;
+      if (!EFI_ERROR (FindBiosFallbackRegion (
+                        BlockSize,
+                        BaseImageSize,
+                        (CONST UINT8 *)Image,
+                        BaseImageSize,
+                        FmapHeader,
+                        FmapAreas,
+                        &BiosOffset,
+                        &BiosSize,
+                        &BiosRegionSource
+                        )))
+      {
+        UseBiosRegion = TRUE;
+        DEBUG ((
+          DEBUG_WARN,
+          "%a(): flashing %a BIOS region instead (0x%x+0x%x)\n",
+          __func__,
+          BiosRegionSource,
+          (UINT32)BiosOffset,
+          (UINT32)BiosSize
+          ));
       } else {
-        DEBUG ((DEBUG_WARN, "%a(): unable to locate SI_BIOS for fallback\n", __func__));
+        DEBUG ((DEBUG_WARN, "%a(): unable to locate BIOS region for fallback\n", __func__));
       }
     }
   }
@@ -1919,6 +2173,34 @@ FmpDeviceSetImageWithStatus (
 
   if (UseManifest && (TotalSteps == 0)) {
     UseManifest = FALSE;
+  }
+
+  if (!UseManifest && !UseBiosRegion && !TriedBiosFallback) {
+    CONST CHAR8  *BiosRegionSource;
+
+    TriedBiosFallback = TRUE;
+    if (!EFI_ERROR (FindBiosFallbackRegion (
+                      BlockSize,
+                      BaseImageSize,
+                      (CONST UINT8 *)Image,
+                      BaseImageSize,
+                      FmapHeader,
+                      FmapAreas,
+                      &BiosOffset,
+                      &BiosSize,
+                      &BiosRegionSource
+                      )))
+    {
+      UseBiosRegion = TRUE;
+      DEBUG ((
+        DEBUG_WARN,
+        "%a(): flashing %a BIOS region as fallback (0x%x+0x%x)\n",
+        __func__,
+        BiosRegionSource,
+        (UINT32)BiosOffset,
+        (UINT32)BiosSize
+        ));
+    }
   }
 
   if (UseManifest) {
@@ -1961,9 +2243,9 @@ FmpDeviceSetImageWithStatus (
 
   if (UseBiosRegion && !UseManifest) {
     //
-    // BIOS-only fallback using FMAP when no manifest is present.
+    // BIOS-only fallback using FMAP or Intel descriptor metadata.
     //
-    DEBUG ((DEBUG_INFO, "%a(): FMAP-guided BIOS-only update\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a(): BIOS-region update\n", __func__));
 
     TotalSteps = ((BiosOffset + BiosSize - 1) / BlockSize - (BiosOffset / BlockSize) + 1) * 2;
     if (TotalSteps == 0) {
