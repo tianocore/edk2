@@ -513,8 +513,10 @@ PartitionValidGptTable (
 
   //
   // Ensure the NumberOfPartitionEntries * SizeOfPartitionEntry doesn't overflow.
+  // Both fields are UINT32, so the product is evaluated in 32-bit arithmetic and
+  // must be bounded by MAX_UINT32 to avoid truncation before it is widened to UINTN.
   //
-  if (PartHdr->NumberOfPartitionEntries > DivU64x32 (MAX_UINTN, PartHdr->SizeOfPartitionEntry)) {
+  if (PartHdr->NumberOfPartitionEntries > DivU64x32 (MAX_UINT32, PartHdr->SizeOfPartitionEntry)) {
     FreePool (PartHdr);
     return FALSE;
   }
