@@ -116,6 +116,7 @@ MmUnblockMemoryLibIsUnblockableRegion (
                                       EfiRuntimeServicesData, EfiACPIMemoryNVS, and EfiReservedMemory.
   @retval RETURN_INVALID_PARAMETER    Input range to unblock contains memory that doesn't belong to
                                       any memory allocation HOB.
+  @retval RETURN_OUT_OF_RESOURCES     No enough resource to handle the unblock request.
   @retval RETURN_ACCESS_DENIED        The request is rejected due to system has passed certain boot
                                       phase.
 **/
@@ -157,7 +158,7 @@ MmUnblockMemoryRequest (
   MmUnblockMemoryHob = BuildGuidHob (&gMmUnblockRegionHobGuid, sizeof (MM_UNBLOCK_REGION));
   if (MmUnblockMemoryHob == NULL) {
     DEBUG ((DEBUG_ERROR, "MmUnblockMemoryRequest: Failed to allocate hob for unblocked data parameter!!\n"));
-    return Status;
+    return RETURN_OUT_OF_RESOURCES;
   }
 
   ZeroMem (MmUnblockMemoryHob, sizeof (MM_UNBLOCK_REGION));
