@@ -1121,7 +1121,99 @@ EXIT:
 }
 
 /**
-  This routine is called to get all caspules from file. The capsule file image is
+  Check if any on-disk capsules are present.
+
+  @param[in]  MaxRetry  Max Connection Retry. Stall 100ms between each
+                        connection try to ensure devices like USB can get
+                        enumerated.
+
+  @retval TRUE   At least one potential on-disk capsule was found on a boot
+                 drive.
+  @retval FALSE  No capsule candidates were discovered on a boot drive.
+**/
+BOOLEAN
+EFIAPI
+CoDPresent (
+  IN UINTN  MaxRetry
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_HANDLE                       FsHandle;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Fs;
+  EFI_FILE_HANDLE                  RootDir;
+  EFI_FILE_HANDLE                  FileDir;
+  UINT16                           *TempOptionNumber;
+  UINTN                            FileCount;
+  LIST_ENTRY                       FileInfoList;
+  LIST_ENTRY                       *Link;
+  FILE_INFO_ENTRY                  *FileInfoEntry;
+
+  if (!PcdGetBool (PcdCapsuleOnDiskSupport)) {
+    return FALSE;
+  }
+
+  TempOptionNumber = NULL;
+  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &TempOptionNumber, &FsHandle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = gBS->HandleProtocol (FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = Fs->OpenVolume (Fs, &RootDir);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = RootDir->Open (
+                      RootDir,
+                      &FileDir,
+                      EFI_CAPSULE_FILE_DIRECTORY,
+                      EFI_FILE_MODE_READ,
+                      0
+                      );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "CoDPresent failed to open %s: %r\n", EFI_CAPSULE_FILE_DIRECTORY, Status));
+    RootDir->Close (RootDir);
+    return FALSE;
+  }
+
+  RootDir->Close (RootDir);
+
+  FileCount = 0;
+  Status = GetFileInfoListInAlphabetFromDir (
+             FileDir,
+             EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE,
+             &FileInfoList,
+             &FileCount
+             );
+  FileDir->Close (FileDir);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "GetFileInfoListInAlphabetFromDir failed: %r\n", Status));
+    return FALSE;
+  }
+
+  while (!IsListEmpty (&FileInfoList)) {
+    Link = FileInfoList.ForwardLink;
+    RemoveEntryList (Link);
+
+    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
+
+    FreePool (FileInfoEntry->FileInfo);
+    FreePool (FileInfoEntry->FileNameFirstPart);
+    FreePool (FileInfoEntry->FileNameSecondPart);
+    FreePool (FileInfoEntry);
+  }
+
+  DEBUG ((DEBUG_INFO, "%a(): found %u potential on-disk capsule(s)\n", __func__, FileCount));
+  return FileCount > 0;
+}
+
+/**
+  This routine is called to get all capsules from file. The capsule file image is
   copied to BS memory. Caller is responsible to free them.
 
   @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
@@ -1135,7 +1227,8 @@ EXIT:
 
 **/
 EFI_STATUS
-GetAllCapsuleOnDisk (
+EFIAPI
+CoDGetAll (
   IN  UINTN       MaxRetry,
   OUT IMAGE_INFO  **CapsulePtr,
   OUT UINTN       *CapsuleNum,
@@ -1207,6 +1300,34 @@ GetAllCapsuleOnDisk (
   }
 
   return Status;
+}
+
+/**
+  Free resources allocated by CoDGetAll.
+
+  @param[in]  ImageInfo  An array of data and information of files
+  @param[in]  Count      Length of the array.
+
+**/
+VOID
+EFIAPI
+CoDFreeImages (
+  IN IMAGE_INFO  *ImageInfo,
+  IN UINTN       Count
+  )
+{
+  UINTN  Index;
+
+  if (ImageInfo == NULL) {
+    return;
+  }
+
+  for (Index = 0; Index < Count; Index++) {
+    FreePool (ImageInfo[Index].ImageAddress);
+    FreePool (ImageInfo[Index].FileInfo);
+  }
+
+  FreePool (ImageInfo);
 }
 
 /**
@@ -1465,9 +1586,9 @@ RelocateCapsuleToDisk (
   //
   // 1. Load all Capsule On Disks in to memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "RelocateCapsule: CoDGetAll Status - 0x%x\n", Status));
     return EFI_NOT_FOUND;
   }
 
@@ -1772,9 +1893,9 @@ RelocateCapsuleToRam (
   //
   // 1. Load all Capsule On Disks into memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "CoDGetAll Status - 0x%x\n", Status));
     return EFI_NOT_FOUND;
   }
 
