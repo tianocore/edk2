@@ -33,8 +33,6 @@ ShellCommandRunEdit (
   CHAR16        *Spot;
   CONST CHAR16  *TempParam;
 
-  //  SHELL_FILE_HANDLE   TempHandle;
-
   Buffer      = NULL;
   ShellStatus = SHELL_SUCCESS;
   Nfs         = NULL;
@@ -108,13 +106,6 @@ ShellCommandRunEdit (
           } else {
             FileBufferSetFileName (TempParam);
           }
-
-          //          if (EFI_ERROR(ShellFileExists(MainEditor.FileBuffer->FileName))) {
-          //            Status = ShellOpenFileByName(MainEditor.FileBuffer->FileName, &TempHandle, EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);
-          //            if (!EFI_ERROR(Status)) {
-          //              ShellCloseFile(&TempHandle);
-          //            }
-          //          }
         }
 
         Status = FileBufferRead (MainEditor.FileBuffer->FileName, FALSE);
