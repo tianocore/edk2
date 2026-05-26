@@ -120,7 +120,11 @@ MainCmdEfiDecompress (
     ASSERT_EFI_ERROR (Status);
 
     Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      ShellStatus = SHELL_NOT_FOUND;
+      goto Done;
+    }
 
     Status = Decompress->GetInfo (Decompress, InBuffer, (UINT32)InSize, &OutSize, &ScratchSize);
   }
