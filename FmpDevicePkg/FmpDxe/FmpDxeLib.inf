@@ -57,6 +57,7 @@
   gEdkiiVariableLockProtocolGuid                ## CONSUMES
   gEfiFirmwareManagementProtocolGuid            ## PRODUCES
   gEdkiiFirmwareManagementProgressProtocolGuid  ## PRODUCES
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
 
 [Pcd]
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable              ## CONSUMES
@@ -68,6 +69,7 @@
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr               ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest              ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid                  ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceDeferImageAuthToSetImage         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                            ## SOMETIMES_PRODUCES
 
 [Depex]

@@ -85,7 +85,7 @@
   #  the FmpHeader containing authentication information will be delivered
   #  to it when this option is enabled.
   #
-  #    TRUE  - Image Authentication will be defered.<BR>
+  #    TRUE  - Image Authentication will be deferred.<BR>
   #    FALSE - Image Authentication will be performed by common function --
   #            CheckTheImageInternal(). <BR>
   # @Prompt Deferred Image Authentication is disabled.
