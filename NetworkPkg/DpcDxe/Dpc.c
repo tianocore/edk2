@@ -145,6 +145,8 @@ DpcQueueDpc (
           ReturnStatus = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+
+        break;
       }
 
       //
