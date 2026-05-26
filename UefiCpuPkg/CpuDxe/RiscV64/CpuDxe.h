@@ -25,6 +25,7 @@
 #include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
+#include <Library/MpInitLib.h>
 #include <Register/RiscV64/RiscVEncoding.h>
 
 /**
