@@ -47,10 +47,13 @@
   LoongArch/LoongArch64/ArchExceptionHandler.c
   LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
 
+[Sources.AARCH64, Sources.RISCV64]
+  CpuExceptionHelpers.h
+  SecPeiCpuExceptionHelpers.c
+
 [Sources.RISCV64]
   RiscV/Backtrace.h
   RiscV/Backtrace.c
-  RiscV/BacktraceHelperSec.c
   RiscV/ExceptionLib.c
   RiscV/ExceptionHandler.h
   RiscV/ExceptionHandlerAsm.S | GCC
@@ -58,8 +61,6 @@
 [Sources.AARCH64]
   AArch64/CpuExceptionHandlerLib.c
   AArch64/ExceptionSupport.S | GCC
-  CpuExceptionHelpers.h
-  SecPeiCpuExceptionHelpers.c
 
 [Packages]
   MdePkg/MdePkg.dec
