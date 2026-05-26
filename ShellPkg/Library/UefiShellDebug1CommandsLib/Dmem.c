@@ -430,6 +430,30 @@ DisplaySystemTable (
   return ShellStatus;
 }
 
+/**
+  Display memory contents and, when applicable, the decoded system table.
+
+  @param[in] Package    List of input parameters.
+  @param[in] Address    Base address to display.
+  @param[in] Size       Number of bytes to display.
+**/
+STATIC
+SHELL_STATUS
+DisplayMemory (
+  IN  LIST_ENTRY  *Package,
+  IN  VOID        *Address,
+  IN  UINT64      Size
+  )
+{
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
+  DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
+  if (Address == (VOID *)gST) {
+    return DisplaySystemTable (Package, Address);
+  }
+
+  return SHELL_SUCCESS;
+}
+
 /** Main function of the 'Dmem' command.
 
   @param[in] Package    List of input parameter for the command.
@@ -440,14 +464,9 @@ MainCmdDmem (
   LIST_ENTRY  *Package
   )
 {
-  SHELL_STATUS  ShellStatus;
   VOID          *Address;
   UINT64        Size;
   CONST CHAR16  *Temp1;
-
-  ShellStatus = SHELL_SUCCESS;
-  Address     = NULL;
-  Size        = 0;
 
   if (ShellCommandLineGetCount (Package) > 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmem");
@@ -456,38 +475,29 @@ MainCmdDmem (
 
   Temp1 = ShellCommandLineGetRawValue (Package, 1);
   if (Temp1 == NULL) {
-    Address = gST;
-    Size    = sizeof (*gST);
+    return DisplayMemory (Package, gST, sizeof (*gST));
+  }
+
+  if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Temp1 = ShellCommandLineGetRawValue (Package, 2);
+  if (Temp1 == NULL) {
+    Size = 512;
   } else {
-    if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
+    if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    }
-
-    Temp1 = ShellCommandLineGetRawValue (Package, 2);
-    if (Temp1 == NULL) {
-      Size = 512;
-    } else {
-      if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
+      return SHELL_INVALID_PARAMETER;
     }
   }
 
-  if (ShellStatus == SHELL_SUCCESS) {
-    if (!ShellCommandLineGetFlag (Package, L"-mmio")) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
-      DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
-      if (Address == (VOID *)gST) {
-        ShellStatus = DisplaySystemTable (Package, Address);
-      }
-    } else {
-      ShellStatus = DisplayMmioMemory (Address, (UINTN)Size);
-    }
+  if (ShellCommandLineGetFlag (Package, L"-mmio")) {
+    return DisplayMmioMemory (Address, (UINTN)Size);
   }
 
-  return ShellStatus;
+  return DisplayMemory (Package, Address, Size);
 }
 
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
