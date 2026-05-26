@@ -225,11 +225,18 @@ InitCapsulePtr (
   UINTN                 CapsuleNameCapsuleTotalNumber;
   VOID                  **CapsuleNameCapsulePtr;
   EFI_PHYSICAL_ADDRESS  *CapsuleNameAddress;
+  EFI_STATUS            Status;
+  UINTN                 CapsuleOnDiskNum;
+  IMAGE_INFO            *CapsuleOnDiskBuf;
+  EFI_HANDLE            EspFsHandle;
+  UINT16                LoadOptionNumber;
 
   CapsuleNameNumber             = 0;
   CapsuleNameTotalNumber        = 0;
   CapsuleNameCapsuleTotalNumber = 0;
+  CapsuleOnDiskNum              = 0;
   CapsuleNameCapsulePtr         = NULL;
+  CapsuleOnDiskBuf              = NULL;
 
   //
   // Find all capsule images from hob
@@ -249,6 +256,23 @@ InitCapsulePtr (
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
 
+  if (CoDCheckCapsuleOnDiskFlag ()) {
+    Status = CoDGetAll (
+               3,
+               &CapsuleOnDiskBuf,
+               &CapsuleOnDiskNum,
+               &EspFsHandle,
+               &LoadOptionNumber
+               );
+    if (EFI_ERROR (Status) || (CapsuleOnDiskBuf == NULL)) {
+      DEBUG ((DEBUG_WARN, "%a(): CoDGetAll Status: %r\n", __func__, Status));
+      CapsuleOnDiskNum = 0;
+    }
+
+    mCapsuleTotalNumber += CapsuleOnDiskNum;
+    DEBUG ((DEBUG_INFO, "%a(): loaded %u on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
+  }
+
   DEBUG ((DEBUG_INFO, "mCapsuleTotalNumber - 0x%x\n", mCapsuleTotalNumber));
 
   if (mCapsuleTotalNumber == 0) {
@@ -262,12 +286,14 @@ InitCapsulePtr (
   if (mCapsulePtr == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate mCapsulePtr fail!\n"));
     mCapsuleTotalNumber = 0;
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return;
   }
 
   mCapsuleStatusArray = (EFI_STATUS *)AllocateZeroPool (sizeof (EFI_STATUS) * mCapsuleTotalNumber);
   if (mCapsuleStatusArray == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate mCapsuleStatusArray fail!\n"));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     FreePool (mCapsulePtr);
     mCapsulePtr         = NULL;
     mCapsuleTotalNumber = 0;
@@ -279,6 +305,7 @@ InitCapsulePtr (
   CapsuleNameCapsulePtr =  (VOID **)AllocateZeroPool (sizeof (VOID *) * CapsuleNameCapsuleTotalNumber);
   if (CapsuleNameCapsulePtr == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate CapsuleNameCapsulePtr fail!\n"));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     FreePool (mCapsulePtr);
     FreePool (mCapsuleStatusArray);
     mCapsulePtr         = NULL;
@@ -317,6 +344,7 @@ InitCapsulePtr (
     mCapsuleNamePtr = (CHAR16 **)AllocateZeroPool (sizeof (CHAR16 *) * mCapsuleTotalNumber);
     if (mCapsuleNamePtr == NULL) {
       DEBUG ((DEBUG_ERROR, "Allocate mCapsuleNamePtr fail!\n"));
+      CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
       FreePool (mCapsulePtr);
       FreePool (mCapsuleStatusArray);
       FreePool (CapsuleNameCapsulePtr);
@@ -336,6 +364,15 @@ InitCapsulePtr (
     }
   } else {
     mCapsuleNamePtr = NULL;
+  }
+
+  if (CapsuleOnDiskBuf != NULL) {
+    for (Index2 = 0; Index2 < CapsuleOnDiskNum; Index2++) {
+      mCapsulePtr[Index++] = CapsuleOnDiskBuf[Index2].ImageAddress;
+      FreePool (CapsuleOnDiskBuf[Index2].FileInfo);
+    }
+
+    FreePool (CapsuleOnDiskBuf);
   }
 
   FreePool (CapsuleNameCapsulePtr);
@@ -511,7 +548,7 @@ ProcessTheseCapsules (
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32 (PcdStatusCodeSubClassCapsule) | PcdGet32 (PcdCapsuleStatusCodeProcessCapsulesBegin)));
 
-  if (FirstRound) {
+  if (FirstRound || (PcdGetBool (PcdCapsuleOnDiskSupport) && (mCapsuleTotalNumber == 0))) {
     InitCapsulePtr ();
   }
 
@@ -686,7 +723,10 @@ ProcessCapsules (
     // Reboot System if and only if all capsule processed.
     // If not, defer reset to 2nd process.
     //
-    if (mNeedReset && AreAllImagesProcessed ()) {
+    if (mNeedReset &&
+        (!CoDCheckCapsuleOnDiskFlag () || (mCapsuleTotalNumber != 0)) &&
+        AreAllImagesProcessed ())
+    {
       DoResetSystem ();
     }
   } else {
