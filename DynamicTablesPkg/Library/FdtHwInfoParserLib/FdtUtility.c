@@ -1498,3 +1498,111 @@ FdtGetParentAddressInfo (
 
   return FdtGetAddressInfo (Fdt, Node, AddressCells, SizeCells);
 }
+
+/** Get an address/size pair from a node "reg" property.
+
+  The "reg" property stores addresses in the parent bus address space.
+  This helper reads the requested entry without applying parent bus
+  "ranges" translations.
+
+  The helper supports address and size fields up to 64 bits.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node owning the "reg" property.
+  @param [in]  Index            Index of the address/size pair to read.
+  @param [out] BaseAddress      If success, contains the raw base address.
+  @param [out] BaseAddressSize  If success, contains the size associated with
+                                the raw base address. This parameter is
+                                optional.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested "reg" entry was not found.
+  @retval EFI_UNSUPPORTED         Unsupported address or size encoding.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetReg (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT       UINT64  *BaseAddress,
+  OUT       UINT64  *BaseAddressSize OPTIONAL
+  )
+{
+  EFI_STATUS    Status;
+  CONST UINT32  *Reg;
+  UINTN         EntryOffset;
+  UINTN         EntryStride;
+  INT32         AddressCells;
+  INT32         SizeCells;
+  INT32         PropertySize;
+
+  if ((Fdt == NULL) || (BaseAddress == NULL)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = FdtGetParentAddressInfo (Fdt, Node, &AddressCells, &SizeCells);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  if ((AddressCells < 1) ||
+      (AddressCells > 2) ||
+      (SizeCells < 1)    ||
+      (SizeCells > 2))
+  {
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
+  }
+
+  Reg = FdtGetProp (Fdt, Node, "reg", &PropertySize);
+  if ((Reg == NULL) || (PropertySize < 0)) {
+    ASSERT (0);
+    return EFI_ABORTED;
+  }
+
+  //
+  // One "reg" entry is encoded as:
+  // <address size>.
+  //
+  EntryStride = (UINTN)AddressCells + (UINTN)SizeCells;
+  if (((PropertySize % sizeof (UINT32)) != 0) ||
+      (((UINTN)PropertySize / sizeof (UINT32)) < EntryStride))
+  {
+    ASSERT (0);
+    return EFI_ABORTED;
+  }
+
+  EntryOffset = (UINTN)Index * EntryStride;
+  if ((EntryOffset + EntryStride) > ((UINTN)PropertySize / sizeof (UINT32))) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // EntryOffset points to the first address cell of the selected "reg"
+  // tuple in the property.
+  //
+  Status = ReadFdtCells64 (Reg + EntryOffset, AddressCells, BaseAddress);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  if (BaseAddressSize != NULL) {
+    //
+    // The size field starts immediately after the address field in the
+    // current "reg" tuple.
+    //
+    Status = ReadFdtCells64 (Reg + EntryOffset + AddressCells, SizeCells, BaseAddressSize);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}

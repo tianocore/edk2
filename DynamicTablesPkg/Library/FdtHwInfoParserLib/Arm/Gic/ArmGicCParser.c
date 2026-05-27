@@ -366,10 +366,10 @@ GicCv2IntcNodeParser (
   CM_ARM_GICC_INFO  *GicCInfo;
   INT32             AddressCells;
   INT32             SizeCells;
-
-  CONST UINT8  *GicCValue;
-  CONST UINT8  *GicVValue;
-  CONST UINT8  *GicHValue;
+  UINT64            GicCValue;
+  UINT64            GicVValue;
+  UINT64            GicHValue;
+  UINT64            RegionSize;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -382,8 +382,9 @@ GicCv2IntcNodeParser (
   }
 
   GicCInfo  = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
-  GicVValue = NULL;
-  GicHValue = NULL;
+  GicCValue = 0;
+  GicVValue = 0;
+  GicHValue = 0;
 
   // Get the #address-cells and #size-cells property values.
   Status = FdtGetParentAddressInfo (
@@ -425,22 +426,34 @@ GicCv2IntcNodeParser (
     case 4:
     {
       // GicV is at index 3 in the reg property. GicV is optional.
-      GicVValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (3, AddressCells, SizeCells));
+      Status = FdtGetReg (Fdt, Gicv2IntcNode, 3, &GicVValue, &RegionSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 3:
     {
       // GicH is at index 2 in the reg property. GicH is optional.
-      GicHValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (2, AddressCells, SizeCells));
+      Status = FdtGetReg (Fdt, Gicv2IntcNode, 2, &GicHValue, &RegionSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 2:
     {
       // GicC is at index 1 in the reg property. GicC is mandatory.
-      GicCValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells));
+      Status = FdtGetReg (Fdt, Gicv2IntcNode, 1, &GicCValue, &RegionSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       break;
     }
     default:
@@ -453,19 +466,9 @@ GicCv2IntcNodeParser (
 
   // Patch the relevant fields of the CM_ARM_GICC_INFO objects.
   for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-    if (AddressCells == 2) {
-      GicCInfo[Index].PhysicalBaseAddress = Fdt64ToCpu (*(UINT64 *)GicCValue);
-      GicCInfo[Index].GICH                = (GicHValue == NULL) ? 0 :
-                                            Fdt64ToCpu (*(UINT64 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt64ToCpu (*(UINT64 *)GicVValue);
-    } else {
-      GicCInfo[Index].PhysicalBaseAddress = Fdt32ToCpu (*(UINT32 *)GicCValue);
-      GicCInfo[Index].GICH                = (GicHValue == NULL) ? 0 :
-                                            Fdt32ToCpu (*(UINT32 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt32ToCpu (*(UINT32 *)GicVValue);
-    }
+    GicCInfo[Index].PhysicalBaseAddress = GicCValue;
+    GicCInfo[Index].GICH                = GicHValue;
+    GicCInfo[Index].GICV                = GicVValue;
   } // for
 
   return EFI_SUCCESS;
@@ -504,10 +507,10 @@ GicCv3IntcNodeParser (
   INT32             AddressCells;
   INT32             SizeCells;
   UINT32            AdditionalRedistReg;
-
-  CONST UINT8  *GicCValue;
-  CONST UINT8  *GicVValue;
-  CONST UINT8  *GicHValue;
+  UINT64            GicCValue;
+  UINT64            GicVValue;
+  UINT64            GicHValue;
+  UINT64            RegionSize;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -520,9 +523,9 @@ GicCv3IntcNodeParser (
   }
 
   GicCInfo  = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
-  GicCValue = NULL;
-  GicVValue = NULL;
-  GicHValue = NULL;
+  GicCValue = 0;
+  GicVValue = 0;
+  GicHValue = 0;
 
   // Get the #address-cells and #size-cells property values.
   Status = FdtGetParentAddressInfo (
@@ -591,35 +594,53 @@ GicCv3IntcNodeParser (
     case 5:
     {
       // GicV is at index 4 in the reg property. GicV is optional.
-      GicVValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (
-                            4 + AdditionalRedistReg,
-                            AddressCells,
-                            SizeCells
-                            ));
+      Status = FdtGetReg (
+                 Fdt,
+                 Gicv3IntcNode,
+                 4 + AdditionalRedistReg,
+                 &GicVValue,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 4:
     {
       // GicH is at index 3 in the reg property. GicH is optional.
-      GicHValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (
-                            3 + AdditionalRedistReg,
-                            AddressCells,
-                            SizeCells
-                            ));
+      Status = FdtGetReg (
+                 Fdt,
+                 Gicv3IntcNode,
+                 3 + AdditionalRedistReg,
+                 &GicHValue,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 3:
     {
       // GicC is at index 2 in the reg property. GicC is optional.
       // Even though GicC is optional, it is made mandatory in this parser.
-      GicCValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (
-                            2 + AdditionalRedistReg,
-                            AddressCells,
-                            SizeCells
-                            ));
+      Status = FdtGetReg (
+                 Fdt,
+                 Gicv3IntcNode,
+                 2 + AdditionalRedistReg,
+                 &GicCValue,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through
     }
     case 2:
@@ -637,28 +658,12 @@ GicCv3IntcNodeParser (
   }
 
   // Patch the relevant fields of the CM_ARM_GICC_INFO objects.
-  if (AddressCells == 2) {
-    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
-      GicCInfo[Index].GICRBaseAddress     = 0;
-      GicCInfo[Index].PhysicalBaseAddress = (GicCValue == NULL) ? 0 :
-                                            Fdt64ToCpu (*(UINT64 *)GicCValue);
-      GicCInfo[Index].GICH = (GicHValue == NULL) ? 0 :
-                             Fdt64ToCpu (*(UINT64 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt64ToCpu (*(UINT64 *)GicVValue);
-    }
-  } else {
-    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
-      GicCInfo[Index].GICRBaseAddress     = 0;
-      GicCInfo[Index].PhysicalBaseAddress = (GicCValue == NULL) ? 0 :
-                                            Fdt32ToCpu (*(UINT32 *)GicCValue);
-      GicCInfo[Index].GICH = (GicHValue == NULL) ? 0 :
-                             Fdt32ToCpu (*(UINT32 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt32ToCpu (*(UINT32 *)GicVValue);
-    }
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
+    GicCInfo[Index].GICRBaseAddress     = 0;
+    GicCInfo[Index].PhysicalBaseAddress = GicCValue;
+    GicCInfo[Index].GICH                = GicHValue;
+    GicCInfo[Index].GICV                = GicVValue;
   }
 
   return EFI_SUCCESS;

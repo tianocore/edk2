@@ -1,7 +1,7 @@
 /** @file
   Arm Gic Distributor Parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -39,10 +39,8 @@ GicDIntcNodeParser (
   IN  CM_ARM_GICD_INFO  *GicDInfo
   )
 {
-  EFI_STATUS   Status;
-  INT32        AddressCells;
-  CONST UINT8  *Data;
-  INT32        DataSize;
+  EFI_STATUS  Status;
+  UINT64      RegionSize;
 
   if ((Fdt == NULL) ||
       (GicDInfo == NULL))
@@ -51,31 +49,15 @@ GicDIntcNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetParentAddressInfo (Fdt, GicIntcNode, &AddressCells, NULL);
+  Status = FdtGetReg (
+             Fdt,
+             GicIntcNode,
+             0,
+             &GicDInfo->PhysicalBaseAddress,
+             &RegionSize
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    return Status;
-  }
-
-  // Don't support more than 64 bits and less than 32 bits addresses.
-  if ((AddressCells < 1)  ||
-      (AddressCells > 2))
-  {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  Data = FdtGetProp (Fdt, GicIntcNode, "reg", &DataSize);
-  if ((Data == NULL) || (DataSize < (INT32)(AddressCells * sizeof (UINT32)))) {
-    // If error or not enough space.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  if (AddressCells == 2) {
-    GicDInfo->PhysicalBaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
-  } else {
-    GicDInfo->PhysicalBaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
   }
 
   return Status;

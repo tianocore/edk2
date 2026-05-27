@@ -428,6 +428,7 @@ PciNodeParser (
   EFI_STATUS   Status;
   INT32        AddressCells;
   INT32        SizeCells;
+  UINT64       ConfigSpaceSize;
   CONST UINT8  *Data;
   INT32        DataSize;
   INT32        SegGroup;
@@ -485,11 +486,16 @@ PciNodeParser (
     return EFI_ABORTED;
   }
 
-  // Base address
-  if (AddressCells == 2) {
-    PciInfo->PciConfigSpaceInfo.BaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
-  } else {
-    PciInfo->PciConfigSpaceInfo.BaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
+  Status = FdtGetReg (
+             Fdt,
+             HostPciNode,
+             0,
+             &PciInfo->PciConfigSpaceInfo.BaseAddress,
+             &ConfigSpaceSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
   }
 
   // Address map

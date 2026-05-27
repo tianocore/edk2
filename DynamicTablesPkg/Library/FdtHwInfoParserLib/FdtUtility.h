@@ -596,6 +596,38 @@ FdtGetParentAddressInfo (
   OUT       INT32     *SizeCells       OPTIONAL
   );
 
+/** Get an address/size pair from a node "reg" property.
+
+  The "reg" property stores addresses in the parent bus address space.
+  This helper reads the requested entry without applying parent bus "ranges"
+  translations.
+
+  The helper supports address and size fields up to 64 bits.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node owning the "reg" property.
+  @param [in]  Index            Index of the address/size pair to read.
+  @param [out] BaseAddress      If success, contains the raw base address.
+  @param [out] BaseAddressSize  If success, contains the size associated with
+                                the raw base address. This parameter is
+                                optional.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested "reg" entry was not found.
+  @retval EFI_UNSUPPORTED         Unsupported address or size encoding.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetReg (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT       UINT64  *BaseAddress,
+  OUT       UINT64  *BaseAddressSize OPTIONAL
+  );
+
 /** For relevant architectures, get the "#address-cells" and/or "#size-cells"
     property of the node.
 

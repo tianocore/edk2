@@ -299,7 +299,7 @@ SmmuV3NodeParser (
   CONST UINT32       *Data;
   INT32              DataSize;
   INT32              IntCells;
-  INT32              AddressCells;
+  UINT64             BaseAddressSize;
   CONST UINT8        *InterruptNames;
   INT32              InterruptNamesSize;
   CM_ARM_ID_MAPPING  *IdMappings;
@@ -311,12 +311,6 @@ SmmuV3NodeParser (
   if ((Fdt == NULL) || (SmmuV3Info == NULL)) {
     ASSERT ((Fdt != NULL) && (SmmuV3Info != NULL));
     return EFI_INVALID_PARAMETER;
-  }
-
-  AddressCells = FdtAddressCells (Fdt, SmmuV3Node);
-  if (AddressCells < 0) {
-    ASSERT (AddressCells >= 0);
-    return EFI_ABORTED;
   }
 
   // Get the number of cells used to encode an interrupt.
@@ -367,16 +361,16 @@ SmmuV3NodeParser (
     SmmuV3Info->Model = EFI_ACPI_IORT_SMMUv3_MODEL_CAVIUM_CN99XX;
   }
 
-  Data = FdtGetProp (Fdt, SmmuV3Node, "reg", &DataSize);
-  if (Data == NULL) {
-    ASSERT (Data != NULL);
-    return EFI_ABORTED;
-  }
-
-  if (AddressCells == 2) {
-    SmmuV3Info->BaseAddress = Fdt64ToCpu (*((UINT64 *)Data));
-  } else {
-    SmmuV3Info->BaseAddress = Fdt32ToCpu (*((UINT32 *)Data));
+  Status = FdtGetReg (
+             Fdt,
+             SmmuV3Node,
+             0,
+             &SmmuV3Info->BaseAddress,
+             &BaseAddressSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   Status = FindIommuMsiMapForSmmuV3 (Fdt, SmmuV3Node, &IommuMapData, &IommuMapSize, &MsiMapData, &MsiMapSize);
