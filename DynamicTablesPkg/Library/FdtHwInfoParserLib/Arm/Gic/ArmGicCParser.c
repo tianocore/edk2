@@ -426,7 +426,7 @@ GicCv2IntcNodeParser (
     case 4:
     {
       // GicV is at index 3 in the reg property. GicV is optional.
-      Status = FdtGetReg (Fdt, Gicv2IntcNode, 3, &GicVValue, &RegionSize);
+      Status = FdtGetTranslatedReg (Fdt, Gicv2IntcNode, 3, &GicVValue, &RegionSize);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         return Status;
@@ -437,7 +437,7 @@ GicCv2IntcNodeParser (
     case 3:
     {
       // GicH is at index 2 in the reg property. GicH is optional.
-      Status = FdtGetReg (Fdt, Gicv2IntcNode, 2, &GicHValue, &RegionSize);
+      Status = FdtGetTranslatedReg (Fdt, Gicv2IntcNode, 2, &GicHValue, &RegionSize);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         return Status;
@@ -448,7 +448,7 @@ GicCv2IntcNodeParser (
     case 2:
     {
       // GicC is at index 1 in the reg property. GicC is mandatory.
-      Status = FdtGetReg (Fdt, Gicv2IntcNode, 1, &GicCValue, &RegionSize);
+      Status = FdtGetTranslatedReg (Fdt, Gicv2IntcNode, 1, &GicCValue, &RegionSize);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         return Status;
@@ -594,7 +594,7 @@ GicCv3IntcNodeParser (
     case 5:
     {
       // GicV is at index 4 in the reg property. GicV is optional.
-      Status = FdtGetReg (
+      Status = FdtGetTranslatedReg (
                  Fdt,
                  Gicv3IntcNode,
                  4 + AdditionalRedistReg,
@@ -611,7 +611,7 @@ GicCv3IntcNodeParser (
     case 4:
     {
       // GicH is at index 3 in the reg property. GicH is optional.
-      Status = FdtGetReg (
+      Status = FdtGetTranslatedReg (
                  Fdt,
                  Gicv3IntcNode,
                  3 + AdditionalRedistReg,
@@ -629,7 +629,7 @@ GicCv3IntcNodeParser (
     {
       // GicC is at index 2 in the reg property. GicC is optional.
       // Even though GicC is optional, it is made mandatory in this parser.
-      Status = FdtGetReg (
+      Status = FdtGetTranslatedReg (
                  Fdt,
                  Gicv3IntcNode,
                  2 + AdditionalRedistReg,

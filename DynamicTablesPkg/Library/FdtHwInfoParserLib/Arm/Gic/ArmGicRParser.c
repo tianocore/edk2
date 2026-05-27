@@ -139,7 +139,7 @@ GicRIntcNodeParser (
   for (Index = 0; Index < RedistReg; Index++) {
     ZeroMem (&GicRInfo, sizeof (CM_ARM_GIC_REDIST_INFO));
 
-    Status = FdtGetReg (
+    Status = FdtGetTranslatedReg (
                Fdt,
                GicIntcNode,
                1 + Index,

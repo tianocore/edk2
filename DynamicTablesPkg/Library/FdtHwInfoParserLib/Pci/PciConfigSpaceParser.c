@@ -486,7 +486,7 @@ PciNodeParser (
     return EFI_ABORTED;
   }
 
-  Status = FdtGetReg (
+  Status = FdtGetTranslatedReg (
              Fdt,
              HostPciNode,
              0,
