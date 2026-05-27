@@ -3047,10 +3047,11 @@ typedef struct {
 ///
 /// Confidential Computing Type definitions.
 ///
-#define EFI_ACPI_6_5_CC_TYPE_NONE   0
-#define EFI_ACPI_6_5_CC_TYPE_SEV    1
-#define EFI_ACPI_6_5_CC_TYPE_TDX    2
-#define EFI_ACPI_6_5_CC_TYPE_APTEE  3
+#define EFI_ACPI_6_5_CC_TYPE_NONE    0
+#define EFI_ACPI_6_5_CC_TYPE_SEV     1
+#define EFI_ACPI_6_5_CC_TYPE_TDX     2
+#define EFI_ACPI_6_5_CC_TYPE_APTEE   3
+#define EFI_ACPI_6_5_CC_TYPE_ARMCCA  4
 
 ///
 /// Confidential Computing Event Log ACPI Table (CCEL).
