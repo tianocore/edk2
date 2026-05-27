@@ -62,7 +62,7 @@ MsiFrameNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetReg (
+  Status = FdtGetTranslatedReg (
              Fdt,
              MsiFrameNode,
              0,

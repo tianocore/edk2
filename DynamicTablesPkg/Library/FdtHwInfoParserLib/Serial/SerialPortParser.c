@@ -106,7 +106,7 @@ SerialPortNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetReg (
+  Status = FdtGetTranslatedReg (
              Fdt,
              SerialPortNode,
              0,
