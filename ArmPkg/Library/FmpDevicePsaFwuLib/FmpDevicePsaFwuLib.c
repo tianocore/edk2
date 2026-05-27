@@ -941,6 +941,10 @@ CancelUpdate:
     ASSERT (CancelStatus == EFI_SUCCESS);
   }
 
+  if (Status == EFI_SECURITY_VIOLATION) {
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_AUTH_ERROR;
+  }
+
   return Status;
 }
 
