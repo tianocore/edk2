@@ -1019,6 +1019,7 @@
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
 !endif
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+  OvmfPkg/WsmtDxe/WsmtDxe.inf
 
   #
   # Hash2 Protocol producer
