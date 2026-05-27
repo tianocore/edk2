@@ -878,81 +878,83 @@ CheckTheImageInternal (
     return EFI_INVALID_PARAMETER;
   }
 
-  PublicKeyDataXdr    = PcdGetPtr (PcdFmpDevicePkcs7CertBufferXdr);
-  PublicKeyDataXdrEnd = PublicKeyDataXdr + PcdGetSize (PcdFmpDevicePkcs7CertBufferXdr);
+  if (!FeaturePcdGet (PcdFmpDeviceDeferImageAuthToSetImage)) {
+    PublicKeyDataXdr    = PcdGetPtr (PcdFmpDevicePkcs7CertBufferXdr);
+    PublicKeyDataXdrEnd = PublicKeyDataXdr + PcdGetSize (PcdFmpDevicePkcs7CertBufferXdr);
 
-  if ((PublicKeyDataXdr == NULL) || (PublicKeyDataXdr == PublicKeyDataXdrEnd)) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Invalid certificate, skipping it.\n", mImageIdName));
-    Status                 = EFI_ABORTED;
-    LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_CERTIFICATE;
-  } else {
-    //
-    // Try each key from PcdFmpDevicePkcs7CertBufferXdr
-    //
-    for (Index = 1; PublicKeyDataXdr < PublicKeyDataXdrEnd; Index++) {
-      Index++;
-      DEBUG (
-        (DEBUG_INFO,
-         "FmpDxe(%s): Certificate #%d [%p..%p].\n",
-         mImageIdName,
-         Index,
-         PublicKeyDataXdr,
-         PublicKeyDataXdrEnd
-        )
-        );
-
-      if ((PublicKeyDataXdr + sizeof (UINT32)) > PublicKeyDataXdrEnd) {
-        //
-        // Key data extends beyond end of PCD
-        //
-        DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Certificate size extends beyond end of PCD, skipping it.\n", mImageIdName));
-        Status                 = EFI_ABORTED;
-        LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_KEY_LENGTH_VALUE;
-        break;
-      }
-
-      //
-      // Read key length stored in big-endian format
-      //
-      PublicKeyDataLength = SwapBytes32 (*(UINT32 *)(PublicKeyDataXdr));
-      //
-      // Point to the start of the key data
-      //
-      PublicKeyDataXdr += sizeof (UINT32);
-      if (PublicKeyDataXdr + PublicKeyDataLength > PublicKeyDataXdrEnd) {
-        //
-        // Key data extends beyond end of PCD
-        //
-        DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Certificate extends beyond end of PCD, skipping it.\n", mImageIdName));
-        Status                 = EFI_ABORTED;
-        LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_KEY_LENGTH;
-        break;
-      }
-
-      PublicKeyData = PublicKeyDataXdr;
-      Status        = AuthenticateFmpImage (
-                        (EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image,
-                        ImageSize,
-                        PublicKeyData,
-                        PublicKeyDataLength
-                        );
-      if (!EFI_ERROR (Status)) {
-        break;
-      }
-
-      PublicKeyDataXdr += ALIGN_VALUE (PublicKeyDataLength, 4);
-    }
-  }
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Authentication Failed %r.\n", mImageIdName, Status));
-    if (LocalLastAttemptStatus != LAST_ATTEMPT_STATUS_SUCCESS) {
-      *LastAttemptStatus = LocalLastAttemptStatus;
+    if ((PublicKeyDataXdr == NULL) || (PublicKeyDataXdr == PublicKeyDataXdrEnd)) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Invalid certificate, skipping it.\n", mImageIdName));
+      Status                 = EFI_ABORTED;
+      LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_CERTIFICATE;
     } else {
-      *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_IMAGE_AUTH_FAILURE;
+      //
+      // Try each key from PcdFmpDevicePkcs7CertBufferXdr
+      //
+      for (Index = 1; PublicKeyDataXdr < PublicKeyDataXdrEnd; Index++) {
+        Index++;
+        DEBUG (
+          (DEBUG_INFO,
+           "FmpDxe(%s): Certificate #%d [%p..%p].\n",
+           mImageIdName,
+           Index,
+           PublicKeyDataXdr,
+           PublicKeyDataXdrEnd
+          )
+          );
+
+        if ((PublicKeyDataXdr + sizeof (UINT32)) > PublicKeyDataXdrEnd) {
+          //
+          // Key data extends beyond end of PCD
+          //
+          DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Certificate size extends beyond end of PCD, skipping it.\n", mImageIdName));
+          Status                 = EFI_ABORTED;
+          LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_KEY_LENGTH_VALUE;
+          break;
+        }
+
+        //
+        // Read key length stored in big-endian format
+        //
+        PublicKeyDataLength = SwapBytes32 (*(UINT32 *)(PublicKeyDataXdr));
+        //
+        // Point to the start of the key data
+        //
+        PublicKeyDataXdr += sizeof (UINT32);
+        if (PublicKeyDataXdr + PublicKeyDataLength > PublicKeyDataXdrEnd) {
+          //
+          // Key data extends beyond end of PCD
+          //
+          DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Certificate extends beyond end of PCD, skipping it.\n", mImageIdName));
+          Status                 = EFI_ABORTED;
+          LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_KEY_LENGTH;
+          break;
+        }
+
+        PublicKeyData = PublicKeyDataXdr;
+        Status        = AuthenticateFmpImage (
+                          (EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image,
+                          ImageSize,
+                          PublicKeyData,
+                          PublicKeyDataLength
+                          );
+        if (!EFI_ERROR (Status)) {
+          break;
+        }
+
+        PublicKeyDataXdr += ALIGN_VALUE (PublicKeyDataLength, 4);
+      }
     }
 
-    goto cleanup;
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Authentication Failed %r.\n", mImageIdName, Status));
+      if (LocalLastAttemptStatus != LAST_ATTEMPT_STATUS_SUCCESS) {
+        *LastAttemptStatus = LocalLastAttemptStatus;
+      } else {
+        *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_IMAGE_AUTH_FAILURE;
+      }
+
+      goto cleanup;
+    }
   }
 
   //
@@ -1417,6 +1419,15 @@ SetTheImage (
   // Indicate that control is handed off to FmpDeviceLib
   //
   Progress (5);
+
+  if (FeaturePcdGet (PcdFmpDeviceDeferImageAuthToSetImage)) {
+    //
+    // When PcdFmpDeviceDeferImageAuthToSetImage is enabled,
+    // All FmpHeaders should be passed to platform to authenticate the
+    // Image. Therefore, set AllHeaderSize as 0.
+    //
+    AllHeaderSize = 0;
+  }
 
   //
   // Copy the requested image to the firmware using the FmpDeviceLib
@@ -1955,7 +1966,9 @@ FmpDxeEntryPoint (
   //
   // Detects if PcdFmpDevicePkcs7CertBufferXdr contains a test key.
   //
-  DetectTestKey ();
+  if (!FeaturePcdGet (PcdFmpDeviceDeferImageAuthToSetImage)) {
+    DetectTestKey ();
+  }
 
   //
   // Fill in FMP Progress Protocol fields for Version 1

@@ -77,6 +77,21 @@
   # @Prompt Firmware Device Storage Access Enabled.
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable|TRUE|BOOLEAN|0x40000011
 
+  ## Indicates whether to defer Image Authentication to
+  #  FmpDeviceSetImage() (FmpDeviceSetImageWithStatus()) so that
+  #  authentication can be performed in a platform-specific manner.
+  #  For example, authentication may be performed using platform-specific
+  #  certificate storage.
+  #  Since authentication is deferred to the platform function,
+  #  the FmpHeader containing authentication information will be delivered
+  #  to it when this option is enabled.
+  #
+  #    TRUE  - Image Authentication will be defered.<BR>
+  #    FALSE - Image Authentication will be performed by common function --
+  #            CheckTheImageInternal(). <BR>
+  # @Prompt Deferred Image Authentication is disabled.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceDeferImageAuthToSetImage|FALSE|BOOLEAN|0x40000012
+
 [PcdsFixedAtBuild]
   ## The SHA-256 hash of a PKCS7 test key that is used to detect if a test key
   #  is being used to authenticate capsules.  Test key detection is disabled by
