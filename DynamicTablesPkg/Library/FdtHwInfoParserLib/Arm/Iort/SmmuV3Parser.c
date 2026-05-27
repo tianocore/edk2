@@ -361,7 +361,7 @@ SmmuV3NodeParser (
     SmmuV3Info->Model = EFI_ACPI_IORT_SMMUv3_MODEL_CAVIUM_CN99XX;
   }
 
-  Status = FdtGetReg (
+  Status = FdtGetTranslatedReg (
              Fdt,
              SmmuV3Node,
              0,

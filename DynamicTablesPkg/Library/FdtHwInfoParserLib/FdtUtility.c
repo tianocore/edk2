@@ -1606,3 +1606,227 @@ FdtGetReg (
 
   return EFI_SUCCESS;
 }
+
+/** Translate an address through a bus node "ranges" property.
+
+  A "ranges" property is encoded as:
+  <
+    child-bus-address
+    parent-bus-address
+    length
+  >
+
+  @param [in]      Fdt      Pointer to a Flattened Device Tree.
+  @param [in]      BusNode  Offset of the bus node containing "ranges".
+                            Must have a "ranges" property.
+  @param [in, out] Address  Address to translate. On success, updated with the
+                            translated parent-bus address.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No matching "ranges" entry found.
+  @retval EFI_UNSUPPORTED         Unsupported address or size encoding.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+TranslateAddressByRanges (
+  IN      CONST VOID    *Fdt,
+  IN            INT32   BusNode,
+  IN OUT        UINT64  *Address
+  )
+{
+  EFI_STATUS    Status;
+  CONST UINT32  *Ranges;
+  UINT64        RangeSize;
+  UINT64        ChildBase;
+  UINT64        ParentBase;
+  UINT64        Offset;
+  UINTN         EntryCount;
+  UINTN         EntryIndex;
+  UINTN         EntryStride;
+  INT32         ParentNode;
+  INT32         ChildAddressCells;
+  INT32         ParentAddressCells;
+  INT32         SizeCells;
+  INT32         PropertySize;
+
+  if ((Fdt == NULL) || (Address == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ParentNode = FdtParentOffset (Fdt, BusNode);
+  if (ParentNode < 0) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  Status = FdtGetAddressInfo (Fdt, BusNode, &ChildAddressCells, &SizeCells);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Status = FdtGetAddressInfo (Fdt, ParentNode, &ParentAddressCells, NULL);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  if ((ChildAddressCells < 1)  ||
+      (ChildAddressCells > 2)  ||
+      (ParentAddressCells < 1) ||
+      (ParentAddressCells > 2) ||
+      (SizeCells < 1)          ||
+      (SizeCells > 2))
+  {
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // The BusNode is expected to have a "ranges" property.
+  //
+  Ranges = FdtGetProp (Fdt, BusNode, "ranges", &PropertySize);
+  if (Ranges == NULL) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  if (PropertySize == 0) {
+    return EFI_SUCCESS;
+  }
+
+  EntryStride = (UINTN)ChildAddressCells + (UINTN)ParentAddressCells + (UINTN)SizeCells;
+  if (((PropertySize % sizeof (UINT32)) != 0) ||
+      (((UINTN)PropertySize / sizeof (UINT32)) % EntryStride != 0))
+  {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  EntryCount = (UINTN)(PropertySize / sizeof (UINT32)) / EntryStride;
+  for (EntryIndex = 0; EntryIndex < EntryCount; EntryIndex++) {
+    //
+    // One "ranges" entry is encoded as:
+    // <child-bus-address parent-bus-address length>.
+    //
+    Status = ReadFdtCells64 (Ranges, ChildAddressCells, &ChildBase);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    Status = ReadFdtCells64 (Ranges + ChildAddressCells, ParentAddressCells, &ParentBase);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    //
+    // The range length field starts after the child and parent bus
+    // addresses in the current "ranges" entry.
+    //
+    Status = ReadFdtCells64 (
+               Ranges + ChildAddressCells + ParentAddressCells,
+               SizeCells,
+               &RangeSize
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    //
+    // If *Address is in the range, the correct mapping has been found.
+    // Translate the address and return.
+    // Otherwise try the next range entry.
+    //
+    if ((*Address >= ChildBase) && ((*Address - ChildBase) < RangeSize)) {
+      Offset   = *Address - ChildBase;
+      *Address = ParentBase + Offset;
+      return EFI_SUCCESS;
+    }
+
+    Ranges += EntryStride;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/** Get a translated address/size pair from a node "reg" property.
+
+  The "reg" property stores addresses in the parent bus address space.
+  This helper reads the requested entry and resolves parent bus "ranges"
+  mappings up to the root bus to return a CPU physical address.
+
+  The helper supports address and size fields up to 64 bits.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node owning the "reg" property.
+  @param [in]  Index            Index of the address/size pair to read.
+  @param [out] BaseAddress      If success, contains the translated base
+                                address.
+  @param [out] BaseAddressSize  If success, contains the size associated with
+                                the translated base address. This parameter is
+                                optional.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No matching "ranges" entry found.
+  @retval EFI_UNSUPPORTED         Unsupported address or size encoding.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetTranslatedReg (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT       UINT64  *BaseAddress,
+  OUT       UINT64  *BaseAddressSize OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  INT32       RangeSize;
+
+  Status = FdtGetReg (Fdt, Node, Index, BaseAddress, BaseAddressSize);
+  if (Status == EFI_NOT_FOUND) {
+    return Status;
+  } else if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  while (Node != 0) {
+    Node = FdtParentOffset (Fdt, Node);
+    if (Node < 0) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    FdtGetProp (Fdt, Node, "ranges", &RangeSize);
+    if ((RangeSize < 0) && (RangeSize != -FDT_ERR_NOTFOUND)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    } else if (RangeSize == -FDT_ERR_NOTFOUND) {
+      //
+      // No "ranges" property: continue.
+      //
+      continue;
+    }
+
+    //
+    // "ranges" property found. Translate and continue.
+    //
+    Status = TranslateAddressByRanges (Fdt, Node, BaseAddress);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}

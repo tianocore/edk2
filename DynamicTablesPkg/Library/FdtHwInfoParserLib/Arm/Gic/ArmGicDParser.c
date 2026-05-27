@@ -49,7 +49,7 @@ GicDIntcNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetReg (
+  Status = FdtGetTranslatedReg (
              Fdt,
              GicIntcNode,
              0,
