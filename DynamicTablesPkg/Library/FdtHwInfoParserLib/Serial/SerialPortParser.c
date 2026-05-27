@@ -92,11 +92,8 @@ SerialPortNodeParser (
 {
   EFI_STATUS    Status;
   INT32         IntcNode;
-  CONST UINT8   *SizeValue;
   CONST UINT32  *DecodedInterruptData;
   INT32         DecodedInterruptCells;
-  INT32         AddressCells;
-  INT32         SizeCells;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -109,49 +106,16 @@ SerialPortNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetParentAddressInfo (
+  Status = FdtGetReg (
              Fdt,
              SerialPortNode,
-             &AddressCells,
-             &SizeCells
+             0,
+             &SerialPortInfo->BaseAddress,
+             &SerialPortInfo->BaseAddressLength
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
-  }
-
-  // Don't support more than 64 bits and less than 32 bits addresses.
-  if ((AddressCells < 1)  ||
-      (AddressCells > 2)  ||
-      (SizeCells < 1)     ||
-      (SizeCells > 2))
-  {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  Data = FdtGetProp (Fdt, SerialPortNode, "reg", &DataSize);
-  if ((Data == NULL) ||
-      (DataSize < (INT32)(sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells)) - 1))
-  {
-    // If error or not enough space.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  if (AddressCells == 2) {
-    SerialPortInfo->BaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
-  } else {
-    SerialPortInfo->BaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
-  }
-
-  SizeValue = Data + (sizeof (UINT32) *
-                      GET_DT_REG_SIZE_OFFSET (0, AddressCells, SizeCells));
-  if (SizeCells == 2) {
-    SerialPortInfo->BaseAddressLength = Fdt64ToCpu (*(UINT64 *)SizeValue);
-  } else {
-    SerialPortInfo->BaseAddressLength = Fdt32ToCpu (*(UINT32 *)SizeValue);
   }
 
   // Get the associated interrupt-controller.
