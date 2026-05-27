@@ -1811,19 +1811,21 @@ makeUrlForService (
   const char      *uri
   )
 {
-  char  *url;
+  char   *url;
+  UINTN  urlLen;
 
   if (service->host == NULL) {
     return NULL;
   }
 
-  url = (char *)malloc (strlen (service->host)+strlen (uri)+1);
+  urlLen = strlen (service->host) + strlen (uri) + 1;
+  url    = (char *)malloc (urlLen);
   if (url == NULL) {
     return NULL;
   }
 
-  strcpy (url, service->host);
-  strcat (url, uri);
+  AsciiStrCpyS (url, urlLen, service->host);
+  AsciiStrCatS (url, urlLen, uri);
   return url;
 }
 
