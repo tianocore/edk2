@@ -133,7 +133,7 @@ CommonCExceptionHandler (
   )
 {
   if ((UINTN)ExceptionType <= gMaxExceptionNumber) {
-    if (gExceptionHandlers[ExceptionType]) {
+    if (gExceptionHandlers[ExceptionType] != NULL) {
       gExceptionHandlers[ExceptionType](ExceptionType, SystemContext);
       return;
     }
