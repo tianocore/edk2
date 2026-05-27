@@ -288,25 +288,14 @@ ParseIrqMap (
   IN OUT        PCI_PARSER_TABLE  *PciInfo
   )
 {
-  EFI_STATUS   Status;
-  CONST UINT8  *Data;
-  INT32        DataSize;
-  UINT32       Index;
-  UINT32       Offset;
+  EFI_STATUS                Status;
+  CONST UINT32              *Data;
+  INT32                     DataSize;
+  UINT32                    Index;
+  INTERRUPT_MAP_ENTRY_INFO  IrqMapEntry;
 
-  INT32  IntcNode;
-  INT32  IntcAddressCells;
-  INT32  IntcCells;
-
-  INT32  PciIntCells;
-  INT32  IntcPhandle;
-
-  INT32        IrqMapSize;
-  UINT32       IrqMapCount;
-  CONST UINT8  *IrqMapMask;
-  INT32        IrqMapMaskSize;
-
-  INT32  PHandleOffset;
+  INT32   PciIntCells;
+  UINT32  IrqMapCount;
 
   UINT32  PciAddressAttr;
 
@@ -337,75 +326,26 @@ ParseIrqMap (
     return EFI_ABORTED;
   }
 
-  IrqMapMask = FdtGetProp (
-                 Fdt,
-                 HostPciNode,
-                 "interrupt-map-mask",
-                 &IrqMapMaskSize
-                 );
-  if ((IrqMapMask == NULL) ||
-      (IrqMapMaskSize !=
-       (PCI_ADDRESS_CELLS + PCI_INTERRUPTS_CELLS) * sizeof (UINT32)))
-  {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
+  // Count the number of entries in the "interrupt-map"
+  for (IrqMapCount = 0; ; IrqMapCount++) {
+    Status = FdtGetInterruptMap (Fdt, HostPciNode, IrqMapCount, TRUE, &IrqMapEntry);
+    if (Status == EFI_NOT_FOUND) {
+      break;
+    }
 
-  // Get the interrupt-controller of the first irq mapping.
-  PHandleOffset = (PCI_ADDRESS_CELLS + PciIntCells) * sizeof (UINT32);
-  if (PHandleOffset > DataSize) {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  IntcPhandle = Fdt32ToCpu (*(UINT32 *)&Data[PHandleOffset]);
-  IntcNode    = FdtNodeOffsetByPhandle (Fdt, IntcPhandle);
-  if (IntcNode < 0) {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  // Get the "address-cells" property of the IntcNode.
-  Status = FdtGetIntcAddressCells (Fdt, IntcNode, &IntcAddressCells, NULL);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // Get the "interrupt-cells" property of the IntcNode.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, &IntcCells);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // An irq mapping is done on IrqMapSize bytes
-  // (which includes 1 cell for the PHandle).
-  IrqMapSize = (PCI_ADDRESS_CELLS + PciIntCells + 1
-                + IntcAddressCells + IntcCells) * sizeof (UINT32);
-  if ((DataSize % IrqMapSize) != 0) {
-    // The mapping is not done on IrqMapSize bytes.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  IrqMapCount = DataSize / IrqMapSize;
-
-  // We assume the same interrupt-controller is used for all the mappings.
-  // Check this is correct.
-  for (Index = 0; Index < IrqMapCount; Index++) {
-    if (IntcPhandle != Fdt32ToCpu (
-                         *(UINT32 *)&Data[(Index * IrqMapSize) + PHandleOffset]
-                         ))
-    {
-      ASSERT (0);
-      return EFI_ABORTED;
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
     }
   }
 
+  if (IrqMapCount == 0) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
   // Allocate a buffer to store each interrupt mapping.
-  IrqMapCount         = DataSize / IrqMapSize;
-  BufferSize          = IrqMapCount * sizeof (CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO);
+  BufferSize          = IrqMapCount * sizeof (CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO);
   PciInterruptMapInfo = AllocateZeroPool (BufferSize);
   if (PciInterruptMapInfo == NULL) {
     ASSERT (0);
@@ -413,35 +353,26 @@ ParseIrqMap (
   }
 
   for (Index = 0; Index < IrqMapCount; Index++) {
-    Offset = Index * IrqMapSize;
+    Status = FdtGetInterruptMap (Fdt, HostPciNode, Index, TRUE, &IrqMapEntry);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      FreePool (PciInterruptMapInfo);
+      return Status;
+    }
 
     // Pci address attributes
-    PciAddressAttr = Fdt32ToCpu (
-                       (*(UINT32 *)&Data[Offset]) &
-                       (*(UINT32 *)&IrqMapMask[0])
-                       );
+    PciAddressAttr                       = IrqMapEntry.ChildAddress[0];
     PciInterruptMapInfo[Index].PciBus    = READ_PCI_BBBBBBBB (PciAddressAttr);
     PciInterruptMapInfo[Index].PciDevice = READ_PCI_DDDDD (PciAddressAttr);
-    Offset                              += PCI_ADDRESS_CELLS * sizeof (UINT32);
 
     // Pci irq
-    PciInterruptMapInfo[Index].PciInterrupt = Fdt32ToCpu (
-                                                (*(UINT32 *)&Data[Offset]) &
-                                                (*(UINT32 *)&IrqMapMask[3 * sizeof (UINT32)])
-                                                );
+    PciInterruptMapInfo[Index].PciInterrupt = IrqMapEntry.ChildInterrupt[0];
     // -1 to translate from device-tree (INTA=1) to ACPI (INTA=0) irq IDs.
     PciInterruptMapInfo[Index].PciInterrupt -= 1;
-    Offset                                  += PCI_INTERRUPTS_CELLS * sizeof (UINT32);
-
-    // PHandle (skip it)
-    Offset += sizeof (UINT32);
-
-    // "Parent unit address" (skip it)
-    Offset += IntcAddressCells * sizeof (UINT32);
 
     // Interrupt controller interrupt and flags
     PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
-      FdtGetInterruptId ((UINT32 *)&Data[Offset]);
+      FdtGetInterruptId (IrqMapEntry.ParentInterrupt);
 
     /*
      * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.
@@ -449,15 +380,28 @@ ParseIrqMap (
      * using the parent interrupt controller information.
      */
  #if defined (MDE_CPU_RISCV64)
+    INT32  IntcPhandle;
+    INT32  IntcNode;
+
+    IntcPhandle = Fdt32ToCpu (*IrqMapEntry.InterruptParent);
+    IntcNode    = FdtNodeOffsetByPhandle (Fdt, IntcPhandle);
+    if (IntcNode < 0) {
+      ASSERT (FALSE);
+      FreePool (PciInterruptMapInfo);
+      return EFI_ABORTED;
+    }
+
     PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
       FdtConvertToGsi (IntcNode, PciInterruptMapInfo[Index].IntcInterrupt.Interrupt);
- #endif
-    if (IntcCells > 1) {
+ #else
+    if (IrqMapEntry.ParentInterruptCells > 1) {
       PciInterruptMapInfo[Index].IntcInterrupt.Flags =
-        FdtGetInterruptFlags ((UINT32 *)&Data[Offset]);
+        FdtGetInterruptFlags (IrqMapEntry.ParentInterrupt);
     } else {
       PciInterruptMapInfo[Index].IntcInterrupt.Flags = 0x0;
     }
+
+ #endif
   } // for
 
   PciInfo->Mapping[PciMappingTableInterrupt].ObjectId =
@@ -467,7 +411,7 @@ ParseIrqMap (
   PciInfo->Mapping[PciMappingTableInterrupt].Data  = PciInterruptMapInfo;
   PciInfo->Mapping[PciMappingTableInterrupt].Count = IrqMapCount;
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /** Parse a Host-pci node.

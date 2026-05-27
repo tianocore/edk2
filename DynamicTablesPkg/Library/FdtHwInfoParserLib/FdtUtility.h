@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <Library/FdtLib.h>
+
 /** Get the offset of an address in a "reg" Device Tree property.
 
   In a Device Tree, the "reg" property stores address/size couples.
@@ -97,6 +99,33 @@ EFIAPI
 FdtGetInterruptFlags (
   UINT32 CONST  *Data
   );
+
+/** Parsed "interrupt-map" entry information.
+*/
+typedef struct {
+  /// Child unit-address cells. Points into the FDT blob unless masked.
+  CONST UINT32    *ChildAddress;
+  /// Number of child unit-address cells.
+  INT32           ChildAddressCells;
+  /// Child interrupt specifier cells. Points into the FDT blob unless masked.
+  CONST UINT32    *ChildInterrupt;
+  /// Number of child interrupt specifier cells.
+  INT32           ChildInterruptCells;
+  /// "interrupt-parent" phandle cell from the map entry.
+  CONST UINT32    *InterruptParent;
+  /// Parent unit-address cells. Points into the FDT blob.
+  CONST UINT32    *ParentAddress;
+  /// Number of parent unit-address cells.
+  INT32           ParentAddressCells;
+  /// Parent interrupt specifier cells. Points into the FDT blob.
+  CONST UINT32    *ParentInterrupt;
+  /// Number of parent interrupt specifier cells.
+  INT32           ParentInterruptCells;
+  /// Storage for masked child unit-address cells when ApplyIntMask is TRUE.
+  UINT32          MaskedChildAddress[FDT_MAX_NCELLS];
+  /// Storage for masked child interrupt cells when ApplyIntMask is TRUE.
+  UINT32          MaskedChildInterrupt[FDT_MAX_NCELLS];
+} INTERRUPT_MAP_ENTRY_INFO;
 
 /** A structure describing a compatibility string.
 */
@@ -424,6 +453,46 @@ FdtGetInterruptCellsInfo (
   IN  CONST VOID   *Fdt,
   IN        INT32  IntcNode,
   OUT       INT32  *InterruptCells
+  );
+
+/** Get one "interrupt-map" entry.
+
+  This helper parses the "interrupt-map" property of a nexus node and returns
+  the fully decoded entry identified by Index. The pointers stored in Entry
+  point inside the FDT blob, except the child-side fields when ApplyIntMask is
+  TRUE. In that case, the child-side fields point to masked copies stored in
+  Entry.
+
+  An "interrupt-map" is encoded as:
+  <
+    child-unit-address
+    child-interrupt-specifier
+    interrupt parent
+    parent-unit-address
+    parent-interrupt-specifier
+  >
+
+  @param [in]  Fdt        Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  NexusNode  Offset of the nexus node exposing "interrupt-map".
+  @param [in]  Index      Zero-based interrupt-map entry index.
+  @param [in]  ApplyIntMask  Whether to apply the "interrupt-map-mask" to the
+                             child-side fields.
+  @param [out] Entry      If success, contains the requested interrupt-map
+                          entry.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested entry was not found.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetInterruptMap (
+  IN  CONST VOID                      *Fdt,
+  IN        INT32                     NexusNode,
+  IN        UINT32                    Index,
+  IN        BOOLEAN                   ApplyIntMask,
+  OUT       INTERRUPT_MAP_ENTRY_INFO  *Entry
   );
 
 /** Get the "#address-cells" and/or "#size-cells" property of the node.

@@ -11,6 +11,7 @@
 **/
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
 #include <FdtHwInfoParserInclude.h>
 #include "FdtUtility.h"
@@ -980,6 +981,188 @@ FdtGetInterruptCellsInfo (
   *IntCells = Fdt32ToCpu (*Data);
 
   return EFI_SUCCESS;
+}
+
+/** Get one "interrupt-map" entry.
+
+  This helper parses the "interrupt-map" property of a nexus node and returns
+  the fully decoded entry identified by Index. The pointers stored in Entry
+  point inside the FDT blob, except the child-side fields when ApplyIntMask is
+  TRUE. In that case, the child-side fields point to masked copies stored in
+  Entry.
+
+  An "interrupt-map" is encoded as:
+  <
+    child-unit-address
+    child-interrupt-specifier
+    interrupt parent
+    parent-unit-address
+    parent-interrupt-specifier
+  >
+
+  @param [in]  Fdt        Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  NexusNode  Offset of the nexus node exposing "interrupt-map".
+  @param [in]  Index      Zero-based interrupt-map entry index.
+  @param [in]  ApplyIntMask  Whether to apply the "interrupt-map-mask" to the
+                             child-side fields.
+  @param [out] Entry      If success, contains the requested interrupt-map
+                          entry.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested entry was not found.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetInterruptMap (
+  IN  CONST VOID                      *Fdt,
+  IN        INT32                     NexusNode,
+  IN        UINT32                    Index,
+  IN        BOOLEAN                   ApplyIntMask,
+  OUT       INTERRUPT_MAP_ENTRY_INFO  *Entry
+  )
+{
+  EFI_STATUS    Status;
+  INT32         ChildAddressCells;
+  INT32         ChildInterruptCells;
+  CONST UINT32  *Map;
+  CONST UINT32  *MapMask;
+  INT32         MapSize;
+  INT32         MapMaskSize;
+  INT32         ParentNode;
+  INT32         ParentAddressCells;
+  INT32         ParentInterruptCells;
+  UINT32        MapCells;
+  UINT32        ChildCells;
+  UINT32        CurrentIndex;
+  UINT32        EntryOffset;
+  UINT32        MaskIndex;
+  UINT32        PHandle;
+  UINT32        EntryCells;
+
+  if ((Fdt == NULL) || (Entry == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ZeroMem (Entry, sizeof (*Entry));
+
+  Status = FdtGetInterruptCellsInfo (Fdt, NexusNode, &ChildInterruptCells);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  ChildAddressCells = FdtAddressCells (Fdt, NexusNode);
+  if (ChildAddressCells < 0) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  Map = FdtGetProp (Fdt, NexusNode, "interrupt-map", &MapSize);
+  if ((Map == NULL) || (MapSize <= 0)) {
+    return EFI_NOT_FOUND;
+  }
+
+  ASSERT ((MapSize % sizeof (UINT32)) == 0);
+  ASSERT ((UINT32)ChildAddressCells <= FDT_MAX_NCELLS);
+  ASSERT ((UINT32)ChildInterruptCells <= FDT_MAX_NCELLS);
+
+  MapCells     = (UINT32)(MapSize / sizeof (UINT32));
+  ChildCells   = (UINT32)ChildAddressCells + (UINT32)ChildInterruptCells;
+  CurrentIndex = 0;
+  EntryOffset  = 0;
+  MapMask      = NULL;
+
+  if (ApplyIntMask) {
+    MapMask = FdtGetProp (Fdt, NexusNode, "interrupt-map-mask", &MapMaskSize);
+    if ((MapMask == NULL) || ((UINT32)MapMaskSize != (ChildCells * sizeof (UINT32)))) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+  }
+
+  while (EntryOffset < MapCells) {
+    if ((EntryOffset + ChildCells + 1U) > MapCells) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    //
+    // An "interrupt-map" child-side key is encoded as:
+    //   <child-unit-address child-interrupt-specifier interrupt-parent ...>
+    // Get the interrupt-parent phandle.
+    //
+    PHandle    = Fdt32ToCpu (Map[EntryOffset + ChildCells]);
+    ParentNode = FdtNodeOffsetByPhandle (Fdt, PHandle);
+    if (ParentNode < 0) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    Status = FdtGetIntcAddressCells (Fdt, ParentNode, &ParentAddressCells, NULL);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    Status = FdtGetInterruptCellsInfo (Fdt, ParentNode, &ParentInterruptCells);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    //
+    // The size of an entry can be computed:
+    // - child-unit-address::ChildAddressCells
+    // - child-interrupt-specifier::ChildInterruptCells
+    // - interrupt parent::1U
+    // - parent-unit-address::ParentAddressCells
+    // - parent-interrupt-specifier::ParentInterruptCells
+    //
+    EntryCells = ChildCells + 1U + (UINT32)ParentAddressCells + (UINT32)ParentInterruptCells;
+    if ((EntryOffset + EntryCells) > MapCells) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    if (CurrentIndex == Index) {
+      Entry->ChildAddress         = &Map[EntryOffset];
+      Entry->ChildAddressCells    = ChildAddressCells;
+      Entry->ChildInterrupt       = &Map[EntryOffset + ChildAddressCells];
+      Entry->ChildInterruptCells  = ChildInterruptCells;
+      Entry->InterruptParent      = &Map[EntryOffset + ChildCells];
+      Entry->ParentAddress        = &Map[EntryOffset + ChildCells + 1U];
+      Entry->ParentAddressCells   = ParentAddressCells;
+      Entry->ParentInterrupt      = &Map[EntryOffset + ChildCells + 1U + (UINT32)ParentAddressCells];
+      Entry->ParentInterruptCells = ParentInterruptCells;
+
+      if (ApplyIntMask) {
+        for (MaskIndex = 0; MaskIndex < (UINT32)ChildAddressCells; MaskIndex++) {
+          Entry->MaskedChildAddress[MaskIndex] =
+            Fdt32ToCpu (Entry->ChildAddress[MaskIndex]) &
+            Fdt32ToCpu (MapMask[MaskIndex]);
+        }
+
+        for (MaskIndex = 0; MaskIndex < (UINT32)ChildInterruptCells; MaskIndex++) {
+          Entry->MaskedChildInterrupt[MaskIndex] =
+            Fdt32ToCpu (Entry->ChildInterrupt[MaskIndex]) &
+            Fdt32ToCpu (MapMask[(UINT32)ChildAddressCells + MaskIndex]);
+        }
+
+        Entry->ChildAddress   = Entry->MaskedChildAddress;
+        Entry->ChildInterrupt = Entry->MaskedChildInterrupt;
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    EntryOffset += EntryCells;
+    CurrentIndex++;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /** Get the "#address-cells" and/or "#size-cells" property of the node.
