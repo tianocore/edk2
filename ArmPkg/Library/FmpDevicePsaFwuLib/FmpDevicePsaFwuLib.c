@@ -880,7 +880,10 @@ FmpDeviceSetImageWithStatus (
    * NOTE:
    *     Next boot, This image accepted in Entry point.
    */
-  Status = FwuCommit (Handle, 1, 0, &CommitProgress, &CommitTotalWorks);
+  do {
+    Status = FwuCommit (Handle, 1, 0, &CommitProgress, &CommitTotalWorks);
+  } while (Status == EFI_TIMEOUT);
+
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
