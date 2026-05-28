@@ -193,6 +193,16 @@ CoreTimerTick (
   EFI_TPL  OriginalTPL;
   IEVENT   *Event;
 
+  DEBUG_CODE_BEGIN ();
+  if (gCpu != NULL) {
+    BOOLEAN  State;
+
+    ASSERT_EFI_ERROR (gCpu->GetInterruptState (gCpu, &State));
+    ASSERT (!State);
+  }
+
+  DEBUG_CODE_END ();
+
   OriginalTPL = CoreRaiseTpl (TPL_HIGH_LEVEL);
 
   //
