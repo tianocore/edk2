@@ -102,6 +102,12 @@ GasketSecDisableInterrupt (
   VOID
   );
 
+BOOLEAN
+EFIAPI
+GasketSecGetInterruptState (
+  VOID
+  );
+
 UINT64
 EFIAPI
 GasketQueryPerformanceFrequency (

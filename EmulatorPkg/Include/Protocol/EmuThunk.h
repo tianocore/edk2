@@ -116,6 +116,12 @@ VOID
   );
 
 typedef
+BOOLEAN
+(EFIAPI *EMU_GET_INTERRUPT_STATE)(
+  VOID
+  );
+
+typedef
 UINT64
 (EFIAPI *EMU_QUERY_PERFORMANCE_FREQENCY)(
   VOID
@@ -225,6 +231,7 @@ struct _EMU_THUNK_PROTOCOL {
   ///
   EMU_ENABLE_INERRUPTS                 EnableInterrupt;
   EMU_DISABLE_INERRUPTS                DisableInterrupt;
+  EMU_GET_INTERRUPT_STATE              GetInterruptState;
   EMU_QUERY_PERFORMANCE_FREQENCY       QueryPerformanceFrequency;
   EMU_QUERY_PERFORMANCE_COUNTER        QueryPerformanceCounter;
 

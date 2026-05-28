@@ -222,6 +222,21 @@ ASM_PFX(GasketSecDisableInterrupt):
   popq    %rbp
   ret
 
+ASM_GLOBAL ASM_PFX(GasketSecGetInterruptState)
+ASM_PFX(GasketSecGetInterruptState):
+  pushq   %rbp            // stack frame is for the debugger
+  movq    %rsp, %rbp
+
+  pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
+  pushq   %rdi
+
+  call    ASM_PFX(SecInterruptEanbled)
+
+  popq    %rdi          // restore state
+  popq    %rsi
+  popq    %rbp
+  ret
+
 ASM_GLOBAL ASM_PFX(GasketQueryPerformanceFrequency)
 ASM_PFX(GasketQueryPerformanceFrequency):
   pushq   %rbp            // stack frame is for the debugger

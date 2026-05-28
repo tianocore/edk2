@@ -32,7 +32,7 @@ int             settimer_initialized;
 struct timeval  settimer_timeval;
 UINTN           settimer_callback = 0;
 
-BOOLEAN  gEmulatorInterruptEnabled = FALSE;
+BOOLEAN  gEmulatorInterruptEnabled = TRUE;
 
 STATIC BOOLEAN         mEmulatorStdInConfigured = FALSE;
 STATIC struct termios  mOldTty;
@@ -186,7 +186,6 @@ SecSetTimer (
     act.sa_handler       = settimer_handler;
     act.sa_flags         = 0;
     sigemptyset (&act.sa_mask);
-    gEmulatorInterruptEnabled = TRUE;
     if (sigaction (SIGALRM, &act, NULL) != 0) {
       printf ("SetTimer: sigaction error %s\n", strerror (errno));
     }
@@ -420,6 +419,7 @@ EMU_THUNK_PROTOCOL  gEmuThunkProtocol = {
   GasketSecPeCoffUnloadImageExtraAction,
   GasketSecEnableInterrupt,
   GasketSecDisableInterrupt,
+  GasketSecGetInterruptState,
   GasketQueryPerformanceFrequency,
   GasketQueryPerformanceCounter,
   GasketSecSleep,

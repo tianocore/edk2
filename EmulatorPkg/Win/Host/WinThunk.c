@@ -261,7 +261,7 @@ CRITICAL_SECTION  mNtCriticalSection;
 //
 UINT  mMMTimerThreadID = 0;
 
-volatile BOOLEAN  mInterruptEnabled = FALSE;
+volatile BOOLEAN  mInterruptEnabled = TRUE;
 
 VOID
 CALLBACK
@@ -448,6 +448,14 @@ SecDisableInterrupt (
   mInterruptEnabled = FALSE;
 }
 
+BOOLEAN
+SecGetInterruptState (
+  VOID
+  )
+{
+  return mInterruptEnabled;
+}
+
 UINT64
 SecQueryPerformanceFrequency (
   VOID
@@ -597,6 +605,7 @@ EMU_THUNK_PROTOCOL  gEmuThunkProtocol = {
   PeCoffLoaderUnloadImageExtraAction,
   SecEnableInterrupt,
   SecDisableInterrupt,
+  SecGetInterruptState,
   SecQueryPerformanceFrequency,
   SecQueryPerformanceCounter,
   SecSleep,
