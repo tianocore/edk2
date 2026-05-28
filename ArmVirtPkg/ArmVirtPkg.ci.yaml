@@ -6,7 +6,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2020 - 2022, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2026, ARM Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -24,6 +24,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+        "ArmCcaBootSync/QcborLib/qcbor"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
@@ -133,5 +134,12 @@
           # Reason: Expansion of macro that contains a print specifier.
           "FMT_CM_OBJECT_ID": "0x%lx"
       }
+    },
+
+    ## options defined in .pytool/Plugin/UncrustifyCheck
+    "UncrustifyCheck": {
+        "IgnoreFiles": [
+            "ArmCcaBootSync/QcborLib/qcbor"
+        ]
     }
 }
