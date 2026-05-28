@@ -428,16 +428,18 @@ CalculateEfiHdrCrc (
   );
 
 /**
-  Called by the platform code to process a tick.
+  Register the DXE core timer tick handler with the timer driver.
 
-  @param  Duration               The number of 100ns elapsed since the last call
-                                 to TimerTick
+  @retval EFI_SUCCESS           The timer handler was registered.
+  @retval EFI_UNSUPPORTED       The platform does not support timer interrupts.
+  @retval EFI_ALREADY_STARTED   A handler is already registered.
+  @retval EFI_DEVICE_ERROR      The timer handler could not be registered.
 
 **/
-VOID
+EFI_STATUS
 EFIAPI
-CoreTimerTick (
-  IN UINT64  Duration
+CoreRegisterTimerHandler (
+  VOID
   );
 
 /**

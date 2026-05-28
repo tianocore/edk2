@@ -183,6 +183,7 @@ CoreInitializeTimer (
                                  to TimerTick
 
 **/
+STATIC
 VOID
 EFIAPI
 CoreTimerTick (
@@ -288,4 +289,22 @@ CoreSetTimer (
   CoreReleaseLock (&mEfiTimerLock);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Register the DXE core timer tick handler with the timer driver.
+
+  @retval EFI_SUCCESS           The timer handler was registered.
+  @retval EFI_UNSUPPORTED       The platform does not support timer interrupts.
+  @retval EFI_ALREADY_STARTED   A handler is already registered.
+  @retval EFI_DEVICE_ERROR      The timer handler could not be registered.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreRegisterTimerHandler (
+  VOID
+  )
+{
+  return gTimer->RegisterHandler (gTimer, CoreTimerTick);
 }

@@ -152,7 +152,7 @@ GenericProtocolNotify (
     //
     // Register the Core timer tick handler with the Timer AP
     //
-    gTimer->RegisterHandler (gTimer, CoreTimerTick);
+    CoreRegisterTimerHandler ();
   }
 
   if (CompareGuid (Entry->ProtocolGuid, &gEfiRuntimeArchProtocolGuid)) {
