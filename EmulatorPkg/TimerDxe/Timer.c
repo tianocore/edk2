@@ -55,24 +55,15 @@ TimerCallback (
   UINT64  DeltaMs
   )
 {
-  EFI_TPL           OriginalTPL;
-  EFI_TIMER_NOTIFY  CallbackFunction;
-
-  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-
-  if (OriginalTPL < TPL_HIGH_LEVEL) {
-    CallbackFunction = mTimerNotifyFunction;
-
-    //
-    // Only invoke the callback function if a Non-NULL handler has been
-    // registered. Assume all other handlers are legal.
-    //
-    if (CallbackFunction != NULL) {
-      CallbackFunction (MultU64x32 (DeltaMs, 10000));
-    }
+  //
+  // Only invoke the callback function if a Non-NULL handler has been
+  // registered. Assume all other handlers are legal.
+  //
+  if (mTimerNotifyFunction != NULL) {
+    gEmuThunk->DisableInterrupt ();
+    mTimerNotifyFunction (MultU64x32 (DeltaMs, 10000));
+    gEmuThunk->EnableInterrupt ();
   }
-
-  gBS->RestoreTPL (OriginalTPL);
 }
 
 EFI_STATUS
