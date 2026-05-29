@@ -11,7 +11,7 @@
     Specification - Version 1.03 - August 10, 2015.
 
 **/
-
+#include <AcpiHelperMacros.h>
 #include <IndustryStandard/DebugPort2Table.h>
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <Library/AcpiLib.h>
@@ -84,7 +84,7 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  AcpiSpcr = {
     EFI_ACPI_RESERVED_BYTE,
     EFI_ACPI_RESERVED_BYTE
   },
-  ARM_GAS32 (0), // {Template}: Serial Port Base Address
+  ACPI_GAS32 (0), // {Template}: Serial Port Base Address
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
   0, // Not used on ARM
   0, // {Template}: Serial Port Interrupt
