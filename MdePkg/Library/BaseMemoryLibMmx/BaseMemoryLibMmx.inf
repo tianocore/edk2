@@ -30,19 +30,19 @@
 
 
 [Sources]
-  ScanMem64Wrapper.c
-  ScanMem32Wrapper.c
-  ScanMem16Wrapper.c
-  ScanMem8Wrapper.c
-  ZeroMemWrapper.c
-  CompareMemWrapper.c
-  SetMemNWrapper.c
-  SetMem64Wrapper.c
-  SetMem32Wrapper.c
-  SetMem16Wrapper.c
-  SetMemWrapper.c
-  CopyMemWrapper.c
-  IsZeroBufferWrapper.c
+  ../Common/MemoryLibWrappers/ScanMem64Wrapper.c
+  ../Common/MemoryLibWrappers/ScanMem32Wrapper.c
+  ../Common/MemoryLibWrappers/ScanMem16Wrapper.c
+  ../Common/MemoryLibWrappers/ScanMem8Wrapper.c
+  ../Common/MemoryLibWrappers/ZeroMemWrapper.c
+  ../Common/MemoryLibWrappers/CompareMemWrapper.c
+  ../Common/MemoryLibWrappers/SetMemNWrapper.c
+  ../Common/MemoryLibWrappers/SetMem64Wrapper.c
+  ../Common/MemoryLibWrappers/SetMem32Wrapper.c
+  ../Common/MemoryLibWrappers/SetMem16Wrapper.c
+  ../Common/MemoryLibWrappers/SetMemWrapper.c
+  ../Common/MemoryLibWrappers/CopyMemWrapper.c
+  ../Common/MemoryLibWrappers/IsZeroBufferWrapper.c
   MemLibGuid.c
   MemLibInternals.h
 
