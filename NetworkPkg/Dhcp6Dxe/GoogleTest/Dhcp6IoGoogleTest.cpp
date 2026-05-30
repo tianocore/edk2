@@ -699,6 +699,182 @@ TEST_F (Dhcp6SeekInnerOptionSafeTest, InvalidOption) {
   ASSERT_EQ (Result, EFI_DEVICE_ERROR);
 }
 
+// Test Description:
+// This test verifies that Dhcp6SeekInnerOptionSafe rejects an IANA option whose
+// declared length runs past the end of the option buffer.
+TEST_F (Dhcp6SeekInnerOptionSafeTest, IANAInnerLenExceedsBufferExpectFail) {
+  EFI_STATUS           Status;
+  UINT8                Option[sizeof (DHCPv6_OPTION_IA_NA) + SEARCH_PATTERN_LEN] = { 0 };
+  UINT32               OptionLength                                              = sizeof (Option);
+  DHCPv6_OPTION_IA_NA  *OptionPtr                                                = (DHCPv6_OPTION_IA_NA *)Option;
+
+  UINT8   *InnerOptionPtr   = NULL;
+  UINT16  InnerOptionLength = 0;
+
+  OptionPtr->Header.Code = Dhcp6OptIana;
+  OptionPtr->Header.Len  = HTONS (0xFFFF); // Declare far more inner data than the buffer holds
+  OptionPtr->Header.IAID = 0x12345678;
+  OptionPtr->T1          = 0x11111111;
+  OptionPtr->T2          = 0x22222222;
+
+  Status = Dhcp6SeekInnerOptionSafe (
+             Dhcp6OptIana,
+             Option,
+             OptionLength,
+             &InnerOptionPtr,
+             &InnerOptionLength
+             );
+  ASSERT_EQ (Status, EFI_DEVICE_ERROR);
+}
+
+// Test Description:
+// This test verifies that Dhcp6SeekInnerOptionSafe rejects an IATA option whose
+// declared length runs past the end of the option buffer.
+TEST_F (Dhcp6SeekInnerOptionSafeTest, IATAInnerLenExceedsBufferExpectFail) {
+  EFI_STATUS           Status;
+  UINT8                Option[sizeof (DHCPv6_OPTION_IA_TA) + SEARCH_PATTERN_LEN] = { 0 };
+  UINT32               OptionLength                                              = sizeof (Option);
+  DHCPv6_OPTION_IA_TA  *OptionPtr                                                = (DHCPv6_OPTION_IA_TA *)Option;
+
+  UINT8   *InnerOptionPtr   = NULL;
+  UINT16  InnerOptionLength = 0;
+
+  OptionPtr->Header.Code = Dhcp6OptIata;
+  OptionPtr->Header.Len  = HTONS (0xFFFF); // Declare far more inner data than the buffer holds
+  OptionPtr->Header.IAID = 0x12345678;
+
+  Status = Dhcp6SeekInnerOptionSafe (
+             Dhcp6OptIata,
+             Option,
+             OptionLength,
+             &InnerOptionPtr,
+             &InnerOptionLength
+             );
+  ASSERT_EQ (Status, EFI_DEVICE_ERROR);
+}
+
+// Test Description:
+// This test verifies that Dhcp6SeekInnerOptionSafe rejects an IANA option whose
+// declared inner length is one byte past the end of the option buffer.
+TEST_F (Dhcp6SeekInnerOptionSafeTest, IANAInnerLenOffByOneExpectFail) {
+  EFI_STATUS           Status;
+  UINT8                Option[sizeof (DHCPv6_OPTION_IA_NA) + SEARCH_PATTERN_LEN] = { 0 };
+  UINT32               OptionLength                                              = sizeof (Option);
+  DHCPv6_OPTION_IA_NA  *OptionPtr                                                = (DHCPv6_OPTION_IA_NA *)Option;
+
+  UINT8   *InnerOptionPtr   = NULL;
+  UINT16  InnerOptionLength = 0;
+
+  OptionPtr->Header.Code = Dhcp6OptIana;
+  // One byte more inner data than OptionLen - DHCP6_MIN_SIZE_OF_IA_NA allows
+  OptionPtr->Header.Len  = HTONS (DHCP6_SIZE_OF_COMBINED_IAID_T1_T2 + (OptionLength - DHCP6_MIN_SIZE_OF_IA_NA) + 1);
+  OptionPtr->Header.IAID = 0x12345678;
+  OptionPtr->T1          = 0x11111111;
+  OptionPtr->T2          = 0x22222222;
+
+  Status = Dhcp6SeekInnerOptionSafe (
+             Dhcp6OptIana,
+             Option,
+             OptionLength,
+             &InnerOptionPtr,
+             &InnerOptionLength
+             );
+  ASSERT_EQ (Status, EFI_DEVICE_ERROR);
+}
+
+// Test Description:
+// This test verifies that Dhcp6SeekInnerOptionSafe rejects an IATA option whose
+// declared inner length is one byte past the end of the option buffer.
+TEST_F (Dhcp6SeekInnerOptionSafeTest, IATAInnerLenOffByOneExpectFail) {
+  EFI_STATUS           Status;
+  UINT8                Option[sizeof (DHCPv6_OPTION_IA_TA) + SEARCH_PATTERN_LEN] = { 0 };
+  UINT32               OptionLength                                              = sizeof (Option);
+  DHCPv6_OPTION_IA_TA  *OptionPtr                                                = (DHCPv6_OPTION_IA_TA *)Option;
+
+  UINT8   *InnerOptionPtr   = NULL;
+  UINT16  InnerOptionLength = 0;
+
+  OptionPtr->Header.Code = Dhcp6OptIata;
+  // One byte more inner data than OptionLen - DHCP6_MIN_SIZE_OF_IA_TA allows
+  OptionPtr->Header.Len  = HTONS ((UINT16)(DHCP6_SIZE_OF_IAID + (OptionLength - DHCP6_MIN_SIZE_OF_IA_TA) + 1));
+  OptionPtr->Header.IAID = 0x12345678;
+
+  Status = Dhcp6SeekInnerOptionSafe (
+             Dhcp6OptIata,
+             Option,
+             OptionLength,
+             &InnerOptionPtr,
+             &InnerOptionLength
+             );
+  ASSERT_EQ (Status, EFI_DEVICE_ERROR);
+}
+
+// Test Description:
+// This test verifies that Dhcp6SeekInnerOptionSafe accepts an IANA option whose
+// declared inner length exactly matches OptionLen - DHCP6_MIN_SIZE_OF_IA_NA.
+TEST_F (Dhcp6SeekInnerOptionSafeTest, IANAInnerLenExactMatchExpectSuccess) {
+  EFI_STATUS           Status;
+  UINT8                Option[sizeof (DHCPv6_OPTION_IA_NA) + SEARCH_PATTERN_LEN] = { 0 };
+  UINT32               OptionLength                                              = sizeof (Option);
+  DHCPv6_OPTION_IA_NA  *OptionPtr                                                = (DHCPv6_OPTION_IA_NA *)Option;
+  UINT32               SearchPattern                                             = SEARCH_PATTERN;
+
+  UINTN   SearchPatternLength = SEARCH_PATTERN_LEN;
+  UINT8   *InnerOptionPtr     = NULL;
+  UINT16  InnerOptionLength   = 0;
+
+  OptionPtr->Header.Code = Dhcp6OptIana;
+  // Inner length exactly equal to OptionLen - DHCP6_MIN_SIZE_OF_IA_NA
+  OptionPtr->Header.Len  = HTONS (DHCP6_SIZE_OF_COMBINED_IAID_T1_T2 + (OptionLength - DHCP6_MIN_SIZE_OF_IA_NA));
+  OptionPtr->Header.IAID = 0x12345678;
+  OptionPtr->T1          = 0x11111111;
+  OptionPtr->T2          = 0x22222222;
+  CopyMem (OptionPtr->InnerOptions, &SearchPattern, SearchPatternLength);
+
+  Status = Dhcp6SeekInnerOptionSafe (
+             Dhcp6OptIana,
+             Option,
+             OptionLength,
+             &InnerOptionPtr,
+             &InnerOptionLength
+             );
+  ASSERT_EQ (Status, EFI_SUCCESS);
+  ASSERT_EQ (InnerOptionLength, (UINT16)(OptionLength - DHCP6_MIN_SIZE_OF_IA_NA));
+  ASSERT_EQ (CompareMem (InnerOptionPtr, &SearchPattern, SearchPatternLength), 0);
+}
+
+// Test Description:
+// This test verifies that Dhcp6SeekInnerOptionSafe accepts an IATA option whose
+// declared inner length exactly matches OptionLen - DHCP6_MIN_SIZE_OF_IA_TA.
+TEST_F (Dhcp6SeekInnerOptionSafeTest, IATAInnerLenExactMatchExpectSuccess) {
+  EFI_STATUS           Status;
+  UINT8                Option[sizeof (DHCPv6_OPTION_IA_TA) + SEARCH_PATTERN_LEN] = { 0 };
+  UINT32               OptionLength                                              = sizeof (Option);
+  DHCPv6_OPTION_IA_TA  *OptionPtr                                                = (DHCPv6_OPTION_IA_TA *)Option;
+  UINT32               SearchPattern                                             = SEARCH_PATTERN;
+
+  UINTN   SearchPatternLength = SEARCH_PATTERN_LEN;
+  UINT8   *InnerOptionPtr     = NULL;
+  UINT16  InnerOptionLength   = 0;
+
+  OptionPtr->Header.Code = Dhcp6OptIata;
+  // Inner length exactly equal to OptionLen - DHCP6_MIN_SIZE_OF_IA_TA
+  OptionPtr->Header.Len  = HTONS ((UINT16)(DHCP6_SIZE_OF_IAID + (OptionLength - DHCP6_MIN_SIZE_OF_IA_TA)));
+  OptionPtr->Header.IAID = 0x12345678;
+  CopyMem (OptionPtr->InnerOptions, &SearchPattern, SearchPatternLength);
+
+  Status = Dhcp6SeekInnerOptionSafe (
+             Dhcp6OptIata,
+             Option,
+             OptionLength,
+             &InnerOptionPtr,
+             &InnerOptionLength
+             );
+  ASSERT_EQ (Status, EFI_SUCCESS);
+  ASSERT_EQ (InnerOptionLength, (UINT16)(OptionLength - DHCP6_MIN_SIZE_OF_IA_TA));
+  ASSERT_EQ (CompareMem (InnerOptionPtr, &SearchPattern, SearchPatternLength), 0);
+}
+
 ////////////////////////////////////////////////////////////////////////
 // Dhcp6SeekStsOption Tests
 ////////////////////////////////////////////////////////////////////////
