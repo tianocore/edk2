@@ -303,7 +303,7 @@ GicCIntcNodeParser (
   }
 
   // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, &IntCells);
+  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, FALSE, &IntCells);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -740,7 +740,7 @@ GicCPmuNodeParser (
   }
 
   // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, &IntCells);
+  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, FALSE, &IntCells);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;

@@ -297,7 +297,6 @@ SmmuV3NodeParser (
 {
   EFI_STATUS         Status;
   CONST UINT32       *Data;
-  INT32              IntcNode;
   INT32              DataSize;
   INT32              IntCells;
   INT32              AddressCells;
@@ -320,15 +319,8 @@ SmmuV3NodeParser (
     return EFI_ABORTED;
   }
 
-  // Get the associated interrupt-controller.
-  Status = FdtGetIntControllerNode (Fdt, SmmuV3Node, &IntcNode);
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
-    return Status;
-  }
-
   // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, &IntCells);
+  Status = FdtGetInterruptCellsInfo (Fdt, SmmuV3Node, TRUE, &IntCells);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     if (Status == EFI_NOT_FOUND) {
