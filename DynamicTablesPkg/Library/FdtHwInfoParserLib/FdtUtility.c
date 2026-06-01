@@ -1,7 +1,7 @@
 /** @file
   Flattened device tree utility.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -705,6 +705,44 @@ FdtGetIntcParentNode (
       return EFI_ABORTED;
     }
   } // while
+}
+
+/** Read up to two FDT cells as a UINT64 value.
+
+  @param [in]  Data       Pointer to the first cell to read.
+  @param [in]  CellCount  Number of cells to read.
+  @param [out] Value      If success, contains the decoded value.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_UNSUPPORTED         Unsupported cell count.
+**/
+EFI_STATUS
+EFIAPI
+ReadFdtCells64 (
+  IN  CONST UINT32  *Data,
+  IN        INT32   CellCount,
+  OUT       UINT64  *Value
+  )
+{
+  INT32  Index;
+
+  if ((Data == NULL) || (Value == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((CellCount < 0) || (CellCount > 2)) {
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+
+  *Value = 0;
+  for (Index = 0; Index < CellCount; Index++) {
+    *Value = LShiftU64 (*Value, 32) | Fdt32ToCpu (Data[Index]);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /** Get the "interrupt-cells" property value of the node.

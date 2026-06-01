@@ -1,7 +1,7 @@
 /** @file
   PCI Configuration Space Parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -188,6 +188,7 @@ ParseAddressMap (
   UINT32       AddressMapSize;
   UINT32       Count;
   UINT32       PciAddressAttr;
+  EFI_STATUS   Status;
 
   CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO  *PciAddressMapInfo;
   UINT32                               BufferSize;
@@ -230,12 +231,10 @@ ParseAddressMap (
     Offset += (PCI_ADDRESS_CELLS - 1) * sizeof (UINT32);
 
     // Cpu address
-    if (AddressCells == 2) {
-      PciAddressMapInfo[Index].CpuAddress =
-        Fdt64ToCpu (*(UINT64 *)&Data[Offset]);
-    } else {
-      PciAddressMapInfo[Index].CpuAddress =
-        Fdt32ToCpu (*(UINT32 *)&Data[Offset]);
+    Status = ReadFdtCells64 ((UINT32 *)&Data[Offset], AddressCells, &PciAddressMapInfo[Index].CpuAddress);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
     }
 
     Offset += AddressCells * sizeof (UINT32);
