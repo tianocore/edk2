@@ -33,6 +33,38 @@ EFI_PEI_PPI_DESCRIPTOR  mStatusCodePpiList[] = {
   }
 };
 
+//
+// GUID for the Report Status Code Router nest status HOB.
+// This HOB stores the reentrant lock to prevent recursive calls in PEI phase.
+//
+EFI_GUID  mRscRouterNestStatusHobGuid = RSC_ROUTER_NEST_STATUS_HOB_GUID;
+
+typedef struct {
+  UINT32    NestStatus;
+} RSC_ROUTER_NEST_STATUS_HOB;
+
+/**
+  Check the RSC Router nest status HOB.
+
+  @return  Pointer to the RSC_ROUTER_NEST_STATUS_HOB data, or NULL on failure.
+
+**/
+STATIC
+RSC_ROUTER_NEST_STATUS_HOB *
+CheckNestStatusHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&mRscRouterNestStatusHobGuid);
+  if (GuidHob != NULL) {
+    return GET_GUID_HOB_DATA (GuidHob);
+  }
+
+  return NULL;
+}
+
 /**
   Worker function to create one memory status code GUID'ed HOB,
   using PacketIndex to identify the packet.
@@ -241,6 +273,17 @@ ReportDispatcher (
   EFI_PEI_RSC_HANDLER_CALLBACK  *CallbackEntry;
   UINTN                         *NumberOfEntries;
   UINTN                         Index;
+  RSC_ROUTER_NEST_STATUS_HOB    *NestStatusHob;
+
+  //
+  // Use atom operation to avoid the reentant of report.
+  // If current status is not zero, then the function is reentrancy.
+  //
+  NestStatusHob = CheckNestStatusHob ();
+
+  if ((NestStatusHob != NULL) && ((InterlockedCompareExchange32 (&NestStatusHob->NestStatus, 0, 1) == 1))) {
+    return EFI_DEVICE_ERROR;
+  }
 
   Hob.Raw = GetFirstGuidHob (&gStatusCodeCallbackGuid);
   while (Hob.Raw != NULL) {
@@ -261,6 +304,13 @@ ReportDispatcher (
 
     Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextGuidHob (&gStatusCodeCallbackGuid, Hob.Raw);
+  }
+
+  //
+  // Restore the nest status of report
+  //
+  if (NestStatusHob != NULL) {
+    InterlockedCompareExchange32 (&NestStatusHob->NestStatus, 1, 0);
   }
 
   return EFI_SUCCESS;
@@ -285,11 +335,22 @@ GenericStatusCodePeiEntry (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                 Status;
-  EFI_PEI_PPI_DESCRIPTOR     *OldDescriptor;
-  EFI_PEI_PROGRESS_CODE_PPI  *OldStatusCodePpi;
+  EFI_STATUS                  Status;
+  EFI_PEI_PPI_DESCRIPTOR      *OldDescriptor;
+  EFI_PEI_PROGRESS_CODE_PPI   *OldStatusCodePpi;
+  RSC_ROUTER_NEST_STATUS_HOB  *NestStatusHob;
 
   CreateRscHandlerCallbackPacket ();
+
+  //
+  // Build NestStatus HOB for installing PPIs to avoid recursive calls.
+  //
+  if (GetFirstGuidHob (&mRscRouterNestStatusHobGuid) == NULL) {
+    NestStatusHob = BuildGuidHob (&mRscRouterNestStatusHobGuid, sizeof (RSC_ROUTER_NEST_STATUS_HOB));
+    if (NestStatusHob != NULL) {
+      NestStatusHob->NestStatus = 0;
+    }
+  }
 
   //
   // Install Report Status Code Handler PPI
