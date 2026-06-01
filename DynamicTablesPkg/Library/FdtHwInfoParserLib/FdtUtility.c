@@ -938,48 +938,57 @@ ReadFdtCells64 (
   return EFI_SUCCESS;
 }
 
-/** Get the "interrupt-cells" property value of the node.
+/** Get the number of cells used to encode an interrupt for a specific Node.
 
-  The "interrupts" property requires to know the number of cells used
-  to encode an interrupt. This information is stored in the
-  interrupt-controller of the input Node.
-
-  @param [in]  Fdt          Pointer to a Flattened Device Tree (Fdt).
-  @param [in]  IntcNode     Offset of an interrupt-controller node.
-  @param [out] IntCells     If success, contains the "interrupt-cells"
-                            property of the IntcNode.
+  @param [in]  Fdt                Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node               Offset of a node in the interrupt hierarchy.
+  @param [in]  SearchInHierarchy  If TRUE, search from the parent node
+                                  (i.e. get the parent #interrupt-cells).
+                                  If FALSE, simply read the property directly from
+                                  the input Node.
+  @param [out] IntCells           If success, contains the "#interrupt-cells"
+                                  property value relevant for Node.
 
   @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_UNSUPPORTED         Unsupported.
 **/
 EFI_STATUS
 EFIAPI
 FdtGetInterruptCellsInfo (
-  IN  CONST VOID   *Fdt,
-  IN        INT32  IntcNode,
-  OUT       INT32  *IntCells
+  IN  CONST VOID     *Fdt,
+  IN        INT32    Node,
+  IN        BOOLEAN  SearchInHierarchy,
+  OUT       INT32    *IntCells
   )
 {
+  EFI_STATUS    Status;
   CONST UINT32  *Data;
   INT32         Size;
+  INT32         IntDomainNode;
 
-  if ((Fdt == NULL) ||
-      (IntCells == NULL))
-  {
-    ASSERT (0);
+  if ((Fdt == NULL) || (IntCells == NULL)) {
+    ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
   }
 
-  Data = FdtGetProp (Fdt, IntcNode, "#interrupt-cells", &Size);
+  if (SearchInHierarchy) {
+    Status = FdtGetIntcNode (Fdt, Node, FALSE, &IntDomainNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+  } else {
+    IntDomainNode = Node;
+  }
+
+  Data = FdtGetProp (Fdt, IntDomainNode, "#interrupt-cells", &Size);
   if ((Data == NULL) || (Size != sizeof (UINT32))) {
-    // If error or not on one UINT32 cell.
-    ASSERT (0);
+    ASSERT (FALSE);
     return EFI_ABORTED;
   }
 
   *IntCells = Fdt32ToCpu (*Data);
-
   return EFI_SUCCESS;
 }
 
@@ -1048,7 +1057,7 @@ FdtGetInterruptMap (
 
   ZeroMem (Entry, sizeof (*Entry));
 
-  Status = FdtGetInterruptCellsInfo (Fdt, NexusNode, &ChildInterruptCells);
+  Status = FdtGetInterruptCellsInfo (Fdt, NexusNode, FALSE, &ChildInterruptCells);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return Status;
@@ -1107,7 +1116,7 @@ FdtGetInterruptMap (
       return Status;
     }
 
-    Status = FdtGetInterruptCellsInfo (Fdt, ParentNode, &ParentInterruptCells);
+    Status = FdtGetInterruptCellsInfo (Fdt, ParentNode, FALSE, &ParentInterruptCells);
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);
       return Status;
