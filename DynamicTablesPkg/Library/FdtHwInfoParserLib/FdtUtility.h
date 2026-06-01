@@ -432,27 +432,28 @@ ReadFdtCells64 (
   OUT       UINT64  *Value
   );
 
-/** Get the "interrupt-cells" property value of the node.
+/** Get the number of cells used to encode an interrupt for a specific Node.
 
-  The "interrupts" property requires to know the number of cells used
-  to encode an interrupt. This information is stored in the
-  interrupt-controller of the input Node.
-
-  @param [in]  Fdt          Pointer to a Flattened Device Tree (Fdt).
-  @param [in]  IntcNode     Offset of an interrupt-controller node.
-  @param [out] IntCells     If success, contains the "interrupt-cells"
-                            property of the IntcNode.
+  @param [in]  Fdt                Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node               Offset of a node in the interrupt hierarchy.
+  @param [in]  SearchInHierarchy  If TRUE, search from the parent node
+                                  (i.e. get the parent #interrupt-cells).
+                                  If FALSE, simply read the property directly from
+                                  the input Node.
+  @param [out] IntCells           If success, contains the "#interrupt-cells"
+                                  property value relevant for Node.
 
   @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_UNSUPPORTED         Unsupported.
 **/
 EFI_STATUS
 EFIAPI
 FdtGetInterruptCellsInfo (
-  IN  CONST VOID   *Fdt,
-  IN        INT32  IntcNode,
-  OUT       INT32  *InterruptCells
+  IN  CONST VOID     *Fdt,
+  IN        INT32    Node,
+  IN        BOOLEAN  SearchInHierarchy,
+  OUT       INT32    *IntCells
   );
 
 /** Get one "interrupt-map" entry.

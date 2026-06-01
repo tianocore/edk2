@@ -293,11 +293,8 @@ ParseIrqMap (
   INT32                     DataSize;
   UINT32                    Index;
   INTERRUPT_MAP_ENTRY_INFO  IrqMapEntry;
-
-  INT32   PciIntCells;
-  UINT32  IrqMapCount;
-
-  UINT32  PciAddressAttr;
+  UINT32                    IrqMapCount;
+  UINT32                    PciAddressAttr;
 
   CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO  *PciInterruptMapInfo;
   UINT32                                 BufferSize;
@@ -314,18 +311,6 @@ ParseIrqMap (
     return EFI_NOT_FOUND;
   }
 
-  // PCI interrupts are expected to be on 1 cell. Check it.
-  Status = FdtGetInterruptCellsInfo (Fdt, HostPciNode, &PciIntCells);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  if (PciIntCells != PCI_INTERRUPTS_CELLS) {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
   // Count the number of entries in the "interrupt-map"
   for (IrqMapCount = 0; ; IrqMapCount++) {
     Status = FdtGetInterruptMap (Fdt, HostPciNode, IrqMapCount, TRUE, &IrqMapEntry);
@@ -336,6 +321,12 @@ ParseIrqMap (
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);
       return Status;
+    }
+
+    // PCI interrupts are expected to be on 1 cell. Check it.
+    if (IrqMapEntry.ChildInterruptCells != PCI_INTERRUPTS_CELLS) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
     }
   }
 

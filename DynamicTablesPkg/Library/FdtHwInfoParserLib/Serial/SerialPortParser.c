@@ -167,7 +167,7 @@ SerialPortNodeParser (
   }
 
   // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, &IntCells);
+  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, FALSE, &IntCells);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
