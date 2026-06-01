@@ -330,29 +330,39 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInterruptParser[] = {
 /** A parser for EArchCommonObjProcHierarchyInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
-  { "Token",                      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "Flags",                      4,                        "0x%x", NULL },
-  { "ParentToken",                sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "AcpiIdObjectToken",          sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "NoOfPrivateResources",       4,                        "0x%x", NULL },
-  { "PrivateResourcesArrayToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "LpiToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "OverrideNameUidEnabled",     1,                        "%d",   NULL },
-  { "OverrideName",               2,                        "0x%x", NULL },
-  { "OverrideUid",                4,                        "0x%x", NULL }
+  { "Token",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "Flags",                      4,                        "0x%x",   NULL        },
+  { "ParentToken",                sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "AcpiIdObjectToken",          sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "NoOfPrivateResources",       4,                        "0x%x",   NULL        },
+  { "PrivateResourcesArrayToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "LpiToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "OverrideNameUidEnabled",     1,                        "%d",     NULL        },
+  { "OverrideName",               2,                        "0x%x",   NULL        },
+  { "OverrideUid",                4,                        "0x%x",   NULL        },
+  { "ProcessorId",                8,                        "0x%llx", NULL        },
+  { "SocketDesignation",          SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "ProcessorManufacturer",      SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "ProcessorVersion",           SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "SerialNumber",               SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "AssetTag",                   SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "PartNumber",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString }
 };
 
 /** A parser for EArchCommonObjCacheInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonCacheInfoParser[] = {
-  { "Token",                 sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "NextLevelOfCacheToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "Size",                  4,                        "0x%x", NULL },
-  { "NumberOfSets",          4,                        "0x%x", NULL },
-  { "Associativity",         4,                        "0x%x", NULL },
-  { "Attributes",            1,                        "0x%x", NULL },
-  { "LineSize",              2,                        "0x%x", NULL },
-  { "CacheId",               4,                        "0x%x", NULL },
+  { "Token",                 sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "NextLevelOfCacheToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Size",                  4,                        "0x%x", NULL        },
+  { "NumberOfSets",          4,                        "0x%x", NULL        },
+  { "Associativity",         4,                        "0x%x", NULL        },
+  { "Attributes",            1,                        "0x%x", NULL        },
+  { "LineSize",              2,                        "0x%x", NULL        },
+  { "CacheId",               4,                        "0x%x", NULL        },
+  { "Level",                 4,                        "0x%x", NULL        },
+  { "SocketDesignation",     SMBIOS_MAX_STRING_SIZE,   "%a",   PrintString },
 };
 
 /** A parser for EArchCommonObjCmRef.
