@@ -1005,6 +1005,8 @@ SmmDispatcher (
         if (SmmIsSchedulable (DriverEntry)) {
           SmmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (DriverEntry);
           ReadyToRun = TRUE;
+        } else if (PcdGetBool (PcdDepexDebugTraceEnabled)) {
+          SmmPrintDriverDepexSummary (DriverEntry);
         }
       }
     }

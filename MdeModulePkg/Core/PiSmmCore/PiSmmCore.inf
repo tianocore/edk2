@@ -29,6 +29,7 @@
   Locate.c
   Notify.c
   Dependency.c
+  Dispatcher/DepexDebug.c
   Dispatcher.c
   Smi.c
   InstallConfigurationTable.c
@@ -98,6 +99,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDepexDebugVerbose                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDepexDebugTraceEnabled              ## CONSUMES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
