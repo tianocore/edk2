@@ -82,6 +82,8 @@ extern EFI_DNS6_PROTOCOL             mDns6Protocol;
 
 #define DNS_TIME_TO_GETMAP  5
 
+#define DNS_MAXIMUM_LABEL_LEN  63
+
 #pragma pack(1)
 
 typedef union _DNS_FLAGS DNS_FLAGS;
