@@ -37,6 +37,8 @@
 // Minimal FMAP parsing to locate and compare the flash map before updating.
 //
 #define FMAP_SIGNATURE  "__FMAP__"
+#define FMAP_VER_MAJOR  1
+#define FMAP_NAME_LEN   32
 
 #pragma pack(1)
 typedef struct {
@@ -45,14 +47,14 @@ typedef struct {
   UINT8     VerMinor;
   UINT64    Base;
   UINT32    Size;
-  CHAR8     Name[32];
+  CHAR8     Name[FMAP_NAME_LEN];
   UINT16    AreaCount;
 } FMAP_HEADER;
 
 typedef struct {
   UINT32    Offset;
   UINT32    Size;
-  CHAR8     Name[32];
+  CHAR8     Name[FMAP_NAME_LEN];
   UINT16    Flags;
 } FMAP_AREA;
 #pragma pack()
@@ -287,6 +289,45 @@ FindFmapRegion (
   OUT UINTN              *RegionSize
   );
 
+STATIC
+UINTN
+FmapSize (
+  IN CONST FMAP_HEADER  *FmapHeader
+  )
+{
+  return sizeof (*FmapHeader) + ((UINTN)FmapHeader->AreaCount * sizeof (FMAP_AREA));
+}
+
+STATIC
+BOOLEAN
+FmapIsGraph (
+  IN CHAR8  Character
+  )
+{
+  return (Character > ' ') && (Character <= '~');
+}
+
+STATIC
+BOOLEAN
+FmapNameIsValid (
+  IN CONST CHAR8  Name[FMAP_NAME_LEN]
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < FMAP_NAME_LEN; ++Index) {
+    if (Name[Index] == '\0') {
+      return TRUE;
+    }
+
+    if (!FmapIsGraph (Name[Index])) {
+      return FALSE;
+    }
+  }
+
+  return FALSE;
+}
+
 /**
   This function requests firmware information on the first call, caches it and
   returns on all calls afterwards.
@@ -348,8 +389,8 @@ LocateFmapInImage (
 {
   UINTN         Offset;
   CONST UINTN   HeaderSize = sizeof (FMAP_HEADER);
-  CONST UINTN   AreaSize   = sizeof (FMAP_AREA);
   CONST UINT32  MinAreas   = 1;
+  UINTN         MapSize;
 
   if ((Image == NULL) || (FmapOffset == NULL) || (FmapLength == NULL)) {
     return EFI_NOT_FOUND;
@@ -366,19 +407,25 @@ LocateFmapInImage (
       continue;
     }
 
-    if (Hdr->AreaCount < MinAreas) {
+    if (Hdr->VerMajor != FMAP_VER_MAJOR) {
       continue;
     }
 
-    //
-    // Validate that all areas fit in the buffer.
-    //
-    if (Offset + HeaderSize + (Hdr->AreaCount * AreaSize) > ImageSize) {
+    MapSize = FmapSize (Hdr);
+    if ((Hdr->AreaCount < MinAreas) || (Hdr->Size < MapSize)) {
+      continue;
+    }
+
+    if (MapSize > (ImageSize - Offset)) {
+      continue;
+    }
+
+    if (!FmapNameIsValid (Hdr->Name)) {
       continue;
     }
 
     *FmapOffset = Offset;
-    *FmapLength = HeaderSize + (Hdr->AreaCount * AreaSize);
+    *FmapLength = MapSize;
     return EFI_SUCCESS;
   }
 
@@ -1905,8 +1952,9 @@ FmpDeviceSetImageWithStatus (
   }
 
   //
-  // Discover optional manifest and FMAP. If anything looks off, fall back to
-  // a BIOS-region update where possible, then legacy full-flash behavior.
+  // Discover optional manifest and FMAP. Prefer a manifest-guided update, then
+  // fall back to an Intel-descriptor BIOS-region update, then legacy full-flash
+  // behavior.
   //
   BaseImageSize      = ImageSize;
   ManifestEntryCount = 0;
