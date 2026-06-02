@@ -1491,6 +1491,9 @@ CoreDisplayDiscoveredNotDispatched (
     DriverEntry = CR (Link, EFI_CORE_DRIVER_ENTRY, Link, EFI_CORE_DRIVER_ENTRY_SIGNATURE);
     if (DriverEntry->Dependent) {
       DEBUG ((DEBUG_LOAD, "Driver %g was discovered but not loaded!!\n", &DriverEntry->FileName));
+      if (PcdGetBool (PcdDepexDebugTraceEnabled)) {
+        CorePrintDriverDepexSummary (DriverEntry);
+      }
     }
   }
 }

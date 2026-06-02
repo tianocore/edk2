@@ -985,6 +985,20 @@
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
+  ## Indicates if DXE Depex diagnostics should emit verbose trace details for
+  #  not-dispatched drivers.<BR><BR>
+  #   TRUE  - Enables verbose Depex diagnostics output.<BR>
+  #   FALSE - Disables verbose Depex diagnostics output.<BR>
+  # @Prompt Enable verbose DXE Depex diagnostics.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDepexDebugVerbose|FALSE|BOOLEAN|0x0001007a
+
+  ## Indicates if DXE Depex diagnostics should emit dependency trace chain
+  #  details for missing protocols.<BR><BR>
+  #   TRUE  - Enables dependency trace chain output.<BR>
+  #   FALSE - Disables dependency trace chain output.<BR>
+  # @Prompt Enable DXE Depex dependency trace diagnostics.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDepexDebugTraceEnabled|FALSE|BOOLEAN|0x0001007b
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 

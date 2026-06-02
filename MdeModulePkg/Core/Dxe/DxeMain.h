@@ -2802,3 +2802,20 @@ EFI_STATUS
 CoreInitializeHandleServices (
   VOID
   );
+
+/**
+  Print a comprehensive summary of a driver's Depex and status.
+
+  This function analyzes the driver's Depex, evaluates the truth table of dependencies,
+  checks for missing protocols, and prints the results to the debug log.
+
+  @param[in] DriverEntry  Pointer to the Core driver entry.
+
+  @retval EFI_SUCCESS             Summary printed successfully.
+  @retval EFI_INVALID_PARAMETER   DriverEntry is NULL.
+  @retval EFI_OUT_OF_RESOURCES    Memory allocation failed.
+**/
+EFI_STATUS
+CorePrintDriverDepexSummary (
+  IN EFI_CORE_DRIVER_ENTRY  *DriverEntry
+  );
