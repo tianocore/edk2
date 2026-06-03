@@ -2,7 +2,7 @@
 #
 # Copyright (c) Microsoft Corporation.
 # Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
-# Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2026, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
@@ -212,6 +212,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "SecurityPkg/DeviceSecurity/SpdmLib/libspdm", False))
         rs.append(RequiredSubmodule(
             "TcgTpmPkg/Library/TpmLib/TPM", False))
+        rs.append(RequiredSubmodule(
+            "ArmVirtPkg/ArmCcaBootSync/QcborLib/qcbor", False))
         return rs
 
     def GetName(self):

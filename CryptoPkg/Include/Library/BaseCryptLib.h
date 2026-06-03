@@ -7,6 +7,7 @@
 Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
 (c) Copyright 2026 HP Development Company, L.P.
+Copyright (c) 2023 - 2026, ARM Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -3568,6 +3569,85 @@ HkdfSha384Expand (
   IN   UINTN        OutSize
   );
 
+/**
+  Derive SHA512 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha512ExtractAndExpand (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha512Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha512Expand (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
 // =====================================================================================
 //    Big number primitives
 // =====================================================================================
@@ -4506,6 +4586,23 @@ EcFree (
   );
 
 /**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+**/
+BOOLEAN
+EFIAPI
+EcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  );
+
+/**
   Generates EC key and returns EC public key (X, Y), Please note, this function uses
   pseudo random number generator. The caller must make sure RandomSeed()
   function was properly called before.
@@ -4719,4 +4816,54 @@ EcDsaVerify (
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
+  );
+
+/**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
+                           resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPublicKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  );
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]  EcContext    Pointer to EC DSA context.
+  @param[out] PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[out] PemSize      Size of the PEM key data in bytes.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and PemSize is not zero, then return FALSE and
+  set the PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+BOOLEAN
+EFIAPI
+EcPublicKeyToPEM (
+  IN  VOID   *EcContext,
+  OUT UINT8  *PemData,
+  OUT UINTN  *PemSize
   );

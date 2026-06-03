@@ -25,6 +25,19 @@ ASM_FUNC(_ModuleEntryPoint)
   bl    ArmEnableVFP
 
   bl    ASM_PFX(DiscoverDramFromDt)
+  // Reduce the system memory size to use as Reserved memory.
+  ldr   x2, PcdGet64 (PcdReservedMemoryCarveout)
+  cbz   x2, _ConfigSystemMemory
+  ldr   x0, PcdGet64 (PcdSystemMemorySize)
+  // Stop if PcdReservedMemoryCarveout >= PcdSystemMemorySize
+  cmp   x2, x0
+_DeadLoop:
+  b.hs  _DeadLoop
+  sub   x0, x0, x2
+  adr   x1, PcdGet64 (PcdSystemMemorySize)
+  str   x0, [x1]
+
+_ConfigSystemMemory:
 
   // Get ID of this CPU in Multicore system
   bl    ASM_PFX(ArmReadMpidr)

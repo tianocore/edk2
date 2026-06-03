@@ -26,8 +26,10 @@
   Include                        # Root include for the package
 
 [LibraryClasses]
+  ArmCcaBootSyncCryptoLib|Include/Library/ArmCcaBootSyncCryptoLib.h
   ArmCcaInitPeiLib|Include/Library/ArmCcaInitPeiLib.h
   ArmCcaLib|Include/Library/ArmCcaLib.h
+  ArmCcaRhiHostSessionLib|Include/Library/ArmCcaRhiHostSessionLib.h
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
   ArmVirtMemInfoLib|Include/Library/ArmVirtMemInfoLib.h
 
@@ -38,6 +40,58 @@
   gArmVirtSystemMemorySizeGuid     = { 0x504eccb9, 0x1bf0, 0x4420, { 0x86, 0x5d, 0xdc, 0x66, 0x06, 0xd4, 0x13, 0xbf } }
   gArmCcaIpaWidthGuid              = { 0xbdb66787, 0xfc8a, 0x412e, { 0xa0, 0x9b, 0x84, 0x96, 0x61, 0x81, 0x72, 0xc0 } }
   gArmCcaIsRealmGuid               = { 0x45e4546d, 0x26ea, 0x449d, { 0xa4, 0xa6, 0xcb, 0x5a, 0x54, 0xe3, 0x03, 0x7c } }
+
+  # 59FC4FCE-B2B2-4DB6-A0CD-3053D9F49738
+  gArmBootSyncAttReport             = { 0x59fc4fce, 0xb2b2, 0x4db6, { 0xa0, 0xcd, 0x30, 0x53, 0xd9, 0xf4, 0x97, 0x38 } }
+
+  # 1B3C3C27-51E1-4D1B-9C44-189EAEA48263
+  gArmBootSyncAttRespGuid           = { 0x1B3C3C27, 0x51E1, 0x4D1B, { 0x9C, 0x44, 0x18, 0x9E, 0xAE, 0xA4, 0x82, 0x63 } }
+
+  # FE4A5C90-FEC5-4029-B515-699A872E3B01
+  gArmBootSyncAttResult             = { 0xfe4a5c90, 0xfec5, 0x4029, { 0xb5, 0x15, 0x69, 0x9a, 0x87, 0x2e, 0x3b, 0x1 } }
+
+  # A31E8A1B-5D80-4336-8C0D-6F653B0CC8D1
+  gArmBootSyncAttReqGuid            = { 0xa31e8a1b, 0x5d80, 0x4336, { 0x8c, 0x0d, 0x6f, 0x65, 0x3b, 0x0c, 0xc8, 0xd1 } }
+
+  # 60E65392-591A-43A4-98E8-257985B9FEB0
+  gArmBootSyncBibReqGuid            = { 0x60e65392, 0x591a, 0x43a4, { 0x98, 0xe8, 0x25, 0x79, 0x85, 0xb9, 0xfe, 0xb0 } }
+
+  # 0DA1DE44-D38D-40E2-9D0B-A4BAD90B1A5A
+  gArmBootSyncBibRespGuid           = { 0x0da1de44, 0xd38d, 0x40e2, { 0x9d, 0x0b, 0xa4, 0xba, 0xd9, 0x0b, 0x1a, 0x5a } }
+
+  # AD96854E-794C-43CA-B91D-61DE98313E45
+  gArmBootSyncFinGuid               = { 0xad96854e, 0x794c, 0x43ca, { 0xb9, 0x1d, 0x61, 0xde, 0x98, 0x31, 0x3e, 0x45 } }
+
+  # Arm CCA Boot Sync Protocol GUID definitions.
+  # gArmBootSyncKeyEncData EAB79650-5746-4E46-9EC4-0BDF3D148A1E
+  gArmBootSyncKeyEncData            = { 0xEAB79650, 0x5746, 0x4E46, { 0x9E, 0xC4, 0x0B, 0xDF, 0x3D, 0x14, 0x8A, 0x1E } }
+
+  # D83BF2F8-6B49-4238-859D-7E4C29150995
+  gArmBootSyncKeyXchgRespGuid       = { 0xd83bf2f8, 0x6b49, 0x4238, { 0x85, 0x9d, 0x7e, 0x4c, 0x29, 0x15, 0x09, 0x95 } }
+
+  # BBD5E1D8-C8E9-48CB-A850-A30B15D08A22
+  gArmBootSyncKeyXchgReqGuid        = { 0xbbd5e1d8, 0xc8e9, 0x48cb, { 0xa8, 0x50, 0xa3, 0x0b, 0x15, 0xd0, 0x8a, 0x22 } }
+
+  # 54E1D918-311F-4F3F-B775-9A74A039C438
+  gArmBootSyncRequestOptions        = { 0x54e1d918, 0x311f, 0x4f3f, { 0xb7, 0x75, 0x9a, 0x74, 0xa0, 0x39, 0xc4, 0x38 } }
+
+  # 7731492A-093E-49ED-8A54-8AD6B8CEC450
+  gArmBootSyncNackGuid              = { 0x7731492a, 0x093e, 0x49ed, { 0x8a, 0x54, 0x8a, 0xd6, 0xb8, 0xce, 0xc4, 0x50 } }
+
+  # 9755286D-E064-41B4-8FC2-54101280525C
+  gArmBootSyncSecretData            = { 0x9755286d, 0xe064, 0x41b4, { 0x8f, 0xc2, 0x54, 0x10, 0x12, 0x80, 0x52, 0x5c } }
+
+  # 1DB974DF-3F49-44EB-B324-3CB7BA00F589
+  gArmBootSyncVarData               = { 0x1db974df, 0x3f49, 0x44eb, { 0xb3, 0x24, 0x3c, 0xb7, 0xba, 0x0, 0xf5, 0x89 } }
+
+  # Confidential Comuting Secret Header
+  gConfidentialComputingSecretHeader = { 0x1e74f542, 0x71dd, 0x4d66, { 0x96, 0x3e, 0xef, 0x42, 0x87, 0xff, 0x17, 0x3b } }
+
+  # Confidential Computing Secret Entry - Grub EFI Disk Password GUID
+  gConfidentialComputingSecretEntryGrubEfiDiskPassword = { 0x736869e5, 0x84f0, 0x4973, { 0x92, 0xec, 0x06, 0x87, 0x9c, 0xe3, 0xda, 0x0b } }
+
+  # Arm CCA Secret Location
+  gArmBootSyncSecretMemoryLocationGuid = { 0xe1872a9e, 0xe9f5, 0x416b, { 0x92, 0x71, 0xbd, 0x4f, 0x21, 0xe0, 0x99, 0xa7 } }
 
 [PcdsFeatureFlag]
   #
@@ -51,3 +105,21 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
+[PcdsFixedAtBuild]
+
+  #
+  # Null-terminated string that describes the Application Information used for deriving the Binding Key
+  # @Prompt Application Information for the Binding Key.
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString|""|VOID*|0x00000007
+
+  #
+  # Null-terminated string that describes the Application Information used for deriving the Encryption Key
+  # @Prompt Application Information for the Encryption Key.
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString|""|VOID*|0x00000008
+
+  #
+  # The amount of System Memory to reduce for use as Reserved Memory.
+  # @Prompt Reserved Memory Carveout size.
+  gArmVirtTokenSpaceGuid.PcdReservedMemoryCarveout|0x0|UINT64|0x00000009
+

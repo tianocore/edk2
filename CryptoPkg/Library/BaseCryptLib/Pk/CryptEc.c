@@ -563,6 +563,52 @@ EcFree (
 }
 
 /**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component or Nid is NULL.
+**/
+BOOLEAN
+EFIAPI
+EcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  )
+{
+  INT32   OpenSslNid;
+  EC_KEY  *EcKey;
+
+  if ((EcContext == NULL) || (Nid == NULL)) {
+    return FALSE;
+  }
+
+  EcKey      = (EC_KEY *)EcContext;
+  OpenSslNid = EC_GROUP_get_curve_name (EC_KEY_get0_group (EcKey));
+  switch (OpenSslNid) {
+    case NID_X9_62_prime256v1:
+      *Nid = CRYPTO_NID_SECP256R1;
+      break;
+    case NID_secp384r1:
+      *Nid = CRYPTO_NID_SECP384R1;
+      break;
+    case NID_secp521r1:
+      *Nid = CRYPTO_NID_SECP521R1;
+      break;
+    case NID_brainpoolP512r1:
+      *Nid = CRYPTO_NID_BRAINPOOLP512R1;
+      break;
+    default:
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
   Generates EC key and returns EC public key (X, Y), Please note, this function uses
   pseudo random number generator. The caller must make sure RandomSeed()
   function was properly called before.

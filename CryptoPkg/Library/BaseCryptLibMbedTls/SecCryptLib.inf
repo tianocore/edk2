@@ -42,6 +42,7 @@
   Pk/CryptRsaBasicNull.c
   Pk/CryptRsaExtNull.c
   Bn/CryptBnNull.c
+  Pem/CryptPemEcPublicNull.c
   Pem/CryptPemNull.c
   Pk/CryptDhNull.c
   Pk/CryptEcNull.c

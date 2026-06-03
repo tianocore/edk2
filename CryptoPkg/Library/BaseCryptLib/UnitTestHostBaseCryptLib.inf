@@ -47,6 +47,7 @@
   Pk/CryptAuthenticode.c
   Pk/CryptTs.c
   Pem/CryptPem.c
+  Pem/CryptPemEcPublic.c
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
   Bn/CryptBn.c
@@ -59,6 +60,9 @@
 
 [Sources.X64]
   Rand/CryptRandTsc.c
+
+[Sources.AARCH64]
+  Rand/CryptRand.c
 
 [Packages]
   MdePkg/MdePkg.dec

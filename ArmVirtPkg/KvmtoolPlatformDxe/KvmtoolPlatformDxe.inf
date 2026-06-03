@@ -21,12 +21,14 @@
   KvmtoolPlatformDxe.c
 
 [Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
   OvmfPkg/OvmfPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  ArmCcaLib
   BaseLib
   DebugLib
   UefiBootServicesTableLib

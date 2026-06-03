@@ -1,7 +1,7 @@
 #  @file
 #  Workspace file for KVMTool virtual platform.
 #
-#  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
+#  Copyright (c) 2018 - 2024, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -28,6 +28,21 @@
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
 
   DEFINE ACPIVIEW_ENABLE         = TRUE
+
+  #
+  # Arm CCA Secure Boot for Realm VMs
+  #  Arm Boot Sync preforms remote attestation, retrieves
+  #  and installs the UEFI secure boot key database.
+  #  Therefore, UEFI secure boot can be enabled for Realm VMs.
+  #  Note: This option MUST NOT be enabled for normal VM builds.
+  #
+  DEFINE ARMCCA_SECURE_BOOT_ENABLE  = FALSE
+
+  #
+  # Arm CCA Test Application
+  #  Note: These MUST NOT be enabled for production builds.
+  #
+  DEFINE ARMCCA_TEST_ENABLE      = FALSE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
@@ -73,7 +88,19 @@
   PciHostBridgeUtilityLib|ArmVirtPkg/Library/ArmVirtPciHostBridgeUtilityLib/ArmVirtPciHostBridgeUtilityLib.inf
 
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+
+  #
+  # Secure Boot dependencies
+  #
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+  SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
+
+  # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
+  PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+!else
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+!endif
 
   PlatformPeiLib|ArmVirtPkg/Library/KvmtoolPlatformPeiLib/KvmtoolPlatformPeiLib.inf
 
@@ -89,6 +116,11 @@
 
   ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorLib/ArmVirtMonitorLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
+  # OpensslLibFull/FullAccel is required for ECDH, see CryptoPkg/Readme.md
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+
+  ArmCcaBootSyncCryptoLib|ArmVirtPkg/Library/ArmCcaBootSyncCryptoLib/ArmCcaBootSyncCryptoLib.inf
+  ArmCcaRhiHostSessionLib|ArmVirtPkg/Library/ArmCcaRhiHostSessionLib/ArmCcaRhiHostSessionLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
@@ -103,11 +135,20 @@
   DebugLib|MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
 !endif
 
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+!endif
+
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  *_*_*_CC_FLAGS =  -D ARMCCA_SECURE_BOOT_ENABLE
+!endif
+
   #
   # We need to avoid jump tables in SEC and BASE modules, so that the PE/COFF
   # self-relocation code itself is guaranteed to be position independent.
@@ -157,6 +198,16 @@
   # BuildCpuHob().
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
+
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  # Override the default values from SecurityPkg to ensure images
+  # from all sources are verified in secure boot
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
+!endif
+
+  gArmVirtTokenSpaceGuid.PcdReservedMemoryCarveout|0x10000
 
 [PcdsPatchableInModule.common]
   #
@@ -225,6 +276,7 @@
   # Define PCD for emulating Runtime Variable storage when
   # CFI flash is absent.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
   ## RTC Register address in MMIO space.
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0
@@ -274,7 +326,16 @@
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   }
 
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+    <LibraryClasses>
+      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+  }
+
+!else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
+
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
     <LibraryClasses>
@@ -393,3 +454,18 @@
   # ACPI Support
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
+
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  ArmVirtPkg/ArmCcaBootSync/ArmCcaBootSyncDxe.inf
+!endif
+
+!if $(ARMCCA_TEST_ENABLE) == TRUE
+  # FV Filesystem
+  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  #
+  # Test Apps
+  #  Note: These MUST NOT be enabled for production builds.
+  #
+  ArmVirtPkg/ArmCcaBootSync/BootSyncTestApp.inf
+!endif

@@ -1,0 +1,87 @@
+##  @file
+#  EFI application tests the RSI interface.
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = BootSyncTestApp
+  FILE_GUID                      = 2707AE9D-EBF7-40B4-BD08-774360E7C59C
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BootSyncTestApp
+
+[Sources.common]
+  BootSyncTestApp/BootSyncTestApp.c
+
+  Common/BootSyncBsbMsg.c
+  Common/BootSyncBsbParser.c
+  Common/BootSyncDebug.c
+  Common/BootSyncSecureChannel.c
+  Common/BootSyncProtocol.c
+
+  Guest/BootSyncAttestationProtocolGuest.c
+  Guest/BootSyncBibProtocolGuest.c
+  Guest/BootSyncKeyExchangeProtocolGuest.c
+  Guest/BootSyncProtocolGuest.h
+  Guest/BootSyncSessionGuest.c
+
+  Include/BootSyncBsbMsg.h
+  Include/BootSyncBsbParser.h
+  Include/BootSyncDebug.h
+  Include/BootSyncProtocol.h
+  Include/BootSyncSecureChannel.h
+  Include/BootSyncSession.h
+  Include/BootSyncProtocolDefines.h
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmCcaBootSyncCryptoLib
+  ArmCcaRsiLib
+  ArmCcaRhiHostSessionLib
+  BaseLib
+  BaseCryptLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  RngLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+
+[Guids]
+  gArmBootSyncAttReport
+  gArmBootSyncAttReqGuid
+  gArmBootSyncAttRespGuid
+  gArmBootSyncAttResult
+  gArmBootSyncBibReqGuid
+  gArmBootSyncBibRespGuid
+  gArmBootSyncFinGuid
+  gArmBootSyncKeyEncData
+  gArmBootSyncKeyXchgReqGuid
+  gArmBootSyncKeyXchgRespGuid
+  gArmBootSyncNackGuid
+  gArmBootSyncRequestOptions
+  gArmBootSyncSecretData
+  gArmBootSyncVarData
+
+[Protocols]
+  gEfiRealmApertureManagementProtocolGuid
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
+
+[Depex]
+  gEfiRealmApertureManagementProtocolGuid
+

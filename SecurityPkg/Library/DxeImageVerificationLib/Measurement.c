@@ -301,7 +301,12 @@ SecureBootHook (
   }
 
   if (IsDataMeasured (VariableName, VendorGuid, Data, DataSize)) {
-    DEBUG ((DEBUG_ERROR, "MeasureSecureAuthorityVariable - IsDataMeasured\n"));
+    DEBUG ((
+      DEBUG_INFO,
+      "MeasureSecureAuthorityVariable - IsDataMeasured %s, %g \n",
+      VariableName,
+      VendorGuid
+      ));
     return;
   }
 

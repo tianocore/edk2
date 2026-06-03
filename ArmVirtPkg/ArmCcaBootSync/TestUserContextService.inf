@@ -1,0 +1,92 @@
+##  @file
+#  Host based unit test User Context service.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = TestUserContextService
+  FILE_GUID                      = ACF605DA-929A-11EE-A408-E3768d49B61A
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  ArmCcaTokenParser/ArmCcaTokenDefs.h
+  ArmCcaTokenParser/ArmCcaTokenParser.c
+
+  Common/BootSyncBsbMsg.c
+  Common/BootSyncBsbParser.c
+  Common/BootSyncDebug.c
+  Common/BootSyncSecureChannel.c
+  Common/BootSyncProtocol.c
+
+  TestUserContextService/TestUserContextService.c
+
+  UserContext/BootSyncAttestationProtocolUserContext.c
+  UserContext/BootSyncBibProtocolUserContext.c
+  UserContext/BootSyncKeyExchangeProtocolUserContext.c
+  UserContext/BootSyncProtocolUserContext.h
+  UserContext/BootSyncSessionUserContext.c
+  UserContext/BootSyncVerification.c
+  UserContext/BootSyncVerification.h
+  UserContext/UserManagement.c
+  UserContext/UserManagement.h
+
+  Include/ArmCcaTokenParser.h
+  Include/BootSyncBsbMsg.h
+  Include/BootSyncBsbParser.h
+  Include/BootSyncDebug.h
+  Include/BootSyncProtocol.h
+  Include/BootSyncSecureChannel.h
+  Include/BootSyncSession.h
+  Include/BootSyncProtocolDefines.h
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmCcaBootSyncCryptoLib
+  BaseLib
+  BaseMemoryLib
+  BaseCryptLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  RngLib
+
+[Guids]
+  gArmBootSyncAttReport
+  gArmBootSyncAttReqGuid
+  gArmBootSyncAttRespGuid
+  gArmBootSyncAttResult
+  gArmBootSyncBibReqGuid
+  gArmBootSyncBibRespGuid
+  gArmBootSyncFinGuid
+  gArmBootSyncKeyEncData
+  gArmBootSyncKeyXchgReqGuid
+  gArmBootSyncKeyXchgRespGuid
+  gArmBootSyncNackGuid
+  gArmBootSyncRequestOptions
+  gArmBootSyncSecretData
+  gArmBootSyncVarData
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -I$(MODULE_DIR)/QcborLib/qcbor/inc
+
+# The following option to link with libqcbor does not work as it gets
+# overridden in UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+# Therefore, this has been specified as a module type option in the
+# DSC file.
+#  GCC:*_*_*_DLINK2_FLAGS = -lqcbor -L$(BIN_DIR)/$(MODULE_RELATIVE_DIR)/QcborLib/QcborLib/OUTPUT
+

@@ -1,0 +1,18 @@
+##  @file
+#  An inf file to facilitate building libqcbor.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = QcborLib
+  FILE_GUID                      = 49e444bf-2e65-43e5-8147-425c54ed2b55
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QcborLib
+  CUSTOM_MAKEFILE                = GCC|GnuMakefile
