@@ -192,8 +192,8 @@ CpusNodeParser (
     return EFI_ABORTED;
   }
 
-  // Count the number of "cpu" nodes under the "cpus" node.
-  Status = FdtCountNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNodeCount);
+  // Count the number of CPU device nodes under the "cpus" node.
+  Status = FdtCountCondNodeInBranch (Fdt, CpusNode, IsCpuDeviceNode, NULL, &CpuNodeCount);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -214,17 +214,10 @@ CpusNodeParser (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CpuNode = CpusNode;
-  for (Index = 0; Index < CpuNodeCount; Index++) {
-    Status = FdtGetNextNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNode);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      if (Status == EFI_NOT_FOUND) {
-        // Should have found the node.
-        Status = EFI_ABORTED;
-      }
-
-      goto exit_handler;
+  Index = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    if (!IsCpuDeviceNode (Fdt, CpuNode, NULL)) {
+      continue;
     }
 
     // Parse the "cpu" node.
@@ -245,7 +238,15 @@ CpusNodeParser (
       ASSERT (0);
       goto exit_handler;
     }
-  } // for
+
+    Index++;
+  }
+
+  if (Index != CpuNodeCount) {
+    ASSERT (FALSE);
+    Status = EFI_ABORTED;
+    goto exit_handler;
+  }
 
   Status = CreateCmObjDesc (
              CREATE_CM_ARM_OBJECT_ID (EArmObjGicCInfo),

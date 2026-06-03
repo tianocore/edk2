@@ -210,6 +210,26 @@ FdtNodeHasProperty (
   IN  CONST VOID   *PropertyName
   );
 
+/** Check whether a node is a CPU device node.
+
+  A CPU device node must have the "cpu" node name and a "device_type"
+  property equal to "cpu".
+
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to operate the check on.
+  @param [in]  Context   Unused.
+
+  @retval TRUE    The node is a CPU device node.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+IsCpuDeviceNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *Context
+  );
+
 /** Get the next node in a branch having a matching name.
 
   The Device tree is traversed in a depth-first search, starting from Node.
