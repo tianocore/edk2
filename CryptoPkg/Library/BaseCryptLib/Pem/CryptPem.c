@@ -2,6 +2,7 @@
   PEM (Privacy Enhanced Mail) Format Handler Wrapper Implementation over OpenSSL.
 
 Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 #include "KeyContext.h"
 #include <openssl/pem.h>
+#include <openssl/bio.h>
 
 /**
   Callback function for password phrase conversion used for retrieving the encrypted PEM.
@@ -294,8 +296,9 @@ EcGetPrivateKeyFromPem (
   OUT  VOID         **EcContext
   )
 {
-  BOOLEAN  Status;
-  BIO      *PemBio;
+  BOOLEAN     Status;
+  BIO         *PemBio;
+  EC_CONTEXT  *EcCtx;
 
   //
   // Check input parameters.
@@ -303,6 +306,8 @@ EcGetPrivateKeyFromPem (
   if ((PemData == NULL) || (EcContext == NULL) || (PemSize > INT_MAX)) {
     return FALSE;
   }
+
+  *EcContext = NULL;
 
   //
   // Add possible block-cipher descriptor for PEM data decryption.
@@ -322,6 +327,11 @@ EcGetPrivateKeyFromPem (
 
   Status = FALSE;
 
+  EcCtx = (EC_CONTEXT *)OPENSSL_zalloc (sizeof (EC_CONTEXT));
+  if (EcCtx == NULL) {
+    return FALSE;
+  }
+
   //
   // Read encrypted PEM Data.
   //
@@ -337,16 +347,30 @@ EcGetPrivateKeyFromPem (
   //
   // Retrieve EC Private Key from encrypted PEM data.
   //
-  *EcContext = PEM_read_bio_ECPrivateKey (PemBio, NULL, (pem_password_cb *)&PasswordCallback, (void *)Password);
-  if (*EcContext != NULL) {
-    Status = TRUE;
+  EcCtx->EvpPkey = PEM_read_bio_PrivateKey (PemBio, NULL, (pem_password_cb *)&PasswordCallback, (void *)Password);
+  if (EcCtx->EvpPkey == NULL) {
+    goto _Exit;
   }
+
+  if (EVP_PKEY_id (EcCtx->EvpPkey) != EVP_PKEY_EC) {
+    EVP_PKEY_free (EcCtx->EvpPkey);
+    EcCtx->EvpPkey = NULL;
+    goto _Exit;
+  }
+
+  Status     = TRUE;
+  *EcContext = EcCtx;
+  EcCtx      = NULL;
 
 _Exit:
   //
   // Release Resources.
   //
   BIO_free (PemBio);
+
+  if (EcCtx != NULL) {
+    OPENSSL_free (EcCtx);
+  }
 
   return Status;
 }
