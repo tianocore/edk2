@@ -30,6 +30,7 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -42,6 +43,7 @@
   SerialPortLib
   ExtractGuidedSectionLib
   PeCoffLib
+  PeilessSecMeasureLib
   PrePiLib
   MemoryAllocationLib
   HobLib

@@ -3099,6 +3099,11 @@ typedef struct {
 #define EFI_ACPI_6_5_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE  SIGNATURE_32('B', 'G', 'R', 'T')
 
 ///
+/// "CCEL" Confidential Compute Event Log Table
+///
+#define EFI_ACPI_6_5_CONFIDENTIAL_COMPUTE_EVENT_LOG_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
+
+///
 /// "CDIT" Component Distance Information Table
 ///
 #define EFI_ACPI_6_5_COMPONENT_DISTANCE_INFORMATION_TABLE_SIGNATURE  SIGNATURE_32('C', 'D', 'I', 'T')
