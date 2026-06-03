@@ -1,7 +1,7 @@
 /** @file
   Configuration manager Object Descriptor Utility.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -137,6 +137,28 @@ AddMultipleCmObj (
   IN  CONST CM_OBJ_DESCRIPTOR *CmObjDesc,
   IN        UINT32 TokenCount, OPTIONAL
   OUT       CM_OBJECT_TOKEN             *TokenTable   OPTIONAL
+  );
+
+/** Add multiple CmObj to the Configuration Manager with caller-provided
+    tokens.
+
+  @param  [in]  FdtParserHandle   A handle to the parser instance.
+  @param  [in]  CmObjDesc         CmObjDesc containing multiple CmObj
+                                  to add.
+  @param  [in]  TokenTable        Tokens to assign to each CmObj.
+                                  Address of an array of CM_OBJECT_TOKEN
+                                  with the same number of elements as the
+                                  CmObjDesc.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AddMultipleCmObjWithToken (
+  IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
+  IN  CONST CM_OBJ_DESCRIPTOR          *CmObjDesc,
+  IN  CONST CM_OBJECT_TOKEN            *TokenTable
   );
 
 /** Add multiple CmObj to the Configuration Manager.

@@ -1,7 +1,7 @@
 /** @file
   Configuration manager Object Descriptor Utility.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -319,6 +319,84 @@ AddMultipleCmObj (
       return Status;
     }
   } // for
+
+  return Status;
+}
+
+/** Add multiple CmObj to the Configuration Manager with caller-provided
+    tokens.
+
+  @param  [in]  FdtParserHandle   A handle to the parser instance.
+  @param  [in]  CmObjDesc         CmObjDesc containing multiple CmObj
+                                  to add.
+  @param  [in]  TokenTable        Tokens to assign to each CmObj.
+                                  Address of an array of CM_OBJECT_TOKEN
+                                  with the same number of elements as the
+                                  CmObjDesc.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AddMultipleCmObjWithToken (
+  IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
+  IN  CONST CM_OBJ_DESCRIPTOR          *CmObjDesc,
+  IN  CONST CM_OBJECT_TOKEN            *TokenTable
+  )
+{
+  EFI_STATUS         Status;
+  UINT32             Index;
+  UINT32             Count;
+  UINT8              *Data;
+  UINT32             Size;
+  CM_OBJ_DESCRIPTOR  SingleCmObjDesc;
+
+  if ((FdtParserHandle == NULL)             ||
+      (FdtParserHandle->HwInfoAdd == NULL)  ||
+      (CmObjDesc == NULL)                   ||
+      (CmObjDesc->Count == 0)               ||
+      (CmObjDesc->Data == NULL)             ||
+      (CmObjDesc->Size == 0)                ||
+      (TokenTable == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Count = CmObjDesc->Count;
+  Data  = CmObjDesc->Data;
+  Size  = CmObjDesc->Size / Count;
+
+  SingleCmObjDesc.ObjectId = CmObjDesc->ObjectId;
+  SingleCmObjDesc.Count    = 1;
+  SingleCmObjDesc.Size     = Size;
+
+  //
+  // Adding objects as single elements allows to create a simple mapping:
+  //   CmObj <-> Token
+  // When adding an array of objects, the array is mapped to a single Token:
+  //   CmObj[X] <-> one unique Token
+  // If one Token is allocated per element in the array, it becomes difficult
+  // to identify CmObj that have been added one by one and that can be handled
+  // alone from CmObj that have been added as a group.
+  //
+  // Thus add the input CmObj one by one.
+  //
+  for (Index = 0; Index < Count; Index++) {
+    SingleCmObjDesc.Data = (VOID *)&Data[Index * Size];
+    Status               = FdtParserHandle->HwInfoAdd (
+                                              FdtParserHandle,
+                                              FdtParserHandle->Context,
+                                              &SingleCmObjDesc,
+                                              TokenTable[Index],
+                                              NULL
+                                              );
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return Status;
+    }
+  }
 
   return Status;
 }
