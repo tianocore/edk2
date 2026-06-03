@@ -472,7 +472,6 @@ FdtGetNextPropNodeInBranch (
   @retval EFI_ABORTED             An error occurred.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 FdtCountCondNodeInBranch (

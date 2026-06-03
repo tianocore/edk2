@@ -277,6 +277,36 @@ FdtGetNextPropNodeInBranch (
   IN OUT        INT32  *Node
   );
 
+/** Count the number of Device Tree nodes fulfilling a condition
+    in a Device Tree branch.
+
+  The condition to fulfill is checked by the NodeChecker function.
+  Context is passed to NodeChecker.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  FdtBranch        Only search in the sub-nodes of this branch.
+                                Write (-1) to search the whole tree.
+  @param [in]  NodeChecker      Function called to check the condition is
+                                fulfilled.
+  @param [in]  Context          Context for the NodeChecker.
+  @param [out] NodeCount        If success, contains the count of nodes
+                                fulfilling the condition.
+                                Can be 0.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+FdtCountCondNodeInBranch (
+  IN  CONST VOID               *Fdt,
+  IN        INT32              FdtBranch,
+  IN        NODE_CHECKER_FUNC  NodeChecker,
+  IN  CONST VOID               *Context,
+  OUT       UINT32             *NodeCount
+  );
+
 /** Count the number of nodes in a branch with the input name.
 
   @param [in]  Fdt              Pointer to a Flattened Device Tree.
