@@ -26,7 +26,6 @@
   @retval True    The node has the input name.
   @retval FALSE   Otherwise, or error.
 **/
-STATIC
 BOOLEAN
 EFIAPI
 FdtNodeHasName (
