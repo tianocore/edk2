@@ -127,6 +127,24 @@ BOOLEAN
   IN  CONST VOID    *Context
   );
 
+/** Check whether a node has the input name.
+
+  @param [in]  Fdt          Pointer to a Flattened Device Tree.
+  @param [in]  Node         Offset of the node to check the name.
+  @param [in]  SearchName   Node name to search.
+                            This is a NULL terminated string.
+
+  @retval True    The node has the input name.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+FdtNodeHasName (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *SearchName
+  );
+
 /** Iterate through the list of strings in the Context,
     and check whether at least one string is matching the
     "compatible" property of the node.
