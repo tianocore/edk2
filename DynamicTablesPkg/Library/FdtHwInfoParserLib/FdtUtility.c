@@ -240,6 +240,43 @@ FdtNodeHasProperty (
   return TRUE;
 }
 
+/** Check whether a node is a CPU device node.
+
+  A CPU device node must have the "cpu" node name and a "device_type"
+  property equal to "cpu".
+
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to operate the check on.
+  @param [in]  Context   Unused.
+
+  @retval TRUE    The node is a CPU device node.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+IsCpuDeviceNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *Context
+  )
+{
+  CONST CHAR8  *DeviceType;
+  INT32        DeviceTypeSize;
+
+  (VOID)Context;
+
+  if ((Fdt == NULL) || !FdtNodeHasName (Fdt, Node, "cpu")) {
+    return FALSE;
+  }
+
+  DeviceType = FdtGetProp (Fdt, Node, "device_type", &DeviceTypeSize);
+  if ((DeviceType == NULL) || (DeviceTypeSize <= 0)) {
+    return FALSE;
+  }
+
+  return (AsciiStrCmp (DeviceType, "cpu") == 0);
+}
+
 /** Get the next node in the whole DT fulfilling a condition.
 
   The condition to fulfill is checked by the NodeChecker function.
