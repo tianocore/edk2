@@ -34,6 +34,7 @@
   RandTests.c
   Pkcs7EkuTests.c
   Pkcs7AttachedContentTest.c
+  Pkcs7EncryptTests.c
   OaepEncryptTests.c
   RsaPssTests.c
   ParallelhashTests.c
