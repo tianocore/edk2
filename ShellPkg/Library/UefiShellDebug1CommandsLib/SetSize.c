@@ -31,22 +31,19 @@ MainCmdSetSize (
 
   if (ShellCommandLineGetCount (Package) < 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setsize");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    NewSize     = 0;
-  } else {
-    Temp1 = ShellCommandLineGetRawValue (Package, 1);
-    if (Temp1 == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setsize");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      NewSize     = 0;
-    } else if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SIZE_NOT_SPEC), gShellDebug1HiiHandle, L"setsize");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      NewSize     = 0;
-    } else {
-      NewSize = ShellStrToUintn (Temp1);
-    }
+    return SHELL_INVALID_PARAMETER;
   }
+
+  Temp1 = ShellCommandLineGetRawValue (Package, 1);
+  if (Temp1 == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setsize");
+    return SHELL_INVALID_PARAMETER;
+  } else if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SIZE_NOT_SPEC), gShellDebug1HiiHandle, L"setsize");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  NewSize = ShellStrToUintn (Temp1);
 
   for (LoopVar = 2; LoopVar < ShellCommandLineGetCount (Package) && ShellStatus == SHELL_SUCCESS; LoopVar++) {
     Status = ShellOpenFileByName (ShellCommandLineGetRawValue (Package, LoopVar), &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);

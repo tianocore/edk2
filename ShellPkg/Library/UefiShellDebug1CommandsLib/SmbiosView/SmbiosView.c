@@ -57,13 +57,13 @@ MainCmdSmbiosView (
 
   if (ShellCommandLineGetCount (Package) > 1) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetFlag (Package, L"-t") && (ShellCommandLineGetValue (Package, L"-t") == NULL)) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"smbiosview", L"-t");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetFlag (Package, L"-h") && (ShellCommandLineGetValue (Package, L"-h") == NULL)) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"smbiosview", L"-h");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (
              (ShellCommandLineGetFlag (Package, L"-t") && ShellCommandLineGetFlag (Package, L"-h")) ||
              (ShellCommandLineGetFlag (Package, L"-t") && ShellCommandLineGetFlag (Package, L"-s")) ||
@@ -74,111 +74,111 @@ MainCmdSmbiosView (
              )
   {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // Init Lib
+  //
+  Status1 = LibSmbiosInit ();
+  Status2 = LibSmbios64BitInit ();
+  if (EFI_ERROR (Status1) && EFI_ERROR (Status2)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_CANNOT_GET_TABLE), gShellDebug1HiiHandle);
+    ShellStatus = SHELL_NOT_FOUND;
+    goto Done;
+  }
+
+  StructType = STRUCTURE_TYPE_RANDOM;
+  RandomView = TRUE;
+
+  Temp = ShellCommandLineGetValue (Package, L"-t");
+  if (Temp != NULL) {
+    StructType = (UINT8)ShellStrToUintn (Temp);
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-a")) {
+    gShowType = SHOW_ALL;
+  }
+
+  if (!EFI_ERROR (Status1)) {
     //
-    // Init Lib
+    // Initialize the StructHandle to be the first handle
     //
-    Status1 = LibSmbiosInit ();
-    Status2 = LibSmbios64BitInit ();
-    if (EFI_ERROR (Status1) && EFI_ERROR (Status2)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_CANNOT_GET_TABLE), gShellDebug1HiiHandle);
+    StructHandle = INVALID_HANDLE;
+    LibGetSmbiosStructure (&StructHandle, NULL, NULL);
+
+    Temp = ShellCommandLineGetValue (Package, L"-h");
+    if (Temp != NULL) {
+      RandomView   = FALSE;
+      StructHandle = (UINT16)ShellStrToUintn (Temp);
+    }
+
+    //
+    // build statistics table
+    //
+    Status = InitSmbiosTableStatistics ();
+    if (EFI_ERROR (Status)) {
       ShellStatus = SHELL_NOT_FOUND;
       goto Done;
     }
 
-    StructType = STRUCTURE_TYPE_RANDOM;
-    RandomView = TRUE;
-
-    Temp = ShellCommandLineGetValue (Package, L"-t");
-    if (Temp != NULL) {
-      StructType = (UINT8)ShellStrToUintn (Temp);
-    }
-
-    if (ShellCommandLineGetFlag (Package, L"-a")) {
-      gShowType = SHOW_ALL;
-    }
-
-    if (!EFI_ERROR (Status1)) {
-      //
-      // Initialize the StructHandle to be the first handle
-      //
-      StructHandle = INVALID_HANDLE;
-      LibGetSmbiosStructure (&StructHandle, NULL, NULL);
-
-      Temp = ShellCommandLineGetValue (Package, L"-h");
-      if (Temp != NULL) {
-        RandomView   = FALSE;
-        StructHandle = (UINT16)ShellStrToUintn (Temp);
-      }
-
-      //
-      // build statistics table
-      //
-      Status = InitSmbiosTableStatistics ();
+    if (ShellCommandLineGetFlag (Package, L"-s")) {
+      Status = DisplayStatisticsTable (SHOW_DETAIL);
       if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_NOT_FOUND;
-        goto Done;
       }
 
-      if (ShellCommandLineGetFlag (Package, L"-s")) {
-        Status = DisplayStatisticsTable (SHOW_DETAIL);
-        if (EFI_ERROR (Status)) {
-          ShellStatus = SHELL_NOT_FOUND;
-        }
-
-        goto Show64Bit;
-      }
-
-      //
-      // Show SMBIOS structure information
-      //
-      Status = SMBiosView (StructType, StructHandle, gShowType, RandomView);
-      if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_NOT_FOUND;
-        goto Done;
-      }
+      goto Show64Bit;
     }
+
+    //
+    // Show SMBIOS structure information
+    //
+    Status = SMBiosView (StructType, StructHandle, gShowType, RandomView);
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_NOT_FOUND;
+      goto Done;
+    }
+  }
 
 Show64Bit:
-    if (!EFI_ERROR (Status2)) {
-      //
-      // build statistics table
-      //
-      Status = InitSmbios64BitTableStatistics ();
-      if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_NOT_FOUND;
-        goto Done;
-      }
+  if (!EFI_ERROR (Status2)) {
+    //
+    // build statistics table
+    //
+    Status = InitSmbios64BitTableStatistics ();
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_NOT_FOUND;
+      goto Done;
+    }
 
-      //
-      // Initialize the StructHandle to be the first handle
-      //
-      StructHandle = INVALID_HANDLE;
-      LibGetSmbios64BitStructure (&StructHandle, NULL, NULL);
+    //
+    // Initialize the StructHandle to be the first handle
+    //
+    StructHandle = INVALID_HANDLE;
+    LibGetSmbios64BitStructure (&StructHandle, NULL, NULL);
 
-      Temp = ShellCommandLineGetValue (Package, L"-h");
-      if (Temp != NULL) {
-        RandomView   = FALSE;
-        StructHandle = (UINT16)ShellStrToUintn (Temp);
-      }
+    Temp = ShellCommandLineGetValue (Package, L"-h");
+    if (Temp != NULL) {
+      RandomView   = FALSE;
+      StructHandle = (UINT16)ShellStrToUintn (Temp);
+    }
 
-      if (ShellCommandLineGetFlag (Package, L"-s")) {
-        Status = DisplaySmbios64BitStatisticsTable (SHOW_DETAIL);
-        if (EFI_ERROR (Status)) {
-          ShellStatus = SHELL_NOT_FOUND;
-        }
-
-        goto Done;
-      }
-
-      //
-      // Show SMBIOS structure information
-      //
-      Status = SMBios64View (StructType, StructHandle, gShowType, RandomView);
+    if (ShellCommandLineGetFlag (Package, L"-s")) {
+      Status = DisplaySmbios64BitStatisticsTable (SHOW_DETAIL);
       if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_NOT_FOUND;
       }
+
+      goto Done;
+    }
+
+    //
+    // Show SMBIOS structure information
+    //
+    Status = SMBios64View (StructType, StructHandle, gShowType, RandomView);
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_NOT_FOUND;
     }
   }
 
