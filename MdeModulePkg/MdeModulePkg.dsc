@@ -184,6 +184,7 @@
 
 [LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
   ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
@@ -537,6 +538,8 @@
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
 
 [Components.AARCH64]
+  MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
   MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf

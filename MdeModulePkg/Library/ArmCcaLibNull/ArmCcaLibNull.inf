@@ -1,5 +1,5 @@
 ## @file
-#  Null implemmentation of the ArmCcaLib library.
+#  Null implementation of the ArmCcaLib library.
 #
 #  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
 #
@@ -20,7 +20,7 @@
 
 
 [Packages]
-  ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
