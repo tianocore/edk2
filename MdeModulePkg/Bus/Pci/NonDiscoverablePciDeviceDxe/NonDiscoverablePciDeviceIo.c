@@ -778,7 +778,7 @@ PciIoMapIoMmu (
   }
 
   Status = IoMmuSetAttribute (
-             NULL,
+             Dev->Handle,
              MapInfo->IoMmuContext,
              IoMmuAttribute
              );
@@ -815,7 +815,7 @@ PciIoUnmapIoMmu (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = IoMmuSetAttribute (NULL, MapInfo->IoMmuContext, 0);
+  Status = IoMmuSetAttribute (Dev->Handle, MapInfo->IoMmuContext, 0);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttribute failed.\n", __func__));
     ASSERT (FALSE);
