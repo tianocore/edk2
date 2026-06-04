@@ -753,7 +753,14 @@ PxeBcMtftp4ReadFile (
   UINT8                WindowsizeBuf[10];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
+  Status = EFI_DEVICE_ERROR;
+
+  if ((Private == NULL) ||
+      (Private->Signature != PXEBC_PRIVATE_DATA_SIGNATURE))
+  {
+    return Status;
+  }
+
   Mtftp4                    = Private->Mtftp4;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
@@ -798,6 +805,11 @@ PxeBcMtftp4ReadFile (
   Token.PacketNeeded    = NULL;
 
   Status = Mtftp4->ReadFile (Mtftp4, &Token);
+
+  if (Private->Signature != PXEBC_PRIVATE_DATA_SIGNATURE) {
+    return EFI_DEVICE_ERROR;
+  }
+
   //
   // Get the real size of received buffer.
   //

@@ -1060,6 +1060,12 @@ PxeBcUninstallCallback (
 {
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
 
+  if ((Private == NULL) ||
+      (Private->Signature != PXEBC_PRIVATE_DATA_SIGNATURE))
+  {
+    return;
+  }
+
   PxeBc = &Private->PxeBc;
 
   if (NewMakeCallback) {

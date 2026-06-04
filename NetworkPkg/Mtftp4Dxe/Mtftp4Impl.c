@@ -1086,7 +1086,10 @@ EfiMtftp4Poll (
 
   Udp    = Instance->UnicastPort->Protocol.Udp4;
   Status = Udp->Poll (Udp);
-  Mtftp4OnTimerTick (NULL, Instance->Service);
+  if ((Instance->Token != NULL)) {
+    Mtftp4OnTimerTick (NULL, Instance->Service);
+  }
+
   return Status;
 }
 
