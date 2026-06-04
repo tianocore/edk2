@@ -74,201 +74,203 @@ ShellCommandRunHexEdit (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // Check for -d
-    //
-    if (ShellCommandLineGetFlag (Package, L"-d")) {
-      if (ShellCommandLineGetCount (Package) < 4) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else if (ShellCommandLineGetCount (Package) > 4) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        WhatToDo = FileTypeDiskBuffer;
-        Name     = ShellCommandLineGetRawValue (Package, 1);
-        Offset   = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 2));
-        Size     = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 3));
-      }
 
-      if ((Offset == (UINTN)-1) || (Size == (UINTN)-1)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"hexedit", L"-d");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
+    return ShellStatus;
+  }
+
+  //
+  // Check for -d
+  //
+  if (ShellCommandLineGetFlag (Package, L"-d")) {
+    if (ShellCommandLineGetCount (Package) < 4) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (ShellCommandLineGetCount (Package) > 4) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      WhatToDo = FileTypeDiskBuffer;
+      Name     = ShellCommandLineGetRawValue (Package, 1);
+      Offset   = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 2));
+      Size     = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 3));
     }
 
-    //
-    // check for -f
-    //
-    if (ShellCommandLineGetFlag (Package, L"-f") && (WhatToDo == FileTypeNone)) {
-      if (ShellCommandLineGetCount (Package) < 2) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else if (ShellCommandLineGetCount (Package) > 2) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Name = ShellCommandLineGetRawValue (Package, 1);
-        if ((Name == NULL) || !IsValidFileName (Name)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"hexedit", Name);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          WhatToDo = FileTypeFileBuffer;
-        }
-      }
+    if ((Offset == (UINTN)-1) || (Size == (UINTN)-1)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"hexedit", L"-d");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     }
+  }
 
-    //
-    // check for -m
-    //
-    if (ShellCommandLineGetFlag (Package, L"-m") && (WhatToDo == FileTypeNone)) {
-      if (ShellCommandLineGetCount (Package) < 3) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else if (ShellCommandLineGetCount (Package) > 3) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        WhatToDo = FileTypeMemBuffer;
-        Offset   = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 1));
-        Size     = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 2));
-      }
-    }
-
-    Name = ShellCommandLineGetRawValue (Package, 1);
-    if ((WhatToDo == FileTypeNone) && (Name != NULL)) {
-      if (ShellCommandLineGetCount (Package) > 2) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else if (!IsValidFileName (Name)) {
+  //
+  // check for -f
+  //
+  if (ShellCommandLineGetFlag (Package, L"-f") && (WhatToDo == FileTypeNone)) {
+    if (ShellCommandLineGetCount (Package) < 2) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (ShellCommandLineGetCount (Package) > 2) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Name = ShellCommandLineGetRawValue (Package, 1);
+      if ((Name == NULL) || !IsValidFileName (Name)) {
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"hexedit", Name);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         WhatToDo = FileTypeFileBuffer;
       }
-    } else if (WhatToDo == FileTypeNone) {
-      if (gEfiShellProtocol->GetCurDir (NULL) == NULL) {
-        ShellStatus = SHELL_NOT_FOUND;
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle, L"hexedit");
-      } else {
-        NewName  = EditGetDefaultFileName (L"bin");
-        Name     = NewName;
-        WhatToDo = FileTypeFileBuffer;
-      }
     }
+  }
 
-    if ((ShellStatus == SHELL_SUCCESS) && (WhatToDo == FileTypeNone)) {
+  //
+  // check for -m
+  //
+  if (ShellCommandLineGetFlag (Package, L"-m") && (WhatToDo == FileTypeNone)) {
+    if (ShellCommandLineGetCount (Package) < 3) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
       ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if ((WhatToDo == FileTypeFileBuffer) && (ShellGetCurrentDir (NULL) == NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle, L"hexedit");
+    } else if (ShellCommandLineGetCount (Package) > 3) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
       ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      WhatToDo = FileTypeMemBuffer;
+      Offset   = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 1));
+      Size     = ShellStrToUintn (ShellCommandLineGetRawValue (Package, 2));
+    }
+  }
+
+  Name = ShellCommandLineGetRawValue (Package, 1);
+  if ((WhatToDo == FileTypeNone) && (Name != NULL)) {
+    if (ShellCommandLineGetCount (Package) > 2) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"hexedit");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (!IsValidFileName (Name)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"hexedit", Name);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      WhatToDo = FileTypeFileBuffer;
+    }
+  } else if (WhatToDo == FileTypeNone) {
+    if (gEfiShellProtocol->GetCurDir (NULL) == NULL) {
+      ShellStatus = SHELL_NOT_FOUND;
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle, L"hexedit");
+    } else {
+      NewName  = EditGetDefaultFileName (L"bin");
+      Name     = NewName;
+      WhatToDo = FileTypeFileBuffer;
+    }
+  }
+
+  if ((ShellStatus == SHELL_SUCCESS) && (WhatToDo == FileTypeNone)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"hexedit");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if ((WhatToDo == FileTypeFileBuffer) && (ShellGetCurrentDir (NULL) == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellDebug1HiiHandle, L"hexedit");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellStatus == SHELL_SUCCESS) {
+    //
+    // Do the editor
+    //
+    Status = HMainEditorInit ();
+    if (EFI_ERROR (Status)) {
+      gST->ConOut->ClearScreen (gST->ConOut);
+      gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_INIT_FAILED), gShellDebug1HiiHandle);
+    } else {
+      HMainEditorBackup ();
+      switch (WhatToDo) {
+        case FileTypeFileBuffer:
+          Status = HBufferImageRead (
+                     Name == NULL ? L"" : Name,
+                     NULL,
+                     0,
+                     0,
+                     0,
+                     0,
+                     FileTypeFileBuffer,
+                     FALSE
+                     );
+          break;
+
+        case FileTypeDiskBuffer:
+          Status = HBufferImageRead (
+                     NULL,
+                     Name == NULL ? L"" : Name,
+                     Offset,
+                     Size,
+                     0,
+                     0,
+                     FileTypeDiskBuffer,
+                     FALSE
+                     );
+          break;
+
+        case FileTypeMemBuffer:
+          Status = HBufferImageRead (
+                     NULL,
+                     NULL,
+                     0,
+                     0,
+                     (UINT32)Offset,
+                     Size,
+                     FileTypeMemBuffer,
+                     FALSE
+                     );
+          break;
+
+        default:
+          Status = EFI_NOT_FOUND;
+          break;
+      }
+
+      if (!EFI_ERROR (Status)) {
+        HMainEditorRefresh ();
+        Status = HMainEditorKeyInput ();
+      }
+
+      if (Status != EFI_OUT_OF_RESOURCES) {
+        //
+        // back up the status string
+        //
+        Buffer = CatSPrint (NULL, L"%s\r\n", StatusBarGetString ());
+      }
     }
 
-    if (ShellStatus == SHELL_SUCCESS) {
-      //
-      // Do the editor
-      //
-      Status = HMainEditorInit ();
-      if (EFI_ERROR (Status)) {
-        gST->ConOut->ClearScreen (gST->ConOut);
-        gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_INIT_FAILED), gShellDebug1HiiHandle);
-      } else {
-        HMainEditorBackup ();
-        switch (WhatToDo) {
-          case FileTypeFileBuffer:
-            Status = HBufferImageRead (
-                       Name == NULL ? L"" : Name,
-                       NULL,
-                       0,
-                       0,
-                       0,
-                       0,
-                       FileTypeFileBuffer,
-                       FALSE
-                       );
-            break;
+    //
+    // cleanup
+    //
+    HMainEditorCleanup ();
 
-          case FileTypeDiskBuffer:
-            Status = HBufferImageRead (
-                       NULL,
-                       Name == NULL ? L"" : Name,
-                       Offset,
-                       Size,
-                       0,
-                       0,
-                       FileTypeDiskBuffer,
-                       FALSE
-                       );
-            break;
-
-          case FileTypeMemBuffer:
-            Status = HBufferImageRead (
-                       NULL,
-                       NULL,
-                       0,
-                       0,
-                       (UINT32)Offset,
-                       Size,
-                       FileTypeMemBuffer,
-                       FALSE
-                       );
-            break;
-
-          default:
-            Status = EFI_NOT_FOUND;
-            break;
-        }
-
-        if (!EFI_ERROR (Status)) {
-          HMainEditorRefresh ();
-          Status = HMainEditorKeyInput ();
-        }
-
-        if (Status != EFI_OUT_OF_RESOURCES) {
-          //
-          // back up the status string
-          //
-          Buffer = CatSPrint (NULL, L"%s\r\n", StatusBarGetString ());
-        }
+    if (EFI_ERROR (Status)) {
+      if (ShellStatus == SHELL_SUCCESS) {
+        ShellStatus = SHELL_UNSUPPORTED;
       }
+    }
 
-      //
-      // cleanup
-      //
-      HMainEditorCleanup ();
-
-      if (EFI_ERROR (Status)) {
-        if (ShellStatus == SHELL_SUCCESS) {
-          ShellStatus = SHELL_UNSUPPORTED;
-        }
-      }
-
-      //
-      // print editor exit code on screen
-      //
-      if (Status == EFI_OUT_OF_RESOURCES) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"hexedit");
-      } else if (EFI_ERROR (Status)) {
-        if (Buffer != NULL) {
-          if (StrCmp (Buffer, L"") != 0) {
-            //
-            // print out the status string
-            //
-            ShellPrintDefaultEx (L"%s", Buffer);
-          } else {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_UNKNOWN_EDITOR), gShellDebug1HiiHandle);
-          }
+    //
+    // print editor exit code on screen
+    //
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"hexedit");
+    } else if (EFI_ERROR (Status)) {
+      if (Buffer != NULL) {
+        if (StrCmp (Buffer, L"") != 0) {
+          //
+          // print out the status string
+          //
+          ShellPrintDefaultEx (L"%s", Buffer);
         } else {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_UNKNOWN_EDITOR), gShellDebug1HiiHandle);
         }
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_UNKNOWN_EDITOR), gShellDebug1HiiHandle);
       }
     }
-
-    ShellCommandLineFreeVarList (Package);
   }
+
+  ShellCommandLineFreeVarList (Package);
 
   SHELL_FREE_NON_NULL (Buffer);
   SHELL_FREE_NON_NULL (NewName);
