@@ -265,17 +265,14 @@ CxlFindEndpoints (
   return Status;
 }
 
-/**
-  Function for 'cxl' command.
+/** Main function of the 'Cxl' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunCxl (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdCxl (
+  LIST_ENTRY  *Package
   )
 {
   UINTN                          Segment;
@@ -286,8 +283,6 @@ ShellCommandRunCxl (
   UINTN                          Index;
   EFI_HANDLE                     *HandleBuf;
   UINTN                          HandleCount;
-  LIST_ENTRY                     *Package;
-  CHAR16                         *ProblemParam;
   SHELL_STATUS                   ShellStatus;
   EFI_PCI_IO_PROTOCOL            *PciIo;
   EDKII_CXL_IO_PROTOCOL          *CxlIo;
@@ -302,31 +297,6 @@ ShellCommandRunCxl (
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
   HandleBuf   = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"cxl", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   //
   // Argument Count == 1(no other argument): enumerate all CXL functions
@@ -519,6 +489,57 @@ Done:
   if (HandleBuf != NULL) {
     FreePool (HandleBuf);
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'cxl' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunCxl (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"cxl", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdCxl (Package);
 
   ShellCommandLineFreeVarList (Package);
 
