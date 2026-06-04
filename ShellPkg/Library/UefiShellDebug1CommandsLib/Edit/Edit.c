@@ -10,24 +10,19 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include "TextEditor.h"
 
-/**
-  Function for 'edit' command.
+/** Main function of the 'Edit' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunEdit (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdEdit (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
   CHAR16        *Buffer;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  LIST_ENTRY    *Package;
   CONST CHAR16  *Cwd;
   CHAR16        *Nfs;
   CHAR16        *Spot;
@@ -36,31 +31,6 @@ ShellCommandRunEdit (
   Buffer      = NULL;
   ShellStatus = SHELL_SUCCESS;
   Nfs         = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"edit", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"edit");
@@ -153,6 +123,58 @@ ShellCommandRunEdit (
       }
     }
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'edit' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunEdit (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+  LIST_ENTRY    *Package;
+
+  //  SHELL_FILE_HANDLE   TempHandle;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"edit", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdEdit (Package);
 
   ShellCommandLineFreeVarList (Package);
 

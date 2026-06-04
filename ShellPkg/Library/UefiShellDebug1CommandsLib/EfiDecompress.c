@@ -10,22 +10,17 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include <Protocol/Decompress.h>
 
-/**
-  Function for 'decompress' command.
+/** Main function of the 'EfiDecompress' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunEfiDecompress (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdEfiDecompress (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS               Status;
-  LIST_ENTRY               *Package;
-  CHAR16                   *ProblemParam;
   SHELL_STATUS             ShellStatus;
   SHELL_FILE_HANDLE        InFileHandle;
   SHELL_FILE_HANDLE        OutFileHandle;
@@ -54,31 +49,6 @@ ShellCommandRunEfiDecompress (
   InFileHandle  = NULL;
   OutFileHandle = NULL;
   Decompress    = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"efidecompress", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   if (ShellCommandLineGetCount (Package) > 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"efidecompress");
@@ -188,8 +158,6 @@ ShellCommandRunEfiDecompress (
   }
 
 Done:
-  ShellCommandLineFreeVarList (Package);
-
   if (InFileHandle != NULL) {
     gEfiShellProtocol->CloseFile (InFileHandle);
   }
@@ -202,6 +170,59 @@ Done:
   SHELL_FREE_NON_NULL (InBuffer);
   SHELL_FREE_NON_NULL (OutBuffer);
   SHELL_FREE_NON_NULL (ScratchBuffer);
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'decompress' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunEfiDecompress (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"efidecompress", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdEfiDecompress (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
