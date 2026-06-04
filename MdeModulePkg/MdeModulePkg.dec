@@ -186,6 +186,10 @@
   #
   HobPrintLib|Include/Library/HobPrintLib.h
 
+  ##  @libraryclass   Provides interfaces for Arm CCA Realm Services.
+  #
+  ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
