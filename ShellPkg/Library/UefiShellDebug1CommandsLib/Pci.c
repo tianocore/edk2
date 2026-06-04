@@ -2499,26 +2499,22 @@ MainCmdPci (
 
   if (ShellCommandLineGetCount (Package) == 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"pci");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    goto Done;
+    return SHELL_INVALID_PARAMETER;
   }
 
   if (ShellCommandLineGetCount (Package) > 4) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    goto Done;
+    return SHELL_INVALID_PARAMETER;
   }
 
   if (ShellCommandLineGetFlag (Package, L"-ec") && (ShellCommandLineGetValue (Package, L"-ec") == NULL)) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"pci", L"-ec");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    goto Done;
+    return SHELL_INVALID_PARAMETER;
   }
 
   if (ShellCommandLineGetFlag (Package, L"-s") && (ShellCommandLineGetValue (Package, L"-s") == NULL)) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"pci", L"-s");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    goto Done;
+    return SHELL_INVALID_PARAMETER;
   }
 
   //
@@ -2530,8 +2526,7 @@ MainCmdPci (
   HandleBuf     = (EFI_HANDLE *)AllocateZeroPool (HandleBufSize);
   if (HandleBuf == NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
-    ShellStatus = SHELL_OUT_OF_RESOURCES;
-    goto Done;
+    return SHELL_OUT_OF_RESOURCES;
   }
 
   Status = gBS->LocateHandle (
