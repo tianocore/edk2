@@ -325,192 +325,194 @@ ShellCommandRunCxl (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // Argument Count == 1(no other argument): enumerate all CXL functions
-    //
-    if (ShellCommandLineGetCount (Package) == 1) {
-      Status = CxlFindEndpoints (&HandleBuf, &HandleCount);
-      if (EFI_ERROR (Status)) {
-        goto Done;
-      }
 
-      for (Index = 0; Index < HandleCount; Index++) {
-        Status = gBS->HandleProtocol (HandleBuf[Index], &gEdkiiCxlIoProtocolGuid, (VOID **)&CxlIo);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"cxl");
-          ShellStatus = SHELL_NOT_FOUND;
-          goto Done;
-        }
+    return ShellStatus;
+  }
 
-        PciIo  = CxlIo->PciIo;
-        Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Func);
-        if (EFI_ERROR (Status)) {
-          goto Done;
-        }
-
-        Status = PciIo->Pci.Read (
-                              PciIo,
-                              EfiPciIoWidthFifoUint32,
-                              0,
-                              sizeof (PciHeader) / sizeof (UINT32),
-                              &PciHeader
-                              );
-        if (EFI_ERROR (Status)) {
-          goto Done;
-        }
-
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_CXL_LINE_P1),
-          gShellDebug1HiiHandle,
-          Segment,
-          Bus,
-          Device,
-          Func
-          );
-
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_CXL_LINE_P2),
-          gShellDebug1HiiHandle,
-          PciHeader.VendorId,
-          PciHeader.DeviceId
-          );
-      }
-
-      Status = EFI_SUCCESS;
+  //
+  // Argument Count == 1(no other argument): enumerate all CXL functions
+  //
+  if (ShellCommandLineGetCount (Package) == 1) {
+    Status = CxlFindEndpoints (&HandleBuf, &HandleCount);
+    if (EFI_ERROR (Status)) {
       goto Done;
-    } else {
-      // Dump extended information
-      TargetSegment = 0;
-      TargetBus     = 0;
-      TargetDevice  = 0;
-      TargetFunc    = 0;
-      if ((ShellCommandLineGetCount (Package) < 4) || (ShellCommandLineGetCount (Package) == 5)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"cxl");
-        ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+
+    for (Index = 0; Index < HandleCount; Index++) {
+      Status = gBS->HandleProtocol (HandleBuf[Index], &gEdkiiCxlIoProtocolGuid, (VOID **)&CxlIo);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"cxl");
+        ShellStatus = SHELL_NOT_FOUND;
         goto Done;
       }
 
-      if (ShellCommandLineGetCount (Package) > 6) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"cxl");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      if (ShellCommandLineGetFlag (Package, L"-s") && (ShellCommandLineGetValue (Package, L"-s") == NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"cxl", L"-s");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      Temp = ShellCommandLineGetValue (Package, L"-s");
-      if (Temp != NULL) {
-        //
-        // Input converted to hexadecimal number.
-        //
-        if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-          TargetSegment = (UINT16)RetVal;
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      }
-
-      //
-      // The first Argument is assumed to be Bus number, second
-      // to be Device number, and third to be Func number.
-      //
-      Temp = ShellCommandLineGetRawValue (Package, 1);
-      if (Temp != NULL) {
-        //
-        // Input converted to hexadecimal number.
-        //
-        if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-          TargetBus = (UINT16)RetVal;
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-
-        if (TargetBus > PCI_MAX_BUS) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      }
-
-      Temp = ShellCommandLineGetRawValue (Package, 2);
-      if (Temp != NULL) {
-        //
-        // Input converted to hexadecimal number.
-        //
-        if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-          TargetDevice = (UINT16)RetVal;
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-
-        if (TargetDevice > PCI_MAX_DEVICE) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      }
-
-      Temp = ShellCommandLineGetRawValue (Package, 3);
-      if (Temp != NULL) {
-        //
-        // Input converted to hexadecimal number.
-        //
-        if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-          TargetFunc = (UINT16)RetVal;
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-
-        if (TargetFunc > PCI_MAX_FUNC) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"cxl", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      }
-
-      Status = CxlFindEndpoints (&HandleBuf, &HandleCount);
+      PciIo  = CxlIo->PciIo;
+      Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Func);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
 
-      for (Index = 0; Index < HandleCount; Index++) {
-        Status = gBS->HandleProtocol (HandleBuf[Index], &gEdkiiCxlIoProtocolGuid, (VOID **)&CxlIo);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"cxl");
-          ShellStatus = SHELL_NOT_FOUND;
-          goto Done;
-        }
-
-        PciIo  = CxlIo->PciIo;
-        Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Func);
-        if (EFI_ERROR (Status)) {
-          goto Done;
-        }
-
-        if ((Segment != TargetSegment) ||
-            (Bus != TargetBus) ||
-            (Device != TargetDevice) ||
-            (Func != TargetFunc))
-        {
-          continue;
-        }
-
-        PrintCdatInfo (CxlIo);
+      Status = PciIo->Pci.Read (
+                            PciIo,
+                            EfiPciIoWidthFifoUint32,
+                            0,
+                            sizeof (PciHeader) / sizeof (UINT32),
+                            &PciHeader
+                            );
+      if (EFI_ERROR (Status)) {
         goto Done;
       }
+
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_CXL_LINE_P1),
+        gShellDebug1HiiHandle,
+        Segment,
+        Bus,
+        Device,
+        Func
+        );
+
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_CXL_LINE_P2),
+        gShellDebug1HiiHandle,
+        PciHeader.VendorId,
+        PciHeader.DeviceId
+        );
+    }
+
+    Status = EFI_SUCCESS;
+    goto Done;
+  } else {
+    // Dump extended information
+    TargetSegment = 0;
+    TargetBus     = 0;
+    TargetDevice  = 0;
+    TargetFunc    = 0;
+    if ((ShellCommandLineGetCount (Package) < 4) || (ShellCommandLineGetCount (Package) == 5)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"cxl");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    if (ShellCommandLineGetCount (Package) > 6) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"cxl");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    if (ShellCommandLineGetFlag (Package, L"-s") && (ShellCommandLineGetValue (Package, L"-s") == NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"cxl", L"-s");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    Temp = ShellCommandLineGetValue (Package, L"-s");
+    if (Temp != NULL) {
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        TargetSegment = (UINT16)RetVal;
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+    }
+
+    //
+    // The first Argument is assumed to be Bus number, second
+    // to be Device number, and third to be Func number.
+    //
+    Temp = ShellCommandLineGetRawValue (Package, 1);
+    if (Temp != NULL) {
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        TargetBus = (UINT16)RetVal;
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
+      if (TargetBus > PCI_MAX_BUS) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+    }
+
+    Temp = ShellCommandLineGetRawValue (Package, 2);
+    if (Temp != NULL) {
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        TargetDevice = (UINT16)RetVal;
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
+      if (TargetDevice > PCI_MAX_DEVICE) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+    }
+
+    Temp = ShellCommandLineGetRawValue (Package, 3);
+    if (Temp != NULL) {
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        TargetFunc = (UINT16)RetVal;
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
+      if (TargetFunc > PCI_MAX_FUNC) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"cxl", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+    }
+
+    Status = CxlFindEndpoints (&HandleBuf, &HandleCount);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    for (Index = 0; Index < HandleCount; Index++) {
+      Status = gBS->HandleProtocol (HandleBuf[Index], &gEdkiiCxlIoProtocolGuid, (VOID **)&CxlIo);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"cxl");
+        ShellStatus = SHELL_NOT_FOUND;
+        goto Done;
+      }
+
+      PciIo  = CxlIo->PciIo;
+      Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Func);
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
+
+      if ((Segment != TargetSegment) ||
+          (Bus != TargetBus) ||
+          (Device != TargetDevice) ||
+          (Func != TargetFunc))
+      {
+        continue;
+      }
+
+      PrintCdatInfo (CxlIo);
+      goto Done;
     }
   }
 

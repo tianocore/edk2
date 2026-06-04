@@ -134,74 +134,76 @@ ShellCommandRunDblk (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetCount (Package) > 4) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dblk");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetCount (Package) < 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"dblk");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    if (ShellCommandLineGetCount (Package) > 4) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dblk");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount (Package) < 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"dblk");
-      ShellStatus = SHELL_INVALID_PARAMETER;
+    //
+    // Parse the params
+    //
+    BlockName        = ShellCommandLineGetRawValue (Package, 1);
+    LbaString        = ShellCommandLineGetRawValue (Package, 2);
+    BlockCountString = ShellCommandLineGetRawValue (Package, 3);
+
+    if (LbaString == NULL) {
+      Lba = 0;
     } else {
-      //
-      // Parse the params
-      //
-      BlockName        = ShellCommandLineGetRawValue (Package, 1);
-      LbaString        = ShellCommandLineGetRawValue (Package, 2);
-      BlockCountString = ShellCommandLineGetRawValue (Package, 3);
-
-      if (LbaString == NULL) {
-        Lba = 0;
-      } else {
-        if (!ShellIsHexOrDecimalNumber (LbaString, TRUE, FALSE)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
-
-        if (EFI_ERROR (ShellConvertStringToUint64 (LbaString, &Lba, TRUE, FALSE))) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
+      if (!ShellIsHexOrDecimalNumber (LbaString, TRUE, FALSE)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
+        ShellStatus = SHELL_INVALID_PARAMETER;
       }
 
-      if (BlockCountString == NULL) {
-        BlockCount = 1;
-      } else {
-        if (!ShellIsHexOrDecimalNumber (BlockCountString, TRUE, FALSE)) {
+      if (EFI_ERROR (ShellConvertStringToUint64 (LbaString, &Lba, TRUE, FALSE))) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
+    }
+
+    if (BlockCountString == NULL) {
+      BlockCount = 1;
+    } else {
+      if (!ShellIsHexOrDecimalNumber (BlockCountString, TRUE, FALSE)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
+
+      if (!EFI_ERROR (ShellConvertStringToUint64 (BlockCountString, &BlockCount, TRUE, FALSE))) {
+        if (BlockCount > 0x10) {
+          BlockCount = 0x10;
+        } else if (BlockCount == 0) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
           ShellStatus = SHELL_INVALID_PARAMETER;
-        }
-
-        if (!EFI_ERROR (ShellConvertStringToUint64 (BlockCountString, &BlockCount, TRUE, FALSE))) {
-          if (BlockCount > 0x10) {
-            BlockCount = 0x10;
-          } else if (BlockCount == 0) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
-        }
-      }
-
-      if (ShellStatus == SHELL_SUCCESS) {
-        //
-        // do the work if we have a valid block identifier
-        //
-        if ((BlockName == NULL) || (gEfiShellProtocol->GetDevicePathFromMap (BlockName) == NULL)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockName);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          DevPath = (EFI_DEVICE_PATH_PROTOCOL *)gEfiShellProtocol->GetDevicePathFromMap (BlockName);
-          if (gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevPath, NULL) == EFI_NOT_FOUND) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_MAP_PROTOCOL), gShellDebug1HiiHandle, L"dblk", BlockName, L"BlockIo");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            ShellStatus = DisplayTheBlocks (gEfiShellProtocol->GetDevicePathFromMap (BlockName), Lba, (UINT8)BlockCount);
-          }
         }
       }
     }
 
-    ShellCommandLineFreeVarList (Package);
+    if (ShellStatus == SHELL_SUCCESS) {
+      //
+      // do the work if we have a valid block identifier
+      //
+      if ((BlockName == NULL) || (gEfiShellProtocol->GetDevicePathFromMap (BlockName) == NULL)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockName);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        DevPath = (EFI_DEVICE_PATH_PROTOCOL *)gEfiShellProtocol->GetDevicePathFromMap (BlockName);
+        if (gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevPath, NULL) == EFI_NOT_FOUND) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_MAP_PROTOCOL), gShellDebug1HiiHandle, L"dblk", BlockName, L"BlockIo");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          ShellStatus = DisplayTheBlocks (gEfiShellProtocol->GetDevicePathFromMap (BlockName), Lba, (UINT8)BlockCount);
+        }
+      }
+    }
   }
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
