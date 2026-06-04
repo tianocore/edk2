@@ -239,17 +239,14 @@ ValidDataBits (
   return (DataBits == 4) || (DataBits == 7) || (DataBits == 8);
 }
 
-/**
-  Function for 'sermode' command.
+/** Main function of the 'SerMode' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunSerMode (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdSerMode (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS              Status;
@@ -263,8 +260,6 @@ ShellCommandRunSerMode (
   UINTN                   BaudRate;
   UINTN                   DataBits;
   EFI_SERIAL_IO_PROTOCOL  *SerialIo;
-  LIST_ENTRY              *Package;
-  CHAR16                  *ProblemParam;
   CONST CHAR16            *Temp;
   UINT64                  Intermediate;
 
@@ -274,19 +269,6 @@ ShellCommandRunSerMode (
   Handles     = NULL;
   NoHandles   = 0;
   Index       = 0;
-
-  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"sermode", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   if ((ShellCommandLineGetCount (Package) < 6) && (ShellCommandLineGetCount (Package) > 2)) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"sermode");
@@ -409,11 +391,50 @@ ShellCommandRunSerMode (
   }
 
 Done:
-  ShellCommandLineFreeVarList (Package);
-
   if (Handles != NULL) {
     FreePool (Handles);
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'sermode' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunSerMode (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  SHELL_STATUS  ShellStatus;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+
+  ShellStatus = SHELL_SUCCESS;
+  Package     = NULL;
+
+  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"sermode", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdSerMode (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return ShellStatus;
 }

@@ -9,22 +9,17 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 
-/**
-  Function for 'setsize' command.
+/** Main function of the 'SetSize' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunSetSize (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdSetSize (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS         Status;
-  LIST_ENTRY         *Package;
-  CHAR16             *ProblemParam;
   SHELL_STATUS       ShellStatus;
   CONST CHAR16       *Temp1;
   UINTN              NewSize;
@@ -33,31 +28,6 @@ ShellCommandRunSetSize (
 
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setsize", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   if (ShellCommandLineGetCount (Package) < 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setsize");
@@ -106,6 +76,57 @@ ShellCommandRunSetSize (
       ShellCloseFile (&FileHandle);
     }
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'setsize' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunSetSize (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setsize", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdSetSize (Package);
 
   ShellCommandLineFreeVarList (Package);
 
