@@ -93,93 +93,95 @@ ShellCommandRunLoadPciRom (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetCount (Package) < 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"loadpcirom");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      if (ShellCommandLineGetFlag (Package, L"-nc")) {
-        Connect = FALSE;
-      } else {
-        Connect = TRUE;
-      }
 
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetCount (Package) < 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"loadpcirom");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else {
+    if (ShellCommandLineGetFlag (Package, L"-nc")) {
+      Connect = FALSE;
+    } else {
+      Connect = TRUE;
+    }
+
+    //
+    // get a list with each file specified by parameters
+    // if parameter is a directory then add all the files below it to the list
+    //
+    for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+          ; Param != NULL
+          ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+          )
+    {
+      Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Param);
+        ShellStatus = SHELL_ACCESS_DENIED;
+        break;
+      }
+    }
+
+    if ((ShellStatus == SHELL_SUCCESS) && (FileList != NULL)) {
       //
-      // get a list with each file specified by parameters
-      // if parameter is a directory then add all the files below it to the list
+      // loop through the list and make sure we are not aborting...
       //
-      for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            ; Param != NULL
-            ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+      for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
+            ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
+            ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
             )
       {
-        Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+        if (EFI_ERROR (Node->Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          continue;
+        }
+
+        if (FileHandleIsDirectory (Node->Handle) == EFI_SUCCESS) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          continue;
+        }
+
+        SourceSize  = (UINTN)Node->Info->FileSize;
+        File1Buffer = AllocateZeroPool (SourceSize);
+        if (File1Buffer == NULL) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"loadpcirom");
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
+          continue;
+        }
+
+        Status = gEfiShellProtocol->ReadFile (Node->Handle, &SourceSize, File1Buffer);
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Param);
-          ShellStatus = SHELL_ACCESS_DENIED;
-          break;
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_READ_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          Status = LoadEfiDriversFromRomImage (
+                     File1Buffer,
+                     SourceSize,
+                     Node->FullName
+                     );
+
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_PCI_ROM_RES), gShellDebug1HiiHandle, Node->FullName, Status);
         }
+
+        FreePool (File1Buffer);
       }
+    } else if (ShellStatus == SHELL_SUCCESS) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_SPEC), gShellDebug1HiiHandle, "loadpcirom");
+      ShellStatus = SHELL_NOT_FOUND;
+    }
 
-      if ((ShellStatus == SHELL_SUCCESS) && (FileList != NULL)) {
-        //
-        // loop through the list and make sure we are not aborting...
-        //
-        for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-              ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-              ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-              )
-        {
-          if (EFI_ERROR (Node->Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-            continue;
-          }
+    if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
+      Status = ShellCloseFileMetaArg (&FileList);
+    }
 
-          if (FileHandleIsDirectory (Node->Handle) == EFI_SUCCESS) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-            continue;
-          }
+    FileList = NULL;
 
-          SourceSize  = (UINTN)Node->Info->FileSize;
-          File1Buffer = AllocateZeroPool (SourceSize);
-          if (File1Buffer == NULL) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"loadpcirom");
-            ShellStatus = SHELL_OUT_OF_RESOURCES;
-            continue;
-          }
-
-          Status = gEfiShellProtocol->ReadFile (Node->Handle, &SourceSize, File1Buffer);
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_READ_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            Status = LoadEfiDriversFromRomImage (
-                       File1Buffer,
-                       SourceSize,
-                       Node->FullName
-                       );
-
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_PCI_ROM_RES), gShellDebug1HiiHandle, Node->FullName, Status);
-          }
-
-          FreePool (File1Buffer);
-        }
-      } else if (ShellStatus == SHELL_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_SPEC), gShellDebug1HiiHandle, "loadpcirom");
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-
-      if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
-        Status = ShellCloseFileMetaArg (&FileList);
-      }
-
-      FileList = NULL;
-
-      if (Connect) {
-        Status = LoadPciRomConnectAllDriversToAllControllers ();
-      }
+    if (Connect) {
+      Status = LoadPciRomConnectAllDriversToAllControllers ();
     }
   }
 
