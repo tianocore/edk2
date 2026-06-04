@@ -20,24 +20,19 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax  }
 };
 
-/**
-  Function for 'hexedit' command.
+/** Main function of the 'HexEdit' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunHexEdit (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdHexEdit (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS      Status;
   CHAR16          *Buffer;
-  CHAR16          *ProblemParam;
   SHELL_STATUS    ShellStatus;
-  LIST_ENTRY      *Package;
   CHAR16          *NewName;
   CONST CHAR16    *Name;
   UINTN           Offset;
@@ -52,31 +47,6 @@ ShellCommandRunHexEdit (
   Offset      = 0;
   Size        = 0;
   WhatToDo    = FileTypeNone;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"hexedit", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   //
   // Check for -d
@@ -270,9 +240,60 @@ ShellCommandRunHexEdit (
     }
   }
 
-  ShellCommandLineFreeVarList (Package);
-
   SHELL_FREE_NON_NULL (Buffer);
   SHELL_FREE_NON_NULL (NewName);
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'hexedit' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunHexEdit (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+  LIST_ENTRY    *Package;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"hexedit", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdHexEdit (Package);
+
+  ShellCommandLineFreeVarList (Package);
+
   return ShellStatus;
 }
