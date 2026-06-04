@@ -52,108 +52,108 @@ MainCmdEfiDecompress (
 
   if (ShellCommandLineGetCount (Package) > 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"efidecompress");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetCount (Package) < 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"efidecompress");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    TempParam = ShellCommandLineGetRawValue (Package, 1);
-    if (TempParam == NULL) {
-      ASSERT (TempParam != NULL);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"efidecompress");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
+    return SHELL_INVALID_PARAMETER;
+  }
 
-    InFileName  = ShellFindFilePath (TempParam);
-    OutFileName = ShellCommandLineGetRawValue (Package, 2);
-    if ((InFileName == NULL) || (OutFileName == NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"efidecompress", TempParam);
+  TempParam = ShellCommandLineGetRawValue (Package, 1);
+  if (TempParam == NULL) {
+    ASSERT (TempParam != NULL);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"efidecompress");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  InFileName  = ShellFindFilePath (TempParam);
+  OutFileName = ShellCommandLineGetRawValue (Package, 2);
+  if ((InFileName == NULL) || (OutFileName == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"efidecompress", TempParam);
+    ShellStatus = SHELL_NOT_FOUND;
+    goto Done;
+  }
+
+  if (ShellIsDirectory (InFileName) == EFI_SUCCESS) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", InFileName);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellIsDirectory (OutFileName) == EFI_SUCCESS) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", OutFileName);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellStatus != SHELL_SUCCESS) {
+    goto Done;
+  }
+
+  Status = ShellOpenFileByName (InFileName, &InFileHandle, EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
+    ShellStatus = SHELL_NOT_FOUND;
+    goto Done;
+  }
+
+  Status = FileHandleGetSize (InFileHandle, &Temp64Bit);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
+    ShellStatus = SHELL_NOT_FOUND;
+    goto Done;
+  }
+
+  //
+  // Limit the File Size to UINT32, even though calls accept UINTN.
+  // 32 bits = 4gb.
+  //
+  Status = SafeUint64ToUint32 (Temp64Bit, (UINT32 *)&InSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    ShellStatus = SHELL_BAD_BUFFER_SIZE;
+    goto Done;
+  }
+
+  InBuffer = AllocateZeroPool (InSize);
+  if (InBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+  } else {
+    Status = gEfiShellProtocol->ReadFile (InFileHandle, &InSize, InBuffer);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = Decompress->GetInfo (Decompress, InBuffer, (UINT32)InSize, &OutSize, &ScratchSize);
+  }
+
+  if (EFI_ERROR (Status) || (OutSize == 0)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EFI_DECOMPRESS_NOPE), gShellDebug1HiiHandle, InFileName);
+    ShellStatus = SHELL_NOT_FOUND;
+  } else {
+    Status = ShellOpenFileByName (OutFileName, &OutFileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue (Package, 2), Status);
       ShellStatus = SHELL_NOT_FOUND;
     } else {
-      if (ShellIsDirectory (InFileName) == EFI_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", InFileName);
-        ShellStatus = SHELL_INVALID_PARAMETER;
+      OutBuffer     = AllocateZeroPool (OutSize);
+      ScratchBuffer = AllocateZeroPool (ScratchSize);
+      if ((OutBuffer == NULL) || (ScratchBuffer == NULL)) {
+        Status = EFI_OUT_OF_RESOURCES;
+      } else {
+        Status = Decompress->Decompress (Decompress, InBuffer, (UINT32)InSize, OutBuffer, OutSize, ScratchBuffer, ScratchSize);
       }
+    }
+  }
 
-      if (ShellIsDirectory (OutFileName) == EFI_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", OutFileName);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
-
-      if (ShellStatus == SHELL_SUCCESS) {
-        Status = ShellOpenFileByName (InFileName, &InFileHandle, EFI_FILE_MODE_READ, 0);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
-          ShellStatus = SHELL_NOT_FOUND;
-        }
-      }
-
-      if (ShellStatus == SHELL_SUCCESS) {
-        Status = FileHandleGetSize (InFileHandle, &Temp64Bit);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
-          ShellStatus = SHELL_NOT_FOUND;
-        }
-      }
-
-      if (ShellStatus == SHELL_SUCCESS) {
-        //
-        // Limit the File Size to UINT32, even though calls accept UINTN.
-        // 32 bits = 4gb.
-        //
-        Status = SafeUint64ToUint32 (Temp64Bit, (UINT32 *)&InSize);
-        if (EFI_ERROR (Status)) {
-          ASSERT_EFI_ERROR (Status);
-          ShellStatus = SHELL_BAD_BUFFER_SIZE;
-          goto Done;
-        }
-
-        InBuffer = AllocateZeroPool (InSize);
-        if (InBuffer == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-        } else {
-          Status = gEfiShellProtocol->ReadFile (InFileHandle, &InSize, InBuffer);
-          ASSERT_EFI_ERROR (Status);
-
-          Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
-          ASSERT_EFI_ERROR (Status);
-
-          Status = Decompress->GetInfo (Decompress, InBuffer, (UINT32)InSize, &OutSize, &ScratchSize);
-        }
-
-        if (EFI_ERROR (Status) || (OutSize == 0)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EFI_DECOMPRESS_NOPE), gShellDebug1HiiHandle, InFileName);
-          ShellStatus = SHELL_NOT_FOUND;
-        } else {
-          Status = ShellOpenFileByName (OutFileName, &OutFileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue (Package, 2), Status);
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            OutBuffer     = AllocateZeroPool (OutSize);
-            ScratchBuffer = AllocateZeroPool (ScratchSize);
-            if ((OutBuffer == NULL) || (ScratchBuffer == NULL)) {
-              Status = EFI_OUT_OF_RESOURCES;
-            } else {
-              Status = Decompress->Decompress (Decompress, InBuffer, (UINT32)InSize, OutBuffer, OutSize, ScratchBuffer, ScratchSize);
-            }
-          }
-        }
-
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
-          ShellStatus = ((Status == EFI_OUT_OF_RESOURCES) ? SHELL_OUT_OF_RESOURCES : SHELL_DEVICE_ERROR);
-        } else {
-          OutSizeTemp = OutSize;
-          Status      = gEfiShellProtocol->WriteFile (OutFileHandle, &OutSizeTemp, OutBuffer);
-          OutSize     = (UINT32)OutSizeTemp;
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);
-            ShellStatus = SHELL_DEVICE_ERROR;
-          }
-        }
-      }
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
+    ShellStatus = ((Status == EFI_OUT_OF_RESOURCES) ? SHELL_OUT_OF_RESOURCES : SHELL_DEVICE_ERROR);
+  } else {
+    OutSizeTemp = OutSize;
+    Status      = gEfiShellProtocol->WriteFile (OutFileHandle, &OutSizeTemp, OutBuffer);
+    OutSize     = (UINT32)OutSizeTemp;
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);
+      ShellStatus = SHELL_DEVICE_ERROR;
     }
   }
 

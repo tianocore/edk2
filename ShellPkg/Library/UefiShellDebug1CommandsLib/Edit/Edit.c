@@ -35,93 +35,94 @@ MainCmdEdit (
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"edit");
     ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    Cwd = gEfiShellProtocol->GetCurDir (NULL);
-    if (Cwd == NULL) {
-      Cwd = ShellGetEnvironmentVariable (L"path");
-      if (Cwd != NULL) {
-        Nfs = StrnCatGrow (&Nfs, NULL, Cwd+3, 0);
-        if (Nfs != NULL) {
-          Spot = StrStr (Nfs, L";");
-          if (Spot != NULL) {
-            *Spot = CHAR_NULL;
-          }
+  }
 
-          Spot = StrStr (Nfs, L"\\");
-          if (Spot != NULL) {
-            Spot[1] = CHAR_NULL;
-          }
-
-          gEfiShellProtocol->SetCurDir (NULL, Nfs);
-          FreePool (Nfs);
+  Cwd = gEfiShellProtocol->GetCurDir (NULL);
+  if (Cwd == NULL) {
+    Cwd = ShellGetEnvironmentVariable (L"path");
+    if (Cwd != NULL) {
+      Nfs = StrnCatGrow (&Nfs, NULL, Cwd+3, 0);
+      if (Nfs != NULL) {
+        Spot = StrStr (Nfs, L";");
+        if (Spot != NULL) {
+          *Spot = CHAR_NULL;
         }
+
+        Spot = StrStr (Nfs, L"\\");
+        if (Spot != NULL) {
+          Spot[1] = CHAR_NULL;
+        }
+
+        gEfiShellProtocol->SetCurDir (NULL, Nfs);
+        FreePool (Nfs);
       }
     }
+  }
 
-    Status = MainEditorInit ();
+  Status = MainEditorInit ();
 
-    if (EFI_ERROR (Status)) {
-      gST->ConOut->ClearScreen (gST->ConOut);
-      gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_INIT_FAILED), gShellDebug1HiiHandle);
+  if (EFI_ERROR (Status)) {
+    gST->ConOut->ClearScreen (gST->ConOut);
+    gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_INIT_FAILED), gShellDebug1HiiHandle);
+    return ShellStatus;
+  }
+
+  MainEditorBackup ();
+
+  //
+  // if editor launched with file named
+  //
+  if (ShellCommandLineGetCount (Package) == 2) {
+    TempParam = ShellCommandLineGetRawValue (Package, 1);
+    if (TempParam == NULL) {
+      ASSERT (TempParam != NULL);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"edit");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      MainEditorBackup ();
-
-      //
-      // if editor launched with file named
-      //
-      if (ShellCommandLineGetCount (Package) == 2) {
-        TempParam = ShellCommandLineGetRawValue (Package, 1);
-        if (TempParam == NULL) {
-          ASSERT (TempParam != NULL);
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"edit");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          FileBufferSetFileName (TempParam);
-        }
-      }
-
-      Status = FileBufferRead (MainEditor.FileBuffer->FileName, FALSE);
-      if (!EFI_ERROR (Status)) {
-        MainEditorRefresh ();
-
-        Status = MainEditorKeyInput ();
-      }
-
-      if (Status != EFI_OUT_OF_RESOURCES) {
-        //
-        // back up the status string
-        //
-        Buffer = CatSPrint (NULL, L"%s", StatusBarGetString ());
-      }
-
-      MainEditorCleanup ();
-
-      //
-      // print editor exit code on screen
-      //
-      if (Status == EFI_SUCCESS) {
-      } else if (Status == EFI_OUT_OF_RESOURCES) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"edit");
-      } else {
-        if (Buffer != NULL) {
-          if (StrCmp (Buffer, L"") != 0) {
-            //
-            // print out the status string
-            //
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_BUFFER), gShellDebug1HiiHandle, Buffer);
-          } else {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_UNKNOWN_EDITOR_ERR), gShellDebug1HiiHandle);
-          }
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_UNKNOWN_EDITOR_ERR), gShellDebug1HiiHandle);
-        }
-      }
-
-      if (Status != EFI_OUT_OF_RESOURCES) {
-        SHELL_FREE_NON_NULL (Buffer);
-      }
+      FileBufferSetFileName (TempParam);
     }
+  }
+
+  Status = FileBufferRead (MainEditor.FileBuffer->FileName, FALSE);
+  if (!EFI_ERROR (Status)) {
+    MainEditorRefresh ();
+
+    Status = MainEditorKeyInput ();
+  }
+
+  if (Status != EFI_OUT_OF_RESOURCES) {
+    //
+    // back up the status string
+    //
+    Buffer = CatSPrint (NULL, L"%s", StatusBarGetString ());
+  }
+
+  MainEditorCleanup ();
+
+  //
+  // print editor exit code on screen
+  //
+  if (Status == EFI_SUCCESS) {
+  } else if (Status == EFI_OUT_OF_RESOURCES) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"edit");
+  } else {
+    if (Buffer != NULL) {
+      if (StrCmp (Buffer, L"") != 0) {
+        //
+        // print out the status string
+        //
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_BUFFER), gShellDebug1HiiHandle, Buffer);
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_UNKNOWN_EDITOR_ERR), gShellDebug1HiiHandle);
+      }
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_MAIN_UNKNOWN_EDITOR_ERR), gShellDebug1HiiHandle);
+    }
+  }
+
+  if (Status != EFI_OUT_OF_RESOURCES) {
+    SHELL_FREE_NON_NULL (Buffer);
   }
 
   return ShellStatus;
