@@ -415,7 +415,7 @@ XenStoreWaitForEvent (
   EFI_EVENT   WaitList[2];
 
   gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &TimerEvent);
-  gBS->SetTimer (TimerEvent, TimerRelative, Timeout);
+  (VOID)gBS->SetTimer (TimerEvent, TimerRelative, Timeout);
 
   WaitList[0] = xs.EventChannelEvent;
   WaitList[1] = TimerEvent;

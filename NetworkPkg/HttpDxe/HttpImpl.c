@@ -1195,7 +1195,7 @@ HttpResponseWorker (
 
     Status = HttpTcpReceiveHeader (HttpInstance, &SizeofHeaders, &BufferSize, HttpInstance->TimeoutEvent);
 
-    gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
+    (VOID)gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
     if (EFI_ERROR (Status)) {
       goto Error;
@@ -1490,7 +1490,7 @@ HttpResponseWorker (
 
     Status = HttpsReceive (HttpInstance, &Fragment, HttpInstance->TimeoutEvent);
 
-    gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
+    (VOID)gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
     if (EFI_ERROR (Status)) {
       goto Error2;

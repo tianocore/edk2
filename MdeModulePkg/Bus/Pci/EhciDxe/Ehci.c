@@ -2047,7 +2047,7 @@ EhcDriverBindingStop (
   // Stop AsyncRequest Polling timer then stop the EHCI driver
   // and uninstall the EHCI protocl.
   //
-  gBS->SetTimer (Ehc->PollTimer, TimerCancel, EHC_ASYNC_POLL_INTERVAL);
+  (VOID)gBS->SetTimer (Ehc->PollTimer, TimerCancel, EHC_ASYNC_POLL_INTERVAL);
   EhcHaltHC (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (Ehc->PollTimer != NULL) {

@@ -1408,7 +1408,7 @@ IfConfig6SetInterfaceInfo (
                        &CurDadXmits
                        );
 
-        gBS->SetTimer (TimeOutEvt, TimerRelative, 50000000 + 10000000 * CurDadXmits);
+        (VOID)gBS->SetTimer (TimeOutEvt, TimerRelative, 50000000 + 10000000 * CurDadXmits);
 
         while (EFI_ERROR (gBS->CheckEvent (TimeOutEvt))) {
           if (IsAddressOk) {

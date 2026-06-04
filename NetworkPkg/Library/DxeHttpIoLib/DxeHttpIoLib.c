@@ -411,7 +411,7 @@ HttpIoRecvResponse (
     //
     // Remove timeout timer from the event list.
     //
-    gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
+    (VOID)gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
     return Status;
   }
 
@@ -425,7 +425,7 @@ HttpIoRecvResponse (
   //
   // Remove timeout timer from the event list.
   //
-  gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
 
   if (!HttpIo->IsRxDone) {
     //

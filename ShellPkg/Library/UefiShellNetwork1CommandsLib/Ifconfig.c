@@ -1057,7 +1057,7 @@ IfConfigSetInterfaceInfo (
                               );
 
       if (Status == EFI_NOT_READY) {
-        gBS->SetTimer (TimeOutEvt, TimerRelative, 50000000);
+        (VOID)gBS->SetTimer (TimeOutEvt, TimerRelative, 50000000);
 
         while (EFI_ERROR (gBS->CheckEvent (TimeOutEvt))) {
           if (IsAddressOk) {

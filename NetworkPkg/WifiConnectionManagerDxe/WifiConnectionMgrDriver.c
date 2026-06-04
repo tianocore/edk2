@@ -334,7 +334,7 @@ WifiMgrDxeDriverBindingStart (
 
 ERROR4:
 
-  gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   RemoveEntryList (&Nic->Link);
   mPrivate->NicCount--;
@@ -453,7 +453,7 @@ WifiMgrDxeDriverBindingStop (
   //
   // Close Event
   //
-  gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
   gBS->CloseEvent (Nic->TickTimer);
 
   //
