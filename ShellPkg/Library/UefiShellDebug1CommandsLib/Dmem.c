@@ -483,47 +483,49 @@ ShellCommandRunDmem (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetCount (Package) > 3) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmem");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    if (ShellCommandLineGetCount (Package) > 3) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmem");
-      ShellStatus = SHELL_INVALID_PARAMETER;
+    Temp1 = ShellCommandLineGetRawValue (Package, 1);
+    if (Temp1 == NULL) {
+      Address = gST;
+      Size    = sizeof (*gST);
     } else {
-      Temp1 = ShellCommandLineGetRawValue (Package, 1);
+      if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
+
+      Temp1 = ShellCommandLineGetRawValue (Package, 2);
       if (Temp1 == NULL) {
-        Address = gST;
-        Size    = sizeof (*gST);
+        Size = 512;
       } else {
-        if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
+        if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
-
-        Temp1 = ShellCommandLineGetRawValue (Package, 2);
-        if (Temp1 == NULL) {
-          Size = 512;
-        } else {
-          if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
-        }
       }
     }
-
-    if (ShellStatus == SHELL_SUCCESS) {
-      if (!ShellCommandLineGetFlag (Package, L"-mmio")) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
-        DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
-        if (Address == (VOID *)gST) {
-          ShellStatus = DisplaySystemTable (Package, Address);
-        }
-      } else {
-        ShellStatus = DisplayMmioMemory (Address, (UINTN)Size);
-      }
-    }
-
-    ShellCommandLineFreeVarList (Package);
   }
+
+  if (ShellStatus == SHELL_SUCCESS) {
+    if (!ShellCommandLineGetFlag (Package, L"-mmio")) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
+      DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
+      if (Address == (VOID *)gST) {
+        ShellStatus = DisplaySystemTable (Package, Address);
+      }
+    } else {
+      ShellStatus = DisplayMmioMemory (Address, (UINTN)Size);
+    }
+  }
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
