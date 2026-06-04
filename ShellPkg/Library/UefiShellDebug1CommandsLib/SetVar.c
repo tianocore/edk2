@@ -341,23 +341,18 @@ GetVariableDataFromParameter (
   return EFI_SUCCESS;
 }
 
-/**
-  Function for 'setvar' command.
+/** Main function of the 'SetVar' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunSetVar (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdSetVar (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS     Status;
   RETURN_STATUS  RStatus;
-  LIST_ENTRY     *Package;
-  CHAR16         *ProblemParam;
   SHELL_STATUS   ShellStatus;
   CONST CHAR16   *VariableName;
   EFI_GUID       Guid;
@@ -373,43 +368,12 @@ ShellCommandRunSetVar (
   Size        = 0;
   Attributes  = 0;
 
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setvar", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  } else if (ShellCommandLineCheckDuplicate (Package, &ProblemParam) != EFI_SUCCESS) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_DUPLICATE), gShellDebug1HiiHandle, L"setvar", ProblemParam);
-    ShellCommandLineFreeVarList (Package);
-    FreePool (ProblemParam);
-    return SHELL_INVALID_PARAMETER;
-  }
-
   if (ShellCommandLineGetCount (Package) < 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setvar");
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     VariableName = ShellCommandLineGetRawValue (Package, 1);
     if (VariableName == NULL) {
-      ShellCommandLineFreeVarList (Package);
       return SHELL_INVALID_PARAMETER;
     }
 
@@ -421,7 +385,6 @@ ShellCommandRunSetVar (
         RStatus = StrToGuid (StringGuid, &Guid);
       } else {
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
-        ShellCommandLineFreeVarList (Package);
         return SHELL_INVALID_PARAMETER;
       }
 
@@ -440,7 +403,6 @@ ShellCommandRunSetVar (
         Buffer = AllocateZeroPool (Size);
         if (Buffer == NULL) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
-          ShellCommandLineFreeVarList (Package);
           return SHELL_OUT_OF_RESOURCES;
         }
 
@@ -467,7 +429,6 @@ ShellCommandRunSetVar (
         Buffer = AllocateZeroPool (Size);
         if (Buffer == NULL) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
-          ShellCommandLineFreeVarList (Package);
           return SHELL_OUT_OF_RESOURCES;
         }
 
@@ -510,11 +471,67 @@ ShellCommandRunSetVar (
     }
   }
 
-  ShellCommandLineFreeVarList (Package);
-
   if (Buffer != NULL) {
     FreePool (Buffer);
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'setvar' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunSetVar (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setvar", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  } else if (ShellCommandLineCheckDuplicate (Package, &ProblemParam) != EFI_SUCCESS) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_DUPLICATE), gShellDebug1HiiHandle, L"setvar", ProblemParam);
+    ShellCommandLineFreeVarList (Package);
+    FreePool (ProblemParam);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  ShellStatus = MainCmdSetVar (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
