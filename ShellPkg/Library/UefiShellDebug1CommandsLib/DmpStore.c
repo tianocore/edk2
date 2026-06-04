@@ -705,33 +705,18 @@ ProcessVariables (
   return (ShellStatus);
 }
 
-STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
-  { L"-d",    TypeFlag  },
-  { L"-l",    TypeValue },
-  { L"-s",    TypeValue },
-  { L"-all",  TypeFlag  },
-  { L"-guid", TypeValue },
-  { L"-sfo",  TypeFlag  },
-  { NULL,     TypeMax   }
-};
+/** Main function of the 'DmpStore' command.
 
-/**
-  Function for 'dmpstore' command.
-
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDmpStore (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDmpStore (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS         Status;
   RETURN_STATUS      RStatus;
-  LIST_ENTRY         *Package;
-  CHAR16             *ProblemParam;
   SHELL_STATUS       ShellStatus;
   CONST CHAR16       *GuidStr;
   CONST CHAR16       *File;
@@ -748,21 +733,6 @@ ShellCommandRunDmpStore (
   File                 = NULL;
   Type                 = DmpStoreDisplay;
   StandardFormatOutput = FALSE;
-
-  ShellStatus = SHELL_SUCCESS;
-
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dmpstore", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmpstore");
@@ -906,6 +876,54 @@ ShellCommandRunDmpStore (
       }
     }
   }
+
+  return ShellStatus;
+}
+
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-d",    TypeFlag  },
+  { L"-l",    TypeValue },
+  { L"-s",    TypeValue },
+  { L"-all",  TypeFlag  },
+  { L"-guid", TypeValue },
+  { L"-sfo",  TypeFlag  },
+  { NULL,     TypeMax   }
+};
+
+/**
+  Function for 'dmpstore' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDmpStore (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dmpstore", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdDmpStore (Package);
 
   ShellCommandLineFreeVarList (Package);
 
