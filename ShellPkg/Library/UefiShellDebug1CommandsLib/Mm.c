@@ -405,17 +405,14 @@ ShellMmLocateIoProtocol (
   return TRUE;
 }
 
-/**
-  Function for 'mm' command.
+/** Main function of the 'Mm' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunMm (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdMm (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS                       Status;
@@ -430,8 +427,6 @@ ShellCommandRunMm (
   BOOLEAN                          Complete;
   CHAR16                           *InputStr;
   BOOLEAN                          Interactive;
-  LIST_ENTRY                       *Package;
-  CHAR16                           *ProblemParam;
   SHELL_STATUS                     ShellStatus;
   CONST CHAR16                     *Temp;
   BOOLEAN                          HasPciRootBridgeIo;
@@ -442,22 +437,6 @@ ShellCommandRunMm (
   InputStr    = NULL;
   Size        = 1;
   AccessType  = ShellMmMemory;
-
-  //
-  // Parse arguments
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   if (ShellCommandLineGetCount (Package) < 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mm");
@@ -669,6 +648,47 @@ Done:
   if (InputStr != NULL) {
     FreePool (InputStr);
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'mm' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunMm (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // Parse arguments
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdMm (Package);
 
   ShellCommandLineFreeVarList (Package);
 
