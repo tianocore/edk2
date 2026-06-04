@@ -21,6 +21,7 @@ MainCmdMode (
 {
   EFI_STATUS    Status;
   SHELL_STATUS  ShellStatus;
+  UINTN         ArgCount;
   UINTN         NewCol;
   UINTN         NewRow;
   UINTN         Col;
@@ -32,59 +33,15 @@ MainCmdMode (
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
 
-  if (ShellCommandLineGetCount (Package) > 3) {
+  ArgCount = ShellCommandLineGetCount (Package);
+
+  if (ArgCount > 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mode");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else if (ShellCommandLineGetCount (Package) == 2) {
+    return SHELL_INVALID_PARAMETER;
+  } else if (ArgCount == 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mode");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else if (ShellCommandLineGetCount (Package) == 3) {
-    Temp = ShellCommandLineGetRawValue (Package, 1);
-    if (Temp == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    }
-
-    NewCol = ShellStrToUintn (Temp);
-    Temp   = ShellCommandLineGetRawValue (Package, 2);
-    if (Temp == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    }
-
-    NewRow = ShellStrToUintn (Temp);
-
-    for (LoopVar = 0, Done = FALSE; LoopVar < gST->ConOut->Mode->MaxMode && ShellStatus == SHELL_SUCCESS; LoopVar++) {
-      Status = gST->ConOut->QueryMode (gST->ConOut, LoopVar, &Col, &Row);
-      if (EFI_ERROR (Status)) {
-        continue;
-      }
-
-      if ((Col == NewCol) && (Row == NewRow)) {
-        Status = gST->ConOut->SetMode (gST->ConOut, LoopVar);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MODE_SET_FAIL), gShellDebug1HiiHandle, L"mode");
-          ShellStatus = SHELL_DEVICE_ERROR;
-        } else {
-          // worked fine...
-          Done = TRUE;
-        }
-
-        break;
-      }
-    }
-
-    if (!Done) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MODE_NO_MATCH), gShellDebug1HiiHandle, L"mode");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    }
-  } else if (ShellCommandLineGetCount (Package) == 1) {
+    return SHELL_INVALID_PARAMETER;
+  } else if (ArgCount == 1) {
     //
     // print out valid
     //
@@ -97,6 +54,58 @@ MainCmdMode (
 
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MODE_LIST_ITEM), gShellDebug1HiiHandle, Col, Row, LoopVar == gST->ConOut->Mode->Mode ? L'*' : L' ');
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // ArgCount == 3
+  //
+
+  Temp = ShellCommandLineGetRawValue (Package, 1);
+  if (Temp == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  NewCol = ShellStrToUintn (Temp);
+  Temp   = ShellCommandLineGetRawValue (Package, 2);
+  if (Temp == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  NewRow = ShellStrToUintn (Temp);
+
+  for (LoopVar = 0, Done = FALSE; LoopVar < gST->ConOut->Mode->MaxMode && ShellStatus == SHELL_SUCCESS; LoopVar++) {
+    Status = gST->ConOut->QueryMode (gST->ConOut, LoopVar, &Col, &Row);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if ((Col == NewCol) && (Row == NewRow)) {
+      Status = gST->ConOut->SetMode (gST->ConOut, LoopVar);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MODE_SET_FAIL), gShellDebug1HiiHandle, L"mode");
+        ShellStatus = SHELL_DEVICE_ERROR;
+      } else {
+        // worked fine...
+        Done = TRUE;
+      }
+
+      break;
+    }
+  }
+
+  if (!Done) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MODE_NO_MATCH), gShellDebug1HiiHandle, L"mode");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   }
 
   return ShellStatus;
