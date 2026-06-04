@@ -451,26 +451,26 @@ MainCmdDmem (
 
   if (ShellCommandLineGetCount (Package) > 3) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmem");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Temp1 = ShellCommandLineGetRawValue (Package, 1);
+  if (Temp1 == NULL) {
+    Address = gST;
+    Size    = sizeof (*gST);
   } else {
-    Temp1 = ShellCommandLineGetRawValue (Package, 1);
+    if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+
+    Temp1 = ShellCommandLineGetRawValue (Package, 2);
     if (Temp1 == NULL) {
-      Address = gST;
-      Size    = sizeof (*gST);
+      Size = 512;
     } else {
-      if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
+      if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
         ShellStatus = SHELL_INVALID_PARAMETER;
-      }
-
-      Temp1 = ShellCommandLineGetRawValue (Package, 2);
-      if (Temp1 == NULL) {
-        Size = 512;
-      } else {
-        if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
       }
     }
   }
