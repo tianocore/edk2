@@ -192,13 +192,7 @@ MainCmdCd (
   TempBuffer  = NULL;
   TotalSize   = 0;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");
     return SHELL_INVALID_PARAMETER;
   }

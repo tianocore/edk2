@@ -31,13 +31,6 @@ MainCmdREcho (
   UINTN   Size;
   CHAR16  *PrintString;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   if (ShellCommandLineGetFlag (Package, L"-on")) {
     //
     // Turn it on

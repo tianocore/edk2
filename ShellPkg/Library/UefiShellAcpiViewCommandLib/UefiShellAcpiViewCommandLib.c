@@ -247,12 +247,6 @@ ShellCommandRunAcpiView (
         L"acpiview"
         );
       ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_GET_HELP_ACPIVIEW),
-        gShellAcpiViewHiiHandle,
-        L"acpiview"
-        );
     } else if (ShellCommandLineGetFlag (Package, L"-s") &&
                (ShellCommandLineGetValue (Package, L"-s") == NULL))
     {

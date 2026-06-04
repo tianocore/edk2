@@ -36,13 +36,6 @@ MainCmdVer (
   Level       = PcdGet8 (PcdShellSupportLevel);
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
     //
     // we have too many parameters
