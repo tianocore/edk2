@@ -22,6 +22,7 @@
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   ArmCcaRsiLib
