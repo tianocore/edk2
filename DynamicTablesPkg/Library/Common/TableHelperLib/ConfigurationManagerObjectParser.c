@@ -409,7 +409,7 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInitiatorAffinityInfoParser[] = {
 
 /** A parser for EArmObjDmc620PmuSocketInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmObjDmc620PmuSocketInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuSocketInfoParser[] = {
   { "NumDevices",            1,                        "0x%x", NULL },
   { "Dmc620PmuRegInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
@@ -1306,11 +1306,11 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjIdMappingArray,             CmArmIdMappingParser),
   CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,         CmArchCommonGenericInterruptParser),
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                 CmArmCmn600InfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuSocketInfo,        CmArmObjDmc620PmuSocketInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuRegInfo,           CmArmDmc620PmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                        CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,      CmArmMemoryRangeDescriptorInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjEtInfo,                     CmArmEtInfo),
+  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuSocketInfo,        CmArmDmc620PmuSocketInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuRegInfo,           CmArmDmc620PmuRegInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
