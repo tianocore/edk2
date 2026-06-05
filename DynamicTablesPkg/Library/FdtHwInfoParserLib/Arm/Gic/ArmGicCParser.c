@@ -933,6 +933,7 @@ GicCPmuNodeParser (
     UINT32  ClockDomain;                      // {default = 0}
     UINT32  AffinityFlags;                    // {default = 0}
     UINT16  TrbeInterrupt;                    // {default = 0}
+    CM_OBJECT_TOKEN EtToken;                  // {default = CM_NULL_TOKEN}
   } CM_ARM_GICC_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
@@ -1055,6 +1056,18 @@ ArmGicCInfoParser (
   // Parse the per-CPU trace buffer extension interrupt.
   Status = GicCTrbeNodeParser (
              Fdt,
+             NewCmObjDesc
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  // Parse the per-CPU embedded trace extension information.
+  Status = ArmTraceAddEtInfo (
+             Fdt,
+             FdtParserHandle,
+             CpuNodeOffsetMap,
              NewCmObjDesc
              );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
