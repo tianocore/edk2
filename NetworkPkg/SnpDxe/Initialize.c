@@ -35,8 +35,6 @@ PxeInit (
     return EFI_DEVICE_ERROR;
   }
 
-  Status = EFI_SUCCESS;
-
   Cpb = Snp->Cpb;
   if (Snp->TxRxBufferSize != 0) {
     Status = Snp->PciIo->AllocateBuffer (

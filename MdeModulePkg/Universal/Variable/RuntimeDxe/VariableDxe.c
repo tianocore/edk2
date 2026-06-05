@@ -43,6 +43,8 @@ EDKII_VAR_CHECK_PROTOCOL        mVarCheck = {
   VarCheckVariablePropertyGet
 };
 
+STATIC EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  mFvbProtocolShadow;
+
 /**
   Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
   Record their initial State when variable write service is ready.
@@ -109,8 +111,28 @@ AcquireLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
   )
 {
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbInstance;
+
   if (!AtRuntime ()) {
     EfiAcquireLock (Lock);
+  } else {
+    //
+    // Check whether we need to swap in the converted pointer values for the
+    // FVB protocol methods. This handles the case where the FVB producer did
+    // not convert its own pointers during SetVirtualAddressMap.
+    //
+    FvbInstance = mVariableModuleGlobal->FvbInstance;
+    if ((FvbInstance != NULL) &&
+        (FvbInstance->GetBlockSize != mFvbProtocolShadow.GetBlockSize))
+    {
+      FvbInstance->GetBlockSize       = mFvbProtocolShadow.GetBlockSize;
+      FvbInstance->GetPhysicalAddress = mFvbProtocolShadow.GetPhysicalAddress;
+      FvbInstance->GetAttributes      = mFvbProtocolShadow.GetAttributes;
+      FvbInstance->SetAttributes      = mFvbProtocolShadow.SetAttributes;
+      FvbInstance->Read               = mFvbProtocolShadow.Read;
+      FvbInstance->Write              = mFvbProtocolShadow.Write;
+      FvbInstance->EraseBlocks        = mFvbProtocolShadow.EraseBlocks;
+    }
   }
 }
 
@@ -248,13 +270,22 @@ VariableClassAddressChangeEvent (
   UINTN  Index;
 
   if (mVariableModuleGlobal->FvbInstance != NULL) {
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->GetBlockSize);
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->GetAttributes);
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->SetAttributes);
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->Read);
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->Write);
-    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->EraseBlocks);
+    //
+    // This module did not produce the FVB protocol instance that provides the
+    // variable store, so it should not be the one performing the pointer
+    // conversion on its members. However, some FVB protocol implementations
+    // may rely on this behavior, which was present in older versions of this
+    // driver, so we need to perform the conversion if the protocol producer
+    // fails to do so. So let's record the converted values now, and swap them
+    // in later if they haven't changed values.
+    //
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.GetBlockSize);
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.GetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.SetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.Read);
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.Write);
+    EfiConvertPointer (0x0, (VOID **)&mFvbProtocolShadow.EraseBlocks);
     EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance);
   }
 
@@ -464,6 +495,13 @@ FtwNotificationEvent (
   }
 
   mVariableModuleGlobal->FvbInstance = FvbProtocol;
+
+  //
+  // Store the boot time values of the function pointers so we can compare
+  // them later. This is needed to avoid double conversion during the call
+  // to SetVirtualAddressMap.
+  //
+  CopyMem (&mFvbProtocolShadow, FvbProtocol, sizeof mFvbProtocolShadow);
 
   //
   // Mark the variable storage region of the FLASH as RUNTIME.

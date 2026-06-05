@@ -108,6 +108,7 @@
   DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiMadtLibArm/AcpiMadtLibArm.inf
 
+  DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
 
@@ -154,6 +155,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
 
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
   }

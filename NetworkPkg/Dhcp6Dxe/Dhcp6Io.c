@@ -2300,8 +2300,6 @@ Dhcp6HandleReplyMsg (
   ASSERT (Instance->IaCb.Ia != NULL);
   ASSERT (Packet != NULL);
 
-  Status = EFI_SUCCESS;
-
   if (Packet->Dhcp6.Header.MessageType != Dhcp6MsgReply) {
     return EFI_DEVICE_ERROR;
   }

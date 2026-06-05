@@ -79,6 +79,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
   EArchCommonObjEinjInstructionsInfo,           ///< 54 - Einj Instruction Info
+  EArchCommonObjPlatformFwInfo,                 ///< 54 - Platform Firmware Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1300,5 +1301,36 @@ typedef struct {
   UINT64                                    Value;
   UINT64                                    Mask;
 } CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
+
+/** A structure that describes BIOS Information.
+
+  SMBIOS Specification v3.9.0 Type 0
+
+  ID: EArchCommonObjPlatformFwInfo
+**/
+typedef struct CmArchCommonPlatformFwInfo {
+  /// CM Object Token uniquely identifying this Platform Firmware info entry.
+  CM_OBJECT_TOKEN              BiosInfoToken;
+  /// BIOS vendor name string.
+  CHAR8                        BiosVendor[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS version string.
+  CHAR8                        BiosVersion[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS release date string.
+  CHAR8                        BiosReleaseDate[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS ROM size in bytes.
+  UINT64                       BiosSize;
+  /// Bit field of supported BIOS functions.
+  MISC_BIOS_CHARACTERISTICS    BiosCharacteristics;
+  /// Optional set of functions that BIOS supports (bytes 0 and 1).
+  UINT8                        BIOSCharacteristicsExtensionBytes[2];
+  /// System BIOS firmware major version.
+  UINT8                        SystemBiosMajorRelease;
+  /// System BIOS firmware minor version.
+  UINT8                        SystemBiosMinorRelease;
+  /// Embedded Controller firmware major release.
+  UINT8                        ECFirmwareMajorRelease;
+  /// Embedded Controller firmware minor release.
+  UINT8                        ECFirmwareMinorRelease;
+} CM_ARCH_COMMON_PLATFORM_FW_INFO;
 
 #pragma pack()
