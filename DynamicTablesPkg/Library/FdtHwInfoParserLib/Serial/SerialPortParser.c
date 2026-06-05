@@ -7,7 +7,7 @@
   @par Reference(s):
   - linux/Documentation/devicetree/bindings/serial/serial.yaml
   - linux/Documentation/devicetree/bindings/serial/8250.txt
-  - linux/Documentation/devicetree/bindings/serial/arm_sbsa_uart.txt
+  - linux/Documentation/devicetree/bindings/serial/arm,sbsa-uart.yaml
   - linux/Documentation/devicetree/bindings/serial/pl011.yaml
 **/
 
@@ -54,13 +54,10 @@ CONST COMPATIBILITY_INFO  Serial16550CompatibleInfo = {
 
 /** SBSA UART compatible strings.
 
-  Include PL011 as SBSA uart is a subset of PL011.
-
   Any string of this list must be part of SerialCompatible.
 */
 STATIC CONST COMPATIBILITY_STR  SerialSbsaCompatibleStr[] = {
-  { "arm,sbsa-uart" },
-  { "arm,pl011"     }
+  { "arm,sbsa-uart" }
 };
 
 /** COMPATIBILITY_INFO structure for the SerialSbsaCompatible.
@@ -69,6 +66,204 @@ CONST COMPATIBILITY_INFO  SerialSbsaCompatibleInfo = {
   ARRAY_SIZE (SerialSbsaCompatibleStr),
   SerialSbsaCompatibleStr
 };
+
+/** PL011 UART compatible strings.
+
+  Any string of this list must be part of SerialCompatible.
+*/
+STATIC CONST COMPATIBILITY_STR  SerialPl011CompatibleStr[] = {
+  { "arm,pl011" }
+};
+
+/** COMPATIBILITY_INFO structure for the SerialPl011Compatible.
+*/
+CONST COMPATIBILITY_INFO  SerialPl011CompatibleInfo = {
+  ARRAY_SIZE (SerialPl011CompatibleStr),
+  SerialPl011CompatibleStr
+};
+
+/** Read the "clock-frequency" property from a node.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node            Offset of the node to inspect.
+  @param [out] ClockFrequency  Clock frequency retrieved from the node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The node does not expose "clock-frequency".
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetNodeClockFrequency (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       Node,
+  OUT UINT32      *ClockFrequency
+  )
+{
+  CONST UINT32  *Data;
+  INT32         DataSize;
+
+  if ((Fdt == NULL) || (ClockFrequency == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Data = FdtGetProp (Fdt, Node, "clock-frequency", &DataSize);
+  if (Data == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (DataSize < sizeof (*Data)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  *ClockFrequency = Fdt32ToCpu (*Data);
+  return EFI_SUCCESS;
+}
+
+/** Resolve the first clock node referenced by a node's "clocks" property.
+
+  @param [in]  Fdt        Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node       Offset of the node to inspect.
+  @param [out] ClockNode  Clock node referenced by the first phandle.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The node does not expose "clocks".
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetNodeClockNode (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       Node,
+  OUT INT32       *ClockNode
+  )
+{
+  CONST UINT32  *Data;
+  INT32         DataSize;
+  UINT32        ClockPHandle;
+
+  if ((Fdt == NULL) || (ClockNode == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Data = FdtGetProp (Fdt, Node, "clocks", &DataSize);
+  if (Data == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (DataSize < sizeof (*Data)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  ClockPHandle = Fdt32ToCpu (*Data);
+  *ClockNode   = FdtNodeOffsetByPhandle (Fdt, ClockPHandle);
+  if (*ClockNode < 0) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Get the 16550 UART input clock frequency.
+
+  One of "clock-frequency", "clocks" properties is required.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  SerialPortNode  Offset of the serial-port node.
+  @param [out] ClockFrequency  Clock frequency retrieved from DT.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No clock frequency was found.
+  @retval EFI_UNSUPPORTED         Unsupported DT clock encoding.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+Get16550ClockFrequency (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       SerialPortNode,
+  OUT UINT32      *ClockFrequency
+  )
+{
+  INT32       ClockNode;
+  EFI_STATUS  Status;
+
+  if ((Fdt == NULL) || (ClockFrequency == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetNodeClockFrequency (Fdt, SerialPortNode, ClockFrequency);
+  if (Status == EFI_SUCCESS) {
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = GetNodeClockNode (Fdt, SerialPortNode, &ClockNode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return GetNodeClockFrequency (Fdt, ClockNode, ClockFrequency);
+}
+
+/** Get the PL011 UART input clock frequency.
+
+  The "clocks" property is optional.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  SerialPortNode  Offset of the serial-port node.
+  @param [out] ClockFrequency  Clock frequency retrieved from DT.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No clock frequency was found.
+  @retval EFI_UNSUPPORTED         Unsupported DT clock encoding.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetPl011ClockFrequency (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       SerialPortNode,
+  OUT UINT32      *ClockFrequency
+  )
+{
+  EFI_STATUS  Status;
+  INT32       ClockNode;
+
+  if ((Fdt == NULL) || (ClockFrequency == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetNodeClockNode (Fdt, SerialPortNode, &ClockNode);
+  if (!EFI_ERROR (Status)) {
+    Status = GetNodeClockFrequency (Fdt, ClockNode, ClockFrequency);
+  }
+
+  // Advertising the clock frequency is optional.
+  if (Status == EFI_NOT_FOUND) {
+    Status = EFI_SUCCESS;
+  }
+
+  ASSERT_EFI_ERROR (Status);
+  return Status;
+}
 
 /** Parse a serial port node.
 
@@ -94,6 +289,7 @@ SerialPortNodeParser (
   INT32         IntcNode;
   CONST UINT32  *DecodedInterruptData;
   INT32         DecodedInterruptCells;
+  UINT32        ClockFrequency;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -153,24 +349,14 @@ SerialPortNodeParser (
   SerialPortInfo->Interrupt = FdtConvertToGsi (IntcNode, SerialPortInfo->Interrupt);
  #endif
 
-  // Note: clock-frequency is optional for SBSA UART.
-  Data = FdtGetProp (Fdt, SerialPortNode, "clock-frequency", &DataSize);
-  if (Data != NULL) {
-    if (DataSize < sizeof (UINT32)) {
-      // If error or not enough space.
-      ASSERT (0);
-      return EFI_ABORTED;
-    } else if (FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*Data)) >= 0) {
-      // "clock-frequency" can be a "clocks phandle to refer to the clk used".
-      // This is not supported.
-      ASSERT (0);
-      return EFI_UNSUPPORTED;
+  if (FdtNodeIsCompatible (Fdt, SerialPortNode, &Serial16550CompatibleInfo)) {
+    Status = Get16550ClockFrequency (Fdt, SerialPortNode, &ClockFrequency);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
     }
 
-    SerialPortInfo->Clock = Fdt32ToCpu (*(UINT32 *)Data);
-  }
-
-  if (FdtNodeIsCompatible (Fdt, SerialPortNode, &Serial16550CompatibleInfo)) {
+    SerialPortInfo->Clock       = ClockFrequency;
     SerialPortInfo->PortSubtype =
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS;
 
@@ -217,8 +403,33 @@ SerialPortNodeParser (
                &SerialSbsaCompatibleInfo
                ))
   {
+    //
+    // SBSA-UART doesn't have a clock specifier.
+    // Default to 115200.
+    //
+    SerialPortInfo->Clock       = 115200;
     SerialPortInfo->PortSubtype =
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART;
+  } else if (FdtNodeIsCompatible (
+               Fdt,
+               SerialPortNode,
+               &SerialPl011CompatibleInfo
+               ))
+  {
+    //
+    // Clock frequency is not mandatory for pl011 nodes.
+    //
+    ClockFrequency = 0;
+
+    Status = GetPl011ClockFrequency (Fdt, SerialPortNode, &ClockFrequency);
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    SerialPortInfo->Clock       = ClockFrequency;
+    SerialPortInfo->PortSubtype =
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART;
   } else {
     ASSERT (0);
     return EFI_UNSUPPORTED;
