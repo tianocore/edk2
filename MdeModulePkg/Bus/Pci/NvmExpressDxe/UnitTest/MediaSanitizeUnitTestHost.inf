@@ -35,3 +35,7 @@
   UnitTestLib
   PrintLib
   MemoryAllocationLib
+  PcdLib
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNvmeGenericTimeout            ## CONSUMES
