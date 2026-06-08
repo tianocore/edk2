@@ -1,7 +1,7 @@
 /** @file
   Arm Gic cpu parser.
 
-  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -848,7 +848,7 @@ ArmGicCInfoParser (
 
   // The FdtBranch points to the Cpus Node.
   // Get the interrupt-controller node associated to the "cpus" node.
-  Status = FdtGetIntcParentNode (Fdt, FdtBranch, &IntcNode);
+  Status = FdtGetIntcNode (Fdt, FdtBranch, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {

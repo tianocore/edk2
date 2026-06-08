@@ -1,7 +1,7 @@
 /** @file
   Serial Port Parser.
 
-  Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -155,7 +155,7 @@ SerialPortNodeParser (
   }
 
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcParentNode (Fdt, SerialPortNode, &IntcNode);
+  Status = FdtGetIntcNode (Fdt, SerialPortNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {
