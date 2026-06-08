@@ -620,6 +620,119 @@ FdtCountPropNodeInBranch (
            );
 }
 
+/** Get the interrupt parent of a node.
+
+  The interrupt parent is:
+  - if the "interrupt-parent" property is present, the node
+    pointed by the property. Note that the node pointed by
+    the interrupt parent is not necessarily an interrupt
+    controller.
+  - otherwise, the parent following the normal hierarchy.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node to start the search.
+  @param [out] IntcNode         If success, contains the offset of the
+                                interrupt-controller node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_NOT_FOUND           No interrupt-controller node found.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+FdtGetIntcParentNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  OUT       INT32  *IntcNode
+  )
+{
+  CONST UINT32  *PHandle;
+  INT32         Size;
+
+  if ((Fdt == NULL) ||
+      (IntcNode == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Check whether the node has the "interrupt-parent" property.
+  PHandle = FdtGetProp (Fdt, Node, "interrupt-parent", &Size);
+  if ((PHandle != NULL) && (Size == sizeof (UINT32))) {
+    Node = FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*PHandle));
+    if (Node < 0) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    *IntcNode = Node;
+    return EFI_SUCCESS;
+  } else if (Size != -FDT_ERR_NOTFOUND) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  if (Node == 0) {
+    // Reached the root of the tree.
+    return EFI_NOT_FOUND;
+  }
+
+  // Get the parent of the node.
+  Node = FdtParentOffset (Fdt, Node);
+  if (Node < 0) {
+    // An error occurred.
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  *IntcNode = Node;
+  return EFI_SUCCESS;
+}
+
+/** Check whether a node defines an interrupt domain.
+
+  An interrupt domain is defined by the presence of one of these properties:
+  - interrupt-controller
+
+  Note: It is possible for a node to define the "#interrupt-cells" property
+  without being an interrupt domain, but it would be meaningless.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node to start the search.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_NOT_FOUND           No interrupt-controller node found.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+FdtIsIntcDomainNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node
+  )
+{
+  INT32       Size;
+  CONST VOID  *Prop;
+
+  if (Fdt == NULL) {
+    ASSERT (FALSE);
+    return FALSE;
+  }
+
+  Prop = FdtGetProp (Fdt, Node, "interrupt-controller", &Size);
+  if ((Prop != NULL) && (Size >= 0)) {
+    return TRUE;
+  } else if (Size != -FDT_ERR_NOTFOUND) {
+    ASSERT (FALSE);
+  }
+
+  return FALSE;
+}
+
 /** Get the interrupt-controller node handling the interrupts of
     the input node.
 
@@ -654,9 +767,7 @@ FdtGetIntcNode (
   OUT       INT32  *IntcNode
   )
 {
-  CONST UINT32  *PHandle;
-  INT32         Size;
-  CONST VOID    *Prop;
+  EFI_STATUS  Status;
 
   if ((Fdt == NULL) ||
       (IntcNode == NULL))
@@ -667,44 +778,25 @@ FdtGetIntcNode (
 
   while (TRUE) {
     // Check whether the node has the "interrupt-controller" property.
-    Prop = FdtGetProp (Fdt, Node, "interrupt-controller", &Size);
-    if ((Prop != NULL) && (Size >= 0)) {
+    if (FdtIsIntcDomainNode (Fdt, Node)) {
       // The interrupt-controller has been found.
       *IntcNode = Node;
       return EFI_SUCCESS;
-    } else {
-      // Check whether the node has the "interrupt-parent" property.
-      PHandle = FdtGetProp (Fdt, Node, "interrupt-parent", &Size);
-      if ((PHandle != NULL) && (Size == sizeof (UINT32))) {
-        // The phandle of the interrupt-controller has been found.
-        // Search the node having this phandle and return it.
-        Node = FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*PHandle));
-        if (Node < 0) {
-          ASSERT (0);
-          return EFI_ABORTED;
-        }
-
-        *IntcNode = Node;
-        return EFI_SUCCESS;
-      } else if (Size != -FDT_ERR_NOTFOUND) {
-        ASSERT (0);
-        return EFI_ABORTED;
-      }
     }
 
-    if (Node == 0) {
-      // We are at the root of the tree. Not parent available.
-      return EFI_NOT_FOUND;
+    Status = FdtGetIntcParentNode (Fdt, Node, IntcNode);
+    if (Status == EFI_NOT_FOUND) {
+      // Reached the root of the tree.
+      break;
+    } else if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
     }
 
-    // Get the parent of the node.
-    Node = FdtParentOffset (Fdt, Node);
-    if (Node < 0) {
-      // An error occurred.
-      ASSERT (0);
-      return EFI_ABORTED;
-    }
+    Node = *IntcNode;
   } // while
+
+  return EFI_NOT_FOUND;
 }
 
 /** Read up to two FDT cells as a UINT64 value.
