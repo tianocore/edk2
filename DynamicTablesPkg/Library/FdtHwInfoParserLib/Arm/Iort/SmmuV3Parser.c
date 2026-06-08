@@ -1,7 +1,7 @@
 /** @file
   Arm SMMUv3 IORT parser.
 
-  Copyright (c) 2025, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2025 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -321,7 +321,7 @@ SmmuV3NodeParser (
   }
 
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcParentNode (Fdt, SmmuV3Node, &IntcNode);
+  Status = FdtGetIntcNode (Fdt, SmmuV3Node, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;

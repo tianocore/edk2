@@ -648,7 +648,7 @@ FdtCountPropNodeInBranch (
 **/
 EFI_STATUS
 EFIAPI
-FdtGetIntcParentNode (
+FdtGetIntcNode (
   IN  CONST VOID   *Fdt,
   IN        INT32  Node,
   OUT       INT32  *IntcNode

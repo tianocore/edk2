@@ -1,7 +1,7 @@
 /** @file
   Arm generic timer parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -74,7 +74,7 @@ TimerNodeParser (
   }
 
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcParentNode (Fdt, TimerNode, &IntcNode);
+  Status = FdtGetIntcNode (Fdt, TimerNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
