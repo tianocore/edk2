@@ -793,6 +793,7 @@ FdtGetIntcNode (
   )
 {
   EFI_STATUS  Status;
+  INT32       InputNode;
 
   if ((Fdt == NULL) ||
       (IntcNode == NULL))
@@ -800,6 +801,17 @@ FdtGetIntcNode (
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  InputNode = Node;
+
+  // Get the interrupt parent (which is not necessarily an interrupt-controller).
+  Status = FdtGetIntcParentNode (Fdt, Node, IntcNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Node = *IntcNode;
 
   while (TRUE) {
     // Check whether the node has the "interrupt-controller" property.
@@ -820,6 +832,15 @@ FdtGetIntcNode (
 
     Node = *IntcNode;
   } // while
+
+  //
+  // Reached the root of the tree without finding an interrupt parent.
+  // If the input node is an interrupt controller, return it.
+  //
+  if (FdtIsIntcDomainNode (Fdt, InputNode, IntControllerOnly)) {
+    *IntcNode = InputNode;
+    return EFI_SUCCESS;
+  }
 
   return EFI_NOT_FOUND;
 }
