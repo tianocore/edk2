@@ -14,45 +14,6 @@
 
 #include <Library/FdtLib.h>
 
-/** Get the offset of an address in a "reg" Device Tree property.
-
-  In a Device Tree, the "reg" property stores address/size couples.
-  They are stored on N 32-bits cells.
-  Based on the value of the #address-cells, the #size-cells and the
-  index in the "reg" property, compute the number of 32-bits cells
-  to skip.
-
-  @param [in]  Index        Index in the reg property.
-  @param [in]  AddrCells    Number of cells used to store an address.
-  @param [in]  SizeCells    Number of cells used to store the size of
-                            an address.
-
-  @retval  Number of 32-bits cells to skip to access the address.
-*/
-#define GET_DT_REG_ADDRESS_OFFSET(Index, AddrCells, SizeCells)  (           \
-          (Index) * ((AddrCells) + (SizeCells))                             \
-          )
-
-/** Get the offset of an address size in a "reg" Device Tree property.
-
-  In a Device Tree, the "reg" property stores address/size couples.
-  They are stored on N 32-bits cells.
-  Based on the value of the #address-cells, the #size-cells and the
-  index in the "reg" property, compute the number of 32-bits cells
-  to skip.
-
-  @param [in]  Index        Index in the reg property.
-  @param [in]  AddrCells    Number of cells used to store an address.
-  @param [in]  SizeCells    Number of cells used to store the size of
-                            an address.
-
-  @retval  Number of 32-bits cells to skip to access the address size.
-*/
-#define GET_DT_REG_SIZE_OFFSET(Index, AddrCells, SizeCells)  (              \
-          GET_DT_REG_ADDRESS_OFFSET ((Index), (AddrCells), (SizeCells)) +   \
-          (SizeCells)                                                       \
-          )
-
 /// Maximum string length for compatible names.
 #define COMPATIBLE_STR_LEN  (32U)
 
