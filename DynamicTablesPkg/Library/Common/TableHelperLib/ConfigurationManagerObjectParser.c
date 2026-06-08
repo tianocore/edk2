@@ -417,26 +417,32 @@ STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuSocketInfoParser[] = {
 /** A parser for EArmObjDmc620PmuRegInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuRegInfoParser[] = {
-  { "BaseAddress", 8, "0x%llx", NULL },
-  { "Length",      8, "0x%llx", NULL },
-  { "PmuIntr",     4, "0x%x",   NULL },
+  { "BaseAddress", 8,                                         "0x%llx", NULL },
+  { "Length",      8,                                         "0x%llx", NULL },
+  { "PmuIntr",     sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
 /** A parser for EArmObjCmn600Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmn600InfoParser[] = {
-  { "PeriphBaseAddress",       8, "0x%llx", NULL },
-  { "PeriphBaseAddressLength", 8, "0x%llx", NULL },
-  { "RootNodeBaseAddress",     8, "0x%llx", NULL },
-  { "DtcCount",                1, "0x%x",   NULL },
-  { "DtcInterrupt[0]",         4, "0x%x",   NULL },
-  { "DtcFlags[0]",             4, "0x%x",   NULL },
-  { "DtcInterrupt[1]",         4, "0x%x",   NULL },
-  { "DtcFlags[1]",             4, "0x%x",   NULL },
-  { "DtcInterrupt[2]",         4, "0x%x",   NULL },
-  { "DtcFlags[2]",             4, "0x%x",   NULL },
-  { "DtcInterrupt[3]",         4, "0x%x",   NULL },
-  { "DtcFlags[3]",             4, "0x%x",   NULL }
+  { "PeriphBaseAddress",       8,                                         "0x%llx", NULL },
+  { "PeriphBaseAddressLength", 8,                                         "0x%llx", NULL },
+  { "RootNodeBaseAddress",     8,                                         "0x%llx", NULL },
+  { "DtcCount",                1,                                         "0x%x",   NULL },
+  { "DtcIntr[0]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "DtcIntr[1]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "DtcIntr[2]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "DtcIntr[3]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
 /** A parser for the EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE structure.
