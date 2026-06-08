@@ -45,6 +45,8 @@ STATIC MPXY_CHANNEL_CONTEXT  mMpxyChannelCtx[MAX_MPXY_OPEN_CHANNELS];
 ///
 STATIC EFI_EVENT  mDxeRiscVMpxyLibVirtualNotifyEvent = NULL;
 
+STATIC BOOLEAN  mMpxyLibraryInitialized = FALSE;
+
 /**
   Convert the physical channel shared memory address.
 
@@ -608,23 +610,24 @@ SbiMpxySendMessage (
 }
 
 /**
-  Constructor allocates the global memory to store the registered guid and Handler list.
+  Initialize the MPXY library
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval  RETURN_SUCCESS            Allocated the global memory space to store guid and function tables.
-  @retval  RETURN_OUT_OF_RESOURCES   Not enough memory to allocate.
+  @retval  EFI_SUCCESS            Library is successfully initialized.
+  @retval  EFI_ALREADY_STARTED    Library is already initialized.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough memory to allocate.
 **/
 RETURN_STATUS
 EFIAPI
-SbiMpxyLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+SbiMpxyLibInit (
+  VOID
   )
 {
   EFI_STATUS  Status;
   UINT64      ShmemSize;
+
+  if (mMpxyLibraryInitialized) {
+    return EFI_ALREADY_STARTED;
+  }
 
   Status = SbiProbeExtension (SBI_EXT_MPXY);
 
@@ -668,6 +671,8 @@ SbiMpxyLibConstructor (
     mNonChanTempShmemPhys = NULL;
     return Status;
   }
+
+  mMpxyLibraryInitialized = TRUE;
 
   return Status;
 }
