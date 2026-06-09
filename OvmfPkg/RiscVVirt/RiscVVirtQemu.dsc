@@ -114,7 +114,6 @@
 
   DxeRiscvMpxyLib|MdePkg/Library/DxeRiscvMpxyLib/DxeRiscvMpxy.inf
   DxeRasAgentClientLib|MdePkg/Library/DxeRiscvRasAgentClientLib/DxeRiscvRasAgentClientLib.inf
-  TimerLib|UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf
   VirtNorFlashDeviceLib|OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
   VirtNorFlashPlatformLib|OvmfPkg/RiscVVirt/Library/VirtNorFlashPlatformLib/VirtNorFlashDeviceTreeLib.inf
 
@@ -156,7 +155,24 @@
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 !endif
 
+[LibraryClasses.common.SEC]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerSecLib.inf
+
+[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerSecLib.inf
+!if $(TPM2_ENABLE) == TRUE
+  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
+!else
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!endif
+
+[LibraryClasses.common.DXE_CORE]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
+
 [LibraryClasses.common.DXE_DRIVER]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
@@ -165,14 +181,19 @@
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
 !endif
 
-[LibraryClasses.common.UEFI_DRIVER]
-  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
-
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
 !if $(CAPSULE_ENABLE) == TRUE
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 !endif
+
+[LibraryClasses.common.UEFI_DRIVER]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
+  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+  PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+
+[LibraryClasses.common.UEFI_APPLICATION]
+  TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
 
 ################################################################################
 #
@@ -291,15 +312,6 @@
 !endif
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
-
-[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
-!if $(TPM2_ENABLE) == TRUE
-  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
-!else
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-!endif
 
 ################################################################################
 #
