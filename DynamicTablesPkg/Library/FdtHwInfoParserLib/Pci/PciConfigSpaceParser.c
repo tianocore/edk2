@@ -363,7 +363,7 @@ ParseIrqMap (
 
     // Interrupt controller interrupt and flags
     PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
-      FdtGetInterruptId (IrqMapEntry.ParentInterrupt);
+      FdtGetInterruptId (IrqMapEntry.ParentInterrupt, IrqMapEntry.ParentInterruptCells);
 
     /*
      * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.
@@ -387,7 +387,7 @@ ParseIrqMap (
  #else
     if (IrqMapEntry.ParentInterruptCells > 1) {
       PciInterruptMapInfo[Index].IntcInterrupt.Flags =
-        FdtGetInterruptFlags (IrqMapEntry.ParentInterrupt);
+        FdtGetInterruptFlags (IrqMapEntry.ParentInterrupt, IrqMapEntry.ParentInterruptCells);
     } else {
       PciInterruptMapInfo[Index].IntcInterrupt.Flags = 0x0;
     }

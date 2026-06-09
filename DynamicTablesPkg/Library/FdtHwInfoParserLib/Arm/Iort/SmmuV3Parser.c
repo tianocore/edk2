@@ -62,7 +62,7 @@ FdtGetInterruptFromName (
     return 0;
   }
 
-  return FdtGetInterruptId (&Interrupts[StrIndex * IntCells]);
+  return FdtGetInterruptId (&Interrupts[StrIndex * IntCells], IntCells);
 }
 
 /** List of "compatible" property values for SmmuV3 nodes.

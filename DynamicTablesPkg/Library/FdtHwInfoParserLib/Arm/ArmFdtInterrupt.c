@@ -1,7 +1,7 @@
 /** @file
   Flattened device tree utility.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -21,19 +21,22 @@
   This function DOES NOT SUPPORT extended SPI range and extended PPI range.
 
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt id.
 **/
 UINT32
 EFIAPI
 FdtGetInterruptId (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   )
 {
   UINT32  IrqType;
   UINT32  IrqId;
 
   ASSERT (Data != NULL);
+  ASSERT (Size > IRQ_NUMBER_OFFSET);
 
   IrqType = Fdt32ToCpu (Data[IRQ_TYPE_OFFSET]);
   IrqId   = Fdt32ToCpu (Data[IRQ_NUMBER_OFFSET]);
@@ -63,19 +66,22 @@ FdtGetInterruptId (
   PPI interrupt cpu mask on bits [15:8] are ignored.
 
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt flags (for ACPI).
 **/
 UINT32
 EFIAPI
 FdtGetInterruptFlags (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   )
 {
   UINT32  IrqFlags;
   UINT32  AcpiIrqFlags;
 
   ASSERT (Data != NULL);
+  ASSERT (Size > IRQ_FLAGS_OFFSET);
 
   IrqFlags = Fdt32ToCpu (Data[IRQ_FLAGS_OFFSET]);
 
