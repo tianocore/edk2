@@ -124,7 +124,7 @@ GetPerformanceCounter (
   return (UINT64)RiscVReadTimer ();
 }
 
-/**return
+/**
   Retrieves the 64-bit frequency in Hz and the range of performance counter
   values.
 
@@ -275,7 +275,7 @@ GetTimeInNanoSecond (
 **/
 EFI_STATUS
 EFIAPI
-BaseRiscV64CpuTimerLibConstructor (
+RiscV64CpuTimerLibConstructor (
   VOID
   )
 {
