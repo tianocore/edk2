@@ -74,7 +74,7 @@ TimerNodeParser (
   }
 
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcNode (Fdt, TimerNode, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, TimerNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
