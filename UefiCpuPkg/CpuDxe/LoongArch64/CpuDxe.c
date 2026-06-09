@@ -489,6 +489,17 @@ InitializeCpu (
   //
   RefreshGcdMemoryAttributes ();
 
+  //
+  // LoongArch page tables identity-map RAM from physical address 0 during
+  // early boot.  When DXE NULL pointer detection is enabled, explicitly make
+  // the first page read-protected after the CPU architectural protocol is
+  // installed, matching the generic DXE NULL pointer protection semantics.
+  //
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0) {
+    Status = CpuSetMemoryAttributes (&gCpu, 0, EFI_PAGE_SIZE, EFI_MEMORY_RP);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   Status = gCpu.RegisterInterruptHandler (
                   &gCpu,
                   EXCEPT_LOONGARCH_INT_IPI,
