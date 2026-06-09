@@ -315,7 +315,7 @@ GicCIntcNodeParser (
   // but it is assumed that only one Gic is available.
   Data = FdtGetProp (Fdt, GicIntcNode, "interrupts", &DataSize);
   if ((Data != NULL) && (DataSize == (IntCells * sizeof (UINT32)))) {
-    MaintenanceInterrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
+    MaintenanceInterrupt = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
     Flags                = DT_IRQ_IS_EDGE_TRIGGERED (
                              Fdt32ToCpu (((UINT32 *)Data)[IRQ_FLAGS_OFFSET])
                              ) ?
@@ -756,7 +756,7 @@ GicCPmuNodeParser (
 
   if (DataSize == (IntCells * sizeof (UINT32))) {
     // One shared PMU IRQ
-    PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data);
+    PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
 
     // Only supports PPI 23 for now.
     // According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23. A non BSA
@@ -773,7 +773,7 @@ GicCPmuNodeParser (
   } else {
     // One PMU IRQ per core
     for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)Data);
+      GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
 
       Data += IntCells * sizeof (UINT32);
     }

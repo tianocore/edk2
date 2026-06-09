@@ -112,9 +112,9 @@ TimerNodeParser (
 
   if ((IntCount > FdtSecureTimerIrq)) {
     GenericTimerInfo->SecurePL1TimerGSIV =
-      FdtGetInterruptId (&Data[FdtSecureTimerIrq * IntCells]);
+      FdtGetInterruptId (&Data[FdtSecureTimerIrq * IntCells], DataSize);
     GenericTimerInfo->SecurePL1TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtSecureTimerIrq * IntCells]) | AlwaysOnTimerFlag;
+      FdtGetInterruptFlags (&Data[FdtSecureTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
   } else {
     // No timer, no luck
     ASSERT (0);
@@ -123,9 +123,9 @@ TimerNodeParser (
 
   if ((IntCount > FdtNonSecureTimerIrq)) {
     GenericTimerInfo->NonSecurePL1TimerGSIV =
-      FdtGetInterruptId (&Data[FdtNonSecureTimerIrq * IntCells]);
+      FdtGetInterruptId (&Data[FdtNonSecureTimerIrq * IntCells], DataSize);
     GenericTimerInfo->NonSecurePL1TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtNonSecureTimerIrq * IntCells]) | AlwaysOnTimerFlag;
+      FdtGetInterruptFlags (&Data[FdtNonSecureTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
   } else {
     GenericTimerInfo->NonSecurePL1TimerGSIV  = 0;
     GenericTimerInfo->NonSecurePL1TimerFlags = 0;
@@ -133,9 +133,9 @@ TimerNodeParser (
 
   if ((IntCount > FdtVirtualTimerIrq)) {
     GenericTimerInfo->VirtualTimerGSIV =
-      FdtGetInterruptId (&Data[FdtVirtualTimerIrq * IntCells]);
+      FdtGetInterruptId (&Data[FdtVirtualTimerIrq * IntCells], DataSize);
     GenericTimerInfo->VirtualTimerFlags =
-      FdtGetInterruptFlags (&Data[FdtVirtualTimerIrq * IntCells]) | AlwaysOnTimerFlag;
+      FdtGetInterruptFlags (&Data[FdtVirtualTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
   } else {
     GenericTimerInfo->VirtualTimerGSIV  = 0;
     GenericTimerInfo->VirtualTimerFlags = 0;
@@ -143,9 +143,9 @@ TimerNodeParser (
 
   if ((IntCount > FdtHypervisorTimerIrq)) {
     GenericTimerInfo->NonSecurePL2TimerGSIV =
-      FdtGetInterruptId (&Data[FdtHypervisorTimerIrq * IntCells]);
+      FdtGetInterruptId (&Data[FdtHypervisorTimerIrq * IntCells], DataSize);
     GenericTimerInfo->NonSecurePL2TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtHypervisorTimerIrq * IntCells]) | AlwaysOnTimerFlag;
+      FdtGetInterruptFlags (&Data[FdtHypervisorTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
   } else {
     GenericTimerInfo->NonSecurePL2TimerGSIV  = 0;
     GenericTimerInfo->NonSecurePL2TimerFlags = 0;
@@ -153,9 +153,9 @@ TimerNodeParser (
 
   if ((IntCount > FdtHypervisorVTimerIrq)) {
     GenericTimerInfo->VirtualPL2TimerGSIV =
-      FdtGetInterruptId (&Data[FdtHypervisorVTimerIrq * IntCells]);
+      FdtGetInterruptId (&Data[FdtHypervisorVTimerIrq * IntCells], DataSize);
     GenericTimerInfo->VirtualPL2TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtHypervisorVTimerIrq * IntCells]) | AlwaysOnTimerFlag;
+      FdtGetInterruptFlags (&Data[FdtHypervisorVTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
   } else {
     GenericTimerInfo->VirtualPL2TimerGSIV  = 0;
     GenericTimerInfo->VirtualPL2TimerFlags = 0;
