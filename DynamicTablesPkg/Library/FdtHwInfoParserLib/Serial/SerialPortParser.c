@@ -155,7 +155,7 @@ SerialPortNodeParser (
   }
 
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcNode (Fdt, SerialPortNode, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, SerialPortNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {

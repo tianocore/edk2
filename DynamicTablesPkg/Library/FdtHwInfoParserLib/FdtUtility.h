@@ -337,26 +337,40 @@ FdtCountPropNodeInBranch (
   OUT       UINT32  *NodeCount
   );
 
-/** Get the interrupt-controller node handling the interrupts of
-    the input node.
+/** Get the interrupt domain parent node handling the interrupts of the input
+    node.
 
-  To do this, recursively search a node with either the "interrupt-controller"
-  or the "interrupt-parent" property in the parents of Node.
+  The interrupt domain parent must be one of the following:
+  - an interrupt-controller
+  - an interrupt nexus
 
-  Devicetree Specification, Release v0.3,
-  2.4.1 "Properties for Interrupt Generating Devices":
-    Because the hierarchy of the nodes in the interrupt tree
-    might not match the devicetree, the interrupt-parent
-    property is available to make the definition of an
-    interrupt parent explicit. The value is the phandle to the
-    interrupt parent. If this property is missing from a
-    device, its interrupt parent is assumed to be its devicetree
-    parent.
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to start the search.
+  @param [out] IntcNode  If success, contains the offset of the matching
+                         interrupt domain node.
 
-  @param [in]  Fdt              Pointer to a Flattened Device Tree.
-  @param [in]  Node             Offset of the node to start the search.
-  @param [out] IntcNode         If success, contains the offset of the
-                                interrupt-controller node.
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_NOT_FOUND           No interrupt domain node found.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetIntDomainNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  OUT       INT32  *IntcNode
+  );
+
+/** Get the interrupt-controller parent node handling the interrupts of the
+    input node.
+
+  The interrupt domain parent must be an interrupt-controller.
+
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to start the search.
+  @param [out] IntcNode  If success, contains the offset of the matching
+                         interrupt-controller node.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_NOT_FOUND           No interrupt-controller node found.
@@ -365,7 +379,7 @@ FdtCountPropNodeInBranch (
 **/
 EFI_STATUS
 EFIAPI
-FdtGetIntcNode (
+FdtGetIntControllerNode (
   IN  CONST VOID   *Fdt,
   IN        INT32  Node,
   OUT       INT32  *IntcNode

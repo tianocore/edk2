@@ -321,7 +321,7 @@ SmmuV3NodeParser (
   }
 
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcNode (Fdt, SmmuV3Node, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, SmmuV3Node, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
