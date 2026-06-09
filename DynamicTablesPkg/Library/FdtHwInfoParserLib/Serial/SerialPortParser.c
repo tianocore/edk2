@@ -180,7 +180,7 @@ SerialPortNodeParser (
     return EFI_ABORTED;
   }
 
-  SerialPortInfo->Interrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
+  SerialPortInfo->Interrupt = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
 
   /*
    * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.

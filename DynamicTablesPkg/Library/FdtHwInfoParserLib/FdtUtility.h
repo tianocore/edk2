@@ -76,13 +76,15 @@
   This function DOES NOT SUPPORT extended SPI range and extended PPI range.
 
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt id.
 **/
 UINT32
 EFIAPI
 FdtGetInterruptId (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   );
 
 /** Get the ACPI interrupt flags of an interrupt described in a fdt.
@@ -90,14 +92,18 @@ FdtGetInterruptId (
   Data must describe a GIC interrupt. A GIC interrupt is on at least
   3 UINT32 cells.
 
+  PPI interrupt cpu mask on bits [15:8] are ignored.
+
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt flags (for ACPI).
 **/
 UINT32
 EFIAPI
 FdtGetInterruptFlags (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   );
 
 /** Parsed "interrupt-map" entry information.
