@@ -866,7 +866,7 @@ typedef struct _EFI_IFR_VARSTORE_EFI {
   EFI_GUID             Guid;
   UINT32               Attributes;
   UINT16               Size;
-  UINT8                Name[1];
+  UINT8                Name[];
 } EFI_IFR_VARSTORE_EFI;
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
