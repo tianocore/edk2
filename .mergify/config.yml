@@ -52,3 +52,7 @@ pull_request_rules:
     actions:
       comment:
         message: PR can not be merged due to conflict.  Please rebase and resubmit
+
+merge_protections_settings:
+  reporting_method: check-runs
+
