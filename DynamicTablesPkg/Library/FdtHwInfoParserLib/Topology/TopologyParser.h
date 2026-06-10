@@ -59,6 +59,34 @@ typedef struct {
   INT32                                 CpuNode;
 } TOPOLOGY_PROC_HIERARCHY_BUFFERS;
 
+/** Buffered representation of one cache object.
+
+  Each entry carries the CM_ARCH_COMMON_CACHE_INFO object that will be
+  published along with parser-only metadata describing the DT cache node,
+  sharing mask, and owning processor-hierarchy node.
+**/
+typedef struct {
+  ///
+  /// Buffered cache objects to be published.
+  ///
+  CM_ARCH_COMMON_CACHE_INFO    Info;
+
+  ///
+  /// Per-cache CPU-sharing masks.
+  ///
+  UINT64                       CpuMasks[TOPOLOGY_MASK_SIZE];
+
+  ///
+  /// DT node offsets for shared cache nodes, or -1 for synthetic L1 entries.
+  ///
+  INT32                        DtNode;
+
+  ///
+  /// Owning processor hierarchy node index for each cache object.
+  ///
+  UINT32                       OwnerProcIndex;
+} TOPOLOGY_CACHE_BUFFERS;
+
 /** Working state for building processor-hierarchy and cache objects from DT.
 
   The context owns all temporary arrays used while deriving topology and cache
@@ -97,6 +125,26 @@ typedef struct {
   /// Ordered list of CPU DT nodes under "\cpus".
   ///
   INT32                              *CpuNodes;
+
+  ///
+  /// Buffered cache objects and parallel cache metadata arrays.
+  ///
+  TOPOLOGY_CACHE_BUFFERS             *CacheBuffers;
+
+  ///
+  /// Number of caches.
+  ///
+  UINT32                             CacheCount;
+
+  ///
+  /// Allocated capacity of the CacheBuffers array.
+  ///
+  UINT32                             CacheCapacity;
+
+  ///
+  /// Index of the cache entry currently being parsed.
+  ///
+  UINT32                             CurrCacheIndex;
 } TOPOLOGY_PARSER_CONTEXT;
 
 /** Processor topology parser.
