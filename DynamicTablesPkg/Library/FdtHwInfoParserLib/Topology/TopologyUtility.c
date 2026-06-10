@@ -47,3 +47,45 @@ SetCpuMaskBit (
   ASSERT (Mask != NULL);
   Mask[CpuIndex / 64] |= LShiftU64 (1ULL, CpuIndex % 64);
 }
+
+/** Get the CPU-mask associated to a cache.
+
+  @param [in] Context    Topology parser context.
+  @param [in] CacheIndex Cache node index.
+
+  @return Pointer to the CPU mask.
+**/
+UINT64 *
+EFIAPI
+GetCacheCpuMask (
+  IN CONST TOPOLOGY_PARSER_CONTEXT  *Context,
+  IN UINT32                         CacheIndex
+  )
+{
+  ASSERT (Context != NULL);
+  ASSERT (
+    (CacheIndex < Context->CacheCount) ||
+    ((CacheIndex == Context->CurrCacheIndex) && (CacheIndex < Context->CacheCapacity))
+    );
+  return Context->CacheBuffers[CacheIndex].CpuMasks;
+}
+
+/** Test whether two CPU masks are identical.
+
+  @param [in] Left     First CPU mask.
+  @param [in] Right    Second CPU mask.
+
+  @retval TRUE   Both masks are identical.
+  @retval FALSE  Otherwise.
+**/
+BOOLEAN
+EFIAPI
+IsCpuMaskEqual (
+  IN CONST UINT64  *Left,
+  IN CONST UINT64  *Right
+  )
+{
+  ASSERT ((Left != NULL) && (Right != NULL));
+
+  return (CompareMem (Left, Right, sizeof (UINT64) * TOPOLOGY_MASK_SIZE) == 0);
+}

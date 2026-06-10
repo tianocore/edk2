@@ -9,6 +9,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
 
+#include "Topology/TopologyCacheParser.h"
 #include "Topology/TopologyHierarchyParser.h"
 #include "Topology/TopologyParser.h"
 #include "Topology/TopologyUtility.h"
@@ -27,6 +28,10 @@ FreeTopologyContext (
 {
   if (Context == NULL) {
     return;
+  }
+
+  if (Context->CacheBuffers != NULL) {
+    FreePool (Context->CacheBuffers);
   }
 
   if (Context->ProcHierarchyBuffers != NULL) {
@@ -89,6 +94,16 @@ TopologyInfoParser (
     goto exit_handler;
   }
 
+  Status = ParseCacheInfo (&Context);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  //
+  // Add the ProcHierarchy nodes.
+  // This must be done after the cache information is parsed.
+  //
   for (Index = 0; Index < Context.ProcHierarchyCount; Index++) {
     Status = AddSingleCmObjWithToken (
                Context.FdtParserHandle,

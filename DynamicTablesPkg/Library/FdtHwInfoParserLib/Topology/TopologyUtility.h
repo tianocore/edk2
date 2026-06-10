@@ -30,3 +30,32 @@ SetCpuMaskBit (
   IN OUT UINT64  *Mask,
   IN     UINT32  CpuIndex
   );
+
+/** Get the CPU-mask associated to a cache.
+
+  @param [in] Context    Topology parser context.
+  @param [in] CacheIndex Cache node index.
+
+  @return Pointer to the CPU mask.
+**/
+UINT64 *
+EFIAPI
+GetCacheCpuMask (
+  IN CONST TOPOLOGY_PARSER_CONTEXT  *Context,
+  IN UINT32                         CacheIndex
+  );
+
+/** Test whether two CPU masks are identical.
+
+  @param [in] Left     First CPU mask.
+  @param [in] Right    Second CPU mask.
+
+  @retval TRUE   Both masks are identical.
+  @retval FALSE  Otherwise.
+**/
+BOOLEAN
+EFIAPI
+IsCpuMaskEqual (
+  IN CONST UINT64  *Left,
+  IN CONST UINT64  *Right
+  );
