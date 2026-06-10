@@ -340,7 +340,7 @@ typedef struct _EFI_HII_STRING_PACKAGE_HDR {
   UINT32                    StringInfoOffset;
   CHAR16                    LanguageWindow[16];
   EFI_STRING_ID             LanguageName;
-  CHAR8                     Language[1];
+  CHAR8                     Language[];
 } EFI_HII_STRING_PACKAGE_HDR;
 
 typedef struct {
