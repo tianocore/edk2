@@ -373,7 +373,7 @@ PciSearchDevice (
 
   DEBUG ((
     DEBUG_INFO,
-    "PciBus: Discovered %s @ [%02x|%02x|%02x]  [VID = 0x%x, DID = 0x%0x]\n",
+    "PciBus: Discovered %s @ [%02x|%02x|%02x]  [VID = 0x%04x, DID = 0x%04x]\n",
     IS_PCI_BRIDGE (Pci) ?     L"PPB" :
     IS_CARDBUS_BRIDGE (Pci) ? L"P2C" :
     L"PCI",
