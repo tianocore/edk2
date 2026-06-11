@@ -92,3 +92,15 @@ SmbiosProtocolReady (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
+
+/** Dynamic Hii Forms Process function.
+
+  Dispatch the generation of HII Forms by getting
+  information from the Configuration Manager.
+
+**/
+VOID
+EFIAPI
+DynamicHiiFormsProcess (
+  VOID
+  );
