@@ -1739,16 +1739,24 @@ WriteSections64 (
             INT32     LoImm, HiImm;
             UINT8     *PreTarg;
             Elf_Rela  *PreRel;
+            INT64     SymCoffRva;
+            INT64     InsnCoffRva;
+            INT64     PairHiCoffRva;
 
           case R_LARCH_SOP_PUSH_ABSOLUTE:
+          case R_LARCH_64:
             //
-            // Absolute relocation.
+            // R_LARCH_SOP_PUSH_ABSOLUTE is an absolute relocation, and
+            // R_LARCH_64 stores an absolute runtime address in section
+            // contents.  Translate such values from the linked ELF section
+            // address space to the generated PE/COFF RVA space.
+            // WriteRelocations64() still emits the PE/COFF base relocation
+            // for load-time image rebasing.
             //
             *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
             break;
 
           case R_LARCH_MARK_LA:
-          case R_LARCH_64:
           case R_LARCH_NONE:
           case R_LARCH_32:
           case R_LARCH_RELATIVE:
@@ -1851,29 +1859,32 @@ WriteSections64 (
           case R_LARCH_PCALA_HI20:
           case R_LARCH_GOT_PC_HI20:
             Offset = 0;
+            SymCoffRva = (INT64)Sym->st_value - (INT64)SymShdr->sh_addr + (INT64)mCoffSectionsOffset[Sym->st_shndx];
+            InsnCoffRva = (INT64)(UINTN)(Targ - mCoffFile);
             if (ELF_R_TYPE(Rel->r_info) == R_LARCH_PCALA_HI20) {
               //
-              // Recover the offset of the ELF PCALAU12I symbol relative to PC.
+              // Calculate the PE PC-relative offset.  SymCoffRva is the
+              // referenced symbol in the generated PE/COFF RVA space, and
+              // InsnCoffRva is the PE/COFF RVA of this instruction.
               //
-              Offset = (INT32)((Sym->st_value + Rel->r_addend) - (Rel->r_offset & ~0xFFF));
-              //
-              // Calculate the offset of PE PCADDU12I relative to PC.
-              //
-              Offset -= (UINTN)(Targ - mCoffFile) & 0xFFF;
+              Offset = (INT32)((SymCoffRva + Rel->r_addend) - InsnCoffRva);
             } else if (ELF_R_TYPE(Rel->r_info) == R_LARCH_GOT_PC_HI20) {
               //
-              // Calculate the offset of PE PCADDU12I relative to PC using the ELF symbol value.
+              // Convert the referenced symbol from the linked ELF section
+              // address space to the generated PE/COFF RVA space before
+              // calculating the PE PC-relative offset.  Targ already points
+              // into the generated PE/COFF image buffer.
               //
-              Offset = Sym->st_value - (UINTN)(Targ - mCoffFile);
+              Offset = SymCoffRva - InsnCoffRva;
             } else {
               Error (NULL, 0, 3000, "Invalid", "LoongArch PC related: wrong relocation type.");
               break;
             }
 
             //
-            // PCALA or GOT offset is relative to the previous page boundary, whereas PCADD
-            // offset is relative to the instruction itself.
-            // So fix up the offset so it points to the page containing the symbol.
+            // The original PCALA/GOT_PC relocations are page based, but this
+            // path rewrites the HI/LO pair to PCADDU12I plus ADDI.D.  Split
+            // the generated PE/COFF instruction-relative offset for that pair.
             //
             HiImm = (UINT32)((Offset + 0x800) >> 12) & 0xFFFFF;
 
@@ -1912,11 +1923,12 @@ WriteSections64 (
             }
 
             //
-            // Calculate the corresponding HI relative to PC using the ELF symbol value and fix the LO offset.
+            // Calculate the corresponding HI relative to PC using the PE symbol RVA and fix the LO offset.
             //
             if (ELF_R_TYPE(Rel->r_info) == R_LARCH_PCALA_LO12 && ELF_R_TYPE(PreRel->r_info) == R_LARCH_PCALA_HI20) {
-              Offset = (INT32)((Sym->st_value + PreRel->r_addend) - (PreRel->r_offset & ~0xFFF));
-              Offset -= (UINTN)(PreTarg - mCoffFile) & 0xFFF;
+              SymCoffRva = (INT64)Sym->st_value - (INT64)SymShdr->sh_addr + (INT64)mCoffSectionsOffset[Sym->st_shndx];
+              PairHiCoffRva = (INT64)(UINTN)(PreTarg - mCoffFile);
+              Offset = (INT32)((SymCoffRva + PreRel->r_addend) - PairHiCoffRva);
               LoImm = (UINT32)(Offset & 0xFFF);
               //
               // Only fill the LO offset in corresponding instructions.
@@ -1924,7 +1936,9 @@ WriteSections64 (
               *(UINT32 *)Targ &= 0xFFC003FF;
               *(UINT32 *)Targ |= LoImm << 10;
             } else if (ELF_R_TYPE(Rel->r_info) == R_LARCH_GOT_PC_LO12 && ELF_R_TYPE(PreRel->r_info) == R_LARCH_GOT_PC_HI20) {
-              Offset = Sym->st_value - (UINTN)(PreTarg - mCoffFile);
+              SymCoffRva = (INT64)Sym->st_value - (INT64)SymShdr->sh_addr + (INT64)mCoffSectionsOffset[Sym->st_shndx];
+              PairHiCoffRva = (INT64)(UINTN)(PreTarg - mCoffFile);
+              Offset = SymCoffRva - PairHiCoffRva;
               LoImm = (UINT32)(Offset & 0xFFF);
               //
               // Convert this instruction as ADDI.D and fill the LO offset into it.
