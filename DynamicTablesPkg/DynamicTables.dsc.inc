@@ -27,6 +27,7 @@
   MetadataObjLib|DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   MetadataHandlerLib|DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
   Tpm2DeviceTableLib|DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
+  HiiFormsLib|DynamicTablesPkg/Library/Common/HiiFormsLib/HiiFormsLib.inf
 
 [LibraryClasses.AARCH64]
   DynamicTablesScmiInfoLib|DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
