@@ -92,3 +92,17 @@ SmbiosProtocolReady (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
+
+/** Dynamic Hii Forms Process function.
+
+  This event notification indicates that the Configuration Manager protocol
+  is ready. Therefore, dispatch the generation of HII Forms by getting
+  information from the Configuration Manager.
+
+  @retval None
+**/
+VOID
+EFIAPI
+DynamicHiiFormsProcess (
+  VOID
+  );
