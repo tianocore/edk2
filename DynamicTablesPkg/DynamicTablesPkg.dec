@@ -31,6 +31,12 @@
   ##  @libraryclass  Defines a set of APIs to handle dynamically created CmObj.
   DynamicPlatRepoLib|Include/Library/DynamicPlatRepoLib.h
 
+  ## @libraryclass Defines a set of APIs to generate HII form packages.
+  HiiFormsLib|Include/Library/HiiFormsLib.h
+
+  ## @libraryclass Defines a set of APIs to generate HII string packages.
+  HiiStringsLib|Include/Library/HiiStringsLib.h
+
   ##  @libraryclass  Defines a set of APIs to a hardware information parser.
   HwInfoParserLib|Include/Library/HwInfoParserLib.h
 
