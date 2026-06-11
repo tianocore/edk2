@@ -629,6 +629,7 @@ SecurityPkg
 F: SecurityPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/security_pkg.html
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
+M: Chris Fernald <chfernal@microsoft.com> [cfernald]
 
 SecurityPkg: Secure boot related modules
 F: SecurityPkg/Library/DxeImageVerificationLib/
