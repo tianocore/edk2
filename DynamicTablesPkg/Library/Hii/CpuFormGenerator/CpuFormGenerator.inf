@@ -1,0 +1,51 @@
+## @file
+#  Dynamic HII Checkbox Question based Form Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CpuForm
+  FILE_GUID                      = D052BAEB-B149-5E09-A467-5CBA9A86AE3f
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = HiiCpuFormConstructor
+  DESTRUCTOR                     = HiiCpuFormDestructor
+
+[Sources]
+  ArmCpuFormGenerator.c
+  ArmCpuFormGenerator.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiFormsLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Event
+  ## CONSUMES ## Event
+  gEfiIfrTianoGuid
+  gEfiIfrRefreshIdOpGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

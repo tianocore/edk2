@@ -64,6 +64,7 @@
   DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
 
   #  HII Form Generators
+  DynamicTablesPkg/Library/Hii/CpuFormGenerator/CpuFormGenerator.inf
   DynamicTablesPkg/Library/Hii/PlatCfgForm/PlatformConfig.inf
 
 
@@ -106,6 +107,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
 
       #  HII Form Generators
+      NULL|DynamicTablesPkg/Library/Hii/CpuFormGenerator/CpuFormGenerator.inf
       NULL|DynamicTablesPkg/Library/Hii/PlatCfgForm/PlatformConfig.inf
   }
 
@@ -175,6 +177,7 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType19Lib/SmbiosType19Lib.inf
 
       #  HII Form Generators
+      NULL|DynamicTablesPkg/Library/Hii/CpuFormGenerator/CpuFormGenerator.inf
       NULL|DynamicTablesPkg/Library/Hii/PlatCfgForm/PlatformConfig.inf
   }
 
