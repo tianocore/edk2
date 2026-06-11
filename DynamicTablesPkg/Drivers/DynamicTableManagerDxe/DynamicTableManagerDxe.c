@@ -26,6 +26,7 @@
 
 STATIC VOID  *mAcpiTableProtocolRegistration;
 STATIC VOID  *mSmbiosProtocolRegistration;
+static VOID  *mHiiFormsRegistration;
 
 /** Entrypoint of Dynamic Table Manager Dxe.
 
@@ -57,6 +58,7 @@ DynamicTableManagerDxeInitialize (
 {
   EFI_EVENT  AcpiEvent;
   EFI_EVENT  SmbiosEvent;
+  EFI_EVENT  HiiFormsEvent;
 
   AcpiEvent = EfiCreateProtocolNotifyEvent (
                 &gEfiAcpiTableProtocolGuid,
@@ -86,6 +88,23 @@ DynamicTableManagerDxeInitialize (
       "Failed to register SMBIOS protocol notification event.\n"
       ));
     gBS->CloseEvent (AcpiEvent);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  HiiFormsEvent = EfiCreateProtocolNotifyEvent (
+                    &gEdkiiConfigurationManagerProtocolGuid,
+                    TPL_CALLBACK,
+                    DynamicHiiFormsProcess,
+                    NULL,
+                    &mHiiFormsRegistration
+                    );
+  if (HiiFormsEvent == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to register Hii Forms protocol notification event.\n"
+      ));
+    gBS->CloseEvent (AcpiEvent);
+    gBS->CloseEvent (SmbiosEvent);
     return EFI_OUT_OF_RESOURCES;
   }
 

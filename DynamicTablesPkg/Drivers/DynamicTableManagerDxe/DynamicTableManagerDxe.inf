@@ -28,6 +28,7 @@
   SmbiosTableDispatcher.h
   AcpiTableBuilder.c
   SmbiosTableBuilder.c
+  HiiFormsBuilder.c
 
 [Sources.AARCH64]
   Arm/ArmDynamicTableManager.c
@@ -44,6 +45,8 @@
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  HiiLib
+  MemoryAllocationLib
   MetadataHandlerLib
   PrintLib
   TableHelperLib
