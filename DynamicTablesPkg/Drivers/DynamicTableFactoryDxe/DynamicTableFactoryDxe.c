@@ -17,6 +17,7 @@
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
 #include <DeviceTreeTableGenerator.h>
+#include <HiiFormsGenerator.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 #include <Protocol/DynamicTableFactoryProtocol.h>
@@ -64,6 +65,9 @@ EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  DynamicTableFactoryProtocol = {
   GetDtTableGenerator,
   RegisterDtTableGenerator,
   DeregisterDtTableGenerator,
+  GetHiiFormsGenerator,
+  RegisterHiiFormsGenerator,
+  DeregisterHiiFormsGenerator,
   GetMetadataRoot,
   AddSmbiosHandle,
   FindSmbiosHandle,
