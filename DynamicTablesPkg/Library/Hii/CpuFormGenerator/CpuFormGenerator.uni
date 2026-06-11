@@ -1,0 +1,16 @@
+// /** @file
+// Dynamic HII CPU Form Generator.
+//
+// Copyright (c) 2026, Arm Limited. All rights reserved.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// --*/
+
+#langdef en-US  "English"
+
+#string STR_MODULE_ABSTRACT                    #language en-US "Dynamic HII CPU form generator"
+#string STR_MODULE_DESCRIPTION                 #language en-US "Dynamic HII CPU form generator"
+#string STR_CPU_GEN_FORM_SET_TITLE             #language en-US "Configure CPU's on the platform"
+#string STR_CPU_GEN_FORM_SET_TITLE_HELP        #language en-US "Configure CPU's on the platform"
+#string STR_CPU_GEN_FORM_TITLE                 #language en-US "Enable/Disable CPU's"
