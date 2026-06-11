@@ -23,6 +23,7 @@
 #include <Protocol/DynamicTableFactoryProtocol.h>
 
 #include "DynamicTableManagerDxe.h"
+#include "HiiFormsBuilder.h"
 
 STATIC VOID  *mAcpiTableProtocolRegistration;
 STATIC VOID  *mSmbiosProtocolRegistration;
@@ -88,6 +89,35 @@ DynamicTableManagerDxeInitialize (
     gBS->CloseEvent (AcpiEvent);
     return EFI_OUT_OF_RESOURCES;
   }
+
+  DynamicHiiFormsProcess ();
+
+  return EFI_SUCCESS;
+}
+
+/** Cleanup of Dynamic Table Manager Dxe.
+
+  This function is invoked when UnloadImage() is called
+  for this module. It is cleaning up the dynamic HII form
+  resources.
+
+  @param  ImageHandle   Handle to the image.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Function parameter is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+DynamicTableManagerDxeUnInitialize (
+  IN  EFI_HANDLE  ImageHandle
+  )
+{
+  if (ImageHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FreeHiiFormResources ();
 
   return EFI_SUCCESS;
 }
