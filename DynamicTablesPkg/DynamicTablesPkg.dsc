@@ -54,6 +54,7 @@
   DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
   DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
   DynamicTablesPkg/Library/Common/HiiFormsLib/HiiFormsLib.inf
+  DynamicTablesPkg/Library/Common/HiiStringsLib/HiiStringsLib.inf
 
 [Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
