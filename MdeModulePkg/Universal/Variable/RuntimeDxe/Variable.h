@@ -368,6 +368,16 @@ VariableCommonInitialize (
   );
 
 /**
+  Uninitialize variable store area, freeing all resources allocated by
+  VariableCommonInitialize().
+
+**/
+VOID
+VariableCommonUninitialize (
+  VOID
+  );
+
+/**
   This function reclaims variable storage if free size is below the threshold.
 
 **/
