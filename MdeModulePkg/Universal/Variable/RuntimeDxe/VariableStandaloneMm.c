@@ -62,6 +62,17 @@ VariableNotifySmmReady (
 }
 
 /**
+  Revert the variable ready notification.
+  This function will be called when an error happens in variable initializing process.
+**/
+VOID
+VariableClearNotifySmmReady (
+  VOID
+  )
+{
+}
+
+/**
   Notify the system that the SMM variable write driver is ready.
 **/
 VOID

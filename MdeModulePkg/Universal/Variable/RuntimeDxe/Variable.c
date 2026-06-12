@@ -3802,6 +3802,49 @@ VariableCommonInitialize (
 }
 
 /**
+  Uninitialize variable store area.
+
+  @retval EFI_SUCCESS           Function successfully executed.
+
+**/
+EFI_STATUS
+VariableCommonUninitialize (
+  VOID
+  )
+{
+  if (mVariableModuleGlobal != NULL) {
+    if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
+      FreePool ((VOID *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase);
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
+    }
+
+    if (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase != 0) {
+      FreePool ((VOID *)(UINTN)mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
+    }
+
+    FreePool (mVariableModuleGlobal);
+    mVariableModuleGlobal = NULL;
+  }
+
+  if (mNvFvHeaderCache != NULL) {
+    //
+    // In real NV mode, mNvVariableCache points into the same allocation as mNvFvHeaderCache.
+    //
+    FreePool (mNvFvHeaderCache);
+    mNvFvHeaderCache = NULL;
+    mNvVariableCache = NULL;
+  } else if ((mNvVariableCache != NULL) && (PcdGet64 (PcdEmuVariableNvStoreReserved) == 0)) {
+    //
+    // In emulated NV mode without a pre-reserved store, mNvVariableCache is a dynamic allocation.
+    //
+    FreePool (mNvVariableCache);
+    mNvVariableCache = NULL;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Get the proper fvb handle and/or fvb protocol by the given Flash address.
 
   @param[in]  Address       The Flash address.

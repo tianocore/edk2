@@ -368,6 +368,18 @@ VariableCommonInitialize (
   );
 
 /**
+  Uninitialize variable store area, freeing all resources allocated by
+  VariableCommonInitialize().
+
+  @retval EFI_SUCCESS           Function successfully executed.
+
+**/
+EFI_STATUS
+VariableCommonUninitialize (
+  VOID
+  );
+
+/**
   This function reclaims variable storage if free size is below the threshold.
 
 **/
