@@ -68,9 +68,11 @@ EFI_STATUS
 
   @param  SectionType           The value of the section type to find.
   @param  SectionCheckHook      A hook which can check if the section is the target one.
-  @param  FileHeader            A pointer to the file header that contains the set of sections to
+  @param  FileHandle            A pointer to the file header that contains the set of sections to
                                 be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
+  @param  AuthenticationStatus  Pointer to the authentication status. This parameter is optional. If non-NULL and
+                                GUIDed extraction occurs, the authentication status will be updated.
 
   @retval EFI_SUCCESS           The section was found.
   @retval EFI_NOT_FOUND         The section was not found.
@@ -82,7 +84,8 @@ FfsFindSectionDataWithHook (
   IN EFI_SECTION_TYPE        SectionType,
   IN FFS_CHECK_SECTION_HOOK  SectionCheckHook,
   IN EFI_PEI_FILE_HANDLE     FileHandle,
-  OUT VOID                   **SectionData
+  OUT VOID                   **SectionData,
+  OUT UINT32                 *AuthenticationStatus OPTIONAL
   );
 
 /**
