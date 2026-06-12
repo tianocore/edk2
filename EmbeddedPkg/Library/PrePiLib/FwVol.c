@@ -798,6 +798,7 @@ FfsGetVolumeInfo (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (VolumeInfo, sizeof (*VolumeInfo));
   VolumeInfo->FvAttributes = FwVolHeader.Attributes;
   VolumeInfo->FvStart      = (VOID *)VolumeHandle;
   VolumeInfo->FvSize       = FwVolHeader.FvLength;
@@ -912,7 +913,6 @@ FfsProcessFvFile (
   //
   // Collect FvImage Info.
   //
-  ZeroMem (&FvImageInfo, sizeof (FvImageInfo));
   Status = FfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
   ASSERT_EFI_ERROR (Status);
 
