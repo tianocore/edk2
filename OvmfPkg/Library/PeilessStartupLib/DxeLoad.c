@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PrePiLib.h>
 #include "X64/PageTables.h"
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/HobLib.h>
 
 #define STACK_SIZE  0x20000
 extern EFI_GUID  gEfiNonCcFvGuid;
@@ -187,6 +188,7 @@ FindDxeNonCc (
   UINT32               FvAlignment;
   VOID                 *FvBuffer;
   EFI_FV_INFO          ParentVolumeInfo;
+  UINT32               AuthenticationStatus;
 
   FileHandle = NULL;
 
@@ -202,7 +204,7 @@ FindDxeNonCc (
   //
   // Find FvImage in FvFile
   //
-  Status = FfsFindSectionDataWithHook (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, CheckSectionHookForDxeNonCc, FileHandle, (VOID **)&FvImageHandle);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, CheckSectionHookForDxeNonCc, FileHandle, (VOID **)&FvImageHandle, &AuthenticationStatus);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -257,6 +259,15 @@ FindDxeNonCc (
     &(((EFI_FFS_FILE_HEADER *)FileHandle)->Name)
     );
 
+  BuildFv3Hob (
+    (EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart,
+    FvImageInfo.FvSize,
+    AuthenticationStatus,
+    TRUE,
+    &ParentVolumeInfo.FvName,
+    &(((EFI_FFS_FILE_HEADER *)FileHandle)->Name)
+    );
+
   return Status;
 }
 
@@ -299,7 +310,7 @@ DxeLoadCore (
   //
   // Load the DXE Core from a Firmware Volume.
   //
-  Status = FfsFindSectionDataWithHook (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage, NULL);
   if (EFI_ERROR (Status)) {
     return Status;
   }
