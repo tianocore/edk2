@@ -171,7 +171,7 @@ CheckSectionHookForDxeNonCc (
  * Find the NonCc FV.
  *
  * @param FvInstance    The FvInstance number.
- * @return EFI_STATUS   Successfuly find the NonCc FV.
+ * @return EFI_STATUS   Successfully find the NonCc FV.
  */
 EFI_STATUS
 EFIAPI
@@ -186,6 +186,7 @@ FindDxeNonCc (
   EFI_FV_INFO          FvImageInfo;
   UINT32               FvAlignment;
   VOID                 *FvBuffer;
+  EFI_FV_INFO          ParentVolumeInfo;
 
   FileHandle = NULL;
 
@@ -237,6 +238,9 @@ FindDxeNonCc (
     FfsGetVolumeInfo ((EFI_PEI_FV_HANDLE)FvBuffer, &FvImageInfo);
   }
 
+  Status = FfsGetVolumeInfo (VolumeHandle, &ParentVolumeInfo);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Inform HOB consumer phase, i.e. DXE core, the existence of this FV
   //
@@ -249,7 +253,7 @@ FindDxeNonCc (
   BuildFv2Hob (
     (EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart,
     FvImageInfo.FvSize,
-    &FvImageInfo.FvName,
+    &ParentVolumeInfo.FvName,
     &(((EFI_FFS_FILE_HEADER *)FileHandle)->Name)
     );
 
