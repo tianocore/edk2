@@ -73,12 +73,6 @@ if /I "%1"=="/?" goto Usage
     set VSTool=VS2017
     goto loop
   )
-  if /I "%1"=="VS2015" (
-    shift
-    set VS2015=TRUE
-    set VSTool=VS2015
-    goto loop
-  )
   if "%1"=="" goto setup_workspace
   if exist %1 (
     if not defined BASE_TOOLS_PATH (
@@ -334,9 +328,6 @@ if defined VS2026 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2019
 ) else if defined VS2017 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2017
-) else if defined VS2015 (
-  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2015
-  call %EDK_TOOLS_PATH%\get_vsvars.bat VS2015
 ) else if not defined BASETOOLS_MINGW_BUILD (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
   call %EDK_TOOLS_PATH%\get_vsvars.bat
@@ -590,7 +581,7 @@ endlocal
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [Mingw-w64] [base_tools_path [edk_tools_path]] [VS2026] [VS2022] [VS2019] [VS2017] [VS2015]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [Mingw-w64] [base_tools_path [edk_tools_path]] [VS2026] [VS2022] [VS2019] [VS2017]"
   @echo.
   @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path.
   @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
@@ -600,7 +591,6 @@ endlocal
   @echo                           whether they have been updated or not.
   @echo         Reconfig          Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo         Mingw-w64         Build BaseTools binaries using mingw-w64.
-  @echo         VS2015            Set the env for VS2015 build.
   @echo         VS2017            Set the env for VS2017 build.
   @echo         VS2019            Set the env for VS2019 build.
   @echo         VS2022            Set the env for VS2022 build.
@@ -615,7 +605,6 @@ set VS2026=
 set VS2022=
 set VS2019=
 set VS2017=
-set VS2015=
 set VSTool=
 set PYTHON_VER_MAJOR=
 set PYTHON_VER_MINOR=

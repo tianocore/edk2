@@ -22,37 +22,12 @@ if /I "%1"=="VS2026" goto SetVS2026
 if /I "%1"=="VS2022" goto SetVS2022
 if /I "%1"=="VS2019" goto SetVS2019
 if /I "%1"=="VS2017" goto SetVS2017
-if /I "%1"=="VS2015" goto SetVS2015
 
 if defined VS71COMNTOOLS (
   if not defined VS2003_PREFIX (
     set "VS2003_PREFIX=%VS71COMNTOOLS:~0,-14%"
   )
 )
-
-:SetVS2015
-if defined VS140COMNTOOLS (
-  if not defined VS2015_PREFIX (
-    set "VS2015_PREFIX=%VS140COMNTOOLS:~0,-14%"
-  )
-  if not defined WINSDK81_PREFIX (
-    if exist "%ProgramFiles%\Windows Kits\8.1\bin" (
-      set "WINSDK81_PREFIX=%ProgramFiles%\Windows Kits\8.1\bin\"
-    ) else if exist "%ProgramFiles(x86)%\Windows Kits\8.1\bin" (
-      set "WINSDK81_PREFIX=%ProgramFiles(x86)%\Windows Kits\8.1\bin\"
-    )
-  )
-  if not defined WINSDK81x86_PREFIX (
-    if exist "%ProgramFiles(x86)%\Windows Kits\8.1\bin" (
-      set "WINSDK81x86_PREFIX=%ProgramFiles(x86)%\Windows Kits\8.1\bin\"
-    ) else if exist "%ProgramFiles%\Windows Kits\8.1\bin" (
-      set "WINSDK81x86_PREFIX=%ProgramFiles%\Windows Kits\8.1\bin\"
-    )
-  )
-) else (
-  if /I "%1"=="VS2015" goto ToolNotInstall
-)
-if /I "%1"=="VS2015" goto SetWinDDK
 
 :SetVS2017
 if not defined VS150COMNTOOLS (
