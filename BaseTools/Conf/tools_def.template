@@ -27,8 +27,15 @@
 # 3.05 - Add CLANGPDB AARCH64 Support
 # 3.06 - Remove GCC48, GCC49 and GCC5
 # 3.07 - Switch alignemnt to 4k for X64 builds add XIP_FLAGS.
+#      - Add --apply-dynamic-relocs option for AARCH64 CLANGDWARF builds
+#      - Add missing CLANGDWARF OBJCOPY_FLAGS
+#      - Canonicalize CLANGDWARF definitions
+#      - Align X64 CLANGDWARF and CLANGPDB definitions
+#      - Add GENFWHII_FLAGS to fix VS2026 GenFw build issue
+#      - Add -malign-double to IA32 ASLCC_FLAGS
+#      - Add CLANGDWARF support for LoongArch64
 #
-#!VERSION=3.06
+#!VERSION=3.07
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
