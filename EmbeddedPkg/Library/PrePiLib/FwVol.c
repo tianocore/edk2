@@ -875,7 +875,7 @@ FfsProcessFvFile (
   EFI_FV_INFO           FvImageInfo;
   UINT32                FvAlignment;
   VOID                  *FvBuffer;
-  EFI_PEI_HOB_POINTERS  HobFv2;
+  EFI_PEI_HOB_POINTERS  Hob;
 
   FvBuffer = NULL;
 
@@ -883,16 +883,22 @@ FfsProcessFvFile (
   // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
   // been extracted.
   //
-  HobFv2.Raw = GetHobList ();
-  while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
-    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobFv2.FirmwareVolume2->FileName)) {
-      //
-      // this FILE has been dispatched, it will not be dispatched again.
-      //
-      return EFI_SUCCESS;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV2) {
+      if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &Hob.FirmwareVolume2->FileName)) {
+        //
+        // this FILE has been dispatched, it will not be dispatched again.
+        //
+        return EFI_SUCCESS;
+      }
+    } else if ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV3) && Hob.FirmwareVolume3->ExtractedFv) {
+      if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &Hob.FirmwareVolume3->FileName)) {
+        //
+        // this FILE has been dispatched, it will not be dispatched again.
+        //
+        return EFI_SUCCESS;
+      }
     }
-
-    HobFv2.Raw = GET_NEXT_HOB (HobFv2);
   }
 
   //
