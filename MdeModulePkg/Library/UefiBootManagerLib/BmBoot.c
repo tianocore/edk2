@@ -67,6 +67,32 @@ EfiBootManagerRegisterLegacyBootSupport (
 }
 
 /**
+  Clear current boot variables.
+**/
+STATIC
+VOID
+BmClearCurrentBootVariables (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gRT->SetVariable (
+                  L"BootCurrent",
+                  &gEfiGlobalVariableGuid,
+                  0,
+                  0,
+                  NULL
+                  );
+  //
+  // Deleting variable with current variable implementation shouldn't fail.
+  // When BootXXXX (e.g.: BootManagerMenu) boots BootYYYY, exiting BootYYYY causes BootCurrent deleted,
+  // exiting BootXXXX causes deleting BootCurrent returns EFI_NOT_FOUND.
+  //
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
+}
+
+/**
   Return TRUE when the boot option is auto-created instead of manually added.
 
   @param BootOption Pointer to the boot option to check.
@@ -2151,22 +2177,7 @@ EfiBootManagerBoot (
     ASSERT_EFI_ERROR (Status);
   }
 
-  //
-  // Clear Boot Current
-  //
-  Status = gRT->SetVariable (
-                  L"BootCurrent",
-                  &gEfiGlobalVariableGuid,
-                  0,
-                  0,
-                  NULL
-                  );
-  //
-  // Deleting variable with current variable implementation shouldn't fail.
-  // When BootXXXX (e.g.: BootManagerMenu) boots BootYYYY, exiting BootYYYY causes BootCurrent deleted,
-  // exiting BootXXXX causes deleting BootCurrent returns EFI_NOT_FOUND.
-  //
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
+  BmClearCurrentBootVariables ();
 }
 
 /**
