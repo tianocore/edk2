@@ -64,6 +64,7 @@
   BaseLib
   UefiDriverEntryPoint
   DebugLib
+  IoMmuLib
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid               ## SOMETIMES_PRODUCES
@@ -80,7 +81,6 @@
   gEfiPciRootBridgeIoProtocolGuid                 ## TO_START
   gEfiIncompatiblePciDeviceSupportProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
-  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
   gEdkiiDeviceSecurityProtocolGuid                ## SOMETIMES_CONSUMES
   gEdkiiDeviceIdentifierTypePciGuid               ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
