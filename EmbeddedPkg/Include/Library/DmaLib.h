@@ -59,6 +59,9 @@ typedef enum {
   @param  HostAddress           The system memory address to map to the DMA controller.
   @param  NumberOfBytes         On input the number of bytes to map. On output the number of bytes
                                 that were mapped.
+  @param  DeviceHandle          Handle of the DMA agent passed to IoMmuSetAttribute(). It must carry a
+                                protocol the IOMMU can resolve to a DMA identifier (e.g. PciIo).
+                                Pass NULL if the caller does not require IOMMU programming.
   @param  DeviceAddress         The resulting map address for the bus master controller to use to
                                 access the hosts HostAddress.
   @param  Mapping               A resulting value to pass to DmaUnmap().
@@ -76,6 +79,7 @@ DmaMap (
   IN     DMA_MAP_OPERATION  Operation,
   IN     VOID               *HostAddress,
   IN OUT UINTN              *NumberOfBytes,
+  IN     EFI_HANDLE         DeviceHandle,
   OUT    PHYSICAL_ADDRESS   *DeviceAddress,
   OUT    VOID               **Mapping
   );
