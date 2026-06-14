@@ -39,13 +39,13 @@
   UefiLib
   PciHostBridgeLib
   TimerLib
+  IoMmuLib
 
 [Protocols]
   gEfiCpuIo2ProtocolGuid                          ## CONSUMES
   gEfiDevicePathProtocolGuid                      ## BY_START
   gEfiPciRootBridgeIoProtocolGuid                 ## BY_START
   gEfiPciHostBridgeResourceAllocationProtocolGuid ## BY_START
-  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiCpuIo2ProtocolGuid AND
