@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PrePiLib.h>
 #include "X64/PageTables.h"
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/HobLib.h>
 
 #define STACK_SIZE  0x20000
 extern EFI_GUID  gEfiNonCcFvGuid;
@@ -120,7 +121,7 @@ FindDxeCore (
     if (*FileHandle) {
       // Assume the FV that contains multiple compressed FVs.
       // So decompress the compressed FVs
-      Status = FfsProcessFvFile (*FileHandle);
+      Status = FfsProcessFvFile (*FileHandle, VolumeHandle);
       ASSERT_EFI_ERROR (Status);
       Status = FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_DXE_CORE, &VolumeHandle, FileHandle);
     }
@@ -171,7 +172,7 @@ CheckSectionHookForDxeNonCc (
  * Find the NonCc FV.
  *
  * @param FvInstance    The FvInstance number.
- * @return EFI_STATUS   Successfuly find the NonCc FV.
+ * @return EFI_STATUS   Successfully find the NonCc FV.
  */
 EFI_STATUS
 EFIAPI
@@ -186,6 +187,8 @@ FindDxeNonCc (
   EFI_FV_INFO          FvImageInfo;
   UINT32               FvAlignment;
   VOID                 *FvBuffer;
+  EFI_FV_INFO          ParentVolumeInfo;
+  UINT32               AuthenticationStatus;
 
   FileHandle = NULL;
 
@@ -201,7 +204,7 @@ FindDxeNonCc (
   //
   // Find FvImage in FvFile
   //
-  Status = FfsFindSectionDataWithHook (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, CheckSectionHookForDxeNonCc, FileHandle, (VOID **)&FvImageHandle);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, CheckSectionHookForDxeNonCc, FileHandle, (VOID **)&FvImageHandle, &AuthenticationStatus);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -237,6 +240,9 @@ FindDxeNonCc (
     FfsGetVolumeInfo ((EFI_PEI_FV_HANDLE)FvBuffer, &FvImageInfo);
   }
 
+  Status = FfsGetVolumeInfo (VolumeHandle, &ParentVolumeInfo);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Inform HOB consumer phase, i.e. DXE core, the existence of this FV
   //
@@ -249,7 +255,16 @@ FindDxeNonCc (
   BuildFv2Hob (
     (EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart,
     FvImageInfo.FvSize,
-    &FvImageInfo.FvName,
+    &ParentVolumeInfo.FvName,
+    &(((EFI_FFS_FILE_HEADER *)FileHandle)->Name)
+    );
+
+  BuildFv3Hob (
+    (EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart,
+    FvImageInfo.FvSize,
+    AuthenticationStatus,
+    TRUE,
+    &ParentVolumeInfo.FvName,
     &(((EFI_FFS_FILE_HEADER *)FileHandle)->Name)
     );
 
@@ -295,7 +310,7 @@ DxeLoadCore (
   //
   // Load the DXE Core from a Firmware Volume.
   //
-  Status = FfsFindSectionDataWithHook (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage, NULL);
   if (EFI_ERROR (Status)) {
     return Status;
   }

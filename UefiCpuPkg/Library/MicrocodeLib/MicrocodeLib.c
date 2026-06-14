@@ -244,7 +244,7 @@ IsValidMicrocode (
   // Check whether the whole microcode is within the buffer.
   // TotalSize should be multiple of 1024.
   //
-  if (((TotalSize % SIZE_1KB) != 0) || (TotalSize > MicrocodeLength)) {
+  if (!IS_ALIGNED (TotalSize, SIZE_1KB) || (TotalSize > MicrocodeLength)) {
     return FALSE;
   }
 

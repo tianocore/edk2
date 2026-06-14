@@ -1,0 +1,52 @@
+## @file
+#  WSMT (Windows SMM Security Mitigation Table) ACPI table driver.
+#
+#  Publishes the WSMT ACPI table when OVMF can attest to supported
+#  MM communication buffer protections.
+#
+#  Copyright (c) 2026, Nutanix, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = WsmtDxe
+  FILE_GUID      = f6394dd2-bafd-4d8e-999e-7590df8fc546
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = WsmtDxeEntryPoint
+
+[Sources]
+  WsmtDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid    ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire
+
+[Depex]
+  gEfiAcpiTableProtocolGuid

@@ -2165,25 +2165,60 @@ CoreConvertResourceDescriptorHobAttributesToCapabilities (
 }
 
 /**
-  Calculate total memory bin size neeeded.
+  Calculate total memory bin size needed.
 
-  @return The total memory bin size neeeded.
+  @param BinTop                The top address of the memory bins. This is an optional parameter.
+                               When NULL, the returned size meets the alignment requirements as long as
+                               the base address selected also meets the alignment requirements. When
+                               non-NULL, then the returned BinTop value and the returned size both meet
+                               the alignment requirements. When non-NULL, this will be updated on
+                               output to the new top address of the memory bins that must be used to
+                               satisfy alignment requirements.
+
+  @return The total memory bin size needed.
 
 **/
 UINT64
 CalculateTotalMemoryBinSizeNeeded (
-  VOID
+  IN OUT OPTIONAL EFI_PHYSICAL_ADDRESS  *BinTop
   )
 {
   UINTN   Index;
   UINT64  TotalSize;
+  UINT64  Granularity;
 
   //
   // Loop through each memory type in the order specified by the gMemoryTypeInformation[] array
   //
   TotalSize = 0;
   for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+    Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+    if ((gMemoryTypeInformation[Index].Type == EfiReservedMemoryType) ||
+        (gMemoryTypeInformation[Index].Type == EfiACPIMemoryNVS) ||
+        (gMemoryTypeInformation[Index].Type == EfiRuntimeServicesCode) ||
+        (gMemoryTypeInformation[Index].Type == EfiRuntimeServicesData))
+    {
+      Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+    }
+
+    // gMemoryTypeInformation[Index].NumberOfPages is already aligned to the allocation granularity
     TotalSize += LShiftU64 (gMemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
+
+    // BinTop is optional
+    if (BinTop == NULL) {
+      continue;
+    }
+
+    // Lower the bin top to the next aligned address, taking any padding into account in the size
+    *BinTop   -= (UINTN)LShiftU64 (gMemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
+    TotalSize += (*BinTop & (Granularity - 1));
+    *BinTop   &= ~(Granularity - 1);
+  }
+
+  if (BinTop != NULL) {
+    // Set *BinTop to the new top of the memory bins. It currently points to the base address of
+    // the memory bins
+    *BinTop += TotalSize;
   }
 
   return TotalSize;
@@ -2289,6 +2324,7 @@ CoreInitializeMemoryServices (
   UINT32                       ReservedCodePageNumber;
   UINT64                       MinimalMemorySizeNeeded;
   EFI_PHYSICAL_ADDRESS         ResourceHobMemoryTop;
+  EFI_PHYSICAL_ADDRESS         BinTop;
 
   //
   // Point at the first HOB.  This must be the PHIT HOB.
@@ -2363,7 +2399,8 @@ CoreInitializeMemoryServices (
           continue;
         }
 
-        if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded ()) {
+        BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+        if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop)) {
           MemoryTypeInformationResourceHob = ResourceHob;
         }
       }
@@ -2377,7 +2414,7 @@ CoreInitializeMemoryServices (
   //
   // Include the total memory bin size needed to make sure memory bin could be allocated successfully.
   //
-  MinimalMemorySizeNeeded = MINIMUM_INITIAL_MEMORY_SIZE + CalculateTotalMemoryBinSizeNeeded ();
+  MinimalMemorySizeNeeded = MINIMUM_INITIAL_MEMORY_SIZE + CalculateTotalMemoryBinSizeNeeded (NULL);
 
   //
   // Find the Resource Descriptor HOB that contains PHIT range EfiFreeMemoryBottom..EfiFreeMemoryTop

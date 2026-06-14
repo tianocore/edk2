@@ -210,7 +210,7 @@ MptScsiInit (
   // Send controller init through doorbell
   //
   STATIC_ASSERT (
-    sizeof (*Req) % sizeof (UINT32) == 0,
+    IS_ALIGNED (sizeof (*Req), sizeof (UINT32)),
     "Req must be multiple of UINT32"
     );
   STATIC_ASSERT (

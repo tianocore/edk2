@@ -45,6 +45,3 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingCredit
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkPeriodicTimerInterval
-
-[Depex]
-  TRUE

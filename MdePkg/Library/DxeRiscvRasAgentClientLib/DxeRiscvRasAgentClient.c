@@ -230,6 +230,11 @@ RacInit (
   EFI_STATUS  Status;
   UINT32      Index;
 
+  Status = SbiMpxyLibInit ();
+  if ((Status != EFI_SUCCESS) && (Status != EFI_ALREADY_STARTED)) {
+    return Status;
+  }
+
   if (!mRacLibraryInitialized) {
     Status = ProbeRasAgentMpxyChannelId (
                RAS_AGENT_CHANNEL_LIST_SIZE,
