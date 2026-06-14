@@ -264,4 +264,3 @@ GetTranslationByResourceType (
   );
 
 extern EFI_CPU_IO2_PROTOCOL  *mCpuIo;
-extern EDKII_IOMMU_PROTOCOL  *mIoMmu;
