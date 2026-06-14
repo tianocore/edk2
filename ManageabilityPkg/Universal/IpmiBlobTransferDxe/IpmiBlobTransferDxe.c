@@ -91,6 +91,7 @@ CalculateCrc16Ccitt (
                                     not used.
 
   @retval EFI_SUCCESS            Successfully sends blob data.
+  @retval EFI_BUFFER_TOO_SMALL   Response buffer too small to hold the response.
   @retval EFI_OUT_OF_RESOURCES   Memory allocation fails.
   @retval EFI_PROTOCOL_ERROR     Communication errors.
   @retval EFI_CRC_ERROR          Data integrity checks fail.
@@ -115,6 +116,7 @@ IpmiBlobTransferSendIpmi (
   UINT8                      *IpmiResponseData;
   UINT8                      *ModifiedResponseData;
   UINT32                     IpmiResponseDataSize;
+  UINT32                     AllocatedResponseSize;
   IPMI_BLOB_TRANSFER_HEADER  Header;
 
   if (((SendDataSize > 0) && (SendData == NULL)) || ((ResponseData == NULL) && (((ResponseDataSize != NULL) && (*ResponseDataSize > 0))))) {
@@ -168,16 +170,12 @@ IpmiBlobTransferSendIpmi (
   DEBUG ((BLOB_TRANSFER_DEBUG, "\n"));
   DEBUG_CODE_END ();
 
-  IpmiResponseDataSize = PROTOCOL_RESPONSE_OVERHEAD;
-  //
-  // If expecting data to be returned, we have to also account for the 16 bit CRC
-  //
-  if ((ResponseDataSize != NULL) && (*ResponseDataSize > 0)) {
-    IpmiResponseDataSize += (*ResponseDataSize + sizeof (Crc));
-  }
+  AllocatedResponseSize = PROTOCOL_RESPONSE_OVERHEAD + sizeof (Crc) + BLOB_MAX_DATA_PER_PACKET;
+  IpmiResponseDataSize  = AllocatedResponseSize;
 
   IpmiResponseData = AllocateZeroPool (IpmiResponseDataSize);
   if (IpmiResponseData == NULL) {
+    FreePool (IpmiSendData);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -206,7 +204,20 @@ IpmiBlobTransferSendIpmi (
   DEBUG_CODE_END ();
 
   if (EFI_ERROR (Status)) {
+    FreePool (IpmiResponseData);
     return Status;
+  }
+
+  if (IpmiResponseDataSize > AllocatedResponseSize) {
+    DEBUG ((DEBUG_ERROR, "%a: Response size %u exceeds allocated buffer %u\n", __func__, IpmiResponseDataSize, AllocatedResponseSize));
+    FreePool (IpmiResponseData);
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (IpmiResponseDataSize < sizeof (CompletionCode)) {
+    DEBUG ((DEBUG_ERROR, "%a: Response too short for Completion Code: %u bytes\n", __func__, IpmiResponseDataSize));
+    FreePool (IpmiResponseData);
+    return EFI_PROTOCOL_ERROR;
   }
 
   CompletionCode = *ModifiedResponseData;
@@ -220,6 +231,12 @@ IpmiBlobTransferSendIpmi (
   ModifiedResponseData  = ModifiedResponseData + sizeof (CompletionCode);
   IpmiResponseDataSize -= sizeof (CompletionCode);
 
+  if (IpmiResponseDataSize < sizeof (OpenBmcOen)) {
+    DEBUG ((DEBUG_ERROR, "%a: Response too short for OEN: %u bytes\n", __func__, IpmiResponseDataSize));
+    FreePool (IpmiResponseData);
+    return EFI_PROTOCOL_ERROR;
+  }
+
   // Check OEN code and verify it matches the OpenBMC OEN
   CopyMem (Oen, ModifiedResponseData, sizeof (OpenBmcOen));
   if (CompareMem (Oen, OpenBmcOen, sizeof (OpenBmcOen)) != 0) {
@@ -227,7 +244,11 @@ IpmiBlobTransferSendIpmi (
     return EFI_PROTOCOL_ERROR;
   }
 
-  if (IpmiResponseDataSize == sizeof (OpenBmcOen)) {
+  // Strip the OEN, we are done with it now
+  ModifiedResponseData  = ModifiedResponseData + sizeof (Oen);
+  IpmiResponseDataSize -= sizeof (Oen);
+
+  if (IpmiResponseDataSize == 0) {
     //
     // In this case, there was no response data sent. This is not an error.
     // Some messages do not require a response.
@@ -240,9 +261,12 @@ IpmiBlobTransferSendIpmi (
     return Status;
     // Now we need to validate the CRC then send the Response body back
   } else {
-    // Strip the OEN, we are done with it now
-    ModifiedResponseData  = ModifiedResponseData + sizeof (Oen);
-    IpmiResponseDataSize -= sizeof (Oen);
+    if (IpmiResponseDataSize < sizeof (Crc)) {
+      DEBUG ((DEBUG_ERROR, "%a: Response too short for CRC: %u bytes\n", __func__, IpmiResponseDataSize));
+      FreePool (IpmiResponseData);
+      return EFI_PROTOCOL_ERROR;
+    }
+
     // Then validate the Crc
     CopyMem (&Crc, ModifiedResponseData, sizeof (Crc));
     ModifiedResponseData  = ModifiedResponseData + sizeof (Crc);
@@ -250,6 +274,12 @@ IpmiBlobTransferSendIpmi (
 
     if (Crc == CalculateCrc16Ccitt (ModifiedResponseData, IpmiResponseDataSize)) {
       if ((ResponseData != NULL) && (ResponseDataSize != NULL)) {
+        if (IpmiResponseDataSize > *ResponseDataSize) {
+          DEBUG ((DEBUG_ERROR, "%a: Response too large for buffer: %u > %u\n", __func__, IpmiResponseDataSize, *ResponseDataSize));
+          FreePool (IpmiResponseData);
+          return EFI_BUFFER_TOO_SMALL;
+        }
+
         CopyMem (ResponseData, ModifiedResponseData, IpmiResponseDataSize);
         CopyMem (ResponseDataSize, &IpmiResponseDataSize, sizeof (IpmiResponseDataSize));
       }
@@ -728,8 +758,10 @@ IpmiBlobTransferStat (
   UINT8       *ResponseData;
   UINT32      SendDataSize;
   UINT32      ResponseDataSize;
+  UINT8       ActMetaLen;
 
   if ((BlobId == NULL) || (BlobState == NULL)) {
+    ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
   }
 
@@ -757,12 +789,17 @@ IpmiBlobTransferStat (
       *Size = ((IPMI_BLOB_TRANSFER_BLOB_STAT_RESPONSE *)ResponseData)->Size;
     }
 
+    ActMetaLen = ((IPMI_BLOB_TRANSFER_BLOB_STAT_RESPONSE *)ResponseData)->MetaDataLen;
     if (MetadataLength != NULL) {
-      *MetadataLength = ((IPMI_BLOB_TRANSFER_BLOB_STAT_RESPONSE *)ResponseData)->MetaDataLen;
+      *MetadataLength = ActMetaLen;
     }
 
     if (Metadata != NULL) {
-      CopyMem (Metadata, ((IPMI_BLOB_TRANSFER_BLOB_STAT_RESPONSE *)ResponseData)->MetaData, sizeof (((IPMI_BLOB_TRANSFER_BLOB_STAT_RESPONSE *)ResponseData)->MetaData));
+      if (ActMetaLen > BLOB_MAX_DATA_PER_PACKET) {
+        ActMetaLen = BLOB_MAX_DATA_PER_PACKET;
+      }
+
+      CopyMem (Metadata, ((IPMI_BLOB_TRANSFER_BLOB_STAT_RESPONSE *)ResponseData)->MetaData, ActMetaLen);
     }
   }
 
@@ -797,6 +834,7 @@ IpmiBlobTransferSessionStat (
   UINT8       *ResponseData;
   UINT32      SendDataSize;
   UINT32      ResponseDataSize;
+  UINT8       ActMetaLen;
 
   if (BlobState == NULL) {
     ASSERT (FALSE);
@@ -828,12 +866,17 @@ IpmiBlobTransferSessionStat (
       *Size = ((IPMI_BLOB_TRANSFER_BLOB_SESSION_STAT_RESPONSE *)ResponseData)->Size;
     }
 
+    ActMetaLen = ((IPMI_BLOB_TRANSFER_BLOB_SESSION_STAT_RESPONSE *)ResponseData)->MetaDataLen;
     if (MetadataLength != NULL) {
-      *MetadataLength = ((IPMI_BLOB_TRANSFER_BLOB_SESSION_STAT_RESPONSE *)ResponseData)->MetaDataLen;
+      *MetadataLength = ActMetaLen;
     }
 
     if (Metadata != NULL) {
-      CopyMem (Metadata, ((IPMI_BLOB_TRANSFER_BLOB_SESSION_STAT_RESPONSE *)ResponseData)->MetaData, sizeof (((IPMI_BLOB_TRANSFER_BLOB_SESSION_STAT_RESPONSE *)ResponseData)->MetaData));
+      if (ActMetaLen > BLOB_MAX_DATA_PER_PACKET) {
+        ActMetaLen = BLOB_MAX_DATA_PER_PACKET;
+      }
+
+      CopyMem (Metadata, ((IPMI_BLOB_TRANSFER_BLOB_SESSION_STAT_RESPONSE *)ResponseData)->MetaData, ActMetaLen);
     }
   }
 
@@ -867,7 +910,7 @@ IpmiBlobTransferWriteMeta (
   UINT32      SendDataSize;
   UINT32      ResponseDataSize;
 
-  if (Data == NULL) {
+  if ((WriteLength > 0) && (Data == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
