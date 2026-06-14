@@ -8,8 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PciBus.h"
 
-extern EDKII_IOMMU_PROTOCOL  *mIoMmuProtocol;
-
 //
 // Pci Io Protocol Interface
 //
@@ -974,6 +972,7 @@ PciIoMap (
   PCI_IO_DEVICE                              *PciIoDevice;
   UINT64                                     IoMmuAttribute;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION  RootBridgeIoOperation;
+  BOOLEAN                                    DualAddressCycle;
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
@@ -985,9 +984,27 @@ PciIoMap (
     return EFI_INVALID_PARAMETER;
   }
 
-  RootBridgeIoOperation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION)Operation;
-  if ((PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) != 0) {
-    RootBridgeIoOperation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION)(Operation + EfiPciOperationBusMasterRead64);
+  DualAddressCycle = (PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) != 0;
+
+  switch (Operation) {
+    case EfiPciIoOperationBusMasterRead:
+      RootBridgeIoOperation = DualAddressCycle ? EfiPciOperationBusMasterRead64
+                                               : EfiPciOperationBusMasterRead;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_READ;
+      break;
+    case EfiPciIoOperationBusMasterWrite:
+      RootBridgeIoOperation = DualAddressCycle ? EfiPciOperationBusMasterWrite64
+                                               : EfiPciOperationBusMasterWrite;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_WRITE;
+      break;
+    case EfiPciIoOperationBusMasterCommonBuffer:
+      RootBridgeIoOperation = DualAddressCycle ? EfiPciOperationBusMasterCommonBuffer64
+                                               : EfiPciOperationBusMasterCommonBuffer;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE;
+      break;
+    default:
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
   }
 
   Status = PciIoDevice->PciRootBridgeIo->Map (
@@ -1005,32 +1022,17 @@ PciIoMap (
       EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
       PciIoDevice->DevicePath
       );
+    return Status;
   }
 
-  if (mIoMmuProtocol != NULL) {
-    if (!EFI_ERROR (Status)) {
-      switch (Operation) {
-        case EfiPciIoOperationBusMasterRead:
-          IoMmuAttribute = EDKII_IOMMU_ACCESS_READ;
-          break;
-        case EfiPciIoOperationBusMasterWrite:
-          IoMmuAttribute = EDKII_IOMMU_ACCESS_WRITE;
-          break;
-        case EfiPciIoOperationBusMasterCommonBuffer:
-          IoMmuAttribute = EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE;
-          break;
-        default:
-          ASSERT (FALSE);
-          return EFI_INVALID_PARAMETER;
-      }
-
-      Status = mIoMmuProtocol->SetAttribute (
-                                 mIoMmuProtocol,
-                                 PciIoDevice->Handle,
-                                 *Mapping,
-                                 IoMmuAttribute
-                                 );
-    }
+  Status = IoMmuSetAttribute (
+             PciIoDevice->Handle,
+             *Mapping,
+             IoMmuAttribute
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttribute failed.\n", __func__));
+    ASSERT (FALSE);
   }
 
   return Status;
@@ -1057,14 +1059,16 @@ PciIoUnmap (
   PCI_IO_DEVICE  *PciIoDevice;
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
+  Status      = IoMmuSetAttribute (
+                  PciIoDevice->Handle,
+                  Mapping,
+                  0
+                  );
 
-  if (mIoMmuProtocol != NULL) {
-    mIoMmuProtocol->SetAttribute (
-                      mIoMmuProtocol,
-                      PciIoDevice->Handle,
-                      Mapping,
-                      0
-                      );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttribute failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
   }
 
   Status = PciIoDevice->PciRootBridgeIo->Unmap (
