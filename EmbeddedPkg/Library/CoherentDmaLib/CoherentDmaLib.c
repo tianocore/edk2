@@ -10,7 +10,15 @@
 #include <Uefi.h>
 #include <Library/DebugLib.h>
 #include <Library/DmaLib.h>
+#include <Library/IoMmuLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Protocol/IoMmu.h>
+
+typedef struct {
+  VOID      *IoMmuContext;
+  UINT64    IommuBase;
+  UINT32    DmaId;
+} COHERENT_MAP_INFO;
 
 STATIC
 PHYSICAL_ADDRESS
@@ -19,6 +27,138 @@ HostToDeviceAddress (
   )
 {
   return (PHYSICAL_ADDRESS)(UINTN)Address + PcdGet64 (PcdDmaDeviceOffset);
+}
+
+/**
+  Translate a DMA bus master operation into the corresponding IOMMU operation
+  and access attributes, install an IOMMU mapping for IoMmuHostAddress and set
+  the access attributes on the resulting mapping via (Map->IommuBase, Map->DmaId).
+
+  On success, Map->IoMmuContext holds the mapping handle that DmaUnmapIoMmu()
+  can later release. On failure, no IOMMU mapping is leaked.
+
+  @param[in]      Operation         The DMA bus master operation.
+  @param[in]      IoMmuHostAddress  Host address to be mapped through the IOMMU.
+  @param[in,out]  NumberOfBytes     Length of the mapping.
+  @param[in,out]  DeviceAddress     Resulting device address.
+  @param[in,out]  Map               Map info; Map->IoMmuContext is populated on
+                                    success.
+
+  @retval EFI_SUCCESS            Mapping established and attributes set.
+  @retval EFI_INVALID_PARAMETER  Operation is not a valid bus master operation.
+  @retval Other                  Error returned by the IOMMU library.
+**/
+STATIC
+EFI_STATUS
+DmaMapIoMmu (
+  IN     DMA_MAP_OPERATION  Operation,
+  IN     VOID               *IoMmuHostAddress,
+  IN OUT UINTN              *NumberOfBytes,
+  IN OUT PHYSICAL_ADDRESS   *DeviceAddress,
+  IN OUT COHERENT_MAP_INFO  *Map
+  )
+{
+  EFI_STATUS             Status;
+  EDKII_IOMMU_OPERATION  IoMmuOperation;
+  UINT64                 IoMmuAttribute;
+
+  if ((Operation >= MapOperationMaximum) || (IoMmuHostAddress == NULL) ||
+      (NumberOfBytes == NULL) || (DeviceAddress == NULL) || (Map == NULL))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (Operation) {
+    case MapOperationBusMasterRead:
+      IoMmuOperation = EdkiiIoMmuOperationBusMasterRead;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_READ;
+      break;
+
+    case MapOperationBusMasterWrite:
+      IoMmuOperation = EdkiiIoMmuOperationBusMasterWrite;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_WRITE;
+      break;
+
+    case MapOperationBusMasterCommonBuffer:
+      IoMmuOperation = EdkiiIoMmuOperationBusMasterCommonBuffer;
+      IoMmuAttribute = (EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
+      break;
+
+    default:
+      DEBUG ((DEBUG_ERROR, "%a - Invalid operation %d\n", __func__, Operation));
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+  }
+
+  Status = IoMmuMap (
+             IoMmuOperation,
+             IoMmuHostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             &Map->IoMmuContext
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuMap failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Status = IoMmuSetAttributeById (
+             Map->IommuBase,
+             Map->DmaId,
+             Map->IoMmuContext,
+             IoMmuAttribute
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttributeById failed.\n", __func__));
+    ASSERT (FALSE);
+    if (EFI_ERROR (IoMmuUnmap (Map->IoMmuContext))) {
+      DEBUG ((DEBUG_ERROR, "%a - IoMmuUnmap failed.\n", __func__));
+      ASSERT (FALSE);
+    }
+
+    Map->IoMmuContext = NULL;
+  }
+
+  return Status;
+}
+
+/**
+  Reverse a previous DmaMapIoMmu() call by clearing the IOMMU access attributes
+  and tearing down the mapping.
+
+  @param[in] Map  Map info populated by DmaMapIoMmu().
+
+  @retval EFI_SUCCESS  The mapping has been released.
+  @retval Other        Error returned by the IOMMU library.
+**/
+STATIC
+EFI_STATUS
+DmaUnmapIoMmu (
+  IN COHERENT_MAP_INFO  *Map
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((Map == NULL)) {
+    return EFI_SUCCESS;
+  }
+
+  Status = IoMmuSetAttributeById (Map->IommuBase, Map->DmaId, Map->IoMmuContext, 0);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttributeById failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Status = IoMmuUnmap (Map->IoMmuContext);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuUnmap failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -47,10 +187,16 @@ DmaMap (
   IN     DMA_MAP_OPERATION  Operation,
   IN     VOID               *HostAddress,
   IN OUT UINTN              *NumberOfBytes,
+  IN     UINT64             IommuBase,
+  IN     UINT32             DmaId,
   OUT    PHYSICAL_ADDRESS   *DeviceAddress,
   OUT    VOID               **Mapping
   )
 {
+  EFI_STATUS         Status;
+  VOID               *IoMmuHostAddress;
+  COHERENT_MAP_INFO  *Map;
+
   if ((HostAddress == NULL) ||
       (NumberOfBytes == NULL) ||
       (DeviceAddress == NULL) ||
@@ -59,8 +205,36 @@ DmaMap (
     return EFI_INVALID_PARAMETER;
   }
 
-  *DeviceAddress = HostToDeviceAddress (HostAddress);
-  *Mapping       = NULL;
+  *DeviceAddress   = HostToDeviceAddress (HostAddress);
+  IoMmuHostAddress = HostAddress;
+  *Mapping         = NULL;
+
+  if (IommuBase == 0) {
+    // No IoMmu
+    return EFI_SUCCESS;
+  }
+
+  Map = AllocateZeroPool (sizeof (COHERENT_MAP_INFO));
+  if (Map == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Map->IommuBase = IommuBase;
+  Map->DmaId     = DmaId;
+
+  Status = DmaMapIoMmu (
+             Operation,
+             IoMmuHostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             Map
+             );
+  if (EFI_ERROR (Status)) {
+    FreePool (Map);
+    return Status;
+  }
+
+  *Mapping = Map;
   return EFI_SUCCESS;
 }
 
@@ -80,6 +254,21 @@ DmaUnmap (
   IN  VOID  *Mapping
   )
 {
+  EFI_STATUS         Status;
+  COHERENT_MAP_INFO  *Map;
+
+  if (Mapping == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  Map = (COHERENT_MAP_INFO *)Mapping;
+
+  Status = DmaUnmapIoMmu (Map);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  FreePool (Map);
   return EFI_SUCCESS;
 }
 

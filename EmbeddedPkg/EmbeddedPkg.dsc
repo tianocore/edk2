@@ -73,6 +73,7 @@
  # Need to change this for IPF
  #
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  IoMmuLib|MdeModulePkg/Library/IoMmuLibNull/IoMmuLibNull.inf
 
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf

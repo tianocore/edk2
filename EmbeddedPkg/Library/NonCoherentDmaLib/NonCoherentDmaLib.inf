@@ -24,12 +24,14 @@
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
   DxeServicesTableLib
   IoLib
+  IoMmuLib
   MemoryAllocationLib
   UefiBootServicesTableLib
 
