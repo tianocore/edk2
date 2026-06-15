@@ -93,6 +93,10 @@
 
   gEdkiiTpmEventLogDescHobGuid = { 0x360c4a06, 0x146c, 0x11f0, { 0xb1, 0x73, 0x6b, 0xd5, 0x98, 0xff, 0x54, 0xd6 }}
 
+  ## SMMU config data
+  # Include/Guid/SmmuConfig.h
+  gSmmuConfigHobGuid = { 0xcd56ec8f, 0x75f1, 0x440a, { 0xaa, 0x48, 0x09, 0x58, 0xb1, 0x1c, 0x9a, 0xa7 } }
+
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
   ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
