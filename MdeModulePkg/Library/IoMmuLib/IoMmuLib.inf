@@ -1,0 +1,35 @@
+## @file
+#  IoMmuLib - Wrapper library for the EDKII IOMMU protocol functions.
+#
+#  Copyright (c) Microsoft Corporation.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001E
+  BASE_NAME                      = IoMmuLib
+  FILE_GUID                      = 55af180d-a4ee-47fa-84d5-01071643ad35
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IoMmuLib
+  CONSTRUCTOR                    = IoMmuLibInit
+
+[Sources]
+  IoMmuLib.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid             ## CONSUMES
+
+[Depex.AARCH64]
+  gEdkiiIoMmuProtocolGuid             ## CONSUMES
