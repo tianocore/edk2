@@ -1,0 +1,56 @@
+## @file  SmmuDxe.inf
+# Smmu Dxe driver - used to enable DMA remapping via the IoMmu.
+# This driver initializes the SmmuV3 hardware to enable stage 2 translation and DMA remapping.
+# The IOMMU protocol is implemented assuming a 4-level Page Table Structure.
+# The Page Table Root address is used to configure the Stream Table to enable the SMMU for stage 2 translation.
+#
+# For more info see README.md
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = SmmuDxe
+  FILE_GUID                      = BE506866-85F2-45EC-AC01-9BBF39D4CA78
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeSmmuDxe
+
+[Sources]
+  IoMmu.c
+  IoMmu.h
+  SmmuDxe.c
+  SmmuV3.h
+  SmmuV3Util.c
+
+[Guids]
+  gSmmuConfigHobGuid
+  gEfiEventExitBootServicesGuid
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  IoLib
+  HobLib
+  MemoryAllocationLib
+  TimerLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid                         ## PRODUCES
+  gEfiAcpiTableProtocolGuid                       ## CONSUMES
+  gEfiPciIoProtocolGuid                           ## CONSUMES
+  gHardwareInterrupt2ProtocolGuid                 ## CONSUMES
+
+[Depex]
+  gEfiAcpiTableProtocolGuid                       AND
+  gHardwareInterrupt2ProtocolGuid
