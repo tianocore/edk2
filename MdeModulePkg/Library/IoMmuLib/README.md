@@ -171,6 +171,57 @@ Sets read/write access attributes for a mapped region in the IOMMU page table.
 - `EFI_NOT_READY`: The IoMmu protocol is not ready.
 - Other status codes as defined by the underlying IOMMU protocol
 
+### IoMmuSetAttributeById
+
+```c
+EFI_STATUS
+EFIAPI
+IoMmuSetAttributeById (
+  IN UINT64  IommuBase,
+  IN UINT32  DmaId,
+  IN VOID    *MappingInfo,
+  IN UINT64  IoMmuAccess
+  );
+```
+
+Sets read/write access attributes for a mapped region in the IOMMU page table by explicitly
+specifying the `(IommuBase, DmaId)` pair instead of an `EFI_HANDLE`.
+
+This function is intended for firmware-internal DMA agents that have no UEFI device handle and
+therefore cannot be resolved through the IORT (I/O Remapping Table). In such cases the caller is
+responsible for providing the correct `IommuBase` and `DmaId`.
+
+**Parameters:**
+
+- `IommuBase`: Base MMIO address of the IOMMU that owns `DmaId`
+- `DmaId`: The DMA identifier emitted by the calling DMA agent (e.g. StreamID on Arm SMMU, RequesterID on VT-d)
+- `MappingInfo`: The mapping handle returned by `IoMmuMap()`
+- `IoMmuAccess`: The desired IOMMU access attributes
+
+**Returns:**
+
+- `EFI_SUCCESS`: Attributes set successfully
+- `EFI_NOT_READY`: The IoMmu protocol is not ready.
+- `EFI_UNSUPPORTED`: The underlying IOMMU protocol does not implement `SetAttributeById`. This occurs when
+  the producer's `EDKII_IOMMU_PROTOCOL` revision is older than `EDKII_IOMMU_PROTOCOL_REVISION` or does not
+  provide a `SetAttributeById` function. The rest of the library remains fully functional.
+- Other status codes as defined by the underlying IOMMU protocol
+
+#### IoMmuSetAttribute vs IoMmuSetAttributeById
+
+Use `IoMmuSetAttribute` when the DMA agent has a UEFI device handle (`EFI_HANDLE`) that the IOMMU
+producer can resolve through the IORT to determine the owning IOMMU and DMA identifier. This is the
+common case for PCIe devices and other handle-backed devices.
+
+Use `IoMmuSetAttributeById` instead of `IoMmuSetAttribute` when the calling DMA agent has **no** UEFI
+device handle and therefore cannot be resolved via the IORT. Because the caller supplies the
+`IommuBase` and `DmaId` directly, the IOMMU producer does not need to look up the device handle. The
+caller is responsible for providing the correct values.
+
+> Note: `IoMmuSetAttributeById` requires an IOMMU producer whose protocol revision is at least
+> `EDKII_IOMMU_PROTOCOL_REVISION` and implements `SetAttributeById`. If this is not the case, the
+> function returns `EFI_UNSUPPORTED`; callers should fall back to `IoMmuSetAttribute` where possible.
+
 ## Usage Guidelines
 
 ### Example Usage Pattern

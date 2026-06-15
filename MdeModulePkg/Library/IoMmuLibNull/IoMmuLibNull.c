@@ -131,3 +131,25 @@ IoMmuSetAttribute (
 {
   return EFI_SUCCESS;
 }
+
+/**
+  NULL implementation of IoMmuSetAttributeById.
+
+  @param [in]  IommuBase     Base MMIO address of the IOMMU that owns DmaId.
+  @param [in]  DmaId     DMA identifier emitted by the calling DMA agent (e.g. StreamID on Arm SMMU, RequesterID on VT-d).
+  @param [in]  MappingInfo  The mapping to set attributes for.
+  @param [in]  IoMmuAccess  The IOMMU access attributes.
+
+  @retval EFI_SUCCESS       NULL implementation, this function always succeeds.
+**/
+EFI_STATUS
+EFIAPI
+IoMmuSetAttributeById (
+  IN UINT64  IommuBase,
+  IN UINT32  DmaId,
+  IN VOID    *MappingInfo,
+  IN UINT64  IoMmuAccess
+  )
+{
+  return EFI_SUCCESS;
+}
