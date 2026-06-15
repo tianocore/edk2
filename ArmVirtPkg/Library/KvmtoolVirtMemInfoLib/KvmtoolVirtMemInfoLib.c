@@ -1,7 +1,7 @@
 /** @file
   Kvmtool virtual memory map library.
 
-  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2018 - 2026, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -9,8 +9,6 @@
 
 #include <Base.h>
 #include <Library/ArmLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 
@@ -37,11 +35,8 @@ ArmVirtGetMemoryMap (
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
   UINTN                         Idx;
-  EFI_PHYSICAL_ADDRESS          TopOfAddressSpace;
 
   ASSERT (VirtualMemoryMap != NULL);
-
-  TopOfAddressSpace = LShiftU64 (1ULL, ArmGetPhysicalAddressBits ());
 
   VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR *)
                        AllocatePages (
@@ -66,19 +61,11 @@ ArmVirtGetMemoryMap (
   VirtualMemoryTable[Idx].Length       = PcdGet64 (PcdSystemMemorySize);
   VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
-  // Peripheral space before DRAM
-  VirtualMemoryTable[++Idx].PhysicalBase = 0x0;
-  VirtualMemoryTable[Idx].VirtualBase    = 0x0;
-  VirtualMemoryTable[Idx].Length         = PcdGet64 (PcdSystemMemoryBase);
+  // Map the UART
+  VirtualMemoryTable[++Idx].PhysicalBase = PcdGet64 (PcdSerialRegisterBase);
+  VirtualMemoryTable[Idx].VirtualBase    = PcdGet64 (PcdSerialRegisterBase);
+  VirtualMemoryTable[Idx].Length         = EFI_PAGE_SIZE;
   VirtualMemoryTable[Idx].Attributes     = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-
-  // Peripheral space after DRAM
-  VirtualMemoryTable[++Idx].PhysicalBase = PcdGet64 (PcdSystemMemoryBase) +
-                                           PcdGet64 (PcdSystemMemorySize);
-  VirtualMemoryTable[Idx].VirtualBase = VirtualMemoryTable[Idx].PhysicalBase;
-  VirtualMemoryTable[Idx].Length      = TopOfAddressSpace -
-                                        VirtualMemoryTable[Idx].PhysicalBase;
-  VirtualMemoryTable[Idx].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // Map the FV region as normal executable memory
   VirtualMemoryTable[++Idx].PhysicalBase = PcdGet64 (PcdFvBaseAddress);
