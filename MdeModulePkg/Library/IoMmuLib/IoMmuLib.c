@@ -179,7 +179,40 @@ IoMmuSetAttribute (
 }
 
 /**
-  The constructor function for IoMmuLib.
+  Set the R/W access attributes for MappingInfo in the Page Table for a caller
+  that explicitly specifies (IommuBase, DmaId) instead of an EFI_HANDLE.
+
+  @param [in]  IommuBase     Base MMIO address of the IOMMU that owns DmaId.
+  @param [in]  DmaId         DMA identifier emitted by the calling DMA agent (e.g. StreamID on Arm SMMU, RequesterID on VT-d).
+  @param [in]  MappingInfo   The mapping to set attributes for. Returned from IoMmuMap.
+  @param [in]  IoMmuAccess   The IOMMU access attributes.
+
+  @retval EFI_SUCCESS        Success
+  @retval EFI_NOT_READY      The IoMmu protocol is not ready.
+  @retval Other              Other errors as defined by the IoMmu protocol.
+**/
+EFI_STATUS
+EFIAPI
+IoMmuSetAttributeById (
+  IN UINT64  IommuBase,
+  IN UINT32  DmaId,
+  IN VOID    *MappingInfo,
+  IN UINT64  IoMmuAccess
+  )
+{
+  if (mIoMmuProtocol == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: IoMmuProtocol is NULL\n", __func__));
+    ASSERT (mIoMmuProtocol != NULL);
+    return EFI_NOT_READY;
+  }
+
+  if ((mIoMmuProtocol->Revision < EDKII_IOMMU_PROTOCOL_REVISION) || (mIoMmuProtocol->SetAttributeById == NULL)) {
+    DEBUG ((DEBUG_WARN, "%a: SetAttributeById not implemented by IoMmu producer.\n", __func__));
+    return EFI_UNSUPPORTED;
+  }
+
+  return mIoMmuProtocol->SetAttributeById (mIoMmuProtocol, IommuBase, DmaId, MappingInfo, IoMmuAccess);
+}
 
 /**
   The constructor function for IoMmuLib.
