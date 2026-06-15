@@ -55,6 +55,7 @@
   ReportStatusCodeLib
   ResetSystemLib
   PrintLib
+  Tpm2HelpLib
 
 [Guids]
   gTcgEventEntryHobGuid                                                ## PRODUCES               ## HOB
