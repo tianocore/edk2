@@ -50,6 +50,7 @@
   TpmMeasurementLib
   TdxLib
   TdxMeasurementLib
+  Tpm2HelpLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"

@@ -45,6 +45,7 @@
 #include <Guid/CcEventHob.h>
 #include <Library/TdxLib.h>
 #include <Library/TdxMeasurementLib.h>
+#include <Library/Tpm2HelpLib.h>
 
 #define PERF_ID_CC_TCG2_DXE  0x3130
 
@@ -78,12 +79,6 @@ typedef struct _TDX_DXE_DATA {
   CC_EVENT_LOG_AREA_STRUCT          FinalEventLogAreaStruct[CC_EVENT_LOG_AREA_COUNT_MAX];
   EFI_CC_FINAL_EVENTS_TABLE         *FinalEventsTable[CC_EVENT_LOG_AREA_COUNT_MAX];
 } TDX_DXE_DATA;
-
-typedef struct {
-  TPMI_ALG_HASH    HashAlgo;
-  UINT16           HashSize;
-  UINT32           HashMask;
-} TDX_HASH_INFO;
 
 //
 //
@@ -128,104 +123,6 @@ EFI_CC_EVENTLOG_ACPI_TABLE  mTdxEventlogAcpiTemplate = {
   0,                      // laml
   0,                      // lasa
 };
-
-//
-// Supported Hash list in Td guest.
-// Currently SHA384 is supported.
-//
-TDX_HASH_INFO  mHashInfo[] = {
-  { TPM_ALG_SHA384, SHA384_DIGEST_SIZE, HASH_ALG_SHA384 }
-};
-
-/**
-  Get hash size based on Algo
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Size of the hash.
-**/
-UINT16
-GetHashSizeFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < sizeof (mHashInfo)/sizeof (mHashInfo[0]); Index++) {
-    if (mHashInfo[Index].HashAlgo == HashAlgo) {
-      return mHashInfo[Index].HashSize;
-    }
-  }
-
-  return 0;
-}
-
-/**
-  Get hash mask based on Algo
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Hash mask.
-**/
-UINT32
-GetHashMaskFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < ARRAY_SIZE (mHashInfo); Index++) {
-    if (mHashInfo[Index].HashAlgo == HashAlgo) {
-      return mHashInfo[Index].HashMask;
-    }
-  }
-
-  ASSERT (FALSE);
-  return 0;
-}
-
-/**
-  Copy TPML_DIGEST_VALUES into a buffer
-
-  @param[in,out] Buffer             Buffer to hold copied TPML_DIGEST_VALUES compact binary.
-  @param[in]     DigestList         TPML_DIGEST_VALUES to be copied.
-  @param[in]     HashAlgorithmMask  HASH bits corresponding to the desired digests to copy.
-
-  @return The end of buffer to hold TPML_DIGEST_VALUES.
-**/
-VOID *
-CopyDigestListToBuffer (
-  IN OUT VOID            *Buffer,
-  IN TPML_DIGEST_VALUES  *DigestList,
-  IN UINT32              HashAlgorithmMask
-  )
-{
-  UINTN   Index;
-  UINT16  DigestSize;
-  UINT32  DigestListCount;
-  UINT32  *DigestListCountPtr;
-
-  DigestListCountPtr = (UINT32 *)Buffer;
-  DigestListCount    = 0;
-  Buffer             = (UINT8 *)Buffer + sizeof (DigestList->count);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    if ((DigestList->digests[Index].hashAlg & HashAlgorithmMask) == 0) {
-      DEBUG ((DEBUG_ERROR, "WARNING: TD Event log has HashAlg unsupported (0x%x)\n", DigestList->digests[Index].hashAlg));
-      continue;
-    }
-
-    CopyMem (Buffer, &DigestList->digests[Index].hashAlg, sizeof (DigestList->digests[Index].hashAlg));
-    Buffer     = (UINT8 *)Buffer + sizeof (DigestList->digests[Index].hashAlg);
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
-    Buffer = (UINT8 *)Buffer + DigestSize;
-    DigestListCount++;
-  }
-
-  WriteUnaligned32 (DigestListCountPtr, DigestListCount);
-
-  return Buffer;
-}
 
 EFI_HANDLE  mImageHandle;
 
@@ -346,7 +243,7 @@ InitNoActionEvent (
   if ((mTdxDxeData.BsCap.HashAlgorithmBitmap & EFI_CC_BOOT_HASH_ALG_SHA384) != 0) {
     HashAlgId = TPM_ALG_SHA384;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
@@ -605,7 +502,7 @@ DumpCcEvent (
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
     DEBUG ((DEBUG_INFO, "      HashAlgo : 0x%04x\n", HashAlgo));
     DEBUG ((DEBUG_INFO, "      Digest(%d): \n", DigestIndex));
-    DigestSize = GetHashSizeFromAlgo (HashAlgo);
+    DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
     InternalDumpHex (DigestBuffer, DigestSize);
     //
     // Prepare next
@@ -647,7 +544,7 @@ GetCcEventSize (
   HashAlgo     = CcEvent->Digests.digests[0].hashAlg;
   DigestBuffer = (UINT8 *)&CcEvent->Digests.digests[0].digest;
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
-    DigestSize = GetHashSizeFromAlgo (HashAlgo);
+    DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
     //
     // Prepare next
     //
@@ -1078,7 +975,7 @@ GetDigestListBinSize (
     TotalSize    += sizeof (HashAlg);
     DigestListBin = (UINT8 *)DigestListBin + sizeof (HashAlg);
 
-    DigestSize    = GetHashSizeFromAlgo (HashAlg);
+    DigestSize    = Tpm2GetHashSizeFromAlgo (HashAlg);
     TotalSize    += DigestSize;
     DigestListBin = (UINT8 *)DigestListBin + DigestSize;
   }
@@ -1121,7 +1018,7 @@ CopyDigestListBinToBuffer (
   for (Index = 0; Index < Count; Index++) {
     HashAlg       = ReadUnaligned16 (DigestListBin);
     DigestListBin = (UINT8 *)DigestListBin + sizeof (HashAlg);
-    DigestSize    = GetHashSizeFromAlgo (HashAlg);
+    DigestSize    = Tpm2GetHashSizeFromAlgo (HashAlg);
 
     if ((HashAlg & HashAlgorithmMask) != 0) {
       CopyMem (Buffer, &HashAlg, sizeof (HashAlg));
@@ -1129,7 +1026,7 @@ CopyDigestListBinToBuffer (
       CopyMem (Buffer, DigestListBin, DigestSize);
       Buffer = (UINT8 *)Buffer + DigestSize;
       DigestListCount++;
-      (*HashAlgorithmMaskCopied) |= GetHashMaskFromAlgo (HashAlg);
+      (*HashAlgorithmMaskCopied) |= Tpm2GetHashMaskFromAlgo (HashAlg);
     } else {
       DEBUG ((DEBUG_ERROR, "WARNING: CopyDigestListBinToBuffer Event log has HashAlg unsupported by PCR bank (0x%x)\n", HashAlg));
     }
@@ -1178,7 +1075,7 @@ TdxDxeLogHashEvent (
   CcEvent.MrIndex   = NewEventHdr->MrIndex;
   CcEvent.EventType = NewEventHdr->EventType;
   DigestBuffer      = (UINT8 *)&CcEvent.Digests;
-  EventSizePtr      = CopyDigestListToBuffer (DigestBuffer, DigestList, HASH_ALG_SHA384);
+  EventSizePtr      = Tpm2CopyDigestListToBuffer (DigestBuffer, DigestList, HASH_ALG_SHA384);
   CopyMem (EventSizePtr, &NewEventHdr->EventSize, sizeof (NewEventHdr->EventSize));
 
   //
