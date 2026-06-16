@@ -117,6 +117,7 @@
             "Library/OpensslLib/OpensslGen/include/openssl/cms.h",
             "Library/OpensslLib/OpensslGen/include/openssl/comp.h",
             "Library/OpensslLib/OpensslGen/include/openssl/conf.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/configuration-ec-lite.h",
             "Library/OpensslLib/OpensslGen/include/openssl/configuration-ec.h",
             "Library/OpensslLib/OpensslGen/include/openssl/configuration-noec.h",
             "Library/OpensslLib/OpensslGen/include/openssl/configuration.h",
