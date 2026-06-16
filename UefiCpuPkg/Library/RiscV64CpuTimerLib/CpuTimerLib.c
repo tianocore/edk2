@@ -159,6 +159,9 @@ GetPerformanceCounterProperties (
   CONST EFI_GUID          SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
   UINT64                  TimeBase;
   CONST VOID              *FdtBase;
+  INT32                   Node;
+  INT32                   Len;
+  CONST FDT_PROPERTY      *Prop;
 
   if (StartValue != NULL) {
     *StartValue = 0;
@@ -194,22 +197,14 @@ GetPerformanceCounterProperties (
   //
   // /cpus node
   //
-  INT32  Node = FdtSubnodeOffsetNameLen (
-                  FdtBase,
-                  0,
-                  "cpus",
-                  sizeof ("cpus") - 1
-                  );
-
+  Node = FdtSubnodeOffsetNameLen (FdtBase, 0, "cpus", (INT32)AsciiStrLen ("cpus"));
   ASSERT (Node >= 0);
 
   //
   // timebase-frequency property
   //
-  INT32               Len;
-  CONST FDT_PROPERTY  *Prop =
-    FdtGetProperty (FdtBase, Node, "timebase-frequency", &Len);
-
+  Len  = 0;
+  Prop = FdtGetProperty (FdtBase, Node, "timebase-frequency", &Len);
   ASSERT (Prop != NULL && Len == sizeof (UINT32));
 
   //
