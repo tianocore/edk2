@@ -138,18 +138,16 @@ if /I "%1"=="Mingw-w64" shift
 if /I "%1"=="VS2026" shift
 if /I "%1"=="VS2022" shift
 if /I "%1"=="VS2019" shift
-if /I "%1"=="VS2017" shift
 if "%1"=="" goto end
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [Mingw-w64] [VS2026] [VS2022] [VS2019] [VS2017]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [Mingw-w64] [VS2026] [VS2022] [VS2019]"
   @echo.
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo         Rebuild        Perform incremental rebuild of BaseTools binaries.
   @echo         ForceRebuild   Force a full rebuild of BaseTools binaries.
   @echo         Mingw-w64      Build BaseTools binaries using mingw-w64.
-  @echo         VS2017         Set the env for VS2017 build.
   @echo         VS2019         Set the env for VS2019 build.
   @echo         VS2022         Set the env for VS2022 build.
   @echo         VS2026         Set the env for VS2026 build.
