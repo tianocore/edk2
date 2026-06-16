@@ -186,9 +186,9 @@ TlsNew (
   }
 
   //
-  // This retains compatibility with previous version of OpenSSL.
+  // Set the default security level to match OpenSSL's default.
   //
-  SSL_set_security_level (TlsConn->Ssl, 3);
+  SSL_set_security_level (TlsConn->Ssl, 2);
 
   //
   // Initialize the created SSL Object
