@@ -57,6 +57,7 @@ body:
         - FmpDevicePkg
         - IntelFsp2Pkg
         - IntelFsp2WrapperPkg
+        - ManageabilityPkg
         - MdeModulePkg
         - MdePkg
         - NetworkPkg
@@ -66,7 +67,6 @@ body:
         - RedfishPkg
         - SecurityPkg
         - ShellPkg
-        - SignedCapsulePkg
         - SourceLevelDebugPkg
         - StandaloneMmPkg
         - UefiCpuPkg

@@ -1,0 +1,59 @@
+## @file
+# IPMI Protocol PEI Driver.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = IpmiPei
+  FILE_GUID                      = 7832F989-CB72-4715-ADCA-35C0B031856C
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeiIpmiEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  IpmiPpi.c
+  IpmiPpiInternal.h
+  ../Common/IpmiProtocolCommon.c
+  ../Common/IpmiProtocolCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  ManageabilityTransportHelperLib
+  ManageabilityTransportLib
+  PeimEntryPoint
+
+[Ppis]
+  gPeiIpmiPpiGuid       # PPI ALWAYS PRODUCED
+
+[Guids]
+  gManageabilityProtocolIpmiGuid
+  gManageabilityTransportKcsGuid
+  gManageabilityTransportSmbusI2cGuid
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress   # Used as default KCS I/O base adddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterLun
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderLun
+
+[Depex]
+  TRUE

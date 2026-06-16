@@ -13,6 +13,36 @@
 UINTN  mDayOfMonth[] = { 31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31, 30 };
 
 /**
+  print out the list of files and directories from the LS command
+
+  @param[in] Rec            TRUE to automatically recurse into each found directory
+                            FALSE to only list the specified directory.
+  @param[in] Attribs        List of required Attribute for display.
+                            If 0 then all non-system and non-hidden files will be printed.
+  @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
+  @param[in] RootPath       String with starting path to search in.
+  @param[in] SearchString   String with search string.
+  @param[in] Found          Set to TRUE, if anyone were found.
+  @param[in] Count          The count of bits enabled in Attribs.
+  @param[in] ListUnfiltered TRUE to request listing the directory contents
+                            unfiltered.
+
+  @retval SHELL_SUCCESS     the printing was successful.
+**/
+STATIC
+SHELL_STATUS
+PrintLsOutput (
+  IN CONST BOOLEAN  Rec,
+  IN CONST UINT64   Attribs,
+  IN CONST BOOLEAN  Sfo,
+  IN CONST CHAR16   *RootPath,
+  IN CONST CHAR16   *SearchString,
+  IN       BOOLEAN  *Found,
+  IN CONST UINTN    Count,
+  IN CONST BOOLEAN  ListUnfiltered
+  );
+
+/**
   print out the standard format output volume entry.
 
   @param[in] TheList           a list of files from the volume.
@@ -405,11 +435,94 @@ FileTimeToLocalTime (
   Time->Year  = (UINT16)(Time->Year + YearNumberOfTempMonth);
 }
 
-/**
-  print out the list of files and directories from the LS command
+/** Update the file time to local time.
 
-  @param[in] Rec            TRUE to automatically recurse into each found directory
-                            FALSE to only list the specified directory.
+  @param[in] Node   File Node to update.
+**/
+STATIC
+VOID
+UpdateFileLocalTime (
+  IN  EFI_SHELL_FILE_INFO  *Node
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TIME    LocalTime;
+
+  Status = gRT->GetTime (&LocalTime, NULL);
+  if (EFI_ERROR (Status) || (LocalTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE)) {
+    return;
+  }
+
+  if ((Node->Info->CreateTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+      ((Node->Info->CreateTime.Month >= 1) && (Node->Info->CreateTime.Month <= 12)))
+  {
+    //
+    // FileTimeToLocalTime () requires Month is in a valid range, other buffer out-of-band access happens.
+    //
+    FileTimeToLocalTime (&Node->Info->CreateTime, LocalTime.TimeZone);
+  }
+
+  if ((Node->Info->LastAccessTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+      ((Node->Info->LastAccessTime.Month >= 1) && (Node->Info->LastAccessTime.Month <= 12)))
+  {
+    FileTimeToLocalTime (&Node->Info->LastAccessTime, LocalTime.TimeZone);
+  }
+
+  if ((Node->Info->ModificationTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+      ((Node->Info->ModificationTime.Month >= 1) && (Node->Info->ModificationTime.Month <= 12)))
+  {
+    FileTimeToLocalTime (&Node->Info->ModificationTime, LocalTime.TimeZone);
+  }
+}
+
+/** Get Corrected Path.
+
+  @param[in] CorrectedPath   String with the corrected path.
+  @param[in] RootPath        String with starting path to search in.
+  @param[in] SearchString    String with search string.
+
+  @return Shell Status.
+**/
+STATIC
+SHELL_STATUS
+GetCorrectedPath (
+  IN            CHAR16  **CorrectedPath,
+  IN      CONST CHAR16  *RootPath,
+  IN      CONST CHAR16  *SearchString
+  )
+{
+  UINTN   LongestPath;
+  CHAR16  *Path;
+
+  ASSERT (CorrectedPath != NULL);
+
+  LongestPath    = 0;
+  Path           = NULL;
+  *CorrectedPath = NULL;
+
+  Path = StrnCatGrow (&Path, &LongestPath, RootPath, 0);
+  if (Path == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
+
+  if (  (Path[StrLen (Path)-1] != L'\\')
+     && (Path[StrLen (Path)-1] != L'/'))
+  {
+    Path = StrnCatGrow (&Path, &LongestPath, L"\\", 0);
+  }
+
+  Path = StrnCatGrow (&Path, &LongestPath, SearchString, 0);
+  if (Path == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
+
+  *CorrectedPath = Path;
+  return SHELL_SUCCESS;
+}
+
+/**
+  Print out the list of files and directories from the LS command at the current level.
+
   @param[in] Attribs        List of required Attribute for display.
                             If 0 then all non-system and non-hidden files will be printed.
   @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
@@ -417,23 +530,20 @@ FileTimeToLocalTime (
   @param[in] SearchString   String with search string.
   @param[in] Found          Set to TRUE, if anyone were found.
   @param[in] Count          The count of bits enabled in Attribs.
-  @param[in] TimeZone       The current time zone offset.
-  @param[in] ListUnfiltered TRUE to request listing the directory contents
-                            unfiltered.
+  @param[in] IsRecursive    TRUE if called from a recursion.
 
   @retval SHELL_SUCCESS     the printing was successful.
 **/
+STATIC
 SHELL_STATUS
-PrintLsOutput (
-  IN CONST BOOLEAN  Rec,
+PrintLsOutputCurr (
   IN CONST UINT64   Attribs,
   IN CONST BOOLEAN  Sfo,
   IN CONST CHAR16   *RootPath,
   IN CONST CHAR16   *SearchString,
   IN       BOOLEAN  *Found,
   IN CONST UINTN    Count,
-  IN CONST INT16    TimeZone,
-  IN CONST BOOLEAN  ListUnfiltered
+  IN       BOOLEAN  IsRecursive
   )
 {
   EFI_STATUS           Status;
@@ -443,11 +553,11 @@ PrintLsOutput (
   UINT64               FileCount;
   UINT64               DirCount;
   UINT64               FileSize;
-  UINTN                LongestPath;
   CHAR16               *CorrectedPath;
   BOOLEAN              FoundOne;
   BOOLEAN              HeaderPrinted;
-  EFI_TIME             LocalTime;
+
+  ASSERT (Found != NULL);
 
   HeaderPrinted = FALSE;
   FileCount     = 0;
@@ -455,29 +565,11 @@ PrintLsOutput (
   FileSize      = 0;
   ListHead      = NULL;
   ShellStatus   = SHELL_SUCCESS;
-  LongestPath   = 0;
-  CorrectedPath = NULL;
+  FoundOne      = FALSE;
 
-  if (Found != NULL) {
-    FoundOne = *Found;
-  } else {
-    FoundOne = FALSE;
-  }
-
-  CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, RootPath, 0);
-  if (CorrectedPath == NULL) {
-    return SHELL_OUT_OF_RESOURCES;
-  }
-
-  if (  (CorrectedPath[StrLen (CorrectedPath)-1] != L'\\')
-     && (CorrectedPath[StrLen (CorrectedPath)-1] != L'/'))
-  {
-    CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, L"\\", 0);
-  }
-
-  CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, SearchString, 0);
-  if (CorrectedPath == NULL) {
-    return (SHELL_OUT_OF_RESOURCES);
+  ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, SearchString);
+  if (ShellStatus != SHELL_SUCCESS) {
+    return ShellStatus;
   }
 
   PathCleanUpDirectories (CorrectedPath);
@@ -489,7 +581,7 @@ PrintLsOutput (
       return (SHELL_SUCCESS);
     }
 
-    if (Sfo && (Found == NULL)) {
+    if (Sfo && !IsRecursive) {
       PrintSfoVolumeInfoTableEntry (ListHead);
     }
 
@@ -507,7 +599,7 @@ PrintLsOutput (
         );
     }
 
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link), LongestPath = 0
+    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
           ; !IsNull (&ListHead->Link, &Node->Link)
           ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
           )
@@ -522,33 +614,7 @@ PrintLsOutput (
       //
       // Change the file time to local time.
       //
-      Status = gRT->GetTime (&LocalTime, NULL);
-      if (!EFI_ERROR (Status) && (LocalTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE)) {
-        if ((Node->Info->CreateTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
-            ((Node->Info->CreateTime.Month >= 1) && (Node->Info->CreateTime.Month <= 12)))
-        {
-          //
-          // FileTimeToLocalTime () requires Month is in a valid range, other buffer out-of-band access happens.
-          //
-          FileTimeToLocalTime (&Node->Info->CreateTime, LocalTime.TimeZone);
-        }
-
-        if ((Node->Info->LastAccessTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
-            ((Node->Info->LastAccessTime.Month >= 1) && (Node->Info->LastAccessTime.Month <= 12)))
-        {
-          FileTimeToLocalTime (&Node->Info->LastAccessTime, LocalTime.TimeZone);
-        }
-
-        if ((Node->Info->ModificationTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
-            ((Node->Info->ModificationTime.Month >= 1) && (Node->Info->ModificationTime.Month <= 12)))
-        {
-          FileTimeToLocalTime (&Node->Info->ModificationTime, LocalTime.TimeZone);
-        }
-      }
-
-      if (LongestPath < StrSize (Node->FullName)) {
-        LongestPath = StrSize (Node->FullName);
-      }
+      UpdateFileLocalTime (Node);
 
       ASSERT (Node->Info != NULL);
       ASSERT ((Node->Info->Attribute & EFI_FILE_VALID_ATTR) == Node->Info->Attribute);
@@ -590,78 +656,168 @@ PrintLsOutput (
     if (!Sfo && (ShellStatus != SHELL_ABORTED) && HeaderPrinted) {
       PrintNonSfoFooter (FileCount, FileSize, DirCount);
     }
+
+    ShellCloseFileMetaArg (&ListHead);
   }
 
-  if (Rec && (ShellStatus != SHELL_ABORTED)) {
-    //
-    // Re-Open all the files under the starting path for directories that didnt necessarily match our file filter
-    //
-    ShellCloseFileMetaArg (&ListHead);
-    CorrectedPath[0] = CHAR_NULL;
-    CorrectedPath    = StrnCatGrow (&CorrectedPath, &LongestPath, RootPath, 0);
-    if (CorrectedPath == NULL) {
-      return SHELL_OUT_OF_RESOURCES;
-    }
-
-    if (  (CorrectedPath[StrLen (CorrectedPath)-1] != L'\\')
-       && (CorrectedPath[StrLen (CorrectedPath)-1] != L'/'))
-    {
-      CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, L"\\", 0);
-    }
-
-    CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, L"*", 0);
-    if (CorrectedPath == NULL) {
-      return SHELL_OUT_OF_RESOURCES;
-    }
-
-    Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
-
-    if (!EFI_ERROR (Status)) {
-      for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
-            ; !IsNull (&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
-            ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
-            )
-      {
-        if (ShellGetExecutionBreakFlag ()) {
-          ShellStatus = SHELL_ABORTED;
-          break;
-        }
-
-        //
-        // recurse on any directory except the traversing ones...
-        //
-        if (  ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
-           && (StrCmp (Node->FileName, L".") != 0)
-           && (StrCmp (Node->FileName, L"..") != 0)
-              )
-        {
-          ShellStatus = PrintLsOutput (
-                          Rec,
-                          Attribs,
-                          Sfo,
-                          Node->FullName,
-                          SearchString,
-                          &FoundOne,
-                          Count,
-                          TimeZone,
-                          FALSE
-                          );
-
-          //
-          // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
-          //
-          if (ShellStatus == SHELL_ABORTED) {
-            break;
-          }
-        }
-      }
-    }
+  if (FoundOne) {
+    *Found = FoundOne;
   }
 
   SHELL_FREE_NON_NULL (CorrectedPath);
-  ShellCloseFileMetaArg (&ListHead);
+  return ShellStatus;
+}
 
-  if ((Found == NULL) && !FoundOne) {
+/**
+  print out the list of files and directories from the LS command
+
+  @param[in] Rec            TRUE to automatically recurse into each found directory
+                            FALSE to only list the specified directory.
+  @param[in] Attribs        List of required Attribute for display.
+                            If 0 then all non-system and non-hidden files will be printed.
+  @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
+  @param[in] RootPath       String with starting path to search in.
+  @param[in] SearchString   String with search string.
+  @param[in] Found          Set to TRUE, if anyone were found.
+  @param[in] Count          The count of bits enabled in Attribs.
+
+  @retval SHELL_SUCCESS     the printing was successful.
+**/
+STATIC
+SHELL_STATUS
+PrintLsOutputRec (
+  IN CONST BOOLEAN  Rec,
+  IN CONST UINT64   Attribs,
+  IN CONST BOOLEAN  Sfo,
+  IN CONST CHAR16   *RootPath,
+  IN CONST CHAR16   *SearchString,
+  IN       BOOLEAN  *Found,
+  IN CONST UINTN    Count
+  )
+{
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *ListHead;
+  EFI_SHELL_FILE_INFO  *Node;
+  SHELL_STATUS         ShellStatus;
+  CHAR16               *CorrectedPath;
+
+  //
+  // Re-Open all the files under the starting path for directories that didnt necessarily match our file filter
+  //
+  ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, L"*");
+  if (ShellStatus != SHELL_SUCCESS) {
+    return ShellStatus;
+  }
+
+  Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
+  if (EFI_ERROR (Status)) {
+    SHELL_FREE_NON_NULL (CorrectedPath);
+    return ShellStatus;
+  }
+
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
+        ; !IsNull (&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
+        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
+        )
+  {
+    if (ShellGetExecutionBreakFlag ()) {
+      ShellStatus = SHELL_ABORTED;
+      break;
+    }
+
+    //
+    // recurse on any directory except the traversing ones...
+    //
+    if (((Node->Info->Attribute & EFI_FILE_DIRECTORY) != EFI_FILE_DIRECTORY) ||
+        IsDotOrDotDot (Node->FileName))
+    {
+      continue;
+    }
+
+    ShellStatus = PrintLsOutput (
+                    Rec,
+                    Attribs,
+                    Sfo,
+                    Node->FullName,
+                    SearchString,
+                    Found,
+                    Count,
+                    FALSE
+                    );
+
+    //
+    // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
+    //
+    if (ShellStatus == SHELL_ABORTED) {
+      break;
+    }
+  }
+
+  ShellCloseFileMetaArg (&ListHead);
+  SHELL_FREE_NON_NULL (CorrectedPath);
+  return ShellStatus;
+}
+
+/**
+  print out the list of files and directories from the LS command
+
+  @param[in] Rec            TRUE to automatically recurse into each found directory
+                            FALSE to only list the specified directory.
+  @param[in] Attribs        List of required Attribute for display.
+                            If 0 then all non-system and non-hidden files will be printed.
+  @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
+  @param[in] RootPath       String with starting path to search in.
+  @param[in] SearchString   String with search string.
+  @param[in] Found          Set to TRUE, if anyone were found.
+  @param[in] Count          The count of bits enabled in Attribs.
+  @param[in] ListUnfiltered TRUE to request listing the directory contents
+                            unfiltered.
+
+  @retval SHELL_SUCCESS     the printing was successful.
+**/
+SHELL_STATUS
+PrintLsOutput (
+  IN CONST BOOLEAN  Rec,
+  IN CONST UINT64   Attribs,
+  IN CONST BOOLEAN  Sfo,
+  IN CONST CHAR16   *RootPath,
+  IN CONST CHAR16   *SearchString,
+  IN       BOOLEAN  *Found,
+  IN CONST UINTN    Count,
+  IN CONST BOOLEAN  ListUnfiltered
+  )
+{
+  SHELL_STATUS  ShellStatus;
+  BOOLEAN       FoundOne;
+  BOOLEAN       IsRecursive;
+
+  ShellStatus = SHELL_SUCCESS;
+  FoundOne    = FALSE;
+  IsRecursive = (Found != NULL);
+
+  ShellStatus = PrintLsOutputCurr (
+                  Attribs,
+                  Sfo,
+                  RootPath,
+                  SearchString,
+                  &FoundOne,
+                  Count,
+                  IsRecursive
+                  );
+
+  if (Rec && (ShellStatus != SHELL_ABORTED)) {
+    ShellStatus = PrintLsOutputRec (
+                    Rec,
+                    Attribs,
+                    Sfo,
+                    RootPath,
+                    SearchString,
+                    &FoundOne,
+                    Count
+                    );
+  }
+
+  if (!IsRecursive && !FoundOne) {
     if (ListUnfiltered) {
       //
       // When running "ls" without any filtering request, avoid outputing
@@ -671,7 +827,7 @@ PrintLsOutput (
       if (!Sfo) {
         PrintNonSfoHeader (RootPath);
         if (ShellStatus != SHELL_ABORTED) {
-          PrintNonSfoFooter (FileCount, FileSize, DirCount);
+          PrintNonSfoFooter (0, 0, 0);
         }
       }
     } else {
@@ -679,7 +835,7 @@ PrintLsOutput (
     }
   }
 
-  if (Found != NULL) {
+  if ((Found != NULL) && FoundOne) {
     *Found = FoundOne;
   }
 
@@ -703,8 +859,6 @@ MainCmdLs (
   LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS  Status;
-
   CONST CHAR16  *Attribs;
   SHELL_STATUS  ShellStatus;
   UINT64        RequiredAttributes;
@@ -713,7 +867,6 @@ MainCmdLs (
   UINTN         Count;
   CHAR16        *FullPath;
   UINTN         Size;
-  EFI_TIME      TheTime;
   CHAR16        *SearchString;
   BOOLEAN       ListUnfiltered;
 
@@ -867,12 +1020,6 @@ MainCmdLs (
     }
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
-  if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);
-    TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
-  }
-
   ShellStatus = PrintLsOutput (
                   ShellCommandLineGetFlag (Package, L"-r"),
                   RequiredAttributes,
@@ -881,7 +1028,6 @@ MainCmdLs (
                   SearchString,
                   NULL,
                   Count,
-                  TheTime.TimeZone,
                   ListUnfiltered
                   );
   if (ShellStatus == SHELL_NOT_FOUND) {

@@ -986,6 +986,14 @@ NvmExpressDriverBindingStart (
                   );
 
   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to open PCI I/O protocol (%r)\n", __func__, Status));
+    // need to free the device path protocol if it was opened successfully
+    gBS->CloseProtocol (
+           Controller,
+           &gEfiDevicePathProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
     return Status;
   }
 
@@ -996,7 +1004,7 @@ NvmExpressDriverBindingStart (
     Private = AllocateZeroPool (sizeof (NVME_CONTROLLER_PRIVATE_DATA));
 
     if (Private == NULL) {
-      DEBUG ((DEBUG_ERROR, "NvmExpressDriverBindingStart: allocating pool for Nvme Private Data failed!\n"));
+      DEBUG ((DEBUG_ERROR, "%a: allocating pool for Nvme Private Data failed!\n", __func__));
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
     }
@@ -1012,7 +1020,8 @@ NvmExpressDriverBindingStart (
                       );
 
     if (EFI_ERROR (Status)) {
-      return Status;
+      DEBUG ((DEBUG_ERROR, "%a: failed to get PCI attributes (%r)\n", __func__, Status));
+      goto Exit;
     }
 
     //

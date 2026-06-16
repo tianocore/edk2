@@ -22,11 +22,11 @@
 
 /**
   This function checks if the input buffer range [UnblockBase, UnblockEnd] is unblockable.
-  The input range should be covered by the EfiRuntimeServicesData, EfiACPIMemoryNVS or
-  EfiReservedMemoryType memory allocation HOB.
+  The input range should be covered by the EfiRuntimeServicesData, EfiACPIMemoryNVS,
+  EfiReservedMemoryType or EfiMemoryMappedIO memory allocation HOB.
 
   @param[in]  HobStart                The starting HOB pointer to search from.
-  @param[in]  UnblockAddress          Base address of the range to unblock.
+  @param[in]  UnblockBase             Base address of the range to unblock.
   @param[in]  UnblockEnd              End address of the range to unblock.
 
   @retval RETURN_SUCCESS              The range is unblockable.
@@ -50,11 +50,12 @@ MmUnblockMemoryLibIsUnblockableRegion (
               MemoryAllocationHob->AllocDescriptor.MemoryLength;
     if ((UnblockBase < HobEnd) && (UnblockEnd > HobBase)) {
       //
-      // The overlapped memory allocation HOB type must be one of the three specific types.
+      // The overlapped memory allocation HOB type must be one of the four specific types.
       //
       if ((MemoryAllocationHob->AllocDescriptor.MemoryType != EfiRuntimeServicesData) &&
           (MemoryAllocationHob->AllocDescriptor.MemoryType != EfiACPIMemoryNVS) &&
-          (MemoryAllocationHob->AllocDescriptor.MemoryType != EfiReservedMemoryType))
+          (MemoryAllocationHob->AllocDescriptor.MemoryType != EfiReservedMemoryType) &&
+          (MemoryAllocationHob->AllocDescriptor.MemoryType != EfiMemoryMappedIO))
       {
         DEBUG ((DEBUG_ERROR, "Error: range [0x%lx, 0x%lx] to unblock contains invalid type memory\n", UnblockBase, UnblockEnd));
         return RETURN_INVALID_PARAMETER;
@@ -115,6 +116,7 @@ MmUnblockMemoryLibIsUnblockableRegion (
                                       EfiRuntimeServicesData, EfiACPIMemoryNVS, and EfiReservedMemory.
   @retval RETURN_INVALID_PARAMETER    Input range to unblock contains memory that doesn't belong to
                                       any memory allocation HOB.
+  @retval RETURN_OUT_OF_RESOURCES     No enough resource to handle the unblock request.
   @retval RETURN_ACCESS_DENIED        The request is rejected due to system has passed certain boot
                                       phase.
 **/
@@ -156,7 +158,7 @@ MmUnblockMemoryRequest (
   MmUnblockMemoryHob = BuildGuidHob (&gMmUnblockRegionHobGuid, sizeof (MM_UNBLOCK_REGION));
   if (MmUnblockMemoryHob == NULL) {
     DEBUG ((DEBUG_ERROR, "MmUnblockMemoryRequest: Failed to allocate hob for unblocked data parameter!!\n"));
-    return Status;
+    return RETURN_OUT_OF_RESOURCES;
   }
 
   ZeroMem (MmUnblockMemoryHob, sizeof (MM_UNBLOCK_REGION));

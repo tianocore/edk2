@@ -504,7 +504,7 @@ CreateMmHobList (
   Status = CreateMmFoundationHobList (
              (UINT8 *)HobList + PhitHobSize + PlatformHobSize,
              &FoundationHobSize,
-             HobList,
+             (UINT8 *)HobList + PhitHobSize,
              PlatformHobSize,
              MmFvBase,
              MmFvSize,

@@ -83,7 +83,7 @@ typedef struct _EFI_MP_SERVICES_PROTOCOL EFI_MP_SERVICES_PROTOCOL;
 #define PROCESSOR_HEALTH_STATUS_BIT  0x00000004
 
 ///
-/// Structure that describes the pyhiscal location of a logical CPU.
+/// Structure that describes the physical location of a logical CPU.
 ///
 typedef struct {
   ///

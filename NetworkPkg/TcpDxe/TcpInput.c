@@ -725,6 +725,7 @@ TcpInput (
   UINT16      Checksum;
   INT32       Usable;
   EFI_STATUS  Status;
+  IP_IO       *IpIoProbe;
 
   ASSERT ((Version == IP_VERSION_4) || (Version == IP_VERSION_6));
 
@@ -780,9 +781,15 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    DEBUG ((DEBUG_NET, "TcpInput: send reset because no TCB found\n"));
+    //
+    // No IpIo sender for Dst: cannot emit RST; discard to avoid failed sends.
+    //
+    IpIoProbe = NULL;
+    Tcb       = NULL;
+    if (IpIoFindSender (&IpIoProbe, Version, Dst) == NULL) {
+      goto DISCARD;
+    }
 
-    Tcb = NULL;
     goto SEND_RESET;
   }
 

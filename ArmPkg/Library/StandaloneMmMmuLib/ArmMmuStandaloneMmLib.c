@@ -35,6 +35,8 @@
   StMM Core invokes this library before constructors are called and before the
   StMM image itself is relocated.
 
+  @param[out]             Version        Version of FF-A ABI.
+
   @retval TRUE            Use FF-A MemPerm ABIs.
   @retval FALSE           Use MM MemPerm ABIs.
 
@@ -43,22 +45,24 @@ STATIC
 BOOLEAN
 EFIAPI
 IsFfaMemoryAbiSupported (
-  IN VOID
+  OUT UINT32  *Version OPTIONAL
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
+  UINT32      CurrentVersion;
+
+  CurrentVersion = 0;
 
   Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
+             ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
+             &CurrentVersion
              );
-
   if (EFI_ERROR (Status)) {
     return FALSE;
+  }
+
+  if (Version != NULL) {
+    *Version = CurrentVersion;
   }
 
   return TRUE;
@@ -147,8 +151,12 @@ SendMemoryPermissionRequest (
 /** Request the permission attributes of a memory region from S-EL0.
 
   @param [in]   UseFfaAbis           Use FF-A abis or not.
+  @param [in]   AbiVersion           ABI Version
   @param [in]   BaseAddress          Base address for the memory region.
+  @param [in]   Length               Size of memory region.
   @param [out]  MemoryAttributes     Pointer to return the memory attributes.
+  @param [out]  PageCount            Number of page sharing the same attribute from
+                                     BaseAddress
 
   @retval EFI_SUCCESS             Request successfull.
   @retval EFI_INVALID_PARAMETER   A parameter is invalid.
@@ -165,8 +173,11 @@ STATIC
 EFI_STATUS
 GetMemoryPermissions (
   IN     BOOLEAN               UseFfaAbis,
+  IN     UINT32                AbiVersion,
   IN     EFI_PHYSICAL_ADDRESS  BaseAddress,
-  OUT    UINT32                *MemoryAttributes
+  IN     UINT64                Length,
+  OUT    UINT32                *MemoryAttributes,
+  OUT    UINT32                *PageCount
   )
 {
   EFI_STATUS    Status;
@@ -187,11 +198,34 @@ GetMemoryPermissions (
   SvcArgs.Arg0 = Fid;
   SvcArgs.Arg1 = BaseAddress;
 
+  if (UseFfaAbis && ARM_FFA_ABI_MINIMUM (AbiVersion, 1, 3)) {
+    /*
+     * The input page count is encoded as (page count - 1),
+     * so subtract 1 from the actual page count.
+     * See the FF-A Memory Management Protocol Spec version 1.3-ALP1
+     * 2.8 FFA_MEM_PERM_GET
+     */
+    SvcArgs.Arg2 = EFI_SIZE_TO_PAGES (Length) - 1;
+  }
+
   Status = SendMemoryPermissionRequest (UseFfaAbis, &SvcArgs, &Ret);
   if (EFI_ERROR (Status)) {
     *MemoryAttributes = 0;
+    *PageCount        = 0;
   } else {
     *MemoryAttributes = Ret;
+    if (UseFfaAbis && ARM_FFA_ABI_MINIMUM (AbiVersion, 1, 3)) {
+      /*
+       * The output page count is encoded as (page count - 1),
+       * so add 1 to get the actual page count.
+       * See the FF-A Memory Management Protocol Spec version 1.3-ALP1
+       * 2.8 FFA_MEM_PERM_GET
+       */
+      *PageCount = SvcArgs.Arg3 + 1;
+      ASSERT (*PageCount <= EFI_SIZE_TO_PAGES (Length));
+    } else {
+      *PageCount = 1;
+    }
   }
 
   return Status;
@@ -243,6 +277,24 @@ RequestMemoryPermissionChange (
   return SendMemoryPermissionRequest (UseFfaAbis, &SvcArgs, &Ret);
 }
 
+/**
+  Set XN bit preserving other permission.
+
+  @param [in]  BaseAddress     Base address for the memory region.
+  @param [in]  Length          Length of the memory region.
+
+  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_NOT_READY           Callee is busy or not in a state to handle
+                                  this request.
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+  @retval EFI_ABORTED             Message target ran into an unexpected error
+                                  and has aborted.
+  @retval EFI_ACCESS_DENIED       Access denied.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory to perform operation.
+
+**/
 EFI_STATUS
 ArmSetMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -253,16 +305,34 @@ ArmSetMemoryRegionNoExec (
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
   BOOLEAN     UseFfaAbis;
+  UINT32      Version;
   UINTN       Size;
+  UINT32      PageCount;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported ();
-  Size       = EFI_PAGE_SIZE;
+  /*
+   * The .reloc section and others may be empty.
+   * In that case, return success silently.
+   */
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
+
+  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
-    Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
+    Status = GetMemoryPermissions (
+               UseFfaAbis,
+               Version,
+               BaseAddress,
+               Length,
+               &MemoryAttributes,
+               &PageCount
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
+
+    Size = EFI_PAGES_TO_SIZE (PageCount);
 
     if (UseFfaAbis) {
       PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
@@ -297,6 +367,24 @@ ArmSetMemoryRegionNoExec (
   return Status;
 }
 
+/**
+  Clear XN bit preserving other permission.
+
+  @param [in]  BaseAddress     Base address for the memory region.
+  @param [in]  Length          Length of the memory region.
+
+  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_NOT_READY           Callee is busy or not in a state to handle
+                                  this request.
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+  @retval EFI_ABORTED             Message target ran into an unexpected error
+                                  and has aborted.
+  @retval EFI_ACCESS_DENIED       Access denied.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory to perform operation.
+
+**/
 EFI_STATUS
 ArmClearMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -307,16 +395,34 @@ ArmClearMemoryRegionNoExec (
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
   BOOLEAN     UseFfaAbis;
+  UINT32      Version;
   UINTN       Size;
+  UINT32      PageCount;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported ();
-  Size       = EFI_PAGE_SIZE;
+  /*
+   * The .reloc section and others may be empty.
+   * In that case, return success silently.
+   */
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
+
+  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
-    Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
+    Status = GetMemoryPermissions (
+               UseFfaAbis,
+               Version,
+               BaseAddress,
+               Length,
+               &MemoryAttributes,
+               &PageCount
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
+
+    Size = EFI_PAGES_TO_SIZE (PageCount);
 
     if (UseFfaAbis) {
       PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
@@ -351,110 +457,176 @@ ArmClearMemoryRegionNoExec (
   return Status;
 }
 
+/**
+  Change memory permission as RO ignoring former permission.
+
+  @param [in]  BaseAddress     Base address for the memory region.
+  @param [in]  Length          Length of the memory region.
+
+  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_NOT_READY           Callee is busy or not in a state to handle
+                                  this request.
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+  @retval EFI_ABORTED             Message target ran into an unexpected error
+                                  and has aborted.
+  @retval EFI_ACCESS_DENIED       Access denied.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory to perform operation.
+
+**/
 EFI_STATUS
-ArmSetMemoryRegionReadOnly (
+ArmSetMemoryRegionReadOnlyPerm (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  EFI_STATUS  Status;
-  UINT32      MemoryAttributes;
-  UINT32      PermissionRequest;
-  BOOLEAN     UseFfaAbis;
-  UINTN       Size;
+  UINT32   PermissionRequest;
+  BOOLEAN  UseFfaAbis;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported ();
-  Size       = EFI_PAGE_SIZE;
+  /*
+   * The .reloc section and others may be empty.
+   * In that case, return success silently.
+   */
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
 
-  while (Length > 0) {
-    Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+  UseFfaAbis = IsFfaMemoryAbiSupported (NULL);
+  Length     = ALIGN_VALUE (Length, EFI_PAGE_SIZE);
 
-    if (UseFfaAbis) {
-      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
-                            (MemoryAttributes >> ARM_FFA_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    } else {
-      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
-                            (MemoryAttributes >> ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    }
+  if (UseFfaAbis) {
+    PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_FFA_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  } else {
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  }
 
-    if (Length < Size) {
-      Length = Size;
-    }
-
-    Status = RequestMemoryPermissionChange (
-               UseFfaAbis,
-               BaseAddress,
-               Size,
-               PermissionRequest
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    Length      -= Size;
-    BaseAddress += Size;
-  } // while
-
-  return Status;
+  return RequestMemoryPermissionChange (
+           UseFfaAbis,
+           BaseAddress,
+           Length,
+           PermissionRequest
+           );
 }
 
+/**
+  Change memory permission as RW ignoring former permission.
+
+  @param [in]  BaseAddress     Base address for the memory region.
+  @param [in]  Length          Length of the memory region.
+
+  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_NOT_READY           Callee is busy or not in a state to handle
+                                  this request.
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+  @retval EFI_ABORTED             Message target ran into an unexpected error
+                                  and has aborted.
+  @retval EFI_ACCESS_DENIED       Access denied.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory to perform operation.
+
+**/
 EFI_STATUS
-ArmClearMemoryRegionReadOnly (
+ArmSetMemoryRegionReadWritePerm (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  EFI_STATUS  Status;
-  UINT32      MemoryAttributes;
-  UINT32      PermissionRequest;
-  BOOLEAN     UseFfaAbis;
-  UINTN       Size;
+  UINT32   PermissionRequest;
+  BOOLEAN  UseFfaAbis;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported ();
-  Size       = EFI_PAGE_SIZE;
+  /*
+   * The .reloc section and others may be empty.
+   * In that case, return success silently.
+   */
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
 
-  while (Length > 0) {
-    Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+  UseFfaAbis = IsFfaMemoryAbiSupported (NULL);
+  Length     = ALIGN_VALUE (Length, EFI_PAGE_SIZE);
 
-    if (UseFfaAbis) {
-      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_FFA_SET_MEM_ATTR_DATA_PERM_RW,
-                            (MemoryAttributes >> ARM_FFA_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    } else {
-      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                            ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
-                            (MemoryAttributes >> ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT)
-                            );
-    }
+  if (UseFfaAbis) {
+    PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_FFA_SET_MEM_ATTR_DATA_PERM_RW,
+                          ARM_FFA_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  } else {
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
+                          ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN
+                          );
+  }
 
-    if (Length < Size) {
-      Length = Size;
-    }
+  return RequestMemoryPermissionChange (
+           UseFfaAbis,
+           BaseAddress,
+           Length,
+           PermissionRequest
+           );
+}
 
-    Status = RequestMemoryPermissionChange (
-               UseFfaAbis,
-               BaseAddress,
-               Size,
-               PermissionRequest
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+/**
+  Change memory permission as ROX ignoring former permission.
 
-    Length      -= Size;
-    BaseAddress += Size;
-  } // while
+  @param [in]  BaseAddress     Base address for the memory region.
+  @param [in]  Length          Length of the memory region.
 
-  return Status;
+  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_NOT_READY           Callee is busy or not in a state to handle
+                                  this request.
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+  @retval EFI_ABORTED             Message target ran into an unexpected error
+                                  and has aborted.
+  @retval EFI_ACCESS_DENIED       Access denied.
+  @retval EFI_OUT_OF_RESOURCES    Out of memory to perform operation.
+
+**/
+EFI_STATUS
+ArmSetMemoryRegionReadOnlyExecPerm (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  UINT32   PermissionRequest;
+  BOOLEAN  UseFfaAbis;
+
+  /*
+   * The .reloc section and others may be empty.
+   * In that case, return success silently.
+   */
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
+
+  UseFfaAbis = IsFfaMemoryAbiSupported (NULL);
+  Length     = ALIGN_VALUE (Length, EFI_PAGE_SIZE);
+
+  if (UseFfaAbis) {
+    PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_FFA_SET_MEM_ATTR_CODE_PERM_X
+                          );
+  } else {
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
+                          ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_X
+                          );
+  }
+
+  return RequestMemoryPermissionChange (
+           UseFfaAbis,
+           BaseAddress,
+           Length,
+           PermissionRequest
+           );
 }

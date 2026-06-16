@@ -132,7 +132,7 @@ EFI_STATUS
                                  SyntaxTypeis not supported by this driver.
   @retval EFI_DEVICE_ERROR       The regular expression string matching
                                  failed due to a hardware or firmware error.
-  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCountis
+  @retval EFI_INVALID_PARAMETER  String, Pattern, Result, or CapturesCount is
                                  NULL.
 
 **/

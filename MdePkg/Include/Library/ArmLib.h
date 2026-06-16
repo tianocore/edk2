@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -677,7 +677,7 @@ ArmHasCcidx (
   Checks whether the CPU implements the Virtualization Host Extensions.
 
   @retval TRUE  FEAT_VHE is implemented.
-  @retval FALSE FEAT_VHE is not mplemented.
+  @retval FALSE FEAT_VHE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -689,7 +689,7 @@ ArmHasVhe (
   Checks whether the CPU implements the Trace Buffer Extension.
 
   @retval TRUE  FEAT_TRBE is implemented.
-  @retval FALSE FEAT_TRBE is not mplemented.
+  @retval FALSE FEAT_TRBE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -701,7 +701,7 @@ ArmHasTrbe (
   Checks whether the CPU implements the Embedded Trace Extension.
 
   @retval TRUE  FEAT_ETE is implemented.
-  @retval FALSE FEAT_ETE is not mplemented.
+  @retval FALSE FEAT_ETE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -719,5 +719,16 @@ ArmHasEte (
 BOOLEAN
 EFIAPI
 ArmHas52BitTgran4 (
+  VOID
+  );
+
+/** Checks if RME is implemented.
+
+   @retval TRUE  RME is implemented.
+   @retval FALSE RME is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasRme (
   VOID
   );

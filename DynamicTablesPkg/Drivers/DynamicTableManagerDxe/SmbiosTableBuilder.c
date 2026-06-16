@@ -555,6 +555,20 @@ SmbiosProtocolReady (
   EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CfgMgrProtocol;
   CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  *CfgMfrInfo;
   EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *TableFactoryProtocol;
+  EFI_SMBIOS_PROTOCOL                    *SmbiosProtocol;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiSmbiosProtocolGuid,
+                  NULL,
+                  (VOID **)&SmbiosProtocol
+                  );
+
+  // The event handler function is called at least once
+  // during installation even if the protocol is not available
+  // at that point.
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
   // Locate the Dynamic Table Factory
   Status = gBS->LocateProtocol (

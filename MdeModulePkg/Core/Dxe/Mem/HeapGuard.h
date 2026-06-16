@@ -275,18 +275,25 @@ AdjustMemoryF (
   memory blocks, and try to use it as the Guard page of the memory to be
   allocated.
 
-  @param[in]  Start           Start address of free memory block.
-  @param[in]  Size            Size of free memory block.
-  @param[in]  SizeRequested   Size of memory to allocate.
+  A guard page is not allowed to be placed at page 0 because it may be used for
+  NULL pointer detection or have special meaning if it is left mapped. This API
+  will reject the memory block if the only available place for the head guard is
+  page 0.
+
+  @param[in,out]  Start           Start address of the free memory block. On successful return, this will contain the
+                                  adjusted start address of the proposed allocation.
+  @param[in]      Size            Size of free memory block.
+  @param[in,out]  SizeRequested   Size of memory to allocate. On successful return, this will contain the adjusted size
+                                  of memory to allocate.
 
   @return The end address of memory block found.
   @return 0 if no enough space for the required size of memory and its Guard.
 **/
 UINT64
 AdjustMemoryS (
-  IN UINT64  Start,
-  IN UINT64  Size,
-  IN UINT64  SizeRequested
+  IN OUT UINT64  *Start,
+  IN UINT64      Size,
+  IN OUT UINT64  *SizeRequested
   );
 
 /**

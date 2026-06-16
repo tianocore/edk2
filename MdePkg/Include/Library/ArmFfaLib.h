@@ -172,19 +172,15 @@ ArmFfaLibGetRxTxBuffers (
 /**
   Get FF-A version
 
-  @param [in]    RequestMajorVersion          Minimal request major version
-  @param [in]    RequestMinorVersion          Minimal request minor version
-  @param [out]   CurrentMajorVersion          Current major version
-  @param [out]   CurrentMinorVersion          Current minor version
+  @param [in]    RequestVersion          Minimal request version
+  @param [out]   CurrentVersion          Current major version
 
 **/
 EFI_STATUS
 EFIAPI
 ArmFfaLibGetVersion (
-  IN  UINT16  RequestMajorVersion,
-  IN  UINT16  RequestMinorVersion,
-  OUT UINT16  *CurrentMajorVersion,
-  OUT UINT16  *CurrentMinorVersion
+  IN  UINT32  RequestVersion,
+  OUT UINT32  *CurrentVersion
   );
 
 /**

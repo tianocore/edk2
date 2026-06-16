@@ -113,6 +113,15 @@
   (((major) << ARM_FFA_MAJOR_VERSION_SHIFT) | \
    ((minor) << ARM_FFA_MINOR_VERSION_SHIFT))
 
+#define ARM_FFA_ABI_COMPATIBLE(version, major, minor) \
+  ((BOOLEAN)(((ARM_FFA_MAJOR_VERSION_GET(version)) == major) && \
+             ((ARM_FFA_MINOR_VERSION_GET(version)) >= minor)))
+
+#define ARM_FFA_ABI_MINIMUM(version, major, minor) \
+  ((BOOLEAN)(((ARM_FFA_MAJOR_VERSION_GET(version)) < major) ? FALSE :  \
+              (((ARM_FFA_MAJOR_VERSION_GET(version)) > major) ? TRUE : \
+                ((ARM_FFA_MINOR_VERSION_GET(version)) >= minor))))
+
 #define ARM_FFA_FEATURES_ID_TYPE_SHIFT     31
 #define ARM_FFA_FEATURES_ID_TYPE_MASK      1
 #define ARM_FFA_FEATURES_ID_TYPE_FEATURE   0

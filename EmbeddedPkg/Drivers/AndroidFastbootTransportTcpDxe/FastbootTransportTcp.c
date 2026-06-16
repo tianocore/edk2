@@ -123,6 +123,7 @@ SubmitRecieveToken (
 */
 STATIC
 VOID
+EFIAPI
 ConnectionClosed (
   IN EFI_EVENT  Event,
   IN VOID       *Context
@@ -291,6 +292,7 @@ ConnectionAccepted (
   start waiting for a TCP connection on the Fastboot port.
 */
 EFI_STATUS
+EFIAPI
 TcpFastbootTransportStart (
   EFI_EVENT  ReceiveEvent
   )
@@ -465,6 +467,7 @@ TcpFastbootTransportStart (
 }
 
 EFI_STATUS
+EFIAPI
 TcpFastbootTransportStop (
   VOID
   )
@@ -557,6 +560,7 @@ DataSent (
 }
 
 EFI_STATUS
+EFIAPI
 TcpFastbootTransportSend (
   IN        UINTN      BufferSize,
   IN  CONST VOID       *Buffer,
@@ -602,6 +606,7 @@ TcpFastbootTransportSend (
 }
 
 EFI_STATUS
+EFIAPI
 TcpFastbootTransportReceive (
   OUT UINTN  *BufferSize,
   OUT VOID   **Buffer

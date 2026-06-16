@@ -30,8 +30,6 @@ Mtftp6RrqSendAck (
   NET_BUF            *Packet;
   EFI_STATUS         Status;
 
-  Status = EFI_SUCCESS;
-
   //
   // Allocate net buffer to create ack packet.
   //
@@ -222,7 +220,6 @@ Mtftp6RrqHandleData (
   INTN        Expected;
 
   *IsCompleted = FALSE;
-  Status       = EFI_SUCCESS;
   BlockNum     = NTOHS (Packet->Data.Block);
   Expected     = Mtftp6GetNextBlockNum (&Instance->BlkList);
 

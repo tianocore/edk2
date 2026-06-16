@@ -18,10 +18,13 @@
 #define UDF_VRS_START_OFFSET      ((UINT64)(16ULL << UDF_LOGICAL_SECTOR_SHIFT))
 
 typedef enum {
-  UdfPrimaryVolumeDescriptor          = 1,
-  UdfAnchorVolumeDescriptorPointer    = 2,
-  UdfVolumeDescriptorPointer          = 3,
-  UdfImplemenationUseVolumeDescriptor = 4,
+  UdfPrimaryVolumeDescriptor           = 1,
+  UdfAnchorVolumeDescriptorPointer     = 2,
+  UdfVolumeDescriptorPointer           = 3,
+  UdfImplementationUseVolumeDescriptor = 4,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  UdfImplemenationUseVolumeDescriptor = UdfImplementationUseVolumeDescriptor,
   UdfPartitionDescriptor              = 5,
   UdfLogicalVolumeDescriptor          = 6,
   UdfUnallocatedSpaceDescriptor       = 7,

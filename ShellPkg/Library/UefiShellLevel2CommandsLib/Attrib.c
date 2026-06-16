@@ -196,7 +196,7 @@ MainCmdAttrib (
           //
           // skip the directory traversing stuff...
           //
-          if ((StrCmp (FileNode->FileName, L".") == 0) || (StrCmp (FileNode->FileName, L"..") == 0)) {
+          if (IsDotOrDotDot (FileNode->FileName)) {
             continue;
           }
 

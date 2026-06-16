@@ -686,7 +686,7 @@ typedef struct {
 /// register offset 16 bits, width 6 bits.
 ///
 /// If you want to register an exception hook, you can
-/// shfit the number left by 16 bits, and the exception
+/// shift the number left by 16 bits, and the exception
 /// handler will know the types.
 ///
 /// For example:

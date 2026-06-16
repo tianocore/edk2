@@ -232,8 +232,8 @@ EFI_STATUS
   @retval EFI_SUCCESS           The requested command completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
   @retval EFI_INVALID_PARAMETER ControlCode requires input parameters but:
-                                  InBuffer is NULL or InBufferLenth is NULL or
-                                  InBuffer is not NULL but InBufferLenth is less than
+                                  InBuffer is NULL or InBufferlength is NULL or
+                                  InBuffer is not NULL but InBufferlength is less than
                                   expected.
   @retval EFI_INVALID_PARAMETER OutBuffer is not NULL but OutBufferLength is NULL.
   @retval EFI_UNSUPPORTED       ControlCode is not supported.
@@ -281,7 +281,7 @@ EFI_STATUS
   @retval EFI_BUFFER_TOO_SMALL  OutBufferLength is not big enough to hold the output
                                 parameters.
                                 OutBufferLength has been updated to the required value.
-  @retval EFI_UNSUPPORTED       Attribis not supported
+  @retval EFI_UNSUPPORTED       Attributes not supported
   @retval EFI_NO_MEDIA          There is no card in the reader and Attrib value
                                 requires one.
   @retval EFI_NOT_READY         Attrib requires a powered card to operate.

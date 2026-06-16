@@ -68,9 +68,11 @@ EFI_STATUS
 
   @param  SectionType           The value of the section type to find.
   @param  SectionCheckHook      A hook which can check if the section is the target one.
-  @param  FileHeader            A pointer to the file header that contains the set of sections to
+  @param  FileHandle            A pointer to the file header that contains the set of sections to
                                 be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
+  @param  AuthenticationStatus  Pointer to the authentication status. This parameter is optional. If non-NULL and
+                                GUIDed extraction occurs, the authentication status will be updated.
 
   @retval EFI_SUCCESS           The section was found.
   @retval EFI_NOT_FOUND         The section was not found.
@@ -82,7 +84,8 @@ FfsFindSectionDataWithHook (
   IN EFI_SECTION_TYPE        SectionType,
   IN FFS_CHECK_SECTION_HOOK  SectionCheckHook,
   IN EFI_PEI_FILE_HANDLE     FileHandle,
-  OUT VOID                   **SectionData
+  OUT VOID                   **SectionData,
+  OUT UINT32                 *AuthenticationStatus OPTIONAL
   );
 
 /**
@@ -180,7 +183,8 @@ FfsGetVolumeInfo (
 /**
   Get Fv image from the FV type file, then add FV & FV2 Hob.
 
-  @param FileHandle      File handle of a Fv type file.
+  @param FvFileHandle        File handle of a Fv type file.
+  @param ParentVolumeHandle  Parent volume handle, for filling out FvName field in FV2 Hob
 
   @retval EFI_NOT_FOUND  FV image can't be found.
   @retval EFI_SUCCESS    Successfully to process it.
@@ -189,7 +193,8 @@ FfsGetVolumeInfo (
 EFI_STATUS
 EFIAPI
 FfsProcessFvFile (
-  IN  EFI_PEI_FILE_HANDLE  FvFileHandle
+  IN  EFI_PEI_FILE_HANDLE  FvFileHandle,
+  IN EFI_PEI_FV_HANDLE     ParentVolumeHandle
   );
 
 /**
@@ -209,22 +214,6 @@ FfsAnyFvFindFirstFile (
   IN  EFI_FV_FILETYPE      FileType,
   OUT EFI_PEI_FV_HANDLE    *VolumeHandle,
   OUT EFI_PEI_FILE_HANDLE  *FileHandle
-  );
-
-/**
-  Get Fv image from the FV type file, then add FV & FV2 Hob.
-
-  @param FileHandle  File handle of a Fv type file.
-
-
-  @retval EFI_NOT_FOUND  FV image can't be found.
-  @retval EFI_SUCCESS    Successfully to process it.
-
-**/
-EFI_STATUS
-EFIAPI
-FfsProcessFvFile (
-  IN  EFI_PEI_FILE_HANDLE  FvFileHandle
   );
 
 /**

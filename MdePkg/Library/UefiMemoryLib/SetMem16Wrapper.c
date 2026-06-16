@@ -51,8 +51,8 @@ SetMem16 (
 
   ASSERT (Buffer != NULL);
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
-  ASSERT ((((UINTN)Buffer) & (sizeof (Value) - 1)) == 0);
-  ASSERT ((Length & (sizeof (Value) - 1)) == 0);
+  ASSERT (ADDRESS_IS_ALIGNED (Buffer, sizeof (Value)));
+  ASSERT (IS_ALIGNED (Length, sizeof (Value)));
 
   return InternalMemSetMem16 (Buffer, Length / sizeof (Value), Value);
 }

@@ -1434,7 +1434,7 @@ EhcGetUsbDebugPortInfo (
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint8,
-                        PCI_CAPBILITY_POINTER_OFFSET,
+                        PCI_CAPABILITY_POINTER_OFFSET,
                         1,
                         &CapabilityPtr
                         );

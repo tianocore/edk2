@@ -208,12 +208,15 @@
   MdePkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
   MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
   MdePkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
+  MdePkg/Library/ArmLib/ArmBaseLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
   MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLib.inf
   MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLibRam.inf
   MdePkg/Library/PeiServicesTablePointerLibRiscV/PeiServicesTablePointerLib.inf
+  MdePkg/Library/DxeRiscvMpxyLib/DxeRiscvMpxy.inf
+  MdePkg/Library/DxeRiscvRasAgentClientLib/DxeRiscvRasAgentClientLib.inf
 
 [Components.LOONGARCH64]
   MdePkg/Library/PeiServicesTablePointerLibKs0/PeiServicesTablePointerLibKs0.inf

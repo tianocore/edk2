@@ -314,7 +314,7 @@ typedef UINT32 TPM_FAMILY_OPERATION;
 #define TPM_ET_OPERATOR         ((UINT16) 0x000C)     ///< The entity is the operator
 #define TPM_ET_RESERVED_HANDLE  ((UINT16) 0x0040)     ///< Reserved. This value avoids collisions with the handle MSB setting.
 //
-// TPM_ENTITY_TYPE MSB Values: The MSB is used to indicate the ADIP encryption sheme when applicable
+// TPM_ENTITY_TYPE MSB Values: The MSB is used to indicate the ADIP encryption scheme when applicable
 //
 #define TPM_ET_XOR     ((UINT16) 0x0000)              ///< ADIP encryption scheme: XOR
 #define TPM_ET_AES128  ((UINT16) 0x0006)              ///< ADIP encryption scheme: AES 128 bits
@@ -1728,19 +1728,22 @@ typedef struct tdTPM_DELEGATIONS {
 //
 // Part 2, section 20.2.1: Owner Permission Settings
 //
-#define TPM_DELEGATE_SetOrdinalAuditStatus           (BIT30)
-#define TPM_DELEGATE_DirWriteAuth                    (BIT29)
-#define TPM_DELEGATE_CMK_ApproveMA                   (BIT28)
-#define TPM_DELEGATE_NV_WriteValue                   (BIT27)
-#define TPM_DELEGATE_CMK_CreateTicket                (BIT26)
-#define TPM_DELEGATE_NV_ReadValue                    (BIT25)
-#define TPM_DELEGATE_Delegate_LoadOwnerDelegation    (BIT24)
-#define TPM_DELEGATE_DAA_Join                        (BIT23)
-#define TPM_DELEGATE_AuthorizeMigrationKey           (BIT22)
-#define TPM_DELEGATE_CreateMaintenanceArchive        (BIT21)
-#define TPM_DELEGATE_LoadMaintenanceArchive          (BIT20)
-#define TPM_DELEGATE_KillMaintenanceFeature          (BIT19)
-#define TPM_DELEGATE_OwnerReadInteralPub             (BIT18)
+#define TPM_DELEGATE_SetOrdinalAuditStatus         (BIT30)
+#define TPM_DELEGATE_DirWriteAuth                  (BIT29)
+#define TPM_DELEGATE_CMK_ApproveMA                 (BIT28)
+#define TPM_DELEGATE_NV_WriteValue                 (BIT27)
+#define TPM_DELEGATE_CMK_CreateTicket              (BIT26)
+#define TPM_DELEGATE_NV_ReadValue                  (BIT25)
+#define TPM_DELEGATE_Delegate_LoadOwnerDelegation  (BIT24)
+#define TPM_DELEGATE_DAA_Join                      (BIT23)
+#define TPM_DELEGATE_AuthorizeMigrationKey         (BIT22)
+#define TPM_DELEGATE_CreateMaintenanceArchive      (BIT21)
+#define TPM_DELEGATE_LoadMaintenanceArchive        (BIT20)
+#define TPM_DELEGATE_KillMaintenanceFeature        (BIT19)
+#define TPM_DELEGATE_OwnerReadInternalPub          (BIT18)
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define TPM_DELEGATE_OwnerReadInteralPub             TPM_DELEGATE_OwnerReadInternalPub
 #define TPM_DELEGATE_ResetLockValue                  (BIT17)
 #define TPM_DELEGATE_OwnerClear                      (BIT16)
 #define TPM_DELEGATE_DisableOwnerClear               (BIT15)

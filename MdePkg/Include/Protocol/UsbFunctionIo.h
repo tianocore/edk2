@@ -402,7 +402,7 @@ EFI_STATUS
   @param[in]      This          A pointer to the EFI_USBFN_IO_PROTOCOL instance.
   @param[out]     Message       Indicates the event that initiated this notification.
   @param[in, out] PayloadSize   On input, the size of the memory pointed by
-                                Payload. On output, the amount ofdata returned
+                                Payload. On output, the amount of data returned
                                 in Payload.
   @param[out]     Payload       A pointer to EFI_USBFN_MESSAGE_PAYLOAD instance
                                 to return additional payload for current message.
@@ -454,7 +454,7 @@ EFI_STATUS
                                   On output, the amount of data transmitted in bytes.
   @param[in, out] Buffer        If Direction is EfiUsbEndpointDirectionDeviceRx:
                                   The Buffer to return the received data.
-                                If Directionis EfiUsbEndpointDirectionDeviceTx:
+                                If Direction is EfiUsbEndpointDirectionDeviceTx:
                                   The Buffer that contains the data to be transmitted.
 
   @retval EFI_SUCCESS           The function returned successfully.

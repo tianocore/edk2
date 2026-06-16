@@ -256,6 +256,12 @@ R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 
+ManageabilityPkg
+F: ManageabilityPkg/
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
+R: Nickle Wang <nicklew@nvidia.com> [nicklela]
+
 MdeModulePkg
 F: MdeModulePkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/mde_module_pkg.html
@@ -623,6 +629,7 @@ SecurityPkg
 F: SecurityPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/security_pkg.html
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
+M: Chris Fernald <chfernal@microsoft.com> [cfernald]
 
 SecurityPkg: Secure boot related modules
 F: SecurityPkg/Library/DxeImageVerificationLib/
@@ -648,10 +655,6 @@ ShellPkg
 F: ShellPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
 R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
-
-SignedCapsulePkg
-F: SignedCapsulePkg/
-W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/signed_capsule_pkg.html
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/

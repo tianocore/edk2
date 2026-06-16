@@ -71,7 +71,7 @@ typedef UINT64 EFI_RESOURCE_ALLOCATION_STATUS;
 #define EFI_RESOURCE_NOT_SATISFIED  0xFFFFFFFFFFFFFFFFULL
 
 ///
-/// This  enum is used to specify the phase of the PCI enumaeration process.
+/// This  enum is used to specify the phase of the PCI enumeration process.
 ///
 typedef enum {
   ///

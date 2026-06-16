@@ -3,7 +3,7 @@
   The implementation of EFI Redfish Discover Protocol.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022, AMD Incorporated. All rights reserved.
+  Copyright (c) 2026, Advanced Micro Devices, Inc. All rights reserved.
   Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (c) 2023, Mike Maslenkin <mike.maslenkin@gmail.com> <BR>
@@ -67,6 +67,30 @@ static REDFISH_DISCOVER_REQUIRED_PROTOCOL  mRequiredProtocol[] = {
     NULL
   }
 };
+
+/**
+  Reports whether a required-protocol table entry is used on this platform.
+
+  TCP6 is required only when PcdIPv6HttpSupport is TRUE so Redfish discovery
+  can run on IPv4-only network stacks (PcdIPv6HttpSupport FALSE).
+
+  @param[in]  Index  Index in mRequiredProtocol.
+
+  @retval TRUE   The entry is required and must be present.
+  @retval FALSE  The entry is skipped (TCP6 when IPv6 HTTP is disabled).
+**/
+STATIC
+BOOLEAN
+IsRedfishRequiredProtocolIndexActive (
+  IN UINTN  Index
+  )
+{
+  if (mRequiredProtocol[Index].ProtocolType == ProtocolTypeTcp6) {
+    return PcdGetBool (PcdIPv6HttpSupport);
+  }
+
+  return TRUE;
+}
 
 /**
   This function creates REST EX instance for the found Resfish service.
@@ -1620,12 +1644,18 @@ RedfishServiceReleaseService (
   IN EFI_REDFISH_DISCOVERED_LIST    *InstanceList
   )
 {
+  EFI_STATUS                            Status;
   UINTN                                 NumService;
   BOOLEAN                               AnyFailRelease;
   EFI_REDFISH_DISCOVERED_INSTANCE       *ThisRedfishInstance;
   EFI_REDFISH_DISCOVERED_INTERNAL_LIST  *DiscoveredRedfishInstance;
+  EFI_REST_EX_PROTOCOL                  *RestExProtocol;
 
-  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
+  if (InstanceList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry, to release %d Redfish instance(s).\n", __func__, InstanceList->NumberOfServiceFound));
 
   if (IsListEmpty (&mRedfishInstanceList)) {
     DEBUG ((DEBUG_ERROR, "%a:No any discovered Redfish service.\n", __func__));
@@ -1638,6 +1668,24 @@ RedfishServiceReleaseService (
     DiscoveredRedfishInstance = (EFI_REDFISH_DISCOVERED_INTERNAL_LIST *)GetFirstNode (&mRedfishInstanceList);
     do {
       if (DiscoveredRedfishInstance->Instance == ThisRedfishInstance) {
+        //
+        // Disable REST EX instance by setting configuration to NULL.
+        // This also closes the underlying protocols, such HTTP.
+        //
+        Status = gBS->LocateProtocol (&gEfiRestExProtocolGuid, NULL, (VOID **)&RestExProtocol);
+        if (!EFI_ERROR (Status)) {
+          Status = RestExProtocol->Configure (
+                                     RestExProtocol,
+                                     NULL
+                                     );
+        }
+
+        if (!EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: REST EX connection is closed.\n", __func__));
+        } else {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: REST EX connection is not propery closed.\n", __func__));
+        }
+
         RemoveEntryList (&DiscoveredRedfishInstance->NextInstance);
         FreeInformationData (&ThisRedfishInstance->Information);
         FreePool ((VOID *)ThisRedfishInstance);
@@ -1788,6 +1836,10 @@ TestForRequiredProtocols (
 
   ListCount = (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
   for (Index = 0; Index < ListCount; Index++) {
+    if (!IsRedfishRequiredProtocolIndexActive (Index)) {
+      continue;
+    }
+
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     mRequiredProtocol[Index].RequiredServiceBindingProtocolGuid,
@@ -1858,6 +1910,10 @@ BuildupNetworkInterface (
   RestExInstance               = NULL;
 
   for (Index = 0; Index < ListCount; Index++) {
+    if (!IsRedfishRequiredProtocolIndexActive (Index)) {
+      continue;
+    }
+
     Status = gBS->OpenProtocol (
                     // Already in list?
                     ControllerHandle,
@@ -2076,6 +2132,10 @@ StopServiceOnNetworkInterface (
   EFI_REDFISH_DISCOVER_PROTOCOL                    *RedfishDiscoverProtocol;
 
   for (Index = 0; Index < (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL)); Index++) {
+    if (!IsRedfishRequiredProtocolIndexActive (Index)) {
+      continue;
+    }
+
     Status = gBS->HandleProtocol (
                     ControllerHandle,
                     mRequiredProtocol[Index].RequiredProtocolGuid,

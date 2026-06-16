@@ -587,6 +587,9 @@ ParseResponseMessage (
       RedfishResponse->Payload = CreateRedfishPayload (ServicePrivate, JsonData);
       if (RedfishResponse->Payload == NULL) {
         DEBUG ((DEBUG_ERROR, "%a: Failed to create payload\n.", __func__));
+        JsonValueFree (JsonData);
+        Status = EFI_DEVICE_ERROR;
+        goto ON_ERROR;
       }
 
       JsonValueFree (JsonData);

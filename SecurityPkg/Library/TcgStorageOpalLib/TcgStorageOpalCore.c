@@ -731,7 +731,7 @@ OpalPyrite2GetActiveDataRemovalMechanism (
     return TcgResultFailure;
   }
 
-  if (RecvActiveDataRemovalMechanism >= ResearvedMechanism) {
+  if (RecvActiveDataRemovalMechanism >= ReservedMechanism) {
     return TcgResultFailure;
   }
 

@@ -28,7 +28,7 @@ typedef enum {
 } EFI_MM_IO_WIDTH;
 
 /**
-  Provides the basic memory and I/O interfaces used toabstract accesses to devices.
+  Provides the basic memory and I/O interfaces used to abstract accesses to devices.
 
   The I/O operations are carried out exactly as requested.  The caller is
   responsible for any alignment and I/O width issues that the bus, device,

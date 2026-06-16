@@ -4,6 +4,7 @@
   or set device information for an adapter.
 
   Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -42,6 +43,11 @@
   { \
     0x8484472f, 0x71ec, 0x411a, { 0xb3, 0x9c, 0x62, 0xcd, 0x94, 0xd9, 0x91, 0x6e } \
   }
+
+#define EFI_ADAPTER_INFO_CDAT_TYPE_GUID \
+{ \
+    0x77af24d1, 0xb6f0, 0x42b9, { 0x83, 0xf5, 0x8f, 0xe6, 0xe8, 0x3e, 0xb6, 0xf0 } \
+}
 
 typedef struct _EFI_ADAPTER_INFORMATION_PROTOCOL EFI_ADAPTER_INFORMATION_PROTOCOL;
 
@@ -134,6 +140,20 @@ typedef struct {
   BOOLEAN    Ipv6Support;
 } EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT;
 
+///
+/// EFI_ADAPTER_INFO_CDAT_TYPE_TYPE
+///
+typedef struct {
+  ///
+  /// Returns the size of the CDAT in bytes.
+  ///
+  UINTN    CdatSize;
+  ///
+  /// Returns the CDAT data.
+  ///
+  UINT8    Cdat[];
+} EFI_ADAPTER_INFO_CDAT_TYPE_TYPE;
+
 /**
   Returns the current state information for the adapter.
 
@@ -145,9 +165,9 @@ typedef struct {
 
   @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
   @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
-  @param[out] InforamtionBlock       The service returns a pointer to the buffer with the InformationBlock
+  @param[out] InformationBlock       The service returns a pointer to the buffer with the InformationBlock
                                      structure which contains details about the data specific to InformationType.
-  @param[out] InforamtionBlockSize   The driver returns the size of the InformationBlock in bytes.
+  @param[out] InformationBlockSize   The driver returns the size of the InformationBlock in bytes.
 
   @retval EFI_SUCCESS                The InformationType information was retrieved.
   @retval EFI_UNSUPPORTED            The InformationType is not known.
@@ -177,9 +197,9 @@ EFI_STATUS
 
   @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
   @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
-  @param[in]  InforamtionBlock       A pointer to the InformationBlock structure which contains details
+  @param[in]  InformationBlock       A pointer to the InformationBlock structure which contains details
                                      about the data specific to InformationType.
-  @param[in]  InforamtionBlockSize   The size of the InformationBlock in bytes.
+  @param[in]  InformationBlockSize   The size of the InformationBlock in bytes.
 
   @retval EFI_SUCCESS                The information was received and interpreted successfully.
   @retval EFI_UNSUPPORTED            The InformationType is not known.
@@ -250,3 +270,5 @@ extern EFI_GUID  gEfiAdapterInfoNetworkBootGuid;
 extern EFI_GUID  gEfiAdapterInfoSanMacAddressGuid;
 
 extern EFI_GUID  gEfiAdapterInfoUndiIpv6SupportGuid;
+
+extern EFI_GUID  gEfiAdapterInfoCdatTypeGuid;

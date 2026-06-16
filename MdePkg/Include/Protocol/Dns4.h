@@ -41,7 +41,7 @@ typedef struct {
   UINTN    DnsServerListCount;
   ///
   /// Pointer to DNS server list containing DnsServerListCount entries or NULL
-  /// if DnsServerListCountis 0. For Configure(), this will be NULL when there are
+  /// if DnsServerListCount is 0. For Configure(), this will be NULL when there are
   /// no caller supplied server addresses, and, the DNS instance will retrieve
   /// DNS server from DHCP Server. The provided DNS server list is
   /// recommended to be filled up in the sequence of preference. When
@@ -428,8 +428,8 @@ EFI_STATUS
 
   @param[in]  This                Pointer to EFI_DNS4_PROTOCOL instance.
   @param[in]  DeleteFlag          If FALSE, this function is to add one entry to the
-                                  DNS Cahce. If TRUE, this function will delete
-                                  matching DNS Cache entry.
+                                  DNS cache. If TRUE, this function will delete
+                                  matching DNS cache entry.
   @param[in]  Override            If TRUE, the maching DNS cache entry will be
                                   overwritten with the supplied parameter. If FALSE,
                                   EFI_ACCESS_DENIED will be returned if the entry to

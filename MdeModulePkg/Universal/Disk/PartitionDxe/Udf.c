@@ -587,7 +587,7 @@ FindLogicalVolumeLocation (
     //
     switch (DescriptorTag->TagIdentifier) {
       case UdfPrimaryVolumeDescriptor:
-      case UdfImplemenationUseVolumeDescriptor:
+      case UdfImplementationUseVolumeDescriptor:
       case UdfPartitionDescriptor:
       case UdfUnallocatedSpaceDescriptor:
         break;

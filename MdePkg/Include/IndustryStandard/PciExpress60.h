@@ -122,6 +122,90 @@ typedef struct {
   PCI_REG_PCIE_DEVICE_STATUS3                 Status;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_DEVICE3;
 
+/// The Data Object Exchange definitions
+/// Based on section 6.30 of PCI Express Base Specification 6.4.
+///@{
+
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_OBJECT_EXCHANGE_ID  0x002E
+
+typedef struct {
+  UINT16    VendorId;
+  UINT8     DataObjectType;
+  UINT8     Reserved;
+  UINT32    Length       : 18; // Units of DWORDs (UINT32s); 0 -> 2^18 DWORDs.
+  UINT32    ConnectionId : 12;
+} PCI_EXPRESS_DOE_DATA_OBJECT_HEADER;
+
+typedef struct {
+  UINT8     Index;
+  UINT8     DoeDiscoveryVersion;
+  UINT16    Reserved;
+} PCI_EXPRESS_DOE_DATA_OBJECT_DISCOVERY_REQUEST;
+
+typedef struct {
+  UINT16    VendorId;
+  UINT8     DataObjectType;
+  UINT8     NextIndex;
+  UINT32    MaxDataObjectLength : 18;
+  UINT32    AdditionalInfo      : 14;
+} PCI_EXPRESS_DOE_DATA_OBJECT_DISCOVERY_RESPONSE;
+
+typedef union {
+  struct {
+    UINT32    InterruptSupport          : 1;
+    UINT32    InterruptMessageNumber    : 11;
+    UINT32    AttentionMechanismSupport : 1;
+    UINT32    AsyncMessageSupport       : 1;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_DOE_CAPABILITIES_REGISTER;
+
+typedef union {
+  struct {
+    UINT32    Abort              : 1;
+    UINT32    InterruptEnable    : 1;
+    UINT32    AttentionNotNeeded : 1;
+    UINT32    AsyncMessageEnable : 1;
+    UINT32    Reserved           : 27;
+    UINT32    Go                 : 1;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_DOE_CONTROL_REGISTER;
+
+typedef union {
+  struct {
+    UINT32    Busy               : 1;
+    UINT32    InterruptStatus    : 1;
+    UINT32    Error              : 1;
+    UINT32    AsyncMessageStatus : 1;
+    UINT32    AtAttention        : 1;
+    UINT32    Reserved           : 26;
+    UINT32    DataObjectReady    : 1;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_DOE_STATUS_REGISTER;
+
+typedef struct {
+  UINT32    DataMailbox;
+} PCI_EXPRESS_DOE_WRITE_DATA_MAILBOX_REGISTER;
+
+typedef struct {
+  UINT32    DataMailbox;
+} PCI_EXPRESS_DOE_READ_DATA_MAILBOX_REGISTER;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER       Header;
+  PCI_EXPRESS_DOE_CAPABILITIES_REGISTER          Capabilities;
+  PCI_EXPRESS_DOE_CONTROL_REGISTER               Control;
+  PCI_EXPRESS_DOE_STATUS_REGISTER                Status;
+  PCI_EXPRESS_DOE_WRITE_DATA_MAILBOX_REGISTER    WriteDataMailbox;
+  PCI_EXPRESS_DOE_READ_DATA_MAILBOX_REGISTER     ReadDataMailbox;
+} PCI_EXPRESS_DOE_EXTENDED_CAPABILITY;
+
+///@}
+
+#pragma pack()
+
 /// Flit Logging Extended Capability Structure
 ///
 /// Based on section 7.7.8 of PCI Express Base Specification 6.0

@@ -69,7 +69,7 @@ EFI_STATUS
                                                                          Event will be signaled upon completion.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no medium in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId is not for the current medium.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current medium.
   @retval EFI_INVALID_PARAMETER The read request contains device addresses that are not valid for the device.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
@@ -102,7 +102,7 @@ EFI_STATUS
   @retval EFI_WRITE_PROTECTED   The device cannot be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write operation.
   @retval EFI_NO_MEDIA          There is no medium in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId is not for the current medium.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current medium.
   @retval EFI_INVALID_PARAMETER The write request contains device addresses that are not valid for the device.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
@@ -132,7 +132,7 @@ EFI_STATUS
   @retval EFI_WRITE_PROTECTED   The device cannot be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write operation.
   @retval EFI_NO_MEDIA          There is no medium in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId is not for the current medium.
+  @retval EFI_MEDIA_CHANGED     The MediaId is not for the current medium.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 **/
 typedef

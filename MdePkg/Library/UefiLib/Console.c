@@ -81,7 +81,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY  mUnicodeWidthTable[] = 
   {(CHAR16)0x209F,  1},       // Superscripts and subscripts. 0x2070-0x209F
   {(CHAR16)0x20CF,  1},       // Currency symbols. 0x20A0-0x20CF
   {(CHAR16)0x20FF,  1},       // Combining diacritical marks for symbols. 0x20D0-0x20FF
-  {(CHAR16)0x214F,  1},       // Letterlike sympbols. 0x2100-0x214F
+  {(CHAR16)0x214F,  1},       // Letterlike symbols. 0x2100-0x214F
   {(CHAR16)0x218F,  1},       // Number forms. 0x2150-0x218F
   {(CHAR16)0x21FF,  1},       // Arrows. 0x2190-0x21FF
   {(CHAR16)0x22FF,  1},       // Mathematical operators. 0x2200-0x22FF

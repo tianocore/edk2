@@ -3,7 +3,7 @@
 
   This protocol is a mandatory protocol published by MM Foundation code.
   This protocol is an MM counterpart of the End of DXE Event.
-  This protocol prorogates End of DXE notification into MM environment.
+  This protocol propagates End of DXE notification into MM environment.
   This protocol is installed prior to installation of the MM Ready to Lock Protocol.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>

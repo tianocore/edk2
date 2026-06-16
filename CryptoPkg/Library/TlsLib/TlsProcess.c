@@ -151,6 +151,22 @@ TlsDoHandshake (
           Func,
           Data
           ));
+
+        if ((ERR_GET_LIB (ErrorCode) == ERR_LIB_SSL) && \
+            (ERR_GET_REASON (ErrorCode) == SSL_R_CERTIFICATE_VERIFY_FAILED))
+        {
+          INT32  X509Err;
+
+          X509Err = SSL_get_verify_result (TlsConn->Ssl);
+
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a X509_verify_result: %d (%a)\n",
+            __func__,
+            X509Err,
+            X509_verify_cert_error_string (X509Err)
+            ));
+        }
       }
 
       DEBUG_CODE_END ();

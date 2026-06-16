@@ -11,6 +11,28 @@
 #include <Library/ShellLib.h>
 #include <Protocol/SerialIo.h>
 
+//
+// Name translation for the Parity Bit
+//
+STATIC CONST CHAR8  ParityBitName[] = {
+  [DefaultParity] = 'D',
+  [NoParity]      = 'N',
+  [EvenParity]    = 'E',
+  [OddParity]     = 'O',
+  [MarkParity]    = 'M',
+  [SpaceParity]   = 'S',
+};
+
+//
+// Name translation for the Stop Bits
+//
+STATIC CONST CHAR16  *StopBitsName[] = {
+  [DefaultStopBits] =  L"Default",
+  [OneStopBit]      =  L"1",
+  [OneFiveStopBits] =  L"1.5",
+  [TwoStopBits]     =  L"2",
+};
+
 /**
   Display information about a serial device by it's handle.
 
@@ -33,12 +55,11 @@ DisplaySettings (
   EFI_HANDLE              *Handles;
   EFI_STATUS              Status;
   UINTN                   Index;
-  CHAR16                  *StopBits;
+  CONST CHAR16            *StopBits;
   CHAR16                  Parity;
   SHELL_STATUS            ShellStatus;
 
-  Handles  = NULL;
-  StopBits = NULL;
+  Handles = NULL;
 
   ShellStatus = SHELL_SUCCESS;
 
@@ -56,84 +77,34 @@ DisplaySettings (
     }
 
     Status = gBS->HandleProtocol (Handles[Index], &gEfiSerialIoProtocolGuid, (VOID **)&SerialIo);
-    if (!EFI_ERROR (Status)) {
-      switch (SerialIo->Mode->Parity) {
-        case DefaultParity:
-
-          Parity = 'D';
-          break;
-
-        case NoParity:
-
-          Parity = 'N';
-          break;
-
-        case EvenParity:
-
-          Parity = 'E';
-          break;
-
-        case OddParity:
-
-          Parity = 'O';
-          break;
-
-        case MarkParity:
-
-          Parity = 'M';
-          break;
-
-        case SpaceParity:
-
-          Parity = 'S';
-          break;
-
-        default:
-
-          Parity = 'U';
-      }
-
-      switch (SerialIo->Mode->StopBits) {
-        case DefaultStopBits:
-
-          StopBits = L"Default";
-          break;
-
-        case OneStopBit:
-
-          StopBits = L"1";
-          break;
-
-        case TwoStopBits:
-
-          StopBits = L"2";
-          break;
-
-        case OneFiveStopBits:
-
-          StopBits = L"1.5";
-          break;
-
-        default:
-
-          StopBits = L"Unknown";
-      }
-
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_SERMODE_DISPLAY),
-        gShellDebug1HiiHandle,
-        ConvertHandleToHandleIndex (Handles[Index]),
-        Handles[Index],
-        SerialIo->Mode->BaudRate,
-        Parity,
-        SerialIo->Mode->DataBits,
-        StopBits
-        );
-    } else {
+    if (EFI_ERROR (Status)) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
       ShellStatus = SHELL_NOT_FOUND;
       break;
     }
+
+    if (SerialIo->Mode->Parity <= SpaceParity) {
+      Parity = ParityBitName[SerialIo->Mode->Parity];
+    } else {
+      Parity = 'U';
+    }
+
+    if (SerialIo->Mode->StopBits <= TwoStopBits) {
+      StopBits = StopBitsName[SerialIo->Mode->StopBits];
+    } else {
+      StopBits = L"Unknown";
+    }
+
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_SERMODE_DISPLAY),
+      gShellDebug1HiiHandle,
+      ConvertHandleToHandleIndex (Handles[Index]),
+      Handles[Index],
+      SerialIo->Mode->BaudRate,
+      Parity,
+      SerialIo->Mode->DataBits,
+      StopBits
+      );
 
     if (HandleValid) {
       break;
@@ -148,6 +119,124 @@ DisplaySettings (
   }
 
   return ShellStatus;
+}
+
+/**
+  Get the Parity Type.
+
+  @param[in]  ParityChar  Parity Type character.
+  @param[out] ParityType  If success, contains the converted Parity type.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
+STATIC
+EFI_STATUS
+GetParityType (
+  IN  CHAR16           ParityChar,
+  OUT EFI_PARITY_TYPE  *ParityType
+  )
+{
+  EFI_STATUS       Status;
+  EFI_PARITY_TYPE  Parity;
+
+  ASSERT (ParityType != NULL);
+  Status = EFI_SUCCESS;
+
+  switch (ParityChar) {
+    case 'd':
+    case 'D':
+      Parity = DefaultParity;
+      break;
+    case 'n':
+    case 'N':
+      Parity = NoParity;
+      break;
+    case 'e':
+    case 'E':
+      Parity = EvenParity;
+      break;
+    case 'o':
+    case 'O':
+      Parity = OddParity;
+      break;
+    case 'm':
+    case 'M':
+      Parity = MarkParity;
+      break;
+    case 's':
+    case 'S':
+      Parity = SpaceParity;
+      break;
+    default:
+      Parity = DefaultParity;
+      Status = EFI_INVALID_PARAMETER;
+      break;
+  }
+
+  *ParityType = Parity;
+  return Status;
+}
+
+/**
+  Get the Stop Bits.
+
+  @param[in]  StopBitsInt   Stop Bits integer.
+  @param[out] StopBitsType  If success, contains the converted StopBits type.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
+STATIC
+EFI_STATUS
+GetStopBits (
+  IN  UINTN               StopBitsInt,
+  OUT EFI_STOP_BITS_TYPE  *StopBitsType
+  )
+{
+  EFI_STATUS          Status;
+  EFI_STOP_BITS_TYPE  StopBits;
+
+  ASSERT (StopBitsType != NULL);
+  Status = EFI_SUCCESS;
+
+  switch (StopBitsInt) {
+    case 0:
+      StopBits = DefaultStopBits;
+      break;
+    case 1:
+      StopBits = OneStopBit;
+      break;
+    case 2:
+      StopBits = TwoStopBits;
+      break;
+    case 15:
+      StopBits = OneFiveStopBits;
+      break;
+    default:
+      StopBits = DefaultStopBits;
+      Status   = EFI_INVALID_PARAMETER;
+      break;
+  }
+
+  *StopBitsType = StopBits;
+  return Status;
+}
+
+/**
+  Check whether the Data Bits are valid.
+
+  @param[in] DataBitsInt  Data Bits integer.
+
+  @return TRUE if the Data Bits are valid.
+**/
+STATIC
+BOOLEAN
+ValidDataBits (
+  IN  UINTN  DataBits
+  )
+{
+  return (DataBits == 4) || (DataBits == 7) || (DataBits == 8);
 }
 
 /**
@@ -173,7 +262,6 @@ ShellCommandRunSerMode (
   UINTN                   HandleIdx;
   UINTN                   BaudRate;
   UINTN                   DataBits;
-  UINTN                   Value;
   EFI_SERIAL_IO_PROTOCOL  *SerialIo;
   LIST_ENTRY              *Package;
   CHAR16                  *ProblemParam;
@@ -232,35 +320,11 @@ ShellCommandRunSerMode (
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        switch (Temp[0]) {
-          case 'd':
-          case 'D':
-            Parity = DefaultParity;
-            break;
-          case 'n':
-          case 'N':
-            Parity = NoParity;
-            break;
-          case 'e':
-          case 'E':
-            Parity = EvenParity;
-            break;
-          case 'o':
-          case 'O':
-            Parity = OddParity;
-            break;
-          case 'm':
-          case 'M':
-            Parity = MarkParity;
-            break;
-          case 's':
-          case 'S':
-            Parity = SpaceParity;
-            break;
-          default:
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-            goto Done;
+        Status = GetParityType (Temp[0], &Parity);
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto Done;
         }
       }
 
@@ -274,15 +338,10 @@ ShellCommandRunSerMode (
         DataBits = 0;
       }
 
-      switch (DataBits) {
-        case 4:
-        case 7:
-        case 8:
-          break;
-        default:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
+      if (!ValidDataBits (DataBits)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
       }
 
       Temp = ShellCommandLineGetRawValue (Package, 5);
@@ -292,28 +351,11 @@ ShellCommandRunSerMode (
         goto Done;
       }
 
-      Value = ShellStrToUintn (Temp);
-      switch (Value) {
-        case 0:
-          StopBits = DefaultStopBits;
-          break;
-
-        case 1:
-          StopBits = OneStopBit;
-          break;
-
-        case 2:
-          StopBits = TwoStopBits;
-          break;
-
-        case 15:
-          StopBits = OneFiveStopBits;
-          break;
-
-        default:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
+      Status = GetStopBits (ShellStrToUintn (Temp), &StopBits);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
       }
 
       Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSerialIoProtocolGuid, NULL, &NoHandles, &Handles);

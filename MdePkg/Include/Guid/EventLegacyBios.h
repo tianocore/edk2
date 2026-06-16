@@ -1,7 +1,7 @@
 /** @file
   GUID is the name of events used with CreateEventEx in order to be notified
   when the EFI boot manager is about to boot a legacy boot option.
-  Events of this type are notificated just before Int19h is invoked.
+  Events of this type are notified just before Int19h is invoked.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

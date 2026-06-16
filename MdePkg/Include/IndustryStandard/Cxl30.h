@@ -67,9 +67,16 @@ typedef union {
     UINT32    Reserved             : 16;      // Bit 16..31
   } Bits;
   UINT32    Uint32;
-} CXL_CM_EXTENTED_REGISTER_CAPABILITY;
+} CXL_CM_EXTENDED_REGISTER_CAPABILITY;
 
-#define CXL_CM_EXTENTED_RANGES_BITMAP  (BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7 | BIT8 | BIT9 | BIT10 | BIT11 | BIT12 | BIT13 | BIT15)
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+typedef CXL_CM_EXTENDED_REGISTER_CAPABILITY CXL_CM_EXTENTED_REGISTER_CAPABILITY;
+
+#define CXL_CM_EXTENDED_RANGES_BITMAP  (BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7 | BIT8 | BIT9 | BIT10 | BIT11 | BIT12 | BIT13 | BIT15)
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define CXL_CM_EXTENTED_RANGES_BITMAP  CXL_CM_EXTENDED_RANGES_BITMAP
 
 //
 // CXL BI Route Table Capability
@@ -368,5 +375,40 @@ typedef struct {
   UINT64            BaseAddress;
   UINT8             ProtocolType;
 } RCEC_DOWNSTREAM_PORT_ASSOCIATION_STRUCTURE;
+
+///
+/// Data Object Exchange (DOE) for CXL.
+///
+typedef enum {
+  EfiCxlDoeComplianceMode = 0,
+  EfiCxlDoeTableAccess    = 2,
+} EFI_CXL_DOE_TYPE;
+
+///
+/// Definition of the CXL Table Access DOE Request.
+/// CXL 3.0 Specification Section 8.1.11.1
+///
+typedef struct {
+  PCI_EXPRESS_DOE_DATA_OBJECT_HEADER    Header;
+  UINT8                                 ReqCode;
+  UINT8                                 TableType;
+  UINT16                                EntryHandle;
+} EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_REQUEST;
+
+///
+/// Definition of the CXL Table Access DOE Response
+/// CXL 3.0 Specification Section 8.1.11.1
+///
+typedef struct {
+  PCI_EXPRESS_DOE_DATA_OBJECT_HEADER    Header;
+  UINT8                                 RspCode;
+  UINT8                                 TableType;
+  UINT16                                EntryHandle;
+} EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE_HEADER;
+
+typedef struct {
+  EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE_HEADER    Header;
+  UINT8                                                  Data[];
+} EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE;
 
 #pragma pack()

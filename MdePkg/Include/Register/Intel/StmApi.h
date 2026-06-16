@@ -858,7 +858,7 @@ typedef enum {
 } TXT_SMM_PROTECTION_EXCEPTION_TYPE;
 
 /**
-  TXT Pocessor SMM Descriptor (PSD) structures
+  TXT Processor SMM Descriptor (PSD) structures
 **/
 
 typedef struct {

@@ -24,6 +24,7 @@
   MemMap.c
   Compress.h
   Compress.c
+  Cxl.c
   EfiCompress.c
   EfiDecompress.c
   Dmem.c
@@ -119,6 +120,8 @@
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEdkiiCxlIoProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiSimplePointerProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiCpuIo2ProtocolGuid                      ## SOMETIMES_CONSUMES

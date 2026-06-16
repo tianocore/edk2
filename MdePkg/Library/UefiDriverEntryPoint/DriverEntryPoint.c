@@ -66,7 +66,7 @@ _DriverUnloadHandler (
   is greater than zero, then an unload handler must be registered for this image
   and the unload handler must invoke ProcessModuleUnloadList().
   If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than
-  _gUefiDriverRevison, then return EFI_INCOMPATIBLE_VERSION.
+  _gUefiDriverRevision, then return EFI_INCOMPATIBLE_VERSION.
 
 
   @param  ImageHandle  The image handle of the DXE Driver, DXE Runtime Driver,
@@ -130,7 +130,7 @@ _ModuleEntryPoint (
   }
 
   //
-  // Return the cummalative return status code from all of the driver entry points
+  // Return the cumulative return status code from all of the driver entry points
   //
   return Status;
 }

@@ -154,10 +154,10 @@ ValidateMmioSize (
   if (InterfaceType == EFI_ACPI_MPAM_INTERFACE_PCC) {
     MmioSize = *((UINT32 *)Ptr);
 
-    if (MmioSize != 0) {
+    if (MmioSize > 1) {
       IncrementErrorCount ();
       Print (
-        L"\nERROR: MMIO size must be 0 for PCC interface type. Size - %u\n",
+        L"\nERROR: MMIO size must be 0 or 1 for PCC interface type. Size - %u\n",
         MmioSize
         );
     }

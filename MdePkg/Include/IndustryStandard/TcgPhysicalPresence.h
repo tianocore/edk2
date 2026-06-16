@@ -54,19 +54,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // TCG PP definition of physical presence operation actions for TPM12
 //
-#define TCG_PHYSICAL_PRESENCE_NO_ACTION                              0
-#define TCG_PHYSICAL_PRESENCE_ENABLE                                 1
-#define TCG_PHYSICAL_PRESENCE_DISABLE                                2
-#define TCG_PHYSICAL_PRESENCE_ACTIVATE                               3
-#define TCG_PHYSICAL_PRESENCE_DEACTIVATE                             4
-#define TCG_PHYSICAL_PRESENCE_CLEAR                                  5
-#define TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE                        6
-#define TCG_PHYSICAL_PRESENCE_DEACTIVATE_DISABLE                     7
-#define TCG_PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE                 8
-#define TCG_PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE                9
-#define TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE             10
-#define TCG_PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE         11
-#define TCG_PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE    12
+#define TCG_PHYSICAL_PRESENCE_NO_ACTION                          0
+#define TCG_PHYSICAL_PRESENCE_ENABLE                             1
+#define TCG_PHYSICAL_PRESENCE_DISABLE                            2
+#define TCG_PHYSICAL_PRESENCE_ACTIVATE                           3
+#define TCG_PHYSICAL_PRESENCE_DEACTIVATE                         4
+#define TCG_PHYSICAL_PRESENCE_CLEAR                              5
+#define TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE                    6
+#define TCG_PHYSICAL_PRESENCE_DEACTIVATE_DISABLE                 7
+#define TCG_PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE             8
+#define TCG_PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE            9
+#define TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE         10
+#define TCG_PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE     11
+#define TCG_PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNED_FIELD_UPGRADE  12
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define TCG_PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE    TCG_PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNED_FIELD_UPGRADE
 #define TCG_PHYSICAL_PRESENCE_SET_OPERATOR_AUTH                      13
 #define TCG_PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE                  14
 #define TCG_PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE             15

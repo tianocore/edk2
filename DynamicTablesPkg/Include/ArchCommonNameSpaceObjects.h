@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
@@ -73,6 +73,16 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
+  EArchCommonObjErrSourcePciRootPortInfo,       ///< 49 - PCI Express AER Info for RootPort
+  EArchCommonObjErrSourcePciDeviceInfo,         ///< 50 - PCI Express AER Info for Device (Endpoint)
+  EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
+  EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
+  EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjEinjInstructionsInfo,           ///< 54 - Einj Instruction Info
+  EArchCommonObjPlatformFwInfo,                 ///< 54 - Platform Firmware Info
+  EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,               ///< 56 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1131,5 +1141,327 @@ typedef struct CmArchCommonObjSpcrInfo {
   /// Specifies the terminal type used by the console device.
   UINT8    TerminalType;
 } CM_ARCH_COMMON_SPCR_INFO;
+
+typedef struct ErrorSourceCommonInfo {
+  /// A unique token used to identify an error source instance.
+  /// This is mapped as key to the SourceId field in the HEST.
+  CM_OBJECT_TOKEN    Token;
+
+  ///  EFI_ACPI_*_*_ERROR_SOURCE_FLAG_*.
+  ///  If an error source doesn't have flags field, This field should be 0.
+  UINT8              Flags;
+
+  /// Error source is enabled or not.
+  /// If an error source doesn't have Enabled field, This field should be 0.
+  BOOLEAN            Enabled;
+
+  /// The number of error records to pre-allocate for this error source.
+  UINT32             NumberOfRecordsToPreAllocate;
+
+  /// Max Sections Per Record.
+  UINT32             MaxSectionsPerRecord;
+} ERROR_SOURCE_COMMON_INFO;
+
+/** A structure that describes common information for Error source
+    relevant PCI AER. Cf. ACPI 6.6, 18.3.2.4 ~ 18.3.2.6
+*/
+typedef struct PciErrSourceCommonInfo {
+  /// Error Source Common Information.
+  ERROR_SOURCE_COMMON_INFO    Common;
+
+  /// Identifies the PCI Bus and Segment.
+  UINT32                      Bus;
+
+  /// Identifies the PCI Device Number
+  UINT16                      Device;
+
+  /// Identifies the PCI Function Number
+  UINT16                      Function;
+
+  /// Device control bits with which to initialize the device.
+  UINT16                      DeviceControl;
+
+  /// Value to write to uncorrectable error mask register.
+  UINT32                      UncorrectableErrMask;
+
+  /// Value to write to uncorrectable error severity register.
+  UINT32                      UncorrectableErrSeverity;
+
+  /// Value to write to correctable error mask register.
+  UINT32                      CorrectableErrMask;
+
+  /// Value to write to advanced capabilities and control register.
+  UINT32                      AdvancedErrCapAndControl;
+} PCI_ERROR_SOURCE_COMMON_INFO;
+
+/** PCI Express Root Port AER Structure information.
+    Cf. ACPI 6.6, 18.3.2.4 PCI Express Root Port AER Structure.
+
+    ID: EArchCommonObjErrSourcePciRootPortInfo
+*/
+typedef struct CmArchCommonObjErrSourcePciRootPortInfo {
+  /// PCI error source common information.
+  PCI_ERROR_SOURCE_COMMON_INFO    PciCommon;
+
+  /// Value to write to the root port’s Root Error Command Register.
+  UINT32                          RootErrorCmd;
+} CM_ARCH_COMMON_ERROR_SOURCE_PCI_ROOT_PORT_INFO;
+
+/** PCI Express Endpoint AER Structure information.
+    Cf. ACPI 6.6, 18.3.2.5 PCI Express Device AER Structure.
+
+    ID: EArchCommonObjErrSourcePciDeviceInfo
+*/
+typedef struct CmArchCommonObjErrSourcePciDeviceInfo {
+  /// PCI error source common information.
+  PCI_ERROR_SOURCE_COMMON_INFO    PciCommon;
+} CM_ARCH_COMMON_ERROR_SOURCE_PCI_DEVICE_INFO;
+
+/** PCI Express Endpoint AER Structure information.
+    Cf. ACPI 6.6, 18.3.2.5 PCI Express Endpoint AER Structure.
+
+    ID: EArchCommonObjErrSourcePciBridgeInfo
+*/
+typedef struct CmArchCommonObjErrSourcePciBridgeInfo {
+  /// PCI error source common information.
+  PCI_ERROR_SOURCE_COMMON_INFO    PciCommon;
+
+  /// Value to write to secondary uncorrectable error mask register.
+  UINT32                          SecondaryUncorrectableErrMask;
+
+  /// Value to write to secondary uncorrectable error severity register.
+  UINT32                          SecondaryUncorrectableErrSeverity;
+
+  /// Value to write to secondary advanced capabilities and control register.
+  UINT32                          SecondaryAdvancedCapAndControl;
+} CM_ARCH_COMMON_ERROR_SOURCE_PCI_BRIDGE_INFO;
+
+/** A structure that describes common information for GHES
+    Cf. ACPI 6.6, 18.3.2.7 ~ 18.3.2.8
+*/
+typedef struct GhesCommonInfo {
+  /// Error Source common information
+  ERROR_SOURCE_COMMON_INFO                              Common;
+
+  /// Relevant error source token with this GHES.
+  CM_OBJECT_TOKEN                                       RelatedSourceToken;
+
+  /// Size in bytes of the error data recorded by this error source.
+  UINT32                                                MaxRawDataLength;
+
+  /** The location of a register that contains the physical address of
+      a block of memory that holds the error status data for
+      this error source.
+  */
+  EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE                ErrorStatusAddress;
+
+  /// Hardware Error Notification Structure
+  EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE    NotificationStructure;
+
+  /// Identifies the length in bytes of the error status data block.
+  UINT32                                                ErrorStatusBlockLength;
+} GHES_COMMON_INFO;
+
+/** A structure that describes Generic Hardware Error Source
+    Cf. ACPI 6.6, 18.3.2.7
+
+    ID: EArchCommonObjErrSourceGenericHwInfo
+*/
+typedef struct CmArchCommonObjErrSourceGenericHwInfo {
+  /// Common information for GHES
+  GHES_COMMON_INFO    GhesCommon;
+} CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_INFO;
+
+/** A structure that describes Generic Hardware Error Source version 2
+    Cf. ACPI 6.6, 18.3.2.8
+
+    ID: EArchCommonObjErrSourceGenericHwVer2Info
+*/
+typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
+  /// Common information for GHES
+  GHES_COMMON_INFO                          GhesCommon;
+
+  /// (v2) The location of the Read Ack Register used to notify the RAS controller
+  EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE    ReadAckRegister;
+
+  /// (v2) Contains a mask of bits to preserve when writing the Read Ack register.
+  UINT64                                    ReadAckPreserve;
+
+  /// (v2) Contains a mask of bits to set when writing the Read Ack register.
+  UINT64                                    ReadAckWrite;
+} CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION_2_INFO;
+
+/** A structure that describes a
+    Einj Instruction Entry.
+
+    ID: EArchCommonObjEinjInstructionsInfo
+*/
+typedef struct {
+  UINT8                                     InjectionAction;
+  UINT8                                     Instruction;
+  UINT8                                     Flags;
+  EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE    RegisterRegion;
+  UINT64                                    Value;
+  UINT64                                    Mask;
+} CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
+
+/** A structure that describes BIOS Information.
+
+  SMBIOS Specification v3.9.0 Type 0
+
+  ID: EArchCommonObjPlatformFwInfo
+**/
+typedef struct CmArchCommonPlatformFwInfo {
+  /// CM Object Token uniquely identifying this Platform Firmware info entry.
+  CM_OBJECT_TOKEN              BiosInfoToken;
+  /// BIOS vendor name string.
+  CHAR8                        BiosVendor[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS version string.
+  CHAR8                        BiosVersion[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS release date string.
+  CHAR8                        BiosReleaseDate[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS ROM size in bytes.
+  UINT64                       BiosSize;
+  /// Bit field of supported BIOS functions.
+  MISC_BIOS_CHARACTERISTICS    BiosCharacteristics;
+  /// Optional set of functions that BIOS supports (bytes 0 and 1).
+  UINT8                        BIOSCharacteristicsExtensionBytes[2];
+  /// System BIOS firmware major version.
+  UINT8                        SystemBiosMajorRelease;
+  /// System BIOS firmware minor version.
+  UINT8                        SystemBiosMinorRelease;
+  /// Embedded Controller firmware major release.
+  UINT8                        ECFirmwareMajorRelease;
+  /// Embedded Controller firmware minor release.
+  UINT8                        ECFirmwareMinorRelease;
+} CM_ARCH_COMMON_PLATFORM_FW_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.9.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Unsupported until SMBIOS Type 18/Type 33 generators are available.
+  /// Kept here to reserve the Type 17 memory error information handle source
+  /// field in the CM object.
+  CM_OBJECT_TOKEN    MemoryErrorInfoToken;
+  /// Number of memory devices (slots or sockets) in the array.
+  UINT16             NumberOfMemoryDevices;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
+
+/** A structure that describes a Memory Device.
+
+  SMBIOS Specification v3.9.0 Type 17
+
+  ID: EArchCommonObjMemoryDeviceInfo
+**/
+typedef struct CmArchCommonMemoryDeviceInfo {
+  /// CM Object Token uniquely identifying this Memory Device.
+  CM_OBJECT_TOKEN                            MemoryDeviceInfoToken;
+  /// CM Object Token of the Physical Memory Array containing this device.
+  CM_OBJECT_TOKEN                            PhysicalArrayToken;
+  /// CM Object Token of the associated memory error information structure.
+  /// Set to CM_NULL_TOKEN if not present; the generator will use 0xFFFE (Not Provided).
+  CM_OBJECT_TOKEN                            MemoryErrorInfoToken;
+  /// Total width of the device in bits (including ECC bits).
+  UINT16                                     TotalWidth;
+  /// Data width of the device in bits.
+  UINT16                                     DataWidth;
+  /// Size of memory in bytes.
+  UINT64                                     Size;
+  /// Form factor enumeration value.
+  MEMORY_FORM_FACTOR                         FormFactor;
+  /// Device Set number (0 = not part of a set).
+  UINT8                                      DeviceSet;
+  /// Device Locator string (slot/position on board).
+  CHAR8                                      DeviceLocator[SMBIOS_MAX_STRING_SIZE];
+  /// Bank Locator string.
+  CHAR8                                      BankLocator[SMBIOS_MAX_STRING_SIZE];
+  /// Memory device type enumeration value.
+  MEMORY_DEVICE_TYPE                         MemoryType;
+  /// Type detail flags.
+  MEMORY_DEVICE_TYPE_DETAIL                  TypeDetail;
+  /// Speed of the device in MegaTransfers/second.
+  UINT32                                     Speed;
+  /// Serial Number string.
+  CHAR8                                      SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset Tag string.
+  CHAR8                                      AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Part Number string.
+  CHAR8                                      PartNum[SMBIOS_MAX_STRING_SIZE];
+  /// Rank of the device.
+  UINT8                                      Rank;
+  /// Configured speed of the device in MegaTransfers/second.
+  UINT32                                     ConfiguredMemorySpeed;
+  /// Minimum operating voltage in millivolts.
+  UINT16                                     MinVolt;
+  /// Maximum operating voltage in millivolts.
+  UINT16                                     MaxVolt;
+  /// Configured voltage in millivolts.
+  UINT16                                     ConfVolt;
+  /// Memory technology enumeration value.
+  MEMORY_DEVICE_TECHNOLOGY                   MemoryTechnology;
+  /// Operating mode capability flags.
+  MEMORY_DEVICE_OPERATING_MODE_CAPABILITY    MemoryOperatingModeCapability;
+  /// Firmware version string of the memory device.
+  CHAR8                                      FirmwareVersion[SMBIOS_MAX_STRING_SIZE];
+  /// 2-byte Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     ModuleManufacturerId;
+  /// 2-byte Manufacturer Product Id.
+  UINT16                                     ModuleProductId;
+  /// 2-byte Memory Subsystem Controller Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     MemorySubsystemControllerManufacturerId;
+  /// 2-byte Memory Subsystem Controller Product Id.
+  UINT16                                     MemorySubsystemControllerProductId;
+  /// Size of non-volatile memory in bytes.
+  /// If the Non-Volatile Size is unknown, the field is set to FFFFFFFFFFFFFFFFh
+  UINT64                                     NonVolatileSize;
+  /// Size of volatile memory in bytes.
+  /// If the Volatile Size is unknown, the field is set to FFFFFFFFFFFFFFFFh
+  UINT64                                     VolatileSize;
+  /// Size of cache memory in bytes.
+  UINT64                                     CacheSize;
+  /// Logical size of the memory device in bytes.
+  UINT64                                     LogicalSize;
+  /// 2-byte PMIC0 Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     Pmic0ManufacturerId;
+  /// PMIC0 revision number.
+  UINT16                                     Pmic0RevisionNumber;
+  /// 2-byte RCD Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     RcdManufacturerId;
+  /// RCD revision number.
+  UINT16                                     RcdRevisionNumber;
+} CM_ARCH_COMMON_MEMORY_DEVICE_INFO;
+
+/** A structure that describes a Memory Array Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 19
+
+  ID: EArchCommonObjMemoryArrayMappedAddress
+**/
+typedef struct CmArchCommonMemoryArrayMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token of the associated Physical Memory Array.
+  CM_OBJECT_TOKEN         PhysMemArrayToken;
+  /// Number of memory devices that form a row in the address partition.
+  UINT8                   NumMemDevices;
+} CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
 
 #pragma pack()

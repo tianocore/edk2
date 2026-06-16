@@ -91,22 +91,17 @@ GetFfaCompatibility (
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
+  UINT32      CurrentVersion;
 
   Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
+             ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
+             &CurrentVersion
              );
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
 
-  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
-      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
-  {
+  if (!ARM_FFA_ABI_COMPATIBLE (CurrentVersion, ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION)) {
     DEBUG ((
       DEBUG_INFO,
       "Incompatible FF-A Versions for MM_COMM.\n" \
@@ -114,8 +109,8 @@ GetFfaCompatibility (
       "Current Version: Major=0x%x, Minor>=0x%x.\n",
       ARM_FFA_MAJOR_VERSION,
       ARM_FFA_MINOR_VERSION,
-      CurrentMajorVersion,
-      CurrentMinorVersion
+      ARM_FFA_MAJOR_VERSION_GET (CurrentVersion),
+      ARM_FFA_MINOR_VERSION_GET (CurrentVersion)
       ));
     return EFI_UNSUPPORTED;
   }
@@ -123,8 +118,8 @@ GetFfaCompatibility (
   DEBUG ((
     DEBUG_INFO,
     "FF-A Version for MM_COMM: Major=0x%x, Minor=0x%x\n",
-    CurrentMajorVersion,
-    CurrentMinorVersion
+    ARM_FFA_MAJOR_VERSION_GET (CurrentVersion),
+    ARM_FFA_MINOR_VERSION_GET (CurrentVersion)
     ));
 
   return EFI_SUCCESS;

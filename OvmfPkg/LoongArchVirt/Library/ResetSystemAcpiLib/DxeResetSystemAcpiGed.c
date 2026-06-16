@@ -8,6 +8,7 @@
 **/
 
 #include <Base.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -104,7 +105,9 @@ GetPowerManagerByParseAcpiInfo (
   EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt    = NULL;
   EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt    = NULL;
   UINT32                                        *Entry32 = NULL;
-  UINTN                                         Entry32Num;
+  UINT8                                         *Entry64 = NULL;
+  UINT64                                        EntryAddress;
+  UINTN                                         EntryNum;
   UINT32                                        *Signature = NULL;
   UINTN                                         Idx;
   EFI_STATUS                                    Status;
@@ -119,27 +122,40 @@ GetPowerManagerByParseAcpiInfo (
     return RETURN_NOT_FOUND;
   }
 
-  Rsdt       = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Rsdp->RsdtAddress;
-  Entry32    = (UINT32 *)(UINTN)(Rsdt + 1);
-  Entry32Num = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
-  for (Idx = 0; Idx < Entry32Num; Idx++) {
-    Signature = (UINT32 *)(UINTN)Entry32[Idx];
-    if (*Signature == EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-      Fadt = (EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
-      DEBUG ((DEBUG_INFO, "Found Fadt in Rsdt\n"));
-      goto Done;
+  if (Rsdp->RsdtAddress != 0) {
+    Rsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Rsdp->RsdtAddress;
+    Entry32  = (UINT32 *)(UINTN)(Rsdt + 1);
+    EntryNum = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
+    for (Idx = 0; Idx < EntryNum; Idx++) {
+      if (Entry32[Idx] == 0) {
+        continue;
+      }
+
+      Signature = (UINT32 *)(UINTN)Entry32[Idx];
+      if (*Signature == EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
+        Fadt = (EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
+        DEBUG ((DEBUG_INFO, "Found Fadt in Rsdt\n"));
+        goto Done;
+      }
     }
   }
 
-  Xsdt       = (EFI_ACPI_DESCRIPTION_HEADER *)Rsdp->XsdtAddress;
-  Entry32    = (UINT32 *)(Xsdt + 1);
-  Entry32Num = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
-  for (Idx = 0; Idx < Entry32Num; Idx++) {
-    Signature = (UINT32 *)(UINTN)Entry32[Idx];
-    if (*Signature == EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-      Fadt = (EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
-      DEBUG ((DEBUG_INFO, "Found Fadt in Xsdt\n"));
-      goto Done;
+  if (Rsdp->XsdtAddress != 0) {
+    Xsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Rsdp->XsdtAddress;
+    Entry64  = (UINT8 *)(UINTN)(Xsdt + 1);
+    EntryNum = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
+    for (Idx = 0; Idx < EntryNum; Idx++) {
+      EntryAddress = ReadUnaligned64 ((UINT64 *)(UINTN)(Entry64 + (Idx * sizeof (UINT64))));
+      if (EntryAddress == 0) {
+        continue;
+      }
+
+      Signature = (UINT32 *)(UINTN)EntryAddress;
+      if (*Signature == EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
+        Fadt = (EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
+        DEBUG ((DEBUG_INFO, "Found Fadt in Xsdt\n"));
+        goto Done;
+      }
     }
   }
 

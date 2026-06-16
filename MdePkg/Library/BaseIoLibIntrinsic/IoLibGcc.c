@@ -4,7 +4,7 @@
 
   GCC - uses EFIAPI assembler. __asm__ calls GAS. __volatile__ makes sure the
   compiler puts the assembler in this exact location. The complex GNUC
-  operations are not optimzed. It would be possible to also write these
+  operations are not optimized. It would be possible to also write these
   with EFIAPI assembler.
 
   We don't advocate putting compiler specifics in libraries or drivers but there
