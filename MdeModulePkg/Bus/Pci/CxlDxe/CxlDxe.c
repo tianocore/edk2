@@ -82,13 +82,13 @@ PciUefiMemReadUInt32Array (
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: PciIo read error at 0x%lx: %r \n", __func__, BufferIndex, Status));
-      break;
+      return Status;
     }
 
     Offset += sizeof (UINT32);
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -137,13 +137,13 @@ PciUefiMemWriteUInt32Array (
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: PciIo write error at 0x%lx: %r \n", __func__, BufferIndex, Status));
-      break;
+      return Status;
     }
 
     Offset += sizeof (UINT32);
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
