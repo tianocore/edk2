@@ -602,7 +602,7 @@ R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 OvmfPkg: LOONGARCH Qemu Virt Platform
 F: OvmfPkg/LoongArchVirt
 M: Chao Li <lichao@loongson.cn> [kilaterlee]
-M: Bibo Mao <maobibo@loongson.cn> [bibo-mao]
+R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
 R: Xianglai Li <lixianglai@loongson.cn> [lixianglai]
 
 PcAtChipsetPkg
