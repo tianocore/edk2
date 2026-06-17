@@ -67,6 +67,7 @@ SsifWriteRequest (
     return EFI_INVALID_PARAMETER;
   }
 
+  MiddleCount      = 0;
   IsMultiPartWrite = FALSE;
   Status           = EFI_SUCCESS;
 
