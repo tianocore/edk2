@@ -21,9 +21,16 @@ typedef struct {
   //
   // for SerialPortLib and console IO
   //
-  UINT64    ConsoleAddress;
+  UINT64     ConsoleAddress;
   //
   // for DebugLib; may equal ConsoleAddress if there's only one PL011 UART
   //
-  UINT64    DebugAddress;
+  UINT64     DebugAddress;
+  //
+  // Serial debug log level override from fw_cfg "opt/org.tianocore/DebugLevel"
+  // or PcdSerialDebugPrintErrorLevel.  DebugLevelSet is TRUE when an override
+  // is active; DebugLevel contains the parsed bitmask.
+  //
+  BOOLEAN    DebugLevelSet;
+  UINT32     DebugLevel;
 } EARLY_PL011_BASE_ADDRESS;
