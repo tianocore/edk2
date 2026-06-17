@@ -29,6 +29,11 @@
 
 #define COMM_BUFFER_ATTRS  (EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME)
 
+// This an absurdly high number. The timer cannot be used reliably at runtime so having some upper bound is necessary.
+// This number is chosen with back-of-the-envelope calculations where the rough time to get a BUSY response it around
+// 10 microseconds, so 500,000 retries is roughly 5 seconds.
+#define MAX_BUSY_RETRIES  500000
+
 //
 // Partition ID if FF-A support is enabled
 //
@@ -64,16 +69,31 @@ SendFfaMmCommunicate (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  CommunicateArgs;
+  UINT64           Retries;
 
-  ZeroMem (&CommunicateArgs, sizeof (DIRECT_MSG_ARGS));
+  Retries = 0;
+  while (TRUE) {
+    ZeroMem (&CommunicateArgs, sizeof (DIRECT_MSG_ARGS));
+    CommunicateArgs.Arg0 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
 
-  CommunicateArgs.Arg0 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
+    Status = ArmFfaLibMsgSendDirectReq (
+               mStMmPartId,
+               0,
+               &CommunicateArgs
+               );
 
-  Status = ArmFfaLibMsgSendDirectReq (
-             mStMmPartId,
-             0,
-             &CommunicateArgs
-             );
+    if (Status == EFI_NO_RESPONSE) {
+      // Only try for so long before just failing.
+      if (Retries >= MAX_BUSY_RETRIES) {
+        return EFI_TIMEOUT;
+      }
+
+      Retries++;
+      continue;
+    }
+
+    break;
+  }
 
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the StMM SP since it is UP.
