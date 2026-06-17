@@ -108,6 +108,7 @@ R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 LOONGARCH64
 F: */LoongArch64/
+F: */LoongArch/
 M: Chao Li <lichao@loongson.cn> [kilaterlee]
 M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
