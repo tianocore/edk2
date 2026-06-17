@@ -405,6 +405,7 @@ HelperManageabilityPayLoadDebugPrint (
 
   RemainingBytes   = PayloadSize;
   TotalBytePrinted = 0;
+  Page256          = 0;
   while (TRUE) {
     if (TotalBytePrinted % 256 == 0) {
       Page256 = (UINT16)TotalBytePrinted / 256;
