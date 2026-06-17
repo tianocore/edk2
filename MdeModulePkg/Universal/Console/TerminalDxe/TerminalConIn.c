@@ -390,7 +390,7 @@ TerminalConInRegisterKeyNotify (
     // protocol.
     //
     DEBUG ((
-      DEBUG_INFO,
+      DEBUG_VERBOSE,
       "%a: Attempt to register notifier for the key 0x%04x (scan code 0x%04x) with shift state 0x%08x and toggle state 0x%02x.\n",
       __func__,
       KeyData->Key.UnicodeChar,
