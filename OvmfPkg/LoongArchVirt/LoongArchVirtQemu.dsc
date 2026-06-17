@@ -22,14 +22,13 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/LoongArchVirt/LoongArchVirtQemu.fdf
-  TTY_TERMINAL                   = FALSE
 
 !include LoongArchVirt.fdf.inc
 
   #
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
-  DEFINE TTY_TERMINAL            = FALSE
+  DEFINE TTY_TERMINAL            = TRUE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SECURE_BOOT_DEFAULT_KEYS = FALSE
   DEFINE QEMU_PV_VARS            = FALSE
@@ -436,6 +435,16 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize       | 0x40000
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask   | 1
+
+  ## Default Terminal Type
+  ## 0-PCANSI, 1-VT100, 2-VT100+, 3-UTF8, 4-TTYTERM
+!if $(TTY_TERMINAL) == TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType                      | 4
+  # Set terminal type to TtyTerm, the value encoded is EFI_TTY_TERM_GUID
+  gUefiOvmfPkgTokenSpaceGuid.PcdTerminalTypeGuidBuffer                 | {0x80, 0x6d, 0x91, 0x7d, 0xb1, 0x5b, 0x8c, 0x45, 0xa4, 0x8f, 0xe2, 0x5f, 0xdd, 0x51, 0xef, 0x94}
+!else
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType                      | 1
+!endif
 
 ################################################################################
 #
