@@ -70,6 +70,10 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   // single call to the hypervisor.
   //
   UINT8     WorkBuffer[1024];
+
+  // The Page State Change Buffer Page used for pre-validation of system
+  // RAM when SEV-SNP is enabled
+  UINT8     PscBufferPage[4096];
 } SEC_SEV_ES_WORK_AREA;
 
 #define SEV_ES_WORK_AREA_FLAG_VC       BIT0
