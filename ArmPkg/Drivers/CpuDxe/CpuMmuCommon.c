@@ -285,10 +285,18 @@ CpuSetMemoryAttributes (
     // stale cache lines are written back and invalidated. If this is not done,
     // depending on the caching behavior of the platform, dirty cache lines may
     // be written back corrupting data in the future, or stale cache lines may
-    // persist if caching is enabled later.
+    // persist if caching is enabled later. In scenarios where the caller didn't
+    // explicitly change the cacheability, ignore this. This could still lead to
+    // unexpected caches, but this is a necessary concession to incorrect behavior
+    // in higher-level components.
     //
     FlushCache = FALSE;
-    if (!EFI_ERROR (Status) && IsArmAttributeCacheable (RegionArmAttributes) && !IsArmAttributeCacheable (ArmAttributes)) {
+    if (!EFI_ERROR (Status) &&
+        ((EfiAttributes & EFI_MEMORY_RP) == 0) &&
+        ((EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) != 0) &&
+        IsArmAttributeCacheable (RegionArmAttributes) &&
+        !IsArmAttributeCacheable (ArmAttributes))
+    {
       FlushCache = TRUE;
     }
 
