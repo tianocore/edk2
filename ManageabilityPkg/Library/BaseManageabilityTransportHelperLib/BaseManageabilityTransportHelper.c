@@ -397,47 +397,55 @@ HelperManageabilityPayLoadDebugPrint (
   IN  UINT32  PayloadSize
   )
 {
-  UINT16  Page256;
-  UINT16  Row16;
-  UINT16  Column16;
-  UINT32  RemainingBytes;
-  UINT32  TotalBytePrinted;
+  UINTN  Block;
+  UINTN  BlockSize;
+  UINTN  RowSize;
+  UINTN  RemainingBytes;
+  UINTN  BytesPrinted;
 
-  RemainingBytes   = PayloadSize;
-  TotalBytePrinted = 0;
-  Page256          = 0;
-  while (TRUE) {
-    if (TotalBytePrinted % 256 == 0) {
-      Page256 = (UINT16)TotalBytePrinted / 256;
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "======== Manageability Payload %04xH - %04xH =========\n", Page256 * 256, Page256 * 256 + MIN (RemainingBytes, 256) - 1));
+  RemainingBytes = PayloadSize;
+  BlockSize      = 256;
+  RowSize        = 16;
+
+  for (Block = 0, BytesPrinted = 0; RemainingBytes > 0;) {
+    UINTN  BlockBase;
+    UINTN  Row;
+    UINTN  RowsToPrint;
+    UINTN  Column;
+
+    Block     = BytesPrinted / BlockSize;
+    BlockBase = Block * BlockSize;
+
+    if (BytesPrinted % BlockSize == 0) {
+      DEBUG ((DEBUG_MANAGEABILITY_INFO, "======== Manageability Payload %04xH - %04xH =========\n", BlockBase, BlockBase + MIN (RemainingBytes, BlockSize) - 1));
       DEBUG ((DEBUG_MANAGEABILITY_INFO, "       "));
-      for (Column16 = 0; Column16 < 16; Column16++) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", Column16));
+      for (Column = 0; Column < RowSize; Column++) {
+        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", Column));
       }
 
       DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n       -----------------------------------------------\n"));
     }
 
-    for (Row16 = 0; Row16 < 16; Row16++) {
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "%04x | ", Page256 * 256 + Row16 * 16));
-      for (Column16 = 0; Column16 < MIN (RemainingBytes, 16); Column16++) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", *((UINT8 *)Payload + Page256 * 256 + Row16 * 16 + Column16)));
+    if (RemainingBytes >= BlockSize) {
+      RowsToPrint = BlockSize / RowSize;
+    } else {
+      RowsToPrint = RemainingBytes / RowSize + 1;
+    }
+
+    for (Row = 0; Row < RowsToPrint; Row++) {
+      DEBUG ((DEBUG_MANAGEABILITY_INFO, "%04x | ", BlockBase + Row * RowSize));
+      for (Column = 0; Column < MIN (RemainingBytes, RowSize); Column++) {
+        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", *((UINT8 *)Payload + BlockBase + Row * RowSize + Column)));
       }
 
-      RemainingBytes   -= Column16;
-      TotalBytePrinted += Column16;
-      if (RemainingBytes == 0) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n\n"));
-        return;
-      }
+      RemainingBytes -= Column;
+      BytesPrinted   += Column;
 
       DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n"));
     }
 
     DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n"));
   }
-
-  DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n\n"));
 }
 
 /**
