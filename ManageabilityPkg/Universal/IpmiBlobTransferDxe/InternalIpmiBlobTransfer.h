@@ -8,15 +8,14 @@
 
 **/
 
+#pragma once
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IpmiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-
-#ifndef INTERNAL_IPMI_BLOB_TRANSFER_H_
-#define INTERNAL_IPMI_BLOB_TRANSFER_H_
 
 #define PROTOCOL_RESPONSE_OVERHEAD  (4 * sizeof (UINT8))       // 1 byte completion code + 3 bytes OEN
 
@@ -35,7 +34,7 @@ typedef enum {
   IpmiBlobTransferSubcommandWriteMeta,
 } IPMI_BLOB_TRANSFER_SUBCOMMANDS;
 
-  #pragma pack(1)
+#pragma pack(1)
 
 typedef struct {
   UINT8    Oen[3];
@@ -176,7 +175,7 @@ typedef struct {
 
 #define IPMI_BLOB_TRANSFER_BLOB_WRITE_META_RESPONSE  NULL
 
-  #pragma pack()
+#pragma pack()
 
 /**
   Calculate CRC-16-CCITT with poly of 0x1021
@@ -416,5 +415,3 @@ IpmiBlobTransferWriteMeta (
   IN  UINT8   *Data,
   IN  UINT32  WriteLength
   );
-
-#endif

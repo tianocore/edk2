@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_IPMI_COMMON_H_
-#define MANAGEABILITY_IPMI_COMMON_H_
+#pragma once
 
 #include <IndustryStandard/IpmiKcs.h>
 #include <Library/ManageabilityTransportLib.h>
@@ -122,5 +121,3 @@ CommonIpmiSubmitCommand (
   OUT    UINT8                          *ResponseData OPTIONAL,
   IN OUT UINT32                         *ResponseDataSize OPTIONAL
   );
-
-#endif

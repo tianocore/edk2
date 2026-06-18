@@ -9,8 +9,7 @@
   @par https://github.com/openbmc/phosphor-ipmi-blobs/blob/master/README.md
 **/
 
-#ifndef EDKII_IPMI_BLOB_TRANSFER_H_
-#define EDKII_IPMI_BLOB_TRANSFER_H_
+#pragma once
 
 #include <Library/IpmiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -260,5 +259,3 @@ struct _EDKII_IPMI_BLOB_TRANSFER_PROTOCOL {
 typedef struct _EDKII_IPMI_BLOB_TRANSFER_PROTOCOL EDKII_IPMI_BLOB_TRANSFER_PROTOCOL;
 
 extern EFI_GUID  gEdkiiIpmiBlobTransferProtocolGuid;
-
-#endif

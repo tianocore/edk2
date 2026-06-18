@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef EDKII_PLDM_PROTOCOL_LIB_H_
-#define EDKII_PLDM_PROTOCOL_LIB_H_
+#pragma once
 
 /**
   This function sets the PLDM source terminus and destination terminus
@@ -53,5 +52,3 @@ PldmSubmitCommand (
   OUT UINT8      *ResponseData,
   IN OUT UINT32  *ResponseDataSize
   );
-
-#endif

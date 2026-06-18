@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_IPMI_PPI_INTERNAL_H_
-#define MANAGEABILITY_IPMI_PPI_INTERNAL_H_
+#pragma once
 
 #include <Library/ManageabilityTransportLib.h>
 #include <Ppi/IpmiPpi.h>
@@ -27,5 +26,3 @@ typedef struct {
   UINT32                                TransportMaximumPayload;
   PEI_IPMI_PPI                          PeiIpmiPpi;
 } PEI_IPMI_PPI_INTERNAL;
-
-#endif // MANAGEABILITY_IPMI_PPI_INTERNAL_H_
