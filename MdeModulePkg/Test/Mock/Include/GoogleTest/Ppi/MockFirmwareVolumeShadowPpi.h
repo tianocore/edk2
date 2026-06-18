@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_EDKII_PEI_FIRMWARE_VOLUME_SHADOW_PPI_H_
-#define MOCK_EDKII_PEI_FIRMWARE_VOLUME_SHADOW_PPI_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -37,5 +36,3 @@ MOCK_FUNCTION_DEFINITION (MockPeiFirmwareVolumeShadowPpi, FirmwareVolumeShadow, 
     FirmwareVolumeShadow                                         \
   };                                                    \
   EDKII_PEI_FIRMWARE_VOLUME_SHADOW_PPI  *NAME = &NAME##_INSTANCE;
-
-#endif
