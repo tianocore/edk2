@@ -13,6 +13,7 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Amd/Svsm.h>
 #include <Register/Amd/SvsmMsr.h>
+#include <Library/AmdSevLib.h>
 
 #define PAGES_PER_2MB_ENTRY  512
 
@@ -867,5 +868,5 @@ AmdSvsmAltInjEnabled (
   VOID
   )
 {
-  return FALSE;
+  return AmdSevSnpAlternateInjectionIsEnabled ();
 }
