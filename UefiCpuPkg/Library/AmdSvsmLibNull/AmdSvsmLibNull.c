@@ -267,3 +267,18 @@ AmdSvsmSnpApicConfigVector (
   )
 {
 }
+
+/**
+  Check Alternate Injection enablement.
+  @retval TRUE                 Alternate Injection enabled
+  @retval FALSE                Alternate Injection not enabled
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmAltInjEnabled (
+  VOID
+  )
+{
+  return FALSE;
+}
