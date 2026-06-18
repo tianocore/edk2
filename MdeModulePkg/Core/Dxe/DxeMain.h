@@ -86,6 +86,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/OrderedCollectionLib.h>
 
+#include <MemoryBin.h>
+
 //
 // attributes for reserved memory before it is promoted to system memory
 //
@@ -230,19 +232,6 @@ typedef struct {
           CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
 
 //
-// Entry in an array that keeps track of memory type statistics per memory bin
-//
-typedef struct {
-  EFI_PHYSICAL_ADDRESS    BaseAddress;
-  EFI_PHYSICAL_ADDRESS    MaximumAddress;
-  UINT64                  CurrentNumberOfPages;
-  UINT64                  NumberOfPages;
-  UINTN                   InformationIndex;
-  BOOLEAN                 Special;
-  BOOLEAN                 Runtime;
-} EFI_MEMORY_TYPE_STATISTICS;
-
-//
 // DXE Core Global Variables
 //
 extern EFI_SYSTEM_TABLE      *gDxeCoreST;
@@ -294,36 +283,6 @@ extern BOOLEAN                                     gLoadFixedAddressCodeMemoryRe
 VOID
 CoreInitializePool (
   VOID
-  );
-
-/**
-  Sets the preferred memory range to use for the Memory Type Information bins.
-  This service must be called before fist call to CoreAddMemoryDescriptor().
-
-  If the location of the Memory Type Information bins has already been
-  established or the size of the range provides is smaller than all the
-  Memory Type Information bins, then the range provides is not used.
-
-  @param  Start                             The start address of the Memory Type Information range.
-  @param  Length                            The size, in bytes, of the Memory Type Information range.
-  @param  MemoryTypeInformation             The memory type information array to be used to determine
-                                            the size of the memory bins.
-  @param  MemoryTypeInformationInitialized  A pointer to a boolean that indicates whether the memory type
-                                            information bins have been initialized.
-  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
-                                            information if the provided range is used.
-  @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
-                                            provided range is used.
-**/
-VOID
-EFIAPI
-CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS         Start,
-  IN UINT64                       Length,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
   );
 
 /**
@@ -2842,25 +2801,4 @@ MergeMemoryMap (
 EFI_STATUS
 CoreInitializeHandleServices (
   VOID
-  );
-
-/**
-  Calculate total memory bin size needed.
-
-  @param BinTop                The top address of the memory bins. This is an optional parameter.
-                               When NULL, the returned size meets the alignment requirements as long as
-                               the base address selected also meets the alignment requirements. When
-                               non-NULL, then the returned BinTop value and the returned size both meet
-                               the alignment requirements. When non-NULL, this will be updated on
-                               output to the new top address of the memory bins that must be used to
-                               satisfy alignment requirements.
-  @param MemoryTypeInformation The memory type information array.
-
-  @return The total memory bin size needed.
-
-**/
-UINT64
-CalculateTotalMemoryBinSizeNeeded (
-  IN OUT OPTIONAL EFI_PHYSICAL_ADDRESS  *BinTop,
-  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation
   );
