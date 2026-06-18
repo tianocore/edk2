@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef EDKII_MCTP_PROTOCOL_H_
-#define EDKII_MCTP_PROTOCOL_H_
+#pragma once
 
 #include <IndustryStandard/Mctp.h>
 
@@ -102,5 +101,3 @@ struct _EDKII_MCTP_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiMctpProtocolGuid;
-
-#endif // EDKII_MCTP_PROTOCOL_H_

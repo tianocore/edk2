@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_TRANSPORT_LIB_H_
-#define MANAGEABILITY_TRANSPORT_LIB_H_
+#pragma once
 
 #define MANAGEABILITY_TRANSPORT_TOKEN_VERSION_MAJOR  1
 #define MANAGEABILITY_TRANSPORT_TOKEN_VERSION_MINOR  0
@@ -372,5 +371,3 @@ struct _MANAGEABILITY_TRANSPORT_FUNCTION_V1_0 {
                                                                         ///< transport and get the
                                                                         ///< response back.
 };
-
-#endif
