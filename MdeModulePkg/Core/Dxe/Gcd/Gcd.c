@@ -2768,14 +2768,14 @@ CoreInitializeGcdServices (
             GcdMemoryType = EfiGcdMemoryTypeReserved;
           }
 
-          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
-            GcdMemoryType = EfiGcdMemoryTypePersistent;
-          }
-
           // Mark special purpose memory as system memory, if it was system memory in the HOB
           // However, if this is also marked as persistent, let persistent take precedence
           if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) {
             GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
+          }
+
+          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
+            GcdMemoryType = EfiGcdMemoryTypePersistent;
           }
 
           break;
