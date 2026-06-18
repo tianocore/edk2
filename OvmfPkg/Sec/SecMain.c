@@ -31,6 +31,7 @@
 #include <Library/CcProbeLib.h>
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Register/Intel/Cpuid.h>
+#include <Library/AmdSvsmLib.h>
 #include "AmdSev.h"
 
 typedef struct _SEC_IDT_TABLE {
@@ -973,6 +974,11 @@ SecCoreStartupWithStack (
   //
   IoWrite8 (0x21, 0xff);
   IoWrite8 (0xA1, 0xff);
+
+  // Enable X2APIC mode if Alternate Injection is enabled.
+  if (AmdSvsmIsSvsmPresent () && AmdSvsmAltInjEnabled ()) {
+    SetApicMode (LOCAL_APIC_MODE_X2APIC);
+  }
 
   //
   // Initialize Local APIC Timer hardware and disable Local APIC Timer

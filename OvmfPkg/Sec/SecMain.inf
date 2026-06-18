@@ -58,6 +58,7 @@
   CcProbeLib
   CpuPageTableLib
   StackCheckLib
+  AmdSvsmLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
