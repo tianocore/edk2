@@ -6,10 +6,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Uefi.h>
+#pragma once
 
-#ifndef TPM2_PTP_H_
-#define TPM2_PTP_H_
+#include <Uefi.h>
 
 /**
   Dump PTP register information.
@@ -82,5 +81,3 @@ DumpTpmOutputBlock (
   IN CONST UINT8  *OutputBlock,
   IN UINT32       CommandCode
   );
-
-#endif // TPM2_PTP_H_
