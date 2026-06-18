@@ -60,7 +60,7 @@ PciUefiMemReadUInt32Array (
   )
 {
   EFI_STATUS  Status;
-  UINT64      BufferIndex;
+  UINTN       BufferIndex;
   UINT64      Offset;
 
   ASSERT ((SizeInBytes % 4) == 0);
@@ -81,7 +81,7 @@ PciUefiMemReadUInt32Array (
                                    );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: PciIo read error at 0x%lx: %r \n", __func__, BufferIndex, Status));
+      DEBUG ((DEBUG_ERROR, "%a: PciIo read error at 0x%lx: %r \n", __func__, (UINT64)BufferIndex, Status));
       return Status;
     }
 
@@ -115,7 +115,7 @@ PciUefiMemWriteUInt32Array (
   )
 {
   EFI_STATUS  Status;
-  UINT64      BufferIndex;
+  UINTN       BufferIndex;
   UINT64      Offset;
 
   ASSERT ((SizeInBytes % 4) == 0);
@@ -136,7 +136,7 @@ PciUefiMemWriteUInt32Array (
                                    );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: PciIo write error at 0x%lx: %r \n", __func__, BufferIndex, Status));
+      DEBUG ((DEBUG_ERROR, "%a: PciIo write error at 0x%lx: %r \n", __func__, (UINT64)BufferIndex, Status));
       return Status;
     }
 
@@ -303,7 +303,7 @@ CxlDecodeRegblock (
   Bar = (UINT8)(Block->OffsetLow.Bits.RegisterBir / 2);
 
   Offset =
-    ((UINT64)Block->OffsetHigh.Bits.RegisterBlockOffsetHigh << 32) |
+    LShiftU64 ((UINT64)Block->OffsetHigh.Bits.RegisterBlockOffsetHigh, 32) |
     (Block->OffsetLow.Bits.RegisterBlockOffsetLow << 16);
 
   RegisterMap->RegisterType        = Block->OffsetLow.Bits.RegisterBlockIdentifier;
