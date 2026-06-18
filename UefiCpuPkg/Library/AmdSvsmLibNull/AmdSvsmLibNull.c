@@ -187,3 +187,83 @@ AmdSvsmUefiMmRequest (
 {
   return FALSE;
 }
+
+/**
+  Issue an SVSM request to perform a SVSM APIC read operation.
+
+  @param[in]    MsrIndex        APIC register MSR.
+
+  @return                       The value of the register.
+
+**/
+UINT64
+EFIAPI
+AmdSvsmSnpReadApicMsr (
+  IN UINT32  MsrIndex
+  )
+{
+  return 0;
+}
+
+/**
+  Issue an SVSM request to perform a SVSM APIC write operation.
+
+  @param[in]    MsrIndex        APIC register MSR.
+  @param[in]    Value           The value of the register.
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpWriteApicMsr (
+  IN UINT32  MsrIndex,
+  IN UINT64  Value
+  )
+{
+}
+
+/**
+  Issue an SVSM request to perform a SVSM APIC features query operation.
+
+  @return               bitmask of supported features.
+
+**/
+UINT64
+EFIAPI
+AmdSvsmSnpApicQueryFeatures (
+  VOID
+  )
+{
+  return 0;
+}
+
+/**
+  Issue an SVSM request to perform a register/deregister Alternate Injection
+  operation.
+
+  @param[in]    Vector          bitmask of the intended operation
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpApicConfigEmulation (
+  IN SVSM_AI_CTRL  Vector
+  )
+{
+}
+
+/**
+  Issue an SVSM request to configure interrupt vectors which is allowed to be
+  delivered from the Hypervisor.
+
+  @param[in]    Vector  bitmask of the signle interrupt vector.
+  @param[in]    Value   bitmask of the intended operation.
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpApicConfigVector (
+  IN UINT8            Vector,
+  IN SVSM_VEC_ENABLE  Value
+  )
+{
+}
