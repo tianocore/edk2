@@ -624,7 +624,9 @@ FillTranslationTable (
   IN  BOOLEAN                       Lpa2Enabled
   )
 {
-  UINT64  CcaProtectionAttribute;
+  EFI_STATUS  Status;
+  UINT64      CcaProtectionAttribute;
+  UINT64      CcaProtectionAttributeMask;
 
   //
   // The CCA protection attribute corresponds to the (IPA_WIDTH - 1) bit of the
@@ -632,6 +634,9 @@ FillTranslationTable (
   // in this bit. Derive the attribute by XORing the two addresses.
   //
   // NOTE: If more than one bit differs, the memory map is misconfigured.
+  //       In case of LPA2 if the CCA protection attribute bit falls in the top
+  //       bits, i.e. 50 & 51; we expect these to be shifted appropriately when
+  //       the memory map is setup.
   //
   CcaProtectionAttribute = MemoryRegion->VirtualBase ^ MemoryRegion->PhysicalBase;
 
@@ -639,6 +644,24 @@ FillTranslationTable (
   // Ensure only one bit is set.
   //
   ASSERT (((CcaProtectionAttribute & (CcaProtectionAttribute - 1)) == 0));
+
+  //
+  // Get the CCA Protection Attribute mask.
+  //
+  Status = ArmCcaGetProtectionAttributeMask (&CcaProtectionAttributeMask);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // The CCA protection attribute is either absent for protected IPA mappings,
+  // or equal to the expected Realm protection attribute mask for unprotected
+  // IPA mappings.
+  //
+  ASSERT (
+    (CcaProtectionAttribute == 0) ||
+    (CcaProtectionAttribute == CcaProtectionAttributeMask)
+    );
 
   return UpdateRegionMapping (
            MemoryRegion->VirtualBase,
