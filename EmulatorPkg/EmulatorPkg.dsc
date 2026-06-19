@@ -692,8 +692,8 @@
   GCC:*_CLANGDWARF_*_DLINK_FLAGS     == -nostdlib -shared -Wl,--section-alignment=0x1000 -Wl,--file-alignment=0x1000
   GCC:*_CLANGDWARF_IA32_DLINK_FLAGS  = -target i686-w64-mingw32 -Wl,--entry,__ModuleEntryPoint
   GCC:*_CLANGDWARF_X64_DLINK_FLAGS   = -target x86_64-w64-mingw32 -Wl,--entry,_ModuleEntryPoint
-  GCC:DEBUG_CLANGDWARF_*_DLINK_FLAGS = -g -Wl,--pdb,$(DEBUG_DIR)/$(BASE_NAME).pdb -Wno-unused-command-line-argument
-  GCC:NOOPT_CLANGDWARF_*_DLINK_FLAGS = -g -Wl,--pdb,$(DEBUG_DIR)/$(BASE_NAME).pdb -Wno-unused-command-line-argument
+  GCC:DEBUG_CLANGDWARF_*_DLINK_FLAGS = -g -Wl,--pdb,$(OUTPUT_DIR)/$(BASE_NAME).pdb -Wno-unused-command-line-argument
+  GCC:NOOPT_CLANGDWARF_*_DLINK_FLAGS = -g -Wl,--pdb,$(OUTPUT_DIR)/$(BASE_NAME).pdb -Wno-unused-command-line-argument
   #
   # Clear DLINK2_FLAGS to disable use of linker script
   #
@@ -730,21 +730,21 @@
   #
   # Must ovveride DLINK_FLAGS to remove /DLL when linking .exe
   #
-  MSFT:*_*_*_DLINK_FLAGS    == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /NOLOGO /SUBSYSTEM:CONSOLE /IGNORE:4086 /MAP /OPT:REF /LTCG
+  MSFT:*_*_*_DLINK_FLAGS    == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /NOLOGO /SUBSYSTEM:CONSOLE /IGNORE:4086 /MAP:"$(OUTPUT_DIR)\$(BASE_NAME).map" /OPT:REF /LTCG
   MSFT:*_*_IA32_DLINK_FLAGS  = $(VISUAL_STUDIO_IA32_LIB_PATHS) $(VISUAL_STUDIO_LIBS)
   MSFT:*_*_X64_DLINK_FLAGS   = $(VISUAL_STUDIO_X64_LIB_PATHS)  $(VISUAL_STUDIO_LIBS)
-  MSFT:DEBUG_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
-  MSFT:NOOPT_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
+  MSFT:DEBUG_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(OUTPUT_DIR)\$(BASE_NAME).pdb"
+  MSFT:NOOPT_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(OUTPUT_DIR)\$(BASE_NAME).pdb"
 
   CLANGPDB:*_*_*_CC_FLAGS        = $(VISUAL_STUDIO_DEFINES)
   #
   # Must ovveride DLINK_FLAGS to remove /DLL when linking .exe
   #
-  CLANGPDB:*_*_*_DLINK_FLAGS    == /OUT:"$(BIN_DIR)\$(BASE_NAME).exe" /NOLOGO /SUBSYSTEM:CONSOLE /IGNORE:4086 /OPT:REF /LLDMAP
+  CLANGPDB:*_*_*_DLINK_FLAGS    == /OUT:"$(BIN_DIR)\$(BASE_NAME).exe" /NOLOGO /SUBSYSTEM:CONSOLE /IGNORE:4086 /OPT:REF /LLDMAP:"$(OUTPUT_DIR)\$(BASE_NAME).map"
   CLANGPDB:*_*_IA32_DLINK_FLAGS  = $(VISUAL_STUDIO_IA32_LIB_PATHS) $(VISUAL_STUDIO_LIBS)
   CLANGPDB:*_*_X64_DLINK_FLAGS   = $(VISUAL_STUDIO_X64_LIB_PATHS)  $(VISUAL_STUDIO_LIBS)
-  CLANGPDB:DEBUG_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
-  CLANGPDB:NOOPT_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
+  CLANGPDB:DEBUG_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(OUTPUT_DIR)\$(BASE_NAME).pdb"
+  CLANGPDB:NOOPT_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(OUTPUT_DIR)\$(BASE_NAME).pdb"
 
   #
   # GCC RELEASE X64 Host application does not work with -flto.
