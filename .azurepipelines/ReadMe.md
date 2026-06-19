@@ -22,7 +22,7 @@ Focused on building a single target platform and confirming functionality on tha
 * Top level CI files should be named `<host os>-<tool_chain>.yml`
   * The pipeline YAML file name is referenced in Azure Pipelines. To allow flexibility for toolchain updates in the
     YAML file without necessitating changes in Azure Pipelines, the toolchain version is not included in the filename.
-    For example, `Windows-VS.yml` is used instead of `Windows-VS2022.yml`.
+    For example, `Windows-VS.yml` is used instead of `Windows-VS2026.yml`.
 
 ## Links
 
