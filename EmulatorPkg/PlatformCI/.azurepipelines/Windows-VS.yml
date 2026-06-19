@@ -90,7 +90,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: VS2022
+        tool_chain_tag: VS2026
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
