@@ -1,7 +1,7 @@
 # @file Edk2ToolsBuild.py
 # Invocable class that builds the basetool c files.
 #
-# Supports VS2019, VS2022, and GCC
+# Supports VS2019, VS2022, VS2026, and GCC
 ##
 # Copyright (c) Microsoft Corporation
 #
@@ -25,7 +25,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
     def ParseCommandLineOptions(self):
         ''' parse arguments '''
         ParserObj = argparse.ArgumentParser()
-        ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2022",
+        ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2026",
                                help="Set the toolchain used to compile the build tools")
         ParserObj.add_argument("-a", "--target_arch", dest="arch", default=None, choices=[None, 'IA32', 'X64', 'AARCH64'],
                                help="Specify the architecture of the built base tools. Not specifying this will fall back to the default "
