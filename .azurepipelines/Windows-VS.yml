@@ -25,7 +25,7 @@ variables:
 jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
-    tool_chain_tag: 'VS2022'
+    tool_chain_tag: 'VS2026'
     vm_image: ${{ variables.default_windows_vm }}
     arch_list: "IA32,X64"
     usePythonVersion: ${{ variables.default_python_version }}
