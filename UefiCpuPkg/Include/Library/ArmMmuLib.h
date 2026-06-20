@@ -133,3 +133,32 @@ ArmCcaSetMemoryProtectionAttribute (
   IN  UINT64                IpaWidth,
   IN  BOOLEAN               Share
   );
+
+/**
+  Return the Realm CCA protection attribute mask encoded for AArch64
+  translation table descriptors.
+
+  The Realm CCA protection attribute is the most significant bit of the Realm
+  IPA space, bit (IPA_WIDTH - 1). For non-LPA2 descriptors, the returned mask
+  is the raw IPA protection bit. When LPA2 is enabled and the protection bit is
+  encoded in the descriptor upper address attribute field, this function returns
+  the page-table descriptor encoding, not the raw IPA address bit.
+
+  The returned mask is suitable for use as a page-table attribute and for the
+  CCA protection attribute value derived from VirtualBase ^ PhysicalBase by
+  ArmConfigureMmu(). Callers that need the raw IPA address bit must not use
+  this function.
+
+  If the current execution context is not a Realm, the returned mask is zero.
+
+  @param[out] CcaProtectionAttributeMask  The CCA protection attribute mask.
+                                          Zero if not running in a Realm.
+
+  @retval EFI_SUCCESS            The mask was returned successfully.
+  @retval EFI_INVALID_PARAMETER  CcaProtectionAttributeMask is NULL.
+  @retval Others                 The Realm IPA width could not be queried.
+**/
+EFI_STATUS
+ArmCcaGetMemoryProtectionAttribute (
+  OUT UINT64  *CcaProtectionAttributeMask
+  );

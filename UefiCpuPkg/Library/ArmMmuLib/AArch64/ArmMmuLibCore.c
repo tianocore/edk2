@@ -30,8 +30,11 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include "ArmMmuLibInternal.h"
+#include <Library/ArmCcaLib.h>
 
 STATIC  ARM_REPLACE_LIVE_TRANSLATION_ENTRY  mReplaceLiveEntryFunc = ArmReplaceLiveTranslationEntry;
+
+STATIC UINT64  mCcaProtectionAttributeMask = 0;
 
 /**
   Whether the current translation regime is either EL1&0 or EL2&0, and
@@ -953,6 +956,93 @@ ArmMmuBaseLibConstructor (
 }
 
 /**
+  Return the Realm CCA protection attribute mask encoded for AArch64
+  translation table descriptors.
+
+  The Realm CCA protection attribute is the most significant bit of the Realm
+  IPA space, bit (IPA_WIDTH - 1). For non-LPA2 descriptors, the returned mask
+  is the raw IPA protection bit. When LPA2 is enabled and the protection bit is
+  encoded in the descriptor upper address attribute field, this function returns
+  the page-table descriptor encoding, not the raw IPA address bit.
+
+  The returned mask is suitable for use as a page-table attribute and for the
+  CCA protection attribute value derived from VirtualBase ^ PhysicalBase by
+  ArmConfigureMmu(). Callers that need the raw IPA address bit must not use
+  this function.
+
+  If the current execution context is not a Realm, the returned mask is zero.
+
+  @param[out] CcaProtectionAttributeMask  The CCA protection attribute mask.
+                                          Zero if not running in a Realm.
+
+  @retval EFI_SUCCESS            The mask was returned successfully.
+  @retval EFI_INVALID_PARAMETER  CcaProtectionAttributeMask is NULL.
+  @retval Others                 The Realm IPA width could not be queried.
+**/
+EFI_STATUS
+ArmCcaGetMemoryProtectionAttribute (
+  OUT UINT64  *CcaProtectionAttributeMask
+  )
+{
+  RETURN_STATUS  Status;
+  UINT64         IpaWidth;
+  UINT64         TopBits;
+  UINT64         MaxAddressBits;
+
+  if (CcaProtectionAttributeMask == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!ArmCcaIsRealm ()) {
+    *CcaProtectionAttributeMask = 0;
+    return EFI_SUCCESS;
+  }
+
+  Status = ArmCcaGetIpaWidth (&IpaWidth);
+  if (RETURN_ERROR (Status)) {
+    *CcaProtectionAttributeMask = 0;
+    return (EFI_STATUS)Status;
+  }
+
+  if (mCcaProtectionAttributeMask == 0) {
+    mCcaProtectionAttributeMask = 1ULL << (IpaWidth - 1);
+
+    if (ArmLpa2Enabled ()) {
+      /*
+      * For LPA2, the top IPA bits (e.g., bits 50..51) map into upper page table
+      * attributes in a packed form. Extract those top IPA bits and move them to
+      * the encoding expected in the Attributes field.
+      *
+      * TopBits calculation: use BIT51|BIT50 to detect whether the protection bit
+      * sits in the top IPA range, then translate to the TTBR/LPA2 attribute
+      * position. (See ARM ARM: translation-table entry formats for LPA2).
+      * When FEAT_LPA2 is implemented and TCR_ELX.DS = 1:
+      *   Bits[9:8] of translation table descriptors hold output address[51:50].
+      */
+      TopBits = mCcaProtectionAttributeMask & TT_UPPER_IPA_BITS;
+      if (TopBits != 0) {
+        mCcaProtectionAttributeMask = (TopBits >> (TT_UPPER_IPA_TO_OUTADDR_SHIFT));
+      }
+    }
+  }
+
+  if (ArmHas52BitTgran4 ()) {
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+  } else {
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
+  }
+
+  if (mCcaProtectionAttributeMask > (1ULL << (MaxAddressBits - 1))) {
+    *CcaProtectionAttributeMask = 0;
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *CcaProtectionAttributeMask = mCcaProtectionAttributeMask;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Configure the protection attribute for the page tables
   describing the memory region.
 
@@ -1003,11 +1093,10 @@ ArmCcaSetMemoryProtectionAttribute (
   IN  BOOLEAN               Share
   )
 {
-  UINT64  Attributes;
-  UINT64  Mask;
-  UINT64  CcaProtectionAttribute;
-  UINT64  TopBits;
-  UINT64  MaxAddressBits;
+  EFI_STATUS  Status;
+  UINT64      Attributes;
+  UINT64      Mask;
+  UINT64      CcaProtectionAttribute;
 
   if ((Length == 0) || (IpaWidth == 0) ||
       !IS_ALIGNED (Length, EFI_PAGE_SIZE) ||
@@ -1020,32 +1109,9 @@ ArmCcaSetMemoryProtectionAttribute (
     return EFI_UNSUPPORTED;
   }
 
-  if (ArmHas52BitTgran4 ()) {
-    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
-  } else {
-    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
-  }
-
-  if (IpaWidth > MaxAddressBits) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  CcaProtectionAttribute = 1ULL << (IpaWidth - 1);
-
-  if (ArmLpa2Enabled ()) {
-    /*
-     * For LPA2, the top IPA bits (e.g., bits 50..51) map into upper page table
-     * attributes in a packed form. Extract those top IPA bits and move them to
-     * the encoding expected in the Attributes field.
-     *
-     * TopBits calculation: use BIT51|BIT50 to detect whether the protection bit
-     * sits in the top IPA range, then translate to the TTBR/LPA2 attribute
-     * position. (See ARM ARM: translation-table entry formats for LPA2).
-     */
-    TopBits = CcaProtectionAttribute & (BIT51 | BIT50);
-    if (TopBits != 0) {
-      CcaProtectionAttribute = ((TopBits >> 0x32) & 0x3) << 8;
-    }
+  Status = ArmCcaGetMemoryProtectionAttribute (&CcaProtectionAttribute);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   if (Share) {
