@@ -113,7 +113,6 @@ ArmLpa2Enabled (
 
     @param [in]  BaseAddress  Base address of the memory region.
     @param [in]  Length       Length of the memory region.
-    @param [in]  IpaWidth     IPA width of the Realm.
     @param [in]  Share        If TRUE, set the most significant
                               bit of the IPA to configure the memory
                               region as Unprotected IPA.
@@ -130,7 +129,6 @@ EFIAPI
 ArmCcaSetMemoryProtectionAttribute (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
-  IN  UINT64                IpaWidth,
   IN  BOOLEAN               Share
   );
 
