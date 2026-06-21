@@ -67,6 +67,17 @@ EfiBootManagerRegisterLegacyBootSupport (
 }
 
 /**
+  Reset optional variables associated with the current boot.
+**/
+STATIC
+VOID
+BmResetCurrentBootOptionalVariables (
+  VOID
+  )
+{
+}
+
+/**
   Clear current boot variables.
 **/
 STATIC
@@ -76,6 +87,8 @@ BmClearCurrentBootVariables (
   )
 {
   EFI_STATUS  Status;
+
+  BmResetCurrentBootOptionalVariables ();
 
   Status = gRT->SetVariable (
                   L"BootCurrent",
@@ -1978,6 +1991,7 @@ EfiBootManagerBoot (
     sizeof (UINT16),
     &Uint16
     );
+  BmResetCurrentBootOptionalVariables ();
 
   //
   // 3. Signal the EVT_SIGNAL_READY_TO_BOOT event when we are about to load and execute
