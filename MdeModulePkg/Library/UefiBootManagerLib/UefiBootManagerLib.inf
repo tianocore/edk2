@@ -79,6 +79,7 @@
   ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
   gEfiGlobalVariableGuid
 
+  gEfiBootLoaderInterfaceGuid                   ## SOMETIMES_PRODUCES ## Variable:L"LoaderDevicePartUUID"
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
   gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_CONSUMES ## GUID
   gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ## GUID

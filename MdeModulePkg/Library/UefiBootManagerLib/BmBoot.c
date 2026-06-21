@@ -75,6 +75,62 @@ BmResetCurrentBootOptionalVariables (
   VOID
   )
 {
+  EFI_STATUS  Status;
+
+  Status = gRT->SetVariable (
+                  L"LoaderDevicePartUUID",
+                  &gEfiBootLoaderInterfaceGuid,
+                  0,
+                  0,
+                  NULL
+                  );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
+}
+
+/**
+  Set the Boot Loader Interface LoaderDevicePartUUID variable.
+
+  @param DevicePath  Device path for the loaded image.
+**/
+STATIC
+VOID
+BmSetLoaderDevicePartUuid (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
+  HARDDRIVE_DEVICE_PATH     *HardDrive;
+  CHAR16                    PartUuid[GUID_STRING_LENGTH + 1];
+
+  for (Node = DevicePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+    if ((DevicePathType (Node) != MEDIA_DEVICE_PATH) ||
+        (DevicePathSubType (Node) != MEDIA_HARDDRIVE_DP))
+    {
+      continue;
+    }
+
+    HardDrive = (HARDDRIVE_DEVICE_PATH *)Node;
+    if ((HardDrive->MBRType != MBR_TYPE_EFI_PARTITION_TABLE_HEADER) ||
+        (HardDrive->SignatureType != SIGNATURE_TYPE_GUID))
+    {
+      continue;
+    }
+
+    UnicodeSPrint (
+      PartUuid,
+      sizeof (PartUuid),
+      L"%g",
+      (EFI_GUID *)HardDrive->Signature
+      );
+    BmSetVariableAndReportStatusCodeOnError (
+      L"LoaderDevicePartUUID",
+      &gEfiBootLoaderInterfaceGuid,
+      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+      StrSize (PartUuid),
+      PartUuid
+      );
+    return;
+  }
 }
 
 /**
@@ -2053,6 +2109,9 @@ EfiBootManagerBoot (
                       FileSize,
                       &ImageHandle
                       );
+      if (!EFI_ERROR (Status)) {
+        BmSetLoaderDevicePartUuid (FilePath);
+      }
     }
 
     if (FileBuffer != NULL) {
