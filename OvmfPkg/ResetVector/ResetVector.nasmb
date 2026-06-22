@@ -138,6 +138,9 @@
   %define OVMF_PAGE_TABLE_BASE      FixedPcdGet32 (PcdOvmfSecPageTablesBase)
   %define OVMF_PAGE_TABLE_SIZE      FixedPcdGet32 (PcdOvmfSecPageTablesSize)
 
+  %define TDX_EARLY_DEBUG_LOG_BASE  FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase)
+  %define TDX_EARLY_DEBUG_LOG_SIZE  FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize)
+
   %define TDX_WORK_AREA_PGTBL_READY (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
   %define TDX_WORK_AREA_GPAW        (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 8)
 
