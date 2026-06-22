@@ -261,6 +261,8 @@ INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
   #
 INF MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
 
+INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+
 ################################################################################
 
 [FV.NCCFV]
@@ -304,7 +306,6 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 INF  MdeModulePkg/Logo/LogoDxe.inf
 
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
-INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 
 #
 # Usb Support
