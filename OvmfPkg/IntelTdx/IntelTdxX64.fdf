@@ -94,6 +94,11 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|gUefiOvmfPkgTokenSpaceGuid.PcdO
 0x00E000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
 
+!if $(DEBUG_TO_MEM)
+0x00F000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+!endif
+
 0x010000|0x010000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
@@ -263,6 +268,8 @@ INF MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
 
 INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 
+INF  OvmfPkg/PlatformDxe/Platform.inf
+
 ################################################################################
 
 [FV.NCCFV]
@@ -321,7 +328,6 @@ INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 
 INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
-INF  OvmfPkg/PlatformDxe/Platform.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 !include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
