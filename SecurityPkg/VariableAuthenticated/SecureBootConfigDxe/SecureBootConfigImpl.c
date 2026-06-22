@@ -1805,6 +1805,8 @@ LoadPeImage (
     mSecDataDir = (EFI_IMAGE_SECURITY_DATA_DIRECTORY *)&(NtHeader32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]);
   } else if (  (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64)
             || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_X64)
+            || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_LOONGARCH64)
+            || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_RISCV64)
             || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_AARCH64))
   {
     //
