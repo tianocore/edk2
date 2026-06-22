@@ -69,7 +69,7 @@ ArmFfaLibGetRxTxBuffers (
   }
 
   if (TxBufferSize != NULL) {
-    *TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    *TxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   }
 
   if (RxBuffer != NULL) {
@@ -77,7 +77,7 @@ ArmFfaLibGetRxTxBuffers (
   }
 
   if (RxBufferSize != NULL) {
-    *RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    *RxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   }
 
   return EFI_SUCCESS;
@@ -111,7 +111,7 @@ ArmFfaLibRxTxMap (
 
   TxBuffer   = (VOID *)(UINTN)PcdGet64 (PcdFfaTxBuffer);
   RxBuffer   = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
 
   /*
    * If someone already mapped Rx/Tx Buffers, return EFI_ALREADY_STARTED.
@@ -243,9 +243,9 @@ UpdateRxTxBufferInfo (
   )
 {
   BufferInfo->TxBufferAddr = PcdGet64 (PcdFfaTxBuffer);
-  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->TxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   BufferInfo->RxBufferAddr = PcdGet64 (PcdFfaRxBuffer);
-  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
 }
 
 /**
@@ -267,7 +267,7 @@ FindRxTxBufferAllocationHob (
   UINT64                BufferSize;
 
   BufferBase = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFfaTxBuffer);
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)) * 2;
 
   return GetRxTxBufferAllocationHob (BufferBase, BufferSize, UseGuid);
 }
@@ -327,7 +327,7 @@ RemapFfaRxTxBuffer (
 
   NewBufferBase = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->RemapOffset;
   NewTxBuffer   = NewBufferBase;
-  NewRxBuffer   = NewTxBuffer + (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE);
+  NewRxBuffer   = NewTxBuffer + (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)));
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_MAP;

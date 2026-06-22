@@ -1180,8 +1180,8 @@ GetRxTxBufferMinSizeAndAlign (
 
   MaxSize = ((MaxSize == 0) ? MAX_UINTN : (MaxSize * MinAndAlign));
 
-  if ((MinAndAlign > (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)) ||
-      (MaxSize < (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)))
+  if ((MinAndAlign > (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)))) ||
+      (MaxSize < (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)))))
   {
     DEBUG ((
       DEBUG_ERROR,
