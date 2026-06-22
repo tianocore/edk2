@@ -63,7 +63,7 @@ extern "C" {
     { EfiMemoryMappedIOPortSpace, 0 },
     { EfiPalCode,                 0 },
     { EfiPersistentMemory,        0 },
-    { EfiGcdMemoryTypeUnaccepted, 0 },
+    { EfiUnacceptedMemoryType,    0 },
     { EfiMaxMemoryType,           0 }
   };
 }
