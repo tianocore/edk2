@@ -54,6 +54,7 @@ BufferNext (
 
 // -----------------------------------------------------------------------------
 // Push the buffer to the device
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardRingSendBuffer (
@@ -106,6 +107,7 @@ VirtioKeyboardRingSendBuffer (
 
 // -----------------------------------------------------------------------------
 // Get data from buffer which is marked as ready from device
+STATIC
 BOOLEAN
 EFIAPI
 VirtioKeyboardRingGetBuffer (
@@ -150,6 +152,7 @@ VirtioKeyboardRingGetBuffer (
 
 // -----------------------------------------------------------------------------
 // Initialize ring buffer
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardInitRing (
@@ -275,6 +278,7 @@ Failed:
 
 // -----------------------------------------------------------------------------
 // Deinitialize ring buffer
+STATIC
 VOID
 EFIAPI
 VirtioKeyboardUninitRing (
@@ -363,6 +367,7 @@ VirtioKeyboardInit (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardSimpleTextInputReset (
@@ -381,6 +386,7 @@ VirtioKeyboardSimpleTextInputReset (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardSimpleTextInputReadKeyStroke (
@@ -636,6 +642,7 @@ VirtioKeyboardTimer (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_PROTOCOL API
+STATIC
 VOID
 EFIAPI
 VirtioKeyboardWaitForKey (
@@ -668,6 +675,7 @@ VirtioKeyboardWaitForKey (
 
 /// -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardResetEx (
@@ -699,6 +707,7 @@ VirtioKeyboardResetEx (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardReadKeyStrokeEx (
@@ -763,6 +772,7 @@ VirtioKeyboardReadKeyStrokeEx (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardSetState (
@@ -777,6 +787,7 @@ VirtioKeyboardSetState (
   return EFI_SUCCESS;
 }
 
+STATIC
 BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegisteredData,
@@ -813,6 +824,7 @@ IsKeyRegistered (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardRegisterKeyNotify (
@@ -882,6 +894,7 @@ Exit:
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioKeyboardUnregisterKeyNotify (
