@@ -1,5 +1,5 @@
 ## @file
-# This driver produces EFI_SIMPLE_TEXT_INPUT_PROTOCOL for virt ARM devices.
+# VirtIO Input DXE driver
 #
 # Copyright (C) 2024, Red Hat
 #
@@ -9,15 +9,15 @@
 
 [Defines]
   INF_VERSION                    = 1.29
-  BASE_NAME                      = VirtioKeyboardDxe
+  BASE_NAME                      = VirtioInputDxe
   FILE_GUID                      = F141B1E5-9C7C-44CC-AFAA-E87D7689B113
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = VirtioKeyboardEntryPoint
+  ENTRY_POINT                    = VirtioInputEntryPoint
 
 [Sources]
-  VirtioKeyboard.c
-  VirtioKeyboard.h
+  VirtioInput.c
+  VirtioInput.h
   VirtioKeyCodes.h
 
 [Packages]

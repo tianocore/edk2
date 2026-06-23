@@ -1,6 +1,6 @@
 /** @file
 
-  Private definitions of the VirtioKeyboard driver
+  Private definitions of the VirtioInput driver
 
   Copyright (C) 2024, Red Hat
 
@@ -17,13 +17,13 @@
 
 #include <IndustryStandard/Virtio.h>
 
-#define VIRTIO_KBD_SIG  SIGNATURE_32 ('V', 'K', 'B', 'D')
+#define VIRTIO_INPUT_SIG  SIGNATURE_32 ('V', 'I', 'N', 'P')
 
-#define KEYBOARD_MAX_RINGS   2
-#define KEYBOARD_RX_BUFSIZE  64
+#define MAX_RINGS   2
+#define RX_BUFSIZE  64
 
-// Fetch new key from VirtIO every 50ms
-#define KEYBOARD_PROBE_TIME_MS  50
+// Fetch new input from VirtIO every 50ms
+#define PROBE_TIME_MS  50
 
 // Max range of recognized keyboard codes
 #define MAX_KEYBOARD_CODE  255
@@ -33,14 +33,14 @@ typedef struct {
   EFI_KEY_DATA               KeyData;
   EFI_KEY_NOTIFY_FUNCTION    KeyNotificationFn;
   LIST_ENTRY                 NotifyEntry;
-} VIRTIO_KBD_IN_EX_NOTIFY;
+} VIRTIO_INPUT_IN_EX_NOTIFY;
 
 // Data structure representing payload delivered from VirtIo
 typedef struct {
   UINT16    Type;
   UINT16    Code;
   UINT32    Value;
-} VIRTIO_KBD_EVENT;
+} VIRTIO_INPUT_EVENT;
 
 // Data structure representing ring buffer
 typedef struct {
@@ -57,7 +57,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS    DeviceAddress;
 
   BOOLEAN                 Ready;
-} VIRTIO_KBD_RING;
+} VIRTIO_INPUT_RING;
 
 // Declaration of data structure representing driver context
 typedef struct {
@@ -90,13 +90,13 @@ typedef struct {
   VIRTIO_DEVICE_PROTOCOL               *VirtIo;
 
   // Hook for ring buffer
-  VIRTIO_KBD_RING                      Rings[KEYBOARD_MAX_RINGS];
+  VIRTIO_INPUT_RING                    Rings[MAX_RINGS];
 
-  // Timer event for checking key presses from VirtIo
-  EFI_EVENT                            KeyReadTimer;
+  // Timer event for checking input from VirtIo
+  EFI_EVENT                            PollTimer;
 
   // List for notifications
-  LIST_ENTRY                           NotifyList;
+  LIST_ENTRY                           KeyNotifyList;
 
   // Last pressed key
   // typedef struct {
@@ -110,13 +110,13 @@ typedef struct {
 
   // If key is ready
   BOOLEAN                              KeyReady;
-} VIRTIO_KBD_DEV;
+} VIRTIO_INPUT_DEV;
 
-// Helper functions to extract VIRTIO_KBD_DEV structure pointers
-#define VIRTIO_KEYBOARD_FROM_THIS(KbrPointer) \
-          CR (KbrPointer, VIRTIO_KBD_DEV, Txt, VIRTIO_KBD_SIG)
-#define VIRTIO_KEYBOARD_EX_FROM_THIS(KbrPointer) \
-          CR (KbrPointer, VIRTIO_KBD_DEV, TxtEx, VIRTIO_KBD_SIG)
+// Helper functions to extract VIRTIO_INPUT_DEV structure pointers
+#define VIRTIO_INPUT_FROM_THIS(KbrPointer) \
+          CR (KbrPointer, VIRTIO_INPUT_DEV, Txt, VIRTIO_INPUT_SIG)
+#define VIRTIO_INPUT_EX_FROM_THIS(KbrPointer) \
+          CR (KbrPointer, VIRTIO_INPUT_DEV, TxtEx, VIRTIO_INPUT_SIG)
 
 // Bellow candidates to be included as Linux header
 #define KEY_PRESSED  1
