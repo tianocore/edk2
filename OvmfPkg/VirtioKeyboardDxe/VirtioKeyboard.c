@@ -794,15 +794,15 @@ VirtioKeyboardSetState (
 
 BOOLEAN
 IsKeyRegistered (
-  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *RegisteredData,
   IN EFI_KEY_DATA  *InputData
   )
 
 {
-  ASSERT (RegsiteredData != NULL && InputData != NULL);
+  ASSERT (RegisteredData != NULL && InputData != NULL);
 
-  if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
-      (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar))
+  if ((RegisteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
+      (RegisteredData->Key.UnicodeChar != InputData->Key.UnicodeChar))
   {
     return FALSE;
   }
@@ -811,14 +811,14 @@ IsKeyRegistered (
   // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means
   // these state could be ignored.
   //
-  if ((RegsiteredData->KeyState.KeyShiftState != 0) &&
-      (RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState))
+  if ((RegisteredData->KeyState.KeyShiftState != 0) &&
+      (RegisteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState))
   {
     return FALSE;
   }
 
-  if ((RegsiteredData->KeyState.KeyToggleState != 0) &&
-      (RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState))
+  if ((RegisteredData->KeyState.KeyToggleState != 0) &&
+      (RegisteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState))
   {
     return FALSE;
   }
