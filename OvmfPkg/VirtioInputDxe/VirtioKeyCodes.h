@@ -1,6 +1,6 @@
 /** @file
 
-  Key codes definitions for the VirtioKeyboard driver
+  Key codes definitions for the virtio input driver
 
   This is a fork of common Linux key codes:
   https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h

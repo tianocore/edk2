@@ -1,6 +1,6 @@
 /** @file
 
-  This driver produces EFI_SIMPLE_TEXT_INPUT_PROTOCOL for virtarm devices.
+  Driver for virtio input devices.
 
   Copyright (C) 2024, Red Hat, Inc.
 
@@ -15,7 +15,7 @@
 #include <Library/UefiLib.h>
 #include <Library/VirtioLib.h>
 
-#include <VirtioKeyboard.h>
+#include <VirtioInput.h>
 #include <VirtioKeyCodes.h>
 
 // -----------------------------------------------------------------------------
@@ -23,8 +23,8 @@
 STATIC
 VOID *
 BufferPtr (
-  IN VIRTIO_KBD_RING  *Ring,
-  IN UINT32           BufferNr
+  IN VIRTIO_INPUT_RING  *Ring,
+  IN UINT32             BufferNr
   )
 {
   return Ring->Buffers + Ring->BufferSize * BufferNr;
@@ -35,8 +35,8 @@ BufferPtr (
 STATIC
 EFI_PHYSICAL_ADDRESS
 BufferAddr (
-  IN VIRTIO_KBD_RING  *Ring,
-  IN UINT32           BufferNr
+  IN VIRTIO_INPUT_RING  *Ring,
+  IN UINT32             BufferNr
   )
 {
   return Ring->DeviceAddress + Ring->BufferSize * BufferNr;
@@ -46,7 +46,7 @@ BufferAddr (
 STATIC
 UINT32
 BufferNext (
-  IN VIRTIO_KBD_RING  *Ring
+  IN VIRTIO_INPUT_RING  *Ring
   )
 {
   return Ring->Indices.NextDescIdx % Ring->Ring.QueueSize;
@@ -57,18 +57,18 @@ BufferNext (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardRingSendBuffer (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN     UINT16          Index,
-  IN     VOID            *Data,
-  IN     UINT32          DataSize,
-  IN     BOOLEAN         Notify
+VirtioInputRingSendBuffer (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN     UINT16            Index,
+  IN     VOID              *Data,
+  IN     UINT32            DataSize,
+  IN     BOOLEAN           Notify
   )
 {
-  VIRTIO_KBD_RING  *Ring    = Dev->Rings + Index;
-  UINT32           BufferNr = BufferNext (Ring);
-  UINT16           Idx      = *Ring->Ring.Avail.Idx;
-  UINT16           Flags    = 0;
+  VIRTIO_INPUT_RING  *Ring    = Dev->Rings + Index;
+  UINT32             BufferNr = BufferNext (Ring);
+  UINT16             Idx      = *Ring->Ring.Avail.Idx;
+  UINT16             Flags    = 0;
 
   ASSERT (DataSize <= Ring->BufferSize);
 
@@ -110,14 +110,14 @@ VirtioKeyboardRingSendBuffer (
 STATIC
 BOOLEAN
 EFIAPI
-VirtioKeyboardRingGetBuffer (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN     UINT16          Index,
-  OUT    VOID            *Data,
-  OUT    UINT32          *DataSize
+VirtioInputRingGetBuffer (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN     UINT16            Index,
+  OUT    VOID              *Data,
+  OUT    UINT32            *DataSize
   )
 {
-  VIRTIO_KBD_RING           *Ring   = Dev->Rings + Index;
+  VIRTIO_INPUT_RING         *Ring   = Dev->Rings + Index;
   UINT16                    UsedIdx = *Ring->Ring.Used.Idx;
   volatile VRING_USED_ELEM  *UsedElem;
 
@@ -143,7 +143,7 @@ VirtioKeyboardRingGetBuffer (
 
   if (Index % 2 == 0) {
     /* RX - re-queue buffer */
-    VirtioKeyboardRingSendBuffer (Dev, Index, NULL, Ring->BufferSize, FALSE);
+    VirtioInputRingSendBuffer (Dev, Index, NULL, Ring->BufferSize, FALSE);
   }
 
   Ring->LastUsedIdx++;
@@ -155,16 +155,16 @@ VirtioKeyboardRingGetBuffer (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardInitRing (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN     UINT16          Index,
-  IN     UINT32          BufferSize
+VirtioInputInitRing (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN     UINT16            Index,
+  IN     UINT32            BufferSize
   )
 {
-  VIRTIO_KBD_RING  *Ring = Dev->Rings + Index;
-  EFI_STATUS       Status;
-  UINT16           QueueSize;
-  UINT64           RingBaseShift;
+  VIRTIO_INPUT_RING  *Ring = Dev->Rings + Index;
+  EFI_STATUS         Status;
+  UINT16             QueueSize;
+  UINT64             RingBaseShift;
 
   //
   // step 4b -- allocate request virtqueue
@@ -180,7 +180,7 @@ VirtioKeyboardInitRing (
   }
 
   //
-  // VirtioKeyboard uses one descriptor
+  // VirtioInput uses one descriptor
   //
   if (QueueSize < 1) {
     Status = EFI_UNSUPPORTED;
@@ -281,12 +281,12 @@ Failed:
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardUninitRing (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN     UINT16          Index
+VirtioInputUninitRing (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN     UINT16            Index
   )
 {
-  VIRTIO_KBD_RING  *Ring = Dev->Rings + Index;
+  VIRTIO_INPUT_RING  *Ring = Dev->Rings + Index;
 
   if (Ring->BufferMap) {
     Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Ring->BufferMap);
@@ -319,14 +319,14 @@ VirtioKeyboardUninitRing (
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardUninitAllRings (
-  IN OUT VIRTIO_KBD_DEV  *Dev
+VirtioInputUninitAllRings (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
   )
 {
   UINT16  Index;
 
-  for (Index = 0; Index < KEYBOARD_MAX_RINGS; Index++) {
-    VirtioKeyboardUninitRing (Dev, Index);
+  for (Index = 0; Index < MAX_RINGS; Index++) {
+    VirtioInputUninitRing (Dev, Index);
   }
 }
 
@@ -334,16 +334,16 @@ VirtioKeyboardUninitAllRings (
 // Mark all buffers as ready to write and push to device
 VOID
 EFIAPI
-VirtioKeyboardRingFillRx (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN     UINT16          Index
+VirtioInputRingFillRx (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN     UINT16            Index
   )
 {
-  VIRTIO_KBD_RING  *Ring = Dev->Rings + Index;
-  UINT32           BufferNr;
+  VIRTIO_INPUT_RING  *Ring = Dev->Rings + Index;
+  UINT32             BufferNr;
 
   for (BufferNr = 0; BufferNr < Ring->BufferCount; BufferNr++) {
-    VirtioKeyboardRingSendBuffer (Dev, Index, NULL, Ring->BufferSize, FALSE);
+    VirtioInputRingSendBuffer (Dev, Index, NULL, Ring->BufferSize, FALSE);
   }
 
   Dev->VirtIo->SetQueueNotify (Dev->VirtIo, Index);
@@ -353,16 +353,16 @@ VirtioKeyboardRingFillRx (
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardUninit (
-  IN OUT VIRTIO_KBD_DEV  *Dev
+VirtioInputUninit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
   );
 
 // Forward declaration of module Init function
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardInit (
-  IN OUT VIRTIO_KBD_DEV  *Dev
+VirtioInputInit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
   );
 
 // -----------------------------------------------------------------------------
@@ -370,16 +370,16 @@ VirtioKeyboardInit (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardSimpleTextInputReset (
+VirtioInputSimpleTextInputReset (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
 {
-  VIRTIO_KBD_DEV  *Dev;
+  VIRTIO_INPUT_DEV  *Dev;
 
-  Dev = VIRTIO_KEYBOARD_FROM_THIS (This);
-  VirtioKeyboardUninit (Dev);
-  VirtioKeyboardInit (Dev);
+  Dev = VIRTIO_INPUT_FROM_THIS (This);
+  VirtioInputUninit (Dev);
+  VirtioInputInit (Dev);
 
   return EFI_SUCCESS;
 }
@@ -389,19 +389,19 @@ VirtioKeyboardSimpleTextInputReset (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardSimpleTextInputReadKeyStroke (
+VirtioInputSimpleTextInputReadKeyStroke (
   IN  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
   OUT EFI_INPUT_KEY                   *Key
   )
 {
-  VIRTIO_KBD_DEV  *Dev;
-  EFI_TPL         OldTpl;
+  VIRTIO_INPUT_DEV  *Dev;
+  EFI_TPL           OldTpl;
 
   if (Key == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_KEYBOARD_FROM_THIS (This);
+  Dev = VIRTIO_INPUT_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (Dev->KeyReady) {
@@ -425,10 +425,10 @@ VirtioKeyboardSimpleTextInputReadKeyStroke (
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardConvertKeyCode (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN UINT16              Code,
-  OUT EFI_INPUT_KEY      *Key
+VirtioInputConvertKeyCode (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN UINT16                Code,
+  OUT EFI_INPUT_KEY        *Key
   )
 {
   // Key mapping in between Linux and UEFI
@@ -557,22 +557,22 @@ VirtioKeyboardConvertKeyCode (
 }
 
 // -----------------------------------------------------------------------------
-// Main function processing virtio keyboard events
+// Main function processing virtio input events
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardGetDeviceData (
-  IN OUT VIRTIO_KBD_DEV  *Dev
+VirtioInputGetDeviceData (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
   )
 {
-  BOOLEAN           HasData;
-  UINT8             Data[KEYBOARD_RX_BUFSIZE + 1];
-  UINT32            DataSize;
-  VIRTIO_KBD_EVENT  Event;
-  EFI_TPL           OldTpl;
+  BOOLEAN             HasData;
+  UINT8               Data[RX_BUFSIZE + 1];
+  UINT32              DataSize;
+  VIRTIO_INPUT_EVENT  Event;
+  EFI_TPL             OldTpl;
 
   for ( ; ; ) {
-    HasData = VirtioKeyboardRingGetBuffer (Dev, 0, Data, &DataSize);
+    HasData = VirtioInputRingGetBuffer (Dev, 0, Data, &DataSize);
 
     // Exit if no new data
     if (!HasData) {
@@ -605,7 +605,7 @@ VirtioKeyboardGetDeviceData (
           Dev->KeyActive[(UINT8)Event.Code] = TRUE;
 
           // Evaluate key
-          VirtioKeyboardConvertKeyCode (Dev, Event.Code, &Dev->LastKey);
+          VirtioInputConvertKeyCode (Dev, Event.Code, &Dev->LastKey);
 
           // Flag that printable character is ready to be send
           Dev->KeyReady = TRUE;
@@ -630,14 +630,14 @@ VirtioKeyboardGetDeviceData (
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardTimer (
+VirtioInputTimer (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
 {
-  VIRTIO_KBD_DEV  *Dev = Context;
+  VIRTIO_INPUT_DEV  *Dev = Context;
 
-  VirtioKeyboardGetDeviceData (Dev);
+  VirtioInputGetDeviceData (Dev);
 }
 
 // -----------------------------------------------------------------------------
@@ -645,12 +645,12 @@ VirtioKeyboardTimer (
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardWaitForKey (
+VirtioInputWaitForKey (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   )
 {
-  VIRTIO_KBD_DEV  *Dev = (VIRTIO_KBD_DEV *)Context;
+  VIRTIO_INPUT_DEV  *Dev = (VIRTIO_INPUT_DEV *)Context;
 
   //
   // Stall 1ms to give a chance to let other driver interrupt this routine
@@ -665,7 +665,7 @@ VirtioKeyboardWaitForKey (
   gBS->Stall (1000);
 
   // Use TimerEvent callback function to check whether there's any key pressed
-  VirtioKeyboardTimer (NULL, Dev);
+  VirtioInputTimer (NULL, Dev);
 
   // If there is a new key ready - send signal
   if (Dev->KeyReady) {
@@ -678,16 +678,16 @@ VirtioKeyboardWaitForKey (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardResetEx (
+VirtioInputResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
 {
-  VIRTIO_KBD_DEV  *Dev;
-  EFI_STATUS      Status;
-  EFI_TPL         OldTpl;
+  VIRTIO_INPUT_DEV  *Dev;
+  EFI_STATUS        Status;
+  EFI_TPL           OldTpl;
 
-  Dev = VIRTIO_KEYBOARD_EX_FROM_THIS (This);
+  Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
   // Call the reset function from SIMPLE_TEXT_INPUT protocol
   Status = Dev->Txt.Reset (
@@ -710,21 +710,21 @@ VirtioKeyboardResetEx (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardReadKeyStrokeEx (
+VirtioInputReadKeyStrokeEx (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   OUT EFI_KEY_DATA                       *KeyData
   )
 {
-  VIRTIO_KBD_DEV  *Dev;
-  EFI_STATUS      Status;
-  EFI_INPUT_KEY   Key;
-  EFI_KEY_STATE   KeyState;
+  VIRTIO_INPUT_DEV  *Dev;
+  EFI_STATUS        Status;
+  EFI_INPUT_KEY     Key;
+  EFI_KEY_STATE     KeyState;
 
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_KEYBOARD_EX_FROM_THIS (This);
+  Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
   // Get the last pressed key
   Status = Dev->Txt.ReadKeyStroke (&Dev->Txt, &Key);
@@ -775,7 +775,7 @@ VirtioKeyboardReadKeyStrokeEx (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardSetState (
+VirtioInputSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
@@ -827,19 +827,19 @@ IsKeyRegistered (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardRegisterKeyNotify (
+VirtioInputRegisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT VOID                              **NotifyHandle
   )
 {
-  EFI_STATUS               Status;
-  VIRTIO_KBD_DEV           *Dev;
-  EFI_TPL                  OldTpl;
-  LIST_ENTRY               *Link;
-  VIRTIO_KBD_IN_EX_NOTIFY  *NewNotify;
-  VIRTIO_KBD_IN_EX_NOTIFY  *CurrentNotify;
+  EFI_STATUS                 Status;
+  VIRTIO_INPUT_DEV           *Dev;
+  EFI_TPL                    OldTpl;
+  LIST_ENTRY                 *Link;
+  VIRTIO_INPUT_IN_EX_NOTIFY  *NewNotify;
+  VIRTIO_INPUT_IN_EX_NOTIFY  *CurrentNotify;
 
   if ((KeyData == NULL) ||
       (NotifyHandle == NULL) ||
@@ -848,20 +848,20 @@ VirtioKeyboardRegisterKeyNotify (
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_KEYBOARD_EX_FROM_THIS (This);
+  Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   // Check if the (KeyData, NotificationFunction) pair is already registered.
-  for (Link = Dev->NotifyList.ForwardLink;
-       Link != &Dev->NotifyList;
+  for (Link = Dev->KeyNotifyList.ForwardLink;
+       Link != &Dev->KeyNotifyList;
        Link = Link->ForwardLink)
   {
     CurrentNotify = CR (
                       Link,
-                      VIRTIO_KBD_IN_EX_NOTIFY,
+                      VIRTIO_INPUT_IN_EX_NOTIFY,
                       NotifyEntry,
-                      VIRTIO_KBD_SIG
+                      VIRTIO_INPUT_SIG
                       );
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
@@ -872,16 +872,16 @@ VirtioKeyboardRegisterKeyNotify (
     }
   }
 
-  NewNotify = (VIRTIO_KBD_IN_EX_NOTIFY *)AllocateZeroPool (sizeof (VIRTIO_KBD_IN_EX_NOTIFY));
+  NewNotify = (VIRTIO_INPUT_IN_EX_NOTIFY *)AllocateZeroPool (sizeof (VIRTIO_INPUT_IN_EX_NOTIFY));
   if (NewNotify == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
 
-  NewNotify->Signature         = VIRTIO_KBD_SIG;
+  NewNotify->Signature         = VIRTIO_INPUT_SIG;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
-  InsertTailList (&Dev->NotifyList, &NewNotify->NotifyEntry);
+  InsertTailList (&Dev->KeyNotifyList, &NewNotify->NotifyEntry);
 
   *NotifyHandle = NewNotify;
   Status        = EFI_SUCCESS;
@@ -897,38 +897,38 @@ Exit:
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardUnregisterKeyNotify (
+VirtioInputUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN VOID                               *NotificationHandle
   )
 {
-  EFI_STATUS               Status;
-  VIRTIO_KBD_DEV           *Dev;
-  EFI_TPL                  OldTpl;
-  LIST_ENTRY               *Link;
-  VIRTIO_KBD_IN_EX_NOTIFY  *CurrentNotify;
+  EFI_STATUS                 Status;
+  VIRTIO_INPUT_DEV           *Dev;
+  EFI_TPL                    OldTpl;
+  LIST_ENTRY                 *Link;
+  VIRTIO_INPUT_IN_EX_NOTIFY  *CurrentNotify;
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((VIRTIO_KBD_IN_EX_NOTIFY *)NotificationHandle)->Signature != VIRTIO_KBD_SIG) {
+  if (((VIRTIO_INPUT_IN_EX_NOTIFY *)NotificationHandle)->Signature != VIRTIO_INPUT_SIG) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_KEYBOARD_EX_FROM_THIS (This);
+  Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  for (Link = Dev->NotifyList.ForwardLink;
-       Link != &Dev->NotifyList;
+  for (Link = Dev->KeyNotifyList.ForwardLink;
+       Link != &Dev->KeyNotifyList;
        Link = Link->ForwardLink)
   {
     CurrentNotify = CR (
                       Link,
-                      VIRTIO_KBD_IN_EX_NOTIFY,
+                      VIRTIO_INPUT_IN_EX_NOTIFY,
                       NotifyEntry,
-                      VIRTIO_KBD_SIG
+                      VIRTIO_INPUT_SIG
                       );
     if (CurrentNotify == NotificationHandle) {
       RemoveEntryList (&CurrentNotify->NotifyEntry);
@@ -952,8 +952,8 @@ Exit:
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardInit (
-  IN OUT VIRTIO_KBD_DEV  *Dev
+VirtioInputInit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
   )
 {
   UINT8       NextDevStat;
@@ -1010,7 +1010,7 @@ VirtioKeyboardInit (
     }
   }
 
-  Status = VirtioKeyboardInitRing (Dev, 0, KEYBOARD_RX_BUFSIZE);
+  Status = VirtioInputInitRing (Dev, 0, RX_BUFSIZE);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -1044,8 +1044,8 @@ VirtioKeyboardInit (
   //    EFI_INPUT_READ_KEY  ReadKeyStroke;
   //    EFI_EVENT           WaitForKey;
   // };
-  Dev->Txt.Reset         = (EFI_INPUT_RESET)VirtioKeyboardSimpleTextInputReset;
-  Dev->Txt.ReadKeyStroke = VirtioKeyboardSimpleTextInputReadKeyStroke;
+  Dev->Txt.Reset         = (EFI_INPUT_RESET)VirtioInputSimpleTextInputReset;
+  Dev->Txt.ReadKeyStroke = VirtioInputSimpleTextInputReadKeyStroke;
 
   // struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
   //    EFI_INPUT_RESET_EX              Reset;
@@ -1055,12 +1055,12 @@ VirtioKeyboardInit (
   //    EFI_REGISTER_KEYSTROKE_NOTIFY   RegisterKeyNotify;
   //    EFI_UNREGISTER_KEYSTROKE_NOTIFY UnregisterKeyNotify;
   // }
-  Dev->TxtEx.Reset               = (EFI_INPUT_RESET_EX)VirtioKeyboardResetEx;
-  Dev->TxtEx.ReadKeyStrokeEx     = VirtioKeyboardReadKeyStrokeEx;
-  Dev->TxtEx.SetState            = VirtioKeyboardSetState;
-  Dev->TxtEx.RegisterKeyNotify   = VirtioKeyboardRegisterKeyNotify;
-  Dev->TxtEx.UnregisterKeyNotify = VirtioKeyboardUnregisterKeyNotify;
-  InitializeListHead (&Dev->NotifyList);
+  Dev->TxtEx.Reset               = (EFI_INPUT_RESET_EX)VirtioInputResetEx;
+  Dev->TxtEx.ReadKeyStrokeEx     = VirtioInputReadKeyStrokeEx;
+  Dev->TxtEx.SetState            = VirtioInputSetState;
+  Dev->TxtEx.RegisterKeyNotify   = VirtioInputRegisterKeyNotify;
+  Dev->TxtEx.UnregisterKeyNotify = VirtioInputUnregisterKeyNotify;
+  InitializeListHead (&Dev->KeyNotifyList);
 
   //
   // Setup the WaitForKey event
@@ -1068,7 +1068,7 @@ VirtioKeyboardInit (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
-                  VirtioKeyboardWaitForKey,
+                  VirtioInputWaitForKey,
                   Dev,
                   &(Dev->Txt.WaitForKey)
                   );
@@ -1082,7 +1082,7 @@ VirtioKeyboardInit (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
-                  VirtioKeyboardWaitForKey,
+                  VirtioInputWaitForKey,
                   Dev,
                   &(Dev->TxtEx.WaitForKeyEx)
                   );
@@ -1090,7 +1090,7 @@ VirtioKeyboardInit (
     goto Failed;
   }
 
-  VirtioKeyboardRingFillRx (Dev, 0);
+  VirtioInputRingFillRx (Dev, 0);
 
   //
   // Event for reading key in time intervals
@@ -1098,18 +1098,18 @@ VirtioKeyboardInit (
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  VirtioKeyboardTimer,
+                  VirtioInputTimer,
                   Dev,
-                  &Dev->KeyReadTimer
+                  &Dev->PollTimer
                   );
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   Status = gBS->SetTimer (
-                  Dev->KeyReadTimer,
+                  Dev->PollTimer,
                   TimerPeriodic,
-                  EFI_TIMER_PERIOD_MILLISECONDS (KEYBOARD_PROBE_TIME_MS)
+                  EFI_TIMER_PERIOD_MILLISECONDS (PROBE_TIME_MS)
                   );
   if (EFI_ERROR (Status)) {
     goto Failed;
@@ -1118,8 +1118,7 @@ VirtioKeyboardInit (
   return EFI_SUCCESS;
 
 Failed:
-  VirtioKeyboardUninitAllRings (Dev);
-  // VirtualKeyboardFreeNotifyList (&VirtualKeyboardPrivate->NotifyList);
+  VirtioInputUninitAllRings (Dev);
 
   //
   // Notify the host about our failure to setup: virtio-0.9.5, 2.2.2.1 Device
@@ -1136,11 +1135,11 @@ Failed:
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardUninit (
-  IN OUT VIRTIO_KBD_DEV  *Dev
+VirtioInputUninit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
   )
 {
-  gBS->CloseEvent (Dev->KeyReadTimer);
+  gBS->CloseEvent (Dev->PollTimer);
   gBS->CloseEvent (Dev->Txt.WaitForKey);
   gBS->CloseEvent (Dev->TxtEx.WaitForKeyEx);
 
@@ -1151,7 +1150,7 @@ VirtioKeyboardUninit (
   //
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
-  VirtioKeyboardUninitAllRings (Dev);
+  VirtioInputUninitAllRings (Dev);
 }
 
 // -----------------------------------------------------------------------------
@@ -1159,12 +1158,12 @@ VirtioKeyboardUninit (
 STATIC
 VOID
 EFIAPI
-VirtioKeyboardExitBoot (
+VirtioInputExitBoot (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   )
 {
-  VIRTIO_KBD_DEV  *Dev;
+  VIRTIO_INPUT_DEV  *Dev;
 
   DEBUG ((DEBUG_INFO, "%a: Context=0x%p\n", __func__, Context));
   //
@@ -1183,7 +1182,7 @@ VirtioKeyboardExitBoot (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardBindingSupported (
+VirtioInputBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   DeviceHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
@@ -1238,16 +1237,16 @@ VirtioKeyboardBindingSupported (
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardBindingStart (
+VirtioInputBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   DeviceHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  VIRTIO_KBD_DEV  *Dev;
-  EFI_STATUS      Status;
+  VIRTIO_INPUT_DEV  *Dev;
+  EFI_STATUS        Status;
 
-  Dev = (VIRTIO_KBD_DEV *)AllocateZeroPool (sizeof *Dev);
+  Dev = (VIRTIO_INPUT_DEV *)AllocateZeroPool (sizeof *Dev);
   if (Dev == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1261,13 +1260,13 @@ VirtioKeyboardBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    goto FreeVirtioKbd;
+    goto FreeVirtioInput;
   }
 
   //
   // VirtIo access granted, configure virtio keyboard device.
   //
-  Status = VirtioKeyboardInit (Dev);
+  Status = VirtioInputInit (Dev);
   if (EFI_ERROR (Status)) {
     goto CloseVirtIo;
   }
@@ -1275,7 +1274,7 @@ VirtioKeyboardBindingStart (
   Status = gBS->CreateEvent (
                   EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_CALLBACK,
-                  &VirtioKeyboardExitBoot,
+                  &VirtioInputExitBoot,
                   Dev,
                   &Dev->ExitBoot
                   );
@@ -1287,7 +1286,7 @@ VirtioKeyboardBindingStart (
   // Setup complete, attempt to export the driver instance's EFI_SIMPLE_TEXT_INPUT_PROTOCOL
   // interface.
   //
-  Dev->Signature = VIRTIO_KBD_SIG;
+  Dev->Signature = VIRTIO_INPUT_SIG;
   Status         = gBS->InstallMultipleProtocolInterfaces (
                           &DeviceHandle,
                           &gEfiSimpleTextInProtocolGuid,
@@ -1306,7 +1305,7 @@ CloseExitBoot:
   gBS->CloseEvent (Dev->ExitBoot);
 
 UninitDev:
-  VirtioKeyboardUninit (Dev);
+  VirtioInputUninit (Dev);
 
 CloseVirtIo:
   gBS->CloseProtocol (
@@ -1316,7 +1315,7 @@ CloseVirtIo:
          DeviceHandle
          );
 
-FreeVirtioKbd:
+FreeVirtioInput:
   FreePool (Dev);
 
   return Status;
@@ -1327,7 +1326,7 @@ FreeVirtioKbd:
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardBindingStop (
+VirtioInputBindingStop (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   DeviceHandle,
   IN UINTN                        NumberOfChildren,
@@ -1336,7 +1335,7 @@ VirtioKeyboardBindingStop (
 {
   EFI_STATUS                      Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *Txt;
-  VIRTIO_KBD_DEV                  *Dev;
+  VIRTIO_INPUT_DEV                *Dev;
 
   Status = gBS->OpenProtocol (
                   DeviceHandle,                     // candidate device
@@ -1350,7 +1349,7 @@ VirtioKeyboardBindingStop (
     return Status;
   }
 
-  Dev = VIRTIO_KEYBOARD_FROM_THIS (Txt);
+  Dev = VIRTIO_INPUT_FROM_THIS (Txt);
 
   //
   // Handle Stop() requests for in-use driver instances gracefully.
@@ -1369,7 +1368,7 @@ VirtioKeyboardBindingStop (
 
   gBS->CloseEvent (Dev->ExitBoot);
 
-  VirtioKeyboardUninit (Dev);
+  VirtioInputUninit (Dev);
 
   gBS->CloseProtocol (
          DeviceHandle,
@@ -1392,8 +1391,8 @@ EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 // Driver name to be displayed
 STATIC
 EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
-  { "eng;en", L"Virtio Keyboard Driver" },
-  { NULL,     NULL                      }
+  { "eng;en", L"Virtio Input Driver" },
+  { NULL,     NULL                   }
 };
 
 // -----------------------------------------------------------------------------
@@ -1401,7 +1400,7 @@ EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardGetDriverName (
+VirtioInputGetDriverName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
@@ -1420,8 +1419,8 @@ VirtioKeyboardGetDriverName (
 // Device name to be displayed
 STATIC
 EFI_UNICODE_STRING_TABLE  mDeviceNameTable[] = {
-  { "eng;en", L"RHEL virtio virtual keyboard BOB (Basic Operation Board)" },
-  { NULL,     NULL                                                        }
+  { "eng;en", L"Red Hat Virtio Input device" },
+  { NULL,     NULL                           }
 };
 
 // -----------------------------------------------------------------------------
@@ -1432,7 +1431,7 @@ EFI_COMPONENT_NAME_PROTOCOL  gDeviceName;
 STATIC
 EFI_STATUS
 EFIAPI
-VirtioKeyboardGetDeviceName (
+VirtioInputGetDeviceName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN  EFI_HANDLE                   DeviceHandle,
   IN  EFI_HANDLE                   ChildHandle,
@@ -1453,8 +1452,8 @@ VirtioKeyboardGetDeviceName (
 // General driver UEFI interface for showing driver name
 STATIC
 EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
-  &VirtioKeyboardGetDriverName,
-  &VirtioKeyboardGetDeviceName,
+  &VirtioInputGetDriverName,
+  &VirtioInputGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
@@ -1462,20 +1461,20 @@ EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
 // General driver UEFI interface for showing driver name
 STATIC
 EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&VirtioKeyboardGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&VirtioKeyboardGetDeviceName,
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&VirtioInputGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&VirtioInputGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };
 
 // -----------------------------------------------------------------------------
 // General driver UEFI interface for loading / unloading driver
 STATIC EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
-  &VirtioKeyboardBindingSupported,
-  &VirtioKeyboardBindingStart,
-  &VirtioKeyboardBindingStop,
+  &VirtioInputBindingSupported,
+  &VirtioInputBindingStart,
+  &VirtioInputBindingStop,
   0x10, // Version, must be in [0x10 .. 0xFFFFFFEF] for IHV-developed drivers
   NULL, // ImageHandle, to be overwritten by
-        // EfiLibInstallDriverBindingComponentName2() in VirtioKeyboardEntryPoint()
+        // EfiLibInstallDriverBindingComponentName2() in VirtioInputEntryPoint()
   NULL  // DriverBindingHandle, ditto
 };
 
@@ -1483,12 +1482,12 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
 // Driver entry point set in INF file, registers all driver functions into UEFI
 EFI_STATUS
 EFIAPI
-VirtioKeyboardEntryPoint (
+VirtioInputEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  DEBUG ((DEBUG_INFO, "Virtio keyboard has been loaded.......................\n"));
+  DEBUG ((DEBUG_INFO, "Virtio input driver has been loaded.......................\n"));
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,
