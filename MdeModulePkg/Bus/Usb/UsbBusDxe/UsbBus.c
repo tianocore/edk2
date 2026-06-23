@@ -816,13 +816,14 @@ UsbIoPortReset (
   IN EFI_USB_IO_PROTOCOL  *This
   )
 {
-  USB_INTERFACE  *UsbIf;
-  USB_INTERFACE  *HubIf;
-  USB_DEVICE     *Dev;
-  EFI_TPL        OldTpl;
-  EFI_STATUS     Status;
-  UINT8          DevAddress;
-  UINT8          Config;
+  USB_INTERFACE    *UsbIf;
+  USB_INTERFACE    *HubIf;
+  USB_DEVICE       *Dev;
+  EFI_TPL          OldTpl;
+  EFI_STATUS       Status;
+  UINT8            DevAddress;
+  UINT8            Config;
+  USB_DEVICE_DESC  *DevDesc;
 
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
@@ -884,21 +885,30 @@ UsbIoPortReset (
   // is in CONFIGURED state.
   //
   if (Dev->ActiveConfig != NULL) {
-    UsbFreeDevDesc (Dev->DevDesc);
-
-    Status = UsbRemoveConfig (Dev);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to remove configuration - %r\n", Status));
-    }
-
     Status = UsbGetMaxPacketSize0 (Dev);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to get max packet size - %r\n", Status));
     }
 
+    // Expect the Device Descriptor should not be changed.
+    // UEFI spec 2.11 Ch. 17.2.18 EFI_USB_IO_PROTOCOL.UsbPortReset
+    // This Reset function does not change the bus topology.
+
+    // Save the device descriptor before resetting and then restore it after build descriptor table
+    DevDesc      = Dev->DevDesc;
+    Dev->DevDesc = NULL;
+
     Status = UsbBuildDescTable (Dev);
+
+    if (Dev->DevDesc != NULL) {
+      UsbFreeDevDesc (Dev->DevDesc);
+    }
+
+    Dev->DevDesc = DevDesc;
+
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to build descriptor table - %r\n", Status));
+      goto ON_EXIT;
     }
 
     Config = Dev->DevDesc->Configs[0]->Desc.ConfigurationValue;
@@ -911,11 +921,6 @@ UsbIoPortReset (
         Dev->Address,
         Status
         ));
-    }
-
-    Status = UsbSelectConfig (Dev, Config);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to set configuration - %r\n", Status));
     }
   }
 
