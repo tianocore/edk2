@@ -321,7 +321,7 @@ VirtioKeyboardUninitRing (
     Ring->Buffers = NULL;
   }
 
-  if (!Ring->RingMap) {
+  if (Ring->RingMap) {
     Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Ring->RingMap);
     Ring->RingMap = NULL;
   }
