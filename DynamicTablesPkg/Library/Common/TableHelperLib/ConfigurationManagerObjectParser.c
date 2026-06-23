@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Object parser.
 
-  Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
   Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1223,6 +1223,18 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryArrayMappedAddressParser[] = {
   { "NumMemDevices",                 sizeof (UINT8),                "0x%u",  NULL },
 };
 
+/** A parser for EArchCommonObjCoolingDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonCoolingDeviceInfoParser[] = {
+  { "Token",                 sizeof (CM_OBJECT_TOKEN),          "0x%p", NULL        },
+  { "TemperatureProbeToken", sizeof (CM_OBJECT_TOKEN),          "0x%p", NULL        },
+  { "DeviceTypeAndStatus",   sizeof (MISC_COOLING_DEVICE_TYPE), "0x%x", NULL        },
+  { "CoolingUnitGroup",      sizeof (UINT8),                    "0x%x", NULL        },
+  { "OEMDefined",            sizeof (UINT32),                   "0x%x", NULL        },
+  { "NominalSpeed",          sizeof (UINT16),                   "0x%x", NULL        },
+  { "Description",           SMBIOS_MAX_STRING_SIZE,            NULL,   PrintString },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1285,6 +1297,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,          CmArchCommonPhysicalMemoryArrayParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceInfo,             CmArchCommonMemoryDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,     CmArchCommonMemoryArrayMappedAddressParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCoolingDeviceInfo,            CmArchCommonCoolingDeviceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
