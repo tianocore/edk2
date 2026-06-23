@@ -35,13 +35,6 @@ typedef struct {
   LIST_ENTRY                 NotifyEntry;
 } VIRTIO_INPUT_IN_EX_NOTIFY;
 
-// Data structure representing payload delivered from VirtIo
-typedef struct {
-  UINT16    Type;
-  UINT16    Code;
-  UINT32    Value;
-} VIRTIO_INPUT_EVENT;
-
 // Data structure representing ring buffer
 typedef struct {
   VRING                   Ring;
