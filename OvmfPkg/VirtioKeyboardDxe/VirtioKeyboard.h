@@ -97,7 +97,6 @@ typedef struct {
 
   // List for notifications
   LIST_ENTRY                           NotifyList;
-  EFI_EVENT                            KeyNotifyTimer;
 
   // Last pressed key
   // typedef struct {
