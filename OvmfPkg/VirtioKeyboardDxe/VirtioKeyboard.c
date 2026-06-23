@@ -105,29 +105,6 @@ VirtioKeyboardRingSendBuffer (
 }
 
 // -----------------------------------------------------------------------------
-// Look for buffer ready to be processed
-BOOLEAN
-EFIAPI
-VirtioKeyboardRingHasBuffer (
-  IN OUT VIRTIO_KBD_DEV  *Dev,
-  IN     UINT16          Index
-  )
-{
-  VIRTIO_KBD_RING  *Ring   = Dev->Rings + Index;
-  UINT16           UsedIdx = *Ring->Ring.Used.Idx;
-
-  if (!Ring->Ready) {
-    return FALSE;
-  }
-
-  if (Ring->LastUsedIdx == UsedIdx) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-// -----------------------------------------------------------------------------
 // Get data from buffer which is marked as ready from device
 BOOLEAN
 EFIAPI
