@@ -38,3 +38,23 @@ MemDebugLogEnabled (
 {
   return FALSE;
 }
+
+EFI_STATUS
+EFIAPI
+MemDebugLogInit (
+  IN EFI_PHYSICAL_ADDRESS  MemDebugLogBufAddr,
+  IN UINT32                MemDebugLogBufSize
+  )
+{
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+MemDebugLogCopy (
+  IN EFI_PHYSICAL_ADDRESS  MemDebugLogBufDestAddr,
+  IN EFI_PHYSICAL_ADDRESS  MemDebugLogBufSrcAddr
+  )
+{
+  return EFI_SUCCESS;
+}
