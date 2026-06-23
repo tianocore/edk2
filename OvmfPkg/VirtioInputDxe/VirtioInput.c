@@ -351,38 +351,29 @@ VirtioInputRingFillRx (
   Dev->VirtIo->SetQueueNotify (Dev->VirtIo, Index);
 }
 
-// Forward declaration of module Uninit function
-STATIC
-VOID
-EFIAPI
-VirtioInputUninit (
-  IN OUT VIRTIO_INPUT_DEV  *Dev
-  );
-
-// Forward declaration of module Init function
-STATIC
-EFI_STATUS
-EFIAPI
-VirtioInputInit (
-  IN OUT VIRTIO_INPUT_DEV  *Dev
-  );
-
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_PROTOCOL API
 STATIC
 EFI_STATUS
 EFIAPI
 VirtioInputSimpleTextInputReset (
-  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN BOOLEAN                            ExtendedVerification
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  IN BOOLEAN                         ExtendedVerification
   )
 {
   VIRTIO_INPUT_DEV  *Dev;
+  EFI_TPL           OldTpl;
 
   Dev = VIRTIO_INPUT_FROM_THIS (This);
-  VirtioInputUninit (Dev);
-  VirtioInputInit (Dev);
 
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  Dev->KeyReady            = FALSE;
+  Dev->LastKey.ScanCode    = SCAN_NULL;
+  Dev->LastKey.UnicodeChar = CHAR_NULL;
+  ZeroMem (Dev->KeyActive, sizeof (Dev->KeyActive));
+
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
 
@@ -687,7 +678,6 @@ VirtioInputResetEx (
 {
   VIRTIO_INPUT_DEV  *Dev;
   EFI_STATUS        Status;
-  EFI_TPL           OldTpl;
 
   Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
@@ -696,13 +686,9 @@ VirtioInputResetEx (
                       &Dev->Txt,
                       ExtendedVerification
                       );
-
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
@@ -1046,7 +1032,7 @@ VirtioInputInit (
   //    EFI_INPUT_READ_KEY  ReadKeyStroke;
   //    EFI_EVENT           WaitForKey;
   // };
-  Dev->Txt.Reset         = (EFI_INPUT_RESET)VirtioInputSimpleTextInputReset;
+  Dev->Txt.Reset         = VirtioInputSimpleTextInputReset;
   Dev->Txt.ReadKeyStroke = VirtioInputSimpleTextInputReadKeyStroke;
 
   // struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
@@ -1057,7 +1043,7 @@ VirtioInputInit (
   //    EFI_REGISTER_KEYSTROKE_NOTIFY   RegisterKeyNotify;
   //    EFI_UNREGISTER_KEYSTROKE_NOTIFY UnregisterKeyNotify;
   // }
-  Dev->TxtEx.Reset               = (EFI_INPUT_RESET_EX)VirtioInputResetEx;
+  Dev->TxtEx.Reset               = VirtioInputResetEx;
   Dev->TxtEx.ReadKeyStrokeEx     = VirtioInputReadKeyStrokeEx;
   Dev->TxtEx.SetState            = VirtioInputSetState;
   Dev->TxtEx.RegisterKeyNotify   = VirtioInputRegisterKeyNotify;
