@@ -73,10 +73,8 @@ SsifWriteRequest (
   if (RequestDataSize > IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) {
     IsMultiPartWrite = TRUE;
 
-    // Minus by one for the maximum integer the data type of MiddleCount presents.
-    // Plus by two for the WRITE start and end.
-    if (RequestDataSize > IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES * ((1 << 8) - 1 + 2)) {
-      DEBUG ((DEBUG_ERROR, "%a: The request data size exceeds the maximum transfer blocks: RequestDataSize = %d, maximum transfer blocks = %d.\n", __func__, RequestDataSize, (1 << 8) - 1 + 2));
+    if (RequestDataSize > mMaxRequestSize) {
+      DEBUG ((DEBUG_ERROR, "%a: The request data size exceeds the maximum input message size: RequestDataSize = %d, maximum input message size = %d.\n", __func__, RequestDataSize, mMaxRequestSize));
       return EFI_INVALID_PARAMETER;
     }
   } else {
