@@ -68,7 +68,6 @@ SsifWriteRequest (
   }
 
   MiddleCount      = 0;
-  IsMultiPartWrite = FALSE;
   Status           = EFI_SUCCESS;
 
   if (RequestDataSize > IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) {
@@ -80,7 +79,11 @@ SsifWriteRequest (
       DEBUG ((DEBUG_ERROR, "%a: The request data size exceeds the maximum transfer blocks: RequestDataSize = %d, maximum transfer blocks = %d.\n", __func__, RequestDataSize, (1 << 8) - 1 + 2));
       return EFI_INVALID_PARAMETER;
     }
+  } else {
+    IsMultiPartWrite = FALSE;
+  }
 
+  if (IsMultiPartWrite) {
     MiddleCount = ((RequestDataSize - 1) / IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) - 1;
 
     if (  ((MiddleCount == 0) && (mTransactionSupport == IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_SINGLE_PARTITION_RW))
