@@ -26,6 +26,9 @@ Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
   - EArchCommonObjCoolingDeviceInfo
+  - EArchCommonObjTemperatureProbeInfo
+    Required only when a cooling device provides a non-null
+    TemperatureProbeToken.
 */
 
 /**
@@ -89,6 +92,46 @@ IsValidCoolingDeviceType (
           (Type < SMBIOS_TYPE27_COOLING_DEVICE_TYPE_GAP_MIN)) ||
          ((Type > SMBIOS_TYPE27_COOLING_DEVICE_TYPE_GAP_MAX) &&
           (Type <= SMBIOS_TYPE27_COOLING_DEVICE_TYPE_MAX));
+}
+
+/** Add the Type 28 Temperature Probe handle to the Type 27 record.
+
+  @param [in]      TemperatureProbeToken  CM token of the temperature probe.
+  @param [in,out]  SmbiosRecord           SMBIOS Type 27 record to update.
+
+  @retval EFI_SUCCESS            The handle was added.
+  @retval EFI_NOT_FOUND          The temperature probe handle was not found.
+**/
+STATIC
+EFI_STATUS
+AddTemperatureProbeHandle (
+  IN     CM_OBJECT_TOKEN      TemperatureProbeToken,
+  IN OUT SMBIOS_TABLE_TYPE27  *SmbiosRecord
+  )
+{
+  SMBIOS_HANDLE  SmbiosHandle;
+
+  if (TemperatureProbeToken == CM_NULL_TOKEN) {
+    SmbiosRecord->TemperatureProbeHandle = 0xFFFF;
+    return EFI_SUCCESS;
+  }
+
+  SmbiosHandle = FindSmbiosHandleEx (
+                   CREATE_STD_SMBIOS_TABLE_GEN_ID (EStdSmbiosTableIdType28),
+                   TemperatureProbeToken
+                   );
+  if (SmbiosHandle == SMBIOS_HANDLE_INVALID) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to find Type 28 handle for TemperatureProbeToken 0x%p\n",
+      __func__,
+      TemperatureProbeToken
+      ));
+    return EFI_NOT_FOUND;
+  }
+
+  SmbiosRecord->TemperatureProbeHandle = SmbiosHandle;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -306,22 +349,14 @@ BuildSmbiosType27TableEx (
     SmbiosRecord->Hdr.Type   = EFI_SMBIOS_TYPE_COOLING_DEVICE;
     SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE27);
 
-    // Type 28 is not supported yet. Per the SMBIOS general handle rule,
-    // use 0xFFFF when the referenced handle is not applicable or does not exist.
-    // Todo: Once Type 28 generator is implemented this has to be changed to handle it
-    if (CoolingDevInfo[Index].TemperatureProbeToken != CM_NULL_TOKEN) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: TemperatureProbeToken is unsupported until SMBIOS Type 28 generation is available for CoolingDevInfo[%u]\n",
-        __func__,
-        Index
-        ));
-      Status = EFI_UNSUPPORTED;
+    Status = AddTemperatureProbeHandle (
+               CoolingDevInfo[Index].TemperatureProbeToken,
+               SmbiosRecord
+               );
+    if (EFI_ERROR (Status)) {
       StringTableFree (&StrTable);
       goto exitErrorBuildSmbiosType27Table;
     }
-
-    SmbiosRecord->TemperatureProbeHandle = 0xFFFF;
 
     if (!IsValidCoolingDeviceStatus (
            CoolingDevInfo[Index].DeviceTypeAndStatus.CoolingDeviceStatus
