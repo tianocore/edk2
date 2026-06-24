@@ -59,16 +59,12 @@ SsifWriteRequest (
   EFI_STATUS  Status;
   BOOLEAN     IsMultiPartWrite;
   UINTN       BytesLeft;
-  UINTN       MiddleCount;
   UINT8       SsifCmd;
   UINTN       WriteLen;
 
   if ((RequestData == NULL) || (RequestDataSize == 0)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  MiddleCount      = 0;
-  Status           = EFI_SUCCESS;
 
   if (RequestDataSize > IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) {
     IsMultiPartWrite = TRUE;
@@ -82,6 +78,7 @@ SsifWriteRequest (
   }
 
   if (IsMultiPartWrite) {
+    UINTN  MiddleCount;
     MiddleCount = ((RequestDataSize - 1) / IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) - 1;
 
     if (  ((MiddleCount == 0) && (mTransactionSupport == IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_SINGLE_PARTITION_RW))
@@ -94,7 +91,7 @@ SsifWriteRequest (
     WriteLen = IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES;
     SsifCmd  = IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_START;
   } else {
-    WriteLen = (UINT8)RequestDataSize;
+    WriteLen = RequestDataSize;
     SsifCmd  = IPMI_SSIF_SMBUS_CMD_SINGLE_PART_WRITE;
   }
 
