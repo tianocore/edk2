@@ -91,6 +91,8 @@ typedef struct {
   // List for notifications
   LIST_ENTRY                           KeyNotifyList;
 
+  BOOLEAN                              HasKeyboard;
+
   // Last pressed key
   // typedef struct {
   //    UINT16  ScanCode;

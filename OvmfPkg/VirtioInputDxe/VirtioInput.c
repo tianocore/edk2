@@ -351,6 +351,63 @@ VirtioInputRingFillRx (
   Dev->VirtIo->SetQueueNotify (Dev->VirtIo, Index);
 }
 
+STATIC
+EFI_STATUS
+VirtioInputConfigQuerySize (
+  IN VIRTIO_INPUT_DEV            *Dev,
+  IN VIRTIO_INPUT_CONFIG_SELECT  Select,
+  IN UINT8                       Subsel,
+  OUT UINT8                      *Size
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = Dev->VirtIo->WriteDevice (Dev->VirtIo, OFFSET_OF_VINPUT (Select), SIZE_OF_VINPUT (Select), Select);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = Dev->VirtIo->WriteDevice (Dev->VirtIo, OFFSET_OF_VINPUT (Subsel), SIZE_OF_VINPUT (Subsel), Subsel);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = Dev->VirtIo->ReadDevice (Dev->VirtIo, OFFSET_OF_VINPUT (Size), SIZE_OF_VINPUT (Size), sizeof (*Size), Size);
+  return Status;
+}
+
+STATIC
+BOOLEAN
+VirtioInputHasKeyboard (
+  IN VIRTIO_INPUT_DEV  *Dev
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       Size;
+  UINT8       Bitmap;
+  UINTN       Index;
+
+  Status = VirtioInputConfigQuerySize (Dev, VirtioInputCfgEvBits, EV_KEY, &Size);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  // Keyboard keys are 0 ~ 255, so if any of them is supported, we have a keyboard
+  Size = MIN (Size, (MAX_KEYBOARD_CODE / 8) + 1);
+  for (Index = 0; Index < Size; Index++) {
+    Status = Dev->VirtIo->ReadDevice (Dev->VirtIo, OFFSET_OF_VINPUT (Data) + Index, 1, 1, &Bitmap);
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+
+    if (Bitmap) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_PROTOCOL API
 STATIC
@@ -1024,58 +1081,56 @@ VirtioInputInit (
   }
 
   //
-  // populate the exported interface's attributes
+  // Check input device capabilities
   //
-
-  // struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
-  //    EFI_INPUT_RESET     Reset;
-  //    EFI_INPUT_READ_KEY  ReadKeyStroke;
-  //    EFI_EVENT           WaitForKey;
-  // };
-  Dev->Txt.Reset         = VirtioInputSimpleTextInputReset;
-  Dev->Txt.ReadKeyStroke = VirtioInputSimpleTextInputReadKeyStroke;
-
-  // struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
-  //    EFI_INPUT_RESET_EX              Reset;
-  //    EFI_INPUT_READ_KEY_EX           ReadKeyStrokeEx;
-  //    EFI_EVENT                       WaitForKeyEx;
-  //    EFI_SET_STATE                   SetState;
-  //    EFI_REGISTER_KEYSTROKE_NOTIFY   RegisterKeyNotify;
-  //    EFI_UNREGISTER_KEYSTROKE_NOTIFY UnregisterKeyNotify;
-  // }
-  Dev->TxtEx.Reset               = VirtioInputResetEx;
-  Dev->TxtEx.ReadKeyStrokeEx     = VirtioInputReadKeyStrokeEx;
-  Dev->TxtEx.SetState            = VirtioInputSetState;
-  Dev->TxtEx.RegisterKeyNotify   = VirtioInputRegisterKeyNotify;
-  Dev->TxtEx.UnregisterKeyNotify = VirtioInputUnregisterKeyNotify;
-  InitializeListHead (&Dev->KeyNotifyList);
-
-  //
-  // Setup the WaitForKey event
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_WAIT,
-                  TPL_NOTIFY,
-                  VirtioInputWaitForKey,
-                  Dev,
-                  &(Dev->Txt.WaitForKey)
-                  );
-  if (EFI_ERROR (Status)) {
+  Dev->HasKeyboard = VirtioInputHasKeyboard (Dev);
+  if (!Dev->HasKeyboard) {
+    Status = EFI_UNSUPPORTED;
     goto Failed;
   }
 
   //
-  // Setup the WaitForKeyEx event
+  // populate the exported interface's attributes
   //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_WAIT,
-                  TPL_NOTIFY,
-                  VirtioInputWaitForKey,
-                  Dev,
-                  &(Dev->TxtEx.WaitForKeyEx)
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Failed;
+  if (Dev->HasKeyboard) {
+    Dev->Txt.Reset         = VirtioInputSimpleTextInputReset;
+    Dev->Txt.ReadKeyStroke = VirtioInputSimpleTextInputReadKeyStroke;
+    Dev->Txt.WaitForKey    = (EFI_EVENT)VirtioInputWaitForKey;
+
+    Dev->TxtEx.Reset               = VirtioInputResetEx;
+    Dev->TxtEx.ReadKeyStrokeEx     = VirtioInputReadKeyStrokeEx;
+    Dev->TxtEx.SetState            = VirtioInputSetState;
+    Dev->TxtEx.RegisterKeyNotify   = VirtioInputRegisterKeyNotify;
+    Dev->TxtEx.UnregisterKeyNotify = VirtioInputUnregisterKeyNotify;
+    InitializeListHead (&Dev->KeyNotifyList);
+
+    //
+    // Setup the WaitForKey event
+    //
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_WAIT,
+                    TPL_NOTIFY,
+                    VirtioInputWaitForKey,
+                    Dev,
+                    &(Dev->Txt.WaitForKey)
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
+
+    //
+    // Setup the WaitForKeyEx event
+    //
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_WAIT,
+                    TPL_NOTIFY,
+                    VirtioInputWaitForKey,
+                    Dev,
+                    &(Dev->TxtEx.WaitForKeyEx)
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
   }
 
   VirtioInputRingFillRx (Dev, 0);
@@ -1128,8 +1183,11 @@ VirtioInputUninit (
   )
 {
   gBS->CloseEvent (Dev->PollTimer);
-  gBS->CloseEvent (Dev->Txt.WaitForKey);
-  gBS->CloseEvent (Dev->TxtEx.WaitForKeyEx);
+
+  if (Dev->HasKeyboard) {
+    gBS->CloseEvent (Dev->Txt.WaitForKey);
+    gBS->CloseEvent (Dev->TxtEx.WaitForKeyEx);
+  }
 
   //
   // Reset the virtual device -- see virtio-0.9.5, 2.2.2.1 Device Status. When
@@ -1275,16 +1333,19 @@ VirtioInputBindingStart (
   // interface.
   //
   Dev->Signature = VIRTIO_INPUT_SIG;
-  Status         = gBS->InstallMultipleProtocolInterfaces (
-                          &DeviceHandle,
-                          &gEfiSimpleTextInProtocolGuid,
-                          &Dev->Txt,
-                          &gEfiSimpleTextInputExProtocolGuid,
-                          &Dev->TxtEx,
-                          NULL
-                          );
-  if (EFI_ERROR (Status)) {
-    goto CloseExitBoot;
+
+  if (Dev->HasKeyboard) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &DeviceHandle,
+                    &gEfiSimpleTextInProtocolGuid,
+                    &Dev->Txt,
+                    &gEfiSimpleTextInputExProtocolGuid,
+                    &Dev->TxtEx,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      goto CloseExitBoot;
+    }
   }
 
   return EFI_SUCCESS;
@@ -1342,16 +1403,18 @@ VirtioInputBindingStop (
   //
   // Handle Stop() requests for in-use driver instances gracefully.
   //
-  Status = gBS->UninstallMultipleProtocolInterfaces (
-                  DeviceHandle,
-                  &gEfiSimpleTextInProtocolGuid,
-                  &Dev->Txt,
-                  &gEfiSimpleTextInputExProtocolGuid,
-                  &Dev->TxtEx,
-                  NULL
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (Dev->HasKeyboard) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    DeviceHandle,
+                    &gEfiSimpleTextInProtocolGuid,
+                    &Dev->Txt,
+                    &gEfiSimpleTextInputExProtocolGuid,
+                    &Dev->TxtEx,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   gBS->CloseEvent (Dev->ExitBoot);
