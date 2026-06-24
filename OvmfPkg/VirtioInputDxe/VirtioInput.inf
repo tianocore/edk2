@@ -19,6 +19,7 @@
   VirtioInput.c
   VirtioInput.h
   VirtioKeyCodes.h
+  VirtioKeyboard.c
 
 [Packages]
   MdePkg/MdePkg.dec
