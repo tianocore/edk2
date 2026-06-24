@@ -55,29 +55,11 @@ typedef struct {
 // Declaration of data structure representing driver context
 typedef struct {
   // Device signature
-  UINT32                            Signature;
+  UINT32                               Signature;
 
   // Hook for the function which shall be caled when driver is closed
   // before system state changes to boot
-  EFI_EVENT                         ExitBoot;
-
-  // Hooks for functions required by UEFI keyboard API
-  // struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
-  //    EFI_INPUT_RESET     Reset;
-  //    EFI_INPUT_READ_KEY  ReadKeyStroke;
-  //    EFI_EVENT           WaitForKey;
-  // };
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    Txt;
-
-  // struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
-  //    EFI_INPUT_RESET_EX              Reset;
-  //    EFI_INPUT_READ_KEY_EX           ReadKeyStrokeEx;
-  //    EFI_EVENT                       WaitForKeyEx;
-  //    EFI_SET_STATE                   SetState;
-  //    EFI_REGISTER_KEYSTROKE_NOTIFY   RegisterKeyNotify;
-  //    EFI_UNREGISTER_KEYSTROKE_NOTIFY UnregisterKeyNotify;
-  // }
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TxtEx;
+  EFI_EVENT                            ExitBoot;
 
   // Virtio device hook
   VIRTIO_DEVICE_PROTOCOL               *VirtIo;
@@ -88,22 +70,13 @@ typedef struct {
   // Timer event for checking input from VirtIo
   EFI_EVENT                            PollTimer;
 
-  // List for notifications
-  LIST_ENTRY                           KeyNotifyList;
-
+  // Keyboard implementation
   BOOLEAN                              HasKeyboard;
-
-  // Last pressed key
-  // typedef struct {
-  //    UINT16  ScanCode;
-  //    CHAR16  UnicodeChar;
-  // } EFI_INPUT_KEY;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL       Txt;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TxtEx;
   EFI_INPUT_KEY                        LastKey;
-
-  // Key modifiers
-  BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE];
-
-  // If key is ready
+  LIST_ENTRY                           KeyNotifyList;
+  BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
   BOOLEAN                              KeyReady;
 } VIRTIO_INPUT_DEV;
 
@@ -115,3 +88,45 @@ typedef struct {
 
 // Bellow candidates to be included as Linux header
 #define KEY_PRESSED  1
+
+//
+// VirtioInput.c
+//
+EFI_STATUS
+VirtioInputConfigQuerySize (
+  IN VIRTIO_INPUT_DEV            *Dev,
+  IN VIRTIO_INPUT_CONFIG_SELECT  Select,
+  IN UINT8                       Subsel,
+  OUT UINT8                      *Size
+  );
+
+VOID
+EFIAPI
+VirtioInputTimer (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+//
+// VirtioKeyboard.c
+//
+BOOLEAN
+VirtioKeyboardProbe (
+  IN VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+VirtioKeyboardHandleEvent (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN VIRTIO_INPUT_EVENT    *Event
+  );
+
+EFI_STATUS
+VirtioKeyboardInit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+VirtioKeyboardUninit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
