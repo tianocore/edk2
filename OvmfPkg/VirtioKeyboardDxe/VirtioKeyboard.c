@@ -1167,6 +1167,9 @@ VirtioKeyboardUninit (
   )
 {
   gBS->CloseEvent (Dev->KeyReadTimer);
+  gBS->CloseEvent (Dev->Txt.WaitForKey);
+  gBS->CloseEvent (Dev->TxtEx.WaitForKeyEx);
+
   //
   // Reset the virtual device -- see virtio-0.9.5, 2.2.2.1 Device Status. When
   // VIRTIO_CFG_WRITE() returns, the host will have learned to stay away from
