@@ -58,7 +58,7 @@ SsifWriteRequest (
 {
   EFI_STATUS  Status;
   BOOLEAN     IsMultiPartWrite;
-  UINTN       Index;
+  UINTN       BytesLeft;
   UINTN       MiddleCount;
   UINT8       SsifCmd;
   UINTN       WriteLen;
@@ -98,57 +98,33 @@ SsifWriteRequest (
     SsifCmd  = IPMI_SSIF_SMBUS_CMD_SINGLE_PART_WRITE;
   }
 
-  SmBusWriteBlock (
-    SMBUS_LIB_ADDRESS (
-      IPMI_SSIF_BMC_SLAVE_ADDR_7BIT,
-      SsifCmd,
-      WriteLen,
-      mPecSupport
-      ),
-    RequestData,
-    &Status
-    );
-
-  if (  EFI_ERROR (Status)
-     || !IsMultiPartWrite)
+  for (BytesLeft = RequestDataSize, Status = EFI_SUCCESS;
+       (BytesLeft > 0) && !EFI_ERROR (Status);
+       BytesLeft -= MIN (BytesLeft, IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES))
   {
-    goto Exit;
-  }
+    // Check for SsifCmd transitions if not the first packet
+    if (BytesLeft < RequestDataSize) {
+      // Is this the End packet?
+      if (BytesLeft <= IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) {
+        WriteLen = BytesLeft;
+        SsifCmd  = IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_END;
+      } else if (SsifCmd == IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_START) {
+        // Did we just write the Start packet of an operation with Middles?
+        SsifCmd = IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_MIDDLE;
+      }
+    }
 
-  for (Index = 1; Index <= MiddleCount; Index++) {
     SmBusWriteBlock (
       SMBUS_LIB_ADDRESS (
         IPMI_SSIF_BMC_SLAVE_ADDR_7BIT,
-        IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_MIDDLE,
+        SsifCmd,
         WriteLen,
         mPecSupport
         ),
-      &RequestData[Index * IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES],
+      &RequestData[RequestDataSize - BytesLeft],
       &Status
       );
-
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
   }
-
-  //
-  // Remain RequestData for END
-  //
-  WriteLen = RequestDataSize - (MiddleCount + 1) * IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES;
-  ASSERT (WriteLen > 0);
-  SmBusWriteBlock (
-    SMBUS_LIB_ADDRESS (
-      IPMI_SSIF_BMC_SLAVE_ADDR_7BIT,
-      IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_END,
-      WriteLen,
-      mPecSupport
-      ),
-    &RequestData[(MiddleCount + 1) * IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES],
-    &Status
-    );
-
-Exit:
 
   return Status;
 }
