@@ -1379,7 +1379,7 @@ VirtioKeyboardBindingStop (
   // Handle Stop() requests for in-use driver instances gracefully.
   //
   Status = gBS->UninstallMultipleProtocolInterfaces (
-                  &DeviceHandle,
+                  DeviceHandle,
                   &gEfiSimpleTextInProtocolGuid,
                   &Dev->Txt,
                   &gEfiSimpleTextInputExProtocolGuid,
