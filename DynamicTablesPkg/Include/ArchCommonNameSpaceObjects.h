@@ -85,6 +85,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
   EArchCommonObjCoolingDeviceInfo,              ///< 58 - Cooling Device Info
   EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
+  EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1533,5 +1534,43 @@ typedef struct CmArchCommonTemperatureProbeInfo {
   /// A value of 0x8000 indicates unknown.
   UINT16                             NominalValue;
 } CM_ARCH_COMMON_TEMPERATURE_PROBE_INFO;
+
+/** A structure that describes a voltage probe.
+
+  SMBIOS Specification v3.9.0 Type 26
+
+  ID: EArchCommonObjVoltageProbeInfo
+**/
+typedef struct CmArchCommonVoltageProbeInfo {
+  /// Token identifying this voltage probe CM object.
+  CM_OBJECT_TOKEN                VoltageProbeToken;
+
+  /// String describing the voltage probe or its location.
+  CHAR8                          Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Probe location and status encoded as SMBIOS Type 26 Location and Status.
+  MISC_VOLTAGE_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         MaximumValue;
+
+  /// Minimum voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         MinimumValue;
+
+  /// Resolution in tenths of millivolts, or 0x8000 if unknown.
+  UINT16                         Resolution;
+
+  /// Tolerance in plus/minus millivolts, or 0x8000 if unknown.
+  UINT16                         Tolerance;
+
+  /// Accuracy in plus/minus 1/100th percent, or 0x8000 if unknown.
+  UINT16                         Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                         OEMDefined;
+
+  /// Nominal voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         NominalValue;
+} CM_ARCH_COMMON_VOLTAGE_PROBE_INFO;
 
 #pragma pack()
