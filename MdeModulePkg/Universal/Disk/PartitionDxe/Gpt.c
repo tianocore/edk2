@@ -149,17 +149,28 @@ PartitionInstallGptChildHandles (
     if (!PartitionValidGptTable (BlockIo, DiskIo, LastBlock, BackupHeader)) {
       DEBUG ((DEBUG_INFO, " Not Valid backup partition table\n"));
       goto Done;
-    } else {
-      DEBUG ((DEBUG_INFO, " Valid backup partition table\n"));
-      DEBUG ((DEBUG_INFO, " Restore primary partition table by the backup\n"));
-      if (!PartitionRestoreGptTable (BlockIo, DiskIo, BackupHeader)) {
-        DEBUG ((DEBUG_INFO, " Restore primary partition table error\n"));
-      }
-
-      if (PartitionValidGptTable (BlockIo, DiskIo, BackupHeader->AlternateLBA, PrimaryHeader)) {
-        DEBUG ((DEBUG_INFO, " Restore backup partition table success\n"));
-      }
     }
+
+    DEBUG ((DEBUG_INFO, " Valid backup partition table\n"));
+    DEBUG ((DEBUG_INFO, " Restore primary partition table by the backup\n"));
+    //
+    // Both the restore write and the subsequent validation can fail (for
+    // example on write-protected media, or when the backup header's
+    // AlternateLBA points beyond the end of the device).  Never fall through
+    // with PrimaryHeader left in an unrestored/invalid state; bail out so the
+    // partition table that gets used is always one that passed validation.
+    //
+    if (!PartitionRestoreGptTable (BlockIo, DiskIo, BackupHeader)) {
+      DEBUG ((DEBUG_INFO, " Restore primary partition table error\n"));
+      goto Done;
+    }
+
+    if (!PartitionValidGptTable (BlockIo, DiskIo, BackupHeader->AlternateLBA, PrimaryHeader)) {
+      DEBUG ((DEBUG_INFO, " Not Valid restored primary partition table\n"));
+      goto Done;
+    }
+
+    DEBUG ((DEBUG_INFO, " Restore primary partition table success\n"));
   } else if (!PartitionValidGptTable (BlockIo, DiskIo, PrimaryHeader->AlternateLBA, BackupHeader)) {
     DEBUG ((DEBUG_INFO, " Valid primary and !Valid backup partition table\n"));
     DEBUG ((DEBUG_INFO, " Restore backup partition table by the primary\n"));
