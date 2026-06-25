@@ -86,6 +86,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjCoolingDeviceInfo,              ///< 58 - Cooling Device Info
   EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
   EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
+  EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1572,5 +1573,43 @@ typedef struct CmArchCommonVoltageProbeInfo {
   /// Nominal voltage in millivolts, or 0x8000 if unknown.
   UINT16                         NominalValue;
 } CM_ARCH_COMMON_VOLTAGE_PROBE_INFO;
+
+/** A structure that describes an electrical current probe.
+
+  SMBIOS Specification v3.9.0 Type 29
+
+  ID: EArchCommonObjElectricalCurrentProbeInfo
+**/
+typedef struct CmArchCommonElectricalCurrentProbeInfo {
+  /// Token identifying this electrical current probe CM object.
+  CM_OBJECT_TOKEN                           ElectricalCurrentProbeToken;
+
+  /// String describing the electrical current probe or its location.
+  CHAR8                                     Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Probe location and status encoded as SMBIOS Type 29 Location and Status.
+  MISC_ELECTRICAL_CURRENT_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    MaximumValue;
+
+  /// Minimum current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    MinimumValue;
+
+  /// Resolution in tenths of milliamperes, or 0x8000 if unknown.
+  UINT16                                    Resolution;
+
+  /// Tolerance in plus/minus milliamperes, or 0x8000 if unknown.
+  UINT16                                    Tolerance;
+
+  /// Accuracy in plus/minus 1/100th percent, or 0x8000 if unknown.
+  UINT16                                    Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                                    OEMDefined;
+
+  /// Nominal current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    NominalValue;
+} CM_ARCH_COMMON_ELECTRICAL_CURRENT_PROBE_INFO;
 
 #pragma pack()
