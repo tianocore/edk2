@@ -21,8 +21,8 @@
 
 [Sources]
   ManageabilityTransportSsif.c
-  ../Common/SsifCommon.c
-  ../Common/ManageabilityTransportSsif.h
+  SsifCommon.c
+  ManageabilityTransportSsif.h
 
 [Packages]
   ManageabilityPkg/ManageabilityPkg.dec
