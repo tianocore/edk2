@@ -168,15 +168,6 @@ VirtioKeyboardReadKeyStrokeEx (
 
 // -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
-VOID
-EFIAPI
-VirtioKeyboardWaitForKeyEx (
-  IN  EFI_EVENT  Event,
-  IN  VOID       *Context
-  );
-
-// -----------------------------------------------------------------------------
-// EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
 EFI_STATUS
 EFIAPI
 VirtioKeyboardSetState (

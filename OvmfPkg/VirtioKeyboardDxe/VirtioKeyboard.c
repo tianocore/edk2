@@ -643,7 +643,7 @@ VirtioKeyboardWaitForKey (
   IN  VOID       *Context
   )
 {
-  VIRTIO_KBD_DEV  *Dev = VIRTIO_KEYBOARD_FROM_THIS (Context);
+  VIRTIO_KBD_DEV  *Dev = (VIRTIO_KBD_DEV *)Context;
 
   //
   // Stall 1ms to give a chance to let other driver interrupt this routine
@@ -759,21 +759,6 @@ VirtioKeyboardReadKeyStrokeEx (
   KeyData->KeyState = KeyState;
 
   return EFI_SUCCESS;
-}
-
-// -----------------------------------------------------------------------------
-// EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL API
-VOID
-EFIAPI
-VirtioKeyboardWaitForKeyEx (
-  IN  EFI_EVENT  Event,
-  IN  VOID       *Context
-  )
-{
-  VIRTIO_KBD_DEV  *Dev;
-
-  Dev = VIRTIO_KEYBOARD_EX_FROM_THIS (Context);
-  VirtioKeyboardWaitForKey (Event, &Dev->Txt);
 }
 
 // -----------------------------------------------------------------------------
@@ -1048,7 +1033,6 @@ VirtioKeyboardInit (
   // };
   Dev->Txt.Reset         = (EFI_INPUT_RESET)VirtioKeyboardSimpleTextInputReset;
   Dev->Txt.ReadKeyStroke = VirtioKeyboardSimpleTextInputReadKeyStroke;
-  Dev->Txt.WaitForKey    = (EFI_EVENT)VirtioKeyboardWaitForKey;
 
   // struct _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
   //    EFI_INPUT_RESET_EX              Reset;
@@ -1072,8 +1056,8 @@ VirtioKeyboardInit (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
                   VirtioKeyboardWaitForKey,
-                  &(Dev->Txt),
-                  &((Dev->Txt).WaitForKey)
+                  Dev,
+                  &(Dev->Txt.WaitForKey)
                   );
   if (EFI_ERROR (Status)) {
     goto Failed;
@@ -1085,9 +1069,9 @@ VirtioKeyboardInit (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
-                  VirtioKeyboardWaitForKeyEx,
-                  &(Dev->TxtEx),
-                  &((Dev->TxtEx).WaitForKeyEx)
+                  VirtioKeyboardWaitForKey,
+                  Dev,
+                  &(Dev->TxtEx.WaitForKeyEx)
                   );
   if (EFI_ERROR (Status)) {
     goto Failed;
