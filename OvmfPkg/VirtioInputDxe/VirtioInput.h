@@ -12,10 +12,13 @@
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
+#include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
 
 #include <IndustryStandard/Virtio.h>
+
+#include "VirtioKeyCodes.h"
 
 #define VIRTIO_INPUT_SIG  SIGNATURE_32 ('V', 'I', 'N', 'P')
 
@@ -26,7 +29,10 @@
 #define PROBE_TIME_MS  50
 
 // Max range of recognized keyboard codes
-#define MAX_KEYBOARD_CODE  255
+#define MAX_KEYBOARD_CODE  (BTN_MISC - 1)
+
+// Key code 0x100 ~ 0x15f range is for all kinds of button events.
+#define IS_BUTTON_CODE(Code)  (((Code) >= BTN_MISC) && ((Code) < KEY_OK))
 
 typedef struct {
   UINTN                      Signature;
@@ -78,6 +84,13 @@ typedef struct {
   LIST_ENTRY                           KeyNotifyList;
   BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
   BOOLEAN                              KeyReady;
+
+  // Mouse implementation
+  BOOLEAN                              HasMouse;
+  EFI_SIMPLE_POINTER_PROTOCOL          SimplePointer;
+  EFI_SIMPLE_POINTER_MODE              PointerMode;
+  EFI_SIMPLE_POINTER_STATE             PointerState;
+  BOOLEAN                              PointerReady;
 } VIRTIO_INPUT_DEV;
 
 // Helper functions to extract VIRTIO_INPUT_DEV structure pointers
@@ -85,6 +98,8 @@ typedef struct {
           CR (KbrPointer, VIRTIO_INPUT_DEV, Txt, VIRTIO_INPUT_SIG)
 #define VIRTIO_INPUT_EX_FROM_THIS(KbrPointer) \
           CR (KbrPointer, VIRTIO_INPUT_DEV, TxtEx, VIRTIO_INPUT_SIG)
+#define VIRTIO_INPUT_FROM_POINTER_THIS(a) \
+          CR (a, VIRTIO_INPUT_DEV, SimplePointer, VIRTIO_INPUT_SIG)
 
 // Bellow candidates to be included as Linux header
 #define KEY_PRESSED  1
@@ -128,5 +143,29 @@ VirtioKeyboardInit (
 
 VOID
 VirtioKeyboardUninit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+//
+// VirtioMouse.c
+//
+BOOLEAN
+VirtioMouseProbe (
+  IN VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+VirtioMouseHandleEvent (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN VIRTIO_INPUT_EVENT    *Event
+  );
+
+EFI_STATUS
+VirtioMouseInit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+VirtioMouseUninit (
   IN OUT VIRTIO_INPUT_DEV  *Dev
   );
