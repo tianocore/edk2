@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <Protocol/AbsolutePointer.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/SimplePointer.h>
@@ -91,6 +92,13 @@ typedef struct {
   EFI_SIMPLE_POINTER_MODE              PointerMode;
   EFI_SIMPLE_POINTER_STATE             PointerState;
   BOOLEAN                              PointerReady;
+
+  // Tablet implementation
+  BOOLEAN                              HasTablet;
+  EFI_ABSOLUTE_POINTER_PROTOCOL        AbsolutePointer;
+  EFI_ABSOLUTE_POINTER_MODE            AbsPointerMode;
+  EFI_ABSOLUTE_POINTER_STATE           AbsPointerState;
+  BOOLEAN                              AbsPointerReady;
 } VIRTIO_INPUT_DEV;
 
 // Helper functions to extract VIRTIO_INPUT_DEV structure pointers
@@ -100,6 +108,8 @@ typedef struct {
           CR (KbrPointer, VIRTIO_INPUT_DEV, TxtEx, VIRTIO_INPUT_SIG)
 #define VIRTIO_INPUT_FROM_POINTER_THIS(a) \
           CR (a, VIRTIO_INPUT_DEV, SimplePointer, VIRTIO_INPUT_SIG)
+#define VIRTIO_INPUT_FROM_ABS_POINTER_THIS(a) \
+          CR (a, VIRTIO_INPUT_DEV, AbsolutePointer, VIRTIO_INPUT_SIG)
 
 // Bellow candidates to be included as Linux header
 #define KEY_PRESSED  1
@@ -167,5 +177,29 @@ VirtioMouseInit (
 
 VOID
 VirtioMouseUninit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+//
+// VirtioTablet.c
+//
+BOOLEAN
+VirtioTabletProbe (
+  IN VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+VirtioTabletHandleEvent (
+  IN OUT VIRTIO_INPUT_DEV  *Dev,
+  IN VIRTIO_INPUT_EVENT    *Event
+  );
+
+EFI_STATUS
+VirtioTabletInit (
+  IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+VirtioTabletUninit (
   IN OUT VIRTIO_INPUT_DEV  *Dev
   );
