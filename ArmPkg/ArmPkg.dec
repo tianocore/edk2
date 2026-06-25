@@ -166,6 +166,7 @@
   gArmTokenSpaceGuid.PcdProcessorSerialNumber|L""|VOID*|0x30000073
   gArmTokenSpaceGuid.PcdProcessorAssetTag|L""|VOID*|0x30000074
   gArmTokenSpaceGuid.PcdProcessorPartNumber|L""|VOID*|0x30000075
+  gArmTokenSpaceGuid.PcdProcessorSocketType|L""|VOID*|0x30000076
 
   #
   # ARM L2x0 PCDs

@@ -104,7 +104,9 @@ SMBIOS_TABLE_TYPE4  mSmbiosProcessorTableTemplate = {
   ProcessorFamilyARM,         // ProcessorFamily2
   0,                          // CoreCount2
   0,                          // EnabledCoreCount2
-  0                           // ThreadCount2
+  0,                          // ThreadCount2
+  0,                          // ThreadEnabled
+  7                           // SocketType
 };
 
 /** Sets the HII variable `StringId` is `Pcd` isn't empty.
@@ -495,12 +497,14 @@ AllocateType4AndSetProcessorInformationStrings (
   EFI_STRING_ID  SerialNumber;
   EFI_STRING_ID  AssetTag;
   EFI_STRING_ID  PartNumber;
+  EFI_STRING_ID  SocketType;
   EFI_STRING     ProcessorStr;
   EFI_STRING     ProcessorManuStr;
   EFI_STRING     ProcessorVersionStr;
   EFI_STRING     SerialNumberStr;
   EFI_STRING     AssetTagStr;
   EFI_STRING     PartNumberStr;
+  EFI_STRING     SocketTypeStr;
   CHAR8          *OptionalStrStart;
   CHAR8          *StrStart;
   UINTN          ProcessorStrLen;
@@ -509,6 +513,7 @@ AllocateType4AndSetProcessorInformationStrings (
   UINTN          SerialNumberStrLen;
   UINTN          AssetTagStrLen;
   UINTN          PartNumberStrLen;
+  UINTN          SocketTypeStrLen;
   UINTN          TotalSize;
   UINTN          StringBufferSize;
 
@@ -519,12 +524,14 @@ AllocateType4AndSetProcessorInformationStrings (
   SerialNumberStr     = NULL;
   AssetTagStr         = NULL;
   PartNumberStr       = NULL;
+  SocketTypeStr       = NULL;
 
   ProcessorManu    = STRING_TOKEN (STR_PROCESSOR_MANUFACTURE);
   ProcessorVersion = STRING_TOKEN (STR_PROCESSOR_VERSION);
   SerialNumber     = STRING_TOKEN (STR_PROCESSOR_SERIAL_NUMBER);
   AssetTag         = STRING_TOKEN (STR_PROCESSOR_ASSET_TAG);
   PartNumber       = STRING_TOKEN (STR_PROCESSOR_PART_NUMBER);
+  SocketType       = STRING_TOKEN (STR_PROCESSOR_SOCKET_TYPE);
 
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorManufacturer, ProcessorManu);
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorAssetTag, AssetTag);
@@ -545,6 +552,12 @@ AllocateType4AndSetProcessorInformationStrings (
     HiiSetString (mHiiHandle, ProcessorVersion, (CHAR16 *)FixedPcdGetPtr (PcdProcessorVersion), NULL);
   } else {
     OemUpdateSmbiosInfo (mHiiHandle, ProcessorVersion, ProcessorVersionType04);
+  }
+
+  if (StrLen ((CHAR16 *)FixedPcdGetPtr (PcdProcessorSocketType)) > 0) {
+    HiiSetString (mHiiHandle, SocketType, (CHAR16 *)FixedPcdGetPtr (PcdProcessorSocketType), NULL);
+  } else {
+    OemUpdateSmbiosInfo (mHiiHandle, SocketType, ProcessorSocketTypeType04);
   }
 
   // Processor Designation
@@ -581,13 +594,17 @@ AllocateType4AndSetProcessorInformationStrings (
   PartNumberStr    = HiiGetPackageString (&gEfiCallerIdGuid, PartNumber, NULL);
   PartNumberStrLen = StrLen (PartNumberStr);
 
+  SocketTypeStr    = HiiGetPackageString (&gEfiCallerIdGuid, SocketType, NULL);
+  SocketTypeStrLen = StrLen (SocketTypeStr);
+
   TotalSize = sizeof (SMBIOS_TABLE_TYPE4) +
               ProcessorStrLen        + 1 +
               ProcessorManuStrLen    + 1 +
               ProcessorVersionStrLen + 1 +
               SerialNumberStrLen     + 1 +
               AssetTagStrLen         + 1 +
-              PartNumberStrLen       + 1 + 1;
+              PartNumberStrLen       + 1 +
+              SocketTypeStrLen       + 1 + 1;
 
   *Type4Record = AllocateZeroPool (TotalSize);
   if (*Type4Record == NULL) {
@@ -639,6 +656,13 @@ AllocateType4AndSetProcessorInformationStrings (
     PartNumberStrLen + 1
     );
 
+  StrStart += PartNumberStrLen + 1;
+  UnicodeStrToAsciiStrS (
+    SocketTypeStr,
+    StrStart,
+    SocketTypeStrLen + 1
+    );
+
 Exit:
   FreePool (ProcessorStr);
   FreePool (ProcessorManuStr);
@@ -646,6 +670,7 @@ Exit:
   FreePool (SerialNumberStr);
   FreePool (AssetTagStr);
   FreePool (PartNumberStr);
+  FreePool (SocketTypeStr);
 
   return Status;
 }

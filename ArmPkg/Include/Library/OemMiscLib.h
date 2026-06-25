@@ -60,6 +60,7 @@ typedef enum {
   ProcessorPartNumType04,
   ProcessorSerialNumType04,
   ProcessorVersionType04,
+  ProcessorSocketTypeType04,
   SmbiosHiiStringFieldMax
 } OEM_MISC_SMBIOS_HII_STRING_FIELD;
 
