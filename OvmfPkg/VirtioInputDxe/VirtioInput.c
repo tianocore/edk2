@@ -419,6 +419,10 @@ VirtioInputGetDeviceData (
           if (Dev->HasMouse) {
             VirtioMouseHandleEvent (Dev, &Event);
           }
+
+          if (Dev->HasTablet) {
+            VirtioTabletHandleEvent (Dev, &Event);
+          }
         } else if (Dev->HasKeyboard) {
           VirtioKeyboardHandleEvent (Dev, &Event);
         }
@@ -429,6 +433,14 @@ VirtioInputGetDeviceData (
         // Relative pointer movement received
         if (Dev->HasMouse) {
           VirtioMouseHandleEvent (Dev, &Event);
+        }
+
+        break;
+
+      case EV_ABS:
+        // Absolute pointer movement received
+        if (Dev->HasTablet) {
+          VirtioTabletHandleEvent (Dev, &Event);
         }
 
         break;
@@ -549,7 +561,8 @@ VirtioInputInit (
   //
   Dev->HasKeyboard = VirtioKeyboardProbe (Dev);
   Dev->HasMouse    = VirtioMouseProbe (Dev);
-  if (!Dev->HasKeyboard && !Dev->HasMouse) {
+  Dev->HasTablet   = VirtioTabletProbe (Dev);
+  if (!Dev->HasKeyboard && !Dev->HasMouse && !Dev->HasTablet) {
     Status = EFI_UNSUPPORTED;
     goto Failed;
   }
@@ -566,6 +579,13 @@ VirtioInputInit (
 
   if (Dev->HasMouse) {
     Status = VirtioMouseInit (Dev);
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
+  }
+
+  if (Dev->HasTablet) {
+    Status = VirtioTabletInit (Dev);
     if (EFI_ERROR (Status)) {
       goto Failed;
     }
@@ -628,6 +648,10 @@ VirtioInputUninit (
 
   if (Dev->HasMouse) {
     VirtioMouseUninit (Dev);
+  }
+
+  if (Dev->HasTablet) {
+    VirtioTabletUninit (Dev);
   }
 
   //
@@ -801,7 +825,29 @@ VirtioInputBindingStart (
     }
   }
 
+  if (Dev->HasTablet) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &DeviceHandle,
+                    &gEfiAbsolutePointerProtocolGuid,
+                    &Dev->AbsolutePointer,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      goto UninstallMouse;
+    }
+  }
+
   return EFI_SUCCESS;
+
+UninstallMouse:
+  if (Dev->HasMouse) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           DeviceHandle,
+           &gEfiSimplePointerProtocolGuid,
+           &Dev->SimplePointer,
+           NULL
+           );
+  }
 
 UninstallKeyboard:
   if (Dev->HasKeyboard) {
@@ -850,6 +896,7 @@ VirtioInputBindingStop (
   EFI_STATUS                      Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *Txt;
   EFI_SIMPLE_POINTER_PROTOCOL     *Pointer;
+  EFI_ABSOLUTE_POINTER_PROTOCOL   *AbsPointer;
   VIRTIO_INPUT_DEV                *Dev;
 
   Status = gBS->OpenProtocol (
@@ -871,11 +918,23 @@ VirtioInputBindingStop (
                     DeviceHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    if (!EFI_ERROR (Status)) {
+      Dev = VIRTIO_INPUT_FROM_POINTER_THIS (Pointer);
+    } else {
+      Status = gBS->OpenProtocol (
+                      DeviceHandle,
+                      &gEfiAbsolutePointerProtocolGuid,
+                      (VOID **)&AbsPointer,
+                      This->DriverBindingHandle,
+                      DeviceHandle,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
 
-    Dev = VIRTIO_INPUT_FROM_POINTER_THIS (Pointer);
+      Dev = VIRTIO_INPUT_FROM_ABS_POINTER_THIS (AbsPointer);
+    }
   }
 
   //
@@ -900,6 +959,18 @@ VirtioInputBindingStop (
                     DeviceHandle,
                     &gEfiSimplePointerProtocolGuid,
                     &Dev->SimplePointer,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (Dev->HasTablet) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    DeviceHandle,
+                    &gEfiAbsolutePointerProtocolGuid,
+                    &Dev->AbsolutePointer,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
