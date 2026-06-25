@@ -88,6 +88,7 @@
   gTpm2StartupLocalityHobGuid                        ## SOMETIMES_CONSUMES  ## HOB
   gTcg800155PlatformIdEventHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
   gEfiDeviceSignatureDatabaseGuid
+  gTcg2EventLogScaledGuid                            ## SOMETIMES_PRODUCES  ## Event
 
 [Protocols]
   gEfiTcg2ProtocolGuid                               ## PRODUCES
@@ -106,8 +107,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgLogAreaMinLen                         ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2FinalLogAreaLen                      ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev                         ## CONSUMES
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml                        ## PRODUCES
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                        ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication           ## CONSUMES
 
