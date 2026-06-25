@@ -415,8 +415,22 @@ VirtioInputGetDeviceData (
         // Key press event received
         // DEBUG ((DEBUG_INFO, "%a: ---------------------- \nType: %x Code: %x Value: %x\n",
         //              __func__, Event.Type, Event.Code, Event.Value));
+        if (IS_BUTTON_CODE (Event.Code)) {
+          if (Dev->HasMouse) {
+            VirtioMouseHandleEvent (Dev, &Event);
+          }
+        } else if (Dev->HasKeyboard) {
+          VirtioKeyboardHandleEvent (Dev, &Event);
+        }
 
-        VirtioKeyboardHandleEvent (Dev, &Event);
+        break;
+
+      case EV_REL:
+        // Relative pointer movement received
+        if (Dev->HasMouse) {
+          VirtioMouseHandleEvent (Dev, &Event);
+        }
+
         break;
 
       default:
@@ -534,7 +548,8 @@ VirtioInputInit (
   // Check input device capabilities
   //
   Dev->HasKeyboard = VirtioKeyboardProbe (Dev);
-  if (!Dev->HasKeyboard) {
+  Dev->HasMouse    = VirtioMouseProbe (Dev);
+  if (!Dev->HasKeyboard && !Dev->HasMouse) {
     Status = EFI_UNSUPPORTED;
     goto Failed;
   }
@@ -544,6 +559,13 @@ VirtioInputInit (
   //
   if (Dev->HasKeyboard) {
     Status = VirtioKeyboardInit (Dev);
+    if (EFI_ERROR (Status)) {
+      goto Failed;
+    }
+  }
+
+  if (Dev->HasMouse) {
+    Status = VirtioMouseInit (Dev);
     if (EFI_ERROR (Status)) {
       goto Failed;
     }
@@ -602,6 +624,10 @@ VirtioInputUninit (
 
   if (Dev->HasKeyboard) {
     VirtioKeyboardUninit (Dev);
+  }
+
+  if (Dev->HasMouse) {
+    VirtioMouseUninit (Dev);
   }
 
   //
@@ -763,7 +789,31 @@ VirtioInputBindingStart (
     }
   }
 
+  if (Dev->HasMouse) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &DeviceHandle,
+                    &gEfiSimplePointerProtocolGuid,
+                    &Dev->SimplePointer,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      goto UninstallKeyboard;
+    }
+  }
+
   return EFI_SUCCESS;
+
+UninstallKeyboard:
+  if (Dev->HasKeyboard) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           DeviceHandle,
+           &gEfiSimpleTextInProtocolGuid,
+           &Dev->Txt,
+           &gEfiSimpleTextInputExProtocolGuid,
+           &Dev->TxtEx,
+           NULL
+           );
+  }
 
 CloseExitBoot:
   gBS->CloseEvent (Dev->ExitBoot);
@@ -799,21 +849,34 @@ VirtioInputBindingStop (
 {
   EFI_STATUS                      Status;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *Txt;
+  EFI_SIMPLE_POINTER_PROTOCOL     *Pointer;
   VIRTIO_INPUT_DEV                *Dev;
 
   Status = gBS->OpenProtocol (
                   DeviceHandle,                     // candidate device
-                  &gEfiSimpleTextInProtocolGuid,    // retrieve the RNG iface
+                  &gEfiSimpleTextInProtocolGuid,    // retrieve the keyboard iface
                   (VOID **)&Txt,                    // target pointer
                   This->DriverBindingHandle,        // requestor driver ident.
                   DeviceHandle,                     // lookup req. for dev.
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL    // lookup only, no new ref.
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  if (!EFI_ERROR (Status)) {
+    Dev = VIRTIO_INPUT_FROM_THIS (Txt);
+  } else {
+    Status = gBS->OpenProtocol (
+                    DeviceHandle,
+                    &gEfiSimplePointerProtocolGuid,
+                    (VOID **)&Pointer,
+                    This->DriverBindingHandle,
+                    DeviceHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  Dev = VIRTIO_INPUT_FROM_THIS (Txt);
+    Dev = VIRTIO_INPUT_FROM_POINTER_THIS (Pointer);
+  }
 
   //
   // Handle Stop() requests for in-use driver instances gracefully.
@@ -825,6 +888,18 @@ VirtioInputBindingStop (
                     &Dev->Txt,
                     &gEfiSimpleTextInputExProtocolGuid,
                     &Dev->TxtEx,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (Dev->HasMouse) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    DeviceHandle,
+                    &gEfiSimplePointerProtocolGuid,
+                    &Dev->SimplePointer,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
