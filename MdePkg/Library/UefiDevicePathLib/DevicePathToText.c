@@ -996,6 +996,7 @@ DevPathToTextUsbWWID (
   UINT16                Length;
 
   UsbWWId = DevPath;
+  NewStr  = NULL;
 
   SerialNumberStr = (CHAR16 *)((UINT8 *)UsbWWId + sizeof (USB_WWID_DEVICE_PATH));
   Length          = (UINT16)((DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *)UsbWWId) - sizeof (USB_WWID_DEVICE_PATH)) / sizeof (CHAR16));
@@ -1018,6 +1019,10 @@ DevPathToTextUsbWWID (
     UsbWWId->InterfaceNumber,
     SerialNumberStr
     );
+
+  if (NewStr != NULL) {
+    FreePool (NewStr);
+  }
 }
 
 /**
