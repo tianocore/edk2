@@ -74,6 +74,10 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   // The Page State Change Buffer Page used for pre-validation of system
   // RAM when SEV-SNP is enabled
   UINT8     PscBufferPage[4096];
+
+  // The Page Table Pool pointer address used by Virtual Memory Management
+  // Services
+  UINT64    PageTablePool;
 } SEC_SEV_ES_WORK_AREA;
 
 #define SEV_ES_WORK_AREA_FLAG_VC       BIT0
