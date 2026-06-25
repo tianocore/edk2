@@ -20,6 +20,7 @@
   VirtioInput.h
   VirtioKeyCodes.h
   VirtioKeyboard.c
+  VirtioMouse.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,3 +41,4 @@
   gEfiSimpleTextInProtocolGuid
   gEfiSimpleTextInputExProtocolGuid
   gVirtioDeviceProtocolGuid
+  gEfiSimplePointerProtocolGuid
