@@ -21,6 +21,7 @@
   VirtioKeyCodes.h
   VirtioKeyboard.c
   VirtioMouse.c
+  VirtioTablet.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,3 +43,4 @@
   gEfiSimpleTextInputExProtocolGuid
   gVirtioDeviceProtocolGuid
   gEfiSimplePointerProtocolGuid
+  gEfiAbsolutePointerProtocolGuid
