@@ -20,8 +20,6 @@
 #include "VirtualMemory.h"
 #include "SnpPageStateChange.h"
 
-STATIC VOID  *mPscBuffer = NULL;
-
 typedef enum {
   SetCBit,
   ClearCBit
@@ -740,6 +738,12 @@ SetMemoryEncDec (
   UINTN                           OrigLength;
   RETURN_STATUS                   Status;
 
+  VOID                  *mPscBuffer;
+  SEC_SEV_ES_WORK_AREA  *WorkArea;
+
+  WorkArea   = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  mPscBuffer = WorkArea->VirtualMemoryPscBuffer;
+
   DEBUG ((
     DEBUG_PAGING,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
@@ -806,6 +810,9 @@ SetMemoryEncDec (
       mPscBuffer,
       EFI_PAGE_SIZE
       );
+
+    // Writeback to the WorkArea pointer
+    WorkArea->VirtualMemoryPscBuffer = mPscBuffer;
   }
 
   //
@@ -1007,6 +1014,9 @@ SetMemoryEncDec (
       mPscBuffer,
       EFI_PAGE_SIZE
       );
+
+    // Writeback to the WorkArea pointer
+    WorkArea->VirtualMemoryPscBuffer = mPscBuffer;
   }
 
 Done:

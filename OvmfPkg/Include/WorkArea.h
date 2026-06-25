@@ -78,6 +78,9 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   // The Page Table Pool pointer address used by Virtual Memory Management
   // Services
   UINT64    PageTablePool;
+
+  // The PscBuffer pointer used by Virtual Memory Management Services
+  VOID      *VirtualMemoryPscBuffer;
 } SEC_SEV_ES_WORK_AREA;
 
 #define SEV_ES_WORK_AREA_FLAG_VC       BIT0
