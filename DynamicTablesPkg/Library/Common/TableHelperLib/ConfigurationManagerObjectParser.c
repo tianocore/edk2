@@ -1250,6 +1250,21 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonTemperatureProbeInfoParser[] = {
   { "NominalValue",          sizeof (UINT16),                          "0x%x", NULL        },
 };
 
+/** A parser for EArchCommonObjVoltageProbeInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonVoltageProbeInfoParser[] = {
+  { "VoltageProbeToken", sizeof (CM_OBJECT_TOKEN),             "0x%p", NULL        },
+  { "Description",       SMBIOS_MAX_STRING_SIZE,               NULL,   PrintString },
+  { "LocationAndStatus", sizeof (MISC_VOLTAGE_PROBE_LOCATION), "0x%x", NULL        },
+  { "MaximumValue",      sizeof (UINT16),                      "0x%x", NULL        },
+  { "MinimumValue",      sizeof (UINT16),                      "0x%x", NULL        },
+  { "Resolution",        sizeof (UINT16),                      "0x%x", NULL        },
+  { "Tolerance",         sizeof (UINT16),                      "0x%x", NULL        },
+  { "Accuracy",          sizeof (UINT16),                      "0x%x", NULL        },
+  { "OEMDefined",        sizeof (UINT32),                      "0x%x", NULL        },
+  { "NominalValue",      sizeof (UINT16),                      "0x%x", NULL        },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1314,6 +1329,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,     CmArchCommonMemoryArrayMappedAddressParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjCoolingDeviceInfo,            CmArchCommonCoolingDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjTemperatureProbeInfo,         CmArchCommonTemperatureProbeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjVoltageProbeInfo,             CmArchCommonVoltageProbeInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
