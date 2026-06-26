@@ -14,6 +14,8 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include "ArchConfig.h"
+
 STATIC EFI_EVENT  mExitBootServicesEvent;
 STATIC BOOLEAN    mAtRuntime = FALSE;
 
@@ -130,7 +132,8 @@ AddMmioMemorySpace (
   of any other type are treated as conflicts.
 
   After the range is backed by compatible MMIO descriptors, the requested GCD
-  memory space attributes are applied to the normalized full range.
+  memory space attributes are applied to the normalized full range, followed by
+  architecture-specific attribute configuration.
 
   If this function fails after adding new GCD MMIO descriptors, the descriptors
   are not rolled back. Callers are expected to treat failures from this function
@@ -207,7 +210,12 @@ MapMmioMemory (
     return Status;
   }
 
-  return gDS->SetMemorySpaceAttributes (Base, Length, Attributes);
+  Status = gDS->SetMemorySpaceAttributes (Base, Length, Attributes);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return ArchConfigureAttributes (Base, Length);
 }
 
 /**
