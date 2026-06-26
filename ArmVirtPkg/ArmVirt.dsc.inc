@@ -483,7 +483,11 @@ DEFINE FD_SIZE_IN_MB    = 3
   #
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 !if $(ENABLE_VIRTIO)
-  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf {
+    <LibraryClasses>
+    NULL|OvmfPkg/Library/VirtioMmioProbeLib/VirtioMmioProbeLib.inf
+  }
+
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
