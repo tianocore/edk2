@@ -1006,6 +1006,10 @@ DevPathToTextUsbWWID (
     //
     NewStr = AllocatePool ((Length + 1) * sizeof (CHAR16));
     ASSERT (NewStr != NULL);
+    if (NewStr == NULL) {
+      return;
+    }
+
     CopyMem (NewStr, SerialNumberStr, Length * sizeof (CHAR16));
     NewStr[Length]  = 0;
     SerialNumberStr = NewStr;
