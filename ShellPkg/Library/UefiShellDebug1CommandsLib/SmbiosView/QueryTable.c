@@ -5101,7 +5101,7 @@ DisplayTemperatureProbeStatus (
   UINT8  Status;
 
   Status = (UINT8)((Key & 0xE0) >> 5);
-  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_TEMP_PROBE), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_TEMP_PROBE_STATUS), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Status, Option);
   PRINT_TABLE_ITEM (TemperatureProbeStatusTable, Status);
 }
@@ -5121,7 +5121,7 @@ DisplayTemperatureProbeLoc (
   UINT8  Loc;
 
   Loc = (UINT8)(Key & 0x1F);
-  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_VOLTAGE_PROBE_LOC), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_TEMP_PROBE_LOC), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Loc, Option);
   PRINT_TABLE_ITEM (TemperatureProbeLocTable, Loc);
 }
