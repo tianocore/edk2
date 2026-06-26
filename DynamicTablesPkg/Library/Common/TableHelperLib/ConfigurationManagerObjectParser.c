@@ -1280,6 +1280,17 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonElectricalCurrentProbeInfoParser[] = {
   { "NominalValue",                sizeof (UINT16),                                 "0x%x", NULL        },
 };
 
+/** A parser for EArchCommonObjSystemResetInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemResetInfoParser[] = {
+  { "SystemResetToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "Capabilities",     sizeof (UINT8),           "0x%x", NULL },
+  { "ResetCount",       sizeof (UINT16),          "0x%x", NULL },
+  { "ResetLimit",       sizeof (UINT16),          "0x%x", NULL },
+  { "TimerInterval",    sizeof (UINT16),          "0x%x", NULL },
+  { "Timeout",          sizeof (UINT16),          "0x%x", NULL },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1346,6 +1357,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjTemperatureProbeInfo,         CmArchCommonTemperatureProbeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjVoltageProbeInfo,             CmArchCommonVoltageProbeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjElectricalCurrentProbeInfo,   CmArchCommonElectricalCurrentProbeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemResetInfo,              CmArchCommonSystemResetInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

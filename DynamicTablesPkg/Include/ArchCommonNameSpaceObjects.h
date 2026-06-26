@@ -87,6 +87,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
   EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
   EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
+  EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1611,5 +1612,31 @@ typedef struct CmArchCommonElectricalCurrentProbeInfo {
   /// Nominal current in milliamperes, or 0x8000 if unknown.
   UINT16                                    NominalValue;
 } CM_ARCH_COMMON_ELECTRICAL_CURRENT_PROBE_INFO;
+
+/** A structure that describes system reset information.
+
+  SMBIOS Specification v3.9.0 Type 23
+
+  ID: EArchCommonObjSystemResetInfo
+**/
+typedef struct CmArchCommonSystemResetInfo {
+  /// Token identifying this system reset CM object.
+  CM_OBJECT_TOKEN    SystemResetToken;
+
+  /// System reset capability flags as defined by SMBIOS Type 23.
+  UINT8              Capabilities;
+
+  /// Number of automatic system resets since the last intentional reset.
+  UINT16             ResetCount;
+
+  /// Number of consecutive automatic reset attempts allowed.
+  UINT16             ResetLimit;
+
+  /// Watchdog timer interval.
+  UINT16             TimerInterval;
+
+  /// Timeout value used by the watchdog timer.
+  UINT16             Timeout;
+} CM_ARCH_COMMON_SYSTEM_RESET_INFO;
 
 #pragma pack()
