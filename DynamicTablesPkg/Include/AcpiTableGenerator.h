@@ -91,6 +91,9 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             Configuration Manager and builds the HEST table.
   - EINJ  : The EINJ generator collates the required platform information from
             the Configuration Manager and builds the EINJ table.
+  - MSCT  : The MSCT (Maximum System Characteristics Table) generator collates
+            the Maximum System Characteristics information from the
+            Configuration Manager and builds the MSCT table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -132,6 +135,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
   EStdAcpiTableIdHest,                          ///< Hest Generator
   EStdAcpiTableIdEinj,                          ///< EINJ Generator
+  EStdAcpiTableIdMsct,                          ///< MSCT Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
