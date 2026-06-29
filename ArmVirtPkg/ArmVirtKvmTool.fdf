@@ -209,6 +209,16 @@ READ_LOCK_STATUS   = TRUE
   #
   INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
+  #
+  # Realm Aperture Management
+  #
+  INF ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  INF ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
