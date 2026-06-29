@@ -2320,6 +2320,17 @@ BuildIortTable (
     goto error_handler;
   }
 
+  if ((AcpiTableInfo->AcpiTableRevision >= EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07) &&
+      (ItsGroupNodeCount > 1)) {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: IORT: Number of ITS Group Node Info must be 1. ItsGroupCount: %d\n",
+      ItsGroupNodeCount
+      ));
+    goto error_handler;
+  }
+
   // Add the ITS group node count
   IortNodeCount = ItsGroupNodeCount;
 
@@ -2987,7 +2998,7 @@ ACPI_IORT_GENERATOR  IortGenerator = {
     // ACPI Table Signature
     EFI_ACPI_6_4_IO_REMAPPING_TABLE_SIGNATURE,
     // ACPI Table Revision supported by this Generator
-    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_06,
+    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07,
     // Minimum supported ACPI Table Revision
     EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00,
     // Creator ID
