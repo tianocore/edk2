@@ -58,6 +58,7 @@ typedef enum ArmObjectID {
   EArmObjGicIrsInfo,                                           ///< 28 - GIC IRS Info
   EArmObjGicItsV5Info,                                         ///< 29 - GIC ITS v5 Info
   EArmObjGicItsV5TranslateFrameInfo,                           ///< 30 - GIC ITS v5 Translate Frame Info
+  EArmObjGicIwbInfo,                                           ///< 34 - GIC IWB Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -954,5 +955,31 @@ typedef struct CmArmGicItsV5TranslateFrameInfo {
   /// Base address of the ITS translate frame
   UINT64             ItsTranslateFrameBase;
 } CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO;
+
+/** A structure that describes the
+    Interrupt Wire Bridge (IWB) information.
+
+    ID: EArmObjGicIwbInfo
+*/
+typedef struct CmArmGicIwbInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// The GIC IWB ID
+  UINT32             GicIwbId;
+  /// Linked ITSv5 ID Token
+  CM_OBJECT_TOKEN    ItsV5Token;
+  /// Base address of the IWB config frame
+  UINT64             ConfigFrameBase;
+  /// Device ID used to signal any interrupt to the connected ITS
+  UINT32             DeviceId;
+  /// Base GSIV for this IWB
+  UINT32             BaseGsiv;
+  /// Number of wires handled by this IWB
+  UINT32             NumWires;
+  /// Reference token for the ID mapping array
+  CM_OBJECT_TOKEN    IdMappingToken;
+  /// Unique identifier for this node.
+  UINT32             Identifier;
+} CM_ARM_GIC_IWB_INFO;
 
 #pragma pack()
