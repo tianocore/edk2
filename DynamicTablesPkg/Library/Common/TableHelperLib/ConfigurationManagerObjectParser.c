@@ -511,6 +511,34 @@ STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
   { "RootNodeBaseAddressLength", 8,                                         "0x%llx", NULL },
 };
 
+/** A parser for EArmObjGicIrsInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmGicIrsInfoParser[] = {
+  { "Token",           sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "GicVersion",      sizeof (UINT32),          "0x%x",   NULL },
+  { "GicIrsId",        sizeof (UINT32),          "0x%x",   NULL },
+  { "Flags",           sizeof (UINT32),          "0x%x",   NULL },
+  { "ConfigFrameBase", sizeof (UINT64),          "0x%llx", NULL },
+  { "SetLpiFrameBase", sizeof (UINT64),          "0x%llx", NULL },
+};
+
+/** A parser for EArmObjGicItsV5Info.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmGicItsV5InfoParser[] = {
+  { "Token",               sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "GicItsId",            sizeof (UINT32),          "0x%x",   NULL },
+  { "Flags",               sizeof (UINT32),          "0x%x",   NULL },
+  { "PhysicalBaseAddress", sizeof (UINT64),          "0x%llx", NULL },
+};
+
+/** A parser for EArmObjGicItsV5TranslateFrameInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmGicItsV5TranslateFrameInfoParser[] = {
+  { "ItsV5Token",            sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ItsTranslateId",        sizeof (UINT32),          "0x%x",   NULL },
+  { "ItsTranslateFrameBase", sizeof (UINT64),          "0x%llx", NULL },
+};
+
 /** A parser for the EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE structure.
 */
 STATIC CONST CM_OBJ_PARSER  AcpiGenericAddressParser[] = {
@@ -1733,6 +1761,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificBlockInfo,      CmArmProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificSubDataArchInfo,CmArmProcessorSpecificSubDataArchInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCoresightPmuInfo,                CmArmCoresightPmuInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjGicIrsInfo,                      CmArmGicIrsInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjGicItsV5Info,                    CmArmGicItsV5InfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjGicItsV5TranslateFrameInfo,      CmArmGicItsV5TranslateFrameInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
