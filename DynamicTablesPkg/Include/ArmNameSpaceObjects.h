@@ -903,6 +903,14 @@ typedef struct CmArmGicIrsInfo {
   UINT64             ConfigFrameBase;
   /// Base address of the IRS SET_LPI frame
   UINT64             SetLpiFrameBase;
+  /// Proximity domain that this IRS belongs to
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_IRS_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARM_GIC_IRS_INFO;
 
 /** A structure that describes the
@@ -919,6 +927,18 @@ typedef struct CmArmGicItsV5Info {
   UINT32             Flags;
   /// Base address of the ITS config frame
   UINT64             PhysicalBaseAddress;
+
+  /** The proximity domain to which the logical processor belongs.
+      This field is used to populate the GIC ITS affinity structure
+      in the SRAT table.
+  */
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_ITSV5_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARM_GIC_ITSV5_INFO;
 
 /** A structure that describes the
