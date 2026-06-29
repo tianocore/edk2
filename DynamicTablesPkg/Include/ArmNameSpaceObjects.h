@@ -858,7 +858,6 @@ typedef struct CmArmGicItsV5TranslateFrameInfo {
 typedef struct CmArmGicIwbInfo {
   /// An unique token used to identify this object
   CM_OBJECT_TOKEN    Token;
-
   /// The GIC IWB ID
   UINT32             GicIwbId;
   /// ITSv5 ID of the linked ITS
@@ -873,14 +872,8 @@ typedef struct CmArmGicIwbInfo {
   UINT32             NumWires;
   /// Proximity domain that this IWB belongs to
   UINT32             ProximityDomain;
-
-  /** ASCII Null terminated string with the full path to
-      the entry in the namespace for this object.
-  */
-  CHAR8              *ObjectName;
   /// Reference token for the ID mapping array
   CM_OBJECT_TOKEN    IdMappingToken;
-
   /// Unique identifier for this node.
   UINT32             Identifier;
 } CM_ARM_GIC_IWB_INFO;
