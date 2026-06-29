@@ -1693,7 +1693,9 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
+    FeaturePcdGet (PcdEfiShellAutoboot)
+      ? LOAD_OPTION_ACTIVE
+      : LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
     ShellEnabled
     );
 
