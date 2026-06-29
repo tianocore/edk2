@@ -38,6 +38,7 @@
 #define EFI_ACPI_IORT_TYPE_SMMUv3        0x4
 #define EFI_ACPI_IORT_TYPE_PMCG          0x5
 #define EFI_ACPI_IORT_TYPE_RMR           0x6
+#define EFI_ACPI_IORT_TYPE_IWB           0x7
 
 #define EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA  BIT0
 
@@ -279,5 +280,17 @@ typedef struct {
   // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE         IdMapping[1];
   // EFI_ACPI_6_0_IO_REMAPPING_MEM_RANGE_DESC   MemRangeDesc[1];
 } EFI_ACPI_6_0_IO_REMAPPING_RMR_NODE;
+
+///
+/// Node type 7: IWB node
+///
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_NODE    Node;
+
+  UINT64                            ConfigFrameBase;
+  UINT16                            IwbIndex;
+  // UINT8                                ObjectName[];
+  // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE   IdMapping[1];
+} EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE;
 
 #pragma pack()
