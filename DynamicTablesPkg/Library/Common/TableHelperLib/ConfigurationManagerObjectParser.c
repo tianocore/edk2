@@ -536,6 +536,20 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicItsV5TranslateFrameInfoParser[] = {
   { "ItsTranslateFrameBase", sizeof (UINT64),          "0x%llx", NULL },
 };
 
+/** A parser for EArmObjGicIwbInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmGicIwbInfoParser[] = {
+  { "Token",           sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "GicIwbId",        sizeof (UINT32),          "0x%x",   NULL },
+  { "ItsV5Token",      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ConfigFrameBase", sizeof (UINT64),          "0x%llx", NULL },
+  { "DeviceId",        sizeof (UINT32),          "0x%x",   NULL },
+  { "BaseGsiv",        sizeof (UINT32),          "0x%x",   NULL },
+  { "NumWires",        sizeof (UINT32),          "0x%x",   NULL },
+  { "IdMappingToken",  sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "Identifier",      sizeof (UINT32),          "0x%x",   NULL },
+};
+
 /** A parser for the EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE structure.
 */
 STATIC CONST CM_OBJ_PARSER  AcpiGenericAddressParser[] = {
@@ -1638,6 +1652,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicIrsInfo,                      CmArmGicIrsInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicItsV5Info,                    CmArmGicItsV5InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicItsV5TranslateFrameInfo,      CmArmGicItsV5TranslateFrameInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
