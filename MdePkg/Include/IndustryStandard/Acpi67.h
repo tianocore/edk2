@@ -323,7 +323,7 @@ typedef struct {
 ///
 /// MADT Revision (as defined in ACPI 6.7 spec.)
 ///
-#define EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x07
+#define EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x08
 
 ///
 /// Multiple APIC Flags
@@ -364,6 +364,9 @@ typedef struct {
 #define EFI_ACPI_6_7_IMSIC                          0x19
 #define EFI_ACPI_6_7_APLIC                          0x1A
 #define EFI_ACPI_6_7_PLIC                           0x1B
+#define EFI_ACPI_6_7_GIC_IRS                        0x1C
+#define EFI_ACPI_6_7_GIC_ITSV5                      0x1D
+#define EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME      0x1E
 
 //
 // APIC Structure Definitions
@@ -560,6 +563,8 @@ typedef struct {
   UINT8     Reserved2;
   UINT16    SpeOverflowInterrupt;
   UINT16    TrbeInterrupt;
+  UINT16    IAffId;
+  UINT32    IrsId;
 } EFI_ACPI_6_7_GIC_STRUCTURE;
 
 ///
@@ -591,6 +596,7 @@ typedef struct {
 #define EFI_ACPI_6_7_GIC_V2  0x02
 #define EFI_ACPI_6_7_GIC_V3  0x03
 #define EFI_ACPI_6_7_GIC_V4  0x04
+#define EFI_ACPI_6_7_GIC_V5  0x05
 
 ///
 /// GIC MSI Frame Structure
@@ -633,6 +639,52 @@ typedef struct {
   UINT64    PhysicalBaseAddress;
   UINT32    Reserved2;
 } EFI_ACPI_6_7_GIC_ITS_STRUCTURE;
+
+///
+/// GIC IRS
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     GicVersion;
+  UINT8     Reserved;
+  UINT32    IrsId;
+  UINT32    Flags;
+  UINT32    Reserved2;
+  UINT64    IrsConfigFrameBase;
+  UINT64    IrsSetLpiFrameBase;
+} EFI_ACPI_6_7_GIC_IRS_STRUCTURE;
+
+#define EFI_ACPI_6_7_GIC_IRS_FLAG_FULLY_COHERENT  (0)
+#define EFI_ACPI_6_7_GIC_IRS_FLAG_NOT_COHERENT    (BIT0)
+
+///
+/// GIC ITSv5
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Flags;
+  UINT8     Reserved;
+  UINT32    GicItsId;
+  UINT64    PhysicalBaseAddress;
+} EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE;
+
+#define EFI_ACPI_6_7_GIC_ITSV5_FLAG_FULLY_COHERENT  (0)
+#define EFI_ACPI_6_7_GIC_ITSV5_FLAG_NOT_COHERENT    (BIT0)
+
+///
+/// GIC ITSv5 translate frame structure
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT16    Reserved;
+  UINT32    LinkedGicItsId;
+  UINT32    ItsTranslateId;
+  UINT32    Reserved2;
+  UINT64    ItsTranslateFrameBase;
+} EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE;
 
 ///
 /// Multiprocessor Wakeup Structure
@@ -885,11 +937,11 @@ typedef struct {
 ///
 /// SRAT Version (as defined in ACPI 6.7 spec.)
 ///
-#define EFI_ACPI_6_7_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION  0x03
+#define EFI_ACPI_6_7_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION  0x04
 
 //
 // SRAT structure types.
-// All other values between 0x08 and 0xFF are reserved and
+// All other values between 0x09 and 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_6_7_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
@@ -900,6 +952,7 @@ typedef struct {
 #define EFI_ACPI_6_7_GENERIC_INITIATOR_AFFINITY           0x05
 #define EFI_ACPI_6_7_GENERIC_PORT_AFFINITY                0x06
 #define EFI_ACPI_6_7_RINTC_AFFINITY                       0x07
+#define EFI_ACPI_6_7_GIC_IRS_AFFINITY                     0x08
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -999,6 +1052,18 @@ typedef struct {
   UINT32    Flags;
   UINT32    ClockDomain;
 } EFI_ACPI_6_7_RINTC_AFFINITY_STRUCTURE;
+
+///
+/// IRS Affinity Structure Definition
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT16    Reserved;
+  UINT32    ProximityDomain;
+  UINT32    IrsId;
+  UINT32    Reserved2;
+} EFI_ACPI_6_7_GIC_IRS_AFFINITY_STRUCTURE;
 
 //
 // Generic Initiator Affinity Structure Device Handle Types
