@@ -21,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  24
+#define EDKII_CRYPTO_VERSION  25
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -1010,6 +1010,48 @@ BOOLEAN
   IN   UINT8        *OtherCerts      OPTIONAL,
   OUT  UINT8        **SignedData,
   OUT  UINTN        *SignedDataSize
+  );
+
+/**
+  Creates a DER-encoded PKCS#7 ContentInfo containing an envelopedData structure
+  that wraps content encrypted for secure transmission to one or more recipients.
+
+  If this interface is not supported, return FALSE.
+
+  @param[in]  X509Stack        Pointer to a stack of X.509 certificates for the
+                               intended recipients of this message, created using
+                               X509ConstructCertificateStack or similar. Each
+                               certificate must provide an RSA public key. Any of the
+                               corresponding private keys will be able to decrypt the
+                               content of the returned ContentInfo.
+  @param[in]  InData           Pointer to the content to be encrypted.
+  @param[in]  InDataSize       Size of the content to be encrypted in bytes.
+  @param[in]  CipherNid        NID of the symmetric cipher to use for encryption.
+                               Supported values are CRYPTO_NID_AES128CBC,
+                               CRYPTO_NID_AES192CBC, and CRYPTO_NID_AES256CBC.
+  @param[in]  Flags            Flags for the encryption operation. Currently only
+                               CRYPTO_PKCS7_DEFAULT is supported, which indicates that
+                               the input data is treated as binary data.
+  @param[out] ContentInfo      Receives a pointer to the output, which is a PKCS#7
+                               DER-encoded ContentInfo that wraps an envelopedData. The
+                               caller must free the returned buffer with FreePool().
+  @param[out] ContentInfoSize  Receives the size of the output in bytes.
+
+  @retval     TRUE             PKCS#7 data encryption succeeded.
+  @retval     FALSE            PKCS#7 data encryption failed.
+  @retval     FALSE            This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_PKCS7_ENCRYPT)(
+  IN   UINT8   *X509Stack,
+  IN   UINT8   *InData,
+  IN   UINTN   InDataSize,
+  IN   UINT32  CipherNid,
+  IN   UINT32  Flags,
+  OUT  UINT8   **ContentInfo,
+  OUT  UINTN   *ContentInfoSize
   );
 
 /**
@@ -6174,6 +6216,8 @@ struct _EDKII_CRYPTO_PROTOCOL {
   /// RSA PSS (Continued)
   EDKII_CRYPTO_RSA_PSS_SIGN_DIGEST                    RsaPssSignDigest;
   EDKII_CRYPTO_RSA_PSS_VERIFY_DIGEST                  RsaPssVerifyDigest;
+  /// Pkcs (Continued)
+  EDKII_CRYPTO_PKCS7_ENCRYPT                          Pkcs7Encrypt;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

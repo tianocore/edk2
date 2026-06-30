@@ -28,6 +28,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CRYPTO_NID_SECP521R1        0x0206
 #define CRYPTO_NID_BRAINPOOLP512R1  0x03A5
 
+// Symmetric ciphers usable with Pkcs7Encrypt.
+#define CRYPTO_NID_AES128CBC  0x01A3 // NID_aes_128_cbc
+#define CRYPTO_NID_AES192CBC  0x01A7 // NID_aes_192_cbc
+#define CRYPTO_NID_AES256CBC  0x01AB // NID_aes_256_cbc
+
+// Flags usable with Pkcs7Encrypt.
+#define CRYPTO_PKCS7_DEFAULT  0x0 // Treat the input as binary data.
+
 ///
 /// MD5 digest size in bytes
 ///
@@ -2677,6 +2685,48 @@ Pkcs7Verify (
   IN  UINTN        CertLength,
   IN  CONST UINT8  *InData,
   IN  UINTN        DataLength
+  );
+
+/**
+  Creates a DER-encoded PKCS#7 ContentInfo containing an envelopedData structure
+  that wraps content encrypted for secure transmission to one or more recipients.
+
+  If this interface is not supported, return FALSE.
+
+  @param[in]  X509Stack        Pointer to a stack of X.509 certificates for the
+                               intended recipients of this message, created using
+                               X509ConstructCertificateStack or similar. Each
+                               certificate must provide an RSA public key. Any of the
+                               corresponding private keys will be able to decrypt the
+                               content of the returned ContentInfo.
+  @param[in]  InData           Pointer to the content to be encrypted.
+  @param[in]  InDataSize       Size of the content to be encrypted in bytes.
+  @param[in]  CipherNid        NID of the symmetric cipher to use for encryption.
+                               Supported values are CRYPTO_NID_AES128CBC,
+                               CRYPTO_NID_AES192CBC, and CRYPTO_NID_AES256CBC.
+  @param[in]  Flags            Flags for the encryption operation. Currently only
+                               CRYPTO_PKCS7_DEFAULT is supported, which indicates that
+                               the input data is treated as binary data.
+  @param[out] ContentInfo      Receives a pointer to the output, which is a PKCS#7
+                               DER-encoded ContentInfo that wraps an envelopedData. The
+                               caller must free the returned buffer with FreePool().
+  @param[out] ContentInfoSize  Receives the size of the output in bytes.
+
+  @retval     TRUE             PKCS#7 data encryption succeeded.
+  @retval     FALSE            PKCS#7 data encryption failed.
+  @retval     FALSE            This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Pkcs7Encrypt (
+  IN   UINT8   *X509Stack,
+  IN   UINT8   *InData,
+  IN   UINTN   InDataSize,
+  IN   UINT32  CipherNid,
+  IN   UINT32  Flags,
+  OUT  UINT8   **ContentInfo,
+  OUT  UINTN   *ContentInfoSize
   );
 
 /**
