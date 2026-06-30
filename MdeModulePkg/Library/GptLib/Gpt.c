@@ -25,6 +25,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/GptLib.h>
 
+//
+// The only GPT header revision defined by the UEFI specification.
+//
+#define GPT_HEADER_REVISION_V1  0x00010000
+
+//
+// Minimum on-disk GPT header size: large enough to cover every defined field
+// through PartitionEntryArrayCRC32 (92 bytes). sizeof (EFI_PARTITION_TABLE_HEADER)
+// cannot be used because the C structure is padded to an 8-byte boundary.
+//
+#define GPT_HEADER_MIN_SIZE  (OFFSET_OF (EFI_PARTITION_TABLE_HEADER, PartitionEntryArrayCRC32) + \
+                              sizeof (((EFI_PARTITION_TABLE_HEADER *)0)->PartitionEntryArrayCRC32))
+
 /**
   Check if the CRC field in the Partition table header is valid
   for Partition entry array.
@@ -160,10 +173,21 @@ PartitionValidGptTable (
     return FALSE;
   }
 
+  //
+  // Validate the header fields against the constraints the UEFI specification
+  // places on a GPT header. SizeOfPartitionEntry must be 128 * 2^n. Note this
+  // routine validates both the primary and the backup header, so it must not
+  // assume the entry array sits before FirstUsableLBA: that holds for the
+  // primary but not for the backup, whose array follows the usable region.
+  //
   if ((PartHdr->Header.Signature != EFI_PTAB_HEADER_ID) ||
+      (PartHdr->Header.Revision != GPT_HEADER_REVISION_V1) ||
+      (PartHdr->Header.HeaderSize < GPT_HEADER_MIN_SIZE) ||
       !PartitionCheckCrc (BlockSize, &PartHdr->Header) ||
       (PartHdr->MyLBA != Lba) ||
-      (PartHdr->SizeOfPartitionEntry < sizeof (EFI_PARTITION_ENTRY))
+      (PartHdr->NumberOfPartitionEntries == 0) ||
+      (PartHdr->SizeOfPartitionEntry < sizeof (EFI_PARTITION_ENTRY)) ||
+      ((PartHdr->SizeOfPartitionEntry & (PartHdr->SizeOfPartitionEntry - 1)) != 0)
       )
   {
     DEBUG ((DEBUG_INFO, "Invalid efi partition table header\n"));
@@ -172,9 +196,13 @@ PartitionValidGptTable (
   }
 
   //
-  // Ensure the NumberOfPartitionEntries * SizeOfPartitionEntry doesn't overflow.
+  // Ensure PartitionEntryLBA * BlockSize and
+  // NumberOfPartitionEntries * SizeOfPartitionEntry don't overflow when they
+  // are later used to read and size the partition entry array.
   //
-  if (PartHdr->NumberOfPartitionEntries > DivU64x32 (MAX_UINTN, PartHdr->SizeOfPartitionEntry)) {
+  if ((PartHdr->PartitionEntryLBA > DivU64x32 (MAX_UINT64, BlockSize)) ||
+      (PartHdr->NumberOfPartitionEntries > DivU64x32 (MAX_UINTN, PartHdr->SizeOfPartitionEntry)))
+  {
     FreePool (PartHdr);
     return FALSE;
   }
