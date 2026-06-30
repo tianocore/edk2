@@ -19,6 +19,7 @@
   DeviceTreeTableFactory/DeviceTreeTableFactory.c
   DynamicTableFactoryDxe.c
   SmbiosTableFactory/SmbiosTableFactory.c
+  HiiFormsFactory/HiiFormsFactory.c
   DynamicTableFactory.h
 
 [Packages]

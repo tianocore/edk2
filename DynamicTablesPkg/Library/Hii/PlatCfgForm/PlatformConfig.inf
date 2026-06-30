@@ -1,0 +1,44 @@
+## @file
+#  Dynamic HII Platform Configuration Form Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PlatformConfig
+  FILE_GUID                      = 967D421F-9AC0-4E9F-B272-8A94F5ED6A25
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = HiiPlatCfgFormConstructor
+  DESTRUCTOR                     = HiiPlatCfgFormDestructor
+
+[Sources]
+  PlatformConfig.c
+  PlatformConfig.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiFormsLib
+  HiiLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Event
+  ## CONSUMES ## Event
+  gEfiIfrTianoGuid
+  gEfiIfrRefreshIdOpGuid

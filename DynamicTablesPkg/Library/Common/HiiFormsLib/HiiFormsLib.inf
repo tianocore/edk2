@@ -1,0 +1,32 @@
+## @file
+#  HII Forms Helper
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = HiiFormsLib
+  FILE_GUID      = C49B6F15-5FAA-4F50-88CC-7F65821B9938
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = HiiFormsLib
+
+[Sources]
+  HiiFormGeneratorLib/HiiFormGenerator.c
+  HiiFormGeneratorLib/HiiFormSerialize.c
+  HiiStringGeneratorLib/HiiStringGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
