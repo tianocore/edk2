@@ -1,0 +1,68 @@
+#/** @file
+#
+#  Virt MM Communicate driver (FDT variant)
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = VirtMmCommunication
+  FILE_GUID                      = 9C9E7951-403D-40A8-9878-497D4F7718CA
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtMmCommunication2Initialize
+  VALID_ARCHITECTURES            = X64 AARCH64 RISCV64 LOONGARCH64
+
+[Sources]
+  VirtMmCommunication.c
+  QemuFdt.c
+  QemuMmio.c
+
+[Sources.X64]
+  Svsm.c
+
+[Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
+  SvsmNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[Packages.X64]
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  FdtLib
+
+[LibraryClasses.X64]
+  AmdSvsmLib
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire                          ## CONSUMES
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gEfiSmmVariableProtocolGuid                   ## PRODUCES
+  gFdtClientProtocolGuid
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+  gEfiEventReadyToBootGuid
+  gSmmVariableWriteGuid
+
+[Depex]
+  gEfiCpuArchProtocolGuid AND gFdtClientProtocolGuid

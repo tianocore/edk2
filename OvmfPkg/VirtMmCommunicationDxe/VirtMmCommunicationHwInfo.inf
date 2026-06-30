@@ -1,0 +1,58 @@
+#/** @file
+#
+#  Virt MM Communicate driver (HwInfo variant for X64)
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = VirtMmCommunication
+  FILE_GUID                      = 0B807404-2D1C-4066-95F4-F28A58800185
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtMmCommunication2Initialize
+  VALID_ARCHITECTURES            = X64
+
+[Sources]
+  VirtMmCommunication.c
+  QemuHwInfo.c
+  QemuMmio.c
+  Svsm.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  DxeHardwareInfoLib
+  QemuFwCfgLib
+  AmdSvsmLib
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire                          ## CONSUMES
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gEfiSmmVariableProtocolGuid                   ## PRODUCES
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+  gEfiEventReadyToBootGuid
+  gSmmVariableWriteGuid
+
+[Depex]
+  gEfiCpuArchProtocolGuid
