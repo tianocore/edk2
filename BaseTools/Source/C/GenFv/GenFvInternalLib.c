@@ -2840,7 +2840,12 @@ Returns:
       // If the PEI Core is found, the VTF file will probably get
       // corrupted by updating the entry point.
       //
+      // The FV is rebased when ForceRebase == 1 or, on the legacy path, when
+      // ForceRebase is unset and the FV has a non-zero base address. In both
+      // cases the reset vector must be updated to match the rebased modules.
+      //
       if (mFvDataInfo.ForceRebase == 1 ||
+          (mFvDataInfo.ForceRebase == -1 && mFvDataInfo.BaseAddress != 0) ||
           (mFvDataInfo.BaseAddress + mFvDataInfo.Size) == FV_IMAGES_TOP_ADDRESS) {
         Status = UpdateResetVector (&FvImageMemoryFile, &mFvDataInfo, VtfFileImage);
         if (EFI_ERROR(Status)) {
