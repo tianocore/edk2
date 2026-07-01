@@ -314,6 +314,7 @@
   QemuFwCfgLib                     | OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   AcpiPlatformLib                  | OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
+  MapMmioLib                       | OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
   MpInitLib                        | UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]

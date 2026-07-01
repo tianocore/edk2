@@ -396,6 +396,7 @@
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   ResetSystemLib|OvmfPkg/Library/ResetSystemLib/DxeResetSystemLibMicrovm.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MapMmioLib|OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
