@@ -1223,6 +1223,19 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryArrayMappedAddressParser[] = {
   { "NumMemDevices",                 sizeof (UINT8),                "0x%u",  NULL },
 };
 
+/** A parser for EArchCommonObjMemoryDeviceMappedAddress.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
+  { "MemoryDeviceMappedAddressToken", sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "StartingAddress",                sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "EndingAddress",                  sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "MemoryDeviceInfoToken",          sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "MemoryArrayMappedAddressToken",  sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "PartitionRowPosition",           sizeof (UINT8),                "0x%u",  NULL },
+  { "InterleavePosition",             sizeof (UINT8),                "0x%u",  NULL },
+  { "InterleavedDataDepth",           sizeof (UINT8),                "0x%u",  NULL },
+};
+
 /** A parser for EArchCommonObjCoolingDeviceInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonCoolingDeviceInfoParser[] = {
@@ -1358,6 +1371,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjVoltageProbeInfo,             CmArchCommonVoltageProbeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjElectricalCurrentProbeInfo,   CmArchCommonElectricalCurrentProbeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemResetInfo,              CmArchCommonSystemResetInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceMappedAddress,    CmArchCommonMemoryDeviceMappedAddressParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

@@ -88,6 +88,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
   EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
   EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1468,6 +1469,34 @@ typedef struct CmArchCommonMemoryArrayMappedAddress {
   /// Number of memory devices that form a row in the address partition.
   UINT8                   NumMemDevices;
 } CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 20
+
+  ID: EArchCommonObjMemoryDeviceMappedAddress
+**/
+typedef struct CmArchCommonMemoryDeviceMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryDeviceMappedAddressToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token of the associated Memory Device.
+  CM_OBJECT_TOKEN         MemoryDeviceInfoToken;
+  /// CM Object Token of the associated Memory Array Mapped Address.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Identifies the position of the referenced memory device in a row.
+  /// Set to 0xFF if unknown.
+  UINT8                   PartitionRowPosition;
+  /// Identifies the position of the referenced memory device in an interleave.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavePosition;
+  /// Number of consecutive rows from the referenced memory device.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavedDataDepth;
+} CM_ARCH_COMMON_MEMORY_DEVICE_MAPPED_ADDRESS;
 
 /** A structure that describes cooling device.
 
