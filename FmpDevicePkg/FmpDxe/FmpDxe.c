@@ -214,15 +214,15 @@ GetImageTypeNameString (
   2. Check if we have a variable for lowest supported version (this will be updated with each capsule applied)
   3. Check Fixed at build PCD
 
-  @param[in] Private  Pointer to the private context structure for the
-                      Firmware Management Protocol instance.
+  @param[in] FmpControllerState  The cached FMP Controller State, or NULL if the
+                                 state could not be retrieved.
 
   @retval  The largest value
 
 **/
 UINT32
 GetLowestSupportedVersion (
-  FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+  FMP_CONTROLLER_STATE  *FmpControllerState
   )
 {
   EFI_STATUS  Status;
@@ -259,7 +259,7 @@ GetLowestSupportedVersion (
   //
   // Check the lowest supported version UEFI variable for this device
   //
-  VariableLowestSupportedVersion = GetLowestSupportedVersionFromVariable (Private);
+  VariableLowestSupportedVersion = GetLowestSupportedVersionFromFmpControllerState (FmpControllerState);
   if (VariableLowestSupportedVersion > ReturnLsv) {
     ReturnLsv = VariableLowestSupportedVersion;
   }
@@ -283,8 +283,9 @@ PopulateDescriptor (
   FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS  Status;
-  UINT32      DependenciesSize;
+  EFI_STATUS            Status;
+  UINT32                DependenciesSize;
+  FMP_CONTROLLER_STATE  *FmpControllerState;
 
   if (Private == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): PopulateDescriptor() - Private is NULL.\n", mImageIdName));
@@ -314,6 +315,8 @@ PopulateDescriptor (
   //
   GenerateFmpVariableNames (Private);
 
+  FmpControllerState = GetFmpControllerState (Private);
+
   //
   // Get the version.  Some devices don't support getting the firmware version
   // at runtime.  If FmpDeviceLib does not support returning a version, then
@@ -322,7 +325,7 @@ PopulateDescriptor (
   Status = FmpDeviceGetVersion (&Private->Descriptor.Version);
   if (Status == EFI_UNSUPPORTED) {
     Private->RuntimeVersionSupported = FALSE;
-    Private->Descriptor.Version      = GetVersionFromVariable (Private);
+    Private->Descriptor.Version      = GetVersionFromFmpControllerState (FmpControllerState);
   } else if (EFI_ERROR (Status)) {
     //
     // Unexpected error.   Use default version.
@@ -358,7 +361,7 @@ PopulateDescriptor (
                                         );
   }
 
-  Private->Descriptor.LowestSupportedImageVersion = GetLowestSupportedVersion (Private);
+  Private->Descriptor.LowestSupportedImageVersion = GetLowestSupportedVersion (FmpControllerState);
 
   //
   // Get attributes from the FmpDeviceLib
@@ -390,8 +393,12 @@ PopulateDescriptor (
     Private->Descriptor.Size = 0;
   }
 
-  Private->Descriptor.LastAttemptVersion = GetLastAttemptVersionFromVariable (Private);
-  Private->Descriptor.LastAttemptStatus  = GetLastAttemptStatusFromVariable (Private);
+  Private->Descriptor.LastAttemptVersion = GetLastAttemptVersionFromFmpControllerState (FmpControllerState);
+  Private->Descriptor.LastAttemptStatus  = GetLastAttemptStatusFromFmpControllerState (FmpControllerState);
+
+  if (FmpControllerState != NULL) {
+    FreePool (FmpControllerState);
+  }
 
   //
   // Get the dependency from the FmpDependencyDeviceLib.
