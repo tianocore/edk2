@@ -560,10 +560,18 @@ DivideWithNoParameterChecking (
   Sample unit test that performs a divide by 0
 **/
 TEST (SanitizerTests, DivideByZeroDeathTest) {
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   //
   // Divide by 0 should be caught by address sanitizer, log details, and exit
   //
   EXPECT_DEATH (DivideWithNoParameterChecking (10, 0), "ERROR: AddressSanitizer: ");
+ #else
+  //
+  // Integer divide by zero is architecturally defined to not trap on some
+  // CPUs (e.g. AARCH64 SDIV/UDIV return 0), so nothing triggers the sanitizer.
+  //
+  GTEST_SKIP () << "Integer divide by zero does not trap on this architecture";
+ #endif
 }
 
 /**
