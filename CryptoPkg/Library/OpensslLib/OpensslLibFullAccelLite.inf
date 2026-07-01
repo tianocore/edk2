@@ -405,6 +405,14 @@
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
   $(OPENSSL_PATH)/crypto/md5/md5_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_sha1.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_encoders.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key_compress.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_matrix.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_ntt.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_params.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sample.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sign.c
   $(OPENSSL_PATH)/crypto/modes/cbc128.c
   $(OPENSSL_PATH)/crypto/modes/ccm128.c
   $(OPENSSL_PATH)/crypto/modes/cfb128.c
@@ -649,6 +657,8 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_common_codecs.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_dsa_codecs.c
   $(OPENSSL_PATH)/providers/implementations/exchange/ecdh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c
   $(OPENSSL_PATH)/providers/implementations/kdfs/argon2.c
@@ -670,6 +680,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/ec_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
@@ -688,6 +699,7 @@
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_win.c
   $(OPENSSL_PATH)/providers/implementations/signature/ecdsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
@@ -695,6 +707,7 @@
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_key.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_sig.c
+  $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
@@ -709,6 +722,7 @@
   $(OPENSSL_PATH)/ssl/record/methods/tls_pad.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_digests_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ec_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
@@ -1131,6 +1145,14 @@
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
   $(OPENSSL_PATH)/crypto/md5/md5_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_sha1.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_encoders.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key_compress.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_matrix.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_ntt.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_params.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sample.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sign.c
   $(OPENSSL_PATH)/crypto/modes/cbc128.c
   $(OPENSSL_PATH)/crypto/modes/ccm128.c
   $(OPENSSL_PATH)/crypto/modes/cfb128.c
@@ -1374,6 +1396,8 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_common_codecs.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_dsa_codecs.c
   $(OPENSSL_PATH)/providers/implementations/exchange/ecdh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c
   $(OPENSSL_PATH)/providers/implementations/kdfs/argon2.c
@@ -1395,6 +1419,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/ec_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
@@ -1413,6 +1438,7 @@
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_win.c
   $(OPENSSL_PATH)/providers/implementations/signature/ecdsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
@@ -1420,6 +1446,7 @@
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_key.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_sig.c
+  $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
@@ -1434,6 +1461,7 @@
   $(OPENSSL_PATH)/ssl/record/methods/tls_pad.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_digests_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ec_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
@@ -1877,6 +1905,14 @@
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
   $(OPENSSL_PATH)/crypto/md5/md5_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_sha1.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_encoders.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key_compress.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_matrix.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_ntt.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_params.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sample.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sign.c
   $(OPENSSL_PATH)/crypto/modes/cbc128.c
   $(OPENSSL_PATH)/crypto/modes/ccm128.c
   $(OPENSSL_PATH)/crypto/modes/cfb128.c
@@ -2120,6 +2156,8 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_common_codecs.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_dsa_codecs.c
   $(OPENSSL_PATH)/providers/implementations/exchange/ecdh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c
   $(OPENSSL_PATH)/providers/implementations/kdfs/argon2.c
@@ -2141,6 +2179,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/ec_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
@@ -2159,6 +2198,7 @@
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_win.c
   $(OPENSSL_PATH)/providers/implementations/signature/ecdsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
@@ -2166,6 +2206,7 @@
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_key.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_sig.c
+  $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
@@ -2180,6 +2221,7 @@
   $(OPENSSL_PATH)/ssl/record/methods/tls_pad.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_digests_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ec_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
