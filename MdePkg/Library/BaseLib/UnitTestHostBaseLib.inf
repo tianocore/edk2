@@ -23,7 +23,7 @@
   LIBRARY_CLASS                  = UnitTestHostBaseLib|HOST_APPLICATION
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -183,8 +183,9 @@
 
 [Sources.AARCH64]
   AArch64/InternalSwitchStack.c
-  AArch64/Unaligned.c
+  Unaligned.c
   Math64.c
+  AArch64/AArch64UnitTestHost.c
 
   AArch64/MemoryFence.S             | GCC
   AArch64/SwitchStack.S             | GCC
