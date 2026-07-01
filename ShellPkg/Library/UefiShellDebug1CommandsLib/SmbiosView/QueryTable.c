@@ -3246,33 +3246,6 @@ TABLE_ITEM  VPLocationTable[] = {
   },
   {
     0x03,
-    L" OK "
-  },
-  {
-    0x04,
-    L" Non-critical "
-  },
-  {
-    0x05,
-    L" Critical "
-  },
-  {
-    0x06,
-    L" Non-recoverable "
-  },
-};
-
-TABLE_ITEM  VPStatusTable[] = {
-  {
-    0x01,
-    L" Other "
-  },
-  {
-    0x02,
-    L" Unknown "
-  },
-  {
-    0x03,
     L" Processor "
   },
   {
@@ -3306,6 +3279,33 @@ TABLE_ITEM  VPStatusTable[] = {
   {
     0x0B,
     L" Add-in Card "
+  },
+};
+
+TABLE_ITEM  VPStatusTable[] = {
+  {
+    0x01,
+    L" Other "
+  },
+  {
+    0x02,
+    L" Unknown "
+  },
+  {
+    0x03,
+    L" OK "
+  },
+  {
+    0x04,
+    L" Non-critical "
+  },
+  {
+    0x05,
+    L" Critical "
+  },
+  {
+    0x06,
+    L" Non-recoverable "
   },
 };
 
