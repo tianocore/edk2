@@ -76,6 +76,13 @@ UINTN
   IN UINTN  Value
   );
 
+//
+// The services below use IA32/X64-only types (IA32_DESCRIPTOR, THUNK_CONTEXT,
+// X86_ASSEMBLY_PATCH_LABEL) that BaseLib defines only for those CPUs.  Guard
+// them so the host BaseLib also builds on other architectures (e.g. AARCH64).
+//
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+
 /**
   Prototype of service that reads and returns an IA32_DESCRIPTOR.
 
@@ -490,6 +497,8 @@ VOID
   IN  UINTN                    ValueSize
   );
 
+#endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+
 ///
 /// Common services
 ///
@@ -499,6 +508,8 @@ typedef struct {
   UNIT_TEST_HOST_BASE_LIB_VOID            EnableDisableInterrupts;
   UNIT_TEST_HOST_BASE_LIB_READ_BOOLEAN    GetInterruptState;
 } UNIT_TEST_HOST_BASE_LIB_COMMON;
+
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
 ///
 /// IA32/X64 services
@@ -566,6 +577,8 @@ typedef struct {
   UNIT_TEST_HOST_BASE_LIB_ASM_PATCH_INSTRUCTION_X86      PatchInstructionX86;
 } UNIT_TEST_HOST_BASE_LIB_X86;
 
+#endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+
 ///
 /// Data structure that contains pointers structures of common services and CPU
 /// architecture specific services.  Support for additional CPU architectures
@@ -573,7 +586,9 @@ typedef struct {
 ///
 typedef struct {
   UNIT_TEST_HOST_BASE_LIB_COMMON    *Common;
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   UNIT_TEST_HOST_BASE_LIB_X86       *X86;
+ #endif
 } UNIT_TEST_HOST_BASE_LIB;
 
 extern UNIT_TEST_HOST_BASE_LIB  gUnitTestHostBaseLib;
