@@ -144,6 +144,7 @@
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiApplicationEntryPoint.inf
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf
   MdePkg/Library/FvLib/FvLib.inf
+  MdePkg/Library/SecureZeroMemoryLib/SecureZeroMemoryLib.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   #
