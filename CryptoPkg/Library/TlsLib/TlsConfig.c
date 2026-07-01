@@ -227,9 +227,38 @@ TlsSetCipherList (
     //
     for (StackIdx = 0; StackIdx < sk_SSL_CIPHER_num (OpensslCipherStack); StackIdx++) {
       OpensslCipher = sk_SSL_CIPHER_value (OpensslCipherStack, StackIdx);
-      if (CipherId[Index] == SSL_CIPHER_get_protocol_id (OpensslCipher)) {
-        break;
+      if (CipherId[Index] != SSL_CIPHER_get_protocol_id (OpensslCipher)) {
+        continue;
       }
+
+      //
+      // Accumulate cipher name string length into CipherStringSize. If this
+      // is not the first successful mapping, account for a colon (":") prefix
+      // too.
+      //
+      if (MappedCipherCount > 0) {
+        Status = SafeUintnAdd (CipherStringSize, 1, &CipherStringSize);
+        if (EFI_ERROR (Status)) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto FreeMappedCipher;
+        }
+      }
+
+      Status = SafeUintnAdd (
+                 CipherStringSize,
+                 AsciiStrLen (SSL_CIPHER_get_name (OpensslCipher)),
+                 &CipherStringSize
+                 );
+      if (EFI_ERROR (Status)) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto FreeMappedCipher;
+      }
+
+      //
+      // Record the mapping.
+      //
+      MappedCipher[MappedCipherCount++] = OpensslCipher;
+      break;
     }
 
     if (StackIdx == sk_SSL_CIPHER_num (OpensslCipherStack)) {
@@ -245,36 +274,7 @@ TlsSetCipherList (
       // preference list of ciphers, thus we can filter it as long as we
       // don't change the relative order of elements on it.
       //
-      continue;
     }
-
-    //
-    // Accumulate cipher name string length into CipherStringSize. If this
-    // is not the first successful mapping, account for a colon (":") prefix
-    // too.
-    //
-    if (MappedCipherCount > 0) {
-      Status = SafeUintnAdd (CipherStringSize, 1, &CipherStringSize);
-      if (EFI_ERROR (Status)) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto FreeMappedCipher;
-      }
-    }
-
-    Status = SafeUintnAdd (
-               CipherStringSize,
-               AsciiStrLen (SSL_CIPHER_get_name (OpensslCipher)),
-               &CipherStringSize
-               );
-    if (EFI_ERROR (Status)) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto FreeMappedCipher;
-    }
-
-    //
-    // Record the mapping.
-    //
-    MappedCipher[MappedCipherCount++] = OpensslCipher;
   }
 
   //

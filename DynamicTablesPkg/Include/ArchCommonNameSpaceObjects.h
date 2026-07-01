@@ -83,6 +83,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
   EArchCommonObjMemoryDeviceInfo,               ///< 56 - Memory Device Info
   EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
+  EArchCommonObjCoolingDeviceInfo,              ///< 58 - Cooling Device Info
+  EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1463,5 +1465,73 @@ typedef struct CmArchCommonMemoryArrayMappedAddress {
   /// Number of memory devices that form a row in the address partition.
   UINT8                   NumMemDevices;
 } CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
+
+/** A structure that describes cooling device.
+
+  SMBIOS Specification v3.9.0 Type 27
+
+  ID: EArchCommonObjCoolingDeviceInfo
+**/
+typedef struct CmArchCommonCoolingDeviceInfo {
+  /// CM Object Token uniquely identifying this cooling device info.
+  CM_OBJECT_TOKEN             Token;
+  /// CM Object Token uniquely identifying temperature probe associated with this device
+  CM_OBJECT_TOKEN             TemperatureProbeToken;
+  /// Type and Status of the cooling device
+  MISC_COOLING_DEVICE_TYPE    DeviceTypeAndStatus;
+  /// Cooling unit group number
+  UINT8                       CoolingUnitGroup;
+  /// OEM defined information
+  UINT32                      OEMDefined;
+  /// Nominal speed for the cooling device in revolutions per minute
+  /// A value of 0x8000 indicates unknown or non-rotating.
+  UINT16                      NominalSpeed;
+  /// Description of the cooling device
+  CHAR8                       Description[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_COOLING_DEVICE_INFO;
+
+/** A structure that describes a temperature probe.
+
+  SMBIOS Specification v3.9.0 Type 28
+
+  ID: EArchCommonObjTemperatureProbeInfo
+**/
+typedef struct CmArchCommonTemperatureProbeInfo {
+  /// CM Object Token uniquely identifying this temperature probe.
+  CM_OBJECT_TOKEN                    TemperatureProbeToken;
+
+  /// Description of the temperature probe or its location.
+  CHAR8                              Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Location and status of the temperature probe.
+  MISC_TEMPERATURE_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum value readable by the probe, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             MaximumValue;
+
+  /// Minimum value readable by the probe, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             MinimumValue;
+
+  /// Resolution for the probe reading, in 1/1000 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Resolution;
+
+  /// Tolerance for the probe reading, plus/minus 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Tolerance;
+
+  /// Accuracy for the probe reading, in plus/minus 1/100 percent.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                             OemDefined;
+
+  /// Nominal temperature value, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             NominalValue;
+} CM_ARCH_COMMON_TEMPERATURE_PROBE_INFO;
 
 #pragma pack()

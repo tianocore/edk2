@@ -234,6 +234,7 @@ UsbCreateDevice (
   Device->ParentPort = ParentPort;
   Device->Tier       = (UINT8)(ParentIf->Device->Tier + 1);
   Device->IsSSDev    = FALSE;
+  Device->EnumScript = 0;
   return Device;
 }
 
@@ -674,6 +675,7 @@ UsbEnumerateNewDev (
   UINTN                Address;
   UINT8                Config;
   EFI_STATUS           Status;
+  EFI_STATUS           OriginalStatus;
   UINT8                RetryCount;
 
   Parent  = HubIf->Device;
@@ -721,6 +723,24 @@ DeviceRetry:
     DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: failed to get speed of port %d\n", Port));
     goto ON_ERROR;
   }
+
+  //
+  // RetryCount is used to execute the different enum scripts.
+  // Current the diffrence is only for getting Configuration Descriptor.
+  // +--------------------+---+----------------------------------------------------+
+  // | UsbEnumScriptWin   | 3 | UsbGetOneConfig get the descriptor with 255 bytes  |
+  // +--------------------+---+----------------------------------------------------+
+  // | UsbEnumScriptLinux | 2 | UsbGetOneConfig get the descriptor with            |
+  // |                    |   | ConfigurationDescriptor Length.                    |
+  // +--------------------+---+----------------------------------------------------+
+  // | UsbEnumScriptRsrv  | 1 | UsbGetOneConfig get the descriptor with 8 bytes    |
+  // |                    |   | and then get the total length. (Same as Edk2 flow) |
+  // +--------------------+---+----------------------------------------------------+
+  // | UsbEnumScriptEdk2  | 0 | UsbGetOneConfig get the descriptor with 8 bytes    |
+  // |                    |   | and then get the total length.                     |
+  // +--------------------+--------------------------------------------------------+
+  //
+  Child->EnumScript = RetryCount;
 
   if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
     DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: No device present at port %d\n", Port));
@@ -793,8 +813,9 @@ DeviceRetry:
       goto ON_ERROR;
     }
   } else {
-    Address        = Child->Address;
-    Child->Address = 0;
+    Address               = Child->Address;
+    Child->Address        = 0;
+    Bus->Devices[Address] = NULL;
   }
 
   Status                = UsbSetAddress (Child, (UINT8)Address);
@@ -884,7 +905,8 @@ ON_ERROR:
   //
   // Do the error handling with retry counter.
   //
-  Status = HubApi->GetPortStatus (HubIf, Port, &PortState);
+  OriginalStatus = Status;
+  Status         = HubApi->GetPortStatus (HubIf, Port, &PortState);
   if (EFI_ERROR (Status) || (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION))) {
     DEBUG ((DEBUG_ERROR, "Device is gone. Don't reset the port\n"));
     Status = EFI_NOT_FOUND;
@@ -919,7 +941,7 @@ ON_ERROR:
   //
   // EDKII UHCI/EHCI doesn't get impacted as it's make sense to reserve s/w resource till it gets unplugged.
   //
-  return Status;
+  return OriginalStatus;
 }
 
 /**

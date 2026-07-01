@@ -183,6 +183,7 @@ F: BaseTools/
 W: https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/base_tools.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
+M: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
 R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
 R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
@@ -216,7 +217,6 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 EmulatorPkg
 F: EmulatorPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/platform-ports/emulator_pkg.html
-M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 S: Maintained
@@ -311,6 +311,7 @@ F: MdeModulePkg/Library/DxeSecurityManagementLib/
 F: MdeModulePkg/Universal/PCD/
 F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
 F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
@@ -378,6 +379,7 @@ R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 MdeModulePkg: Pei Core
 F: MdeModulePkg/Core/Pei/
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 

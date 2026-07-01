@@ -40,6 +40,7 @@
   AeadAesGcmTests.c
   BnTests.c
   EcTests.c
+  EdDsaTests.c
   X509Tests.c
   Pkcs7AttachedContentTest.c
 
