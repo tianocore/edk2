@@ -16,16 +16,23 @@
   LIBRARY_CLASS   = SubhookLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
-[Sources]
+# subhook only implements a hooking backend for IA32 and X64.  On other
+# architectures the SubhookLib class header provides a no-op stub (see
+# Include/Library/SubhookLib.h), so no subhook source is compiled.
+[Sources.IA32, Sources.X64]
   subhook/subhook.c
+
+[Sources]
+  SubhookLibNull.c
 
 [Packages]
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS   == /c /Zi /DSUBHOOK_STATIC /Od
-  GCC:*_*_IA32_CC_FLAGS == -g -c -O0 -m32 -DSUBHOOK_STATIC
-  GCC:*_*_X64_CC_FLAGS  == -g -c -O0 -m64 -DSUBHOOK_STATIC
+  MSFT:*_*_*_CC_FLAGS      == /c /Zi /DSUBHOOK_STATIC /Od
+  GCC:*_*_IA32_CC_FLAGS    == -g -c -O0 -m32 -DSUBHOOK_STATIC
+  GCC:*_*_X64_CC_FLAGS     == -g -c -O0 -m64 -DSUBHOOK_STATIC
+  GCC:*_*_AARCH64_CC_FLAGS == -g -c -O0

@@ -24,7 +24,12 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Library/CmockaLib/cmocka",
-            "Library/UnitTestLib/RunTestsCmocka.c"
+            "Library/UnitTestLib/RunTestsCmocka.c",
+            ## SubhookLib.h provides a C++ class stub and SubhookLibNull.c is a
+            ## header-free placeholder for non-x86 hosts; neither maps onto the
+            ## EDK II C coding style the checker enforces.
+            "Include/Library/SubhookLib.h",
+            "Library/SubhookLib/SubhookLibNull.c"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
