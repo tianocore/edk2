@@ -94,7 +94,6 @@ DeleteFmpVariable (
   @return  Pointer to the allocated FMP Controller State.  Returns NULL
            if the variable does not exist or is a different size than expected.
 **/
-static
 FMP_CONTROLLER_STATE *
 GetFmpControllerState (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
@@ -319,6 +318,154 @@ GenerateFmpVariableNames (
     DeleteFmpVariable (Private->LastAttemptVersionVariableName);
   }
 }
+
+//
+// Cached-state variants of the getter functions.
+// These extract values from a pre-fetched FMP_CONTROLLER_STATE without
+// performing an additional NV variable read.  Used by PopulateDescriptor()
+// to avoid redundant GetVariable2() calls.
+//
+
+/**
+  Returns the Version from a pre-fetched FMP controller state.
+
+  @param[in] Private              Private context structure for the managed controller.
+  @param[in] FmpControllerState   Cached state from GetFmpControllerState().
+
+  @return  The firmware version, or DEFAULT_VERSION if field is not valid.
+**/
+UINT32
+GetVersionFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  )
+{
+  UINT32  Value;
+
+  Value = DEFAULT_VERSION;
+  if (FmpControllerState != NULL) {
+    if (FmpControllerState->VersionValid) {
+      Value = FmpControllerState->Version;
+      DEBUG ((
+        DEBUG_INFO,
+        "FmpDxe(%s): Get variable %g %s Version %08x\n",
+        mImageIdName,
+        &gEfiCallerIdGuid,
+        Private->FmpStateVariableName,
+        Value
+        ));
+    }
+  }
+
+  return Value;
+}
+
+/**
+  Returns the LowestSupportedVersion from a pre-fetched FMP controller state.
+
+  @param[in] Private              Private context structure for the managed controller.
+  @param[in] FmpControllerState   Cached state from GetFmpControllerState().
+
+  @return  The LSV, or DEFAULT_LOWESTSUPPORTEDVERSION if field is not valid.
+**/
+UINT32
+GetLowestSupportedVersionFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  )
+{
+  UINT32  Value;
+
+  Value = DEFAULT_LOWESTSUPPORTEDVERSION;
+  if (FmpControllerState != NULL) {
+    if (FmpControllerState->LsvValid) {
+      Value = FmpControllerState->Lsv;
+      DEBUG ((
+        DEBUG_INFO,
+        "FmpDxe(%s): Get variable %g %s LowestSupportedVersion %08x\n",
+        mImageIdName,
+        &gEfiCallerIdGuid,
+        Private->FmpStateVariableName,
+        Value
+        ));
+    }
+  }
+
+  return Value;
+}
+
+/**
+  Returns the LastAttemptStatus from a pre-fetched FMP controller state.
+
+  @param[in] Private              Private context structure for the managed controller.
+  @param[in] FmpControllerState   Cached state from GetFmpControllerState().
+
+  @return  The last attempt status, or DEFAULT_LASTATTEMPTSTATUS if field is not valid.
+**/
+UINT32
+GetLastAttemptStatusFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  )
+{
+  UINT32  Value;
+
+  Value = DEFAULT_LASTATTEMPTSTATUS;
+  if (FmpControllerState != NULL) {
+    if (FmpControllerState->LastAttemptStatusValid) {
+      Value = FmpControllerState->LastAttemptStatus;
+      DEBUG ((
+        DEBUG_INFO,
+        "FmpDxe(%s): Get variable %g %s LastAttemptStatus %08x\n",
+        mImageIdName,
+        &gEfiCallerIdGuid,
+        Private->FmpStateVariableName,
+        Value
+        ));
+    }
+  }
+
+  return Value;
+}
+
+/**
+  Returns the LastAttemptVersion from a pre-fetched FMP controller state.
+
+  @param[in] Private              Private context structure for the managed controller.
+  @param[in] FmpControllerState   Cached state from GetFmpControllerState().
+
+  @return  The last attempt version, or DEFAULT_LASTATTEMPTVERSION if field is not valid.
+**/
+UINT32
+GetLastAttemptVersionFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  )
+{
+  UINT32  Value;
+
+  Value = DEFAULT_LASTATTEMPTVERSION;
+  if (FmpControllerState != NULL) {
+    if (FmpControllerState->LastAttemptVersionValid) {
+      Value = FmpControllerState->LastAttemptVersion;
+      DEBUG ((
+        DEBUG_INFO,
+        "FmpDxe(%s): Get variable %g %s LastAttemptVersion %08x\n",
+        mImageIdName,
+        &gEfiCallerIdGuid,
+        Private->FmpStateVariableName,
+        Value
+        ));
+    }
+  }
+
+  return Value;
+}
+
+//
+// Original getter functions below — each reads FmpState independently.
+// These are used by callers outside PopulateDescriptor().
+//
 
 /**
   Returns the value used to fill in the Version field of the
