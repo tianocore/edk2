@@ -34,7 +34,7 @@ extern "C" {
   /// Point to jump buffer used with SetJump()/LongJump() to test if a function
   /// under test generates an expected ASSERT() condition.
   ///
-  BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer = NULL;
+  BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer = nullptr;
 
   /**
     Unit test library replacement for DebugAssert() in DebugLib.
@@ -57,7 +57,7 @@ extern "C" {
   {
     CHAR8  Message[256];
 
-    if (gUnitTestExpectAssertFailureJumpBuffer != NULL) {
+    if (gUnitTestExpectAssertFailureJumpBuffer != nullptr) {
       UT_LOG_INFO ("Detected expected ASSERT: %a(%d): %a\n", FileName, LineNumber, Description);
 
       //
@@ -72,7 +72,7 @@ extern "C" {
 
       LongJump (gUnitTestExpectAssertFailureJumpBuffer, 1);
     } else {
-      if (GetActiveFrameworkHandle () != NULL) {
+      if (GetActiveFrameworkHandle () != nullptr) {
         AsciiStrCpyS (Message, sizeof (Message), "Detected unexpected ASSERT(");
         AsciiStrCatS (Message, sizeof (Message), Description);
         AsciiStrCatS (Message, sizeof (Message), ")");
