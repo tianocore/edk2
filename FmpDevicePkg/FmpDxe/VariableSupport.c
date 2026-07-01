@@ -87,14 +87,14 @@ DeleteFmpVariable (
   Retrieve the FMP Controller State UEFI Variable value.  Return NULL if
   the variable does not exist or if the size of the UEFI Variable is not the
   size of FMP_CONTROLLER_STATE.  The buffer for the UEFI Variable value
-  if allocated using the UEFI Boot Service AllocatePool().
+  is allocated using the UEFI Boot Service AllocatePool().  Caller must free
+  the returned buffer with FreePool().
 
   @param[in] Private  Private context structure for the managed controller.
 
   @return  Pointer to the allocated FMP Controller State.  Returns NULL
            if the variable does not exist or is a different size than expected.
 **/
-static
 FMP_CONTROLLER_STATE *
 GetFmpControllerState (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
@@ -323,40 +323,31 @@ GenerateFmpVariableNames (
 /**
   Returns the value used to fill in the Version field of the
   EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the GetImageInfo()
-  service of the Firmware Management Protocol.  The value is read from a UEFI
-  variable.  If the UEFI variables does not exist, then a default version value
-  is returned.
+  service of the Firmware Management Protocol.  The value is extracted from the
+  provided FmpControllerState.  If FmpControllerState is NULL or the Version
+  field is not valid, then a default version value is returned.
 
-  UEFI Variable accessed: GUID = gEfiCallerIdGuid, Name = L"FmpState"
-
-  @param[in] Private  Private context structure for the managed controller.
+  @param[in] FmpControllerState  The cached FMP Controller State, or NULL if the
+                                 state could not be retrieved.
 
   @return  The version of the firmware image in the firmware device.
 **/
 UINT32
-GetVersionFromVariable (
-  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+GetVersionFromFmpControllerState (
+  IN FMP_CONTROLLER_STATE  *FmpControllerState
   )
 {
-  FMP_CONTROLLER_STATE  *FmpControllerState;
-  UINT32                Value;
+  UINT32  Value;
 
-  Value              = DEFAULT_VERSION;
-  FmpControllerState = GetFmpControllerState (Private);
-  if (FmpControllerState != NULL) {
-    if (FmpControllerState->VersionValid) {
-      Value = FmpControllerState->Version;
-      DEBUG ((
-        DEBUG_INFO,
-        "FmpDxe(%s): Get variable %g %s Version %08x\n",
-        mImageIdName,
-        &gEfiCallerIdGuid,
-        Private->FmpStateVariableName,
-        Value
-        ));
-    }
-
-    FreePool (FmpControllerState);
+  Value = DEFAULT_VERSION;
+  if ((FmpControllerState != NULL) && FmpControllerState->VersionValid) {
+    Value = FmpControllerState->Version;
+    DEBUG ((
+      DEBUG_INFO,
+      "FmpDxe(%s): FMP Controller State Version %08x\n",
+      mImageIdName,
+      Value
+      ));
   }
 
   return Value;
@@ -365,41 +356,32 @@ GetVersionFromVariable (
 /**
   Returns the value used to fill in the LowestSupportedVersion field of the
   EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the GetImageInfo()
-  service of the Firmware Management Protocol.  The value is read from a UEFI
-  variable.  If the UEFI variables does not exist, then a default lowest
-  supported version value is returned.
+  service of the Firmware Management Protocol.  The value is extracted from the
+  provided FmpControllerState.  If FmpControllerState is NULL or the Lsv field
+  is not valid, then a default lowest supported version value is returned.
 
-  UEFI Variable accessed: GUID = gEfiCallerIdGuid, Name = L"FmpState"
-
-  @param[in] Private  Private context structure for the managed controller.
+  @param[in] FmpControllerState  The cached FMP Controller State, or NULL if the
+                                 state could not be retrieved.
 
   @return  The lowest supported version of the firmware image in the firmware
            device.
 **/
 UINT32
-GetLowestSupportedVersionFromVariable (
-  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+GetLowestSupportedVersionFromFmpControllerState (
+  IN FMP_CONTROLLER_STATE  *FmpControllerState
   )
 {
-  FMP_CONTROLLER_STATE  *FmpControllerState;
-  UINT32                Value;
+  UINT32  Value;
 
-  Value              = DEFAULT_LOWESTSUPPORTEDVERSION;
-  FmpControllerState = GetFmpControllerState (Private);
-  if (FmpControllerState != NULL) {
-    if (FmpControllerState->LsvValid) {
-      Value = FmpControllerState->Lsv;
-      DEBUG ((
-        DEBUG_INFO,
-        "FmpDxe(%s): Get variable %g %s LowestSupportedVersion %08x\n",
-        mImageIdName,
-        &gEfiCallerIdGuid,
-        Private->FmpStateVariableName,
-        Value
-        ));
-    }
-
-    FreePool (FmpControllerState);
+  Value = DEFAULT_LOWESTSUPPORTEDVERSION;
+  if ((FmpControllerState != NULL) && FmpControllerState->LsvValid) {
+    Value = FmpControllerState->Lsv;
+    DEBUG ((
+      DEBUG_INFO,
+      "FmpDxe(%s): FMP Controller State LowestSupportedVersion %08x\n",
+      mImageIdName,
+      Value
+      ));
   }
 
   return Value;
@@ -408,40 +390,32 @@ GetLowestSupportedVersionFromVariable (
 /**
   Returns the value used to fill in the LastAttemptStatus field of the
   EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the GetImageInfo()
-  service of the Firmware Management Protocol.  The value is read from a UEFI
-  variable.  If the UEFI variables does not exist, then a default last attempt
-  status value is returned.
+  service of the Firmware Management Protocol.  The value is extracted from the
+  provided FmpControllerState.  If FmpControllerState is NULL or the
+  LastAttemptStatus field is not valid, then a default last attempt status value
+  is returned.
 
-  UEFI Variable accessed: GUID = gEfiCallerIdGuid, Name = L"FmpState"
-
-  @param[in] Private  Private context structure for the managed controller.
+  @param[in] FmpControllerState  The cached FMP Controller State, or NULL if the
+                                 state could not be retrieved.
 
   @return  The last attempt status value for the most recent capsule update.
 **/
 UINT32
-GetLastAttemptStatusFromVariable (
-  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+GetLastAttemptStatusFromFmpControllerState (
+  IN FMP_CONTROLLER_STATE  *FmpControllerState
   )
 {
-  FMP_CONTROLLER_STATE  *FmpControllerState;
-  UINT32                Value;
+  UINT32  Value;
 
-  Value              = DEFAULT_LASTATTEMPTSTATUS;
-  FmpControllerState = GetFmpControllerState (Private);
-  if (FmpControllerState != NULL) {
-    if (FmpControllerState->LastAttemptStatusValid) {
-      Value = FmpControllerState->LastAttemptStatus;
-      DEBUG ((
-        DEBUG_INFO,
-        "FmpDxe(%s): Get variable %g %s LastAttemptStatus %08x\n",
-        mImageIdName,
-        &gEfiCallerIdGuid,
-        Private->FmpStateVariableName,
-        Value
-        ));
-    }
-
-    FreePool (FmpControllerState);
+  Value = DEFAULT_LASTATTEMPTSTATUS;
+  if ((FmpControllerState != NULL) && FmpControllerState->LastAttemptStatusValid) {
+    Value = FmpControllerState->LastAttemptStatus;
+    DEBUG ((
+      DEBUG_INFO,
+      "FmpDxe(%s): FMP Controller State LastAttemptStatus %08x\n",
+      mImageIdName,
+      Value
+      ));
   }
 
   return Value;
@@ -450,40 +424,32 @@ GetLastAttemptStatusFromVariable (
 /**
   Returns the value used to fill in the LastAttemptVersion field of the
   EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the GetImageInfo()
-  service of the Firmware Management Protocol.  The value is read from a UEFI
-  variable.  If the UEFI variables does not exist, then a default last attempt
-  version value is returned.
+  service of the Firmware Management Protocol.  The value is extracted from the
+  provided FmpControllerState.  If FmpControllerState is NULL or the
+  LastAttemptVersion field is not valid, then a default last attempt version
+  value is returned.
 
-  UEFI Variable accessed: GUID = gEfiCallerIdGuid, Name = L"FmpState"
-
-  @param[in] Private  Private context structure for the managed controller.
+  @param[in] FmpControllerState  The cached FMP Controller State, or NULL if the
+                                 state could not be retrieved.
 
   @return  The last attempt version value for the most recent capsule update.
 **/
 UINT32
-GetLastAttemptVersionFromVariable (
-  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+GetLastAttemptVersionFromFmpControllerState (
+  IN FMP_CONTROLLER_STATE  *FmpControllerState
   )
 {
-  FMP_CONTROLLER_STATE  *FmpControllerState;
-  UINT32                Value;
+  UINT32  Value;
 
-  Value              = DEFAULT_LASTATTEMPTVERSION;
-  FmpControllerState = GetFmpControllerState (Private);
-  if (FmpControllerState != NULL) {
-    if (FmpControllerState->LastAttemptVersionValid) {
-      Value = FmpControllerState->LastAttemptVersion;
-      DEBUG ((
-        DEBUG_INFO,
-        "FmpDxe(%s): Get variable %g %s LastAttemptVersion %08x\n",
-        mImageIdName,
-        &gEfiCallerIdGuid,
-        Private->FmpStateVariableName,
-        Value
-        ));
-    }
-
-    FreePool (FmpControllerState);
+  Value = DEFAULT_LASTATTEMPTVERSION;
+  if ((FmpControllerState != NULL) && FmpControllerState->LastAttemptVersionValid) {
+    Value = FmpControllerState->LastAttemptVersion;
+    DEBUG ((
+      DEBUG_INFO,
+      "FmpDxe(%s): FMP Controller State LastAttemptVersion %08x\n",
+      mImageIdName,
+      Value
+      ));
   }
 
   return Value;
