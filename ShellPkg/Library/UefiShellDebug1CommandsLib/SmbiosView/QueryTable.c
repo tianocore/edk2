@@ -3455,6 +3455,22 @@ TABLE_ITEM  TemperatureProbeLocTable[] = {
     0x0B,
     L" Add-in Card "
   },
+  {
+    0x0C,
+    L" Front Panel Board "
+  },
+  {
+    0x0D,
+    L" Back Panel Board "
+  },
+  {
+    0x0E,
+    L" Power System Board "
+  },
+  {
+    0x0F,
+    L" Drive Back Plane "
+  },
 };
 
 TABLE_ITEM  ECPStatusTable[] = {
