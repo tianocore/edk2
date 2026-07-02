@@ -1603,6 +1603,11 @@
   # @Prompt Boot Manager Menu File
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0xdc, 0x5b, 0xc2, 0xee, 0xf2, 0x67, 0x95, 0x4d, 0xb1, 0xd5, 0xf8, 0x1b, 0x20, 0x39, 0xd1, 0x1d }|VOID*|0x0001006b
 
+  ## When TRUE, EfiBootManagerFindLoadOption() matches load options without comparing
+  #  the Description field (OptionType, Attributes, FilePath, and OptionalData must still match).
+  # @Prompt Ignore load option description when finding a matching load option
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFindLoadOptionIgnoreDescription|FALSE|BOOLEAN|0x0001007B
+
   ## This PCD points to the formset GUID of the driver health management form
   #  The form will be popped up by BDS core when there are Configuration Required driver health instances.
   #  Platform can customize the PCD to point to different formset.
