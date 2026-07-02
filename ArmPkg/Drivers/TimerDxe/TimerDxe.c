@@ -289,16 +289,8 @@ TimerInterruptHandler (
   IN  EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  EFI_TPL  OriginalTPL;
-  UINT64   CurrentValue;
-  UINT64   CompareValue;
-
-  //
-  // DXE core uses this callback for the EFI timer tick. The DXE core uses locks
-  // that raise to TPL_HIGH and then restore back to current level. Thus we need
-  // to make sure TPL level is set to TPL_HIGH while we are handling the timer tick.
-  //
-  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  UINT64  CurrentValue;
+  UINT64  CompareValue;
 
   // Signal end of interrupt early to help avoid losing subsequent ticks
   // from long duration handlers
@@ -333,8 +325,6 @@ TimerInterruptHandler (
     ArmGenericTimerReenableTimer ();
     ArmInstructionSynchronizationBarrier ();
   }
-
-  gBS->RestoreTPL (OriginalTPL);
 }
 
 /**

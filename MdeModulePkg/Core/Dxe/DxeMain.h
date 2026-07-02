@@ -428,16 +428,18 @@ CalculateEfiHdrCrc (
   );
 
 /**
-  Called by the platform code to process a tick.
+  Register the DXE core timer tick handler with the timer driver.
 
-  @param  Duration               The number of 100ns elapsed since the last call
-                                 to TimerTick
+  @retval EFI_SUCCESS           The timer handler was registered.
+  @retval EFI_UNSUPPORTED       The platform does not support timer interrupts.
+  @retval EFI_ALREADY_STARTED   A handler is already registered.
+  @retval EFI_DEVICE_ERROR      The timer handler could not be registered.
 
 **/
-VOID
+EFI_STATUS
 EFIAPI
-CoreTimerTick (
-  IN UINT64  Duration
+CoreRegisterTimerHandler (
+  VOID
   );
 
 /**
@@ -576,6 +578,21 @@ CoreRaiseTpl (
 VOID
 EFIAPI
 CoreRestoreTpl (
+  IN EFI_TPL  NewTpl
+  );
+
+/**
+  Lowers the task priority from TPL_HIGH_LEVEL to the previous value.
+  If the new priority unmasks events at a higher priority, they are
+  dispatched with interrupts enabled. Upon return, interrupts will be
+  disabled.
+
+  @param  NewTpl  New, lower, task priority
+
+**/
+VOID
+EFIAPI
+CoreRestoreTplWithInterruptsMasked (
   IN EFI_TPL  NewTpl
   );
 

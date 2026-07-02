@@ -36,7 +36,6 @@ CPU_ARCH_PROTOCOL_PRIVATE  mCpuTemplate = {
       CpuIoServiceWrite
     }
   },
-  TRUE
 };
 
 #define EFI_CPU_DATA_MAXIMUM_LENGTH  0x100
@@ -277,10 +276,6 @@ EmuEnableInterrupt (
   IN EFI_CPU_ARCH_PROTOCOL  *This
   )
 {
-  CPU_ARCH_PROTOCOL_PRIVATE  *Private;
-
-  Private                 = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
-  Private->InterruptState = TRUE;
   gEmuThunk->EnableInterrupt ();
   return EFI_SUCCESS;
 }
@@ -291,10 +286,6 @@ EmuDisableInterrupt (
   IN EFI_CPU_ARCH_PROTOCOL  *This
   )
 {
-  CPU_ARCH_PROTOCOL_PRIVATE  *Private;
-
-  Private                 = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
-  Private->InterruptState = FALSE;
   gEmuThunk->DisableInterrupt ();
   return EFI_SUCCESS;
 }
@@ -306,14 +297,11 @@ EmuGetInterruptState (
   OUT BOOLEAN               *State
   )
 {
-  CPU_ARCH_PROTOCOL_PRIVATE  *Private;
-
   if (State == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
-  *State  = Private->InterruptState;
+  *State = gEmuThunk->GetInterruptState ();
   return EFI_SUCCESS;
 }
 

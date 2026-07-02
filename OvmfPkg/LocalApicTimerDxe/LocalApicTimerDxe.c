@@ -8,8 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/NestedInterruptTplLib.h>
-
 #include "LocalApicTimerDxe.h"
 
 //
@@ -60,11 +58,6 @@ TimerInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  STATIC NESTED_INTERRUPT_STATE  NestedInterruptState;
-  EFI_TPL                        OriginalTPL;
-
-  OriginalTPL = NestedInterruptRaiseTPL ();
-
   SendApicEoi ();
 
   if (mTimerNotifyFunction != NULL) {
@@ -73,8 +66,6 @@ TimerInterruptHandler (
     //
     mTimerNotifyFunction (mTimerPeriod);
   }
-
-  NestedInterruptRestoreTPL (OriginalTPL, SystemContext, &NestedInterruptState);
 }
 
 /**
