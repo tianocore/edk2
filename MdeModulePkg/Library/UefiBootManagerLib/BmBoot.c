@@ -2523,7 +2523,16 @@ EfiBootManagerRefreshAllBootOption (
   //
   for (Index = 0; Index < BootOptionCount; Index++) {
     if (EfiBootManagerFindLoadOption (&BootOptions[Index], NvBootOptions, NvBootOptionCount) == -1) {
-      EfiBootManagerAddLoadOptionVariable (&BootOptions[Index], (UINTN)-1);
+      Status = EfiBootManagerAddLoadOptionVariable (&BootOptions[Index], (UINTN)-1);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "[Bds] Failed to add boot option for '%s': %r\n",
+          BootOptions[Index].Description,
+          Status
+          ));
+      }
+
       //
       // Try best to add the boot options so continue upon failure.
       //

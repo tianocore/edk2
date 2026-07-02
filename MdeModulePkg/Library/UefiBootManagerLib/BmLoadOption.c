@@ -260,13 +260,13 @@ structure.
     VariableAttributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
-  Status = gRT->SetVariable (
-                  OptionName,
-                  &gEfiGlobalVariableGuid,
-                  VariableAttributes,
-                  VariableSize,
-                  Variable
-                  );
+  Status = BmSetVariableAndReportStatusCodeOnError (
+             OptionName,
+             &gEfiGlobalVariableGuid,
+             VariableAttributes,
+             VariableSize,
+             Variable
+             );
   FreePool (Variable);
 
   return Status;
@@ -323,13 +323,13 @@ BmAddOptionNumberToOrderVariable (
 
     NewOptionOrder[Position] = OptionNumber;
 
-    Status = gRT->SetVariable (
-                    OptionOrderName,
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    OptionOrderSize + sizeof (UINT16),
-                    NewOptionOrder
-                    );
+    Status = BmSetVariableAndReportStatusCodeOnError (
+               OptionOrderName,
+               &gEfiGlobalVariableGuid,
+               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+               OptionOrderSize + sizeof (UINT16),
+               NewOptionOrder
+               );
     FreePool (NewOptionOrder);
   }
 
