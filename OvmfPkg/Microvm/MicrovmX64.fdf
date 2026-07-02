@@ -248,6 +248,13 @@ INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf
 INF  OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
+!if $(QEMU_PV_VARS) == TRUE
+#
+# Variable driver stack (qemu -device uefi-vars)
+#
+INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunicationFdt.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
 #
 # Variable driver stack (non-SMM)
 #
@@ -255,6 +262,7 @@ INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 !include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc

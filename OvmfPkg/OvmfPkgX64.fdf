@@ -353,7 +353,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
   #
   # Variable driver stack (qemu-system-x86_64 -device uefi-vars-isa)
   #
-INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunicationHwInfo.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
 !else

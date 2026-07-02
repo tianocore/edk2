@@ -575,7 +575,7 @@
       NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
   }
 !if $(QEMU_PV_VARS) == TRUE
-  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunicationFdt.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !else
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
