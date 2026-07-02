@@ -835,6 +835,49 @@ WifiMgrGetLinkState (
 }
 
 /**
+  Check an AKM suite list and a Cipher suite list to see if 192 bit mode is supported.
+  In WiFi 6 standard, 192 bit mode is defined in Suite B, which requires AKM suite
+  to be 802.1X Suite B 192 and Cipher suite to be GCMP-256.
+
+  @param[in]  AKMSuiteSelector                     The target AKM suite list to be checked.
+  @param[in]  CipherSuiteSelector                  The target Cipher suite list to be checked
+
+  @retval TRUE   192 bit mode is supported.
+  @retval FALSE  One or more parameters are invalid or the suite is not supported.
+
+**/
+STATIC
+BOOLEAN
+IsSuiteB192Mode (
+  IN    EFI_80211_AKM_SUITE_SELECTOR     *AKMSuiteSelector,
+  IN    EFI_80211_CIPHER_SUITE_SELECTOR  *CipherSuiteSelector
+  )
+{
+  UINT16  IndexOfAKMSuiteList;
+  UINT16  IndexOfCipherSuiteList;
+  UINT32  *AKMSuiteType;
+  UINT32  *CipherSuiteType;
+
+  if ((AKMSuiteSelector == NULL) || (CipherSuiteSelector == NULL)) {
+    return FALSE;
+  }
+
+  for (IndexOfAKMSuiteList = 0; IndexOfAKMSuiteList < AKMSuiteSelector->AKMSuiteCount; IndexOfAKMSuiteList++) {
+    AKMSuiteType = (UINT32 *)((AKMSuiteSelector->AKMSuiteList) + IndexOfAKMSuiteList);
+    for (IndexOfCipherSuiteList = 0; IndexOfCipherSuiteList < CipherSuiteSelector->CipherSuiteCount; IndexOfCipherSuiteList++) {
+      CipherSuiteType = (UINT32 *)((CipherSuiteSelector->CipherSuiteList) + IndexOfCipherSuiteList);
+      if ((*AKMSuiteType == IEEE_80211_AKM_SUITE_8021X_SUITE_B192) &&
+          (*CipherSuiteType == IEEE_80211_PAIRWISE_CIPHER_SUITE_GCMP256))
+      {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Prepare configuration work before connecting to the target network.
   For WPA2 Personal networks, password should be checked; and for EAP networks, parameters
   are different for different networks.
@@ -893,9 +936,30 @@ WifiMgrPrepareConnection (
         break;
 
       case SECURITY_TYPE_WPA2_ENTERPRISE:
-      case SECURITY_TYPE_WPA3_ENTERPRISE:
 
         Status = WifiMgrConfigEap (Nic, Profile);
+        if (EFI_ERROR (Status)) {
+          if (Status == EFI_INVALID_PARAMETER) {
+            if (Nic->OneTimeConnectRequest) {
+              WifiMgrUpdateConnectMessage (Nic, FALSE, L"Connect Failed: Invalid Configuration!");
+            }
+          }
+
+          return Status;
+        }
+
+        break;
+
+      case SECURITY_TYPE_WPA3_ENTERPRISE:
+
+        if (IsSuiteB192Mode (Profile->Network.AKMSuite, Profile->Network.CipherSuite) &&
+            ((Profile->EapAuthMethod == EAP_AUTH_METHOD_TTLS) || (Profile->EapAuthMethod == EAP_AUTH_METHOD_PEAP)))
+        {
+          Status = EFI_INVALID_PARAMETER;
+        } else {
+          Status = WifiMgrConfigEap (Nic, Profile);
+        }
+
         if (EFI_ERROR (Status)) {
           if (Status == EFI_INVALID_PARAMETER) {
             if (Nic->OneTimeConnectRequest) {
