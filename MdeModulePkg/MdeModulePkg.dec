@@ -759,6 +759,9 @@
   ## Include/Protocol/CxlIo.h
   gEdkiiCxlIoProtocolGuid = { 0x8FAC60B2, 0xBBC1, 0x41DE, {0xA7, 0x97, 0x98, 0x75, 0xCD, 0xD3, 0xA8, 0xF8 } }
 
+  ## Include/Protocol/InterruptHandlerTplControl.h
+  gEdkiiInterruptHandlerTplControlProtocolGuid = { 0x643a2d7d, 0xa44d, 0x4ea9, { 0x82, 0x9c, 0x04, 0x76, 0x02, 0x9e, 0x5f, 0x6a } }
+
 [PcdsFeatureFlag]
   ## Indicates if the platform can support update capsule across a system reset.<BR><BR>
   #   TRUE  - Supports update capsule across a system reset.<BR>

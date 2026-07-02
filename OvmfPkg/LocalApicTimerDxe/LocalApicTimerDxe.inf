@@ -19,6 +19,7 @@
   ENTRY_POINT                    = TimerDriverInitialize
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
@@ -27,7 +28,6 @@
   UefiBootServicesTableLib
   BaseLib
   DebugLib
-  NestedInterruptTplLib
   UefiDriverEntryPoint
   LocalApicLib
 
@@ -36,9 +36,12 @@
   LocalApicTimerDxe.c
 
 [Protocols]
-  gEfiCpuArchProtocolGuid       ## CONSUMES
-  gEfiTimerArchProtocolGuid     ## PRODUCES
+  gEdkiiInterruptHandlerTplControlProtocolGuid  ## CONSUMES
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiTimerArchProtocolGuid                     ## PRODUCES
+
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock  ## CONSUMES
+
 [Depex]
-  gEfiCpuArchProtocolGuid
+  gEfiCpuArchProtocolGuid AND gEdkiiInterruptHandlerTplControlProtocolGuid

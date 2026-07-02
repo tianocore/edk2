@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "Event.h"
 
+#include <Protocol/InterruptHandlerTplControl.h>
+
 /**
   Set Interrupt State.
 
@@ -90,9 +92,9 @@ CoreRaiseTpl (
   @param  NewTpl  New, lower, task priority
 
 **/
+static
 VOID
-EFIAPI
-CoreRestoreTpl (
+LowerTplAndDispatchPendingEvents (
   IN EFI_TPL  NewTpl
   )
 {
@@ -132,6 +134,22 @@ CoreRestoreTpl (
 
     CoreDispatchEventNotifies (gEfiCurrentTpl);
   }
+}
+
+/**
+  Lowers the task priority to the previous value.   If the new
+  priority unmasks events at a higher priority, they are dispatched.
+
+  @param  NewTpl  New, lower, task priority
+
+**/
+VOID
+EFIAPI
+CoreRestoreTpl (
+  IN EFI_TPL  NewTpl
+  )
+{
+  LowerTplAndDispatchPendingEvents (NewTpl);
 
   //
   // Set the new value
@@ -146,4 +164,70 @@ CoreRestoreTpl (
   if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
     CoreSetInterruptState (TRUE);
   }
+}
+
+/**
+  Raises a task's priority level to TPL_HIGH_LEVEL and returns its previous
+  level.
+
+  @return Previous task priority level
+
+**/
+static
+EFI_TPL
+EFIAPI
+RaiseTplForInterruptHandler (
+  VOID
+  )
+{
+  return CoreRaiseTpl (TPL_HIGH_LEVEL);
+}
+
+/**
+  Restores a task's priority level from TPL_HIGH_LEVEL to its previous value
+  without re-enabling interrupts.
+
+  @param[in]  OldTpl          The previous task priority level to restore.
+
+**/
+static
+VOID
+EFIAPI
+RestoreTplForInterruptHandler (
+  IN EFI_TPL  OldTpl
+  )
+{
+  LowerTplAndDispatchPendingEvents (OldTpl);
+
+  //
+  // Disable interrupts before lowering the TPL level to its target value. This
+  // ensures that any reentrant calls into this function are guaranteed to pass
+  // a value of OldTpl that is strictly greater than the one observed by this
+  // invocation. This bounds the recursion to the number of distinct TPL levels.
+  //
+  CoreSetInterruptState (FALSE);
+  gEfiCurrentTpl = OldTpl;
+}
+
+static CONST EDKII_INTERRUPT_HANDLER_TPL_CONTROL_PROTOCOL  InterruptHandlerTplControl = {
+  RaiseTplForInterruptHandler,
+  RestoreTplForInterruptHandler
+};
+
+EFI_STATUS
+CoreInitializeTplServices (
+  VOID
+  )
+{
+  EFI_HANDLE  Handle;
+
+  Handle = NULL;
+
+  return CoreInstallProtocolInterfaceNotify (
+           &Handle,
+           &gEdkiiInterruptHandlerTplControlProtocolGuid,
+           EFI_NATIVE_INTERFACE,
+           (VOID **)&InterruptHandlerTplControl,
+           FALSE
+           );
 }
