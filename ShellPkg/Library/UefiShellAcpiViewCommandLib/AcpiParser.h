@@ -268,6 +268,36 @@ DumpReservedBits (
   );
 
 /**
+  This function validates reserved fields to check if they are 0.
+
+  @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
+  @param [in] Context   Pointer to context specific information.
+**/
+VOID
+EFIAPI
+ValidateReserved (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  );
+
+/**
+  This function validates bit-length reserved fields to check if they are 0.
+
+  @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
+  @param [in] Context   Pointer to context specific information.
+**/
+VOID
+EFIAPI
+ValidateReservedBits (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  );
+
+/**
   This function indents and prints the ACPI table Field Name.
 
   @param [in] Indent      Number of spaces to add to the global table
@@ -662,6 +692,25 @@ ParseAcpiApmt (
 VOID
 EFIAPI
 ParseAcpiBgrt (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
+  This function parses the ACPI CCEL table.
+  When trace is enabled this function parses the CCEL table and
+  traces the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiCcel (
   IN BOOLEAN  Trace,
   IN UINT8    *Ptr,
   IN UINT32   AcpiTableLength,
