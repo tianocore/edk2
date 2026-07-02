@@ -2020,12 +2020,34 @@ ReadDirectoryEntry (
     }
 
     //
+    // The fixed header carries the length fields used to size the rest of the
+    // descriptor, so it must lie within the directory data before it is read.
+    //
+    if (ReadDirInfo->DirectoryLength - ReadDirInfo->FidOffset <
+        OFFSET_OF (UDF_FILE_IDENTIFIER_DESCRIPTOR, Data[0]))
+    {
+      return EFI_VOLUME_CORRUPTED;
+    }
+
+    //
     // Get FID for this entry.
     //
     FileIdentifierDesc = GET_FID_FROM_ADS (
                            ReadDirInfo->DirectoryData,
                            ReadDirInfo->FidOffset
                            );
+
+    //
+    // The variable-length file identifier and implementation-use areas must
+    // also fit, otherwise GetFidDescriptorLength below and the DuplicateFid
+    // copy read past the directory buffer.
+    //
+    if (ReadDirInfo->DirectoryLength - ReadDirInfo->FidOffset <
+        GetFidDescriptorLength (FileIdentifierDesc))
+    {
+      return EFI_VOLUME_CORRUPTED;
+    }
+
     //
     // Update FidOffset to point to next FID.
     //
