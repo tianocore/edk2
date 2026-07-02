@@ -121,9 +121,11 @@ DiskIoDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  DISK_IO_PRIVATE_DATA  *Instance;
-  EFI_TPL               OldTpl;
+  EFI_STATUS              Status;
+  DISK_IO_PRIVATE_DATA    *Instance;
+  EFI_TPL                 OldTpl;
+  EFI_BLOCK_IO_PROTOCOL   *TempBlockIo;
+  EFI_BLOCK_IO2_PROTOCOL  *TempBlockIo2;
 
   Instance = NULL;
 
@@ -135,7 +137,7 @@ DiskIoDriverBindingStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
-                  (VOID **)&gDiskIoPrivateDataTemplate.BlockIo,
+                  (VOID **)&TempBlockIo,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -147,13 +149,13 @@ DiskIoDriverBindingStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIo2ProtocolGuid,
-                  (VOID **)&gDiskIoPrivateDataTemplate.BlockIo2,
+                  (VOID **)&TempBlockIo2,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    gDiskIoPrivateDataTemplate.BlockIo2 = NULL;
+    TempBlockIo2 = NULL;
   }
 
   //
@@ -164,6 +166,9 @@ DiskIoDriverBindingStart (
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
+
+  Instance->BlockIo  = TempBlockIo;
+  Instance->BlockIo2 = TempBlockIo2;
 
   //
   // The BlockSize and IoAlign of BlockIo and BlockIo2 should equal.
@@ -216,16 +221,25 @@ ErrorExit:
         );
     }
 
-    if (Instance != NULL) {
-      FreePool (Instance);
-    }
-
     gBS->CloseProtocol (
            ControllerHandle,
            &gEfiBlockIoProtocolGuid,
            This->DriverBindingHandle,
            ControllerHandle
            );
+
+    if (Instance->BlockIo2 != NULL) {
+      gBS->CloseProtocol (
+             ControllerHandle,
+             &gEfiBlockIo2ProtocolGuid,
+             This->DriverBindingHandle,
+             ControllerHandle
+             );
+    }
+
+    if (Instance != NULL) {
+      FreePool (Instance);
+    }
   }
 
 ErrorExit1:
