@@ -113,6 +113,7 @@ M: Chao Li <lichao@loongson.cn> [kilaterlee]
 M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
 R: Xiangdong Meng <mengxiangdong@loongson.cn> [AydenMeng]
+R: Qihang Gao <gaoqihang@loongson.cn> [EricGao2015]
 
 EDK II Continuous Integration:
 ------------------------------
@@ -606,6 +607,7 @@ F: OvmfPkg/LoongArchVirt
 M: Chao Li <lichao@loongson.cn> [kilaterlee]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
 R: Xianglai Li <lixianglai@loongson.cn> [lixianglai]
+R: Qihang Gao <gaoqihang@loongson.cn> [EricGao2015]
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
