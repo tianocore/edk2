@@ -404,10 +404,11 @@ DxeMain (
     if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
       DEBUG ((
         DEBUG_INFO | DEBUG_LOAD,
-        "Memory Allocation 0x%08x 0x%0lx - 0x%0lx\n", \
-        Hob.MemoryAllocation->AllocDescriptor.MemoryType,                      \
-        Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,               \
-        Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1
+        "Memory Allocation 0x%08x 0x%0lx - 0x%0lx (%a)\n",
+        Hob.MemoryAllocation->AllocDescriptor.MemoryType,
+        Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
+        Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1,
+        GetMemoryTypeName (Hob.MemoryAllocation->AllocDescriptor.MemoryType)
         ));
     }
   }
