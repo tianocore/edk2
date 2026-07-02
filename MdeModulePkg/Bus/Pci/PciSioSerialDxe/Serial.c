@@ -758,7 +758,10 @@ GetChildSerialDevices (
   }
 
   SerialDevices = AllocatePool (EntryCount * sizeof (SERIAL_DEV *));
-  ASSERT (SerialDevices != NULL);
+  if (SerialDevices == NULL) {
+    ASSERT (SerialDevices != NULL);
+    return NULL;
+  }
 
   *Count       = 0;
   OpenByDriver = FALSE;
@@ -905,7 +908,11 @@ SerialControllerDriverStart (
       //
       Uart = (UART_DEVICE_PATH *)SkipControllerDevicePathNode (RemainingDevicePath, &ContainsControllerNode, &ControllerNumber);
       for (Index = 0; Index < SerialDeviceCount; Index++) {
-        ASSERT ((SerialDevices != NULL) && (SerialDevices[Index] != NULL));
+        if ((SerialDevices == NULL) || (SerialDevices[Index] == NULL)) {
+          ASSERT ((SerialDevices != NULL) && (SerialDevices[Index] != NULL));
+          continue;
+        }
+
         if ((!SerialDevices[Index]->ContainsControllerNode && !ContainsControllerNode) ||
             (SerialDevices[Index]->ContainsControllerNode && ContainsControllerNode && (SerialDevices[Index]->Instance == ControllerNumber))
             )
@@ -1016,7 +1023,11 @@ SerialControllerDriverStart (
         // Restore the PCI attributes when all children is destroyed (PciDeviceInfo->ChildCount == 0).
         //
         PciDeviceInfo = AllocatePool (sizeof (PCI_DEVICE_INFO));
-        ASSERT (PciDeviceInfo != NULL);
+        if (PciDeviceInfo == NULL) {
+          ASSERT (PciDeviceInfo != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         PciDeviceInfo->ChildCount = 0;
         PciDeviceInfo->PciIo      = ParentIo.PciIo;
         Status                    = ParentIo.PciIo->Attributes (
@@ -1047,9 +1058,16 @@ SerialControllerDriverStart (
         //
         // Re-use the PciDeviceInfo stored in existing children.
         //
-        ASSERT ((SerialDevices != NULL) && (SerialDevices[0] != NULL));
+        if ((SerialDevices == NULL) || (SerialDevices[0] == NULL)) {
+          ASSERT ((SerialDevices != NULL) && (SerialDevices[0] != NULL));
+          return EFI_UNSUPPORTED;
+        }
+
         PciDeviceInfo = SerialDevices[0]->PciDeviceInfo;
-        ASSERT (PciDeviceInfo != NULL);
+        if (PciDeviceInfo == NULL) {
+          ASSERT (PciDeviceInfo != NULL);
+          return EFI_UNSUPPORTED;
+        }
       }
 
       Status = EFI_NOT_FOUND;
