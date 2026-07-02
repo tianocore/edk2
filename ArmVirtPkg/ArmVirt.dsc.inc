@@ -286,6 +286,7 @@ DEFINE FD_SIZE_IN_MB    = 3
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  MemoryMapLib|MdeModulePkg/Library/MemoryMapLib/MemoryMapLib.inf
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DxeRuntimeDebugLibFdtPL011Uart.inf
 !endif
