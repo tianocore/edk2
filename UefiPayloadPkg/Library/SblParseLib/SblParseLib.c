@@ -113,7 +113,7 @@ ParseMemoryInfo (
 /**
   Acquire SMBIOS table from slim bootloader.
 
-  @param  SmbiosTable           Pointer to the SMBIOS table info.
+  @param  SmBiosEntryPoint          Pointer to the SMBIOS structure.
 
   @retval RETURN_SUCCESS            Successfully find out the tables.
   @retval RETURN_NOT_FOUND          Failed to find the tables.
@@ -122,10 +122,14 @@ ParseMemoryInfo (
 RETURN_STATUS
 EFIAPI
 ParseSmbiosTable (
-  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable
+  OUT UINT64  *SmBiosEntryPoint
   )
 {
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *TableInfo;
+
+  if (SmBiosEntryPoint == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
 
   TableInfo = (UNIVERSAL_PAYLOAD_SMBIOS_TABLE *)GetGuidHobDataFromSbl (&gUniversalPayloadSmbiosTableGuid);
   if (TableInfo == NULL) {
@@ -133,7 +137,7 @@ ParseSmbiosTable (
     return RETURN_NOT_FOUND;
   }
 
-  SmbiosTable->SmBiosEntryPoint = TableInfo->SmBiosEntryPoint;
+  *SmBiosEntryPoint = TableInfo->SmBiosEntryPoint;
 
   return RETURN_SUCCESS;
 }
