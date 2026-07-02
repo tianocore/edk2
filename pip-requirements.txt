@@ -12,7 +12,7 @@
 # https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ##
 
-edk2-pytool-library~=0.23.13
+edk2-pytool-library~=0.23.15
 edk2-pytool-extensions~=0.31.0
 antlr4-python3-runtime==4.13.2
 lcov-cobertura==2.1.1
