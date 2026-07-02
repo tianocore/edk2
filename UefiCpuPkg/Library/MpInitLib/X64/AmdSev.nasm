@@ -267,7 +267,7 @@ BITS 64
 
     ;
     ; Get RDX reset value before changing stacks since the
-    ; new stack won't be able to accomodate a #VC exception.
+    ; new stack won't be able to accommodate a #VC exception.
     ;
     push       rax
     push       rbx

@@ -176,7 +176,7 @@ typedef union {
 typedef union {
   struct {
     UINT8    TrFIFOE  : 1; ///< Transmit and Receive FIFO Enable
-    UINT8    ResetRF  : 1; ///< Reset Reciever FIFO
+    UINT8    ResetRF  : 1; ///< Reset Receiver FIFO
     UINT8    ResetTF  : 1; ///< Reset Transmistter FIFO
     UINT8    Dms      : 1; ///< DMA Mode Select
     UINT8    Reserved : 1;
