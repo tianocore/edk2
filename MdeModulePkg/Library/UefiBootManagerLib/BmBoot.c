@@ -1426,6 +1426,7 @@ BmExpandLoadFile (
   VOID                      *FileBuffer;
   EFI_HANDLE                RamDiskHandle;
   UINTN                     BufferSize;
+  UINTN                     AllocatedPages;
   EFI_DEVICE_PATH_PROTOCOL  *FullPath;
 
   Status = gBS->OpenProtocol (
@@ -1459,7 +1460,8 @@ BmExpandLoadFile (
   // wish to map this with huge page support.
   //
 
-  FileBuffer = AllocateAlignedReservedPages (EFI_SIZE_TO_PAGES (BufferSize), SIZE_2MB);
+  AllocatedPages = EFI_SIZE_TO_PAGES (ALIGN_VALUE (BufferSize, RUNTIME_PAGE_ALLOCATION_GRANULARITY));
+  FileBuffer     = AllocateAlignedReservedPages (AllocatedPages, SIZE_2MB);
   if (FileBuffer == NULL) {
     DEBUG_CODE_BEGIN ();
     EFI_DEVICE_PATH  *LoadFilePath;
@@ -1500,7 +1502,7 @@ BmExpandLoadFile (
 
   Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
   if (EFI_ERROR (Status)) {
-    FreeAlignedPages (FileBuffer, EFI_SIZE_TO_PAGES (BufferSize));
+    FreeAlignedPages (FileBuffer, AllocatedPages);
     return NULL;
   }
 
