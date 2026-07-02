@@ -2,6 +2,7 @@
 # Host-based UnitTest for BaseCryptLibMbedTls
 #
 # Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+# (c) Copyright 2026 HP Development Company, L.P.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -39,6 +40,7 @@
   ParallelhashTests.c
   HkdfTests.c
   AeadAesGcmTests.c
+  AesCtrTests.c
   X509Tests.c
 
 [Packages]
