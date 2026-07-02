@@ -183,6 +183,10 @@
   #
   HobPrintLib|Include/Library/HobPrintLib.h
 
+  ## @libraryclass IoMmu library that can be used for IoMmu Protocol functions.
+  #
+  IoMmuLib|Include/Library/IoMmuLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
