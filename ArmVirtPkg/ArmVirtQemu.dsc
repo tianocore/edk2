@@ -59,7 +59,7 @@
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
-  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmTransferListLib|MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf

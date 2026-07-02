@@ -45,7 +45,7 @@
   PciHostBridgeUtilityLib|ArmVirtPkg/Library/ArmVirtPciHostBridgeUtilityLib/ArmVirtPciHostBridgeUtilityLib.inf
 
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
-  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmTransferListLib|MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
 !include MdePkg/MdeLibs.dsc.inc
 
