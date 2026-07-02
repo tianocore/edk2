@@ -177,6 +177,7 @@ BuildSmbiosType4TableEx (
   UINTN                           CpuIndex2;
   PROCESSOR_STATUS_DATA           *StatusData;
   PROCESSOR_CHARACTERISTIC_FLAGS  *CharacteristicFlags;
+  CM_OBJECT_TOKEN                 *CmObjectList;
 
   UINT32  ProcHierarchyNodeCount;
   UINT32  CacheStructCount;
@@ -213,7 +214,9 @@ BuildSmbiosType4TableEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Table = NULL;
+  *Table         = NULL;
+  *CmObjectToken = NULL;
+  CmObjectList   = NULL;
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
@@ -263,6 +266,18 @@ BuildSmbiosType4TableEx (
   if (SocketCount == 0) {
     ASSERT (SocketCount != 0);
     return EFI_INVALID_PARAMETER;
+  }
+
+  CmObjectList = AllocateZeroPool (sizeof (CM_OBJECT_TOKEN) * SocketCount);
+  if (CmObjectList == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to alloc memory for %u tokens.\n",
+      __func__,
+      SocketCount
+      ));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto exitErrorBuildSmbiosType4Table;
   }
 
   TableList = (SMBIOS_STRUCTURE **)AllocateZeroPool (sizeof (SMBIOS_STRUCTURE *) * SocketCount);
@@ -497,7 +512,8 @@ BuildSmbiosType4TableEx (
 
     StringTableFree (&StrTable);
 
-    TableList[ObjIndex] = (SMBIOS_STRUCTURE *)SmbiosRecord;
+    TableList[ObjIndex]    = (SMBIOS_STRUCTURE *)SmbiosRecord;
+    CmObjectList[ObjIndex] = ProcHierarchyNodeList[Index].Token;
     ObjIndex++;
     ASSERT (ObjIndex <= SocketCount);
   }
@@ -505,7 +521,7 @@ BuildSmbiosType4TableEx (
   ASSERT (ObjIndex == SocketCount);
 
   *Table         = TableList;
-  *CmObjectToken = NULL;
+  *CmObjectToken = CmObjectList;
   *TableCount    = SocketCount;
 
   return EFI_SUCCESS;
@@ -519,6 +535,10 @@ exitErrorBuildSmbiosType4Table:
     }
 
     FreePool (TableList);
+  }
+
+  if (CmObjectList != NULL) {
+    FreePool (CmObjectList);
   }
 
   return Status;
