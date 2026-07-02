@@ -8,7 +8,9 @@
 #pragma once
 
 #include <Library/GoogleTestLib.h>
-#include <Library/SubhookLib.h>
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  #include <Library/SubhookLib.h>
+#endif
 #include <type_traits>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,6 +54,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // The below macros are private and should not be used outside this file.
 
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 #define MOCK_FUNCTION_HOOK_DECLARATIONS(FUNC)     \
   static subhook::Hook Hook##FUNC;                \
   struct MockContainer_##FUNC {                   \
@@ -59,6 +62,9 @@
     ~MockContainer_##FUNC ();                     \
   };                                              \
   MockContainer_##FUNC MockContainerInst_##FUNC;
+#else
+#define MOCK_FUNCTION_HOOK_DECLARATIONS(FUNC)
+#endif
 
 // This definition implements a constructor and destructor inside a nested
 // class to enable automatic installation of the hooks to the associated
