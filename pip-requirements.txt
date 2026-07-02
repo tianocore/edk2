@@ -16,6 +16,6 @@ edk2-pytool-library~=0.23.13
 edk2-pytool-extensions~=0.31.0
 antlr4-python3-runtime==4.13.2
 lcov-cobertura==2.1.1
-regex==2026.5.9
+regex==2026.6.28
 pylibfdt==1.7.2.post1
 pefile
