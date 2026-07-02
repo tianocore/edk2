@@ -555,6 +555,7 @@
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
 # |                    | VS2022 |          |            | GCCNOLTO |        |
+# |                    | VS2026 |          |            |          |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -595,7 +596,7 @@
 # macOS/XCODE: macOS environment with XCODE5 installed.
 #
 !if $(WIN_MINGW32_BUILD)
-  !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022"
+  !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022 VS2026"
     !error EmulatorPkg not supported for Mingw/VS20xx builds
   !endif
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
@@ -613,7 +614,7 @@
       !error EmulatorPkg not supported for Windows/CLANGDWARF builds
     !endif
   !else
-    !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022"
+    !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022 VS2026"
       !error EmulatorPkg not supported for Linux/VS20xx builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
