@@ -39,3 +39,16 @@
 #define REDFISH_HTTP_CACHE_DEBUG          DEBUG_MANAGEABILITY
 #define REDFISH_HTTP_CACHE_DEBUG_DUMP     DEBUG_MANAGEABILITY
 #define REDFISH_HTTP_CACHE_DEBUG_REQUEST  DEBUG_MANAGEABILITY
+
+/**
+  Return HTTP method in ASCII string. Caller does not need
+  to free returned string buffer.
+
+  @param[in]  Method         HTTP method.
+
+  @retval CHAR8 *   Method in string.
+**/
+CHAR8 *
+HttpMethodToString (
+  IN  EFI_HTTP_METHOD  Method
+  );

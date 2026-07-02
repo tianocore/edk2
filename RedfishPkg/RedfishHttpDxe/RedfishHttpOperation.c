@@ -644,7 +644,7 @@ HttpSendReceive (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((REDFISH_HTTP_CACHE_DEBUG_REQUEST, "%a: Method: 0x%x %s\n", __func__, Method, Uri));
+  DEBUG ((REDFISH_HTTP_CACHE_DEBUG_REQUEST, "%a: Method: %a %s\n", __func__, HttpMethodToString (Method), Uri));
 
   ServicePrivate = (REDFISH_SERVICE_PRIVATE *)Service;
   if (ServicePrivate->Signature != REDFISH_HTTP_SERVICE_SIGNATURE) {
