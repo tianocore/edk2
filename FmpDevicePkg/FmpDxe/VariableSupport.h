@@ -52,6 +52,83 @@ typedef struct {
 } FMP_CONTROLLER_STATE;
 
 /**
+  Retrieve the FMP Controller State UEFI Variable value.  Return NULL if
+  the variable does not exist or if the size of the UEFI Variable is not the
+  size of FMP_CONTROLLER_STATE.  The buffer for the UEFI Variable value
+  is allocated using the UEFI Boot Service AllocatePool().
+
+  @param[in] Private  Private context structure for the managed controller.
+
+  @return  Pointer to the allocated FMP Controller State.  Returns NULL
+           if the variable does not exist or is a different size than expected.
+           Caller must free the returned buffer with FreePool().
+**/
+FMP_CONTROLLER_STATE *
+GetFmpControllerState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+  );
+
+/**
+  Returns the Version from a pre-fetched FMP Controller State.
+  If the field is not valid, returns the default.
+
+  @param[in] Private             Private context structure for the managed controller.
+  @param[in] FmpControllerState  Cached controller state.
+
+  @return  The firmware version value.
+**/
+UINT32
+GetVersionFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  );
+
+/**
+  Returns the LowestSupportedVersion from a pre-fetched FMP Controller State.
+  If the field is not valid, returns the default.
+
+  @param[in] Private             Private context structure for the managed controller.
+  @param[in] FmpControllerState  Cached controller state.
+
+  @return  The lowest supported version value.
+**/
+UINT32
+GetLowestSupportedVersionFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  );
+
+/**
+  Returns the LastAttemptStatus from a pre-fetched FMP Controller State.
+  If the field is not valid, returns the default.
+
+  @param[in] Private             Private context structure for the managed controller.
+  @param[in] FmpControllerState  Cached controller state.
+
+  @return  The last attempt status value.
+**/
+UINT32
+GetLastAttemptStatusFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  );
+
+/**
+  Returns the LastAttemptVersion from a pre-fetched FMP Controller State.
+  If the field is not valid, returns the default.
+
+  @param[in] Private             Private context structure for the managed controller.
+  @param[in] FmpControllerState  Cached controller state.
+
+  @return  The last attempt version value.
+**/
+UINT32
+GetLastAttemptVersionFromCachedState (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN FMP_CONTROLLER_STATE              *FmpControllerState
+  );
+
+/**
   Generate the names of the UEFI Variables used to store state information for
   a managed controller.  The UEFI Variables names are a combination of a base
   name and an optional hardware instance value as a 16 character hex value.  If
