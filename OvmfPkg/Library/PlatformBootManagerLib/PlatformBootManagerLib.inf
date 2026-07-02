@@ -59,6 +59,9 @@
   QemuFwCfgSimpleParserLib
   PlatformBootManagerCommonLib
 
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdEfiShellAutoboot
+
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable

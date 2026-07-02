@@ -55,6 +55,9 @@
   UefiRuntimeServicesTableLib
   PlatformBootManagerCommonLib
 
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdEfiShellAutoboot
+
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
