@@ -2510,10 +2510,15 @@ Ip6ProcessRedirect (
   // Check the options. The only interested option here is the target-link layer
   // address option.
   //
+  // Per RFC 4861 Section 4.6, every ND option length is in units of 8 octets,
+  // so the smallest valid option is 8 bytes (Length field = 1). Guard with
+  // ">= 8" instead of "> 0" to avoid parsing malformed trailing fragments
+  // that cannot form a complete option.
+  //
   Length          = Packet->TotalSize - 40;
   Option          = (UINT8 *)(IcmpDest + 1);
   LinkLayerOption = NULL;
-  while (Length > 0) {
+  while (Length >= 8) {
     switch (*Option) {
       case Ip6OptionEtherTarget:
 
