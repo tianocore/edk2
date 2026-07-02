@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -53,6 +53,10 @@ typedef enum ArmObjectID {
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
   EArmObjDmc620PmuSocketInfo,                                  ///< 24 - DMC620 Socket Info
   EArmObjDmc620PmuRegInfo,                                     ///< 25 - DMC620 PMU Reg Info
+  EArmObjGicIrsInfo,                                           ///< 26 - GIC IRS Info
+  EArmObjGicItsV5Info,                                         ///< 27 - GIC ITS v5 Info
+  EArmObjGicItsV5TranslateFrameInfo,                           ///< 28 - GIC ITS v5 Translate Frame Info
+  EArmObjGicIwbInfo,                                           ///< 29 - GIC IWB Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -203,6 +207,16 @@ typedef struct CmArmGicCInfo {
         CM_ARM_GICC_INFO.ClockDomain
   */
   CM_OBJECT_TOKEN    ClockDomainToken;
+
+  /** GICv5 Interrupt Controller processor affinity ID.
+      This must be 0 for pre-v5 GIC.
+  */
+  UINT16             IAffId;
+
+  /** The ID of the IRS that this processor is connected to.
+      This must be 0 for pre-v5 GIC.
+  */
+  UINT32             IrsId;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -619,7 +633,7 @@ typedef struct CmArmPmcgNode {
     ID: EArmObjGicItsIdentifierArray
 */
 typedef struct CmArmGicItsIdentifier {
-  /// The ITS Identifier
+  /// The ITS Identifier or ITS Translate Id (GicV5)
   UINT32    ItsId;
 } CM_ARM_ITS_IDENTIFIER;
 
@@ -776,5 +790,92 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
+
+/** A structure that describes GIC interrupt Routing Service (IRS).
+
+    ID: EArmObjGicIrsInfo
+*/
+typedef struct CmArmGicIrsInfo {
+  /// GIC version.
+  UINT32    GicVersion;
+  /// The GIC IRS ID
+  UINT32    GicIrsId;
+  /// Flags
+  UINT32    Flags;
+  /// Base address of the IRS config frame
+  UINT64    ConfigFrameBase;
+  /// Base address of the IRS SET_LPI frame
+  UINT64    SetLpiFrameBase;
+  /// Proximity domain that this IRS belongs to
+  UINT32    ProximityDomain;
+} CM_ARM_GIC_IRS_INFO;
+
+/** A structure that describes the
+    GICv5 Interrupt Translation Service information for the Platform.
+
+    ID: EArmObjGicItsV5Info
+*/
+typedef struct CmArmGicItsV5Info {
+  /// The GIC ITSv5 ID
+  UINT32             GicItsId;
+  /// Flags
+  UINT32             Flags;
+  /// Base address of the ITS config frame
+  UINT64             PhysicalBaseAddress;
+
+  /** The proximity domain to which the logical processor belongs.
+      This field is used to populate the GIC ITS affinity structure
+      in the SRAT table.
+  */
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_ITSV5_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+} CM_ARM_GIC_ITSV5_INFO;
+
+/** A structure that describes the
+    frame information for GICv5 Interrupt Translation Service.
+
+    ID: EArmObjGicItsV5Info
+*/
+typedef struct CmArmGicItsV5TranslateFrameInfo {
+  /// Linked GIC ITSv5 ID
+  UINT32    LinkedGicItsId;
+  /// The GIC ITSv5 translate frame ID
+  UINT32    ItsTranslateId;
+  /// Base address of the ITS translate frame
+  UINT64    ItsTranslateFrameBase;
+} CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO;
+
+/** A structure that describes the
+    Interrupt Wire Bridge (IWB) information.
+
+    ID: EArmObjGicIwbInfo
+*/
+typedef struct CmArmGicIwbInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// The GIC IWB ID
+  UINT32             GicIwbId;
+  /// ITSv5 ID of the linked ITS
+  UINT32             LinkedItsId;
+  /// Base address of the IWB config frame
+  UINT64             ConfigFrameBase;
+  /// Device ID used to signal any interrupt to the connected ITS
+  UINT32             DeviceId;
+  /// Base GSIV for this IWB
+  UINT32             BaseGsiv;
+  /// Number of wires handled by this IWB
+  UINT32             NumWires;
+  /// Proximity domain that this IWB belongs to
+  UINT32             ProximityDomain;
+  /// Reference token for the ID mapping array
+  CM_OBJECT_TOKEN    IdMappingToken;
+  /// Unique identifier for this node.
+  UINT32             Identifier;
+} CM_ARM_GIC_IWB_INFO;
 
 #pragma pack()

@@ -1,11 +1,11 @@
 /** @file
   IORT Table Generator
 
-  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-  - IO Remapping Table, Platform Design Document, Revision E.d, Feb 2022
+  - IO Remapping Table, Platform Design Document, Revision E.g, Mar 2026
     (https://developer.arm.com/documentation/den0049/)
 
 **/
@@ -15,16 +15,22 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PrintLib.h>
 #include <Protocol/AcpiTable.h>
 
 // Module specific include files.
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/AcpiHelperLib.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "IortGenerator.h"
+
+#define MAX_IWB_COUNT      (16)
+#define IWB_DEV_NAME_SIZE  (AML_NAME_SEG_SIZE + 1)
+#define IWB_DEV_PATH_SIZE  (IWB_DEV_NAME_SIZE + 6)      /* "\\_SB_." */
 
 /** ARM standard IORT Generator
 
@@ -42,6 +48,7 @@ Requirements:
   - EArmObjIdMappingArray
   - EArmObjSmmuInterruptArray
   - EArmObjMemoryRangeDescriptor
+  - EArmObjGicIwbInfo
 */
 
 /** This macro expands to a function that retrieves the ITS
@@ -141,6 +148,15 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjSmmuInterruptArray,
   CM_ARM_SMMU_INTERRUPT
+  );
+
+/** This macro expands to a function that retrieves the
+    GIC IWB information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjGicIwbInfo,
+  CM_ARM_GIC_IWB_INFO
   );
 
 /** Returns the size of the ITS Group node.
@@ -2164,6 +2180,225 @@ AddRmrNodes (
   return EFI_SUCCESS;
 }
 
+/** Returns the size of the IWB node.
+
+    @param [in]  Node    Pointer to IWB node.
+
+    @retval Size of the IWB node.
+**/
+STATIC
+UINT32
+GetIwbNodeSize (
+  IN  CONST CM_ARM_GIC_IWB_INFO  *Node
+  )
+{
+  ASSERT (Node != NULL);
+
+  /* Size of IWB node +
+     Size of ID mapping array +
+     Size of ASCII string + 'padding to 32-bit word aligned'.
+  */
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE) +
+                  sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE) +
+                  ALIGN_VALUE (IWB_DEV_PATH_SIZE, 4));
+}
+
+/** Returns the total size required for the Iwb nodes and
+    updates the Node Indexer.
+
+    This function calculates the size required for the node group
+    and also populates the Node Indexer array with offsets for the
+    individual nodes.
+
+    @param [in]       NodeStartOffset Offset from the start of the
+                                      IORT where this node group starts.
+    @param [in]       NodeList        Pointer to IWB node list.
+    @param [in]       NodeCount       Count of the IWB nodes.
+    @param [in, out]  NodeIndexer     Pointer to the next Node Indexer.
+
+    @retval Total size of the IWB nodes.
+**/
+STATIC
+UINT64
+GetSizeofIwbNodes (
+  IN      CONST UINT32                              NodeStartOffset,
+  IN      CONST CM_ARM_GIC_IWB_INFO                 *NodeList,
+  IN            UINT32                              NodeCount,
+  IN OUT        IORT_NODE_INDEXER          **CONST  NodeIndexer
+  )
+{
+  UINT64  Size;
+
+  ASSERT (NodeList != NULL);
+
+  Size = 0;
+  while (NodeCount-- != 0) {
+    (*NodeIndexer)->Token      = NodeList->Token;
+    (*NodeIndexer)->Object     = (VOID *)NodeList;
+    (*NodeIndexer)->Offset     = (UINT32)(Size + NodeStartOffset);
+    (*NodeIndexer)->Identifier = NodeList->Identifier;
+    DEBUG ((
+      DEBUG_INFO,
+      "IORT: Node Indexer = %p, Token = %p, Object = %p,"
+      " Offset = 0x%x, Identifier = 0x%x\n",
+      *NodeIndexer,
+      (*NodeIndexer)->Token,
+      (*NodeIndexer)->Object,
+      (*NodeIndexer)->Offset,
+      (*NodeIndexer)->Identifier
+      ));
+
+    Size += GetIwbNodeSize (NodeList);
+    (*NodeIndexer)++;
+    NodeList++;
+  }
+
+  return Size;
+}
+
+/** Update the IWB Node Information.
+
+    @param [in]     This             Pointer to the table Generator.
+    @param [in]     CfgMgrProtocol   Pointer to the Configuration Manager
+                                     Protocol Interface.
+    @param [in]     AcpiTableInfo    Pointer to the ACPI table info structure.
+    @param [in]     Iort             Pointer to IORT table structure.
+    @param [in]     NodesStartOffset Offset for the start of the IWB Group
+                                     Nodes.
+    @param [in]     NodeList         Pointer to an array of IWB Group Node
+                                     Objects.
+    @param [in]     NodeCount        Number of IWB Group Node Objects.
+
+    @retval EFI_SUCCESS           Table generated successfully.
+    @retval EFI_INVALID_PARAMETER A parameter is invalid.
+    @retval EFI_NOT_FOUND         The required object was not found.
+**/
+STATIC
+EFI_STATUS
+AddIwbNodes (
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,
+  IN  CONST UINT32                                        NodesStartOffset,
+  IN  CONST CM_ARM_GIC_IWB_INFO                           *NodeList,
+  IN        UINT32                                        NodeCount
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE  *IwbNode;
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE  *IdMapArray;
+  UINT64                              NodeLength;
+  CHAR8                               *ObjectName;
+  CHAR8                               IwbDevPath[IWB_DEV_PATH_SIZE];
+  UINT32                              Idx;
+
+  ASSERT (Iort != NULL);
+
+  IwbNode = (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE *)((UINT8 *)Iort +
+                                                   NodesStartOffset);
+
+  /*
+   * Auto generated object name could be IWB0 to IWB9 for
+   * the limit of AML_NAME_SEG_SIZE (4 chars).
+   */
+  if (NodeCount > MAX_IWB_COUNT) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: IORT: Too many number of IWB. Couldn't generate object name. Count: %d\n",
+      NodeCount
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Idx = 0; Idx < NodeCount; Idx++) {
+    NodeLength = GetIwbNodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: IWB Id Array Node length 0x%lx > MAX_UINT16."
+        " Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
+    // Populate the node header
+    IwbNode->Node.Type          = EFI_ACPI_IORT_TYPE_IWB;
+    IwbNode->Node.Length        = (UINT16)NodeLength;
+    IwbNode->Node.Revision      = 1;
+    IwbNode->Node.Identifier    = NodeList->Identifier;
+    IwbNode->Node.NumIdMappings = 1;
+    IwbNode->Node.IdReference   = NodeLength - sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE);
+
+    // IORT specific data
+    IwbNode->ConfigFrameBase = NodeList->ConfigFrameBase;
+    IwbNode->IwbIndex        = NodeList->GicIwbId;
+
+    // Generate object name
+    AsciiSPrint (IwbDevPath, IWB_DEV_PATH_SIZE, "\\_SB_.IWB%x", Idx);
+
+    // Copy the object name
+    ObjectName = (CHAR8 *)((UINT8 *)IwbNode +
+                           sizeof (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE));
+
+    Status = AsciiStrCpyS (
+               ObjectName,
+               IWB_DEV_PATH_SIZE,
+               IwbDevPath
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Failed to copy Object Name. Status = %r\n",
+        Status
+        ));
+      return Status;
+    }
+
+    if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Id Mapping token,"
+        " Token = 0x%x, Status =%r\n",
+        NodeList->IdMappingToken,
+        Status
+        ));
+      return Status;
+    }
+
+    // Ids for IWB node
+    IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE *)((UINT8 *)IwbNode +
+                                                        IwbNode->Node.IdReference);
+
+    Status = AddIdMappingArray (
+               This,
+               CfgMgrProtocol,
+               IdMapArray,
+               1,
+               NodeList->IdMappingToken
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Failed to add Id Mapping Array. Status = %r\n",
+        Status
+        ));
+      return Status;
+    }
+
+    // Next IORT Group Node
+    IwbNode = (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE *)((UINT8 *)IwbNode +
+                                                     IwbNode->Node.Length);
+    NodeList++;
+  } // IORT Group Node
+
+  return EFI_SUCCESS;
+}
+
 /** Validates that the IORT nodes Identifier are unique.
 
     @param [in]     NodeIndexer      Pointer to the Node Indexer.
@@ -2189,10 +2424,12 @@ ValidateNodeIdentifiers (
       {
         DEBUG ((
           DEBUG_ERROR,
-          "ERROR: IORT: UID %d of Token %p matches with that of Token %p.\n",
+          "ERROR: IORT: UID %d of Token %p matches with that of Token %p. (%u/%u)\n",
           NodeIndexer[IndexI].Identifier,
           NodeIndexer[IndexI].Token,
-          NodeIndexer[IndexJ].Token
+          NodeIndexer[IndexJ].Token,
+          IndexI,
+          IndexJ
           ));
         return EFI_INVALID_PARAMETER;
       }
@@ -2215,7 +2452,8 @@ ValidateNodeIdentifiers (
     @param [in]  AcpiTableInfo  Pointer to the ACPI Table Info.
     @param [in]  CfgMgrProtocol Pointer to the Configuration Manager
                                 Protocol Interface.
-    @param [out] Table          Pointer to the constructed ACPI Table.
+    @param [out] Table          Pointer to a list of generated ACPI table(s).
+    @param [out] TableCount     Number of generated ACPI table(s).
 
     @retval EFI_SUCCESS           Table generated successfully.
     @retval EFI_INVALID_PARAMETER A parameter is invalid.
@@ -2227,11 +2465,12 @@ ValidateNodeIdentifiers (
 STATIC
 EFI_STATUS
 EFIAPI
-BuildIortTable (
+BuildIortTableEx (
   IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
+  OUT       EFI_ACPI_DESCRIPTION_HEADER                   ***Table,
+  OUT       UINTN                                 *CONST  TableCount
   )
 {
   EFI_STATUS  Status;
@@ -2247,6 +2486,7 @@ BuildIortTable (
   UINT32  SmmuV3NodeCount;
   UINT32  PmcgNodeCount;
   UINT32  RmrNodeCount;
+  UINT32  IwbNodeCount;
 
   UINT32  ItsGroupOffset;
   UINT32  NamedComponentOffset;
@@ -2255,6 +2495,7 @@ BuildIortTable (
   UINT32  SmmuV3Offset;
   UINT32  PmcgOffset;
   UINT32  RmrOffset;
+  UINT32  IwbOffset;
 
   CM_ARM_ITS_GROUP_NODE        *ItsGroupNodeList;
   CM_ARM_NAMED_COMPONENT_NODE  *NamedComponentNodeList;
@@ -2263,10 +2504,16 @@ BuildIortTable (
   CM_ARM_SMMUV3_NODE           *SmmuV3NodeList;
   CM_ARM_PMCG_NODE             *PmcgNodeList;
   CM_ARM_RMR_NODE              *RmrNodeList;
+  CM_ARM_GIC_IWB_INFO          *IwbNodeList;
 
   EFI_ACPI_6_0_IO_REMAPPING_TABLE  *Iort;
   IORT_NODE_INDEXER                *NodeIndexer;
   ACPI_IORT_GENERATOR              *Generator;
+
+  EFI_ACPI_DESCRIPTION_HEADER  **TableList;
+  UINT32                       TableIdx;
+  CHAR8                        IwbDevName[IWB_DEV_NAME_SIZE];
+  UINT8                        IwbUid;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -2301,8 +2548,19 @@ BuildIortTable (
     return EFI_INVALID_PARAMETER;
   }
 
-  Generator = (ACPI_IORT_GENERATOR *)This;
-  *Table    = NULL;
+  Generator   = (ACPI_IORT_GENERATOR *)This;
+  *Table      = NULL;
+  *TableCount = 0;
+
+  TableList    = NULL;
+  Iort         = NULL;
+  IwbNodeCount = 0;
+  TableIdx     = 0;
+
+  IwbDevName[0] = 'I';
+  IwbDevName[1] = 'W';
+  IwbDevName[2] = 'B';
+  IwbDevName[4] = '\0';
 
   // Get the ITS group node info
   Status = GetEArmObjItsGroup (
@@ -2316,6 +2574,18 @@ BuildIortTable (
       DEBUG_ERROR,
       "ERROR: IORT: Failed to get ITS Group Node Info. Status = %r\n",
       Status
+      ));
+    goto error_handler;
+  }
+
+  if ((AcpiTableInfo->AcpiTableRevision >= EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07) &&
+      (ItsGroupNodeCount > 1))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: IORT: Number of ITS Group Node Info must be 1. ItsGroupCount: %d\n",
+      ItsGroupNodeCount
       ));
     goto error_handler;
   }
@@ -2439,6 +2709,29 @@ BuildIortTable (
 
     // Add the RMR node count
     IortNodeCount += RmrNodeCount;
+  }
+
+  if (AcpiTableInfo->AcpiTableRevision >=
+      EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07)
+  {
+    // Get the IWB node info
+    Status = GetEArmObjGicIwbInfo (
+               CfgMgrProtocol,
+               CM_NULL_TOKEN,
+               &IwbNodeList,
+               &IwbNodeCount
+               );
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Failed to get IWB Node Info. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+
+    // Add the IWB node count
+    IortNodeCount += IwbNodeCount;
   }
 
   // Allocate Node Indexer array
@@ -2684,6 +2977,40 @@ BuildIortTable (
       ));
   }
 
+  // IWB Nodes
+  if ((AcpiTableInfo->AcpiTableRevision >=
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07) &&
+      (IwbNodeCount > 0))
+  {
+    IwbOffset = (UINT32)TableSize;
+    // Size of IWB node list.
+    NodeSize = GetSizeofIwbNodes (
+                 IwbOffset,
+                 IwbNodeList,
+                 IwbNodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of IWB Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+
+    TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " IwbNodeCount = %d\n" \
+      " IwbOffset = %d\n",
+      IwbNodeCount,
+      IwbOffset
+      ));
+  }
+
   DEBUG ((
     DEBUG_INFO,
     "INFO: IORT:\n" \
@@ -2720,9 +3047,22 @@ BuildIortTable (
     }
   }
 
-  // Allocate the Buffer for IORT table
-  *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
-  if (*Table == NULL) {
+  // Allocate the Buffer for IORT and IWB SSDT tables.
+  TableList = (EFI_ACPI_DESCRIPTION_HEADER **)
+              AllocateZeroPool (
+                (sizeof (EFI_ACPI_DESCRIPTION_HEADER *) * (1 + IwbNodeCount))
+                );
+  if (TableList == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: IORT: Failed to allocate memory for TableList.\n"
+      ));
+    goto error_handler;
+  }
+
+  TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
+  if (TableList[0] == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((
       DEBUG_ERROR,
@@ -2734,7 +3074,8 @@ BuildIortTable (
     goto error_handler;
   }
 
-  Iort = (EFI_ACPI_6_0_IO_REMAPPING_TABLE *)*Table;
+  Iort = (EFI_ACPI_6_0_IO_REMAPPING_TABLE *)TableList[0];
+  TableIdx++;
 
   DEBUG ((
     DEBUG_INFO,
@@ -2907,6 +3248,54 @@ BuildIortTable (
     }
   }
 
+  if ((AcpiTableInfo->AcpiTableRevision >=
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07) &&
+      (IwbNodeCount > 0))
+  {
+    Status = AddIwbNodes (
+               This,
+               CfgMgrProtocol,
+               AcpiTableInfo,
+               Iort,
+               IwbOffset,
+               IwbNodeList,
+               IwbNodeCount
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Failed to add IWB Node. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+
+    while ((TableIdx - 1) < IwbNodeCount) {
+      IwbUid        = TableIdx - 1;
+      IwbDevName[3] = AsciiFromHex (IwbUid);
+
+      Status = BuildIwbDeviceTable (
+                 &IwbNodeList[IwbUid],
+                 IwbDevName,
+                 IwbUid,
+                 &TableList[TableIdx]
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Failed to add IWB SSDT table. Status = %r\n",
+          Status
+          ));
+        goto error_handler;
+      }
+
+      TableIdx++;
+    }
+  }
+
+  *Table      = TableList;
+  *TableCount = 1 + IwbNodeCount;
+
   return EFI_SUCCESS;
 
 error_handler:
@@ -2915,9 +3304,16 @@ error_handler:
     Generator->NodeIndexer = NULL;
   }
 
-  if (*Table != NULL) {
-    FreePool (*Table);
-    *Table = NULL;
+  if (TableList != NULL) {
+    while (TableIdx > 1) {
+      FreeIwbDeviceTable (TableList[TableIdx]);
+    }
+
+    if (Iort != NULL) {
+      FreePool (TableList[0]);
+    }
+
+    FreePool (TableList);
   }
 
   return Status;
@@ -2929,21 +3325,26 @@ error_handler:
   @param [in]      AcpiTableInfo  Pointer to the ACPI Table Info.
   @param [in]      CfgMgrProtocol Pointer to the Configuration Manager
                                   Protocol Interface.
-  @param [in, out] Table          Pointer to the ACPI Table.
+  @param [in, out] Table          Pointer to an array of pointers
+                                  to ACPI Table(s).
+  @param [in]      TableCount     Number of ACPI table(s).
 
   @retval EFI_SUCCESS           The resources were freed successfully.
   @retval EFI_INVALID_PARAMETER The table pointer is NULL or invalid.
 **/
 STATIC
 EFI_STATUS
-FreeIortTableResources (
-  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
+FreeIortTableResourcesEx (
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST   This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST   AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST   CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          ***CONST  Table,
+  IN      CONST UINTN                                          TableCount
   )
 {
-  ACPI_IORT_GENERATOR  *Generator;
+  ACPI_IORT_GENERATOR          *Generator;
+  EFI_ACPI_DESCRIPTION_HEADER  **TableList;
+  UINTN                        Idx;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -2963,6 +3364,16 @@ FreeIortTableResources (
     DEBUG ((DEBUG_ERROR, "ERROR: IORT: Invalid Table Pointer\n"));
     ASSERT ((Table != NULL) && (*Table != NULL));
     return EFI_INVALID_PARAMETER;
+  }
+
+  TableList = *Table;
+
+  for (Idx = 1; Idx < TableCount; Idx++) {
+    FreeIwbDeviceTable (TableList[Idx]);
+  }
+
+  if (TableList[0] != NULL) {
+    FreePool (TableList[0]);
   }
 
   FreePool (*Table);
@@ -2985,9 +3396,9 @@ ACPI_IORT_GENERATOR  IortGenerator = {
     // Generator Description
     L"ACPI.STD.IORT.GENERATOR",
     // ACPI Table Signature
-    EFI_ACPI_6_4_IO_REMAPPING_TABLE_SIGNATURE,
+    EFI_ACPI_6_7_IO_REMAPPING_TABLE_SIGNATURE,
     // ACPI Table Revision supported by this Generator
-    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_06,
+    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07,
     // Minimum supported ACPI Table Revision
     EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00,
     // Creator ID
@@ -2995,14 +3406,13 @@ ACPI_IORT_GENERATOR  IortGenerator = {
     // Creator Revision
     IORT_GENERATOR_REVISION,
     // Build Table function
-    BuildIortTable,
-    // Free Resource function
-    FreeIortTableResources,
-    // Extended build function not needed
     NULL,
-    // Extended build function not implemented by the generator.
-    // Hence extended free resource function is not required.
-    NULL
+    // Free Resource function
+    NULL,
+    // Extended build function not needed
+    BuildIortTableEx,
+    // Extended Free Resource function
+    FreeIortTableResourcesEx,
   },
 
   // IORT Generator private data

@@ -1,7 +1,7 @@
 /** @file
   SRAT Table Generator
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.
+  Copyright (c) 2019 - 2026, Arm Limited. All rights reserved.
   Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -623,9 +623,9 @@ ACPI_TABLE_GENERATOR  SratGenerator = {
   // Generator Description
   L"ACPI.STD.SRAT.GENERATOR",
   // ACPI Table Signature
-  EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
+  EFI_ACPI_6_7_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
+  EFI_ACPI_6_7_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
   // Minimum supported ACPI Table Revision
   EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
   // Creator ID

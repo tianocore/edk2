@@ -41,4 +41,42 @@ typedef struct AcpiIortGenerator {
   IORT_NODE_INDEXER       *NodeIndexer;
 } ACPI_IORT_GENERATOR;
 
+/** Build a SSDT table describing the IWB device.
+
+  The table created by this function must be freed by FreeSimpleIwbDeviceTable.
+
+  @param [in]  IwbInfo          IWB device info to describe in the SSDT table.
+  @param [in]  Name             The Name to give to the Device.
+                                Must be a NULL-terminated ASL NameString
+                                e.g.: "DEV0", "DV15.DEV0", etc.
+  @param [in]  Uid              UID for the IWB device
+  @param [out] Table            If success, pointer to the created SSDT table.
+
+  @retval EFI_SUCCESS            Table generated successfully.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_NOT_FOUND          Could not find information.
+  @retval EFI_OUT_OF_RESOURCES   Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+BuildIwbDeviceTable (
+  IN  CONST CM_ARM_GIC_IWB_INFO          *IwbInfo,
+  IN  CONST CHAR8                        *Name,
+  IN  CONST UINT64                       Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table
+  );
+
+/** Free an Iwb device table previously created by
+    the BuildIwbDeviceTable function.
+
+  @param [in] Table   Pointer to a Iwb Device table allocated by
+                      the BuildIwbDeviceTable function.
+
+**/
+VOID
+EFIAPI
+FreeIwbDeviceTable (
+  IN EFI_ACPI_DESCRIPTION_HEADER  *Table
+  );
+
 #pragma pack()
