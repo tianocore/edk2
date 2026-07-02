@@ -301,7 +301,7 @@ GetBootOptionInOrder (
   // Second get BootOption from "BootOrder"
   //
   BootOrderOptionBuf = EfiBootManagerGetLoadOptions (&BootOrderCount, LoadOptionTypeBoot);
-  if ((BootNextCount == 0) && (BootOrderCount == 0)) {
+  if (((BootNextCount == 0) && (BootOrderCount == 0)) || (BootOrderOptionBuf == NULL)) {
     return EFI_NOT_FOUND;
   }
 
