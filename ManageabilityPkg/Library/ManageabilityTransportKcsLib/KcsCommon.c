@@ -383,6 +383,47 @@ KcsTransportRead (
     }
   }
 
+  //
+  // Per IPMI 2.0 Spec Figure 9-7, drain remaining bytes until
+  // BMC transitions to IDLE_STATE.
+  //
+  while (TRUE) {
+    Status = WaitStatusClear (IPMI_KCS_IBF);
+    if (EFI_ERROR (Status)) {
+      *Length = ReadLength;
+      return Status;
+    }
+
+    if (IPMI_KCS_GET_STATE (KcsRegisterRead8 (KCS_REG_STATUS)) == IpmiKcsIdleState) {
+      Status = WaitStatusSet (IPMI_KCS_OBF);
+      if (EFI_ERROR (Status)) {
+        *Length = ReadLength;
+        return Status;
+      }
+
+      KcsRegisterRead8 (KCS_REG_DATA_IN);
+      break;
+    } else if (IPMI_KCS_GET_STATE (KcsRegisterRead8 (KCS_REG_STATUS)) == IpmiKcsReadState) {
+      Status = WaitStatusSet (IPMI_KCS_OBF);
+      if (EFI_ERROR (Status)) {
+        *Length = ReadLength;
+        return Status;
+      }
+
+      KcsRegisterRead8 (KCS_REG_DATA_IN);
+      Status = WaitStatusClear (IPMI_KCS_IBF);
+      if (EFI_ERROR (Status)) {
+        *Length = ReadLength;
+        return Status;
+      }
+
+      KcsRegisterWrite8 (KCS_REG_DATA_OUT, IPMI_KCS_CONTROL_CODE_READ);
+    } else {
+      *Length = ReadLength;
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
   *Length = ReadLength;
   return EFI_SUCCESS;
 }
@@ -644,7 +685,6 @@ KcsTransportSendCommand (
 {
   EFI_STATUS  Status;
   UINT8       *RspHeader;
-  UINT32      ExpectedResponseDataSize;
 
   if ((RequestData != NULL) && (RequestDataSize == 0)) {
     DEBUG ((DEBUG_ERROR, "%a: Mismatched values of RequestData and RequestDataSize\n", __func__));
@@ -718,24 +758,13 @@ KcsTransportSendCommand (
 
     FreePool (RspHeader);
 
-    ExpectedResponseDataSize = *ResponseDataSize;
-    Status                   = KcsTransportRead (ResponseData, ResponseDataSize);
+    Status = KcsTransportRead (ResponseData, ResponseDataSize);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "KCS response read Failed with Status(%r)\n", Status));
     }
 
     // Print out the response payloads.
     if (*ResponseDataSize != 0) {
-      if (ExpectedResponseDataSize != *ResponseDataSize) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "Expected KCS response size : %d is not matched to returned size : %d.\n",
-          ExpectedResponseDataSize,
-          *ResponseDataSize
-          ));
-        return EFI_DEVICE_ERROR;
-      }
-
       HelperManageabilityDebugPrint ((VOID *)ResponseData, (UINT32)*ResponseDataSize, "KCS Response Data:\n");
       Status = KcsCheckResponseData (ResponseData, *ResponseDataSize, AdditionalStatus);
     } else {
