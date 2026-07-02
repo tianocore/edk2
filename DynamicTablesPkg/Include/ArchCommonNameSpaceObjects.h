@@ -19,6 +19,7 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
+#include <IndustryStandard/SmBios.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -91,6 +92,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
   EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
   EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1704,5 +1706,25 @@ typedef struct CmArchCommonSystemResetInfo {
   /// Timeout value used by the watchdog timer.
   UINT16             Timeout;
 } CM_ARCH_COMMON_SYSTEM_RESET_INFO;
+
+/** A structure that describes processor specific data.
+
+  SMBIOS Specification v3.9.0 Type 44
+
+  ID: EArchCommonObjProcessorSpecificBlockInfo
+**/
+typedef struct CmArchCommonProcessorSpecificBlockInfo {
+  /// CM Object Token uniquely identifying this processor specific block info.
+  CM_OBJECT_TOKEN                       Token;
+
+  /// Relevant Process Hierarchy Socket Token.
+  CM_OBJECT_TOKEN                       ProcSocketToken;
+
+  /// Processor Architecture Type.
+  PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE    ProcArchType;
+
+  /// Token array for architecture specific Processor Data.
+  CM_OBJECT_TOKEN                       ArchProcessorSpecificDataToken;
+} CM_ARCH_COMMON_PROCESSOR_SPECIFIC_BLOCK_INFO;
 
 #pragma pack()
