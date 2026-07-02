@@ -63,7 +63,8 @@
             "8002", "aligned (",
             "4002", "_ReturnAddress",
             "8005", "__security_cookie",
-            "8006", "__stack_chk_fail"
+            "8006", "__stack_chk_fail",
+            "8005", "UNIT_TEST_HOST_BASE_LIB.X86"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
