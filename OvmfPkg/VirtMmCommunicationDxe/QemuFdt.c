@@ -136,24 +136,24 @@ VirtMmHwFind (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  VirtMmGetProp (
-    FdtClient,
-    "qemu,platform",
-    "ranges",
-    &Ranges,
-    &RangesSize
-    );
+  Status = VirtMmGetProp (
+             FdtClient,
+             "qemu,platform",
+             "ranges",
+             &Ranges,
+             &RangesSize
+             );
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
 
-  VirtMmGetProp (
-    FdtClient,
-    UEFI_VARS_FDT_COMPAT,
-    "reg",
-    &Reg,
-    &RegSize
-    );
+  Status = VirtMmGetProp (
+             FdtClient,
+             UEFI_VARS_FDT_COMPAT,
+             "reg",
+             &Reg,
+             &RegSize
+             );
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
