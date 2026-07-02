@@ -25,6 +25,14 @@ static CONST UINT8  mOidBasicConstraints[] = OID_BASIC_CONSTRAINTS;
 #define CRYPTO_ASN1_TAG_PC_MASK     0x20
 #define CRYPTO_ASN1_TAG_VALUE_MASK  0x1F
 
+#define CRYPTO_ASN1_OID             0x06
+
+UINT8 m_MlDsa87_Oid[] = {
+  /* 2.16.840.1.101.3.4.3.19 */
+  0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x13
+};
+UINT8 m_MlDsa87_OidSize = sizeof (m_MlDsa87_Oid);
+
 /**
   Construct a X509 object from DER-encoded certificate data.
 
@@ -877,6 +885,45 @@ X509GetTBSCert (
 }
 
 /**
+  Performs a constant-time comparison of two memory buffers.
+
+  This function compares two memory buffers in constant time to prevent
+  timing-based side-channel attacks. It is typically used for comparing
+  sensitive data such as cryptographic keys, MACs, or OIDs where timing
+  variations could leak information about the data being compared.
+
+  @param[in]  DestinationBuffer  Pointer to the first buffer to compare.
+  @param[in]  SourceBuffer       Pointer to the second buffer to compare.
+  @param[in]  Length             Number of bytes to compare.
+
+  @retval TRUE   The two buffers are identical.
+  @retval FALSE  The two buffers differ in at least one byte.
+
+**/
+BOOLEAN
+EFIAPI
+ConstTimeIsMemEqual (
+  IN  CONST VOID   *DestinationBuffer,
+  IN  CONST VOID   *SourceBuffer,
+  IN  UINTN        Length
+  )
+{
+  CONST volatile UINT8  *PointerDst;
+  CONST volatile UINT8  *PointerSrc;
+  UINTN Delta;
+
+  PointerDst = (CONST UINT8 *)DestinationBuffer;
+  PointerSrc = (CONST UINT8 *)SourceBuffer;
+  Delta = 0;
+
+  while ((Length-- != 0)) {
+    Delta |= *(PointerDst++) ^ *(PointerSrc++);
+  }
+
+  return ((Delta == 0) ? TRUE : FALSE);
+}
+
+/**
   Retrieve the EC Public Key from one DER-encoded X509 certificate.
 
   @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
@@ -1074,6 +1121,134 @@ _Exit:
   }
 
   return Status;
+}
+
+BOOLEAN
+EFIAPI
+MlDsaGetPublicKeyFromX509 (
+    IN   CONST UINT8  *Cert,
+    IN   UINTN        CertSize,
+    OUT  VOID         **MlDsaContext
+  )
+{
+  UINTN       KeySize;
+  UINTN       ObjectLen;
+  UINTN       Nid;
+  UINT8       *KeyData;
+  UINT8       *Ptr;
+  UINT8       *End;
+  BOOLEAN     Result;
+
+  if ((Cert == NULL) || (MlDsaContext == NULL)) {
+    return FALSE;
+  }
+
+  Ptr = (UINT8 *)(UINTN) Cert;
+  ObjectLen = 0;
+  End = Ptr + CertSize;
+
+  // Certificate SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+
+  // Data SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+
+  // Version count
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_CONTEXT_SPECIFIC | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Serial Number INTEGER
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_INTEGER);
+  if (!Result) {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Signature Algorithm SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Issuer SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Validity SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Subject SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Subject Public Key Info SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+
+  // Public Key Algorithm SEQUENCE
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_SEQUENCE | V_ASN1_CONSTRUCTED);
+  if (!Result) {
+    return FALSE;
+  }
+
+  // OID
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, CRYPTO_ASN1_OID);
+  if (!Result) {
+    return FALSE;
+  }
+
+  if ((ObjectLen == m_MlDsa87_OidSize) && (ConstTimeIsMemEqual (Ptr, m_MlDsa87_Oid, ObjectLen))) {
+    Nid = CRYPTO_NID_ML_DSA_87;
+    KeySize = 2592;
+  } else {
+    return FALSE;
+  }
+  Ptr += ObjectLen;
+
+  // Public Key BIT STRING
+  Result = Asn1GetTag (&Ptr, End, &ObjectLen, V_ASN1_BIT_STRING);
+  if (!Result) {
+    return FALSE;
+  }
+
+  if (ObjectLen == KeySize) {
+    KeyData = Ptr;
+  } else if ((ObjectLen == KeySize + 1) && (*Ptr == 0)) {
+    KeyData = Ptr + 1;
+  } else {
+    return FALSE;
+  }
+
+  *MlDsaContext = MlDsaNewByNid (Nid);
+
+  Result = MlDsaSetPubKey (*MlDsaContext, KeyData, KeySize);
+  if (!Result) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**
