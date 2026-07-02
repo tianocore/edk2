@@ -1,0 +1,31 @@
+## @file
+#  Helper Library for mapping the memory regions.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = MemoryMapLib
+  FILE_GUID                      = 65d2e4bd-7e64-4c5a-888e-eb0e5337033a
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryMapLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+
+[Sources]
+  MemoryMapLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib

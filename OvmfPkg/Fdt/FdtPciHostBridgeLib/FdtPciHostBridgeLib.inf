@@ -29,8 +29,8 @@
   BaseMemoryLib
   DebugLib
   DevicePathLib
-  DxeServicesTableLib
   MemoryAllocationLib
+  MemoryMapLib
   PciHostBridgeUtilityLib
   PciPcdProducerLib
 

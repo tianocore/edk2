@@ -20,6 +20,12 @@ ASM_FUNC(_ModuleEntryPoint)
 0:mov   x28, x0             // preserve DTB pointer
   mov   x27, x1             // preserve base of image pointer
 
+  // The TPIDR_EL0 register is used to store the HobList pointer.
+  // The register value is unknown at reset, so clear the register
+  // to prevent early callers of GetHobList(), i.e. before the HOB list
+  // has been setup in PrePiMain() from getting an invalid value.
+  msr   tpidr_el0, xzr
+
   // Enable Floating Point. This needs to be done before entering C code, which
   // may use FP/SIMD registers.
   bl    ArmEnableVFP

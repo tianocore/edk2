@@ -183,6 +183,10 @@
   #
   HobPrintLib|Include/Library/HobPrintLib.h
 
+  ##  @libraryclass   Provides helper interface for mapping memory regions.
+  #
+  MemoryMapLib|Include/Library/MemoryMapLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
