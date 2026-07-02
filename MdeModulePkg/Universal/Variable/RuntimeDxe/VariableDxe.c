@@ -568,7 +568,12 @@ ProtocolIsVariablePolicyEnabled (
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
 
-  @retval EFI_SUCCESS       Variable service successfully initialized.
+  @retval EFI_SUCCESS           Variable service successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES  Insufficient memory to allocate variable
+                                storage or event/protocol resources.
+  @retval EFI_VOLUME_CORRUPTED  The non-volatile variable store is corrupted.
+  @retval Others                An error from protocol installation, event
+                                creation, or variable policy initialization.
 
 **/
 EFI_STATUS
@@ -581,9 +586,40 @@ VariableServiceInitialize (
   EFI_STATUS  Status;
   EFI_EVENT   ReadyToBootEvent;
   EFI_EVENT   EndOfDxeEvent;
+  EFI_EVENT   FtwNotifyEvent;
+  BOOLEAN     VariableLockProtocolInstalled;
+  BOOLEAN     VarCheckProtocolInstalled;
+  BOOLEAN     RuntimeServicesUpdated;
+  BOOLEAN     VariableArchProtocolInstalled;
+  BOOLEAN     FtwNotifyRegistered;
+  BOOLEAN     VirtualAddressChangeRegistered;
+  BOOLEAN     ReadyToBootEventCreated;
+  BOOLEAN     EndOfDxeEventCreated;
+  BOOLEAN     VariablePolicyLibInitialized;
+
+  ReadyToBootEvent               = NULL;
+  EndOfDxeEvent                  = NULL;
+  FtwNotifyEvent                 = NULL;
+  VariableLockProtocolInstalled  = FALSE;
+  VarCheckProtocolInstalled      = FALSE;
+  RuntimeServicesUpdated         = FALSE;
+  VariableArchProtocolInstalled  = FALSE;
+  FtwNotifyRegistered            = FALSE;
+  VirtualAddressChangeRegistered = FALSE;
+  ReadyToBootEventCreated        = FALSE;
+  EndOfDxeEventCreated           = FALSE;
+  VariablePolicyLibInitialized   = FALSE;
 
   Status = VariableCommonInitialize ();
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: VariableCommonInitialize failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,
@@ -591,7 +627,17 @@ VariableServiceInitialize (
                   &mVariableLock,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Installing gEdkiiVariableLockProtocolGuid failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  VariableLockProtocolInstalled = TRUE;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,
@@ -599,12 +645,23 @@ VariableServiceInitialize (
                   &mVarCheck,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Installing gEdkiiVarCheckProtocolGuid failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  VarCheckProtocolInstalled = TRUE;
 
   SystemTable->RuntimeServices->GetVariable         = VariableServiceGetVariable;
   SystemTable->RuntimeServices->GetNextVariableName = VariableServiceGetNextVariableName;
   SystemTable->RuntimeServices->SetVariable         = VariableServiceSetVariable;
   SystemTable->RuntimeServices->QueryVariableInfo   = VariableServiceQueryVariableInfo;
+  RuntimeServicesUpdated                            = TRUE;
 
   //
   // Now install the Variable Runtime Architectural protocol on a new handle.
@@ -615,19 +672,40 @@ VariableServiceInitialize (
                   EFI_NATIVE_INTERFACE,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Installing gEfiVariableArchProtocolGuid failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  VariableArchProtocolInstalled = TRUE;
 
   if (!PcdGetBool (PcdEmuVariableNvModeEnable)) {
     //
     // Register FtwNotificationEvent () notify function.
     //
-    EfiCreateProtocolNotifyEvent (
-      &gEfiFaultTolerantWriteProtocolGuid,
-      TPL_CALLBACK,
-      FtwNotificationEvent,
-      (VOID *)SystemTable,
-      &mFtwRegistration
-      );
+    FtwNotifyEvent = EfiCreateProtocolNotifyEvent (
+                       &gEfiFaultTolerantWriteProtocolGuid,
+                       TPL_CALLBACK,
+                       FtwNotificationEvent,
+                       (VOID *)SystemTable,
+                       &mFtwRegistration
+                       );
+    if (FtwNotifyEvent == NULL) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: EfiCreateProtocolNotifyEvent for FTW failed. Aborting variable init.\n",
+        __func__
+        ));
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ErrorExit;
+    }
+
+    FtwNotifyRegistered = TRUE;
   } else {
     //
     // Emulated non-volatile variable mode does not depend on FVB and FTW.
@@ -643,7 +721,17 @@ VariableServiceInitialize (
                   &gEfiEventVirtualAddressChangeGuid,
                   &mVirtualAddressChangeEvent
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: CreateEventEx for VirtualAddressChange failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  VirtualAddressChangeRegistered = TRUE;
 
   //
   // Register the event handling function to reclaim variable for OS usage.
@@ -654,7 +742,17 @@ VariableServiceInitialize (
              NULL,
              &ReadyToBootEvent
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: EfiCreateEventReadyToBootEx failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  ReadyToBootEventCreated = TRUE;
 
   //
   // Register the event handling function to set the End Of DXE flag.
@@ -667,20 +765,119 @@ VariableServiceInitialize (
                   &gEfiEndOfDxeEventGroupGuid,
                   &EndOfDxeEvent
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: CreateEventEx for EndOfDxe failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  EndOfDxeEventCreated = TRUE;
 
   // Register and initialize the VariablePolicy engine.
   Status = InitVariablePolicyLib (VariableServiceGetVariable);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: InitVariablePolicyLib failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  VariablePolicyLibInitialized = TRUE;
+
   Status = VarCheckRegisterSetVariableCheckHandler (ValidateSetVariable);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: VarCheckRegisterSetVariableCheckHandler failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,
                   &gEdkiiVariablePolicyProtocolGuid,
                   &mVariablePolicyProtocol,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Installing gEdkiiVariablePolicyProtocolGuid failed - %r. Aborting variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
 
   return EFI_SUCCESS;
+
+ErrorExit:
+  if (EndOfDxeEventCreated) {
+    gBS->CloseEvent (EndOfDxeEvent);
+  }
+
+  if (ReadyToBootEventCreated) {
+    gBS->CloseEvent (ReadyToBootEvent);
+  }
+
+  if (VirtualAddressChangeRegistered) {
+    gBS->CloseEvent (mVirtualAddressChangeEvent);
+    mVirtualAddressChangeEvent = NULL;
+  }
+
+  if (FtwNotifyRegistered) {
+    gBS->CloseEvent (FtwNotifyEvent);
+    mFtwRegistration = NULL;
+  }
+
+  if (VariableArchProtocolInstalled) {
+    gBS->UninstallProtocolInterface (
+           mHandle,
+           &gEfiVariableArchProtocolGuid,
+           NULL
+           );
+  }
+
+  if (RuntimeServicesUpdated) {
+    SystemTable->RuntimeServices->GetVariable         = NULL;
+    SystemTable->RuntimeServices->GetNextVariableName = NULL;
+    SystemTable->RuntimeServices->SetVariable         = NULL;
+    SystemTable->RuntimeServices->QueryVariableInfo   = NULL;
+  }
+
+  if (VarCheckProtocolInstalled) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           mHandle,
+           &gEdkiiVarCheckProtocolGuid,
+           &mVarCheck,
+           NULL
+           );
+  }
+
+  if (VariableLockProtocolInstalled) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           mHandle,
+           &gEdkiiVariableLockProtocolGuid,
+           &mVariableLock,
+           NULL
+           );
+  }
+
+  if (VariablePolicyLibInitialized) {
+    DeinitVariablePolicyLib ();
+  }
+
+  VariableCommonUninitialize ();
+
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }
