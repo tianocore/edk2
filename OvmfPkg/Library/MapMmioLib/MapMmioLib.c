@@ -14,6 +14,9 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+STATIC EFI_EVENT  mExitBootServicesEvent;
+STATIC BOOLEAN    mAtRuntime = FALSE;
+
 /**
   Ensure a range is present in the GCD memory space map as MMIO.
 
@@ -146,6 +149,7 @@ AddMmioMemorySpace (
                                  descriptor, or an MMIO descriptor without the
                                  requested attributes.
   @retval EFI_ABORTED            An existing GCD descriptor is malformed.
+  @retval EFI_ACCESS_DENIED      DXE Services are no longer available.
   @retval Others                 The GCD memory services returned an error.
 **/
 EFI_STATUS
@@ -158,6 +162,13 @@ MapMmioMemory (
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  RegionEnd;
+
+  if (mAtRuntime) {
+    //
+    // DXE Services are no longer available.
+    //
+    return EFI_ACCESS_DENIED;
+  }
 
   DEBUG ((
     DEBUG_INFO,
@@ -197,4 +208,74 @@ MapMmioMemory (
   }
 
   return gDS->SetMemorySpaceAttributes (Base, Length, Attributes);
+}
+
+/**
+  Notification function signaled when ExitBootServices() is called.
+
+  Record that DXE services are no longer available. MapMmioMemory() uses this
+  state to reject calls after ExitBootServices().
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  Pointer to the notification function's context.
+**/
+STATIC
+VOID
+EFIAPI
+MapMmioLibExitBootServicesNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  mAtRuntime = TRUE;
+}
+
+/**
+  Library instance destructor.
+
+  Close the ExitBootServices event created by the constructor.
+
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS  The ExitBootServices event was closed.
+  @retval Others       Failed to close the ExitBootServices event.
+**/
+EFI_STATUS
+EFIAPI
+MapMmioLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return gBS->CloseEvent (mExitBootServicesEvent);
+}
+
+/**
+  Library instance constructor.
+
+  Register for ExitBootServices() notification so MapMmioLib can detect when
+  DXE services are no longer available.
+
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS  The ExitBootServices event was registered.
+  @retval Others       Failed to register the ExitBootServices event.
+**/
+EFI_STATUS
+EFIAPI
+MapMmioLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return gBS->CreateEventEx (
+                EVT_NOTIFY_SIGNAL,
+                TPL_CALLBACK,
+                MapMmioLibExitBootServicesNotify,
+                NULL,
+                &gEfiEventExitBootServicesGuid,
+                &mExitBootServicesEvent
+                );
 }

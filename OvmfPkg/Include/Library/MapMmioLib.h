@@ -38,6 +38,7 @@
                                   descriptor, or an MMIO descriptor without the
                                   requested attributes.
   @retval EFI_ABORTED            An existing GCD descriptor is malformed.
+  @retval EFI_ACCESS_DENIED      DXE Services are no longer available.
   @retval Others                 The GCD memory services returned an error.
 **/
 EFI_STATUS
