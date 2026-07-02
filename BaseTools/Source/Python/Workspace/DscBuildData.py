@@ -789,7 +789,7 @@ class DscBuildData(PlatformBuildClassObject):
             for Type in [MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, \
                          MODEL_PCD_FEATURE_FLAG, MODEL_PCD_DYNAMIC, MODEL_PCD_DYNAMIC_EX]:
                 RecordList = self._RawData[Type, self._Arch, None, ModuleId]
-                for TokenSpaceGuid, PcdCName, Setting, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5 in RecordList:
+                for TokenSpaceGuid, PcdCName, Setting, Arch, Platform, DefaultStore, RecordId, LineNo in RecordList:
                     TokenList = GetSplitValueList(Setting)
                     DefaultValue = TokenList[0]
                     # the format is PcdName| Value | VOID* | MaxDatumSize
@@ -802,7 +802,7 @@ class DscBuildData(PlatformBuildClassObject):
                     TCName,PCName,DimensionAttr,Field = self.ParsePcdNameStruct(TokenSpaceGuid, PcdCName)
 
                     if ("." in TokenSpaceGuid or "[" in PcdCName):
-                        S_PcdSet.append([ TCName,PCName,DimensionAttr,Field, ModuleBuildData.Guid, "", Dummy5, AnalyzePcdExpression(Setting)[0]])
+                        S_PcdSet.append([ TCName,PCName,DimensionAttr,Field, ModuleBuildData.Guid, "", LineNo, AnalyzePcdExpression(Setting)[0]])
                         DefaultValue = ''
                     if ( PCName,TCName) not in Module.Pcds:
                         Pcd = PcdClassObject(
@@ -822,10 +822,10 @@ class DscBuildData(PlatformBuildClassObject):
             Module.StrPcdSet = S_PcdSet
             for TCName,PCName, _,_,_,_,_,_ in S_PcdSet:
                 if (PCName,TCName) in Module.Pcds:
-                    Module.StrPcdOverallValue[(PCName,TCName)] = Module.Pcds[(PCName,TCName)].DefaultValue, self.MetaFile,Dummy5
+                    Module.StrPcdOverallValue[(PCName,TCName)] = Module.Pcds[(PCName,TCName)].DefaultValue, self.MetaFile,LineNo
             # get module private build options
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, None, ModuleId]
-            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5 in RecordList:
+            for ToolChainFamily, ToolChain, Option, Arch, Platform, DefaultStore, RecordId, LineNo in RecordList:
                 if (ToolChainFamily, ToolChain) not in Module.BuildOptions:
                     Module.BuildOptions[ToolChainFamily, ToolChain] = Option
                 else:
@@ -1235,29 +1235,55 @@ class DscBuildData(PlatformBuildClassObject):
             self.RecoverCommandLinePcd()
         return self._Pcds
 
-    ## Retrieve [BuildOptions]
+    ## Retrieve [BuildOptions] grouped by originating source section
+    #
+    #  Each [BuildOptions] section from the DSC and its !include files is
+    #  kept separate so that BUILDRULEFAMILY vs FAMILY matching can be
+    #  applied independently per section.
+    #
+    #  @retval list     A list of OrderedDicts, each keyed by
+    #                   (ToolChainFamily, ToolChain, CodeBase)
+    #
     @property
     def BuildOptions(self):
         if self._BuildOptions is None:
-            self._BuildOptions = OrderedDict()
-            #
-            # Retrieve build option for EDKII and EDK style module
-            #
+            # Build a mapping from record ID to a section key that uniquely
+            # identifies which [BuildOptions] section each record belongs to.
+            # FromItem alone only distinguishes different files; two
+            # [BuildOptions] sections in the same file share the same
+            # FromItem.  By also tracking the StartLine of the most recent
+            # [BuildOptions] section header per FromItem, we can distinguish
+            # multiple sections within one file.
+            SectionKeyMap = {}
+            CurrentSectionForFile = {}
+            for Row in self._RawData._Table.CurrentContent:
+                if Row[0] < 0 or Row[-1] < 0:
+                    continue
+                FromItem = Row[9]
+                if Row[1] == MODEL_META_DATA_SECTION_HEADER:
+                    CurrentSectionForFile[FromItem] = (FromItem, Row[10])
+                elif Row[1] == MODEL_META_DATA_BUILD_OPTION:
+                    SectionKeyMap[Row[0]] = CurrentSectionForFile.get(FromItem, (FromItem, -1))
+
+            Groups = OrderedDict()
             for CodeBase in (EDKII_NAME, EDK_NAME):
                 RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, CodeBase]
-                for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5 in RecordList:
-                    if Dummy3.upper() != TAB_COMMON:
+                for ToolChainFamily, ToolChain, Option, Arch, Platform, DefaultStore, RecordId, LineNo in RecordList:
+                    if DefaultStore.upper() != TAB_COMMON:
                         continue
+                    SectionKey = SectionKeyMap.get(RecordId, (-1, -1))
+                    if SectionKey not in Groups:
+                        Groups[SectionKey] = OrderedDict()
+                    Group = Groups[SectionKey]
                     CurKey = (ToolChainFamily, ToolChain, CodeBase)
-                    #
-                    # Only flags can be appended
-                    #
-                    if CurKey not in self._BuildOptions or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
-                        self._BuildOptions[CurKey] = Option
+                    if CurKey not in Group or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
+                        Group[CurKey] = Option
                     else:
-                        if ' ' + Option not in self._BuildOptions[CurKey]:
-                            self._BuildOptions[CurKey] += ' ' + Option
+                        if ' ' + Option not in Group[CurKey]:
+                            Group[CurKey] += ' ' + Option
+            self._BuildOptions = list(Groups.values())
         return self._BuildOptions
+
     def GetBuildOptionsByModuleType(self, Edk, ModuleType):
         if self._ModuleTypeOptions is None:
             self._ModuleTypeOptions = OrderedDict()
@@ -1267,8 +1293,8 @@ class DscBuildData(PlatformBuildClassObject):
             DriverType = '%s.%s' % (Edk, ModuleType)
             CommonDriverType = '%s.%s' % (TAB_COMMON, ModuleType)
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch]
-            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5 in RecordList:
-                Type = Dummy2 + '.' + Dummy3
+            for ToolChainFamily, ToolChain, Option, Arch, Platform, DefaultStore, RecordId, LineNo in RecordList:
+                Type = Platform + '.' + DefaultStore
                 if Type.upper() == DriverType.upper() or Type.upper() == CommonDriverType.upper():
                     Key = (ToolChainFamily, ToolChain, Edk)
                     if Key not in options or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
@@ -2755,27 +2781,28 @@ class DscBuildData(PlatformBuildClassObject):
         if sys.platform == "win32" and not self._MingwBaseToolsBuild:
             CC_FLAGS = WindowsCFLAGS
         BuildOptions = OrderedDict()
-        for Options in self.BuildOptions:
-            if Options[2] != EDKII_NAME:
-                continue
-            Family = Options[0]
-            if Family and Family != self.ToolChainFamily:
-                continue
-            Target, Tag, Arch, Tool, Attr = Options[1].split("_")
-            if Tool != 'CC':
-                continue
-            if Attr != "FLAGS":
-                continue
-            if Target == TAB_STAR or Target == self._Target:
-                if Tag == TAB_STAR or Tag == self._Toolchain:
-                    if 'COMMON' not in BuildOptions:
-                        BuildOptions['COMMON'] = set()
-                    if Arch == TAB_STAR:
-                        BuildOptions['COMMON']|= self.ParseCCFlags(self.BuildOptions[Options])
-                    if Arch in self.SupArchList:
-                        if Arch not in BuildOptions:
-                            BuildOptions[Arch] = set()
-                        BuildOptions[Arch] |= self.ParseCCFlags(self.BuildOptions[Options])
+        for Group in self.BuildOptions:
+            for Options in Group:
+                if Options[2] != EDKII_NAME:
+                    continue
+                Family = Options[0]
+                if Family and Family != self.ToolChainFamily:
+                    continue
+                Target, Tag, Arch, Tool, Attr = Options[1].split("_")
+                if Tool != 'CC':
+                    continue
+                if Attr != "FLAGS":
+                    continue
+                if Target == TAB_STAR or Target == self._Target:
+                    if Tag == TAB_STAR or Tag == self._Toolchain:
+                        if 'COMMON' not in BuildOptions:
+                            BuildOptions['COMMON'] = set()
+                        if Arch == TAB_STAR:
+                            BuildOptions['COMMON']|= self.ParseCCFlags(Group[Options])
+                        if Arch in self.SupArchList:
+                            if Arch not in BuildOptions:
+                                BuildOptions[Arch] = set()
+                            BuildOptions[Arch] |= self.ParseCCFlags(Group[Options])
 
         if BuildOptions:
             ArchBuildOptions = {arch:flags for arch,flags in BuildOptions.items() if arch != 'COMMON'}
