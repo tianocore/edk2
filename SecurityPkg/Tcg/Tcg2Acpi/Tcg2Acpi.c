@@ -74,38 +74,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define MAX_PRS_INT_BUF_SIZE  (15*4)
 
-#pragma pack(1)
-
-typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER    Header;
-  // Flags field is replaced in version 4 and above
-  //    BIT0~15:  PlatformClass      This field is only valid for version 4 and above
-  //    BIT16~31: Reserved
-  UINT32                         Flags;
-  UINT64                         AddressOfControlArea;
-  UINT32                         StartMethod;
-  UINT8                          PlatformSpecificParameters[12]; // size up to 12
-  UINT32                         Laml;                           // Optional
-  UINT64                         Lasa;                           // Optional
-} EFI_TPM2_ACPI_TABLE_V4;
-
-#pragma pack()
-
-EFI_TPM2_ACPI_TABLE_V4  mTpm2AcpiTemplate = {
-  {
-    EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,
-    sizeof (mTpm2AcpiTemplate),
-    EFI_TPM2_ACPI_TABLE_REVISION,
-    //
-    // Compiler initializes the remaining bytes to 0
-    // These fields should be filled in in production
-    //
-  },
-  0, // BIT0~15:  PlatformClass
-     // BIT16~31: Reserved
-  0,                                    // Control Area
-  EFI_TPM2_ACPI_TABLE_START_METHOD_TIS, // StartMethod
-};
+EFI_TPM2_ACPI_TABLE_TEMPLATE  mTpm2AcpiTemplate;
 
 TCG_NVS  *mTcgNvs;
 
@@ -786,6 +755,8 @@ PublishTpm2 (
   UINT64                      OemTableId;
   EFI_TPM2_ACPI_CONTROL_AREA  *ControlArea;
   TPM2_PTP_INTERFACE_TYPE     InterfaceType;
+  EFI_TPM2_ACPI_TABLE_V4      *Tpm2AcpiTableV4;
+  EFI_TPM2_ACPI_TABLE_V5      *Tpm2AcpiTableV5;
 
   //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA.
@@ -799,10 +770,11 @@ PublishTpm2 (
     EV_POSTCODE_INFO_ACPI_DATA,
     ACPI_DATA_LEN,
     &mTpm2AcpiTemplate,
-    mTpm2AcpiTemplate.Header.Length
+    sizeof (EFI_TPM2_ACPI_TABLE_TEMPLATE)
     );
 
-  mTpm2AcpiTemplate.Header.Revision = PcdGet8 (PcdTpm2AcpiTableRev);
+  mTpm2AcpiTemplate.Header.Signature = EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE;
+  mTpm2AcpiTemplate.Header.Revision  = PcdGet8 (PcdTpm2AcpiTableRev);
   DEBUG ((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", mTpm2AcpiTemplate.Header.Revision));
 
   //
@@ -815,16 +787,45 @@ PublishTpm2 (
     DEBUG ((DEBUG_INFO, "Tpm2 ACPI table PlatformClass is %d\n", (mTpm2AcpiTemplate.Flags & 0x0000FFFF)));
   }
 
-  mTpm2AcpiTemplate.Laml = PcdGet32 (PcdTpm2AcpiTableLaml);
-  mTpm2AcpiTemplate.Lasa = PcdGet64 (PcdTpm2AcpiTableLasa);
-  if ((mTpm2AcpiTemplate.Header.Revision < EFI_TPM2_ACPI_TABLE_REVISION_4) ||
-      (mTpm2AcpiTemplate.Laml == 0) || (mTpm2AcpiTemplate.Lasa == 0))
-  {
-    //
-    // If version is smaller than 4 or Laml/Lasa is not valid, rollback to original Length.
-    //
-    mTpm2AcpiTemplate.Header.Length = sizeof (EFI_TPM2_ACPI_TABLE);
+  switch (mTpm2AcpiTemplate.Header.Revision) {
+    case EFI_TPM2_ACPI_TABLE_REVISION_3:
+      mTpm2AcpiTemplate.Header.Length = sizeof (EFI_TPM2_ACPI_TABLE);
+      break;
+
+    case EFI_TPM2_ACPI_TABLE_REVISION_4:
+      mTpm2AcpiTemplate.Header.Length = sizeof (EFI_TPM2_ACPI_TABLE_V4);
+      Tpm2AcpiTableV4                 = (EFI_TPM2_ACPI_TABLE_V4 *)&mTpm2AcpiTemplate;
+      Tpm2AcpiTableV4->Laml           = PcdGet32 (PcdTpm2AcpiTableLaml);
+      Tpm2AcpiTableV4->Lasa           = PcdGet64 (PcdTpm2AcpiTableLasa);
+
+      if ((Tpm2AcpiTableV4->Laml == 0) || (Tpm2AcpiTableV4->Lasa == 0)) {
+        // Remove LAML/LASA from the length if either is 0.
+        mTpm2AcpiTemplate.Header.Length -= (sizeof (UINT32) + sizeof (UINT64));
+      }
+
+      break;
+
+    case EFI_TPM2_ACPI_TABLE_REVISION_5:
+      mTpm2AcpiTemplate.Header.Length = sizeof (EFI_TPM2_ACPI_TABLE_V5);
+      Tpm2AcpiTableV5                 = (EFI_TPM2_ACPI_TABLE_V5 *)&mTpm2AcpiTemplate;
+      Tpm2AcpiTableV5->Laml           = PcdGet32 (PcdTpm2AcpiTableLaml);
+      Tpm2AcpiTableV5->Lasa           = PcdGet64 (PcdTpm2AcpiTableLasa);
+
+      if ((Tpm2AcpiTableV5->Laml == 0) || (Tpm2AcpiTableV5->Lasa == 0)) {
+        // Remove LAML/LASA from the length if either is 0.
+        mTpm2AcpiTemplate.Header.Length -= (sizeof (UINT32) + sizeof (UINT64));
+      }
+
+      break;
+
+    default:
+      mTpm2AcpiTemplate.Header.Length = sizeof (EFI_TPM2_ACPI_TABLE_TEMPLATE);
+      DEBUG ((DEBUG_ERROR, "TPM2 revision get error! %d\n", mTpm2AcpiTemplate.Header.Revision));
+      ASSERT (FALSE);
+      break;
   }
+
+  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table size %d\n", mTpm2AcpiTemplate.Header.Length));
 
   InterfaceType = PcdGet8 (PcdActiveTpmInterfaceType);
   switch (InterfaceType) {
@@ -839,9 +840,11 @@ PublishTpm2 (
       break;
     case Tpm2PtpInterfaceFifo:
     case Tpm2PtpInterfaceTis:
+      mTpm2AcpiTemplate.StartMethod = EFI_TPM2_ACPI_TABLE_START_METHOD_TIS;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "TPM2 InterfaceType get error! %d\n", InterfaceType));
+      ASSERT (FALSE);
       break;
   }
 

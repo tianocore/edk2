@@ -164,6 +164,10 @@
   ## Include/Guid/TcgEventHob.h
   gTcg800155PlatformIdEventHobGuid   = { 0xe2c3bc69, 0x615c, 0x4b5b, { 0x8e, 0x5c, 0xa0, 0x33, 0xa9, 0xc2, 0x5e, 0xd6 }}
 
+  ## GUID used to signal dynamic scaling of the TCG event log.
+  ## Include/Guid/Tcg2EventLogScaled.h
+  gTcg2EventLogScaledGuid            = { 0x9b4f7c2a, 0x1d3e, 0x4a8b, { 0x9c, 0x6f, 0x5e, 0x8d, 0x2a, 0x1b, 0x4c, 0x7f }}
+
   ## HOB GUID used to pass all PEI measured FV info to DXE Driver.
   #  Include/Guid/MeasuredFvHob.h
   gMeasuredFvHobGuid                 = { 0xb2360b42, 0x7173, 0x420a, { 0x86, 0x96, 0x46, 0xca, 0x6b, 0xab, 0x10, 0x60 }}
@@ -254,6 +258,12 @@
   ## TPM Service over FF-A
   #  Include/Guid/Tpm2ServiceFfa.h
   gTpm2ServiceFfaGuid = { 0x17b862a4, 0x1806, 0x4faf, { 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 } }
+
+[Protocols]
+  ## Protocol used to test dynamic TCG log scaling functionality. This is a private protocol with visibility to
+  ## only the TestApp and DXE driver.
+  # Tcg/TcgLogTest/TcgLogTest.h
+  gTcgLogTestProtocolGuid            = {0xa3c12f80, 0x7d9e, 0x4b5a, { 0x91, 0xe4, 0x6c, 0xf8, 0x2d, 0xa1, 0xb7, 0x03 }}
 
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
