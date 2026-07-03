@@ -2541,10 +2541,9 @@ ScsiDiskDetectMedia (
   //
   // Get FUA Mode
   //
-  for (Retry = 0; Retry < MaxRetry; Retry++) {
-    if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
-      Status = ScsiDiskFuaMode (ScsiDiskDevice);
-      if (!EFI_ERROR (Status)) {
+  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+    for (Retry = 0; Retry < MaxRetry; Retry++) {
+      if (!EFI_ERROR (ScsiDiskFuaMode (ScsiDiskDevice))) {
         break;
       }
     }
