@@ -211,7 +211,9 @@ PciGetPciRom (
   AllOnes &= 0xFFFFF800;
   if ((AllOnes == 0) || (AllOnes == 0xFFFFF800)) {
     DEBUG ((DEBUG_VERBOSE, "%a: No Option ROM found\n", __func__));
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    RomBar = Buffer;
+    goto RestoreBar;
   }
 
   *RomSize = (~AllOnes) + 1;
@@ -248,6 +250,7 @@ PciGetPciRom (
   FirstCheck        = TRUE;
   LegacyImageLength = 0;
   RomImageSize      = 0;
+  CodeType          = 0;
 
   //
   // Expect to find a PCI ROM header at offset 0.
