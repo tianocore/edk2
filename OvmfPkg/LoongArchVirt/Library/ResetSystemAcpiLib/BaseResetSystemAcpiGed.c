@@ -10,6 +10,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <IndustryStandard/Acpi.h>
 #include "ResetSystemAcpiGed.h"
 
 /**
@@ -130,10 +131,9 @@ Done:
   @retval EFI_NOT_FOUND   Failed to initialize mPowerManager.
 **/
 EFI_STATUS
-EFI_API
+EFIAPI
 ResetSystemLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+  VOID
   )
 {
   EFI_STATUS  Status;

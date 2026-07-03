@@ -3069,6 +3069,37 @@ typedef struct {
 #define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_POWER_LOSS        0x24
 #define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_POWER_BUTTON      0x25
 
+///
+/// Confidential Computing Type definitions.
+///
+#define EFI_ACPI_6_5_CC_TYPE_NONE    0
+#define EFI_ACPI_6_5_CC_TYPE_SEV     1
+#define EFI_ACPI_6_5_CC_TYPE_TDX     2
+#define EFI_ACPI_6_5_CC_TYPE_APTEE   3
+#define EFI_ACPI_6_5_CC_TYPE_ARMCCA  4
+
+///
+/// Confidential Computing Event Log ACPI Table (CCEL).
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  /// Confidential Computing (CC) type.
+  UINT8                          Type;
+  /// Confidential Computing (CC) sub type.
+  UINT8                          SubType;
+  /// Reserved.
+  UINT16                         Reserved;
+  /// Log Area Minimum Length.
+  UINT64                         Laml;
+  /// Log Area Start Address.
+  UINT64                         Lasa;
+} EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE;
+
+///
+/// CCEL Revision (as defined in ACPI 6.5 spec.)
+///
+#define EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_REVISION  0x01
+
 //
 // Known table signatures
 //
@@ -3097,6 +3128,11 @@ typedef struct {
 /// "BGRT" Boot Graphics Resource Table
 ///
 #define EFI_ACPI_6_5_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE  SIGNATURE_32('B', 'G', 'R', 'T')
+
+///
+/// "CCEL" Confidential Compute Event Log Table
+///
+#define EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
 
 ///
 /// "CDIT" Component Distance Information Table

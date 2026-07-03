@@ -10,12 +10,14 @@
   capability.
 
 Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #pragma once
 
+#include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
 
 #define EFI_CC_MEASUREMENT_PROTOCOL_GUID  \
@@ -29,16 +31,18 @@ typedef struct {
   UINT8    Minor;
 } EFI_CC_VERSION;
 
-//
-// EFI_CC Type/SubType definition
-//
-#define EFI_CC_TYPE_NONE   0
-#define EFI_CC_TYPE_SEV    1
-#define EFI_CC_TYPE_TDX    2
-#define EFI_CC_TYPE_APTEE  3
+/**
+  A structure defining the Confidential Computing (CC) type and subtype.
 
+  The Type and Subtype field values must match the definitions in the ACPI
+  specification version 6.5 or later,
+  e.g. the macros EFI_ACPI_6_5_CC_TYPE_* must be used to populate the
+  Type field.
+*/
 typedef struct {
+  /// Confidential Computing (CC) type.
   UINT8    Type;
+  /// Confidential Computing (CC) sub type.
   UINT8    SubType;
 } EFI_CC_TYPE;
 
@@ -56,8 +60,37 @@ typedef UINT32 EFI_CC_MR_INDEX;
 #define TDX_MR_INDEX_RTMR2  3
 #define TDX_MR_INDEX_RTMR3  4
 
+/**
+  Macro definitions for mapping CC Measurement indices to Arm CCA
+  Realm measurement registers.
+
+  The mapping between the TPM PCR index and the Arm CCA Realm
+  Extensible measurement as defined by the UEFI specification
+  in section 38.4.3 Arm Confidential Compute Architecture Extension.
+
+  The following table shows the TPM PCR index mapping and CC event log
+  measurement register index interpretation for Arm CCA where:
+    - RIM means Realm Initial Measurement Register and
+    - REM means Realm Extensible Measurement Register
+
+  TPM PCR Index | CC Measurement  | Arm CCA-measurement |
+                | Register Index  |  register           |
+  -------------------------------------------------------
+  0             |   0             |   RIM               |
+  1, 7          |   1             |   REM[0]            |
+  2~6           |   2             |   REM[1]            |
+  8~15          |   3             |   REM[2]            |
+*/
+#define   ARMCCA_MR_INDEX_0_RIM    0
+#define   ARMCCA_MR_INDEX_1_REM0   1
+#define   ARMCCA_MR_INDEX_2_REM1   2
+#define   ARMCCA_MR_INDEX_3_REM2   3
+#define   ARMCCA_MR_INDEX_INVALID  4
+
 #define EFI_CC_EVENT_LOG_FORMAT_TCG_2  0x00000002
+#define EFI_CC_BOOT_HASH_ALG_SHA256    0x00000002
 #define EFI_CC_BOOT_HASH_ALG_SHA384    0x00000004
+#define EFI_CC_BOOT_HASH_ALG_SHA512    0x00000008
 
 //
 // This bit is shall be set when an event shall be extended but not logged.
@@ -298,24 +331,3 @@ typedef struct {
   {0xdd4a4648, 0x2de7, 0x4665, {0x96, 0x4d, 0x21, 0xd9, 0xef, 0x5f, 0xb4, 0x46}}
 
 extern EFI_GUID  gEfiCcFinalEventsTableGuid;
-
-//
-// Define the CC Measure EventLog ACPI Table
-//
-#pragma pack(1)
-
-typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER    Header;
-  EFI_CC_TYPE                    CcType;
-  UINT16                         Rsvd;
-  UINT64                         Laml;
-  UINT64                         Lasa;
-} EFI_CC_EVENTLOG_ACPI_TABLE;
-
-#pragma pack()
-
-//
-// Define the signature and revision of CC Measurement EventLog ACPI Table
-//
-#define EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
-#define EFI_CC_EVENTLOG_ACPI_TABLE_REVISION   1
