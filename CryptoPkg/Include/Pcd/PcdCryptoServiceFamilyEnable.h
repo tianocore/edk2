@@ -441,6 +441,8 @@ typedef struct {
       UINT8    GroupSetGenerator             : 1;
       UINT8    PointMul2                     : 1;
       UINT8    PointsMul                     : 1;
+      UINT8    GetPublicKeyFromPem           : 1;
+      UINT8    PublicKeyToPEM                : 1;
     } Services;
     UINT32    Family;
   } Ec;

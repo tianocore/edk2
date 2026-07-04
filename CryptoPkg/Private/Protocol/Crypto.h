@@ -4,6 +4,7 @@
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
   (c) Copyright 2026 HP Development Company, L.P.
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -6074,6 +6075,62 @@ BOOLEAN
   );
 
 /**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted
+                           PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which
+                           contain the retrieved EC public key component.
+                           Use EcFree() function to free the resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM)(
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  );
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]      EcContext   Pointer to EC DSA context.
+  @param[out]     PemData     Pointer to the PEM-encoded key data to be
+                              retrieved.
+  @param[in, out] PemSize     On input, size of PemData in bytes.
+                              On output, size of data returned or required size.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and *PemSize is zero, then return FALSE and set
+  *PemSize to the required size of the PemData buffer.
+  If PemData is NULL and *PemSize is not zero, then return FALSE.
+  If PemData is not NULL and *PemSize is too small, then return FALSE and
+  set *PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_PUBLIC_KEY_TO_PEM)(
+  IN  VOID   *EcContext,
+  OUT UINT8  *PemData,
+  IN OUT UINTN  *PemSize
+  );
+
+/**
   Generates an EdDSA signature for a given message.
 
   This function creates an EdDSA signature using the private key stored in the
@@ -6793,6 +6850,9 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_ML_DSA_GET_PRIVATE_KEY_FROM_PEM        MlDsaGetPrivateKeyFromPem;
   EDKII_CRYPTO_ML_DSA_SIGN                            MlDsaSign;
   EDKII_CRYPTO_ML_DSA_VERIFY                          MlDsaVerify;
+  /// Ec (Continued)
+  EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM             EcGetPublicKeyFromPem;
+  EDKII_CRYPTO_EC_PUBLIC_KEY_TO_PEM                   EcPublicKeyToPEM;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

@@ -5,6 +5,7 @@
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
   (c) Copyright 2026 HP Development Company, L.P.
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -6928,6 +6929,68 @@ CryptoServiceEcPointsMul (
 }
 
 /**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted
+                           PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which
+                           contain the retrieved EC public key component.
+                           Use EcFree() function to free the resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcGetPublicKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.GetPublicKeyFromPem, EcGetPublicKeyFromPem, (PemData, PemSize, Password, EcContext), FALSE);
+}
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]      EcContext   Pointer to EC DSA context.
+  @param[out]     PemData     Pointer to the PEM-encoded key data to be
+                              retrieved.
+  @param[in, out] PemSize     On input, size of PemData in bytes.
+                              On output, size of data returned or required size.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and *PemSize is zero, then return FALSE and set
+  *PemSize to the required size of the PemData buffer.
+  If PemData is NULL and *PemSize is not zero, then return FALSE.
+  If PemData is not NULL and *PemSize is too small, then return FALSE and
+  set *PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcPublicKeyToPEM (
+  IN  VOID      *EcContext,
+  OUT UINT8     *PemData,
+  IN OUT UINTN  *PemSize
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.PublicKeyToPEM, EcPublicKeyToPEM, (EcContext, PemData, PemSize), FALSE);
+}
+
+/**
   Calculate the inverse of the supplied EC point.
 
   @param[in]     EcGroup   EC group object.
@@ -8245,4 +8308,7 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceMlDsaGetPrivateKeyFromPem,
   CryptoServiceMlDsaSign,
   CryptoServiceMlDsaVerify,
+  /// Ec (Continued)
+  CryptoServiceEcGetPublicKeyFromPem,
+  CryptoServiceEcPublicKeyToPEM,
 };
