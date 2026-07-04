@@ -365,6 +365,71 @@ TestVerifyEcDh (
 
 UNIT_TEST_STATUS
 EFIAPI
+TestVerifyEcGetCurveNid (
+  UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  VOID     *EcContext;
+  UINTN    CurveCount;
+  UINTN    Nid;
+  UINTN    PublicKeySize;
+  UINT8    PublicKey[66 * 2];
+
+  //
+  // Test if EcContext is NULL.
+  //
+  Status = EcGetCurveNid (NULL, &Nid);
+  UT_ASSERT_FALSE (Status);
+
+  for (CurveCount = 0; CurveCount < EC_CURVE_NUM_SUPPORTED; CurveCount++) {
+    //
+    // Generate an EcContext for the curve.
+    //
+    EcContext = EcNewByNid (EcCurveList[CurveCount]);
+    UT_ASSERT_NOT_NULL (EcContext);
+
+    //
+    // Test if the Nid parameter is NULL.
+    //
+    Status = EcGetCurveNid (EcContext, NULL);
+    UT_ASSERT_FALSE (Status);
+
+    //
+    // Get the Nid for the curve and compare with the EcContext Curve Nid.
+    //
+    Nid    = 0;
+    Status = EcGetCurveNid (EcContext, &Nid);
+    UT_ASSERT_TRUE (Status);
+    UT_ASSERT_EQUAL (Nid, EcCurveList[CurveCount]);
+
+    //
+    // Generate an EC key.
+    //
+    PublicKeySize = sizeof (PublicKey);
+    Status        = EcGenerateKey (EcContext, PublicKey, &PublicKeySize);
+    UT_ASSERT_TRUE (Status);
+
+    //
+    // Retrieve the Nid using the EC key context and
+    // compare with the Curve Nid.
+    //
+    Nid    = 0;
+    Status = EcGetCurveNid (EcContext, &Nid);
+    UT_ASSERT_TRUE (Status);
+    UT_ASSERT_EQUAL (Nid, EcCurveList[CurveCount]);
+
+    //
+    // Free resources.
+    //
+    EcFree (EcContext);
+  }
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
 TestVerifyEcKey (
   UNIT_TEST_CONTEXT  Context
   )
@@ -628,6 +693,7 @@ TEST_DESC  mEcTest[] = {
   //
   { "TestVerifyEcBasic()",        "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcBasic,        TestVerifyEcPreReq, TestVerifyEcCleanUp, NULL },
   { "TestVerifyEcDh()",           "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcDh,           TestVerifyEcPreReq, TestVerifyEcCleanUp, NULL },
+  { "TestVerifyEcGetCurveNid()",  "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcGetCurveNid,  NULL,               NULL,                NULL },
   { "TestVerifyEcKey()",          "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcKey,          NULL,               NULL,                NULL },
   { "TestVerifyEcPublicKeyPem()", "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcPublicKeyPem, NULL,               NULL,                NULL },
 };
