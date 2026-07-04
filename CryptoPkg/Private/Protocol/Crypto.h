@@ -22,7 +22,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  27
+#define EDKII_CRYPTO_VERSION  28
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -3431,6 +3431,85 @@ BOOLEAN
 typedef
 BOOLEAN
 (EFIAPI *EDKII_CRYPTO_HKDF_SHA_384_EXPAND)(
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_512_EXTRACT_AND_EXPAND)(
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_512_EXTRACT)(
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_512_EXPAND)(
   IN   CONST UINT8  *Prk,
   IN   UINTN        PrkSize,
   IN   CONST UINT8  *Info,
@@ -6871,6 +6950,10 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM             EcGetPublicKeyFromPem;
   EDKII_CRYPTO_EC_PUBLIC_KEY_TO_PEM                   EcPublicKeyToPEM;
   EDKII_CRYPTO_EC_GET_CURVE_NID                       EcGetCurveNid;
+  /// HKDF (continued)
+  EDKII_CRYPTO_HKDF_SHA_512_EXTRACT_AND_EXPAND        HkdfSha512ExtractAndExpand;
+  EDKII_CRYPTO_HKDF_SHA_512_EXTRACT                   HkdfSha512Extract;
+  EDKII_CRYPTO_HKDF_SHA_512_EXPAND                    HkdfSha512Expand;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

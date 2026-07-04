@@ -291,6 +291,9 @@ typedef struct {
       UINT8    Sha384ExtractAndExpand : 1;
       UINT8    Sha384Extract          : 1;
       UINT8    Sha384Expand           : 1;
+      UINT8    Sha512ExtractAndExpand : 1;
+      UINT8    Sha512Extract          : 1;
+      UINT8    Sha512Expand           : 1;
     } Services;
     UINT32    Family;
   } Hkdf;
