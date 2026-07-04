@@ -7140,6 +7140,26 @@ CryptoServiceEcFree (
 }
 
 /**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component or Nid is NULL.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.GetCurveNid, EcGetCurveNid, (EcContext, Nid), FALSE);
+}
+
+/**
   Generates EC key and returns EC public key (X, Y), Please note, this function uses
   pseudo random number generator. The caller must make sure RandomSeed()
   function was properly called before.
@@ -8311,4 +8331,5 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// Ec (Continued)
   CryptoServiceEcGetPublicKeyFromPem,
   CryptoServiceEcPublicKeyToPEM,
+  CryptoServiceEcGetCurveNid,
 };

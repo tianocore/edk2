@@ -443,6 +443,7 @@ typedef struct {
       UINT8    PointsMul                     : 1;
       UINT8    GetPublicKeyFromPem           : 1;
       UINT8    PublicKeyToPEM                : 1;
+      UINT8    GetCurveNid                   : 1;
     } Services;
     UINT32    Family;
   } Ec;

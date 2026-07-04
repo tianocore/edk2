@@ -22,7 +22,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  26
+#define EDKII_CRYPTO_VERSION  27
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -5648,6 +5648,23 @@ VOID
   );
 
 /**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component or Nid is NULL.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GET_CURVE_NID)(
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  );
+
+/**
   Generates EC key and returns EC public key (X, Y), Please note, this function uses
   pseudo random number generator. The caller must make sure RandomSeed()
   function was properly called before.
@@ -6853,6 +6870,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   /// Ec (Continued)
   EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM             EcGetPublicKeyFromPem;
   EDKII_CRYPTO_EC_PUBLIC_KEY_TO_PEM                   EcPublicKeyToPEM;
+  EDKII_CRYPTO_EC_GET_CURVE_NID                       EcGetCurveNid;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
