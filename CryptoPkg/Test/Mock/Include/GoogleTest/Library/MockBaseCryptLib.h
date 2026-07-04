@@ -1663,6 +1663,15 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
+    EcGetCurveNid,
+    (
+     IN      VOID   *EcContext,
+     OUT     UINTN  *Nid
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
     EcGenerateKey,
     (
      IN OUT  VOID   *EcContext,
