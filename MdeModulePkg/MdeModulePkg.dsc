@@ -115,6 +115,7 @@
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -127,6 +128,7 @@
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf

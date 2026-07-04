@@ -382,6 +382,28 @@ PrintFv3Hob (
   return EFI_SUCCESS;
 }
 
+/**
+  Return the human-readable name string for the given EFI_MEMORY_TYPE.
+
+  @param[in] MemoryType   The memory type value.
+
+  @return A pointer to a null-terminated ASCII string describing the memory type,
+          or "Unknown" if the type is not recognized.
+
+**/
+CONST CHAR8 *
+EFIAPI
+GetMemoryTypeName (
+  IN EFI_MEMORY_TYPE  MemoryType
+  )
+{
+  if ((UINTN)MemoryType < ARRAY_SIZE (mMemoryTypeStr)) {
+    return mMemoryTypeStr[MemoryType];
+  }
+
+  return "Unknown";
+}
+
 //
 // Mapping table from Hob type to Hob print function.
 //
