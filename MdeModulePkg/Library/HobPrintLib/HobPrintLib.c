@@ -39,7 +39,7 @@ CHAR8  *mMemoryTypeStr[] = {
   "EfiMemoryMappedIOPortSpace",
   "EfiPalCode",
   "EfiPersistentMemory",
-  "EfiMaxMemoryType"
+  "EfiUnacceptedMemoryType"
 };
 
 CHAR8  *mResource_Type_List[] = {
