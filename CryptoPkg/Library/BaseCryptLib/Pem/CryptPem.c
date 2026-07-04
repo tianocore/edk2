@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval  The number of characters in the passphrase or 0 if an error occurred.
 
 **/
+STATIC
 INTN
 PasswordCallback (
   OUT  CHAR8  *Buf,
