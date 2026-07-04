@@ -1707,6 +1707,27 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
+    EcGetPublicKeyFromPem,
+    (
+     IN   CONST UINT8  *PemData,
+     IN   UINTN        PemSize,
+     IN   CONST CHAR8  *Password,
+     OUT  VOID         **EcContext
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
+    EcPublicKeyToPEM,
+    (
+     IN      VOID   *EcContext,
+     OUT     UINT8  *PemData,
+     IN OUT  UINTN  *PemSize
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
     EcGetPublicKeyFromX509,
     (
      IN   CONST UINT8  *Cert,
