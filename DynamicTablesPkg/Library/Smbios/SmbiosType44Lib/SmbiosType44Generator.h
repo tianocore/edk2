@@ -18,6 +18,12 @@
 #define   ARM_SMBIOS_TYPE44_RECORD_UNSUPPORTED  FALSE
 #endif
 
+#if !defined (MDE_CPU_X64) && !defined (MDE_CPU_IA32)
+#define   X86_SMBIOS_TYPE44_RECORD_UNSUPPORTED  TRUE
+#else
+#define   X86_SMBIOS_TYPE44_RECORD_UNSUPPORTED  FALSE
+#endif
+
 typedef struct ArmProcessorSubDataOps     ARM_PROCESSOR_SUB_DATA_OPS;
 typedef struct ProcessorSpecificBlockOps  PROCESSOR_SPECIFIC_BLOCK_OPS;
 
