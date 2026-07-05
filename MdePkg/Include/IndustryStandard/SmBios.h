@@ -3031,6 +3031,26 @@ typedef struct X86ProcessorSpecificBlock {
 } X86_PROCESSOR_SPECIFIC_BLOCK;
 
 ///
+/// RiscV processor specific Block.
+///
+typedef struct RiscVProcessorSpecificBlock {
+  /// Revision
+  UINT16    Revision;
+
+  /// The ID of this RISC-V hart.
+  UINT64    HartId;
+
+  /// Vendor ID.
+  UINT64    VendorId;
+
+  /// Machine Architecture ID.
+  UINT64    ArchId;
+
+  /// Machine Implementation ID.
+  UINT64    ImplId;
+} RISCV_PROCESSOR_SPECIFIC_BLOCK;
+
+///
 /// Processor Additional Information(Type 44).
 ///
 /// The information in this structure defines the processor additional information in case
