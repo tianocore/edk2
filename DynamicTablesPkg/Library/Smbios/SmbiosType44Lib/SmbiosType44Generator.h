@@ -24,6 +24,12 @@
 #define   X86_SMBIOS_TYPE44_RECORD_UNSUPPORTED  FALSE
 #endif
 
+#if !defined (MDE_CPU_RISCV64)
+#define   RISCV_SMBIOS_TYPE44_RECORD_UNSUPPORTED  TRUE
+#else
+#define   RISCV_SMBIOS_TYPE44_RECORD_UNSUPPORTED  FALSE
+#endif
+
 typedef struct ArmProcessorSubDataOps     ARM_PROCESSOR_SUB_DATA_OPS;
 typedef struct ProcessorSpecificBlockOps  PROCESSOR_SPECIFIC_BLOCK_OPS;
 
