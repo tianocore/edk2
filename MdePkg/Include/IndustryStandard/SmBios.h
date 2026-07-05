@@ -3011,6 +3011,25 @@ typedef struct AArch64ProcessorSpecificSubDataArch {
   UINT64    IdAA64Zfr0;
 } AARCH64_PROCESSOR_SPECIFIC_SUB_DATA_ARCH;
 
+#define X86_PROCESSOR_BLOCK_IDENTIFIER_USE_CONDITION_DATA  (0x01)
+
+///
+/// X86 (X64) processor specific Block.
+///
+typedef struct X86ProcessorSpecificBlock {
+  /// Identifier.
+  UINT8     BlockIdentifier;
+
+  /// Length of Processor-specific Block
+  UINT8     BlockLength;
+
+  /// Revision
+  UINT16    Revision;
+
+  /// Use Condition Attributes
+  UINT32    UseConditionAttributes;
+} X86_PROCESSOR_SPECIFIC_BLOCK;
+
 ///
 /// Processor Additional Information(Type 44).
 ///
