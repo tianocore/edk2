@@ -2896,6 +2896,121 @@ typedef struct {
   ///
 } PROCESSOR_SPECIFIC_BLOCK;
 
+#define PROCESSOR_SPECIFIC_MAJOR_VERSION_SHIFT  (8)
+#define PROCESSOR_SPECIFIC_MAJOR_VERSION_MASK   (0xff00)
+#define PROCESSOR_SPECIFIC_MINOR_VERSION_SHIFT  (0)
+#define PROCESSOR_SPECIFIC_MINOR_VERSION_MASK   (0x00ff)
+#define PROCESSOR_SPECIFIC_VERSION_INFO(major, minor) \
+        ((UINT16)((((major) & ((PROCESSOR_SPECIFIC_MAJOR_VERSION_MASK >> \
+                                PROCESSOR_SPECIFIC_MAJOR_VERSION_SHIFT))) << \
+                  PROCESSOR_SPECIFIC_MAJOR_VERSION_SHIFT) | \
+                  (((minor) & PROCESSOR_SPECIFIC_MINOR_VERSION_MASK) << \
+                   PROCESSOR_SPECIFIC_MINOR_VERSION_SHIFT)))
+
+///
+/// Arm (AARCH64) processor specific Block.
+///
+typedef struct ArmProcSpecificBlock {
+  /// Revision for processor specific block
+  UINT16    Revision;
+
+  /// Length of this structure.
+  UINT8     Length;
+
+  /// Reserved;
+  UINT8     Reserved0;
+
+  /// Vendor ID.
+  UINT16    VendorId;
+
+  /// Sub type of Processor specific sub-data.
+  UINT8     SubType;
+
+  /// Reserved;
+  UINT8     Reserved1;
+
+  ///
+  /// Below followed by Arm Processor-specific sub-data
+  ///
+} ARM_PROCESSOR_SPECIFIC_BLOCK;
+
+///
+/// AArch64 Architecture Data for ArmProcessorSpecificDataSubTypeArch.
+///
+typedef struct AArch64ProcessorSpecificSubDataArch {
+  /// Version for Processor Specific Sub Data (Arch Data).
+  UINT16    Version;
+
+  /// Length of this structure.
+  UINT8     Length;
+
+  /// Reserved.
+  UINT8     Reserved0;
+
+  /// Reserved.
+  UINT32    Reserved1;
+
+  /// Value of ID_AA64AFR0_EL1.
+  UINT64    IdAA64Afr0;
+
+  /// Value of ID_AA64AFR1_EL1.
+  UINT64    IdAA64Afr1;
+
+  /// Value of ID_AA64DFR0_EL1.
+  UINT64    IdAA64Dfr0;
+
+  /// Value of ID_AA64DFR1_EL1.
+  UINT64    IdAA64Dfr1;
+
+  /// Value of ID_AA64DFR2_EL1.
+  UINT64    IdAA64Dfr2;
+
+  /// Value of ID_AA64FPFR0_EL1.
+  UINT64    IdAA64Fpfr0;
+
+  /// Value of ID_AA64ISAR0_EL1.
+  UINT64    IdAA64Isar0;
+
+  /// Value of ID_AA64ISAR1_EL1.
+  UINT64    IdAA64Isar1;
+
+  /// Value of ID_AA64ISAR2_EL1.
+  UINT64    IdAA64Isar2;
+
+  /// Value of ID_AA64ISAR3_EL1.
+  UINT64    IdAA64Isar3;
+
+  /// Value of ID_AA64MMFR0_EL1.
+  UINT64    IdAA64Mmfr0;
+
+  /// Value of ID_AA64MMFR1_EL1.
+  UINT64    IdAA64Mmfr1;
+
+  /// Value of ID_AA64MMFR2_EL1.
+  UINT64    IdAA64Mmfr2;
+
+  /// Value of ID_AA64MMFR3_EL1.
+  UINT64    IdAA64Mmfr3;
+
+  /// Value of ID_AA64MMFR4_EL1.
+  UINT64    IdAA64Mmfr4;
+
+  /// Value of ID_AA64PFR0_EL1.
+  UINT64    IdAA64Pfr0;
+
+  /// Value of ID_AA64PFR1_EL1.
+  UINT64    IdAA64Pfr1;
+
+  /// Value of ID_AA64PFR2_EL1.
+  UINT64    IdAA64Pfr2;
+
+  /// Value of ID_AA64SMFR0_EL1.
+  UINT64    IdAA64Smfr0;
+
+  /// Value of ID_AA64ZFR0_EL1.
+  UINT64    IdAA64Zfr0;
+} AARCH64_PROCESSOR_SPECIFIC_SUB_DATA_ARCH;
+
 ///
 /// Processor Additional Information(Type 44).
 ///
