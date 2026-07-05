@@ -55,6 +55,12 @@ GET_OBJECT_LIST (
   CM_ARM_PROCESSOR_SPECIFIC_SUB_DATA_ARCH_INFO
   );
 
+GET_OBJECT_LIST (
+  EObjNameSpaceX64,
+  EX64ObjProcessorSpecificBlockInfo,
+  CM_X64_PROCESSOR_SPECIFIC_BLOCK_INFO
+  );
+
 /** Get Arm Processor Specific sub-data CM objects.
 
   @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
@@ -258,6 +264,51 @@ GetArmProcBlockCmObj (
   return EFI_SUCCESS;
 }
 
+/** Get x86 (x64) Processor Specific Block CM objects.
+
+  @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
+                                         Protocol Interface.
+  @param [in]       Token                Processor Specific Block Token.
+  @param [out]      ProcBlockOps         Process Specific Block Operation.
+
+  @retval EFI_SUCCESS
+  @retval Others                         Failed to initialise
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetX64ProcBlockCmObj (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN            CM_OBJECT_TOKEN                               Token,
+  OUT           PROCESSOR_SPECIFIC_BLOCK_OPS                  *ProcBlockOps
+  )
+{
+  EFI_STATUS                            Status;
+  CM_X64_PROCESSOR_SPECIFIC_BLOCK_INFO  *Block;
+  UINT32                                BlockCount;
+
+  Status = GetEX64ObjProcessorSpecificBlockInfo (
+             CfgMgrProtocol,
+             Token,
+             &Block,
+             &BlockCount
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get X64 processor data info. Status = %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  ProcBlockOps->CmObject = Block;
+
+  return EFI_SUCCESS;
+}
+
 /** Get size of Arm Processor Specific Block.
 
   @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
@@ -348,6 +399,57 @@ GetSizeofArmProcBlock (
   return EFI_SUCCESS;
 }
 
+/** Get size of x86 (x64) Processor Specific Block.
+
+  @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
+                                         Protocol Interface.
+  @param [in]       CmObject             CM object of Processor Specific Block.
+  @param [out]      Size                 Size of Processor Specific Block.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER          A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetSizeofX64ProcBlock (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST VOID                                          *CmObject,
+  OUT     UINT32                                              *Size
+  )
+{
+  CONST CM_X64_PROCESSOR_SPECIFIC_BLOCK_INFO  *Block;
+
+  Block = CmObject;
+  *Size = 0;
+
+  if (Block->BlockIdentifier == X86_PROCESSOR_BLOCK_IDENTIFIER_USE_CONDITION_DATA) {
+    switch (Block->Revision) {
+      case PROCESSOR_SPECIFIC_VERSION_INFO (1, 0):
+        *Size = sizeof (X86_PROCESSOR_SPECIFIC_BLOCK);
+        break;
+      default:
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Invalid revision for USE_CONDITION_DATA block.: 0x%x\n",
+          __func__,
+          Block->Revision
+          ));
+        return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Invalid Block Identifier: 0x%x\n",
+      __func__,
+      Block->BlockIdentifier
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Add Arm Processor Specific Block into SMBIOS record.
 
   @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
@@ -404,6 +506,39 @@ AddArmProcBlock (
                        );
 }
 
+/** Add x86 (x64) Processor Specific Block into SMBIOS record.
+
+  @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
+                                         Protocol Interface.
+  @param [in]       CmObject             CM object of Processor Specific Block.
+  @param [out]      SmbiosRecord         Type 44 Smbios Record.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER          A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AddX64ProcBlock (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST VOID                                          *CmObject,
+  OUT     SMBIOS_TABLE_TYPE44                                 *SmbiosRecord
+  )
+{
+  X86_PROCESSOR_SPECIFIC_BLOCK                *ProcBlock;
+  CONST CM_X64_PROCESSOR_SPECIFIC_BLOCK_INFO  *Block;
+
+  Block     = CmObject;
+  ProcBlock = (X86_PROCESSOR_SPECIFIC_BLOCK *)(SmbiosRecord + 1);
+
+  ProcBlock->BlockIdentifier        = Block->BlockIdentifier;
+  ProcBlock->BlockLength            = sizeof (X86_PROCESSOR_SPECIFIC_BLOCK);
+  ProcBlock->Revision               = Block->Revision;
+  ProcBlock->UseConditionAttributes = Block->UseConditionAttributes;
+
+  return EFI_SUCCESS;
+}
+
 /** Operation table to handle Processor Specific Block to generate
     Smbios Type 44 record.
 **/
@@ -417,24 +552,24 @@ STATIC PROCESSOR_SPECIFIC_BLOCK_OPS  mProcSpecificBlockOps[] = {
   },
   {
     ProcessorSpecificBlockArchTypeIa32,
-    NULL,
-    NULL,
-    NULL,
-    TRUE,
+    GetX64ProcBlockCmObj,
+    GetSizeofX64ProcBlock,
+    AddX64ProcBlock,
+    X86_SMBIOS_TYPE44_RECORD_UNSUPPORTED,
   },
   {
     ProcessorSpecificBlockArchTypeX64,
-    NULL,
-    NULL,
-    NULL,
-    TRUE,
+    GetX64ProcBlockCmObj,
+    GetSizeofX64ProcBlock,
+    AddX64ProcBlock,
+    X86_SMBIOS_TYPE44_RECORD_UNSUPPORTED,
   },
   {
     ProcessorSpecificBlockArchTypeItanium,
-    NULL,
-    NULL,
-    NULL,
-    TRUE,
+    GetX64ProcBlockCmObj,
+    GetSizeofX64ProcBlock,
+    AddX64ProcBlock,
+    X86_SMBIOS_TYPE44_RECORD_UNSUPPORTED,
   },
   {
     ProcessorSpecificBlockArchTypeAarch32,
