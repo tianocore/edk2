@@ -61,6 +61,12 @@ GET_OBJECT_LIST (
   CM_X64_PROCESSOR_SPECIFIC_BLOCK_INFO
   );
 
+GET_OBJECT_LIST (
+  EObjNameSpaceRiscV,
+  ERiscVObjProcessorSpecificBlockInfo,
+  CM_RISCV_PROCESSOR_SPECIFIC_BLOCK_INFO
+  );
+
 /** Get Arm Processor Specific sub-data CM objects.
 
   @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
@@ -309,6 +315,51 @@ GetX64ProcBlockCmObj (
   return EFI_SUCCESS;
 }
 
+/** Get RiscV Processor Specific Block CM objects.
+
+  @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
+                                         Protocol Interface.
+  @param [in]       Token                Processor Specific Block Token.
+  @param [out]      ProcBlockOps         Process Specific Block Operation.
+
+  @retval EFI_SUCCESS
+  @retval Others                         Failed to initialise
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetRiscVProcBlockCmObj (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN            CM_OBJECT_TOKEN                               Token,
+  OUT           PROCESSOR_SPECIFIC_BLOCK_OPS                  *ProcBlockOps
+  )
+{
+  EFI_STATUS                              Status;
+  CM_RISCV_PROCESSOR_SPECIFIC_BLOCK_INFO  *Block;
+  UINT32                                  BlockCount;
+
+  Status = GetERiscVObjProcessorSpecificBlockInfo (
+             CfgMgrProtocol,
+             Token,
+             &Block,
+             &BlockCount
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get risc-v processor data info. Status = %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  ProcBlockOps->CmObject = Block;
+
+  return EFI_SUCCESS;
+}
+
 /** Get size of Arm Processor Specific Block.
 
   @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
@@ -450,6 +501,47 @@ GetSizeofX64ProcBlock (
   return EFI_SUCCESS;
 }
 
+/** Get size of RiscV Processor Specific Block.
+
+  @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
+                                         Protocol Interface.
+  @param [in]       CmObject             CM object of Processor Specific Block.
+  @param [out]      Size                 Size of Processor Specific Block.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER          A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetSizeofRiscVProcBlock (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST VOID                                          *CmObject,
+  OUT     UINT32                                              *Size
+  )
+{
+  CONST CM_RISCV_PROCESSOR_SPECIFIC_BLOCK_INFO  *Block;
+
+  Block = CmObject;
+  *Size = 0;
+
+  switch (Block->Revision) {
+    case PROCESSOR_SPECIFIC_VERSION_INFO (1, 0):
+      *Size = sizeof (RISCV_PROCESSOR_SPECIFIC_BLOCK);
+      break;
+    default:
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Invalid revision for risc-v block.: 0x%x\n",
+        __func__,
+        Block->Revision
+        ));
+      return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Add Arm Processor Specific Block into SMBIOS record.
 
   @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
@@ -539,6 +631,40 @@ AddX64ProcBlock (
   return EFI_SUCCESS;
 }
 
+/** Add risc-v Processor Specific Block into SMBIOS record.
+
+  @param [in]       CfgMgrProtocol       Pointer to the Configuration Manager
+                                         Protocol Interface.
+  @param [in]       CmObject             CM object of Processor Specific Block.
+  @param [out]      SmbiosRecord         Type 44 Smbios Record.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER          A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AddRiscVProcBlock (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST VOID                                          *CmObject,
+  OUT     SMBIOS_TABLE_TYPE44                                 *SmbiosRecord
+  )
+{
+  RISCV_PROCESSOR_SPECIFIC_BLOCK                *ProcBlock;
+  CONST CM_RISCV_PROCESSOR_SPECIFIC_BLOCK_INFO  *Block;
+
+  Block     = CmObject;
+  ProcBlock = (RISCV_PROCESSOR_SPECIFIC_BLOCK *)(SmbiosRecord + 1);
+
+  ProcBlock->Revision = Block->Revision;
+  ProcBlock->HartId   = Block->HartId;
+  ProcBlock->VendorId = Block->VendorId;
+  ProcBlock->ArchId   = Block->ArchId;
+  ProcBlock->ImplId   = Block->ImplId;
+
+  return EFI_SUCCESS;
+}
+
 /** Operation table to handle Processor Specific Block to generate
     Smbios Type 44 record.
 **/
@@ -587,24 +713,24 @@ STATIC PROCESSOR_SPECIFIC_BLOCK_OPS  mProcSpecificBlockOps[] = {
   },
   {
     ProcessorSpecificBlockArchTypeRiscVRV32,
-    NULL,
-    NULL,
-    NULL,
-    TRUE,
+    GetRiscVProcBlockCmObj,
+    GetSizeofRiscVProcBlock,
+    AddRiscVProcBlock,
+    RISCV_SMBIOS_TYPE44_RECORD_UNSUPPORTED,
   },
   {
     ProcessorSpecificBlockArchTypeRiscVRV64,
-    NULL,
-    NULL,
-    NULL,
-    TRUE,
+    GetRiscVProcBlockCmObj,
+    GetSizeofRiscVProcBlock,
+    AddRiscVProcBlock,
+    RISCV_SMBIOS_TYPE44_RECORD_UNSUPPORTED,
   },
   {
     ProcessorSpecificBlockArchTypeRiscVRV128,
-    NULL,
-    NULL,
-    NULL,
-    TRUE,
+    GetRiscVProcBlockCmObj,
+    GetSizeofRiscVProcBlock,
+    AddRiscVProcBlock,
+    RISCV_SMBIOS_TYPE44_RECORD_UNSUPPORTED,
   },
 };
 
