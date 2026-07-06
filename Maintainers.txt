@@ -150,6 +150,10 @@ R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 EDK II Contributed Files:
 -------------------------
+Breaking Changes Documentation
+F: BREAKING-CHANGES.md
+R: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+
 VS Code PR Dashboard Notebook
 F: contrib/PullRequests.github-issues
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
