@@ -48,6 +48,7 @@
   CcExitLib
   DebugLib
   LocalApicLib
+  PcdLib
   PeCoffGetEntryPointLib
   PrintLib
   SerialPortLib
@@ -55,6 +56,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
+  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
 

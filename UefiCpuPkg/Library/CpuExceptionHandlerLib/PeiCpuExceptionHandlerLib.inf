@@ -49,6 +49,7 @@
   HobLib
   LocalApicLib
   MemoryAllocationLib
+  PcdLib
   PeCoffGetEntryPointLib
   PrintLib
   SerialPortLib
@@ -56,6 +57,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
 

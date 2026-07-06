@@ -8,7 +8,30 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/DebugLib.h>
 #include <Library/CcExitLib.h>
+#include <Library/PcdLib.h>
 #include "CpuExceptionCommon.h"
+
+/**
+  Return TRUE if an unhandled vector should be treated as a fatal CPU fault.
+
+  Intel defines vectors 0-31 as CPU exceptions and 32-255 as external
+  interrupts.  After expanding the SMM IDT to 256 entries, spurious hardware
+  interrupts (for example ExtINT/IRQ0 on vector 32 left enabled by coreboot)
+  must not hang the system.  Stack cookie violations use
+  PcdStackCookieExceptionVector (default 0x42) and remain fatal.
+**/
+STATIC
+BOOLEAN
+IsFatalUnhandledVector (
+  IN EFI_EXCEPTION_TYPE  ExceptionType
+  )
+{
+  if (ExceptionType < X86_CPU_EXCEPTION_NUM) {
+    return TRUE;
+  }
+
+  return (BOOLEAN)(ExceptionType == FixedPcdGet8 (PcdStackCookieExceptionVector));
+}
 
 /**
   Internal worker function for common exception handler.
@@ -134,7 +157,7 @@ CommonExceptionHandlerWorker (
       (ExternalInterruptHandler[ExceptionType] != NULL))
   {
     (ExternalInterruptHandler[ExceptionType])(ExceptionType, SystemContext);
-  } else if (ExceptionType < X86_CPU_INTERRUPT_NUM) {
+  } else if (IsFatalUnhandledVector (ExceptionType)) {
     //
     // Get Spinlock to display CPU information
     //

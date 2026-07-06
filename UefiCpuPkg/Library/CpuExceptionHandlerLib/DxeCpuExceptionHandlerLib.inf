@@ -65,6 +65,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
+  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
 
@@ -80,6 +81,7 @@
   BaseLib
   DebugLib
   MemoryAllocationLib
+  PcdLib
   PeCoffGetEntryPointLib
   PrintLib
   SerialPortLib
