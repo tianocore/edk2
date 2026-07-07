@@ -89,6 +89,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
   EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
   EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1497,6 +1499,41 @@ typedef struct CmArchCommonMemoryDeviceMappedAddress {
   /// Set to 0xFF if unknown.
   UINT8                   InterleavedDataDepth;
 } CM_ARCH_COMMON_MEMORY_DEVICE_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device entry associated with a
+  Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelDevice
+**/
+typedef struct CmArchCommonMemoryChannelDevice {
+  /// The load on the channel represented by the associated memory device.
+  UINT8              DeviceLoad;
+
+  /// CM Object Token of the associated SMBIOS Type 17 Memory Device.
+  CM_OBJECT_TOKEN    MemoryDeviceInfoToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_DEVICE;
+
+/** A structure that describes a Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelInfo
+**/
+typedef struct CmArchCommonMemoryChannelInfo {
+  /// CM Object Token uniquely identifying this memory channel.
+  CM_OBJECT_TOKEN    MemoryChannelToken;
+
+  /// Type of the memory channel.
+  UINT8              ChannelType;
+
+  /// Maximum load supported by the memory channel.
+  UINT8              MaximumChannelLoad;
+
+  /// Token referencing an array of Memory Channel Device entries.
+  CM_OBJECT_TOKEN    MemoryDeviceListToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_INFO;
 
 /** A structure that describes cooling device.
 
