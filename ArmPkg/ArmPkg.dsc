@@ -132,8 +132,6 @@
   ArmPkg/Library/ArmHvcLibNull/ArmHvcLibNull.inf
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
-  ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
