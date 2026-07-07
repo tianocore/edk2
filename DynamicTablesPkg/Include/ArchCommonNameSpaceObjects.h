@@ -65,80 +65,88 @@
     in the Arch Common Namespace
 */
 typedef enum ArchCommonObjectID {
-  EArchCommonObjReserved,                       ///<  0 - Reserved
-  EArchCommonObjPowerManagementProfileInfo,     ///<  1 - Power Management Profile Info
-  EArchCommonObjSerialPortInfo,                 ///<  2 - Generic Serial Port Info
-  EArchCommonObjConsolePortInfo,                ///<  3 - Serial Console Port Info
-  EArchCommonObjSerialDebugPortInfo,            ///<  4 - Serial Debug Port Info
-  EArchCommonObjHypervisorVendorIdentity,       ///<  5 - Hypervisor Vendor Id
-  EArchCommonObjFixedFeatureFlags,              ///<  6 - Fixed feature flags for FADT
-  EArchCommonObjCmRef,                          ///<  7 - CM Object Reference
-  EArchCommonObjPciConfigSpaceInfo,             ///<  8 - PCI Configuration Space Info
-  EArchCommonObjPciAddressMapInfo,              ///<  9 - Pci Address Map Info
-  EArchCommonObjPciInterruptMapInfo,            ///< 10 - Pci Interrupt Map Info
-  EArchCommonObjMemoryAffinityInfo,             ///< 11 - Memory Affinity Info
-  EArchCommonObjDeviceHandleAcpi,               ///< 12 - Device Handle Acpi
-  EArchCommonObjDeviceHandlePci,                ///< 13 - Device Handle Pci
-  EArchCommonObjGenericInitiatorAffinityInfo,   ///< 14 - Generic Initiator Affinity
-  EArchCommonObjLpiInfo,                        ///< 15 - Lpi Info
-  EArchCommonObjProcHierarchyInfo,              ///< 16 - Processor Hierarchy Info
-  EArchCommonObjCacheInfo,                      ///< 17 - Cache Info
-  EArchCommonObjCpcInfo,                        ///< 18 - Continuous Performance Control Info
-  EArchCommonObjPccSubspaceType0Info,           ///< 19 - Pcc Subspace Type 0 Info
-  EArchCommonObjPccSubspaceType1Info,           ///< 20 - Pcc Subspace Type 1 Info
-  EArchCommonObjPccSubspaceType2Info,           ///< 21 - Pcc Subspace Type 2 Info
-  EArchCommonObjPccSubspaceType3Info,           ///< 22 - Pcc Subspace Type 3 Info
-  EArchCommonObjPccSubspaceType4Info,           ///< 23 - Pcc Subspace Type 4 Info
-  EArchCommonObjPccSubspaceType5Info,           ///< 24 - Pcc Subspace Type 5 Info
-  EArchCommonObjPsdInfo,                        ///< 25 - P-State Dependency (PSD) Info
-  EArchCommonObjTpm2InterfaceInfo,              ///< 26 - TPM Interface Info
-  EArchCommonObjSpmiInterfaceInfo,              ///< 27 - SPMI Interface Info
-  EArchCommonObjSpmiInterruptDeviceInfo,        ///< 28 - SPMI Interrupt and Device Info
-  EArchCommonObjCstInfo,                        ///< 29 - C-State Info
-  EArchCommonObjCsdInfo,                        ///< 30 - C-State Dependency (CSD) Info
-  EArchCommonObjPctInfo,                        ///< 31 - P-State control (PCT) Info
-  EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
-  EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
-  EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
-  EArchCommonObjMemoryRangeDescriptor,          ///< 35 - Memory Range Descriptor
-  EArchCommonObjGenericDbg2DeviceInfo,          ///< 36 - Generic DBG2 Device Info
-  EArchCommonObjCxlHostBridgeInfo,              ///< 37 - CXL Host Bridge Info
-  EArchCommonObjCxlFixedMemoryWindowInfo,       ///< 38 - CXL Fixed Memory Window Info
-  EArchCommonObjProximityDomainInfo,            ///< 39 - Proximity Domain Info
-  EArchCommonObjProximityDomainRelationInfo,    ///< 40 - Proximity Domain Relation Info
-  EArchCommonObjSystemLocalityInfo,             ///< 41 - System Locality Info
-  EArchCommonObjMemoryProximityDomainAttrInfo,  ///< 42 - Memory Proximity Domain Attribute
-  EArchCommonObjMemoryLatBwInfo,                ///< 43 - Memory Latency Bandwidth Info
-  EArchCommonObjMemoryCacheInfo,                ///< 44 - Memory Cache Info
-  EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
-  EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
-  EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
-  EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
-  EArchCommonObjErrSourcePciRootPortInfo,       ///< 49 - PCI Express AER Info for RootPort
-  EArchCommonObjErrSourcePciDeviceInfo,         ///< 50 - PCI Express AER Info for Device (Endpoint)
-  EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
-  EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
-  EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
-  EArchCommonObjEinjInstructionsInfo,           ///< 54 - Einj Instruction Info
-  EArchCommonObjPlatformFwInfo,                 ///< 54 - Platform Firmware Info
-  EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
-  EArchCommonObjMemoryDeviceInfo,               ///< 56 - Memory Device Info
-  EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
-  EArchCommonObjCoolingDeviceInfo,              ///< 58 - Cooling Device Info
-  EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
-  EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
-  EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
-  EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
-  EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
-  EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
-  EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
-  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
-  EArchCommonObjSystemInfo,                     ///< 67 - System Info
-  EArchCommonObjAdditionalInformation,          ///< 68 - Additional Information
-  EArchCommonObjAdditionalInformationEntry,     ///< 69 - Additional Information Entry
-  EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
-  EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
-  EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
+  EArchCommonObjReserved,                          ///<  0 - Reserved
+  EArchCommonObjPowerManagementProfileInfo,        ///<  1 - Power Management Profile Info
+  EArchCommonObjSerialPortInfo,                    ///<  2 - Generic Serial Port Info
+  EArchCommonObjConsolePortInfo,                   ///<  3 - Serial Console Port Info
+  EArchCommonObjSerialDebugPortInfo,               ///<  4 - Serial Debug Port Info
+  EArchCommonObjHypervisorVendorIdentity,          ///<  5 - Hypervisor Vendor Id
+  EArchCommonObjFixedFeatureFlags,                 ///<  6 - Fixed feature flags for FADT
+  EArchCommonObjCmRef,                             ///<  7 - CM Object Reference
+  EArchCommonObjPciConfigSpaceInfo,                ///<  8 - PCI Configuration Space Info
+  EArchCommonObjPciAddressMapInfo,                 ///<  9 - Pci Address Map Info
+  EArchCommonObjPciInterruptMapInfo,               ///< 10 - Pci Interrupt Map Info
+  EArchCommonObjMemoryAffinityInfo,                ///< 11 - Memory Affinity Info
+  EArchCommonObjDeviceHandleAcpi,                  ///< 12 - Device Handle Acpi
+  EArchCommonObjDeviceHandlePci,                   ///< 13 - Device Handle Pci
+  EArchCommonObjGenericInitiatorAffinityInfo,      ///< 14 - Generic Initiator Affinity
+  EArchCommonObjLpiInfo,                           ///< 15 - Lpi Info
+  EArchCommonObjProcHierarchyInfo,                 ///< 16 - Processor Hierarchy Info
+  EArchCommonObjCacheInfo,                         ///< 17 - Cache Info
+  EArchCommonObjCpcInfo,                           ///< 18 - Continuous Performance Control Info
+  EArchCommonObjPccSubspaceType0Info,              ///< 19 - Pcc Subspace Type 0 Info
+  EArchCommonObjPccSubspaceType1Info,              ///< 20 - Pcc Subspace Type 1 Info
+  EArchCommonObjPccSubspaceType2Info,              ///< 21 - Pcc Subspace Type 2 Info
+  EArchCommonObjPccSubspaceType3Info,              ///< 22 - Pcc Subspace Type 3 Info
+  EArchCommonObjPccSubspaceType4Info,              ///< 23 - Pcc Subspace Type 4 Info
+  EArchCommonObjPccSubspaceType5Info,              ///< 24 - Pcc Subspace Type 5 Info
+  EArchCommonObjPsdInfo,                           ///< 25 - P-State Dependency (PSD) Info
+  EArchCommonObjTpm2InterfaceInfo,                 ///< 26 - TPM Interface Info
+  EArchCommonObjSpmiInterfaceInfo,                 ///< 27 - SPMI Interface Info
+  EArchCommonObjSpmiInterruptDeviceInfo,           ///< 28 - SPMI Interrupt and Device Info
+  EArchCommonObjCstInfo,                           ///< 29 - C-State Info
+  EArchCommonObjCsdInfo,                           ///< 30 - C-State Dependency (CSD) Info
+  EArchCommonObjPctInfo,                           ///< 31 - P-State control (PCT) Info
+  EArchCommonObjPssInfo,                           ///< 32 - P-State status (PSS) Info
+  EArchCommonObjPpcInfo,                           ///< 33 - P-State control (PPC) Info
+  EArchCommonObjStaInfo,                           ///< 34 - _STA (Device Status) Info
+  EArchCommonObjMemoryRangeDescriptor,             ///< 35 - Memory Range Descriptor
+  EArchCommonObjGenericDbg2DeviceInfo,             ///< 36 - Generic DBG2 Device Info
+  EArchCommonObjCxlHostBridgeInfo,                 ///< 37 - CXL Host Bridge Info
+  EArchCommonObjCxlFixedMemoryWindowInfo,          ///< 38 - CXL Fixed Memory Window Info
+  EArchCommonObjProximityDomainInfo,               ///< 39 - Proximity Domain Info
+  EArchCommonObjProximityDomainRelationInfo,       ///< 40 - Proximity Domain Relation Info
+  EArchCommonObjSystemLocalityInfo,                ///< 41 - System Locality Info
+  EArchCommonObjMemoryProximityDomainAttrInfo,     ///< 42 - Memory Proximity Domain Attribute
+  EArchCommonObjMemoryLatBwInfo,                   ///< 43 - Memory Latency Bandwidth Info
+  EArchCommonObjMemoryCacheInfo,                   ///< 44 - Memory Cache Info
+  EArchCommonObjSpcrInfo,                          ///< 45 - Serial Terminal and Interrupt Info
+  EArchCommonObjTpm2DeviceInfo,                    ///< 46 - TPM2 Device Info
+  EArchCommonObjMcfgPciConfigSpaceInfo,            ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjPciRootPortInfo,                   ///< 48 - PCI root port configuration Info
+  EArchCommonObjErrSourcePciRootPortInfo,          ///< 49 - PCI Express AER Info for RootPort
+  EArchCommonObjErrSourcePciDeviceInfo,            ///< 50 - PCI Express AER Info for Device (Endpoint)
+  EArchCommonObjErrSourcePciBridgeInfo,            ///< 51 - PCI Express AER Info for Bridge
+  EArchCommonObjErrSourceGenericHwInfo,            ///< 52 - Generic Hardware Error Source Info
+  EArchCommonObjErrSourceGenericHwVer2Info,        ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjEinjInstructionsInfo,              ///< 54 - Einj Instruction Info
+  EArchCommonObjPlatformFwInfo,                    ///< 54 - Platform Firmware Info
+  EArchCommonObjPhysicalMemoryArray,               ///< 55 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,                  ///< 56 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,          ///< 57 - Memory Array Mapped Address Info
+  EArchCommonObjCoolingDeviceInfo,                 ///< 58 - Cooling Device Info
+  EArchCommonObjTemperatureProbeInfo,              ///< 59 - Temperature Probe Info
+  EArchCommonObjVoltageProbeInfo,                  ///< 60 - Voltage Probe Info
+  EArchCommonObjElectricalCurrentProbeInfo,        ///< 61 - Electrical Current Probe Info
+  EArchCommonObjSystemResetInfo,                   ///< 62 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,         ///< 63 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,                 ///< 64 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,               ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,        ///< 66 - Processor specific data Info
+  EArchCommonObjSystemInfo,                        ///< 67 - System Info
+  EArchCommonObjAdditionalInformation,             ///< 68 - Additional Information
+  EArchCommonObjAdditionalInformationEntry,        ///< 69 - Additional Information Entry
+  EArchCommonObjAdditionalInformationValue,        ///< 70 - Additional Information Value
+  EArchCommonObjSystemEnclosureInfo,               ///< 71 - System Enclosure Info
+  EArchCommonObjEnclosureElement,                  ///< 72 - System Enclosure Contained Element
+  EArchCommonObjMchiInfo,                          ///< 73 - Management Controller Host Interface Info.
+  EArchCommonObjMchiMctpDataInfo,                  ///< 74 - MCHI MCTP specific data Info.
+  EArchCommonObjMchiNetworkDataInfo,               ///< 75 - MCHI Network specific data Info.
+  EArchCommonObjMchiProtocolInfo,                  ///< 76 - Management Controller Host Interface Protocol Info.
+  EArchCommonObjMchiProtocolMctpDataInfo,          ///< 77 - MCHI MCTP Protocol Info.
+  EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 78 - Redfish Over Ip Protocol Info.
+  EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 79 - MCHI USB Network Device descriptor info
+  EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 80 - MCHI PCI/PCIe Network Device descriptor info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1908,5 +1916,193 @@ typedef struct CmArchCommonSystemEnclosureInfo {
   /// Rack height in rack units when Height is 0xFF.
   UINT8              RackHeight;
 } CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
+
+/** A structure that describes Management Controller Host Interface Info.
+
+  ID: EArchCommonObjMchiInfo
+**/
+typedef struct CmArchCommonMchiInfo {
+  /// A unique token used to identify this object.
+  CM_OBJECT_TOKEN           Token;
+
+  /// Interface Type.
+  MC_HOST_INTERFACE_TYPE    InterfaceType;
+
+  /// Interface Specific Data Token.
+  CM_OBJECT_TOKEN           InterfaceDataToken;
+
+  /// Protocol Token Array for CM_ARCH_COMMON_MCHI_PROTOCOL_INFO
+  CM_ARCH_COMMON_OBJ_REF    ProtocolTokenArray;
+} CM_ARCH_COMMON_MCHI_INFO;
+
+/** A structure that describes MCHI MCTP specific data.
+
+  ID: EArchCommonObjMchiMctpDataInfo
+**/
+typedef struct CmArchCommonMchiMctpDataInfo {
+  /// A pointer to the MMBI capability pointer. (only for MCTP-MMBI).
+  UINT64    MmbiCapDesPointer;
+} CM_ARCH_COMMON_MCHI_MCTP_DATA_INFO;
+
+/** A structure that describes MCHI Network specific data.
+
+  ID: EArchCommonObjMchiNetworkDataInfo
+**/
+typedef struct CmArchCommonMchiNetworkDataInfo {
+  /// Device Type.
+  UINT8              DeviceType;
+
+  /// Device data descriptor Data Token.
+  CM_OBJECT_TOKEN    DeviceDataToken;
+} CM_ARCH_COMMON_MCHI_NETWORK_DATA_INFO;
+
+/** A structure that describes Management Controller Host Interface
+    Protocol Info.
+
+  ID: EArchCommonObjMchiProtocolInfo
+**/
+typedef struct CmArchCommonMchiProtocolInfo {
+  /// Protocol Type.
+  MC_HOST_INTERFACE_PROTOCOL_TYPE    ProtocolType;
+
+  /// Interface Specific Data Token.
+  CM_OBJECT_TOKEN                    ProtocolDataToken;
+} CM_ARCH_COMMON_MCHI_PROTOCOL_INFO;
+
+/** A structure that describes MCTP Ip protocol info.
+
+  ID: EArchCommonObjMchiProtocolMctpDataInfo
+**/
+typedef struct CmArchCommonMchiProtocolMctpDataInfo {
+  /// Version (Major[15:8], Minor[7:0]).
+  UINT16                    Version;
+
+  /// Link-layer type.
+  MC_HOST_INTERFACE_TYPE    LinkLayerType;
+
+  /// Instance Number.
+  UINT32                    Instance;
+
+  /// Characteristics
+  UINT32                    Characteristics;
+} CM_ARCH_COMMON_MCHI_PROTOCOL_MCTP_DATA_INFO;
+
+/** A structure that describes Redfish Over Ip protocol info.
+
+  ID: EArchCommonObjMchiProtocolRedfishOverIpDataInfo
+**/
+typedef struct CmArchCommonMchiProtocolRedfishOverIpDataInfo {
+  /// Service UUID.
+  EFI_GUID    ServiceUuid;
+
+  /// Host Ip assignment type.
+  UINT8       HostIpAssignType;
+
+  /// Host Ip address format.
+  UINT8       HostIpAddressFormat;
+
+  /// Host Ip address.
+  UINT8       HostIpAddress[16];
+
+  /// Host Ip mask.
+  UINT8       HostIpMask[16];
+
+  /// Service Ip discovery type.
+  UINT8       ServiceIpDiscoveryType;
+
+  /// Service Ip address format.
+  UINT8       ServiceIpAddressFormat;
+
+  /// Service Ip address.
+  UINT8       ServiceIpAddress[16];
+
+  /// Service Ip Mask.
+  UINT8       ServiceIpMask[16];
+
+  /// Service Ip Port.
+  UINT16      ServiceIpPort;
+
+  /// Service Vlan Id.
+  UINT32      ServiceVlanId;
+
+  /// Hostname
+  CHAR8       Hostname[MAX_UINT8 - 0x5B];
+} CM_ARCH_COMMON_MCHI_PROTOCOL_REDFISH_OVER_IP_DATA_INFO;
+
+/** A structure that describes Redfish USB Device descriptor Data.
+
+  ID: EArchCommonObjMchiNetworkDeviceDescUsbInfo
+**/
+typedef struct CmArchCommonMchiNetworkDeviceDescUsbInfo {
+  /// Version (1 or 2).
+  UINT16             Version;
+
+  /// Vendor Id.
+  UINT16             VendorId;
+
+  /// Product Id.
+  UINT16             ProductId;
+
+  /// Serial Number String.
+  CHAR8              SerialNumberStr[SMBIOS_MAX_STRING_SIZE_REDUCED];
+
+  /// MAC address (v2 only).
+  UINT8              MacAddress[6];
+
+  /// Device Characteristics (v2 only).
+  UINT16             Characteristic;
+
+  ///
+  /// IPMI token associated with Type 38 record (v2 only).
+  /// Set to CM_NULL_TOKEN if unused.
+  ///
+  CM_OBJECT_TOKEN    IpmiToken;
+} CM_ARCH_COMMON_MCHI_NETWORK_DEVICE_DESC_USB_INFO;
+
+/** A structure that describes Redfish PCI/PCIe Device descriptor Data.
+
+  ID: EArchCommonObjMchiNetworkDeviceDescPciInfo
+**/
+typedef struct CmArchCommonMchiNetworkDeviceDescPciInfo {
+  /// Version (1 or 2).
+  UINT16             Version;
+
+  /// Vendor Id.
+  UINT16             VendorId;
+
+  /// Device Id.
+  UINT16             DeviceId;
+
+  /// Subsystem Vendor Id.
+  UINT16             SubSystemVendorId;
+
+  /// Subsystem Id.
+  UINT16             SubSystemId;
+
+  /// MAC address (v2 only).
+  UINT8              MacAddress[6];
+
+  /// Segment group number (v2 only).
+  UINT16             Segment;
+
+  /// Bus (v2 only)
+  UINT8              Bus;
+
+  ///
+  /// Function (device) number (v2 only):
+  ///   Bits 7:3 - Device Number
+  ///   Bits 2:0 - Function Number
+  ///
+  UINT8              Function;
+
+  /// Device Characteristics (v2 only).
+  UINT16             Characteristic;
+
+  ///
+  /// IPMI token associated with Type 38 record (v2 only).
+  /// Set to CM_NULL_TOKEN if unused.
+  ///
+  CM_OBJECT_TOKEN    IpmiToken;
+} CM_ARCH_COMMON_MCHI_NETWORK_DEVICE_DESC_PCI_INFO;
 
 #pragma pack()
