@@ -543,6 +543,80 @@ UnprotectUefiImage (
 }
 
 /**
+  Disable NULL pointer detection. This is a workaround resort in
+  order to skip unfixable NULL pointer access issues detected in OptionROM or
+  boot loaders.
+**/
+VOID
+DisableNullDetection (
+  VOID
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Desc;
+
+  //
+  // Disable NULL pointer detection by enabling first 4K page
+  //
+  Status = CoreGetMemorySpaceDescriptor (0, &Desc);
+  ASSERT_EFI_ERROR (Status);
+
+  // Only re-enable the null page if it is system memory. If this page belongs to
+  // another memory type or is unmapped in general, leave it RP
+  if (Desc.GcdMemoryType != EfiGcdMemoryTypeSystemMemory) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a - Not disabling null detection as page 0 is not marked as system memory\n",
+      __func__
+      ));
+    return;
+  }
+
+  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
+    Status = CoreSetMemorySpaceCapabilities (
+               0,
+               EFI_PAGE_SIZE,
+               Desc.Capabilities | EFI_MEMORY_RP
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Status = CoreSetMemorySpaceAttributes (
+             0,
+             EFI_PAGE_SIZE,
+             Desc.Attributes & ~EFI_MEMORY_RP
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Page 0 might have be allocated to avoid misuses. Free it here anyway.
+  //
+  CoreFreePages (0, 1);
+
+  return;
+}
+
+/**
+  Disable NULL pointer detection after EndOfDxe. This is a workaround resort in
+  order to skip unfixable NULL pointer access issues detected in OptionROM or
+  boot loaders.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+DisableNullDetectionAtTheEndOfDxe (
+  EFI_EVENT  Event,
+  VOID       *Context
+  )
+{
+  DisableNullDetection ();
+  CoreCloseEvent (Event);
+  return;
+}
+
+/**
   Return the EFI memory permission attribute associated with memory
   type 'MemoryType' under the configured DXE memory protection policy.
 
@@ -982,58 +1056,6 @@ MemoryProtectionExitBootServicesCallback (
       SetUefiImageMemoryAttributes ((UINT64)(UINTN)RuntimeImage->ImageBase, ALIGN_VALUE (RuntimeImage->ImageSize, EFI_PAGE_SIZE), 0);
     }
   }
-}
-
-/**
-  Disable NULL pointer detection after EndOfDxe. This is a workaround resort in
-  order to skip unfixable NULL pointer access issues detected in OptionROM or
-  boot loaders.
-
-  @param[in]  Event     The Event this notify function registered to.
-  @param[in]  Context   Pointer to the context data registered to the Event.
-**/
-VOID
-EFIAPI
-DisableNullDetectionAtTheEndOfDxe (
-  EFI_EVENT  Event,
-  VOID       *Context
-  )
-{
-  EFI_STATUS                       Status;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Desc;
-
-  DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): start\r\n"));
-  //
-  // Disable NULL pointer detection by enabling first 4K page
-  //
-  Status = CoreGetMemorySpaceDescriptor (0, &Desc);
-  ASSERT_EFI_ERROR (Status);
-
-  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
-    Status = CoreSetMemorySpaceCapabilities (
-               0,
-               EFI_PAGE_SIZE,
-               Desc.Capabilities | EFI_MEMORY_RP
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  Status = CoreSetMemorySpaceAttributes (
-             0,
-             EFI_PAGE_SIZE,
-             Desc.Attributes & ~EFI_MEMORY_RP
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Page 0 might have be allocated to avoid misuses. Free it here anyway.
-  //
-  CoreFreePages (0, 1);
-
-  CoreCloseEvent (Event);
-  DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): end\r\n"));
-
-  return;
 }
 
 /**
