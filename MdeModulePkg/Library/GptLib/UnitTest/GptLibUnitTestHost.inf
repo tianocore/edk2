@@ -2,8 +2,8 @@
 # Host-based unit tests for GptLib.
 #
 # Exercises PartitionValidGptTable(), PartitionCheckGptEntry() and
-# PartitionRestoreGptTable() against an in-memory mock disk, covering their
-# behavior on well-formed GPT structures.
+# PartitionRestoreGptTable() against an in-memory mock disk, covering both
+# well-formed GPT structures and malformed ones an attacker may present.
 #
 # Copyright (c) 2026, SUSE LLC. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
