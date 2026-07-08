@@ -187,6 +187,10 @@ GetUefiImageProtectionPolicy (
     return FALSE;
   }
 
+  if (IsNxCompatibilityModeActive ()) {
+    return DO_NOT_PROTECT;
+  }
+
   //
   // Check DevicePath
   //
@@ -728,6 +732,10 @@ GetPermissionAttributeForMemoryType (
 {
   UINT64  TestBit;
 
+  if (IsNxCompatibilityModeActive ()) {
+    return 0;
+  }
+
   if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
     TestBit = BIT63;
   } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
@@ -738,9 +746,9 @@ GetPermissionAttributeForMemoryType (
 
   if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
     return EFI_MEMORY_XP;
-  } else {
-    return 0;
   }
+
+  return 0;
 }
 
 /**
