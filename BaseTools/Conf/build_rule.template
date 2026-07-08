@@ -561,7 +561,7 @@
       "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
       Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
       "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
-      "$(DLINK)" -o ${dst} $(DLINK_FLAGS) --start-group $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj --end-group
+      "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -Wl,--start-group $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj -Wl,--end-group
 
     <Command.XCODE>
       Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
