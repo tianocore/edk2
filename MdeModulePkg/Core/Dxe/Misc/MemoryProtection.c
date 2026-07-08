@@ -1330,8 +1330,10 @@ ApplyMemoryProtectionPolicy (
   IN  UINT64                Length
   )
 {
-  UINT64  OldAttributes;
-  UINT64  NewAttributes;
+  UINT64      OldAttributes;
+  UINT64      NewAttributes;
+  EFI_STATUS  Status;
+  EFI_TPL     OldTpl;
 
   //
   // The policy configured in PcdDxeNxMemoryProtectionPolicy
@@ -1386,16 +1388,45 @@ ApplyMemoryProtectionPolicy (
   //
   NewAttributes = GetPermissionAttributeForMemoryType (NewType);
 
-  if (OldType != EfiMaxMemoryType) {
-    OldAttributes = GetPermissionAttributeForMemoryType (OldType);
-    if (OldAttributes == NewAttributes) {
-      // policy is the same between OldType and NewType
-      return EFI_SUCCESS;
+  // Raise to TPL_NOTIFY (the same as the memory lock) here to protect against timer callbacks from
+  // allocating memory and not getting XP removed if we are in compatibility mode. Timer callbacks
+  // run at TPL_NOTIFY or lower, so we won't be preempted. Per UEFI spec, memory allocation services
+  // can only be called at TPL_NOTIFY or lower as well (and the lock there will enforce that). We can't
+  // hold the memory lock itself while running this function because gCpu->SetMemorySpaceAttributes() may
+  // allocate memory and we'd get a recursive lock acquisition.
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  // If compatibility mode is active, we need to always apply the new attributes because they may differ from
+  // previously set attributes.
+  if (!IsCompatibilityModeActive ()) {
+    if (OldType != EfiMaxMemoryType) {
+      OldAttributes = GetPermissionAttributeForMemoryType (OldType);
+      if (OldAttributes == NewAttributes) {
+        // policy is the same between OldType and NewType
+        Status = EFI_SUCCESS;
+        goto Done;
+      }
+    } else if (NewAttributes == 0) {
+      // newly added region of a type that does not require protection
+      Status = EFI_SUCCESS;
+      goto Done;
     }
-  } else if (NewAttributes == 0) {
-    // newly added region of a type that does not require protection
-    return EFI_SUCCESS;
+  } else if (mSettingAttributes) {
+    // If we are already setting attributes, then we are in the case where CpuDxe is allocating more page table
+    // pages while we are trying to set attributes on a memory range. Just return success here, CpuDxe can manage
+    // the permissions on its page table pages. X64 will preallocate page table pages and AARCH64 sets all free memory
+    // to be EFI_MEMORY_XP on initialization. We are also already in compatibility mode, so memory protection guarantees
+    // are off. This only becomes a problem after compatibility mode is activated because free memory may still have XP
+    // set on it that needs to get removed.
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
-  return gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
+  mSettingAttributes = TRUE;
+  Status             = gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
+  mSettingAttributes = FALSE;
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
 }
