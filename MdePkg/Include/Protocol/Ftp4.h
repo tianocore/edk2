@@ -128,7 +128,7 @@ typedef struct {
   ///
   UINT8    FileStruct;
   ///
-  /// Defines the transifer mode used in FTP. 0x00 = stream, 0x01 = Block, 0x02 = Compressed.
+  /// Defines the transfer mode used in FTP. 0x00 = stream, 0x01 = Block, 0x02 = Compressed.
   ///
   UINT8    TransMode;
 } EFI_FTP4_CONFIG_DATA;
@@ -142,7 +142,7 @@ typedef struct _EFI_FTP4_COMMAND_TOKEN EFI_FTP4_COMMAND_TOKEN;
   is called when data buffer is full. Then, old data in the data buffer should be
   flushed and new data is stored from the beginning of data buffer.
   If it is a transmit function that lead to outbound data and the size of
-  Data in daata buffer has been transmitted, this callback function is called to
+  Data in data buffer has been transmitted, this callback function is called to
   supply additional data to be transmitted.
 
   @param[in] This                Pointer to the EFI_FTP4_PROTOCOL instance.
@@ -259,7 +259,7 @@ EFI_STATUS
 
   The Connect() function will initiate a connection request to the remote FTP server
   with the corresponding connection token. If this function returns EFI_SUCCESS, the
-  connection sequence is initiated successfully.  If the connection succeeds or faild
+  connection sequence is initiated successfully.  If the connection succeeds or failed
   due to any error, the Token->Event will be signaled and Token->Status will be updated
   accordingly.
 

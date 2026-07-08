@@ -1,7 +1,7 @@
 /** @file
   Security Architectural Protocol as defined in PI Specification VOLUME 2 DXE
 
-  Used to provide Security services.  Specifically, dependening upon the
+  Used to provide Security services.  Specifically, depending upon the
   authentication state of a discovered driver in a Firmware Volume, the
   portable DXE Core Dispatcher will call into the Security Architectural
   Protocol (SAP) with the authentication state of the driver.

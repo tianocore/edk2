@@ -30,7 +30,7 @@ typedef UINT32 EFI_REDFISH_DISCOVER_FLAG;
 #define EFI_REDFISH_DISCOVER_KEEP_ALIVE      0x00000008 ///< Keep to send UPnP Search in the duration indicated in
                                                         ///< EFI_REDFISH_DISCOVER_DURATION_MASK.
 #define EFI_REDFISH_DISCOVER_RENEW  0x00000010         ///< Set this bit to indicate this function to notify the caller
-                                                       ///< a list of all Redfish servers it found. Otherwise, this fucntion
+                                                       ///< a list of all Redfish servers it found. Otherwise, this function
                                                        ///< just notify the caller new found Redfish servers.
                                                        ///<
 #define EFI_REDFISH_DISCOVER_VALIDATION     0x80000000 ///< Validate Redfish service for host interface instance.
@@ -65,7 +65,7 @@ typedef struct {
 } EFI_REDFISH_DISCOVERED_LIST;
 
 typedef struct {
-  EFI_MAC_ADDRESS    MacAddress;                  ///< MAC address of network interfase to discover Redfish service.
+  EFI_MAC_ADDRESS    MacAddress;                  ///< MAC address of network interface to discover Redfish service.
   BOOLEAN            IsIpv6;                      ///< Indicates it's IP versino 6.
   EFI_IP_ADDRESS     SubnetId;                    ///< Subnet ID.
   UINT8              SubnetPrefixLength;          ///< Subnet prefix-length for IPv4 and IPv6.
@@ -117,8 +117,8 @@ EFI_STATUS
   This function acquires Redfish services by discovering static Redfish setting
   according to Redfish Host Interface or through SSDP. Returns a list of EFI
   handles in EFI_REDFISH_DISCOVERED_LIST. Each of EFI handle has cooresponding
-  EFI REST EX instance installed on it. Each REST EX isntance is a child instance which
-  created through EFI REST EX serivce protoocl for communicating with specific
+  EFI REST EX instance installed on it. Each REST EX instance is a child instance which
+  created through EFI REST EX service protocol for communicating with specific
   Redfish service.
 
   @param[in]    This          EFI_REDFISH_DISCOVER_PROTOCOL instance.

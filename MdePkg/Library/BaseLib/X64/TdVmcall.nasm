@@ -121,7 +121,7 @@ ASM_PFX(TdVmCall):
 
        tdcall
 
-       ; ignore return dataif TDCALL reports failure.
+       ; ignore return data if TDCALL reports failure.
        test rax, rax
        jnz .no_return_data
 

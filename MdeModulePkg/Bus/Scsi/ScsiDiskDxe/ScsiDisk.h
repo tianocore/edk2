@@ -92,6 +92,11 @@ typedef struct {
   // The queue for asynchronous task requests
   //
   LIST_ENTRY                               AsyncTaskQueue;
+
+  //
+  // The flag indicates FUA support
+  //
+  BOOLEAN                                  FuaMode;
 } SCSI_DISK_DEV;
 
 #define SCSI_DISK_DEV_FROM_BLKIO(a)     CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
@@ -192,6 +197,13 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 // to respond command.
 //
 #define SCSI_DISK_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (30)
+
+//
+// The length of Mode parameter header(10) is 8 bytes. The
+// length of Caching Mode page is 20 bytes. Without block
+// descriptors, the buffer for Caching Mode page is 28.
+//
+#define CACHE_MODE_PAGE_LEN  28
 
 /**
   Test to see if this driver supports ControllerHandle.
@@ -1589,4 +1601,15 @@ BOOLEAN
 DetermineInstallStorageSecurity (
   IN  SCSI_DISK_DEV  *ScsiDiskDevice,
   IN  EFI_HANDLE     ChildHandle
+  );
+
+/**
+  Get FUA Mode for the storage.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+
+**/
+EFI_STATUS
+ScsiDiskFuaMode (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
   );

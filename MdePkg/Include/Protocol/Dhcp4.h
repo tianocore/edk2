@@ -458,7 +458,7 @@ EFI_STATUS
                                 Otherwise, the state was left unchanged.
   @retval EFI_ACCESS_DENIED     This instance of the EFI DHCPv4 Protocol driver was not in the
                                 Dhcp4Stopped, Dhcp4Init, Dhcp4InitReboot, or Dhcp4Bound state;
-                                Or onother instance of this EFI DHCPv4 Protocol driver is already
+                                Or another instance of this EFI DHCPv4 Protocol driver is already
                                 in a valid configured state.
   @retval EFI_INVALID_PARAMETER One or more following conditions are TRUE:
                                 This is NULL.

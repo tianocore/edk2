@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -179,6 +181,10 @@ ArmCallFfa (
   @param [in]    RequestVersion          Minimal request version
   @param [out]   CurrentVersion          Current major version
 
+  @retval EFI_SUCCESS              Success to get supported FF-A version.
+  @retval EFI_INVALID_PARAMETER    Invalid Parameter.
+  @retval EFI_UNSUPPORTED          FF-A isn't supported.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -189,6 +195,10 @@ ArmFfaLibGetVersion (
 {
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
+
+  if (CurrentVersion == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
@@ -202,9 +212,7 @@ ArmFfaLibGetVersion (
     return Status;
   }
 
-  if (CurrentVersion != NULL) {
-    *CurrentVersion = FfaArgs.Arg0;
-  }
+  *CurrentVersion = FfaArgs.Arg0;
 
   return EFI_SUCCESS;
 }
@@ -323,6 +331,13 @@ ArmFfaLibRxRelease (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RX_RELEASE;
+
+  /*
+   * Per Table 13.21: FFA_RX_RELEASE function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * PartId should be set to 0 in ARM_FID_FFA_RX_RELEASE.
+   */
+  PartId       = 0;
   FfaArgs.Arg1 = PartId;
 
   ArmCallFfa (&FfaArgs);

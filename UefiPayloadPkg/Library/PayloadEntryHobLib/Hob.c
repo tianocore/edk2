@@ -281,8 +281,8 @@ BuildModuleHob (
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *Hob;
 
   ASSERT (
-    ((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
-    ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0)
+    IS_ALIGNED (MemoryAllocationModule, EFI_PAGE_SIZE) &&
+    IS_ALIGNED (ModuleLength, EFI_PAGE_SIZE)
     );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
@@ -592,8 +592,8 @@ BuildStackHob (
   EFI_HOB_MEMORY_ALLOCATION_STACK  *Hob;
 
   ASSERT (
-    ((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
-    ((Length & (EFI_PAGE_SIZE - 1)) == 0)
+    IS_ALIGNED (BaseAddress, EFI_PAGE_SIZE) &&
+    IS_ALIGNED (Length, EFI_PAGE_SIZE)
     );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
@@ -678,8 +678,8 @@ BuildMemoryAllocationHob (
   EFI_HOB_MEMORY_ALLOCATION  *Hob;
 
   ASSERT (
-    ((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
-    ((Length & (EFI_PAGE_SIZE - 1)) == 0)
+    IS_ALIGNED (BaseAddress, EFI_PAGE_SIZE) &&
+    IS_ALIGNED (Length, EFI_PAGE_SIZE)
     );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));

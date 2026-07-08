@@ -37,6 +37,7 @@
   PeiServicesLib
   DebugLib
   HobLib
+  SynchronizationLib
 
 [Guids]
   ## PRODUCES ## HOB

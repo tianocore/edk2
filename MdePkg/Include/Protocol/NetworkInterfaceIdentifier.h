@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 //
-// GUID intruduced in UEFI Specification 2.1b
+// GUID introduced in UEFI Specification 2.1b
 //
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_GUID_31 \
   { \

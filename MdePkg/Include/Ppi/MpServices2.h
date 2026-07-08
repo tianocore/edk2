@@ -68,7 +68,7 @@ EFI_STATUS
   );
 
 /**
-  Activate all of the application proessors.
+  Activate all of the application processors.
 
   @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
   @param[in] Procedure            A pointer to the function to be run on enabled APs of
@@ -237,7 +237,7 @@ EFI_STATUS
   );
 
 /**
-  Activate all of the application proessors.
+  Activate all of the application processors.
 
   @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
   @param[in] Procedure            A pointer to the function to be run on enabled APs of

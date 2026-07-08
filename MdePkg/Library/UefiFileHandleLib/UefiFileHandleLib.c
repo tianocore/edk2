@@ -568,7 +568,7 @@ FileHandleFindNextFile (
   }
 
   //
-  // If we read 0 bytes (but did not have erros) we already read in the last file.
+  // If we read 0 bytes (but did not have errors) we already read in the last file.
   //
   if (BufferSize == 0) {
     FreePool (Buffer);
@@ -787,7 +787,7 @@ StrnCatGrowLeft (
   @param[out] FullFileName      pointer to pointer to generated full file name.  It
                                 is the responsibility of the caller to free this memory
                                 with a call to FreePool().
-  @retval EFI_SUCCESS           the operation was sucessful and the FullFileName is valid.
+  @retval EFI_SUCCESS           the operation was successful and the FullFileName is valid.
   @retval EFI_INVALID_PARAMETER Handle was NULL.
   @retval EFI_INVALID_PARAMETER FullFileName was NULL.
   @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.

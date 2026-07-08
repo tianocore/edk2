@@ -353,7 +353,7 @@ EFI_STATUS
   @param NotificationHandle   The handle of the notification
                               function being unregistered.
 
-  @retval EFI_SUCCESS   Successsfully unregistered the notification.
+  @retval EFI_SUCCESS   Successfully unregistered the notification.
 
   @retval EFI_NOT_FOUND The incoming notification handle does not exist
                         in the current hii database.

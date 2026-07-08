@@ -107,6 +107,7 @@ typedef enum {
     1 - AmlMethodParamTypeString
     2 - AmlMethodParamTypeArg
     3 - AmlMethodParamTypeLocal
+    4 - AmlMethodParamTypeBuffer
 
   @par Reference(s)
   - ACPI 6.5, s20.2.5 "Term Objects Encoding"
@@ -116,7 +117,8 @@ typedef enum {
   AmlMethodParamTypeInteger = 0,
   AmlMethodParamTypeString  = 1,
   AmlMethodParamTypeArg     = 2,
-  AmlMethodParamTypeLocal   = 3
+  AmlMethodParamTypeLocal   = 3,
+  AmlMethodParamTypeBuffer  = 4
 } AML_METHOD_PARAM_TYPE;
 
 /** AML Method parameter data
@@ -142,7 +144,10 @@ typedef union {
             If Type is AmlMethodParamTypeLocal
               then Data contains the Local variable number,
               0 to 7 are supported value.
-  DataSize - for future use
+            If Type is AmlMethodParamTypeBuffer
+              then Data.Buffer points to a UINT8 byte array and
+              DataSize holds the byte count of that array.
+  DataSize - byte count when Type is AmlMethodParamTypeBuffer; unused otherwise.
 **/
 typedef struct {
   AML_METHOD_PARAM_TYPE    Type;

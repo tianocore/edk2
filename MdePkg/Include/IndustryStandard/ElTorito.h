@@ -125,7 +125,7 @@ typedef union {
   /// Section Header Entry
   ///
   struct {
-    UINT8     Indicator;     ///< 90 - Header, more header follw, 91 - Final Header
+    UINT8     Indicator;     ///< 90 - Header, more header follow, 91 - Final Header
     UINT8     PlatformId;
     UINT16    SectionEntries; ///< Number of section entries following this header
     CHAR8     Id[28];

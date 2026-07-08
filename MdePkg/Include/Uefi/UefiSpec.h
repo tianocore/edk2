@@ -776,7 +776,7 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set,
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS being set,
                                  but the AuthInfo does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
@@ -1377,7 +1377,7 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       Handle does not support Protocol.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_ACCESS_DENIED     Required attributes can't be supported in current environment.
-  @retval EFI_ALREADY_STARTED   Item on the open list already has requierd attributes whose agent
+  @retval EFI_ALREADY_STARTED   Item on the open list already has required attributes whose agent
                                 handle is the same as AgentHandle.
 
 **/
@@ -1737,7 +1737,7 @@ typedef struct {
   @param[in]  CapsuleHeaderArray Virtual pointer to an array of virtual pointers to the capsules
                                  being passed into update capsule.
   @param[in]  CapsuleCount       Number of pointers to EFI_CAPSULE_HEADER in
-                                 CaspuleHeaderArray.
+                                 CapsuleHeaderArray.
   @param[in]  ScatterGatherList  Physical pointer to a set of
                                  EFI_CAPSULE_BLOCK_DESCRIPTOR that describes the
                                  location in physical memory of a set of capsules.
@@ -1774,8 +1774,8 @@ EFI_STATUS
   @param[in]   CapsuleHeaderArray  Virtual pointer to an array of virtual pointers to the capsules
                                    being passed into update capsule.
   @param[in]   CapsuleCount        Number of pointers to EFI_CAPSULE_HEADER in
-                                   CaspuleHeaderArray.
-  @param[out]  MaxiumCapsuleSize   On output the maximum size that UpdateCapsule() can
+                                   CapsuleHeaderArray.
+  @param[out]  MaximumCapsuleSize  On output the maximum size that UpdateCapsule() can
                                    support as an argument to UpdateCapsule() via
                                    CapsuleHeaderArray and ScatterGatherList.
   @param[out]  ResetType           Returns the type of reset required for the capsule update.

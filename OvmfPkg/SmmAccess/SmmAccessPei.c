@@ -309,7 +309,7 @@ SmmAccessPeiEntryPoint (
   }
 
   TopOfLowRam = GetSystemMemorySizeBelow4gb ();
-  ASSERT ((TopOfLowRam & (SIZE_1MB - 1)) == 0);
+  ASSERT (IS_ALIGNED (TopOfLowRam, SIZE_1MB));
   TopOfLowRamMb = TopOfLowRam >> 20;
 
   //

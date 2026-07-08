@@ -6,7 +6,7 @@
   the platform manufacturer.
   This protocol is a mandatory protocol published by SMM Foundation code.
   This protocol is an SMM counterpart of the End of DXE Event.
-  This protocol prorogates End of DXE notification into SMM environment.
+  This protocol propagates End of DXE notification into SMM environment.
   This protocol is installed prior to installation of the SMM Ready to Lock Protocol.
 
   Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>

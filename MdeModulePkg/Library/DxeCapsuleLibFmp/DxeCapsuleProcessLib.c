@@ -631,7 +631,7 @@ DoResetSystem (
   VOID
   )
 {
-  DEBUG ((DEBUG_INFO, "Capsule Request Cold Reboot."));
+  DEBUG ((DEBUG_INFO, "Capsule Request Cold Reboot.\n"));
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32 (PcdStatusCodeSubClassCapsule) | PcdGet32 (PcdCapsuleStatusCodeResettingSystem)));
 

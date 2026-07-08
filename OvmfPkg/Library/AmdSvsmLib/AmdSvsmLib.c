@@ -12,6 +12,7 @@
 #include <Library/AmdSvsmLib.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Amd/Svsm.h>
+#include <Register/Amd/SvsmMsr.h>
 
 #define PAGES_PER_2MB_ENTRY  512
 
@@ -639,4 +640,34 @@ AmdSvsmQueryProtocol (
   }
 
   return TRUE;
+}
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Caa;
+  UINTN           Ret;
+
+  Function.Id.Protocol = SVSM_UEFI_MM_PROTOCOL;
+  Function.Id.CallId   = SVSM_UEFI_MM_REQUEST;
+
+  // This is (also) called from rumtime services.  We can not use
+  // AmdSvsmSnpGetCaa() here because (a) this function works for BootServices
+  // only, and (b) the OS might have moved the CAA page to a different place.
+  // So read the CCA MSR instead to get the address.
+  Caa = AsmReadMsr64 (MSR_SVSM_CAA);
+
+  SvsmCallData.Caa   = (SVSM_CAA *)Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = BufferAddr;
+  SvsmCallData.RdxIn = BufferSize;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  return (Ret == 0) ? TRUE : FALSE;
 }

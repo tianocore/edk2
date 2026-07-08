@@ -8,7 +8,7 @@
 #include <Uefi.h>
 #include <Library/StackCheckLib.h>
 
-VOID  *__stack_chk_guard = (VOID *)(UINTN)0x0;
+__UINTPTR_TYPE__  __stack_chk_guard = 0;
 
 /**
   This function gets called when a gcc/clang generated stack cookie fails. This implementation does nothing when

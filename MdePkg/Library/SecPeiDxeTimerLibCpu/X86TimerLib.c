@@ -134,7 +134,7 @@ InternalX86GetInitTimerCount (
   Stalls the CPU for at least the given number of ticks. It's invoked by
   MicroSecondDelay() and NanoSecondDelay().
 
-  This function will ASSERT if the APIC timer intial count returned from
+  This function will ASSERT if the APIC timer initial count returned from
   InternalX86GetInitTimerCount() is zero.
 
   @param  ApicBase  The base address of memory mapped registers of local APIC.
@@ -154,11 +154,11 @@ InternalX86Delay (
   UINT32  StartTick;
 
   //
-  // In case Delay is too larger, separate it into several small delay slot.
-  // Devided Delay by half value of Init Count is to avoid Delay close to
-  // the Init Count, timeout maybe missing if the time consuming between 2
-  // GetApicTimerCurrentCount() invoking is larger than the time gap between
-  // Delay and the Init Count.
+  // If Delay is larger than we can handle, separate it into several smaller delays.
+  // Delay is divided by half of Init Count to avoid Delay being close to
+  // the InitCount; the timeout might be missed if the time consumed between 2
+  // GetApicTimerCurrentCount() invocations is larger than the time gap between
+  // Delay and InitCount.
   //
   InitCount = InternalX86GetInitTimerCount (ApicBase);
   ASSERT (InitCount != 0);

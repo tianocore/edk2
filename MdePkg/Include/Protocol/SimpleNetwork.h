@@ -53,7 +53,7 @@ typedef struct {
   UINT64    RxUndersizeFrames;
 
   ///
-  /// Number of frames longer than the maxminum length for the
+  /// Number of frames longer than the maximum length for the
   /// media.  This would be >1500 for ethernet.
   ///
   UINT64    RxOversizeFrames;
@@ -74,7 +74,7 @@ typedef struct {
   UINT64    RxBroadcastFrames;
 
   ///
-  /// Number of valid mutlicast frames received and not dropped.
+  /// Number of valid multicast frames received and not dropped.
   ///
   UINT64    RxMulticastFrames;
 

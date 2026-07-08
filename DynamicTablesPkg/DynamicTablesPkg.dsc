@@ -66,5 +66,5 @@
 !ifdef STATIC_ANALYSIS
   # Check all rules
   # Inhibit C6305: Potential mismatch between sizeof and countof quantities.
-  *_VS2017_*_CC_FLAGS = /wd6305 /analyze
+  *_VS2019_*_CC_FLAGS = /wd6305 /analyze
 !endif

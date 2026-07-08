@@ -224,7 +224,13 @@ TcgMeasureGptTable (
   //
   // Prepare Data for Measurement
   //
-  Status   = TpmSanitizePrimaryHeaderGptEventSize (PrimaryHeader, NumberOfPartition, &EventSize);
+  Status = TpmSanitizePrimaryHeaderGptEventSize (PrimaryHeader, NumberOfPartition, &EventSize);
+  if (EFI_ERROR (Status)) {
+    FreePool (PrimaryHeader);
+    FreePool (EntryPtr);
+    return EFI_DEVICE_ERROR;
+  }
+
   TcgEvent = (TCG_PCR_EVENT *)AllocateZeroPool (EventSize);
   if (TcgEvent == NULL) {
     FreePool (PrimaryHeader);

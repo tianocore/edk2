@@ -4138,6 +4138,26 @@ AmlCodeGenInvokeMethod (
           }
 
           break;
+        case AmlMethodParamTypeBuffer:
+          if ((Parameters[Index].Data.Buffer == NULL) !=
+              (Parameters[Index].DataSize == 0))
+          {
+            ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+            Status = EFI_INVALID_PARAMETER;
+            goto exit_handler;
+          }
+
+          Status = AmlCodeGenBuffer (
+                     Parameters[Index].Data.Buffer,
+                     (UINT32)Parameters[Index].DataSize,
+                     &ObjectNode
+                     );
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            goto exit_handler;
+          }
+
+          break;
         default:
           ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
           Status = EFI_INVALID_PARAMETER;

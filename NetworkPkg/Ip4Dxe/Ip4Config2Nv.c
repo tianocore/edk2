@@ -535,7 +535,6 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
   UINTN          DataSize;
   EFI_INPUT_KEY  Key;
 
-  Status    = EFI_SUCCESS;
   Ip4Cfg2   = &Instance->Ip4Config2;
   Ip4NvData = &Instance->Ip4NvData;
 
@@ -878,7 +877,6 @@ Ip4FormExtractConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status             = EFI_SUCCESS;
   IfrFormNvData      = NULL;
   ConfigRequest      = NULL;
   FormResult         = NULL;
@@ -893,66 +891,64 @@ Ip4FormExtractConfig (
   //
   // Check Request data in <ConfigHdr>.
   //
-  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &gIp4Config2NvDataGuid, mIp4Config2StorageName)) {
-    IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG2_IFR_NVDATA));
-    if (IfrFormNvData == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Ip4Config2ConvertConfigNvDataToIfrNvData (Ip4Config2Instance, IfrFormNvData);
-
-    if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
-      //
-      // Request has no request element, construct full request string.
-      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
-      // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
-      //
-      ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
-      Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-      ConfigRequest    = AllocateZeroPool (Size);
-      if (ConfigRequest == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Failure;
-      }
-
-      AllocatedRequest = TRUE;
-
-      UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
-      FreePool (ConfigRequestHdr);
-    }
-
-    //
-    // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
-    //
-    Status = gHiiConfigRouting->BlockToConfig (
-                                  gHiiConfigRouting,
-                                  ConfigRequest,
-                                  (UINT8 *)IfrFormNvData,
-                                  BufferSize,
-                                  &FormResult,
-                                  Progress
-                                  );
-
-    FreePool (IfrFormNvData);
-
-    //
-    // Free the allocated config request string.
-    //
-    if (AllocatedRequest) {
-      FreePool (ConfigRequest);
-      ConfigRequest = NULL;
-    }
-
-    if (EFI_ERROR (Status)) {
-      goto Failure;
-    }
-  }
-
-  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &gIp4Config2NvDataGuid, mIp4Config2StorageName)) {
-    *Results = FormResult;
-  } else {
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gIp4Config2NvDataGuid, mIp4Config2StorageName)) {
     return EFI_NOT_FOUND;
   }
+
+  IfrFormNvData = AllocateZeroPool (sizeof (IP4_CONFIG2_IFR_NVDATA));
+  if (IfrFormNvData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Ip4Config2ConvertConfigNvDataToIfrNvData (Ip4Config2Instance, IfrFormNvData);
+
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request has no request element, construct full request string.
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Failure;
+    }
+
+    AllocatedRequest = TRUE;
+
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+  }
+
+  //
+  // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
+  //
+  Status = gHiiConfigRouting->BlockToConfig (
+                                gHiiConfigRouting,
+                                ConfigRequest,
+                                (UINT8 *)IfrFormNvData,
+                                BufferSize,
+                                &FormResult,
+                                Progress
+                                );
+
+  FreePool (IfrFormNvData);
+
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
+    ConfigRequest = NULL;
+  }
+
+  if (EFI_ERROR (Status)) {
+    goto Failure;
+  }
+
+  *Results = FormResult;
 
 Failure:
   //

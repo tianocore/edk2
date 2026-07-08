@@ -89,6 +89,8 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             Configuration Manager and builds the SLIT table.
   - HEST  : The HEST generator collates the HEST information from the
             Configuration Manager and builds the HEST table.
+  - EINJ  : The EINJ generator collates the required platform information from
+            the Configuration Manager and builds the EINJ table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -129,6 +131,8 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdRhct,                          ///< RHCT Generator
   EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
   EStdAcpiTableIdHest,                          ///< Hest Generator
+  EStdAcpiTableIdEinj,                          ///< EINJ Generator
+  EStdAcpiTableIdHmat,                          ///< HMAT Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

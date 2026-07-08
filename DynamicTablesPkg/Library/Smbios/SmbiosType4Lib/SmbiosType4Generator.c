@@ -2,7 +2,7 @@
   SMBIOS Type4 Table Generator.
 
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-  Copyright (c) 2020 - 2025, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -284,7 +284,17 @@ BuildSmbiosType4TableEx (
       continue;
     }
 
-    StringTableInitialize (&StrTable, SMBIOS_TYPE4_MAX_STRINGS);
+    Status = StringTableInitialize (&StrTable, SMBIOS_TYPE4_MAX_STRINGS);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to initialize string table for ProcHierarchyNodeList[%u]. Status = %r\n",
+        __func__,
+        Index,
+        Status
+        ));
+      goto exitErrorBuildSmbiosType4Table;
+    }
 
     SocketDesignationRef     = 0;
     ProcessorManufacturerRef = 0;
@@ -299,6 +309,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Socket Designation String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -308,6 +319,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Processor Manufacturer String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -317,6 +329,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Processor Version String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -326,6 +339,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Serial Number String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -335,6 +349,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Asset Tag String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -344,6 +359,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Part Number String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -353,6 +369,7 @@ BuildSmbiosType4TableEx (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Failed to add Socket Type String %r\n", Status));
         ASSERT (!EFI_ERROR (Status));
+        StringTableFree (&StrTable);
         goto exitErrorBuildSmbiosType4Table;
       }
     }
@@ -361,6 +378,7 @@ BuildSmbiosType4TableEx (
     SmbiosRecord     = (SMBIOS_TABLE_TYPE4 *)AllocateZeroPool (SmbiosRecordSize);
     if (SmbiosRecord == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
+      StringTableFree (&StrTable);
       goto exitErrorBuildSmbiosType4Table;
     }
 
@@ -400,6 +418,8 @@ BuildSmbiosType4TableEx (
         if (Node == NULL) {
           ASSERT (Node != NULL);
           Status = EFI_INVALID_PARAMETER;
+          FreePool (SmbiosRecord);
+          StringTableFree (&StrTable);
           goto exitErrorBuildSmbiosType4Table;
         }
 
@@ -449,10 +469,13 @@ BuildSmbiosType4TableEx (
 
     CharacteristicFlags = (PROCESSOR_CHARACTERISTIC_FLAGS *)&SmbiosRecord->ProcessorCharacteristics;
  #if defined (MDE_CPU_AARCH64)
-    CharacteristicFlags->Processor64BitCapable = 1;
+    CharacteristicFlags->ProcessorArm64SocId = 1;
  #endif
     CharacteristicFlags->ProcessorMultiCore      = (CpuCount > 1) ? 1 : 0;
     CharacteristicFlags->ProcessorHardwareThread = (ThreadCount > CpuCount) ? 1 : 0;
+    if (MAX_UINTN == MAX_UINT64) {
+      CharacteristicFlags->Processor64BitCapable = 1;
+    }
 
     SmbiosRecord->CoreCount         = (CpuCount < 256) ? CpuCount : 0xff;
     SmbiosRecord->CoreCount2        = CpuCount;
@@ -472,6 +495,8 @@ BuildSmbiosType4TableEx (
 
     StringTablePublishStringSet (&StrTable, (CHAR8 *)(SmbiosRecord + 1), SmbiosRecordSize - sizeof (SMBIOS_TABLE_TYPE4));
 
+    StringTableFree (&StrTable);
+
     TableList[ObjIndex] = (SMBIOS_STRUCTURE *)SmbiosRecord;
     ObjIndex++;
     ASSERT (ObjIndex <= SocketCount);
@@ -486,7 +511,13 @@ BuildSmbiosType4TableEx (
   return EFI_SUCCESS;
 
 exitErrorBuildSmbiosType4Table:
-  if (TableList) {
+  if (TableList != NULL) {
+    for (Index = 0; Index < ObjIndex; Index++) {
+      if (TableList[Index] != NULL) {
+        FreePool (TableList[Index]);
+      }
+    }
+
     FreePool (TableList);
   }
 

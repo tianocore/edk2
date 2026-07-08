@@ -167,7 +167,7 @@ EFI_STATUS
 
   @param This           Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
 
-  @param Configuration  A null-terminated string in <MulltiConfigResp> format.
+  @param Configuration  A null-terminated string in <MultiConfigResp> format.
 
   @param Progress       A pointer to a string filled in with the
                         offset of the most recent '&' before the

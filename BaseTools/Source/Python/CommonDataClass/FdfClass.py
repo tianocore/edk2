@@ -249,6 +249,7 @@ class RuleClassObject :
         self.FvFileType = None       # for Ffs File Type
         self.KeyStringList = []
         self.KeepReloc = None
+        self.Xip = False
 
 ## Complex rule data in FDF
 #

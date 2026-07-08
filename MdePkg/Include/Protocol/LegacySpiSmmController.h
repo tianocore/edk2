@@ -1,5 +1,5 @@
 /** @file
-  This file defines the Legacy SPI SMM Controler Protocol.
+  This file defines the Legacy SPI SMM Controller Protocol.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

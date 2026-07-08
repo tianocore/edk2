@@ -390,7 +390,7 @@ PublishTpm2 (
     mTpm2AcpiTemplate.AddressOfControlArea     = PcdGet64 (PcdTpmBaseAddress) + 0x40;
     mTpm2AcpiTemplate.FfaParameters.Flags      = 0x00;           // Notifications Not Supported
     mTpm2AcpiTemplate.FfaParameters.Attributes = (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_4KB << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_SHIFT) |
-                                                 (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_NOT_CACHABLE << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_SHIFT);
+                                                 (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_NOT_CACHEABLE << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_SHIFT);
     mTpm2AcpiTemplate.FfaParameters.PartitionId = PartitionId;   // Partition ID
     ControlArea                                 = (EFI_TPM2_ACPI_CONTROL_AREA *)(UINTN)mTpm2AcpiTemplate.AddressOfControlArea;
     ControlArea->CommandSize                    = 0xF80;

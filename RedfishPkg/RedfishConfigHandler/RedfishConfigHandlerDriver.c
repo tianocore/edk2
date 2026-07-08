@@ -41,6 +41,43 @@ EFI_DRIVER_BINDING_PROTOCOL  gRedfishConfigDriverBinding = {
 };
 
 /**
+  Disconnect the interface communication with REST EX protocol.
+
+  @param[in]   Event    Event whose notification function is being invoked.
+  @param[out]  Context  Pointer to the Context buffer
+
+**/
+VOID
+EFIAPI
+RedfishConfigDisconnection (
+  IN  EFI_EVENT  Event,
+  OUT VOID       *Context
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_REDFISH_DISCOVERED_LIST  *DiscoveredList;
+
+  if (gRedfishServiceDiscovered) {
+    DiscoveredList = (EFI_REDFISH_DISCOVERED_LIST *)Context;
+    if (DiscoveredList == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: DiscoveredList == NULL, failed to release Redfish service.\n", __func__));
+      return;
+    } else {
+      Status = gEfiRedfishDiscoverProtocol->ReleaseRedfishService (gEfiRedfishDiscoverProtocol, DiscoveredList);
+      FreePool (DiscoveredList);
+      if (!EFI_ERROR (Status)) {
+        gBS->CloseEvent (Event);
+        gRedfishServiceDiscovered = FALSE;
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish service is released.\n", __func__));
+        return;
+      }
+
+      DEBUG ((DEBUG_ERROR, "%a: Failed to release Redfish service.: %r\n", __func__, Status));
+    }
+  }
+}
+
+/**
   Stop acquiring Redfish service.
 
 **/
@@ -320,8 +357,11 @@ RedfishServiceDiscoveredCallback (
   OUT VOID       *Context
   )
 {
+  EFI_STATUS                       Status;
+  EFI_EVENT                        ThisEvent;
   EFI_REDFISH_DISCOVERED_TOKEN     *RedfishDiscoveredToken;
   EFI_REDFISH_DISCOVERED_INSTANCE  *RedfishInstance;
+  EFI_REDFISH_DISCOVERED_LIST      *ThisDiscoveredList;
 
   RedfishDiscoveredToken = (EFI_REDFISH_DISCOVERED_TOKEN *)Context;
   gBS->CloseEvent (RedfishDiscoveredToken->Event);
@@ -331,6 +371,33 @@ RedfishServiceDiscoveredCallback (
   //
   if (!gRedfishServiceDiscovered) {
     RedfishInstance = RedfishDiscoveredToken->DiscoverList.RedfishInstances;
+
+    // Save EFI_REDFISH_DISCOVERED_LIST for the later release.
+    ThisDiscoveredList = (EFI_REDFISH_DISCOVERED_LIST *)AllocatePool (sizeof (EFI_REDFISH_DISCOVERED_LIST));
+    if (ThisDiscoveredList == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: Memory allocation of EFI_REDFISH_DISCOVERED_LIST is failed.\n", __func__));
+      goto ErrorExit;
+    }
+
+    CopyMem ((VOID *)ThisDiscoveredList, (VOID *)&RedfishDiscoveredToken->DiscoverList, sizeof (EFI_REDFISH_DISCOVERED_LIST));
+
+    //
+    // Create gEdkIIRedfisEventRedfishInterfaceDisconnectionGuid event to stop Redfish service.
+    //
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    RedfishConfigDisconnection,
+                    (VOID *)ThisDiscoveredList,
+                    &gEdkIIRedfisEventRedfishInterfaceDisconnectionGuid,
+                    &ThisEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Fail to register Redfish transport interface disconnection event.\n", __func__));
+      FreePool (ThisDiscoveredList);
+      goto ErrorExit;
+    }
+
     //
     // Only pick up the first found Redfish service.
     //
@@ -355,6 +422,7 @@ RedfishServiceDiscoveredCallback (
     RedfishConfigHandlerInstalledCallback (gRedfishConfigData.Event, &gRedfishConfigData);
   }
 
+ErrorExit:
   FreePool (RedfishDiscoveredToken);
 }
 

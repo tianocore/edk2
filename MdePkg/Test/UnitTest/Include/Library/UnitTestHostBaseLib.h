@@ -568,7 +568,7 @@ typedef struct {
 
 ///
 /// Data structure that contains pointers structures of common services and CPU
-/// architctuire specific services.  Support for additional CPU architectures
+/// architecture specific services.  Support for additional CPU architectures
 /// can be added to the end of this structure.
 ///
 typedef struct {

@@ -43,23 +43,40 @@ generators implement the functionality required for ARM architecture;
 the framework is extensible, and support for other architectures can
 be added easily.
 
-The framework currently supports the following table generators for ARM:
-* DBG2 - Debug Port Table 2
+The framework currently supports the following table generators:
+
 * DSDT - Differentiated system description table. This is essentially
          a RAW table generator.
-* FADT - Fixed ACPI Description Table
-* GTDT - Generic Timer Description Table
-* IORT - IO Remapping Table
-* MADT - Multiple APIC Description Table
-* MCFG - PCI Express memory mapped configuration space base address
-         Description Table
-* PCCT - Platform Communications Channel Table
-* PPTT - Processor Properties Topology Table
-* SPCR - Serial Port Console Redirection Table
-* SRAT - System Resource Affinity Table
 * SSDT - Secondary System Description Table. This is essentially
          a RAW table generator.
+* MADT - Multiple APIC Description Table
+* GTDT - Generic Timer Description Table
+* DBG2 - Debug Port Table 2
+* SPCR - Serial Port Console Redirection Table
+* MCFG - PCI Express memory mapped configuration space base address
+         Description Table
+* IORT - IO Remapping Table
+* PPTT - Processor Properties Topology Table
+* SRAT - System Resource Affinity Table
+* SSDT Serial Port
+* SSDT CMN
+* SSDT Cpu
+* SSDT Pcie
+* SSDT Plic/Aplic
+* PCCT - Platform Communications Channel Table
+* FADT - Fixed ACPI Description Table
+* TPM2 - Trusted Platform Module 2 Table
+* WSMT - Windows Security Mitigation Table
+* HPET - IA-PC High Precision Event Timer Table
+* SSDT HPET
+* SPMI - Server Platform Management Interface Table
+* FACS - Firmware ACPI Control Structure
+* CEDT - CXL Early Discovery Table
+* SLIT - System Locality Information Table
+* RHCT - RISC-V Hart Capabilities Table
+* SSDT DMC
 * HEST - Hardware Error Source Table
+* EINJ - APEI Error Injection Table
 
 ## Dynamic AML
 

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
+#include "KeyContext.h"
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <crypto/asn1.h>
@@ -946,6 +947,119 @@ EcGetPublicKeyFromX509 (
   if ((*EcContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
     Status = TRUE;
   }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  if (Pkey != NULL) {
+    EVP_PKEY_free (Pkey);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the Ed-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert          Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize      Size of the X509 certificate in bytes.
+  @param[out] EdDsaContext  Pointer to new-generated Ed DSA context which contain the retrieved
+                            Ed-Dsa public key component. Use EdDsaFree() function to free the
+                            resource.
+
+  If Cert is NULL, then return FALSE.
+  If EdDsaContext is NULL, then return FALSE.
+
+  @retval  TRUE   EdDsa Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve EdDsa public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+EdDsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EdDsaContext
+  )
+{
+  BOOLEAN      Status;
+  EVP_PKEY     *Pkey;
+  EVP_PKEY     *DupPkey;
+  INT32        Nid;
+  X509         *X509Cert;
+  KEY_CONTEXT  *Ctx;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (EdDsaContext == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // If CertSize is 0, return FALSE to be safe.
+  //
+  if (CertSize == 0) {
+    *EdDsaContext = NULL;
+    return FALSE;
+  }
+
+  Pkey     = NULL;
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if (!Status || (X509Cert == NULL)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Retrieve and check EVP_PKEY data from X509 Certificate.
+  //
+  Pkey = X509_get_pubkey (X509Cert);
+  if (Pkey == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Nid = EVP_PKEY_id (Pkey);
+  if (Nid != EVP_PKEY_ED448) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Duplicate EdDSA Context from the retrieved EVP_PKEY.
+  //
+  DupPkey = EVP_PKEY_dup (Pkey);
+  if (DupPkey == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Allocate KEY_CONTEXT wrapper structure
+  //
+  Ctx = (KEY_CONTEXT *)AllocateZeroPool (sizeof (KEY_CONTEXT));
+  if (Ctx == NULL) {
+    EVP_PKEY_free (DupPkey);
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Ctx->Nid      = Nid;
+  Ctx->EvpPkey  = DupPkey;
+  *EdDsaContext = (VOID *)Ctx;
+  Status        = TRUE;
 
 _Exit:
   //

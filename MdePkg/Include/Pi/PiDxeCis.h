@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Pi/PiMultiPhase.h>
 
 ///
-/// Global Coherencey Domain types - Memory type.
+/// Global Coherency Domain types - Memory type.
 ///
 typedef enum {
   ///
@@ -64,7 +64,7 @@ typedef enum {
 } EFI_GCD_MEMORY_TYPE;
 
 ///
-/// Global Coherencey Domain types - IO type.
+/// Global Coherency Domain types - IO type.
 ///
 typedef enum {
   ///

@@ -51,6 +51,32 @@ Note: Please refer to QEMU compilation rules, located in qemu/doc/system/loongar
     source edk2/edksetup.sh BaseTools
     build -b RELEASE -t GCC -a LOONGARCH64 -p OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc
 
+### Secure Boot
+
+LoongArchVirt Secure Boot builds that are intended to keep Secure Boot
+state locked from the guest should use the QEMU UEFI variable store:
+
+    build -b RELEASE -t GCC -a LOONGARCH64 \
+      -p OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc \
+      -D SECURE_BOOT_ENABLE=TRUE \
+      -D QEMU_PV_VARS=TRUE
+
+When using `QEMU_PV_VARS=TRUE`, configure the QEMU `uefi-vars-sysbus`
+device with policy options that keep Secure Boot enabled and prevent
+guest-side Custom Mode changes:
+
+    -device uefi-vars-sysbus,jsonfile=/path/to/varstore.json,\
+disable-custom-mode=on,force-secure-boot=on
+
+Without these QEMU-side policy options, the VM manager does not lock
+the guest out of Custom Mode or Secure Boot state changes through UEFI
+variable services. LoongArchVirt does not provide a hardware-backed
+physical-presence mechanism, so locked Secure Boot deployments must
+express this policy in the QEMU configuration.
+
+Refer to `OvmfPkg/QEMU_PV_VARS.md` for more information about the QEMU
+UEFI variable store.
+
 ## Test LoongArch QEMU virtual machine firmware
     qemu-system-loongarch64 \
     -m 4G \

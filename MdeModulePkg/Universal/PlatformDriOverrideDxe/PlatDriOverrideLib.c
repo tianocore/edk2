@@ -686,7 +686,7 @@ InitOverridesMapping (
   // Check the environment variable(s) that contain the override mappings .
   //
   VariableBuffer = GetVariableAndSize (L"PlatDriOver", &gEfiCallerIdGuid, &BufferSize);
-  ASSERT ((UINTN)VariableBuffer % sizeof (UINTN) == 0);
+  ASSERT (ADDRESS_IS_ALIGNED (VariableBuffer, sizeof (UINTN)));
   if (VariableBuffer == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -818,7 +818,7 @@ InitOverridesMapping (
     if (NotEnd != 0) {
       UnicodeSPrint (OverrideVariableName, sizeof (OverrideVariableName), L"PlatDriOver%d", VariableNum++);
       VariableBuffer = GetVariableAndSize (OverrideVariableName, &gEfiCallerIdGuid, &BufferSize);
-      ASSERT ((UINTN)VariableBuffer % sizeof (UINTN) == 0);
+      ASSERT (ADDRESS_IS_ALIGNED (VariableBuffer, sizeof (UINTN)));
       if (VariableBuffer == NULL) {
         FreeMappingDatabase (MappingDataBase);
         return EFI_VOLUME_CORRUPTED;
@@ -1043,7 +1043,7 @@ SaveOverridesMapping (
     //
     VariableBuffer = AllocateZeroPool (VariableNeededSize);
     ASSERT (VariableBuffer != NULL);
-    ASSERT ((UINTN)VariableBuffer % sizeof (UINTN) == 0);
+    ASSERT (ADDRESS_IS_ALIGNED (VariableBuffer, sizeof (UINTN)));
 
     //
     // Fill the variable buffer according to MappingDataBase

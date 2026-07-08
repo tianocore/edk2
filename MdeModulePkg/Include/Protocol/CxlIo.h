@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __CXL_IO_H__
-#define __CXL_IO_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include "IndustryStandard/Cxl20.h"
@@ -150,5 +149,3 @@ struct _EDKII_CXL_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiCxlIoProtocolGuid;
-
-#endif

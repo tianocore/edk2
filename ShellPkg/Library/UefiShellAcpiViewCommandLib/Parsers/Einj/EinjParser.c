@@ -327,7 +327,9 @@ ParseAcpiEinj (
              );
 
   // Validate Error Source Descriptors Count.
-  if ((mEinjInjectionHdrSize == NULL) || (*mEinjInjectionHdrSize != Offset)) {
+  if ((mEinjInjectionHdrSize == NULL) ||
+      (*mEinjInjectionHdrSize != (Offset - sizeof (EFI_ACPI_DESCRIPTION_HEADER))))
+  {
     IncrementErrorCount ();
     Print (L"ERROR: Invalid Injection Header...\n");
     return;

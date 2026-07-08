@@ -164,7 +164,7 @@ EFI_STATUS
                                 is set to 1 on input, but the
                                 device does not support enabling
                                 writes
-                                (FvAttributes:EFI_FV_WRITE_ENABL
+                                (FvAttributes:EFI_FV_WRITE_ENABLE_CAP
                                 is clear on return from
                                 GetVolumeAttributes()). Actual
                                 volume attributes are unchanged.

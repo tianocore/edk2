@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_TRANSPORT_KCS_LIB_H_
-#define MANAGEABILITY_TRANSPORT_KCS_LIB_H_
+#pragma once
 
 #include <Library/ManageabilityTransportLib.h>
 
@@ -34,9 +33,7 @@ typedef struct {
 
 #define MCTP_KCS_MTU_IN_POWER_OF_2  8
 
-/// 5 sec, according to IPMI spec
-#define IPMI_KCS_TIMEOUT_5_SEC  5000*1000
-#define IPMI_KCS_TIMEOUT_1MS    1000
+#define IPMI_KCS_TIMEOUT_1MS  1000
 
 /**
   This service communicates with BMC using KCS protocol.
@@ -109,5 +106,3 @@ KcsRegisterWrite8 (
   MANAGEABILITY_TRANSPORT_HARDWARE_IO  Address,
   UINT8                                Value
   );
-
-#endif

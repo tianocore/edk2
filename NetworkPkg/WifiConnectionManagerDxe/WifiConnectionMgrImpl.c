@@ -267,7 +267,6 @@ WifiMgrStartScan (
 
   Nic->ScanState  = WifiMgrScanning;
   OldTpl          = gBS->RaiseTPL (TPL_CALLBACK);
-  Status          = EFI_SUCCESS;
   HiddenSSIdList  = NULL;
   HiddenSSIdCount = Nic->Private->HiddenNetworkCount;
   HiddenSSIdIndex = 0;
@@ -1399,7 +1398,6 @@ WifiMgrDisconnectToNetwork (
   }
 
   OldTpl      = gBS->RaiseTPL (TPL_CALLBACK);
-  Status      = EFI_SUCCESS;
   ConfigToken = AllocateZeroPool (sizeof (WIFI_MGR_MAC_CONFIG_TOKEN));
   if (ConfigToken == NULL) {
     gBS->RestoreTPL (OldTpl);

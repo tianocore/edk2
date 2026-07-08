@@ -5,7 +5,7 @@
   all over this file.
 
   The only place where multi-instance device paths are supported is in
-  environment varibles. Multi-instance device paths should never be placed
+  environment variables. Multi-instance device paths should never be placed
   on a Handle.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
