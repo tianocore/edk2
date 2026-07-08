@@ -184,6 +184,10 @@ GetUefiImageProtectionPolicy (
     return FALSE;
   }
 
+  if (IsCompatibilityModeActive ()) {
+    return DO_NOT_PROTECT;
+  }
+
   //
   // Check DevicePath
   //
@@ -851,11 +855,13 @@ GetPermissionAttributeForMemoryType (
     TestBit = LShiftU64 (1, MemoryType);
   }
 
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
-    return EFI_MEMORY_XP;
-  } else {
+  if (IsCompatibilityModeActive ()) {
     return 0;
+  } else if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
+    return EFI_MEMORY_XP;
   }
+
+  return 0;
 }
 
 /**
