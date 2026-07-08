@@ -69,6 +69,12 @@
   DxeMain/DxeProtocolNotify.c
   DxeMain/DxeMain.c
 
+[Sources.X64]
+  Misc/X64/LegacyBiosMemoryProt.c
+
+[Sources.IA32, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
+  Misc/LegacyBiosMemoryProt.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -98,6 +104,9 @@
   ImagePropertiesRecordLib
   OrderedCollectionLib
 
+[LibraryClasses.X64]
+  SafeIntLib
+
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## PRODUCES             ## Event
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
@@ -126,6 +135,7 @@
   gEfiMemoryAttributesTableGuid                 ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event
   gEfiHobMemoryAllocStackGuid                   ## SOMETIMES_CONSUMES   ## SystemTable
+  gCompatibilityModeActivatedEventGuid          ## SOMETIMES_PRODUCES   ## Event
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED # HOB
