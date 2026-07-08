@@ -20,6 +20,12 @@
 #include <AmlInclude.h>
 #include <Api/AmlApiHelper.h>
 #include <CodeGen/AmlResourceDataCodeGen.h>
+#include <Utils/AmlUtility.h>
+
+/* Macros to read General flags of a Resource Data Address Descriptors */
+#define IS_RD_ADDR_POS_DECODE(GenFlag)  (((GenFlag) & BIT1) == 0)
+#define IS_RD_ADDR_MIN_FIXED(GenFlag)   (((GenFlag) & BIT2) == BIT2)
+#define IS_RD_ADDR_MAX_FIXED(GenFlag)   (((GenFlag) & BIT3) == BIT3)
 
 /** Update the first interrupt of an Interrupt resource data node.
 
@@ -271,7 +277,8 @@ AmlUpdateRdQWord (
           AML_RD_BUILD_LARGE_DESC_ID (
             ACPI_LARGE_QWORD_ADDRESS_SPACE_DESCRIPTOR_NAME
             )
-          )))
+          )) ||
+      (BaseAddressLength == 0))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -312,6 +319,20 @@ AmlUpdateRdQWord (
   RdQWord->AddrRangeMin = BaseAddress;
   RdQWord->AddrRangeMax = BaseAddress + BaseAddressLength - 1;
   RdQWord->AddrLen      = BaseAddressLength;
+
+  Status = CheckAddressSpaceFields (
+             IS_RD_ADDR_MIN_FIXED (RdQWord->GenFlag),
+             IS_RD_ADDR_MAX_FIXED (RdQWord->GenFlag),
+             RdQWord->AddrSpaceGranularity,
+             RdQWord->AddrRangeMin,
+             RdQWord->AddrRangeMax,
+             RdQWord->AddrTranslationOffset,
+             RdQWord->AddrLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
 
   // Update Base Address Resource Data node.
   Status = AmlUpdateDataNode (
