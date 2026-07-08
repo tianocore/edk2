@@ -2802,3 +2802,12 @@ EFI_STATUS
 CoreInitializeHandleServices (
   VOID
   );
+
+/**
+  Activate compatibility mode to disable memory protections for non-NX_COMPAT EFI_APPLICATIONS.
+**/
+VOID
+EFIAPI
+ActivateCompatibilityMode (
+  VOID
+  );
