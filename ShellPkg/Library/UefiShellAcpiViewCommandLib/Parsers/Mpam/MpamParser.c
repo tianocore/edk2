@@ -71,61 +71,6 @@ MpamLengthError (
 }
 
 /**
-  This function validates reserved fields. Any reserved field within the MPAM
-  specification must be 0.
-
-  @param [in] Ptr       Pointer to the start of the field data.
-  @param [in] Length    Length of the field.
-  @param [in] Context   Pointer to context specific information. For this
-                        particular function, context holds the size of the
-                        reserved field that needs to be validated.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateReserved (
-  IN UINT8   *Ptr,
-  IN UINT32  Length,
-  IN VOID    *Context
-  )
-{
-  while (Length > 0) {
-    if (Ptr[Length-1] != 0) {
-      IncrementErrorCount ();
-      Print (L"\nERROR : Reserved field must be 0\n");
-      break;
-    }
-
-    Length--;
-  }
-}
-
-/**
-  This function validates bit-length reserved fields. Any reserved field within
-  the MPAM specification must be 0.
-
-  @param [in] Ptr       Pointer to the start of the field data.
-  @param [in] Length    Length of the field.
-  @param [in] Context   Pointer to context specific information. For this
-                        particular function, context holds the size of the
-                        reserved field that needs to be validated.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateReservedBits (
-  IN UINT8   *Ptr,
-  IN UINT32  Length,
-  IN VOID    *Context
-  )
-{
-  UINT32  ByteLength;
-
-  ByteLength = (Length + 7) >> 3;
-  ValidateReserved (Ptr, ByteLength, Context);
-}
-
-/**
   This function validates the MMIO size within the MSC node body for MPAM ACPI
   table. MPAM ACPI specification states that the MMIO size for an MSC having PCC
   type interface should be zero.

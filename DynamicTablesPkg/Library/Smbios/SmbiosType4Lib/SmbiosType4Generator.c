@@ -469,10 +469,13 @@ BuildSmbiosType4TableEx (
 
     CharacteristicFlags = (PROCESSOR_CHARACTERISTIC_FLAGS *)&SmbiosRecord->ProcessorCharacteristics;
  #if defined (MDE_CPU_AARCH64)
-    CharacteristicFlags->Processor64BitCapable = 1;
+    CharacteristicFlags->ProcessorArm64SocId = 1;
  #endif
     CharacteristicFlags->ProcessorMultiCore      = (CpuCount > 1) ? 1 : 0;
     CharacteristicFlags->ProcessorHardwareThread = (ThreadCount > CpuCount) ? 1 : 0;
+    if (MAX_UINTN == MAX_UINT64) {
+      CharacteristicFlags->Processor64BitCapable = 1;
+    }
 
     SmbiosRecord->CoreCount         = (CpuCount < 256) ? CpuCount : 0xff;
     SmbiosRecord->CoreCount2        = CpuCount;

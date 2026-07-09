@@ -113,6 +113,7 @@ M: Chao Li <lichao@loongson.cn> [kilaterlee]
 M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
 R: Xiangdong Meng <mengxiangdong@loongson.cn> [AydenMeng]
+R: Qihang Gao <gaoqihang@loongson.cn> [EricGao2015]
 
 EDK II Continuous Integration:
 ------------------------------
@@ -217,7 +218,6 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 EmulatorPkg
 F: EmulatorPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/platform-ports/emulator_pkg.html
-M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 S: Maintained
@@ -312,6 +312,7 @@ F: MdeModulePkg/Library/DxeSecurityManagementLib/
 F: MdeModulePkg/Universal/PCD/
 F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
 F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
@@ -379,6 +380,7 @@ R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 MdeModulePkg: Pei Core
 F: MdeModulePkg/Core/Pei/
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
@@ -605,6 +607,7 @@ F: OvmfPkg/LoongArchVirt
 M: Chao Li <lichao@loongson.cn> [kilaterlee]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
 R: Xianglai Li <lixianglai@loongson.cn> [lixianglai]
+R: Qihang Gao <gaoqihang@loongson.cn> [EricGao2015]
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
