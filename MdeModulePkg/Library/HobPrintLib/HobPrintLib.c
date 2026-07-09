@@ -382,28 +382,6 @@ PrintFv3Hob (
   return EFI_SUCCESS;
 }
 
-/**
-  Return the human-readable name string for the given EFI_MEMORY_TYPE.
-
-  @param[in] MemoryType   The memory type value.
-
-  @return A pointer to a null-terminated ASCII string describing the memory type,
-          or "Unknown" if the type is not recognized.
-
-**/
-CONST CHAR8 *
-EFIAPI
-GetMemoryTypeName (
-  IN EFI_MEMORY_TYPE  MemoryType
-  )
-{
-  if ((UINTN)MemoryType < ARRAY_SIZE (mMemoryTypeStr)) {
-    return mMemoryTypeStr[MemoryType];
-  }
-
-  return "Unknown";
-}
-
 //
 // Mapping table from Hob type to Hob print function.
 //
@@ -422,7 +400,11 @@ HOB_PRINT_HANDLER_TABLE  mHobHandles[] = {
 };
 
 /**
-  Print all HOBs info from the HOB list.
+  Print memory allocation HOB information from the HOB list.
+
+  If a custom PrintHandler is provided, it is called first. If it returns
+  EFI_SUCCESS, the default handling for the HOB is skipped. Otherwise, only
+  EFI_HOB_TYPE_MEMORY_ALLOCATION HOBs are printed.
 
   @param[in] HobStart       A pointer to the HOB list.
   @param[in] PrintHandler   A custom handler to print HOB info.
@@ -437,58 +419,51 @@ PrintHobList (
 {
   EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
-  UINTN                 Count;
-  UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  End;
+  CONST CHAR8           *MemoryTypeName;
 
   ASSERT (HobStart != NULL);
 
   Hob.Raw = (UINT8 *)HobStart;
-  DEBUG ((DEBUG_INFO, "Print all Hob information from Hob 0x%p\n", Hob.Raw));
 
-  Status = EFI_SUCCESS;
-  Count  = 0;
-  //
-  // Parse the HOB list to see which type it is, and print the information.
-  //
   while (!END_OF_HOB_LIST (Hob)) {
-    //
-    // Print HOB generic information
-    //
-    for (Index = 0; Index < ARRAY_SIZE (mHobHandles); Index++) {
-      if (Hob.Header->HobType == mHobHandles[Index].Type) {
-        DEBUG ((DEBUG_INFO, "HOB[%d]: Type = %a, Offset = 0x%p, Length = 0x%x\n", Count, mHobHandles[Index].Name, (Hob.Raw - (UINT8 *)HobStart), Hob.Header->HobLength));
-        break;
-      }
-    }
-
-    if (Index == ARRAY_SIZE (mHobHandles)) {
-      DEBUG ((DEBUG_INFO, "HOB[%d]: Type = %d, Offset = 0x%p, Length = 0x%x\n", Count, Hob.Header->HobType, (Hob.Raw - (UINT8 *)HobStart), Hob.Header->HobLength));
-    }
-
     //
     // Process custom HOB print handler first
     //
+    Status = EFI_SUCCESS;
     if (PrintHandler != NULL) {
       Status = PrintHandler (Hob.Raw, Hob.Header->HobLength);
     }
 
     //
-    // Process internal HOB print handler
+    // Print concise memory allocation information when the custom handler
+    // does not handle this HOB.
     //
     if ((PrintHandler == NULL) || EFI_ERROR (Status)) {
-      if (Index < ARRAY_SIZE (mHobHandles)) {
-        if (mHobHandles[Index].PrintHandler != NULL) {
-          mHobHandles[Index].PrintHandler (Hob.Raw, Hob.Header->HobLength);
+      if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+        if (Hob.MemoryAllocation->AllocDescriptor.MemoryLength == 0) {
+          End = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+        } else {
+          End = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1;
         }
-      } else {
-        DEBUG ((DEBUG_INFO, "   Unknown Hob type, full hex dump in below:\n"));
-        PrintHex (DEBUG_INFO, Hob.Raw, Hob.Header->HobLength);
+
+        if ((UINTN)Hob.MemoryAllocation->AllocDescriptor.MemoryType < ARRAY_SIZE (mMemoryTypeStr)) {
+          MemoryTypeName = mMemoryTypeStr[Hob.MemoryAllocation->AllocDescriptor.MemoryType];
+        } else {
+          MemoryTypeName = "Unknown";
+        }
+
+        DEBUG ((
+          DEBUG_INFO,
+          "Memory Allocation 0x%08x 0x%0lx - 0x%0lx (%a)\n",
+          Hob.MemoryAllocation->AllocDescriptor.MemoryType,
+          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
+          End,
+          MemoryTypeName
+          ));
       }
     }
 
-    Count++;
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
-
-  DEBUG ((DEBUG_INFO, "There are totally %d Hobs, the End Hob address is %p\n", Count, Hob.Raw));
 }

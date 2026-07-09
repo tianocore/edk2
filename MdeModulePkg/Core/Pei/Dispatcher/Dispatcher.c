@@ -1094,7 +1094,6 @@ PeiCheckAndSwitchStack (
     //
     DEBUG_CODE_BEGIN ();
     UINT32                *StackPointer;
-    EFI_PEI_HOB_POINTERS  Hob;
 
     for (  StackPointer = (UINT32 *)SecCoreData->StackBase;
            (StackPointer < (UINT32 *)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
@@ -1121,18 +1120,7 @@ PeiCheckAndSwitchStack (
       "  temporary memory heap occupied by memory pages: %d bytes.\n",
       (UINT32)(UINTN)(Private->HobList.HandoffInformationTable->EfiMemoryTop - Private->HobList.HandoffInformationTable->EfiFreeMemoryTop)
       ));
-    for (Hob.Raw = Private->HobList.Raw; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
-        DEBUG ((
-          DEBUG_INFO,
-          "Memory Allocation 0x%08x 0x%0lx - 0x%0lx (%a)\n",
-          Hob.MemoryAllocation->AllocDescriptor.MemoryType,
-          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
-          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1,
-          GetMemoryTypeName (Hob.MemoryAllocation->AllocDescriptor.MemoryType)
-          ));
-      }
-    }
+    PrintHobList (Private->HobList.Raw, NULL);
 
     DEBUG_CODE_END ();
 
