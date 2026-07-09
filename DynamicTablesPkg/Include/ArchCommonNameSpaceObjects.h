@@ -88,6 +88,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
   EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
   EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1468,6 +1471,69 @@ typedef struct CmArchCommonMemoryArrayMappedAddress {
   /// Number of memory devices that form a row in the address partition.
   UINT8                   NumMemDevices;
 } CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 20
+
+  ID: EArchCommonObjMemoryDeviceMappedAddress
+**/
+typedef struct CmArchCommonMemoryDeviceMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryDeviceMappedAddressToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token of the associated Memory Device.
+  CM_OBJECT_TOKEN         MemoryDeviceInfoToken;
+  /// CM Object Token of the associated Memory Array Mapped Address.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Identifies the position of the referenced memory device in a row.
+  /// Set to 0xFF if unknown.
+  UINT8                   PartitionRowPosition;
+  /// Identifies the position of the referenced memory device in an interleave.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavePosition;
+  /// Number of consecutive rows from the referenced memory device.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavedDataDepth;
+} CM_ARCH_COMMON_MEMORY_DEVICE_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device entry associated with a
+  Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelDevice
+**/
+typedef struct CmArchCommonMemoryChannelDevice {
+  /// The load on the channel represented by the associated memory device.
+  UINT8              DeviceLoad;
+
+  /// CM Object Token of the associated SMBIOS Type 17 Memory Device.
+  CM_OBJECT_TOKEN    MemoryDeviceInfoToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_DEVICE;
+
+/** A structure that describes a Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelInfo
+**/
+typedef struct CmArchCommonMemoryChannelInfo {
+  /// CM Object Token uniquely identifying this memory channel.
+  CM_OBJECT_TOKEN    MemoryChannelToken;
+
+  /// Type of the memory channel.
+  UINT8              ChannelType;
+
+  /// Maximum load supported by the memory channel.
+  UINT8              MaximumChannelLoad;
+
+  /// Token referencing an array of Memory Channel Device entries.
+  CM_OBJECT_TOKEN    MemoryDeviceListToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_INFO;
 
 /** A structure that describes cooling device.
 
