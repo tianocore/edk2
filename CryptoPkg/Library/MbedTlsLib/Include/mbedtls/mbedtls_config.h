@@ -2,6 +2,7 @@
   mbedtls_config.h  Configuration options (set of defines).
 
   Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -659,7 +660,7 @@
  *
  * Enable Counter Block Cipher mode (CTR) for symmetric ciphers.
  */
-// #define MBEDTLS_CIPHER_MODE_CTR
+#define MBEDTLS_CIPHER_MODE_CTR
 
 /**
  * \def MBEDTLS_CIPHER_MODE_OFB

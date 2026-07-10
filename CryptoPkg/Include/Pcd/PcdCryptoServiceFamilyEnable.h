@@ -377,6 +377,13 @@ typedef struct {
   } AeadAesGcm;
   union {
     struct {
+      UINT8    Encrypt : 1;
+      UINT8    Decrypt : 1;
+    } Services;
+    UINT32    Family;
+  } AesCtr;
+  union {
+    struct {
       UINT8    Init         : 1;
       UINT8    FromBin      : 1;
       UINT8    ToBin        : 1;
