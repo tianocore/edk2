@@ -19,6 +19,7 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
+#include <IndustryStandard/SmBios.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -89,6 +90,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
   EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
   EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1498,6 +1502,41 @@ typedef struct CmArchCommonMemoryDeviceMappedAddress {
   UINT8                   InterleavedDataDepth;
 } CM_ARCH_COMMON_MEMORY_DEVICE_MAPPED_ADDRESS;
 
+/** A structure that describes a Memory Device entry associated with a
+  Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelDevice
+**/
+typedef struct CmArchCommonMemoryChannelDevice {
+  /// The load on the channel represented by the associated memory device.
+  UINT8              DeviceLoad;
+
+  /// CM Object Token of the associated SMBIOS Type 17 Memory Device.
+  CM_OBJECT_TOKEN    MemoryDeviceInfoToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_DEVICE;
+
+/** A structure that describes a Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelInfo
+**/
+typedef struct CmArchCommonMemoryChannelInfo {
+  /// CM Object Token uniquely identifying this memory channel.
+  CM_OBJECT_TOKEN    MemoryChannelToken;
+
+  /// Type of the memory channel.
+  UINT8              ChannelType;
+
+  /// Maximum load supported by the memory channel.
+  UINT8              MaximumChannelLoad;
+
+  /// Token referencing an array of Memory Channel Device entries.
+  CM_OBJECT_TOKEN    MemoryDeviceListToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_INFO;
+
 /** A structure that describes cooling device.
 
   SMBIOS Specification v3.9.0 Type 27
@@ -1667,5 +1706,25 @@ typedef struct CmArchCommonSystemResetInfo {
   /// Timeout value used by the watchdog timer.
   UINT16             Timeout;
 } CM_ARCH_COMMON_SYSTEM_RESET_INFO;
+
+/** A structure that describes processor specific data.
+
+  SMBIOS Specification v3.9.0 Type 44
+
+  ID: EArchCommonObjProcessorSpecificBlockInfo
+**/
+typedef struct CmArchCommonProcessorSpecificBlockInfo {
+  /// CM Object Token uniquely identifying this processor specific block info.
+  CM_OBJECT_TOKEN                       Token;
+
+  /// Relevant Process Hierarchy Socket Token.
+  CM_OBJECT_TOKEN                       ProcSocketToken;
+
+  /// Processor Architecture Type.
+  PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE    ProcArchType;
+
+  /// Token array for architecture specific Processor Data.
+  CM_OBJECT_TOKEN                       ArchProcessorSpecificDataToken;
+} CM_ARCH_COMMON_PROCESSOR_SPECIFIC_BLOCK_INFO;
 
 #pragma pack()
