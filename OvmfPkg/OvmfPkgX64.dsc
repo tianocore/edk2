@@ -266,7 +266,9 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
-!include OvmfPkg/Include/Dsc/OvmfTpmLibs.dsc.inc
+  DxeMemoryProtectionHobLib|MdeModulePkg/Library/MemoryProtectionHobLib/DxeMemoryProtectionHobLib.inf
+
+  !include OvmfPkg/Include/Dsc/OvmfTpmLibs.dsc.inc
 !include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
 !include OvmfPkg/Include/Dsc/OvmfTlsLibs.dsc.inc
 
