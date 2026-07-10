@@ -17,6 +17,7 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/AmdSevLib.h>
+#include <Library/AmdSvsmLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
@@ -192,6 +193,28 @@ STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
   AmdSevMemoryAccept
 };
 
+STATIC EFI_EVENT  mDeregisterAlternateInjectionEvent = NULL;
+
+/**
+  Deregister Alternate Injection in ExitBootServices.
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    The pointer to the notification function's context,
+                        which is implementation-dependent.
+**/
+STATIC
+VOID
+EFIAPI
+DeregisterAlternateInjection (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  AmdSvsmSnpApicConfigEmulation (SVSM_AI_DEREGISTER);
+
+  gBS->CloseEvent (mDeregisterAlternateInjectionEvent);
+}
+
 EFI_STATUS
 EFIAPI
 AmdSevDxeEntryPoint (
@@ -350,6 +373,24 @@ AmdSevDxeEntryPoint (
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "AllowUnacceptedMemory event creation for EventBeforeExitBootServices failed.\n"));
+    }
+
+    if (AmdSvsmIsSvsmPresent () && AmdSvsmAltInjEnabled ()) {
+      Status = gBS->CreateEventEx (
+                      EVT_NOTIFY_SIGNAL,
+                      TPL_CALLBACK,
+                      DeregisterAlternateInjection,
+                      NULL,
+                      &gEfiEventBeforeExitBootServicesGuid,
+                      &mDeregisterAlternateInjectionEvent
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "DeregisterAlternateInjection event creation for EventBeforeExitBootServices failed.\n"
+          ));
+      }
     }
 
     //
