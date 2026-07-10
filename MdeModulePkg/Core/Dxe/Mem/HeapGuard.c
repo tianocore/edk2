@@ -553,7 +553,7 @@ UnsetGuardPage (
   // memory.
   //
   Attributes = 0;
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & (1 << EfiConventionalMemory)) != 0) {
+  if (gDxeMps.NxProtectionPolicy.Fields.EfiConventionalMemory) {
     Attributes |= EFI_MEMORY_XP;
   }
 
@@ -590,38 +590,17 @@ IsMemoryTypeToGuard (
   IN UINT8              PageOrPool
   )
 {
-  UINT64  TestBit;
-  UINT64  ConfigBit;
-
   if (AllocateType == AllocateAddress) {
     return FALSE;
   }
 
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & PageOrPool) == 0) {
-    return FALSE;
+  if ((PageOrPool == GUARD_HEAP_TYPE_POOL) && gDxeMps.HeapGuardPolicy.Fields.UefiPoolGuard) {
+    return GetDxeMemoryTypeSettingFromBitfield (MemoryType, gDxeMps.HeapGuardPoolType);
+  } else if ((PageOrPool == GUARD_HEAP_TYPE_PAGE) && gDxeMps.HeapGuardPolicy.Fields.UefiPageGuard) {
+    return GetDxeMemoryTypeSettingFromBitfield (MemoryType, gDxeMps.HeapGuardPageType);
   }
 
-  if (PageOrPool == GUARD_HEAP_TYPE_POOL) {
-    ConfigBit = PcdGet64 (PcdHeapGuardPoolType);
-  } else if (PageOrPool == GUARD_HEAP_TYPE_PAGE) {
-    ConfigBit = PcdGet64 (PcdHeapGuardPageType);
-  } else {
-    ConfigBit = (UINT64)-1;
-  }
-
-  if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
-    TestBit = BIT63;
-  } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
-    TestBit = BIT62;
-  } else if (MemoryType < EfiMaxMemoryType) {
-    TestBit = LShiftU64 (1, MemoryType);
-  } else if (MemoryType == EfiMaxMemoryType) {
-    TestBit = (UINT64)-1;
-  } else {
-    TestBit = 0;
-  }
-
-  return ((ConfigBit & TestBit) != 0);
+  return FALSE;
 }
 
 /**
@@ -675,7 +654,14 @@ IsHeapGuardEnabled (
   UINT8  GuardType
   )
 {
-  return IsMemoryTypeToGuard (EfiMaxMemoryType, AllocateAnyPages, GuardType);
+  if ((((GuardType & GUARD_HEAP_TYPE_PAGE) == GUARD_HEAP_TYPE_PAGE) && gDxeMps.HeapGuardPolicy.Fields.UefiPageGuard) ||
+      (((GuardType & GUARD_HEAP_TYPE_POOL) == GUARD_HEAP_TYPE_POOL) && gDxeMps.HeapGuardPolicy.Fields.UefiPoolGuard) ||
+      (((GuardType & GUARD_HEAP_TYPE_FREED) == GUARD_HEAP_TYPE_FREED) && gDxeMps.HeapGuardPolicy.Fields.UefiFreedMemoryGuard))
+  {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
@@ -851,7 +837,7 @@ AdjustMemoryS (
   // indicated to put the pool near the Tail Guard, we need extra bytes to
   // make sure alignment of the returned pool address.
   //
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0) {
+  if (gDxeMps.HeapGuardPolicy.Fields.Direction == HEAP_GUARD_ALIGNED_TO_TAIL) {
     *SizeRequested = ALIGN_VALUE (*SizeRequested, 8);
   }
 
@@ -1052,7 +1038,7 @@ AdjustPoolHeadA (
   IN UINTN                 Size
   )
 {
-  if ((Memory == 0) || ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0)) {
+  if ((Memory == 0) || (gDxeMps.HeapGuardPolicy.Fields.Direction == HEAP_GUARD_ALIGNED_TO_HEAD)) {
     //
     // Pool head is put near the head Guard
     //
@@ -1083,7 +1069,7 @@ AdjustPoolHeadF (
   IN UINTN                 Size
   )
 {
-  if ((Memory == 0) || ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0)) {
+  if ((Memory == 0) || (gDxeMps.HeapGuardPolicy.Fields.Direction == HEAP_GUARD_ALIGNED_TO_HEAD)) {
     //
     // Pool head is put near the head Guard
     //
