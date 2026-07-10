@@ -102,6 +102,7 @@
   TimerLib                         | UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
   PrintLib                         | MdePkg/Library/BasePrintLib/BasePrintLib.inf
   BaseMemoryLib                    | MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  DxeMemoryProtectionHobLib        | MdeModulePkg/Library/MemoryProtectionHobLib/DxeMemoryProtectionHobLib.inf
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
