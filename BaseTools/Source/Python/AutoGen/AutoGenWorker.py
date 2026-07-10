@@ -216,6 +216,7 @@ class AutoGenWorkerInProcess(mp.Process):
             GlobalData.gModuleHashFile = dict()
             GlobalData.gFileHashDict = dict()
             GlobalData.gEnableGenfdsMultiThread = self.data_pipe.Get("EnableGenfdsMultiThread")
+            GlobalData.gUseRecommendedInstances = self.data_pipe.Get("UseRecommendedInstances")
             GlobalData.gPlatformFinalPcds = self.data_pipe.Get("gPlatformFinalPcds")
             GlobalData.file_lock = self.file_lock
             CommandTarget = self.data_pipe.Get("CommandTarget")

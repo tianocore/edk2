@@ -36,6 +36,8 @@ from Common.DataType import TAB_COMMENT_EDK_START, TAB_COMMENT_EDK_END
 hexVersionPattern = re.compile(r'0[xX][\da-f-A-F]{5,8}')
 decVersionPattern = re.compile(r'\d+\.\d+')
 CODEPattern = re.compile(r"{CODE\([a-fA-F0-9Xx\{\},\s]*\)}")
+## RegEx for the "## @RecommendedInstance" comment used in INF [LibraryClasses] sections
+RecommendedInstancePattern = re.compile(r'^#+\s*@RecommendedInstance\s+(\S+)')
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
@@ -679,6 +681,18 @@ class InfParser(MetaFileParser):
                 Comments.append((Comment, Index + 1))
             if GlobalData.gOptions and GlobalData.gOptions.CheckUsage:
                 CheckInfComment(self._SectionType, Comments, str(self.MetaFile), Index + 1, self._ValueList)
+            #
+            # Capture the recommended library instance specified by a preceding
+            # "## @RecommendedInstance <PackageRelativePath>" comment in a
+            # [LibraryClasses] section. The resolved path is stored in Value3
+            # of the library class record so it can be used as a fallback when a
+            # library class to instance mapping is missing from the DSC file.
+            #
+            if self._SectionType == MODEL_EFI_LIBRARY_CLASS and self._ValueList[0]:
+                for Cmt, _ in Comments:
+                    Match = RecommendedInstancePattern.match(Cmt)
+                    if Match:
+                        self._ValueList[2] = ReplaceMacro(Match.group(1), self._Macros)
             #
             # Model, Value1, Value2, Value3, Arch, Platform, BelongsToItem=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1

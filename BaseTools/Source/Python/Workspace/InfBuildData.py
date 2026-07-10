@@ -564,6 +564,30 @@ class InfBuildData(ModuleBuildClassObject):
                 RetVal[Lib] = None
         return RetVal
 
+    ## Retrieve the recommended library instances declared in the [LibraryClasses]
+    #  section(s) via "## @RecommendedInstance <PackageRelativePath>" comments.
+    #
+    #  @retval  An OrderedDict mapping a library class name to a PathClass that
+    #           points to the recommended library instance INF file.
+    #
+    @cached_property
+    def RecommendedInstances(self):
+        RetVal = OrderedDict()
+        RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, self._Platform]
+        for Record in RecordList:
+            Lib = Record[0]
+            Instance = Record[2]
+            if not Instance:
+                continue
+            LibraryPath = PathClass(NormPath(Instance, self._Macros), GlobalData.gWorkspace, Arch=self._Arch)
+            # check the file validation
+            ErrorCode, ErrorInfo = LibraryPath.Validate('.inf')
+            if ErrorCode != 0:
+                EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=Record[-1],
+                                ExtraData=ErrorInfo)
+            RetVal[Lib] = LibraryPath
+        return RetVal
+
     ## Retrieve library names (for Edk.x style of modules)
     @cached_property
     def Libraries(self):

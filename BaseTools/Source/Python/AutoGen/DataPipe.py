@@ -170,4 +170,6 @@ class MemoryDataPipe(DataPipe):
 
         self.DataContainer = {"EnableGenfdsMultiThread":GlobalData.gEnableGenfdsMultiThread}
 
+        self.DataContainer = {"UseRecommendedInstances":GlobalData.gUseRecommendedInstances}
+
         self.DataContainer = {"gPlatformFinalPcds":GlobalData.gPlatformFinalPcds}

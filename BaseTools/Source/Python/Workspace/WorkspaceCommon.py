@@ -141,6 +141,21 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
                 if LibraryPath is None:
                     LibraryPath = M.LibraryClasses.get(LibraryClassName)
                     if LibraryPath is None:
+                        # As a fallback, honor a "## @RecommendedInstance" comment
+                        # declared in the [LibraryClasses] section of the consuming
+                        # module/library INF when the DSC file is missing this
+                        # library class to instance mapping. This is enabled by
+                        # default; it can be disabled with --no-recommended-instances
+                        # to make a missing mapping fail the build.
+                        RecommendedInstance = M.RecommendedInstances.get(LibraryClassName)
+                        if RecommendedInstance is not None and GlobalData.gUseRecommendedInstances:
+                            EdkLogger.warn("build",
+                                           f"Instance of library class [{LibraryClassName}] is not found in the DSC for"
+                                           f" module [{Module}]; using @RecommendedInstance [{RecommendedInstance}]"
+                                           f" declared in [{M}] instead.",
+                                           File=FileName)
+                            LibraryPath = RecommendedInstance
+                    if LibraryPath is None:
                         if not Module.LibraryClass:
                             EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
                                             f"Instance of library class [{LibraryClassName}] is not found for"

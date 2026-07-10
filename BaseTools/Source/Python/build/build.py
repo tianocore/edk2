@@ -741,6 +741,7 @@ class Build():
         GlobalData.gBinCacheSource = BuildOptions.BinCacheSource
         GlobalData.gEnableGenfdsMultiThread = not BuildOptions.NoGenfdsMultiThread
         GlobalData.gDisableIncludePathCheck = BuildOptions.DisableIncludePathCheck
+        GlobalData.gUseRecommendedInstances = BuildOptions.UseRecommendedInstances and not BuildOptions.NoRecommendedInstances
 
         if GlobalData.gBinCacheDest and not GlobalData.gUseHashCache:
             EdkLogger.error("build", OPTION_NOT_SUPPORTED, ExtraData="--binary-destination must be used together with --hash.")

@@ -120,6 +120,13 @@ gModuleCacheHit = None
 
 gEnableGenfdsMultiThread = True
 gSikpAutoGenCache = set()
+
+#
+# Build flag to allow the use of "## @RecommendedInstance" comments in INF files
+# as a fallback when a library class to instance mapping is missing in the DSC.
+#
+gUseRecommendedInstances = True
+
 # Common lock for the file access in multiple process AutoGens
 file_lock = None
 gStackCookieValues32 = []
