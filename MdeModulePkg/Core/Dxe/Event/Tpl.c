@@ -32,15 +32,14 @@ CoreSetInterruptState (
     return;
   }
 
-  if (gSmmBase2 == NULL) {
-    gCpu->EnableInterrupt (gCpu);
-    return;
+  if (gSmmBase2 != NULL) {
+    Status = gSmmBase2->InSmm (gSmmBase2, &InSmm);
+    if (EFI_ERROR (Status) || InSmm) {
+      return;
+    }
   }
 
-  Status = gSmmBase2->InSmm (gSmmBase2, &InSmm);
-  if (!EFI_ERROR (Status) && !InSmm) {
-    gCpu->EnableInterrupt (gCpu);
-  }
+  gCpu->EnableInterrupt (gCpu);
 }
 
 /**
