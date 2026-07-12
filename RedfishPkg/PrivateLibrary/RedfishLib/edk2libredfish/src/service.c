@@ -16,6 +16,7 @@
 
 **/
 
+#include <Library/SafeIntLib.h>
 #include <redfishService.h>
 #include <redfishPayload.h>
 #include <redpath.h>
@@ -1811,19 +1812,50 @@ makeUrlForService (
   const char      *uri
   )
 {
-  char  *url;
+  char           *url;
+  UINTN          hostLen;
+  UINTN          uriLen;
+  UINTN          urlSize;
+  RETURN_STATUS  Status;
 
   if (service->host == NULL) {
     return NULL;
   }
 
-  url = (char *)malloc (strlen (service->host)+strlen (uri)+1);
+  //
+  // Get string lengths
+  //
+  hostLen = AsciiStrLen (service->host);
+  uriLen  = AsciiStrLen (uri);
+
+  //
+  // Check for integer overflow before allocation
+  // urlSize = hostLen + uriLen + 1 (for null terminator)
+  //
+  Status = SafeUintnAdd (hostLen, uriLen, &urlSize);
+  if (RETURN_ERROR (Status)) {
+    return NULL;
+  }
+
+  Status = SafeUintnAdd (urlSize, 1, &urlSize);
+  if (RETURN_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Allocate buffer with checked size
+  //
+  url = (char *)malloc (urlSize);
   if (url == NULL) {
     return NULL;
   }
 
-  strcpy (url, service->host);
-  strcat (url, uri);
+  //
+  // Safely copy and concatenate strings
+  //
+  AsciiStrCpyS (url, urlSize, service->host);
+  AsciiStrCatS (url, urlSize, uri);
+
   return url;
 }
 

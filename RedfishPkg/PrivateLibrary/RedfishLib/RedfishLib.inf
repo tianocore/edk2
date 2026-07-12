@@ -45,6 +45,7 @@
   NetLib
   RedfishContentCodingLib
   RedfishCrtLib
+  SafeIntLib
   UefiBootServicesTableLib
   UefiLib
 
