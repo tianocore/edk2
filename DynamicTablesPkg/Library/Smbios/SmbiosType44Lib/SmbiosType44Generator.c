@@ -757,6 +757,7 @@ STATIC PROCESSOR_SPECIFIC_BLOCK_OPS  mProcSpecificBlockOps[] = {
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType44TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -810,6 +811,7 @@ FreeSmbiosType44TableEx (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType44TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,

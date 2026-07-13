@@ -57,6 +57,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType17TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                   *CONST  This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL     *CONST  TableFactoryProtocol,
@@ -250,6 +251,7 @@ UpdateSmbiosType17Rank (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType17TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,

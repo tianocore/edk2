@@ -79,6 +79,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType7TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -411,6 +412,7 @@ FindExistingCacheRecord (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType7TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
