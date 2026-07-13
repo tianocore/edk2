@@ -51,6 +51,22 @@
   DynamicTablesPkg/Library/Acpi/Common/AcpiHestLib/AcpiHestLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiEinjLib/AcpiEinjLib.inf
 
+  # SMBIOS Generators (Common)
+  DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType16Lib/SmbiosType16Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType17Lib/SmbiosType17Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType19Lib/SmbiosType19Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType20Lib/SmbiosType20Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType23Lib/SmbiosType23Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType26Lib/SmbiosType26Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType27Lib/SmbiosType27Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType28Lib/SmbiosType28Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType29Lib/SmbiosType29Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
+
   # AML Fixup (Common)
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
 
@@ -109,21 +125,6 @@
   DynamicTablesPkg/Library/Acpi/Arm/AcpiGtdtLibArm/AcpiGtdtLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiMadtLibArm/AcpiMadtLibArm.inf
-
-  DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType16Lib/SmbiosType16Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType17Lib/SmbiosType17Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType19Lib/SmbiosType19Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType20Lib/SmbiosType20Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType23Lib/SmbiosType23Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType26Lib/SmbiosType26Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType27Lib/SmbiosType27Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType28Lib/SmbiosType28Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType29Lib/SmbiosType29Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
-  DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
 
   # AML Fixup (Arm specific)
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmn600LibArm/SsdtCmn600LibArm.inf
