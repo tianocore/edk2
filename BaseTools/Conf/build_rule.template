@@ -419,7 +419,6 @@
         $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR)
 
     <Command.XCODE>
         # tool to convert Mach-O to PE/COFF
