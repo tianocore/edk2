@@ -62,6 +62,7 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   PeimEntryPoint
+  PlatformMemoryProtectionLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
   QemuFwCfgSimpleParserLib

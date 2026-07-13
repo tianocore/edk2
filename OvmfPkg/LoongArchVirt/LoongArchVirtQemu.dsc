@@ -270,6 +270,7 @@
   PcdLib                           | MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   QemuFwCfgS3Lib                   | OvmfPkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
   QemuFwCfgLib                     | OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioPeiLib.inf
+  PlatformMemoryProtectionLib      | OvmfPkg/Library/PlatformMemoryProtectionLib/PlatformMemoryProtectionLib.inf
   CpuMmuLib                        | UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
   CpuMmuInitLib                    | OvmfPkg/LoongArchVirt/Library/CpuMmuInitLib/CpuMmuInitLib.inf
   MpInitLib                        | UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
