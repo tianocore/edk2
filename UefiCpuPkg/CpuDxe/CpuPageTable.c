@@ -1333,9 +1333,9 @@ PageFaultExceptionHandler (
 
   PFAddress = AsmReadCr2 () & ~EFI_PAGE_MASK;
   if (PFAddress < BASE_4KB) {
-    NonStopMode = NULL_DETECTION_NONSTOP_MODE ? TRUE : FALSE;
+    NonStopMode = gDxeMps.NullPointerDetectionPolicy.Fields.NonStopMode ? TRUE : FALSE;
   } else {
-    NonStopMode = HEAP_GUARD_NONSTOP_MODE ? TRUE : FALSE;
+    NonStopMode = gDxeMps.HeapGuardPolicy.Fields.NonStopMode ? TRUE : FALSE;
   }
 
   if (NonStopMode) {
@@ -1429,7 +1429,7 @@ InitializePageTableLib (
     EnableReadOnlyPageWriteProtect ();
   }
 
-  if (HEAP_GUARD_NONSTOP_MODE || NULL_DETECTION_NONSTOP_MODE) {
+  if (gDxeMps.HeapGuardPolicy.Fields.NonStopMode || gDxeMps.NullPointerDetectionPolicy.Fields.NonStopMode) {
     mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mNumberOfProcessors);
     ASSERT (mPFEntryCount != NULL);
 

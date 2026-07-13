@@ -1331,7 +1331,7 @@ GenSmmPageTable (
     }
   }
 
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
+  if (gMmMps.NullPointerDetectionPolicy) {
     //
     // Mark [0, 4k] as non-present
     //
@@ -1486,12 +1486,10 @@ IfReadOnlyPageTableNeeded (
 {
   //
   // Don't mark page table memory as read-only if
-  //  - SMM heap guard feature enabled; or
-  //      BIT2: SMM page guard enabled
-  //      BIT3: SMM pool guard enabled
+  //  - SMM heap guard feature enabled or
   //  - SMM profile feature enabled
   //
-  if (((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
+  if (((gMmMps.HeapGuardPolicy.Fields.MmPageGuard | gMmMps.HeapGuardPolicy.Fields.MmPoolGuard) != 0) ||
       mSmmProfileEnabled)
   {
     return FALSE;
