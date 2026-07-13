@@ -147,8 +147,8 @@ UpdateSmbiosType19Address (
     SmbiosRecord->ExtendedStartingAddress = StartAddress;
     SmbiosRecord->ExtendedEndingAddress   = EndAddress;
   } else {
-    SmbiosRecord->StartingAddress = StartingAddressKb;
-    SmbiosRecord->EndingAddress   = EndingAddressKb;
+    SmbiosRecord->StartingAddress = (UINT32)StartingAddressKb;
+    SmbiosRecord->EndingAddress   = (UINT32)EndingAddressKb;
   }
 }
 

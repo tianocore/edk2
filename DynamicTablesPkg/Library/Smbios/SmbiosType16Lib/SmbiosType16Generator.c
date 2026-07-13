@@ -108,7 +108,7 @@ UpdateSmbiosType16Size (
   SizeKb = SizeBytes / SIZE_1KB;
 
   if (SizeBytes < EXTENDED_SIZE_THRESHOLD) {
-    SmbiosRecord->MaximumCapacity = SizeKb;
+    SmbiosRecord->MaximumCapacity = (UINT32)SizeKb;
   } else {
     SmbiosRecord->MaximumCapacity         = 0x80000000;
     SmbiosRecord->ExtendedMaximumCapacity = SizeBytes;
