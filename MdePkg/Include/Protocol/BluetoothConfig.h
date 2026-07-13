@@ -34,7 +34,7 @@ typedef struct {
   ///
   BLUETOOTH_ADDRESS            BDAddr;
   ///
-  /// State of the remote deive
+  /// State of the remote device
   ///
   UINT8                        RemoteDeviceState;
   ///

@@ -5,7 +5,7 @@
   all over this file.
 
   The only place where multi-instance device paths are supported is in
-  environment varibles. Multi-instance device paths should never be placed
+  environment variables. Multi-instance device paths should never be placed
   on a Handle.
 
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -20,7 +20,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_TO_TEXT_PROTOCOL    *mDevicePathLi
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *mDevicePathLibDevicePathFromText  = NULL;
 
 /**
-  The constructor function caches the pointer to DevicePathUtilites protocol,
+  The constructor function caches the pointer to DevicePathUtilities protocol,
   DevicePathToText protocol and DevicePathFromText protocol.
 
   The constructor function locates these three protocols from protocol database.

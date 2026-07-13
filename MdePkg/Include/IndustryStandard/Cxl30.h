@@ -67,9 +67,16 @@ typedef union {
     UINT32    Reserved             : 16;      // Bit 16..31
   } Bits;
   UINT32    Uint32;
-} CXL_CM_EXTENTED_REGISTER_CAPABILITY;
+} CXL_CM_EXTENDED_REGISTER_CAPABILITY;
 
-#define CXL_CM_EXTENTED_RANGES_BITMAP  (BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7 | BIT8 | BIT9 | BIT10 | BIT11 | BIT12 | BIT13 | BIT15)
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+typedef CXL_CM_EXTENDED_REGISTER_CAPABILITY CXL_CM_EXTENTED_REGISTER_CAPABILITY;
+
+#define CXL_CM_EXTENDED_RANGES_BITMAP  (BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7 | BIT8 | BIT9 | BIT10 | BIT11 | BIT12 | BIT13 | BIT15)
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define CXL_CM_EXTENTED_RANGES_BITMAP  CXL_CM_EXTENDED_RANGES_BITMAP
 
 //
 // CXL BI Route Table Capability

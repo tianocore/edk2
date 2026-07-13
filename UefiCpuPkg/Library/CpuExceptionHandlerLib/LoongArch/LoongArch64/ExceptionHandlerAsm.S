@@ -19,9 +19,28 @@
 #define FP_REG_CONTEXT_SIZE   34 * RSIZE  // Floating-point registers size
 #define CSR_REG_CONTEXT_SIZE  9  * RSIZE  // CSR registers size
 
-ASM_GLOBAL ASM_PFX(ExceptionEntry)
 ASM_GLOBAL ASM_PFX(ExceptionEntryStart)
 ASM_GLOBAL ASM_PFX(ExceptionEntryEnd)
+ASM_GLOBAL ASM_PFX(PatchAbsAddressInException)
+
+//
+// This function must be called after the exception vector code copied.
+// It patchs the the exception vector address variable, which located at
+// the end of exception vector code.
+//
+// a0, CPU exception entry point (4K alignment)
+//
+ASM_PFX(PatchAbsAddressInException):
+  la.pcrel  $t0, ExceptionEntryStart
+  la.pcrel  $t1, ExceptionEntryAddress
+  la.pcrel  $t2, ExceptionEntry
+
+  sub.d     $t0, $t1, $t0 // Offset
+  add.d     $t0, $t0, $a0 // The location of ExceptionEntryAddress after copying the vector.
+  st.d      $t2, $t0, 0x0
+  dbar      0
+
+  jirl      $zero, $ra, 0
 
 ASM_PFX(ExceptionEntry):
   move    $s0, $a0
@@ -437,9 +456,17 @@ ReadRealResumeVector:
   //
 
 EntryCommonHandler:
-  addi.d  $sp, $sp, -(GP_REG_CONTEXT_SIZE + CSR_REG_CONTEXT_SIZE)
-  move    $a0, $sp
-  la.abs  $ra, ExceptionEntry
+  addi.d   $sp, $sp, -(GP_REG_CONTEXT_SIZE + CSR_REG_CONTEXT_SIZE)
+  move     $a0, $sp
+  la.pcrel $t0, ExceptionEntryAddress
+  ld.d     $ra, $t0, 0x0
+
   jirl    $zero, $ra, 0
+
+  //
+  // The following address require patching the runtime address after code copying.
+  //
+ExceptionEntryAddress:
+  .dword  0x0
 ASM_PFX(ExceptionEntryEnd):
 .end

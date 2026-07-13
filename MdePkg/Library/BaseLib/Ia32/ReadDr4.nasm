@@ -31,7 +31,7 @@ ASM_PFX(AsmReadDr4):
     ; this register will cause a #UD exception.
     ;
     ; MS assembler doesn't support this instruction since no one would use it
-    ; under normal circustances.
+    ; under normal circumstances.
     ;
     mov     eax, dr4
     ret

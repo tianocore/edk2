@@ -445,8 +445,8 @@ InternalLongJump (
 
   @param  Char  The character to check against.
 
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
+  @retval TRUE  If the Char is a decimal character.
+  @retval FALSE If the Char is not a decimal character.
 
 **/
 BOOLEAN
@@ -484,8 +484,8 @@ InternalHexCharToUintn (
 
   @param  Char  The character to check against.
 
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
+  @retval TRUE  If the Char is a hexadecimal character.
+  @retval FALSE If the Char is not a hexadecimal character.
 
 **/
 BOOLEAN
@@ -503,8 +503,8 @@ InternalIsHexaDecimalDigitCharacter (
 
   @param  Char  The character to check against.
 
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
+  @retval TRUE  If the Char is a decimal character.
+  @retval FALSE If the Char is not a decimal character.
 
 **/
 BOOLEAN
@@ -523,8 +523,8 @@ InternalAsciiIsDecimalDigitCharacter (
 
   @param  Char  The character to check against.
 
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
+  @retval TRUE  If the Char is a hexadecimal character.
+  @retval FALSE If the Char is not a hexadecimal character.
 
 **/
 BOOLEAN

@@ -368,6 +368,8 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 !endif
 
+INF  OvmfPkg/WsmtDxe/WsmtDxe.inf
+
 #
 # EFI_CC_MEASUREMENT_PROTOCOL
 #

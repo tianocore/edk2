@@ -220,6 +220,7 @@ EXIT:
   and uninstall the protocols
 **/
 VOID
+EFIAPI
 LcdGraphicsExitBootServicesEvent (
   IN EFI_EVENT  Event,
   IN VOID       *Context

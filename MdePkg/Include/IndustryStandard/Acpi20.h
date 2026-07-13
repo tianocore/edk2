@@ -449,7 +449,7 @@ typedef struct {
 #define EFI_ACPI_2_0_SIMPLE_BOOT_FLAG_TABLE_SIGNATURE  SIGNATURE_32('B', 'O', 'O', 'T')
 
 ///
-/// "DBGP" MS Bebug Port Spec
+/// "DBGP" MS Debug Port Spec
 ///
 #define EFI_ACPI_2_0_DEBUG_PORT_TABLE_SIGNATURE  SIGNATURE_32('D', 'B', 'G', 'P')
 

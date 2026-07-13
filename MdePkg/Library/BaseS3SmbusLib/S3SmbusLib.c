@@ -21,7 +21,7 @@
 
   This function provides a standard way to save SMBus operation to S3 boot Script.
   The data can either be of the Length byte, word, or a block of data.
-  If it falis to save S3 boot script, then ASSERT ().
+  If it fails to save S3 boot script, then ASSERT ().
 
   @param  SmbusOperation  Signifies which particular SMBus hardware protocol instance that it will use to
                           execute the SMBus transactions.

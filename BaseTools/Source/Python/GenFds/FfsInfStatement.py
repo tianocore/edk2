@@ -71,6 +71,31 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.PatchedBinFile = ''
         self.MacroDict = {}
         self.Depex = False
+        self.XipEnabled = False
+
+    @staticmethod
+    def DetermineXipEnabled(Rule):
+        """Determine whether XIP is enabled based on a Rule object.
+
+        For a RuleComplexFile, scans SectionList for any section with Xip='TRUE'.
+        For a RuleSimpleFile or other rule, checks Rule.Xip directly.
+
+        Args:
+            Rule: A RuleComplexFile or RuleSimpleFile (or similar) object.
+
+        Returns:
+            bool: True if XIP is enabled for this rule, False otherwise.
+        """
+        if isinstance(Rule, RuleComplexFile.RuleComplexFile):
+            for Sect in Rule.SectionList:
+                if hasattr(Sect, 'Xip') and Sect.Xip and Sect.Xip.upper() == 'TRUE':
+                    return True
+        elif hasattr(Rule, 'Xip') and Rule.Xip:
+            if isinstance(Rule.Xip, str) and Rule.Xip.upper() == 'TRUE':
+                return True
+            elif Rule.Xip is True:
+                return True
+        return False
 
     ## GetFinalTargetSuffixMap() method
     #
@@ -134,7 +159,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
                         LibraryInstance[LibName] = LibraryModule
                         DependencyList.append(LibraryModule)
                 if DepexList:
-                    Dpx = DependencyExpression(DepexList, ModuleType, True)
+                    try:
+                        Dpx = DependencyExpression(DepexList, ModuleType, True)
+                    except Exception:
+                        GenFdsGlobalVariable.ErrorLogger("Failed to parse Depex for: %s\n" % self.InfFileName)
+                        raise
                     if len(Dpx.PostfixNotation) != 0:
                         # It means this module has DEPEX
                         self.FinalTargetSuffixMap['.depex'] = [os.path.join(self.EfiOutputPath, self.BaseName) + '.depex']
@@ -488,6 +517,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
         #
         Rule = self.__GetRule__()
         GenFdsGlobalVariable.VerboseLogger( "Packing binaries from inf file : %s" %self.InfFileName)
+        #
+        # Determine XIP setting from Rule sections
+        #
+        self.XipEnabled = FfsInfStatement.DetermineXipEnabled(Rule)
         #
         # Convert Fv File Type for PI1.1 SMM driver.
         #

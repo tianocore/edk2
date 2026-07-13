@@ -65,7 +65,7 @@ UINT64
 
   @retval      EFI_SUCCESS             The properties were successfully retrieved.
   @retval      EFI_DEVICE_ERROR        An error occurred trying to retrieve the properties of the timestamp
-                                       counter subsystem. Properties is not pedated.
+                                       counter subsystem. Properties is not updated.
   @retval      EFI_INVALID_PARAMETER   Properties is NULL.
 
 **/

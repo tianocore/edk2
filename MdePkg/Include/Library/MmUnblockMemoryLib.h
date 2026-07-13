@@ -29,6 +29,7 @@
   @retval RETURN_SECURITY_VIOLATION   The requested address failed to pass security check for
                                       unblocking.
   @retval RETURN_INVALID_PARAMETER    Input address either NULL pointer or not page aligned.
+  @retval RETURN_OUT_OF_RESOURCES     No enough resource to handle the unblock request.
   @retval RETURN_ACCESS_DENIED        The request is rejected due to system has passed certain boot
                                       phase.
 

@@ -1995,8 +1995,8 @@ RequestSense (
   // fill command packet for Request Sense Packet Command
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Packet.RequestSence.opcode            = ATA_CMD_REQUEST_SENSE;
-  Packet.RequestSence.allocation_length = (UINT8)sizeof (ATAPI_REQUEST_SENSE_DATA);
+  Packet.RequestSense.opcode            = ATA_CMD_REQUEST_SENSE;
+  Packet.RequestSense.allocation_length = (UINT8)sizeof (ATAPI_REQUEST_SENSE_DATA);
 
   Ptr = (UINT16 *)SenseBuffers;
   //

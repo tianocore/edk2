@@ -266,10 +266,21 @@ PciPciDeviceInfoCollector (
                  );
 
       if (EFI_ERROR (Status) && (Func == 0)) {
+        if (!FeaturePcdGet (PcdPciScanFuncIfFunc0Absent)) {
+          //
+          // Preserve default behavior for physical platforms: go to next
+          // device if there is no Function 0.
+          //
+          break;
+        }
+
         //
-        // go to next device if there is no Function 0
+        // Some virtualized PCI topologies may let a hypervisor expose
+        // selected non-zero functions to a guest while Function 0 is absent.
+        // Some platforms may require probing such functions.
+        // Keep scanning only when enabled by platform policy.
         //
-        break;
+        continue;
       }
 
       if (!EFI_ERROR (Status)) {
@@ -373,7 +384,7 @@ PciSearchDevice (
 
   DEBUG ((
     DEBUG_INFO,
-    "PciBus: Discovered %s @ [%02x|%02x|%02x]  [VID = 0x%x, DID = 0x%0x]\n",
+    "PciBus: Discovered %s @ [%02x|%02x|%02x]  [VID = 0x%04x, DID = 0x%04x]\n",
     IS_PCI_BRIDGE (Pci) ?     L"PPB" :
     IS_CARDBUS_BRIDGE (Pci) ? L"P2C" :
     L"PCI",
@@ -2910,13 +2921,12 @@ IsPciDeviceRejected (
       //
       // Mem Bar
       //
-      Mask      = 0xFFFFFFF0;
-      TestValue = TestValue & Mask;
-
+      Mask = 0xFFFFFFF0;
       if ((TestValue & 0x07) == 0x04) {
         //
         // Mem64 or PMem64
         //
+        TestValue  = TestValue & Mask;
         BarOffset += sizeof (UINT32);
         if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
           //
@@ -2931,6 +2941,7 @@ IsPciDeviceRejected (
         //
         // Mem32 or PMem32
         //
+        TestValue = TestValue & Mask;
         if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
           return TRUE;
         }

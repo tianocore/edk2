@@ -107,6 +107,7 @@ typedef enum {
     1 - AmlMethodParamTypeString
     2 - AmlMethodParamTypeArg
     3 - AmlMethodParamTypeLocal
+    4 - AmlMethodParamTypeBuffer
 
   @par Reference(s)
   - ACPI 6.5, s20.2.5 "Term Objects Encoding"
@@ -116,7 +117,8 @@ typedef enum {
   AmlMethodParamTypeInteger = 0,
   AmlMethodParamTypeString  = 1,
   AmlMethodParamTypeArg     = 2,
-  AmlMethodParamTypeLocal   = 3
+  AmlMethodParamTypeLocal   = 3,
+  AmlMethodParamTypeBuffer  = 4
 } AML_METHOD_PARAM_TYPE;
 
 /** AML Method parameter data
@@ -142,7 +144,10 @@ typedef union {
             If Type is AmlMethodParamTypeLocal
               then Data contains the Local variable number,
               0 to 7 are supported value.
-  DataSize - for future use
+            If Type is AmlMethodParamTypeBuffer
+              then Data.Buffer points to a UINT8 byte array and
+              DataSize holds the byte count of that array.
+  DataSize - byte count when Type is AmlMethodParamTypeBuffer; unused otherwise.
 **/
 typedef struct {
   AML_METHOD_PARAM_TYPE    Type;
@@ -531,6 +536,48 @@ EFIAPI
 AmlUpdateRdInterrupt (
   IN  AML_DATA_NODE_HANDLE  InterruptRdNode,
   IN  UINT32                Irq
+  );
+
+/** Update the base address and length of a DWord resource data node.
+
+  @ingroup UserApis
+
+  @param  [in] DWordRdNode         Pointer a DWord resource data
+                                   node.
+  @param  [in] BaseAddress         Base address.
+  @param  [in] BaseAddressLength   Base address length.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+**/
+EFI_STATUS
+EFIAPI
+AmlUpdateRdDWord (
+  IN  AML_DATA_NODE_HANDLE  DWordRdNode,
+  IN  UINT32                BaseAddress,
+  IN  UINT32                BaseAddressLength
+  );
+
+/** Update the base address and length of a Word resource data node.
+
+  @ingroup UserApis
+
+  @param  [in] WordRdNode          Pointer a Word resource data
+                                   node.
+  @param  [in] BaseAddress         Base address.
+  @param  [in] BaseAddressLength   Base address length.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+**/
+EFI_STATUS
+EFIAPI
+AmlUpdateRdWord (
+  IN  AML_DATA_NODE_HANDLE  WordRdNode,
+  IN  UINT16                BaseAddress,
+  IN  UINT16                BaseAddressLength
   );
 
 /** Update the base address and length of a QWord resource data node.

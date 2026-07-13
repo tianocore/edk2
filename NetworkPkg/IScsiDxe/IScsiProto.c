@@ -1922,7 +1922,7 @@ IScsiBuildKeyValueList (
 
     KeyValuePair->Value = Data;
 
-    Status = SafeUint32Add ((UINT32)AsciiStrLen (KeyValuePair->Value), 1, &Result);
+    Status = SafeUint32Add ((UINT32)AsciiStrnLenS (KeyValuePair->Value, Len), 1, &Result);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a Memory Overflow is Detected.\n", __func__));
       FreePool (KeyValuePair);

@@ -165,3 +165,25 @@ AmdSvsmQueryProtocol (
 {
   return FALSE;
 }
+
+/**
+  Perform a SVSM_UEFI_MM_REQUEST operation
+
+  Send the specified MM communication buffer to the SVSM.
+
+  @param[in] BufferAddr  Physical address of the buffer.
+  @param[in] BufferSize  Size of the buffer.
+
+  @retval TRUE           The command was processed.
+  @retval FALSE          The command was not processed.
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  )
+{
+  return FALSE;
+}

@@ -372,7 +372,7 @@ DeleteVariable (
 
   Status = CreateTimeBasedPayload (&DataSize, &Data, &mMaxTimestamp);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r\n", Status));
     return Status;
   }
 
@@ -470,7 +470,7 @@ IsSecureBootEnabled (
   // Skip verification if SecureBoot variable doesn't exist.
   //
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Cannot check SecureBoot variable %r \n ", Status));
+    DEBUG ((DEBUG_ERROR, "Cannot check SecureBoot variable - %r\n", Status));
     return FALSE;
   }
 
@@ -864,10 +864,10 @@ SetSecureBootVariablesToDefault (
                  Data
                  );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DB %r!\n", __func__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DB - %r!\n", __func__, Status));
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBX %r!\n", __func__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBX - %r!\n", __func__, Status));
   }
 
   // Keep it going. Keep it going. dbt if supplied...
@@ -881,7 +881,7 @@ SetSecureBootVariablesToDefault (
                  Data
                  );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBT %r!\n", __func__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBT - %r!\n", __func__, Status));
     }
   }
 
@@ -896,7 +896,7 @@ SetSecureBootVariablesToDefault (
                  Data
                  );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll KEK %r!\n", __func__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll KEK - %r!\n", __func__, Status));
     }
   }
 

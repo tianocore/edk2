@@ -43,7 +43,6 @@
   CpuLib
   CpuExceptionHandlerLib
   DebugLib
-  DefaultExceptionHandlerLib
   DxeServicesTableLib
   HobLib
   MemoryAllocationLib

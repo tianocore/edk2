@@ -5147,8 +5147,8 @@ PrintInterpretedExtendedCompatibilityAcs (
     Header->AcsCapability,
     Header->AcsControl
     );
-  if (PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_CONTROL (Header)) {
-    VectorSize = PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_VECTOR_SIZE (Header);
+  if (PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_CONTROL (Header)) {
+    VectorSize = PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_VECTOR_SIZE (Header);
     if (VectorSize == 0) {
       VectorSize = 256;
     }

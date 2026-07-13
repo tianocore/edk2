@@ -16,6 +16,7 @@
 #include <Protocol/AcpiTable.h>
 
 // Module specific include files.
+#include <AcpiHelperMacros.h>
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
@@ -209,7 +210,7 @@ EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   // UINT32     Flags
   0,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  ResetReg
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // UINT8      ResetValue
   0,
   // UINT16     ArmBootArch
@@ -221,25 +222,25 @@ EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   // UINT64     XDsdt
   0,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1bEvtBlk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1aCntBlk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1bCntBlk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm2CntBlk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPmTmrBlk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  SleepControlReg
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  SleepStatusReg
-  NULL_GAS,
+  ACPI_NULL_GAS,
   // UINT64     HypervisorVendorIdentity
   EFI_ACPI_RESERVED_QWORD  // {Template}: Hypervisor Vendor ID
 };

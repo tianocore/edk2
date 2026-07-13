@@ -93,7 +93,7 @@ InitVariableStore (
   //
   // NvStorageBase needs to be 4KB aligned, NvStorageSize needs to be 8KB * n
   //
-  if (((NvStorageBase & (SIZE_4KB - 1)) != 0) || ((NvStorageSize & (SIZE_8KB - 1)) != 0)) {
+  if (!IS_ALIGNED (NvStorageBase, SIZE_4KB) || !IS_ALIGNED (NvStorageSize, SIZE_8KB)) {
     return EFI_INVALID_PARAMETER;
   }
 

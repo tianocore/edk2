@@ -3,7 +3,7 @@
   and the standard requests defined in USB 1.1 spec.
 
 Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
-Copyright (c) 2024, American Megatrends Intenational LLC. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/

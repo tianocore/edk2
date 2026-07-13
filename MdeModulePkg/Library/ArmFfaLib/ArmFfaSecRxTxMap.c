@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -309,15 +311,16 @@ ArmFfaLibRxTxUnmap (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = ArmFfaLibPartitionIdGet (&PartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a, Failed to acquire partition ID. Status: %r\n", __func__, Status));
-    return EFI_INVALID_PARAMETER;
-  }
-
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
+
+  /*
+   * Per Table 13.30: FFA_RXTX_UNMAP function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * PartId should be set to 0 in ARM_FID_FFA_RXTX_UNMAP.
+   */
+  PartId       = 0;
   FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
 
   ArmCallFfa (&FfaArgs);

@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024-2025, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -138,7 +140,7 @@ ArmFfaLibRxTxMap (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   TxBuffer   = Buffers;
   RxBuffer   = Buffers + BufferSize;
 
@@ -216,8 +218,6 @@ ArmFfaLibRxTxUnmap (
   VOID          *Buffers;
   UINT16        SourceId;
 
-  ArmFfaLibGetPartId (&SourceId);
-
   if (mArmFfaRxTxBufferStmmInfoHandle == NULL) {
     // This means that the agent tried to unmap the buffers before even know them.
     // Let's be a nice player...
@@ -227,6 +227,13 @@ ArmFfaLibRxTxUnmap (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
+
+  /*
+   * Per Table 13.30: FFA_RXTX_UNMAP function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * SourceId should be set to 0 in ARM_FID_FFA_RXTX_UNMAP.
+   */
+  SourceId     = 0;
   FfaArgs.Arg1 = (SourceId << ARM_FFA_SOURCE_EP_SHIFT);
 
   ArmCallFfa (&FfaArgs);

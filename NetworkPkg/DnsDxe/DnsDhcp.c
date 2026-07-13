@@ -474,6 +474,14 @@ GetDns4ServerFromDhcp4 (
   ParaList[1]->Data[0] = DHCP4_TAG_DNS_SERVER;
 
   Status = Dhcp4->Build (Dhcp4, &SeedPacket, 0, NULL, 2, ParaList, &Token.Packet);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  if (Token.Packet == NULL) {
+    Status = EFI_NOT_FOUND;
+    goto ON_EXIT;
+  }
 
   Token.Packet->Dhcp4.Header.Xid = Random;
 

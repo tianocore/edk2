@@ -2,7 +2,7 @@
   ACPI 6.5 definitions from the ACPI Specification Revision 6.5 Aug, 2022.
 
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2024, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
   Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
@@ -2289,6 +2289,40 @@ typedef struct {
 #define EFI_ACPI_6_5_HMAT_TYPE_MEMORY_SIDE_CACHE_INFO                      0x02
 
 ///
+/// HMAT Memory Proximity Domain Attributes Flags
+///
+#define EFI_ACPI_6_5_HMAT_PROXIMITY_DOMAIN_INITIATOR_VALID  1
+
+///
+/// HMAT System Locality Latency and Bandwidth Info Flags
+///
+#define EFI_ACPI_6_5_HMAT_MEMORY_HIERARCHY_MEMORY    0
+#define EFI_ACPI_6_5_HMAT_MEMORY_HIERARCHY_L1_CACHE  1
+#define EFI_ACPI_6_5_HMAT_MEMORY_HIERARCHY_L2_CACHE  2
+#define EFI_ACPI_6_5_HMAT_MEMORY_HIERARCHY_L3_CACHE  3
+
+#define EFI_ACPI_6_5_HMAT_ACCESS_ATTRIBUTES_MIN_TRANSFER_SIZE  0x10
+#define EFI_ACPI_6_5_HMAT_ACCESS_ATTRIBUTES_NON_SEQUENTIAL     0x20
+
+///
+/// HMAT System Locality Latency and Bandwidth Info Data Type
+///
+/// For Memory Hierarchy == 0
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_ACCESS_LATENCY    0
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_READ_LATENCY      1
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_WRITE_LATENCY     2
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_ACCESS_BANDWIDTH  3
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_READ_BANDWIDTH    4
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_WRITE_BANDWIDTH   5
+/// For Memory Hierarchy == 1, 2, or 3
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_HIT_ACCESS_LATENCY    0
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_HIT_READ_LATENCY      1
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_HIT_WRITE_LATENCY     2
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_HIT_ACCESS_BANDWIDTH  3
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_HIT_READ_BANDWIDTH    4
+#define EFI_ACPI_6_5_HMAT_SSLBI_DATA_TYPE_HIT_WRITE_BANDWIDTH   5
+
+///
 /// HMAT Structure Header
 ///
 typedef struct {
@@ -2549,6 +2583,31 @@ typedef struct {
   UINT32    TableSize;
   UINT32    EntryCount;
 } EFI_ACPI_6_5_EINJ_TRIGGER_ACTION_TABLE;
+
+///
+/// EINJ Vendor Error Type Extension
+///
+typedef struct {
+  UINT32    Length;
+  UINT32    SBDF;
+  UINT16    VendorID;
+  UINT16    DeviceID;
+  UINT8     RevID;
+  UINT8     Reserved[3];
+} EFI_ACPI_6_5_VENDOR_ERROR_TYPE_EXTENSION_STRUCTURE;
+
+///
+/// EINJ Set Error Type With Address
+///
+typedef struct {
+  UINT32    ErrorType;
+  UINT32    VendorStructureOffset;
+  UINT32    Flags;
+  UINT32    ProcessorId;
+  UINT64    MemAddr;
+  UINT64    MemAddrRange;
+  UINT32    PcieSBDF;
+} EFI_ACPI_6_5_SET_ERROR_TYPE_WITH_ADDRESS;
 
 ///
 /// Platform Communications Channel Table (PCCT)
@@ -3044,6 +3103,37 @@ typedef struct {
 #define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_POWER_LOSS        0x24
 #define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_POWER_BUTTON      0x25
 
+///
+/// Confidential Computing Type definitions.
+///
+#define EFI_ACPI_6_5_CC_TYPE_NONE    0
+#define EFI_ACPI_6_5_CC_TYPE_SEV     1
+#define EFI_ACPI_6_5_CC_TYPE_TDX     2
+#define EFI_ACPI_6_5_CC_TYPE_APTEE   3
+#define EFI_ACPI_6_5_CC_TYPE_ARMCCA  4
+
+///
+/// Confidential Computing Event Log ACPI Table (CCEL).
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  /// Confidential Computing (CC) type.
+  UINT8                          Type;
+  /// Confidential Computing (CC) sub type.
+  UINT8                          SubType;
+  /// Reserved.
+  UINT16                         Reserved;
+  /// Log Area Minimum Length.
+  UINT64                         Laml;
+  /// Log Area Start Address.
+  UINT64                         Lasa;
+} EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE;
+
+///
+/// CCEL Revision (as defined in ACPI 6.5 spec.)
+///
+#define EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_REVISION  0x01
+
 //
 // Known table signatures
 //
@@ -3072,6 +3162,11 @@ typedef struct {
 /// "BGRT" Boot Graphics Resource Table
 ///
 #define EFI_ACPI_6_5_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE  SIGNATURE_32('B', 'G', 'R', 'T')
+
+///
+/// "CCEL" Confidential Compute Event Log Table
+///
+#define EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
 
 ///
 /// "CDIT" Component Distance Information Table

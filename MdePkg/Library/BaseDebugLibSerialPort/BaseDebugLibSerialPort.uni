@@ -1,7 +1,7 @@
 // /** @file
 // Instance of Debug Library based on Serial Port Library.
 //
-// It uses Print Library to produce formatted output strings to seiral port device.
+// It uses Print Library to produce formatted output strings to a serial port device.
 //
 // Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 //

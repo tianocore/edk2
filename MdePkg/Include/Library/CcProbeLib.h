@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <ConfidentialComputingGuestAttr.h>
 
 /**
-  Probe the ConfidentialComputing Guest type. See defition of
+  Probe the ConfidentialComputing Guest type. See definition of
   CC_GUEST_TYPE in <ConfidentialComputingGuestAttr.h>.
 
   @return The guest type

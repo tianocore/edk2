@@ -254,7 +254,7 @@ EFI_STATUS
   the processor instruction cache following creation of thunks.
 
   @param  This       A pointer to the EFI_EBC_PROTOCOL instance.
-  @param  Flush      Pointer to a function of type EBC_ICACH_FLUSH.
+  @param  Flush      Pointer to a function of type EBC_ICACHE_FLUSH.
 
   @retval EFI_SUCCESS            The function completed successfully.
 

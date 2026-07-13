@@ -682,7 +682,7 @@ typedef union {
     /// platform devices are processor cores, SOC, memory, add-on or
     /// peripheral devices that get powered directly from the platform power
     /// delivery means. The energy units are specified in the
-    /// MSR_RAPL_POWER_UNIT.Enery_Status_Unit.
+    /// MSR_RAPL_POWER_UNIT.Energy_Status_Unit.
     ///
     UINT32    TotalEnergy : 32;
     UINT32    Reserved    : 32;
