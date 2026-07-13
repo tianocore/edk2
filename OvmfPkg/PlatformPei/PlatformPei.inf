@@ -50,6 +50,7 @@
   gUefiOvmfPkgPlatformInfoGuid
   gGhcbApicIdsGuid
   gTcg800155PlatformIdEventHobGuid              ## SOMETIMES_PRODUCES
+  gDxeMemoryProtectionSettingsGuid              ## PRODUCES
 
 [LibraryClasses]
   BaseLib
@@ -145,6 +146,7 @@
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire
+  gUefiOvmfPkgTokenSpaceGuid.PcdStrictMemoryProtections
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid

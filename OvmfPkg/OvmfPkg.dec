@@ -502,3 +502,6 @@
   ## Informs modules whether the platform firmware supports Standalone MM.
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdStandaloneMmEnable|FALSE|BOOLEAN|0x100065
+
+  ## Enable Strict Memory Protections
+  gUefiOvmfPkgTokenSpaceGuid.PcdStrictMemoryProtections|TRUE|BOOLEAN|0x100066
