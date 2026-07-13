@@ -50,6 +50,7 @@
   gUefiOvmfPkgPlatformInfoGuid
   gGhcbApicIdsGuid
   gTcg800155PlatformIdEventHobGuid              ## SOMETIMES_PRODUCES
+  gDxeMemoryProtectionSettingsGuid              ## SOMETIMES_PRODUCES
 
 [LibraryClasses]
   BaseLib

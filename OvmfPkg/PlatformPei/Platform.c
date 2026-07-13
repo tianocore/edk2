@@ -31,6 +31,7 @@
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Ppi/MasterBootMode.h>
+#include <Guid/DxeMemoryProtectionSettings.h>
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Microvm.h>
 #include <IndustryStandard/Pci22.h>
@@ -339,6 +340,86 @@ CompleteInitialization (
 }
 
 /**
+  Build the DXE memory protection settings HOB based on a QEMU fw_cfg selector.
+
+  The fw_cfg file "opt/org.tianocore/MemoryProfile" contains the name of the
+  memory protection profile to apply (e.g. "DEBUG" selects
+  DXE_MEMORY_PROTECTION_SETTINGS_DEBUG). If the fw_cfg file is not present, no
+  HOB is produced and the memory protection PCDs are used as a fallback.
+**/
+STATIC
+VOID
+MemoryProtectionInitialization (
+  VOID
+  )
+{
+  STATIC CONST struct {
+    CONST CHAR8                       *Name;
+    DXE_MEMORY_PROTECTION_SETTINGS    Settings;
+  } Profiles[] = {
+    { "DEBUG",                    DXE_MEMORY_PROTECTION_SETTINGS_DEBUG                    },
+    { "SHIP_MODE",                DXE_MEMORY_PROTECTION_SETTINGS_SHIP_MODE                },
+    { "SHIP_MODE_NO_PAGE_GUARDS", DXE_MEMORY_PROTECTION_SETTINGS_SHIP_MODE_NO_PAGE_GUARDS },
+    { "OFF",                      DXE_MEMORY_PROTECTION_SETTINGS_OFF                      },
+  };
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
+  EFI_STATUS            Status;
+  CHAR8                 ProfileName[32];
+  UINTN                 Index;
+
+  Status = QemuFwCfgFindFile (
+             "opt/org.tianocore/MemoryProfile",
+             &FwCfgItem,
+             &FwCfgSize
+             );
+  if (EFI_ERROR (Status)) {
+    //
+    // No profile selected via fw_cfg; do not produce a HOB.
+    //
+    return;
+  }
+
+  if ((FwCfgSize == 0) || (FwCfgSize >= sizeof (ProfileName))) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: invalid MemoryProfile fw_cfg size %u\n",
+      __func__,
+      (UINT32)FwCfgSize
+      ));
+    return;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (FwCfgSize, ProfileName);
+  ProfileName[FwCfgSize] = '\0';
+
+  for (Index = 0; Index < ARRAY_SIZE (Profiles); Index++) {
+    if (AsciiStrCmp (ProfileName, Profiles[Index].Name) == 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: applying memory protection profile %a\n",
+        __func__,
+        ProfileName
+        ));
+      BuildGuidDataHob (
+        &gDxeMemoryProtectionSettingsGuid,
+        (VOID *)&Profiles[Index].Settings,
+        sizeof (DXE_MEMORY_PROTECTION_SETTINGS)
+        );
+      return;
+    }
+  }
+
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: unknown memory protection profile '%a'\n",
+    __func__,
+    ProfileName
+    ));
+}
+
+/**
   Perform Platform PEI initialization.
 
   @param  FileHandle      Handle of the file being invoked.
@@ -358,7 +439,15 @@ InitializePlatform (
   EFI_STATUS             Status;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+
   PlatformInfoHob = BuildPlatformInfoHob ();
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. This must run
+  // after the PlatformInfo HOB is built, because the PEI fw_cfg library keeps
+  // its availability state inside that HOB.
+  //
+  MemoryProtectionInitialization ();
 
   if (TdIsEnabled ()) {
     TdxHelperBuildGuidHobForTdxMeasurement ();
