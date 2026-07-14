@@ -9,13 +9,14 @@
 # FfsRebase() in GenFvInternalLib.c decides whether to rebase each PE/COFF
 # image in an FV based on three inputs: ForceRebase, BaseAddress, and XipFile[].
 #
-#   ForceRebase  BaseAddress  XipFile[]  Result
-#   -----------  -----------  ---------  ---------------------------------
-#   -1 (unset)   0            any        No rebase (early return)
-#   0  (FALSE)   any          any        No rebase (early return)
-#   1  (TRUE)    any          FALSE      No rebase (skip non-XIP file)
-#   1  (TRUE)    any          TRUE       Rebase (XIP file selected)
-#   -1 (unset)   != 0         any        Rebase ALL files (legacy path)
+#   ForceRebase  BaseAddress  XipFileCount  XipFile[]  Result
+#   -----------  -----------  ------------  ---------  ---------------------------------
+#   -1 (unset)   0            any           any        No rebase (early return)
+#   0  (FALSE)   any          any           any        No rebase (early return)
+#   1  (TRUE)    any          0             any        Rebase ALL files (legacy compat)
+#   1  (TRUE)    any          > 0           FALSE      No rebase (skip non-XIP file)
+#   1  (TRUE)    any          > 0           TRUE       Rebase (XIP file selected)
+#   -1 (unset)   != 0         any           any        Rebase ALL files (legacy path)
 #
 # Unit Tests (TestDetermineXipEnabled):
 #   11 parameterized subtests calling FfsInfStatement.DetermineXipEnabled()
@@ -35,7 +36,7 @@
 #   TC3: ForceRebase=FALSE, Base!=0       -> no rebase
 #   TC4: ForceRebase=TRUE,  all Xip=TRUE  -> rebase all
 #   TC5: ForceRebase=TRUE,  selective Xip -> rebase only Xip=TRUE
-#   TC6: ForceRebase=TRUE,  no Xip        -> no rebase
+#   TC6: ForceRebase=TRUE,  no Xip        -> rebase all (legacy compat)
 #   TC7: ForceRebase=TRUE,  mixed Xip     -> rebase Xip=TRUE only
 #   TC8: ForceRebase=TRUE,  Base=0, Xip   -> rebase (force overrides)
 #
@@ -802,9 +803,9 @@ INF  TestXipRebasePkg/TestDxeDriver/TestDxeDriver.inf
         ('TESTFV5', '0x00800000', 'TRUE',  'TRUE', 'TRUE', None,
          (True,  True,  False), 'TC5: ForceRebase=TRUE, selective Xip -> rebase Xip only'),
         # TC6: ForceRebase=TRUE, no files have Xip keyword.
-        # All files have XipFile==FALSE, so none are rebased.
+        # XipFileCount==0, so legacy behavior is preserved: rebase all files.
         ('TESTFV6', '0x00800000', 'TRUE',  None,   None,   None,
-         (False, False, False), 'TC6: ForceRebase=TRUE, no Xip -> no rebase'),
+         (True,  True,  True),  'TC6: ForceRebase=TRUE, no Xip -> rebase all (legacy compat)'),
         # TC7: ForceRebase=TRUE, PEIM1 has Xip=TRUE, PEIM2 has Xip=FALSE.
         # Mixed XIP within same module type via RuleOverride.
         # Only PEIM1 is rebased; PEIM2 and DXE are skipped.
