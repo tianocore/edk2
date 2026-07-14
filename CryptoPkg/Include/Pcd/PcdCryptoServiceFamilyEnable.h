@@ -483,4 +483,19 @@ typedef struct {
     } Services;
     UINT32    Family;
   } MlDsa;
+  union {
+    struct {
+      UINT8    NewByNid             : 1;
+      UINT8    Free                 : 1;
+      UINT8    SetPrivKey           : 1;
+      UINT8    GeneratePubKey       : 1;
+      UINT8    SetPubKey            : 1;
+      UINT8    GetPubKey            : 1;
+      UINT8    GetPublicKeyFromX509 : 1;
+      UINT8    GetPrivateKeyFromPem : 1;
+      UINT8    Sign                 : 1;
+      UINT8    Verify               : 1;
+    } Services;
+    UINT32    Family;
+  } SlhDsa;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;

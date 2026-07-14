@@ -65,6 +65,7 @@
   Pk/CryptEcNull.c
   Pk/CryptEdDsaNull.c
   Pk/CryptMlDsaNull.c
+  Pk/CryptSlhDsaNull.c
   Pem/CryptPem.c
   Bn/CryptBnNull.c
 

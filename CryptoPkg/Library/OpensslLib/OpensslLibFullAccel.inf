@@ -535,6 +535,16 @@
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha3.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_adrs.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_hash_ctx.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_key.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_fors.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hash.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hypertree.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_params.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_wots.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_xmss.c
   $(OPENSSL_PATH)/crypto/sm3/legacy_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/stack/stack.c
@@ -715,6 +725,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/slh_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
@@ -735,6 +746,7 @@
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/slh_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
@@ -744,6 +756,7 @@
   $(OPENSSL_PATH)/providers/common/der/der_ecx_key.c
   $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
+  $(OPENSSL_PATH)/providers/common/der/der_slh_dsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/ciphercommon.c
@@ -760,6 +773,7 @@
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ecx_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_slh_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
   $(OPENSSL_PATH)/ssl/d1_lib.c
@@ -1317,6 +1331,16 @@
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha3.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_adrs.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_hash_ctx.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_key.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_fors.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hash.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hypertree.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_params.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_wots.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_xmss.c
   $(OPENSSL_PATH)/crypto/sm3/legacy_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/stack/stack.c
@@ -1497,6 +1521,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/slh_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
@@ -1517,6 +1542,7 @@
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/slh_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
@@ -1526,6 +1552,7 @@
   $(OPENSSL_PATH)/providers/common/der/der_ecx_key.c
   $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
+  $(OPENSSL_PATH)/providers/common/der/der_slh_dsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/ciphercommon.c
@@ -1542,6 +1569,7 @@
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ecx_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_slh_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
   $(OPENSSL_PATH)/ssl/d1_lib.c
@@ -2122,6 +2150,16 @@
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha3.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_adrs.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_hash_ctx.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_key.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_fors.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hash.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hypertree.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_params.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_wots.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_xmss.c
   $(OPENSSL_PATH)/crypto/sm3/legacy_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/stack/stack.c
@@ -2302,6 +2340,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/slh_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
@@ -2322,6 +2361,7 @@
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/slh_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
   $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
@@ -2331,6 +2371,7 @@
   $(OPENSSL_PATH)/providers/common/der/der_ecx_key.c
   $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
+  $(OPENSSL_PATH)/providers/common/der/der_slh_dsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/ciphercommon.c
@@ -2347,6 +2388,7 @@
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ecx_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_slh_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
   $(OPENSSL_PATH)/ssl/d1_lib.c
