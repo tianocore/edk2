@@ -2256,6 +2256,21 @@
   # @Prompt Capsule On Disk Temp Relocation file name in PEI phase
   gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName|L"Cod.tmp"|VOID*|0x30001048
 
+  ## Specifies the FILE_GUID of the FREEFORM FFS file that contains the
+  #  platform logo BMP image as a RAW section. LogoFvFileDxe uses this GUID
+  #  to locate the logo at runtime via GetSectionFromAnyFv().
+  #  The default value is the FILE_GUID of MdeModulePkg/Logo/Logo.inf
+  #  (TianoCore logo). Platforms override this PCD in their DSC to supply a
+  #  custom logo without modifying or forking the driver.
+  #
+  #  NOTE: The platform FDF must include a FILE FREEFORM block matching this
+  #  GUID, otherwise no logo is displayed. For the default TianoCore logo:
+  #    FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+  #      SECTION RAW = MdeModulePkg/Logo/Logo.bmp
+  #    }
+  # @Prompt Platform logo firmware volume file GUID.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLogoFile|{ 0x99, 0x8B, 0xB2, 0x7B, 0xBB, 0x61, 0xD5, 0x11, 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }|VOID*|0x30001049
+
   ## This PCD hold a list GUIDs for the ImageTypeId to indicate the
   #  FMP capsule is a system FMP.
   # @Prompt A list of system FMP ImageTypeId GUIDs
