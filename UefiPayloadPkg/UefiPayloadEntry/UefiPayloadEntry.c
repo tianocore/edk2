@@ -335,7 +335,7 @@ MemInfoCallback (
 **/
 EFI_STATUS
 BuildHobFromBl (
-  VOID
+  IN OUT EFI_HOB_HANDOFF_INFO_TABLE  *HobInfo
   )
 {
   EFI_STATUS                        Status;
@@ -350,6 +350,7 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *NewGfxDeviceInfo;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE    *SmBiosTableHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE      *AcpiTableHob;
+  EFI_BOOT_MODE                     BootMode;
 
   //
   // First find TOLUD
@@ -410,6 +411,15 @@ BuildHobFromBl (
     ASSERT (NewFirmwareInfo != NULL);
     CopyMem (NewFirmwareInfo, &FirmwareInfo, sizeof (FirmwareInfo));
     DEBUG ((DEBUG_INFO, "Created firmware info hob\n"));
+  }
+
+  //
+  // Get boot mode from bootloader and set it in HOB
+  //
+  Status = ParseBootMode (&BootMode);
+  if (!EFI_ERROR (Status)) {
+    HobInfo->BootMode = BootMode;
+    DEBUG ((DEBUG_INFO, "BootMode from payload: %x\n", BootMode));
   }
 
   //
@@ -590,7 +600,7 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "HobMemBase    = 0x%llx\n", (UINT64)HobMemBase));
 
   // Build HOB based on information from Bootloader
-  Status = BuildHobFromBl ();
+  Status = BuildHobFromBl (HobInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "BuildHobFromBl Status = %r\n", Status));
     return Status;

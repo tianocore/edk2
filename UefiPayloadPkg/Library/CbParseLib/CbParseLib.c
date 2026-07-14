@@ -409,6 +409,47 @@ ParseMemoryInfo (
 }
 
 /**
+  Parse the boot mode from the coreboot table in memory.
+
+  @param  Mode              Pointer to the boot mode variable
+
+  @retval RETURN_SUCCESS     Successfully find out the memory information.
+  @retval RETURN_NOT_FOUND   Failed to find the memory information.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseBootMode (
+  OUT EFI_BOOT_MODE  *Mode
+  )
+{
+  struct lb_boot_mode  *boot_mode;
+
+  //
+  // Get the coreboot memory table
+  //
+  boot_mode = (struct lb_boot_mode *)FindCbTag (CB_TAG_BOOT_MODE);
+  if (boot_mode == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  switch (boot_mode->boot_mode) {
+    case LB_BOOT_MODE_NORMAL:
+      *Mode = BOOT_WITH_FULL_CONFIGURATION;
+      break;
+
+    case LB_BOOT_MODE_FLASH_UPDATE:
+      *Mode = BOOT_ON_FLASH_UPDATE;
+      break;
+
+    default:
+      return RETURN_UNSUPPORTED;
+  }
+
+  return RETURN_SUCCESS;
+}
+
+/**
   Acquire SMBIOS table from coreboot.
 
   @param  SmbiosTable               Pointer to the SMBIOS table info.

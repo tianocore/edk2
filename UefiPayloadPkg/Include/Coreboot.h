@@ -302,4 +302,31 @@ struct cb_range {
 
 typedef struct cb_memory CB_MEMORY;
 
+#define CB_TAG_BOOT_MODE  0x00cd
+
+enum cb_boot_mode {
+  /* Regular boot scenarios */
+  LB_BOOT_MODE_NORMAL,
+  /* Device is booting in low-batter w/o charger attached */
+  LB_BOOT_MODE_LOW_BATTERY,
+  /* Device is booting in low-batter w/ charger attached */
+  LB_BOOT_MODE_LOW_BATTERY_CHARGING,
+  /* Device is booting in due to charger insertion */
+  LB_BOOT_MODE_OFFMODE_CHARGING,
+  /* Device is booting in due to RTC alarm */
+  LB_BOOT_MODE_RTC_WAKE,
+  /* Device is booting in "no-battery" */
+  LB_BOOT_MODE_NO_BATTERY,
+  /* Device is booting with flash unlocked. */
+  LB_BOOT_MODE_FLASH_UPDATE,
+};
+
+/*
+ * Boot Mode: Passed the platform boot mode information to payload.
+ */
+struct lb_boot_mode {
+  UINT32            tag;
+  UINT32            size;
+  enum cb_boot_mode boot_mode;
+} __attribute__((packed));
 #endif // _COREBOOT_PEI_H_INCLUDED_
