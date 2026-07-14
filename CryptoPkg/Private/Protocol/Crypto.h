@@ -21,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  26
+#define EDKII_CRYPTO_VERSION  27
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -6459,6 +6459,300 @@ BOOLEAN
   IN  UINTN        SigSize
   );
 
+/**
+  Creates a new SLH-DSA context by Crypto NID.
+
+  This function allocates and initializes a new SLH-DSA context for the specified
+  SLH-DSA variant. The context contains an EVP_PKEY structure initialized with the
+  SLH-DSA parameters. The caller must call SlhDsaFree() to release the context when done.
+
+  Before keys can be used for signing or verification, they must be set using
+  SlhDsaSetPrivKey() or SlhDsaSetPubKey().
+
+  If Nid is not a supported SLH-DSA variant, then return NULL.
+  If memory allocation fails, then return NULL.
+
+  @param[in]  Nid   Crypto NID of the SLH-DSA variant (e.g., CRYPTO_NID_SLH_DSA_SHAKE_256S).
+
+  @retval Pointer to new SLH-DSA context if successful.
+  @retval NULL if Nid is unsupported or allocation failed.
+
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_NEW_BY_NID)(
+  IN  UINTN  Nid
+  );
+
+/**
+  Frees an SLH-DSA context and all associated resources.
+
+  This function releases all memory associated with the SLH-DSA context, including
+  the EVP_PKEY structure. After calling this function, the SlhDsaContext pointer
+  should not be used.
+
+  If SlhDsaContext is NULL, then this function returns immediately without action.
+
+  @param[in]  SlhDsaContext  Pointer to the SLH-DSA context to be released.
+
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_FREE)(
+  IN  VOID  *SlhDsaContext
+  );
+
+/**
+  Sets the SLH-DSA private key in the SLH-DSA context.
+
+  This function imports a raw private key into the SLH-DSA context. The private key
+  must be in raw binary format (not PEM or DER encoded). The key size must match
+  the expected size for the SLH-DSA variant (128 bytes for SLH-DSA-SHAKE-256s).
+
+  OpenSSL automatically derives the public key from the private key, so after
+  calling this function, both signing and verification operations are possible.
+
+  If SlhDsaContext is NULL, then return FALSE.
+  If PrivateKey is NULL, then return FALSE.
+  If PrivateKeySize is 0, then return FALSE.
+  If PrivateKeySize does not match the expected size for the variant, then return FALSE.
+
+  @param[in]  SlhDsaContext    Pointer to SLH-DSA context created by SlhDsaNewByNid().
+  @param[in]  PrivateKey       Pointer to raw private key bytes.
+  @param[in]  PrivateKeySize   Size of the private key in bytes.
+
+  @retval TRUE   SLH-DSA private key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_SET_PRIV_KEY)(
+  IN  VOID   *SlhDsaContext,
+  IN  UINT8  *PrivateKey,
+  IN  UINTN  PrivateKeySize
+  );
+
+/**
+  Generates and retrieves the public key from a private key context.
+
+  @param[in]   SlhDsaContext   Pointer to SLH-DSA context containing the private key.
+  @param[out]  PublicKey       Pointer to buffer to receive the public key.
+  @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
+
+  @retval TRUE   Public key generated and retrieved successfully.
+  @retval FALSE  Invalid parameters or public key extraction failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_GENERATE_PUB_KEY)(
+  IN  VOID   *SlhDsaContext,
+  OUT UINT8  *PublicKey,
+  IN  UINTN  PublicKeySize
+  );
+
+/**
+  Sets the SLH-DSA public key in the SLH-DSA context.
+
+  This function imports a raw public key into the SLH-DSA context. The public key
+  must be in raw binary format (not PEM or DER encoded). The key size must match
+  the expected size for the SLH-DSA variant (64 bytes for SLH-DSA-SHAKE-256s).
+
+  After setting the public key, the context can be used for signature verification
+  but not for signing (which requires the private key).
+
+  If SlhDsaContext is NULL, then return FALSE.
+  If PublicKey is NULL, then return FALSE.
+  If PublicKeySize is 0, then return FALSE.
+  If PublicKeySize does not match the expected size for the variant, then return FALSE.
+
+  @param[in]  SlhDsaContext   Pointer to SLH-DSA context created by SlhDsaNewByNid().
+  @param[in]  PublicKey       Pointer to raw public key bytes.
+  @param[in]  PublicKeySize   Size of the public key in bytes.
+
+  @retval TRUE   SLH-DSA public key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_SET_PUB_KEY)(
+  IN  VOID   *SlhDsaContext,
+  IN  UINT8  *PublicKey,
+  IN  UINTN  PublicKeySize
+  );
+
+/**
+  Retrieves the SLH-DSA public key from the SLH-DSA context.
+
+  This function extracts the public key from the SLH-DSA context and copies it to
+  the provided buffer. The public key is returned in raw binary format.
+
+  The context must have a key set (either via SlhDsaSetPrivKey() or SlhDsaSetPubKey())
+  before calling this function.
+
+  If SlhDsaContext is NULL, then return FALSE.
+  If PublicKey is NULL, then return FALSE.
+  If PublicKeySize is NULL, then return FALSE.
+  If the context does not contain a valid key, then return FALSE.
+  If PublicKey buffer is too small, PublicKeySize is updated with required size and return FALSE.
+
+  @param[in]      SlhDsaContext   Pointer to SLH-DSA context containing the key.
+  @param[out]     PublicKey       Pointer to buffer to receive the public key.
+  @param[in,out]  PublicKeySize   On input, size of PublicKey buffer in bytes.
+                                  On output, actual size of public key written.
+
+  @retval TRUE   SLH-DSA public key retrieved successfully.
+  @retval FALSE  Invalid parameters or buffer too small.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_GET_PUB_KEY)(
+  IN      VOID   *SlhDsaContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
+
+/**
+  Retrieve the SLH-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert           Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize       Size of the X509 certificate in bytes.
+  @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contain the retrieved
+                             SLH-DSA public key component. Use SlhDsaFree() function to free the
+                             resource.
+
+  If Cert is NULL, then return FALSE.
+  If SlhDsaContext is NULL, then return FALSE.
+
+  @retval  TRUE   SLH-DSA Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve SLH-DSA public key from X509 certificate.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_GET_PUBLIC_KEY_FROM_X509)(
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **SlhDsaContext
+  );
+
+/**
+   Retrieve the SLH-DSA Private Key from the password-protected PEM key data.
+
+   @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
+   @param[in]  PemSize        Size of the PEM key data in bytes.
+   @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
+   @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contains the retrieved
+   SLH-DSA private key component. Use SlhDsaFree() function to free the
+   resource.
+
+   If PemData is NULL, then return FALSE.
+   If SlhDsaContext is NULL, then return FALSE.
+
+   @retval  TRUE   SLH-DSA Private Key was retrieved successfully.
+   @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_GET_PRIVATE_KEY_FROM_PEM)(
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **SlhDsaContext
+  );
+
+/**
+  Generates an SLH-DSA signature for a given message.
+
+  This function creates an SLH-DSA signature using the private key stored in the
+  SLH-DSA context. SLH-DSA signatures can include an optional context string for
+  domain separation, allowing the same key to be used in different contexts
+  without creating security vulnerabilities.
+
+  The context must contain a private key (set via SlhDsaSetPrivKey() or loaded
+  from PEM) before calling this function.
+
+  If SlhDsaContext is NULL, then return FALSE.
+  If Message is NULL, then return FALSE.
+  If MessageSize is 0 or exceeds INT_MAX, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If SigSize is NULL, then return FALSE.
+  Context may be NULL if no context string is used (ContextSize must be 0).
+
+  @param[in]      SlhDsaContext  Pointer to SLH-DSA context containing the private key.
+  @param[in]      Context        Optional context string for domain separation.
+                                 May be NULL for default context.
+  @param[in]      ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]      Message        Pointer to message data to be signed.
+  @param[in]      MessageSize    Size of message in bytes.
+  @param[out]     Signature      Pointer to buffer to receive the signature.
+  @param[in,out]  SigSize        On input, size of Signature buffer.
+                                 On output, actual size of signature (29792 bytes for SLH-DSA-SHAKE-256s).
+
+  @retval TRUE   SLH-DSA signature generated successfully.
+  @retval FALSE  Invalid parameters or signature generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_SIGN)(
+  IN      VOID         *SlhDsaContext,
+  IN      UINT8        *Context,
+  IN      UINTN        ContextSize,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+/**
+  Verifies the SLH-DSA signature for a given message.
+
+  This function verifies an SLH-DSA signature against a message using the public key
+  contained in the SLH-DSA context. An optional context string can be provided which
+  must match the context used during signing.
+
+  The context must contain a key (either public or private) set via SlhDsaSetPrivKey()
+  or SlhDsaSetPubKey() before calling this function.
+
+  If SlhDsaContext is NULL, then return FALSE.
+  If Message is NULL, then return FALSE.
+  If MessageSize is 0, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If SigSize is 0 or exceeds INT_MAX, then return FALSE.
+  If SigSize does not match expected signature size for the variant, then return FALSE.
+  Context may be NULL if no context string is used.
+
+  @param[in]  SlhDsaContext  Pointer to SLH-DSA context containing the public key.
+  @param[in]  Context        Optional context string for domain separation.
+                             May be NULL for default context.
+  @param[in]  ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]  Message        Pointer to the message data to verify.
+  @param[in]  MessageSize    Size of the message in bytes.
+  @param[in]  Signature      Pointer to the SLH-DSA signature to verify.
+  @param[in]  SigSize        Size of the signature in bytes.
+                             Must match variant size (29792 bytes for SLH-DSA-SHAKE-256s).
+
+  @retval TRUE   SLH-DSA signature verification succeeded.
+  @retval FALSE  SLH-DSA signature verification failed or invalid parameters.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_SLH_DSA_VERIFY)(
+  IN  VOID         *SlhDsaContext,
+  IN  UINT8        *Context,
+  IN  UINTN        ContextSize,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        MessageSize,
+  IN  UINT8        *Signature,
+  IN  UINTN        SigSize
+  );
+
 ///
 /// EDK II Crypto Protocol
 ///
@@ -6793,6 +7087,17 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_ML_DSA_GET_PRIVATE_KEY_FROM_PEM        MlDsaGetPrivateKeyFromPem;
   EDKII_CRYPTO_ML_DSA_SIGN                            MlDsaSign;
   EDKII_CRYPTO_ML_DSA_VERIFY                          MlDsaVerify;
+  /// SLH-DSA
+  EDKII_CRYPTO_SLH_DSA_NEW_BY_NID                     SlhDsaNewByNid;
+  EDKII_CRYPTO_SLH_DSA_FREE                           SlhDsaFree;
+  EDKII_CRYPTO_SLH_DSA_SET_PRIV_KEY                   SlhDsaSetPrivKey;
+  EDKII_CRYPTO_SLH_DSA_GENERATE_PUB_KEY               SlhDsaGeneratePubKey;
+  EDKII_CRYPTO_SLH_DSA_SET_PUB_KEY                    SlhDsaSetPubKey;
+  EDKII_CRYPTO_SLH_DSA_GET_PUB_KEY                    SlhDsaGetPubKey;
+  EDKII_CRYPTO_SLH_DSA_GET_PUBLIC_KEY_FROM_X509       SlhDsaGetPublicKeyFromX509;
+  EDKII_CRYPTO_SLH_DSA_GET_PRIVATE_KEY_FROM_PEM       SlhDsaGetPrivateKeyFromPem;
+  EDKII_CRYPTO_SLH_DSA_SIGN                           SlhDsaSign;
+  EDKII_CRYPTO_SLH_DSA_VERIFY                         SlhDsaVerify;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
