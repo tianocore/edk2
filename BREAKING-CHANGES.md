@@ -68,7 +68,35 @@ None
 
 #### edk2-stable202608: Changes without Removal
 
-None
+##### Breaking Change: New GptLib library class dependency
+
+**Status**: Announced
+
+**Tracking Issue**: tianocore/edk2#12808
+
+**Type**: Source-Level (Non-removal) - Library class dependency addition
+(single expected instance)
+
+**What changed**: PartitionDxe, DxeTpm2MeasureBootLib and
+DxeTpmMeasureBootLib gained a required dependency on the new GptLib library
+class declared in MdeModulePkg. Platforms that build any of these modules
+must resolve GptLib in their DSC or the build fails with an unresolved
+library class.
+
+**Why it changed**: As reported in CVE-2024-13745, DxeTpm2MeasureBootLib
+could measure a GPT partition table that differs from the one parsed and
+used by PartitionDxe, because the two components carried independent GPT
+parsing logic. GptLib consolidates GPT parsing and validation so the
+partition table measured into PCR[5] is validated by the same logic the
+firmware uses.
+
+**What replaces it**: Nothing is removed. A single canonical GptLib
+instance is provided in-tree (MdeModulePkg/Library/GptLib/GptLib.inf).
+
+**How to migrate**: Add the following mapping to the platform DSC
+[LibraryClasses] section:
+
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 
 ### edk2-stable202608: Behavioral Breaking Changes
 
