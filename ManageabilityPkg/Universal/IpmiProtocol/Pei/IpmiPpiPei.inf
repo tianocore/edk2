@@ -3,6 +3,7 @@
 #
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -49,6 +50,7 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress   # Used as default KCS I/O base adddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress

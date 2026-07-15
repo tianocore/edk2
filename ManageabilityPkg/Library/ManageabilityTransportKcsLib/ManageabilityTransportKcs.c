@@ -3,6 +3,7 @@
   KCS instance of Manageability Transport Library
 
   Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -68,8 +69,8 @@ KcsTransportInit (
     mKcsHardwareInfo.IoBaseAddress.IoAddress16    = PcdGet16 (PcdIpmiKcsIoBaseAddress);
     mKcsHardwareInfo.IoDataInAddress.IoAddress16  = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_IN_REGISTER_OFFSET;
     mKcsHardwareInfo.IoDataOutAddress.IoAddress16 = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_OUT_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoCommandAddress.IoAddress16 = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_COMMAND_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoStatusAddress.IoAddress16  = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_STATUS_REGISTER_OFFSET;
+    mKcsHardwareInfo.IoCommandAddress.IoAddress16 = PcdGet16 (PcdIpmiKcsIoCommandAddress);
+    mKcsHardwareInfo.IoStatusAddress.IoAddress16  = PcdGet16 (PcdIpmiKcsIoCommandAddress);
   } else {
     mKcsHardwareInfo.MemoryMap        = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->MemoryMap;
     mKcsHardwareInfo.IoBaseAddress    = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoBaseAddress;

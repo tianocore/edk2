@@ -2,6 +2,7 @@
   IPMI ACPI SSDT.
 
 Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -42,8 +43,8 @@ Device(IPMC)
     // Return the x86 resources consumed by BMC
     Name(_CRS, ResourceTemplate()
     {
-        // Uses 8-bit ports 0xCA2-0xCA5
-        IO(Decode16, 0xCA2, 0xCA2, 0, 2)
+        IO(Decode16, FixedPcdGet16 (PcdIpmiKcsIoBaseAddress), FixedPcdGet16 (PcdIpmiKcsIoBaseAddress), 0, 1)
+        IO(Decode16, FixedPcdGet16 (PcdIpmiKcsIoCommandAddress), FixedPcdGet16 (PcdIpmiKcsIoCommandAddress), 0, 1)
     })
 
     Name(_HID, "IPI0001")           // IPMI device
@@ -54,5 +55,3 @@ Device(IPMC)
 
 
 } // end of  Device(IPMC)
-
-
