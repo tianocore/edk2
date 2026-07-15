@@ -3,6 +3,8 @@
 
 Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1392,6 +1394,60 @@ Tcg2HashLogExtendEvent (
 }
 
 /**
+  The EFI_TCG2_PROTOCOL LogHashEvent function call logs a pre-computed digest list and an event.
+  The caller is responsible for calculateing the digest values and extend them into TPM outside
+  this function call.
+
+  @param[in]  This               Indicates the calling context
+  @param[in]  DigestList         Pointer to a TPML_DIGEST_VALUES structure containing
+                                 the pre-computed digest values to log.
+  @param[in]  Event              Pointer to data buffer containing information about the event.
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+  @retval EFI_VOLUME_FULL        The extend operation occurred, but the event could not be written to one or more event logs.
+  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
+**/
+EFI_STATUS
+EFIAPI
+Tcg2LogHashEvent (
+  IN EFI_TCG2_PROTOCOL     *This,
+  IN TPML_DIGEST_VALUES    *DigestList,
+  IN EFI_TCG2_EVENT        *Event
+  )
+{
+  EFI_STATUS         Status;
+  TCG_PCR_EVENT_HDR  NewEventHdr;
+
+  DEBUG ((DEBUG_VERBOSE, "Tcg2LogHashEvent ...\n"));
+
+  if ((This == NULL) || (DigestList == NULL) || (Event == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Event->Size < Event->Header.HeaderSize + sizeof (UINT32)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Event->Header.EventType != EV_NO_ACTION) && (Event->Header.PCRIndex > MAX_PCR_INDEX)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NewEventHdr.PCRIndex  = Event->Header.PCRIndex;
+  NewEventHdr.EventType = Event->Header.EventType;
+  NewEventHdr.EventSize = Event->Size - sizeof (UINT32) - Event->Header.HeaderSize;
+
+  Status = TcgDxeLogHashEvent (DigestList, &NewEventHdr, Event->Event);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Tcg2LogHashEvent - %r.\n", Status));
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "Tcg2LogHashEvent - %r\n", Status));
+  return Status;
+}
+
+/**
   This service enables the sending of commands to the TPM.
 
   @param[in]  This                     Indicates the calling context
@@ -1583,6 +1639,7 @@ EFI_TCG2_PROTOCOL  mTcg2Protocol = {
   Tcg2GetActivePCRBanks,
   Tcg2SetActivePCRBanks,
   Tcg2GetResultOfSetActivePcrBanks,
+  Tcg2LogHashEvent,
 };
 
 /**
