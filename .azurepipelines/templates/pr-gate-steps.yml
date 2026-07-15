@@ -26,6 +26,11 @@ steps:
   clean: true
   fetchDepth: 1
 
+- script: |
+    git config --global --add url."https://github.com/TF-Shared/transfer-list-library.git".insteadOf "https://review.trustedfirmware.org/shared/transfer-list-library.git"
+    git config --global --add url."https://github.com/TF-Shared/transfer-list-library.git".insteadOf "https://review.trustedfirmware.org/shared/transfer-list-library"
+  displayName: Redirect libtl submodule checkout to GitHub mirror
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: ${{ parameters.usePythonVersion }}
