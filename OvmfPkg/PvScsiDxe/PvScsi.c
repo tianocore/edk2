@@ -1115,7 +1115,7 @@ PvScsiSetupRings (
                           );
 
   STATIC_ASSERT (
-    sizeof (*Cmd) % sizeof (UINT32) == 0,
+    IS_ALIGNED (sizeof (*Cmd), sizeof (UINT32)),
     "Cmd must be multiple of 32-bit words"
     );
   return PvScsiWriteCmdDesc (

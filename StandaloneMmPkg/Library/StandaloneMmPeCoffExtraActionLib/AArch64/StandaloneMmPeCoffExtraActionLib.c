@@ -28,7 +28,8 @@ RETURN_STATUS
 UpdatePeCoffPermissions (
   IN  CONST PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
   IN  REGION_PERMISSION_UPDATE_FUNC       NoExecUpdater,
-  IN  REGION_PERMISSION_UPDATE_FUNC       ReadOnlyUpdater
+  IN  REGION_PERMISSION_UPDATE_FUNC       ReadOnlyUpdater,
+  IN  REGION_PERMISSION_UPDATE_FUNC       ReadOnlyExecUpdater
   )
 {
   RETURN_STATUS                        Status;
@@ -205,8 +206,7 @@ UpdatePeCoffPermissions (
         Base,
         SectionHeader.Misc.VirtualSize
         ));
-      ReadOnlyUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
-      NoExecUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
+      ReadOnlyExecUpdater (Base, ALIGN_VALUE (SectionHeader.Misc.VirtualSize, SectionAlignment));
     }
 
     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
@@ -233,7 +233,8 @@ PeCoffLoaderRelocateImageExtraAction (
   UpdatePeCoffPermissions (
     ImageContext,
     ArmClearMemoryRegionNoExec,
-    ArmSetMemoryRegionReadOnly
+    ArmSetMemoryRegionReadOnlyPerm,
+    ArmSetMemoryRegionReadOnlyExecPerm
     );
 }
 
@@ -256,6 +257,7 @@ PeCoffLoaderUnloadImageExtraAction (
   UpdatePeCoffPermissions (
     ImageContext,
     ArmSetMemoryRegionNoExec,
-    ArmClearMemoryRegionReadOnly
+    ArmSetMemoryRegionReadWritePerm,
+    ArmSetMemoryRegionReadWritePerm
     );
 }

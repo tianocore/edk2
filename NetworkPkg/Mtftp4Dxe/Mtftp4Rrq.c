@@ -91,8 +91,6 @@ Mtftp4RrqSendAck (
   NET_BUF            *Packet;
   EFI_STATUS         Status;
 
-  Status = EFI_SUCCESS;
-
   Packet = NetbufAlloc (sizeof (EFI_MTFTP4_ACK_HEADER));
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -252,7 +250,6 @@ Mtftp4RrqHandleData (
   INTN        Expected;
 
   *Completed = FALSE;
-  Status     = EFI_SUCCESS;
   BlockNum   = NTOHS (Packet->Data.Block);
   Expected   = Mtftp4GetNextBlockNum (&Instance->Blocks);
 

@@ -24,9 +24,16 @@
     "allowCompoundWords": true,
     "maxNumberOfProblems": 200,
     "maxDuplicateProblems": 200,
+    "ignoreRegExpList": [
+        # Ignore copyrights
+        "/Copyright\\s*\\([cC]\\).*$/gm",
+        # Ignore hex values
+        "/0x[0-9a-fA-F]+/"
+    ],
     "ignoreWords": [],
     "words": [
         "AABBCCDD",
+        "AAPCS",
         "ABPID",
         "ACPIBAR",
         "ACPICA",
@@ -366,6 +373,7 @@
         "frcerr",
         "freqcsr",
         "fsgsbase",
+        "fstack",
         "fvmain",
         "fword",
         "fwvol",

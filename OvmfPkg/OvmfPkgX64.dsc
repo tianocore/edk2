@@ -577,6 +577,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE
 !endif
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|TRUE
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
@@ -1019,6 +1020,7 @@
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
 !endif
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+  OvmfPkg/WsmtDxe/WsmtDxe.inf
 
   #
   # Hash2 Protocol producer

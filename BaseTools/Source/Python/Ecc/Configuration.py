@@ -71,6 +71,7 @@ _ConfigFileToInternalTranslation = {
     "HeaderCheckFunction":"HeaderCheckFunction",
     "IncludeFileCheckAll":"IncludeFileCheckAll",
     "IncludeFileCheckData":"IncludeFileCheckData",
+    "IncludeFileCheckPragmaOnce":"IncludeFileCheckPragmaOnce",
     "IncludeFileCheckSameName":"IncludeFileCheckSameName",
     "MetaDataFileCheckAll":"MetaDataFileCheckAll",
     "MetaDataFileCheckBinaryInfInFdf":"MetaDataFileCheckBinaryInfInFdf",
@@ -243,6 +244,8 @@ class Configuration(object):
         # Check whether include files contain only public or only private data
         # Check whether include files NOT contain code or define data variables
         self.IncludeFileCheckData = 1
+        # Check whether include files use '#pragma once' instead of a traditional #ifndef/#define include guard
+        self.IncludeFileCheckPragmaOnce = 1
 
         ## Declarations and Data Types Checking
         self.DeclarationDataTypeCheckAll = 0

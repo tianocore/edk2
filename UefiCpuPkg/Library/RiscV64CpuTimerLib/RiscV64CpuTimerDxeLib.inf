@@ -1,0 +1,37 @@
+## @file
+# RISC-V CPU Timer Library Instance
+#
+#  Copyright (c) 2016 - 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
+#  Copyright (C) 2026 Qualcomm Technologies, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = RiscV64CpuTimerDxeLib
+  FILE_GUID                      = B635A600-EA24-4199-88E8-5761EEA96A51
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib | DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  MODULE_UNI_FILE                = RiscV64CpuTimerLib.uni
+  CONSTRUCTOR                    = RiscV64CpuTimerLibConstructor
+
+[Sources]
+  CpuTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  FdtLib
+  HobLib
+
+[Guids]
+  gFdtHobGuid

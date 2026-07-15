@@ -2,7 +2,7 @@
   SMBIOS Type7 Table Generator.
 
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-  Copyright (c) 2020 - 2025, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -630,19 +630,36 @@ BuildSmbiosType7TableEx (
         SmbiosRecord->Associativity = CacheAssociativityOther;
       } else {
         // No previously seen cache at this level, create new table entry
-        StringTableInitialize (&StrTable, SMBIOS_TYPE7_MAX_STRINGS);
+        Status = StringTableInitialize (&StrTable, SMBIOS_TYPE7_MAX_STRINGS);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Failed to initialize string table. Status = %r\n",
+            __func__,
+            Status
+            ));
+          goto exitErrorBuildSmbiosType7Table;
+        }
+
         SocketDesignationRef = 0;
 
         if (CacheNode->SocketDesignation[0]) {
           Status = StringTableAddString (&StrTable, CacheNode->SocketDesignation, &SocketDesignationRef);
           if (EFI_ERROR (Status)) {
             DEBUG ((DEBUG_ERROR, "Failed to add Socket Designation String %r\n", Status));
+            StringTableFree (&StrTable);
             goto exitErrorBuildSmbiosType7Table;
           }
         }
 
         SmbiosRecordSize = sizeof (SMBIOS_TABLE_TYPE7) + StringTableGetStringSetSize (&StrTable);
         SmbiosRecord     = (SMBIOS_TABLE_TYPE7 *)AllocateZeroPool (SmbiosRecordSize);
+        if (SmbiosRecord == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          DEBUG ((DEBUG_ERROR, "Failed to allocate memory\n"));
+          StringTableFree (&StrTable);
+          goto exitErrorBuildSmbiosType7Table;
+        }
 
         // Set up the header
         SmbiosRecord->Hdr.Type   = EFI_SMBIOS_TYPE_CACHE_INFORMATION;
@@ -665,6 +682,8 @@ BuildSmbiosType7TableEx (
         if (CacheUsers < 0) {
           ASSERT (CacheUsers >= 0);
           Status = EFI_INVALID_PARAMETER;
+          StringTableFree (&StrTable);
+          FreePool (SmbiosRecord);
           goto exitErrorBuildSmbiosType7Table;
         }
 
@@ -682,6 +701,8 @@ BuildSmbiosType7TableEx (
         SmbiosRecord->Associativity   = GetCacheAssociativity (CacheNode->Associativity);
 
         StringTablePublishStringSet (&StrTable, (CHAR8 *)(SmbiosRecord + 1), SmbiosRecordSize - sizeof (SMBIOS_TABLE_TYPE7));
+
+        StringTableFree (&StrTable);
 
         TableList[ObjIndex]          = (SMBIOS_STRUCTURE *)SmbiosRecord;
         CmObjectList[ObjIndex]       = CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceSmbios, EStdSmbiosTableIdType07, CacheNode->Level | (SocketIndex << 2));
@@ -737,6 +758,12 @@ exitErrorBuildSmbiosType7Table:
   }
 
   if (TableList) {
+    for (Index = 0; Index < ObjIndex; Index++) {
+      if (TableList[Index] != NULL) {
+        FreePool (TableList[Index]);
+      }
+    }
+
     FreePool (TableList);
   }
 

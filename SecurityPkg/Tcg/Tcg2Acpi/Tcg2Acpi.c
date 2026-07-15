@@ -725,7 +725,7 @@ PublishAcpiTable (
     PossibleIrqNumBuf     = (UINT32 *)PcdGetPtr (PcdTpm2PossibleIrqNumBuf);
     PossibleIrqNumBufSize = (UINT32)PcdGetSize (PcdTpm2PossibleIrqNumBuf);
 
-    if ((PossibleIrqNumBufSize <= MAX_PRS_INT_BUF_SIZE) && ((PossibleIrqNumBufSize % sizeof (UINT32)) == 0)) {
+    if ((PossibleIrqNumBufSize <= MAX_PRS_INT_BUF_SIZE) && IS_ALIGNED (PossibleIrqNumBufSize, sizeof (UINT32))) {
       Status = UpdatePossibleResource (Table, PossibleIrqNumBuf, PossibleIrqNumBufSize, &IsShortFormPkgLength);
       DEBUG ((
         DEBUG_INFO,

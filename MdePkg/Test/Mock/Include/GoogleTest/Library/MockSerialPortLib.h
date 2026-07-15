@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_SERIAL_PORT_LIB_H_
-#define MOCK_SERIAL_PORT_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -75,5 +74,3 @@ struct MockSerialPortLib {
     )
     );
 };
-
-#endif

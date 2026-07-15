@@ -44,8 +44,6 @@
 [Sources.AARCH64]
   ArmRngDxe.c
   ArmTrng.c
-
-[Sources.AARCH64]
   AArch64/AArch64Algo.c
 
 [Packages]

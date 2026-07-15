@@ -2,6 +2,8 @@
   Flattened Device Tree Library.
 
   Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -427,6 +429,55 @@ FdtStringListContains (
   )
 {
   return fdt_stringlist_contains (StringList, ListLength, String);
+}
+
+/**
+  Returns the number of strings in the given property.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Property       Name of the property containing the string list.
+
+  @return The number of strings in the property, or a negative error code
+          on failure. Returns -FDT_ERR_BADVALUE if the property value is
+          not a valid NUL-terminated string list.
+
+**/
+INT32
+EFIAPI
+FdtStringListCount (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Property
+  )
+{
+  return fdt_stringlist_count (Fdt, NodeOffset, Property);
+}
+
+/**
+  Searches for a string in a string list property and returns its index.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Property       The name of the property to search.
+  @param[in] String         String to find within the list.
+
+  @return The index of the string in the string list (>=0) on success,
+          -FDT_ERR_NOTFOUND if the string is not found,
+          -FDT_ERR_BADVALUE if the property is not a valid NUL-terminated
+          string list, or another negative error code on failure.
+
+**/
+INT32
+EFIAPI
+FdtStringListSearch (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Property,
+  IN CONST CHAR8  *String
+  )
+{
+  return fdt_stringlist_search (Fdt, NodeOffset, Property, String);
 }
 
 /**

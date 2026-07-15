@@ -1001,7 +1001,6 @@ Ip6InitDADProcess (
     return EFI_SUCCESS;
   }
 
-  Status   = EFI_SUCCESS;
   IpSb     = IpIf->Service;
   DadXmits = &IpSb->Ip6ConfigInstance.DadXmits;
 
@@ -2278,6 +2277,7 @@ Ip6ProcessRouterAdvertise (
           //
           if ((PrefixList == NULL) &&
               (PrefixOption.ValidLifetime != 0) &&
+              (IpSb->InterfaceId != NULL) &&
               (PrefixOption.PrefixLength + IpSb->InterfaceIdLen * 8 == 128)
               )
           {

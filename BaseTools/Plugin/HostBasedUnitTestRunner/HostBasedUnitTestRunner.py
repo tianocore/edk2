@@ -213,7 +213,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
             return 1
 
         # Filter out auto-generated and test code
-        ret = RunCmd("lcov_cobertura",f"{buildOutputBase}/total-coverage.info --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {buildOutputBase}/coverage.xml")
+        ret = RunCmd("lcov_cobertura",f'{buildOutputBase}/total-coverage.info --excludes "^.*UnitTest|^.*MU|^.*Mock|^.*DEBUG" -o {buildOutputBase}/coverage.xml')
         if ret != 0:
             logging.error("UnitTest Coverage: Failed generate filtered coverage XML.")
             return 1
@@ -232,7 +232,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         # Generate and XML file if requested for all package
         if os.path.isfile(f"{workspace}/Build/coverage.xml"):
             os.remove(f"{workspace}/Build/coverage.xml")
-        ret = RunCmd("lcov_cobertura",f"{workspace}/Build/all-coverage.info --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {workspace}/Build/coverage.xml")
+        ret = RunCmd("lcov_cobertura",f'{workspace}/Build/all-coverage.info --excludes "^.*UnitTest|^.*MU|^.*Mock|^.*DEBUG" -o {workspace}/Build/coverage.xml')
 
         return 0
 
@@ -345,7 +345,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         if ret != 0:
             logging.error(f"clang_gen_lcov_xml: Failed to generate coverage lcov. {output_lcov}")
             return 1
-        ret = RunCmd("lcov_cobertura",f'{output_lcov} --excludes "^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG" -o {output_xml}')
+        ret = RunCmd("lcov_cobertura",f'{output_lcov} --excludes "^.*UnitTest|^.*MU|^.*Mock|^.*DEBUG" -o {output_xml}')
         if ret != 0:
             logging.error(f"clang_gen_lcov_xml: Failed generate filtered coverage XML. {output_xml}")
             return 1

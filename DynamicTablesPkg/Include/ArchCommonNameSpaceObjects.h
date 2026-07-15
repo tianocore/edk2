@@ -19,6 +19,7 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
+#include <IndustryStandard/SmBios.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -78,6 +79,20 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
   EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjEinjInstructionsInfo,           ///< 54 - Einj Instruction Info
+  EArchCommonObjPlatformFwInfo,                 ///< 54 - Platform Firmware Info
+  EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,               ///< 56 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
+  EArchCommonObjCoolingDeviceInfo,              ///< 58 - Cooling Device Info
+  EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
+  EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
+  EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
+  EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1285,5 +1300,431 @@ typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
   /// (v2) Contains a mask of bits to set when writing the Read Ack register.
   UINT64                                    ReadAckWrite;
 } CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION_2_INFO;
+
+/** A structure that describes a
+    Einj Instruction Entry.
+
+    ID: EArchCommonObjEinjInstructionsInfo
+*/
+typedef struct {
+  UINT8                                     InjectionAction;
+  UINT8                                     Instruction;
+  UINT8                                     Flags;
+  EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE    RegisterRegion;
+  UINT64                                    Value;
+  UINT64                                    Mask;
+} CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
+
+/** A structure that describes BIOS Information.
+
+  SMBIOS Specification v3.9.0 Type 0
+
+  ID: EArchCommonObjPlatformFwInfo
+**/
+typedef struct CmArchCommonPlatformFwInfo {
+  /// CM Object Token uniquely identifying this Platform Firmware info entry.
+  CM_OBJECT_TOKEN              BiosInfoToken;
+  /// BIOS vendor name string.
+  CHAR8                        BiosVendor[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS version string.
+  CHAR8                        BiosVersion[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS release date string.
+  CHAR8                        BiosReleaseDate[SMBIOS_MAX_STRING_SIZE];
+  /// BIOS ROM size in bytes.
+  UINT64                       BiosSize;
+  /// Bit field of supported BIOS functions.
+  MISC_BIOS_CHARACTERISTICS    BiosCharacteristics;
+  /// Optional set of functions that BIOS supports (bytes 0 and 1).
+  UINT8                        BIOSCharacteristicsExtensionBytes[2];
+  /// System BIOS firmware major version.
+  UINT8                        SystemBiosMajorRelease;
+  /// System BIOS firmware minor version.
+  UINT8                        SystemBiosMinorRelease;
+  /// Embedded Controller firmware major release.
+  UINT8                        ECFirmwareMajorRelease;
+  /// Embedded Controller firmware minor release.
+  UINT8                        ECFirmwareMinorRelease;
+} CM_ARCH_COMMON_PLATFORM_FW_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.9.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Unsupported until SMBIOS Type 18/Type 33 generators are available.
+  /// Kept here to reserve the Type 17 memory error information handle source
+  /// field in the CM object.
+  CM_OBJECT_TOKEN    MemoryErrorInfoToken;
+  /// Number of memory devices (slots or sockets) in the array.
+  UINT16             NumberOfMemoryDevices;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
+
+/** A structure that describes a Memory Device.
+
+  SMBIOS Specification v3.9.0 Type 17
+
+  ID: EArchCommonObjMemoryDeviceInfo
+**/
+typedef struct CmArchCommonMemoryDeviceInfo {
+  /// CM Object Token uniquely identifying this Memory Device.
+  CM_OBJECT_TOKEN                            MemoryDeviceInfoToken;
+  /// CM Object Token of the Physical Memory Array containing this device.
+  CM_OBJECT_TOKEN                            PhysicalArrayToken;
+  /// CM Object Token of the associated memory error information structure.
+  /// Set to CM_NULL_TOKEN if not present; the generator will use 0xFFFE (Not Provided).
+  CM_OBJECT_TOKEN                            MemoryErrorInfoToken;
+  /// Total width of the device in bits (including ECC bits).
+  UINT16                                     TotalWidth;
+  /// Data width of the device in bits.
+  UINT16                                     DataWidth;
+  /// Size of memory in bytes.
+  UINT64                                     Size;
+  /// Form factor enumeration value.
+  MEMORY_FORM_FACTOR                         FormFactor;
+  /// Device Set number (0 = not part of a set).
+  UINT8                                      DeviceSet;
+  /// Device Locator string (slot/position on board).
+  CHAR8                                      DeviceLocator[SMBIOS_MAX_STRING_SIZE];
+  /// Bank Locator string.
+  CHAR8                                      BankLocator[SMBIOS_MAX_STRING_SIZE];
+  /// Memory device type enumeration value.
+  MEMORY_DEVICE_TYPE                         MemoryType;
+  /// Type detail flags.
+  MEMORY_DEVICE_TYPE_DETAIL                  TypeDetail;
+  /// Speed of the device in MegaTransfers/second.
+  UINT32                                     Speed;
+  /// Serial Number string.
+  CHAR8                                      SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset Tag string.
+  CHAR8                                      AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Part Number string.
+  CHAR8                                      PartNum[SMBIOS_MAX_STRING_SIZE];
+  /// Rank of the device.
+  UINT8                                      Rank;
+  /// Configured speed of the device in MegaTransfers/second.
+  UINT32                                     ConfiguredMemorySpeed;
+  /// Minimum operating voltage in millivolts.
+  UINT16                                     MinVolt;
+  /// Maximum operating voltage in millivolts.
+  UINT16                                     MaxVolt;
+  /// Configured voltage in millivolts.
+  UINT16                                     ConfVolt;
+  /// Memory technology enumeration value.
+  MEMORY_DEVICE_TECHNOLOGY                   MemoryTechnology;
+  /// Operating mode capability flags.
+  MEMORY_DEVICE_OPERATING_MODE_CAPABILITY    MemoryOperatingModeCapability;
+  /// Firmware version string of the memory device.
+  CHAR8                                      FirmwareVersion[SMBIOS_MAX_STRING_SIZE];
+  /// 2-byte Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     ModuleManufacturerId;
+  /// 2-byte Manufacturer Product Id.
+  UINT16                                     ModuleProductId;
+  /// 2-byte Memory Subsystem Controller Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     MemorySubsystemControllerManufacturerId;
+  /// 2-byte Memory Subsystem Controller Product Id.
+  UINT16                                     MemorySubsystemControllerProductId;
+  /// Size of non-volatile memory in bytes.
+  /// If the Non-Volatile Size is unknown, the field is set to FFFFFFFFFFFFFFFFh
+  UINT64                                     NonVolatileSize;
+  /// Size of volatile memory in bytes.
+  /// If the Volatile Size is unknown, the field is set to FFFFFFFFFFFFFFFFh
+  UINT64                                     VolatileSize;
+  /// Size of cache memory in bytes.
+  UINT64                                     CacheSize;
+  /// Logical size of the memory device in bytes.
+  UINT64                                     LogicalSize;
+  /// 2-byte PMIC0 Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     Pmic0ManufacturerId;
+  /// PMIC0 revision number.
+  UINT16                                     Pmic0RevisionNumber;
+  /// 2-byte RCD Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     RcdManufacturerId;
+  /// RCD revision number.
+  UINT16                                     RcdRevisionNumber;
+} CM_ARCH_COMMON_MEMORY_DEVICE_INFO;
+
+/** A structure that describes a Memory Array Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 19
+
+  ID: EArchCommonObjMemoryArrayMappedAddress
+**/
+typedef struct CmArchCommonMemoryArrayMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token of the associated Physical Memory Array.
+  CM_OBJECT_TOKEN         PhysMemArrayToken;
+  /// Number of memory devices that form a row in the address partition.
+  UINT8                   NumMemDevices;
+} CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 20
+
+  ID: EArchCommonObjMemoryDeviceMappedAddress
+**/
+typedef struct CmArchCommonMemoryDeviceMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryDeviceMappedAddressToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token of the associated Memory Device.
+  CM_OBJECT_TOKEN         MemoryDeviceInfoToken;
+  /// CM Object Token of the associated Memory Array Mapped Address.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Identifies the position of the referenced memory device in a row.
+  /// Set to 0xFF if unknown.
+  UINT8                   PartitionRowPosition;
+  /// Identifies the position of the referenced memory device in an interleave.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavePosition;
+  /// Number of consecutive rows from the referenced memory device.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavedDataDepth;
+} CM_ARCH_COMMON_MEMORY_DEVICE_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device entry associated with a
+  Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelDevice
+**/
+typedef struct CmArchCommonMemoryChannelDevice {
+  /// The load on the channel represented by the associated memory device.
+  UINT8              DeviceLoad;
+
+  /// CM Object Token of the associated SMBIOS Type 17 Memory Device.
+  CM_OBJECT_TOKEN    MemoryDeviceInfoToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_DEVICE;
+
+/** A structure that describes a Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelInfo
+**/
+typedef struct CmArchCommonMemoryChannelInfo {
+  /// CM Object Token uniquely identifying this memory channel.
+  CM_OBJECT_TOKEN    MemoryChannelToken;
+
+  /// Type of the memory channel.
+  UINT8              ChannelType;
+
+  /// Maximum load supported by the memory channel.
+  UINT8              MaximumChannelLoad;
+
+  /// Token referencing an array of Memory Channel Device entries.
+  CM_OBJECT_TOKEN    MemoryDeviceListToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_INFO;
+
+/** A structure that describes cooling device.
+
+  SMBIOS Specification v3.9.0 Type 27
+
+  ID: EArchCommonObjCoolingDeviceInfo
+**/
+typedef struct CmArchCommonCoolingDeviceInfo {
+  /// CM Object Token uniquely identifying this cooling device info.
+  CM_OBJECT_TOKEN             Token;
+  /// CM Object Token uniquely identifying temperature probe associated with this device
+  CM_OBJECT_TOKEN             TemperatureProbeToken;
+  /// Type and Status of the cooling device
+  MISC_COOLING_DEVICE_TYPE    DeviceTypeAndStatus;
+  /// Cooling unit group number
+  UINT8                       CoolingUnitGroup;
+  /// OEM defined information
+  UINT32                      OEMDefined;
+  /// Nominal speed for the cooling device in revolutions per minute
+  /// A value of 0x8000 indicates unknown or non-rotating.
+  UINT16                      NominalSpeed;
+  /// Description of the cooling device
+  CHAR8                       Description[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_COOLING_DEVICE_INFO;
+
+/** A structure that describes a temperature probe.
+
+  SMBIOS Specification v3.9.0 Type 28
+
+  ID: EArchCommonObjTemperatureProbeInfo
+**/
+typedef struct CmArchCommonTemperatureProbeInfo {
+  /// CM Object Token uniquely identifying this temperature probe.
+  CM_OBJECT_TOKEN                    TemperatureProbeToken;
+
+  /// Description of the temperature probe or its location.
+  CHAR8                              Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Location and status of the temperature probe.
+  MISC_TEMPERATURE_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum value readable by the probe, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             MaximumValue;
+
+  /// Minimum value readable by the probe, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             MinimumValue;
+
+  /// Resolution for the probe reading, in 1/1000 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Resolution;
+
+  /// Tolerance for the probe reading, plus/minus 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Tolerance;
+
+  /// Accuracy for the probe reading, in plus/minus 1/100 percent.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                             OemDefined;
+
+  /// Nominal temperature value, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             NominalValue;
+} CM_ARCH_COMMON_TEMPERATURE_PROBE_INFO;
+
+/** A structure that describes a voltage probe.
+
+  SMBIOS Specification v3.9.0 Type 26
+
+  ID: EArchCommonObjVoltageProbeInfo
+**/
+typedef struct CmArchCommonVoltageProbeInfo {
+  /// Token identifying this voltage probe CM object.
+  CM_OBJECT_TOKEN                VoltageProbeToken;
+
+  /// String describing the voltage probe or its location.
+  CHAR8                          Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Probe location and status encoded as SMBIOS Type 26 Location and Status.
+  MISC_VOLTAGE_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         MaximumValue;
+
+  /// Minimum voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         MinimumValue;
+
+  /// Resolution in tenths of millivolts, or 0x8000 if unknown.
+  UINT16                         Resolution;
+
+  /// Tolerance in plus/minus millivolts, or 0x8000 if unknown.
+  UINT16                         Tolerance;
+
+  /// Accuracy in plus/minus 1/100th percent, or 0x8000 if unknown.
+  UINT16                         Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                         OEMDefined;
+
+  /// Nominal voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         NominalValue;
+} CM_ARCH_COMMON_VOLTAGE_PROBE_INFO;
+
+/** A structure that describes an electrical current probe.
+
+  SMBIOS Specification v3.9.0 Type 29
+
+  ID: EArchCommonObjElectricalCurrentProbeInfo
+**/
+typedef struct CmArchCommonElectricalCurrentProbeInfo {
+  /// Token identifying this electrical current probe CM object.
+  CM_OBJECT_TOKEN                           ElectricalCurrentProbeToken;
+
+  /// String describing the electrical current probe or its location.
+  CHAR8                                     Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Probe location and status encoded as SMBIOS Type 29 Location and Status.
+  MISC_ELECTRICAL_CURRENT_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    MaximumValue;
+
+  /// Minimum current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    MinimumValue;
+
+  /// Resolution in tenths of milliamperes, or 0x8000 if unknown.
+  UINT16                                    Resolution;
+
+  /// Tolerance in plus/minus milliamperes, or 0x8000 if unknown.
+  UINT16                                    Tolerance;
+
+  /// Accuracy in plus/minus 1/100th percent, or 0x8000 if unknown.
+  UINT16                                    Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                                    OEMDefined;
+
+  /// Nominal current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    NominalValue;
+} CM_ARCH_COMMON_ELECTRICAL_CURRENT_PROBE_INFO;
+
+/** A structure that describes system reset information.
+
+  SMBIOS Specification v3.9.0 Type 23
+
+  ID: EArchCommonObjSystemResetInfo
+**/
+typedef struct CmArchCommonSystemResetInfo {
+  /// Token identifying this system reset CM object.
+  CM_OBJECT_TOKEN    SystemResetToken;
+
+  /// System reset capability flags as defined by SMBIOS Type 23.
+  UINT8              Capabilities;
+
+  /// Number of automatic system resets since the last intentional reset.
+  UINT16             ResetCount;
+
+  /// Number of consecutive automatic reset attempts allowed.
+  UINT16             ResetLimit;
+
+  /// Watchdog timer interval.
+  UINT16             TimerInterval;
+
+  /// Timeout value used by the watchdog timer.
+  UINT16             Timeout;
+} CM_ARCH_COMMON_SYSTEM_RESET_INFO;
+
+/** A structure that describes processor specific data.
+
+  SMBIOS Specification v3.9.0 Type 44
+
+  ID: EArchCommonObjProcessorSpecificBlockInfo
+**/
+typedef struct CmArchCommonProcessorSpecificBlockInfo {
+  /// CM Object Token uniquely identifying this processor specific block info.
+  CM_OBJECT_TOKEN                       Token;
+
+  /// Relevant Process Hierarchy Socket Token.
+  CM_OBJECT_TOKEN                       ProcSocketToken;
+
+  /// Processor Architecture Type.
+  PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE    ProcArchType;
+
+  /// Token array for architecture specific Processor Data.
+  CM_OBJECT_TOKEN                       ArchProcessorSpecificDataToken;
+} CM_ARCH_COMMON_PROCESSOR_SPECIFIC_BLOCK_INFO;
 
 #pragma pack()

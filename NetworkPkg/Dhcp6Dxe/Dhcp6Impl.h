@@ -148,8 +148,8 @@ STATIC_ASSERT (
   );
 
 // This is the size of IA_NA without options (16)
-#define DHCP6_MIN_SIZE_OF_IA_NA  DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN + \
-                                 DHCP6_SIZE_OF_COMBINED_IAID_T1_T2
+#define DHCP6_MIN_SIZE_OF_IA_NA  (DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN + \
+                                  DHCP6_SIZE_OF_COMBINED_IAID_T1_T2)
 STATIC_ASSERT (
   DHCP6_MIN_SIZE_OF_IA_NA == 16,
   "Minimum combined size of IA_TA per RFC 8415"

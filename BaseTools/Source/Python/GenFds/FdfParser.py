@@ -2210,7 +2210,6 @@ class FdfParser:
     def _GetFvAttributes(self, FvObj):
         IsWordToken = False
         while self._GetNextWord():
-            IsWordToken = True
             name = self._Token
             if name not in {"ERASE_POLARITY", "MEMORY_MAPPED", \
                            "STICKY_WRITE", "LOCK_CAP", "LOCK_STATUS", "WRITE_ENABLED_CAP", \
@@ -2219,7 +2218,7 @@ class FdfParser:
                            "READ_LOCK_STATUS", "WRITE_LOCK_CAP", "WRITE_LOCK_STATUS", \
                            "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT", "FvUsedSizeEnable"}:
                 self._UndoToken()
-                return False
+                return IsWordToken
 
             if not self._IsToken(TAB_EQUAL_SPLIT):
                 raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
@@ -2228,6 +2227,7 @@ class FdfParser:
                 raise Warning.Expected("TRUE/FALSE (1/0)", self.FileName, self.CurrentLineNumber)
 
             FvObj.FvAttributeDict[name] = self._Token
+            IsWordToken = True
 
         return IsWordToken
 
@@ -3893,23 +3893,34 @@ class FdfParser:
                     raise Warning.Expected("Build number", self.FileName, self.CurrentLineNumber)
                 EfiSectionObj.BuildNum = self._Token
 
-        if self._GetAlignment():
-            if self._Token not in ALIGNMENTS:
-                raise Warning("Incorrect alignment '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-            if self._Token == 'Auto' and (not SectionName == BINARY_FILE_TYPE_PE32) and (not SectionName == BINARY_FILE_TYPE_TE):
-                raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
-            EfiSectionObj.Alignment = self._Token
-
-        if self._IsKeyword('RELOCS_STRIPPED') or self._IsKeyword('RELOCS_RETAINED'):
-            if self._SectionCouldHaveRelocFlag(EfiSectionObj.SectionType):
-                if self._Token == 'RELOCS_STRIPPED':
-                    EfiSectionObj.KeepReloc = False
+        while True:
+            if self._GetAlignment():
+                if self._Token not in ALIGNMENTS:
+                    raise Warning("Incorrect alignment '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
+                if self._Token == 'Auto' and (not SectionName == BINARY_FILE_TYPE_PE32) and (not SectionName == BINARY_FILE_TYPE_TE):
+                    raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
+                EfiSectionObj.Alignment = self._Token
+            elif self._IsKeyword("Xip"):
+                if not self._IsToken(TAB_EQUAL_SPLIT):
+                    raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
+                if not self._GetNextWord():
+                    raise Warning.Expected("Xip value (TRUE/FALSE)", self.FileName, self.CurrentLineNumber)
+                XipValue = self._Token.strip().upper()
+                if XipValue not in {"TRUE", "FALSE"}:
+                    raise Warning("Invalid Xip value '%s'" % XipValue, self.FileName, self.CurrentLineNumber)
+                EfiSectionObj.Xip = XipValue
+            elif self._IsKeyword('RELOCS_STRIPPED') or self._IsKeyword('RELOCS_RETAINED'):
+                if self._SectionCouldHaveRelocFlag(EfiSectionObj.SectionType):
+                    if self._Token == 'RELOCS_STRIPPED':
+                        EfiSectionObj.KeepReloc = False
+                    else:
+                        EfiSectionObj.KeepReloc = True
+                    if Obj.KeepReloc is not None and Obj.KeepReloc != EfiSectionObj.KeepReloc:
+                        raise Warning("Section type %s has reloc strip flag conflict with Rule" % EfiSectionObj.SectionType, self.FileName, self.CurrentLineNumber)
                 else:
-                    EfiSectionObj.KeepReloc = True
-                if Obj.KeepReloc is not None and Obj.KeepReloc != EfiSectionObj.KeepReloc:
-                    raise Warning("Section type %s has reloc strip flag conflict with Rule" % EfiSectionObj.SectionType, self.FileName, self.CurrentLineNumber)
+                    raise Warning("Section type %s could not have reloc strip flag" % EfiSectionObj.SectionType, self.FileName, self.CurrentLineNumber)
             else:
-                raise Warning("Section type %s could not have reloc strip flag" % EfiSectionObj.SectionType, self.FileName, self.CurrentLineNumber)
+                break
 
 
         if self._IsToken(TAB_VALUE_SPLIT):
