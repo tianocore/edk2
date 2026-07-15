@@ -171,6 +171,14 @@ BootLogoEnableLogo (
         DestX = SizeOfX - Image.Width;
         DestY = SizeOfY - Image.Height;
         break;
+      case EdkiiPlatformLogoDisplayAttributeMicrosoft:
+        //
+        // Microsoft's guidance places the center of the logo at 38.2% of the
+        // display height.
+        //
+        DestX = MAX (0, ((INTN)SizeOfX - (INTN)Image.Width) / 2);
+        DestY = MAX (0, (INTN)SizeOfY * 382 / 1000 - (INTN)Image.Height / 2);
+        break;
 
       default:
         ASSERT (FALSE);
