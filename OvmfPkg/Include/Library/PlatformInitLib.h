@@ -41,6 +41,8 @@ typedef struct {
 
   UINT32                   LowMemory;
   UINT64                   FirstNonAddress;
+  UINT64                   HotPlugMemoryStart;
+  UINT64                   HotPlugMemoryEnd;
   UINT8                    PhysMemAddressWidth;
   UINT32                   Uc32Base;
   UINT32                   Uc32Size;
