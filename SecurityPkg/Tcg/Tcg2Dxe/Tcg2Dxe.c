@@ -1347,7 +1347,7 @@ Tcg2HashLogExtendEvent (
     return EFI_DEVICE_ERROR;
   }
 
-  if (Event->Size < Event->Header.HeaderSize + sizeof (UINT32)) {
+  if (Event->Size < Event->Header.HeaderSize + sizeof (Event->Size)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1425,7 +1425,7 @@ Tcg2LogHashEvent (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Event->Size < Event->Header.HeaderSize + sizeof (UINT32)) {
+  if (Event->Size < Event->Header.HeaderSize + sizeof (Event->Size)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1435,7 +1435,7 @@ Tcg2LogHashEvent (
 
   NewEventHdr.PCRIndex  = Event->Header.PCRIndex;
   NewEventHdr.EventType = Event->Header.EventType;
-  NewEventHdr.EventSize = Event->Size - sizeof (UINT32) - Event->Header.HeaderSize;
+  NewEventHdr.EventSize = Event->Size - sizeof (Event->Size) - Event->Header.HeaderSize;
 
   Status = TcgDxeLogHashEvent (DigestList, &NewEventHdr, Event->Event);
 
@@ -1639,7 +1639,7 @@ EFI_TCG2_PROTOCOL  mTcg2Protocol = {
   Tcg2GetActivePCRBanks,
   Tcg2SetActivePCRBanks,
   Tcg2GetResultOfSetActivePcrBanks,
-  Tcg2LogHashEvent,
+  Tcg2LogHashEvent
 };
 
 /**
