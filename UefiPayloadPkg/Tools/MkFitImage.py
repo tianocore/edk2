@@ -134,7 +134,7 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
             MultiImage[Index][-1] = DataOffset
             DataOffset += len (BinaryData)
     libfdt.fdt_setprop_u32(Fdt, 0, 'size', DataOffset)
-    posix_time = int(time.time())
+    posix_time = int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))
     libfdt.fdt_setprop_u32(Fdt, 0, 'timestamp', posix_time)
     DescriptionFit = 'Uefi OS Loader'
     libfdt.fdt_setprop(Fdt, 0, 'description', bytes(DescriptionFit, 'utf-8'), len(DescriptionFit) + 1)
