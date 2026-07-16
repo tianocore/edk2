@@ -141,7 +141,8 @@ CoDPresent (
   @param[out]   FsHandle             File system handle
   @param[out]   LoadOptionNumber     OptionNumber of boot option
 
-  @retval EFI_SUCCESS  Succeed to get all capsules.
+  @retval EFI_SUCCESS              Succeed to get all capsules.
+  @retval EFI_WARN_DELETE_FAILURE  Valid capsules were loaded, but at least one source file could not be removed.
 
 **/
 EFI_STATUS
