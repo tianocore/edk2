@@ -575,6 +575,75 @@ class Check(object):
     def IncludeFileCheck(self):
         self.IncludeFileCheckData()
         self.IncludeFileCheckSameName()
+        self.IncludeFileCheckPragmaOnce()
+
+    # Check whether include files use '#pragma once' instead of a traditional #ifndef/#define include guard
+    def IncludeFileCheckPragmaOnce(self):
+        if EccGlobalData.gConfig.IncludeFileCheckPragmaOnce == '1' or EccGlobalData.gConfig.IncludeFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            EdkLogger.quiet("Checking if header file uses '#pragma once' ...")
+
+            # Build the set of header files to check, indexed by File table ID.
+            HeaderFileSet = {}
+            SqlCommand = """select ID, FullPath, ExtName from File where ExtName in ('h')"""
+            for Record in EccGlobalData.gDb.TblFile.Exec(SqlCommand):
+                if Record[2].upper() not in EccGlobalData.gConfig.BinaryExtList:
+                    HeaderFileSet[Record[0]] = Record[1]
+            if not HeaderFileSet:
+                return
+
+            #
+            # The preprocessor directives of each source file are parsed into the
+            # identifier table(s) with their actual line numbers. Reporting against
+            # those rows (instead of the File table) gives an accurate line number,
+            # which is required by the incremental EccCheck plugin that filters
+            # findings by the changed line ranges of a commit.
+            #
+            for IdentifierTable in EccGlobalData.gIdentifierTableList:
+                SqlCommand = """select ID, Value, BelongsToFile from %s
+                                where Model in (%s, %s, %s)
+                                order by BelongsToFile, StartLine, ID""" \
+                                % (IdentifierTable,
+                                   MODEL_IDENTIFIER_MACRO_IFNDEF,
+                                   MODEL_IDENTIFIER_MACRO_DEFINE,
+                                   MODEL_IDENTIFIER_MACRO_PRAGMA)
+                RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+
+                # Group the parsed directives by the file they belong to.
+                FileRecordDict = {}
+                for Record in RecordSet:
+                    if Record[2] not in HeaderFileSet:
+                        continue
+                    FileRecordDict.setdefault(Record[2], []).append(Record)
+
+                for FileId, Records in FileRecordDict.items():
+                    Path = mws.relpath(HeaderFileSet[FileId], EccGlobalData.gWorkspace)
+                    if EccGlobalData.gException.IsException(ERROR_INCLUDE_FILE_CHECK_PRAGMA_ONCE, Path):
+                        continue
+
+                    # Walk the directives in file order. '#pragma once' makes the file
+                    # compliant. Otherwise a '#ifndef NAME' directly followed by a
+                    # valueless '#define NAME' is treated as a traditional include guard.
+                    PragmaOnceFound = False
+                    GuardRecord = None
+                    PrevIfndef = None
+                    for Record in Records:
+                        Content = Record[1].strip().splitlines()[0].strip() if Record[1].strip() else ''
+                        if re.match(r'#\s*pragma\s+once\b', Content):
+                            PragmaOnceFound = True
+                            break
+                        MatchIfndef = re.match(r'#\s*ifndef\s+(\w+)', Content)
+                        if MatchIfndef:
+                            PrevIfndef = (MatchIfndef.group(1), Record)
+                            continue
+                        MatchDefine = re.match(r'#\s*define\s+(\w+)\s*(//.*|/\*.*)?$', Content)
+                        if MatchDefine and PrevIfndef and MatchDefine.group(1) == PrevIfndef[0]:
+                            GuardRecord = PrevIfndef[1]
+                            break
+                        PrevIfndef = None
+
+                    if not PragmaOnceFound and GuardRecord is not None:
+                        OtherMsg = "Include file [%s] uses a traditional #ifndef/#define include guard, please use '#pragma once' instead" % Path
+                        EccGlobalData.gDb.TblReport.Insert(ERROR_INCLUDE_FILE_CHECK_PRAGMA_ONCE, OtherMsg=OtherMsg, BelongsToTable=IdentifierTable, BelongsToItem=GuardRecord[0])
 
     # Check whether having include files with same name
     def IncludeFileCheckSameName(self):

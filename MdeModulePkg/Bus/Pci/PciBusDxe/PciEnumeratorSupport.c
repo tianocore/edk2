@@ -2928,13 +2928,12 @@ IsPciDeviceRejected (
       //
       // Mem Bar
       //
-      Mask      = 0xFFFFFFF0;
-      TestValue = TestValue & Mask;
-
+      Mask = 0xFFFFFFF0;
       if ((TestValue & 0x07) == 0x04) {
         //
         // Mem64 or PMem64
         //
+        TestValue  = TestValue & Mask;
         BarOffset += sizeof (UINT32);
         if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
           //
@@ -2949,6 +2948,7 @@ IsPciDeviceRejected (
         //
         // Mem32 or PMem32
         //
+        TestValue = TestValue & Mask;
         if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
           return TRUE;
         }

@@ -625,6 +625,53 @@ DumpReservedBits (
 }
 
 /**
+  This function validates reserved fields to check if they are 0.
+
+  @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
+  @param [in] Context   Pointer to context specific information.
+**/
+VOID
+EFIAPI
+ValidateReserved (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  )
+{
+  while (Length > 0) {
+    if (Ptr[Length - 1] != 0) {
+      IncrementErrorCount ();
+      Print (L"\nERROR : Reserved field must be 0\n");
+      break;
+    }
+
+    Length--;
+  }
+}
+
+/**
+  This function validates bit-length reserved fields to check if they are 0.
+
+  @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
+  @param [in] Context   Pointer to context specific information.
+**/
+VOID
+EFIAPI
+ValidateReservedBits (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  )
+{
+  UINT32  ByteLength;
+
+  ByteLength = (Length + 7) >> 3;
+  ValidateReserved (Ptr, ByteLength, Context);
+}
+
+/**
   This function indents and prints the ACPI table Field Name.
 
   @param [in] Indent      Number of spaces to add to the global table indent.

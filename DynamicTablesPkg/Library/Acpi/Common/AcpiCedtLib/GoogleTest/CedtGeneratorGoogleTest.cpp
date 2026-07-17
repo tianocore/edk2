@@ -78,17 +78,6 @@ using ::testing::DoAll;
 using ::testing::SetArgPointee;
 using ::testing::AtLeast;
 
-#define WRAP_ACCESSOR(accessor) \
-  [this] \
-  (IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL *This, \
-   IN  CONST CM_OBJECT_ID                         CmObjectId, \
-   IN  CONST CM_OBJECT_TOKEN                      Token, \
-   IN  OUT   CM_OBJ_DESCRIPTOR                    *CmObject \
-  ) \
-  { \
-    return this->accessor(This, CmObjectId, Token, CmObject); \
-  }
-
 class CedtGeneratorTest : public ::testing::Test {
 protected:
   MockConfigurationManagerProtocol MockConfigMgrProtocol;
