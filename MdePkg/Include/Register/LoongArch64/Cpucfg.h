@@ -1,7 +1,7 @@
 /** @file
   CPUCFG definitions.
 
-  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Loongson Technology Corporation Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -137,90 +137,127 @@ typedef union {
     /// [Bit 0] Basic Floating-Point. A value of 1 indicates the processor supports basic
     /// floating-point instructions.
     ///
-    UINT32    FP       : 1;
+    UINT32    FP          : 1;
     ///
     /// [Bit 1] Single-Precision. A value of 1 indicates the processor supports single-precision
     /// floating-point numbers.
     ///
-    UINT32    FP_SP    : 1;
+    UINT32    FP_SP       : 1;
     ///
     /// [Bit 2] Double-Precision. A value of 1 indicates the processor supports double-precision
     /// floating-point numbers.
     ///
-    UINT32    FP_DP    : 1;
+    UINT32    FP_DP       : 1;
     ///
     /// [Bit 5:3] The version number of the floating-point arithmetic standard. 1 is the initial
     /// version number, indicating that it is compatible with the IEEE 754-2008 standard.
     ///
-    UINT32    FP_ver   : 3;
+    UINT32    FP_ver      : 3;
     ///
     /// [Bit 6] 128-bit Vector Extension. A value of 1 indicates the processor supports 128-bit
     /// vector extension.
     ///
-    UINT32    LSX      : 1;
+    UINT32    LSX         : 1;
     ///
     /// [Bit 7] 256-bit Vector Extension. A value of 1 indicates the processor supports 256-bit
     /// vector extension.
     ///
-    UINT32    LASX     : 1;
+    UINT32    LASX        : 1;
     ///
     /// [Bit 8] Complex Vector Operation Instructions. A value of 1 indicates the processor supports
     /// complex vector operation instructions.
     ///
-    UINT32    COMPLEX  : 1;
+    UINT32    COMPLEX     : 1;
     ///
     /// [Bit 9] Encryption And Decryption Vector Instructions. A value of 1 indicates the processor
     /// supports encryption and decryption vector instructions.
     ///
-    UINT32    CRYPTO   : 1;
+    UINT32    CRYPTO      : 1;
     ///
     /// [Bit 10] Virtualization Expansion. A value of 1 indicates the processor supports
     /// virtualization expansion.
     ///
-    UINT32    LVZ      : 1;
+    UINT32    LVZ         : 1;
     ///
     /// [Bit 13:11] The version number of the virtualization hardware acceleration specification.
     /// 1 is the initial version number.
     ///
-    UINT32    LVZ_ver  : 3;
+    UINT32    LVZ_ver     : 3;
     ///
     /// [Bit 14] Constant Frequency Counter And Timer. A value of 1 indicates the processor supports
     /// constant frequency counter and timer.
     ///
-    UINT32    LLFTP    : 1;
+    UINT32    LLFTP       : 1;
     ///
     /// [Bit 17:15] Constant frequency counter and timer version number. 1 is the initial version.
     ///
-    UINT32    LLTP_ver : 3;
+    UINT32    LLTP_ver    : 3;
     ///
     /// [Bit 18] X86 Binary Translation Extension. A value of 1 indicates the processor supports
     /// X86 binary translation extension.
     ///
-    UINT32    LBT_X86  : 1;
+    UINT32    LBT_X86     : 1;
     ///
     /// [Bit 19] ARM Binary Translation Extension. A value of 1 indicates the processor supports
     /// ARM binary translation extension.
     ///
-    UINT32    LBT_ARM  : 1;
+    UINT32    LBT_ARM     : 1;
     ///
     /// [Bit 20] MIPS Binary Translation Extension. A value of 1 indicates the processor supports
     /// MIPS binary translation extension.
     ///
-    UINT32    LBT_MIPS : 1;
+    UINT32    LBT_MIPS    : 1;
     ///
     /// [Bit 21] Software Page Table Walking Instruction. A value of 1 indicates the processor
     /// supports software page table walking instruction.
     ///
-    UINT32    LSPW     : 1;
+    UINT32    LSPW        : 1;
     ///
     /// [Bit 22] Atomic Memory Access Instruction. A value of 1 indicates the processor supports
     /// AM* atomic memory access instruction.
     ///
-    UINT32    LAM      : 1;
+    UINT32    LAM         : 1;
     ///
-    /// [Bit 31:23] Reserved.
+    /// [Bit 23] Reserved.
     ///
-    UINT32    Reserved : 9;
+    UINT32    Reserved0   : 1;
+    ///
+    /// [Bit 24] Hardware Page Table Walker. A value of 1 indicates the processor supports
+    /// hardware page table walker.
+    ///
+    UINT32    HPTW        : 1;
+    ///
+    /// [Bit 25] FRECIPE Instruction. A value of 1 indicates the processor supports FRECIPE.{S/D} and
+    /// FRSQRTE.{S/D}. If 128-bit vector extension is also supported, VFRECIPE.{S/D} and VFRSQRTE.{S/D}
+    /// is supported. If 256-bit vector extension is also supported, XVFRECIPE.{S/D} and XVFRSQRTE.{S/D}
+    /// is supported
+    ///
+    UINT32    FRECIPE     : 1;
+    ///
+    /// [Bit 26] A value of 1 indicates that DIV.W[U] and MOD.W[U] instructions on 64-bit machines
+    /// compute only the low 32-bit data of the input register.
+    ///
+    UINT32    DIV32       : 1;
+    ///
+    /// [Bit 27] A value of 1 indicates the processor supports AM{SWAP/ADD}[_DB].{B/H} instructions.
+    ///
+    UINT32    LAM_BH      : 1;
+    ///
+    /// [Bit 28] A value of 1 indicates the processor supports AMCAS[_DB].{B/H/W/D} instructions.
+    ///
+    UINT32    LAMCAS      : 1;
+    ///
+    /// [Bit 29] A value of 1 indicates the processor supports LLACQ.{W/D} and SCREL.{W/D} instructions.
+    ///
+    UINT32    LLACQ_SCREL : 1;
+    ///
+    /// [Bit 30] A value of 1 indicates the processor supports SC.Q instruction.
+    ///
+    UINT32    SCQ         : 1;
+    ///
+    /// [Bit 31] Reserved.
+    ///
+    UINT32    Reserved1   : 1;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
@@ -246,63 +283,77 @@ typedef union {
     /// [Bit 0] Hardware Cache Coherent DMA. A value of 1 indicates the processor supports
     /// hardware cache coherent DMA.
     ///
-    UINT32    CCDMA     : 1;
+    UINT32    CCDMA      : 1;
     ///
     /// [Bit 1] Store Fill Buffer. A value of 1 indicates the processor supports store fill
     /// buffer (SFB).
     ///
-    UINT32    SFB       : 1;
+    UINT32    SFB        : 1;
     ///
     /// [Bit 2] Uncache Accelerate. A value of 1 indicates the processor supports uncache
     /// accelerate.
     ///
-    UINT32    UCACC     : 1;
+    UINT32    UCACC      : 1;
     ///
     /// [Bit 3] A value of 1 indicates the processor supports LL instruction to fetch exclusive
     /// block function.
     ///
-    UINT32    LLEXC     : 1;
+    UINT32    LLEXC      : 1;
     ///
     /// [Bit 4] A value of 1 indicates the processor supports random delay function after SC
     /// instruction.
     ///
-    UINT32    SCDLY     : 1;
+    UINT32    SCDLY      : 1;
     ///
     /// [Bit 5] A value of 1 indicates the processor supports LL automatic with dbar function.
     ///
-    UINT32    LLDBAR    : 1;
+    UINT32    LLDBAR     : 1;
     ///
     /// [Bit 6] A value of 1 indicates the processor supports the hardware maintains the
     /// consistency between ITLB and TLB.
     ///
-    UINT32    ITLBT     : 1;
+    UINT32    ITLBT      : 1;
     ///
     /// [Bit 7] A value of 1 indicates the processor supports the hardware maintains the data
     /// consistency between ICache and DCache in one processor core.
     ///
-    UINT32    ICACHET   : 1;
+    UINT32    ICACHET    : 1;
     ///
     /// [Bit 10:8] The maximum number of directory levels supported by the page walk instruction.
     ///
-    UINT32    SPW_LVL   : 3;
+    UINT32    SPW_LVL    : 3;
     ///
     /// [Bit 11] A value of 1 indicates the processor supports the page walk instruction fills
     /// the TLB in half when it encounters a large page.
     ///
-    UINT32    SPW_HP_HF : 1;
+    UINT32    SPW_HP_HF  : 1;
     ///
     /// [Bit 12] Virtual Address Range. A value of 1 indicates the processor supports the software
     /// configuration can be used to shorten the virtual address range.
     ///
-    UINT32    RVA       : 1;
+    UINT32    RVA        : 1;
     ///
     /// [Bit 16:13] The maximum configurable virtual address is shortened by -1.
     ///
-    UINT32    RVAMAX_1  : 4;
+    UINT32    RVAMAX_1   : 4;
     ///
-    /// [Bit 31:17] Reserved.
+    /// [Bit 17] A value of 1 indicates that the non-0 value of the DBAR is implemented according
+    /// to the recommended meaning of the manual.
     ///
-    UINT32    Reserved  : 15;
+    UINT32    DBAR_hints : 1;
+    ///
+    /// [Bit 22:18] Reserved.
+    ///
+    UINT32    Reserved0  : 5;
+    ///
+    /// [Bit 23] A value of 1 indicates that the hardware is enabled to guarantee sequmential
+    /// execution of load operations at the same address.
+    ///
+    UINT32    LD_SEQ_SA  : 1;
+    ///
+    /// [Bit 31:24] Reserved.
+    ///
+    UINT32    Reserved1  : 8;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
