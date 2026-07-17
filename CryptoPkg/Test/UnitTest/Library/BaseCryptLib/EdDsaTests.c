@@ -809,16 +809,16 @@ TestVerifyEdDsaGeneratePubKey (
   UT_ASSERT_NOT_NULL (EdDsaContext1);
 
   //
-  // EdDsaGeneratePubKey is a placeholder that always returns TRUE
+  // EdDsaGeneratePubKey is a placeholder that always returns FALSE
   //
   Status = EdDsaGeneratePubKey (EdDsaContext1, PublicKey, ED448_KEY_SIZE);
-  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_FALSE (Status);
 
   //
-  // It should return TRUE even with NULL parameters
+  // It should return FALSE even with NULL parameters
   //
   Status = EdDsaGeneratePubKey (NULL, NULL, 0);
-  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_FALSE (Status);
 
   return UNIT_TEST_PASSED;
 }
