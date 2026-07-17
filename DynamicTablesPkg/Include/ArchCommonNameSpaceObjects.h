@@ -21,6 +21,19 @@
 #include <IndustryStandard/Tpm2Acpi.h>
 #include <IndustryStandard/SmBios.h>
 
+///
+/// Maximum storage size, including the terminating NULL, for SMBIOS strings
+/// represented inline in Configuration Manager objects. This is a
+/// DynamicTablesPkg implementation limit.
+///
+/// The legacy 64-character constraint from SMBIOS 2.6 was required for MIF
+/// compatibility and does not apply to SMBIOS 2.7 or later tables.
+///
+#define SMBIOS_MAX_STRING_SIZE  (1024)
+
+// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
+#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
+
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
 */
@@ -458,8 +471,6 @@ typedef struct CmArchCommonLpiInfo {
   */
   CHAR8                                     StateName[16];
 } CM_ARCH_COMMON_LPI_INFO;
-
-#define SMBIOS_MAX_STRING_SIZE  (1024)
 
 /** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
 
@@ -979,9 +990,6 @@ typedef struct CmArchCommonCxlHostBridgeInfo {
   /// Base address of the component registers.
   UINT64             ComponentRegisterBase;
 } CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO;
-
-// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
-#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
 
 /** A structure that describes the CXL Fixed Memory Window Structure (Type 1).
 
