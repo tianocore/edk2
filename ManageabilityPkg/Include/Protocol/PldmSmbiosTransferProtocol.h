@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef EDKII_PLDM_SMBIOS_TRANSFER_PROTOCOL_H_
-#define EDKII_PLDM_SMBIOS_TRANSFER_PROTOCOL_H_
+#pragma once
 
 #include <IndustryStandard/Pldm.h>
 
@@ -206,5 +205,3 @@ struct _EDKII_PLDM_SMBIOS_TRANSFER_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiPldmSmbiosTransferProtocolGuid;
-
-#endif // EDKII_PLDM_SMBIOS_TRANSFER_PROTOCOL_H_

@@ -882,6 +882,12 @@
   # @Prompt Enable PCI bridge IO alignment probe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x0001004e
 
+  ## Indicates if the PciBus driver scans functions 1..7 when function 0 is absent.<BR>
+  #   TRUE  - PciBus driver scans non-zero functions when Function 0 is absent.<BR>
+  #   FALSE - PciBus driver skips the device when Function 0 is absent.<BR>
+  # @Prompt Enable scanning PCI functions 1..7 without Function 0.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciScanFuncIfFunc0Absent|FALSE|BOOLEAN|0x0001007a
+
   ## Indicates if PEI phase StatusCode will be replayed in DXE phase.<BR><BR>
   #   TRUE  - Replays PEI phase StatusCode in DXE phased.<BR>
   #   FALSE - Does not replay PEI phase StatusCode in DXE phase.<BR>

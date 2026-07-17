@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_MCTP_COMMON_H_
-#define MANAGEABILITY_MCTP_COMMON_H_
+#pragma once
 
 #include <IndustryStandard/IpmiKcs.h>
 #include <Library/ManageabilityTransportLib.h>
@@ -135,5 +134,3 @@ CommonMctpSubmitMessage (
   IN     UINT32                                     ResponseTimeout,
   OUT    MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  *AdditionalTransferError
   );
-
-#endif

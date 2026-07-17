@@ -207,16 +207,18 @@ BuildAndInstallMultipleSmbiosTables (
   UINTN              TableCount;
   UINTN              Index;
 
-  TableCount = 0;
-  Status     = Generator->BuildSmbiosTableEx (
-                            Generator,
-                            TableFactoryProtocol,
-                            SmbiosTableInfo,
-                            CfgMgrProtocol,
-                            &SmbiosTable,
-                            &CmObjToken,
-                            &TableCount
-                            );
+  SmbiosTable = NULL;
+  CmObjToken  = NULL;
+  TableCount  = 0;
+  Status      = Generator->BuildSmbiosTableEx (
+                             Generator,
+                             TableFactoryProtocol,
+                             SmbiosTableInfo,
+                             CfgMgrProtocol,
+                             &SmbiosTable,
+                             &CmObjToken,
+                             &TableCount
+                             );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
