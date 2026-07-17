@@ -534,6 +534,96 @@ GetEfiSysPartitionFromDevPath (
   return EFI_NOT_FOUND;
 }
 
+STATIC
+BOOLEAN
+IsNetworkBootDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  BOOLEAN  NetworkPath;
+  BOOLEAN  StoragePath;
+  UINT8    SubType;
+
+  NetworkPath = FALSE;
+  StoragePath = FALSE;
+  while (!IsDevicePathEnd (DevicePath)) {
+    SubType = DevicePathSubType (DevicePath);
+    if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+        ((SubType == MEDIA_HARDDRIVE_DP) || (SubType == MEDIA_CDROM_DP)))
+    {
+      StoragePath = TRUE;
+    } else if (DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) {
+      switch (SubType) {
+        case MSG_INFINIBAND_DP:
+          if (DevicePathNodeLength (DevicePath) < sizeof (INFINIBAND_DEVICE_PATH)) {
+            NetworkPath = TRUE;
+            break;
+          }
+
+          if ((((INFINIBAND_DEVICE_PATH *)DevicePath)->ResourceFlags &
+               INFINIBAND_RESOURCE_FLAG_STORAGE_PROTOCOL) != 0)
+          {
+            StoragePath = TRUE;
+          }
+
+          if ((((INFINIBAND_DEVICE_PATH *)DevicePath)->ResourceFlags &
+               INFINIBAND_RESOURCE_FLAG_NETWORK_PROTOCOL) != 0)
+          {
+            NetworkPath = TRUE;
+          }
+
+          break;
+        case MSG_MAC_ADDR_DP:
+        case MSG_IPv4_DP:
+        case MSG_IPv6_DP:
+        case MSG_VLAN_DP:
+        case MSG_URI_DP:
+        case MSG_DNS_DP:
+        case MSG_WIFI_DP:
+          NetworkPath = TRUE;
+          break;
+        case MSG_ATAPI_DP:
+        case MSG_SCSI_DP:
+        case MSG_FIBRECHANNEL_DP:
+        case MSG_FIBRECHANNELEX_DP:
+        case MSG_ISCSI_DP:
+        case MSG_I2O_DP:
+        case MSG_DEVICE_LOGICAL_UNIT_DP:
+        case MSG_SATA_DP:
+        case MSG_SASEX_DP:
+        case MSG_NVME_NAMESPACE_DP:
+        case MSG_NVME_OF_NAMESPACE_DP:
+        case MSG_UFS_DP:
+        case MSG_SD_DP:
+        case MSG_EMMC_DP:
+          StoragePath = TRUE;
+          break;
+        default:
+          break;
+      }
+    }
+
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  //
+  // Controller-only paths may not identify their transport until connected.
+  // Reject only paths that are positively network boot and are not SAN-backed.
+  //
+  return NetworkPath && !StoragePath;
+}
+
+STATIC
+BOOLEAN
+IsMediaShortFormDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  return (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+         ((DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP) ||
+          (DevicePathSubType (DevicePath) == MEDIA_FILEPATH_DP));
+}
+
 /**
   This routine is called to get Simple File System protocol on the first EFI system partition found in
   active boot option. The boot option list is detemined in order by
@@ -546,6 +636,10 @@ GetEfiSysPartitionFromDevPath (
                                       On output, return the OptionNumber of the boot option where EFI
                                       system partition is got from.
   @param[out]      FsFsHandle         Simple File System Protocol found on first active EFI system partition
+  @param[in]       ConnectBootDevice  Connect the boot device before expanding
+                                      its media path.
+  @param[out]      ConnectAllNeeded   Set when an active media-only boot path
+                                      needs global device connection. Optional.
 
   @retval EFI_SUCCESS     Simple File System protocol found for EFI system partition
   @retval EFI_NOT_FOUND   No Simple File System protocol found for EFI system partition
@@ -555,16 +649,26 @@ EFI_STATUS
 GetEfiSysPartitionFromActiveBootOption (
   IN UINTN        MaxRetry,
   IN OUT UINT16   **LoadOptionNumber,
-  OUT EFI_HANDLE  *FsHandle
+  OUT EFI_HANDLE  *FsHandle,
+  IN BOOLEAN      ConnectBootDevice,
+  OUT BOOLEAN     *ConnectAllNeeded OPTIONAL
   )
 {
   EFI_STATUS                    Status;
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptionBuf;
   UINTN                         BootOptionNum;
   UINTN                         Index;
+  UINTN                         RetryCount;
+  UINTN                         DevicePathSize;
+  EFI_HANDLE                    DeviceHandle;
   EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath;
   EFI_DEVICE_PATH_PROTOCOL      *CurFullPath;
   EFI_DEVICE_PATH_PROTOCOL      *PreFullPath;
+
+  if (ConnectAllNeeded != NULL) {
+    *ConnectAllNeeded = FALSE;
+  }
 
   *FsHandle   = NULL;
   CurFullPath = NULL;
@@ -592,17 +696,53 @@ GetEfiSysPartitionFromActiveBootOption (
   //
   for (Index = 0; Index < BootOptionNum; Index++) {
     //
-    // Get the boot option from the link list
+    // Skip inactive boot options.
     //
-    DevicePath = BootOptionBuf[Index].FilePath;
+    if ((BootOptionBuf[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) {
+      continue;
+    }
+
+    RetryCount          = MaxRetry;
+    Status              = EFI_NOT_FOUND;
+    RemainingDevicePath = BootOptionBuf[Index].FilePath;
+    DevicePath          = GetNextDevicePathInstance (&RemainingDevicePath, &DevicePathSize);
+    if (DevicePath == NULL) {
+      continue;
+    }
 
     //
-    // Skip inactive or legacy boot options
+    // Only FilePathList[0] identifies the boot image. Later path instances are
+    // OSV-specific metadata and must not be connected as boot targets.
     //
-    if (((BootOptionBuf[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) ||
-        (DevicePathType (DevicePath) == BBS_DEVICE_PATH))
+    if ((DevicePathType (DevicePath) == BBS_DEVICE_PATH) ||
+        (ConnectBootDevice && IsNetworkBootDevicePath (DevicePath)))
     {
+      FreePool (DevicePath);
       continue;
+    }
+
+    //
+    // A file-path-only option does not identify a filesystem. Targeted and
+    // capsule-in-RAM lookups must not expand it to an unrelated ESP. The no-RAM
+    // legacy path retains global resolution for relocation compatibility.
+    //
+    if ((ConnectBootDevice || PcdGetBool (PcdCapsuleInRamSupport)) &&
+        (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+        (DevicePathSubType (DevicePath) == MEDIA_FILEPATH_DP))
+    {
+      if (ConnectBootDevice && (ConnectAllNeeded != NULL)) {
+        *ConnectAllNeeded = TRUE;
+      }
+
+      FreePool (DevicePath);
+      break;
+    }
+
+    if (ConnectBootDevice &&
+        IsMediaShortFormDevicePath (DevicePath) &&
+        (ConnectAllNeeded != NULL))
+    {
+      *ConnectAllNeeded = TRUE;
     }
 
     DEBUG_CODE_BEGIN ();
@@ -618,19 +758,57 @@ GetEfiSysPartitionFromActiveBootOption (
 
     DEBUG_CODE_END ();
 
+    if (ConnectBootDevice) {
+      //
+      // A disk-only boot option does not name the partition or filesystem,
+      // so expansion cannot find the ESP until the storage controller has
+      // produced those child handles.
+      //
+      DeviceHandle = NULL;
+      Status       = EfiBootManagerConnectDevicePath (DevicePath, &DeviceHandle);
+      if (!EFI_ERROR (Status) && (DeviceHandle != NULL)) {
+        gBS->ConnectController (DeviceHandle, NULL, NULL, TRUE);
+      }
+    }
+
     CurFullPath = NULL;
     //
     // Try every full device Path generated from bootoption
     //
     do {
       PreFullPath = CurFullPath;
-      CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath (DevicePath, CurFullPath);
+      if (ConnectBootDevice) {
+        CurFullPath = EfiBootManagerGetNextLoadOptionDevicePathNoConnectAll (
+                        DevicePath,
+                        CurFullPath
+                        );
+      } else {
+        CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath (DevicePath, CurFullPath);
+      }
 
       if (PreFullPath != NULL) {
         FreePool (PreFullPath);
       }
 
       if (CurFullPath == NULL) {
+        if (ConnectBootDevice && (RetryCount > 0))
+        {
+          //
+          // A slow device may not expose a path on the first connection.
+          // Retry the targeted connection before expanding the path again.
+          //
+          gBS->Stall (100000);
+          RetryCount--;
+          DeviceHandle = NULL;
+          Status       = EfiBootManagerConnectDevicePath (DevicePath, &DeviceHandle);
+          if (!EFI_ERROR (Status) && (DeviceHandle != NULL)) {
+            gBS->ConnectController (DeviceHandle, NULL, NULL, TRUE);
+          }
+
+          Status = EFI_NOT_READY;
+          continue;
+        }
+
         //
         // No Active EFI system partition is found in BootOption device path
         //
@@ -651,8 +829,8 @@ GetEfiSysPartitionFromActiveBootOption (
 
       //
       // Make sure the boot option device path connected.
-      // Only handle first device in boot option. Other optional device paths are described as OSV specific
-      // FullDevice could contain extra directory & file info. So don't check connection status here.
+      // FullDevice could contain extra directory and file information, so
+      // do not check connection status here.
       //
       EfiBootManagerConnectDevicePath (CurFullPath, NULL);
       Status = GetEfiSysPartitionFromDevPath (CurFullPath, FsHandle);
@@ -660,11 +838,12 @@ GetEfiSysPartitionFromActiveBootOption (
       //
       // Some relocation device like USB need more time to get enumerated
       //
-      while (EFI_ERROR (Status) && MaxRetry > 0) {
+      while (EFI_ERROR (Status) && RetryCount > 0) {
         EfiBootManagerConnectDevicePath (CurFullPath, NULL);
 
         //
-        // Search for EFI system partition protocol on full device path in Boot Option
+        // Search for EFI system partition protocol on full device path in
+        // Boot Option.
         //
         Status = GetEfiSysPartitionFromDevPath (CurFullPath, FsHandle);
         if (!EFI_ERROR (Status)) {
@@ -676,9 +855,11 @@ GetEfiSysPartitionFromActiveBootOption (
         // Stall 100ms if connection failed to ensure USB stack is ready
         //
         gBS->Stall (100000);
-        MaxRetry--;
+        RetryCount--;
       }
     } while (EFI_ERROR (Status));
+
+    FreePool (DevicePath);
 
     //
     // Find a qualified Simple File System
@@ -1237,7 +1418,9 @@ CoDSelectCapsuleFs (
     Status               = GetEfiSysPartitionFromActiveBootOption (
                              0,
                              &ResolvedOptionNumber,
-                             &ResolvedFsHandle
+                             &ResolvedFsHandle,
+                             FALSE,
+                             NULL
                              );
     if (!EFI_ERROR (Status)) {
       PreferredFsHandle = ResolvedFsHandle;
@@ -1589,9 +1772,15 @@ EXIT:
 /**
   Check if any on-disk capsules are present.
 
-  @param[in]  MaxRetry  Max Connection Retry. Stall 100ms between each
-                        connection try to ensure devices like USB can get
-                        enumerated.
+  @param[in]  MaxRetry          Max Connection Retry. Stall 100ms between each
+                                connection try to ensure devices like USB can
+                                get enumerated.
+  @param[in]  ConnectBootDevice Connect the active boot device before expanding
+                                its media path.
+  @param[out] BootDeviceReady   Set to TRUE when the active boot option's
+                                filesystem is available. Optional.
+  @param[out] ConnectAllNeeded  Set to TRUE when an active media-only boot path
+                                needs global device connection. Optional.
 
   @retval TRUE   At least one potential on-disk capsule was found on a boot
                  drive.
@@ -1600,7 +1789,10 @@ EXIT:
 BOOLEAN
 EFIAPI
 CoDPresent (
-  IN UINTN  MaxRetry
+  IN  UINTN    MaxRetry,
+  IN  BOOLEAN  ConnectBootDevice,
+  OUT BOOLEAN  *BootDeviceReady OPTIONAL,
+  OUT BOOLEAN  *ConnectAllNeeded OPTIONAL
   )
 {
   EFI_STATUS  Status;
@@ -1608,6 +1800,14 @@ CoDPresent (
   EFI_HANDLE  CapsuleFsHandle;
   UINT16      *TempOptionNumber;
   UINTN       FileCount;
+
+  if (BootDeviceReady != NULL) {
+    *BootDeviceReady = FALSE;
+  }
+
+  if (ConnectAllNeeded != NULL) {
+    *ConnectAllNeeded = FALSE;
+  }
 
   if (!PcdGetBool (PcdCapsuleOnDiskSupport)) {
     return FALSE;
@@ -1618,7 +1818,17 @@ CoDPresent (
   CapsuleFsHandle  = NULL;
   FileCount        = 0;
 
-  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &TempOptionNumber, &ActiveFsHandle);
+  Status = GetEfiSysPartitionFromActiveBootOption (
+             MaxRetry,
+             &TempOptionNumber,
+             &ActiveFsHandle,
+             ConnectBootDevice,
+             ConnectAllNeeded
+             );
+  if (!EFI_ERROR (Status) && (BootDeviceReady != NULL)) {
+    *BootDeviceReady = TRUE;
+  }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "%a(): active boot option lookup failed: %r\n", __func__, Status));
   }
@@ -1691,7 +1901,15 @@ CoDGetAll (
   *CapsuleNum            = 0;
   *FsHandle              = NULL;
 
-  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &TempOptionNumber, &ActiveFsHandle);
+  Status = GetEfiSysPartitionFromActiveBootOption (
+             MaxRetry,
+             &TempOptionNumber,
+             &ActiveFsHandle,
+             (BOOLEAN)(PcdGetBool (PcdCapsuleInRamSupport) &&
+                       FeaturePcdGet (PcdCapsuleOnDiskConnectBootDevice) &&
+                       !mDxeCapsuleLibEndOfDxe),
+             NULL
+             );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "%a(): active boot option lookup failed: %r\n", __func__, Status));
   }
@@ -1972,7 +2190,9 @@ CoDClearCapsuleOnDiskFlag (
                          sizeof (UINT64),
                          &OsIndication
                          );
-  ASSERT (!EFI_ERROR (Status));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Delete BootNext variable. Capsule Process may reset system, so can't rely on Bds to clear this variable
@@ -1984,9 +2204,7 @@ CoDClearCapsuleOnDiskFlag (
                   0,
                   NULL
                   );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
-
-  return EFI_SUCCESS;
+  return (Status == EFI_NOT_FOUND) ? EFI_SUCCESS : Status;
 }
 
 /**
@@ -2562,7 +2780,13 @@ CoDRemoveTempFile (
   //
   // Get the EFI file system from the boot option where the capsules are relocated
   //
-  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &LoadOptionNumber, &FsHandle);
+  Status = GetEfiSysPartitionFromActiveBootOption (
+             MaxRetry,
+             &LoadOptionNumber,
+             &FsHandle,
+             FALSE,
+             NULL
+             );
   if (EFI_ERROR (Status)) {
     goto EXIT;
   }

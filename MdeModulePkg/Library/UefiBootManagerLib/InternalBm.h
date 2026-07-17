@@ -429,6 +429,7 @@ BmDestroyRamDisk (
                    It could be a short-form device path.
   @param FullPath  The full path returned by the routine in last call.
                    Set to NULL in first call.
+  @param ConnectAll Whether short-form expansion may connect all devices.
 
   @return The next possible full path pointing to the load option.
           Caller is responsible to free the memory.
@@ -436,7 +437,8 @@ BmDestroyRamDisk (
 EFI_DEVICE_PATH_PROTOCOL *
 BmGetNextLoadOptionDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath,
+  IN  BOOLEAN                   ConnectAll
   );
 
 /**

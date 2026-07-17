@@ -130,6 +130,7 @@ CHAR16      **mCapsuleNamePtr;
 EFI_STATUS  *mCapsuleStatusArray;
 UINT32      mCapsuleTotalNumber;
 BOOLEAN     mCapsuleOnDiskDeferred;
+STATIC EFI_STATUS  mCapsuleOnDiskStatus;
 STATIC IMAGE_INFO  *mQueuedCapsuleOnDiskBuf;
 STATIC UINTN       mQueuedCapsuleOnDiskNum;
 
@@ -293,6 +294,7 @@ InitCapsulePtr (
   CapsuleNameCapsulePtr         = NULL;
   CapsuleOnDiskBuf              = NULL;
   mCapsuleOnDiskDeferred        = FALSE;
+  mCapsuleOnDiskStatus          = EFI_SUCCESS;
 
   //
   // Find all capsule images from hob
@@ -322,6 +324,7 @@ InitCapsulePtr (
                &EspFsHandle,
                NULL
                );
+    mCapsuleOnDiskStatus = Status;
     if (EFI_ERROR (Status) || (CapsuleOnDiskBuf == NULL)) {
       DEBUG ((DEBUG_WARN, "%a(): CoDGetAll Status: %r\n", __func__, Status));
       mCapsuleOnDiskDeferred = (BOOLEAN)(Status == EFI_NOT_READY);
@@ -501,6 +504,7 @@ AppendDeferredCapsulesOnDisk (
                &EspFsHandle,
                NULL
                );
+    mCapsuleOnDiskStatus = Status;
     if (EFI_ERROR (Status) || (CapsuleOnDiskBuf == NULL)) {
       DEBUG ((DEBUG_WARN, "%a(): CoDGetAll Status: %r\n", __func__, Status));
       mCapsuleOnDiskDeferred = (BOOLEAN)(Status == EFI_NOT_READY);
@@ -590,6 +594,7 @@ AppendDeferredCapsulesOnDisk (
   mCapsuleNamePtr          = NewCapsuleNamePtr;
   mCapsuleTotalNumber      = NewCapsuleTotalNumber;
   mCapsuleOnDiskDeferred   = FALSE;
+  mCapsuleOnDiskStatus     = EFI_SUCCESS;
 
   DEBUG ((DEBUG_INFO, "%a(): appended %u on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
   return EFI_SUCCESS;
@@ -787,6 +792,17 @@ ProcessTheseCapsules (
     if (mCapsuleOnDiskDeferred) {
       DEBUG ((DEBUG_INFO, "%a(): on-disk capsule discovery deferred until EndOfDxe\n", __func__));
       return EFI_SUCCESS;
+    }
+
+    if (mCapsuleOnDiskStatus == EFI_NOT_FOUND) {
+      if (CoDCheckCapsuleOnDiskFlag ()) {
+        Status = CoDClearCapsuleOnDiskFlag ();
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      }
+    } else if (EFI_ERROR (mCapsuleOnDiskStatus)) {
+      return mCapsuleOnDiskStatus;
     }
 
     //

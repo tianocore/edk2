@@ -1331,7 +1331,7 @@ BmGetNextLoadOptionBuffer (
   CurFullPath   = *FullPath;
   do {
     PreFullPath = CurFullPath;
-    CurFullPath = BmGetNextLoadOptionDevicePath (FilePath, CurFullPath);
+    CurFullPath = BmGetNextLoadOptionDevicePath (FilePath, CurFullPath, TRUE);
     //
     // Only free the full path created *inside* this routine
     //

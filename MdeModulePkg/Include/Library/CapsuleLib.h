@@ -116,9 +116,18 @@ CoDCheckCapsuleOnDiskFlag (
 /**
   Check if any on-disk capsules are present.
 
-  @param[in]  MaxRetry  Max Connection Retry. Stall 100ms between each
-                        connection try to ensure devices like USB can get
-                        enumerated.
+  Connecting the boot device can discover option ROMs. The caller must provide
+  a suitable image-dispatch policy before setting ConnectBootDevice to TRUE.
+
+  @param[in]  MaxRetry          Max Connection Retry. Stall 100ms between each
+                                connection try to ensure devices like USB can
+                                get enumerated.
+  @param[in]  ConnectBootDevice Connect the active boot device before expanding
+                                its media path.
+  @param[out] BootDeviceReady   Set to TRUE when the active boot option's
+                                filesystem is available. Optional.
+  @param[out] ConnectAllNeeded  Set to TRUE when an active media-only boot path
+                                needs global device connection. Optional.
 
   @retval TRUE   At least one potential on-disk capsule was found on a boot
                  drive.
@@ -127,7 +136,10 @@ CoDCheckCapsuleOnDiskFlag (
 BOOLEAN
 EFIAPI
 CoDPresent (
-  IN UINTN  MaxRetry
+  IN  UINTN    MaxRetry,
+  IN  BOOLEAN  ConnectBootDevice,
+  OUT BOOLEAN  *BootDeviceReady OPTIONAL,
+  OUT BOOLEAN  *ConnectAllNeeded OPTIONAL
   );
 
 /**
