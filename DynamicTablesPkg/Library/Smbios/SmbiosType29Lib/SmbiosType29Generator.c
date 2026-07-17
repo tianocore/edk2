@@ -111,6 +111,7 @@ IsValidElectricalCurrentProbeLocation (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType29TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -168,6 +169,7 @@ FreeSmbiosType29TableEx (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType29TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
