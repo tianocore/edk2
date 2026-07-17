@@ -1335,7 +1335,7 @@ Dhcp6GenerateIaCb (
   UINT32        IaSize;
   EFI_DHCP6_IA  *Ia;
 
-  if (Instance->IaCb.Ia == NULL) {
+  if ((Instance->IaCb.Ia == NULL) || (Instance->Config == NULL)) {
     return EFI_DEVICE_ERROR;
   }
 

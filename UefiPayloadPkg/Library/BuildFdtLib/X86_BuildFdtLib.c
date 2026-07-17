@@ -700,7 +700,7 @@ BuildFdtForPciRootBridge (
         if (!EFI_ERROR (Status)) {
           Status = mPciDevicePpi->PciIo.Pci.Read (
                                               &mPciDevicePpi->PciIo,
-                                              (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint16,
+                                              EfiPciIoWidthUint16,
                                               PCI_VENDOR_ID_OFFSET,
                                               sizeof (PciData.Hdr.VendorId),
                                               &(PciData.Hdr.VendorId)
@@ -708,7 +708,7 @@ BuildFdtForPciRootBridge (
 
           Status = mPciDevicePpi->PciIo.Pci.Read (
                                               &mPciDevicePpi->PciIo,
-                                              (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint16,
+                                              EfiPciIoWidthUint16,
                                               PCI_DEVICE_ID_OFFSET,
                                               sizeof (PciData.Hdr.DeviceId),
                                               &(PciData.Hdr.DeviceId)
@@ -716,7 +716,7 @@ BuildFdtForPciRootBridge (
 
           Status = mPciDevicePpi->PciIo.Pci.Read (
                                               &mPciDevicePpi->PciIo,
-                                              (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint8,
+                                              EfiPciIoWidthUint8,
                                               PCI_REVISION_ID_OFFSET,
                                               sizeof (PciData.Hdr.RevisionID),
                                               &(PciData.Hdr.RevisionID)
@@ -724,7 +724,7 @@ BuildFdtForPciRootBridge (
 
           Status = mPciDevicePpi->PciIo.Pci.Read (
                                               &mPciDevicePpi->PciIo,
-                                              (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint16,
+                                              EfiPciIoWidthUint16,
                                               PCI_SVID_OFFSET,
                                               sizeof (PciData.Device.SubsystemVendorID),
                                               &(PciData.Device.SubsystemVendorID)
@@ -732,7 +732,7 @@ BuildFdtForPciRootBridge (
 
           Status = mPciDevicePpi->PciIo.Pci.Read (
                                               &mPciDevicePpi->PciIo,
-                                              (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint16,
+                                              EfiPciIoWidthUint16,
                                               PCI_SID_OFFSET,
                                               sizeof (PciData.Device.SubsystemID),
                                               &(PciData.Device.SubsystemID)

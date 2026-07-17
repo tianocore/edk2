@@ -1,0 +1,31 @@
+# TianoCore edk2 GitHub Breaking Change Removal Issue Template
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: 💥 Breaking Change (Removal)
+description: Subissue tracking the eventual removal of a deprecated item
+title: "[Breaking Change Removal]: <title>"
+labels: ["impact:breaking-change", "deprecation:removal"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        👋 This is a subissue of a breaking change Tracking Issue, following the
+           [Breaking Change and Release Process for EDK II](https://raw.githubusercontent.com/tianocore/tianocore-wiki.github.io/refs/heads/main/rfc/text/0003-edk2-breaking-change-and-release-process.md).
+
+        It tracks the eventual removal of the deprecated item. It is closed when the item is removed from the
+        codebase. Detailed documentation for the change lives only in the `BREAKING-CHANGES.md` entry.
+
+  - type: textarea
+    id: special_notes
+    attributes:
+      label: Special Notes
+      description: |
+        Any special notes about the removal portion of the process. If there are no special notes, enter exactly:
+        `Breaking change process issue.`
+      value: "Breaking change process issue."
+    validations:
+      required: true
