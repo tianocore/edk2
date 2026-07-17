@@ -255,7 +255,7 @@ EdDsaGeneratePubKey (
   IN   UINTN  PublicKeySize
   )
 {
-  return TRUE;
+  return FALSE;
 }
 
 /**
@@ -454,6 +454,10 @@ EdDsaSign (
     return FALSE;
   }
 
+  if ((ContextSize > 0) && (Context == NULL)) {
+    return FALSE;
+  }
+
   Ctx = (KEY_CONTEXT *)EdDsaContext;
   if (Ctx == NULL) {
     return FALSE;
@@ -566,6 +570,10 @@ EdDsaVerify (
   }
 
   if ((SigSize > INT_MAX) || (SigSize == 0)) {
+    return FALSE;
+  }
+
+  if ((ContextSize > 0) && (Context == NULL)) {
     return FALSE;
   }
 
