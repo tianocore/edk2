@@ -587,9 +587,9 @@ AddArmProcBlock (
   }
 
   ProcBlock->Revision = Block->Revision;
-  ProcBlock->Length   = sizeof (ARM_PROCESSOR_SPECIFIC_BLOCK) + SubDataSize;
+  ProcBlock->Length   = (UINT8)(sizeof (ARM_PROCESSOR_SPECIFIC_BLOCK) + SubDataSize);
   ProcBlock->VendorId = Block->VendorId;
-  ProcBlock->SubType  = Block->SubType;
+  ProcBlock->SubType  = (UINT8)Block->SubType;
 
   return SubDataOps->AddProcSubData (
                        CfgMgrProtocol,
@@ -757,6 +757,7 @@ STATIC PROCESSOR_SPECIFIC_BLOCK_OPS  mProcSpecificBlockOps[] = {
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType44TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -810,6 +811,7 @@ FreeSmbiosType44TableEx (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType44TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
@@ -963,10 +965,10 @@ BuildSmbiosType44TableEx (
 
     // Set up the header
     SmbiosRecord->Hdr.Type                                 = EFI_SMBIOS_TYPE_PROCESSOR_ADDITIONAL_INFORMATION;
-    SmbiosRecord->Hdr.Length                               = SmbiosRecordSize - 2;
+    SmbiosRecord->Hdr.Length                               = (UINT8)(SmbiosRecordSize - 2);
     SmbiosRecord->RefHandle                                = Type4Handle;
-    SmbiosRecord->ProcessorSpecificBlock.ProcessorArchType = ProcSpecificBlockList[Index].ProcArchType;
-    SmbiosRecord->ProcessorSpecificBlock.Length            = ProcBlockSize;
+    SmbiosRecord->ProcessorSpecificBlock.ProcessorArchType = (UINT8)ProcSpecificBlockList[Index].ProcArchType;
+    SmbiosRecord->ProcessorSpecificBlock.Length            = (UINT8)ProcBlockSize;
 
     Status = ProcBlockOps->AddProcBlock (
                              CfgMgrProtocol,

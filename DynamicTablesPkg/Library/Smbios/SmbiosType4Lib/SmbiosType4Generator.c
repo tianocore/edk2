@@ -69,6 +69,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType4TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -157,6 +158,7 @@ FindProcHierarchyInfoFromToken (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType4TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
@@ -466,6 +468,20 @@ BuildSmbiosType4TableEx (
       ThreadCount++;
     }
 
+    if ((CpuCount > MAX_UINT16) || (ThreadCount > MAX_UINT16)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: CPU count %u or thread count %u exceeds the SMBIOS limit.\n",
+        __func__,
+        CpuCount,
+        ThreadCount
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      FreePool (SmbiosRecord);
+      StringTableFree (&StrTable);
+      goto exitErrorBuildSmbiosType4Table;
+    }
+
     SmbiosRecord->ProcessorType    = CentralProcessor;
     SmbiosRecord->ProcessorUpgrade = ProcessorUpgradeUnknown;
  #if defined (MDE_CPU_AARCH64)
@@ -492,13 +508,13 @@ BuildSmbiosType4TableEx (
       CharacteristicFlags->Processor64BitCapable = 1;
     }
 
-    SmbiosRecord->CoreCount         = (CpuCount < 256) ? CpuCount : 0xff;
-    SmbiosRecord->CoreCount2        = CpuCount;
-    SmbiosRecord->EnabledCoreCount  = (CpuCount < 256) ? CpuCount : 0xff;
-    SmbiosRecord->EnabledCoreCount2 = CpuCount;
-    SmbiosRecord->ThreadCount       = (ThreadCount < 256) ? ThreadCount : 0xff;
-    SmbiosRecord->ThreadCount2      = ThreadCount;
-    SmbiosRecord->ThreadEnabled     = ThreadCount;
+    SmbiosRecord->CoreCount         = (UINT8)((CpuCount < 256) ? CpuCount : MAX_UINT8);
+    SmbiosRecord->CoreCount2        = (UINT16)CpuCount;
+    SmbiosRecord->EnabledCoreCount  = (UINT8)((CpuCount < 256) ? CpuCount : MAX_UINT8);
+    SmbiosRecord->EnabledCoreCount2 = (UINT16)CpuCount;
+    SmbiosRecord->ThreadCount       = (UINT8)((ThreadCount < 256) ? ThreadCount : MAX_UINT8);
+    SmbiosRecord->ThreadCount2      = (UINT16)ThreadCount;
+    SmbiosRecord->ThreadEnabled     = (UINT16)ThreadCount;
 
     SmbiosRecord->Socket                = SocketDesignationRef;
     SmbiosRecord->ProcessorManufacturer = ProcessorManufacturerRef;
