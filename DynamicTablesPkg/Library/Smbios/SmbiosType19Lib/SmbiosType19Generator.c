@@ -58,6 +58,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType19TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                   *CONST  This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL     *CONST  TableFactoryProtocol,
@@ -146,8 +147,8 @@ UpdateSmbiosType19Address (
     SmbiosRecord->ExtendedStartingAddress = StartAddress;
     SmbiosRecord->ExtendedEndingAddress   = EndAddress;
   } else {
-    SmbiosRecord->StartingAddress = StartingAddressKb;
-    SmbiosRecord->EndingAddress   = EndingAddressKb;
+    SmbiosRecord->StartingAddress = (UINT32)StartingAddressKb;
+    SmbiosRecord->EndingAddress   = (UINT32)EndingAddressKb;
   }
 }
 
@@ -177,6 +178,7 @@ UpdateSmbiosType19Address (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType19TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,

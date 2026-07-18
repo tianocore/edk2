@@ -4,7 +4,7 @@
 Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1595,7 +1595,14 @@ UpdatePciInfo (
             if (PciIoDevice->PciBar[BarIndex].BarType == PciBarTypePMem64) {
               switch (Ptr->AddrSpaceGranularity) {
                 case 32:
-                  PciIoDevice->PciBar[BarIndex].BarType = PciBarTypePMem32;
+                  if ((Ptr->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) ==
+                      EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE)
+                  {
+                    PciIoDevice->PciBar[BarIndex].BarType = PciBarTypePMem32;
+                  } else {
+                    PciIoDevice->PciBar[BarIndex].BarType = PciBarTypeMem32;
+                  }
+
                 case 64:
                   PciIoDevice->PciBar[BarIndex].BarTypeFixed = TRUE;
                   break;
