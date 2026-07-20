@@ -20,6 +20,12 @@
 #include <AmlInclude.h>
 #include <Api/AmlApiHelper.h>
 #include <CodeGen/AmlResourceDataCodeGen.h>
+#include <Utils/AmlUtility.h>
+
+/* Macros to read General flags of a Resource Data Address Descriptors */
+#define IS_RD_ADDR_POS_DECODE(GenFlag)  (((GenFlag) & BIT1) == 0)
+#define IS_RD_ADDR_MIN_FIXED(GenFlag)   (((GenFlag) & BIT2) == BIT2)
+#define IS_RD_ADDR_MAX_FIXED(GenFlag)   (((GenFlag) & BIT3) == BIT3)
 
 /** Update the first interrupt of an Interrupt resource data node.
 
@@ -271,7 +277,8 @@ AmlUpdateRdQWord (
           AML_RD_BUILD_LARGE_DESC_ID (
             ACPI_LARGE_QWORD_ADDRESS_SPACE_DESCRIPTOR_NAME
             )
-          )))
+          )) ||
+      (BaseAddressLength == 0))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -313,9 +320,241 @@ AmlUpdateRdQWord (
   RdQWord->AddrRangeMax = BaseAddress + BaseAddressLength - 1;
   RdQWord->AddrLen      = BaseAddressLength;
 
+  Status = CheckAddressSpaceFields (
+             IS_RD_ADDR_MIN_FIXED (RdQWord->GenFlag),
+             IS_RD_ADDR_MAX_FIXED (RdQWord->GenFlag),
+             RdQWord->AddrSpaceGranularity,
+             RdQWord->AddrRangeMin,
+             RdQWord->AddrRangeMax,
+             RdQWord->AddrTranslationOffset,
+             RdQWord->AddrLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
   // Update Base Address Resource Data node.
   Status = AmlUpdateDataNode (
              QWordRdNode,
+             EAmlNodeDataTypeResourceData,
+             QueryBuffer,
+             QueryBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+  }
+
+error_handler:
+  if (QueryBuffer != NULL) {
+    FreePool (QueryBuffer);
+  }
+
+  return Status;
+}
+
+/** Update the base address and length of a DWord resource data node.
+
+  @param  [in] DWordRdNode         Pointer a DWord resource data
+                                   node.
+  @param  [in] BaseAddress         Base address.
+  @param  [in] BaseAddressLength   Base address length.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+**/
+EFI_STATUS
+EFIAPI
+AmlUpdateRdDWord (
+  IN  AML_DATA_NODE_HANDLE  DWordRdNode,
+  IN  UINT32                BaseAddress,
+  IN  UINT32                BaseAddressLength
+  )
+{
+  EFI_STATUS                               Status;
+  EFI_ACPI_DWORD_ADDRESS_SPACE_DESCRIPTOR  *RdDWord;
+
+  UINT8   *QueryBuffer;
+  UINT32  QueryBufferSize;
+
+  if ((DWordRdNode == NULL)                                             ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)DWordRdNode) != EAmlNodeData)   ||
+      (!AmlNodeHasDataType (DWordRdNode, EAmlNodeDataTypeResourceData)) ||
+      (!AmlNodeHasRdDataType (
+          DWordRdNode,
+          AML_RD_BUILD_LARGE_DESC_ID (
+            ACPI_LARGE_DWORD_ADDRESS_SPACE_DESCRIPTOR_NAME
+            )
+          )) ||
+      (BaseAddressLength == 0))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get the size of the DWordRdNode's buffer.
+  Status = AmlGetDataNodeBuffer (
+             DWordRdNode,
+             NULL,
+             &QueryBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Allocate a buffer to fetch the data.
+  QueryBuffer = AllocatePool (QueryBufferSize);
+  if (QueryBuffer == NULL) {
+    ASSERT (0);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Get the data.
+  Status = AmlGetDataNodeBuffer (
+             DWordRdNode,
+             QueryBuffer,
+             &QueryBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  RdDWord = (EFI_ACPI_DWORD_ADDRESS_SPACE_DESCRIPTOR *)QueryBuffer;
+
+  // Update the Base Address and Length.
+  RdDWord->AddrRangeMin = BaseAddress;
+  RdDWord->AddrRangeMax = BaseAddress + BaseAddressLength - 1;
+  RdDWord->AddrLen      = BaseAddressLength;
+
+  Status = CheckAddressSpaceFields (
+             IS_RD_ADDR_MIN_FIXED (RdDWord->GenFlag),
+             IS_RD_ADDR_MAX_FIXED (RdDWord->GenFlag),
+             RdDWord->AddrSpaceGranularity,
+             RdDWord->AddrRangeMin,
+             RdDWord->AddrRangeMax,
+             RdDWord->AddrTranslationOffset,
+             RdDWord->AddrLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Update Base Address Resource Data node.
+  Status = AmlUpdateDataNode (
+             DWordRdNode,
+             EAmlNodeDataTypeResourceData,
+             QueryBuffer,
+             QueryBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+  }
+
+error_handler:
+  if (QueryBuffer != NULL) {
+    FreePool (QueryBuffer);
+  }
+
+  return Status;
+}
+
+/** Update the base address and length of a Word resource data node.
+
+  @param  [in] WordRdNode          Pointer a Word resource data
+                                   node.
+  @param  [in] BaseAddress         Base address.
+  @param  [in] BaseAddressLength   Base address length.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+**/
+EFI_STATUS
+EFIAPI
+AmlUpdateRdWord (
+  IN  AML_DATA_NODE_HANDLE  WordRdNode,
+  IN  UINT16                BaseAddress,
+  IN  UINT16                BaseAddressLength
+  )
+{
+  EFI_STATUS                              Status;
+  EFI_ACPI_WORD_ADDRESS_SPACE_DESCRIPTOR  *RdWord;
+
+  UINT8   *QueryBuffer;
+  UINT32  QueryBufferSize;
+
+  if ((WordRdNode == NULL)                                             ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)WordRdNode) != EAmlNodeData)   ||
+      (!AmlNodeHasDataType (WordRdNode, EAmlNodeDataTypeResourceData)) ||
+      (!AmlNodeHasRdDataType (
+          WordRdNode,
+          AML_RD_BUILD_LARGE_DESC_ID (
+            ACPI_LARGE_WORD_ADDRESS_SPACE_DESCRIPTOR_NAME
+            )
+          )) ||
+      (BaseAddressLength == 0))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get the size of the WordRdNode's buffer.
+  Status = AmlGetDataNodeBuffer (
+             WordRdNode,
+             NULL,
+             &QueryBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Allocate a buffer to fetch the data.
+  QueryBuffer = AllocatePool (QueryBufferSize);
+  if (QueryBuffer == NULL) {
+    ASSERT (0);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Get the data.
+  Status = AmlGetDataNodeBuffer (
+             WordRdNode,
+             QueryBuffer,
+             &QueryBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  RdWord = (EFI_ACPI_WORD_ADDRESS_SPACE_DESCRIPTOR *)QueryBuffer;
+
+  // Update the Base Address and Length.
+  RdWord->AddrRangeMin = BaseAddress;
+  RdWord->AddrRangeMax = BaseAddress + BaseAddressLength - 1;
+  RdWord->AddrLen      = BaseAddressLength;
+
+  Status = CheckAddressSpaceFields (
+             IS_RD_ADDR_MIN_FIXED (RdWord->GenFlag),
+             IS_RD_ADDR_MAX_FIXED (RdWord->GenFlag),
+             RdWord->AddrSpaceGranularity,
+             RdWord->AddrRangeMin,
+             RdWord->AddrRangeMax,
+             RdWord->AddrTranslationOffset,
+             RdWord->AddrLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Update Base Address Resource Data node.
+  Status = AmlUpdateDataNode (
+             WordRdNode,
              EAmlNodeDataTypeResourceData,
              QueryBuffer,
              QueryBufferSize

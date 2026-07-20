@@ -19,6 +19,7 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
+#include <IndustryStandard/SmBios.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -91,6 +92,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
   EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
   EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
+  EArchCommonObjSystemInfo,                     ///< 67 - System Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1704,5 +1707,52 @@ typedef struct CmArchCommonSystemResetInfo {
   /// Timeout value used by the watchdog timer.
   UINT16             Timeout;
 } CM_ARCH_COMMON_SYSTEM_RESET_INFO;
+
+/** A structure that describes processor specific data.
+
+  SMBIOS Specification v3.9.0 Type 44
+
+  ID: EArchCommonObjProcessorSpecificBlockInfo
+**/
+typedef struct CmArchCommonProcessorSpecificBlockInfo {
+  /// CM Object Token uniquely identifying this processor specific block info.
+  CM_OBJECT_TOKEN                       Token;
+
+  /// Relevant Process Hierarchy Socket Token.
+  CM_OBJECT_TOKEN                       ProcSocketToken;
+
+  /// Processor Architecture Type.
+  PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE    ProcArchType;
+
+  /// Token array for architecture specific Processor Data.
+  CM_OBJECT_TOKEN                       ArchProcessorSpecificDataToken;
+} CM_ARCH_COMMON_PROCESSOR_SPECIFIC_BLOCK_INFO;
+
+/** A structure that describes System Information.
+
+  SMBIOS Specification v3.9.0 Type 1
+
+  ID: EArchCommonObjSystemInfo
+**/
+typedef struct CmArchCommonSystemInfo {
+  /// CM Object Token uniquely identifying this System Information entry.
+  CM_OBJECT_TOKEN    SystemInfoToken;
+  /// Manufacturer of the system.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Product name of the system.
+  CHAR8              ProductName[SMBIOS_MAX_STRING_SIZE];
+  /// Version of the system.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the system.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Universal unique ID of the system.
+  GUID               Uuid;
+  /// Identifies the event that caused the system to power up.
+  UINT8              WakeUpType;
+  /// SKU number of the system.
+  CHAR8              SkuNum[SMBIOS_MAX_STRING_SIZE];
+  /// Family that the system belongs to.
+  CHAR8              Family[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_SYSTEM_INFO;
 
 #pragma pack()
