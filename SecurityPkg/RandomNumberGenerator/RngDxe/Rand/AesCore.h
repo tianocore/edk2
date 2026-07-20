@@ -1,8 +1,9 @@
 /** @file
   Function prototype for AES Block Cipher support.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 

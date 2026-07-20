@@ -58,6 +58,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType16TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -107,7 +108,7 @@ UpdateSmbiosType16Size (
   SizeKb = SizeBytes / SIZE_1KB;
 
   if (SizeBytes < EXTENDED_SIZE_THRESHOLD) {
-    SmbiosRecord->MaximumCapacity = SizeKb;
+    SmbiosRecord->MaximumCapacity = (UINT32)SizeKb;
   } else {
     SmbiosRecord->MaximumCapacity         = 0x80000000;
     SmbiosRecord->ExtendedMaximumCapacity = SizeBytes;
@@ -161,6 +162,7 @@ AddMemErrDeviceHandle (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType16TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,

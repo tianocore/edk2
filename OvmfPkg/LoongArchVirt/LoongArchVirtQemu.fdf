@@ -210,6 +210,15 @@ INF ShellPkg/Application/Shell/Shell.inf
 INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
 INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 
+#
+# TPM support
+#
+!if $(TPM2_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!endif
+!endif
 #####################################################################################################
 [FV.FVMAIN_COMPACT]
 FvNameGuid         = af8c3fe8-9ce8-4548-884a-e3f4dd91f040
@@ -249,6 +258,12 @@ INF  OvmfPkg/LoongArchVirt/Sec/SecMain.inf
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  OvmfPkg/LoongArchVirt/PlatformPei/PlatformPei.inf
+
+!if $(TPM2_ENABLE) == TRUE
+  INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
+  INF  SecurityPkg/Tcg/Tcg2PlatformPei/Tcg2PlatformPei.inf
+  INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+!endif
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
