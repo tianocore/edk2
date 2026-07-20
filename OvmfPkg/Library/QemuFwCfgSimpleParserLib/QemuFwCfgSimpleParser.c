@@ -82,8 +82,8 @@ STATIC CONST CHAR8 *CONST  mFalseString[] = {
   @return                        Error codes propagated from
                                  QemuFwCfgFindFile().
 **/
-STATIC
 RETURN_STATUS
+EFIAPI
 QemuFwCfgGetAsString (
   IN     CONST CHAR8  *FileName,
   IN OUT UINTN        *BufferSize,

@@ -1,8 +1,9 @@
 /** @file
   RNG Driver to produce the UEFI Random Number Generator protocol.
 
-  The driver uses CPU RNG instructions to produce high-quality,
-  high-performance entropy and random number.
+  The driver uses the platform RngLib and/or architecture specific
+  instructions or firmware interface implementation to produce
+  high-quality, high-performance entropy and random numbers.
 
   RNG Algorithms defined in UEFI 2.4:
    - EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID
@@ -12,10 +13,10 @@
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID
    - EFI_RNG_ALGORITHM_X9_31_AES_GUID
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -118,7 +119,7 @@ RngDriverUnLoad (
 }
 
 /**
-  Runs CPU RNG instruction to fill a buffer of arbitrary size with random bytes.
+  Fills a buffer of arbitrary size with random bytes.
 
   @param[in]   Length        Size of the buffer, in bytes,  to fill with.
   @param[out]  RandBuffer    Pointer to the buffer to store the random result.
