@@ -13,6 +13,8 @@
 
 [Sources]
   FmpDeviceSmmLibUnitTest.c
+  FmpDeviceSmmFlashRetry.c
+  FmpDeviceSmmFlashRetry.h
   FmpDeviceSmmUpdatePolicy.c
   FmpDeviceSmmUpdatePolicy.h
 
@@ -22,6 +24,7 @@
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
   MemoryAllocationLib
   UnitTestLib

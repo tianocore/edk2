@@ -33,6 +33,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Coreboot.h>
 
+#include "FmpDeviceSmmFlashRetry.h"
 #include "FmpDeviceSmmUpdatePolicy.h"
 
 //
@@ -67,7 +68,6 @@ typedef struct {
 //
 #define REGION_MANIFEST_SIGNATURE      SIGNATURE_32 ('R', 'M', 'A', 'P')
 #define REGION_MANIFEST_VERSION        1
-#define SMMSTORE_FLASH_RETRY_COUNT     4
 #define SMMSTORE_FLASH_RETRY_STALL_US  500
 #define INTEL_DESCRIPTOR_SIGNATURE     0x0ff0a55a
 #define INTEL_DESCRIPTOR_SIGNATURE_OFF 0x10
@@ -99,6 +99,46 @@ StallBetweenFlashAttempts (
 
 STATIC
 EFI_STATUS
+ReadAnyBlock (
+  IN     EFI_LBA  Lba,
+  IN     UINTN    Offset,
+  IN OUT UINTN    *NumBytes,
+  OUT    UINT8    *Buffer
+  )
+{
+  return SmmStoreLibReadAnyBlock (Lba, Offset, NumBytes, Buffer);
+}
+
+STATIC
+EFI_STATUS
+WriteAnyBlock (
+  IN     EFI_LBA  Lba,
+  IN     UINTN    Offset,
+  IN OUT UINTN    *NumBytes,
+  IN     UINT8    *Buffer
+  )
+{
+  return SmmStoreLibWriteAnyBlock (Lba, Offset, NumBytes, Buffer);
+}
+
+STATIC
+EFI_STATUS
+EraseAnyBlock (
+  IN EFI_LBA  Lba
+  )
+{
+  return SmmStoreLibEraseAnyBlock (Lba);
+}
+
+STATIC CONST FMP_DEVICE_FLASH_IO  mFlashIo = {
+  ReadAnyBlock,
+  WriteAnyBlock,
+  EraseAnyBlock,
+  StallBetweenFlashAttempts
+};
+
+STATIC
+EFI_STATUS
 ReadAnyBlockWithRetry (
   IN     EFI_LBA  Lba,
   IN     UINTN    Offset,
@@ -106,124 +146,7 @@ ReadAnyBlockWithRetry (
   OUT    VOID     *Buffer
   )
 {
-  EFI_STATUS  Status;
-  UINTN       Attempt;
-  UINTN       RequestedBytes;
-  UINTN       ActualBytes;
-
-  if ((NumBytes == NULL) || (Buffer == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  RequestedBytes = *NumBytes;
-  Status         = EFI_DEVICE_ERROR;
-  ActualBytes    = 0;
-
-  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
-    ActualBytes = RequestedBytes;
-    Status      = SmmStoreLibReadAnyBlock (Lba, Offset, &ActualBytes, Buffer);
-    if (!EFI_ERROR (Status) && (ActualBytes == RequestedBytes)) {
-      *NumBytes = ActualBytes;
-      return EFI_SUCCESS;
-    }
-
-    *NumBytes = ActualBytes;
-    StallBetweenFlashAttempts (Attempt);
-  }
-
-  if (!EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-  }
-
-  return Status;
-}
-
-STATIC
-EFI_STATUS
-EraseAnyBlockWithRetry (
-  IN EFI_LBA  Lba
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       Attempt;
-
-  Status = EFI_DEVICE_ERROR;
-  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
-    Status = SmmStoreLibEraseAnyBlock (Lba);
-    if (!EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
-    }
-
-    StallBetweenFlashAttempts (Attempt);
-  }
-
-  return Status;
-}
-
-STATIC
-EFI_STATUS
-WriteAnyBlockWithRetry (
-  IN     EFI_LBA  Lba,
-  IN     UINTN    Offset,
-  IN OUT UINTN    *NumBytes,
-  IN     VOID     *Buffer
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       Attempt;
-  UINTN       RequestedBytes;
-  UINTN       ActualBytes;
-
-  if ((NumBytes == NULL) || (Buffer == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  RequestedBytes = *NumBytes;
-  Status         = EFI_DEVICE_ERROR;
-  ActualBytes    = 0;
-
-  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
-    ActualBytes = RequestedBytes;
-    Status      = SmmStoreLibWriteAnyBlock (Lba, Offset, &ActualBytes, Buffer);
-    if (!EFI_ERROR (Status) && (ActualBytes == RequestedBytes)) {
-      *NumBytes = ActualBytes;
-      return EFI_SUCCESS;
-    }
-
-    *NumBytes = ActualBytes;
-    StallBetweenFlashAttempts (Attempt);
-  }
-
-  if (!EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-  }
-
-  return Status;
-}
-
-STATIC
-EFI_STATUS
-VerifyAnyBlockWrite (
-  IN  EFI_LBA      Lba,
-  IN  CONST UINT8  *Expected,
-  OUT UINT8        *VerifyBuffer,
-  IN  UINTN        BlockSize
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       NumBytes;
-
-  if ((Expected == NULL) || (VerifyBuffer == NULL) || (BlockSize == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  NumBytes = BlockSize;
-  Status   = ReadAnyBlockWithRetry (Lba, 0, &NumBytes, VerifyBuffer);
-  if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  return (CompareMem (VerifyBuffer, Expected, BlockSize) == 0) ? EFI_SUCCESS : EFI_VOLUME_CORRUPTED;
+  return FmpDeviceFlashReadWithRetry (&mFlashIo, Lba, Offset, NumBytes, Buffer);
 }
 
 STATIC
@@ -235,39 +158,7 @@ ProgramAnyBlockWithRetry (
   IN  UINTN        BlockSize
   )
 {
-  EFI_STATUS  Status;
-  UINTN       Attempt;
-  UINTN       NumBytes;
-
-  if ((Expected == NULL) || (VerifyBuffer == NULL) || (BlockSize == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = EFI_DEVICE_ERROR;
-  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
-    Status = EraseAnyBlockWithRetry (Lba);
-    if (EFI_ERROR (Status)) {
-      StallBetweenFlashAttempts (Attempt);
-      continue;
-    }
-
-    NumBytes = BlockSize;
-    Status   = WriteAnyBlockWithRetry (Lba, 0, &NumBytes, (VOID *)Expected);
-    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
-      Status = EFI_DEVICE_ERROR;
-      StallBetweenFlashAttempts (Attempt);
-      continue;
-    }
-
-    Status = VerifyAnyBlockWrite (Lba, Expected, VerifyBuffer, BlockSize);
-    if (!EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
-    }
-
-    StallBetweenFlashAttempts (Attempt);
-  }
-
-  return Status;
+  return FmpDeviceFlashProgramWithRetry (&mFlashIo, Lba, Expected, VerifyBuffer, BlockSize);
 }
 
 STATIC
