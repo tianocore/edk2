@@ -52,3 +52,8 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
+  ## Serial debug log level override.  Accepts "silent", "verbose", or a
+  #  hex bitmask (e.g. "0x80000040").  "verbose" falls back to the
+  #  compiled-in PcdDebugPrintErrorLevel.
+  gArmVirtTokenSpaceGuid.PcdSerialDebugPrintErrorLevel|"verbose"|VOID*|0x00000006
