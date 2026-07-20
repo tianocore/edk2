@@ -1,0 +1,27 @@
+## @file
+# Host unit tests for SMMSTORE-backed firmware update policy.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = FmpDeviceSmmLibUnitTest
+  FILE_GUID           = 2A8F905F-D9DF-4292-99BB-1D5122260ADE
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+[Sources]
+  FmpDeviceSmmLibUnitTest.c
+  FmpDeviceSmmUpdatePolicy.c
+  FmpDeviceSmmUpdatePolicy.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  UnitTestLib

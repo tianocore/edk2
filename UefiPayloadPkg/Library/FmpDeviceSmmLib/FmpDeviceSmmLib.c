@@ -33,6 +33,8 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Coreboot.h>
 
+#include "FmpDeviceSmmUpdatePolicy.h"
+
 //
 // Minimal FMAP parsing to locate and compare the flash map before updating.
 //
@@ -1927,6 +1929,9 @@ FmpDeviceSetImageWithStatus (
   VOID                         *FlashFmapBuffer;
   FMAP_HEADER                  *FlashFmapHeader;
   FMAP_AREA                    *FlashFmapAreas;
+  BOOLEAN                      VariableStorePreserved;
+  UINTN                        VariableStoreOffset;
+  UINTN                        VariableStoreSize;
 
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
   BlockCount         = 0;
@@ -1968,9 +1973,12 @@ FmpDeviceSetImageWithStatus (
   FmapAreas          = NULL;
   FmapOffset         = 0;
   FmapLength         = 0;
-  FlashFmapBuffer    = NULL;
-  FlashFmapHeader    = NULL;
-  FlashFmapAreas     = NULL;
+  FlashFmapBuffer        = NULL;
+  FlashFmapHeader        = NULL;
+  FlashFmapAreas         = NULL;
+  VariableStorePreserved = FALSE;
+  VariableStoreOffset    = 0;
+  VariableStoreSize      = 0;
 
   Status = LocateRegionManifest (Image, ImageSize, &ManifestEntryCount, &ManifestEntries, &BaseImageSize);
   if (EFI_ERROR (Status)) {
@@ -2058,6 +2066,7 @@ FmpDeviceSetImageWithStatus (
     UINTN       CapsuleRegionSize;
     UINTN       FlashRegionOffset;
     UINTN       FlashRegionSize;
+    CONST CHAR8  SmmStoreRegionName[16] = "SMMSTORE";
 
     LayoutMismatch      = FALSE;
     MismatchIndex       = MAX_UINTN;
@@ -2077,6 +2086,23 @@ FmpDeviceSetImageWithStatus (
     if (EFI_ERROR (FlashFmapStatus)) {
       LayoutMismatch = TRUE;
       DEBUG ((DEBUG_WARN, "%a(): failed to load flash FMAP: %r\n", __func__, FlashFmapStatus));
+    } else {
+      Status = FindFmapRegion (
+                 FlashFmapHeader,
+                 FlashFmapAreas,
+                 FlashFmapHeader->AreaCount,
+                 SmmStoreRegionName,
+                 &VariableStoreOffset,
+                 &VariableStoreSize
+                 );
+      if (!EFI_ERROR (Status) && (VariableStoreSize != 0) &&
+          (VariableStoreOffset < BaseImageSize) &&
+          (VariableStoreSize <= (BaseImageSize - VariableStoreOffset)))
+      {
+        VariableStorePreserved = TRUE;
+      } else {
+        DEBUG ((DEBUG_WARN, "%a(): current SMMSTORE range is unavailable or invalid\n", __func__));
+      }
     }
 
     TotalSteps = 0;
@@ -2130,6 +2156,15 @@ FmpDeviceSetImageWithStatus (
             FlashRegionOffset = 0;
             FlashRegionSize   = 0;
           }
+        } else if (VariableStorePreserved &&
+                   FmpDeviceFlashRangesOverlap (
+                     FlashRegionOffset,
+                     FlashRegionSize,
+                     VariableStoreOffset,
+                     VariableStoreSize
+                     ))
+        {
+          VariableStorePreserved = FALSE;
         }
       }
 
@@ -2149,8 +2184,9 @@ FmpDeviceSetImageWithStatus (
       CHAR8        RegionName[17];
       CONST CHAR8  *BiosRegionSource;
 
-      UseManifest   = FALSE;
-      UseBiosRegion = FALSE;
+      UseManifest            = FALSE;
+      UseBiosRegion          = FALSE;
+      VariableStorePreserved = FALSE;
 
       if (MismatchIndex != MAX_UINTN) {
         CopyMem (RegionName, ManifestEntries[MismatchIndex].RegionName, 16);
@@ -2345,32 +2381,33 @@ FmpDeviceSetImageWithStatus (
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
 
   //
-  // Updating the firmware on system flash overwrites SMMSTORE region which
-  // backs up EFI variables of the running firmware.  At this point both SMI
-  // handler from coreboot and variable services of EDK can be mistaken in
-  // their assumptions about the location, size and contents of the region.
-  // Accessing flash where SMMSTORE used to be can lead to unexpected results
-  // including corruption of the new image outside of its SMMSTORE.  Switch to
-  // the use of stubs for dealing with EFI variables that do nothing.
+  // A full-flash, BIOS-region, or overlapping manifest update can overwrite
+  // the SMMSTORE region that backs EFI variables.  In those cases, the running
+  // coreboot SMI handler and EDK variable services may have stale assumptions
+  // about the store, so replace the services with failure stubs.
   //
-  // New firmware will not report result of flashing in any way unless some
-  // kind of communication mechanism is implemented for this purpose.
+  // A manifest update may keep using variable services only when the live FMAP
+  // was read successfully, all selected regions matched the live layout, and
+  // none overlapped the live SMMSTORE range.  This lets FmpDxe persist final
+  // last-attempt state before the mandatory reset.
   //
   // If there was an error, it's unclear whether these stubs would be of any
   // help, so they are employed only on successful flashing.
   //
 
-  gRT->GetVariable         = GetVariableHook;
-  gRT->GetNextVariableName = GetNextVariableNameHook;
-  gRT->SetVariable         = SetVariableHook;
-  gRT->QueryVariableInfo   = QueryVariableInfoHook;
+  if (FmpDeviceShouldDisableVariableServices (UseManifest && VariableStorePreserved)) {
+    gRT->GetVariable         = GetVariableHook;
+    gRT->GetNextVariableName = GetNextVariableNameHook;
+    gRT->SetVariable         = SetVariableHook;
+    gRT->QueryVariableInfo   = QueryVariableInfoHook;
 
-  gRT->Hdr.CRC32 = 0;
-  gBS->CalculateCrc32 (
-         (UINT8 *)&gRT->Hdr,
-         gRT->Hdr.HeaderSize,
-         &gRT->Hdr.CRC32
-         );
+    gRT->Hdr.CRC32 = 0;
+    gBS->CalculateCrc32 (
+           (UINT8 *)&gRT->Hdr,
+           gRT->Hdr.HeaderSize,
+           &gRT->Hdr.CRC32
+           );
+  }
 
   return EFI_SUCCESS;
 

@@ -21,6 +21,8 @@
 
 [Sources]
   FmpDeviceSmmLib.c
+  FmpDeviceSmmUpdatePolicy.c
+  FmpDeviceSmmUpdatePolicy.h
 
 [LibraryClasses]
   BaseMemoryLib
