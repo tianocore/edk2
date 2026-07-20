@@ -564,6 +564,11 @@ FitUplEntryPoint (
  #endif
   VOID  *FdtBaseResvd;
 
+  Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   if (FixedPcdGetBool (PcdHandOffFdtEnable)) {
     mHobList = (VOID *)NULL;
   } else {

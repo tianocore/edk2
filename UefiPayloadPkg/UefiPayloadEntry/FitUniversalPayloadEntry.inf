@@ -116,6 +116,7 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
   gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4305
