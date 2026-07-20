@@ -1,0 +1,39 @@
+## @file
+# Host unit tests for FMP variable update checkpoints.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = VariableSupportUnitTest
+  FILE_GUID           = D182A7AB-1BD2-4D1B-8769-5067A6F31A49
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+[Sources]
+  VariableSupport.c
+  VariableSupport.h
+  VariableSupportUnitTest.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UnitTestLib
+  VariablePolicyHelperLib
+
+[Protocols]
+  gEdkiiVariablePolicyProtocolGuid
