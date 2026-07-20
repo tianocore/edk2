@@ -503,6 +503,11 @@ AddIsaStringNodes (
                                      IsaLength,
                                      NodeList->IsaString
                                      );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+
     IsaStringNode = (EFI_ACPI_6_6_RHCT_ISA_STRING_NODE *)((CHAR8 *)IsaStringNode + NodeLength);
     NodeList++;
   }
