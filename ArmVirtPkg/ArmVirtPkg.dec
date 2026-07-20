@@ -28,6 +28,7 @@
 [LibraryClasses]
   ArmCcaInitPeiLib|Include/Library/ArmCcaInitPeiLib.h
   ArmCcaLib|Include/Library/ArmCcaLib.h
+  ArmCcaRhiHostSessionLib|Include/Library/ArmCcaRhiHostSessionLib.h
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
   ArmVirtMemInfoLib|Include/Library/ArmVirtMemInfoLib.h
 
