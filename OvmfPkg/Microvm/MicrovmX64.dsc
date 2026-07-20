@@ -33,6 +33,7 @@
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE DEBUG_TO_MEM            = FALSE
+  DEFINE QEMU_PV_VARS            = FALSE
 
   #
   # Shell can be useful for debugging but should not be enabled for production
@@ -492,6 +493,10 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE
 !endif
+!if $(QEMU_PV_VARS) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
+!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
@@ -878,6 +883,13 @@
   OvmfPkg/PlatformDxe/Platform.inf
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
+!if $(QEMU_PV_VARS) == TRUE
+  #
+  # Variable driver stack (qemu -device uefi-vars)
+  #
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunicationFdt.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
   #
   # Variable driver stack (non-SMM)
   #
@@ -891,3 +903,4 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   }
+!endif

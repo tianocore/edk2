@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Virt MM Communicate driver
+#  Virt MM Communicate driver (FDT variant)
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -9,7 +9,7 @@
 [Defines]
   INF_VERSION                    = 0x0001001A
   BASE_NAME                      = VirtMmCommunication
-  FILE_GUID                      = 0B807404-2D1C-4066-95F4-F28A58800185
+  FILE_GUID                      = 9C9E7951-403D-40A8-9878-497D4F7718CA
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = VirtMmCommunication2Initialize
@@ -17,24 +17,19 @@
 
 [Sources]
   VirtMmCommunication.c
+  QemuFdt.c
+  QemuMmio.c
 
 [Sources.X64]
-#  QemuX64.c
-  QemuHwInfo.c
-  QemuMmio.c
   Svsm.c
 
 [Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
-  QemuFdt.c
-  QemuMmio.c
   SvsmNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
-
-[Packages.AARCH64, Packages.RISCV64, Packages.LOONGARCH64]
   EmbeddedPkg/EmbeddedPkg.dec
 
 [Packages.X64]
@@ -48,14 +43,10 @@
   IoLib
   MemoryAllocationLib
   UefiDriverEntryPoint
+  FdtLib
 
 [LibraryClasses.X64]
-  DxeHardwareInfoLib
-  QemuFwCfgLib
   AmdSvsmLib
-
-[LibraryClasses.AARCH64, LibraryClasses.RISCV64, LibraryClasses.LOONGARCH64]
-  FdtLib
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
@@ -65,8 +56,6 @@
 [Protocols]
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
   gEfiSmmVariableProtocolGuid                   ## PRODUCES
-
-[Protocols.AARCH64, Protocols.RISCV64, Protocols.LOONGARCH64]
   gFdtClientProtocolGuid
 
 [Guids]
@@ -76,7 +65,4 @@
   gSmmVariableWriteGuid
 
 [Depex]
-  gEfiCpuArchProtocolGuid
-
-[Depex.AARCH64, Depex.RISCV64, Depex.LOONGARCH64]
-  gFdtClientProtocolGuid
+  gEfiCpuArchProtocolGuid AND gFdtClientProtocolGuid

@@ -1150,7 +1150,7 @@
   #
   # Variable driver stack (qemu -device uefi-vars)
   #
-  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunicationHwInfo.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
 !else
