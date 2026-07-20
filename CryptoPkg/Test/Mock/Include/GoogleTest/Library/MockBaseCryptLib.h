@@ -1265,6 +1265,47 @@ struct MockBaseCryptLib {
     );
 
   MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
+    HkdfSha512ExtractAndExpand,
+    (
+     IN   CONST UINT8  *Key,
+     IN   UINTN        KeySize,
+     IN   CONST UINT8  *Salt,
+     IN   UINTN        SaltSize,
+     IN   CONST UINT8  *Info,
+     IN   UINTN        InfoSize,
+     OUT  UINT8        *Out,
+     IN   UINTN        OutSize
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
+    HkdfSha512Extract,
+    (
+     IN CONST UINT8  *Key,
+     IN UINTN        KeySize,
+     IN CONST UINT8  *Salt,
+     IN UINTN        SaltSize,
+     OUT UINT8       *PrkOut,
+     UINTN           PrkOutSize
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
+    HkdfSha512Expand,
+    (
+     IN   CONST UINT8  *Prk,
+     IN   UINTN        PrkSize,
+     IN   CONST UINT8  *Info,
+     IN   UINTN        InfoSize,
+     OUT  UINT8        *Out,
+     IN   UINTN        OutSize
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
     VOID *,
     BigNumInit,
     (
@@ -1663,6 +1704,15 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
+    EcGetCurveNid,
+    (
+     IN      VOID   *EcContext,
+     OUT     UINTN  *Nid
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
     EcGenerateKey,
     (
      IN OUT  VOID   *EcContext,
@@ -1702,6 +1752,27 @@ struct MockBaseCryptLib {
      IN   UINTN        PemSize,
      IN   CONST CHAR8  *Password,
      OUT  VOID         **EcContext
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
+    EcGetPublicKeyFromPem,
+    (
+     IN   CONST UINT8  *PemData,
+     IN   UINTN        PemSize,
+     IN   CONST CHAR8  *Password,
+     OUT  VOID         **EcContext
+    )
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    BOOLEAN,
+    EcPublicKeyToPEM,
+    (
+     IN      VOID   *EcContext,
+     OUT     UINT8  *PemData,
+     IN OUT  UINTN  *PemSize
     )
     );
 

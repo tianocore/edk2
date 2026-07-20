@@ -50,8 +50,8 @@
   OpensslStub/rand_pool.c
 #  OpensslStub/SslNull.c
 #  OpensslStub/EcSm2Null.c
-  OpensslStub/uefiprov.c
-  OpensslStub/EncoderNull.c
+  OpensslStub/uefiprov_full.c
+#  OpensslStub/EncoderNull.c
   OpensslStub/SslStatServNull.c
   OpensslStub/SslExtServNull.c
   OpensslStub/CamelliaNull.c
@@ -247,6 +247,10 @@
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_lib.c
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_meth.c
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_pkey.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_err.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_lib.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_meth.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_pkey.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_all.c
   $(OPENSSL_PATH)/crypto/err/err_all_legacy.c
@@ -648,6 +652,10 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pem2der.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2any.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2blob.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2ms.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2text.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
   $(OPENSSL_PATH)/providers/implementations/exchange/ecdh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c
@@ -973,6 +981,10 @@
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_lib.c
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_meth.c
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_pkey.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_err.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_lib.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_meth.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_pkey.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_all.c
   $(OPENSSL_PATH)/crypto/err/err_all_legacy.c
@@ -1373,6 +1385,10 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pem2der.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2any.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2blob.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2ms.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2text.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
   $(OPENSSL_PATH)/providers/implementations/exchange/ecdh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c
@@ -1719,6 +1735,10 @@
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_lib.c
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_meth.c
   $(OPENSSL_PATH)/crypto/encode_decode/decoder_pkey.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_err.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_lib.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_meth.c
+  $(OPENSSL_PATH)/crypto/encode_decode/encoder_pkey.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_all.c
   $(OPENSSL_PATH)/crypto/err/err_all_legacy.c
@@ -2119,6 +2139,10 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pem2der.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2any.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2blob.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2ms.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/encode_key2text.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
   $(OPENSSL_PATH)/providers/implementations/exchange/ecdh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c

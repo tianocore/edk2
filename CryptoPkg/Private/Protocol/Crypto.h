@@ -4,6 +4,7 @@
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
   (c) Copyright 2026 HP Development Company, L.P.
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -21,7 +22,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  26
+#define EDKII_CRYPTO_VERSION  28
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -3439,6 +3440,85 @@ BOOLEAN
   );
 
 /**
+  Derive SHA512 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_512_EXTRACT_AND_EXPAND)(
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_512_EXTRACT)(
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_512_EXPAND)(
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+/**
   Initializes the OpenSSL library.
 
   This function registers ciphers and digests used directly and indirectly
@@ -5647,6 +5727,23 @@ VOID
   );
 
 /**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component or Nid is NULL.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GET_CURVE_NID)(
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  );
+
+/**
   Generates EC key and returns EC public key (X, Y), Please note, this function uses
   pseudo random number generator. The caller must make sure RandomSeed()
   function was properly called before.
@@ -6071,6 +6168,62 @@ BOOLEAN
   IN   UINTN        PemSize,
   IN   CONST CHAR8  *Password,
   OUT  VOID         **EdDsaContext
+  );
+
+/**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted
+                           PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which
+                           contain the retrieved EC public key component.
+                           Use EcFree() function to free the resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM)(
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  );
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]      EcContext   Pointer to EC DSA context.
+  @param[out]     PemData     Pointer to the PEM-encoded key data to be
+                              retrieved.
+  @param[in, out] PemSize     On input, size of PemData in bytes.
+                              On output, size of data returned or required size.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and *PemSize is zero, then return FALSE and set
+  *PemSize to the required size of the PemData buffer.
+  If PemData is NULL and *PemSize is not zero, then return FALSE.
+  If PemData is not NULL and *PemSize is too small, then return FALSE and
+  set *PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_PUBLIC_KEY_TO_PEM)(
+  IN  VOID   *EcContext,
+  OUT UINT8  *PemData,
+  IN OUT UINTN  *PemSize
   );
 
 /**
@@ -6793,6 +6946,14 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_ML_DSA_GET_PRIVATE_KEY_FROM_PEM        MlDsaGetPrivateKeyFromPem;
   EDKII_CRYPTO_ML_DSA_SIGN                            MlDsaSign;
   EDKII_CRYPTO_ML_DSA_VERIFY                          MlDsaVerify;
+  /// Ec (Continued)
+  EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM             EcGetPublicKeyFromPem;
+  EDKII_CRYPTO_EC_PUBLIC_KEY_TO_PEM                   EcPublicKeyToPEM;
+  EDKII_CRYPTO_EC_GET_CURVE_NID                       EcGetCurveNid;
+  /// HKDF (continued)
+  EDKII_CRYPTO_HKDF_SHA_512_EXTRACT_AND_EXPAND        HkdfSha512ExtractAndExpand;
+  EDKII_CRYPTO_HKDF_SHA_512_EXTRACT                   HkdfSha512Extract;
+  EDKII_CRYPTO_HKDF_SHA_512_EXPAND                    HkdfSha512Expand;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
