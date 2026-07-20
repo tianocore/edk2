@@ -164,6 +164,10 @@ PlatformGetFirstNonAddressCB (
   there are multiple memory blocks below 4G though, because SVSM caves out a
   chunk of memory for itself.  Only the first of these blocks is considered
   low memory.
+
+  Multiple blocks without gap inbetween are grouped together.
+  This is required for TDX which has two low memory descriptors
+  (accepted and unaccepted).
 **/
 STATIC
 VOID
@@ -176,12 +180,12 @@ PlatformGetLowMemoryCB (
     return;
   }
 
-  if (E820Entry->BaseAddr != 0) {
+  if (E820Entry->BaseAddr != PlatformInfoHob->LowMemory) {
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __func__, E820Entry->Length));
-  PlatformInfoHob->LowMemory = (UINT32)E820Entry->Length;
+  PlatformInfoHob->LowMemory += (UINT32)E820Entry->Length;
+  DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __func__, PlatformInfoHob->LowMemory));
 }
 
 /**
