@@ -129,6 +129,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
   EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
   EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
+  EArchCommonObjBaseboardInfo,                  ///< 73 - Baseboard Info
+  EArchCommonObjBaseboardContainedObject,       ///< 74 - Baseboard Contained Object
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1898,5 +1900,51 @@ typedef struct CmArchCommonSystemEnclosureInfo {
   /// Rack height in rack units when Height is 0xFF.
   UINT8              RackHeight;
 } CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
+
+/** A structure that identifies an SMBIOS object contained by a Baseboard.
+
+  SMBIOS Specification v3.9.0 Type 2
+
+  ID: EArchCommonObjBaseboardContainedObject
+**/
+typedef struct CmArchCommonBaseboardContainedObject {
+  /// CM Object Token identifying the contained SMBIOS object.
+  CM_OBJECT_TOKEN              ContainedObjectToken;
+  /// Generator ID for the contained SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    GeneratorId;
+} CM_ARCH_COMMON_BASEBOARD_CONTAINED_OBJECT;
+
+/** A structure that describes Baseboard (or Module) Information.
+
+  SMBIOS Specification v3.9.0 Type 2
+
+  ID: EArchCommonObjBaseboardInfo
+**/
+typedef struct CmArchCommonBaseboardInfo {
+  /// CM Object Token uniquely identifying this Baseboard entry.
+  CM_OBJECT_TOKEN    BaseboardInfoToken;
+  /// CM Object Token identifying the containing System Enclosure.
+  /// CM_NULL_TOKEN indicates that no enclosure reference is supplied.
+  CM_OBJECT_TOKEN    ChassisToken;
+  /// Token referencing an array of Baseboard Contained Objects.
+  /// CM_NULL_TOKEN indicates that no contained objects are supplied.
+  CM_OBJECT_TOKEN    ContainedObjectListToken;
+  /// Manufacturer of the Baseboard.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Product name of the Baseboard.
+  CHAR8              ProductName[SMBIOS_MAX_STRING_SIZE];
+  /// Version of the Baseboard.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the Baseboard.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset tag of the Baseboard.
+  CHAR8              AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Baseboard feature flags as defined by SMBIOS Type 2.
+  UINT8              FeatureFlag;
+  /// Location of the Baseboard within the chassis.
+  CHAR8              LocationInChassis[SMBIOS_MAX_STRING_SIZE];
+  /// Baseboard type as defined by SMBIOS Type 2.
+  UINT8              BoardType;
+} CM_ARCH_COMMON_BASEBOARD_INFO;
 
 #pragma pack()
