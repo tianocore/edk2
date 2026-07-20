@@ -71,6 +71,8 @@
 !endif
 
 [LibraryClasses]
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
+
   #
   # Entry point
   #
