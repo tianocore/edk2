@@ -4,7 +4,7 @@
 Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -266,10 +266,21 @@ PciPciDeviceInfoCollector (
                  );
 
       if (EFI_ERROR (Status) && (Func == 0)) {
+        if (!FeaturePcdGet (PcdPciScanFuncIfFunc0Absent)) {
+          //
+          // Preserve default behavior for physical platforms: go to next
+          // device if there is no Function 0.
+          //
+          break;
+        }
+
         //
-        // go to next device if there is no Function 0
+        // Some virtualized PCI topologies may let a hypervisor expose
+        // selected non-zero functions to a guest while Function 0 is absent.
+        // Some platforms may require probing such functions.
+        // Keep scanning only when enabled by platform policy.
         //
-        break;
+        continue;
       }
 
       if (!EFI_ERROR (Status)) {
@@ -1584,7 +1595,14 @@ UpdatePciInfo (
             if (PciIoDevice->PciBar[BarIndex].BarType == PciBarTypePMem64) {
               switch (Ptr->AddrSpaceGranularity) {
                 case 32:
-                  PciIoDevice->PciBar[BarIndex].BarType = PciBarTypePMem32;
+                  if ((Ptr->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) ==
+                      EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE)
+                  {
+                    PciIoDevice->PciBar[BarIndex].BarType = PciBarTypePMem32;
+                  } else {
+                    PciIoDevice->PciBar[BarIndex].BarType = PciBarTypeMem32;
+                  }
+
                 case 64:
                   PciIoDevice->PciBar[BarIndex].BarTypeFixed = TRUE;
                   break;
@@ -2910,13 +2928,12 @@ IsPciDeviceRejected (
       //
       // Mem Bar
       //
-      Mask      = 0xFFFFFFF0;
-      TestValue = TestValue & Mask;
-
+      Mask = 0xFFFFFFF0;
       if ((TestValue & 0x07) == 0x04) {
         //
         // Mem64 or PMem64
         //
+        TestValue  = TestValue & Mask;
         BarOffset += sizeof (UINT32);
         if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
           //
@@ -2931,6 +2948,7 @@ IsPciDeviceRejected (
         //
         // Mem32 or PMem32
         //
+        TestValue = TestValue & Mask;
         if ((TestValue != 0) && (TestValue == (OldValue & Mask))) {
           return TRUE;
         }

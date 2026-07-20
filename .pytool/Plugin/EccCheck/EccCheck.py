@@ -34,6 +34,10 @@ class EccCheck(ICiBuildPlugin):
     LineScopePattern = (r'@@ -\d*\,*\d* \+\d*\,*\d* @@.*')
     LineNumRange = re.compile(r'@@ -\d*\,*\d* \+(\d*)\,*(\d*) @@.*')
 
+    # Sub-directory of the workspace where the package under review is copied
+    # and scanned by ECC.
+    BuildTempSubDir = os.path.join('Build', '.pytool', 'Plugin', 'EccCheck')
+
     def GetTestName(self, packagename: str, environment: VarDict) -> tuple:
         """ Provide the testcase name and classname for use in reporting
             testclassname: a descriptive string for the testcase can include whitespace
@@ -77,7 +81,7 @@ class EccCheck(ICiBuildPlugin):
             return 0
 
         # Create temp directory
-        temp_path = os.path.join(workspace_path, 'Build', '.pytool', 'Plugin', 'EccCheck')
+        temp_path = os.path.join(workspace_path, self.BuildTempSubDir)
         try:
             # Delete temp directory
             if os.path.exists(temp_path):
@@ -327,6 +331,8 @@ class EccCheck(ICiBuildPlugin):
                             for i in ecc_diff_range[modify_file]:
                                 line_no = int(row[4])
                                 if i[0] <= line_no <= i[1] and row[1] not in ignore_error_code:
+                                    row[3] = modify_file
+                                    row[5] = row[5].replace(self.BuildTempSubDir + os.sep, '')
                                     row[0] = '\nEFI coding style error'
                                     row[1] = 'Error code: ' + row[1]
                                     row[3] = 'file: ' + row[3]

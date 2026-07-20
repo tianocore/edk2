@@ -23,16 +23,17 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
   InternalCryptLib.h
+  KeyContext.h
   Hash/CryptSha512.c
 
   Hash/CryptMd5Null.c
   Hash/CryptSha1Null.c
-  Hash/CryptSha256Null.c
+  Hash/CryptSha256.c
   Hash/CryptSm3Null.c
   Hash/CryptParallelHashNull.c
   Hmac/CryptHmacNull.c
@@ -56,6 +57,8 @@
   Pk/CryptRsaPssNull.c
   Pk/CryptRsaPssSignNull.c
   Pk/CryptEcNull.c
+  Pk/CryptEdDsaNull.c
+  Pk/CryptMlDsaNull.c
   Bn/CryptBnNull.c
 
   SysCall/CrtWrapper.c

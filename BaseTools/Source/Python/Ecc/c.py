@@ -75,7 +75,7 @@ def GetIdType(Str):
     elif List[1] == 'endif':
         Type = DataClass.MODEL_IDENTIFIER_MACRO_ENDIF
     elif List[1] == 'pragma':
-        Type = DataClass.MODEL_IDENTIFIER_MACRO_PROGMA
+        Type = DataClass.MODEL_IDENTIFIER_MACRO_PRAGMA
     else:
         Type = DataClass.MODEL_UNKNOWN
     return Type

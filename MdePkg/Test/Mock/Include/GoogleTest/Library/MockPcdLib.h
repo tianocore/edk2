@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_PCD_LIB_H_
-#define MOCK_PCD_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -296,5 +295,3 @@ struct MockPcdLib {
     ()
     );
 };
-
-#endif

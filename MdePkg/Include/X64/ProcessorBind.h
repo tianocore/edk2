@@ -89,13 +89,13 @@
 
 //
 // This warning is for potentially uninitialized local variable, and it may cause false
-// positive issues in VS2015 build
+// positive issues in VS build
 //
     #pragma warning ( disable : 4701 )
 
 //
 // This warning is for potentially uninitialized local pointer variable, and it may cause
-// false positive issues in VS2015 build
+// false positive issues in VS build
 //
     #pragma warning ( disable : 4703 )
 

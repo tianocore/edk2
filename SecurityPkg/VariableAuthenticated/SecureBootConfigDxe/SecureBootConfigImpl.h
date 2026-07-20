@@ -159,11 +159,6 @@ typedef struct {
   UINT32    SizeOfCert;             // size of certificate appended
 } EFI_IMAGE_SECURITY_DATA_DIRECTORY;
 
-typedef enum {
-  ImageType_IA32,
-  ImageType_X64
-} IMAGE_TYPE;
-
 ///
 /// HII specific Vendor Device Path definition.
 ///

@@ -53,6 +53,8 @@ typedef enum ArmObjectID {
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
   EArmObjDmc620PmuSocketInfo,                                  ///< 24 - DMC620 Socket Info
   EArmObjDmc620PmuRegInfo,                                     ///< 25 - DMC620 PMU Reg Info
+  EArmObjProcessorSpecificBlockInfo,                           ///< 26 - Processor Specific Block.
+  EArmObjProcessorSpecificSubDataArchInfo,                     ///< 27 - Processor Specific Sub Data (ArchData)
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -776,5 +778,99 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
+
+typedef enum ArmProcessorSpecifcDataSubType {
+  ArmProcessorSpecificDataSubTypeArch,
+  /// Define vendor type from here.
+  ArmProcessorSpecificDataSubTypeMax,
+} ARM_PROCESSOR_SPECIFIC_DATA_SUB_TYPE;
+
+/** A structure that describes the processor specific data.
+
+    ID: EArmObjProcessorSpecificBlockInfo
+*/
+typedef struct CmArmProcessorSpecificBlockInfo {
+  /// Revision for processor specific block
+  UINT16                                  Revision;
+
+  /// Vendor ID.
+  UINT16                                  VendorId;
+
+  /// Sub type of Processor specific block.
+  ARM_PROCESSOR_SPECIFIC_DATA_SUB_TYPE    SubType;
+
+  /// Sub data token relevant to SubType.
+  CM_OBJECT_TOKEN                         SubDataToken;
+} CM_ARM_PROCESSOR_SPECIFIC_BLOCK_INFO;
+
+/** A structure that describes the processor specific sub data
+    (Architecture Data).
+
+    ID: EArmObjProcessorSpecificSubDataArchInfo
+*/
+typedef struct CmArmProcessorSpecificSubDataArchInfo {
+  /// Version for Processor Specific Sub Data (Arch Data).
+  UINT16    Version;
+
+  /// Value of ID_AA64AFR0_EL1.
+  UINT64    IdAA64Afr0;
+
+  /// Value of ID_AA64AFR1_EL1.
+  UINT64    IdAA64Afr1;
+
+  /// Value of ID_AA64DFR0_EL1.
+  UINT64    IdAA64Dfr0;
+
+  /// Value of ID_AA64DFR1_EL1.
+  UINT64    IdAA64Dfr1;
+
+  /// Value of ID_AA64DFR2_EL1.
+  UINT64    IdAA64Dfr2;
+
+  /// Value of ID_AA64FPFR0_EL1.
+  UINT64    IdAA64Fpfr0;
+
+  /// Value of ID_AA64ISAR0_EL1.
+  UINT64    IdAA64Isar0;
+
+  /// Value of ID_AA64ISAR1_EL1.
+  UINT64    IdAA64Isar1;
+
+  /// Value of ID_AA64ISAR2_EL1.
+  UINT64    IdAA64Isar2;
+
+  /// Value of ID_AA64ISAR3_EL1.
+  UINT64    IdAA64Isar3;
+
+  /// Value of ID_AA64MMFR0_EL1.
+  UINT64    IdAA64Mmfr0;
+
+  /// Value of ID_AA64MMFR1_EL1.
+  UINT64    IdAA64Mmfr1;
+
+  /// Value of ID_AA64MMFR2_EL1.
+  UINT64    IdAA64Mmfr2;
+
+  /// Value of ID_AA64MMFR3_EL1.
+  UINT64    IdAA64Mmfr3;
+
+  /// Value of ID_AA64MMFR4_EL1.
+  UINT64    IdAA64Mmfr4;
+
+  /// Value of ID_AA64PFR0_EL1.
+  UINT64    IdAA64Pfr0;
+
+  /// Value of ID_AA64PFR1_EL1.
+  UINT64    IdAA64Pfr1;
+
+  /// Value of ID_AA64PFR2_EL1.
+  UINT64    IdAA64Pfr2;
+
+  /// Value of ID_AA64SMFR0_EL1.
+  UINT64    IdAA64Smfr0;
+
+  /// Value of ID_AA64ZFR0_EL1.
+  UINT64    IdAA64Zfr0;
+} CM_ARM_PROCESSOR_SPECIFIC_SUB_DATA_ARCH_INFO;
 
 #pragma pack()
