@@ -68,6 +68,10 @@
   DynamicPlatRepoLib|DynamicTablesPkg/Library/Common/DynamicPlatRepoLib/DynamicPlatRepoLib.inf
 
   ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorLib/ArmVirtMonitorLib.inf
+  # OpensslLibFull/FullAccel is required for ECDH, see CryptoPkg/Readme.md
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+
+  ArmCcaBootSyncCryptoLib|ArmVirtPkg/Library/ArmCcaBootSyncCryptoLib/ArmCcaBootSyncCryptoLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
@@ -223,6 +227,7 @@
       HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
       PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
       MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
+      NULL|ArmVirtPkg/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortProbeLib.inf
   }
 
   #

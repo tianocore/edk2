@@ -647,6 +647,10 @@ MlDsaVerify (
     return FALSE;
   }
 
+  if ((ContextSize > 0) && (Context == NULL)) {
+    return FALSE;
+  }
+
   Ctx = (KEY_CONTEXT *)MlDsaContext;
   if (Ctx->EvpPkey == NULL) {
     return FALSE;

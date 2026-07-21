@@ -72,7 +72,6 @@ def openssl_configure(openssldir, target, ec = True, lite = True):
         'no-shared',
         'no-siphash',
         'no-siv',
-        'no-slh-dsa',
         'no-sm2',
         'no-sm4',
         'no-sock',
@@ -93,7 +92,7 @@ def openssl_configure(openssldir, target, ec = True, lite = True):
     if not ec:
         cmdline += [ 'no-ec', 'no-camellia', 'no-cmac' ]
     if lite:
-        cmdline += [ 'no-camellia', 'no-dh', 'no-ecx', 'no-ml-dsa' ]
+        cmdline += [ 'no-camellia', 'no-dh', 'no-ecx', 'no-ml-dsa', 'no-slh-dsa' ]
     print('')
     print(f'# -*-  configure openssl for {target} (ec={ec}, lite={lite})  -*-')
     rc = subprocess.run(cmdline, cwd = openssldir,

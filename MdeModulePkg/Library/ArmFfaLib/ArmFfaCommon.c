@@ -749,12 +749,12 @@ ArmFfaLibRun (
   ArmCallFfa (&FfaArgs);
 
   Status = FfaArgsToEfiStatus (&FfaArgs);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   if (DirectMsgArg != NULL) {
     ZeroMem (DirectMsgArg, sizeof (DIRECT_MSG_ARGS));
+
+    // Copy the FFA header to the direct message arguments
+    CopyMem (&(DirectMsgArg->Header), &FfaArgs, sizeof (DirectMsgArg->Header));
 
     if (FfaArgs.Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_RESP) {
       DirectMsgArg->Arg0 = FfaArgs.Arg3;
@@ -790,6 +790,8 @@ ArmFfaLibRun (
   @param [in]      Flags            Message flags
   @param [in, out] ImpDefArgs       Implemented defined arguments and
                                     Implemented defined return values
+                                    The header registers (x0-x2) will be initialized
+                                    with the values from DestPartId and Flags.
 
   @retval EFI_SUCCESS               Success
   @retval Others                    Error
@@ -831,6 +833,7 @@ ArmFfaLibMsgSendDirectReq (
 
   Status = FfaArgsToEfiStatus (&FfaArgs);
   if (EFI_ERROR (Status)) {
+    CopyMem (ImpDefArgs, &FfaArgs, sizeof (DIRECT_MSG_ARGS));
     return Status;
   }
 
@@ -850,6 +853,8 @@ ArmFfaLibMsgSendDirectReq (
   @param [in]       ServiceGuid      Service guid
   @param [in, out]  ImpDefArgs       Implemented defined arguments and
                                      Implemented defined return values
+                                     The header registers (x0-x3) will be
+                                     initialized with the values from DestPartId and ServiceGuid.
 
   @retval EFI_SUCCESS               Success
   @retval Others                    Error
@@ -915,6 +920,7 @@ ArmFfaLibMsgSendDirectReq2 (
 
   Status = FfaArgsToEfiStatus (&FfaArgs);
   if (EFI_ERROR (Status)) {
+    CopyMem (ImpDefArgs, &FfaArgs, sizeof (DIRECT_MSG_ARGS));
     return Status;
   }
 

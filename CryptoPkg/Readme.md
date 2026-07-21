@@ -235,6 +235,8 @@ also configured.
 | Ec                              |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 | Camellia                        |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 | EdDsa                           |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| MlDsa                           |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| SlhDsa                          |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 
 ## Platform Configuration of Cryptographic Services
 
