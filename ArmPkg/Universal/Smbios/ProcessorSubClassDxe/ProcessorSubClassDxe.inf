@@ -55,6 +55,7 @@
   gArmTokenSpaceGuid.PcdProcessorSerialNumber
   gArmTokenSpaceGuid.PcdProcessorAssetTag
   gArmTokenSpaceGuid.PcdProcessorPartNumber
+  gArmTokenSpaceGuid.PcdProcessorSocketType
 
 [Guids]
 

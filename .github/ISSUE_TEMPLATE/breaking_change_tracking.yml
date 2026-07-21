@@ -1,0 +1,51 @@
+# TianoCore edk2 GitHub Breaking Change Tracking Issue Template
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: 💥 Breaking Change (Tracking)
+description: Central tracking issue for a breaking change
+title: "[Breaking Change Tracking]: <title>"
+labels: ["impact:breaking-change", "deprecation:tracking"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        👋 Use this issue to track a breaking change following the
+           [Breaking Change and Release Process for EDK II](https://raw.githubusercontent.com/tianocore/tianocore-wiki.github.io/refs/heads/main/rfc/text/0003-edk2-breaking-change-and-release-process.md).
+
+        **Read that process before filing this issue.**
+
+        This is the central Tracking Issue. The Deprecation Issue and Removal Issue (when applicable) are created as
+        subissues of this one. The detailed documentation for the change (motivation, what replaces it, migration
+        guidance, removal target, etc.) is described in the `BREAKING-CHANGES.md` entry and should not be duplicated
+        here.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A high-level summary of the breaking change (a few sentences).
+    validations:
+      required: true
+
+  - type: input
+    id: breaking_changes_entry
+    attributes:
+      label: BREAKING-CHANGES.md Entry
+      description: Link to the corresponding entry in `BREAKING-CHANGES.md`. May be updated after issue creation.
+      placeholder: https://github.com/tianocore/edk2/blob/master/BREAKING-CHANGES.md#<anchor>
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: |
+        Any other relevant information that is not already captured in the `BREAKING-CHANGES.md` entry. Do not
+        duplicate content from that entry here.
+    validations:
+      required: false

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DxeHobListLib.h>
+#include <Library/UefiLib.h>
 
 /**
   Returns the pointer to the HOB list.
@@ -35,7 +36,13 @@ GetHobList (
   VOID
   )
 {
-  ASSERT (gHobList != NULL);
+  EFI_STATUS  Status;
+
+  if (gHobList == NULL) {
+    Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &gHobList);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return gHobList;
 }
 

@@ -20,6 +20,7 @@
 #include <Api/AmlApiHelper.h>
 #include <Tree/AmlNode.h>
 #include <ResourceData/AmlResourceData.h>
+#include <Utils/AmlUtility.h>
 
 /** If ParentNode is not NULL, append RdNode.
     If NewRdNode is not NULL, update its value to RdNode.
@@ -214,78 +215,6 @@ AddressSpaceGeneralFlags (
   return (IsPosDecode ? 0 : BIT1)    |
          (IsMinFixed ? BIT2 : 0)     |
          (IsMaxFixed ? BIT3 : 0);
-}
-
-/** Check Address Space Descriptor Fields.
-
-  Cf. ACPI 6.4 Table 6.44:
-  "Valid Combination of Address Space Descriptor Fields"
-
-  See ACPI 6.4 spec, s19.6.36 for more.
-
-  @param [in]  IsMinFixed           Minimum address is fixed.
-  @param [in]  IsMaxFixed           Maximum address is fixed.
-  @param [in]  AddressGranularity   Address granularity.
-  @param [in]  AddressMinimum       Minimum address.
-  @param [in]  AddressMaximum       Maximum address.
-  @param [in]  AddressTranslation   Address translation.
-  @param [in]  RangeLength          Range length.
-
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-CheckAddressSpaceFields (
-  IN  BOOLEAN  IsMinFixed,
-  IN  BOOLEAN  IsMaxFixed,
-  IN  UINT64   AddressGranularity,
-  IN  UINT64   AddressMinimum,
-  IN  UINT64   AddressMaximum,
-  IN  UINT64   AddressTranslation,
-  IN  UINT64   RangeLength
-  )
-{
-  if ((AddressMinimum > AddressMaximum)                     ||
-      (RangeLength > (AddressMaximum - AddressMinimum + 1)) ||
-      ((AddressGranularity != 0) &&
-       (((AddressGranularity + 1) & AddressGranularity) != 0)))
-  {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (RangeLength != 0) {
-    if (IsMinFixed ^ IsMaxFixed) {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    } else if (IsMinFixed                 &&
-               IsMaxFixed                 &&
-               (AddressGranularity != 0)  &&
-               ((AddressMaximum - AddressMinimum + 1) != RangeLength))
-    {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    }
-  } else {
-    if (IsMinFixed && IsMaxFixed) {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    } else if (IsMinFixed &&
-               ((AddressMinimum & AddressGranularity) != 0))
-    {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    } else if (IsMaxFixed &&
-               (((AddressMaximum + 1) & AddressGranularity) != 0))
-    {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    }
-  }
-
-  return EFI_SUCCESS;
 }
 
 /** Code generation for the "DWordSpace ()" ASL function.
