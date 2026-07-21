@@ -204,6 +204,7 @@ ParseReservedMemory (
   UINT64                          NumberOfBytes;
   UNIVERSAL_PAYLOAD_ACPI_TABLE    *PlatformAcpiTable;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable;
+  CONST EFI_GUID                  *SmbiosTableGuid;
   FDT_NODE_HEADER                 *NodePtr;
   UINT32                          Attribute;
 
@@ -270,8 +271,21 @@ ParseReservedMemory (
         }
       } else if (AsciiStrnCmp (TempStr, "smbios", AsciiStrLen ("smbios")) == 0) {
         DEBUG ((DEBUG_INFO, " build smbios, NumberOfBytes:%x\n", NumberOfBytes));
+        if ((NumberOfBytes >= SMBIOS_3_0_ANCHOR_STRING_LENGTH) &&
+            (CompareMem ((VOID *)(UINTN)StartAddress, SMBIOS_3_0_ANCHOR_STRING, SMBIOS_3_0_ANCHOR_STRING_LENGTH) == 0))
+        {
+          SmbiosTableGuid = &gUniversalPayloadSmbios3TableGuid;
+        } else if ((NumberOfBytes >= SMBIOS_ANCHOR_STRING_LENGTH) &&
+                   (CompareMem ((VOID *)(UINTN)StartAddress, SMBIOS_ANCHOR_STRING, SMBIOS_ANCHOR_STRING_LENGTH) == 0))
+        {
+          SmbiosTableGuid = &gUniversalPayloadSmbiosTableGuid;
+        } else {
+          DEBUG ((DEBUG_ERROR, " invalid SMBIOS entry point at %Lx\n", StartAddress));
+          goto FallbackType;
+        }
+
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
-        SmbiosTable = BuildGuidHob (&gUniversalPayloadSmbios3TableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+        SmbiosTable = BuildGuidHob (SmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
         if (SmbiosTable != NULL) {
           SmbiosTable->Header.Revision  = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
           SmbiosTable->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
