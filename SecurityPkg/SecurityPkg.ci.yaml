@@ -31,7 +31,9 @@
             "Library/Tpm2CommandLib/Tpm2NVStorage.c",
             "DeviceSecurity/SpdmLib/Include",
             "DeviceSecurity/SpdmLib/libspdm",
-            "DeviceSecurity/OsStub"
+            "DeviceSecurity/OsStub",
+            # Ignore test binary files in headers
+            "Library/DxeImageVerificationLib/GoogleTest"
         ]
     },
     "CompilerPlugin": {

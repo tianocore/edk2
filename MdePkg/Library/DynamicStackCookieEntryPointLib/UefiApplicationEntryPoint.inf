@@ -18,7 +18,7 @@
   LIBRARY_CLASS                  = UefiApplicationEntryPoint|UEFI_APPLICATION
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 LOONGARCH64
 #
 
 [Sources]
@@ -35,6 +35,9 @@
 [Sources.AARCH64]
   AArch64/DynamicCookieGcc.S | GCC
 
+[Sources.LOONGARCH64]
+  LoongArch64/DynamicCookieGcc.S | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -43,3 +46,6 @@
   DebugLib
   BaseLib
   StackCheckLib
+
+[LibraryClasses.LOONGARCH64]
+  RngLib

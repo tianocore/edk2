@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_TRANSPORT_MCTP_LIB_H_
-#define MANAGEABILITY_TRANSPORT_MCTP_LIB_H_
+#pragma once
 
 #include <Library/ManageabilityTransportLib.h>
 
@@ -55,5 +54,3 @@ typedef struct {
 #define MCTP_MESSAGE_TAG_OWNER_RESPONSE  0
 
 #define MCTP_PACKET_SEQUENCE_MASK  0x3
-
-#endif // MANAGEABILITY_TRANSPORT_MCTP_LIB_H_

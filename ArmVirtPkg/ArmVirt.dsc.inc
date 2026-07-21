@@ -51,6 +51,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 !else
@@ -378,8 +379,8 @@ DEFINE FD_SIZE_IN_MB    = 3
   # (the memory used, and the free memory that was prereserved
   # but not used).
   #
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|4
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x3C
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|600
@@ -387,7 +388,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|1500
 !else
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|300
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|150
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x424
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|1000
 !endif
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|12000

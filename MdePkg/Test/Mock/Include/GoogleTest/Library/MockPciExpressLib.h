@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_PCI_EXPRESS_LIB_H_
-#define MOCK_PCI_EXPRESS_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -41,5 +40,3 @@ struct MockPciExpressLib {
     )
     );
 };
-
-#endif //MOCK_PCI_EXPRESS_LIB_H_

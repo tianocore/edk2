@@ -1705,9 +1705,13 @@ DxeImageVerificationHandler (
   IsFoundInDatabase = FALSE;
 
   //
-  // Sanity check
+  // Sanity check:
+  // Ensure that either File or FileBuffer is provided.
+  // Return EFI_INVALID_PARAMETER if both are NULL.
+  // This prevents security verification from proceeding
+  // when no valid input buffer is available.
   //
-  if (File == NULL) {
+  if ((File == NULL) && (FileBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

@@ -2948,7 +2948,13 @@ SdPeimIdentification (
         goto Error;
       }
 
-      SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+      Status = SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimHcRwMmio fails with %r\n", Status));
+        Status = EFI_DEVICE_ERROR;
+        goto Error;
+      }
+
       if (((PresentState >> 20) & 0xF) != 0) {
         DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SwitchVoltage fails with PresentState = 0x%x\n", PresentState));
         Status = EFI_DEVICE_ERROR;
@@ -2960,7 +2966,13 @@ SdPeimIdentification (
 
       MicroSecondDelay (5000);
 
-      SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
+      Status = SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimHcRwMmio fails with %r\n", Status));
+        Status = EFI_DEVICE_ERROR;
+        goto Error;
+      }
+
       if ((HostCtrl2 & BIT3) == 0) {
         DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SwitchVoltage fails with HostCtrl2 = 0x%x\n", HostCtrl2));
         Status = EFI_DEVICE_ERROR;
@@ -2971,7 +2983,13 @@ SdPeimIdentification (
 
       MicroSecondDelay (1000);
 
-      SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+      Status = SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimHcRwMmio fails with %r\n", Status));
+        Status = EFI_DEVICE_ERROR;
+        goto Error;
+      }
+
       if (((PresentState >> 20) & 0xF) != 0xF) {
         DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
         Status = EFI_DEVICE_ERROR;
