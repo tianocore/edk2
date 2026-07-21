@@ -1,0 +1,40 @@
+## @file
+# Host-based unit tests for GptLib.
+#
+# Exercises PartitionValidGptTable(), PartitionCheckGptEntry() and
+# PartitionRestoreGptTable() against an in-memory mock disk, covering both
+# well-formed GPT structures and malformed ones an attacker may present.
+#
+# Copyright (c) 2026, SUSE LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = GptLibUnitTestHost
+  FILE_GUID                      = 2F5B4C8E-6D3A-4B1F-9E07-8A2C5D14E6B3
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  GptLibUnitTestCommon.h
+  GptLibUnitTestCommon.c
+  GptLibUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  GptLib
+  UnitTestLib
