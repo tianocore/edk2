@@ -73,6 +73,12 @@
 
   ArmCcaBootSyncCryptoLib|ArmVirtPkg/Library/ArmCcaBootSyncCryptoLib/ArmCcaBootSyncCryptoLib.inf
 
+  ArmCcaLib|ArmVirtPkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|ArmVirtPkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+
+[LibraryClasses.common.SEC]
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
+
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
   PlatformHookLib|ArmVirtPkg/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortHookLib.inf
@@ -221,6 +227,7 @@
   #
   ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf {
     <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
@@ -283,3 +290,13 @@
   # ACPI Support
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
+
+  #
+  # Realm Aperture Management
+  #
+  ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
