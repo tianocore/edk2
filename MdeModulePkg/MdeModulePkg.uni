@@ -865,6 +865,11 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBootManagerMenuFile_HELP  #language en-US "This PCD points to the file name GUID of the BootManagerMenuApp\n"
                                                                                         "Platform can customize the PCD to point to different application for Boot Manager Menu"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFindLoadOptionIgnoreDescription_PROMPT  #language en-US "Ignore load option description when finding a matching load option"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFindLoadOptionIgnoreDescription_HELP  #language en-US "When TRUE, EfiBootManagerFindLoadOption() treats two load options as equal without comparing the Description string.\n"
+                                                                                              "OptionType, Attributes, FilePath, and OptionalData must still match."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdDriverHealthConfigureForm_PROMPT  #language en-US "Driver Health Management Form"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdDriverHealthConfigureForm_HELP  #language en-US "This PCD points to the formset GUID of the driver health management form\n"
