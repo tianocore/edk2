@@ -305,45 +305,70 @@ ParseFrameBuffer (
   CONST CHAR8                *TempStr;
   UINT32                     *Data32;
   UINT64                     FrameBufferBase;
-  UINT32                     FrameBufferSize;
+  UINT64                     FrameBufferSize;
+  UINT32                     Width;
+  UINT32                     Height;
+  UINT32                     Stride;
+  EFI_GRAPHICS_PIXEL_FORMAT  PixelFormat;
   EFI_PEI_GRAPHICS_INFO_HOB  *GraphicsInfo;
   CHAR8                      *GmaStr;
+  BOOLEAN                    HasReg;
 
-  GmaStr = "Gma";
-  //
-  // Create GraphicInfo HOB.
-  //
-  GraphicsInfo = BuildGuidHob (&gEfiGraphicsInfoHobGuid, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
-  ASSERT (GraphicsInfo != NULL);
-  if (GraphicsInfo == NULL) {
-    return GmaStr;
-  }
-
-  ZeroMem (GraphicsInfo, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
+  GmaStr          = "Gma";
+  FrameBufferBase = 0;
+  FrameBufferSize = 0;
+  Width           = 0;
+  Height          = 0;
+  Stride          = 0;
+  PixelFormat     = PixelFormatMax;
+  HasReg          = FALSE;
 
   for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
     PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
     TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
     if (AsciiStrCmp (TempStr, "reg") == 0) {
-      Data32                        = (UINT32 *)(PropertyPtr->Data);
-      FrameBufferBase               = Fdt32ToCpu (*(Data32 + 0));
-      FrameBufferSize               = Fdt32ToCpu (*(Data32 + 1));
-      GraphicsInfo->FrameBufferBase = FrameBufferBase;
-      GraphicsInfo->FrameBufferSize = (UINT32)FrameBufferSize;
+      if (TempLen != (2 * sizeof (UINT64))) {
+        DEBUG ((DEBUG_ERROR, "Framebuffer reg must contain 64-bit address and size cells\n"));
+        return GmaStr;
+      }
+
+      FrameBufferBase = Fdt64ToCpu (ReadUnaligned64 ((CONST UINT64 *)&PropertyPtr->Data[0]));
+      FrameBufferSize = Fdt64ToCpu (ReadUnaligned64 ((CONST UINT64 *)&PropertyPtr->Data[sizeof (UINT64)]));
+      HasReg          = TRUE;
     } else if (AsciiStrCmp (TempStr, "width") == 0) {
-      Data32                                          = (UINT32 *)(PropertyPtr->Data);
-      GraphicsInfo->GraphicsMode.HorizontalResolution = Fdt32ToCpu (*Data32);
+      if (TempLen != sizeof (UINT32)) {
+        return GmaStr;
+      }
+
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+      Width  = Fdt32ToCpu (ReadUnaligned32 (Data32));
     } else if (AsciiStrCmp (TempStr, "height") == 0) {
-      Data32                                        = (UINT32 *)(PropertyPtr->Data);
-      GraphicsInfo->GraphicsMode.VerticalResolution = Fdt32ToCpu (*Data32);
+      if (TempLen != sizeof (UINT32)) {
+        return GmaStr;
+      }
+
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+      Height = Fdt32ToCpu (ReadUnaligned32 (Data32));
+    } else if (AsciiStrCmp (TempStr, "stride") == 0) {
+      if (TempLen != sizeof (UINT32)) {
+        return GmaStr;
+      }
+
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+      Stride = Fdt32ToCpu (ReadUnaligned32 (Data32));
     } else if (AsciiStrCmp (TempStr, "format") == 0) {
+      if (TempLen != sizeof ("a8r8g8b8")) {
+        return GmaStr;
+      }
+
       TempStr = (CHAR8 *)(PropertyPtr->Data);
-      if (AsciiStrCmp (TempStr, "a8r8g8b8") == 0) {
-        GraphicsInfo->GraphicsMode.PixelFormat = PixelRedGreenBlueReserved8BitPerColor;
-      } else if (AsciiStrCmp (TempStr, "a8b8g8r8") == 0) {
-        GraphicsInfo->GraphicsMode.PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
+      if ((AsciiStrCmp (TempStr, "a8r8g8b8") == 0) || (AsciiStrCmp (TempStr, "x8r8g8b8") == 0)) {
+        PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
+      } else if ((AsciiStrCmp (TempStr, "a8b8g8r8") == 0) || (AsciiStrCmp (TempStr, "x8b8g8r8") == 0)) {
+        PixelFormat = PixelRedGreenBlueReserved8BitPerColor;
       } else {
-        GraphicsInfo->GraphicsMode.PixelFormat = PixelFormatMax;
+        DEBUG ((DEBUG_ERROR, "Unsupported framebuffer format: %a\n", TempStr));
+        return GmaStr;
       }
     } else if (AsciiStrCmp (TempStr, "display") == 0) {
       GmaStr = (CHAR8 *)(PropertyPtr->Data);
@@ -351,9 +376,30 @@ ParseFrameBuffer (
       DEBUG ((DEBUG_INFO, "  display (%s)", GmaStr));
     }
 
-    // In most case, PixelsPerScanLine is identical to HorizontalResolution
-    GraphicsInfo->GraphicsMode.PixelsPerScanLine = GraphicsInfo->GraphicsMode.HorizontalResolution;
   }
+
+  if (!HasReg || (FrameBufferSize > MAX_UINT32) || (Width == 0) || (Height == 0) ||
+      (Width > (MAX_UINT32 / sizeof (UINT32))) ||
+      (Stride < (Width * sizeof (UINT32))) || ((Stride % sizeof (UINT32)) != 0) ||
+      ((UINT64)Stride * Height > FrameBufferSize) || (PixelFormat == PixelFormatMax))
+  {
+    DEBUG ((DEBUG_ERROR, "Framebuffer node is incomplete or invalid\n"));
+    return GmaStr;
+  }
+
+  GraphicsInfo = BuildGuidHob (&gEfiGraphicsInfoHobGuid, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
+  ASSERT (GraphicsInfo != NULL);
+  if (GraphicsInfo == NULL) {
+    return GmaStr;
+  }
+
+  ZeroMem (GraphicsInfo, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
+  GraphicsInfo->FrameBufferBase                          = FrameBufferBase;
+  GraphicsInfo->FrameBufferSize                          = (UINT32)FrameBufferSize;
+  GraphicsInfo->GraphicsMode.HorizontalResolution        = Width;
+  GraphicsInfo->GraphicsMode.VerticalResolution          = Height;
+  GraphicsInfo->GraphicsMode.PixelFormat                 = PixelFormat;
+  GraphicsInfo->GraphicsMode.PixelsPerScanLine           = Stride / sizeof (UINT32);
 
   return GmaStr;
 }
