@@ -2,6 +2,7 @@
   PCI Host Bridge Library instance for pci-ecam-generic DT nodes
 
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,7 +11,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/DxeServicesTableLib.h>
+#include <Library/MapMmioLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciHostBridgeLib.h>
@@ -41,46 +42,6 @@ typedef struct {
 #define DTB_PCI_HOST_RANGE_MMIO64        (BIT25 | BIT24)
 #define DTB_PCI_HOST_RANGE_IO            BIT24
 #define DTB_PCI_HOST_RANGE_TYPEMASK      (BIT31 | BIT30 | BIT29 | BIT25 | BIT24)
-
-STATIC
-EFI_STATUS
-MapGcdMmioSpace (
-  IN    UINT64  Base,
-  IN    UINT64  Size
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo,
-                  Base,
-                  Size,
-                  EFI_MEMORY_UC
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: failed to add GCD memory space for region [0x%Lx+0x%Lx)\n",
-      __func__,
-      Base,
-      Size
-      ));
-    return Status;
-  }
-
-  Status = gDS->SetMemorySpaceAttributes (Base, Size, EFI_MEMORY_UC);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: failed to set memory space attributes for region [0x%Lx+0x%Lx)\n",
-      __func__,
-      Base,
-      Size
-      ));
-  }
-
-  return Status;
-}
 
 STATIC
 EFI_STATUS
@@ -322,7 +283,7 @@ ProcessPciHost (
     ));
 
   // Map the ECAM space in the GCD memory map
-  Status = MapGcdMmioSpace (ConfigBase, ConfigSize);
+  Status = MapMmioMemory (ConfigBase, ConfigSize, EFI_MEMORY_UC);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -334,7 +295,23 @@ ProcessPciHost (
     // is not aware of this translation and so it will only map the I/O view
     // in the GCD I/O map.
     //
-    Status = MapGcdMmioSpace (*IoBase + IoTranslation, *IoSize);
+    Status = MapMmioMemory (*IoBase + IoTranslation, *IoSize, EFI_MEMORY_UC);
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (*Mmio32Size != 0) {
+    Status = MapMmioMemory (*Mmio32Base, *Mmio32Size, EFI_MEMORY_UC);
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (*Mmio64Size != 0) {
+    Status = MapMmioMemory (*Mmio64Base, *Mmio64Size, EFI_MEMORY_UC);
     ASSERT_EFI_ERROR (Status);
   }
 

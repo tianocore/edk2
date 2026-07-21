@@ -66,6 +66,7 @@
   Pk/CryptEc.c
   Pk/CryptEdDsa.c
   Pk/CryptMlDsa.c
+  Pk/CryptSlhDsa.c
   Pem/CryptPem.c
   Bn/CryptBn.c
 

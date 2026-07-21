@@ -293,9 +293,6 @@ extern "C" {
 # ifndef OPENSSL_NO_SIV
 #  define OPENSSL_NO_SIV
 # endif
-# ifndef OPENSSL_NO_SLH_DSA
-#  define OPENSSL_NO_SLH_DSA
-# endif
 # ifndef OPENSSL_NO_SM2
 #  define OPENSSL_NO_SM2
 # endif
