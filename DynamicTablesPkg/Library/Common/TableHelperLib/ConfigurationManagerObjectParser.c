@@ -1248,6 +1248,30 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryChannelInfoParser[] = {
   { "MemoryDeviceListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
+/** A parser for EArchCommonObjAdditionalInformation.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationParser[] = {
+  { "AdditionalInformationToken",          sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "AdditionalInformationEntryListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjAdditionalInformationEntry.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationEntryParser[] = {
+  { "ReferencedObjectToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ReferencedTableGeneratorId", sizeof (UINT32),          "0x%x", NULL        },
+  { "ReferencedOffset",           sizeof (UINT8),           "0x%x", NULL        },
+  { "EntryString",                SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ValueToken",                 sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+};
+
+/** A parser for EArchCommonObjAdditionalInformationValue.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationValueParser[] = {
+  { "Len",   sizeof (UINT8),                               "0x%x", NULL    },
+  { "Value", SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE, NULL,   HexDump },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1415,6 +1439,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryChannelDevice,                 CmArchCommonMemoryChannelDeviceParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjProcessorSpecificBlockInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemInfo,                          CmArchCommonSystemInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformation,               CmArchCommonAdditionalInformationParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationEntry,          CmArchCommonAdditionalInformationEntryParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationValue,          CmArchCommonAdditionalInformationValueParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

@@ -34,6 +34,23 @@
 // Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
 #define CFMWS_MAX_INTERLEAVE_WAYS  (16)
 
+/**
+  Maximum number of Value bytes that can fit in a single-entry SMBIOS Type 40
+  formatted structure.
+
+  The SMBIOS formatted length is limited to MAX_UINT8. Five bytes are required
+  for the SMBIOS Type 40 header and NumberOfAdditionalInformationEntries, and
+  five bytes are required for the fixed portion of an Additional Information
+  Entry:
+
+    MAX_UINT8 - 5 - 5 = 245 bytes.
+
+  A Type 40 structure containing multiple entries may have a smaller effective
+  maximum per entry. The generator must therefore also validate the aggregate
+  formatted length.
+**/
+#define SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE  245
+
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
 */
@@ -107,6 +124,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
   EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
   EArchCommonObjSystemInfo,                     ///< 67 - System Info
+  EArchCommonObjAdditionalInformation,          ///< 68 - Additional Information
+  EArchCommonObjAdditionalInformationEntry,     ///< 69 - Additional Information Entry
+  EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1762,5 +1782,58 @@ typedef struct CmArchCommonSystemInfo {
   /// Family that the system belongs to.
   CHAR8              Family[SMBIOS_MAX_STRING_SIZE];
 } CM_ARCH_COMMON_SYSTEM_INFO;
+
+/** A structure that describes SMBIOS Additional Information.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformation
+**/
+typedef struct CmArchCommonAdditionalInformation {
+  /// CM Object Token uniquely identifying this Additional Information structure.
+  CM_OBJECT_TOKEN    AdditionalInformationToken;
+
+  /// Token referencing an array of Additional Information Entry structures.
+  CM_OBJECT_TOKEN    AdditionalInformationEntryListToken;
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION;
+
+/** A structure that describes an Additional Information Entry.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformationEntry
+**/
+typedef struct CmArchCommonAdditionalInformationEntry {
+  /// CM Object Token of the SMBIOS structure referenced by this entry.
+  CM_OBJECT_TOKEN    ReferencedObjectToken;
+
+  /// SMBIOS table generator ID for the referenced structure.
+  /// Allows to find the handle of the Smbios table to update.
+  UINT32             ReferencedTableGeneratorId;
+
+  /// Offset of the referenced field in the referenced SMBIOS structure.
+  UINT8              ReferencedOffset;
+
+  /// String describing the additional information entry.
+  /// Optional for SMBIOS spec. update already proposed.
+  CHAR8              EntryString[SMBIOS_MAX_STRING_SIZE];
+
+  /// Token referencing an Additional Information Value structure.
+  CM_OBJECT_TOKEN    ValueToken;
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION_ENTRY;
+
+/** A structure that describes an Additional Information Value.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformationValue
+**/
+typedef struct CmArchCommonAdditionalInformationValue {
+  /// Number of valid bytes in the Value array.
+  UINT8    Len;
+
+  /// Additional Information Value bytes.
+  UINT8    Value[SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE];
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION_VALUE;
 
 #pragma pack()
