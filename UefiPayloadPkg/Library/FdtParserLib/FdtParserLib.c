@@ -968,7 +968,7 @@ ParseDtb (
   CHAR8                 *GmaStr;
   UINTN                 PciRbArrayIndex;
   INT32                 *PciRbNodes;
-  UINT8                 ReservedMemoryDepth;
+  INT32                 ReservedMemoryDepth;
   INTN                  NumRsv;
   EFI_PHYSICAL_ADDRESS  Addr;
   UINT64                Size;
@@ -996,7 +996,7 @@ ParseDtb (
   RootAddressCells    = 2;
   GmaStr              = "<NULL>";
   PciRbArrayIndex     = 0;
-  ReservedMemoryDepth = 0xFF;
+  ReservedMemoryDepth = -1;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
   DEBUG ((DEBUG_INFO, "Start parsing DTB data\n"));
@@ -1015,11 +1015,11 @@ ParseDtb (
     // Ensure we don't submit a child of reserved-memory as main memory block.
     NodeType = CheckNodeType (NodePtr->Name, Depth);
     // Already found reserved block.
-    if ((ReservedMemoryDepth != 0xFF) && (Depth > ReservedMemoryDepth)) {
+    if ((ReservedMemoryDepth >= 0) && (Depth > ReservedMemoryDepth)) {
       DEBUG ((DEBUG_INFO, "Skipping reserved-memory block.\n"));
       continue;
-    } else if ((ReservedMemoryDepth != 0xFF) && (Depth <= ReservedMemoryDepth)) {
-      ReservedMemoryDepth = 0xFF;
+    } else if ((ReservedMemoryDepth >= 0) && (Depth <= ReservedMemoryDepth)) {
+      ReservedMemoryDepth = -1;
     }
 
     // Newly found reserved block.
@@ -1090,15 +1090,15 @@ ParseDtb (
 
   index               = RootBridgeCount - 1;
   Depth               = 0;
-  ReservedMemoryDepth = 0xFF;
+  ReservedMemoryDepth = -1;
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
 
     // Ensure we don't parse a child of reserved-memory as main memory block.
     NodeType = CheckNodeType (NodePtr->Name, Depth);
-    if ((ReservedMemoryDepth != 0xFF) && (Depth <= ReservedMemoryDepth)) {
-      ReservedMemoryDepth = 0xFF;
+    if ((ReservedMemoryDepth >= 0) && (Depth <= ReservedMemoryDepth)) {
+      ReservedMemoryDepth = -1;
     }
 
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
@@ -1122,7 +1122,7 @@ ParseDtb (
         break;
       case Memory:
         DEBUG ((DEBUG_INFO, "ParseMemory\n"));
-        if ((ReservedMemoryDepth != 0xFF) && (Depth > ReservedMemoryDepth)) {
+        if ((ReservedMemoryDepth >= 0) && (Depth > ReservedMemoryDepth)) {
           DEBUG ((DEBUG_INFO, "Memory has initialized\n"));
         } else {
           ParseMemory (Fdt, Node);
