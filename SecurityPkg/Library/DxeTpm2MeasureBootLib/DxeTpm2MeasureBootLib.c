@@ -44,6 +44,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeCoffLib.h>
 #include <Library/SecurityManagementLib.h>
 #include <Library/HobLib.h>
+#include <Library/GptLib.h>
 #include <Protocol/CcMeasurement.h>
 
 #include "DxeTpm2MeasureBootLibSanitization.h"
@@ -140,6 +141,7 @@ Tcg2MeasureGptTable (
   EFI_BLOCK_IO_PROTOCOL        *BlockIo;
   EFI_DISK_IO_PROTOCOL         *DiskIo;
   EFI_PARTITION_TABLE_HEADER   *PrimaryHeader;
+  EFI_PARTITION_TABLE_HEADER   *BackupHeader;
   EFI_PARTITION_ENTRY          *PartitionEntry;
   UINT8                        *EntryPtr;
   UINTN                        NumberOfPartition;
@@ -159,6 +161,7 @@ Tcg2MeasureGptTable (
   }
 
   PrimaryHeader = NULL;
+  BackupHeader  = NULL;
   EntryPtr      = NULL;
   EventPtr      = NULL;
 
@@ -186,24 +189,45 @@ Tcg2MeasureGptTable (
   }
 
   //
-  // Read the EFI Partition Table Header
+  // Obtain the GPT partition table header that the platform actually parses
+  // and uses, applying the same strict validation (including the header CRC32
+  // and the partition-entry-array CRC32) as the PartitionDxe driver, via the
+  // shared GptLib parser. Previously this code read LBA 1 directly and
+  // validated it with a relaxed, CRC-less check, which allowed the table
+  // measured into PCR[5] to differ from the table the driver actually used
+  // (CVE-2024-13745).
   //
-  PrimaryHeader = (EFI_PARTITION_TABLE_HEADER *)AllocatePool (BlockIo->Media->BlockSize);
+  PrimaryHeader = (EFI_PARTITION_TABLE_HEADER *)AllocatePool (sizeof (EFI_PARTITION_TABLE_HEADER));
   if (PrimaryHeader == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = DiskIo->ReadDisk (
-                     DiskIo,
-                     BlockIo->Media->MediaId,
-                     1 * BlockIo->Media->BlockSize,
-                     BlockIo->Media->BlockSize,
-                     (UINT8 *)PrimaryHeader
-                     );
-  if (EFI_ERROR (Status) || EFI_ERROR (Tpm2SanitizeEfiPartitionTableHeader (PrimaryHeader, BlockIo))) {
-    DEBUG ((DEBUG_ERROR, "Failed to read Partition Table Header or invalid Partition Table Header!\n"));
-    FreePool (PrimaryHeader);
-    return EFI_DEVICE_ERROR;
+  if (!PartitionValidGptTable (BlockIo, DiskIo, PRIMARY_PART_HEADER_LBA, PrimaryHeader)) {
+    //
+    // The primary GPT header is not valid. Mirror the driver's recovery
+    // selection: when a valid backup header exists, the driver restores and
+    // then uses the header located at the backup's AlternateLBA. Validate and
+    // use that same header (read-only) so the measured table matches the used
+    // one. If neither the primary nor the backup table is valid, fail closed
+    // and measure nothing.
+    //
+    BackupHeader = (EFI_PARTITION_TABLE_HEADER *)AllocatePool (sizeof (EFI_PARTITION_TABLE_HEADER));
+    if (BackupHeader == NULL) {
+      FreePool (PrimaryHeader);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    if (!PartitionValidGptTable (BlockIo, DiskIo, BlockIo->Media->LastBlock, BackupHeader) ||
+        !PartitionValidGptTable (BlockIo, DiskIo, BackupHeader->AlternateLBA, PrimaryHeader))
+    {
+      DEBUG ((DEBUG_ERROR, "Failed to obtain a valid GPT partition table header to measure!\n"));
+      FreePool (BackupHeader);
+      FreePool (PrimaryHeader);
+      return EFI_DEVICE_ERROR;
+    }
+
+    FreePool (BackupHeader);
+    BackupHeader = NULL;
   }
 
   //
@@ -236,6 +260,14 @@ Tcg2MeasureGptTable (
 
   //
   // Count the valid partition
+  //
+  // Empty entries (zero PartitionTypeGUID) are intentionally not measured
+  // individually. Their content is already fully covered by the
+  // partition-entry-array CRC32, which PartitionValidGptTable() verified above
+  // before any data was measured. Any tampering with an empty entry therefore
+  // changes that CRC32 and makes the primary GPT validation fail (causing a
+  // fall back to the backup, or a fail-closed with no PCR[5] extend), so
+  // re-measuring the all-zero entries would add no additional protection.
   //
   PartitionEntry    = (EFI_PARTITION_ENTRY *)EntryPtr;
   NumberOfPartition = 0;
@@ -548,7 +580,7 @@ GetMeasureBootProtocols (
     ZeroMem (&CcProtocolCapability, sizeof (CcProtocolCapability));
     CcProtocolCapability.Size = sizeof (CcProtocolCapability);
     Status                    = CcProtocol->GetCapability (CcProtocol, &CcProtocolCapability);
-    if (EFI_ERROR (Status) || (CcProtocolCapability.CcType.Type == EFI_CC_TYPE_NONE)) {
+    if (EFI_ERROR (Status) || (CcProtocolCapability.CcType.Type == EFI_ACPI_6_5_CC_TYPE_NONE)) {
       DEBUG ((DEBUG_ERROR, " CcProtocol->GetCapability returns : %x, %r\n", CcProtocolCapability.CcType.Type, Status));
       CcProtocol = NULL;
     }

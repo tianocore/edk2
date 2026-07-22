@@ -29,8 +29,12 @@
 
 [Includes.Common.Private]
   Library/BrotliCustomDecompressLib/brotli/c/include
+  Core/PrivateInclude
 
 [LibraryClasses]
+  ##  @libraryclass  Provides GPT partition table parsing and validation routines.
+  GptLib|Include/Library/GptLib.h
+
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
@@ -881,6 +885,12 @@
   # @Prompt Enable PCI bridge IO alignment probe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x0001004e
 
+  ## Indicates if the PciBus driver scans functions 1..7 when function 0 is absent.<BR>
+  #   TRUE  - PciBus driver scans non-zero functions when Function 0 is absent.<BR>
+  #   FALSE - PciBus driver skips the device when Function 0 is absent.<BR>
+  # @Prompt Enable scanning PCI functions 1..7 without Function 0.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciScanFuncIfFunc0Absent|FALSE|BOOLEAN|0x0001007a
+
   ## Indicates if PEI phase StatusCode will be replayed in DXE phase.<BR><BR>
   #   TRUE  - Replays PEI phase StatusCode in DXE phased.<BR>
   #   FALSE - Does not replay PEI phase StatusCode in DXE phase.<BR>
@@ -984,6 +994,18 @@
   #   FALSE - Does not support process non-reset capsule image at runtime.<BR>
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
+
+  ## Indicates if the PEI memory bins feature is allowed to be enabled.
+  #  TRUE  - The PEI memory bins feature is allowed to be enabled. The platform must also produce the
+  #          gEfiMemoryTypeInformationGuid HOB prior to permanent memory installation in order to enroll in the
+  #          feature.
+  #  FALSE - The PEI memory bins feature is not allowed to be enabled. If the gEfiMemoryTypeInformationGuid HOB
+  #          is produced by the platform in PEI, DXE will set up the memory bins. If not, no memory bins will be
+  #          used.
+  #
+  # This PCD defaults to FALSE to follow the same behavior prior to the PEI memory bins feature being introduced.
+  # See MdeModulePkg/Core/MemoryBins.md for more details.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|FALSE|BOOLEAN|0x00010080
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
@@ -2083,7 +2105,7 @@
 
   ## SMBIOS version.
   # @Prompt SMBIOS version.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0303|UINT16|0x00010055
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0308|UINT16|0x00010055
 
   ## SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
   # @Prompt SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.

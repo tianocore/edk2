@@ -53,6 +53,14 @@ typedef struct ArmFfaArgs {
  *  FFA_SEND_MSG_DIRECT_REQ2/FFA_SEND_MSG_DIRECT_RESP2 (i.e. v2)
  */
 typedef struct DirectMsgArgs {
+  /// Header containing the arguments for the header registers (x0-x2 (v1) or x0-x3 (v2))
+  struct {
+    UINTN    x0;
+    UINTN    x1;
+    UINTN    x2;
+    UINTN    x3;
+  } Header;
+
   /// Implementation define argument 0, this will be set to/from x3(v1) or x4(v2)
   UINTN    Arg0;
 
@@ -95,6 +103,8 @@ typedef struct DirectMsgArgs {
   /// Implementation define argument 13, this will be set to/from x17(v2)
   UINTN    Arg13;
 } DIRECT_MSG_ARGS;
+
+STATIC_ASSERT (sizeof (DIRECT_MSG_ARGS) == sizeof (ARM_FFA_ARGS), "DIRECT_MSG_ARGS and ARM_FFA_ARGS must be the same size");
 
 /**
   Trigger FF-A ABI call according to PcdFfaLibConduitSmc.

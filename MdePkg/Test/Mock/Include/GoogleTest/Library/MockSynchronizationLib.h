@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_SYNCHRONIZATION_LIB_H_
-#define MOCK_SYNCHRONIZATION_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -114,5 +113,3 @@ struct MockSynchronizationLib {
     )
     );
 };
-
-#endif //MOCK_SYNCHRONIZATION_LIB_H_

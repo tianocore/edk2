@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_TRANSPORT_SERIAL_LIB_H_
-#define MANAGEABILITY_TRANSPORT_SERIAL_LIB_H_
+#pragma once
 
 #include <IndustryStandard/IpmiNetFnApp.h>
 #include <Library/ManageabilityTransportIpmiLib.h>
@@ -89,5 +88,3 @@ SerialTransportSendCommand (
   IN  OUT UINT32                                  *ResponseDataSize OPTIONAL,
   OUT  MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  *AdditionalStatus
   );
-
-#endif

@@ -102,6 +102,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
   PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
 
   # Virtio Support

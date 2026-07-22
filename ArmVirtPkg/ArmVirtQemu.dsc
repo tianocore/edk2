@@ -147,6 +147,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 !endif
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|TRUE
 
 [PcdsFixedAtBuild.common]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x00000000
@@ -437,7 +438,7 @@
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0
   }
-  OvmfPkg/VirtioKeyboardDxe/VirtioKeyboard.inf
+  OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {

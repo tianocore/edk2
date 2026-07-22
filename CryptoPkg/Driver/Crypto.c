@@ -7313,6 +7313,834 @@ CryptoServiceEcDsaVerify (
   return CALL_BASECRYPTLIB (Ec.Services.DsaVerify, EcDsaVerify, (EcContext, HashNid, MessageHash, HashSize, Signature, SigSize), FALSE);
 }
 
+/**
+  Creates a new EdDSA context by Crypto NID.
+
+  This function allocates and initializes a new EdDSA context for the specified
+  curve. The context stores the curve NID and will hold an EVP_PKEY structure
+  after a key is set. The caller must call EdDsaFree() to release the context
+  when done.
+
+  Before keys can be used for signing or verification, they must be set using
+  EdDsaSetPrivKey() or EdDsaSetPubKey().
+
+  If Nid is not a supported EdDSA curve, then return NULL.
+  If memory allocation fails, then return NULL.
+
+  @param[in]  Nid   Crypto NID of the EdDSA curve (e.g., CRYPTO_NID_ED448).
+
+  @retval Pointer to new EdDSA context if successful.
+  @retval NULL if Nid is unsupported or allocation failed.
+
+**/
+VOID *
+EFIAPI
+CryptoServiceEdDsaNewByNid (
+  IN UINTN  Nid
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.NewByNid, EdDsaNewByNid, (Nid), NULL);
+}
+
+/**
+  Frees an EdDSA context and all associated resources.
+
+  This function releases all memory associated with the EdDSA context, including
+  the EVP_PKEY structure. After calling this function, the EdDsaContext pointer
+  should not be used.
+
+  If EdDsaContext is NULL, then this function returns immediately without action.
+
+  @param[in]  EdDsaContext  Pointer to the EdDSA context to be released.
+
+**/
+VOID
+EFIAPI
+CryptoServiceEdDsaFree (
+  IN VOID  *EdDsaContext
+  )
+{
+  CALL_VOID_BASECRYPTLIB (EdDsa.Services.Free, EdDsaFree, (EdDsaContext));
+}
+
+/**
+  Sets the EdDSA private key in the EdDSA context.
+
+  This function imports a raw private key into the EdDSA context. The private key
+  must be in raw binary format (not PEM or DER encoded). The key size must match
+  the expected size for the curve type (57 bytes for Ed448).
+
+  OpenSSL automatically derives the public key from the private key, so after
+  calling this function, both signing and verification operations are possible.
+
+  If EdDsaContext is NULL, then return FALSE.
+  If PrivateKey is NULL, then return FALSE.
+  If PrivateKeySize is 0, then return FALSE.
+  If PrivateKeySize does not match the expected size for the curve, then return FALSE.
+
+  @param[in]  EdDsaContext    Pointer to EdDSA context created by EdDsaNewByNid().
+  @param[in]  PrivateKey      Pointer to raw private key bytes.
+  @param[in]  PrivateKeySize  Size of the private key in bytes.
+
+  @retval TRUE   EdDSA private key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaSetPrivKey (
+  IN    VOID   *EdDsaContext,
+  IN    UINT8  *PrivateKey,
+  IN    UINTN  PrivateKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.SetPrivKey, EdDsaSetPrivKey, (EdDsaContext, PrivateKey, PrivateKeySize), FALSE);
+}
+
+/**
+  Generates the EdDSA public key from the private key.
+
+  This function is a placeholder and always returns TRUE. In practice, OpenSSL
+  automatically derives the public key when a private key is set using
+  EdDsaSetPrivKey(), so explicit public key generation is not needed.
+
+  Use EdDsaGetPubKey() to retrieve the public key after setting the private key.
+
+  @param[in]   EdDsaContext    Pointer to EdDSA context.
+  @param[out]  PublicKey       Pointer to buffer for public key (unused).
+  @param[in]   PublicKeySize   Size of public key buffer (unused).
+
+  @retval TRUE   Always returns TRUE.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaGeneratePubKey (
+  IN   VOID   *EdDsaContext,
+  OUT  UINT8  *PublicKey,
+  IN   UINTN  PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.GeneratePubKey, EdDsaGeneratePubKey, (EdDsaContext, PublicKey, PublicKeySize), TRUE);
+}
+
+/**
+  Sets the EdDSA public key in the EdDSA context.
+
+  This function imports a raw public key into the EdDSA context. The public key
+  must be in raw binary format (not PEM or DER encoded). The key size must match
+  the expected size for the curve type (57 bytes for Ed448).
+
+  After setting the public key, the context can be used for signature verification
+  but not for signing (which requires the private key).
+
+  If EdDsaContext is NULL, then return FALSE.
+  If PublicKey is NULL, then return FALSE.
+  If PublicKeySize is 0, then return FALSE.
+  If PublicKeySize does not match the expected size for the curve, then return FALSE.
+
+  @param[in]  EdDsaContext    Pointer to EdDSA context created by EdDsaNewByNid().
+  @param[in]  PublicKey       Pointer to raw public key bytes.
+  @param[in]  PublicKeySize   Size of the public key in bytes.
+
+  @retval TRUE   EdDSA public key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaSetPubKey (
+  IN  VOID         *EdDsaContext,
+  IN  CONST UINT8  *PublicKey,
+  IN  UINTN        PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.SetPubKey, EdDsaSetPubKey, (EdDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Retrieves the EdDSA public key from the EdDSA context.
+
+  This function extracts the public key from the EdDSA context and copies it to
+  the provided buffer. The public key is returned in raw binary format.
+
+  The context must have a key set (either via EdDsaSetPrivKey() or EdDsaSetPubKey())
+  before calling this function.
+
+  If EdDsaContext is NULL, then return FALSE.
+  If PublicKey is NULL, then return FALSE.
+  If PublicKeySize is NULL, then return FALSE.
+  If the context does not contain a valid key, then return FALSE.
+  If PublicKey buffer is too small, PublicKeySize is updated with required size and return FALSE.
+
+  @param[in]      EdDsaContext    Pointer to EdDSA context containing the key.
+  @param[out]     PublicKey       Pointer to buffer to receive the public key.
+  @param[in,out]  PublicKeySize   On input, size of PublicKey buffer in bytes.
+                                  On output, actual size of public key written.
+
+  @retval TRUE   EdDSA public key retrieved successfully.
+  @retval FALSE  Invalid parameters or buffer too small.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaGetPubKey (
+  IN      VOID   *EdDsaContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.GetPubKey, EdDsaGetPubKey, (EdDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Retrieve the Ed-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert          Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize      Size of the X509 certificate in bytes.
+  @param[out] EdDsaContext  Pointer to new-generated Ed DSA context which contain the retrieved
+                            Ed-Dsa public key component. Use EdDsaFree() function to free the
+                            resource.
+
+  If Cert is NULL, then return FALSE.
+  If EdDsaContext is NULL, then return FALSE.
+
+  @retval  TRUE   EdDsa Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve EdDsa public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EdDsaContext
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.GetPublicKeyFromX509, EdDsaGetPublicKeyFromX509, (Cert, CertSize, EdDsaContext), FALSE);
+}
+
+/**
+   Retrieve the EdDSA Private Key from the password-protected PEM key data.
+
+   @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
+   @param[in]  PemSize        Size of the PEM key data in bytes.
+   @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
+   @param[out] EdDsaContext   Pointer to new-generated EdDSA context which contains the retrieved
+                              EdDSA private key component. Use EdDsaFree() function to free the
+                              resource.
+
+   If PemData is NULL, then return FALSE.
+   If EdDsaContext is NULL, then return FALSE.
+
+   @retval  TRUE   EdDSA Private Key was retrieved successfully.
+   @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EdDsaContext
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.GetPrivateKeyFromPem, EdDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, EdDsaContext), FALSE);
+}
+
+/**
+  Generates an EdDSA signature for a given message.
+
+  This function creates an EdDSA signature using the private key stored in the
+  EdDSA context. EdDSA uses a 'pure' signature scheme where the entire message
+  is processed directly without pre-computing a hash digest.
+
+  For Ed448, an optional context string can be provided for domain separation.
+  This allows the same key to be used in different contexts without creating
+  security vulnerabilities.
+
+  The context must contain a private key (set via EdDsaSetPrivKey() or loaded
+  from PEM) before calling this function.
+
+  If EdDsaContext is NULL, then return FALSE.
+  If Message is NULL, then return FALSE.
+  If MessageSize is 0 or exceeds INT_MAX, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If SigSize is NULL, then return FALSE.
+  For Ed448: Context may be NULL if no context string is used (ContextSize must be 0).
+
+  @param[in]      EdDsaContext    Pointer to EdDSA context containing the private key.
+  @param[in]      Context         Optional context string for Ed448 domain separation.
+                                  May be NULL for default context.
+  @param[in]      ContextSize     Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]      Message         Pointer to message data to be signed.
+  @param[in]      MessageSize     Size of message in bytes.
+  @param[out]     Signature       Pointer to buffer to receive the signature.
+  @param[in,out]  SigSize         On input, size of Signature buffer.
+                                  On output, actual size of signature (114 bytes for Ed448).
+
+  @retval TRUE   EdDSA signature generated successfully.
+  @retval FALSE  Invalid parameters or signature generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaSign (
+  IN      VOID         *EdDsaContext,
+  IN      CONST UINT8  *Context,
+  IN      UINTN        ContextSize,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.Sign, EdDsaSign, (EdDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Verifies the EdDSA signature for a given message.
+
+  This function verifies an EdDSA signature against a message using the public key
+  contained in the EdDSA context. EdDSA signatures use a 'pure' implementation,
+  meaning the message digest cannot be computed ahead of time - the raw message
+  data is passed directly to the verification function.
+
+  For Ed448, an optional context string can be provided as additional domain
+  separation.
+
+  If EdDsaContext is NULL, then return FALSE.
+  If Message is NULL, then return FALSE.
+  If MessageSize is 0, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If SigSize is 0 or exceeds INT_MAX, then return FALSE.
+  If SigSize does not match expected signature size for the key type, then return FALSE.
+  For Ed448: Context may be NULL if no context string is used.
+
+  @param[in]      EdDsaContext    Pointer to EdDSA context containing the public key.
+  @param[in]      Context         Optional context string for Ed448 (domain separation).
+                                  May be NULL for default context.
+  @param[in]      ContextSize     Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]      Message         Pointer to the message data to verify.
+  @param[in]      MessageSize     Size of the message in bytes.
+  @param[in]      Signature       Pointer to the EdDSA signature to verify.
+  @param[in]      SigSize         Size of the signature in bytes.
+                                  Must be 2 * key_size (114 bytes for Ed448).
+
+  @retval TRUE   EdDSA signature verification succeeded.
+  @retval FALSE  EdDSA signature verification failed or invalid parameters.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaVerify (
+  IN     VOID         *EdDsaContext,
+  IN     CONST UINT8  *Context,
+  IN     UINTN        ContextSize,
+  IN     CONST UINT8  *Message,
+  IN     UINTN        MessageSize,
+  IN     UINT8        *Signature,
+  IN     UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (EdDsa.Services.Verify, EdDsaVerify, (EdDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Creates a new ML-DSA context by Crypto NID.
+
+  This function allocates and initializes a new ML-DSA context for the specified
+  ML-DSA variant. The context contains an EVP_PKEY structure initialized with the
+  ML-DSA parameters. The caller must call MlDsaFree() to release the context when done.
+
+  Before keys can be used for signing or verification, they must be set using
+  MlDsaSetPrivKey() or MlDsaSetPubKey().
+
+  @param[in]  Nid   Crypto NID of the ML-DSA variant (e.g., CRYPTO_NID_ML_DSA_87).
+
+  @retval Pointer to new ML-DSA context if successful.
+  @retval NULL if Nid is unsupported or allocation failed.
+
+**/
+VOID *
+EFIAPI
+CryptoServiceMlDsaNewByNid (
+  IN UINTN  Nid
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.NewByNid, MlDsaNewByNid, (Nid), NULL);
+}
+
+/**
+  Frees an ML-DSA context and all associated resources.
+
+  This function releases all memory associated with the ML-DSA context, including
+  the EVP_PKEY structure. After calling this function, the MlDsaContext pointer
+  should not be used.
+
+  If MlDsaContext is NULL, then this function returns immediately without action.
+
+  @param[in]  MlDsaContext  Pointer to the ML-DSA context to be released.
+
+**/
+VOID
+EFIAPI
+CryptoServiceMlDsaFree (
+  IN VOID  *MlDsaContext
+  )
+{
+  CALL_VOID_BASECRYPTLIB (MlDsa.Services.Free, MlDsaFree, (MlDsaContext));
+}
+
+/**
+  Sets the ML-DSA private key in the ML-DSA context.
+
+  @param[in]  MlDsaContext     Pointer to ML-DSA context created by MlDsaNewByNid().
+  @param[in]  PrivateKey       Pointer to raw private key bytes.
+  @param[in]  PrivateKeySize   Size of the private key in bytes.
+
+  @retval TRUE   ML-DSA private key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaSetPrivKey (
+  IN    VOID   *MlDsaContext,
+  IN    UINT8  *PrivateKey,
+  IN    UINTN  PrivateKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.SetPrivKey, MlDsaSetPrivKey, (MlDsaContext, PrivateKey, PrivateKeySize), FALSE);
+}
+
+/**
+  Generates and retrieves the public key from a private key context.
+
+  @param[in]   MlDsaContext    Pointer to ML-DSA context containing the private key.
+  @param[out]  PublicKey       Pointer to buffer to receive the public key.
+  @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
+
+  @retval TRUE   Public key generated and retrieved successfully.
+  @retval FALSE  Invalid parameters or public key extraction failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaGeneratePubKey (
+  IN  VOID   *MlDsaContext,
+  OUT UINT8  *PublicKey,
+  IN  UINTN  PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.GeneratePubKey, MlDsaGeneratePubKey, (MlDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Sets the ML-DSA public key in the ML-DSA context.
+
+  @param[in]  MlDsaContext    Pointer to ML-DSA context created by MlDsaNewByNid().
+  @param[in]  PublicKey       Pointer to raw public key bytes.
+  @param[in]  PublicKeySize   Size of the public key in bytes.
+
+  @retval TRUE   ML-DSA public key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaSetPubKey (
+  IN  VOID   *MlDsaContext,
+  IN  UINT8  *PublicKey,
+  IN  UINTN  PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.SetPubKey, MlDsaSetPubKey, (MlDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Retrieves the ML-DSA public key from the ML-DSA context.
+
+  @param[in]      MlDsaContext    Pointer to ML-DSA context containing the key.
+  @param[out]     PublicKey       Pointer to buffer to receive the public key.
+  @param[in,out]  PublicKeySize   On input, size of PublicKey buffer in bytes.
+                                  On output, actual size of public key written.
+
+  @retval TRUE   ML-DSA public key retrieved successfully.
+  @retval FALSE  Invalid parameters or buffer too small.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaGetPubKey (
+  IN      VOID   *MlDsaContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.GetPubKey, MlDsaGetPubKey, (MlDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Retrieve the ML-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert          Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize      Size of the X509 certificate in bytes.
+  @param[out] MlDsaContext  Pointer to new-generated ML-DSA context which contain the retrieved
+                            ML-DSA public key component. Use MlDsaFree() function to free the
+                            resource.
+
+  @retval  TRUE   ML-DSA Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve ML-DSA public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **MlDsaContext
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.GetPublicKeyFromX509, MlDsaGetPublicKeyFromX509, (Cert, CertSize, MlDsaContext), FALSE);
+}
+
+/**
+  Retrieve the ML-DSA Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData       Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize       Size of the PEM key data in bytes.
+  @param[in]  Password      NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] MlDsaContext  Pointer to new-generated ML-DSA context which contains
+                            the retrieved ML-DSA private key. Use MlDsaFree() to free.
+
+  @retval  TRUE   ML-DSA Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **MlDsaContext
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.GetPrivateKeyFromPem, MlDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, MlDsaContext), FALSE);
+}
+
+/**
+  Generates an ML-DSA signature for a given message.
+
+  @param[in]      MlDsaContext   Pointer to ML-DSA context containing the private key.
+  @param[in]      Context        Optional context string for domain separation.
+                                 May be NULL for default context.
+  @param[in]      ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]      Message        Pointer to message data to be signed.
+  @param[in]      MessageSize    Size of message in bytes.
+  @param[out]     Signature      Pointer to buffer to receive the signature.
+  @param[in,out]  SigSize        On input, size of Signature buffer.
+                                 On output, actual size of signature.
+
+  @retval TRUE   ML-DSA signature generated successfully.
+  @retval FALSE  Invalid parameters or signature generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaSign (
+  IN      VOID         *MlDsaContext,
+  IN      UINT8        *Context,
+  IN      UINTN        ContextSize,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.Sign, MlDsaSign, (MlDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Verifies the ML-DSA signature for a given message.
+
+  @param[in]  MlDsaContext   Pointer to ML-DSA context containing the public key.
+  @param[in]  Context        Optional context string for domain separation.
+                             May be NULL for default context.
+  @param[in]  ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]  Message        Pointer to the message data to verify.
+  @param[in]  MessageSize    Size of the message in bytes.
+  @param[in]  Signature      Pointer to the ML-DSA signature to verify.
+  @param[in]  SigSize        Size of the signature in bytes.
+
+  @retval TRUE   ML-DSA signature verification succeeded.
+  @retval FALSE  ML-DSA signature verification failed or invalid parameters.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaVerify (
+  IN  VOID         *MlDsaContext,
+  IN  UINT8        *Context,
+  IN  UINTN        ContextSize,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        MessageSize,
+  IN  UINT8        *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (MlDsa.Services.Verify, MlDsaVerify, (MlDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Creates a new SLH-DSA context by Crypto NID.
+
+  This function allocates and initializes a new SLH-DSA context for the specified
+  SLH-DSA variant. The context contains an EVP_PKEY structure initialized with the
+  SLH-DSA parameters. The caller must call SlhDsaFree() to release the context when done.
+
+  Before keys can be used for signing or verification, they must be set using
+  SlhDsaSetPrivKey() or SlhDsaSetPubKey().
+
+  @param[in]  Nid   Crypto NID of the SLH-DSA variant (e.g., CRYPTO_NID_SLH_DSA_SHAKE_256S).
+
+  @retval Pointer to new SLH-DSA context if successful.
+  @retval NULL if Nid is unsupported or allocation failed.
+
+**/
+VOID *
+EFIAPI
+CryptoServiceSlhDsaNewByNid (
+  IN UINTN  Nid
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.NewByNid, SlhDsaNewByNid, (Nid), NULL);
+}
+
+/**
+  Frees an SLH-DSA context and all associated resources.
+
+  This function releases all memory associated with the SLH-DSA context, including
+  the EVP_PKEY structure. After calling this function, the SlhDsaContext pointer
+  should not be used.
+
+  If SlhDsaContext is NULL, then this function returns immediately without action.
+
+  @param[in]  SlhDsaContext  Pointer to the SLH-DSA context to be released.
+
+**/
+VOID
+EFIAPI
+CryptoServiceSlhDsaFree (
+  IN VOID  *SlhDsaContext
+  )
+{
+  CALL_VOID_BASECRYPTLIB (SlhDsa.Services.Free, SlhDsaFree, (SlhDsaContext));
+}
+
+/**
+  Sets the SLH-DSA private key in the SLH-DSA context.
+
+  @param[in]  SlhDsaContext    Pointer to SLH-DSA context created by SlhDsaNewByNid().
+  @param[in]  PrivateKey       Pointer to raw private key bytes.
+  @param[in]  PrivateKeySize   Size of the private key in bytes.
+
+  @retval TRUE   SLH-DSA private key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaSetPrivKey (
+  IN    VOID   *SlhDsaContext,
+  IN    UINT8  *PrivateKey,
+  IN    UINTN  PrivateKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.SetPrivKey, SlhDsaSetPrivKey, (SlhDsaContext, PrivateKey, PrivateKeySize), FALSE);
+}
+
+/**
+  Generates and retrieves the public key from a private key context.
+
+  @param[in]   SlhDsaContext   Pointer to SLH-DSA context containing the private key.
+  @param[out]  PublicKey       Pointer to buffer to receive the public key.
+  @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
+
+  @retval TRUE   Public key generated and retrieved successfully.
+  @retval FALSE  Invalid parameters or public key extraction failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaGeneratePubKey (
+  IN  VOID   *SlhDsaContext,
+  OUT UINT8  *PublicKey,
+  IN  UINTN  PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.GeneratePubKey, SlhDsaGeneratePubKey, (SlhDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Sets the SLH-DSA public key in the SLH-DSA context.
+
+  @param[in]  SlhDsaContext   Pointer to SLH-DSA context created by SlhDsaNewByNid().
+  @param[in]  PublicKey       Pointer to raw public key bytes.
+  @param[in]  PublicKeySize   Size of the public key in bytes.
+
+  @retval TRUE   SLH-DSA public key was set successfully.
+  @retval FALSE  Invalid parameters or key size mismatch.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaSetPubKey (
+  IN  VOID   *SlhDsaContext,
+  IN  UINT8  *PublicKey,
+  IN  UINTN  PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.SetPubKey, SlhDsaSetPubKey, (SlhDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Retrieves the SLH-DSA public key from the SLH-DSA context.
+
+  @param[in]      SlhDsaContext   Pointer to SLH-DSA context containing the key.
+  @param[out]     PublicKey       Pointer to buffer to receive the public key.
+  @param[in,out]  PublicKeySize   On input, size of PublicKey buffer in bytes.
+                                  On output, actual size of public key written.
+
+  @retval TRUE   SLH-DSA public key retrieved successfully.
+  @retval FALSE  Invalid parameters or buffer too small.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaGetPubKey (
+  IN      VOID   *SlhDsaContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.GetPubKey, SlhDsaGetPubKey, (SlhDsaContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Retrieve the SLH-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert           Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize       Size of the X509 certificate in bytes.
+  @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contain the retrieved
+                             SLH-DSA public key component. Use SlhDsaFree() function to free the
+                             resource.
+
+  @retval  TRUE   SLH-DSA Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve SLH-DSA public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **SlhDsaContext
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.GetPublicKeyFromX509, SlhDsaGetPublicKeyFromX509, (Cert, CertSize, SlhDsaContext), FALSE);
+}
+
+/**
+  Retrieve the SLH-DSA Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize        Size of the PEM key data in bytes.
+  @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contains
+                             the retrieved SLH-DSA private key. Use SlhDsaFree() to free.
+
+  @retval  TRUE   SLH-DSA Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **SlhDsaContext
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.GetPrivateKeyFromPem, SlhDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, SlhDsaContext), FALSE);
+}
+
+/**
+  Generates an SLH-DSA signature for a given message.
+
+  @param[in]      SlhDsaContext  Pointer to SLH-DSA context containing the private key.
+  @param[in]      Context        Optional context string for domain separation.
+                                 May be NULL for default context.
+  @param[in]      ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]      Message        Pointer to message data to be signed.
+  @param[in]      MessageSize    Size of message in bytes.
+  @param[out]     Signature      Pointer to buffer to receive the signature.
+  @param[in,out]  SigSize        On input, size of Signature buffer.
+                                 On output, actual size of signature.
+
+  @retval TRUE   SLH-DSA signature generated successfully.
+  @retval FALSE  Invalid parameters or signature generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaSign (
+  IN      VOID         *SlhDsaContext,
+  IN      UINT8        *Context,
+  IN      UINTN        ContextSize,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.Sign, SlhDsaSign, (SlhDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Verifies the SLH-DSA signature for a given message.
+
+  @param[in]  SlhDsaContext  Pointer to SLH-DSA context containing the public key.
+  @param[in]  Context        Optional context string for domain separation.
+                             May be NULL for default context.
+  @param[in]  ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
+  @param[in]  Message        Pointer to the message data to verify.
+  @param[in]  MessageSize    Size of the message in bytes.
+  @param[in]  Signature      Pointer to the SLH-DSA signature to verify.
+  @param[in]  SigSize        Size of the signature in bytes.
+
+  @retval TRUE   SLH-DSA signature verification succeeded.
+  @retval FALSE  SLH-DSA signature verification failed or invalid parameters.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaVerify (
+  IN  VOID         *SlhDsaContext,
+  IN  UINT8        *Context,
+  IN  UINTN        ContextSize,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        MessageSize,
+  IN  UINT8        *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (SlhDsa.Services.Verify, SlhDsaVerify, (SlhDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+}
+
 const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// Version
   CryptoServiceGetCryptoVersion,
@@ -7642,4 +8470,37 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// RSA PSS (Continued)
   CryptoServiceRsaPssSignDigest,
   CryptoServiceRsaPssVerifyDigest,
+  /// EdDSA
+  CryptoServiceEdDsaNewByNid,
+  CryptoServiceEdDsaFree,
+  CryptoServiceEdDsaSetPrivKey,
+  CryptoServiceEdDsaGeneratePubKey,
+  CryptoServiceEdDsaSetPubKey,
+  CryptoServiceEdDsaGetPubKey,
+  CryptoServiceEdDsaGetPublicKeyFromX509,
+  CryptoServiceEdDsaGetPrivateKeyFromPem,
+  CryptoServiceEdDsaSign,
+  CryptoServiceEdDsaVerify,
+  /// ML-DSA
+  CryptoServiceMlDsaNewByNid,
+  CryptoServiceMlDsaFree,
+  CryptoServiceMlDsaSetPrivKey,
+  CryptoServiceMlDsaGeneratePubKey,
+  CryptoServiceMlDsaSetPubKey,
+  CryptoServiceMlDsaGetPubKey,
+  CryptoServiceMlDsaGetPublicKeyFromX509,
+  CryptoServiceMlDsaGetPrivateKeyFromPem,
+  CryptoServiceMlDsaSign,
+  CryptoServiceMlDsaVerify,
+  /// SLH-DSA
+  CryptoServiceSlhDsaNewByNid,
+  CryptoServiceSlhDsaFree,
+  CryptoServiceSlhDsaSetPrivKey,
+  CryptoServiceSlhDsaGeneratePubKey,
+  CryptoServiceSlhDsaSetPubKey,
+  CryptoServiceSlhDsaGetPubKey,
+  CryptoServiceSlhDsaGetPublicKeyFromX509,
+  CryptoServiceSlhDsaGetPrivateKeyFromPem,
+  CryptoServiceSlhDsaSign,
+  CryptoServiceSlhDsaVerify,
 };
