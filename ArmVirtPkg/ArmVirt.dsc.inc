@@ -323,6 +323,10 @@ DEFINE FD_SIZE_IN_MB    = 3
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
 
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
+  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
+
 !ifdef $(FIRMWARE_VER)
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 !endif
@@ -413,6 +417,25 @@ DEFINE FD_SIZE_IN_MB    = 3
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|TRUE
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+
+[PcdsDynamicDefault.common]
+  #
+  # ARM Timers
+  #
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
+
+  #
+  # ARM General Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
 
 [Components.common]
   #
