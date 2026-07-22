@@ -1023,12 +1023,14 @@ GetScatterGatherHeadEntries (
 
   if (ValidIndex == 0) {
     DEBUG ((DEBUG_ERROR, "%a didn't find any SG lists in variables\n", __func__));
+    FreePool (TempList);
     return EFI_NOT_FOUND;
   }
 
   *HeadList = AllocateZeroPool ((ValidIndex + 1) * sizeof (EFI_PHYSICAL_ADDRESS));
   if (*HeadList == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory\n"));
+    FreePool (TempList);
     return EFI_OUT_OF_RESOURCES;
   }
 
