@@ -81,6 +81,11 @@ UsbIoControlTransfer (
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    DEBUG ((DEBUG_ERROR, "UsbIoControlTransfer No media\n"));
+    goto ON_EXIT;
+  }
 
   RequestedDataLength = DataLength;
   Status              = UsbHcControlTransfer (
@@ -265,6 +270,11 @@ UsbIoBulkTransfer (
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    DEBUG ((DEBUG_ERROR, "UsbIoBulkTransfer No media\n"));
+    goto ON_EXIT;
+  }
 
   EpDesc = UsbGetEndpointDesc (UsbIf, Endpoint);
 
@@ -358,6 +368,11 @@ UsbIoSyncInterruptTransfer (
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    DEBUG ((DEBUG_ERROR, "UsbIoSyncInterruptTransfer No media\n"));
+    goto ON_EXIT;
+  }
 
   EpDesc = UsbGetEndpointDesc (UsbIf, Endpoint);
 
@@ -434,6 +449,11 @@ UsbIoAsyncInterruptTransfer (
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
   UsbIf  = USB_INTERFACE_FROM_USBIO (This);
   Dev    = UsbIf->Device;
+  if ((!Dev->Connected) && (IsNewTransfer)) {
+    Status = EFI_DEVICE_ERROR;
+    DEBUG ((DEBUG_ERROR, "UsbIoAsyncInterruptTransfer No media\n"));
+    goto ON_EXIT;
+  }
 
   EpDesc = UsbGetEndpointDesc (UsbIf, Endpoint);
 
@@ -538,20 +558,29 @@ UsbIoGetDeviceDescriptor (
   USB_DEVICE     *Dev;
   USB_INTERFACE  *UsbIf;
   EFI_TPL        OldTpl;
+  EFI_STATUS     Status;
 
   if (Descriptor == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  Status = EFI_SUCCESS;
 
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
 
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
+  }
+
   CopyMem (Descriptor, &Dev->DevDesc->Desc, sizeof (EFI_USB_DEVICE_DESCRIPTOR));
 
+ON_EXIT:
   gBS->RestoreTPL (OldTpl);
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -586,6 +615,10 @@ UsbIoGetActiveConfigDescriptor (
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
+  }
 
   if (Dev->ActiveConfig == NULL) {
     Status = EFI_NOT_FOUND;
@@ -616,20 +649,32 @@ UsbIoGetInterfaceDescriptor (
   OUT EFI_USB_INTERFACE_DESCRIPTOR  *Descriptor
   )
 {
+  USB_DEVICE     *Dev;
   USB_INTERFACE  *UsbIf;
   EFI_TPL        OldTpl;
+  EFI_STATUS     Status;
 
   if (Descriptor == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
+
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
+  Dev   = UsbIf->Device;
+
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
+  }
+
   CopyMem (Descriptor, &(UsbIf->IfSetting->Desc), sizeof (EFI_USB_INTERFACE_DESCRIPTOR));
 
+ON_EXIT:
   gBS->RestoreTPL (OldTpl);
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -652,21 +697,31 @@ UsbIoGetEndpointDescriptor (
   OUT EFI_USB_ENDPOINT_DESCRIPTOR  *Descriptor
   )
 {
+  USB_DEVICE     *Dev;
   USB_INTERFACE  *UsbIf;
   EFI_TPL        OldTpl;
+  EFI_STATUS     Status;
+
+  Status = EFI_SUCCESS;
 
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
+  Dev   = UsbIf->Device;
+
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
+  }
 
   if ((Descriptor == NULL) || (Index > 15)) {
-    gBS->RestoreTPL (OldTpl);
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
   }
 
   if (Index >= UsbIf->IfSetting->Desc.NumEndpoints) {
-    gBS->RestoreTPL (OldTpl);
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto ON_EXIT;
   }
 
   CopyMem (
@@ -675,8 +730,9 @@ UsbIoGetEndpointDescriptor (
     sizeof (EFI_USB_ENDPOINT_DESCRIPTOR)
     );
 
+ON_EXIT:
   gBS->RestoreTPL (OldTpl);
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -700,17 +756,26 @@ UsbIoGetSupportedLanguages (
   USB_DEVICE     *Dev;
   USB_INTERFACE  *UsbIf;
   EFI_TPL        OldTpl;
+  EFI_STATUS     Status;
+
+  Status = EFI_SUCCESS;
 
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
 
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
+  }
+
   *LangIDTable = Dev->LangId;
   *TableSize   = (UINT16)(Dev->TotalLangId * sizeof (UINT16));
 
+ON_EXIT:
   gBS->RestoreTPL (OldTpl);
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -750,6 +815,11 @@ UsbIoGetStringDescriptor (
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
+
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
+  }
 
   //
   // Check whether language ID is supported
@@ -828,6 +898,11 @@ UsbIoPortReset (
 
   UsbIf = USB_INTERFACE_FROM_USBIO (This);
   Dev   = UsbIf->Device;
+  if (!Dev->Connected) {
+    Status = EFI_DEVICE_ERROR;
+    DEBUG ((DEBUG_ERROR, "UsbIoPortReset No media\n"));
+    goto ON_EXIT;
+  }
 
   if (UsbIf->IsHub) {
     Status = EFI_INVALID_PARAMETER;

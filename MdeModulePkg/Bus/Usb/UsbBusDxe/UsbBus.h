@@ -196,6 +196,7 @@ struct _USB_DEVICE {
   USB_INTERFACE                         *ParentIf;
   UINT8                                 ParentPort; // Start at 0
   UINT8                                 Tier;
+  BOOLEAN                               Connected;
   BOOLEAN                               DisconnectFail;
   UINT8                                 EnumScript;
 };
