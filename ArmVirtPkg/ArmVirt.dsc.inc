@@ -46,6 +46,9 @@
 !if $(NETWORK_TLS_ENABLE) == TRUE && $(NETWORK_TLS_ENABLE_SUPPORTED) == FALSE
   !error NETWORK_TLS_ENABLE=TRUE is not supported for this platform.
 !endif
+!if $(QEMU_PV_VARS) == TRUE && $(QEMU_PV_VARS_SUPPORTED) == FALSE
+  !error QEMU_PV_VARS=TRUE is not supported for this platform.
+!endif
 
 # Various builds now exceed 2MB so choose 3MB as the default.
 DEFINE FD_SIZE_IN_MB    = 3
@@ -562,10 +565,28 @@ DEFINE FD_SIZE_IN_MB    = 3
   # Runtime variable
   #
 !if $(FLASH_BACKED_RUNTIME_VARIABLE)
+!if $(QEMU_PV_VARS)
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else # QEMU_PV_VARS
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+!endif # QEMU_PV_VARS
+
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
     <LibraryClasses>
       # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+!else # FLASH_BACKED_RUNTIME_VARIABLE
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   }
 !endif
 
