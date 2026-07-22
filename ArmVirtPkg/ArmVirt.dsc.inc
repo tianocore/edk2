@@ -28,6 +28,16 @@
   DEFINE ENABLE_PCI              = TRUE
 !endif
 
+  #
+  # Catch invalid MACRO configurations from .dsc files
+  #
+!if $(SECURE_BOOT_ENABLE) == TRUE && $(SECURE_BOOT_ENABLE_SUPPORTED) == FALSE
+  !error SECURE_BOOT_ENABLE=TRUE is not supported for this platform.
+!endif
+!if $(TPM2_ENABLE) == TRUE && $(TPM2_ENABLE_SUPPORTED) == FALSE
+  !error TPM2_ENABLE=TRUE is not supported for this platform.
+!endif
+
 # Various builds now exceed 2MB so choose 3MB as the default.
 DEFINE FD_SIZE_IN_MB    = 3
 
@@ -420,6 +430,13 @@ DEFINE FD_SIZE_IN_MB    = 3
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
 
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
+!endif
+
 [PcdsDynamicDefault.common]
   #
   # ARM Timers
@@ -479,6 +496,19 @@ DEFINE FD_SIZE_IN_MB    = 3
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+    <LibraryClasses>
+      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!if $(TPM2_ENABLE) == TRUE
+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
+  }
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
+!else
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
 
   #
   # DXE
