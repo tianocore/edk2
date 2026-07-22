@@ -52,6 +52,7 @@
   #
   DEFINE SECURE_BOOT_ENABLE_SUPPORTED              = TRUE
   DEFINE TPM2_ENABLE_SUPPORTED                     = TRUE
+  DEFINE NETWORK_TLS_ENABLE_SUPPORTED              = TRUE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
@@ -162,14 +163,6 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  #
-  # The cumulative and individual VOLATILE variable size limits should be set
-  # high enough for accommodating several and/or large CA certificates.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
-!endif
 
   #
   # ARM PrimeCell
