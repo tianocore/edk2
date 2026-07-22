@@ -160,10 +160,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize   | 0x40000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize   | 0x40000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize | 0x40000
-
 [PcdsPatchableInModule.common]
   # we need to provide a resolution for this PCD that supports PcdSet64()
   # being called from ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.c,
@@ -188,13 +184,6 @@
 
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase     | 0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64   | 0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64   | 0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase     | 0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase   | 0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64 | 0
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
@@ -262,11 +251,6 @@
       NULL|ArmVirtPkg/Library/ArmVirtPL031FdtClientLib/ArmVirtPL031FdtClientLib.inf
   }
 
-  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
-    <LibraryClasses>
-      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  }
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
   #
