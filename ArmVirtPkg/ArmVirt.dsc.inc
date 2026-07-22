@@ -28,6 +28,12 @@
   DEFINE ENABLE_PCI              = TRUE
 !endif
 
+!if $(PLAT_CLOUD_HV) == TRUE || $(PLAT_XEN) == TRUE
+  DEFINE FLASH_BACKED_RUNTIME_VARIABLE   = FALSE
+!else
+  DEFINE FLASH_BACKED_RUNTIME_VARIABLE   = TRUE
+!endif
+
   #
   # Catch invalid MACRO configurations from .dsc files
   #
@@ -466,6 +472,19 @@ DEFINE FD_SIZE_IN_MB    = 3
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
 
+!if $(FLASH_BACKED_RUNTIME_VARIABLE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x40000
+!endif
+
   #
   # PCI settings
   #
@@ -534,6 +553,17 @@ DEFINE FD_SIZE_IN_MB    = 3
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
+
+  #
+  # Runtime variable
+  #
+!if $(FLASH_BACKED_RUNTIME_VARIABLE)
+  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
+    <LibraryClasses>
+      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+!endif
 
   #
   # Multiple Console IO support
