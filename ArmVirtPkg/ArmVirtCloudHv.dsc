@@ -28,11 +28,13 @@
   DEFINE PLAT_CLOUD_HV           = TRUE
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE NETWORK_TLS_ENABLE      = FALSE
 
   #
   # Defines for _SUPPORTED values, allowing to identify supported features.
   #
   DEFINE SECURE_BOOT_ENABLE_SUPPORTED                = TRUE
+  DEFINE NETWORK_TLS_ENABLE_SUPPORTED                = TRUE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
@@ -91,14 +93,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x4000000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x40000
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  #
-  # The cumulative and individual VOLATILE variable size limits should be set
-  # high enough for accommodating several and/or large CA certificates.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
-!endif
 
   #
   # ARM PrimeCell

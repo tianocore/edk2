@@ -37,6 +37,9 @@
 !if $(TPM2_ENABLE) == TRUE && $(TPM2_ENABLE_SUPPORTED) == FALSE
   !error TPM2_ENABLE=TRUE is not supported for this platform.
 !endif
+!if $(NETWORK_TLS_ENABLE) == TRUE && $(NETWORK_TLS_ENABLE_SUPPORTED) == FALSE
+  !error NETWORK_TLS_ENABLE=TRUE is not supported for this platform.
+!endif
 
 # Various builds now exceed 2MB so choose 3MB as the default.
 DEFINE FD_SIZE_IN_MB    = 3
@@ -435,6 +438,15 @@ DEFINE FD_SIZE_IN_MB    = 3
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
   gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
   gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
+!endif
+
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  #
+  # The cumulative and individual VOLATILE variable size limits should be set
+  # high enough for accommodating several and/or large CA certificates.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
 !endif
 
 [PcdsDynamicDefault.common]
