@@ -234,6 +234,40 @@ removal stable tag has not been scheduled at this time.
 > - [Platform/MinPlatformPkg: Switch to Tpm2HelpLib](https://github.com/tianocore/edk2-platforms/issues/995)
 > - [Silicon/Ampere/AmpereAltraPkg: Switch to Tpm2HelpLib](https://github.com/tianocore/edk2-platforms/issues/996)
 
+#### Breaking Change: New Tcg2PhysicalPresencePromptLib library class dependency
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#TBD](https://github.com/tianocore/edk2/issues/12832)
+- **Pull Request**: [tianocore/edk2#12820](https://github.com/tianocore/edk2/pull/12820)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition (platform-implemented)
+
+**What changed**: `SecurityPkg` `DxeTcg2PhysicalPresenceLib` gained a required dependency on the new
+`Tcg2PhysicalPresencePromptLib` library class declared in `SecurityPkg/SecurityPkg.dec`. Platforms
+that build `DxeTcg2PhysicalPresenceLib` must resolve `Tcg2PhysicalPresencePromptLib` in their DSC or
+the build fails with an unresolved library class.
+
+**Why it changed**: Previously, `DxeTcg2PhysicalPresenceLib` printed the Physical Presence confirmation prompt
+directly to the console, giving platforms no clean way to substitute a platform-specific user-interaction mechanism.
+Extracting the prompt behind a library class lets platforms provide their own prompt implementation without patching
+`DxeTcg2PhysicalPresenceLib` and keeps the TPM 2.0 Physical Presence flow decoupled from any specific UI.
+
+**What replaces it**: Nothing is removed. `DxeTcg2PhysicalPresenceLib` now calls into the
+`Tcg2PhysicalPresencePromptLib` interface, and `SecurityPkg` provides the console-based default instance for platforms
+that do not implement their own.
+
+**How to migrate**: Platforms building `DxeTcg2PhysicalPresenceLib` must add a `Tcg2PhysicalPresencePromptLib` mapping
+to their platform DSC `[LibraryClasses]` section. To keep the existing behavior, map to the in-tree console instance:
+
+  Tcg2PhysicalPresencePromptLib|SecurityPkg/Library/Tcg2PhysicalPresencePromptLib/Tcg2PhysicalPresencePromptLibConsole.inf
+
+Platforms that want a custom prompt UI can instead provide their own instance implementing the
+`Tcg2PhysicalPresencePromptLib` interface declared in
+`SecurityPkg/Include/Library/Tcg2PhysicalPresencePromptLib.h` and map the library class to that instance in their DSC.
+
+**Breaking conditions**: Affects platforms and out-of-tree modules that build `SecurityPkg`'s
+`DxeTcg2PhysicalPresenceLib` (`Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib/DxeTcg2PhysicalPresenceLib.inf`).
+Platforms that do not consume `DxeTcg2PhysicalPresenceLib` are unaffected.
+
 ### edk2-stable202608: Behavioral Breaking Changes
 
 None
