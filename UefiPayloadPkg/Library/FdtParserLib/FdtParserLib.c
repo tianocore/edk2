@@ -293,7 +293,12 @@ ParseReservedMemory (
         }
       } else {
 FallbackType:
-        BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiReservedMemoryType);
+        BuildResourceDescriptorHob (
+          EFI_RESOURCE_MEMORY_RESERVED,
+          MEMORY_ATTRIBUTE_DEFAULT,
+          StartAddress,
+          NumberOfBytes
+          );
       }
     }
   }
