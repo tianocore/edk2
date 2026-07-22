@@ -157,17 +157,6 @@
 
 [PcdsDynamicDefault.common]
   #
-  # PCI settings
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
-
-  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
-  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
-
-  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
-
-  #
   # Set video resolution for boot options and for text setup.
   # PlatformDxe can set the former at runtime.
   #

@@ -437,6 +437,21 @@ DEFINE FD_SIZE_IN_MB    = 3
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
 
+  #
+  # PCI settings
+  #
+!if $(ENABLE_PCI)
+  ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
+  #  enumeration to complete before installing ACPI tables.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
+
+  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
+  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
+!endif
+
 [Components.common]
   #
   # Ramdisk support
