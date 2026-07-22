@@ -90,8 +90,6 @@
   # Rsdp base address in Cloud Hypervisor
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x40200000
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x4000000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x40000
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
   #
@@ -181,8 +179,6 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
