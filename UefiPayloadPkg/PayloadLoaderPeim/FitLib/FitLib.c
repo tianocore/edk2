@@ -68,10 +68,10 @@ FitParseFirmwarePropertyData (
   }
 
   //
-  // Need to load the FIT header (FDT) too. "load" property of tianocore entrypoint refers to image.
-  // Since FDT is directly before tianocore, subtract its size from load.
+  // The external image store follows the aligned FIT header.
   //
-  Context->PayloadLoadAddress -= FdtTotalSize (Fdt);
+  Context->PayloadEntryOffset += ALIGN_VALUE (FdtTotalSize (Fdt), 4);
+  Context->PayloadLoadAddress -= Context->PayloadEntryOffset;
 
   return EFI_SUCCESS;
 }

@@ -123,7 +123,7 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
     BuildConfNode(Fdt, ConfNode, MultiImage)
 
     # Build image
-    DataOffset = InfoHeader.DataOffset
+    DataOffset = 0
     for Index in range (0, len (MultiImage)):
         _, Path, _, _, _, _ = MultiImage[Index]
         if exists(Path) == 1:
@@ -133,7 +133,7 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
             MultiImage[Index][-2] = BinaryData
             MultiImage[Index][-1] = DataOffset
             DataOffset += len (BinaryData)
-    libfdt.fdt_setprop_u32(Fdt, 0, 'size', DataOffset)
+    libfdt.fdt_setprop_u32(Fdt, 0, 'size', InfoHeader.DataOffset + DataOffset)
     posix_time = int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))
     libfdt.fdt_setprop_u32(Fdt, 0, 'timestamp', posix_time)
     DescriptionFit = 'Uefi OS Loader'
@@ -187,7 +187,8 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         with open (UplBinary, "rb") as File:
             Dtb = File.read ()
         Fit          = libfdt.Fdt (Dtb)
-        NewFitHeader = bytearray(Dtb[0:Fit.totalsize()])
+        FitDataOffset = (Fit.totalsize() + 3) & ~3
+        NewFitHeader = bytearray(Dtb[0:FitDataOffset])
         FitSize      = len(Dtb)
 
         LoadablesList = []
@@ -209,7 +210,8 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
             ImageNode    = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, Item)
             ImageOffset  = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big')
             ImageSize    = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-size')[0], 'big')
-            MultiFvList.append ([Item, Dtb[ImageOffset:ImageOffset + ImageSize]])
+            ImagePosition = FitDataOffset + ImageOffset
+            MultiFvList.append ([Item, Dtb[ImagePosition:ImagePosition + ImageSize]])
 
         IsFvExist = False
         for Index in range (0, len (MultiFvList)):
@@ -233,7 +235,10 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
                 SectionFvFileBinary = File.read ()
             MultiFvList.append ([SectionName, SectionFvFileBinary])
             FvNode = libfdt.fdt_add_subnode(NewFitHeader, ImagesNode, SectionName)
-            BuildFvImageNode (NewFitHeader, None, FvNode, FitSize, len(SectionFvFileBinary), SectionName + " Firmware Volume", Arch)
+            BuildFvImageNode (
+                NewFitHeader, None, FvNode, FitSize - FitDataOffset,
+                len(SectionFvFileBinary), SectionName + " Firmware Volume", Arch
+                )
             FitSize += len(SectionFvFileBinary)
         else:
             for Index in range (0, len (MultiFvList)):
@@ -255,7 +260,8 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         TianoNode     = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, 'tianocore')
         TianoOffset   = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, TianoNode, 'data-offset')[0], 'big')
         TianoSize     = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, TianoNode, 'data-size')[0], 'big')
-        TianoBinary   = Dtb[TianoOffset:TianoOffset + TianoSize]
+        TianoPosition = FitDataOffset + TianoOffset
+        TianoBinary   = Dtb[TianoPosition:TianoPosition + TianoSize]
 
         print("\nGenerate new fit image:")
         NewUplBinary = bytearray(FitSize)
@@ -267,8 +273,12 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
             ImageNode   = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, MultiFvList[Index][0])
             ImageOffset = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big')
             ImageSize   = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-size')[0], 'big')
-            NewUplBinary[ImageOffset:ImageOffset + ImageSize] = MultiFvList[Index][1]
-            print("Update " + MultiFvList[Index][0] + "\t\t to " + str(hex(ImageOffset)) + "\t ~ " + str(hex(ImageOffset + ImageSize)))
+            ImagePosition = FitDataOffset + ImageOffset
+            NewUplBinary[ImagePosition:ImagePosition + ImageSize] = MultiFvList[Index][1]
+            print(
+                "Update " + MultiFvList[Index][0] + "\t\t to " +
+                str(hex(ImagePosition)) + "\t ~ " + str(hex(ImagePosition + ImageSize))
+                )
 
         with open (UplBinary, "wb") as File:
             File.write (NewUplBinary)
