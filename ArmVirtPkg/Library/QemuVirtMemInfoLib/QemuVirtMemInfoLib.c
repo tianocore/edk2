@@ -10,14 +10,16 @@
 #include <Uefi.h>
 #include <Pi/PiMultiPhase.h>
 #include <Library/ArmLib.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/FdtSerialPortAddressLib.h>
+#include <Library/FdtLib.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  (4)
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  (5)
 
 /** A macro to trace the memory map.
 **/
@@ -100,6 +102,75 @@ GetUartBase (
 }
 
 /**
+  Get the QEMU fw_cfg MMIO region from the device tree.
+
+  @param[in]  DeviceTreeBase        Base address of the Device Tree.
+  @param[out] FwCfgBase             Base address of the fw_cfg MMIO region.
+  @param[out] FwCfgSize             Size of the fw_cfg MMIO region.
+
+  @retval RETURN_INVALID_PARAMETER  Device Tree Base address is invalid.
+  @retval RETURN_NOT_FOUND          No fw_cfg MMIO node has been found.
+  @retval RETURN_SUCCESS            FwCfgBase and FwCfgSize have been populated.
+**/
+STATIC
+RETURN_STATUS
+EFIAPI
+GetFwCfgMmioRegion (
+  IN  VOID    *DeviceTreeBase,
+  OUT UINT64  *FwCfgBase,
+  OUT UINT64  *FwCfgSize
+  )
+{
+  RETURN_STATUS  Status;
+  INT32          Len;
+  INT32          Node;
+  INT32          Prev;
+  CONST CHAR8    *Type;
+  CONST UINT64   *Reg;
+
+  if (DeviceTreeBase == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Status = RETURN_NOT_FOUND;
+  for (Prev = 0; ; Prev = Node) {
+    Node = FdtNextNode (DeviceTreeBase, Prev, NULL);
+    if (Node < 0) {
+      break;
+    }
+
+    //
+    // Check for memory node
+    //
+    Type = FdtGetProp (DeviceTreeBase, Node, "compatible", &Len);
+    if ((Type != NULL) &&
+        (AsciiStrnCmp (Type, "qemu,fw-cfg-mmio", Len) == 0))
+    {
+      //
+      // Get the 'reg' property of this node. For now, we will assume
+      // two 8 byte quantities for base and size, respectively.
+      //
+      Reg = FdtGetProp (DeviceTreeBase, Node, "reg", &Len);
+      if ((Reg != 0) && (Len == (2 * sizeof (UINT64)))) {
+        *FwCfgBase = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[0]));
+        *FwCfgSize = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[1]));
+        Status     = RETURN_SUCCESS;
+        break;
+      } else {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Failed to parse FDT QemuCfg node\n",
+          __func__
+          ));
+        break;
+      }
+    }
+  } // for
+
+  return Status;
+}
+
+/**
   Return the Virtual Memory Map of your platform
 
   This Virtual Memory Map is used by MemoryInitPei Module to initialize the MMU
@@ -125,6 +196,8 @@ ArmVirtGetMemoryMap (
   UINT64                        MappingBase;
   UINT64                        MappingSize;
   UINT64                        UartBase;
+  UINT64                        FwCfgBase;
+  UINT64                        FwCfgSize;
 
   ASSERT (VirtualMemoryMap != NULL);
 
@@ -144,6 +217,15 @@ ArmVirtGetMemoryMap (
 
   RetStatus = GetUartBase (DeviceTreeBase, &UartBase);
   if (RETURN_ERROR (RetStatus) || (UartBase == 0)) {
+    ASSERT_RETURN_ERROR (RetStatus);
+    return;
+  }
+
+  RetStatus = GetFwCfgMmioRegion (DeviceTreeBase, &FwCfgBase, &FwCfgSize);
+  if (RETURN_ERROR (RetStatus) ||
+      (FwCfgBase == 0) ||
+      (FwCfgSize == 0))
+  {
     ASSERT_RETURN_ERROR (RetStatus);
     return;
   }
@@ -190,6 +272,18 @@ ArmVirtGetMemoryMap (
   VirtualMemoryTable[Idx].Length       = MappingSize;
   VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
   LOG_MEM_MAP ("Serial Port");
+  Idx++;
+
+  // Map the fw_cfg MMIO region
+  MappingBase = FwCfgBase & ~(UINT64)EFI_PAGE_MASK;
+  MappingSize = EFI_PAGES_TO_SIZE (
+                  EFI_SIZE_TO_PAGES (FwCfgBase - MappingBase + FwCfgSize)
+                  );
+  VirtualMemoryTable[Idx].PhysicalBase = MappingBase;
+  VirtualMemoryTable[Idx].VirtualBase  = MappingBase;
+  VirtualMemoryTable[Idx].Length       = MappingSize;
+  VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  LOG_MEM_MAP ("FwCfg");
   Idx++;
 
   // End of Table
