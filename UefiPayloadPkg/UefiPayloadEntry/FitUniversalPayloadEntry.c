@@ -55,6 +55,55 @@ ProcessLibraryConstructorList (
   );
 
 /**
+  Build HOBs from bootloader-specific data.
+**/
+STATIC
+VOID
+BuildBootloaderHobs (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_HOB_HANDOFF_INFO_TABLE      *Phit;
+  FIRMWARE_INFO                   FirmwareInfo;
+  SMMSTORE_INFO                   SmmStoreInfo;
+
+  if (GetFirstGuidHob (&gEfiSmmStoreInfoHobGuid) == NULL) {
+    Status = ParseSmmStoreInfo (&SmmStoreInfo);
+    if (!EFI_ERROR (Status)) {
+      BuildGuidDataHob (
+        &gEfiSmmStoreInfoHobGuid,
+        &SmmStoreInfo,
+        sizeof (SmmStoreInfo)
+        );
+    }
+  }
+
+  if (GetFirstGuidHob (&gEfiFirmwareInfoHobGuid) == NULL) {
+    Status = ParseFirmwareInfo (&FirmwareInfo);
+    if (!EFI_ERROR (Status)) {
+      BuildGuidDataHob (
+        &gEfiFirmwareInfoHobGuid,
+        &FirmwareInfo,
+        sizeof (FirmwareInfo)
+        );
+    }
+  }
+
+  Status = ParseCapsules (BuildCvHob);
+  if (EFI_ERROR (Status) && (Status != RETURN_NOT_FOUND)) {
+    DEBUG ((DEBUG_WARN, "Failed to parse bootloader capsules: %r\n", Status));
+  }
+
+  if (GetFirstHob (EFI_HOB_TYPE_UEFI_CAPSULE) != NULL) {
+    Phit = GetFirstHob (EFI_HOB_TYPE_HANDOFF);
+    if (Phit != NULL) {
+      Phit->BootMode = BOOT_ON_FLASH_UPDATE;
+    }
+  }
+}
+
+/**
   Find the first substring.
   @param  String    Point to the string where to find the substring.
   @param  CharSet   Point to the string to be found.
@@ -521,6 +570,8 @@ FitBuildHobs (
       ASSERT (AcpiBoardInfo != NULL);
     }
   }
+
+  BuildBootloaderHobs ();
 
   //
   // Create an empty FvHob for the DXE FV that contains DXE core.

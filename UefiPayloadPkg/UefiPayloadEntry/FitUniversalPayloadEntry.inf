@@ -69,6 +69,7 @@
   PcdLib
   StackCheckLib
   MemoryAllocationLib
+  BlParseLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -87,6 +88,8 @@
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
   gUniversalPayloadDeviceTreeGuid
+  gEfiFirmwareInfoHobGuid
+  gEfiSmmStoreInfoHobGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
