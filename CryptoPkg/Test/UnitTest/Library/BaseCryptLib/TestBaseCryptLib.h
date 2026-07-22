@@ -100,6 +100,12 @@ extern TEST_DESC  mEcTest[];
 extern UINTN      mEdDsaTestNum;
 extern TEST_DESC  mEdDsaTest[];
 
+extern UINTN      mMlDsaTestNum;
+extern TEST_DESC  mMlDsaTest[];
+
+extern UINTN      mSlhDsaTestNum;
+extern TEST_DESC  mSlhDsaTest[];
+
 extern UINTN      mX509TestNum;
 extern TEST_DESC  mX509Test[];
 

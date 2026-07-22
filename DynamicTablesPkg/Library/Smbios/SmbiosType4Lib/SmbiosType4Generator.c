@@ -69,6 +69,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType4TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -157,6 +158,7 @@ FindProcHierarchyInfoFromToken (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType4TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
@@ -177,6 +179,7 @@ BuildSmbiosType4TableEx (
   UINTN                           CpuIndex2;
   PROCESSOR_STATUS_DATA           *StatusData;
   PROCESSOR_CHARACTERISTIC_FLAGS  *CharacteristicFlags;
+  CM_OBJECT_TOKEN                 *CmObjectList;
 
   UINT32  ProcHierarchyNodeCount;
   UINT32  CacheStructCount;
@@ -213,7 +216,9 @@ BuildSmbiosType4TableEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Table = NULL;
+  *Table         = NULL;
+  *CmObjectToken = NULL;
+  CmObjectList   = NULL;
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
@@ -263,6 +268,18 @@ BuildSmbiosType4TableEx (
   if (SocketCount == 0) {
     ASSERT (SocketCount != 0);
     return EFI_INVALID_PARAMETER;
+  }
+
+  CmObjectList = AllocateZeroPool (sizeof (CM_OBJECT_TOKEN) * SocketCount);
+  if (CmObjectList == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to alloc memory for %u tokens.\n",
+      __func__,
+      SocketCount
+      ));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto exitErrorBuildSmbiosType4Table;
   }
 
   TableList = (SMBIOS_STRUCTURE **)AllocateZeroPool (sizeof (SMBIOS_STRUCTURE *) * SocketCount);
@@ -451,6 +468,20 @@ BuildSmbiosType4TableEx (
       ThreadCount++;
     }
 
+    if ((CpuCount > MAX_UINT16) || (ThreadCount > MAX_UINT16)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: CPU count %u or thread count %u exceeds the SMBIOS limit.\n",
+        __func__,
+        CpuCount,
+        ThreadCount
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      FreePool (SmbiosRecord);
+      StringTableFree (&StrTable);
+      goto exitErrorBuildSmbiosType4Table;
+    }
+
     SmbiosRecord->ProcessorType    = CentralProcessor;
     SmbiosRecord->ProcessorUpgrade = ProcessorUpgradeUnknown;
  #if defined (MDE_CPU_AARCH64)
@@ -477,13 +508,13 @@ BuildSmbiosType4TableEx (
       CharacteristicFlags->Processor64BitCapable = 1;
     }
 
-    SmbiosRecord->CoreCount         = (CpuCount < 256) ? CpuCount : 0xff;
-    SmbiosRecord->CoreCount2        = CpuCount;
-    SmbiosRecord->EnabledCoreCount  = (CpuCount < 256) ? CpuCount : 0xff;
-    SmbiosRecord->EnabledCoreCount2 = CpuCount;
-    SmbiosRecord->ThreadCount       = (ThreadCount < 256) ? ThreadCount : 0xff;
-    SmbiosRecord->ThreadCount2      = ThreadCount;
-    SmbiosRecord->ThreadEnabled     = ThreadCount;
+    SmbiosRecord->CoreCount         = (UINT8)((CpuCount < 256) ? CpuCount : MAX_UINT8);
+    SmbiosRecord->CoreCount2        = (UINT16)CpuCount;
+    SmbiosRecord->EnabledCoreCount  = (UINT8)((CpuCount < 256) ? CpuCount : MAX_UINT8);
+    SmbiosRecord->EnabledCoreCount2 = (UINT16)CpuCount;
+    SmbiosRecord->ThreadCount       = (UINT8)((ThreadCount < 256) ? ThreadCount : MAX_UINT8);
+    SmbiosRecord->ThreadCount2      = (UINT16)ThreadCount;
+    SmbiosRecord->ThreadEnabled     = (UINT16)ThreadCount;
 
     SmbiosRecord->Socket                = SocketDesignationRef;
     SmbiosRecord->ProcessorManufacturer = ProcessorManufacturerRef;
@@ -497,7 +528,8 @@ BuildSmbiosType4TableEx (
 
     StringTableFree (&StrTable);
 
-    TableList[ObjIndex] = (SMBIOS_STRUCTURE *)SmbiosRecord;
+    TableList[ObjIndex]    = (SMBIOS_STRUCTURE *)SmbiosRecord;
+    CmObjectList[ObjIndex] = ProcHierarchyNodeList[Index].Token;
     ObjIndex++;
     ASSERT (ObjIndex <= SocketCount);
   }
@@ -505,7 +537,7 @@ BuildSmbiosType4TableEx (
   ASSERT (ObjIndex == SocketCount);
 
   *Table         = TableList;
-  *CmObjectToken = NULL;
+  *CmObjectToken = CmObjectList;
   *TableCount    = SocketCount;
 
   return EFI_SUCCESS;
@@ -519,6 +551,10 @@ exitErrorBuildSmbiosType4Table:
     }
 
     FreePool (TableList);
+  }
+
+  if (CmObjectList != NULL) {
+    FreePool (CmObjectList);
   }
 
   return Status;

@@ -25,10 +25,17 @@
   AcpiHelperLib|DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
+  CmObjHelperLib|DynamicTablesPkg/Library/Common/CmObjHelperLib/CmObjHelperLib.inf
+  MetadataHandlerLib|DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
+  MetadataObjLib|DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   SsdtSerialPortFixupLib|DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
 [Components]
+  DynamicTablesPkg/Library/Common/CmObjHelperLib/CmObjHelperLib.inf
+  DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
+  DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
+
   DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/GoogleTest/Dbg2GeneratorGoogleTest.inf {
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
@@ -36,4 +43,8 @@
   DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/GoogleTest/CedtGeneratorGoogleTest.inf {
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
+  }
+  DynamicTablesPkg/Library/Acpi/Common/AcpiHmatLib/GoogleTest/HmatGeneratorGoogleTest.inf {
+    <LibraryClasses>
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiHmatLib/AcpiHmatLib.inf
   }

@@ -11,6 +11,7 @@
 - [ ] Breaking change?
   - **Breaking change** - Does this PR cause a break in build or boot behavior?
   - Examples: Does it add a new library class or move a module to a different repo.
+  - If checked, follow the [Breaking Change and Release Process](https://raw.githubusercontent.com/tianocore/tianocore-wiki.github.io/refs/heads/main/rfc/text/0003-edk2-breaking-change-and-release-process.md).
 - [ ] Impacts security?
   - **Security** - Does this PR have a direct security impact?
   - Examples: Crypto algorithm change or buffer overflow fix.

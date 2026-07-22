@@ -50,40 +50,13 @@ ValidateWsmtProtectionFlag (
 }
 
 /**
-  This function validates the reserved bits in the WSMT Protection flag.
-
-  @param [in] Ptr     Pointer to the start of the buffer.
-  @param [in] Length  Length of the field.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateReserved (
-  IN UINT8   *Ptr,
-  IN UINT32  Length,
-  IN VOID    *Context
-  )
-{
-  UINT32  ProtectionFlag;
-
-  ProtectionFlag = *(UINT32 *)Ptr;
-
-  if ((ProtectionFlag & 0xFFFFFFF8) != 0) {
-    IncrementErrorCount ();
-    Print (L"ERROR: Reserved bits are not zero.\n");
-  }
-}
-
-/**
   An ACPI_PARSER array describing the WSMT Protection flag .
 **/
 STATIC CONST ACPI_PARSER  WsmtProtectionFlagParser[] = {
-  { L"FIXED_COMM_BUFFERS ",                1,  0, L"0x%x", NULL, NULL, NULL,             NULL },
-  { L"COMM_BUFFER_NESTED_PTR_PROTECTION ", 1,  1, L"0x%x", NULL, NULL, NULL,             NULL },
-  { L"SYSTEM_RESOURCE_PROTECTION ",        1,  2, L"0x%x", NULL, NULL, NULL,             NULL },
-  { L"Reserved ",                          29, 3, L"0x%x", NULL, NULL, ValidateReserved, NULL },
+  { L"FIXED_COMM_BUFFERS ",                1,  0, L"0x%x", NULL,             NULL, NULL,                 NULL },
+  { L"COMM_BUFFER_NESTED_PTR_PROTECTION ", 1,  1, L"0x%x", NULL,             NULL, NULL,                 NULL },
+  { L"SYSTEM_RESOURCE_PROTECTION ",        1,  2, L"0x%x", NULL,             NULL, NULL,                 NULL },
+  { L"Reserved ",                          29, 3, NULL,    DumpReservedBits, NULL, ValidateReservedBits, NULL },
 };
 
 /**
