@@ -37,8 +37,10 @@ SetupVariableInit (
     //
     // SetupVariable is corrupt
     //
-    SystemConfigData.ConOutRow    = PcdGet32 (PcdConOutColumn);
-    SystemConfigData.ConOutColumn = PcdGet32 (PcdConOutRow);
+    // Read console resolution values from PCD
+    //
+    SystemConfigData.ConOutRow    = PcdGet32 (PcdConOutRow);
+    SystemConfigData.ConOutColumn = PcdGet32 (PcdConOutColumn);
 
     Status = gRT->SetVariable (
                     L"Setup",
