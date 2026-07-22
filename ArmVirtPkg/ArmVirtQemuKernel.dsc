@@ -48,6 +48,7 @@
   #
   DEFINE SECURE_BOOT_ENABLE_SUPPORTED                = TRUE
   DEFINE NETWORK_TLS_ENABLE_SUPPORTED                = TRUE
+  DEFINE QEMU_PV_VARS_SUPPORTED                      = TRUE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
@@ -230,18 +231,6 @@
   #
   # Architectural Protocols
   #
-!if $(QEMU_PV_VARS) == TRUE
-  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-!else
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
-      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  }
-!endif
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
