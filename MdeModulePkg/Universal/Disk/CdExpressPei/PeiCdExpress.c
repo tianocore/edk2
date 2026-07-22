@@ -62,6 +62,7 @@ CdExpressPeimEntry (
 
   PrivateData->BlockBuffer = AllocatePages (EFI_SIZE_TO_PAGES (PEI_CD_BLOCK_SIZE));
   if (PrivateData->BlockBuffer == NULL) {
+    FreePool (PrivateData);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -82,6 +83,7 @@ CdExpressPeimEntry (
 
   Status = PeiServicesInstallPpi (&PrivateData->PpiDescriptor);
   if (EFI_ERROR (Status)) {
+    FreePool (PrivateData);
     return EFI_OUT_OF_RESOURCES;
   }
 
