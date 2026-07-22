@@ -90,8 +90,6 @@
   # Rsdp base address in Cloud Hypervisor
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x40200000
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
-
   #
   # ARM PrimeCell
   #

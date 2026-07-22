@@ -455,6 +455,10 @@ DEFINE FD_SIZE_IN_MB    = 3
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
 !endif
 
+!if $(FLASH_BACKED_RUNTIME_VARIABLE) == FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+!endif
+
 [PcdsDynamicDefault.common]
   #
   # ARM Timers
