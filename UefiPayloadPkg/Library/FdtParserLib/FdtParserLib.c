@@ -38,8 +38,7 @@ typedef enum {
   FrameBuffer,
   PciRootBridge,
   Options,
-  IsaSerialPort,
-  MmioSerialPort,
+  SerialPort,
   DoNothing
 } FDT_NODE_TYPE;
 
@@ -106,10 +105,10 @@ CheckNodeType (
   )
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
-  if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0) {
-    return MmioSerialPort;
-  } else if (AsciiStrnCmp (NodeString, "isa", AsciiStrLen ("isa")) == 0) {
-    return IsaSerialPort;
+  if ((AsciiStrCmp (NodeString, "serial") == 0) ||
+      (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0))
+  {
+    return SerialPort;
   } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0) {
     return ReservedMemory;
   } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0) {
@@ -288,7 +287,12 @@ ParseReservedMemory (
 
     if (AsciiStrnCmp (NodePtr->Name, "mmio@", AsciiStrLen ("mmio@")) == 0) {
       DEBUG ((DEBUG_INFO, "  MemoryMappedIO"));
-      BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiMemoryMappedIO);
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_MEMORY_MAPPED_IO,
+        MEMORY_ATTRIBUTE_DEFAULT,
+        StartAddress,
+        NumberOfBytes
+        );
     } else {
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
       if (PropertyPtr == NULL) {
@@ -460,7 +464,10 @@ ParseFrameBuffer (
       GmaStr++;
       DEBUG ((DEBUG_INFO, "  display (%s)", GmaStr));
     }
+  }
 
+  if ((Stride == 0) && (Width <= (MAX_UINT32 / sizeof (UINT32)))) {
+    Stride = Width * sizeof (UINT32);
   }
 
   if (!HasReg || (FrameBufferSize > MAX_UINT32) || (Width == 0) || (Height == 0) ||
@@ -479,12 +486,12 @@ ParseFrameBuffer (
   }
 
   ZeroMem (GraphicsInfo, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
-  GraphicsInfo->FrameBufferBase                          = FrameBufferBase;
-  GraphicsInfo->FrameBufferSize                          = (UINT32)FrameBufferSize;
-  GraphicsInfo->GraphicsMode.HorizontalResolution        = Width;
-  GraphicsInfo->GraphicsMode.VerticalResolution          = Height;
-  GraphicsInfo->GraphicsMode.PixelFormat                 = PixelFormat;
-  GraphicsInfo->GraphicsMode.PixelsPerScanLine           = Stride / sizeof (UINT32);
+  GraphicsInfo->FrameBufferBase                   = FrameBufferBase;
+  GraphicsInfo->FrameBufferSize                   = (UINT32)FrameBufferSize;
+  GraphicsInfo->GraphicsMode.HorizontalResolution = Width;
+  GraphicsInfo->GraphicsMode.VerticalResolution   = Height;
+  GraphicsInfo->GraphicsMode.PixelFormat          = PixelFormat;
+  GraphicsInfo->GraphicsMode.PixelsPerScanLine    = Stride / sizeof (UINT32);
 
   return GmaStr;
 }
@@ -558,7 +565,7 @@ ParseOptions (
       }
 
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "pci-enum-done", &TempLen);
-      if (TempLen > 0) {
+      if (PropertyPtr != NULL) {
         *PciEnumDone = 1;
         DEBUG ((DEBUG_INFO, "  Found PciEnumDone (%08X)\n", *PciEnumDone));
       } else {
@@ -779,7 +786,6 @@ ParsePciRootBridge (
 {
   INT32               SubNode;
   INT32               Property;
-  INT32               SSubNode;
   FDT_NODE_HEADER     *NodePtr;
   CONST FDT_PROPERTY  *PropertyPtr;
   INT32               TempLen;
@@ -838,20 +844,6 @@ ParsePciRootBridge (
     if (AsciiStrnCmp (NodePtr->Name, GmaStr, AsciiStrLen (GmaStr)) == 0) {
       DEBUG ((DEBUG_INFO, "  Found gma@ node \n"));
       ParsegraphicNode (Fdt, SubNode);
-    }
-
-    if (AsciiStrnCmp (NodePtr->Name, "isa", AsciiStrLen ("isa")) == 0) {
-      PropertyPtr = FdtGetProperty (Fdt, SubNode, "#address-cells", &TempLen);
-      if ((PropertyPtr != NULL) && (TempLen > 0)) {
-        AddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
-      }
-
-      SSubNode = FdtFirstSubnode (Fdt, SubNode);
-      ParseSerialPort (Fdt, SSubNode, AddressCells);
-    }
-
-    if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
-      ParseSerialPort (Fdt, SubNode, AddressCells);
     }
   }
 
@@ -1044,9 +1036,8 @@ ParseDtb (
   UINT8                 *RbSegNumAlreadyAssigned;
   UINT8                 NumberOfRbSegNumAlreadyAssigned;
   UINT32                RootAddressCells;
+  UINT32                SerialAddressCells;
   INT32                 ParentNode;
-  UINT32                IsaAddressCells;
-  INT32                 SSubNode;
 
   Fdt               = FdtBase;
   Depth             = 0;
@@ -1062,6 +1053,7 @@ ParseDtb (
   RootAddressCells    = 2;
   GmaStr              = "<NULL>";
   PciRbArrayIndex     = 0;
+  PciRbNodes          = NULL;
   ReservedMemoryDepth = -1;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
@@ -1110,7 +1102,7 @@ ParseDtb (
           NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
           NodeType   = CheckNodeType (NodePtr->Name, Depth);
           if (!IsHobConstructed && (NodeType != ReservedMemory)) {
-            if ((NumberOfBytes > MinimalNeededSize) && (StartAddress < BASE_4GB)) {
+            if (NumberOfBytes > MinimalNeededSize) {
               MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
               FreeMemoryBottom = MemoryBottom;
               FreeMemoryTop    = StartAddress + NumberOfBytes;
@@ -1142,6 +1134,9 @@ ParseDtb (
 
   if (RootBridgeCount) {
     PciRbNodes = AllocateZeroPool (RootBridgeCount * sizeof (INT32));
+    if (PciRbNodes == NULL) {
+      goto Done;
+    }
   }
 
   NumRsv = FdtGetNumberOfReserveMapEntries (Fdt);
@@ -1169,17 +1164,17 @@ ParseDtb (
 
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
-      case MmioSerialPort:
-        ParseSerialPort (Fdt, Node, RootAddressCells);
-        break;
-      case IsaSerialPort:
-        PropertyPtr = FdtGetProperty (Fdt, Node, "#address-cells", &TempLen);
-        if ((PropertyPtr != NULL) && (TempLen > 0)) {
-          IsaAddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+      case SerialPort:
+        SerialAddressCells = RootAddressCells;
+        ParentNode         = FdtParentOffset (Fdt, Node);
+        if (ParentNode >= 0) {
+          PropertyPtr = FdtGetProperty (Fdt, ParentNode, "#address-cells", &TempLen);
+          if ((PropertyPtr != NULL) && (TempLen == sizeof (UINT32))) {
+            SerialAddressCells = Fdt32ToCpu (ReadUnaligned32 ((CONST UINT32 *)PropertyPtr->Data));
+          }
         }
 
-        SSubNode = FdtFirstSubnode (Fdt, Node);
-        ParseSerialPort (Fdt, SSubNode, IsaAddressCells);
+        ParseSerialPort (Fdt, Node, SerialAddressCells);
         break;
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
