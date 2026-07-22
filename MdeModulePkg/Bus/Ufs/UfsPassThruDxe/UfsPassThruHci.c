@@ -181,7 +181,7 @@ DumpUicCmdExecResult (
         DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - DME_FAILURE\n"));
         break;
       default:
-        ASSERT (FALSE);
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - UNKNOWN_ERROR (0x%02x)\n", Result));
         break;
     }
   } else {
@@ -192,7 +192,7 @@ DumpUicCmdExecResult (
         DEBUG ((DEBUG_VERBOSE, "UIC control command fails - FAILURE\n"));
         break;
       default:
-        ASSERT (FALSE);
+        DEBUG ((DEBUG_VERBOSE, "UIC control command fails - UNKNOWN_ERROR (0x%02x)\n", Result));
         break;
     }
   }
@@ -241,7 +241,7 @@ DumpQueryResponseResult (
       DEBUG ((DEBUG_VERBOSE, "Query Response with General Failure\n"));
       break;
     default:
-      ASSERT (FALSE);
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Unknown Error (0x%02x)\n", Result));
       break;
   }
 }
