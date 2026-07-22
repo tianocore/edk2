@@ -63,10 +63,10 @@ BuildBootloaderHobs (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  EFI_HOB_HANDOFF_INFO_TABLE      *Phit;
-  FIRMWARE_INFO                   FirmwareInfo;
-  SMMSTORE_INFO                   SmmStoreInfo;
+  EFI_STATUS                  Status;
+  EFI_HOB_HANDOFF_INFO_TABLE  *Phit;
+  FIRMWARE_INFO               FirmwareInfo;
+  SMMSTORE_INFO               SmmStoreInfo;
 
   if (GetFirstGuidHob (&gEfiSmmStoreInfoHobGuid) == NULL) {
     Status = ParseSmmStoreInfo (&SmmStoreInfo);
@@ -287,7 +287,7 @@ BuildFitLoadablesFvHob (
   UINT32                  *Data32;
   UINTN                   FvBase;
 
-  Fdt = NULL;
+  Fdt    = NULL;
   *DxeFv = NULL;
 
   GuidHob = GetFirstGuidHob (&gUniversalPayloadBaseGuid);
@@ -356,7 +356,7 @@ BuildFitLoadablesFvHob (
       return EFI_COMPROMISED_DATA;
     }
 
-    Data32  = (UINT32 *)(PropertyPtr->Data);
+    Data32   = (UINT32 *)(PropertyPtr->Data);
     DataSize = Fdt32ToCpu (ReadUnaligned32 (Data32));
     if ((DataOffset > FitSize - FitDataOffset) ||
         (DataSize < sizeof (EFI_FIRMWARE_VOLUME_HEADER)) ||
@@ -520,7 +520,7 @@ FitBuildHobs (
   OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
   )
 {
-  EFI_STATUS                      Status;
+  EFI_STATUS                     Status;
   UINT8                          *GuidHob;
   UINT32                         FdtSize;
   EFI_HOB_FIRMWARE_VOLUME        *FvHob;
@@ -583,6 +583,7 @@ FitBuildHobs (
     DEBUG ((DEBUG_ERROR, "Failed to create FIT FV HOBs: %r\n", Status));
     return Status;
   }
+
   //
   // Update DXE FV information to first fv hob in the hob list, which
   // is the empty FvHob created before.
@@ -656,6 +657,9 @@ FitUplEntryPoint (
 
   // Build HOB based on information from Bootloader
   Status = FitBuildHobs ((UINTN)FdtBaseResvd, &DxeFv);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   // Call constructor for all libraries again since hobs were built
   ProcessLibraryConstructorList ();
