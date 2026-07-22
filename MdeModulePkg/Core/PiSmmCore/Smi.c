@@ -366,6 +366,7 @@ SmiHandlerRegister (
     //
     SmiEntry = SmmCoreFindSmiEntry ((EFI_GUID *)HandlerType, TRUE);
     if (SmiEntry == NULL) {
+      FreePool (SmiHandler);
       return EFI_OUT_OF_RESOURCES;
     }
   }
