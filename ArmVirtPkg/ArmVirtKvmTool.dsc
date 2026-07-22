@@ -111,8 +111,6 @@
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|1
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
 
