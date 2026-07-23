@@ -27,7 +27,26 @@ EFIAPI
 CfrExtractVarBinary (
   IN     UINT8   *Buffer,
   IN OUT UINTN   *Offset,
+  IN     UINTN   BufferSize,
   IN     UINT32  TargetTag
+  );
+
+/**
+  Validate a CFR form and every child record.
+
+  @param Form      The form to validate.
+  @param FormSize  The number of bytes available at Form.
+
+  @retval RETURN_SUCCESS           The complete form is valid.
+  @retval RETURN_INVALID_PARAMETER A parameter is invalid.
+  @retval RETURN_COMPROMISED_DATA  A record is malformed.
+
+**/
+RETURN_STATUS
+EFIAPI
+CfrValidateForm (
+  IN CONST CFR_OPTION_FORM  *Form,
+  IN UINTN                  FormSize
   );
 
 /**
@@ -38,6 +57,7 @@ CfrExtractVarBinary (
 
   @retval EFI_SUCCESS            The default value is found.
   @retval EFI_INVALID_PARAMETER  The function parameters are invalid.
+  @retval EFI_COMPROMISED_DATA   A CFR form is malformed.
   @retval EFI_NOT_FOUND          The option cannot be found, or type doesn't have default values.
 
 **/

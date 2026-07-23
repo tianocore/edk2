@@ -31,6 +31,7 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  CfrHelpersLib
   IoLib
   DebugLib
   PcdLib

@@ -9,12 +9,12 @@
 #ifndef __CFR_SETUP_MENU_GUID_H__
 #define __CFR_SETUP_MENU_GUID_H__
 
-#define CB_CFR_VERSION 0x00000000
+#define CB_CFR_VERSION  0x00000000
 
 ///
 /// CFR options form GUID
 ///
-extern EFI_GUID gEfiCfrSetupMenuFormGuid;
+extern EFI_GUID  gEfiCfrSetupMenuFormGuid;
 
 /*
  * The following tags are for CFR (Cursed Form Representation) entries.
@@ -35,11 +35,11 @@ extern EFI_GUID gEfiCfrSetupMenuFormGuid;
  * TODO: "This should be documentation instead."
  */
 enum cfr_option_flags {
-  CFR_OPTFLAG_READONLY  = 1 << 0,
-  CFR_OPTFLAG_INACTIVE  = 1 << 1,
-  CFR_OPTFLAG_SUPPRESS  = 1 << 2,
-  CFR_OPTFLAG_VOLATILE  = 1 << 3,
-  CFR_OPTFLAG_RUNTIME   = 1 << 4,
+  CFR_OPTFLAG_READONLY = 1 << 0,
+  CFR_OPTFLAG_INACTIVE = 1 << 1,
+  CFR_OPTFLAG_SUPPRESS = 1 << 2,
+  CFR_OPTFLAG_VOLATILE = 1 << 3,
+  CFR_OPTFLAG_RUNTIME  = 1 << 4,
 };
 
 #define CB_TAG_CFR_VARCHAR_OPT_NAME     0x0007
@@ -47,71 +47,88 @@ enum cfr_option_flags {
 #define CB_TAG_CFR_VARCHAR_UI_HELPTEXT  0x0009
 #define CB_TAG_CFR_VARCHAR_DEF_VALUE    0x000a
 #define CB_TAG_CFR_DEP_VALUES           0x000c
+#define CB_TAG_CFR_RUNTIME_APPLY        0x000d
 #pragma pack (1)
 typedef struct {
-  UINT32  tag;          /*
+  UINT32    tag;         /*
                          * CFR_TAG_VARCHAR_OPT_NAME, CFR_TAG_VARCHAR_UI_NAME,
                          * CFR_TAG_VARCHAR_UI_HELPTEXT, CFR_TAG_VARCHAR_DEF_VALUE
                          * or CFR_TAG_DEP_VALUES
                          */
-  UINT32  size;         /* Length of the entire structure */
-  UINT32  data_length;  /* Length of data, including NULL terminator for strings */
-  UINT8   data[];
+  UINT32    size;        /* Length of the entire structure */
+  UINT32    data_length; /* Length of data, including NULL terminator for strings */
+  UINT8     data[];
 } CFR_VARBINARY;
+
+typedef enum {
+  CfrRuntimeApplyNone   = 0,
+  CfrRuntimeApplyApmCnt = 1,
+} CFR_RUNTIME_APPLY_METHOD;
+
+typedef struct {
+  UINT32    tag;   /* CFR_TAG_RUNTIME_APPLY */
+  UINT32    size;
+  UINT32    method; /* CFR_RUNTIME_APPLY_METHOD */
+  UINT32    id;     /* Method-specific token */
+} CFR_RUNTIME_APPLY;
 
 #define CB_TAG_CFR_ENUM_VALUE  0x0002
 typedef struct {
-  UINT32          tag;      /* CFR_TAG_ENUM_VALUE */
-  UINT32          size;
-  UINT32          value;
+  UINT32    tag;            /* CFR_TAG_ENUM_VALUE */
+  UINT32    size;
+  UINT32    value;
+
   /*
    * CFR_UI_NAME  ui_name
    */
 } CFR_ENUM_VALUE;
 
 enum cfr_numeric_option_display_flags {
-  CFR_NUM_OPT_DISPFLAG_HEX  = 1 << 0,
+  CFR_NUM_OPT_DISPFLAG_HEX = 1 << 0,
 };
 
 #define CB_TAG_CFR_OPTION_ENUM    0x0003
 #define CB_TAG_CFR_OPTION_NUMBER  0x0004
 #define CB_TAG_CFR_OPTION_BOOL    0x0005
 typedef struct {
-  UINT32                      tag;            /*
+  UINT32    tag;                              /*
                                                * CFR_TAG_OPTION_ENUM, CFR_TAG_OPTION_NUMBER or
                                                * CFR_TAG_OPTION_BOOL
                                                */
-  UINT32                      size;
-  UINT64                      object_id;      /* Unique ID */
-  UINT64                      dependency_id;  /* Dependent object ID, or 0 */
-  UINT32                      flags;          /* enum cfr_option_flags */
-  UINT32                      default_value;
-  UINT32                      min;
-  UINT32                      max;
-  UINT32                      step;
-  UINT32                      display_flags;  /* enum cfr_numeric_option_display_flags */
+  UINT32    size;
+  UINT64    object_id;                        /* Unique ID */
+  UINT64    dependency_id;                    /* Dependent object ID, or 0 */
+  UINT32    flags;                            /* enum cfr_option_flags */
+  UINT32    default_value;
+  UINT32    min;
+  UINT32    max;
+  UINT32    step;
+  UINT32    display_flags;                    /* enum cfr_numeric_option_display_flags */
+
   /*
    * CFR_VARCHAR_OPT_NAME     opt_name
    * CFR_VARCHAR_UI_NAME      ui_name
    * CFR_VARCHAR_UI_HELPTEXT  ui_helptext (Optional)
    * CFR_DEP_VALUES           dependency_values (Optional)
+   * CFR_RUNTIME_APPLY        runtime_apply (Optional)
    * CFR_ENUM_VALUE           enum_values[]
    */
 } CFR_OPTION_NUMERIC;
 
 #define CB_TAG_CFR_OPTION_VARCHAR  0x0006
 typedef struct {
-  UINT32              tag;            /* CFR_OPTION_VARCHAR */
-  UINT32              size;
-  UINT64              object_id;      /* Unique ID */
-  UINT64              dependency_id;  /* Dependent object ID, or 0 */
-  UINT32              flags;          /* enum cfr_option_flags */
+  UINT32    tag;                      /* CFR_OPTION_VARCHAR */
+  UINT32    size;
+  UINT64    object_id;                /* Unique ID */
+  UINT64    dependency_id;            /* Dependent object ID, or 0 */
+  UINT32    flags;                    /* enum cfr_option_flags */
+
   /*
+   * CFR_VARCHAR      default_value
    * CFR_OPT_NAME     opt_name
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
    * CFR_DEP_VALUES   dependency_values (Optional)
-   * CFR_VARCHAR      default_value
    */
 } CFR_OPTION_VARCHAR;
 
@@ -122,11 +139,12 @@ typedef struct {
  */
 #define CB_TAG_CFR_OPTION_COMMENT  0x000b
 typedef struct {
-  UINT32              tag;              /* CFR_OPTION_COMMENT */
-  UINT32              size;
-  UINT64              object_id;        /* Unique ID */
-  UINT64              dependency_id;    /* Dependent object ID, or 0 */
-  UINT32              flags;            /* enum cfr_option_flags */
+  UINT32    tag;                        /* CFR_OPTION_COMMENT */
+  UINT32    size;
+  UINT64    object_id;                  /* Unique ID */
+  UINT64    dependency_id;              /* Dependent object ID, or 0 */
+  UINT32    flags;                      /* enum cfr_option_flags */
+
   /*
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
@@ -137,11 +155,12 @@ typedef struct {
 /* CFR forms are considered options as they can be nested inside other forms */
 #define CB_TAG_CFR_OPTION_FORM  0x0001
 typedef struct {
-  UINT32                tag;              /* CFR_OPTION_FORM */
-  UINT32                size;
-  UINT64                object_id;        /* Unique ID */
-  UINT64                dependency_id;    /* Dependent object ID, or 0 */
-  UINT32                flags;            /* enum cfr_option_flags */
+  UINT32    tag;                          /* CFR_OPTION_FORM */
+  UINT32    size;
+  UINT64    object_id;                    /* Unique ID */
+  UINT64    dependency_id;                /* Dependent object ID, or 0 */
+  UINT32    flags;                        /* enum cfr_option_flags */
+
   /*
    * CFR_UI_NAME        ui_name
    * CFR_DEP_VALUES     dependency_values (Optional)

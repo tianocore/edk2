@@ -64,14 +64,15 @@ HII_VENDOR_DEVICE_PATH  mSetupMenuHiiVendorDevicePath = {
   It's assumed that ConfigRouting generates endian-specific strings,
     so `SwapBytes16` is always required on `StrHexToBytes` byte-array.
 
-  Caller to free VariableString pool.
+  Caller to free the returned VariableString pool.
 
 **/
 STATIC
-CHAR16 *
+EFI_STATUS
 EFIAPI
 ConvertHiiConfigStringToVariableString (
-  IN  EFI_STRING  HiiConfigString
+  IN  EFI_STRING  HiiConfigString,
+  OUT CHAR16      **VariableString
   )
 {
   EFI_STRING  ConfigStringNameStart;
@@ -79,45 +80,69 @@ ConvertHiiConfigStringToVariableString (
   UINTN       ConfigStringNameLengthChars;
   UINTN       ConvertStringLengthBytes;
   UINTN       VariableStringLengthChars;
-  CHAR16      *VariableString;
   UINTN       Index;
   EFI_STATUS  Status;
 
+  if ((HiiConfigString == NULL) || (VariableString == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *VariableString = NULL;
   ConfigStringNameStart = HiiConfigString;
 
   //
   // Find the start and length of variable name in stringified hex
   //
   ConfigStringNameStart = StrStr (ConfigStringNameStart, L"&NAME=");
-  ASSERT (ConfigStringNameStart != NULL);
+  if (ConfigStringNameStart == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ConfigStringNameStart += StrLen (L"&NAME=");
 
   ConfigStringNameEnd = StrStr (ConfigStringNameStart, L"&");
-  ASSERT (ConfigStringNameEnd != NULL);
+  if (ConfigStringNameEnd == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   ConfigStringNameLengthChars = ConfigStringNameEnd - ConfigStringNameStart;
+  if ((ConfigStringNameLengthChars == 0) ||
+      ((ConfigStringNameLengthChars % (sizeof (CHAR16) * 2)) != 0))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Convert stringified hex to bytes, then fixup to endian-correct string
   //
   ConvertStringLengthBytes = ConfigStringNameLengthChars / 2;
   VariableStringLengthChars = ConvertStringLengthBytes / 2;
-  VariableString = AllocatePool (ConvertStringLengthBytes + sizeof (CHAR16));
+  if (ConvertStringLengthBytes > MAX_UINTN - sizeof (CHAR16)) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  *VariableString = AllocateZeroPool (ConvertStringLengthBytes + sizeof (CHAR16));
+  if (*VariableString == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   Status = StrHexToBytes (
              ConfigStringNameStart,
              ConfigStringNameLengthChars,
-             (UINT8 *)VariableString,
+             (UINT8 *)*VariableString,
              ConvertStringLengthBytes
              );
-  ASSERT_EFI_ERROR (Status);
-
-  VariableString[VariableStringLengthChars] = 0;
-
-  for (Index = 0; Index < VariableStringLengthChars; Index++) {
-    VariableString[Index] = SwapBytes16 (VariableString[Index]);
+  if (EFI_ERROR (Status)) {
+    FreePool (*VariableString);
+    *VariableString = NULL;
+    return Status;
   }
 
-  return VariableString;
+  for (Index = 0; Index < VariableStringLengthChars; Index++) {
+    (*VariableString)[Index] = SwapBytes16 ((*VariableString)[Index]);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -163,14 +188,22 @@ SetupMenuExtractConfig (
   *Progress = Request;
 
   // Get variable
-  VariableName = ConvertHiiConfigStringToVariableString (Request);
+  VariableName = NULL;
+  Status = ConvertHiiConfigStringToVariableString (Request, &VariableName);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = GetVariable2 (
              VariableName,
              &gEficorebootNvDataGuid,
              &VariableOption,
              &DataSize
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    FreePool (VariableName);
+    return Status;
+  }
 
   // Use HII helper to convert variable data to config
   Status = gHiiConfigRouting->BlockToConfig (
@@ -181,7 +214,6 @@ SetupMenuExtractConfig (
                                 Results,
                                 Progress
                                 );
-  ASSERT_EFI_ERROR (Status);
 
   FreePool (VariableName);
   if (VariableOption != NULL) {
@@ -229,7 +261,12 @@ SetupMenuRouteConfig (
   *Progress = Configuration;
 
   // Get variable
-  VariableName = ConvertHiiConfigStringToVariableString (Configuration);
+  VariableName = NULL;
+  Status = ConvertHiiConfigStringToVariableString (Configuration, &VariableName);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = GetVariable3 (
              VariableName,
              &gEficorebootNvDataGuid,
@@ -237,7 +274,10 @@ SetupMenuRouteConfig (
              &DataSize,
              &Attributes
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    FreePool (VariableName);
+    return Status;
+  }
 
   // Use HII helper to convert updated config to variable data
   TempDataSize = DataSize;
@@ -248,7 +288,14 @@ SetupMenuRouteConfig (
                                 &TempDataSize,
                                 Progress
                                 );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    FreePool (VariableName);
+    if (VariableOption != NULL) {
+      FreePool (VariableOption);
+    }
+
+    return Status;
+  }
 
   // Set variable
   Status = gRT->SetVariable (
@@ -258,11 +305,6 @@ SetupMenuRouteConfig (
                   DataSize,
                   VariableOption
                   );
-  if (Status == EFI_WRITE_PROTECTED) {
-    Status = EFI_SUCCESS;
-  }
-
-  ASSERT_EFI_ERROR (Status);
 
   FreePool (VariableName);
   if (VariableOption != NULL) {
