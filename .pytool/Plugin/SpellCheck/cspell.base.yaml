@@ -6,9 +6,9 @@
 ##
 {
     "version": "0.1",
-    "language": "en",
+    "language": "en,en-GB",
     "dictionaries": [
-        "companies ",
+        "companies",
         "softwareTerms",
         "python",
         "cpp"
