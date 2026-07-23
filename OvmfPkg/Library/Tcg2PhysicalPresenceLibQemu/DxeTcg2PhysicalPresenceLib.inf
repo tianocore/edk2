@@ -57,12 +57,12 @@
   HobLib
   MemoryAllocationLib
   PrintLib
-  QemuFwCfgLib
   Tpm2CommandLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
+  Tcg2PhysicalPresencePlatformLib
 
 [Protocols]
   gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES

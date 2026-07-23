@@ -27,8 +27,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
-#include <Library/QemuFwCfgLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tcg2PhysicalPresencePlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -45,38 +45,6 @@ EFI_HII_HANDLE  mTcg2PpStringPackHandle;
 STATIC volatile QEMU_TPM_PPI  *mPpi;
 
 /**
-  Reads QEMU PPI config from fw_cfg.
-
-  @param[out]  The Config structure to read to.
-
-  @retval EFI_SUCCESS           Operation completed successfully.
-  @retval EFI_PROTOCOL_ERROR    Invalid fw_cfg entry size.
-**/
-STATIC
-EFI_STATUS
-QemuTpmReadConfig (
-  OUT QEMU_FWCFG_TPM_CONFIG  *Config
-  )
-{
-  EFI_STATUS            Status;
-  FIRMWARE_CONFIG_ITEM  FwCfgItem;
-  UINTN                 FwCfgSize;
-
-  Status = QemuFwCfgFindFile ("etc/tpm/config", &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (FwCfgSize != sizeof (*Config)) {
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  QemuFwCfgSelectItem (FwCfgItem);
-  QemuFwCfgReadBytes (sizeof (*Config), Config);
-  return EFI_SUCCESS;
-}
-
-/**
   Initializes QEMU PPI memory region.
 
   @retval EFI_SUCCESS           Operation completed successfully.
@@ -88,29 +56,34 @@ QemuTpmInitPPI (
   VOID
   )
 {
-  EFI_STATUS                       Status;
-  QEMU_FWCFG_TPM_CONFIG            Config;
-  EFI_PHYSICAL_ADDRESS             PpiAddress64;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
-  UINTN                            Idx;
+  EFI_STATUS                              Status;
+  TCG2_PHYSICAL_PRESENCE_PLATFORM_CONFIG  Config;
+  EFI_PHYSICAL_ADDRESS                    PpiAddress64;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR         Descriptor;
+  UINTN                                   Idx;
 
   if (mPpi != NULL) {
     return EFI_SUCCESS;
   }
 
-  Status = QemuTpmReadConfig (&Config);
+  Status = TpmPpiPlatformReadConfig (&Config);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  mPpi = (QEMU_TPM_PPI *)(UINTN)Config.PpiAddress;
-  if (mPpi == NULL) {
+  if ((Config.PpiAddress == 0) || (Config.PpiAddress > MAX_UINTN)) {
     return EFI_PROTOCOL_ERROR;
   }
 
+  PpiAddress64 = Config.PpiAddress;
+  mPpi         = (QEMU_TPM_PPI *)(UINTN)PpiAddress64;
   DEBUG ((DEBUG_INFO, "[TPM2PP] mPpi=%p version=%d\n", mPpi, Config.TpmVersion));
 
-  PpiAddress64 = (UINTN)mPpi;
+  if (PpiAddress64 > MAX_UINT64 - sizeof (*mPpi) + 1) {
+    DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi address overflows\n"));
+    goto InvalidPpiAddress;
+  }
+
   if ((PpiAddress64 & ~(UINT64)EFI_PAGE_MASK) !=
       ((PpiAddress64 + sizeof *mPpi - 1) & ~(UINT64)EFI_PAGE_MASK))
   {
@@ -124,19 +97,29 @@ QemuTpmInitPPI (
     goto InvalidPpiAddress;
   }
 
-  if (!EFI_ERROR (Status) &&
-      ((Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) &&
-       (Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)))
-  {
-    DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
-    goto InvalidPpiAddress;
+  if (Config.PpiInMmio) {
+    if (!EFI_ERROR (Status) &&
+        ((Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) &&
+         (Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)))
+    {
+      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
+      goto InvalidPpiAddress;
+    }
+  } else {
+    if (!EFI_ERROR (Status) &&
+        ((Descriptor.GcdMemoryType != EfiGcdMemoryTypeReserved) &&
+         (Descriptor.GcdMemoryType != EfiGcdMemoryTypeSystemMemory)))
+    {
+      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
+      goto InvalidPpiAddress;
+    }
   }
 
   for (Idx = 0; Idx < ARRAY_SIZE (mPpi->Func); Idx++) {
     mPpi->Func[Idx] = 0;
   }
 
-  if (Config.TpmVersion == QEMU_TPM_VERSION_2) {
+  if (Config.TpmVersion == Tcg2PhysicalPresenceTpmVersion20) {
     mPpi->Func[TCG2_PHYSICAL_PRESENCE_NO_ACTION]         = TPM_PPI_FLAGS;
     mPpi->Func[TCG2_PHYSICAL_PRESENCE_CLEAR]             = TPM_PPI_FLAGS;
     mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR]      = TPM_PPI_FLAGS;
