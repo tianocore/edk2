@@ -239,6 +239,8 @@ CfrProduceStorageForOption (
 {
   CHAR16            *VariableCfrName;
   UINT32            VariableAttributes;
+  UINT32            ExistingAttributes;
+  VOID              *ExistingData;
   UINTN             DataSize;
   EFI_STATUS        Status;
   UINTN             OptionNameLength;
@@ -262,11 +264,13 @@ CfrProduceStorageForOption (
     VariableAttributes |= EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
-  DataSize = 0;
+  ExistingAttributes = 0;
+  ExistingData       = NULL;
+  DataSize           = 0;
   Status = gRT->GetVariable (
                   VariableCfrName,
                   &gEficorebootNvDataGuid,
-                  NULL,
+                  &ExistingAttributes,
                   &DataSize,
                   NULL
                   );
@@ -280,6 +284,61 @@ CfrProduceStorageForOption (
                     CfrOptionDefaultValue
                     );
     ASSERT_EFI_ERROR (Status);
+  } else if ((Status == EFI_BUFFER_TOO_SMALL) && (ExistingAttributes != VariableAttributes)) {
+    ExistingData = AllocatePool (DataSize);
+    if (ExistingData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      Status = gRT->GetVariable (
+                      VariableCfrName,
+                      &gEficorebootNvDataGuid,
+                      &ExistingAttributes,
+                      &DataSize,
+                      ExistingData
+                      );
+      if (!EFI_ERROR (Status)) {
+        Status = gRT->SetVariable (
+                        VariableCfrName,
+                        &gEficorebootNvDataGuid,
+                        VariableAttributes,
+                        DataSize,
+                        ExistingData
+                        );
+        if (Status == EFI_INVALID_PARAMETER) {
+          //
+          // UEFI variables cannot always be updated in-place when their
+          // attributes change. Delete the old variable and recreate it with
+          // the current CFR attributes while keeping the stored value.
+          //
+          Status = gRT->SetVariable (
+                          VariableCfrName,
+                          &gEficorebootNvDataGuid,
+                          0,
+                          0,
+                          NULL
+                          );
+          if (!EFI_ERROR (Status)) {
+            Status = gRT->SetVariable (
+                            VariableCfrName,
+                            &gEficorebootNvDataGuid,
+                            VariableAttributes,
+                            DataSize,
+                            ExistingData
+                            );
+          }
+        }
+      }
+      FreePool (ExistingData);
+    }
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "CFR: Failed to update attributes for variable \"%s\": %r\n",
+        VariableCfrName,
+        Status
+        ));
+    }
   }
 
   if (OptionFlags & CFR_OPTFLAG_READONLY && mVariablePolicy != NULL) {
