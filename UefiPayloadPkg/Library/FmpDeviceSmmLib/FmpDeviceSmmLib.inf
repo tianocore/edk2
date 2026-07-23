@@ -23,6 +23,8 @@
   FmpDeviceSmmLib.c
   FmpDeviceSmmFlashRetry.c
   FmpDeviceSmmFlashRetry.h
+  FmpDeviceSmmManifest.c
+  FmpDeviceSmmManifest.h
   FmpDeviceSmmUpdatePolicy.c
   FmpDeviceSmmUpdatePolicy.h
 

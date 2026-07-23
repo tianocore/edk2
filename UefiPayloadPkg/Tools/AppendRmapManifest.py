@@ -31,13 +31,22 @@ ENTRY_SIZE     = 16
 def build_manifest(region_names):
     """Return the encoded manifest bytes for the given region names."""
     entries = []
+    encoded_names = set()
+    if not region_names or len(region_names) > 0xffff:
+        raise ValueError("Manifest must contain between 1 and 65535 regions")
+
     for name in region_names:
         try:
             encoded = name.encode('ascii')
         except UnicodeError:
             raise ValueError("Region name '{}' is not ASCII".format(name))
+        if not encoded or any(character <= 0x20 or character > 0x7e for character in encoded):
+            raise ValueError("Region name '{}' contains invalid characters".format(name))
         if len(encoded) > ENTRY_SIZE:
             raise ValueError("Region name '{}' longer than {} bytes".format(name, ENTRY_SIZE))
+        if encoded in encoded_names:
+            raise ValueError("Region name '{}' is duplicated".format(name))
+        encoded_names.add(encoded)
         entries.append(struct.pack('<{}s'.format(ENTRY_SIZE), encoded))
 
     trailer = struct.pack('<IHH', RMAP_SIGNATURE, RMAP_VERSION, len(entries))

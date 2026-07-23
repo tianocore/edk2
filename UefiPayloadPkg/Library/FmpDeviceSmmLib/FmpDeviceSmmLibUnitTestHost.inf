@@ -1,6 +1,7 @@
 ## @file
 # Host unit tests for SMMSTORE-backed firmware update policy.
 #
+# Copyright (c) 2026, Star Labs Systems. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -15,6 +16,8 @@
   FmpDeviceSmmLibUnitTest.c
   FmpDeviceSmmFlashRetry.c
   FmpDeviceSmmFlashRetry.h
+  FmpDeviceSmmManifest.c
+  FmpDeviceSmmManifest.h
   FmpDeviceSmmUpdatePolicy.c
   FmpDeviceSmmUpdatePolicy.h
 
