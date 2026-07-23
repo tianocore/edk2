@@ -12,6 +12,50 @@
 
 /**
   Look up FileName with QemuFwCfgFindFile() from QemuFwCfgLib. Read the fw_cfg
+  file into the caller-provided CHAR8 array. NUL-terminate the array.
+
+  @param[in] FileName        The name of the fw_cfg file to look up and read.
+
+  @param[in,out] BufferSize  On input, number of bytes available in Buffer.
+
+                             On output, the number of bytes that have been
+                             stored to Buffer.
+
+                             On error, BufferSize is indeterminate.
+
+  @param[out] Buffer         The buffer to read the fw_cfg file into. If the
+                             fw_cfg file contents are not NUL-terminated, then
+                             a NUL character is placed into Buffer after the
+                             fw_cfg file contents.
+
+                             On error, Buffer is indeterminate.
+
+  @retval RETURN_SUCCESS         Buffer has been populated with the fw_cfg file
+                                 contents. Buffer is NUL-terminated regardless
+                                 of whether the fw_cfg file itself was
+                                 NUL-terminated.
+
+  @retval RETURN_UNSUPPORTED     Firmware configuration is unavailable.
+
+  @retval RETURN_PROTOCOL_ERROR  The fw_cfg file does not fit into Buffer.
+
+  @retval RETURN_PROTOCOL_ERROR  The fw_cfg file contents are not themselves
+                                 NUL-terminated, and an extra NUL byte does not
+                                 fit into Buffer.
+
+  @return                        Error codes propagated from
+                                 QemuFwCfgFindFile().
+**/
+RETURN_STATUS
+EFIAPI
+QemuFwCfgGetAsString (
+  IN     CONST CHAR8  *FileName,
+  IN OUT UINTN        *BufferSize,
+  OUT    CHAR8        *Buffer
+  );
+
+/**
+  Look up FileName with QemuFwCfgFindFile() from QemuFwCfgLib. Read the fw_cfg
   file into a small array with automatic storage duration. Parse the array as
   the textual representation of a BOOLEAN.
 
