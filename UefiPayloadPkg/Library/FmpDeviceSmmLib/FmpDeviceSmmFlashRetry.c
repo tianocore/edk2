@@ -1,6 +1,7 @@
 /** @file
   Internal retry helpers for SMMSTORE-backed firmware updates.
 
+  Copyright (c) 2026, Star Labs Systems. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -8,6 +9,12 @@
 
 #include "FmpDeviceSmmFlashRetry.h"
 
+/**
+  Delay after a failed flash operation when a stall callback is available.
+
+  @param[in] FlashIo  Flash operation callbacks.
+  @param[in] Attempt  Failed attempt number.
+**/
 STATIC
 VOID
 StallAfterFailure (
@@ -20,6 +27,19 @@ StallAfterFailure (
   }
 }
 
+/**
+  Read from flash, retrying transient failures and short reads.
+
+  @param[in]     FlashIo   Flash operation callbacks.
+  @param[in]     Lba       Flash block number.
+  @param[in]     Offset    Offset within the block.
+  @param[in,out] NumBytes  Requested and actual byte count.
+  @param[out]    Buffer    Destination buffer.
+
+  @retval EFI_SUCCESS           The requested bytes were read.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @return                       The final flash read error.
+**/
 EFI_STATUS
 FmpDeviceFlashReadWithRetry (
   IN     CONST FMP_DEVICE_FLASH_IO  *FlashIo,
@@ -57,6 +77,16 @@ FmpDeviceFlashReadWithRetry (
   return EFI_ERROR (Status) ? Status : EFI_DEVICE_ERROR;
 }
 
+/**
+  Erase a flash block, retrying transient failures.
+
+  @param[in] FlashIo  Flash operation callbacks.
+  @param[in] Lba      Flash block number.
+
+  @retval EFI_SUCCESS           The block was erased.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @return                       The final flash erase error.
+**/
 EFI_STATUS
 FmpDeviceFlashEraseWithRetry (
   IN CONST FMP_DEVICE_FLASH_IO  *FlashIo,
@@ -83,6 +113,19 @@ FmpDeviceFlashEraseWithRetry (
   return Status;
 }
 
+/**
+  Write to flash, retrying transient failures and short writes.
+
+  @param[in]     FlashIo   Flash operation callbacks.
+  @param[in]     Lba       Flash block number.
+  @param[in]     Offset    Offset within the block.
+  @param[in,out] NumBytes  Requested and actual byte count.
+  @param[in]     Buffer    Source buffer.
+
+  @retval EFI_SUCCESS           The requested bytes were written.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @return                       The final flash write error.
+**/
 EFI_STATUS
 FmpDeviceFlashWriteWithRetry (
   IN     CONST FMP_DEVICE_FLASH_IO  *FlashIo,
@@ -120,6 +163,19 @@ FmpDeviceFlashWriteWithRetry (
   return EFI_ERROR (Status) ? Status : EFI_DEVICE_ERROR;
 }
 
+/**
+  Read back and verify a programmed flash block.
+
+  @param[in]  FlashIo      Flash operation callbacks.
+  @param[in]  Lba          Flash block number.
+  @param[in]  Expected     Expected block contents.
+  @param[out] VerifyBuffer Scratch buffer for the readback.
+  @param[in]  BlockSize    Flash block size.
+
+  @retval EFI_SUCCESS           The block matches Expected.
+  @retval EFI_DEVICE_ERROR      The block could not be read.
+  @retval EFI_VOLUME_CORRUPTED  The block contents differ.
+**/
 STATIC
 EFI_STATUS
 VerifyFlashWrite (
@@ -142,6 +198,19 @@ VerifyFlashWrite (
   return (CompareMem (VerifyBuffer, Expected, BlockSize) == 0) ? EFI_SUCCESS : EFI_VOLUME_CORRUPTED;
 }
 
+/**
+  Erase, write and verify a complete flash block with retries.
+
+  @param[in]  FlashIo      Flash operation callbacks.
+  @param[in]  Lba          Flash block number.
+  @param[in]  Expected     Block contents to program.
+  @param[out] VerifyBuffer Scratch buffer for the readback.
+  @param[in]  BlockSize    Flash block size.
+
+  @retval EFI_SUCCESS           The block was programmed and verified.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @return                       The final flash operation error.
+**/
 EFI_STATUS
 FmpDeviceFlashProgramWithRetry (
   IN  CONST FMP_DEVICE_FLASH_IO  *FlashIo,

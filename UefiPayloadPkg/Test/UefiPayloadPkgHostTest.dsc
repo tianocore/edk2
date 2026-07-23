@@ -1,6 +1,7 @@
 ## @file
 # UefiPayloadPkg host-based unit tests.
 #
+# Copyright (c) 2026, Star Labs Systems. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 

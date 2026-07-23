@@ -1,6 +1,7 @@
 /** @file
   Unit tests for SMMSTORE-backed firmware update policy.
 
+  Copyright (c) 2026, Star Labs Systems. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -18,6 +19,7 @@
 #include <Library/UnitTestLib.h>
 
 #include "FmpDeviceSmmFlashRetry.h"
+#include "FmpDeviceSmmManifest.h"
 #include "FmpDeviceSmmUpdatePolicy.h"
 
 #define UNIT_TEST_APP_NAME     "FmpDeviceSmmLib Unit Tests"
@@ -39,6 +41,20 @@ typedef struct {
 
 STATIC FLASH_IO_TEST_CONTEXT  mFlashContext;
 
+typedef struct {
+  UINT8                      Firmware[32];
+  REGION_MANIFEST_ENTRY      Entries[2];
+  REGION_MANIFEST_TRAILER    Trailer;
+} TEST_MANIFEST_IMAGE;
+
+/**
+  Consume one injected failure.
+
+  @param[in,out] Failures  Remaining failure count.
+
+  @retval TRUE   A failure was consumed.
+  @retval FALSE  No failures remain.
+**/
 STATIC
 BOOLEAN
 ConsumeFailure (
@@ -53,6 +69,18 @@ ConsumeFailure (
   return TRUE;
 }
 
+/**
+  Read from the in-memory test flash.
+
+  @param[in]     Lba       Ignored block number.
+  @param[in]     Offset    Offset in the test flash.
+  @param[in,out] NumBytes  Requested and actual byte count.
+  @param[out]    Buffer    Destination buffer.
+
+  @retval EFI_SUCCESS          The data was read.
+  @retval EFI_BAD_BUFFER_SIZE  The range is invalid.
+  @retval EFI_DEVICE_ERROR     An injected failure occurred.
+**/
 STATIC
 EFI_STATUS
 TestFlashRead (
@@ -79,6 +107,18 @@ TestFlashRead (
   return EFI_SUCCESS;
 }
 
+/**
+  Write to the in-memory test flash.
+
+  @param[in]     Lba       Ignored block number.
+  @param[in]     Offset    Offset in the test flash.
+  @param[in,out] NumBytes  Requested and actual byte count.
+  @param[in]     Buffer    Source buffer.
+
+  @retval EFI_SUCCESS          The data was written or a short write injected.
+  @retval EFI_BAD_BUFFER_SIZE  The range is invalid.
+  @retval EFI_DEVICE_ERROR     An injected failure occurred.
+**/
 STATIC
 EFI_STATUS
 TestFlashWrite (
@@ -106,6 +146,14 @@ TestFlashWrite (
   return EFI_SUCCESS;
 }
 
+/**
+  Erase the in-memory test flash.
+
+  @param[in] Lba  Ignored block number.
+
+  @retval EFI_SUCCESS       The block was erased.
+  @retval EFI_DEVICE_ERROR  An injected failure occurred.
+**/
 STATIC
 EFI_STATUS
 TestFlashErase (
@@ -121,6 +169,11 @@ TestFlashErase (
   return EFI_SUCCESS;
 }
 
+/**
+  Record a retry stall.
+
+  @param[in] Attempt  Ignored attempt number.
+**/
 STATIC
 VOID
 TestFlashStall (
@@ -137,6 +190,9 @@ STATIC CONST FMP_DEVICE_FLASH_IO  mTestFlashIo = {
   TestFlashStall
 };
 
+/**
+  Reset the in-memory flash test context.
+**/
 STATIC
 VOID
 ResetFlashContext (
@@ -146,6 +202,13 @@ ResetFlashContext (
   ZeroMem (&mFlashContext, sizeof (mFlashContext));
 }
 
+/**
+  Verify preserved variable storage keeps variable services enabled.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -157,6 +220,13 @@ PreservedStoreKeepsVariableServices (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify unproven variable storage disables variable services.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -168,6 +238,13 @@ UnprovenStoreDisablesVariableServices (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify overlapping flash ranges are detected.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -180,6 +257,13 @@ OverlappingRangesAreDetected (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify adjacent flash ranges are not treated as overlapping.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -192,6 +276,13 @@ AdjacentRangesDoNotOverlap (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify malformed flash ranges fail closed.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -204,6 +295,222 @@ MalformedRangesFailClosed (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify flash update steps are calculated across block boundaries.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+FlashRangeStepsAreCalculated (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       StepCount;
+
+  Status = FmpDeviceGetFlashRangeStepCount (15, 2, 16, &StepCount);
+
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (StepCount, 4);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Verify flash update step arithmetic rejects overflow.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+FlashRangeStepOverflowFails (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN  StepCount;
+
+  UT_ASSERT_EQUAL (
+    FmpDeviceGetFlashRangeStepCount (MAX_UINTN, 2, 16, &StepCount),
+    EFI_BAD_BUFFER_SIZE
+    );
+  UT_ASSERT_EQUAL (
+    FmpDeviceGetFlashRangeStepCount (0, MAX_UINTN, 1, &StepCount),
+    EFI_BAD_BUFFER_SIZE
+    );
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Initialize a test image containing an RMAP manifest.
+
+  @param[out] Image       Image to initialize.
+  @param[in]  EntryCount  Manifest entry count.
+**/
+STATIC
+VOID
+InitializeManifestImage (
+  OUT TEST_MANIFEST_IMAGE  *Image,
+  IN  UINT16               EntryCount
+  )
+{
+  ZeroMem (Image, sizeof (*Image));
+  CopyMem (Image->Entries[0].RegionName, "COREBOOT", sizeof ("COREBOOT"));
+  CopyMem (Image->Entries[1].RegionName, "FW_MAIN_A", sizeof ("FW_MAIN_A"));
+  Image->Trailer.Signature  = REGION_MANIFEST_SIGNATURE;
+  Image->Trailer.Version    = REGION_MANIFEST_VERSION;
+  Image->Trailer.EntryCount = EntryCount;
+}
+
+/**
+  Verify an image without a manifest reports EFI_NOT_FOUND.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+AbsentManifestIsReported (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  EFI_STATUS                   Status;
+  UINT8                        Image[32];
+  UINTN                        EntryCount;
+  CONST REGION_MANIFEST_ENTRY  *Entries;
+  UINTN                        FirmwareImageSize;
+
+  ZeroMem (Image, sizeof (Image));
+  Status = FmpDeviceLocateRegionManifest (
+             Image,
+             sizeof (Image),
+             &EntryCount,
+             &Entries,
+             &FirmwareImageSize
+             );
+
+  UT_ASSERT_EQUAL (Status, EFI_NOT_FOUND);
+  UT_ASSERT_EQUAL (EntryCount, 0);
+  UT_ASSERT_EQUAL ((UINTN)Entries, (UINTN)NULL);
+  UT_ASSERT_EQUAL (FirmwareImageSize, sizeof (Image));
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Verify a valid manifest is located and decoded.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+ValidManifestIsLocated (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  EFI_STATUS                   Status;
+  TEST_MANIFEST_IMAGE          Image;
+  UINTN                        EntryCount;
+  CONST REGION_MANIFEST_ENTRY  *Entries;
+  UINTN                        FirmwareImageSize;
+
+  InitializeManifestImage (&Image, ARRAY_SIZE (Image.Entries));
+  Status = FmpDeviceLocateRegionManifest (
+             (CONST UINT8 *)&Image,
+             sizeof (Image),
+             &EntryCount,
+             &Entries,
+             &FirmwareImageSize
+             );
+
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (EntryCount, ARRAY_SIZE (Image.Entries));
+  UT_ASSERT_EQUAL ((UINTN)Entries, (UINTN)Image.Entries);
+  UT_ASSERT_EQUAL (FirmwareImageSize, sizeof (Image.Firmware));
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Verify malformed manifests are rejected.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+MalformedManifestFailsClosed (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  EFI_STATUS                   Status;
+  TEST_MANIFEST_IMAGE          Image;
+  UINTN                        EntryCount;
+  CONST REGION_MANIFEST_ENTRY  *Entries;
+  UINTN                        FirmwareImageSize;
+
+  InitializeManifestImage (&Image, ARRAY_SIZE (Image.Entries));
+  Image.Trailer.Version = REGION_MANIFEST_VERSION + 1;
+  Status                = FmpDeviceLocateRegionManifest (
+                            (CONST UINT8 *)&Image,
+                            sizeof (Image),
+                            &EntryCount,
+                            &Entries,
+                            &FirmwareImageSize
+                            );
+  UT_ASSERT_EQUAL (Status, EFI_COMPROMISED_DATA);
+
+  InitializeManifestImage (&Image, MAX_UINT16);
+  Status = FmpDeviceLocateRegionManifest (
+             (CONST UINT8 *)&Image,
+             sizeof (Image),
+             &EntryCount,
+             &Entries,
+             &FirmwareImageSize
+             );
+  UT_ASSERT_EQUAL (Status, EFI_COMPROMISED_DATA);
+
+  InitializeManifestImage (&Image, ARRAY_SIZE (Image.Entries));
+  CopyMem (Image.Entries[1].RegionName, Image.Entries[0].RegionName, sizeof (Image.Entries[1].RegionName));
+  Status = FmpDeviceLocateRegionManifest (
+             (CONST UINT8 *)&Image,
+             sizeof (Image),
+             &EntryCount,
+             &Entries,
+             &FirmwareImageSize
+             );
+  UT_ASSERT_EQUAL (Status, EFI_COMPROMISED_DATA);
+
+  InitializeManifestImage (&Image, ARRAY_SIZE (Image.Entries));
+  Image.Entries[0].RegionName[9] = 'X';
+  Status                         = FmpDeviceLocateRegionManifest (
+                                     (CONST UINT8 *)&Image,
+                                     sizeof (Image),
+                                     &EntryCount,
+                                     &Entries,
+                                     &FirmwareImageSize
+                                     );
+  UT_ASSERT_EQUAL (Status, EFI_COMPROMISED_DATA);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Verify transient erase, write and verify failures recover.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -231,6 +538,13 @@ TransientFlashErrorsRecover (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify persistent read failures exhaust the retry limit.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -253,6 +567,13 @@ ReadErrorsExhaustRetryLimit (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify persistent erase failures exhaust the retry limit.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -272,6 +593,13 @@ EraseErrorsExhaustRetryLimit (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify persistent write failures exhaust the retry limit.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -294,6 +622,13 @@ WriteErrorsExhaustRetryLimit (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Verify repeated short writes exhaust the retry limit.
+
+  @param[in] Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+**/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -317,6 +652,12 @@ ShortWritesExhaustRetryLimit (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Create and run the SMMSTORE update policy test suite.
+
+  @retval EFI_SUCCESS  All tests passed.
+  @retval Others       Test framework setup or execution failed.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -359,6 +700,11 @@ UnitTestingEntry (
   AddTestCase (PolicyTests, "Overlapping ranges are detected", "Overlap", OverlappingRangesAreDetected, NULL, NULL, NULL);
   AddTestCase (PolicyTests, "Adjacent ranges do not overlap", "Adjacent", AdjacentRangesDoNotOverlap, NULL, NULL, NULL);
   AddTestCase (PolicyTests, "Malformed ranges fail closed", "Malformed", MalformedRangesFailClosed, NULL, NULL, NULL);
+  AddTestCase (PolicyTests, "Flash range steps are calculated", "StepCount", FlashRangeStepsAreCalculated, NULL, NULL, NULL);
+  AddTestCase (PolicyTests, "Flash range step overflow fails", "StepOverflow", FlashRangeStepOverflowFails, NULL, NULL, NULL);
+  AddTestCase (PolicyTests, "Absent manifest is reported", "ManifestAbsent", AbsentManifestIsReported, NULL, NULL, NULL);
+  AddTestCase (PolicyTests, "Valid manifest is located", "ManifestValid", ValidManifestIsLocated, NULL, NULL, NULL);
+  AddTestCase (PolicyTests, "Malformed manifest fails closed", "ManifestMalformed", MalformedManifestFailsClosed, NULL, NULL, NULL);
   AddTestCase (PolicyTests, "Transient flash errors recover", "TransientIo", TransientFlashErrorsRecover, NULL, NULL, NULL);
   AddTestCase (PolicyTests, "Read errors exhaust retry limit", "ReadError", ReadErrorsExhaustRetryLimit, NULL, NULL, NULL);
   AddTestCase (PolicyTests, "Erase errors exhaust retry limit", "EraseError", EraseErrorsExhaustRetryLimit, NULL, NULL, NULL);
@@ -372,6 +718,15 @@ UnitTestingEntry (
 
 #define FmpDeviceSmmLibUnitTestMain  main
 
+/**
+  Host test application entry point.
+
+  @param[in] Argc  Command-line argument count.
+  @param[in] Argv  Command-line arguments.
+
+  @retval 0  All tests passed.
+  @retval 1  A test failed.
+**/
 INT32
 FmpDeviceSmmLibUnitTestMain (
   IN INT32  Argc,
