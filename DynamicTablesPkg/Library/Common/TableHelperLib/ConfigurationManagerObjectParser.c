@@ -1363,6 +1363,13 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageParser[] = {
   { "Language", SMBIOS_MAX_STRING_SIZE, NULL, PrintString },
 };
 
+/** A parser for EArchCommonObjSystemBootInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemBootInfoParser[] = {
+  { "SystemBootInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "BootStatus",          sizeof (UINT8),           "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1690,6 +1697,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescPciInfo,     CmArchCommonMchiNetworkDeviceDescPciInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguageInfo,                 CmArchCommonBiosLanguageInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguage,                     CmArchCommonBiosLanguageParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemBootInfo,                   CmArchCommonSystemBootInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

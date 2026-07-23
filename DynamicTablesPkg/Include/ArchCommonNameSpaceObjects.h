@@ -152,6 +152,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 83 - MCHI PCI/PCIe Network Device descriptor info
   EArchCommonObjBiosLanguageInfo,                  ///< 84 - BIOS Language Information
   EArchCommonObjBiosLanguage,                      ///< 85 - BIOS Language
+  EArchCommonObjSystemBootInfo,                    ///< 86 - System Boot Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2201,5 +2202,19 @@ typedef struct CmArchCommonBiosLanguageInfo {
   /// One-based index of the currently installed firmware language.
   UINT8              CurrentLanguage;
 } CM_ARCH_COMMON_BIOS_LANGUAGE_INFO;
+
+/** A structure that describes System Boot Information.
+
+  SMBIOS Specification v3.9.0 Type 32
+
+  ID: EArchCommonObjSystemBootInfo
+**/
+typedef struct CmArchCommonSystemBootInfo {
+  /// CM Object Token uniquely identifying this System Boot Information.
+  CM_OBJECT_TOKEN    SystemBootInfoToken;
+
+  /// System boot status as defined by SMBIOS Type 32.
+  UINT8              BootStatus;
+} CM_ARCH_COMMON_SYSTEM_BOOT_INFO;
 
 #pragma pack()
