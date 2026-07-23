@@ -44,6 +44,7 @@
   UefiLib
   HobLib
   PcdLib
+  SafeIntLib
 
 [Guids]
   gEfiGraphicsInfoHobGuid                       ## CONSUMES ## HOB

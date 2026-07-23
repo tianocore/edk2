@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/EventGroup.h>
 
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 
 #define GRAPHICS_OUTPUT_MODE_PHYSICAL  0
 #define GRAPHICS_OUTPUT_MODE_HIDPI     1
@@ -73,7 +74,7 @@ TryGetWideAspectCappedViewportWidth (
     return FALSE;
   }
 
-  CandidateWidth = ((UINT64)VerticalResolution * CapAspectWidth) / CapAspectHeight;
+  CandidateWidth  = ((UINT64)VerticalResolution * CapAspectWidth) / CapAspectHeight;
   CandidateWidth &= ~1ULL;
   if ((CandidateWidth == 0) || (CandidateWidth >= HorizontalResolution)) {
     return FALSE;
@@ -81,6 +82,164 @@ TryGetWideAspectCappedViewportWidth (
 
   *ViewportWidth = (UINT32)CandidateWidth;
   return TRUE;
+}
+
+/**
+  Checks whether a non-empty rectangle fits within a bounding rectangle.
+
+  @param[in] X              Rectangle X coordinate.
+  @param[in] Y              Rectangle Y coordinate.
+  @param[in] Width          Rectangle width.
+  @param[in] Height         Rectangle height.
+  @param[in] MaximumWidth   Bounding rectangle width.
+  @param[in] MaximumHeight  Bounding rectangle height.
+
+  @retval TRUE   The rectangle fits.
+  @retval FALSE  The rectangle is empty or exceeds the bounds.
+**/
+STATIC
+BOOLEAN
+RectangleFits (
+  IN UINTN  X,
+  IN UINTN  Y,
+  IN UINTN  Width,
+  IN UINTN  Height,
+  IN UINTN  MaximumWidth,
+  IN UINTN  MaximumHeight
+  )
+{
+  return (BOOLEAN)(
+                   (Width != 0) &&
+                   (Height != 0) &&
+                   (X <= MaximumWidth) &&
+                   (Y <= MaximumHeight) &&
+                   (Width <= MaximumWidth - X) &&
+                   (Height <= MaximumHeight - Y)
+                   );
+}
+
+/**
+  Calculates the byte range occupied by a BLT buffer rectangle.
+
+  A zero Delta describes a tightly packed rectangle and is replaced with its
+  calculated row size.
+
+  @param[in]     X       Rectangle X coordinate in the BLT buffer.
+  @param[in]     Y       Rectangle Y coordinate in the BLT buffer.
+  @param[in]     Width   Rectangle width.
+  @param[in]     Height  Rectangle height.
+  @param[in,out] Delta   BLT buffer row size in bytes.
+  @param[out]    Offset  Byte offset of the rectangle's first pixel.
+  @param[out]    Extent  Byte offset immediately after its final pixel.
+
+  @retval EFI_SUCCESS            The byte range was calculated.
+  @retval EFI_INVALID_PARAMETER  Input is invalid or arithmetic overflowed.
+**/
+STATIC
+EFI_STATUS
+GetBltBufferOffset (
+  IN     UINTN  X,
+  IN     UINTN  Y,
+  IN     UINTN  Width,
+  IN     UINTN  Height,
+  IN OUT UINTN  *Delta,
+  OUT UINTN     *Offset,
+  OUT UINTN     *Extent
+  )
+{
+  RETURN_STATUS  Status;
+  UINTN          ColumnOffset;
+  UINTN          LastRow;
+  UINTN          LastRowOffset;
+  UINTN          RowBytes;
+  UINTN          RowPixels;
+  UINTN          WidthBytes;
+
+  if ((Delta == NULL) || (Offset == NULL) || (Extent == NULL) || (Width == 0) || (Height == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = SafeUintnMult (Width, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), &WidthBytes);
+  if (RETURN_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*Delta == 0) {
+    if ((X != 0) || (Y != 0)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    *Delta = WidthBytes;
+  } else {
+    Status = SafeUintnAdd (X, Width, &RowPixels);
+    if (RETURN_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Status = SafeUintnMult (RowPixels, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), &RowBytes);
+    if (RETURN_ERROR (Status) || (*Delta < RowBytes)) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Status = SafeUintnAdd (Y, Height - 1, &LastRow);
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (LastRow, *Delta, &LastRowOffset);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (X, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), &ColumnOffset);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnAdd (LastRowOffset, ColumnOffset, &LastRowOffset);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnAdd (LastRowOffset, WidthBytes, &LastRowOffset);
+  }
+
+  if (RETURN_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Extent = LastRowOffset;
+  Status  = SafeUintnMult (Y, *Delta, Offset);
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnAdd (*Offset, ColumnOffset, Offset);
+  }
+
+  return RETURN_ERROR (Status) ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
+}
+
+/**
+  Scales a coordinate and applies its physical viewport offset.
+
+  @param[in]  Coordinate        Logical coordinate.
+  @param[in]  Scale             Framebuffer scale.
+  @param[in]  Offset            Physical viewport offset.
+  @param[out] ScaledCoordinate  Resulting physical coordinate.
+
+  @retval EFI_SUCCESS            The coordinate was converted.
+  @retval EFI_INVALID_PARAMETER  Arithmetic overflowed.
+**/
+STATIC
+EFI_STATUS
+ScaleCoordinate (
+  IN  UINTN   Coordinate,
+  IN  UINT32  Scale,
+  IN  UINT32  Offset,
+  OUT UINTN   *ScaledCoordinate
+  )
+{
+  RETURN_STATUS  Status;
+
+  Status = SafeUintnMult (Coordinate, Scale, ScaledCoordinate);
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnAdd (*ScaledCoordinate, Offset, ScaledCoordinate);
+  }
+
+  return RETURN_ERROR (Status) ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
 }
 
 /**
@@ -319,10 +478,37 @@ ScaleBltBuffer2x (
   OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Dst
   )
 {
-  UINTN  Row;
-  UINTN  Col;
+  RETURN_STATUS  Status;
+  UINTN          Col;
+  UINTN          DstHeight;
+  UINTN          DstSize;
+  UINTN          DstWidth;
+  UINTN          DstWidthBytes;
+  UINTN          Row;
+  UINTN          SrcWidthBytes;
 
   if ((Src == NULL) || (Dst == NULL) || (SrcWidth == 0) || (SrcHeight == 0) || (SrcDeltaBytes == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = SafeUintnMult (SrcWidth, sizeof (*Src), &SrcWidthBytes);
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (SrcWidth, 2, &DstWidth);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (SrcHeight, 2, &DstHeight);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (DstWidth, sizeof (*Dst), &DstWidthBytes);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (DstHeight, DstWidthBytes, &DstSize);
+  }
+
+  if (RETURN_ERROR (Status) || (SrcDeltaBytes < SrcWidthBytes) || (DstSize == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -332,8 +518,8 @@ ScaleBltBuffer2x (
     EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *DstRow1;
 
     SrcRow  = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)Src + Row * SrcDeltaBytes);
-    DstRow0 = Dst + (Row * 2) * (SrcWidth * 2);
-    DstRow1 = DstRow0 + (SrcWidth * 2);
+    DstRow0 = Dst + (Row * 2) * DstWidth;
+    DstRow1 = DstRow0 + DstWidth;
 
     for (Col = 0; Col < SrcWidth; Col++) {
       EFI_GRAPHICS_OUTPUT_BLT_PIXEL  P;
@@ -380,8 +566,13 @@ DownscaleBltBuffer2x (
   IN  UINTN                          DstDeltaBytes
   )
 {
-  UINTN  Row;
-  UINTN  Col;
+  RETURN_STATUS  Status;
+  UINTN          Col;
+  UINTN          DstWidthBytes;
+  UINTN          RequiredSrcHeight;
+  UINTN          RequiredSrcWidth;
+  UINTN          Row;
+  UINTN          SrcWidthBytes;
 
   if ((Src == NULL) || (Dst == NULL) || (DstWidth == 0) || (DstHeight == 0) ||
       (SrcDeltaBytes == 0) || (DstDeltaBytes == 0))
@@ -389,7 +580,25 @@ DownscaleBltBuffer2x (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((SrcWidth < DstWidth * 2) || (SrcHeight < DstHeight * 2)) {
+  Status = SafeUintnMult (DstWidth, 2, &RequiredSrcWidth);
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (DstHeight, 2, &RequiredSrcHeight);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (SrcWidth, sizeof (*Src), &SrcWidthBytes);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (DstWidth, sizeof (*Dst), &DstWidthBytes);
+  }
+
+  if (RETURN_ERROR (Status) ||
+      (SrcWidth < RequiredSrcWidth) ||
+      (SrcHeight < RequiredSrcHeight) ||
+      (SrcDeltaBytes < SrcWidthBytes) ||
+      (DstDeltaBytes < DstWidthBytes))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -446,14 +655,36 @@ GraphicsOutputBlt (
   IN  UINTN                              Delta         OPTIONAL
   )
 {
-  RETURN_STATUS                 Status;
-  EFI_TPL                       Tpl;
-  GRAPHICS_OUTPUT_PRIVATE_DATA  *Private;
-  UINT32                        Scale;
+  UINTN                          BufferAddress;
+  UINTN                          BufferExtent;
+  UINTN                          BufferOffset;
+  UINTN                          BufferEnd;
+  UINTN                          BufferDelta;
+  EFI_STATUS                     EfiStatus;
+  UINTN                          PhysicalDestinationX;
+  UINTN                          PhysicalDestinationY;
+  UINTN                          PhysicalSourceX;
+  UINTN                          PhysicalSourceY;
+  GRAPHICS_OUTPUT_PRIVATE_DATA   *Private;
+  UINT32                         Scale;
+  UINTN                          ScaledHeight;
+  UINTN                          ScaledWidth;
+  RETURN_STATUS                  Status;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Temp;
+  UINTN                          TempDeltaBytes;
+  UINTN                          TempSize;
+  EFI_TPL                        Tpl;
+
+  if ((This == NULL) ||
+      (This->Mode == NULL) ||
+      (This->Mode->Info == NULL) ||
+      (BltOperation >= EfiGraphicsOutputBltOperationMax))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Private = GRAPHICS_OUTPUT_PRIVATE_FROM_THIS (This);
   Scale   = Private->FrameBufferScale;
-
   if (Scale == 0) {
     Scale = 1;
   }
@@ -462,20 +693,67 @@ GraphicsOutputBlt (
     return EFI_UNSUPPORTED;
   }
 
-  if (Scale == 1) {
-    Private->ViewportOffsetX = 0;
-    Private->ViewportOffsetY = 0;
-    Private->ViewportWidth   = Private->PhysicalModeInfo.HorizontalResolution;
-    Private->ViewportHeight  = Private->PhysicalModeInfo.VerticalResolution;
+  switch (BltOperation) {
+    case EfiBltVideoFill:
+    case EfiBltBufferToVideo:
+      if (!RectangleFits (
+             DestinationX,
+             DestinationY,
+             Width,
+             Height,
+             This->Mode->Info->HorizontalResolution,
+             This->Mode->Info->VerticalResolution
+             ))
+      {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      break;
+
+    case EfiBltVideoToBltBuffer:
+      if (!RectangleFits (
+             SourceX,
+             SourceY,
+             Width,
+             Height,
+             This->Mode->Info->HorizontalResolution,
+             This->Mode->Info->VerticalResolution
+             ))
+      {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      break;
+
+    case EfiBltVideoToVideo:
+      if (!RectangleFits (
+             SourceX,
+             SourceY,
+             Width,
+             Height,
+             This->Mode->Info->HorizontalResolution,
+             This->Mode->Info->VerticalResolution
+             ) ||
+          !RectangleFits (
+             DestinationX,
+             DestinationY,
+             Width,
+             Height,
+             This->Mode->Info->HorizontalResolution,
+             This->Mode->Info->VerticalResolution
+             ))
+      {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      break;
+
+    default:
+      return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // We have to raise to TPL_NOTIFY, so we make an atomic write to the frame buffer.
-  // We would not want a timer based event (Cursor, ...) to come in while we are
-  // doing this operation.
-  //
-  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (Scale == 1) {
+    Tpl    = gBS->RaiseTPL (TPL_NOTIFY);
     Status = FrameBufferBlt (
                Private->FrameBufferBltLibConfigure,
                BltBuffer,
@@ -488,183 +766,270 @@ GraphicsOutputBlt (
                Height,
                Delta
                );
-  } else {
-    switch (BltOperation) {
-      case EfiBltVideoFill:
-      case EfiBltVideoToVideo:
-        Status = FrameBufferBlt (
-                   Private->FrameBufferBltLibConfigure,
-                   BltBuffer,
-                   BltOperation,
-                   SourceX * Scale + Private->ViewportOffsetX,
-                   SourceY * Scale + Private->ViewportOffsetY,
-                   DestinationX * Scale + Private->ViewportOffsetX,
-                   DestinationY * Scale + Private->ViewportOffsetY,
-                   Width * Scale,
-                   Height * Scale,
-                   Delta
-                   );
-        break;
-
-      case EfiBltBufferToVideo:
-      {
-        EFI_STATUS                     EfiStatus;
-        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Temp;
-        UINTN                          PixelSize;
-        UINTN                          SrcDeltaBytes;
-        UINTN                          TempWidth;
-        UINTN                          TempHeight;
-        UINTN                          TempSize;
-        UINTN                          TempDeltaBytes;
-        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *SrcBase;
-
-        if (BltBuffer == NULL) {
-          Status = RETURN_INVALID_PARAMETER;
-          break;
-        }
-
-        PixelSize  = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
-        TempWidth  = Width * Scale;
-        TempHeight = Height * Scale;
-
-        if ((TempWidth / Scale != Width) || (TempHeight / Scale != Height)) {
-          Status = RETURN_INVALID_PARAMETER;
-          break;
-        }
-
-        SrcDeltaBytes = Delta;
-        if (SrcDeltaBytes == 0) {
-          if ((SourceX != 0) || (SourceY != 0)) {
-            Status = RETURN_INVALID_PARAMETER;
-            break;
-          }
-
-          SrcDeltaBytes = Width * PixelSize;
-        }
-
-        TempDeltaBytes = TempWidth * PixelSize;
-        TempSize       = TempHeight * TempDeltaBytes;
-        Temp           = AllocatePool (TempSize);
-        if (Temp == NULL) {
-          Status = RETURN_OUT_OF_RESOURCES;
-          break;
-        }
-
-        SrcBase   = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)BltBuffer + SourceY * SrcDeltaBytes + SourceX * PixelSize);
-        EfiStatus = ScaleBltBuffer2x (
-                      SrcBase,
-                      Width,
-                      Height,
-                      SrcDeltaBytes,
-                      Temp
-                      );
-        if (EFI_ERROR (EfiStatus)) {
-          FreePool (Temp);
-          Status = RETURN_INVALID_PARAMETER;
-          break;
-        }
-
-        Status = FrameBufferBlt (
-                   Private->FrameBufferBltLibConfigure,
-                   Temp,
-                   EfiBltBufferToVideo,
-                   0,
-                   0,
-                   DestinationX * Scale + Private->ViewportOffsetX,
-                   DestinationY * Scale + Private->ViewportOffsetY,
-                   TempWidth,
-                   TempHeight,
-                   TempDeltaBytes
-                   );
-
-        FreePool (Temp);
-        break;
-      }
-
-      case EfiBltVideoToBltBuffer:
-      {
-        EFI_STATUS                     EfiStatus;
-        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Temp;
-        UINTN                          PixelSize;
-        UINTN                          DstDeltaBytes;
-        UINTN                          TempWidth;
-        UINTN                          TempHeight;
-        UINTN                          TempSize;
-        UINTN                          TempDeltaBytes;
-        EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *DstBase;
-
-        if (BltBuffer == NULL) {
-          Status = RETURN_INVALID_PARAMETER;
-          break;
-        }
-
-        PixelSize  = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
-        TempWidth  = Width * Scale;
-        TempHeight = Height * Scale;
-
-        if ((TempWidth / Scale != Width) || (TempHeight / Scale != Height)) {
-          Status = RETURN_INVALID_PARAMETER;
-          break;
-        }
-
-        DstDeltaBytes = Delta;
-        if (DstDeltaBytes == 0) {
-          if ((DestinationX != 0) || (DestinationY != 0)) {
-            Status = RETURN_INVALID_PARAMETER;
-            break;
-          }
-
-          DstDeltaBytes = Width * PixelSize;
-        }
-
-        TempDeltaBytes = TempWidth * PixelSize;
-        TempSize       = TempHeight * TempDeltaBytes;
-        Temp           = AllocatePool (TempSize);
-        if (Temp == NULL) {
-          Status = RETURN_OUT_OF_RESOURCES;
-          break;
-        }
-
-        Status = FrameBufferBlt (
-                   Private->FrameBufferBltLibConfigure,
-                   Temp,
-                   EfiBltVideoToBltBuffer,
-                   SourceX * Scale + Private->ViewportOffsetX,
-                   SourceY * Scale + Private->ViewportOffsetY,
-                   0,
-                   0,
-                   TempWidth,
-                   TempHeight,
-                   TempDeltaBytes
-                   );
-        if (RETURN_ERROR (Status)) {
-          FreePool (Temp);
-          break;
-        }
-
-        DstBase   = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)BltBuffer + DestinationY * DstDeltaBytes + DestinationX * PixelSize);
-        EfiStatus = DownscaleBltBuffer2x (
-                      Temp,
-                      TempWidth,
-                      TempHeight,
-                      TempDeltaBytes,
-                      DstBase,
-                      Width,
-                      Height,
-                      DstDeltaBytes
-                      );
-        FreePool (Temp);
-        Status = EFI_ERROR (EfiStatus) ? RETURN_INVALID_PARAMETER : RETURN_SUCCESS;
-        break;
-      }
-
-      default:
-        Status = RETURN_INVALID_PARAMETER;
-        break;
-    }
+    gBS->RestoreTPL (Tpl);
+    return RETURN_ERROR (Status) ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
   }
 
-  gBS->RestoreTPL (Tpl);
+  Status = SafeUintnMult (Width, Scale, &ScaledWidth);
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (Height, Scale, &ScaledHeight);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (ScaledWidth, sizeof (*Temp), &TempDeltaBytes);
+  }
+
+  if (!RETURN_ERROR (Status)) {
+    Status = SafeUintnMult (ScaledHeight, TempDeltaBytes, &TempSize);
+  }
+
+  if (RETURN_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (BltOperation) {
+    case EfiBltVideoFill:
+      EfiStatus = ScaleCoordinate (
+                    DestinationX,
+                    Scale,
+                    Private->ViewportOffsetX,
+                    &PhysicalDestinationX
+                    );
+      if (!EFI_ERROR (EfiStatus)) {
+        EfiStatus = ScaleCoordinate (
+                      DestinationY,
+                      Scale,
+                      Private->ViewportOffsetY,
+                      &PhysicalDestinationY
+                      );
+      }
+
+      if (EFI_ERROR (EfiStatus)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Tpl    = gBS->RaiseTPL (TPL_NOTIFY);
+      Status = FrameBufferBlt (
+                 Private->FrameBufferBltLibConfigure,
+                 BltBuffer,
+                 EfiBltVideoFill,
+                 0,
+                 0,
+                 PhysicalDestinationX,
+                 PhysicalDestinationY,
+                 ScaledWidth,
+                 ScaledHeight,
+                 0
+                 );
+      gBS->RestoreTPL (Tpl);
+      break;
+
+    case EfiBltVideoToVideo:
+      EfiStatus = ScaleCoordinate (SourceX, Scale, Private->ViewportOffsetX, &PhysicalSourceX);
+      if (!EFI_ERROR (EfiStatus)) {
+        EfiStatus = ScaleCoordinate (SourceY, Scale, Private->ViewportOffsetY, &PhysicalSourceY);
+      }
+
+      if (!EFI_ERROR (EfiStatus)) {
+        EfiStatus = ScaleCoordinate (
+                      DestinationX,
+                      Scale,
+                      Private->ViewportOffsetX,
+                      &PhysicalDestinationX
+                      );
+      }
+
+      if (!EFI_ERROR (EfiStatus)) {
+        EfiStatus = ScaleCoordinate (
+                      DestinationY,
+                      Scale,
+                      Private->ViewportOffsetY,
+                      &PhysicalDestinationY
+                      );
+      }
+
+      if (EFI_ERROR (EfiStatus)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Tpl    = gBS->RaiseTPL (TPL_NOTIFY);
+      Status = FrameBufferBlt (
+                 Private->FrameBufferBltLibConfigure,
+                 NULL,
+                 EfiBltVideoToVideo,
+                 PhysicalSourceX,
+                 PhysicalSourceY,
+                 PhysicalDestinationX,
+                 PhysicalDestinationY,
+                 ScaledWidth,
+                 ScaledHeight,
+                 0
+                 );
+      gBS->RestoreTPL (Tpl);
+      break;
+
+    case EfiBltBufferToVideo:
+      if (BltBuffer == NULL) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      BufferDelta = Delta;
+      EfiStatus   = GetBltBufferOffset (
+                      SourceX,
+                      SourceY,
+                      Width,
+                      Height,
+                      &BufferDelta,
+                      &BufferOffset,
+                      &BufferExtent
+                      );
+      if (!EFI_ERROR (EfiStatus)) {
+        Status = SafeUintnAdd ((UINTN)BltBuffer, BufferOffset, &BufferAddress);
+      }
+
+      if (!EFI_ERROR (EfiStatus) && !RETURN_ERROR (Status)) {
+        Status = SafeUintnAdd ((UINTN)BltBuffer, BufferExtent, &BufferEnd);
+      }
+
+      if (EFI_ERROR (EfiStatus) || RETURN_ERROR (Status)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Temp = AllocatePool (TempSize);
+      if (Temp == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      EfiStatus = ScaleBltBuffer2x (
+                    (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)BufferAddress,
+                    Width,
+                    Height,
+                    BufferDelta,
+                    Temp
+                    );
+      if (EFI_ERROR (EfiStatus)) {
+        FreePool (Temp);
+        return EfiStatus;
+      }
+
+      EfiStatus = ScaleCoordinate (
+                    DestinationX,
+                    Scale,
+                    Private->ViewportOffsetX,
+                    &PhysicalDestinationX
+                    );
+      if (!EFI_ERROR (EfiStatus)) {
+        EfiStatus = ScaleCoordinate (
+                      DestinationY,
+                      Scale,
+                      Private->ViewportOffsetY,
+                      &PhysicalDestinationY
+                      );
+      }
+
+      if (EFI_ERROR (EfiStatus)) {
+        FreePool (Temp);
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Tpl    = gBS->RaiseTPL (TPL_NOTIFY);
+      Status = FrameBufferBlt (
+                 Private->FrameBufferBltLibConfigure,
+                 Temp,
+                 EfiBltBufferToVideo,
+                 0,
+                 0,
+                 PhysicalDestinationX,
+                 PhysicalDestinationY,
+                 ScaledWidth,
+                 ScaledHeight,
+                 TempDeltaBytes
+                 );
+      gBS->RestoreTPL (Tpl);
+      FreePool (Temp);
+      break;
+
+    case EfiBltVideoToBltBuffer:
+      if (BltBuffer == NULL) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      BufferDelta = Delta;
+      EfiStatus   = GetBltBufferOffset (
+                      DestinationX,
+                      DestinationY,
+                      Width,
+                      Height,
+                      &BufferDelta,
+                      &BufferOffset,
+                      &BufferExtent
+                      );
+      if (!EFI_ERROR (EfiStatus)) {
+        Status = SafeUintnAdd ((UINTN)BltBuffer, BufferOffset, &BufferAddress);
+      }
+
+      if (!EFI_ERROR (EfiStatus) && !RETURN_ERROR (Status)) {
+        Status = SafeUintnAdd ((UINTN)BltBuffer, BufferExtent, &BufferEnd);
+      }
+
+      if (EFI_ERROR (EfiStatus) || RETURN_ERROR (Status)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      EfiStatus = ScaleCoordinate (SourceX, Scale, Private->ViewportOffsetX, &PhysicalSourceX);
+      if (!EFI_ERROR (EfiStatus)) {
+        EfiStatus = ScaleCoordinate (SourceY, Scale, Private->ViewportOffsetY, &PhysicalSourceY);
+      }
+
+      if (EFI_ERROR (EfiStatus)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Temp = AllocatePool (TempSize);
+      if (Temp == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Tpl    = gBS->RaiseTPL (TPL_NOTIFY);
+      Status = FrameBufferBlt (
+                 Private->FrameBufferBltLibConfigure,
+                 Temp,
+                 EfiBltVideoToBltBuffer,
+                 PhysicalSourceX,
+                 PhysicalSourceY,
+                 0,
+                 0,
+                 ScaledWidth,
+                 ScaledHeight,
+                 TempDeltaBytes
+                 );
+      gBS->RestoreTPL (Tpl);
+      if (RETURN_ERROR (Status)) {
+        FreePool (Temp);
+        break;
+      }
+
+      EfiStatus = DownscaleBltBuffer2x (
+                    Temp,
+                    ScaledWidth,
+                    ScaledHeight,
+                    TempDeltaBytes,
+                    (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)BufferAddress,
+                    Width,
+                    Height,
+                    BufferDelta
+                    );
+      FreePool (Temp);
+      if (EFI_ERROR (EfiStatus)) {
+        return EfiStatus;
+      }
+
+      Status = RETURN_SUCCESS;
+      break;
+
+    default:
+      return EFI_INVALID_PARAMETER;
+  }
 
   return RETURN_ERROR (Status) ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
 }
@@ -980,10 +1345,10 @@ GraphicsOutputDriverBindingStart (
   CopyMem (&Private->PhysicalModeInfo, &GraphicsInfo->GraphicsMode, sizeof (Private->PhysicalModeInfo));
   CopyMem (&Private->LogicalModeInfo, &Private->PhysicalModeInfo, sizeof (Private->LogicalModeInfo));
 
-  Private->ViewportOffsetX = 0;
-  Private->ViewportOffsetY = 0;
-  Private->ViewportWidth   = Private->PhysicalModeInfo.HorizontalResolution;
-  Private->ViewportHeight  = Private->PhysicalModeInfo.VerticalResolution;
+  Private->ViewportOffsetX  = 0;
+  Private->ViewportOffsetY  = 0;
+  Private->ViewportWidth    = Private->PhysicalModeInfo.HorizontalResolution;
+  Private->ViewportHeight   = Private->PhysicalModeInfo.VerticalResolution;
   Private->HasHiDpiMode     = FALSE;
   Private->FrameBufferScale = 1;
   if (FeaturePcdGet (PcdFspGopBasicHiDpiSupport)) {
@@ -999,7 +1364,7 @@ GraphicsOutputDriverBindingStart (
         ((Private->PhysicalModeInfo.HorizontalResolution % 2) == 0) &&
         ((Private->PhysicalModeInfo.VerticalResolution % 2) == 0))
     {
-      Private->HasHiDpiMode                         = TRUE;
+      Private->HasHiDpiMode = TRUE;
       if (FeaturePcdGet (PcdFspGopBasicHiDpiWideAspectCapSupport) &&
           TryGetWideAspectCappedViewportWidth (
             Private->PhysicalModeInfo.HorizontalResolution,
