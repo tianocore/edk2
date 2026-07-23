@@ -39,6 +39,12 @@ typedef struct {
 extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 
 //
+// Maximum number of times RtcReadRegistersSafe () retries the read when an
+// update collision is detected before returning EFI_DEVICE_ERROR.
+//
+#define RTC_SAFE_READ_MAX_RETRY  5
+
+//
 // Dallas DS12C887 Real Time Clock
 //
 #define RTC_ADDRESS_SECONDS           0   // R/W  Range 0..59

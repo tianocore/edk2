@@ -60,6 +60,18 @@ IsWithinOneDay (
   );
 
 /**
+  Safely read a set of RTC time/date registers (indices 0-9) in small,
+  update-window-bounded batches.  See definition for full description.
+**/
+STATIC
+EFI_STATUS
+RtcReadRegistersSafe (
+  IN  CONST UINT8  *Addresses,
+  OUT UINT8        *Values,
+  IN  UINTN        Count
+  );
+
+/**
   Read RTC content through its registers using IO access.
 
   @param  Address   Address offset of RTC. It is recommended to use
@@ -327,13 +339,32 @@ PcRtcInit (
 
   //
   // Get the Time/Date/Daylight Savings values.
+  // Read in batches so a slow read sequence cannot span the update cycle
+  // (see RtcReadRegistersSafe).
   //
-  Time.Second = RtcRead (RTC_ADDRESS_SECONDS);
-  Time.Minute = RtcRead (RTC_ADDRESS_MINUTES);
-  Time.Hour   = RtcRead (RTC_ADDRESS_HOURS);
-  Time.Day    = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-  Time.Month  = RtcRead (RTC_ADDRESS_MONTH);
-  Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
+  {
+    CONST UINT8  ReadAddr[] = {
+      RTC_ADDRESS_SECONDS, RTC_ADDRESS_MINUTES, RTC_ADDRESS_HOURS,
+      RTC_ADDRESS_DAY_OF_THE_MONTH, RTC_ADDRESS_MONTH, RTC_ADDRESS_YEAR
+    };
+    UINT8  ReadVal[ARRAY_SIZE (ReadAddr)];
+
+    Status = RtcReadRegistersSafe (ReadAddr, ReadVal, ARRAY_SIZE (ReadAddr));
+    if (EFI_ERROR (Status)) {
+      if (!EfiAtRuntime ()) {
+        EfiReleaseLock (&Global->RtcLock);
+      }
+
+      return EFI_DEVICE_ERROR;
+    }
+
+    Time.Second = ReadVal[0];
+    Time.Minute = ReadVal[1];
+    Time.Hour   = ReadVal[2];
+    Time.Day    = ReadVal[3];
+    Time.Month  = ReadVal[4];
+    Time.Year   = ReadVal[5];
+  }
 
   //
   // Release RTC Lock.
@@ -560,19 +591,38 @@ PcRtcGetTime (
   }
 
   //
-  // Read Register B
+  // Read Register B (format/mode info, not affected by update cycle)
   //
   RegisterB.Data = RtcRead (RTC_ADDRESS_REGISTER_B);
 
   //
   // Get the Time/Date/Daylight Savings values.
+  // Read in batches so a slow read sequence cannot span the update cycle
+  // (see RtcReadRegistersSafe).
   //
-  Time->Second = RtcRead (RTC_ADDRESS_SECONDS);
-  Time->Minute = RtcRead (RTC_ADDRESS_MINUTES);
-  Time->Hour   = RtcRead (RTC_ADDRESS_HOURS);
-  Time->Day    = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-  Time->Month  = RtcRead (RTC_ADDRESS_MONTH);
-  Time->Year   = RtcRead (RTC_ADDRESS_YEAR);
+  {
+    CONST UINT8  ReadAddr[] = {
+      RTC_ADDRESS_SECONDS, RTC_ADDRESS_MINUTES, RTC_ADDRESS_HOURS,
+      RTC_ADDRESS_DAY_OF_THE_MONTH, RTC_ADDRESS_MONTH, RTC_ADDRESS_YEAR
+    };
+    UINT8  ReadVal[ARRAY_SIZE (ReadAddr)];
+
+    Status = RtcReadRegistersSafe (ReadAddr, ReadVal, ARRAY_SIZE (ReadAddr));
+    if (EFI_ERROR (Status)) {
+      if (!EfiAtRuntime ()) {
+        EfiReleaseLock (&Global->RtcLock);
+      }
+
+      return Status;
+    }
+
+    Time->Second = ReadVal[0];
+    Time->Minute = ReadVal[1];
+    Time->Hour   = ReadVal[2];
+    Time->Day    = ReadVal[3];
+    Time->Month  = ReadVal[4];
+    Time->Year   = ReadVal[5];
+  }
 
   //
   // Release RTC Lock.
@@ -591,11 +641,38 @@ PcRtcGetTime (
   // Make sure all field values are in correct range
   //
   Status = ConvertRtcTimeToEfiTime (Time, RegisterB);
-  if (!EFI_ERROR (Status)) {
-    Status = RtcTimeFieldsValid (Time);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: BCD conversion/format failure, returning EFI_DEVICE_ERROR. Status=%r RawTime Y=%u M=%u D=%u H=%u Min=%u S=%u\n",
+      __func__,
+      Status,
+      Time->Year,
+      Time->Month,
+      Time->Day,
+      Time->Hour,
+      Time->Minute,
+      Time->Second
+      ));
+    return EFI_DEVICE_ERROR;
   }
 
+  Status = RtcTimeFieldsValid (Time);
   if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: field-range validation failure, returning EFI_DEVICE_ERROR. Status=%r Time Y=%u M=%u D=%u H=%u Min=%u S=%u TZ=%d DL=0x%x\n",
+      __func__,
+      Status,
+      Time->Year,
+      Time->Month,
+      Time->Day,
+      Time->Hour,
+      Time->Minute,
+      Time->Second,
+      Time->TimeZone,
+      Time->Daylight
+      ));
     return EFI_DEVICE_ERROR;
   }
 
@@ -798,12 +875,32 @@ PcRtcGetWakeupTime (
   *Enabled = RegisterB.Bits.Aie;
   *Pending = RegisterC.Bits.Af;
 
-  Time->Second   = RtcRead (RTC_ADDRESS_SECONDS_ALARM);
-  Time->Minute   = RtcRead (RTC_ADDRESS_MINUTES_ALARM);
-  Time->Hour     = RtcRead (RTC_ADDRESS_HOURS_ALARM);
-  Time->Day      = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-  Time->Month    = RtcRead (RTC_ADDRESS_MONTH);
-  Time->Year     = RtcRead (RTC_ADDRESS_YEAR);
+  //
+  // Read the alarm and date registers safely (see RtcReadRegistersSafe).
+  //
+  {
+    CONST UINT8  ReadAddr[] = {
+      RTC_ADDRESS_SECONDS_ALARM, RTC_ADDRESS_MINUTES_ALARM, RTC_ADDRESS_HOURS_ALARM,
+      RTC_ADDRESS_DAY_OF_THE_MONTH, RTC_ADDRESS_MONTH, RTC_ADDRESS_YEAR
+    };
+    UINT8  ReadVal[ARRAY_SIZE (ReadAddr)];
+
+    Status = RtcReadRegistersSafe (ReadAddr, ReadVal, ARRAY_SIZE (ReadAddr));
+    if (EFI_ERROR (Status)) {
+      if (!EfiAtRuntime ()) {
+        EfiReleaseLock (&Global->RtcLock);
+      }
+
+      return EFI_DEVICE_ERROR;
+    }
+
+    Time->Second = ReadVal[0];
+    Time->Minute = ReadVal[1];
+    Time->Hour   = ReadVal[2];
+    Time->Day    = ReadVal[3];
+    Time->Month  = ReadVal[4];
+    Time->Year   = ReadVal[5];
+  }
   Time->TimeZone = Global->SavedTimeZone;
   Time->Daylight = Global->Daylight;
 
@@ -943,12 +1040,32 @@ PcRtcSetWakeupTime (
     //
     // if the alarm is disable, record the current setting.
     //
-    RtcTime.Second   = RtcRead (RTC_ADDRESS_SECONDS_ALARM);
-    RtcTime.Minute   = RtcRead (RTC_ADDRESS_MINUTES_ALARM);
-    RtcTime.Hour     = RtcRead (RTC_ADDRESS_HOURS_ALARM);
-    RtcTime.Day      = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-    RtcTime.Month    = RtcRead (RTC_ADDRESS_MONTH);
-    RtcTime.Year     = RtcRead (RTC_ADDRESS_YEAR);
+    //
+    // Read the alarm and date registers safely (see RtcReadRegistersSafe).
+    //
+    {
+      CONST UINT8  ReadAddr[] = {
+        RTC_ADDRESS_SECONDS_ALARM, RTC_ADDRESS_MINUTES_ALARM, RTC_ADDRESS_HOURS_ALARM,
+        RTC_ADDRESS_DAY_OF_THE_MONTH, RTC_ADDRESS_MONTH, RTC_ADDRESS_YEAR
+      };
+      UINT8  ReadVal[ARRAY_SIZE (ReadAddr)];
+
+      Status = RtcReadRegistersSafe (ReadAddr, ReadVal, ARRAY_SIZE (ReadAddr));
+      if (EFI_ERROR (Status)) {
+        if (!EfiAtRuntime ()) {
+          EfiReleaseLock (&Global->RtcLock);
+        }
+
+        return EFI_DEVICE_ERROR;
+      }
+
+      RtcTime.Second = ReadVal[0];
+      RtcTime.Minute = ReadVal[1];
+      RtcTime.Hour   = ReadVal[2];
+      RtcTime.Day    = ReadVal[3];
+      RtcTime.Month  = ReadVal[4];
+      RtcTime.Year   = ReadVal[5];
+    }
     RtcTime.TimeZone = Global->SavedTimeZone;
     RtcTime.Daylight = Global->Daylight;
   }
@@ -1127,6 +1244,9 @@ RtcWaitToUpdate (
 {
   RTC_REGISTER_A  RegisterA;
   RTC_REGISTER_D  RegisterD;
+  UINTN           OriginalTimeout;
+
+  OriginalTimeout = Timeout;
 
   //
   // See if the RTC is functioning correctly
@@ -1134,6 +1254,7 @@ RtcWaitToUpdate (
   RegisterD.Data = RtcRead (RTC_ADDRESS_REGISTER_D);
 
   if (RegisterD.Bits.Vrt == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: VRT bit is 0 before UIP wait\n", __func__));
     return EFI_DEVICE_ERROR;
   }
 
@@ -1149,11 +1270,113 @@ RtcWaitToUpdate (
   }
 
   RegisterD.Data = RtcRead (RTC_ADDRESS_REGISTER_D);
-  if ((Timeout == 0) || (RegisterD.Bits.Vrt == 0)) {
+  if (Timeout == 0) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: UIP timeout while waiting RTC update completion (requested=%u ticks, remaining=%u)\n",
+      __func__,
+      (UINT32)OriginalTimeout,
+      (UINT32)Timeout
+      ));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (RegisterD.Bits.Vrt == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: VRT bit is 0 after UIP wait\n", __func__));
     return EFI_DEVICE_ERROR;
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Safely read a set of RTC time/date registers (indices 0-9).
+
+  RTC RAM locations 0-9 are disconnected from the external bus during an update
+  cycle, so a read that spans the update returns wrong-register / undefined
+  data.  Where a single RTC access is slow, the multi-register read can exceed
+  the guaranteed update-free window after the UIP bit reads 0, so a single
+  up-front RtcWaitToUpdate() is not sufficient.
+
+  Each attempt enters a fresh update-free window (RtcWaitToUpdate), records the
+  Seconds register, reads the requested registers, then confirms no update
+  crossed the read: the UIP bit must still be clear AND Seconds must be
+  unchanged.  Because every update increments Seconds, the Seconds comparison
+  detects an update anywhere in the read regardless of where the momentary UIP
+  pulse fell - unlike a mid-read UIP poll, it does not depend on observing UIP
+  at the instant of the update.  If either check fails, all values are discarded
+  and the read is retried, bounded by RTC_SAFE_READ_MAX_RETRY.  This mirrors the
+  Linux mc146818_get_time() / mc146818_avoid_UIP() approach.
+
+  The RtcLock, if used, must be held by the caller.
+
+  @param  Addresses  Array of RTC register indices to read.
+  @param  Values     Array receiving the value read from each index.
+  @param  Count      Number of registers to read.
+
+  @retval EFI_SUCCESS       All registers were read from one update-free window.
+  @retval EFI_DEVICE_ERROR  RTC not ready, VRT invalid, or retries exhausted.
+**/
+STATIC
+EFI_STATUS
+RtcReadRegistersSafe (
+  IN  CONST UINT8  *Addresses,
+  OUT UINT8        *Values,
+  IN  UINTN        Count
+  )
+{
+  EFI_STATUS      Status;
+  RTC_REGISTER_A  RegisterA;
+  UINTN           Retry;
+  UINTN           Index;
+  UINT8           SecondsAtStart;
+
+  for (Retry = 0; Retry < RTC_SAFE_READ_MAX_RETRY; Retry++) {
+    //
+    // Enter a fresh update-free window (also validates VRT).
+    //
+    Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Snapshot Seconds, read the whole set, then confirm no update crossed the
+    // read: UIP must still be clear AND Seconds must be unchanged.  Seconds
+    // increments on every update, so an update anywhere in the read is detected
+    // by the Seconds comparison regardless of where the momentary UIP pulse
+    // fell; the UIP check ensures the final Seconds read was not itself taken
+    // mid-update.
+    //
+    SecondsAtStart = RtcRead (RTC_ADDRESS_SECONDS);
+
+    for (Index = 0; Index < Count; Index++) {
+      Values[Index] = RtcRead (Addresses[Index]);
+    }
+
+    RegisterA.Data = RtcRead (RTC_ADDRESS_REGISTER_A);
+    if ((RegisterA.Bits.Uip == 0) &&
+        (RtcRead (RTC_ADDRESS_SECONDS) == SecondsAtStart))
+    {
+      return EFI_SUCCESS;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: update collided with read, retrying (%u/%u)\n",
+      __func__,
+      (UINT32)(Retry + 1),
+      (UINT32)RTC_SAFE_READ_MAX_RETRY
+      ));
+  }
+
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: Retries exhausted (%u) - returning EFI_DEVICE_ERROR\n",
+    __func__,
+    (UINT32)RTC_SAFE_READ_MAX_RETRY
+    ));
+  return EFI_DEVICE_ERROR;
 }
 
 /**
