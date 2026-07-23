@@ -16,6 +16,63 @@
 ///
 extern EFI_GUID  gEfiCfrSetupMenuFormGuid;
 
+#define CFR_FWUPD_SETTINGS_VARIABLE_NAME  L"CorebootCfrSettings"
+
+#define CFR_FWUPD_SETTINGS_MAGIC    SIGNATURE_32 ('C', 'F', 'W', 'D')
+#define CFR_FWUPD_SETTINGS_VERSION  2
+
+///
+/// Numeric CFR option types published for operating-system consumers.
+///
+typedef enum {
+  CfrFwupdOptionTypeEnum   = 1,
+  CfrFwupdOptionTypeNumber = 2,
+  CfrFwupdOptionTypeBool   = 3,
+} CFR_FWUPD_OPTION_TYPE;
+
+#pragma pack (1)
+///
+/// Header for the volatile CorebootCfrSettings variable.
+///
+typedef struct {
+  UINT32    Magic;
+  UINT16    Version;
+  UINT16    HeaderSize;
+  UINT32    Size;
+  UINT32    RecordCount;
+} CFR_FWUPD_SETTINGS_HEADER;
+
+///
+/// Fixed portion of one runtime CFR option record.
+///
+typedef struct {
+  UINT16    Type;
+  UINT16    HeaderSize;
+  UINT32    CfrFlags;
+  UINT64    ObjectId;
+  UINT32    RuntimeApplyMethod;
+  UINT32    RuntimeApplyId;
+  UINT32    DefaultValue;
+  UINT32    Min;
+  UINT32    Max;
+  UINT32    Step;
+  UINT32    DisplayFlags;
+  UINT32    NameSize;
+  UINT32    UiNameSize;
+  UINT32    HelpTextSize;
+  UINT32    EnumCount;
+} CFR_FWUPD_OPTION_RECORD;
+
+///
+/// Fixed portion of an enum value following its option record.
+///
+typedef struct {
+  UINT32    Value;
+  UINT32    UiNameSize;
+} CFR_FWUPD_ENUM_RECORD;
+
+#pragma pack ()
+
 /*
  * The following tags are for CFR (Cursed Form Representation) entries.
  *

@@ -20,6 +20,130 @@
 #include <Guid/CfrSetupMenuGuid.h>
 #include <Guid/VariableFormat.h>
 
+typedef struct {
+  UINT8         *Data;
+  UINTN         Size;
+  UINTN         Capacity;
+  UINT32        RecordCount;
+  EFI_STATUS    Status;
+} CFR_FWUPD_SETTINGS_BUILDER;
+
+STATIC CFR_FWUPD_SETTINGS_BUILDER  mCfrFwupdSettings;
+
+/**
+  Grow the runtime CFR settings buffer.
+
+  @param[in] ExtraSize  Number of additional bytes required.
+
+  @retval EFI_SUCCESS           The buffer has sufficient capacity.
+  @retval EFI_OUT_OF_RESOURCES  The required size is unsupported or allocation
+                                failed.
+**/
+STATIC
+EFI_STATUS
+CfrFwupdSettingsReserve (
+  IN UINTN  ExtraSize
+  )
+{
+  UINT8  *NewData;
+  UINTN  NewCapacity;
+  UINTN  RequiredSize;
+
+  if (EFI_ERROR (mCfrFwupdSettings.Status)) {
+    return mCfrFwupdSettings.Status;
+  }
+
+  if ((ExtraSize > MAX_UINT32) ||
+      (mCfrFwupdSettings.Size > (MAX_UINT32 - ExtraSize)))
+  {
+    mCfrFwupdSettings.Status = EFI_OUT_OF_RESOURCES;
+    return mCfrFwupdSettings.Status;
+  }
+
+  RequiredSize = mCfrFwupdSettings.Size + ExtraSize;
+  if (RequiredSize <= mCfrFwupdSettings.Capacity) {
+    return EFI_SUCCESS;
+  }
+
+  NewCapacity = MAX (mCfrFwupdSettings.Capacity, 256);
+  while (NewCapacity < RequiredSize) {
+    if (NewCapacity > (MAX_UINT32 / 2)) {
+      NewCapacity = RequiredSize;
+      break;
+    }
+
+    NewCapacity *= 2;
+  }
+
+  NewData = ReallocatePool (
+              mCfrFwupdSettings.Capacity,
+              NewCapacity,
+              mCfrFwupdSettings.Data
+              );
+  if (NewData == NULL) {
+    mCfrFwupdSettings.Status = EFI_OUT_OF_RESOURCES;
+    return mCfrFwupdSettings.Status;
+  }
+
+  mCfrFwupdSettings.Data     = NewData;
+  mCfrFwupdSettings.Capacity = NewCapacity;
+  return EFI_SUCCESS;
+}
+
+/**
+  Append bytes to the runtime CFR settings buffer.
+
+  @param[in] Data      Bytes to append.
+  @param[in] DataSize  Number of bytes to append.
+
+  @retval EFI_SUCCESS           The bytes were appended.
+  @retval EFI_OUT_OF_RESOURCES  The buffer could not be grown.
+**/
+STATIC
+EFI_STATUS
+CfrFwupdSettingsAppend (
+  IN CONST VOID  *Data,
+  IN UINTN       DataSize
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = CfrFwupdSettingsReserve (DataSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DataSize > 0) {
+    CopyMem (mCfrFwupdSettings.Data + mCfrFwupdSettings.Size, Data, DataSize);
+  }
+
+  mCfrFwupdSettings.Size += DataSize;
+  return EFI_SUCCESS;
+}
+
+/**
+  Reset the runtime CFR settings builder and append its header.
+**/
+STATIC
+VOID
+CfrFwupdSettingsInit (
+  VOID
+  )
+{
+  CFR_FWUPD_SETTINGS_HEADER  Header;
+
+  if (mCfrFwupdSettings.Data != NULL) {
+    FreePool (mCfrFwupdSettings.Data);
+  }
+
+  ZeroMem (&mCfrFwupdSettings, sizeof (mCfrFwupdSettings));
+  ZeroMem (&Header, sizeof (Header));
+  Header.Magic      = CFR_FWUPD_SETTINGS_MAGIC;
+  Header.Version    = CFR_FWUPD_SETTINGS_VERSION;
+  Header.HeaderSize = sizeof (Header);
+  CfrFwupdSettingsAppend (&Header, sizeof (Header));
+}
+
 /**
   CFR_VARBINARY records are used as option name and UI name and help text.
   Convert one to formats used for EDK2 HII.
@@ -106,6 +230,227 @@ CfrExtractRuntimeApply (
 
   *Offset += RuntimeApply->size;
   return RuntimeApply;
+}
+
+/**
+  Append the data carried by an optional CFR variable-length record.
+
+  @param[in] CfrString  Record to append, or NULL.
+
+  @retval EFI_SUCCESS           The record was absent or its data was appended.
+  @retval EFI_OUT_OF_RESOURCES  The output buffer could not be grown.
+**/
+STATIC
+EFI_STATUS
+CfrFwupdSettingsAppendVarBinary (
+  IN CFR_VARBINARY  *CfrString OPTIONAL
+  )
+{
+  if (CfrString == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  return CfrFwupdSettingsAppend (CfrString->data, CfrString->data_length);
+}
+
+/**
+  Count the enum records following a validated CFR numeric option.
+
+  @param[in] Option           Numeric option containing the enum records.
+  @param[in] FirstEnumOffset  Offset of the first enum record.
+
+  @return Number of enum records.
+**/
+STATIC
+UINT32
+CfrFwupdEnumCount (
+  IN CFR_OPTION_NUMERIC  *Option,
+  IN UINTN               FirstEnumOffset
+  )
+{
+  UINT32          EnumCount;
+  UINTN           Offset;
+  CFR_ENUM_VALUE  *CfrEnumValue;
+
+  EnumCount = 0;
+  Offset    = FirstEnumOffset;
+  while (Offset < Option->size) {
+    CfrEnumValue = (CFR_ENUM_VALUE *)((UINT8 *)Option + Offset);
+    EnumCount++;
+    Offset += CfrEnumValue->size;
+  }
+
+  return EnumCount;
+}
+
+/**
+  Add a runtime-accessible numeric CFR option to the settings buffer.
+
+  @param[in] Option           Numeric option to add.
+  @param[in] CfrOptionName    Variable name record.
+  @param[in] CfrDisplayName   Display name record.
+  @param[in] CfrHelpText      Optional help text record.
+  @param[in] CfrRuntimeApply  Optional runtime-apply record.
+  @param[in] FirstEnumOffset  Offset of the first enum record.
+**/
+STATIC
+VOID
+CfrFwupdSettingsAddNumericOption (
+  IN CFR_OPTION_NUMERIC  *Option,
+  IN CFR_VARBINARY       *CfrOptionName,
+  IN CFR_VARBINARY       *CfrDisplayName,
+  IN CFR_VARBINARY       *CfrHelpText OPTIONAL,
+  IN CFR_RUNTIME_APPLY   *CfrRuntimeApply OPTIONAL,
+  IN UINTN               FirstEnumOffset
+  )
+{
+  EFI_STATUS               Status;
+  CFR_FWUPD_OPTION_RECORD  Record;
+  CFR_FWUPD_ENUM_RECORD    EnumRecord;
+  UINTN                    Offset;
+  CFR_ENUM_VALUE           *CfrEnumValue;
+  CFR_VARBINARY            *CfrEnumUiString;
+
+  if (((Option->flags & CFR_OPTFLAG_RUNTIME) == 0) ||
+      ((Option->flags & (CFR_OPTFLAG_SUPPRESS | CFR_OPTFLAG_VOLATILE)) != 0) ||
+      EFI_ERROR (mCfrFwupdSettings.Status))
+  {
+    return;
+  }
+
+  ZeroMem (&Record, sizeof (Record));
+  Record.HeaderSize   = sizeof (Record);
+  Record.CfrFlags     = Option->flags;
+  Record.ObjectId     = Option->object_id;
+  Record.DefaultValue = Option->default_value;
+  Record.Min          = Option->min;
+  Record.Max          = Option->max;
+  Record.Step         = Option->step;
+  Record.DisplayFlags = Option->display_flags;
+  Record.NameSize     = CfrOptionName->data_length;
+  Record.UiNameSize   = CfrDisplayName->data_length;
+  Record.HelpTextSize = (CfrHelpText != NULL) ? CfrHelpText->data_length : 0;
+
+  if (CfrRuntimeApply != NULL) {
+    Record.RuntimeApplyMethod = CfrRuntimeApply->method;
+    Record.RuntimeApplyId     = CfrRuntimeApply->id;
+  }
+
+  if (Option->tag == CB_TAG_CFR_OPTION_ENUM) {
+    Record.Type      = CfrFwupdOptionTypeEnum;
+    Record.EnumCount = CfrFwupdEnumCount (Option, FirstEnumOffset);
+  } else if (Option->tag == CB_TAG_CFR_OPTION_NUMBER) {
+    Record.Type = CfrFwupdOptionTypeNumber;
+  } else {
+    Record.Type = CfrFwupdOptionTypeBool;
+  }
+
+  Status = CfrFwupdSettingsAppend (&Record, sizeof (Record));
+  if (!EFI_ERROR (Status)) {
+    Status = CfrFwupdSettingsAppendVarBinary (CfrOptionName);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    Status = CfrFwupdSettingsAppendVarBinary (CfrDisplayName);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    Status = CfrFwupdSettingsAppendVarBinary (CfrHelpText);
+  }
+
+  Offset = FirstEnumOffset;
+  while (!EFI_ERROR (Status) && (Offset < Option->size)) {
+    CfrEnumValue    = (CFR_ENUM_VALUE *)((UINT8 *)Option + Offset);
+    CfrEnumUiString = (CFR_VARBINARY *)(
+                                        (UINT8 *)CfrEnumValue + sizeof (CFR_ENUM_VALUE)
+                                        );
+    EnumRecord.Value      = CfrEnumValue->value;
+    EnumRecord.UiNameSize = CfrEnumUiString->data_length;
+    Status                = CfrFwupdSettingsAppend (&EnumRecord, sizeof (EnumRecord));
+    if (!EFI_ERROR (Status)) {
+      Status = CfrFwupdSettingsAppendVarBinary (CfrEnumUiString);
+    }
+
+    Offset += CfrEnumValue->size;
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "CFR: Failed to add fwupd option: %r\n", Status));
+    return;
+  }
+
+  if (mCfrFwupdSettings.RecordCount == MAX_UINT32) {
+    mCfrFwupdSettings.Status = EFI_OUT_OF_RESOURCES;
+    return;
+  }
+
+  mCfrFwupdSettings.RecordCount++;
+}
+
+/**
+  Publish the completed runtime CFR settings buffer and release it.
+**/
+STATIC
+VOID
+CfrFwupdSettingsPublish (
+  VOID
+  )
+{
+  EFI_STATUS                 Status;
+  CFR_FWUPD_SETTINGS_HEADER  *Header;
+  UINT32                     Attributes;
+
+  if (EFI_ERROR (mCfrFwupdSettings.Status) ||
+      (mCfrFwupdSettings.Data == NULL))
+  {
+    DEBUG ((
+      DEBUG_WARN,
+      "CFR: Failed to build fwupd settings: %r\n",
+      mCfrFwupdSettings.Status
+      ));
+    goto Free;
+  }
+
+  Header              = (CFR_FWUPD_SETTINGS_HEADER *)mCfrFwupdSettings.Data;
+  Header->Size        = (UINT32)mCfrFwupdSettings.Size;
+  Header->RecordCount = mCfrFwupdSettings.RecordCount;
+
+  Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS |
+               EFI_VARIABLE_RUNTIME_ACCESS;
+  Status = gRT->SetVariable (
+                  CFR_FWUPD_SETTINGS_VARIABLE_NAME,
+                  &gEficorebootNvDataGuid,
+                  Attributes,
+                  mCfrFwupdSettings.Size,
+                  mCfrFwupdSettings.Data
+                  );
+  if (Status == EFI_INVALID_PARAMETER) {
+    gRT->SetVariable (
+           CFR_FWUPD_SETTINGS_VARIABLE_NAME,
+           &gEficorebootNvDataGuid,
+           0,
+           0,
+           NULL
+           );
+    Status = gRT->SetVariable (
+                    CFR_FWUPD_SETTINGS_VARIABLE_NAME,
+                    &gEficorebootNvDataGuid,
+                    Attributes,
+                    mCfrFwupdSettings.Size,
+                    mCfrFwupdSettings.Data
+                    );
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "CFR: Failed to publish fwupd settings: %r\n", Status));
+  }
+
+Free:
+  if (mCfrFwupdSettings.Data != NULL) {
+    FreePool (mCfrFwupdSettings.Data);
+  }
+
+  ZeroMem (&mCfrFwupdSettings, sizeof (mCfrFwupdSettings));
 }
 
 /**
@@ -547,26 +892,27 @@ CfrProcessNumericOption (
   IN OUT UINTN               *ProcessedLength
   )
 {
-  UINTN           OptionProcessedLength;
-  CFR_VARBINARY   *CfrOptionName;
-  CFR_VARBINARY   *CfrDisplayName;
-  CFR_VARBINARY   *CfrHelpText;
-  UINT32          *DepValues;
-  UINT32          NumDepValues;
-  CFR_VARBINARY   *CfrDepValues;
-  UINTN           QuestionIdVarStoreId;
-  UINT8           QuestionFlags;
-  VOID            *DefaultOpCodeHandle;
-  UINT8           *TempHiiBuffer;
-  CHAR16          *HiiDisplayString;
-  EFI_STRING_ID   HiiDisplayStringId;
-  CHAR16          *HiiHelpText;
-  EFI_STRING_ID   HiiHelpTextId;
-  VOID            *OptionOpCodeHandle;
-  CFR_ENUM_VALUE  *CfrEnumValues;
-  CFR_VARBINARY   *CfrEnumUiString;
-  CHAR16          *HiiEnumStrings;
-  EFI_STRING_ID   HiiEnumStringsId;
+  UINTN              OptionProcessedLength;
+  CFR_VARBINARY      *CfrOptionName;
+  CFR_VARBINARY      *CfrDisplayName;
+  CFR_VARBINARY      *CfrHelpText;
+  UINT32             *DepValues;
+  UINT32             NumDepValues;
+  CFR_VARBINARY      *CfrDepValues;
+  CFR_RUNTIME_APPLY  *CfrRuntimeApply;
+  UINTN              QuestionIdVarStoreId;
+  UINT8              QuestionFlags;
+  VOID               *DefaultOpCodeHandle;
+  UINT8              *TempHiiBuffer;
+  CHAR16             *HiiDisplayString;
+  EFI_STRING_ID      HiiDisplayStringId;
+  CHAR16             *HiiHelpText;
+  EFI_STRING_ID      HiiHelpTextId;
+  VOID               *OptionOpCodeHandle;
+  CFR_ENUM_VALUE     *CfrEnumValues;
+  CFR_VARBINARY      *CfrEnumUiString;
+  CHAR16             *HiiEnumStrings;
+  EFI_STRING_ID      HiiEnumStringsId;
 
   //
   // Extract variable-length fields that follow the header
@@ -613,10 +959,19 @@ CfrProcessNumericOption (
     CfrConvertVarBinaryToUint32Array (CfrDepValues, &DepValues, &NumDepValues);
   }
 
-  CfrExtractRuntimeApply (
-    (UINT8 *)Option,
-    &OptionProcessedLength,
-    Option->size
+  CfrRuntimeApply = CfrExtractRuntimeApply (
+                      (UINT8 *)Option,
+                      &OptionProcessedLength,
+                      Option->size
+                      );
+
+  CfrFwupdSettingsAddNumericOption (
+    Option,
+    CfrOptionName,
+    CfrDisplayName,
+    CfrHelpText,
+    CfrRuntimeApply,
+    OptionProcessedLength
     );
 
   DEBUG ((
@@ -1031,6 +1386,8 @@ CfrCreateRuntimeComponents (
   EFI_STATUS          Status;
   UINT8               *TempHiiBuffer;
 
+  CfrFwupdSettingsInit ();
+
   //
   // Allocate GUIDed markers at runtime component offset in IFR
   //
@@ -1144,6 +1501,8 @@ CfrCreateRuntimeComponents (
              EndOpCodeHandle
              );
   ASSERT_EFI_ERROR (Status);
+
+  CfrFwupdSettingsPublish ();
 
   HiiFreeOpCodeHandle (StartOpCodeHandle);
   HiiFreeOpCodeHandle (EndOpCodeHandle);
