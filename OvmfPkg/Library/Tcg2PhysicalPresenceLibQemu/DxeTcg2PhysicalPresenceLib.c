@@ -40,6 +40,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 EFI_HII_HANDLE  mTcg2PpStringPackHandle;
 
+#define TCG2_PHYSICAL_PRESENCE_USER_CONFIRM_TIMEOUT_100NS  (3ULL * 60ULL * 10000000ULL)
+
 #define TPM_PPI_FLAGS  (QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ)
 
 STATIC volatile QEMU_TPM_PPI  *mPpi;
@@ -348,31 +350,51 @@ Tcg2ReadUserKey (
   EFI_STATUS     Status;
   EFI_INPUT_KEY  Key;
   UINT16         InputKey;
+  EFI_EVENT      TimeoutEvent;
+  EFI_EVENT      WaitList[2];
+  UINTN          WaitIndex;
 
-  InputKey = 0;
-  do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-    }
-  } while (InputKey == 0);
-
-  if (InputKey != SCAN_ESC) {
-    return TRUE;
+  Status = gBS->CreateEvent (EVT_TIMER, TPL_CALLBACK, NULL, NULL, &TimeoutEvent);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
   }
 
-  return FALSE;
+  Status = gBS->SetTimer (
+                  TimeoutEvent,
+                  TimerRelative,
+                  TCG2_PHYSICAL_PRESENCE_USER_CONFIRM_TIMEOUT_100NS
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (TimeoutEvent);
+    return FALSE;
+  }
+
+  WaitList[0] = gST->ConIn->WaitForKey;
+  WaitList[1] = TimeoutEvent;
+  InputKey    = 0;
+
+  while (InputKey == 0) {
+    Status = gBS->WaitForEvent (ARRAY_SIZE (WaitList), WaitList, &WaitIndex);
+    if (EFI_ERROR (Status) || (WaitIndex == 1)) {
+      break;
+    }
+
+    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if ((Key.ScanCode == SCAN_ESC) ||
+        ((Key.ScanCode == SCAN_F10) && !CautionKey) ||
+        ((Key.ScanCode == SCAN_F12) && CautionKey))
+    {
+      InputKey = Key.ScanCode;
+    }
+  }
+
+  gBS->CloseEvent (TimeoutEvent);
+
+  return (BOOLEAN)((InputKey != 0) && (InputKey != SCAN_ESC));
 }
 
 /**
