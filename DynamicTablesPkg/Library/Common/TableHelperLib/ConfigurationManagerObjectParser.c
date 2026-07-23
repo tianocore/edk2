@@ -1272,6 +1272,13 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationValueParser[] = {
   { "Value", SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE, NULL,   HexDump },
 };
 
+/** A parser for EArchCommonObjSystemBootInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemBootInfoParser[] = {
+  { "SystemBootInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "BootStatus",          sizeof (UINT8),           "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1474,6 +1481,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationValue,          CmArchCommonAdditionalInformationValueParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemEnclosureInfo,                 CmArchCommonSystemEnclosureInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjEnclosureElement,                    CmArchCommonEnclosureElementParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemBootInfo,                      CmArchCommonSystemBootInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
