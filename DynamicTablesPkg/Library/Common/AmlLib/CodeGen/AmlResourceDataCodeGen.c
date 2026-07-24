@@ -1266,7 +1266,8 @@ AmlCodeGenRdInterrupt (
   EFI_STATUS  Status;
 
   AML_DATA_NODE                           *RdNode;
-  EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR  RdInterrupt;
+  EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR  *RdInterrupt;
+  UINT16                                  RdInterruptSize;
   UINT32                                  *FirstInterrupt;
 
   if ((IrqList == NULL) ||
@@ -1277,32 +1278,36 @@ AmlCodeGenRdInterrupt (
     return EFI_INVALID_PARAMETER;
   }
 
+  // EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR already includes the first interrupt
+  RdInterruptSize = sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR) + (IrqCount - 1) * sizeof (UINT32);
+  RdInterrupt     = (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR *)AllocateZeroPool (RdInterruptSize);
+
   // Header
-  RdInterrupt.Header.Header.Bits.Name =
+  RdInterrupt->Header.Header.Bits.Name =
     ACPI_LARGE_EXTENDED_IRQ_DESCRIPTOR_NAME;
-  RdInterrupt.Header.Header.Bits.Type = ACPI_LARGE_ITEM_FLAG;
-  RdInterrupt.Header.Length           = sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR) -
-                                        sizeof (ACPI_LARGE_RESOURCE_HEADER);
+  RdInterrupt->Header.Header.Bits.Type = ACPI_LARGE_ITEM_FLAG;
+  RdInterrupt->Header.Length           = RdInterruptSize - sizeof (ACPI_LARGE_RESOURCE_HEADER);
 
   // Body
-  RdInterrupt.InterruptVectorFlags = (ResourceConsumer ? BIT0 : 0) |
-                                     (EdgeTriggered ? BIT1 : 0)    |
-                                     (ActiveLow ? BIT2 : 0)        |
-                                     (Shared ? BIT3 : 0);
-  RdInterrupt.InterruptTableLength = IrqCount;
+  RdInterrupt->InterruptVectorFlags = (ResourceConsumer ? BIT0 : 0) |
+                                      (EdgeTriggered ? BIT1 : 0)    |
+                                      (ActiveLow ? BIT2 : 0)        |
+                                      (Shared ? BIT3 : 0);
+  RdInterrupt->InterruptTableLength = IrqCount;
 
   // Get the address of the first interrupt field.
-  FirstInterrupt = RdInterrupt.InterruptNumber;
+  FirstInterrupt = RdInterrupt->InterruptNumber;
 
   // Copy the list of interrupts.
   CopyMem (FirstInterrupt, IrqList, (sizeof (UINT32) * IrqCount));
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeResourceData,
-             (UINT8 *)&RdInterrupt,
-             sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR),
+             (UINT8 *)RdInterrupt,
+             RdInterruptSize,
              &RdNode
              );
+  FreePool (RdInterrupt);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;

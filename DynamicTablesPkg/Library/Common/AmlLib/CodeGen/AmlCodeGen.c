@@ -1568,16 +1568,15 @@ error_handler1:
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenMethod (
-  IN  CONST CHAR8            *NameString,
-  IN        UINT8            NumArgs,
-  IN        BOOLEAN          IsSerialized,
-  IN        UINT8            SyncLevel,
-  IN        AML_NODE_HEADER  *ParentNode      OPTIONAL,
-  OUT       AML_OBJECT_NODE  **NewObjectNode   OPTIONAL
+  IN  CONST CHAR8                   *NameString,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   )
 {
   EFI_STATUS       Status;
@@ -2388,6 +2387,120 @@ AmlCodeGenMethodRetInteger (
   Status = AmlCodeGenReturnInteger (
              ReturnedInteger,
              (AML_NODE_HANDLE)MethodNode,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = LinkNode (
+             MethodNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  if (MethodNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)MethodNode);
+  }
+
+  return Status;
+}
+
+/** AML code generation for a method returning a Buffer.
+
+  AmlCodeGenMethodRetBuffer (
+    "_MAT", ReturnedBuffer, ReturnedBufferSize, 1, TRUE, 0, ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(_MAT, 1, Serialized, 0) {
+      Return (Buffer (ReturnedBufferSize) {...})
+    }
+
+  To return an empty buffer, call the function with
+  (ReturnedBuffer=NULL, ReturnedBufferSize=0).
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  ReturnedBuffer       The buffer returned by the method.
+                                    The input buffer is copied.
+                                    NULL if an empty buffer is returned.
+  @param [in]  ReturnedBufferSize   Size of ReturnedBuffer.
+                                    Must be 0 if ReturnedBuffer is NULL.
+  @param [in]  NumArgs              Number of arguments.
+                                    Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodRetBuffer (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST UINT8                   *ReturnedBuffer,
+  IN        UINT32                  ReturnedBufferSize,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  MethodNode;
+  AML_OBJECT_NODE_HANDLE  BufferNode;
+
+  if ((MethodNameString == NULL)                         ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)) ||
+      ((ReturnedBuffer == NULL) != (ReturnedBufferSize == 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Create a Method named MethodNameString.
+  Status = AmlCodeGenMethod (
+             MethodNameString,
+             NumArgs,
+             IsSerialized,
+             SyncLevel,
+             NULL,
+             &MethodNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenBuffer (ReturnedBuffer, ReturnedBufferSize, &BufferNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // AmlCodeGenReturn() deletes BufferNode if an error occurs.
+  Status = AmlCodeGenReturn (
+             (AML_NODE_HEADER *)BufferNode,
+             (AML_NODE_HEADER *)MethodNode,
              NULL
              );
   if (EFI_ERROR (Status)) {
