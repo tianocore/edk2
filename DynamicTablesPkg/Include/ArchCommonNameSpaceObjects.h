@@ -31,6 +31,16 @@
 ///
 #define SMBIOS_MAX_STRING_SIZE  (1024)
 
+///
+/// Reduced Maximum storage size, including the terminating NULL, for SMBIOS strings
+/// represented inline in Configuration Manager objects. This is a
+/// DynamicTablesPkg implementation limit.
+///
+/// The legacy 64-character constraint from SMBIOS 2.6 was required for MIF
+/// compatibility and does not apply to SMBIOS 2.7 or later tables.
+///
+#define SMBIOS_MAX_STRING_SIZE_REDUCED  ((2 * SMBIOS_STRING_MAX_LENGTH) + 1)
+
 // Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
 #define CFMWS_MAX_INTERLEAVE_WAYS  (16)
 
