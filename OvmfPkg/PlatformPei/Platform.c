@@ -31,6 +31,7 @@
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Ppi/MasterBootMode.h>
+#include <Guid/DxeMemoryProtectionSettings.h>
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Microvm.h>
 #include <IndustryStandard/Pci22.h>
@@ -354,10 +355,25 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob;
-  EFI_STATUS             Status;
+  EFI_HOB_PLATFORM_INFO           *PlatformInfoHob;
+  EFI_STATUS                      Status;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+
+  if (FeaturePcdGet (PcdStrictMemoryProtections)) {
+    DxeSettings = (DXE_MEMORY_PROTECTION_SETTINGS)DXE_MEMORY_PROTECTION_SETTINGS_DEBUG;
+  } else {
+    ZeroMem (&DxeSettings, sizeof (DxeSettings));
+    DxeSettings.StructVersion = DXE_MEMORY_PROTECTION_SETTINGS_CURRENT_VERSION;
+  }
+
+  BuildGuidDataHob (
+    &gDxeMemoryProtectionSettingsGuid,
+    &DxeSettings,
+    sizeof (DxeSettings)
+    );
+
   PlatformInfoHob = BuildPlatformInfoHob ();
 
   if (TdIsEnabled ()) {
