@@ -1328,6 +1328,7 @@ ParseOpCodes (
   mExpressionOpCodeIndex    = 0;
   FormSet->ExpressionBuffer = AllocateZeroPool (NumberOfExpression * sizeof (EXPRESSION_OPCODE));
   if (FormSet->ExpressionBuffer == NULL) {
+    FreePool (FormSet->StatementBuffer);
     return EFI_OUT_OF_RESOURCES;
   }
 

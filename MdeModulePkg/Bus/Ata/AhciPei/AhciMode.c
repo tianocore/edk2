@@ -1619,6 +1619,7 @@ CreateNewDevice (
   if (IdentifyData != NULL) {
     DeviceData->IdentifyData = AllocateCopyPool (sizeof (ATA_IDENTIFY_DATA), IdentifyData);
     if (DeviceData->IdentifyData == NULL) {
+      FreePool (DeviceData);
       return EFI_OUT_OF_RESOURCES;
     }
   }
@@ -1632,6 +1633,7 @@ CreateNewDevice (
 
   Status = IdentifyAtaDevice (DeviceData);
   if (EFI_ERROR (Status)) {
+    FreePool (DeviceData);
     return Status;
   }
 
