@@ -33,6 +33,7 @@
   #
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE DEBUG_TO_MEM            = FALSE
+  DEFINE ENABLE_5LEVEL_PAGING    = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
@@ -497,6 +498,10 @@
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
+
+!if $(ENABLE_5LEVEL_PAGING) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable|TRUE
+!endif
 
 ################################################################################
 #
