@@ -188,6 +188,18 @@ ASM_PFX(GasketSecDisableInterrupt):
   leave
   ret
 
+ASM_GLOBAL ASM_PFX(GasketSecGetInterruptState)
+ASM_PFX(GasketSecGetInterruptState):
+  pushl %ebp
+  movl  %esp, %ebp
+  subl  $24, %esp      // sub extra 16 from the stack for alignment
+  and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
+
+  call    ASM_PFX(SecInterruptEanbled)
+
+  leave
+  ret
+
 ASM_GLOBAL ASM_PFX(GasketQueryPerformanceFrequency)
 ASM_PFX(GasketQueryPerformanceFrequency):
   pushl %ebp

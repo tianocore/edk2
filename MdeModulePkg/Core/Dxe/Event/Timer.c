@@ -183,13 +183,27 @@ CoreInitializeTimer (
                                  to TimerTick
 
 **/
+STATIC
 VOID
 EFIAPI
 CoreTimerTick (
   IN UINT64  Duration
   )
 {
-  IEVENT  *Event;
+  EFI_TPL  OriginalTPL;
+  IEVENT   *Event;
+
+  DEBUG_CODE_BEGIN ();
+  if (gCpu != NULL) {
+    BOOLEAN  State;
+
+    ASSERT_EFI_ERROR (gCpu->GetInterruptState (gCpu, &State));
+    ASSERT (!State);
+  }
+
+  DEBUG_CODE_END ();
+
+  OriginalTPL = CoreRaiseTpl (TPL_HIGH_LEVEL);
 
   //
   // Check runtiem flag in case there are ticks while exiting boot services
@@ -214,6 +228,18 @@ CoreTimerTick (
   }
 
   CoreReleaseLock (&mEfiSystemTimeLock);
+
+  //
+  // Restore the original TPL but without re-enabling interrupts. This is the
+  // responsibility of the caller, which will do so implicitly by returning
+  // from the timer ISR in an architecture-specific manner (IRET, ERET, etc).
+  //
+  // Re-enabling interrupts before that leaves a window where the timer
+  // interrupt, which has been re-armed at this point, may fire again
+  // immediately, resulting in unbounded recursion if the interrupts are
+  // arriving at a higher rate than they can be serviced.
+  //
+  CoreRestoreTplWithInterruptsMasked (OriginalTPL);
 }
 
 /**
@@ -288,4 +314,22 @@ CoreSetTimer (
   CoreReleaseLock (&mEfiTimerLock);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Register the DXE core timer tick handler with the timer driver.
+
+  @retval EFI_SUCCESS           The timer handler was registered.
+  @retval EFI_UNSUPPORTED       The platform does not support timer interrupts.
+  @retval EFI_ALREADY_STARTED   A handler is already registered.
+  @retval EFI_DEVICE_ERROR      The timer handler could not be registered.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreRegisterTimerHandler (
+  VOID
+  )
+{
+  return gTimer->RegisterHandler (gTimer, CoreTimerTick);
 }

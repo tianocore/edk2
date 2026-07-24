@@ -45,7 +45,6 @@ typedef struct {
   //
   // Local Data for CPU interface goes here
   //
-  BOOLEAN                  InterruptState;
 } CPU_ARCH_PROTOCOL_PRIVATE;
 
 #define CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS(a) \
