@@ -1,0 +1,11 @@
+## @file
+# Build Plugin used to set the path to the Clang/LLVM tools chain
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global",
+  "name": "Clang Tool Chain Support",
+  "module": "ClangToolChain"
+}
