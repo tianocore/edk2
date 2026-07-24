@@ -176,7 +176,7 @@ InternalDumpData (
 /**
 
   This function initialize TCG_PCR_EVENT2_HDR for EV_NO_ACTION Event Type other than EFI Specification ID event
-  The behavior is defined by TCG PC Client PFP Spec. Section 9.3.4 EV_NO_ACTION Event Types
+  The behavior is defined by TCG PC Client PFP Spec. 00.21 (2016) Section 9.3.4 EV_NO_ACTION Event Types
 
   @param[in, out]   NoActionEvent  Event Header of EV_NO_ACTION Event
   @param[in]        EventSize      Event Size of the EV_NO_ACTION Event
@@ -1736,8 +1736,8 @@ SetupEventLog (
 
         //
         // Log TcgEfiSpecIdEventStruct as the first Event. Event format is TCG_PCR_EVENT.
-        //   TCG EFI Protocol Spec. Section 5.3 Event Log Header
-        //   TCG PC Client PFP spec. Section 9.2 Measurement Event Entries and Log
+        //   TCG EFI Protocol Spec. 00.13 (2016) Section 5.3 Event Log Header
+        //   TCG PC Client PFP Spec. 00.21 (2016) Section 9.2 Measurement Event Entries and Log
         //
         Status = TcgDxeLogEvent (
                    mTcg2EventInfo[Index].LogFormat,
@@ -1791,7 +1791,7 @@ SetupEventLog (
 
           //
           // Log EfiStartupLocalityEvent as the second Event
-          //   TCG PC Client PFP spec. Section 9.3.4.3 Startup Locality Event
+          //   TCG PC Client PFP Spec. 00.21 (2016) Section 9.3.4.3 Startup Locality Event
           //
           Status = TcgDxeLogEvent (
                      mTcg2EventInfo[Index].LogFormat,
@@ -2197,7 +2197,7 @@ ReadAndMeasureVariable (
 
 /**
   Read then Measure and log an EFI boot variable, and extend the measurement result into PCR[1].
-according to TCG PC Client PFP spec 0021 Section 2.4.4.2
+according to TCG PC Client PFP Spec. 00.21 (2016) Section 2.4.4.2
 
   @param[in]   VarName          A Null-terminated string that is the name of the vendor's variable.
   @param[in]   VendorGuid       A unique identifier for the vendor.
@@ -2566,7 +2566,7 @@ OnReadyToBoot (
 
     //
     // 7. Next boot attempt, measure "Calling EFI Application from Boot Option" again
-    // TCG PC Client PFP spec Section 2.4.4.5 Step 4
+    // TCG PC Client PFP Spec. 00.21 (2016) Section 2.4.4.5 Step 4
     //
     Status = TcgMeasureAction (
                4,
