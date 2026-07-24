@@ -1839,7 +1839,6 @@ typedef struct CmArchCommonAdditionalInformationValue {
   UINT8    Value[SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE];
 } CM_ARCH_COMMON_ADDITIONAL_INFORMATION_VALUE;
 
-
 /** A structure that describes a System Enclosure Contained Element.
 
   SMBIOS Specification v3.9.0 Type 3
