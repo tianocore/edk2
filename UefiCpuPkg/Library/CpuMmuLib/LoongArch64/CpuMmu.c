@@ -19,6 +19,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/DebugSupport.h>
+#include <Register/LoongArch64/Cpucfg.h>
 #include <Register/LoongArch64/Csr.h>
 #include "TlbInvalid.h"
 #include "TlbExceptionHandle.h"
@@ -124,8 +125,8 @@ SetValidPte (
   IN  UINTN  Entry
   )
 {
-  /* Set Valid and Global mapping bits */
-  return Entry | PAGE_GLOBAL | PAGE_VALID;
+  /* Keep the hardware-PTW Present bit paired with the Accessed/Valid bit. */
+  return Entry | PAGE_GLOBAL | PAGE_PRESENT | PAGE_VALID;
 }
 
 /**
@@ -508,13 +509,13 @@ UpdateRegionMappingRecursive (
       EntryValue = SetValidPte (EntryValue);
 
       if (Level < (ParseMaxPageTableLevel (PageWalkCfg) - 1)) {
-        EntryValue |= (PAGE_HGLOBAL | PAGE_HUGE | PAGE_VALID);
+        EntryValue |= PAGE_HGLOBAL | PAGE_HUGE;
       } else {
-        EntryValue |= PAGE_GLOBAL | PAGE_VALID;
+        EntryValue |= PAGE_GLOBAL;
       }
 
       if ((AttributeSetMask & PAGE_NO_READ) != 0) {
-        EntryValue &= ~PAGE_VALID;
+        EntryValue &= ~(PAGE_PRESENT | PAGE_VALID);
       }
 
       ReplaceTableEntry (Entry, EntryValue, RegionStart, TableIsLive);
@@ -582,7 +583,12 @@ EfiAttributeConverse (
 {
   UINT64  LoongArchAttributes;
 
-  LoongArchAttributes = PAGE_VALID | PAGE_DIRTY | PLV_KERNEL | PAGE_GLOBAL;
+  //
+  // Firmware has no swap-backed mappings. Keep the hardware-PTW permission
+  // bits paired with the software-refill Accessed/Dirty bits.
+  //
+  LoongArchAttributes = PAGE_PRESENT | PAGE_VALID | PAGE_WRITE | PAGE_DIRTY |
+                        PLV_KERNEL | PAGE_GLOBAL;
 
   switch (EfiAttributes & EFI_CACHE_ATTRIBUTE_MASK) {
     case EFI_MEMORY_UC:
@@ -596,7 +602,7 @@ EfiAttributeConverse (
       LoongArchAttributes |= CACHE_CC;
       break;
     case EFI_MEMORY_WP:
-      LoongArchAttributes &= ~PAGE_DIRTY;
+      LoongArchAttributes &= ~(PAGE_WRITE | PAGE_DIRTY);
       break;
     default:
       LoongArchAttributes |= CACHE_CC;
@@ -612,7 +618,7 @@ EfiAttributeConverse (
       LoongArchAttributes |= PAGE_NO_EXEC;
       break;
     case EFI_MEMORY_RO:
-      LoongArchAttributes &= ~PAGE_DIRTY;
+      LoongArchAttributes &= ~(PAGE_WRITE | PAGE_DIRTY);
       break;
     default:
       break;
@@ -634,10 +640,24 @@ TlbRefillHandlerConfigure (
   VOID
   )
 {
-  UINTN  Length;
-  UINTN  TlbReEntry;
-  UINTN  TlbReEntryOffset;
-  UINTN  Remaining;
+  UINTN                  Length;
+  UINTN                  TlbReEntry;
+  UINTN                  TlbReEntryOffset;
+  UINTN                  Remaining;
+  CPUCFG_REG2_INFO_DATA  CpucfgReg2Data;
+
+  //
+  // Get the status indicating that the HPTW bit has been set.
+  //
+  AsmCpucfg (CPUCFG_REG2_INFO, &CpucfgReg2Data.Uint32);
+
+  if (CpucfgReg2Data.Bits.HPTW != 0) {
+    //
+    // Enable the hardware page table walker.
+    //
+    CsrXChg (LOONGARCH_CSR_PWCTL1, BIT24, BIT24);
+    return EFI_SUCCESS;
+  }
 
   //
   // Set TLB exception handler
