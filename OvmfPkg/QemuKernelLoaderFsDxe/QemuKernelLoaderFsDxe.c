@@ -990,6 +990,7 @@ QemuKernelFetchBlob (
   )
 {
   UINT32       Size;
+  UINT64       TotalSize;
   UINTN        Idx;
   UINT8        *ChunkData;
   KERNEL_BLOB  *Blob;
@@ -1001,7 +1002,13 @@ QemuKernelFetchBlob (
   //   SizeKey != 0   ->  read size from fw_cfg
   //   both are 0     ->  unused entry
   //
-  for (Size = 0, Idx = 0; Idx < ARRAY_SIZE (BlobItems->FwCfgItem); Idx++) {
+  // Accumulate in 64-bit to detect a total that does not fit in UINT32. The
+  // per-item sizes are host-controlled (fw_cfg), and the blob is served from a
+  // single UINT32-sized allocation that is later filled by copying each item's
+  // UINT32 size. Summing into a UINT32 here could wrap and undersize the
+  // allocation, after which the copy loop below would overflow it.
+  //
+  for (TotalSize = 0, Idx = 0; Idx < ARRAY_SIZE (BlobItems->FwCfgItem); Idx++) {
     if ((BlobItems->FwCfgItem[Idx].SizeKey == 0) &&
         (BlobItems->FwCfgItem[Idx].Size == 0))
     {
@@ -1013,8 +1020,21 @@ QemuKernelFetchBlob (
       BlobItems->FwCfgItem[Idx].Size = QemuFwCfgRead32 ();
     }
 
-    Size += BlobItems->FwCfgItem[Idx].Size;
+    TotalSize += BlobItems->FwCfgItem[Idx].Size;
   }
+
+  if (TotalSize > MAX_UINT32) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: total fw_cfg blob size 0x%Lx too large for \"%s\"\n",
+      __func__,
+      TotalSize,
+      BlobItems->Name
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Size = (UINT32)TotalSize;
 
   if (Size == 0) {
     return EFI_SUCCESS;
