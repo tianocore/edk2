@@ -9,51 +9,36 @@
 #include <PiDxe.h>
 
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/TpmPlatformHierarchyLib.h>
 #include <Protocol/DxeSmmReadyToLock.h>
 
 /**
-   This callback function will run at the SmmReadyToLock event.
+   This callback function will run at EndOfDxe or ReadyToBoot based on boot mode.
 
    Configuration of the TPM's Platform Hierarchy Authorization Value (platformAuth)
    and Platform Hierarchy Authorization Policy (platformPolicy) can be defined through this function.
 
   @param  Event   Pointer to this event
-  @param  Context Event hanlder private data
+  @param  Context Event handler private data
  **/
 VOID
 EFIAPI
-SmmReadyToLockEventCallBack (
+TpmReadyToLockEventCallBack (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
 {
-  EFI_STATUS  Status;
-  VOID        *Interface;
-
-  //
-  // Try to locate it because EfiCreateProtocolNotifyEvent will trigger it once when registration.
-  // Just return if it is not found.
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiDxeSmmReadyToLockProtocolGuid,
-                  NULL,
-                  &Interface
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to locate gEfiDxeSmmReadyToLockProtocolGuid.\n"));
-    return;
-  }
-
+  DEBUG ((DEBUG_INFO, "[%a] Disabling TPM Platform Hierarchy\n", __func__));
   ConfigureTpmPlatformHierarchy ();
 
   gBS->CloseEvent (Event);
 }
 
 /**
-   The driver's entry point. Will register a function for callback during SmmReadyToLock event to
+   The driver's entry point. Will register a function for callback during ReadyToBoot event to
    configure the TPM's platform authorization.
 
    @param[in] ImageHandle  The firmware allocated handle for the EFI image.
@@ -69,21 +54,29 @@ Tcg2PlatformDxeEntryPoint (
   IN    EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID       *Registration;
-  EFI_EVENT  Event;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
+  EFI_EVENT      Event;
 
-  Event = EfiCreateProtocolNotifyEvent (
-            &gEfiDxeSmmReadyToLockProtocolGuid,
-            TPL_CALLBACK,
-            SmmReadyToLockEventCallBack,
-            NULL,
-            &Registration
-            );
+  BootMode = GetBootModeHob ();
 
-  if (Event == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to create protocol notify event for SmmReadyToLockProtocol.\n"));
-    return EFI_DEVICE_ERROR;
+  // In flash update boot path, leave TPM Platform Hierarchy enabled until ReadyToBoot (which should never actually
+  // occur, since capsule reset will occur first).
+  if (BootMode == BOOT_ON_FLASH_UPDATE) {
+    Status = EfiCreateEventReadyToBootEx (TPL_CALLBACK, TpmReadyToLockEventCallBack, NULL, &Event);
+  } else {
+    // In all other boot paths, disable TPM Platform Hierarchy at EndOfDxe.
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    TpmReadyToLockEventCallBack,
+                    NULL,
+                    &gEfiEndOfDxeEventGroupGuid,
+                    &Event
+                    );
   }
+
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
