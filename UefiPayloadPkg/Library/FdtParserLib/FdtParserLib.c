@@ -64,8 +64,6 @@ typedef enum {
 
 extern VOID                         *mHobList;
 UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *mPciRootBridgeInfo = NULL;
-INT32                               mNode[0x500]        = { 0 };
-UINT32                              mNodeIndex          = 0;
 UPL_PCI_SEGMENT_INFO_HOB            *mUplPciSegmentInfoHob;
 
 /**
@@ -93,45 +91,6 @@ HobConstructor (
   );
 
 /**
-  It will record the memory node initialized.
-
-  @param[in]  Node           memory node is going to parsing.
-**/
-VOID
-RecordMemoryNode (
-  INT32  Node
-  )
-{
-  DEBUG ((DEBUG_INFO, "\n RecordMemoryNode  %x , mNodeIndex :%x  \n", Node, mNodeIndex));
-  mNode[mNodeIndex] = Node;
-  mNodeIndex++;
-}
-
-/**
-  Check the memory node if initialized.
-
-  @param[in]  Node           memory node is going to parsing.
-
-  @return TRUE               memory node was initialized. don't parse it again.
-  @return FALSE              memory node wasn't initialized, go to parse it.
-**/
-BOOLEAN
-CheckMemoryNodeIfInit (
-  INT32  Node
-  )
-{
-  UINT32  i;
-
-  for (i = 0; i < mNodeIndex; i++) {
-    if (mNode[i] == Node) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
   It will check device node from FDT.
 
   @param[in]  NodeString        Device node name string.
@@ -146,7 +105,9 @@ CheckNodeType (
   )
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
-  if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0) {
+  if ((AsciiStrCmp (NodeString, "serial") == 0) ||
+      (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0))
+  {
     return SerialPort;
   } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0) {
     return ReservedMemory;
@@ -222,6 +183,68 @@ ParseMemory (
 }
 
 /**
+  Check whether a range is contained in a system-memory node.
+
+  @param[in]  Fdt               Address of the Fdt data.
+  @param[in]  StartAddress      Start of the range.
+  @param[in]  NumberOfBytes     Size of the range.
+
+  @retval TRUE                  The range is contained in system memory.
+  @retval FALSE                 The range is outside system memory.
+**/
+STATIC
+BOOLEAN
+IsRangeInSystemMemory (
+  IN VOID    *Fdt,
+  IN UINT64  StartAddress,
+  IN UINT64  NumberOfBytes
+  )
+{
+  CONST FDT_PROPERTY  *PropertyPtr;
+  CONST UINT64        *Data64;
+  CONST CHAR8         *NodeName;
+  UINT64              EndAddress;
+  UINT64              MemoryEnd;
+  UINT64              MemorySize;
+  UINT64              MemoryStart;
+  INT32               Node;
+  INT32               TempLen;
+
+  if ((NumberOfBytes == 0) || (StartAddress > (MAX_UINT64 - NumberOfBytes))) {
+    return FALSE;
+  }
+
+  EndAddress = StartAddress + NumberOfBytes;
+  for (Node = FdtFirstSubnode (Fdt, 0); Node >= 0; Node = FdtNextSubnode (Fdt, Node)) {
+    NodeName = FdtGetName (Fdt, Node, NULL);
+    if ((NodeName == NULL) ||
+        (AsciiStrnCmp (NodeName, "memory@", AsciiStrLen ("memory@")) != 0))
+    {
+      continue;
+    }
+
+    PropertyPtr = FdtGetProperty (Fdt, Node, "reg", &TempLen);
+    if ((PropertyPtr == NULL) || (TempLen != (2 * sizeof (UINT64)))) {
+      continue;
+    }
+
+    Data64      = (CONST UINT64 *)PropertyPtr->Data;
+    MemoryStart = Fdt64ToCpu (ReadUnaligned64 (&Data64[0]));
+    MemorySize  = Fdt64ToCpu (ReadUnaligned64 (&Data64[1]));
+    if ((MemorySize == 0) || (MemoryStart > (MAX_UINT64 - MemorySize))) {
+      continue;
+    }
+
+    MemoryEnd = MemoryStart + MemorySize;
+    if ((StartAddress >= MemoryStart) && (EndAddress <= MemoryEnd)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   It will ParseReservedMemory node from FDT.
 
   @param[in]  Fdt               Address of the Fdt data.
@@ -242,6 +265,7 @@ ParseReservedMemory (
   UINT64                          NumberOfBytes;
   UNIVERSAL_PAYLOAD_ACPI_TABLE    *PlatformAcpiTable;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable;
+  CONST EFI_GUID                  *SmbiosTableGuid;
   FDT_NODE_HEADER                 *NodePtr;
   UINT32                          Attribute;
 
@@ -261,14 +285,21 @@ ParseReservedMemory (
       DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
     }
 
-    RecordMemoryNode (SubNode);
-
     if (AsciiStrnCmp (NodePtr->Name, "mmio@", AsciiStrLen ("mmio@")) == 0) {
       DEBUG ((DEBUG_INFO, "  MemoryMappedIO"));
-      BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiMemoryMappedIO);
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_MEMORY_MAPPED_IO,
+        MEMORY_ATTRIBUTE_DEFAULT,
+        StartAddress,
+        NumberOfBytes
+        );
     } else {
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
-      TempStr     = (CHAR8 *)(PropertyPtr->Data);
+      if (PropertyPtr == NULL) {
+        goto FallbackType;
+      }
+
+      TempStr = (CHAR8 *)(PropertyPtr->Data);
       DEBUG ((DEBUG_INFO, "compatible:  %a\n", TempStr));
       if (AsciiStrnCmp (TempStr, "boot-code", AsciiStrLen ("boot-code")) == 0) {
         DEBUG ((DEBUG_INFO, "  boot-code\n"));
@@ -306,15 +337,38 @@ ParseReservedMemory (
         }
       } else if (AsciiStrnCmp (TempStr, "smbios", AsciiStrLen ("smbios")) == 0) {
         DEBUG ((DEBUG_INFO, " build smbios, NumberOfBytes:%x\n", NumberOfBytes));
+        if ((NumberOfBytes >= SMBIOS_3_0_ANCHOR_STRING_LENGTH) &&
+            (CompareMem ((VOID *)(UINTN)StartAddress, SMBIOS_3_0_ANCHOR_STRING, SMBIOS_3_0_ANCHOR_STRING_LENGTH) == 0))
+        {
+          SmbiosTableGuid = &gUniversalPayloadSmbios3TableGuid;
+        } else if ((NumberOfBytes >= SMBIOS_ANCHOR_STRING_LENGTH) &&
+                   (CompareMem ((VOID *)(UINTN)StartAddress, SMBIOS_ANCHOR_STRING, SMBIOS_ANCHOR_STRING_LENGTH) == 0))
+        {
+          SmbiosTableGuid = &gUniversalPayloadSmbiosTableGuid;
+        } else {
+          DEBUG ((DEBUG_ERROR, " invalid SMBIOS entry point at %Lx\n", StartAddress));
+          goto FallbackType;
+        }
+
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
-        SmbiosTable = BuildGuidHob (&gUniversalPayloadSmbios3TableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+        SmbiosTable = BuildGuidHob (SmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
         if (SmbiosTable != NULL) {
           SmbiosTable->Header.Revision  = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
           SmbiosTable->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
           SmbiosTable->SmBiosEntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)(StartAddress);
         }
       } else {
-        BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiReservedMemoryType);
+FallbackType:
+        if (IsRangeInSystemMemory (Fdt, StartAddress, NumberOfBytes)) {
+          BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiReservedMemoryType);
+        } else {
+          BuildResourceDescriptorHob (
+            EFI_RESOURCE_MEMORY_RESERVED,
+            MEMORY_ATTRIBUTE_DEFAULT,
+            StartAddress,
+            NumberOfBytes
+            );
+        }
       }
     }
   }
@@ -340,14 +394,91 @@ ParseFrameBuffer (
   CONST CHAR8                *TempStr;
   UINT32                     *Data32;
   UINT64                     FrameBufferBase;
-  UINT32                     FrameBufferSize;
+  UINT64                     FrameBufferSize;
+  UINT32                     Width;
+  UINT32                     Height;
+  UINT32                     Stride;
+  EFI_GRAPHICS_PIXEL_FORMAT  PixelFormat;
   EFI_PEI_GRAPHICS_INFO_HOB  *GraphicsInfo;
   CHAR8                      *GmaStr;
+  BOOLEAN                    HasReg;
 
-  GmaStr = "Gma";
-  //
-  // Create GraphicInfo HOB.
-  //
+  GmaStr          = "Gma";
+  FrameBufferBase = 0;
+  FrameBufferSize = 0;
+  Width           = 0;
+  Height          = 0;
+  Stride          = 0;
+  PixelFormat     = PixelFormatMax;
+  HasReg          = FALSE;
+
+  for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
+    PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
+    TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
+    if (AsciiStrCmp (TempStr, "reg") == 0) {
+      if (TempLen != (2 * sizeof (UINT64))) {
+        DEBUG ((DEBUG_ERROR, "Framebuffer reg must contain 64-bit address and size cells\n"));
+        return GmaStr;
+      }
+
+      FrameBufferBase = Fdt64ToCpu (ReadUnaligned64 ((CONST UINT64 *)&PropertyPtr->Data[0]));
+      FrameBufferSize = Fdt64ToCpu (ReadUnaligned64 ((CONST UINT64 *)&PropertyPtr->Data[sizeof (UINT64)]));
+      HasReg          = TRUE;
+    } else if (AsciiStrCmp (TempStr, "width") == 0) {
+      if (TempLen != sizeof (UINT32)) {
+        return GmaStr;
+      }
+
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+      Width  = Fdt32ToCpu (ReadUnaligned32 (Data32));
+    } else if (AsciiStrCmp (TempStr, "height") == 0) {
+      if (TempLen != sizeof (UINT32)) {
+        return GmaStr;
+      }
+
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+      Height = Fdt32ToCpu (ReadUnaligned32 (Data32));
+    } else if (AsciiStrCmp (TempStr, "stride") == 0) {
+      if (TempLen != sizeof (UINT32)) {
+        return GmaStr;
+      }
+
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+      Stride = Fdt32ToCpu (ReadUnaligned32 (Data32));
+    } else if (AsciiStrCmp (TempStr, "format") == 0) {
+      if (TempLen != sizeof ("a8r8g8b8")) {
+        return GmaStr;
+      }
+
+      TempStr = (CHAR8 *)(PropertyPtr->Data);
+      if ((AsciiStrCmp (TempStr, "a8r8g8b8") == 0) || (AsciiStrCmp (TempStr, "x8r8g8b8") == 0)) {
+        PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
+      } else if ((AsciiStrCmp (TempStr, "a8b8g8r8") == 0) || (AsciiStrCmp (TempStr, "x8b8g8r8") == 0)) {
+        PixelFormat = PixelRedGreenBlueReserved8BitPerColor;
+      } else {
+        DEBUG ((DEBUG_ERROR, "Unsupported framebuffer format: %a\n", TempStr));
+        return GmaStr;
+      }
+    } else if (AsciiStrCmp (TempStr, "display") == 0) {
+      GmaStr = (CHAR8 *)(PropertyPtr->Data);
+      GmaStr++;
+      DEBUG ((DEBUG_INFO, "  display (%s)", GmaStr));
+    }
+  }
+
+  if ((Stride == 0) && (Width <= (MAX_UINT32 / sizeof (UINT32)))) {
+    Stride = Width * sizeof (UINT32);
+  }
+
+  if (!HasReg || (FrameBufferSize > MAX_UINT32) || (Width == 0) || (Height == 0) ||
+      (Width > (MAX_UINT32 / sizeof (UINT32))) ||
+      (Stride < (Width * sizeof (UINT32))) || ((Stride % sizeof (UINT32)) != 0) ||
+      ((UINT64)Stride * Height > FrameBufferSize) || (PixelFormat == PixelFormatMax))
+  {
+    DEBUG ((DEBUG_ERROR, "Framebuffer node is incomplete or invalid\n"));
+    return GmaStr;
+  }
+
   GraphicsInfo = BuildGuidHob (&gEfiGraphicsInfoHobGuid, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
   ASSERT (GraphicsInfo != NULL);
   if (GraphicsInfo == NULL) {
@@ -355,40 +486,12 @@ ParseFrameBuffer (
   }
 
   ZeroMem (GraphicsInfo, sizeof (EFI_PEI_GRAPHICS_INFO_HOB));
-
-  for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
-    PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
-    TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
-    if (AsciiStrCmp (TempStr, "reg") == 0) {
-      Data32                        = (UINT32 *)(PropertyPtr->Data);
-      FrameBufferBase               = Fdt32ToCpu (*(Data32 + 0));
-      FrameBufferSize               = Fdt32ToCpu (*(Data32 + 1));
-      GraphicsInfo->FrameBufferBase = FrameBufferBase;
-      GraphicsInfo->FrameBufferSize = (UINT32)FrameBufferSize;
-    } else if (AsciiStrCmp (TempStr, "width") == 0) {
-      Data32                                          = (UINT32 *)(PropertyPtr->Data);
-      GraphicsInfo->GraphicsMode.HorizontalResolution = Fdt32ToCpu (*Data32);
-    } else if (AsciiStrCmp (TempStr, "height") == 0) {
-      Data32                                        = (UINT32 *)(PropertyPtr->Data);
-      GraphicsInfo->GraphicsMode.VerticalResolution = Fdt32ToCpu (*Data32);
-    } else if (AsciiStrCmp (TempStr, "format") == 0) {
-      TempStr = (CHAR8 *)(PropertyPtr->Data);
-      if (AsciiStrCmp (TempStr, "a8r8g8b8") == 0) {
-        GraphicsInfo->GraphicsMode.PixelFormat = PixelRedGreenBlueReserved8BitPerColor;
-      } else if (AsciiStrCmp (TempStr, "a8b8g8r8") == 0) {
-        GraphicsInfo->GraphicsMode.PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
-      } else {
-        GraphicsInfo->GraphicsMode.PixelFormat = PixelFormatMax;
-      }
-    } else if (AsciiStrCmp (TempStr, "display") == 0) {
-      GmaStr = (CHAR8 *)(PropertyPtr->Data);
-      GmaStr++;
-      DEBUG ((DEBUG_INFO, "  display (%s)", GmaStr));
-    }
-
-    // In most case, PixelsPerScanLine is identical to HorizontalResolution
-    GraphicsInfo->GraphicsMode.PixelsPerScanLine = GraphicsInfo->GraphicsMode.HorizontalResolution;
-  }
+  GraphicsInfo->FrameBufferBase                   = FrameBufferBase;
+  GraphicsInfo->FrameBufferSize                   = (UINT32)FrameBufferSize;
+  GraphicsInfo->GraphicsMode.HorizontalResolution = Width;
+  GraphicsInfo->GraphicsMode.VerticalResolution   = Height;
+  GraphicsInfo->GraphicsMode.PixelFormat          = PixelFormat;
+  GraphicsInfo->GraphicsMode.PixelsPerScanLine    = Stride / sizeof (UINT32);
 
   return GmaStr;
 }
@@ -424,7 +527,7 @@ ParseOptions (
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + SubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n      SubNode(%08X)  %a", SubNode, NodePtr->Name));
 
-    if (AsciiStrnCmp (NodePtr->Name, "upl-images@", AsciiStrLen ("upl-images@")) == 0) {
+    if (AsciiStrnCmp (NodePtr->Name, "upl-image@", AsciiStrLen ("upl-image@")) == 0) {
       DEBUG ((DEBUG_INFO, "  Found image@ node \n"));
       //
       // Build PayloadBase HOB .
@@ -462,7 +565,7 @@ ParseOptions (
       }
 
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "pci-enum-done", &TempLen);
-      if (TempLen > 0) {
+      if (PropertyPtr != NULL) {
         *PciEnumDone = 1;
         DEBUG ((DEBUG_INFO, "  Found PciEnumDone (%08X)\n", *PciEnumDone));
       } else {
@@ -683,7 +786,6 @@ ParsePciRootBridge (
 {
   INT32               SubNode;
   INT32               Property;
-  INT32               SSubNode;
   FDT_NODE_HEADER     *NodePtr;
   CONST FDT_PROPERTY  *PropertyPtr;
   INT32               TempLen;
@@ -743,21 +845,9 @@ ParsePciRootBridge (
       DEBUG ((DEBUG_INFO, "  Found gma@ node \n"));
       ParsegraphicNode (Fdt, SubNode);
     }
-
-    if (AsciiStrnCmp (NodePtr->Name, "isa", AsciiStrLen ("isa")) == 0) {
-      PropertyPtr = FdtGetProperty (Fdt, SubNode, "#address-cells", &TempLen);
-      if ((PropertyPtr != NULL) && (TempLen > 0)) {
-        AddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
-      }
-
-      SSubNode = FdtFirstSubnode (Fdt, SubNode);
-      ParseSerialPort (Fdt, SSubNode, AddressCells);
-    }
-
-    if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
-      ParseSerialPort (Fdt, SubNode, AddressCells);
-    }
   }
+
+  DEBUG ((DEBUG_INFO, "\n"));
 
   for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
     PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
@@ -928,13 +1018,15 @@ ParseDtb (
   EFI_PHYSICAL_ADDRESS  MemoryBottom;
   EFI_PHYSICAL_ADDRESS  MemoryTop;
   BOOLEAN               IsHobConstructed;
-  UINTN                 NewHobList;
   UINT8                 RootBridgeCount;
   UINT8                 index;
   UINT8                 PciEnumDone;
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
   CHAR8                 *GmaStr;
+  UINTN                 PciRbArrayIndex;
+  INT32                 *PciRbNodes;
+  INT32                 ReservedMemoryDepth;
   INTN                  NumRsv;
   EFI_PHYSICAL_ADDRESS  Addr;
   UINT64                Size;
@@ -944,21 +1036,25 @@ ParseDtb (
   UINT8                 *RbSegNumAlreadyAssigned;
   UINT8                 NumberOfRbSegNumAlreadyAssigned;
   UINT32                RootAddressCells;
+  UINT32                SerialAddressCells;
   INT32                 ParentNode;
 
   Fdt               = FdtBase;
   Depth             = 0;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   IsHobConstructed  = FALSE;
-  NewHobList        = 0;
   RootBridgeCount   = 0;
   index             = 0;
   // TODO: This value comes from FDT. Currently there is a bug in implementation
   // which assumes node ordering. Which requires a fix.
-  PciEnumDone      = 1;
-  BootMode         = 0;
-  NodeType         = 0;
-  RootAddressCells = 2;
+  PciEnumDone         = 1;
+  BootMode            = 0;
+  NodeType            = 0;
+  RootAddressCells    = 2;
+  GmaStr              = "<NULL>";
+  PciRbArrayIndex     = 0;
+  PciRbNodes          = NULL;
+  ReservedMemoryDepth = -1;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
   DEBUG ((DEBUG_INFO, "Start parsing DTB data\n"));
@@ -973,6 +1069,23 @@ ParseDtb (
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x\n", Node, NodePtr->Name, Depth));
+
+    // Ensure we don't submit a child of reserved-memory as main memory block.
+    NodeType = CheckNodeType (NodePtr->Name, Depth);
+    // Already found reserved block.
+    if ((ReservedMemoryDepth >= 0) && (Depth > ReservedMemoryDepth)) {
+      DEBUG ((DEBUG_INFO, "Skipping reserved-memory block.\n"));
+      continue;
+    } else if ((ReservedMemoryDepth >= 0) && (Depth <= ReservedMemoryDepth)) {
+      ReservedMemoryDepth = -1;
+    }
+
+    // Newly found reserved block.
+    if (NodeType == ReservedMemory) {
+      ReservedMemoryDepth = Depth;
+      continue;
+    }
+
     // memory node
     if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
@@ -983,7 +1096,7 @@ ParseDtb (
           StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
           NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
-          DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
+          DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
           // If parent node type is reserved-memory we are looking at special-purpose memory. Ignore it.
           ParentNode = FdtParentOffset (Fdt, Node);
           NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
@@ -1001,7 +1114,6 @@ ParseDtb (
               DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
               mHobList         = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
               IsHobConstructed = TRUE;
-              NewHobList       = (UINTN)mHobList;
               break;
             }
           }
@@ -1020,6 +1132,13 @@ ParseDtb (
     }
   }
 
+  if (RootBridgeCount) {
+    PciRbNodes = AllocateZeroPool (RootBridgeCount * sizeof (INT32));
+    if (PciRbNodes == NULL) {
+      goto Done;
+    }
+  }
+
   NumRsv = FdtGetNumberOfReserveMapEntries (Fdt);
   /* Look for an existing entry and add it to the efi mem map. */
   for (index = 0; index < NumRsv; index++) {
@@ -1030,39 +1149,56 @@ ParseDtb (
     BuildMemoryAllocationHob (Addr, Size, EfiReservedMemoryType);
   }
 
-  index = RootBridgeCount - 1;
-  Depth = 0;
+  index               = RootBridgeCount - 1;
+  Depth               = 0;
+  ReservedMemoryDepth = -1;
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
 
+    // Ensure we don't parse a child of reserved-memory as main memory block.
     NodeType = CheckNodeType (NodePtr->Name, Depth);
+    if ((ReservedMemoryDepth >= 0) && (Depth <= ReservedMemoryDepth)) {
+      ReservedMemoryDepth = -1;
+    }
+
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
       case SerialPort:
-        ParseSerialPort (Fdt, Node, RootAddressCells);
+        SerialAddressCells = RootAddressCells;
+        ParentNode         = FdtParentOffset (Fdt, Node);
+        if (ParentNode >= 0) {
+          PropertyPtr = FdtGetProperty (Fdt, ParentNode, "#address-cells", &TempLen);
+          if ((PropertyPtr != NULL) && (TempLen == sizeof (UINT32))) {
+            SerialAddressCells = Fdt32ToCpu (ReadUnaligned32 ((CONST UINT32 *)PropertyPtr->Data));
+          }
+        }
+
+        ParseSerialPort (Fdt, Node, SerialAddressCells);
         break;
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
         ParseReservedMemory (Fdt, Node);
+        ReservedMemoryDepth = Depth;
         break;
       case Memory:
         DEBUG ((DEBUG_INFO, "ParseMemory\n"));
-        if (!CheckMemoryNodeIfInit (Node)) {
-          ParseMemory (Fdt, Node);
-        } else {
+        if ((ReservedMemoryDepth >= 0) && (Depth > ReservedMemoryDepth)) {
           DEBUG ((DEBUG_INFO, "Memory has initialized\n"));
+        } else {
+          ParseMemory (Fdt, Node);
         }
 
         break;
       case FrameBuffer:
+        // FIXME: Ensure this node gets parsed first so that it gets the
+        // correct options to feed into others (like GMA string)
         DEBUG ((DEBUG_INFO, "ParseFrameBuffer\n"));
         GmaStr = ParseFrameBuffer (Fdt, Node);
         break;
       case PciRootBridge:
-        DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x \n", index));
-        ParsePciRootBridge (Fdt, Node, RootBridgeCount, GmaStr, &index);
-        DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
+        DEBUG ((DEBUG_INFO, "Found PciRootBridge\n"));
+        PciRbNodes[PciRbArrayIndex++] = Node;
         break;
       case Options:
         // FIXME: Need to ensure this node gets parsed first so that it gets
@@ -1075,6 +1211,26 @@ ParseDtb (
         break;
     }
   }
+
+  DEBUG ((DEBUG_INFO, "\n"));
+
+  // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
+  // may not be good idea. Instead standardise GMA string?
+  while (PciRbArrayIndex--) {
+    DEBUG ((DEBUG_INFO, "Before ParsePciRootBridge, index: %d\n", index));
+    ParsePciRootBridge (Fdt, PciRbNodes[PciRbArrayIndex], RootBridgeCount, GmaStr, &index);
+    DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index: %d\n", index));
+  }
+
+  if (!RootBridgeCount) {
+    DEBUG ((DEBUG_ERROR, "Platform Init violates the spec! No PCI root bridges found.\n"));
+    goto Done;
+  }
+
+  //
+  // UniversalPayloadEntry phase does not define FreePool(), so just continue.
+  //
+  // FreePool (PciRbNodes);
 
   if ((NULL != mPciRootBridgeInfo) && (NULL != mUplPciSegmentInfoHob)) {
     // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
@@ -1120,10 +1276,10 @@ ParseDtb (
     }
   }
 
+Done:
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
-  DEBUG ((DEBUG_INFO, "\n"));
 
-  return NewHobList;
+  return (UINTN)mHobList;
 }
 
 /**
@@ -1158,19 +1314,18 @@ UplInitHob (
 {
   UINTN  NHobAddress;
 
-  NHobAddress = 0;
   //
   // Check parameter type
   //
   if (FdtCheckHeader (FdtBase) == 0) {
     DEBUG ((DEBUG_INFO, "%a() FDT blob\n", __func__));
     NHobAddress = FdtNodeParser ((VOID *)FdtBase);
+
+    return NHobAddress;
   } else {
-    DEBUG ((DEBUG_INFO, "%a() HOb list\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a() HOB list\n", __func__));
     mHobList = FdtBase;
 
-    return (UINTN)(mHobList);
+    return (UINTN)mHobList;
   }
-
-  return NHobAddress;
 }
