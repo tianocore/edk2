@@ -12,7 +12,7 @@
   PLATFORM_VERSION        = 0.1
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/SecurityPkg/HostTest
-  SUPPORTED_ARCHITECTURES = IA32|X64
+  SUPPORTED_ARCHITECTURES = IA32|X64|AARCH64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -20,6 +20,10 @@
 
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+
+[LibraryClasses.AARCH64]
+  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 
 [Components]
   SecurityPkg/Library/SecureBootVariableLib/UnitTest/MockUefiRuntimeServicesTableLib.inf
@@ -54,7 +58,6 @@
       DxeImageVerificationLib|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
-      RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
       UefiLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.inf
       DevicePathLib|MdePkg/Test/Mock/Library/GoogleTest/MockDevicePathLib/MockDevicePathLib.inf
       SecurityManagementLib|MdeModulePkg/Test/Mock/Library/GoogleTest/MockSecurityManagementLib/MockSecurityManagementLib.inf

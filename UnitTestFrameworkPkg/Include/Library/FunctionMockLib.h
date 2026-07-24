@@ -8,7 +8,9 @@
 #pragma once
 
 #include <Library/GoogleTestLib.h>
-#include <Library/SubhookLib.h>
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  #include <Library/SubhookLib.h>
+#endif
 #include <type_traits>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,6 +54,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // The below macros are private and should not be used outside this file.
 
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 #define MOCK_FUNCTION_HOOK_DECLARATIONS(FUNC)     \
   static subhook::Hook Hook##FUNC;                \
   struct MockContainer_##FUNC {                   \
@@ -59,11 +62,15 @@
     ~MockContainer_##FUNC ();                     \
   };                                              \
   MockContainer_##FUNC MockContainerInst_##FUNC;
+#else
+#define MOCK_FUNCTION_HOOK_DECLARATIONS(FUNC)
+#endif
 
 // This definition implements a constructor and destructor inside a nested
 // class to enable automatic installation of the hooks to the associated
 // MOCK_FUNC() when the mock object is instantiated in scope and automatic
 // removal when the instantiated mock object goes out of scope.
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 #define MOCK_FUNCTION_HOOK_DEFINITIONS(MOCK, FUNC)                        \
   subhook :: Hook MOCK :: Hook##FUNC;                                     \
   MOCK :: MockContainer_##FUNC :: MockContainer_##FUNC () {               \
@@ -83,6 +90,9 @@
     "different return type, arguments, or calling convention. See "       \
     "associated 'MOCK_FUNCTION_INTERNAL_DECLARATION' macro invocation "   \
     "for more details.");
+#else
+#define MOCK_FUNCTION_HOOK_DEFINITIONS(MOCK, FUNC)
+#endif
 
 #define MOCK_FUNCTION_TYPE_DEFINITIONS(RET_TYPE, FUNC, ARGS)  \
   using FUNC##_ret_type = RET_TYPE;                           \
