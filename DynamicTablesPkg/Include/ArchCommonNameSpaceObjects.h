@@ -129,6 +129,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
   EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
   EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
+  EArchCommonObjMsctMaxPhysicalAddrInfo,        ///< 73 - MSCT Maximum physical address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1898,5 +1899,15 @@ typedef struct CmArchCommonSystemEnclosureInfo {
   /// Rack height in rack units when Height is 0xFF.
   UINT8              RackHeight;
 } CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
+
+/** A structure that describes the Maximum Physical Address Information
+    for the MSCT (Maximum System Characteristics Table).
+
+    ID: EArchCommonObjMsctMaxPhysicalAddrInfo
+*/
+typedef struct CmArchCommonObjMsctMaxPhysicalAddrInfo {
+  /// Maximum Physical Address
+  UINT64    MaxPhysicalAddress;
+} CM_ARCH_COMMON_MSCT_MAX_PHYSICAL_ADDR_INFO;
 
 #pragma pack()
