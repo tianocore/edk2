@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2025, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2025 - 2026, ARM Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -18,9 +18,10 @@
   SmbiosSmcLib.c
 
 [Packages]
+  ArmPkg/ArmPkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  ArmSmcLib
+  ArmSmcccSocIdLib
 

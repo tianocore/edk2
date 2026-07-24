@@ -3,6 +3,7 @@
 
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2021 - 2022, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,10 +11,9 @@
 
 #include <Uefi.h>
 #include <IndustryStandard/ArmCache.h>
-#include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/SmBios.h>
 #include <Library/ArmLib.h>
-#include <Library/ArmSmcLib.h>
+#include <Library/ArmSmcccSocIdLib.h>
 #include <Library/BaseMemoryLib.h>
 
 #include "SmbiosProcessor.h"
@@ -79,75 +79,6 @@ SmbiosProcessorHasSeparateCaches (
   return SeparateCaches;
 }
 
-/** Checks if ther ARM64 SoC ID SMC call is supported
-
-    @return Whether the ARM64 SoC ID call is supported.
-**/
-BOOLEAN
-HasSmcArm64SocId (
-  VOID
-  )
-{
-  INT32    SmcCallStatus;
-  BOOLEAN  Arm64SocIdSupported;
-  UINTN    SmcParam;
-
-  Arm64SocIdSupported = FALSE;
-
-  SmcCallStatus = ArmCallSmc0 (SMCCC_VERSION, NULL, NULL, NULL);
-
-  if ((SmcCallStatus < 0) || ((SmcCallStatus >> 16) >= 1)) {
-    SmcParam      = SMCCC_ARCH_SOC_ID;
-    SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_FEATURES, &SmcParam, NULL, NULL);
-    if (SmcCallStatus >= 0) {
-      Arm64SocIdSupported = TRUE;
-    }
-  }
-
-  return Arm64SocIdSupported;
-}
-
-/** Fetches the JEP106 code and SoC Revision.
-
-    @param Jep106Code  JEP 106 code.
-    @param SocRevision SoC revision.
-
-    @retval EFI_SUCCESS Succeeded.
-    @retval EFI_UNSUPPORTED Failed.
-**/
-EFI_STATUS
-SmbiosGetSmcArm64SocId (
-  OUT INT32  *Jep106Code,
-  OUT INT32  *SocRevision
-  )
-{
-  INT32       SmcCallStatus;
-  EFI_STATUS  Status;
-  UINTN       SmcParam;
-
-  Status = EFI_SUCCESS;
-
-  SmcParam      = 0;
-  SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
-
-  if (SmcCallStatus >= 0) {
-    *Jep106Code = SmcCallStatus;
-  } else {
-    Status = EFI_UNSUPPORTED;
-  }
-
-  SmcParam      = 1;
-  SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
-
-  if (SmcCallStatus >= 0) {
-    *SocRevision = SmcCallStatus;
-  } else {
-    Status = EFI_UNSUPPORTED;
-  }
-
-  return Status;
-}
-
 /** Returns a value for the Processor ID field that conforms to SMBIOS
     requirements.
 
@@ -158,12 +89,13 @@ SmbiosGetProcessorId (
   VOID
   )
 {
-  INT32   Jep106Code;
-  INT32   SocRevision;
-  UINT64  ProcessorId;
+  EFI_STATUS  Status;
+  UINT32      Jep106Code;
+  UINT32      SocRevision;
+  UINT64      ProcessorId;
 
-  if (HasSmcArm64SocId ()) {
-    SmbiosGetSmcArm64SocId (&Jep106Code, &SocRevision);
+  Status = ArmSmcccGetSocId (&Jep106Code, &SocRevision);
+  if (!EFI_ERROR (Status)) {
     ProcessorId = ((UINT64)SocRevision << 32) | Jep106Code;
   } else {
     ProcessorId = ArmReadMidr ();
@@ -236,7 +168,8 @@ SmbiosGetProcessorCharacteristics (
 
   ZeroMem (&Characteristics, sizeof (Characteristics));
 
-  Characteristics.ProcessorArm64SocId = HasSmcArm64SocId ();
+  Characteristics.ProcessorArm64SocId =
+    ArmSmcccSocIdIsSupported ();
 
   return Characteristics;
 }
