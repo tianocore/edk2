@@ -54,6 +54,7 @@
   # SMBIOS Generators (Common)
   DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType1Lib/SmbiosType1Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType2Lib/SmbiosType2Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType3Lib/SmbiosType3Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
@@ -175,6 +176,7 @@
 
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType1Lib/SmbiosType1Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType2Lib/SmbiosType2Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType3Lib/SmbiosType3Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
