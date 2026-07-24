@@ -383,6 +383,11 @@ PlatformBootManagerWaitCallback (
   UINT16  TimeoutRemain
   )
 {
+  /* Clear text from screen once timeout expires */
+  if (TimeoutRemain == 0) {
+    gST->ConOut->ClearScreen (gST->ConOut);
+    BootLogoEnableLogo ();
+  }
   return;
 }
 
