@@ -34,15 +34,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MAX_PCI_BAR  6
 
 typedef struct {
-  UINT32                               Signature;
-  EFI_HANDLE                           GraphicsOutputHandle;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL         GraphicsOutput;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    GraphicsOutputMode;
-  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
-  EFI_PCI_IO_PROTOCOL                  *PciIo;
-  UINT64                               PciAttributes;
-  FRAME_BUFFER_CONFIGURE               *FrameBufferBltLibConfigure;
-  UINTN                                FrameBufferBltLibConfigureSize;
+  UINT32                                  Signature;
+  EFI_HANDLE                              GraphicsOutputHandle;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL            GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE       GraphicsOutputMode;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION    LogicalModeInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION    PhysicalModeInfo;
+  UINT32                                  FrameBufferScale;
+  UINT32                                  ViewportOffsetX;
+  UINT32                                  ViewportOffsetY;
+  UINT32                                  ViewportWidth;
+  UINT32                                  ViewportHeight;
+  BOOLEAN                                 HasHiDpiMode;
+  EFI_EVENT                               ReadyToBootEvent;
+  UINT64                                  PhysicalFrameBufferBase;
+  UINTN                                   PhysicalFrameBufferSize;
+  EFI_DEVICE_PATH_PROTOCOL                *DevicePath;
+  EFI_PCI_IO_PROTOCOL                     *PciIo;
+  UINT64                                  PciAttributes;
+  FRAME_BUFFER_CONFIGURE                  *FrameBufferBltLibConfigure;
+  UINTN                                   FrameBufferBltLibConfigureSize;
 } GRAPHICS_OUTPUT_PRIVATE_DATA;
 
 #define GRAPHICS_OUTPUT_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('g', 'g', 'o', 'p')
