@@ -2,6 +2,7 @@
 # This is IPMI BMC ACPI module.
 #
 # Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -35,8 +36,11 @@
   gEfiFirmwareVolume2ProtocolGuid
   gEfiAcpiTableProtocolGuid
 
-[Pcd]
+[FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress
+
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
 

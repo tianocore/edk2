@@ -236,7 +236,48 @@ removal stable tag has not been scheduled at this time.
 
 ### edk2-stable202608: Behavioral Breaking Changes
 
-None
+#### Breaking Change: Separate IPMI KCS command/status address
+
+**Status**: Deprecation Active
+**Tracking Issue**: [tianocore/edk2#12805](https://github.com/tianocore/edk2/issues/12805)
+**Type**: Behavioral - Changed default behavior
+
+**What changed**: The IPMI KCS command/status register address is no longer
+derived from `PcdIpmiKcsIoBaseAddress + 1`. The new
+`PcdIpmiKcsIoCommandAddress` specifies the address independently and defaults
+to `0xCA3`. The data register PCD continues to default to `0xCA2`. The IPMI
+ACPI device also moves from the platform-specific `\_SB.PC00.LPC0.IPMC`
+namespace to `\_SB.IPMC`. `BmcAcpi` now consumes both KCS address PCDs as
+FixedAtBuild, consistent with the other IPMI KCS modules in `ManageabilityPkg`.
+
+**Why it changed**: Some KCS interfaces use non-contiguous data and
+command/status registers, such as `0x62` and `0x66`. Describing both addresses
+explicitly also keeps the ACPI resource declaration consistent with the
+addresses used by the IPMI transport drivers.
+
+**What replaces it**: Configure `PcdIpmiKcsIoBaseAddress` for the data register
+and `PcdIpmiKcsIoCommandAddress` for the command/status register.
+
+**How to migrate**: Platforms that override `PcdIpmiKcsIoBaseAddress` must also
+set `PcdIpmiKcsIoCommandAddress` in their DSC. For example:
+
+```text
+gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0x62
+gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress|0x66
+```
+
+References in platform ASL or tooling to `\_SB.PC00.LPC0.IPMC` must be updated
+to `\_SB.IPMC`. Platforms that build `BmcAcpi` with these PCDs as
+PatchableInModule must resolve them as FixedAtBuild instead.
+
+**Breaking conditions**: The address change affects platforms that override
+`PcdIpmiKcsIoBaseAddress` and do not configure the new command/status address
+PCD. The namespace change affects platforms with absolute references to the
+former `\_SB.PC00.LPC0.IPMC` path. The PCD access change affects platforms
+that use `BmcAcpi` without the standard IPMI stack and resolve either KCS
+address PCD as PatchableInModule.
+
+**Companion PR**: N/A
 
 ### edk2-stable202608: Build-System Breaking Changes
 

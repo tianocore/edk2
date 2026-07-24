@@ -2,6 +2,7 @@
   IPMI BMC ACPI driver to update APCI SSDT table.
 
   Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -126,8 +127,6 @@ UpdateDeviceSsdtTable (
 {
   EFI_ACPI_DESCRIPTION_HEADER  *TableHeader;
   UINT64                       TempOemTableId;
-  UINT8                        *DataPtr;
-  EFI_ACPI_IO_PORT_DESCRIPTOR  *IoRsc;
 
   TableHeader = (EFI_ACPI_DESCRIPTION_HEADER *)Table;
 
@@ -139,33 +138,6 @@ UpdateDeviceSsdtTable (
   CopyMem (&TableHeader->OemTableId, &TempOemTableId, sizeof (UINT64));
   TableHeader->CreatorId       = EFI_ACPI_CREATOR_ID;
   TableHeader->CreatorRevision = EFI_ACPI_CREATOR_REVISION;
-
-  //
-  // Update IO(Decode16, 0xCA2, 0xCA2, 0, 2)
-  //
-  DEBUG ((DEBUG_MANAGEABILITY_INFO, "UpdateDeviceSsdtTable - IPMI\n"));
-  for (DataPtr = (UINT8 *)(Table + 1);
-       DataPtr < (UINT8 *)((UINT8 *)Table + Table->Length - 4);
-       DataPtr++)
-  {
-    if (CompareMem (DataPtr, "_CRS", 4) == 0) {
-      DataPtr += 4; // Skip _CRS
-      ASSERT (*DataPtr == AML_BUFFER_OP);
-      DataPtr++;  // Skip AML_BUFFER_OP
-      ASSERT ((*DataPtr & (BIT7|BIT6)) == 0);
-      DataPtr++;  // Skip PkgLength - 0xD
-      ASSERT ((*DataPtr) == AML_BYTE_PREFIX);
-      DataPtr++;  // Skip BufferSize OpCode
-      DataPtr++;  // Skip BufferSize - 0xA
-      IoRsc = (VOID *)DataPtr;
-      ASSERT (IoRsc->Header.Bits.Type == ACPI_SMALL_ITEM_FLAG);
-      ASSERT (IoRsc->Header.Bits.Name == ACPI_SMALL_IO_PORT_DESCRIPTOR_NAME);
-      ASSERT (IoRsc->Header.Bits.Length == sizeof (EFI_ACPI_IO_PORT_DESCRIPTOR) - sizeof (ACPI_SMALL_RESOURCE_HEADER));
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "IPMI IO Base in ASL update - 0x%04x <= 0x%04x\n", IoRsc->BaseAddressMin, PcdGet16 (PcdIpmiKcsIoBaseAddress)));
-      IoRsc->BaseAddressMin = PcdGet16 (PcdIpmiKcsIoBaseAddress);
-      IoRsc->BaseAddressMax = PcdGet16 (PcdIpmiKcsIoBaseAddress);
-    }
-  }
 
   return EFI_SUCCESS;
 }
