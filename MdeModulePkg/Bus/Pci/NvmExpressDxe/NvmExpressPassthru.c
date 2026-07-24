@@ -219,10 +219,10 @@ NvmeCreatePrpList (
   OUT VOID                     **Mapping
   )
 {
-  UINTN                 PrpEntryNo;
+  UINT64                PrpEntryNo;
   UINT64                PrpListBase;
-  UINTN                 PrpListIndex;
-  UINTN                 PrpEntryIndex;
+  UINT64                PrpListIndex;
+  UINT64                PrpEntryIndex;
   UINT64                Remainder;
   EFI_PHYSICAL_ADDRESS  PrpListPhyAddr;
   UINTN                 Bytes;
@@ -236,7 +236,7 @@ NvmeCreatePrpList (
   //
   // Calculate total PrpList number.
   //
-  *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, (UINT64)PrpEntryNo - 1, &Remainder);
+  *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, PrpEntryNo - 1, &Remainder);
   if (*PrpListNo == 0) {
     *PrpListNo = 1;
   } else if ((Remainder != 0) && (Remainder != 1)) {
