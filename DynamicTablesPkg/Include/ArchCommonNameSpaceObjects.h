@@ -129,6 +129,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
   EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
   EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
+  EArchCommonObjSystemBootInfo,                 ///< 73 - System Boot Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1898,5 +1899,19 @@ typedef struct CmArchCommonSystemEnclosureInfo {
   /// Rack height in rack units when Height is 0xFF.
   UINT8              RackHeight;
 } CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
+
+/** A structure that describes System Boot Information.
+
+  SMBIOS Specification v3.9.0 Type 32
+
+  ID: EArchCommonObjSystemBootInfo
+**/
+typedef struct CmArchCommonSystemBootInfo {
+  /// CM Object Token uniquely identifying this System Boot Information.
+  CM_OBJECT_TOKEN    SystemBootInfoToken;
+
+  /// System boot status as defined by SMBIOS Type 32.
+  UINT8              BootStatus;
+} CM_ARCH_COMMON_SYSTEM_BOOT_INFO;
 
 #pragma pack()

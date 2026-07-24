@@ -66,6 +66,7 @@
   DynamicTablesPkg/Library/Smbios/SmbiosType27Lib/SmbiosType27Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType28Lib/SmbiosType28Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType29Lib/SmbiosType29Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType32Lib/SmbiosType32Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType40Lib/SmbiosType40Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
@@ -187,6 +188,7 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType27Lib/SmbiosType27Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType28Lib/SmbiosType28Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType29Lib/SmbiosType29Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType32Lib/SmbiosType32Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType40Lib/SmbiosType40Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
