@@ -4,6 +4,9 @@ This file is the in-tree record of breaking changes in EDK II. Each breaking cha
 in the pull request that introduces the change and updated in any later pull request that changes its state. The file
 is organized by stable tag milestone with most recent first.
 
+Within a given section, each breaking change is added after existing entries so they are in chronological merge order
+within the section.
+
 For the full process, including the breaking change taxonomy, deprecation timeline, required entry content, and GitHub
 issue requirements, see the [Breaking Change and Release Process for EDK II](https://raw.githubusercontent.com/tianocore/tianocore-wiki.github.io/refs/heads/main/rfc/text/0003-edk2-breaking-change-and-release-process.md)
 RFC.
@@ -70,7 +73,7 @@ None
 
 #### edk2-stable202608: Changes with Removal
 
-### Breaking Change: AArch64 exception handling relocated from ArmPkg to UefiCpuPkg
+##### Breaking Change: AArch64 exception handling relocated from ArmPkg to UefiCpuPkg
 
 - **Status**: Removed
 - **Tracking Issue**: N/A (merged before the breaking change process took effect)
@@ -102,39 +105,7 @@ file.
 
 **Earliest removal**: Already removed in this change. The old code was removed in the same PR with no compatibility window.
 
-### Breaking Change: BaseRiscV64CpuTimerLib renamed and split into SEC and DXE TimerLib instances
-
-- **Status**: Removed
-- **Tracking Issue**: N/A (merged before the breaking change process took effect)
-- **Deprecation Issue**: N/A
-- **Removal Issue**: N/A
-- **Pull Request**: [tianocore/edk2#12210](https://github.com/tianocore/edk2/pull/12210)
-- **Type**: Source-Level (Removal) - Library class restructure
-
-**What changed**: The `UefiCpuPkg` `BaseRiscV64CpuTimerLib` was renamed to `RiscV64CpuTimerLib` and split into two
-instances: `RiscV64CpuTimerSecLib.inf` (`MODULE_TYPE` `SEC`, for SEC and PEI, no constructor) and
-`RiscV64CpuTimerDxeLib.inf` (for `DXE_CORE`, `DXE_DRIVER`, and other DXE-phase modules, which retains the constructor).
-The old `UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf` path was removed.
-
-**What is removed**: The `BaseRiscV64CpuTimerLib` library instance and its INF path.
-
-**Why it changed**: The library constructor calls `GetPerformanceCounterProperties()`, which requires the HOB list. In
-the SEC and PEI phases the HOB list may not yet be available, causing a crash. Splitting the instances runs the
-constructor only in the DXE instance.
-
-**What replaces it**: The phase-specific instances `RiscV64CpuTimerSecLib.inf` (SEC and PEI) and
-`RiscV64CpuTimerDxeLib.inf` (DXE).
-
-**How to migrate**: Update platform DSC `TimerLib` mappings that referenced
-`UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf`. Map `TimerLib` to `RiscV64CpuTimerSecLib.inf`
-for SEC and PEI modules and to `RiscV64CpuTimerDxeLib.inf` for DXE modules.
-
-**Breaking conditions**: Affects RISC-V (RISCV64) platforms that consume the RISC-V CPU timer library.
-
-**Earliest removal**: Already removed in this change. The old INF path was removed in the same PR with no compatibility
-window.
-
-### Breaking Change: PrePiLib FfsFindSectionDataWithHook and FfsProcessFvFile gain new parameters
+##### Breaking Change: PrePiLib FfsFindSectionDataWithHook and FfsProcessFvFile gain new parameters
 
 - **Status**: Removed
 - **Tracking Issue**: N/A (merged before the breaking change process took effect)
@@ -166,39 +137,39 @@ correct FV2 HOB production requires the parent FV handle.
 **Earliest removal**: Already removed in this change. The old signatures were replaced in the same PR with no
 compatibility window.
 
-#### edk2-stable202608: Changes without Removal
+##### Breaking Change: BaseRiscV64CpuTimerLib renamed and split into SEC and DXE TimerLib instances
 
-##### Breaking Change: New GptLib library class dependency
+- **Status**: Removed
+- **Tracking Issue**: N/A (merged before the breaking change process took effect)
+- **Deprecation Issue**: N/A
+- **Removal Issue**: N/A
+- **Pull Request**: [tianocore/edk2#12210](https://github.com/tianocore/edk2/pull/12210)
+- **Type**: Source-Level (Removal) - Library class restructure
 
-**Status**: Announced
+**What changed**: The `UefiCpuPkg` `BaseRiscV64CpuTimerLib` was renamed to `RiscV64CpuTimerLib` and split into two
+instances: `RiscV64CpuTimerSecLib.inf` (`MODULE_TYPE` `SEC`, for SEC and PEI, no constructor) and
+`RiscV64CpuTimerDxeLib.inf` (for `DXE_CORE`, `DXE_DRIVER`, and other DXE-phase modules, which retains the constructor).
+The old `UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf` path was removed.
 
-**Tracking Issue**: tianocore/edk2#12808
+**What is removed**: The `BaseRiscV64CpuTimerLib` library instance and its INF path.
 
-**Type**: Source-Level (Non-removal) - Library class dependency addition
-(single expected instance)
+**Why it changed**: The library constructor calls `GetPerformanceCounterProperties()`, which requires the HOB list. In
+the SEC and PEI phases the HOB list may not yet be available, causing a crash. Splitting the instances runs the
+constructor only in the DXE instance.
 
-**What changed**: PartitionDxe, DxeTpm2MeasureBootLib and
-DxeTpmMeasureBootLib gained a required dependency on the new GptLib library
-class declared in MdeModulePkg. Platforms that build any of these modules
-must resolve GptLib in their DSC or the build fails with an unresolved
-library class.
+**What replaces it**: The phase-specific instances `RiscV64CpuTimerSecLib.inf` (SEC and PEI) and
+`RiscV64CpuTimerDxeLib.inf` (DXE).
 
-**Why it changed**: As reported in CVE-2024-13745, DxeTpm2MeasureBootLib
-could measure a GPT partition table that differs from the one parsed and
-used by PartitionDxe, because the two components carried independent GPT
-parsing logic. GptLib consolidates GPT parsing and validation so the
-partition table measured into PCR[5] is validated by the same logic the
-firmware uses.
+**How to migrate**: Update platform DSC `TimerLib` mappings that referenced
+`UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf`. Map `TimerLib` to `RiscV64CpuTimerSecLib.inf`
+for SEC and PEI modules and to `RiscV64CpuTimerDxeLib.inf` for DXE modules.
 
-**What replaces it**: Nothing is removed. A single canonical GptLib
-instance is provided in-tree (MdeModulePkg/Library/GptLib/GptLib.inf).
+**Breaking conditions**: Affects RISC-V (RISCV64) platforms that consume the RISC-V CPU timer library.
 
-**How to migrate**: Add the following mapping to the platform DSC
-[LibraryClasses] section:
+**Earliest removal**: Already removed in this change. The old INF path was removed in the same PR with no compatibility
+window.
 
-  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
-
-### Breaking Change: TPM2 helper functions moved to new Tpm2HelpLib library class
+##### Breaking Change: TPM2 helper functions moved to new Tpm2HelpLib library class
 
 - **Status**: Deprecation Active
 - **Tracking Issue**: [tianocore/edk2#12797](https://github.com/tianocore/edk2/issues/12797)
@@ -234,13 +205,45 @@ removal stable tag has not been scheduled at this time.
 > - [Platform/MinPlatformPkg: Switch to Tpm2HelpLib](https://github.com/tianocore/edk2-platforms/issues/995)
 > - [Silicon/Ampere/AmpereAltraPkg: Switch to Tpm2HelpLib](https://github.com/tianocore/edk2-platforms/issues/996)
 
+#### edk2-stable202608: Changes without Removal
+
+##### Breaking Change: New GptLib library class dependency
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#12808](https://github.com/tianocore/edk2/issues/12808)
+- **Pull Request**: [tianocore/edk2#12745](https://github.com/tianocore/edk2/pull/12745)
+
+**Type**: Source-Level (Non-removal) - Library class dependency addition
+(single expected instance)
+
+**What changed**: PartitionDxe, DxeTpm2MeasureBootLib and
+DxeTpmMeasureBootLib gained a required dependency on the new GptLib library
+class declared in MdeModulePkg. Platforms that build any of these modules
+must resolve GptLib in their DSC or the build fails with an unresolved
+library class.
+
+**Why it changed**: As reported in CVE-2024-13745, DxeTpm2MeasureBootLib
+could measure a GPT partition table that differs from the one parsed and
+used by PartitionDxe, because the two components carried independent GPT
+parsing logic. GptLib consolidates GPT parsing and validation so the
+partition table measured into PCR[5] is validated by the same logic the
+firmware uses.
+
+**What replaces it**: Nothing is removed. A single canonical GptLib
+instance is provided in-tree (MdeModulePkg/Library/GptLib/GptLib.inf).
+
+**How to migrate**: Add the following mapping to the platform DSC
+[LibraryClasses] section:
+
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
+
 ### edk2-stable202608: Behavioral Breaking Changes
 
 None
 
 ### edk2-stable202608: Build-System Breaking Changes
 
-### Breaking Change: GenFv ForceRebase now honors a per-module Xip flag
+#### Breaking Change: GenFv ForceRebase now honors a per-module Xip flag
 
 - **Status**: Removed
 - **Tracking Issue**: N/A (merged before the breaking change process took effect)
@@ -325,7 +328,7 @@ with no compatibility window.
 > is preserved. The **Breaking conditions** and **How to migrate** guidance above reflect the behavior after this
 > fix.
 
-### Breaking Change: Visual Studio 2015 and 2017 toolchain support removed
+#### Breaking Change: Visual Studio 2015 and 2017 toolchain support removed
 
 - **Status**: Removed
 - **Tracking Issue**: N/A (merged before the breaking change process took effect)
