@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
-  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -127,6 +127,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjAdditionalInformation,          ///< 68 - Additional Information
   EArchCommonObjAdditionalInformationEntry,     ///< 69 - Additional Information Entry
   EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
+  EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
+  EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1835,5 +1837,66 @@ typedef struct CmArchCommonAdditionalInformationValue {
   /// Additional Information Value bytes.
   UINT8    Value[SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE];
 } CM_ARCH_COMMON_ADDITIONAL_INFORMATION_VALUE;
+
+/** A structure that describes a System Enclosure Contained Element.
+
+  SMBIOS Specification v3.9.0 Type 3
+
+  ID: EArchCommonObjEnclosureElement
+**/
+typedef struct CmArchCommonEnclosureElement {
+  /// The contained element type.
+  UINT8    ContainedElementType;
+
+  /// Minimum number of the element type required for proper operation.
+  UINT8    ContainedElementMinimum;
+
+  /// Maximum number of the element type that can be installed.
+  UINT8    ContainedElementMaximum;
+} CM_ARCH_COMMON_ENCLOSURE_ELEMENT;
+
+/** A structure that describes System Enclosure Information.
+
+  SMBIOS Specification v3.9.0 Type 3
+
+  ID: EArchCommonObjSystemEnclosureInfo
+**/
+typedef struct CmArchCommonSystemEnclosureInfo {
+  /// CM Object Token uniquely identifying this System Enclosure entry.
+  CM_OBJECT_TOKEN    SystemEnclosureToken;
+  /// Manufacturer of the enclosure.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Chassis type with the lock-present bit in bit 7.
+  UINT8              Type;
+  /// Version of the enclosure.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the enclosure.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset tag of the enclosure.
+  CHAR8              AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Boot-up state as defined by SMBIOS Type 3.
+  UINT8              BootUpState;
+  /// Power supply state as defined by SMBIOS Type 3.
+  UINT8              PowerSupplyState;
+  /// Thermal state as defined by SMBIOS Type 3.
+  UINT8              ThermalState;
+  /// Security status as defined by SMBIOS Type 3.
+  UINT8              SecurityStatus;
+  /// OEM-defined value.
+  UINT32             OemDefined;
+  /// Height of the enclosure in rack units.
+  UINT8              Height;
+  /// Number of power cords associated with the enclosure.
+  UINT8              NumberOfPowerCords;
+  /// Token referencing an array of System Enclosure Contained Elements.
+  /// CM_NULL_TOKEN indicates that no contained elements are supplied.
+  CM_OBJECT_TOKEN    ContainedElementListToken;
+  /// SKU number of the enclosure.
+  CHAR8              SkuNum[SMBIOS_MAX_STRING_SIZE];
+  /// Rack type as defined by SMBIOS Type 3.
+  UINT8              RackType;
+  /// Rack height in rack units when Height is 0xFF.
+  UINT8              RackHeight;
+} CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
 
 #pragma pack()
