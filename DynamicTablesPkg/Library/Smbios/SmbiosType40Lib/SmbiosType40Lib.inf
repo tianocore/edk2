@@ -1,0 +1,38 @@
+## @file
+#  SMBIOS Type40 Table Generator.
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x0001001B
+  BASE_NAME       = SmbiosType40LibArm
+  FILE_GUID       = aae7f4ca-f8f5-460a-b0fa-91a478f273d4
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = NULL|DXE_DRIVER
+  CONSTRUCTOR     = SmbiosType40LibConstructor
+  DESTRUCTOR      = SmbiosType40LibDestructor
+
+[Sources]
+  SmbiosType40Generator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+  gEdkiiDynamicTableFactoryProtocolGuid
+
+[FixedPcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxAdditionalInformationValue

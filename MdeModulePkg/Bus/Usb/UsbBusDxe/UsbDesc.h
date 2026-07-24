@@ -71,6 +71,7 @@ typedef struct {
   UINT8                        *StrDescManufacturerUS;
   UINT8                        *StrDescProductUS;
   UINT8                        *StrDescSerialNumberUS;
+  EFI_USB_BOS_DESCRIPTOR       *BosDesc;
 } USB_DEVICE_DESC;
 
 /**

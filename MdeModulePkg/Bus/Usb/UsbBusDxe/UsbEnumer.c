@@ -234,6 +234,7 @@ UsbCreateDevice (
   Device->ParentPort = ParentPort;
   Device->Tier       = (UINT8)(ParentIf->Device->Tier + 1);
   Device->EnumScript = 0;
+  Device->IsSSDev    = FALSE;
   return Device;
 }
 
@@ -851,6 +852,18 @@ DeviceRetry:
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: failed to build descriptor table - %r\n", Status));
+    goto ON_ERROR;
+  }
+
+  // Below code is ensuring the device can be executed with SS.
+  // Some device FW might execute with SS later but it would produce failure if the device is already enumerated with HS.
+  if (  (RetryCount > 0)
+     && (Bus->Usb2Hc != NULL)
+     && (Bus->Usb2Hc->MajorRevision >= 0x3)
+     && (Child->IsSSDev)
+     && (Child->Speed < EFI_USB_SPEED_SUPER)
+     && (Child->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE))
+  {
     goto ON_ERROR;
   }
 

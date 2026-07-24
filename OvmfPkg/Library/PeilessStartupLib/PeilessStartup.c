@@ -21,8 +21,10 @@
 #include <Library/PeilessStartupLib.h>
 #include <Library/PlatformInitLib.h>
 #include <Library/TdxHelperLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
+#include <Library/MemDebugLogLib.h>
 #include <OvmfPlatforms.h>
 #include "PeilessStartupInternal.h"
 
@@ -124,6 +126,79 @@ InitializePlatform (
 }
 
 STATIC
+VOID
+MemDebugLogSetup (
+  VOID
+  )
+{
+  UINT32                  MemDebugLogBufPages;
+  VOID                    *Buffer;
+  MEM_DEBUG_LOG_HOB_DATA  HobData;
+  EFI_STATUS              Status;
+
+  Status = QemuFwCfgParseUint32 ("opt/ovmf/MemDebugLogPages", TRUE, &MemDebugLogBufPages);
+  if (EFI_ERROR (Status)) {
+    MemDebugLogBufPages = FixedPcdGet32 (PcdMemDebugLogPages);
+  }
+
+  if (MemDebugLogBufPages == 0) {
+    HobData.MemDebugLogBufAddr = 0;
+    BuildGuidDataHob (&gMemDebugLogHobGuid, &HobData, sizeof (HobData));
+    return;
+  }
+
+  if (MemDebugLogBufPages > MAX_MEM_DEBUG_LOG_PAGES) {
+    MemDebugLogBufPages = MAX_MEM_DEBUG_LOG_PAGES;
+  }
+
+  Buffer = AllocateRuntimePages (MemDebugLogBufPages);
+  if (Buffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate Memory Debug Log buffer. Logging disabled\n", __func__));
+    HobData.MemDebugLogBufAddr = 0;
+    BuildGuidDataHob (&gMemDebugLogHobGuid, &HobData, sizeof (HobData));
+    return;
+  }
+
+  Status = MemDebugLogInit (
+             (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+             (UINT32)EFI_PAGES_TO_SIZE (MemDebugLogBufPages)
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: MemDebugLogInit failed: %r\n", __func__, Status));
+    FreePages (Buffer, MemDebugLogBufPages);
+    HobData.MemDebugLogBufAddr = 0;
+    BuildGuidDataHob (&gMemDebugLogHobGuid, &HobData, sizeof (HobData));
+    return;
+  }
+
+  if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase) != 0) {
+    Status = MemDebugLogCopy (
+               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+               (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase)
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: MemDebugLogCopy failed: %r\n", __func__, Status));
+    }
+
+    ZeroMem (
+      (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
+      FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize)
+      );
+  }
+
+  HobData.MemDebugLogBufAddr = (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer;
+  BuildGuidDataHob (&gMemDebugLogHobGuid, &HobData, sizeof (HobData));
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: MemDebugLog buffer at 0x%lx, %d pages\n",
+    __func__,
+    (UINT64)(UINTN)Buffer,
+    MemDebugLogBufPages
+    ));
+}
+
+STATIC
 EFI_HOB_PLATFORM_INFO *
 BuildPlatformInfoHob (
   VOID
@@ -213,6 +288,10 @@ PeilessStartup (
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     CpuDeadLoop ();
+  }
+
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogSetup ();
   }
 
   //
