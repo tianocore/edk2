@@ -751,7 +751,7 @@ HostInterfaceIpmiCheckMacAddress (
              (VOID *)&IpmiLanChannelMacAddress.Addr,
              IpmiLanMacAddressSize - 1
              ) != 0) ||
-          ((IpmiLanChannelMacAddress.Addr[IpmiLanMacAddressSize - 1] - 1) !=
+          (((UINT8)(IpmiLanChannelMacAddress.Addr[IpmiLanMacAddressSize - 1] - 1)) !=
            *(UsbNicInfo->MacAddress + IpmiLanMacAddressSize - 1))
           )
       {
