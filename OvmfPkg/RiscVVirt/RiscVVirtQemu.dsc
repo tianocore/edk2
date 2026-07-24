@@ -162,6 +162,7 @@
 
 [LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerSecLib.inf
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 !if $(TPM2_ENABLE) == TRUE
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
@@ -172,6 +173,7 @@
 
 [LibraryClasses.common.DXE_CORE]
   TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
