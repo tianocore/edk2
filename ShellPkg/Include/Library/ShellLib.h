@@ -699,7 +699,7 @@ typedef enum {
   TypeValue,        ///< A flag that has some data following it with a space (IE "-a 1").
   TypePosition,     ///< Some data that did not follow a parameter (IE "filename.txt").
   TypeStart,        ///< A flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...).
-  TypeDoubleValue,  ///< A flag that has 2 space seperated value data following it (IE "-a 1 2").
+  TypeDoubleValue,  ///< A flag that has 2 space separated value data following it (IE "-a 1 2").
   TypeMaxValue,     ///< A flag followed by all the command line data before the next flag.
   TypeTimeValue,    ///< A flag that has a time value following it (IE "-a -5:00").
   TypeMax,

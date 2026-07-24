@@ -2142,7 +2142,7 @@ EdbPrintSource (
   *(UINT8 *)FuncEnd = 0;
 
   //
-  // seperate buffer by \n, so that \r can be added.
+  // separate buffer by \n, so that \r can be added.
   //
   FuncIndex = FuncStart;
   while (*FuncIndex != 0) {
