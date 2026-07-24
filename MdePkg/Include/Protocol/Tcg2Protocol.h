@@ -3,6 +3,8 @@
   See http://trustedcomputinggroup.org for the latest specification
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -244,6 +246,29 @@ EFI_STATUS
   );
 
 /**
+  The EFI_TCG2_PROTOCOL LogHashEvent function call logs a pre-computed digest list and an event.
+  The caller is responsible for calculateing the digest values and extend them into TPM outside
+  this function call.
+
+  @param[in]  This               Indicates the calling context
+  @param[in]  DigestList         Pointer to a TPML_DIGEST_VALUES structure containing
+                                 the pre-computed digest values to log.
+  @param[in]  Event              Pointer to data buffer containing information about the event.
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+  @retval EFI_VOLUME_FULL        The extend operation occurred, but the event could not be written to one or more event logs.
+  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TCG2_LOG_HASH_EVENT)(
+  IN EFI_TCG2_PROTOCOL         *This,
+  IN TPML_DIGEST_VALUES        *DigestList,
+  IN EFI_TCG2_EVENT            *Event
+  );
+
+/**
   This service returns the currently active PCR banks.
 
   @param[in]  This            Indicates the calling context
@@ -301,6 +326,7 @@ struct tdEFI_TCG2_PROTOCOL {
   EFI_TCG2_GET_ACTIVE_PCR_BANKS                  GetActivePcrBanks;
   EFI_TCG2_SET_ACTIVE_PCR_BANKS                  SetActivePcrBanks;
   EFI_TCG2_GET_RESULT_OF_SET_ACTIVE_PCR_BANKS    GetResultOfSetActivePcrBanks;
+  EFI_TCG2_LOG_HASH_EVENT                        LogHashEvent;
 };
 
 extern EFI_GUID  gEfiTcg2ProtocolGuid;
