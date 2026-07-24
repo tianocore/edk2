@@ -320,8 +320,13 @@ PlatformBootManagerAfterConsole (
     BootLogoEnableLogo ();
   }
 
-  EfiBootManagerConnectAll ();
-  EfiBootManagerRefreshAllBootOption ();
+  //
+  // Connecting removable media can perturb the memory map used for S4 resume.
+  //
+  if (GetBootModeHob () != BOOT_ON_S4_RESUME) {
+    EfiBootManagerConnectAll ();
+    EfiBootManagerRefreshAllBootOption ();
+  }
 
   //
   // Active BOOT_ON_FLASH_UPDATE mode means that at least one capsule has been
