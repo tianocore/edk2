@@ -129,6 +129,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
   EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
   EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
+  EArchCommonObjBiosLanguageInfo,               ///< 73 - BIOS Language Information
+  EArchCommonObjBiosLanguage,                   ///< 74 - BIOS Language
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1898,5 +1900,36 @@ typedef struct CmArchCommonSystemEnclosureInfo {
   /// Rack height in rack units when Height is 0xFF.
   UINT8              RackHeight;
 } CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
+
+/** A structure that describes an installable firmware language.
+
+  SMBIOS Specification v3.9.0 Type 13
+
+  ID: EArchCommonObjBiosLanguage
+**/
+typedef struct CmArchCommonBiosLanguage {
+  /// Firmware language string in long or abbreviated SMBIOS format.
+  CHAR8    Language[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_BIOS_LANGUAGE;
+
+/** A structure that describes Firmware Language Information.
+
+  SMBIOS Specification v3.9.0 Type 13
+
+  ID: EArchCommonObjBiosLanguageInfo
+**/
+typedef struct CmArchCommonBiosLanguageInfo {
+  /// CM Object Token uniquely identifying this Firmware Language Information.
+  CM_OBJECT_TOKEN    BiosLanguageInfoToken;
+
+  /// Token referencing an array of installable firmware languages.
+  CM_OBJECT_TOKEN    LanguageListToken;
+
+  /// Firmware language format flags as defined by SMBIOS Type 13.
+  UINT8              Flags;
+
+  /// One-based index of the currently installed firmware language.
+  UINT8              CurrentLanguage;
+} CM_ARCH_COMMON_BIOS_LANGUAGE_INFO;
 
 #pragma pack()
