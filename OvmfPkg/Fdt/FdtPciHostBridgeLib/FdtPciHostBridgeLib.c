@@ -283,7 +283,7 @@ ProcessPciHost (
     ));
 
   // Map the ECAM space in the GCD memory map
-  Status = MapMmioMemory (ConfigBase, ConfigSize, EFI_MEMORY_UC);
+  Status = MapMmioMemory (ConfigBase, ConfigSize, EFI_MEMORY_UC | EFI_MEMORY_XP);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -295,7 +295,7 @@ ProcessPciHost (
     // is not aware of this translation and so it will only map the I/O view
     // in the GCD I/O map.
     //
-    Status = MapMmioMemory (*IoBase + IoTranslation, *IoSize, EFI_MEMORY_UC);
+    Status = MapMmioMemory (*IoBase + IoTranslation, *IoSize, EFI_MEMORY_UC | EFI_MEMORY_XP);
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -303,7 +303,7 @@ ProcessPciHost (
   }
 
   if (*Mmio32Size != 0) {
-    Status = MapMmioMemory (*Mmio32Base, *Mmio32Size, EFI_MEMORY_UC);
+    Status = MapMmioMemory (*Mmio32Base, *Mmio32Size, EFI_MEMORY_UC | EFI_MEMORY_XP);
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -311,7 +311,7 @@ ProcessPciHost (
   }
 
   if (*Mmio64Size != 0) {
-    Status = MapMmioMemory (*Mmio64Base, *Mmio64Size, EFI_MEMORY_UC);
+    Status = MapMmioMemory (*Mmio64Base, *Mmio64Size, EFI_MEMORY_UC | EFI_MEMORY_XP);
     ASSERT_EFI_ERROR (Status);
   }
 
