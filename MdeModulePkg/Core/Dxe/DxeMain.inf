@@ -97,6 +97,7 @@
   PcdLib
   ImagePropertiesRecordLib
   OrderedCollectionLib
+  SafeIntLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## PRODUCES             ## Event
@@ -126,6 +127,7 @@
   gEfiMemoryAttributesTableGuid                 ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event
   gEfiHobMemoryAllocStackGuid                   ## SOMETIMES_CONSUMES   ## SystemTable
+  gCompatibilityModeActivatedEventGuid          ## SOMETIMES_PRODUCES   ## Event
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED # HOB

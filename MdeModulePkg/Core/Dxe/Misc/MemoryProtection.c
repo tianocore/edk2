@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/SafeIntLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/DebugLib.h>
@@ -62,7 +63,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
 
-UINT32  mImageProtectionPolicy;
+#define LEGACY_BIOS_WB_LENGTH  0xA0000
+
+UINT32   mImageProtectionPolicy;
+BOOLEAN  mIsCompatibilityModeActive = FALSE;
+BOOLEAN  mSettingAttributes         = FALSE;
 
 extern LIST_ENTRY  mGcdMemorySpaceMap;
 
@@ -138,6 +143,18 @@ GetProtectionPolicyFromImageType (
 }
 
 /**
+  Returns TRUE if ActivateCompatibilityMode() has been called.
+**/
+BOOLEAN
+EFIAPI
+IsCompatibilityModeActive (
+  VOID
+  )
+{
+  return mIsCompatibilityModeActive;
+}
+
+/**
   Get UEFI image protection policy based upon loaded image device path.
 
   @param[in]  LoadedImage              The loaded image protocol
@@ -165,6 +182,10 @@ GetUefiImageProtectionPolicy (
 
   if (InSmm) {
     return FALSE;
+  }
+
+  if (IsCompatibilityModeActive ()) {
+    return DO_NOT_PROTECT;
   }
 
   //
@@ -543,6 +564,276 @@ UnprotectUefiImage (
 }
 
 /**
+  Disable NULL pointer detection. This is a workaround resort in
+  order to skip unfixable NULL pointer access issues detected in OptionROM or
+  boot loaders.
+**/
+VOID
+DisableNullDetection (
+  VOID
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Desc;
+
+  //
+  // Disable NULL pointer detection by enabling first 4K page
+  //
+  Status = CoreGetMemorySpaceDescriptor (0, &Desc);
+  ASSERT_EFI_ERROR (Status);
+
+  // Only re-enable the null page if it is system memory. If this page belongs to
+  // another memory type or is unmapped in general, leave it RP
+  if (Desc.GcdMemoryType != EfiGcdMemoryTypeSystemMemory) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a - Not disabling null detection as page 0 is not marked as system memory\n",
+      __func__
+      ));
+    return;
+  }
+
+  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
+    Status = CoreSetMemorySpaceCapabilities (
+               0,
+               EFI_PAGE_SIZE,
+               Desc.Capabilities | EFI_MEMORY_RP
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Status = CoreSetMemorySpaceAttributes (
+             0,
+             EFI_PAGE_SIZE,
+             Desc.Attributes & ~EFI_MEMORY_RP
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Page 0 might have be allocated to avoid misuses. Free it here anyway.
+  //
+  CoreFreePages (0, 1);
+
+  return;
+}
+
+/**
+  Disable NULL pointer detection after EndOfDxe. This is a workaround resort in
+  order to skip unfixable NULL pointer access issues detected in OptionROM or
+  boot loaders.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+DisableNullDetectionAtTheEndOfDxe (
+  EFI_EVENT  Event,
+  VOID       *Context
+  )
+{
+  DisableNullDetection ();
+  CoreCloseEvent (Event);
+  return;
+}
+
+/**
+  Uninstalls the Memory Attribute Protocol from all handles.
+**/
+VOID
+EFIAPI
+UninstallMemoryAttributeProtocol (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       HandleCount;
+  UINTN       Index;
+  EFI_HANDLE  *HandleBuffer;
+
+  if (gMemoryAttributeProtocol == NULL) {
+    Status = gBS->LocateProtocol (&gEfiMemoryAttributeProtocolGuid, NULL, (VOID **)&gMemoryAttributeProtocol);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+  }
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < HandleCount; Index++) {
+      Status = gBS->UninstallProtocolInterface (
+                      HandleBuffer[Index],
+                      &gEfiMemoryAttributeProtocolGuid,
+                      gMemoryAttributeProtocol
+                      );
+      DEBUG ((DEBUG_INFO, "%a - Uninstalling Memory Attribute Protocol from handle %p - %r\n", __func__, HandleBuffer[Index], Status));
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
+}
+
+/**
+  Maps memory below 640K (legacy BIOS write-back memory) as readable, writeable, and executable.
+**/
+STATIC
+VOID
+MapLegacyBiosMemoryRWX (
+  VOID
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Desc;
+  EFI_PHYSICAL_ADDRESS             Start;
+  UINT64                           Length;
+  UINT64                           DescLengthFromStart;
+
+  Status = EFI_SUCCESS;
+  Start  = 0x0;
+
+  if (gCpu == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a cannot remap Legacy BIOS memory as RWX because gCpu is NULL\n",
+      __func__
+      ));
+    return;
+  }
+
+  // Ensure that this memory is marked as system memory. If it is not system memory, do not change
+  // the memory attributes as we do not want to map something that shouldn't be mapped or map something
+  // incorrectly
+  while (Start < LEGACY_BIOS_WB_LENGTH) {
+    Status = CoreGetMemorySpaceDescriptor (Start, &Desc);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a - Failed to get memory space descriptor for address 0x%llx! Status = %r\n",
+        __func__,
+        Start,
+        Status
+        ));
+      return;
+    }
+
+    // find the length from Start to the end of this descriptor, in the case Start != Desc.BaseAddress
+    // these should all be well formed descriptors, but use SafeIntLib functions just to be sure we don't
+    // over/underflow
+    Status = SafeUint64Add (Desc.BaseAddress, Desc.Length, &DescLengthFromStart);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a - Memory space descriptor has UINT64 overflowing address 0x%llx + length 0x%llx! Status = %r\n",
+        __func__,
+        Desc.BaseAddress,
+        Desc.Length,
+        Status
+        ));
+
+      // if we fail here this is very bad and means the GCD is malformed
+      ASSERT (FALSE);
+      return;
+    }
+
+    Status = SafeUint64Sub (DescLengthFromStart, Start, &DescLengthFromStart);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a - Memory space descriptor has UINT64 underflowing address 0x%llx + length 0x%llx Start: 0x%llx! Status = %r\n",
+        __func__,
+        Desc.BaseAddress,
+        Desc.Length,
+        Start,
+        Status
+        ));
+
+      // if we fail here this is very bad and means the GCD is malformed
+      ASSERT (FALSE);
+      return;
+    }
+
+    // Ensure we only go up to LEGACY_BIOS_WB_LENGTH here, we know Start is less than it due to while condition
+    // We also know Start + DescLengthFromStart won't overflow because above we did a safe subtraction of Start from
+    // DescLengthFromStart
+    if (Start + DescLengthFromStart > LEGACY_BIOS_WB_LENGTH) {
+      Length = LEGACY_BIOS_WB_LENGTH - Start;
+    } else {
+      Length = DescLengthFromStart;
+    }
+
+    // remove this chunk from being remapped if it is not system memory
+    if (Desc.GcdMemoryType != EfiGcdMemoryTypeSystemMemory) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a Not mapping 0x%llx for 0x%llx as RWX because it is not system memory\n",
+        __func__,
+        Desc.BaseAddress,
+        Length
+        ));
+
+      // we know this doesn't overflow because we did a safe subtraction of Start from DescLengthFromStart above
+      Start += DescLengthFromStart;
+      continue;
+    }
+
+    // Map the legacy BIOS write-back memory as RWX.
+    Status = gCpu->SetMemoryAttributes (
+                     gCpu,
+                     Start,
+                     Length,
+                     0
+                     );
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a failed to map 0x%llx for length 0x%llx as RWX\n",
+        __func__,
+        Start,
+        Length
+        ));
+
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    // we know this doesn't overflow because we did a safe subtraction of Start from DescLengthFromStart above
+    Start += DescLengthFromStart;
+  }
+}
+
+/**
+  Activate compatibility mode to disable memory protections for non-NX_COMPAT EFI_APPLICATIONS.
+**/
+VOID
+EFIAPI
+ActivateCompatibilityMode (
+  VOID
+  )
+{
+  if (mIsCompatibilityModeActive) {
+    return;
+  }
+
+  DEBUG ((DEBUG_WARN, "%a - Activating Memory Protection Compatibility Mode!\n", __func__));
+
+  mIsCompatibilityModeActive = TRUE;
+  DisableNullDetection ();
+  UninstallMemoryAttributeProtocol ();
+  MapLegacyBiosMemoryRWX ();
+  CoreNotifySignalList (&gCompatibilityModeActivatedEventGuid);
+}
+
+/**
   Return the EFI memory permission attribute associated with memory
   type 'MemoryType' under the configured DXE memory protection policy.
 
@@ -564,11 +855,13 @@ GetPermissionAttributeForMemoryType (
     TestBit = LShiftU64 (1, MemoryType);
   }
 
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
-    return EFI_MEMORY_XP;
-  } else {
+  if (IsCompatibilityModeActive ()) {
     return 0;
+  } else if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
+    return EFI_MEMORY_XP;
   }
+
+  return 0;
 }
 
 /**
@@ -985,58 +1278,6 @@ MemoryProtectionExitBootServicesCallback (
 }
 
 /**
-  Disable NULL pointer detection after EndOfDxe. This is a workaround resort in
-  order to skip unfixable NULL pointer access issues detected in OptionROM or
-  boot loaders.
-
-  @param[in]  Event     The Event this notify function registered to.
-  @param[in]  Context   Pointer to the context data registered to the Event.
-**/
-VOID
-EFIAPI
-DisableNullDetectionAtTheEndOfDxe (
-  EFI_EVENT  Event,
-  VOID       *Context
-  )
-{
-  EFI_STATUS                       Status;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Desc;
-
-  DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): start\r\n"));
-  //
-  // Disable NULL pointer detection by enabling first 4K page
-  //
-  Status = CoreGetMemorySpaceDescriptor (0, &Desc);
-  ASSERT_EFI_ERROR (Status);
-
-  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
-    Status = CoreSetMemorySpaceCapabilities (
-               0,
-               EFI_PAGE_SIZE,
-               Desc.Capabilities | EFI_MEMORY_RP
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  Status = CoreSetMemorySpaceAttributes (
-             0,
-             EFI_PAGE_SIZE,
-             Desc.Attributes & ~EFI_MEMORY_RP
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Page 0 might have be allocated to avoid misuses. Free it here anyway.
-  //
-  CoreFreePages (0, 1);
-
-  CoreCloseEvent (Event);
-  DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): end\r\n"));
-
-  return;
-}
-
-/**
   A notification for the Memory Attribute Protocol Installation.
 
   @param[in]  Event                 Event whose notification function is being invoked.
@@ -1212,8 +1453,9 @@ ApplyMemoryProtectionPolicy (
   IN  UINT64                Length
   )
 {
-  UINT64  OldAttributes;
-  UINT64  NewAttributes;
+  UINT64      OldAttributes;
+  UINT64      NewAttributes;
+  EFI_STATUS  Status;
 
   //
   // The policy configured in PcdDxeNxMemoryProtectionPolicy
@@ -1268,16 +1510,31 @@ ApplyMemoryProtectionPolicy (
   //
   NewAttributes = GetPermissionAttributeForMemoryType (NewType);
 
-  if (OldType != EfiMaxMemoryType) {
-    OldAttributes = GetPermissionAttributeForMemoryType (OldType);
-    if (OldAttributes == NewAttributes) {
-      // policy is the same between OldType and NewType
+  // If compatibility mode is active, we need to always apply the new attributes because they may differ from
+  // previously set attributes.
+  if (!IsCompatibilityModeActive ()) {
+    if (OldType != EfiMaxMemoryType) {
+      OldAttributes = GetPermissionAttributeForMemoryType (OldType);
+      if (OldAttributes == NewAttributes) {
+        // policy is the same between OldType and NewType
+        return EFI_SUCCESS;
+      }
+    } else if (NewAttributes == 0) {
+      // newly added region of a type that does not require protection
       return EFI_SUCCESS;
     }
-  } else if (NewAttributes == 0) {
-    // newly added region of a type that does not require protection
+  } else if (mSettingAttributes) {
+    // If we are already setting attributes, then we are in the case where CpuDxe is allocating more page table
+    // pages while we are trying to set attributes on a memory range. Just return success here, CpuDxe can manage
+    // the permissions on its page table pages. X64 will preallocate page table pages and AARCH64 sets all free memory
+    // to be EFI_MEMORY_XP on initialization. We are also already in compatibility mode, so memory protection guarantees
+    // are oof. This only becomes a problem after compatibility mode is activated because free memory may still have XP
+    // set on it that needs to get removed.
     return EFI_SUCCESS;
   }
 
-  return gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
+  mSettingAttributes = TRUE;
+  Status             = gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
+  mSettingAttributes = FALSE;
+  return Status;
 }
