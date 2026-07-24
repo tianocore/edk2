@@ -348,6 +348,7 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 
 !if $(UNIVERSAL_PAYLOAD) == FALSE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF UefiPayloadPkg/CfrSetupMenuDxe/CfrSetupMenuDxe.inf
 INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 #
