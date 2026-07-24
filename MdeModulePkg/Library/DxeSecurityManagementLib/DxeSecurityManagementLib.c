@@ -220,7 +220,7 @@ ExecuteSecurityHandlers (
   UINTN                     FileSize;
   EFI_HANDLE                Handle;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
-  EFI_DEVICE_PATH_PROTOCOL  *FilePathToVerfiy;
+  EFI_DEVICE_PATH_PROTOCOL  *FilePathToVerify;
 
   if (FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -237,7 +237,7 @@ ExecuteSecurityHandlers (
   FileBuffer                  = NULL;
   FileSize                    = 0;
   HandlerAuthenticationStatus = AuthenticationStatus;
-  FilePathToVerfiy            = (EFI_DEVICE_PATH_PROTOCOL *)FilePath;
+  FilePathToVerify            = (EFI_DEVICE_PATH_PROTOCOL *)FilePath;
   //
   // Run security handler in same order to their registered list
   //
@@ -247,7 +247,7 @@ ExecuteSecurityHandlers (
       // Try get file buffer when the handler requires image buffer.
       //
       if (FileBuffer == NULL) {
-        Node   = FilePathToVerfiy;
+        Node   = FilePathToVerify;
         Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
         //
         // Try to get image by FALSE boot policy for the exact boot file path.
@@ -264,14 +264,19 @@ ExecuteSecurityHandlers (
           //
           // LoadFile () may cause the device path of the Handle be updated.
           //
-          FilePathToVerfiy = AppendDevicePath (DevicePathFromHandle (Handle), Node);
+          FilePathToVerify = AppendDevicePath (DevicePathFromHandle (Handle), Node);
         }
       }
     }
 
+    if (FilePathToVerify == NULL) {
+      ASSERT (FilePathToVerify != NULL);
+      continue;
+    }
+
     Status = mSecurityTable[Index].SecurityHandler (
                                      HandlerAuthenticationStatus,
-                                     FilePathToVerfiy,
+                                     FilePathToVerify,
                                      FileBuffer,
                                      FileSize
                                      );
@@ -284,8 +289,8 @@ ExecuteSecurityHandlers (
     FreePool (FileBuffer);
   }
 
-  if (FilePathToVerfiy != FilePath) {
-    FreePool (FilePathToVerfiy);
+  if (FilePathToVerify != FilePath) {
+    FreePool (FilePathToVerify);
   }
 
   return Status;
