@@ -10,9 +10,6 @@
 
 #include <Protocol/DriverBinding.h>
 
-#define MAX_NON_DISCOVERABLE_PCI_DEVICE_ID  (32 * 256)
-
-STATIC UINTN           mUniqueIdCounter = 0;
 EFI_CPU_ARCH_PROTOCOL  *mCpu;
 
 //
@@ -124,6 +121,75 @@ CloseProtocol:
 }
 
 /**
+  Check whether any other handle bound to gEdkiiNonDiscoverableDeviceProtocolGuid
+  already advertises the given UniqueId. Used to enforce that the
+  platform-assigned UniqueId is distinct across NonDiscoverableDevice instances.
+
+  @param[in]  DeviceHandle  The controller handle being bound; excluded from the
+                            duplicate check.
+  @param[in]  UniqueId      The UniqueId to look for on other handles.
+
+  @retval EFI_SUCCESS       No other handle advertises UniqueId.
+  @retval EFI_DEVICE_ERROR  Another handle already uses UniqueId.
+  @retval Other             Error returned by LocateHandleBuffer().
+**/
+STATIC
+EFI_STATUS
+CheckUniqueIdNotInUse (
+  IN EFI_HANDLE  DeviceHandle,
+  IN UINTN       UniqueId
+  )
+{
+  EFI_STATUS               Status;
+  UINTN                    HandleCount;
+  EFI_HANDLE               *HandleBuffer;
+  UINTN                    Index;
+  NON_DISCOVERABLE_DEVICE  *OtherDevice;
+
+  HandleCount  = 0;
+  HandleBuffer = NULL;
+  Status       = gBS->LocateHandleBuffer (
+                        ByProtocol,
+                        &gEdkiiNonDiscoverableDeviceProtocolGuid,
+                        NULL,
+                        &HandleCount,
+                        &HandleBuffer
+                        );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: LocateHandleBuffer failed: %r\n", __func__, Status));
+    return Status;
+  }
+
+  Status = EFI_SUCCESS;
+  for (Index = 0; Index < HandleCount; Index++) {
+    // Skip our own handle
+    if (HandleBuffer[Index] == DeviceHandle) {
+      continue;
+    }
+
+    if (EFI_ERROR (
+          gBS->HandleProtocol (
+                 HandleBuffer[Index],
+                 &gEdkiiNonDiscoverableDeviceProtocolGuid,
+                 (VOID **)&OtherDevice
+                 )
+          ))
+    {
+      continue;
+    }
+
+    if (OtherDevice->UniqueId == UniqueId) {
+      DEBUG ((DEBUG_ERROR, "%a: duplicate NonDiscoverableDevice UniqueId 0x%llx\n", __func__, UniqueId));
+      Status = EFI_DEVICE_ERROR;
+      break;
+    }
+  }
+
+  FreePool (HandleBuffer);
+  return Status;
+}
+
+/**
   This routine is called right after the .Supported() called and
   Start this driver on ControllerHandle.
 
@@ -148,11 +214,6 @@ NonDiscoverablePciDeviceStart (
   NON_DISCOVERABLE_PCI_DEVICE  *Dev;
   EFI_STATUS                   Status;
 
-  ASSERT (mUniqueIdCounter < MAX_NON_DISCOVERABLE_PCI_DEVICE_ID);
-  if (mUniqueIdCounter >= MAX_NON_DISCOVERABLE_PCI_DEVICE_ID) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   Dev = AllocateZeroPool (sizeof *Dev);
   if (Dev == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -168,6 +229,13 @@ NonDiscoverablePciDeviceStart (
                   );
   if (EFI_ERROR (Status)) {
     goto FreeDev;
+  }
+
+  // Reject duplicate UniqueId across NonDiscoverableDevice handles, so the
+  // platform is forced to assign a distinct ID per registration.
+  Status = CheckUniqueIdNotInUse (DeviceHandle, Dev->Device->UniqueId);
+  if (EFI_ERROR (Status)) {
+    goto CloseProtocol;
   }
 
   InitializePciIoProtocol (Dev);
@@ -187,7 +255,16 @@ NonDiscoverablePciDeviceStart (
     goto CloseProtocol;
   }
 
-  Dev->UniqueId = mUniqueIdCounter++;
+  //
+  // Use platform-supplied UniqueId from NON_DISCOVERABLE_DEVICE.
+  //
+  Dev->UniqueId = Dev->Device->UniqueId;
+
+  //
+  // Remember the controller handle so PciIoMap/SetAttribute
+  // can pass it to IoMmuSetAttribute for DMA identifier resolution.
+  //
+  Dev->Handle = DeviceHandle;
 
   return EFI_SUCCESS;
 
