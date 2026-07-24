@@ -29,16 +29,27 @@
  * For register convention, please see below:
  * https://github.com/FirmwareHandoff/firmware_handoff/blob/main/source/register_conventions.rst
  */
+#ifndef REGISTER_CONVENTION_VERSION_SHIFT_64
 #define REGISTER_CONVENTION_VERSION_SHIFT_64  (32)
+#endif
+
 #define TRANSFER_LIST_SIGNATURE_MASK_64       \
   ((1ULL << REGISTER_CONVENTION_VERSION_SHIFT_64) - 1)
 
+#ifndef REGISTER_CONVENTION_VERSION_SHIFT_32
 #define REGISTER_CONVENTION_VERSION_SHIFT_32  (24)
+#endif
+
 #define TRANSFER_LIST_SIGNATURE_MASK_32       \
   ((1UL << REGISTER_CONVENTION_VERSION_SHIFT_32) - 1)
 
+#ifndef REGISTER_CONVENTION_VERSION_MASK
 #define REGISTER_CONVENTION_VERSION_MASK  (0xff)
-#define REGISTER_CONVENTION_VERSION       (1)
+#endif
+
+#ifndef REGISTER_CONVENTION_VERSION
+#define REGISTER_CONVENTION_VERSION  (1)
+#endif
 
 #define CREATE_TRANSFER_LIST_HANDOFF_X1_VALUE(version)    \
   ((TRANSFER_LIST_SIGNATURE &                             \
@@ -64,6 +75,11 @@
 #define TRANSFER_ENTRY_TAG_ID_ACPI_TABLE_AGGREGATE  4
 #define TRANSFER_ENTRY_TAG_ID_TPM_EVENT_LOG         5
 #define TRANSFER_ENTRY_TAG_ID_TPM_CRB_BASE          6
+
+/*
+ * Tag ID mask: TagId field is 24-bit.
+ */
+#define TRANSFER_LIST_TAGID_MASK  0xFFFFFFU
 
 /*
  * Flag value in TransferListHeader->Flags.
@@ -130,13 +146,10 @@ typedef struct TransferListHeader {
  */
 typedef struct TransferEntryHeader {
   /// The entry type identifier.
-  UINT16    TagId;
-
-  /// Reserved.
-  UINT8     Reserved0;
+  UINT32    TagId      : 24;
 
   /// The size of this entry header in bytes.
-  UINT8     HeaderSize;
+  UINT32    HeaderSize : 8;
 
   /// The size of the data content in bytes.
   UINT32    DataSize;
@@ -152,6 +165,6 @@ typedef struct TransferListEventLog {
   UINT32    Flags;
 
   /// TPM event log as much as
-  /// TRNASFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
+  /// TRANSFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
   UINT8     EventLog[];
 } TRANSFER_LIST_EVENTLOG;

@@ -72,6 +72,11 @@ jobs:
         name: 'Set Safe Directory'
         if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
 
+      - run: |
+          git config --global --add url."https://github.com/TF-Shared/transfer-list-library.git".insteadOf "https://review.trustedfirmware.org/shared/transfer-list-library.git"
+          git config --global --add url."https://github.com/TF-Shared/transfer-list-library.git".insteadOf "https://review.trustedfirmware.org/shared/transfer-list-library"
+        name: 'Redirect libtl submodule checkout to GitHub mirror'
+
       - name: Set up Python ${{ inputs.python-version }}
         uses: actions/setup-python@v6
         with:

@@ -85,7 +85,10 @@
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.c",
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.h",
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathStringConversions.c",
-            "Include/Register/LoongArch64/Cpucfg.h"
+            "Include/Register/LoongArch64/Cpucfg.h",
+            "Library/ArmTransferListLib/libtl",
+            "Library/ArmTransferListLib/Include",
+            "Library/ArmTransferListLib/TransferListLibSupport.h"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
@@ -177,6 +180,7 @@
     "SpellCheck": {
         "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
         "IgnoreFiles": [
+            "Library/ArmTransferListLib/libtl/**", # submodule outside of our control
             "Library/BaseFdtLib/libfdt/**",    # submodule outside of our control
             "Library/JedecJep106Lib/**",        # JEDEC vendor name data
             "Library/MipiSysTLib/mipisyst/**",  # submodule outside of our control
@@ -197,12 +201,14 @@
             "cound",            # PciExpress*.h
             "desciptor",        # Runtime.h
             "egres",            # PciExpress21.h
+            "evlog",            # ArmTransferList.h
             "extenion",         # HiiImageDecoder.h
             "extented",         # Cxl30.h
             "identifer",        # Acpi*.h, Cxl*.h
             "implemenation",    # Udf.h
             "initialzation",    # Cxl20.h
             "interal",          # Tpm12.h
+            "libtl",            # ArmTransferListLib
             "magik",            # Dhcp4.h, PxeBaseCode.h
             "managment",        # SmBios.h
             "mutil",            # SmBios.h
@@ -236,13 +242,18 @@
             "Library/BaseFdtLib/stdint.h",
             "Library/BaseFdtLib/stdlib.h",
             "Library/BaseFdtLib/string.h",
-            "mipi_syst.h"
+            "mipi_syst.h",
+            "Library/ArmTransferListLib/libtl",
+            "Library/ArmTransferListLib/Include",
+            "Library/ArmTransferListLib/TransferListLibSupport.h"
         ]
     },
 
     ## options defined .pytool/Plugin/MarkdownLintCheck
     "MarkdownLintCheck": {
-        "IgnoreFiles": [ "Library/MipiSysTLib/mipisyst"  # submodule outside of control
+        "IgnoreFiles": [
+            "Library/ArmTransferListLib/libtl", # submodule outside of control
+            "Library/MipiSysTLib/mipisyst"      # submodule outside of control
         ]            # package root relative file, folder, or glob pattern to ignore
     }
 }
