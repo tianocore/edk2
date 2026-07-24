@@ -28,6 +28,13 @@
   DEFINE PLAT_CLOUD_HV           = TRUE
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE NETWORK_TLS_ENABLE      = FALSE
+
+  #
+  # Defines for _SUPPORTED values, allowing to identify supported features.
+  #
+  DEFINE SECURE_BOOT_ENABLE_SUPPORTED                = TRUE
+  DEFINE NETWORK_TLS_ENABLE_SUPPORTED                = TRUE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
@@ -77,27 +84,11 @@
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
-  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
 
   # Rsdp base address in Cloud Hypervisor
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x40200000
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x4000000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x40000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  #
-  # The cumulative and individual VOLATILE variable size limits should be set
-  # high enough for accommodating several and/or large CA certificates.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
-!endif
-
-  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
 
   #
   # ARM PrimeCell
@@ -116,7 +107,6 @@
   # initial location of the device tree blob passed by Cloud Hypervisor -- base of DRAM
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x40000000
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
 
   #
@@ -129,13 +119,6 @@
   # Enable the non-executable DXE stack. (This gets set up by DxeIpl)
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
-
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
-  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
-  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
-  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
-!endif
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
@@ -151,34 +134,11 @@
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
-  ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
-  #  enumeration to complete before installing ACPI tables.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
-
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x00100000
 
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
-
-  #
-  # ARM General Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
-
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
-
-  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
-  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
-
-  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0
 
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
 
@@ -214,22 +174,6 @@
   #
   # Architectural Protocols
   #
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  }
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
-    <LibraryClasses>
-      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
-  }
-  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
-!else
-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-!endif
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
     <LibraryClasses>

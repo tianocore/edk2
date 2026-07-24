@@ -28,6 +28,28 @@
   DEFINE ENABLE_PCI              = TRUE
 !endif
 
+!if $(PLAT_CLOUD_HV) == TRUE || $(PLAT_XEN) == TRUE
+  DEFINE FLASH_BACKED_RUNTIME_VARIABLE   = FALSE
+!else
+  DEFINE FLASH_BACKED_RUNTIME_VARIABLE   = TRUE
+!endif
+
+  #
+  # Catch invalid MACRO configurations from .dsc files
+  #
+!if $(SECURE_BOOT_ENABLE) == TRUE && $(SECURE_BOOT_ENABLE_SUPPORTED) == FALSE
+  !error SECURE_BOOT_ENABLE=TRUE is not supported for this platform.
+!endif
+!if $(TPM2_ENABLE) == TRUE && $(TPM2_ENABLE_SUPPORTED) == FALSE
+  !error TPM2_ENABLE=TRUE is not supported for this platform.
+!endif
+!if $(NETWORK_TLS_ENABLE) == TRUE && $(NETWORK_TLS_ENABLE_SUPPORTED) == FALSE
+  !error NETWORK_TLS_ENABLE=TRUE is not supported for this platform.
+!endif
+!if $(QEMU_PV_VARS) == TRUE && $(QEMU_PV_VARS_SUPPORTED) == FALSE
+  !error QEMU_PV_VARS=TRUE is not supported for this platform.
+!endif
+
 # Various builds now exceed 2MB so choose 3MB as the default.
 DEFINE FD_SIZE_IN_MB    = 3
 
@@ -323,6 +345,10 @@ DEFINE FD_SIZE_IN_MB    = 3
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
 
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
+  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
+
 !ifdef $(FIRMWARE_VER)
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 !endif
@@ -414,6 +440,73 @@ DEFINE FD_SIZE_IN_MB    = 3
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|TRUE
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
+!endif
+
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  #
+  # The cumulative and individual VOLATILE variable size limits should be set
+  # high enough for accommodating several and/or large CA certificates.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+!endif
+
+!if $(FLASH_BACKED_RUNTIME_VARIABLE) == FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+!endif
+
+[PcdsDynamicDefault.common]
+  #
+  # ARM Timers
+  #
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
+
+  #
+  # ARM General Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
+
+!if $(FLASH_BACKED_RUNTIME_VARIABLE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x40000
+!endif
+
+  #
+  # PCI settings
+  #
+!if $(ENABLE_PCI)
+  ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
+  #  enumeration to complete before installing ACPI tables.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
+
+  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
+  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
+!endif
+
 [Components.common]
   #
   # Ramdisk support
@@ -441,6 +534,19 @@ DEFINE FD_SIZE_IN_MB    = 3
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+    <LibraryClasses>
+      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!if $(TPM2_ENABLE) == TRUE
+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
+  }
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
+!else
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
 
   #
   # DXE
@@ -454,6 +560,35 @@ DEFINE FD_SIZE_IN_MB    = 3
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
+
+  #
+  # Runtime variable
+  #
+!if $(FLASH_BACKED_RUNTIME_VARIABLE)
+!if $(QEMU_PV_VARS)
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else # QEMU_PV_VARS
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+!endif # QEMU_PV_VARS
+
+  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
+    <LibraryClasses>
+      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+!else # FLASH_BACKED_RUNTIME_VARIABLE
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+  }
+!endif
 
   #
   # Multiple Console IO support
