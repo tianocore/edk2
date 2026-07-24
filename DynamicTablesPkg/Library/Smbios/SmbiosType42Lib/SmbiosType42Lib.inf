@@ -1,0 +1,33 @@
+## @file
+#  SMBIOS Type44 Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosType44Lib
+  FILE_GUID      = 579b59b0-7be4-11f1-b32c-238ebfd9c619
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = SmbiosType42LibConstructor
+  DESTRUCTOR     = SmbiosType42LibDestructor
+
+[Sources]
+  SmbiosType42Generator.c
+  SmbiosType42Generator.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  SmbiosStringTableLib
