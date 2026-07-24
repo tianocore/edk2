@@ -13,6 +13,57 @@ EFI_GUID  mCapsuleOnDiskBootOptionGuid = {
 };
 
 /**
+  Check if a device path is a network boot option that cannot host an EFI
+  System Partition.  Returns TRUE if the device path contains a network node
+  (MAC, IPv4, IPv6, or URI) and does NOT contain an iSCSI node.  iSCSI boot
+  options travel over the network but can present an EFI System Partition and
+  must not be skipped.
+
+  @param[in] DevicePath  The device path to check.
+
+  @retval TRUE   The device path is a non-iSCSI network boot option.
+  @retval FALSE  The device path is not a network boot option, or it is iSCSI.
+**/
+STATIC
+BOOLEAN
+IsPxeBootDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
+  BOOLEAN                   HasNetworkNode;
+
+  if (DevicePath == NULL) {
+    return FALSE;
+  }
+
+  HasNetworkNode = FALSE;
+
+  for (Node = DevicePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+    if (DevicePathType (Node) == MESSAGING_DEVICE_PATH) {
+      switch (DevicePathSubType (Node)) {
+        case MSG_MAC_ADDR_DP:
+        case MSG_IPv4_DP:
+        case MSG_IPv6_DP:
+        case MSG_URI_DP:
+          HasNetworkNode = TRUE;
+          break;
+        case MSG_ISCSI_DP:
+          //
+          // iSCSI is network-based but can host an EFI System Partition.
+          // Do not skip iSCSI boot options.
+          //
+          return FALSE;
+        default:
+          break;
+      }
+    }
+  }
+
+  return HasNetworkNode;
+}
+
+/**
   Get file name from file path.
 
   @param  FilePath    File path.
@@ -475,6 +526,15 @@ GetUpdateFileSystem (
     if (((BootOptionBuffer[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) ||
         (DevicePathType (DevicePath) == BBS_DEVICE_PATH))
     {
+      continue;
+    }
+
+    //
+    // Skip PXE and HTTP boot options - they do not provide an EFI System
+    // Partition. iSCSI boot options are not skipped as they can host an ESP.
+    //
+    if (IsPxeBootDevicePath (DevicePath)) {
+      DEBUG ((DEBUG_INFO, "CapsuleOnDisk: Skip network boot option\n"));
       continue;
     }
 
