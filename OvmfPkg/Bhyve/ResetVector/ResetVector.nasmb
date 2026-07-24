@@ -32,16 +32,16 @@
   %error "Either ARCH_IA32 or ARCH_X64 must be defined."
 %endif
 
-%include "CommonMacros.inc"
+%include "Ia32/CommonMacros.inc"
 
-%include "PostCodes.inc"
+%include "Ia32/PostCodes.inc"
 
 %ifdef DEBUG_PORT80
-  %include "Port80Debug.nasm.inc"
+  %include "Ia32/Port80Debug.nasm.inc"
 %elifdef DEBUG_SERIAL
-  %include "SerialDebug.nasm.inc"
+  %include "Ia32/SerialDebug.nasm.inc"
 %else
-  %include "DebugDisabled.nasm.inc"
+  %include "Ia32/DebugDisabled.nasm.inc"
 %endif
 
 %include "Ia32/SearchForBfvBase.nasm.inc"
@@ -62,7 +62,7 @@
 %include "Ia16/Real16ToFlat32.nasm.inc"
 %include "Ia16/Init16.nasm.inc"
 
-%include "Main.nasm.inc"
+%include "Ia32/Main.nasm.inc"
 
 %include "Ia16/ResetVectorVtf0.nasm.inc"
 
