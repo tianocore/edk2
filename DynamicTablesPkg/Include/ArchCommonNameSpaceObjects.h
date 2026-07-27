@@ -551,6 +551,11 @@ typedef struct CmArchCommonProcHierarchyInfo {
   CHAR8              PartNumber[SMBIOS_MAX_STRING_SIZE];
   /// SMBIOS: String stating processor socket type.
   CHAR8              SocketType[SMBIOS_MAX_STRING_SIZE];
+
+  /** Optional field: Reference Token for _STA info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_STA_INFO object.
+   */
+  CM_OBJECT_TOKEN    StaToken;
 } CM_ARCH_COMMON_PROC_HIERARCHY_INFO;
 
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT
