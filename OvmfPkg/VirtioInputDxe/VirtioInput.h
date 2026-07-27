@@ -17,7 +17,10 @@
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
 
+#include <Library/VirtioLib.h>
+
 #include <IndustryStandard/Virtio.h>
+#include <IndustryStandard/VirtioInput.h>
 
 #include "VirtioKeyCodes.h"
 
