@@ -84,10 +84,12 @@ typedef struct {
   BOOLEAN                              HasKeyboard;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL       Txt;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TxtEx;
-  EFI_INPUT_KEY                        LastKey;
+  EFI_KEY_DATA                         LastKeyData;
   LIST_ENTRY                           KeyNotifyList;
   BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
   BOOLEAN                              KeyReady;
+
+  BOOLEAN                              SupportPartialKeys;
 
   // Mouse implementation
   BOOLEAN                              HasMouse;
