@@ -18,9 +18,9 @@
 #include <Library/BlParseLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SmmStoreParseLib.h>
-#include <Guid/CfrSetupMenuGuid.h>
 #include <IndustryStandard/Acpi.h>
 #include <Coreboot.h>
+#include <Guid/CfrSetupMenuGuid.h>
 
 /**
   Convert a packed value from cbuint64 to a UINT64 value.
@@ -585,75 +585,6 @@ ParseGfxDeviceInfo (
 }
 
 /**
-  Parse coreboot's CFR info
-
-  @retval RETURN_SUCCESS    The CFR information was parsed successfully.
-  @retval RETURN_NOT_FOUND  The CFR table was not found.
-
-**/
-RETURN_STATUS
-ParseCfrInfo (
-  VOID
-  )
-{
-  struct cb_cfr    *CbCfrSetupMenu;
-  UINT32           CbCfrChecksum;
-  UINT32           CfrCalculatedChecksum;
-  UINTN            ProcessedLength;
-  CFR_OPTION_FORM  *CbCfrOuterFormOffset;
-  CFR_OPTION_FORM  *CfrSetupMenuForm;
-  CFR_VARBINARY    *CfrFormName;
-
-  CbCfrSetupMenu = FindCbTag (CB_TAG_CFR_ROOT);
-  if (CbCfrSetupMenu == NULL) {
-    DEBUG ((DEBUG_ERROR, "CFR tag not found in cbtables\n"));
-    return RETURN_NOT_FOUND;
-  }
-
-  CbCfrChecksum            = CbCfrSetupMenu->checksum;
-  CbCfrSetupMenu->checksum = 0;
-  CfrCalculatedChecksum    = CalculateCrc32 (CbCfrSetupMenu, CbCfrSetupMenu->size);
-  CbCfrSetupMenu->checksum = CbCfrChecksum;
-
-  if (CfrCalculatedChecksum != CbCfrChecksum) {
-    DEBUG ((
-      DEBUG_WARN,
-      "CFR: Calculated CRC32 0x%x does not match stored CRC32 0x%x!\n",
-      CfrCalculatedChecksum,
-      CbCfrChecksum
-      ));
-  }
-
-  ProcessedLength = sizeof (struct cb_cfr);
-  while (ProcessedLength < CbCfrSetupMenu->size) {
-    CbCfrOuterFormOffset = (CFR_OPTION_FORM *)((UINT8 *)CbCfrSetupMenu + ProcessedLength);
-    CfrSetupMenuForm      = BuildGuidDataHob (
-                              &gEfiCfrSetupMenuFormGuid,
-                              CbCfrOuterFormOffset,
-                              CbCfrOuterFormOffset->size
-                              );
-    if (CfrSetupMenuForm == NULL) {
-      break;
-    }
-
-    ASSERT (CfrSetupMenuForm->tag == CB_TAG_CFR_OPTION_FORM);
-
-    CfrFormName = (CFR_VARBINARY *)((UINT8 *)CfrSetupMenuForm + sizeof (CFR_OPTION_FORM));
-    DEBUG ((
-      DEBUG_INFO,
-      "CFR: Found form[%d] \"%a\" of %d bytes\n",
-      CfrSetupMenuForm->object_id,
-      CfrFormName->data,
-      CfrSetupMenuForm->size
-      ));
-
-    ProcessedLength += CfrSetupMenuForm->size;
-  }
-
-  return RETURN_SUCCESS;
-}
-
-/**
   Parse and handle the misc info provided by bootloader
 
   @retval RETURN_SUCCESS           The misc information was parsed successfully.
@@ -667,11 +598,64 @@ ParseMiscInfo (
   VOID
   )
 {
-  EFI_STATUS  Status;
+  struct cb_cfr    *CbCfrSetupMenu;
+  UINT32           CfrCalculatedChecksum;
+  UINTN            ProcessedLength;
+  CFR_OPTION_FORM  *CbCfrOuterFormOffset;
+  CFR_OPTION_FORM  *CfrSetupMenuForm;
+  CFR_VARBINARY    *CfrFormName;
 
-  Status = ParseCfrInfo ();
-  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-    DEBUG ((DEBUG_ERROR, "Error when parsing CFR info, Status = %r\n", Status));
+  //
+  // CFR has several CB tags, though these are nested structures,
+  // not for individual table-to-HOB conversion
+  //
+  CbCfrSetupMenu = FindCbTag (CB_TAG_CFR_ROOT);
+  if (CbCfrSetupMenu == NULL) {
+    DEBUG ((DEBUG_ERROR, "CFR Tag not found in cbtables\n"));
+    return RETURN_NOT_FOUND;
+  }
+
+  //
+  // Checksum over CFR_FORM[] data  -- CbCfrSetupMenu header excluded
+  //
+  CfrCalculatedChecksum = CalculateCrc32 (CbCfrSetupMenu + 1, CbCfrSetupMenu->size - sizeof(*CbCfrSetupMenu));
+
+  if (CfrCalculatedChecksum != CbCfrSetupMenu->checksum) {
+    DEBUG ((DEBUG_WARN, "CFR: Calculated CRC32 0x%x does not match stored CRC32 0x%x!\n", CfrCalculatedChecksum, CbCfrSetupMenu->checksum));
+    // Disable for now until cause of checksum mismatch found
+    //return RETURN_CRC_ERROR;
+  }
+
+  ProcessedLength = sizeof (struct cb_cfr);
+
+  //
+  // Copy each form to HOB; TODO: This creates duplicate, copy pointer?
+  //
+  while (ProcessedLength < CbCfrSetupMenu->size) {
+    CbCfrOuterFormOffset = (CFR_OPTION_FORM *)((UINT8 *)CbCfrSetupMenu + ProcessedLength);
+    if (CbCfrOuterFormOffset->tag != CB_TAG_CFR_OPTION_FORM) {
+      DEBUG ((DEBUG_ERROR, "CFR Tag mismatch: 0x%x vs 0x%x\n", CbCfrOuterFormOffset->tag, CB_TAG_CFR_OPTION_FORM));
+      return RETURN_NOT_FOUND;
+    }
+    CfrSetupMenuForm      = BuildGuidDataHob (
+                              &gEfiCfrSetupMenuFormGuid,
+                              CbCfrOuterFormOffset,
+                              CbCfrOuterFormOffset->size
+                              );
+    if (CfrSetupMenuForm == NULL) {
+      break;
+    }
+    ASSERT (CfrSetupMenuForm->tag == CB_TAG_CFR_OPTION_FORM);
+
+    CfrFormName = (CFR_VARBINARY *)((UINT8 *)CfrSetupMenuForm + sizeof (CFR_OPTION_FORM));
+    DEBUG ((
+      DEBUG_INFO,
+      "CFR: Found form \"%a\", size 0x%x bytes\n",
+      CfrFormName->data,
+      CfrSetupMenuForm->size
+      ));
+
+    ProcessedLength += CfrSetupMenuForm->size;
   }
 
   return RETURN_SUCCESS;

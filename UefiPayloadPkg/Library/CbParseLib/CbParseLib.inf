@@ -33,9 +33,9 @@
   BaseMemoryLib
   IoLib
   DebugLib
-  HobLib
   PcdLib
   PrintLib
+  HobLib
 
 [Guids]
   gEfiCfrSetupMenuFormGuid

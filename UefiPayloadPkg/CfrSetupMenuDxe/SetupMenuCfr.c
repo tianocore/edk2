@@ -39,9 +39,6 @@ CfrConvertVarBinaryToStrings (
   EFI_STATUS  Status;
 
   ASSERT ((CfrString != NULL) && (UnicodeString != NULL));
-  if ((CfrString == NULL) || (UnicodeString == NULL)) {
-    return;
-  }
 
   *UnicodeString = AllocatePool (CfrString->data_length * sizeof (CHAR16));
   ASSERT (*UnicodeString != NULL);
@@ -256,8 +253,7 @@ CfrProcessFormOption (
 
   DEBUG ((
     DEBUG_INFO,
-    "CFR: Process form[%d] \"%a\" of size 0x%x\n",
-    Option->object_id,
+    "CFR: Processing form \"%a\", size 0x%x\n",
     CfrFormName->data,
     Option->size
     ));
@@ -268,7 +264,7 @@ CfrProcessFormOption (
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_SUPPRESS_IF_OP);
   }
-  if (Option->flags & CFR_OPTFLAG_GRAYOUT) {
+  if (Option->flags & CFR_OPTFLAG_INACTIVE) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_GRAY_OUT_IF_OP);
   }
 
@@ -281,7 +277,7 @@ CfrProcessFormOption (
                     );
   ASSERT (TempHiiBuffer != NULL);
 
-  if (Option->flags & CFR_OPTFLAG_GRAYOUT) {
+  if (Option->flags & CFR_OPTFLAG_INACTIVE) {
     TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
     ASSERT (TempHiiBuffer != NULL);
   }
@@ -340,8 +336,7 @@ CfrProcessNumericOption (
 
   DEBUG ((
     DEBUG_INFO,
-    "CFR: Process option[%d] \"%a\" of size 0x%x\n",
-    Option->object_id,
+    "CFR: Processing option \"%a\", size 0x%x\n",
     CfrOptionName->data,
     Option->size
     ));
@@ -367,7 +362,7 @@ CfrProcessNumericOption (
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_SUPPRESS_IF_OP);
   }
-  if (Option->flags & CFR_OPTFLAG_GRAYOUT) {
+  if (Option->flags & CFR_OPTFLAG_INACTIVE) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_GRAY_OUT_IF_OP);
   }
 
@@ -466,7 +461,7 @@ CfrProcessNumericOption (
     ASSERT (TempHiiBuffer != NULL);
   }
 
-  if (Option->flags & CFR_OPTFLAG_GRAYOUT) {
+  if (Option->flags & CFR_OPTFLAG_INACTIVE) {
     TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
     ASSERT (TempHiiBuffer != NULL);
   }
@@ -499,9 +494,9 @@ CfrProcessCharacterOption (
 {
   UINTN           OptionProcessedLength;
   CFR_VARBINARY   *CfrOptionName;
-  CFR_VARBINARY   *CfrDefaultValue;
   CFR_VARBINARY   *CfrDisplayName;
   CFR_VARBINARY   *CfrHelpText;
+  CFR_VARBINARY   *CfrDefaultValue;
   UINTN           QuestionIdVarStoreId;
   CHAR16          *HiiDefaultValue;
   EFI_STRING_ID   HiiDefaultValueId;
@@ -526,6 +521,12 @@ CfrProcessCharacterOption (
     CfrDefaultValue = CfrExtractVarBinary ((UINT8 *)Option, &OptionProcessedLength, CB_TAG_CFR_VARCHAR_DEF_VALUE);
     ASSERT (CfrDefaultValue != NULL);
 
+    if (CfrDefaultValue->data_length > 0xFF) {
+      DEBUG ((DEBUG_ERROR, "CFR: Default value length 0x%x is too long!\n", CfrDefaultValue->data_length));
+      *ProcessedLength += Option->size;
+      return;
+    }
+
     CfrOptionName = CfrExtractVarBinary ((UINT8 *)Option, &OptionProcessedLength, CB_TAG_CFR_VARCHAR_OPT_NAME);
     ASSERT (CfrOptionName != NULL);
   }
@@ -541,8 +542,7 @@ CfrProcessCharacterOption (
 
   DEBUG ((
     DEBUG_INFO,
-    "CFR: Process option[%d] \"%a\" of size 0x%x\n",
-    Option->object_id,
+    "CFR: Processing option \"%a\", size 0x%x\n",
     (CfrOptionName != NULL) ? CfrOptionName->data : CfrDisplayName->data,
     Option->size
     ));
@@ -551,12 +551,6 @@ CfrProcessCharacterOption (
   // Processing start
   //
   if (Option->tag == CB_TAG_CFR_OPTION_VARCHAR) {
-    if (CfrDefaultValue->data_length > 0xFF) {
-      DEBUG ((DEBUG_ERROR, "CFR: Default value length 0x%x is too long!\n", CfrDefaultValue->data_length));
-      *ProcessedLength += Option->size;
-      return;
-    }
-
     QuestionIdVarStoreId = CFR_COMPONENT_START + Option->object_id;
 
     if (CfrDefaultValue->data_length > 1) {
@@ -585,7 +579,7 @@ CfrProcessCharacterOption (
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_SUPPRESS_IF_OP);
   }
-  if (Option->flags & CFR_OPTFLAG_GRAYOUT) {
+  if (Option->flags & CFR_OPTFLAG_INACTIVE) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_GRAY_OUT_IF_OP);
   }
 
@@ -646,7 +640,7 @@ CfrProcessCharacterOption (
     ASSERT (TempHiiBuffer != NULL);
   }
 
-  if (Option->flags & CFR_OPTFLAG_GRAYOUT) {
+  if (Option->flags & CFR_OPTFLAG_INACTIVE) {
     TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
     ASSERT (TempHiiBuffer != NULL);
   }
@@ -678,6 +672,7 @@ CfrCreateRuntimeComponents (
   UINTN               ProcessedLength;
   CFR_OPTION_FORM     *CfrFormData;
   EFI_STATUS          Status;
+  UINT8               *TempHiiBuffer;
 
   //
   // Allocate GUIDed markers at runtime component offset in IFR
@@ -768,6 +763,15 @@ CfrCreateRuntimeComponents (
           break;
       }
     }
+
+    TempHiiBuffer = HiiCreateSubTitleOpCode (
+                      StartOpCodeHandle,
+                      STRING_TOKEN (STR_EMPTY_STRING),
+                      0,
+                      0,
+                      0
+                  );
+    ASSERT (TempHiiBuffer != NULL);
 
     GuidHob = GetNextGuidHob (&gEfiCfrSetupMenuFormGuid, GET_NEXT_HOB (GuidHob));
   }

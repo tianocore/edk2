@@ -39,20 +39,24 @@ enum cfr_option_flags {
   CFR_OPTFLAG_VOLATILE  = 1 << 3,
 };
 
-#define CB_TAG_CFR_VARCHAR_OPT_NAME     0x0107
-#define CB_TAG_CFR_VARCHAR_UI_NAME      0x0108
-#define CB_TAG_CFR_VARCHAR_UI_HELPTEXT  0x0109
-#define CB_TAG_CFR_VARCHAR_DEF_VALUE    0x010a
+#define CB_TAG_CFR_VARCHAR_OPT_NAME     0x0007
+#define CB_TAG_CFR_VARCHAR_UI_NAME      0x0008
+#define CB_TAG_CFR_VARCHAR_UI_HELPTEXT  0x0009
+#define CB_TAG_CFR_VARCHAR_DEF_VALUE    0x000a
+#pragma pack (1)
 typedef struct {
-  UINT32  tag;          /* Any CFR_VARBINARY or CFR_VARCHAR */
+  UINT32  tag;          /*
+                         * CFR_TAG_VARCHAR_OPT_NAME, CFR_TAG_VARCHAR_UI_NAME,
+                         * CFR_TAG_VARCHAR_UI_HELPTEXT or CFR_TAG_VARCHAR_DEF_VALUE
+                         */
   UINT32  size;         /* Length of the entire structure */
   UINT32  data_length;  /* Length of data, including NULL terminator for strings */
   UINT8   data[];
 } CFR_VARBINARY;
 
-#define CB_TAG_CFR_ENUM_VALUE  0x0102
+#define CB_TAG_CFR_ENUM_VALUE  0x0002
 typedef struct {
-  UINT32          tag;
+  UINT32          tag;      /* CFR_TAG_ENUM_VALUE */
   UINT32          size;
   UINT32          value;
   /*
@@ -60,13 +64,17 @@ typedef struct {
    */
 } CFR_ENUM_VALUE;
 
-#define CB_TAG_CFR_OPTION_ENUM    0x0103
-#define CB_TAG_CFR_OPTION_NUMBER  0x0104
-#define CB_TAG_CFR_OPTION_BOOL    0x0105
+#define CB_TAG_CFR_OPTION_ENUM    0x0003
+#define CB_TAG_CFR_OPTION_NUMBER  0x0004
+#define CB_TAG_CFR_OPTION_BOOL    0x0005
 typedef struct {
-  UINT32                      tag;            /* CFR_OPTION_ENUM, CFR_OPTION_NUMBER, CFR_OPTION_BOOL */
+  UINT32                      tag;            /*
+                                               * CFR_TAG_OPTION_ENUM, CFR_TAG_OPTION_NUMBER or
+                                               * CFR_TAG_OPTION_BOOL
+                                               */
   UINT32                      size;
-  UINT32                      object_id;
+  UINT64                      object_id;      /* Unique ID */
+  UINT64                      dependency_id;  /* Dependent object ID, or 0 */
   UINT32                      flags;          /* enum cfr_option_flags */
   UINT32                      default_value;
   /*
@@ -77,17 +85,18 @@ typedef struct {
    */
 } CFR_OPTION_NUMERIC;
 
-#define CB_TAG_CFR_OPTION_VARCHAR  0x0106
+#define CB_TAG_CFR_OPTION_VARCHAR  0x0006
 typedef struct {
   UINT32              tag;        /* CFR_OPTION_VARCHAR */
   UINT32              size;
-  UINT32              object_id;
+  UINT64              object_id;      /* Unique ID */
+  UINT64              dependency_id;  /* Dependent object ID, or 0 */
   UINT32              flags;      /* enum cfr_option_flags */
   /*
-   * CFR_VARCHAR      default_value
    * CFR_OPT_NAME     opt_name
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
+   * CFR_VARCHAR      default_value
    */
 } CFR_OPTION_VARCHAR;
 
@@ -96,11 +105,12 @@ typedef struct {
  * Option comments are *NOT* string options (see CFR_OPTION_VARCHAR
  * instead) but they're considered an option for simplicity's sake.
  */
-#define CB_TAG_CFR_OPTION_COMMENT  0x010b
+#define CB_TAG_CFR_OPTION_COMMENT  0x000b
 typedef struct {
   UINT32              tag;        /* CFR_OPTION_COMMENT */
   UINT32              size;
-  UINT32              object_id;
+  UINT64              object_id;        /* Unique ID */
+  UINT64              dependency_id;    /* Dependent object ID, or 0 */
   UINT32              flags;      /* enum cfr_option_flags */
   /*
    * CFR_UI_NAME      ui_name
@@ -109,16 +119,18 @@ typedef struct {
 } CFR_OPTION_COMMENT;
 
 /* CFR forms are considered options as they can be nested inside other forms */
-#define CB_TAG_CFR_OPTION_FORM  0x0101
+#define CB_TAG_CFR_OPTION_FORM  0x0001
 typedef struct {
   UINT32                tag;        /* CFR_OPTION_FORM */
   UINT32                size;
-  UINT32                object_id;
+  UINT64                object_id;        /* Unique ID */
+  UINT64                dependency_id;    /* Dependent object ID, or 0 */
   UINT32                flags;      /* enum cfr_option_flags */
   /*
    * CFR_UI_NAME        ui_name
    * <T in CFR_OPTION>  options[]
    */
 } CFR_OPTION_FORM;
+#pragma pack ()
 
 #endif // __CFR_SETUP_MENU_GUID_H__
