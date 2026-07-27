@@ -114,11 +114,11 @@ typedef struct {
   UINT64              dependency_id;  /* Dependent object ID, or 0 */
   UINT32              flags;          /* enum cfr_option_flags */
   /*
+   * CFR_VARCHAR      default_value
    * CFR_OPT_NAME     opt_name
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
    * CFR_DEP_VALUES   dependency_values (Optional)
-   * CFR_VARCHAR      default_value
    */
 } CFR_OPTION_VARCHAR;
 
