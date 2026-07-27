@@ -118,3 +118,23 @@ gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|TRUE|BOOLEAN|0x00
 
 ## Indicates whether allows PCI Root Bridge to allocate DMA memory resource above 4G
 gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE|BOOLEAN|0x0000002E
+
+[PcdsFeatureFlag]
+## Publish the MCFG ECAM window as EFI_RESOURCE_MEMORY_RESERVED rather
+#  than EFI_RESOURCE_MEMORY_MAPPED_IO, so that it appears in the UEFI
+#  memory map as a Reserved entry.
+#
+#  Linux only uses MMCONFIG for extended PCIe configuration space if the
+#  window passes its is_mmconf_reserved() check, which requires the range
+#  to be covered by a Reserved entry in the firmware-provided memory map.
+#  A plain MMIO resource does not qualify: CoreGetMemoryMap() reports an
+#  MMIO range only when it also carries EFI_MEMORY_RUNTIME, which the ECAM
+#  window does not. The window is still device memory, so it is published
+#  advertising UNCACHEABLE only, and a consumer that builds page tables
+#  from these HOBs must not map configuration space write-back.
+#
+#  Declared as a feature flag rather than alongside the package's other
+#  boolean knobs in [PcdsFixedAtBuild, PcdsPatchableInModule] so that the
+#  publication code is eliminated outright on platforms that leave it off.
+# @Prompt Publish the MCFG ECAM window as Reserved memory.
+gUefiPayloadPkgTokenSpaceGuid.PcdPublishMcfgAsReservedMemory|FALSE|BOOLEAN|0x0000002F

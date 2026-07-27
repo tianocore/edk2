@@ -26,6 +26,10 @@ ParseAcpiInfo (
   )
 {
   EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE                                              *Fadt;
+  UINTN                                                                                  Index;
+  UINTN                                                                                  MmCfgCount;
+  UINT8                                                                                  MinStart;
+  UINT8                                                                                  MaxEnd;
   EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER                         *MmCfgHdr;
   EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE  *MmCfgBase;
 
@@ -61,10 +65,53 @@ ParseAcpiInfo (
     AcpiBoardInfo->PmGpeEnBase = 0;
   }
 
-  if (MmCfgHdr != NULL) {
+  //
+  // A table shorter than one allocation structure carries no usable
+  // allocation: report no MCFG rather than computing a count from an
+  // underflowing length subtraction and walking off the end of it.
+  //
+  if ((MmCfgHdr != NULL) &&
+      (MmCfgHdr->Header.Length >= sizeof (*MmCfgHdr) + sizeof (*MmCfgBase)))
+  {
     MmCfgBase                      = (EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *)((UINT8 *)MmCfgHdr + sizeof (*MmCfgHdr));
     AcpiBoardInfo->PcieBaseAddress = MmCfgBase->BaseAddress;
-    AcpiBoardInfo->PcieBaseSize    = (MmCfgBase->EndBusNumber + 1 - MmCfgBase->StartBusNumber) * 4096 * 32 * 8;
+
+    //
+    // Some platforms describe multiple root bridges on segment 0 with
+    // separate MCFG allocation entries that share the same BaseAddress
+    // but split the bus range.  PcieBaseSize gates every ECAM read via
+    // PcdPciExpressBaseSize, so span the lowest StartBusNumber to the
+    // highest EndBusNumber across all entries with the same base rather
+    // than only the first entry.  The window starts at StartBusNumber,
+    // so that term has to stay in the size or config accesses past the
+    // end of the window are permitted on any platform whose allocation
+    // does not begin at bus 0.
+    //
+    MmCfgCount = (MmCfgHdr->Header.Length - sizeof (*MmCfgHdr)) / sizeof (*MmCfgBase);
+    MinStart   = MmCfgBase->StartBusNumber;
+    MaxEnd     = MmCfgBase->EndBusNumber;
+    for (Index = 1; Index < MmCfgCount; Index++) {
+      if (MmCfgBase[Index].BaseAddress != MmCfgBase->BaseAddress) {
+        continue;
+      }
+
+      if (MmCfgBase[Index].StartBusNumber < MinStart) {
+        MinStart = MmCfgBase[Index].StartBusNumber;
+      }
+
+      if (MmCfgBase[Index].EndBusNumber > MaxEnd) {
+        MaxEnd = MmCfgBase[Index].EndBusNumber;
+      }
+    }
+
+    if (MaxEnd >= MinStart) {
+      AcpiBoardInfo->PcieBaseSize = ((UINT64)MaxEnd + 1 - MinStart) * 4096 * 32 * 8;
+    } else {
+      //
+      // Reversed bus range: no usable window.
+      //
+      AcpiBoardInfo->PcieBaseSize = 0;
+    }
   } else {
     AcpiBoardInfo->PcieBaseAddress = 0;
     AcpiBoardInfo->PcieBaseSize    = 0;

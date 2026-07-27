@@ -11,7 +11,8 @@
 #include <Library/BaseArchLibSupport.h>
 #include "UefiPayloadEntry.h"
 
-STATIC UINT32  mTopOfLowerUsableDram = 0;
+STATIC UINT32   mTopOfLowerUsableDram = 0;
+STATIC BOOLEAN  mMcfgResourceHobBuilt = FALSE;
 
 EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
   { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory)   },
@@ -53,6 +54,20 @@ MemInfoCallbackMmio (
   }
 
   //
+  // Note any entry that overlaps the ECAM window, whether or not it
+  // starts at exactly its base.  BuildHobFromBl() publishes the window
+  // from ACPI MCFG only when nothing in the bootloader's map covered it,
+  // because CoreInitializeGcdServices() does not tolerate overlapping
+  // resource descriptor HOBs.
+  //
+  if ((AcpiBoardInfo->PcieBaseSize != 0) &&
+      (MemoryMapEntry->Base < (AcpiBoardInfo->PcieBaseAddress + AcpiBoardInfo->PcieBaseSize)) &&
+      ((MemoryMapEntry->Base + MemoryMapEntry->Size) > AcpiBoardInfo->PcieBaseAddress))
+  {
+    mMcfgResourceHobBuilt = TRUE;
+  }
+
+  //
   // Skip types already handled in MemInfoCallback
   //
   if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI)) {
@@ -61,9 +76,39 @@ MemInfoCallbackMmio (
 
   if (MemoryMapEntry->Base == AcpiBoardInfo->PcieBaseAddress) {
     //
-    // MMCONF is always MMIO
+    // MMCONF is always MMIO. Optionally surface it as Reserved instead
+    // so that Linux's is_mmconf_reserved() check accepts it and
+    // MMCONFIG can be used for extended PCIe config space. A plain
+    // MMIO resource is only surfaced by CoreGetMemoryMap() when it
+    // also carries EFI_MEMORY_RUNTIME, which this range does not.
     //
-    Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+    if (FeaturePcdGet (PcdPublishMcfgAsReservedMemory)) {
+      //
+      // Reserved so Linux accepts it, but it is still device memory:
+      // advertise UNCACHEABLE only so that a consumer building page
+      // tables from these HOBs does not map config space write-back.
+      //
+      Type = EFI_RESOURCE_MEMORY_RESERVED;
+      BuildResourceDescriptorHob (
+        Type,
+        EFI_RESOURCE_ATTRIBUTE_PRESENT |
+        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+        EFI_RESOURCE_ATTRIBUTE_TESTED |
+        EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE,
+        (EFI_PHYSICAL_ADDRESS)MemoryMapEntry->Base,
+        MemoryMapEntry->Size
+        );
+      DEBUG ((
+        DEBUG_INFO,
+        "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x (MMCONF, UC-only)\n",
+        MemoryMapEntry->Base,
+        MemoryMapEntry->Size,
+        Type
+        ));
+      return EFI_SUCCESS;
+    } else {
+      Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+    }
   } else if (MemoryMapEntry->Base < mTopOfLowerUsableDram) {
     //
     // It's in DRAM and thus must be reserved
@@ -461,6 +506,40 @@ BuildHobFromBl (
   Status = ParseMemoryInfo (MemInfoCallbackMmio, AcpiBoardInfo);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  //
+  // The bootloader's memory map may not cover the ECAM range at all,
+  // in which case MemInfoCallbackMmio() never fires for it.  Publish
+  // the range parsed from ACPI MCFG so that it is present in the GCD
+  // memory map (and, on AArch64, in the payload page tables) before
+  // PciHostBridgeDxe touches config space.
+  //
+  // Gated on the same PCD as the Reserved publication above: a platform
+  // that leaves the PCD at its default keeps the memory map it always
+  // had, and one that describes the window inside a larger range does
+  // not get a second, overlapping descriptor for it.
+  //
+  if (FeaturePcdGet (PcdPublishMcfgAsReservedMemory) &&
+      (AcpiBoardInfo->PcieBaseAddress != 0) &&
+      (AcpiBoardInfo->PcieBaseSize != 0) &&
+      !mMcfgResourceHobBuilt)
+  {
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_MEMORY_RESERVED,
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_TESTED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE,
+      (EFI_PHYSICAL_ADDRESS)AcpiBoardInfo->PcieBaseAddress,
+      AcpiBoardInfo->PcieBaseSize
+      );
+    DEBUG ((
+      DEBUG_INFO,
+      "buildhob: base = 0x%lx, size = 0x%lx (MMCONF from ACPI MCFG)\n",
+      AcpiBoardInfo->PcieBaseAddress,
+      AcpiBoardInfo->PcieBaseSize
+      ));
   }
 
   //

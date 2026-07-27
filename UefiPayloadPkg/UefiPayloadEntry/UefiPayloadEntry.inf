@@ -75,12 +75,14 @@
   gEfiFirmwareInfoHobGuid
   gEfiSmmStoreInfoHobGuid
 
+[FeaturePcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPublishMcfgAsReservedMemory  ## CONSUMES
+
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
 
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
-
 
 [Pcd.IA32,Pcd.X64,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
