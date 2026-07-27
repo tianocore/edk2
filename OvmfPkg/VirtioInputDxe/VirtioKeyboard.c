@@ -182,6 +182,67 @@ VirtioKeyboardConvertKeyCode (
 }
 
 // -----------------------------------------------------------------------------
+// Function populating modifier and toggle state of an UEFI key event
+STATIC
+VOID
+VirtioKeyboardInitializeKeyState (
+  IN  VIRTIO_INPUT_DEV  *Dev,
+  OUT EFI_KEY_STATE     *KeyState
+  )
+{
+  KeyState->KeyShiftState = (
+                             (Dev->KeyActive[KEY_RIGHTSHIFT] ? EFI_RIGHT_SHIFT_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_LEFTSHIFT] ? EFI_LEFT_SHIFT_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_RIGHTCTRL] ? EFI_RIGHT_CONTROL_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_LEFTCTRL] ? EFI_LEFT_CONTROL_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_RIGHTALT] ? EFI_RIGHT_ALT_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_LEFTALT] ? EFI_LEFT_ALT_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_RIGHTMETA] ? EFI_RIGHT_LOGO_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_LEFTMETA] ? EFI_LEFT_LOGO_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_COMPOSE] ? EFI_MENU_KEY_PRESSED : 0) |
+                             (Dev->KeyActive[KEY_SYSRQ] ? EFI_SYS_REQ_PRESSED : 0) |
+                             EFI_SHIFT_STATE_VALID
+                             );
+
+  KeyState->KeyToggleState = (
+                              (Dev->SupportPartialKeys ? EFI_KEY_STATE_EXPOSED : 0) |
+                              EFI_TOGGLE_STATE_VALID
+                              );
+}
+
+// -----------------------------------------------------------------------------
+// Function processing a single VirtIO keyboard event into a complete UEFI event
+STATIC
+EFI_STATUS
+VirtioKeyboardProcessEvent (
+  IN  VIRTIO_INPUT_DEV  *Dev,
+  IN  UINT16            KeyCode,
+  OUT EFI_KEY_DATA      *KeyData
+  )
+{
+  //
+  // Translate the virtio scancode into EFI scancode and Unicode char
+  //
+  VirtioKeyboardConvertKeyCode (Dev, KeyCode, &KeyData->Key);
+
+  //
+  // Keys with no Unicode representation and no EFI scancode are not valid,
+  // unless we were requested to process partial keys
+  //
+  if ((KeyData->Key.UnicodeChar == CHAR_NULL) && (KeyData->Key.ScanCode == SCAN_NULL)) {
+    if (!Dev->SupportPartialKeys) {
+      return EFI_NOT_READY;
+    }
+  }
+
+  //
+  // Complete the key data structure with current keyboard state (active modifiers)
+  //
+  VirtioKeyboardInitializeKeyState (Dev, &KeyData->KeyState);
+  return EFI_SUCCESS;
+}
+
+// -----------------------------------------------------------------------------
 // Function handling VirtIO keyboard events
 VOID
 VirtioKeyboardHandleEvent (
@@ -189,15 +250,23 @@ VirtioKeyboardHandleEvent (
   IN VIRTIO_INPUT_EVENT    *Event
   )
 {
+  EFI_STATUS    Status;
+  EFI_KEY_DATA  KeyData;
+
   if (Event->Value != KEY_RELEASED) {
     // Key pressed event received
     Dev->KeyActive[(UINT8)Event->Code] = TRUE;
 
     // Evaluate key
-    VirtioKeyboardConvertKeyCode (Dev, Event->Code, &Dev->LastKey);
+    Status = VirtioKeyboardProcessEvent (Dev, Event->Code, &KeyData);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
 
     // Flag that printable character is ready to be send
-    Dev->KeyReady = TRUE;
+    // TODO: turn this into a queue
+    Dev->LastKeyData = KeyData;
+    Dev->KeyReady    = TRUE;
   } else {
     // Key released event received
     Dev->KeyActive[(UINT8)Event->Code] = FALSE;
@@ -221,10 +290,11 @@ VirtioKeyboardReset (
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Dev->KeyReady            = FALSE;
-  Dev->LastKey.ScanCode    = SCAN_NULL;
-  Dev->LastKey.UnicodeChar = CHAR_NULL;
+  Dev->KeyReady = FALSE;
+  ZeroMem (&Dev->LastKeyData, sizeof (Dev->LastKeyData));
   ZeroMem (Dev->KeyActive, sizeof (Dev->KeyActive));
+
+  Dev->SupportPartialKeys = FALSE;
 
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
@@ -252,7 +322,7 @@ VirtioKeyboardReadKeyStroke (
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (Dev->KeyReady) {
     // Get last key from the buffer
-    *Key = Dev->LastKey;
+    *Key = Dev->LastKeyData.Key;
 
     // Mark key as consumed
     Dev->KeyReady = FALSE;
@@ -337,9 +407,7 @@ VirtioKeyboardReadKeyStrokeEx (
   )
 {
   VIRTIO_INPUT_DEV  *Dev;
-  EFI_STATUS        Status;
-  EFI_INPUT_KEY     Key;
-  EFI_KEY_STATE     KeyState;
+  EFI_TPL           OldTpl;
 
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -347,48 +415,20 @@ VirtioKeyboardReadKeyStrokeEx (
 
   Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
-  // Get the last pressed key
-  Status = Dev->Txt.ReadKeyStroke (&Dev->Txt, &Key);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  if (Dev->KeyReady) {
+    // Get last key from the buffer
+    *KeyData = Dev->LastKeyData;
+
+    // Mark key as consumed
+    Dev->KeyReady = FALSE;
+
+    gBS->RestoreTPL (OldTpl);
+    return EFI_SUCCESS;
   }
 
-  // Add key state informations
-  KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
-
-  // Shift key modifier
-  if (Dev->KeyActive[KEY_LEFTSHIFT]) {
-    KeyState.KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
-  }
-
-  if (Dev->KeyActive[KEY_RIGHTSHIFT]) {
-    KeyState.KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
-  }
-
-  // Ctrl key modifier
-  if (Dev->KeyActive[KEY_LEFTCTRL]) {
-    KeyState.KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
-  }
-
-  if (Dev->KeyActive[KEY_RIGHTCTRL]) {
-    KeyState.KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
-  }
-
-  // ALt key modifier
-  if (Dev->KeyActive[KEY_LEFTALT]) {
-    KeyState.KeyShiftState |= EFI_LEFT_ALT_PRESSED;
-  }
-
-  if (Dev->KeyActive[KEY_RIGHTALT]) {
-    KeyState.KeyShiftState |= EFI_RIGHT_ALT_PRESSED;
-  }
-
-  // Return value only when there is no failure
-  KeyData->Key      = Key;
-  KeyData->KeyState = KeyState;
-
-  return EFI_SUCCESS;
+  gBS->RestoreTPL (OldTpl);
+  return EFI_NOT_READY;
 }
 
 // -----------------------------------------------------------------------------
@@ -401,9 +441,19 @@ VirtioKeyboardSetStateEx (
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   )
 {
+  VIRTIO_INPUT_DEV  *Dev;
+
   if (KeyToggleState == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
+
+  if (!(*KeyToggleState & EFI_TOGGLE_STATE_VALID)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Dev->SupportPartialKeys = (BOOLEAN)((*KeyToggleState & EFI_KEY_STATE_EXPOSED) != 0);
 
   return EFI_SUCCESS;
 }
