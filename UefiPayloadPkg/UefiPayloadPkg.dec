@@ -116,3 +116,9 @@ gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|TRUE|BOOLEAN|0x00
 
 ## Indicates whether allows PCI Root Bridge to allocate DMA memory resource above 4G
 gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE|BOOLEAN|0x0000002E
+
+[PcdsFeatureFlag]
+## Indicates whether all boot devices are connected before the selected boot
+## option is launched. Platforms that disable this can connect the selected
+## path on demand and discover removable media only when needed.
+gUefiPayloadPkgTokenSpaceGuid.PcdConnectAllDevices|TRUE|BOOLEAN|0x0000002F
