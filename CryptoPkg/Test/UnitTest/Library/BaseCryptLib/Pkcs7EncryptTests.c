@@ -3,9 +3,9 @@
 
   These tests exercise both the OpenSSL- and mbedtls-backed implementations.
   They build envelopedData ContentInfo blobs for one or more recipients with
-  each supported AES-CBC cipher and verify the result structurally (DER walk)
-  without requiring the matching private key. Negative tests cover the
-  parameter-validation contract documented in BaseCryptLib.h.
+  each supported AES-CBC cipher and verify the result structurally (DER walk),
+  plus the parameter-validation contract documented in BaseCryptLib.h. Proving
+  that the content can be recovered is covered by Pkcs7DecryptTests.c.
 
   Copyright (c) Microsoft Corporation. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -354,6 +354,9 @@ ValidatePkcs7EnvelopedData (
 /**
   Run an end-to-end encryption with a single recipient and validate the output.
 
+  The resulting envelopedData is checked structurally. Recovering the plaintext
+  is covered separately by the Pkcs7Decrypt() tests.
+
   @param[in]  CipherNid             Symmetric cipher NID to request.
   @param[in]  ExpectedCipherOid     Reference DER-encoded OID.
   @param[in]  ExpectedCipherOidLen  Length of ExpectedCipherOid.
@@ -380,8 +383,8 @@ RunPkcs7EncryptSingleRecipient (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);
@@ -469,8 +472,8 @@ TestPkcs7EncryptAes256Cbc (
 }
 
 /**
-  Build a stack with two recipients (the same certificate added twice) and
-  verify the resulting envelopedData carries two RecipientInfo entries.
+  Build a stack with two distinct recipients and verify the resulting
+  envelopedData carries two RecipientInfo entries.
 **/
 STATIC
 UNIT_TEST_STATUS
@@ -490,10 +493,10 @@ TestPkcs7EncryptMultipleRecipients (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
+             mPkcs7TestRecipient2Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient2Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);
@@ -583,8 +586,8 @@ TestPkcs7EncryptNullInData (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);
@@ -626,8 +629,8 @@ TestPkcs7EncryptNullContentInfo (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);
@@ -668,8 +671,8 @@ TestPkcs7EncryptNullContentInfoSize (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);
@@ -712,8 +715,8 @@ TestPkcs7EncryptUnsupportedCipher (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);
@@ -757,8 +760,8 @@ TestPkcs7EncryptUnsupportedFlags (
 
   Result = X509ConstructCertificateStack (
              &X509Stack,
-             mPkcs7EncryptTestCert,
-             (UINTN)sizeof (mPkcs7EncryptTestCert),
+             mPkcs7TestRecipient1Cert,
+             (UINTN)sizeof (mPkcs7TestRecipient1Cert),
              NULL
              );
   UT_ASSERT_TRUE (Result);

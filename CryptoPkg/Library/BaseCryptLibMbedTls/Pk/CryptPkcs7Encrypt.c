@@ -21,11 +21,6 @@
 #define USE_OAEP  0
 #endif
 
-//
-// id-RSAES-OAEP ::= { pkcs-1 7 }  (not defined by mbedtls headers)
-//
-#define OID_RSAES_OAEP  MBEDTLS_OID_PKCS1 "\x07"
-
 #define PKCS7_MAX_RECIPIENT_COUNT  256
 
 /**
@@ -189,8 +184,8 @@ WriteEnvelopedDataKeyTransRecipientInfo (
       mbedtls_asn1_write_algorithm_identifier (
         Ptr,
         Start,
-        OID_RSAES_OAEP,
-        MBEDTLS_OID_SIZE (OID_RSAES_OAEP),
+        MBEDTLS_OID_RSAES_OAEP,
+        MBEDTLS_OID_SIZE (MBEDTLS_OID_RSAES_OAEP),
         OaepParamsLen
         )
       );
