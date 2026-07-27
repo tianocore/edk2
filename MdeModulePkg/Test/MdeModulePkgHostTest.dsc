@@ -24,6 +24,7 @@
 
 [Components]
   MdeModulePkg/Library/DxeResetSystemLib/UnitTest/MockUefiRuntimeServicesTableLib.inf
+  MdeModulePkg/Universal/BdsDxe/BdsBootNextPolicyUnitTestHost.inf
 
   #
   # Build MdeModulePkg HOST_APPLICATION Tests
