@@ -80,6 +80,43 @@ CfrConvertVarBinaryToUint32Array (
 }
 
 /**
+  Skip an optional CFR record that is not consumed by the setup UI.
+**/
+STATIC
+VOID
+EFIAPI
+CfrSkipOptionalRecord (
+  IN     UINT8   *Buffer,
+  IN OUT UINTN   *Offset,
+  IN     UINTN   BufferSize,
+  IN     UINT32  TargetTag
+  )
+{
+  CFR_RECORD  *Record;
+
+  if ((*Offset > BufferSize) ||
+      ((BufferSize - *Offset) < sizeof (CFR_RECORD)))
+  {
+    return;
+  }
+
+  Record = (CFR_RECORD *)(Buffer + *Offset);
+  if (Record->tag != TargetTag) {
+    return;
+  }
+
+  if ((Record->size < sizeof (CFR_RECORD)) ||
+      (Record->size > (BufferSize - *Offset)))
+  {
+    DEBUG ((DEBUG_ERROR, "CFR: Invalid record 0x%x size 0x%x\n", Record->tag, Record->size));
+    *Offset = BufferSize;
+    return;
+  }
+
+  *Offset += Record->size;
+}
+
+/**
   Produce conditional HII for a CFR flag or dependency.
 
   Caller to close each `*_IF` with `HiiCreateEndOpCode()`.
@@ -522,6 +559,17 @@ CfrProcessNumericOption (
     ASSERT (CfrDepValues->tag == CB_TAG_CFR_DEP_VALUES);
     CfrConvertVarBinaryToUint32Array (CfrDepValues, &DepValues, &NumDepValues);
   }
+
+  //
+  // Runtime application is performed by the OS and coreboot. Skip its
+  // metadata so that any following enum values remain correctly aligned.
+  //
+  CfrSkipOptionalRecord (
+    (UINT8 *)Option,
+    &OptionProcessedLength,
+    Option->size,
+    CB_TAG_CFR_RUNTIME_APPLY
+    );
 
   DEBUG ((
     DEBUG_INFO,

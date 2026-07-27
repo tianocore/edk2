@@ -47,7 +47,13 @@ enum cfr_option_flags {
 #define CB_TAG_CFR_VARCHAR_UI_HELPTEXT  0x0009
 #define CB_TAG_CFR_VARCHAR_DEF_VALUE    0x000a
 #define CB_TAG_CFR_DEP_VALUES           0x000c
+#define CB_TAG_CFR_RUNTIME_APPLY        0x000d
 #pragma pack (1)
+typedef struct {
+  UINT32  tag;
+  UINT32  size;
+} CFR_RECORD;
+
 typedef struct {
   UINT32  tag;          /*
                          * CFR_TAG_VARCHAR_OPT_NAME, CFR_TAG_VARCHAR_UI_NAME,
@@ -95,6 +101,7 @@ typedef struct {
    * CFR_VARCHAR_UI_NAME      ui_name
    * CFR_VARCHAR_UI_HELPTEXT  ui_helptext (Optional)
    * CFR_DEP_VALUES           dependency_values (Optional)
+   * CFR_RUNTIME_APPLY        runtime_apply (Optional)
    * CFR_ENUM_VALUE           enum_values[]
    */
 } CFR_OPTION_NUMERIC;
