@@ -1325,6 +1325,7 @@ StartBusEnumeration (
   PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
   EFI_ACPI_END_TAG_DESCRIPTOR        *End;
+  UINTN                              DescriptorCount;
 
   if (Configuration == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1338,7 +1339,21 @@ StartBusEnumeration (
   {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
-      *Configuration = AllocatePool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+      //
+      // Keep the root bus as the enumeration entry in the first descriptor.
+      // The optional second descriptor only raises the lower bound for
+      // downstream bus number allocation. Skipped bus numbers remain within
+      // the root bridge configuration space aperture.
+      //
+      DescriptorCount = 1;
+      if (RootBridge->MinSecondaryBusNumber > RootBridge->Bus.Base + 1) {
+        DescriptorCount = 2;
+      }
+
+      *Configuration = AllocateZeroPool (
+                         DescriptorCount * sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) +
+                         sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
+                         );
       if (*Configuration == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
@@ -1354,6 +1369,21 @@ StartBusEnumeration (
       Descriptor->AddrRangeMax          = 0;
       Descriptor->AddrTranslationOffset = 0;
       Descriptor->AddrLen               = RootBridge->Bus.Limit - RootBridge->Bus.Base + 1;
+
+      if (DescriptorCount == 2) {
+        Descriptor->AddrLen = 1;
+        Descriptor++;
+        Descriptor->Desc                  = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+        Descriptor->Len                   = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+        Descriptor->ResType               = ACPI_ADDRESS_SPACE_TYPE_BUS;
+        Descriptor->GenFlag               = 0;
+        Descriptor->SpecificFlag          = 0;
+        Descriptor->AddrSpaceGranularity  = 0;
+        Descriptor->AddrRangeMin          = RootBridge->MinSecondaryBusNumber;
+        Descriptor->AddrRangeMax          = 0;
+        Descriptor->AddrTranslationOffset = 0;
+        Descriptor->AddrLen               = RootBridge->Bus.Limit - RootBridge->MinSecondaryBusNumber + 1;
+      }
 
       End           = (EFI_ACPI_END_TAG_DESCRIPTOR *)(Descriptor + 1);
       End->Desc     = ACPI_END_TAG_DESCRIPTOR;
@@ -1391,23 +1421,12 @@ SetBusNumbers (
   PCI_HOST_BRIDGE_INSTANCE           *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *NextDescriptor;
   EFI_ACPI_END_TAG_DESCRIPTOR        *End;
+  UINT64                             AllocatedBusBase;
+  UINT64                             LastBusNumber;
 
   if (Configuration == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
-  End        = (EFI_ACPI_END_TAG_DESCRIPTOR *)(Descriptor + 1);
-
-  //
-  // Check the Configuration is valid
-  //
-  if ((Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR) ||
-      (Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_BUS) ||
-      (End->Desc != ACPI_END_TAG_DESCRIPTOR)
-      )
-  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1419,22 +1438,58 @@ SetBusNumbers (
   {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
-      if (Descriptor->AddrLen == 0) {
-        return EFI_INVALID_PARAMETER;
-      }
-
-      if ((Descriptor->AddrRangeMin < RootBridge->Bus.Base) ||
-          (Descriptor->AddrRangeMin + Descriptor->AddrLen - 1 > RootBridge->Bus.Limit)
-          )
+      Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
+      if ((Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR) ||
+          (Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_BUS) ||
+          (Descriptor->AddrLen == 0) ||
+          (Descriptor->AddrRangeMin < RootBridge->Bus.Base) ||
+          (Descriptor->AddrRangeMin > RootBridge->Bus.Limit) ||
+          (Descriptor->AddrLen > RootBridge->Bus.Limit - Descriptor->AddrRangeMin + 1))
       {
         return EFI_INVALID_PARAMETER;
       }
 
+      AllocatedBusBase = Descriptor->AddrRangeMin;
+      LastBusNumber    = Descriptor->AddrRangeMin + Descriptor->AddrLen - 1;
+      NextDescriptor   = Descriptor + 1;
+      if (NextDescriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
+        if ((RootBridge->MinSecondaryBusNumber <= RootBridge->Bus.Base + 1) ||
+            (Descriptor->AddrRangeMin != RootBridge->Bus.Base) ||
+            (Descriptor->AddrLen != 1) ||
+            (NextDescriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_BUS) ||
+            (NextDescriptor->AddrRangeMin != RootBridge->MinSecondaryBusNumber) ||
+            (NextDescriptor->AddrLen == 0) ||
+            (NextDescriptor->AddrLen > RootBridge->Bus.Limit - NextDescriptor->AddrRangeMin + 1))
+        {
+          return EFI_INVALID_PARAMETER;
+        }
+
+        AllocatedBusBase = RootBridge->Bus.Base;
+        LastBusNumber    = NextDescriptor->AddrRangeMin + NextDescriptor->AddrLen - 1;
+        End              = (EFI_ACPI_END_TAG_DESCRIPTOR *)(NextDescriptor + 1);
+      } else {
+        End = (EFI_ACPI_END_TAG_DESCRIPTOR *)NextDescriptor;
+        if ((RootBridge->MinSecondaryBusNumber > RootBridge->Bus.Base + 1) &&
+            ((Descriptor->AddrRangeMin != RootBridge->Bus.Base) || (Descriptor->AddrLen != 1)))
+        {
+          return EFI_INVALID_PARAMETER;
+        }
+
+        if (RootBridge->MinSecondaryBusNumber > RootBridge->Bus.Base + 1) {
+          AllocatedBusBase = RootBridge->Bus.Base;
+        }
+      }
+
+      if (End->Desc != ACPI_END_TAG_DESCRIPTOR) {
+        return EFI_INVALID_PARAMETER;
+      }
+
       //
-      // Update the Bus Range
+      // The skipped bus numbers remain part of the root bridge decode aperture,
+      // but are not assigned to PCI bridges.
       //
-      RootBridge->ResAllocNode[TypeBus].Base   = Descriptor->AddrRangeMin;
-      RootBridge->ResAllocNode[TypeBus].Length = Descriptor->AddrLen;
+      RootBridge->ResAllocNode[TypeBus].Base   = AllocatedBusBase;
+      RootBridge->ResAllocNode[TypeBus].Length = LastBusNumber - AllocatedBusBase + 1;
       RootBridge->ResAllocNode[TypeBus].Status = ResAllocated;
       return EFI_SUCCESS;
     }

@@ -59,6 +59,7 @@ typedef struct {
   UINT64                             Supports;
   PCI_RES_NODE                       ResAllocNode[TypeMax];
   PCI_ROOT_BRIDGE_APERTURE           Bus;
+  UINT8                              MinSecondaryBusNumber;
   PCI_ROOT_BRIDGE_APERTURE           Io;
   PCI_ROOT_BRIDGE_APERTURE           Mem;
   PCI_ROOT_BRIDGE_APERTURE           PMem;

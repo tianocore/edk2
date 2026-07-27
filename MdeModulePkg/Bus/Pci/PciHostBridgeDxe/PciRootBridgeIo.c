@@ -90,11 +90,20 @@ CreateRootBridge (
     Bridge->Bus.Limit,
     Bridge->Bus.Translation
     ));
+  DEBUG ((DEBUG_INFO, "      MinSecBus: %x\n", Bridge->MinSecondaryBusNumber));
   //
   // Translation for bus is not supported.
   //
   ASSERT (Bridge->Bus.Translation == 0);
   if (Bridge->Bus.Translation != 0) {
+    return NULL;
+  }
+
+  //
+  // The minimum secondary bus number must not exceed the bus aperture.
+  // Values at or below Bus.Base + 1 keep the default allocation behavior.
+  //
+  if (Bridge->MinSecondaryBusNumber > Bridge->Bus.Limit) {
     return NULL;
   }
 
@@ -204,6 +213,7 @@ CreateRootBridge (
   RootBridge->DmaAbove4G            = Bridge->DmaAbove4G;
   RootBridge->NoExtendedConfigSpace = Bridge->NoExtendedConfigSpace;
   RootBridge->AllocationAttributes  = Bridge->AllocationAttributes;
+  RootBridge->MinSecondaryBusNumber = Bridge->MinSecondaryBusNumber;
   RootBridge->DevicePath            = DuplicateDevicePath (Bridge->DevicePath);
   RootBridge->DevicePathStr         = DevicePathStr;
   RootBridge->ConfigBuffer          = AllocatePool (
