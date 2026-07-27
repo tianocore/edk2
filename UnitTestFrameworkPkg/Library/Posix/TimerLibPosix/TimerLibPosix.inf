@@ -1,0 +1,29 @@
+## @file
+#  Instance of Timer Library based on the host's standard C library.
+#
+#  Uses the C11 timespec_get() API to provide a free running performance
+#  counter and calibrated delays for host-based unit tests.
+#
+#  Do NOT use this on a production system.
+#
+#  Copyright (c) Microsoft Corporation.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x0001001B
+  BASE_NAME       = TimerLibPosix
+  FILE_GUID       = 6C3F9A17-9A1B-4E5C-8B7D-2E9F4A6C1D30
+  MODULE_TYPE     = BASE
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = TimerLib|HOST_APPLICATION
+
+[Sources]
+  TimerLibPosix.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
