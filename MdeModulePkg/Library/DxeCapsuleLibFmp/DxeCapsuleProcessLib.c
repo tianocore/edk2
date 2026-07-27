@@ -780,7 +780,10 @@ ProcessTheseCapsules (
       CapsulesLoadedAfterEndOfDxe = (BOOLEAN)(mCapsuleTotalNumber != 0);
     } else if (mCapsuleOnDiskDeferred) {
       Status = AppendDeferredCapsulesOnDisk ();
-      if (Status == EFI_OUT_OF_RESOURCES) {
+      if (EFI_ERROR (Status) &&
+          (Status != EFI_NOT_FOUND) &&
+          (Status != EFI_NOT_READY))
+      {
         return Status;
       }
 
