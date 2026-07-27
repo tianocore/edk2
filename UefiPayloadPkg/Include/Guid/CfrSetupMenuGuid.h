@@ -87,11 +87,11 @@ typedef struct {
 
 #define CB_TAG_CFR_OPTION_VARCHAR  0x0006
 typedef struct {
-  UINT32              tag;        /* CFR_OPTION_VARCHAR */
+  UINT32              tag;            /* CFR_OPTION_VARCHAR */
   UINT32              size;
   UINT64              object_id;      /* Unique ID */
   UINT64              dependency_id;  /* Dependent object ID, or 0 */
-  UINT32              flags;      /* enum cfr_option_flags */
+  UINT32              flags;          /* enum cfr_option_flags */
   /*
    * CFR_OPT_NAME     opt_name
    * CFR_UI_NAME      ui_name
@@ -107,11 +107,11 @@ typedef struct {
  */
 #define CB_TAG_CFR_OPTION_COMMENT  0x000b
 typedef struct {
-  UINT32              tag;        /* CFR_OPTION_COMMENT */
+  UINT32              tag;              /* CFR_OPTION_COMMENT */
   UINT32              size;
   UINT64              object_id;        /* Unique ID */
   UINT64              dependency_id;    /* Dependent object ID, or 0 */
-  UINT32              flags;      /* enum cfr_option_flags */
+  UINT32              flags;            /* enum cfr_option_flags */
   /*
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
@@ -121,11 +121,11 @@ typedef struct {
 /* CFR forms are considered options as they can be nested inside other forms */
 #define CB_TAG_CFR_OPTION_FORM  0x0001
 typedef struct {
-  UINT32                tag;        /* CFR_OPTION_FORM */
+  UINT32                tag;              /* CFR_OPTION_FORM */
   UINT32                size;
   UINT64                object_id;        /* Unique ID */
   UINT64                dependency_id;    /* Dependent object ID, or 0 */
-  UINT32                flags;      /* enum cfr_option_flags */
+  UINT32                flags;            /* enum cfr_option_flags */
   /*
    * CFR_UI_NAME        ui_name
    * <T in CFR_OPTION>  options[]

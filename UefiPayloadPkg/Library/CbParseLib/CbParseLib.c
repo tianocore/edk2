@@ -598,12 +598,12 @@ ParseMiscInfo (
   VOID
   )
 {
-  struct cb_cfr    *CbCfrSetupMenu;
-  UINT32           CfrCalculatedChecksum;
-  UINTN            ProcessedLength;
-  CFR_OPTION_FORM  *CbCfrOuterFormOffset;
-  CFR_OPTION_FORM  *CfrSetupMenuForm;
-  CFR_VARBINARY    *CfrFormName;
+  struct cb_cfr                         *CbCfrSetupMenu;
+  UINT32                                CfrCalculatedChecksum;
+  UINTN                                 ProcessedLength;
+  CFR_OPTION_FORM                       *CbCfrOuterFormOffset;
+  CFR_OPTION_FORM                       *CfrSetupMenuForm;
+  CFR_VARBINARY                         *CfrFormName;
 
   //
   // CFR has several CB tags, though these are nested structures,
@@ -637,11 +637,11 @@ ParseMiscInfo (
       DEBUG ((DEBUG_ERROR, "CFR Tag mismatch: 0x%x vs 0x%x\n", CbCfrOuterFormOffset->tag, CB_TAG_CFR_OPTION_FORM));
       return RETURN_NOT_FOUND;
     }
-    CfrSetupMenuForm      = BuildGuidDataHob (
-                              &gEfiCfrSetupMenuFormGuid,
-                              CbCfrOuterFormOffset,
-                              CbCfrOuterFormOffset->size
-                              );
+    CfrSetupMenuForm = BuildGuidDataHob (
+                          &gEfiCfrSetupMenuFormGuid,
+                          CbCfrOuterFormOffset,
+                          CbCfrOuterFormOffset->size
+                          );
     if (CfrSetupMenuForm == NULL) {
       break;
     }
