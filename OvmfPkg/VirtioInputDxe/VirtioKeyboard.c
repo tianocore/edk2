@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
 
 #include "VirtioInput.h"
@@ -440,6 +441,16 @@ VirtioKeyboardHandleEvent (
   if (Event->Value != KEY_RELEASED) {
     // Key pressed event received
     Dev->KeyActive[(UINT8)Event->Code] = TRUE;
+
+    // Handle Ctrl-Alt-Del (in any order)
+    if (
+        (Dev->KeyActive[KEY_LEFTCTRL] || Dev->KeyActive[KEY_RIGHTCTRL]) &&
+        (Dev->KeyActive[KEY_LEFTALT] || Dev->KeyActive[KEY_RIGHTALT]) &&
+        Dev->KeyActive[KEY_DELETE]
+        )
+    {
+      gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    }
 
     //
     // Update toggle state
