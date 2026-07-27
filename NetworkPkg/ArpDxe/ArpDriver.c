@@ -138,6 +138,11 @@ ArpCreateService (
     goto ERROR_EXIT;
   }
 
+  if (ArpService->SnpMode.IfType != NET_IFTYPE_ETHERNET) {
+    Status = EFI_UNSUPPORTED;
+    goto ERROR_EXIT;
+  }
+
   //
   // Create the event used in the RxToken.
   //
