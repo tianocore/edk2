@@ -18,6 +18,9 @@
 #include <Protocol/SimpleTextInEx.h>
 
 #include <IndustryStandard/Virtio.h>
+#include <IndustryStandard/VirtioInput.h>
+
+#include <Library/VirtioLib.h>
 
 #include "VirtioKeyCodes.h"
 
