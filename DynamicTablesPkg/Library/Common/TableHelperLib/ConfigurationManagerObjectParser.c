@@ -356,7 +356,8 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
   { "SerialNumber",               SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
   { "AssetTag",                   SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
   { "PartNumber",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
-  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString }
+  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "StaToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
 };
 
 /** A parser for EArchCommonObjCacheInfo.
