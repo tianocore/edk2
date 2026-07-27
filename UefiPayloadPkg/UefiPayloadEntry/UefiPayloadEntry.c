@@ -493,19 +493,130 @@ BuildHobFromBl (
 }
 
 /**
-  This function will build some generic HOBs that doesn't depend on information from bootloaders.
+  Locate the bootloader's ExtraData HOB and report how many entries it
+  actually has room for.
 
+  Only bootloaders that hand over a PEI-format HOB list (Slim Bootloader
+  and compatible frontends such as ChainloadApp) can carry an ExtraData
+  HOB. coreboot passes a coreboot table pointer, which fails the handoff
+  header check and returns NULL.
+
+  @param[in]  BootloaderParameter  Bootloader-provided argument.
+  @param[out] Count                Entry count, clamped to what the HOB's
+                                   own data size can hold.
+
+  @return  The ExtraData structure, or NULL if the bootloader did not hand
+           over a PEI HOB list carrying one.
+**/
+STATIC
+UNIVERSAL_PAYLOAD_EXTRA_DATA *
+FindBootloaderExtraDataHob (
+  IN  UINTN  BootloaderParameter,
+  OUT UINTN  *Count
+  )
+{
+  EFI_PEI_HOB_POINTERS          BlHob;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
+  UINTN                         DataSize;
+
+  BlHob.Raw = (UINT8 *)BootloaderParameter;
+  if ((BlHob.Raw == NULL) ||
+      (BlHob.Header->HobType != EFI_HOB_TYPE_HANDOFF) ||
+      (BlHob.Header->HobLength != sizeof (EFI_HOB_HANDOFF_INFO_TABLE)))
+  {
+    return NULL;
+  }
+
+  BlHob.Raw = GetNextGuidHob (&gUniversalPayloadExtraDataGuid, BlHob.Raw);
+  if (BlHob.Raw == NULL) {
+    return NULL;
+  }
+
+  ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (BlHob.Raw);
+  DataSize  = GET_GUID_HOB_DATA_SIZE (BlHob.Raw);
+  if (DataSize < sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA)) {
+    return NULL;
+  }
+
+  *Count = MIN (
+             (UINTN)ExtraData->Count,
+             (DataSize - sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA)) /
+             sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY)
+             );
+
+  return ExtraData;
+}
+
+/**
+  Locate the payload FV base and size from the bootloader's ExtraData
+  HOB, if it published one.
+
+  @param[in]  BootloaderParameter  Bootloader-provided argument.
+  @param[out] FvBase               ExtraData "uefi_fv" entry base.
+  @param[out] FvSize               ExtraData "uefi_fv" entry size.
+
+  @retval TRUE   The bootloader supplied an ExtraData FV location.
+  @retval FALSE  No usable ExtraData "uefi_fv" entry.
+**/
+STATIC
+BOOLEAN
+FindPayloadFvFromBootloader (
+  IN  UINTN  BootloaderParameter,
+  OUT UINTN  *FvBase,
+  OUT UINTN  *FvSize
+  )
+{
+  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
+  UINTN                         Count;
+  UINTN                         Index;
+
+  Count     = 0;
+  ExtraData = FindBootloaderExtraDataHob (BootloaderParameter, &Count);
+  if (ExtraData == NULL) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < Count; Index++) {
+    if (AsciiStrnCmp (
+          ExtraData->Entry[Index].Identifier,
+          "uefi_fv",
+          sizeof (ExtraData->Entry[Index].Identifier)
+          ) == 0)
+    {
+      if (ExtraData->Entry[Index].Size == 0) {
+        DEBUG ((DEBUG_ERROR, "%a: uefi_fv ExtraData entry has zero size\n", __func__));
+        return FALSE;
+      }
+
+      *FvBase = (UINTN)ExtraData->Entry[Index].Base;
+      *FvSize = (UINTN)ExtraData->Entry[Index].Size;
+
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+  This function will build the HOBs that every payload needs regardless of
+  which bootloader it was launched from: the payload FV reservation and the
+  CPU HOB, plus the Local APIC range on x86.
+
+  @param[in] PayloadFvBase  Base of the payload FV to reserve.
+  @param[in] PayloadFvSize  Size of the payload FV to reserve.
 **/
 VOID
 BuildGenericHob (
-  VOID
+  IN UINTN  PayloadFvBase,
+  IN UINTN  PayloadFvSize
   )
 {
   UINT8                        PhysicalAddressBits;
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
 
   // The UEFI payload FV
-  BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
+  BuildMemoryAllocationHob (PayloadFvBase, PayloadFvSize, EfiBootServicesData);
 
   PhysicalAddressBits = ArchGetPhysicalAddressBits ();
   BuildCpuHob (PhysicalAddressBits, 16);
@@ -545,6 +656,12 @@ _ModuleEntryPoint (
   SERIAL_PORT_INFO                    SerialPortInfo;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
   EFI_HOB_HANDOFF_INFO_TABLE          *HobInfo;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA        *ExtraData;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA        *NewExtraData;
+  UINTN                               ExtraDataSize;
+  UINTN                               ExtraDataCount;
+  UINTN                               PayloadFvBase;
+  UINTN                               PayloadFvSize;
 
   Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
   ASSERT_EFI_ERROR (Status);
@@ -552,8 +669,18 @@ _ModuleEntryPoint (
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
 
+  //
+  // Determine the payload FV location. If the bootloader relocated the
+  // FV and published an ExtraData HOB, honour that; otherwise fall back
+  // to the build-time PCD.
+  //
+  if (!FindPayloadFvFromBootloader (BootloaderParameter, &PayloadFvBase, &PayloadFvSize)) {
+    PayloadFvBase = PcdGet32 (PcdPayloadFdMemBase);
+    PayloadFvSize = PcdGet32 (PcdPayloadFdMemSize);
+  }
+
   // HOB region is used for HOB and memory allocation for this module
-  MemBase    = PcdGet32 (PcdPayloadFdMemBase);
+  MemBase    = PayloadFvBase;
   HobMemBase = 0;
 
   //
@@ -563,7 +690,7 @@ _ModuleEntryPoint (
 
   ASSERT (HobMemBase != 0);
   if (HobMemBase == 0) {
-    HobMemBase = ALIGN_VALUE (MemBase + PcdGet32 (PcdPayloadFdMemSize), SIZE_1MB);
+    HobMemBase = ALIGN_VALUE (MemBase + PayloadFvSize, SIZE_1MB);
   }
 
   HobMemTop = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -606,8 +733,39 @@ _ModuleEntryPoint (
     return Status;
   }
 
+  //
+  // Republish the ExtraData HOB in the new HOB list so that DXE-phase
+  // consumers can locate the relocated payload FV.  LoadDxeCore() does
+  // not read it: the FV was resolved once, above.
+  //
+  ExtraDataCount = 0;
+  ExtraData      = FindBootloaderExtraDataHob (BootloaderParameter, &ExtraDataCount);
+  if (ExtraData != NULL) {
+    ExtraDataSize = sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) +
+                    ExtraDataCount * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY);
+    NewExtraData = BuildGuidHob (&gUniversalPayloadExtraDataGuid, ExtraDataSize);
+    ASSERT (NewExtraData != NULL);
+    if (NewExtraData == NULL) {
+      //
+      // Not fatal: the FV was already resolved and reserved.  Only
+      // DXE-phase consumers of the HOB lose out, so say so and go on.
+      //
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: failed to build ExtraData HOB of 0x%x bytes\n",
+        __func__,
+        (UINT32)ExtraDataSize
+        ));
+    } else {
+      CopyMem (NewExtraData, ExtraData, ExtraDataSize);
+      NewExtraData->Count         = (UINT32)ExtraDataCount;
+      NewExtraData->Header.Length = (UINT16)ExtraDataSize;
+      DEBUG ((DEBUG_INFO, "Copied ExtraData HOB with %u entries\n", (UINT32)ExtraDataCount));
+    }
+  }
+
   // Build other HOBs required by DXE
-  BuildGenericHob ();
+  BuildGenericHob (PayloadFvBase, PayloadFvSize);
 
   //
   // Create Memory Type Information HOB
@@ -619,7 +777,7 @@ _ModuleEntryPoint (
     );
 
   // Load the DXE Core
-  Status = LoadDxeCore (&DxeCoreEntryPoint);
+  Status = LoadDxeCore ((EFI_FIRMWARE_VOLUME_HEADER *)PayloadFvBase, &DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((DEBUG_INFO, "DxeCoreEntryPoint = 0x%lx\n", DxeCoreEntryPoint));

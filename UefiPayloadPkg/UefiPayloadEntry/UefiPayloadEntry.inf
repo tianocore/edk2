@@ -71,6 +71,7 @@
   gUniversalPayloadSmbiosTableGuid
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadSerialPortInfoGuid
+  gUniversalPayloadExtraDataGuid
   gEfiFirmwareInfoHobGuid
   gEfiSmmStoreInfoHobGuid
 
