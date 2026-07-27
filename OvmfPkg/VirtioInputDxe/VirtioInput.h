@@ -92,8 +92,10 @@ typedef struct {
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL       Txt;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TxtEx;
   LIST_ENTRY                           KeyNotifyList;
+  EFI_EVENT                            KeyNotifyProcessEvent;
   BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
   EFI_KEY_QUEUE                        KeyQueue;
+  EFI_KEY_QUEUE                        KeyQueueForNotify;
 
   BOOLEAN                              CapsLock;
   BOOLEAN                              NumLock;
@@ -169,6 +171,13 @@ VirtioKeyboardInit (
 VOID
 VirtioKeyboardUninit (
   IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+EFIAPI
+VirtioKeyboardNotifyHandler (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 //

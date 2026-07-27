@@ -141,6 +141,13 @@ ClearEfikeyBuf (
   ZeroMem (Queue->Buffer, sizeof (Queue->Buffer));
 }
 
+STATIC
+BOOLEAN
+IsKeyRegistered (
+  IN EFI_KEY_DATA  *RegisteredData,
+  IN EFI_KEY_DATA  *InputData
+  );
+
 // -----------------------------------------------------------------------------
 // End utility functions
 // -----------------------------------------------------------------------------
@@ -372,6 +379,10 @@ VirtioKeyboardProcessEvent (
   OUT EFI_KEY_DATA      *KeyData
   )
 {
+  LIST_ENTRY                 *Link;
+  LIST_ENTRY                 *NotifyList;
+  VIRTIO_INPUT_IN_EX_NOTIFY  *CurrentNotify;
+
   //
   // Initialize the key data structure with current keyboard and toggle state
   //
@@ -389,6 +400,29 @@ VirtioKeyboardProcessEvent (
   if ((KeyData->Key.UnicodeChar == CHAR_NULL) && (KeyData->Key.ScanCode == SCAN_NULL)) {
     if (!Dev->SupportPartialKeys) {
       return EFI_NOT_READY;
+    }
+  }
+
+  //
+  // Signal KeyNotify process event if this key pressed matches any key registered.
+  //
+  NotifyList = &Dev->KeyNotifyList;
+  for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList, Link); Link = GetNextNode (NotifyList, Link)) {
+    CurrentNotify = CR (
+                      Link,
+                      VIRTIO_INPUT_IN_EX_NOTIFY,
+                      NotifyEntry,
+                      VIRTIO_INPUT_SIG
+                      );
+    if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
+      //
+      // The key notification function needs to run at TPL_CALLBACK
+      // while current TPL is TPL_NOTIFY. It will be invoked in
+      // KeyNotifyProcessHandler() which runs at TPL_CALLBACK.
+      //
+      PushEfikeyBufTail (&Dev->KeyQueueForNotify, KeyData);
+      gBS->SignalEvent (Dev->KeyNotifyProcessEvent);
+      break;
     }
   }
 
@@ -445,6 +479,52 @@ VirtioKeyboardHandleEvent (
 }
 
 // -----------------------------------------------------------------------------
+// Function handling key notifications
+VOID
+EFIAPI
+VirtioKeyboardNotifyHandler (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  EFI_STATUS                 Status;
+  VIRTIO_INPUT_DEV           *Dev;
+  EFI_KEY_DATA               KeyData;
+  LIST_ENTRY                 *Link;
+  LIST_ENTRY                 *NotifyList;
+  VIRTIO_INPUT_IN_EX_NOTIFY  *CurrentNotify;
+  EFI_TPL                    OldTpl;
+
+  Dev        = (VIRTIO_INPUT_DEV *)Context;
+  NotifyList = &Dev->KeyNotifyList;
+
+  while (TRUE) {
+    //
+    // Critical section
+    //
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    Status = PopEfikeyBufHead (&Dev->KeyQueueForNotify, &KeyData);
+    gBS->RestoreTPL (OldTpl);
+
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList, Link); Link = GetNextNode (NotifyList, Link)) {
+      CurrentNotify = CR (
+                        Link,
+                        VIRTIO_INPUT_IN_EX_NOTIFY,
+                        NotifyEntry,
+                        VIRTIO_INPUT_SIG
+                        );
+      if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
+        CurrentNotify->KeyNotificationFn (&KeyData);
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
 // EFI_SIMPLE_TEXT_INPUT_PROTOCOL API
 STATIC
 EFI_STATUS
@@ -463,6 +543,7 @@ VirtioKeyboardReset (
 
   ZeroMem (Dev->KeyActive, sizeof (Dev->KeyActive));
   ClearEfikeyBuf (&Dev->KeyQueue);
+  ClearEfikeyBuf (&Dev->KeyQueueForNotify);
 
   Dev->NumLock            = FALSE;
   Dev->CapsLock           = FALSE;
@@ -890,6 +971,46 @@ VirtioKeyboardInit (
     return Status;
   }
 
+  //
+  // Setup the key notification processing callback event
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  &VirtioKeyboardNotifyHandler,
+                  Dev,
+                  &Dev->KeyNotifyProcessEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+VirtioFreeNotifyList (
+  IN OUT LIST_ENTRY  *ListHead
+  )
+{
+  VIRTIO_INPUT_IN_EX_NOTIFY  *NotifyNode;
+
+  if (ListHead == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  while (!IsListEmpty (ListHead)) {
+    NotifyNode = CR (
+                   ListHead->ForwardLink,
+                   VIRTIO_INPUT_IN_EX_NOTIFY,
+                   NotifyEntry,
+                   VIRTIO_INPUT_SIG
+                   );
+    RemoveEntryList (ListHead->ForwardLink);
+    gBS->FreePool (NotifyNode);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -900,4 +1021,6 @@ VirtioKeyboardUninit (
 {
   gBS->CloseEvent (Dev->Txt.WaitForKey);
   gBS->CloseEvent (Dev->TxtEx.WaitForKeyEx);
+  gBS->CloseEvent (Dev->KeyNotifyProcessEvent);
+  VirtioFreeNotifyList (&Dev->KeyNotifyList);
 }
