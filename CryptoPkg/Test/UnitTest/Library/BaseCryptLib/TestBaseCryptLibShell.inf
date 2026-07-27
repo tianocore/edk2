@@ -46,6 +46,7 @@
   X509Tests.c
   Pkcs7AttachedContentTest.c
   Pkcs7EncryptTests.c
+  Pkcs7DecryptTests.c
 
 [Packages]
   MdePkg/MdePkg.dec
