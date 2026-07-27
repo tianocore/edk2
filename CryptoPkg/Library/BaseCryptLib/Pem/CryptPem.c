@@ -129,6 +129,120 @@ AllocateKeyContext (
 }
 
 /**
+  Convert an ML-DSA type name string to an OpenSSL NID.
+
+  This helper function translates ML-DSA type name strings (e.g., "ML-DSA-87")
+  to their corresponding OpenSSL EVP_PKEY NIDs (e.g., EVP_PKEY_ML_DSA_87).
+
+  If the type name is not recognized, EVP_PKEY_NONE is returned.
+
+  @param[in]  TypeName   ML-DSA type name string (e.g., "ML-DSA-87").
+
+  @retval OpenSSL NID (e.g., EVP_PKEY_ML_DSA_87) if recognized.
+  @retval EVP_PKEY_NONE if the type name is not recognized.
+
+**/
+STATIC
+INT32
+MlDsaTypeNameToNid (
+  IN CONST CHAR8  *TypeName
+  )
+{
+  INT32  Nid;
+
+  if (AsciiStrCmp (TypeName, "ML-DSA-87") == 0) {
+    Nid = EVP_PKEY_ML_DSA_87;
+  } else {
+    Nid = EVP_PKEY_NONE;
+  }
+
+  return Nid;
+}
+
+/**
+  Check if the given NID is supported for ML-DSA.
+
+  This helper function checks if the provided NID corresponds to a supported
+  ML-DSA type. Currently, only EVP_PKEY_ML_DSA_87 is supported.
+
+  @param[in]  Nid   The NID to check.
+
+  @retval TRUE   The NID is supported for ML-DSA.
+  @retval FALSE  The NID is not supported for ML-DSA.
+
+**/
+STATIC
+BOOLEAN
+IsMlDsaNidSupported (
+  IN INT32  Nid
+  )
+{
+  switch (Nid) {
+    case EVP_PKEY_ML_DSA_87:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+  Convert an SLH-DSA type name string to an OpenSSL NID.
+
+  This helper function translates SLH-DSA type name strings (e.g., "SLH-DSA-SHAKE-256s")
+  to their corresponding OpenSSL EVP_PKEY NIDs (e.g., EVP_PKEY_SLH_DSA_SHAKE_256S).
+
+  If the type name is not recognized, EVP_PKEY_NONE is returned.
+
+  @param[in]  TypeName   SLH-DSA type name string (e.g., "SLH-DSA-SHAKE-256s").
+
+  @retval OpenSSL NID (e.g., EVP_PKEY_SLH_DSA_SHAKE_256S) if recognized.
+  @retval EVP_PKEY_NONE if the type name is not recognized.
+
+**/
+STATIC
+INT32
+SlhDsaTypeNameToNid (
+  IN CONST CHAR8  *TypeName
+  )
+{
+  INT32  Nid;
+
+  if (AsciiStrCmp (TypeName, "SLH-DSA-SHAKE-256s") == 0) {
+    Nid = EVP_PKEY_SLH_DSA_SHAKE_256S;
+  } else {
+    Nid = EVP_PKEY_NONE;
+  }
+
+  return Nid;
+}
+
+/**
+  Check if the given NID is supported for SLH-DSA.
+
+  This helper function checks if the provided NID corresponds to a supported
+  SLH-DSA type. Currently, only EVP_PKEY_SLH_DSA_SHAKE_256S is supported.
+
+  @param[in]  Nid   The NID to check.
+
+  @retval TRUE   The NID is supported for SLH-DSA.
+  @retval FALSE  The NID is not supported for SLH-DSA.
+
+**/
+STATIC
+BOOLEAN
+IsSlhDsaNidSupported (
+  IN INT32  Nid
+  )
+{
+  switch (Nid) {
+    case EVP_PKEY_SLH_DSA_SHAKE_256S:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
+/**
   Retrieve the RSA Private Key from the password-protected PEM key data.
 
   @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
@@ -341,6 +455,116 @@ EdDsaGetPrivateKeyFromPem (
 
   // Allocate wrapper structure (now consistent with other key types)
   if (!AllocateKeyContext (Pkey, Nid, EdDsaContext)) {
+    EVP_PKEY_free (Pkey);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Retrieve the ML-DSA Private Key from the password-protected PEM key data.
+
+  If PemData is NULL, then return FALSE.
+  If MlDsaContext is NULL, then return FALSE.
+
+  @param[in]  PemData       Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize       Size of the PEM key data in bytes.
+  @param[in]  Password      NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] MlDsaContext  Pointer to new-generated ML-DSA context which contains
+                            the retrieved ML-DSA private key. Use MlDsaFree() to free.
+
+  @retval  TRUE   ML-DSA Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+MlDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **MlDsaContext
+  )
+{
+  EVP_PKEY  *Pkey;
+  INT32     Nid;
+
+  //
+  // Check input parameters.
+  //
+  if ((PemData == NULL) || (MlDsaContext == NULL) || (PemSize > INT_MAX)) {
+    return FALSE;
+  }
+
+  // Read PEM data
+  if (!GetPrivateKeyFromPem (PemData, PemSize, Password, &Pkey)) {
+    return FALSE;
+  }
+
+  Nid = MlDsaTypeNameToNid (EVP_PKEY_get0_type_name (Pkey));
+  if (!IsMlDsaNidSupported (Nid)) {
+    EVP_PKEY_free (Pkey);
+    return FALSE;
+  }
+
+  // Allocate wrapper structure (now consistent with other key types)
+  if (!AllocateKeyContext (Pkey, Nid, MlDsaContext)) {
+    EVP_PKEY_free (Pkey);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Retrieve the SLH-DSA Private Key from the password-protected PEM key data.
+
+  If PemData is NULL, then return FALSE.
+  If SlhDsaContext is NULL, then return FALSE.
+
+  @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize        Size of the PEM key data in bytes.
+  @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contains
+                             the retrieved SLH-DSA private key. Use SlhDsaFree() to free.
+
+  @retval  TRUE   SLH-DSA Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+SlhDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **SlhDsaContext
+  )
+{
+  EVP_PKEY  *Pkey;
+  INT32     Nid;
+
+  //
+  // Check input parameters.
+  //
+  if ((PemData == NULL) || (SlhDsaContext == NULL) || (PemSize > INT_MAX)) {
+    return FALSE;
+  }
+
+  // Read PEM data
+  if (!GetPrivateKeyFromPem (PemData, PemSize, Password, &Pkey)) {
+    return FALSE;
+  }
+
+  Nid = SlhDsaTypeNameToNid (EVP_PKEY_get0_type_name (Pkey));
+  if (!IsSlhDsaNidSupported (Nid)) {
+    EVP_PKEY_free (Pkey);
+    return FALSE;
+  }
+
+  // Allocate wrapper structure (now consistent with other key types)
+  if (!AllocateKeyContext (Pkey, Nid, SlhDsaContext)) {
     EVP_PKEY_free (Pkey);
     return FALSE;
   }

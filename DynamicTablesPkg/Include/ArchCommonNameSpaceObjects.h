@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
-  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -19,6 +19,37 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
+#include <IndustryStandard/SmBios.h>
+
+///
+/// Maximum storage size, including the terminating NULL, for SMBIOS strings
+/// represented inline in Configuration Manager objects. This is a
+/// DynamicTablesPkg implementation limit.
+///
+/// The legacy 64-character constraint from SMBIOS 2.6 was required for MIF
+/// compatibility and does not apply to SMBIOS 2.7 or later tables.
+///
+#define SMBIOS_MAX_STRING_SIZE  (1024)
+
+// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
+#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
+
+/**
+  Maximum number of Value bytes that can fit in a single-entry SMBIOS Type 40
+  formatted structure.
+
+  The SMBIOS formatted length is limited to MAX_UINT8. Five bytes are required
+  for the SMBIOS Type 40 header and NumberOfAdditionalInformationEntries, and
+  five bytes are required for the fixed portion of an Additional Information
+  Entry:
+
+    MAX_UINT8 - 5 - 5 = 245 bytes.
+
+  A Type 40 structure containing multiple entries may have a smaller effective
+  maximum per entry. The generator must therefore also validate the aggregate
+  formatted length.
+**/
+#define SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE  245
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -91,6 +122,13 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
   EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
   EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
+  EArchCommonObjSystemInfo,                     ///< 67 - System Info
+  EArchCommonObjAdditionalInformation,          ///< 68 - Additional Information
+  EArchCommonObjAdditionalInformationEntry,     ///< 69 - Additional Information Entry
+  EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
+  EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
+  EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -455,8 +493,6 @@ typedef struct CmArchCommonLpiInfo {
   */
   CHAR8                                     StateName[16];
 } CM_ARCH_COMMON_LPI_INFO;
-
-#define SMBIOS_MAX_STRING_SIZE  (1024)
 
 /** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
 
@@ -976,9 +1012,6 @@ typedef struct CmArchCommonCxlHostBridgeInfo {
   /// Base address of the component registers.
   UINT64             ComponentRegisterBase;
 } CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO;
-
-// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
-#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
 
 /** A structure that describes the CXL Fixed Memory Window Structure (Type 1).
 
@@ -1704,5 +1737,166 @@ typedef struct CmArchCommonSystemResetInfo {
   /// Timeout value used by the watchdog timer.
   UINT16             Timeout;
 } CM_ARCH_COMMON_SYSTEM_RESET_INFO;
+
+/** A structure that describes processor specific data.
+
+  SMBIOS Specification v3.9.0 Type 44
+
+  ID: EArchCommonObjProcessorSpecificBlockInfo
+**/
+typedef struct CmArchCommonProcessorSpecificBlockInfo {
+  /// CM Object Token uniquely identifying this processor specific block info.
+  CM_OBJECT_TOKEN                       Token;
+
+  /// Relevant Process Hierarchy Socket Token.
+  CM_OBJECT_TOKEN                       ProcSocketToken;
+
+  /// Processor Architecture Type.
+  PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE    ProcArchType;
+
+  /// Token array for architecture specific Processor Data.
+  CM_OBJECT_TOKEN                       ArchProcessorSpecificDataToken;
+} CM_ARCH_COMMON_PROCESSOR_SPECIFIC_BLOCK_INFO;
+
+/** A structure that describes System Information.
+
+  SMBIOS Specification v3.9.0 Type 1
+
+  ID: EArchCommonObjSystemInfo
+**/
+typedef struct CmArchCommonSystemInfo {
+  /// CM Object Token uniquely identifying this System Information entry.
+  CM_OBJECT_TOKEN    SystemInfoToken;
+  /// Manufacturer of the system.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Product name of the system.
+  CHAR8              ProductName[SMBIOS_MAX_STRING_SIZE];
+  /// Version of the system.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the system.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Universal unique ID of the system.
+  GUID               Uuid;
+  /// Identifies the event that caused the system to power up.
+  UINT8              WakeUpType;
+  /// SKU number of the system.
+  CHAR8              SkuNum[SMBIOS_MAX_STRING_SIZE];
+  /// Family that the system belongs to.
+  CHAR8              Family[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_SYSTEM_INFO;
+
+/** A structure that describes SMBIOS Additional Information.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformation
+**/
+typedef struct CmArchCommonAdditionalInformation {
+  /// CM Object Token uniquely identifying this Additional Information structure.
+  CM_OBJECT_TOKEN    AdditionalInformationToken;
+
+  /// Token referencing an array of Additional Information Entry structures.
+  CM_OBJECT_TOKEN    AdditionalInformationEntryListToken;
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION;
+
+/** A structure that describes an Additional Information Entry.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformationEntry
+**/
+typedef struct CmArchCommonAdditionalInformationEntry {
+  /// CM Object Token of the SMBIOS structure referenced by this entry.
+  CM_OBJECT_TOKEN    ReferencedObjectToken;
+
+  /// SMBIOS table generator ID for the referenced structure.
+  /// Allows to find the handle of the Smbios table to update.
+  UINT32             ReferencedTableGeneratorId;
+
+  /// Offset of the referenced field in the referenced SMBIOS structure.
+  UINT8              ReferencedOffset;
+
+  /// String describing the additional information entry.
+  /// Optional for SMBIOS spec. update already proposed.
+  CHAR8              EntryString[SMBIOS_MAX_STRING_SIZE];
+
+  /// Token referencing an Additional Information Value structure.
+  CM_OBJECT_TOKEN    ValueToken;
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION_ENTRY;
+
+/** A structure that describes an Additional Information Value.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformationValue
+**/
+typedef struct CmArchCommonAdditionalInformationValue {
+  /// Number of valid bytes in the Value array.
+  UINT8    Len;
+
+  /// Additional Information Value bytes.
+  UINT8    Value[SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE];
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION_VALUE;
+
+/** A structure that describes a System Enclosure Contained Element.
+
+  SMBIOS Specification v3.9.0 Type 3
+
+  ID: EArchCommonObjEnclosureElement
+**/
+typedef struct CmArchCommonEnclosureElement {
+  /// The contained element type.
+  UINT8    ContainedElementType;
+
+  /// Minimum number of the element type required for proper operation.
+  UINT8    ContainedElementMinimum;
+
+  /// Maximum number of the element type that can be installed.
+  UINT8    ContainedElementMaximum;
+} CM_ARCH_COMMON_ENCLOSURE_ELEMENT;
+
+/** A structure that describes System Enclosure Information.
+
+  SMBIOS Specification v3.9.0 Type 3
+
+  ID: EArchCommonObjSystemEnclosureInfo
+**/
+typedef struct CmArchCommonSystemEnclosureInfo {
+  /// CM Object Token uniquely identifying this System Enclosure entry.
+  CM_OBJECT_TOKEN    SystemEnclosureToken;
+  /// Manufacturer of the enclosure.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Chassis type with the lock-present bit in bit 7.
+  UINT8              Type;
+  /// Version of the enclosure.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the enclosure.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset tag of the enclosure.
+  CHAR8              AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Boot-up state as defined by SMBIOS Type 3.
+  UINT8              BootUpState;
+  /// Power supply state as defined by SMBIOS Type 3.
+  UINT8              PowerSupplyState;
+  /// Thermal state as defined by SMBIOS Type 3.
+  UINT8              ThermalState;
+  /// Security status as defined by SMBIOS Type 3.
+  UINT8              SecurityStatus;
+  /// OEM-defined value.
+  UINT32             OemDefined;
+  /// Height of the enclosure in rack units.
+  UINT8              Height;
+  /// Number of power cords associated with the enclosure.
+  UINT8              NumberOfPowerCords;
+  /// Token referencing an array of System Enclosure Contained Elements.
+  /// CM_NULL_TOKEN indicates that no contained elements are supplied.
+  CM_OBJECT_TOKEN    ContainedElementListToken;
+  /// SKU number of the enclosure.
+  CHAR8              SkuNum[SMBIOS_MAX_STRING_SIZE];
+  /// Rack type as defined by SMBIOS Type 3.
+  UINT8              RackType;
+  /// Rack height in rack units when Height is 0xFF.
+  UINT8              RackHeight;
+} CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
 
 #pragma pack()

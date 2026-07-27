@@ -150,6 +150,10 @@ R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 EDK II Contributed Files:
 -------------------------
+Breaking Changes Documentation
+F: BREAKING-CHANGES.md
+R: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+
 VS Code PR Dashboard Notebook
 F: contrib/PullRequests.github-issues
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
@@ -187,7 +191,6 @@ M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalo
 M: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
 R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 BaseTools: Plugins
 F: BaseTools/Plugin/
@@ -286,7 +289,6 @@ F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -315,7 +317,6 @@ F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
 M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Device and Peripheral modules
 F: MdeModulePkg/*PciHostBridge*/
@@ -367,7 +368,6 @@ F: MdeModulePkg/Universal/DisplayEngineDxe/
 F: MdeModulePkg/Universal/DriverSampleDxe/
 F: MdeModulePkg/Universal/SetupBrowserDxe/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Management Mode (MM, SMM) modules
 F: MdeModulePkg/*Smi*/
@@ -398,7 +398,6 @@ F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Universal Payload definitions
 F: MdeModulePkg/Include/UniversalPayload/
@@ -492,7 +491,6 @@ F: NetworkPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/network_pkg.html
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 OvmfPkg
 F: OvmfPkg/
@@ -500,7 +498,6 @@ W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
-R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 S: Maintained
 
 OvmfPkg: bhyve-related modules

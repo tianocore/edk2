@@ -58,7 +58,8 @@ typedef enum X64ObjectID {
   EX64ObjErrSourceIa32CorrectedMachineCheckInfo, ///< 21 - IA-32 Architecture Corrected Machine Check Error Source info
   EX64ObjErrSourceIa32DeferredMachineCheckInfo,  ///< 22 - IA-32 Architecture Deferred Machine Check Error Source info
   EX64ObjErrSourceIa32NmiInfo,                   ///< 23 - IA-32 Architecture Non-Maskable Interrupt
-  EX64ObjMax                                     ///< 24 - Maximum Object ID
+  EX64ObjProcessorSpecificBlockInfo,             ///< 24 - X86 (X64) Processor Specific Block info
+  EX64ObjMax                                     ///< 25 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -433,5 +434,21 @@ typedef struct CmX64Ia32ErrSourceNmiInfo {
   /// The size in bytes of the NMI error data.
   UINT32                      MaxRawDataLength;
 } CM_X64_ERROR_SOURCE_IA32_NMI_INFO;
+
+/**
+  A structure that describes X86 (X64) Processor Specific Block Information.
+
+  ID: EX64ObjProcessorSpecificBlockInfo
+ */
+typedef struct CmX64ProcessorSpecificBlockInfo {
+  /// Identifier.
+  UINT8     BlockIdentifier;
+
+  /// Revision
+  UINT16    Revision;
+
+  /// Use Condition Attributes
+  UINT32    UseConditionAttributes;
+} CM_X64_PROCESSOR_SPECIFIC_BLOCK_INFO;
 
 #pragma pack()

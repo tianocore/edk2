@@ -217,7 +217,7 @@ SendFfaMmCommunicate (
 
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the StMM SP since it is UP.
-    Status = ArmFfaLibRun (mStMmPartId, 0x00, NULL);
+    Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (CommunicateArgs.Header.x1), 0x00, &CommunicateArgs);
   }
 
   return Status;

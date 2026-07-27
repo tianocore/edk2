@@ -538,7 +538,9 @@ Dhcp6UpdateIaInfo (
   T1 = 0;
   T2 = 0;
 
-  ASSERT (Instance->Config != NULL);
+  if (Instance->Config == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
 
   // OptionLen is the length of the Options excluding the DHCP header.
   // Length of the EFI_DHCP6_PACKET from the first byte of the Header field to the last
