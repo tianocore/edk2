@@ -385,7 +385,7 @@ EfiPxeBcStop (
   Mode->Ipv6Available = Ipv6Available;
   Mode->Ipv6Supported = Ipv6Supported;
   Mode->AutoArp       = TRUE;
-  Mode->TTL           = DEFAULT_TTL;
+  Mode->TTL           = PXEBC_DEFAULT_TTL;
   Mode->ToS           = DEFAULT_ToS;
 
   return EFI_SUCCESS;
