@@ -447,8 +447,22 @@ VirtioKeyboardReadKeyStroke (
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status = PopEfikeyBufHead (&Dev->KeyQueue, &KeyData);
-  *Key   = KeyData.Key;
+  //
+  // ReadKeyStroke of SIMPLE_TEXT_INPUT must omit partial keystrokes
+  //
+  while (TRUE) {
+    Status = PopEfikeyBufHead (&Dev->KeyQueue, &KeyData);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    if ((KeyData.Key.ScanCode == SCAN_NULL) && (KeyData.Key.UnicodeChar == CHAR_NULL)) {
+      continue;
+    }
+
+    *Key = KeyData.Key;
+    break;
+  }
 
   gBS->RestoreTPL (OldTpl);
 
@@ -467,6 +481,8 @@ VirtioKeyboardWaitForKey (
 {
   VIRTIO_INPUT_DEV  *Dev = (VIRTIO_INPUT_DEV *)Context;
   EFI_TPL           OldTpl;
+  EFI_KEY_DATA      KeyData;
+  EFI_STATUS        Status;
 
   //
   // Stall 1ms to give a chance to let other driver interrupt this routine
@@ -485,9 +501,23 @@ VirtioKeyboardWaitForKey (
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
+  //
   // If there is a new key ready - send signal
-  if (!IsEfikeyBufEmpty (&Dev->KeyQueue)) {
+  // WaitForKey(Ex) must omit partial keystrokes
+  //
+  while (TRUE) {
+    Status = PeekEfikeyBufHead (&Dev->KeyQueue, &KeyData);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    if ((KeyData.Key.ScanCode == SCAN_NULL) && (KeyData.Key.UnicodeChar == CHAR_NULL)) {
+      (void)PopEfikeyBufHead (&Dev->KeyQueue, NULL);
+      continue;
+    }
+
     gBS->SignalEvent (Event);
+    break;
   }
 
   gBS->RestoreTPL (OldTpl);
