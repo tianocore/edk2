@@ -689,6 +689,8 @@
   # different PCD with the same name; UefiPayloadEntry consumes only the
   # gUefiPayloadPkgTokenSpaceGuid one below.
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x10000000
+  # Only consumed by UefiCpuPkg MpInitLib on IA32/X64; harmless on AArch64.
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 !endif
 
 [PcdsFixedAtBuild.AARCH64]
