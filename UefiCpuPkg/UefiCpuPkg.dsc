@@ -123,6 +123,9 @@
 [LibraryClasses.LoongArch64]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
+[LibraryClasses.AARCH64]
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+
 #
 # Drivers/Libraries within this package
 #
