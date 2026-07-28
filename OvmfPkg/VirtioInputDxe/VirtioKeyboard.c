@@ -312,6 +312,17 @@ VirtioKeyboardConvertKeyCode (
         KeyData->KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
       }
 
+      if (Dev->CapsLock) {
+        // On CapsLock, invert capitalization of alphabetic characters
+        // NB1: this must run in series with Shift handling (CapsLock XORs with Shift)
+        // NB2: this must run after Ctrl handling (CapsLock must not affect control codes)
+        if (((Key->UnicodeChar >= 'a') && (Key->UnicodeChar <= 'z')) ||
+            ((Key->UnicodeChar >= 'A') && (Key->UnicodeChar <= 'Z')))
+        {
+          Key->UnicodeChar ^= 0x20;
+        }
+      }
+
       break;
   }
 }
@@ -340,6 +351,9 @@ VirtioKeyboardInitializeKeyState (
                              );
 
   KeyState->KeyToggleState = (
+                              (Dev->NumLock ? EFI_NUM_LOCK_ACTIVE : 0) |
+                              (Dev->CapsLock ? EFI_CAPS_LOCK_ACTIVE : 0) |
+                              (Dev->ScrollLock ? EFI_SCROLL_LOCK_ACTIVE : 0) |
                               (Dev->SupportPartialKeys ? EFI_KEY_STATE_EXPOSED : 0) |
                               EFI_TOGGLE_STATE_VALID
                               );
@@ -393,6 +407,26 @@ VirtioKeyboardHandleEvent (
     // Key pressed event received
     Dev->KeyActive[(UINT8)Event->Code] = TRUE;
 
+    //
+    // Update toggle state
+    // This must happen before EFI_KEY_DATA is populated, since the toggle state
+    // is used both to initialize ->KeyState and to modify key code behavior.
+    // NB: only explicitly handle KEY_PRESSED to ignore autorepeat events
+    //
+    if (Event->Value == KEY_PRESSED) {
+      switch (Event->Code) {
+        case KEY_NUMLOCK:
+          Dev->NumLock = (BOOLEAN) !Dev->NumLock;
+          break;
+        case KEY_CAPSLOCK:
+          Dev->CapsLock = (BOOLEAN) !Dev->CapsLock;
+          break;
+        case KEY_SCROLLLOCK:
+          Dev->ScrollLock = (BOOLEAN) !Dev->ScrollLock;
+          break;
+      }
+    }
+
     // Evaluate key
     Status = VirtioKeyboardProcessEvent (Dev, Event->Code, &KeyData);
     if (EFI_ERROR (Status)) {
@@ -427,6 +461,9 @@ VirtioKeyboardReset (
   ZeroMem (Dev->KeyActive, sizeof (Dev->KeyActive));
   ClearEfikeyBuf (&Dev->KeyQueue);
 
+  Dev->NumLock            = FALSE;
+  Dev->CapsLock           = FALSE;
+  Dev->ScrollLock         = FALSE;
   Dev->SupportPartialKeys = FALSE;
 
   gBS->RestoreTPL (OldTpl);
@@ -631,6 +668,14 @@ VirtioKeyboardSetStateEx (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Update effective toggle states
+  // TODO: updating (virtio) hardware LEDs is not implemented
+  //       (needs EV_LED write on status virtqueue; this driver does not initialize it)
+  //
+  Dev->NumLock            = (BOOLEAN)((*KeyToggleState & EFI_NUM_LOCK_ACTIVE) != 0);
+  Dev->CapsLock           = (BOOLEAN)((*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) != 0);
+  Dev->ScrollLock         = (BOOLEAN)((*KeyToggleState & EFI_SCROLL_LOCK_ACTIVE) != 0);
   Dev->SupportPartialKeys = (BOOLEAN)((*KeyToggleState & EFI_KEY_STATE_EXPOSED) != 0);
 
   return EFI_SUCCESS;
