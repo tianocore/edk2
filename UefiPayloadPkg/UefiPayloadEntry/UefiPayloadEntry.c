@@ -76,11 +76,12 @@ MemInfoCallbackMmio (
 
   if (MemoryMapEntry->Base == AcpiBoardInfo->PcieBaseAddress) {
     //
-    // MMCONF is always MMIO. Optionally surface it as Reserved instead
-    // so that Linux's is_mmconf_reserved() check accepts it and
-    // MMCONFIG can be used for extended PCIe config space. A plain
-    // MMIO resource is only surfaced by CoreGetMemoryMap() when it
-    // also carries EFI_MEMORY_RUNTIME, which this range does not.
+    // MMCONF is always MMIO.  Optionally surface it as Reserved instead;
+    // see PcdPublishMcfgAsReservedMemory in UefiPayloadPkg.dec for why an
+    // OS may need that.  This check runs before the MEM_MAP_FLAG_MMIO
+    // branch below because a bootloader that discovers MMIO from the
+    // outer firmware's GCD map will emit the ECAM window with that flag
+    // set.
     //
     if (FeaturePcdGet (PcdPublishMcfgAsReservedMemory)) {
       //
@@ -109,6 +110,12 @@ MemInfoCallbackMmio (
     } else {
       Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
     }
+  } else if ((MemoryMapEntry->Flag & MEM_MAP_FLAG_MMIO) != 0) {
+    //
+    // The bootloader explicitly marked this range as device MMIO, so
+    // take it at its word instead of guessing from the address.
+    //
+    Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
   } else if (MemoryMapEntry->Base < mTopOfLowerUsableDram) {
     //
     // It's in DRAM and thus must be reserved
