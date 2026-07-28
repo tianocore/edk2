@@ -732,25 +732,23 @@ BuildMemoryResourceDescriptor (
   VOID
   )
 {
-  EFI_PEI_HOB_POINTERS         Hob;
-  UINTN                        Index;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceDescriptor;
-  MEMORY_RESOURCE_DESCRIPTOR   *MemoryResource;
-  EFI_STATUS                   Status;
+  EFI_PEI_HOB_POINTERS        Hob;
+  UINTN                       Index;
+  MEMORY_RESOURCE_DESCRIPTOR  *MemoryResource;
+  EFI_STATUS                  Status;
 
   //
   // Get the count of memory resource descriptor.
   //
-  Index   = 0;
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
-    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
-    if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
-      Index++;
+  Index = 0;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
     }
 
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+    if (GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) == EFI_RESOURCE_SYSTEM_MEMORY) {
+      Index++;
+    }
   }
 
   if (Index == 0) {
@@ -789,25 +787,24 @@ BuildMemoryResourceDescriptor (
   //
   // Get the content of memory resource descriptor.
   //
-  Index   = 0;
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
-    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
-    if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+  Index = 0;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
+    if (GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) == EFI_RESOURCE_SYSTEM_MEMORY) {
       DEBUG ((
         DEBUG_INFO,
         "MemoryResource[0x%x] - Start(0x%0lx) Length(0x%0lx)\n",
         Index,
-        ResourceDescriptor->PhysicalStart,
-        ResourceDescriptor->ResourceLength
+        GET_RESOURCE_HOB_PHYSICAL_START (Hob),
+        GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob)
         ));
-      MemoryResource[Index].PhysicalStart  = ResourceDescriptor->PhysicalStart;
-      MemoryResource[Index].ResourceLength = ResourceDescriptor->ResourceLength;
+      MemoryResource[Index].PhysicalStart  = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+      MemoryResource[Index].ResourceLength = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
       Index++;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   SortMemoryResourceDescriptor (MemoryResource);
