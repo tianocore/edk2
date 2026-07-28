@@ -14,19 +14,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // HobType of EFI_HOB_GENERIC_HEADER.
 //
-#define EFI_HOB_TYPE_HANDOFF              0x0001
-#define EFI_HOB_TYPE_MEMORY_ALLOCATION    0x0002
-#define EFI_HOB_TYPE_RESOURCE_DESCRIPTOR  0x0003
-#define EFI_HOB_TYPE_GUID_EXTENSION       0x0004
-#define EFI_HOB_TYPE_FV                   0x0005
-#define EFI_HOB_TYPE_CPU                  0x0006
-#define EFI_HOB_TYPE_MEMORY_POOL          0x0007
-#define EFI_HOB_TYPE_FV2                  0x0009
-#define EFI_HOB_TYPE_LOAD_PEIM_UNUSED     0x000A
-#define EFI_HOB_TYPE_UEFI_CAPSULE         0x000B
-#define EFI_HOB_TYPE_FV3                  0x000C
-#define EFI_HOB_TYPE_UNUSED               0xFFFE
-#define EFI_HOB_TYPE_END_OF_HOB_LIST      0xFFFF
+#define EFI_HOB_TYPE_HANDOFF               0x0001
+#define EFI_HOB_TYPE_MEMORY_ALLOCATION     0x0002
+#define EFI_HOB_TYPE_RESOURCE_DESCRIPTOR   0x0003
+#define EFI_HOB_TYPE_GUID_EXTENSION        0x0004
+#define EFI_HOB_TYPE_FV                    0x0005
+#define EFI_HOB_TYPE_CPU                   0x0006
+#define EFI_HOB_TYPE_MEMORY_POOL           0x0007
+#define EFI_HOB_TYPE_FV2                   0x0009
+#define EFI_HOB_TYPE_LOAD_PEIM_UNUSED      0x000A
+#define EFI_HOB_TYPE_UEFI_CAPSULE          0x000B
+#define EFI_HOB_TYPE_FV3                   0x000C
+#define EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2  0x000D
+#define EFI_HOB_TYPE_UNUSED                0xFFFE
+#define EFI_HOB_TYPE_END_OF_HOB_LIST       0xFFFF
 
 ///
 /// Describes the format and size of the data inside the HOB.
@@ -333,6 +334,43 @@ typedef struct {
 } EFI_HOB_RESOURCE_DESCRIPTOR;
 
 ///
+/// Describes the resource properties and memory attributes
+/// of all fixed, non-relocatable resource ranges found on the
+/// processor host bus during the HOB producer phase.
+///
+typedef struct {
+  ///
+  /// The HOB generic header. Header.HobType = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2.
+  ///
+  EFI_HOB_GENERIC_HEADER         Header;
+  ///
+  /// A GUID representing the owner of the resource. This GUID is used by HOB
+  /// consumer phase components to correlate device ownership of a resource.
+  ///
+  EFI_GUID                       Owner;
+  ///
+  /// The resource type as defined by EFI_RESOURCE_TYPE.
+  ///
+  EFI_RESOURCE_TYPE              ResourceType;
+  ///
+  /// Resource Capabilities as defined by EFI_RESOURCE_ATTRIBUTE_TYPE.
+  ///
+  EFI_RESOURCE_ATTRIBUTE_TYPE    ResourceCapabilities;
+  ///
+  /// The physical start address of the resource region.
+  ///
+  EFI_PHYSICAL_ADDRESS           PhysicalStart;
+  ///
+  /// The number of bytes of the resource region.
+  ///
+  UINT64                         ResourceLength;
+  ///
+  /// The memory attributes (paging and caching) of the resource region.
+  ///
+  UINT64                         ResourceMemoryAttributes;
+} EFI_HOB_RESOURCE_DESCRIPTOR2;
+
+///
 /// Allows writers of executable content in the HOB producer phase to
 /// maintain and manage HOBs with specific GUID.
 ///
@@ -505,5 +543,6 @@ typedef union {
   EFI_HOB_CPU                            *Cpu;
   EFI_HOB_MEMORY_POOL                    *Pool;
   EFI_HOB_UEFI_CAPSULE                   *Capsule;
+  EFI_HOB_RESOURCE_DESCRIPTOR2           *ResourceDescriptor2;
   UINT8                                  *Raw;
 } EFI_PEI_HOB_POINTERS;
