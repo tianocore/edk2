@@ -741,16 +741,16 @@ BuildMemoryResourceDescriptor (
   //
   // Get the count of memory resource descriptor.
   //
-  Index   = 0;
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
-    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
+  Index = 0;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
+    ResourceDescriptor = Hob.ResourceDescriptor;
     if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
       Index++;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   if (Index == 0) {
@@ -789,10 +789,13 @@ BuildMemoryResourceDescriptor (
   //
   // Get the content of memory resource descriptor.
   //
-  Index   = 0;
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
-    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
+  Index = 0;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
+    ResourceDescriptor = Hob.ResourceDescriptor;
     if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
       DEBUG ((
         DEBUG_INFO,
@@ -805,9 +808,6 @@ BuildMemoryResourceDescriptor (
       MemoryResource[Index].ResourceLength = ResourceDescriptor->ResourceLength;
       Index++;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   SortMemoryResourceDescriptor (MemoryResource);
