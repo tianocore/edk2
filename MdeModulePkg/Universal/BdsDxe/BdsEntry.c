@@ -277,6 +277,27 @@ BdsWaitForSingleEvent (
 }
 
 /**
+  Drain queued console input.
+
+**/
+STATIC
+VOID
+BdsDrainConsoleInput (
+  VOID
+  )
+{
+  EFI_INPUT_KEY  Key;
+  EFI_STATUS     Status;
+
+  while (gST->ConIn != NULL) {
+    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+  }
+}
+
+/**
   The function waits for the boot manager timeout expires or hotkey is pressed.
 
   It calls PlatformBootManagerWaitCallback each second.
@@ -1009,6 +1030,12 @@ BdsEntry (
     if (PcdGetBool (PcdConInConnectOnDemand)) {
       BdsDxeOnConnectConInCallBack (NULL, NULL);
     }
+
+    //
+    // A hotkey notification can leave the same key queued for ReadKeyStroke().
+    // Consume it before Enter can immediately select Continue in Front Page.
+    //
+    BdsDrainConsoleInput ();
 
     //
     // Directly enter the setup page.
