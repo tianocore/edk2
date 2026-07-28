@@ -76,6 +76,16 @@ struct MockHobLib {
      IN UINT64                       NumberOfBytes)
     );
   MOCK_FUNCTION_DECLARATION (
+    VOID,
+    BuildResourceDescriptor2Hob,
+    (IN EFI_RESOURCE_TYPE            ResourceType,
+     IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceCapabilities,
+     IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+     IN UINT64                       ResourceLength,
+     IN UINT64                       ResourceMemoryAttributes,
+     IN EFI_GUID                     *OwnerGUID)
+    );
+  MOCK_FUNCTION_DECLARATION (
     VOID *,
     BuildGuidHob,
     (IN CONST EFI_GUID  *Guid,
