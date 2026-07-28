@@ -95,6 +95,9 @@ typedef struct {
   BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
   EFI_KEY_QUEUE                        KeyQueue;
 
+  BOOLEAN                              CapsLock;
+  BOOLEAN                              NumLock;
+  BOOLEAN                              ScrollLock;
   BOOLEAN                              SupportPartialKeys;
 
   // Mouse implementation
