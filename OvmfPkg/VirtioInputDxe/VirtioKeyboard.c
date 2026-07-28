@@ -570,6 +570,11 @@ VirtioKeyboardReadKeyStrokeEx (
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   Status = PopEfikeyBufHead (&Dev->KeyQueue, KeyData);
+  // "There was no keystroke data available. Current KeyData.KeyState values are exposed."
+  if (Status == EFI_NOT_READY) {
+    ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+    VirtioKeyboardInitializeKeyState (Dev, &KeyData->KeyState);
+  }
 
   gBS->RestoreTPL (OldTpl);
 
