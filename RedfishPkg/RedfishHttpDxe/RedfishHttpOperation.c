@@ -2,6 +2,7 @@
   RedfishHttpOperation handles HTTP operations.
 
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2026, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -60,16 +61,33 @@ CopyHttpHeaders (
   for (Index = 0; Index < SrcHeaderCount; Index++) {
     (*DstHeaders)[Index].FieldName = ASCII_STR_DUPLICATE (SrcHeaders[Index].FieldName);
     if ((*DstHeaders)[Index].FieldName == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
     }
 
     (*DstHeaders)[Index].FieldValue = ASCII_STR_DUPLICATE (SrcHeaders[Index].FieldValue);
     if ((*DstHeaders)[Index].FieldValue == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
     }
   }
 
   return EFI_SUCCESS;
+
+ON_ERROR:
+  for (Index = 0; Index < SrcHeaderCount; Index++) {
+    if ((*DstHeaders)[Index].FieldName != NULL) {
+      FreePool ((*DstHeaders)[Index].FieldName);
+    }
+
+    if ((*DstHeaders)[Index].FieldValue != NULL) {
+      FreePool ((*DstHeaders)[Index].FieldValue);
+    }
+  }
+
+  FreePool (*DstHeaders);
+  *DstHeaders     = NULL;
+  *DstHeaderCount = 0;
+
+  return EFI_OUT_OF_RESOURCES;
 }
 
 /**
