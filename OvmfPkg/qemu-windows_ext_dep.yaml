@@ -1,0 +1,19 @@
+##
+# Downloads the exact version of QEMU that is known to work for the
+# current version of mu_tiano_platforms.
+#
+# Copyright (c) 2019, Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-win",
+  "type": "web",
+  "name": "qemu-win",
+  "source": "https://github.com/microsoft/mu_tiano_platforms/releases/download/v14.0.1/qemu-windows-v14.0.1.zip",
+  "version": "v14.0.1",
+  "sha256": "2a3f208c5e8665591df73551e29891eebe6adad7c91b57586308203ebd3f5574",
+  "internal_path": "/bin/",
+  "compression_type": "zip",
+  "flags": ["set_path", "set_build_var"],
+  "var_name": "QEMU_DIR",
+}

@@ -376,28 +376,28 @@ AcceptMemoryForAPsStack (
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob) && !MemoryRegionFound) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor2->ResourceType));
 
-      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
-        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
+      if (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
+        ResourceLength = Hob.ResourceDescriptor2->ResourceLength;
+        PhysicalStart  = Hob.ResourceDescriptor2->PhysicalStart;
         PhysicalEnd    = PhysicalStart + ResourceLength;
 
-        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
+        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor2->ResourceCapabilities));
         DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", PhysicalStart));
         DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", ResourceLength));
-        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
+        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor2->Owner));
 
         if (ResourceLength >= APsStackSize) {
           MemoryRegionFound = TRUE;
           if (ResourceLength > ACCEPT_CHUNK_SIZE) {
-            PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + APsStackSize;
+            PhysicalEnd = Hob.ResourceDescriptor2->PhysicalStart + APsStackSize;
           }
         }
 
         Status = BspAcceptMemoryResourceRange (
-                   Hob.ResourceDescriptor->PhysicalStart,
+                   Hob.ResourceDescriptor2->PhysicalStart,
                    PhysicalEnd
                    );
         if (EFI_ERROR (Status)) {
@@ -454,10 +454,10 @@ AcceptMemory (
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
-        PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
+        PhysicalStart = Hob.ResourceDescriptor2->PhysicalStart;
+        PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor2->ResourceLength;
 
         if (PhysicalEnd <= PhysicalAddressStart) {
           // this memory region has been accepted. Skipped it.
@@ -482,10 +482,10 @@ AcceptMemory (
           PhysicalEnd = AcceptMemoryEndAddress;
         }
 
-        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
-        DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", Hob.ResourceDescriptor->PhysicalStart));
-        DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
-        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
+        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor2->ResourceCapabilities));
+        DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", Hob.ResourceDescriptor2->PhysicalStart));
+        DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor2->ResourceLength));
+        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor2->Owner));
 
         // Now we're ready to accept memory [PhysicalStart, PhysicalEnd)
         if (CpusNum == 1) {
@@ -636,46 +636,49 @@ ValidateHobList (
         break;
 
       case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR:
-        if (Hob.Header->HobLength != sizeof (EFI_HOB_RESOURCE_DESCRIPTOR)) {
-          DEBUG ((DEBUG_ERROR, "HOB: Hob length is not equal corresponding hob structure. Type: 0x%04x\n", EFI_HOB_TYPE_RESOURCE_DESCRIPTOR));
-          return FALSE;
-        }
-
-        if (IsInValidList (Hob.ResourceDescriptor->ResourceType, EFI_RESOURCE_TYPE_LIST, ARRAY_SIZE (EFI_RESOURCE_TYPE_LIST)) == FALSE) {
-          DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceType type. Type: 0x%08x\n", Hob.ResourceDescriptor->ResourceType));
-          return FALSE;
-        }
-
-        if ((Hob.ResourceDescriptor->ResourceAttribute & (~(EFI_RESOURCE_ATTRIBUTE_PRESENT |
-                                                            EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                                                            EFI_RESOURCE_ATTRIBUTE_TESTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_PERSISTENT |
-                                                            EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC |
-                                                            EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC |
-                                                            EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1 |
-                                                            EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2 |
-                                                            EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_16_BIT_IO |
-                                                            EFI_RESOURCE_ATTRIBUTE_32_BIT_IO |
-                                                            EFI_RESOURCE_ATTRIBUTE_64_BIT_IO |
-                                                            EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_PERSISTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_ENCRYPTED|
-                                                            EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE |
-                                                            EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE))) != 0)
+      case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2:
+        if (((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) && (Hob.Header->HobLength != sizeof (EFI_HOB_RESOURCE_DESCRIPTOR))) ||
+            ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) && (Hob.Header->HobLength != sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2))))
         {
-          DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceAttribute type. Type: 0x%08x\n", Hob.ResourceDescriptor->ResourceAttribute));
+          DEBUG ((DEBUG_ERROR, "HOB: Hob length is not equal corresponding hob structure. Type: 0x%04x\n", GET_HOB_TYPE (Hob)));
+          return FALSE;
+        }
+
+        if (IsInValidList (Hob.ResourceDescriptor2->ResourceType, EFI_RESOURCE_TYPE_LIST, ARRAY_SIZE (EFI_RESOURCE_TYPE_LIST)) == FALSE) {
+          DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceType type. Type: 0x%08x\n", Hob.ResourceDescriptor2->ResourceType));
+          return FALSE;
+        }
+
+        if ((Hob.ResourceDescriptor2->ResourceCapabilities & (~(EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                                                                EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                                                                EFI_RESOURCE_ATTRIBUTE_TESTED |
+                                                                EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
+                                                                EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
+                                                                EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED |
+                                                                EFI_RESOURCE_ATTRIBUTE_PERSISTENT |
+                                                                EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC |
+                                                                EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC |
+                                                                EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1 |
+                                                                EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2 |
+                                                                EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_16_BIT_IO |
+                                                                EFI_RESOURCE_ATTRIBUTE_32_BIT_IO |
+                                                                EFI_RESOURCE_ATTRIBUTE_64_BIT_IO |
+                                                                EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED |
+                                                                EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_PERSISTABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED |
+                                                                EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE |
+                                                                EFI_RESOURCE_ATTRIBUTE_ENCRYPTED|
+                                                                EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE |
+                                                                EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE))) != 0)
+        {
+          DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceAttribute type. Type: 0x%08x\n", Hob.ResourceDescriptor2->ResourceCapabilities));
           return FALSE;
         }
 
