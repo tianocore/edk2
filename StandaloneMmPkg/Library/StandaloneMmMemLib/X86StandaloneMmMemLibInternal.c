@@ -186,11 +186,11 @@ MmMemLibInitializeValidNonMmramRanges (
   //
   // 1. Get the count.
   //
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  Hob.Raw = GetNextResourceHob (GetHobList ());
   while (Hob.Raw != NULL) {
     Count++;
     Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+    Hob.Raw = GetNextResourceHob (Hob.Raw);
   }
 
   //
@@ -200,14 +200,14 @@ MmMemLibInitializeValidNonMmramRanges (
   mValidNonMmramRanges = (NON_MM_MEMORY_RANGE *)AllocateZeroPool (RangeSize);
   ASSERT (mValidNonMmramRanges != NULL);
 
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  Hob.Raw = GetNextResourceHob (GetHobList ());
   while (Hob.Raw != NULL) {
-    mValidNonMmramRanges[Index].Base   = Hob.ResourceDescriptor->PhysicalStart;
-    mValidNonMmramRanges[Index].Length = Hob.ResourceDescriptor->ResourceLength;
+    mValidNonMmramRanges[Index].Base   = Hob.ResourceDescriptor2->PhysicalStart;
+    mValidNonMmramRanges[Index].Length = Hob.ResourceDescriptor2->ResourceLength;
     Index++;
 
     Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+    Hob.Raw = GetNextResourceHob (Hob.Raw);
   }
 
   ASSERT (Index == Count);
