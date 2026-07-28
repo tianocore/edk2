@@ -18,6 +18,130 @@
 #include "VirtioInput.h"
 #include "VirtioKeyCodes.h"
 
+// -----------------------------------------------------------------------------
+// Utility functions
+// -----------------------------------------------------------------------------
+
+/**
+  Check whether the EFI key buffer is empty.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+
+  @retval TRUE    The EFI key buffer is empty.
+  @retval FALSE   The EFI key buffer isn't empty.
+**/
+STATIC
+BOOLEAN
+IsEfikeyBufEmpty (
+  IN  EFI_KEY_QUEUE  *Queue
+  )
+{
+  return (BOOLEAN)(Queue->Head == Queue->Tail);
+}
+
+/**
+  Read (but do not remove) one key data entry from the EFI key buffer.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+  @param KeyData   Receive the key data.
+
+  @retval EFI_SUCCESS   The key data is popped successfully.
+  @retval EFI_NOT_READY There is no key data available.
+**/
+STATIC
+EFI_STATUS
+PeekEfikeyBufHead (
+  IN  EFI_KEY_QUEUE  *Queue,
+  OUT EFI_KEY_DATA   *KeyData OPTIONAL
+  )
+{
+  if (IsEfikeyBufEmpty (Queue)) {
+    return EFI_NOT_READY;
+  }
+
+  if (KeyData != NULL) {
+    CopyMem (KeyData, &Queue->Buffer[Queue->Head], sizeof (EFI_KEY_DATA));
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Read & remove one key data from the EFI key buffer.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+  @param KeyData   Receive the key data.
+
+  @retval EFI_SUCCESS   The key data is popped successfully.
+  @retval EFI_NOT_READY There is no key data available.
+**/
+STATIC
+EFI_STATUS
+PopEfikeyBufHead (
+  IN  EFI_KEY_QUEUE  *Queue,
+  OUT EFI_KEY_DATA   *KeyData OPTIONAL
+  )
+{
+  if (IsEfikeyBufEmpty (Queue)) {
+    return EFI_NOT_READY;
+  }
+
+  //
+  // Retrieve and remove the values
+  //
+  if (KeyData != NULL) {
+    CopyMem (KeyData, &Queue->Buffer[Queue->Head], sizeof (EFI_KEY_DATA));
+  }
+
+  ZeroMem (&Queue->Buffer[Queue->Head], sizeof (EFI_KEY_DATA));
+  Queue->Head = (Queue->Head + 1) % KEYBOARD_EFI_KEY_MAX_COUNT;
+  return EFI_SUCCESS;
+}
+
+/**
+  Push one key data to the EFI key buffer.
+
+  @param Queue     Pointer to instance of EFI_KEY_QUEUE.
+  @param KeyData   The key data to push.
+**/
+STATIC
+VOID
+PushEfikeyBufTail (
+  IN  EFI_KEY_QUEUE  *Queue,
+  IN  EFI_KEY_DATA   *KeyData
+  )
+{
+  if ((Queue->Tail + 1) % KEYBOARD_EFI_KEY_MAX_COUNT == Queue->Head) {
+    //
+    // If Queue is full, pop the one from head.
+    //
+    PopEfikeyBufHead (Queue, NULL);
+  }
+
+  CopyMem (&Queue->Buffer[Queue->Tail], KeyData, sizeof (EFI_KEY_DATA));
+  Queue->Tail = (Queue->Tail + 1) % KEYBOARD_EFI_KEY_MAX_COUNT;
+}
+
+/**
+  Clear the EFI key queue.
+
+  @param Queue   Pointer to instance of EFI_KEY_QUEUE.
+ */
+STATIC
+VOID
+ClearEfikeyBuf (
+  IN  EFI_KEY_QUEUE  *Queue
+  )
+{
+  Queue->Head = 0;
+  Queue->Tail = 0;
+  ZeroMem (Queue->Buffer, sizeof (Queue->Buffer));
+}
+
+// -----------------------------------------------------------------------------
+// End utility functions
+// -----------------------------------------------------------------------------
+
 BOOLEAN
 VirtioKeyboardProbe (
   IN VIRTIO_INPUT_DEV  *Dev
@@ -263,10 +387,8 @@ VirtioKeyboardHandleEvent (
       return;
     }
 
-    // Flag that printable character is ready to be send
-    // TODO: turn this into a queue
-    Dev->LastKeyData = KeyData;
-    Dev->KeyReady    = TRUE;
+    // Submit this key
+    PushEfikeyBufTail (&Dev->KeyQueue, &KeyData);
   } else {
     // Key released event received
     Dev->KeyActive[(UINT8)Event->Code] = FALSE;
@@ -290,9 +412,8 @@ VirtioKeyboardReset (
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Dev->KeyReady = FALSE;
-  ZeroMem (&Dev->LastKeyData, sizeof (Dev->LastKeyData));
   ZeroMem (Dev->KeyActive, sizeof (Dev->KeyActive));
+  ClearEfikeyBuf (&Dev->KeyQueue);
 
   Dev->SupportPartialKeys = FALSE;
 
@@ -312,6 +433,8 @@ VirtioKeyboardReadKeyStroke (
 {
   VIRTIO_INPUT_DEV  *Dev;
   EFI_TPL           OldTpl;
+  EFI_KEY_DATA      KeyData;
+  EFI_STATUS        Status;
 
   if (Key == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -320,20 +443,13 @@ VirtioKeyboardReadKeyStroke (
   Dev = VIRTIO_INPUT_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  if (Dev->KeyReady) {
-    // Get last key from the buffer
-    *Key = Dev->LastKeyData.Key;
 
-    // Mark key as consumed
-    Dev->KeyReady = FALSE;
-
-    gBS->RestoreTPL (OldTpl);
-    return EFI_SUCCESS;
-  }
+  Status = PopEfikeyBufHead (&Dev->KeyQueue, &KeyData);
+  *Key   = KeyData.Key;
 
   gBS->RestoreTPL (OldTpl);
 
-  return EFI_NOT_READY;
+  return Status;
 }
 
 // -----------------------------------------------------------------------------
@@ -347,6 +463,7 @@ VirtioKeyboardWaitForKey (
   )
 {
   VIRTIO_INPUT_DEV  *Dev = (VIRTIO_INPUT_DEV *)Context;
+  EFI_TPL           OldTpl;
 
   //
   // Stall 1ms to give a chance to let other driver interrupt this routine
@@ -363,10 +480,14 @@ VirtioKeyboardWaitForKey (
   // Use TimerEvent callback function to check whether there's any key pressed
   VirtioInputTimer (NULL, Dev);
 
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
   // If there is a new key ready - send signal
-  if (Dev->KeyReady) {
+  if (!IsEfikeyBufEmpty (&Dev->KeyQueue)) {
     gBS->SignalEvent (Event);
   }
+
+  gBS->RestoreTPL (OldTpl);
 }
 
 /// -----------------------------------------------------------------------------
@@ -408,6 +529,7 @@ VirtioKeyboardReadKeyStrokeEx (
 {
   VIRTIO_INPUT_DEV  *Dev;
   EFI_TPL           OldTpl;
+  EFI_STATUS        Status;
 
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -416,19 +538,12 @@ VirtioKeyboardReadKeyStrokeEx (
   Dev = VIRTIO_INPUT_EX_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  if (Dev->KeyReady) {
-    // Get last key from the buffer
-    *KeyData = Dev->LastKeyData;
 
-    // Mark key as consumed
-    Dev->KeyReady = FALSE;
-
-    gBS->RestoreTPL (OldTpl);
-    return EFI_SUCCESS;
-  }
+  Status = PopEfikeyBufHead (&Dev->KeyQueue, KeyData);
 
   gBS->RestoreTPL (OldTpl);
-  return EFI_NOT_READY;
+
+  return Status;
 }
 
 // -----------------------------------------------------------------------------
