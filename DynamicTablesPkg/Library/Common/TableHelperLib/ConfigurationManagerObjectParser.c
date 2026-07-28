@@ -4,6 +4,7 @@
   Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
   Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2026, Loongson Technology Corporation Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1836,6 +1837,93 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  RiscVNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (ERiscVObjMax)
 };
 
+/** A parser for ELoongArch64ObjMadtInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64MadtInfoParser[] = {
+  { "LocalApicAddress", 4, "0x%x", NULL },
+  { "Flags",            4, "0x%x", NULL }
+};
+
+/** A parser for ELoongArch64ObjCorePicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64CorePicInfoParser[] = {
+  { "Version",          1, "0x%x", NULL },
+  { "AcpiProcessorUid", 4, "0x%x", NULL },
+  { "CoreId",           4, "0x%x", NULL },
+  { "Flags",            4, "0x%x", NULL }
+};
+
+/** A parser for ELoongArch64ObjLioPicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64LioPicInfoParser[] = {
+  { "Version",    1,                   "0x%x",   NULL    },
+  { "Address",    8,                   "0x%llx", NULL    },
+  { "Size",       2,                   "0x%x",   NULL    },
+  { "Cascade",    sizeof (UINT8) * 2,  NULL,     HexDump },
+  { "CascadeMap", sizeof (UINT32) * 2, NULL,     HexDump }
+};
+
+/** A parser for ELoongArch64ObjHtPicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64HtPicInfoParser[] = {
+  { "Version", 1,                  "0x%x",   NULL    },
+  { "Address", 8,                  "0x%llx", NULL    },
+  { "Size",    2,                  "0x%x",   NULL    },
+  { "Cascade", sizeof (UINT8) * 8, NULL,     HexDump }
+};
+
+/** A parser for ELoongArch64ObjEioPicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64EioPicInfoParser[] = {
+  { "Version", 1, "0x%x",   NULL },
+  { "Cascade", 1, "0x%x",   NULL },
+  { "Node",    1, "0x%x",   NULL },
+  { "NodeMap", 8, "0x%llx", NULL }
+};
+
+/** A parser for ELoongArch64ObjMsiPicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64MsiPicInfoParser[] = {
+  { "Version",    1, "0x%x",   NULL },
+  { "MsgAddress", 8, "0x%llx", NULL },
+  { "Start",      4, "0x%x",   NULL },
+  { "Count",      4, "0x%x",   NULL }
+};
+
+/** A parser for ELoongArch64ObjBioPicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64BioPicInfoParser[] = {
+  { "Version", 1, "0x%x",   NULL },
+  { "Address", 8, "0x%llx", NULL },
+  { "Size",    2, "0x%x",   NULL },
+  { "Id",      2, "0x%x",   NULL },
+  { "GsiBase", 2, "0x%x",   NULL }
+};
+
+/** A parser for ELoongArch64ObjLpcPicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmLoongArch64LpcPicInfoParser[] = {
+  { "Version", 1, "0x%x",   NULL },
+  { "Address", 8, "0x%llx", NULL },
+  { "Size",    2, "0x%x",   NULL },
+  { "Cascade", 1, "0x%x",   NULL }
+};
+
+/** A parser for LoongArch64 namespace objects.
+*/
+STATIC CONST CM_OBJ_PARSER_ARRAY  LoongArch64NamespaceObjectParser[] = {
+  CM_PARSER_ADD_OBJECT_RESERVED (ELoongArch64ObjReserved),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjMadtInfo,          CmLoongArch64MadtInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjCorePicInfo,       CmLoongArch64CorePicInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjLioPicInfo,        CmLoongArch64LioPicInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjHtPicInfo,         CmLoongArch64HtPicInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjEioPicInfo,        CmLoongArch64EioPicInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjMsiPicInfo,        CmLoongArch64MsiPicInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjBioPicInfo,        CmLoongArch64BioPicInfoParser),
+  CM_PARSER_ADD_OBJECT (ELoongArch64ObjLpcPicInfo,        CmLoongArch64LpcPicInfoParser),
+  CM_PARSER_ADD_OBJECT_RESERVED (ELoongArch64ObjMax)
+};
+
 /** A parser for EStdObjCfgMgrInfo.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
@@ -2172,6 +2260,21 @@ ParseCmObjDesc (
       }
 
       ParserArray = &RiscVNamespaceObjectParser[ObjId];
+      break;
+
+    case EObjNameSpaceLoongArch64:
+      if (ObjId >= ELoongArch64ObjMax) {
+        ASSERT (0);
+        return;
+      }
+
+      if (ObjId >= ARRAY_SIZE (LoongArch64NamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the LoongArch64NamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
+      ParserArray = &LoongArch64NamespaceObjectParser[ObjId];
       break;
 
     case EObjNameSpaceArchCommon:
