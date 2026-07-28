@@ -147,14 +147,10 @@ FindResourceDescriptorByRange (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
 
-  for (Hob.Raw = (UINT8 *)HobList; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    //
-    // Skip all HOBs except Resource Descriptor HOBs
-    //
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      continue;
-    }
-
+  for (Hob.Raw = GetNextResourceHob (HobList);
+       Hob.Raw != NULL;
+       Hob.Raw = GetNextResourceHob (GET_NEXT_HOB (Hob)))
+  {
     //
     // Skip Resource Descriptor HOBs that do not describe tested system memory
     //
@@ -206,14 +202,10 @@ FindAnotherHighestBelow4GResourceDescriptor (
 
   ReturnResourceHob = NULL;
 
-  for (Hob.Raw = (UINT8 *)HobList; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    //
-    // Skip all HOBs except Resource Descriptor HOBs
-    //
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      continue;
-    }
-
+  for (Hob.Raw = GetNextResourceHob (HobList);
+       Hob.Raw != NULL;
+       Hob.Raw = GetNextResourceHob (GET_NEXT_HOB (Hob)))
+  {
     //
     // Skip Resource Descriptor HOBs that do not describe tested system memory
     //
