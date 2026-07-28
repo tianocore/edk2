@@ -156,7 +156,7 @@ PxeSetStnAddr (
     //
     // UNDI command failed.  Return UNDI status to caller.
     //
-    return EFI_DEVICE_ERROR;
+    return EFI_UNSUPPORTED;
   }
 
   //
