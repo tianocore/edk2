@@ -73,6 +73,17 @@
   DEFINE UNIVERSAL_PAYLOAD_FORMAT     = ELF
 
   #
+  # Enable defaults suited to the ChainloadApp frontend:
+  # MCFG published as reserved memory, endpoint PCI BARs left at zero
+  # by the outer firmware programmed before PciBusDxe runs, full
+  # INIT-SIPI-SIPI for the first AP wakeup, a larger UEFI region, and
+  # on AArch64 the HOB-driven SerialPortLib plus MADT-derived GIC
+  # bases.  Left FALSE so that coreboot/Slim Bootloader users are
+  # unaffected.
+  #
+  DEFINE CHAINLOAD_DEFAULTS           = FALSE
+
+  #
   # NULL:    NullMemoryTestDxe
   # GENERIC: GenericMemoryTestDxe
   #
@@ -594,6 +605,10 @@
   ## Whether capsules are allowed to persist across reset.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|$(CAPSULE_SUPPORT)
 
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  gUefiPayloadPkgTokenSpaceGuid.PcdPublishMcfgAsReservedMemory|TRUE
+!endif
+
 [PcdsFeatureFlag.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
@@ -669,6 +684,12 @@
 
   ## Whether allows PCI RB to allocate DMA memory above 4GB
   gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  # Note: gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize is a
+  # different PCD with the same name; UefiPayloadEntry consumes only the
+  # gUefiPayloadPkgTokenSpaceGuid one below.
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x10000000
+!endif
 
 [PcdsFixedAtBuild.AARCH64]
   # System Memory Base -- fixed at 0x4000_0000
