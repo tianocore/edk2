@@ -79,7 +79,7 @@ FindInstallPeiMemory (
   // Iterate through the HOB list
   Hob.Raw = HobList;
   while (!END_OF_HOB_LIST (Hob)) {
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       ResourceHob = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
       if (  (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY)
          && (ResourceHob->PhysicalStart > PeiMemoryBase)

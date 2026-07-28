@@ -376,7 +376,7 @@ AcceptMemoryForAPsStack (
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob) && !MemoryRegionFound) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
 
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
@@ -454,7 +454,7 @@ AcceptMemory (
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
         PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
         PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
@@ -636,8 +636,11 @@ ValidateHobList (
         break;
 
       case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR:
-        if (Hob.Header->HobLength != sizeof (EFI_HOB_RESOURCE_DESCRIPTOR)) {
-          DEBUG ((DEBUG_ERROR, "HOB: Hob length is not equal corresponding hob structure. Type: 0x%04x\n", EFI_HOB_TYPE_RESOURCE_DESCRIPTOR));
+      case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2:
+        if (((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) && (Hob.Header->HobLength != sizeof (EFI_HOB_RESOURCE_DESCRIPTOR))) ||
+            ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) && (Hob.Header->HobLength != sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2))))
+        {
+          DEBUG ((DEBUG_ERROR, "HOB: Hob length is not equal corresponding hob structure. Type: 0x%04x\n", GET_HOB_TYPE (Hob)));
           return FALSE;
         }
 
@@ -646,34 +649,34 @@ ValidateHobList (
           return FALSE;
         }
 
-        if ((Hob.ResourceDescriptor->ResourceAttribute & (~(EFI_RESOURCE_ATTRIBUTE_PRESENT |
-                                                            EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                                                            EFI_RESOURCE_ATTRIBUTE_TESTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_PERSISTENT |
-                                                            EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC |
-                                                            EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC |
-                                                            EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1 |
-                                                            EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2 |
-                                                            EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_16_BIT_IO |
-                                                            EFI_RESOURCE_ATTRIBUTE_32_BIT_IO |
-                                                            EFI_RESOURCE_ATTRIBUTE_64_BIT_IO |
-                                                            EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_PERSISTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED |
-                                                            EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE |
-                                                            EFI_RESOURCE_ATTRIBUTE_ENCRYPTED|
-                                                            EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE |
-                                                            EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE))) != 0)
+        if ((GET_RESOURCE_HOB_ATTRIBUTE (Hob) & (~(EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                                                   EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                                                   EFI_RESOURCE_ATTRIBUTE_TESTED |
+                                                   EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
+                                                   EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
+                                                   EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED |
+                                                   EFI_RESOURCE_ATTRIBUTE_PERSISTENT |
+                                                   EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC |
+                                                   EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC |
+                                                   EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1 |
+                                                   EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2 |
+                                                   EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_16_BIT_IO |
+                                                   EFI_RESOURCE_ATTRIBUTE_32_BIT_IO |
+                                                   EFI_RESOURCE_ATTRIBUTE_64_BIT_IO |
+                                                   EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED |
+                                                   EFI_RESOURCE_ATTRIBUTE_READ_PROTECTABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_PERSISTABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED |
+                                                   EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTABLE |
+                                                   EFI_RESOURCE_ATTRIBUTE_ENCRYPTED|
+                                                   EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE |
+                                                   EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE))) != 0)
         {
           DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceAttribute type. Type: 0x%08x\n", Hob.ResourceDescriptor->ResourceAttribute));
           return FALSE;
