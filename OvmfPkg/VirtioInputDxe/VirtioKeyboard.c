@@ -167,10 +167,8 @@ VirtioKeyboardConvertKeyCode (
 
     default:
       if (Dev->KeyActive[KEY_LEFTSHIFT] || Dev->KeyActive[KEY_RIGHTSHIFT]) {
-        Key->ScanCode    = MapShift[Code];
         Key->UnicodeChar = MapShift[Code];
       } else {
-        Key->ScanCode    = Map[Code];
         Key->UnicodeChar = Map[Code];
       }
 
