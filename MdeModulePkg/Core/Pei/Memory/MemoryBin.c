@@ -219,6 +219,7 @@ GetMemoryTypeInformationResourceHob (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceHobAttribute;
   EFI_PHYSICAL_ADDRESS         BinTop;
 
   ASSERT (HobStart != NULL);
@@ -233,11 +234,12 @@ GetMemoryTypeInformationResourceHob (
   MemoryTypeInformationResourceHob = NULL;
   Count                            = 0;
   for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       continue;
     }
 
-    ResourceHob = Hob.ResourceDescriptor;
+    ResourceHob          = Hob.ResourceDescriptor;
+    ResourceHobAttribute = GET_RESOURCE_HOB_ATTRIBUTE (Hob);
     if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
       continue;
     }
@@ -247,7 +249,7 @@ GetMemoryTypeInformationResourceHob (
       continue;
     }
 
-    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+    if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
       continue;
     }
 
