@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2025, ARM Limited. All rights reserved.
+*  Copyright (c) 2025 - 2026, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -8,14 +8,17 @@
 
 #pragma once
 
-/** Returns the SOC ID, formatted for the SMBIOS Type 4 Processor ID field.
+/**
+  Return the SoC ID formatted for the SMBIOS Type 4 Processor ID field.
 
-    @param Processor ID.
+  @param[out] ProcessorId  Pointer to the SMBIOS Processor ID.
 
-    @return 0 on success
-    @return EFI_UNSUPPORTED if SMCCC_ARCH_SOC_ID is not implemented
+  @retval EFI_SUCCESS            The Processor ID was returned successfully.
+  @retval EFI_INVALID_PARAMETER  ProcessorId is NULL.
+  @retval EFI_UNSUPPORTED        The SMCCC Architecture SoC ID interface is
+                                 unsupported or an SoC ID call failed.
 **/
-UINT64
+EFI_STATUS
 SmbiosSmcGetSocId (
-  UINT64  *ProcessorId
+  OUT UINT64  *ProcessorId
   );
