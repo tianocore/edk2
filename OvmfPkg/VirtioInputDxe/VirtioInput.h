@@ -38,6 +38,13 @@
 // Key code 0x100 ~ 0x15f range is for all kinds of button events.
 #define IS_BUTTON_CODE(Code)  (((Code) >= BTN_MISC) && ((Code) < KEY_OK))
 
+#define KEYBOARD_EFI_KEY_MAX_COUNT  256
+typedef struct {
+  EFI_KEY_DATA    Buffer[KEYBOARD_EFI_KEY_MAX_COUNT];
+  UINTN           Head;
+  UINTN           Tail;
+} EFI_KEY_QUEUE;
+
 typedef struct {
   UINTN                      Signature;
   EFI_KEY_DATA               KeyData;
@@ -84,10 +91,9 @@ typedef struct {
   BOOLEAN                              HasKeyboard;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL       Txt;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TxtEx;
-  EFI_KEY_DATA                         LastKeyData;
   LIST_ENTRY                           KeyNotifyList;
   BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
-  BOOLEAN                              KeyReady;
+  EFI_KEY_QUEUE                        KeyQueue;
 
   BOOLEAN                              SupportPartialKeys;
 
