@@ -773,7 +773,7 @@ InitializeMmHobList (
   Hob.Raw = (UINT8 *)HobStart;
   while (!END_OF_HOB_LIST (Hob)) {
     Hob.Raw = GET_NEXT_HOB (Hob);
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       ResourceHobBase = Hob.ResourceDescriptor->PhysicalStart;
       ResourceHobEnd  = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
 
