@@ -228,6 +228,31 @@ BuildResourceDescriptorHob (
   );
 
 /**
+Builds a HOB that describes a chunk of system memory with memory attributes.
+
+This function builds a HOB that describes a chunk of system memory.
+If there is no additional space for HOB creation, then ASSERT().
+
+@param  ResourceType               The type of resource described by this HOB.
+@param  ResourceCapabilities       The resource capabilities of the memory described by this HOB.
+@param  PhysicalStart              The 64 bit physical address of memory described by this HOB.
+@param  ResourceLength             The length of the memory described by this HOB in bytes.
+@param  ResourceMemoryAttributes   The memory attribute for the memory described by this HOB.
+@param  OwnerGUID                  GUID for the owner of this resource.
+
+**/
+VOID
+EFIAPI
+BuildResourceDescriptor2Hob (
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceCapabilities,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       ResourceLength,
+  IN UINT64                       ResourceMemoryAttributes,
+  IN EFI_GUID                     *OwnerGUID OPTIONAL
+  );
+
+/**
   Builds a customized HOB tagged with a GUID for identification and returns
   the start address of GUID HOB data.
 
@@ -602,3 +627,37 @@ TagMemoryAllocationHobWithGuid (
 **/
 #define GET_GUID_HOB_DATA_SIZE(HobStart) \
   (UINT16)(GET_HOB_LENGTH (HobStart) - sizeof (EFI_HOB_GUID_TYPE))
+
+/**
+  Determines if a HOB is a Resource Descriptor HOB (v1 or v2).
+
+  This macro returns TRUE if the HOB specified by Hob is of type
+  EFI_HOB_TYPE_RESOURCE_DESCRIPTOR or EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2.
+
+  @param  Hob   A pointer to a HOB.
+
+  @retval TRUE   The HOB is a Resource Descriptor v1 or v2.
+  @retval FALSE  The HOB is not a Resource Descriptor.
+
+**/
+#define IS_RESOURCE_DESCRIPTOR_HOB(Hob)  \
+  ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) || \
+   (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2))
+
+/**
+  Returns the resource attribute from a Resource Descriptor HOB (v1 or v2).
+
+  This macro returns the ResourceAttribute field for a Resource Descriptor v1
+  HOB, or the ResourceCapabilities field for a Resource Descriptor v2 HOB.
+  Hob is assumed to be a HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR or
+  EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2.
+
+  @param  Hob   A pointer to a HOB.
+
+  @return The resource attribute (v1) or resource capabilities (v2) value.
+
+**/
+#define GET_RESOURCE_HOB_ATTRIBUTE(Hob)  \
+  ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) ? \
+   (Hob).ResourceDescriptor2->ResourceCapabilities :            \
+   (Hob).ResourceDescriptor->ResourceAttribute)
