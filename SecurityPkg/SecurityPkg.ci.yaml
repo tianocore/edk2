@@ -134,5 +134,11 @@
           #         Replace ternary operator in debug string with single specifier
           'Index == COLUME_SIZE/2 ? " | %02x" : " %02x"': "%d"
       }
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "AuditOnly": True,           # If True, log all errors and then mark as skipped
+        "IgnoreFiles": []            # package root relative file, folder, or glob pattern to ignore
     }
 }
