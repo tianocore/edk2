@@ -184,6 +184,68 @@ ParseMemory (
 }
 
 /**
+  Check whether a range is contained in a system-memory node.
+
+  @param[in]  Fdt               Address of the Fdt data.
+  @param[in]  StartAddress      Start of the range.
+  @param[in]  NumberOfBytes     Size of the range.
+
+  @retval TRUE                  The range is contained in system memory.
+  @retval FALSE                 The range is outside system memory.
+**/
+STATIC
+BOOLEAN
+IsRangeInSystemMemory (
+  IN VOID    *Fdt,
+  IN UINT64  StartAddress,
+  IN UINT64  NumberOfBytes
+  )
+{
+  CONST FDT_PROPERTY  *PropertyPtr;
+  CONST UINT64        *Data64;
+  CONST CHAR8         *NodeName;
+  UINT64              EndAddress;
+  UINT64              MemoryEnd;
+  UINT64              MemorySize;
+  UINT64              MemoryStart;
+  INT32               Node;
+  INT32               TempLen;
+
+  if ((NumberOfBytes == 0) || (StartAddress > (MAX_UINT64 - NumberOfBytes))) {
+    return FALSE;
+  }
+
+  EndAddress = StartAddress + NumberOfBytes;
+  for (Node = FdtFirstSubnode (Fdt, 0); Node >= 0; Node = FdtNextSubnode (Fdt, Node)) {
+    NodeName = FdtGetName (Fdt, Node, NULL);
+    if ((NodeName == NULL) ||
+        (AsciiStrnCmp (NodeName, "memory@", AsciiStrLen ("memory@")) != 0))
+    {
+      continue;
+    }
+
+    PropertyPtr = FdtGetProperty (Fdt, Node, "reg", &TempLen);
+    if ((PropertyPtr == NULL) || (TempLen != (2 * sizeof (UINT64)))) {
+      continue;
+    }
+
+    Data64      = (CONST UINT64 *)PropertyPtr->Data;
+    MemoryStart = Fdt64ToCpu (ReadUnaligned64 (&Data64[0]));
+    MemorySize  = Fdt64ToCpu (ReadUnaligned64 (&Data64[1]));
+    if ((MemorySize == 0) || (MemoryStart > (MAX_UINT64 - MemorySize))) {
+      continue;
+    }
+
+    MemoryEnd = MemoryStart + MemorySize;
+    if ((StartAddress >= MemoryStart) && (EndAddress <= MemoryEnd)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   It will ParseReservedMemory node from FDT.
 
   @param[in]  Fdt               Address of the Fdt data.
@@ -293,6 +355,15 @@ ParseReservedMemory (
         }
       } else {
 FallbackType:
+        if (!IsRangeInSystemMemory (Fdt, StartAddress, NumberOfBytes)) {
+          BuildResourceDescriptorHob (
+            EFI_RESOURCE_MEMORY_RESERVED,
+            MEMORY_ATTRIBUTE_DEFAULT,
+            StartAddress,
+            NumberOfBytes
+            );
+        }
+
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiReservedMemoryType);
       }
     }
