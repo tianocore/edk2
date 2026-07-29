@@ -313,6 +313,9 @@ class UncrustifyCheck(ICiBuildPlugin):
                 "Git is not found on this system. Git submodule paths will not be considered.")
             return []
 
+        if not os.path.exists(os.path.join(self._abs_workspace_path, ".git")):
+            return []
+
         outstream_buffer = StringIO()
         exit_code = RunCmd("git", "ls-files --other",
                            workingdir=self._abs_workspace_path, outstream=outstream_buffer, logging_level=logging.NOTSET)
