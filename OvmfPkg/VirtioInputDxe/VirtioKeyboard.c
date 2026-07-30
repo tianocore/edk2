@@ -194,7 +194,7 @@ VirtioKeyboardHandleEvent (
   IN VIRTIO_INPUT_EVENT    *Event
   )
 {
-  if (Event->Value == KEY_PRESSED) {
+  if (Event->Value != KEY_RELEASED) {
     // Key pressed event received
     Dev->KeyActive[(UINT8)Event->Code] = TRUE;
 
