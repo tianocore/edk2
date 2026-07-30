@@ -115,7 +115,8 @@ typedef struct {
           CR (a, VIRTIO_INPUT_DEV, AbsolutePointer, VIRTIO_INPUT_SIG)
 
 // Bellow candidates to be included as Linux header
-#define KEY_PRESSED  1
+#define KEY_RELEASED  0
+#define KEY_PRESSED   1
 
 //
 // VirtioInput.c
