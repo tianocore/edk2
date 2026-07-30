@@ -14,6 +14,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = DxeBaseSerialPortLibHobConstructor
+  DESTRUCTOR                     = DxeBaseSerialPortLibHobDestructor
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
