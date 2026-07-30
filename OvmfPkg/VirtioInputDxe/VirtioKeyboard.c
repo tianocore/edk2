@@ -183,7 +183,7 @@ VOID
 VirtioKeyboardConvertKeyCode (
   IN OUT VIRTIO_INPUT_DEV  *Dev,
   IN UINT16                Code,
-  OUT EFI_INPUT_KEY        *Key
+  OUT EFI_KEY_DATA         *KeyData
   )
 {
   // Key mapping in between Linux and UEFI
@@ -218,6 +218,8 @@ VirtioKeyboardConvertKeyCode (
     [KEY_SPACE]         = ' ',
     [MAX_KEYBOARD_CODE] = 0x00
   };
+
+  EFI_INPUT_KEY  *Key = &KeyData->Key;
 
   // Set default readings
   Key->ScanCode    = SCAN_NULL;
@@ -299,6 +301,20 @@ VirtioKeyboardConvertKeyCode (
         Key->UnicodeChar = Map[Code];
       }
 
+      // If this key cannot be mapped to either a scancode or a printable character, return
+      if (Key->UnicodeChar == CHAR_NULL) {
+        return;
+      }
+
+      // If we are processing a shiftable character, clear the explicit shift state (if any)
+      // because it is now reflected in the character representation itself.
+      // "if a class of printable characters that are normally adjusted by shift modifiers
+      // (e.g. Shift Key + “f” key) would be presented solely as a KeyData.Key.UnicodeChar
+      // without the associated shift state."
+      if (MapShift[Code] != Map[Code]) {
+        KeyData->KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
+      }
+
       if (Dev->KeyActive[KEY_LEFTCTRL] || Dev->KeyActive[KEY_RIGHTCTRL]) {
         // Convert Ctrl+[a-z] and Ctrl+[A-Z] into [1-26] ASCII table entries
         Key->UnicodeChar &= 0x1F;
@@ -348,9 +364,14 @@ VirtioKeyboardProcessEvent (
   )
 {
   //
+  // Initialize the key data structure with current keyboard and toggle state
+  //
+  VirtioKeyboardInitializeKeyState (Dev, &KeyData->KeyState);
+
+  //
   // Translate the virtio scancode into EFI scancode and Unicode char
   //
-  VirtioKeyboardConvertKeyCode (Dev, KeyCode, &KeyData->Key);
+  VirtioKeyboardConvertKeyCode (Dev, KeyCode, KeyData);
 
   //
   // Keys with no Unicode representation and no EFI scancode are not valid,
@@ -362,10 +383,6 @@ VirtioKeyboardProcessEvent (
     }
   }
 
-  //
-  // Complete the key data structure with current keyboard state (active modifiers)
-  //
-  VirtioKeyboardInitializeKeyState (Dev, &KeyData->KeyState);
   return EFI_SUCCESS;
 }
 
