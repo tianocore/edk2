@@ -170,6 +170,19 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
   !elseif $(TIMER_SUPPORT) == "LAPIC"
     INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   !endif
+  !if $(VIRTIO_ENABLE) == TRUE
+    #
+    # Virtio: modern + legacy PCI transport, blk / scsi / net class
+    # drivers.  Enables boot from a virtio-blk root disk on X64
+    # payloads chainloaded inside a virtual machine (e.g. QEMU) that
+    # exposes a virtio-pci endpoint.
+    #
+    INF OvmfPkg/Virtio10Dxe/Virtio10.inf
+    INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+    INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+    INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+    INF OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  !endif
 !elseif "AARCH64" IN "$(ARCH)"
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
