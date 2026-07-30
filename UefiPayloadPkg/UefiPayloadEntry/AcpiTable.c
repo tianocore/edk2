@@ -105,7 +105,19 @@ Done:
   AcpiBoardInfo->ResetRegAddress = Fadt->ResetReg.Address;
   AcpiBoardInfo->ResetValue      = Fadt->ResetValue;
   AcpiBoardInfo->PmEvtBase       = Fadt->Pm1aEvtBlk;
-  AcpiBoardInfo->PmGpeEnBase     = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
+
+  //
+  // The GPE0 enable register is the upper half of a GPE0 register pair
+  // that is Gpe0BlkLen bytes long.  A FADT reporting a zero length has no
+  // enable register at all, and adding half of zero would name the GPE0
+  // status block instead: report 0 so that consumers skip the access
+  // rather than clearing status bits.
+  //
+  if (Fadt->Gpe0BlkLen != 0) {
+    AcpiBoardInfo->PmGpeEnBase = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
+  } else {
+    AcpiBoardInfo->PmGpeEnBase = 0;
+  }
 
   if (MmCfgHdr != NULL) {
     MmCfgBase                      = (EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *)((UINT8 *)MmCfgHdr + sizeof (*MmCfgHdr));
