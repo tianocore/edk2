@@ -70,4 +70,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable
