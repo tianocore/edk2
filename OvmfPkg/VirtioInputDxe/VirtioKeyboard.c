@@ -315,11 +315,6 @@ VirtioKeyboardConvertKeyCode (
         KeyData->KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
       }
 
-      if (Dev->KeyActive[KEY_LEFTCTRL] || Dev->KeyActive[KEY_RIGHTCTRL]) {
-        // Convert Ctrl+[a-z] and Ctrl+[A-Z] into [1-26] ASCII table entries
-        Key->UnicodeChar &= 0x1F;
-      }
-
       break;
   }
 }
@@ -475,6 +470,22 @@ VirtioKeyboardReadKeyStroke (
 
     if ((KeyData.Key.ScanCode == SCAN_NULL) && (KeyData.Key.UnicodeChar == CHAR_NULL)) {
       continue;
+    }
+
+    // Since ReadKeyStroke does not allow to convey modifier state, we have to
+    // fold Ctrl into the printable character to produce a C0 control code
+    // (i.e. apply the caret notation).
+    // NB1: this is not actually in the SIMPLE_TEXT_INPUT(_EX) spec; we do it
+    //     for compatibility with other keyboard drivers and TerminalDxe.
+    // NB2: We only apply a subset of caret notation limited to alphabetic
+    //      characters, as these are idempotent wrt. Shift and CapsLock
+    //      (which are already applied at this point).
+    if (KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) {
+      if (((KeyData.Key.UnicodeChar >= 'A') && (KeyData.Key.UnicodeChar <= 'Z')) ||
+          ((KeyData.Key.UnicodeChar >= 'a') && (KeyData.Key.UnicodeChar <= 'z')))
+      {
+        KeyData.Key.UnicodeChar &= 0x1F;
+      }
     }
 
     *Key = KeyData.Key;
