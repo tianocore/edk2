@@ -3,7 +3,7 @@
 
   Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
-  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1248,6 +1248,30 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryChannelInfoParser[] = {
   { "MemoryDeviceListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
+/** A parser for EArchCommonObjAdditionalInformation.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationParser[] = {
+  { "AdditionalInformationToken",          sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "AdditionalInformationEntryListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjAdditionalInformationEntry.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationEntryParser[] = {
+  { "ReferencedObjectToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ReferencedTableGeneratorId", sizeof (UINT32),          "0x%x", NULL        },
+  { "ReferencedOffset",           sizeof (UINT8),           "0x%x", NULL        },
+  { "EntryString",                SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ValueToken",                 sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+};
+
+/** A parser for EArchCommonObjAdditionalInformationValue.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationValueParser[] = {
+  { "Len",   sizeof (UINT8),                               "0x%x", NULL    },
+  { "Value", SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE, NULL,   HexDump },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1343,6 +1367,36 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemInfoParser[] = {
   { "Family",          SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
 };
 
+/** A parser for EArchCommonObjSystemEnclosureInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemEnclosureInfoParser[] = {
+  { "SystemEnclosureToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Manufacturer",              SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Type",                      sizeof (UINT8),           "0x%x", NULL        },
+  { "Version",                   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNum",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "AssetTag",                  SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "BootUpState",               sizeof (UINT8),           "0x%x", NULL        },
+  { "PowerSupplyState",          sizeof (UINT8),           "0x%x", NULL        },
+  { "ThermalState",              sizeof (UINT8),           "0x%x", NULL        },
+  { "SecurityStatus",            sizeof (UINT8),           "0x%x", NULL        },
+  { "OemDefined",                sizeof (UINT32),          "0x%x", NULL        },
+  { "Height",                    sizeof (UINT8),           "0x%x", NULL        },
+  { "NumberOfPowerCords",        sizeof (UINT8),           "0x%x", NULL        },
+  { "ContainedElementListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "SkuNum",                    SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "RackType",                  sizeof (UINT8),           "0x%x", NULL        },
+  { "RackHeight",                sizeof (UINT8),           "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjEnclosureElement.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonEnclosureElementParser[] = {
+  { "ContainedElementType",    sizeof (UINT8), "0x%x", NULL },
+  { "ContainedElementMinimum", sizeof (UINT8), "%u",   NULL },
+  { "ContainedElementMaximum", sizeof (UINT8), "%u",   NULL },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1415,6 +1469,11 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryChannelDevice,                 CmArchCommonMemoryChannelDeviceParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjProcessorSpecificBlockInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemInfo,                          CmArchCommonSystemInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformation,               CmArchCommonAdditionalInformationParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationEntry,          CmArchCommonAdditionalInformationEntryParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationValue,          CmArchCommonAdditionalInformationValueParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemEnclosureInfo,                 CmArchCommonSystemEnclosureInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjEnclosureElement,                    CmArchCommonEnclosureElementParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
