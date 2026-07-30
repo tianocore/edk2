@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2023, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2026, ARM Limited. All rights reserved.
 # Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -50,6 +50,11 @@
   #   default conduit (HVC or SMC).
   #
   ArmMonitorLib|Include/Library/ArmMonitorLib.h
+
+  ##  @libraryclass  Provides access to the Arm SMCCC Architecture SoC ID
+  #                  interface.
+  #
+  ArmSmcccSocIdLib|Include/Library/ArmSmcccSocIdLib.h
 
   ##  @libraryclass  Provides an interface to query miscellaneous OEM
   #   information.
