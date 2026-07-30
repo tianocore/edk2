@@ -120,5 +120,13 @@
             "canthave"
         ],
         "AdditionalIncludePaths": [] # Additional paths to spell check relative to package root (wildcards supported)
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "AuditOnly": True,          # If True, log all errors and then mark as skipped
+        "IgnoreFiles": [ "Universal/RegularExpressionDxe/oniguruma",  # submodule outside of control
+                         "Library/BrotliCustomDecompressLib/brotli"   # submodule outside of control
+        ]
     }
 }
