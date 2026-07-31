@@ -10,6 +10,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <IndustryStandard/SmBios.h>
 #include <ConfigurationManagerObject.h>
 #include "ArchCommonNameSpaceObjects.h"
 #include "ConfigurationManagerObjectParser.h"
@@ -1397,6 +1398,89 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonEnclosureElementParser[] = {
   { "ContainedElementMaximum", sizeof (UINT8), "%u",   NULL },
 };
 
+/** A parser for EArchCommonObjMchiInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiInfoParser[] = {
+  { "Token",              sizeof (CM_OBJECT_TOKEN),        "0x%p", NULL },
+  { "InterfaceType",      sizeof (MC_HOST_INTERFACE_TYPE), "0x%x", NULL },
+  { "InterfaceDataToken", sizeof (CM_OBJECT_TOKEN),        "0x%p", NULL },
+  { "ProtocolTokenArray", sizeof (CM_ARCH_COMMON_OBJ_REF), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjMchiMctpDataInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiMctpDataInfoParser[] = {
+  { "MmbiCapDesPointer", sizeof (UINT64), "0x%lx", NULL },
+};
+
+/** A parser for EArchCommonObjMchiNetworkDataInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiNetworkDataInfoParser[] = {
+  { "DeviceType",      sizeof (UINT8),           "0x%x", NULL },
+  { "DeviceDataToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjMchiProtocolInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiProtocolInfoParser[] = {
+  { "ProtocolType",      sizeof (MC_HOST_INTERFACE_TYPE), "0x%x", NULL },
+  { "ProtocolDataToken", sizeof (CM_OBJECT_TOKEN),        "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjMchiProtocolMctpDataInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiProtocolMctpDataInfoParser[] = {
+  { "Version",         sizeof (UINT16),                 "0x%x", NULL },
+  { "LinkLayerType",   sizeof (MC_HOST_INTERFACE_TYPE), "0x%x", NULL },
+  { "Instance",        sizeof (UINT32),                 "0x%x", NULL },
+  { "Characteristics", sizeof (UINT32),                 "0x%x", NULL },
+};
+
+/** A parser for EArchCommonObjMchiProtocolRedfishOverIpDataInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiProtocolRedfishOverIpDataInfoParser[] = {
+  { "ServiceUuid",            sizeof (EFI_GUID),   "0x%g", NULL        },
+  { "HostIpAssignType",       sizeof (UINT8),      "0x%x", NULL        },
+  { "HostIpAddressFormat",    sizeof (UINT8),      "0x%x", NULL        },
+  { "HostIpAddress",          sizeof (UINT8) * 16, NULL,   HexDump     },
+  { "HostIpMask",             sizeof (UINT8) * 16, NULL,   HexDump     },
+  { "ServiceIpDiscoveryType", sizeof (UINT8),      "0x%x", NULL        },
+  { "ServiceIpAddressFormat", sizeof (UINT8),      "0x%x", NULL        },
+  { "ServiceIpAddress",       sizeof (UINT8) * 16, NULL,   HexDump     },
+  { "ServiceIpMask",          sizeof (UINT8) * 16, NULL,   HexDump     },
+  { "ServiceIpPort",          sizeof (UINT16),     "0x%x", NULL        },
+  { "ServiceVlanId",          sizeof (UINT32),     "0x%x", NULL        },
+  { "Hostname",               MAX_UINT8 - 0x5B,    NULL,   PrintString },
+};
+
+/** A parser for EArchCommonObjMchiNetworkDeviceDescUsbInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiNetworkDeviceDescUsbInfoParser[] = {
+  { "Version",         sizeof (UINT16),                "0x%x", NULL        },
+  { "VendorId",        sizeof (UINT16),                "0x%x", NULL        },
+  { "ProductId",       sizeof (UINT16),                "0x%x", NULL        },
+  { "SerialNumberStr", SMBIOS_MAX_STRING_SIZE_REDUCED, NULL,   PrintString },
+  { "MacAddress",      sizeof (UINT8) * 6,             NULL,   HexDump     },
+  { "Characteristic",  sizeof (UINT16),                "0x%x", NULL        },
+  { "IpmiToken",       sizeof (CM_OBJECT_TOKEN),       "0x%p", NULL        },
+};
+
+/** A parser for EArchCommonObjMchiNetworkDeviceDescPciInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiNetworkDeviceDescPciInfoParser[] = {
+  { "Version",           sizeof (UINT16),          "0x%x", NULL    },
+  { "VendorId",          sizeof (UINT16),          "0x%x", NULL    },
+  { "DeviceId",          sizeof (UINT16),          "0x%x", NULL    },
+  { "SubSystemVendorId", sizeof (UINT16),          "0x%x", NULL    },
+  { "SubSystemId",       sizeof (UINT16),          "0x%x", NULL    },
+  { "MacAddress",        sizeof (UINT8) * 6,       NULL,   HexDump },
+  { "Segment",           sizeof (UINT16),          "0x%x", NULL    },
+  { "Bus",               sizeof (UINT8),           "0x%x", NULL    },
+  { "Function",          sizeof (UINT8),           "0x%x", NULL    },
+  { "Characteristic",    sizeof (UINT16),          "0x%x", NULL    },
+  { "IpmiToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL    },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1474,6 +1558,14 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationValue,          CmArchCommonAdditionalInformationValueParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemEnclosureInfo,                 CmArchCommonSystemEnclosureInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjEnclosureElement,                    CmArchCommonEnclosureElementParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiInfo,                            CmArchCommonMchiInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiMctpDataInfo,                    CmArchCommonMchiMctpDataInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDataInfo,                 CmArchCommonMchiNetworkDataInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiProtocolInfo,                    CmArchCommonMchiProtocolInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiProtocolMctpDataInfo,            CmArchCommonMchiProtocolMctpDataInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiProtocolRedfishOverIpDataInfo,   CmArchCommonMchiProtocolRedfishOverIpDataInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescUsbInfo,        CmArchCommonMchiNetworkDeviceDescUsbInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescPciInfo,        CmArchCommonMchiNetworkDeviceDescPciInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
