@@ -514,6 +514,12 @@ UpdateBootManager (
   GroupMultipleLegacyBootOption4SameType ();
 
   BootOption = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
+  if (BootOption == NULL) {
+    //
+    // No boot option available, return directly
+    //
+    return;
+  }
 
   HiiHandle = gBootManagerPrivate.HiiHandle;
 
@@ -521,10 +527,17 @@ UpdateBootManager (
   // Allocate space for creation of UpdateData Buffer
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle == NULL) {
+    ASSERT (StartOpCodeHandle != NULL);
+    return;
+  }
 
   EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
+  if (EndOpCodeHandle == NULL) {
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+    ASSERT (EndOpCodeHandle != NULL);
+    return;
+  }
 
   //
   // Create Hii Extend Label OpCode as the start opcode
@@ -853,6 +866,9 @@ BootManagerCallback (
   }
 
   BootOption = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
+  if (BootOption == NULL) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Clear  the  screen  before.

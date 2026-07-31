@@ -367,15 +367,6 @@ MmiHandlerRegister (
     return EFI_INVALID_PARAMETER;
   }
 
-  MmiHandler = AllocateZeroPool (sizeof (MMI_HANDLER));
-  if (MmiHandler == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  MmiHandler->Signature = MMI_HANDLER_SIGNATURE;
-  MmiHandler->Handler   = Handler;
-  MmiHandler->ToRemove  = FALSE;
-
   if (HandlerType == NULL) {
     //
     // This is root MMI handler
@@ -394,7 +385,15 @@ MmiHandlerRegister (
     List = &MmiEntry->MmiHandlers;
   }
 
-  MmiHandler->MmiEntry = MmiEntry;
+  MmiHandler = AllocateZeroPool (sizeof (MMI_HANDLER));
+  if (MmiHandler == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  MmiHandler->Signature = MMI_HANDLER_SIGNATURE;
+  MmiHandler->Handler   = Handler;
+  MmiHandler->ToRemove  = FALSE;
+  MmiHandler->MmiEntry  = MmiEntry;
   InsertTailList (List, &MmiHandler->Link);
 
   *DispatchHandle = (EFI_HANDLE)MmiHandler;

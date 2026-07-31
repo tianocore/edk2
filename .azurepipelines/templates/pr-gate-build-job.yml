@@ -117,7 +117,7 @@ jobs:
     container: ${{ parameters.container }}
 
   steps:
-  # Strip test targets for CI toolchains other than GCC and VS2022, as these
+  # Strip test targets for CI toolchains other than GCC and VS2026, as these
   # cannot run them and would be duplicating work during CI if they could.
   # Note: Within PR gate CI, NOOPT is only used for building tests.
   - bash: |
@@ -147,7 +147,7 @@ jobs:
     clean: all
 
   pool:
-    vmImage: 'windows-2022'
+    vmImage: 'windows-2025-vs2026'
 
   steps:
     - checkout: self
