@@ -8,8 +8,10 @@
 
 #include <stdexcept>
 
-#ifdef NULL
-  #undef NULL
+#ifndef MDE_CPU_AARCH64
+  #ifdef NULL
+    #undef NULL
+  #endif
 #endif
 
 extern "C" {

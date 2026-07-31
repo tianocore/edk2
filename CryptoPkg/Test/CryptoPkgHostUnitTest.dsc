@@ -13,7 +13,7 @@
   PLATFORM_VERSION        = 0.1
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/CryptoPkg/HostTest
-  SUPPORTED_ARCHITECTURES = IA32|X64
+  SUPPORTED_ARCHITECTURES = IA32|X64|AARCH64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -39,6 +39,9 @@
 [LibraryClasses.X64, LibraryClasses.IA32]
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
+[LibraryClasses.AARCH64]
+  RngLib|UnitTestFrameworkPkg/Library/UnitTestHostRngLib/UnitTestHostRngLib.inf
+
 [Components]
   #
   # Build HOST_APPLICATION that tests the SampleUnitTest
@@ -48,12 +51,6 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   }
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf {
-    <Defines>
-      FILE_GUID = 3604CCB8-138C-488F-8045-18704F73E734
-    <LibraryClasses>
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
-  }
 !endif
 
 !if $(CRYPTO_TEST_TYPE) IN "MBEDTLS"
@@ -62,6 +59,16 @@
       BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/UnitTestHostBaseCryptLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibSm3.inf
       MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
+  }
+!endif
+
+[Components.X64, Components.IA32]
+!if $(CRYPTO_TEST_TYPE) IN "OPENSSL"
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf {
+    <Defines>
+      FILE_GUID = 3604CCB8-138C-488F-8045-18704F73E734
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
   }
 !endif
 

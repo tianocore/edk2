@@ -39,3 +39,4 @@
   UnitTestFrameworkPkg/Library/SubhookLib/SubhookLib.inf
   UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
   UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
+  UnitTestFrameworkPkg/Library/UnitTestHostRngLib/UnitTestHostRngLib.inf
