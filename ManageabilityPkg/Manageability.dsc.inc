@@ -91,7 +91,7 @@
   ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf
   ManageabilityPkg/Library/ManageabilityTransportMctpLib/Dxe/DxeManageabilityTransportMctp.inf
   ManageabilityPkg/Library/ManageabilityTransportSerialLib/Dxe/DxeManageabilityTransportSerial.inf
-  ManageabilityPkg/Library/ManageabilityTransportSsifLib/Dxe/DxeManageabilityTransportSsif.inf
-  ManageabilityPkg/Library/ManageabilityTransportSsifLib/Pei/PeiManageabilityTransportSsif.inf
+  ManageabilityPkg/Library/ManageabilityTransportSsifLib/DxeManageabilityTransportSsif.inf
+  ManageabilityPkg/Library/ManageabilityTransportSsifLib/PeiManageabilityTransportSsif.inf
   ManageabilityPkg/Library/PlatformBmcReadyLibNull/PlatformBmcReadyLibNull.inf
   ManageabilityPkg/Library/PldmProtocolLibrary/Dxe/PldmProtocolLib.inf

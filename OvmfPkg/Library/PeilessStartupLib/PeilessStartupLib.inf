@@ -55,7 +55,9 @@
   MemoryAllocationLib
   PrePiLib
   QemuFwCfgLib
+  QemuFwCfgSimpleParserLib
   PlatformInitLib
+  MemDebugLogLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -65,6 +67,7 @@
   gPcdDataBaseHobGuid
   gCcEventEntryHobGuid
   gEfiNonCcFvGuid
+  gMemDebugLogHobGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
@@ -84,3 +87,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdMemDebugLogPages
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize

@@ -198,6 +198,7 @@ struct _USB_DEVICE {
   UINT8                                 Tier;
   BOOLEAN                               DisconnectFail;
   UINT8                                 EnumScript;
+  BOOLEAN                               IsSSDev;
 };
 
 //
