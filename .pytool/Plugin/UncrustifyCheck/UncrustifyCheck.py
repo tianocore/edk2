@@ -24,7 +24,7 @@ from edk2toollib.log.junit_report_format import JunitReportTestCase
 from edk2toollib.uefi.edk2.path_utilities import Edk2Path
 from edk2toollib.utility_functions import  RunCmd
 from io import StringIO
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 #
 # Provide more user friendly messages for certain scenarios
@@ -62,15 +62,6 @@ class UncrustifyInputFileCreationErrorException(UncrustifyException):
 class UncrustifyInvalidIgnoreStandardPathsException(UncrustifyException):
     def __init__(self, message):
         super().__init__(message, -122)
-
-class UncrustifyGitIgnoreFileException(UncrustifyException):
-    def __init__(self, message):
-        super().__init__(message, -140)
-
-
-class UncrustifyGitSubmoduleException(UncrustifyException):
-    def __init__(self, message):
-        super().__init__(message, -141)
 
 
 class UncrustifyCheck(ICiBuildPlugin):
@@ -303,56 +294,81 @@ class UncrustifyCheck(ICiBuildPlugin):
         return parse_gitignore_lines(ignored_files, "Package configuration file", self._abs_package_path)
 
     def _get_git_ignored_paths(self) -> List[str]:
-        """"
+        """
         Returns a list of file absolute path strings to all files ignored in this git repository.
 
-        If git is not found, an empty list will be returned.
+        If the package's git repository could not be determined, or the command otherwise
+        fails, an empty list is returned instead.
         """
-        if not shutil.which("git"):
-            logging.warning(
-                "Git is not found on this system. Git submodule paths will not be considered.")
+        if self._abs_git_repo_path is None:
             return []
 
         outstream_buffer = StringIO()
         exit_code = RunCmd("git", "ls-files --other",
-                           workingdir=self._abs_workspace_path, outstream=outstream_buffer, logging_level=logging.NOTSET)
-        if (exit_code != 0):
-            raise UncrustifyGitIgnoreFileException(
-                f"An error occurred reading git ignore settings. This will prevent Uncrustify from running against the expected set of files.")
+                           workingdir=self._abs_git_repo_path, outstream=outstream_buffer, logging_level=logging.NOTSET)
+        if exit_code != 0:
+            logging.warning(
+                "An error occurred reading git ignore settings. Git ignored paths will not be considered.")
+            return []
 
         # Note: This will potentially be a large list, but at least sorted
         rel_paths = outstream_buffer.getvalue().strip().splitlines()
         abs_paths = []
         for path in rel_paths:
             abs_paths.append(
-                os.path.normpath(os.path.join(self._abs_workspace_path, path)))
+                os.path.normpath(os.path.join(self._abs_git_repo_path, path)))
         return abs_paths
 
-    def _get_git_submodule_paths(self) -> List[str]:
+    def _get_git_repo_path(self) -> Optional[str]:
         """
-        Returns a list of directory absolute path strings to the root of each submodule in the workspace repository.
+        Returns the absolute path to the root of the git repository that contains the package
+        currently being checked. This is not necessarily the edk2 repository, since the package
+        may belong to a different repository combined into the workspace (e.g. via
+        PACKAGES_PATH).
 
-        If git is not found, an empty list will be returned.
+        Returns None if git is not found or the package is not within a git workspace.
         """
         if not shutil.which("git"):
             logging.warning(
-                "Git is not found on this system. Git submodule paths will not be considered.")
+                "Git is not found on this system. Git exclusions will not be considered.")
+            return None
+
+        outstream_buffer = StringIO()
+        exit_code = RunCmd("git", "rev-parse --show-toplevel",
+                           workingdir=self._abs_package_path, outstream=outstream_buffer, logging_level=logging.NOTSET)
+        if exit_code != 0:
+            logging.warning(
+                f"{self._package_name} does not appear to be in a git workspace. Git exclusions will not be considered.")
+            return None
+
+        return os.path.normpath(outstream_buffer.getvalue().strip())
+
+    def _get_git_submodule_paths(self) -> List[str]:
+        """
+        Returns a list of directory absolute path strings to the root of each submodule in the
+        package's git repository.
+
+        If the package's git repository could not be determined, there is no .gitmodules file,
+        or the command otherwise fails, an empty list is returned instead.
+        """
+        if self._abs_git_repo_path is None:
             return []
 
-        if os.path.isfile(os.path.join(self._abs_workspace_path, ".gitmodules")):
+        if os.path.isfile(os.path.join(self._abs_git_repo_path, ".gitmodules")):
             logging.info(
                 f".gitmodules file found. Excluding submodules in {self._package_name}.")
 
             outstream_buffer = StringIO()
-            exit_code = RunCmd("git", "config --file .gitmodules --get-regexp path", workingdir=self._abs_workspace_path, outstream=outstream_buffer, logging_level=logging.NOTSET)
-            if (exit_code != 0):
-                raise UncrustifyGitSubmoduleException(
-                    f".gitmodule file detected but an error occurred reading the file. Cannot proceed with unknown submodule paths.")
+            exit_code = RunCmd("git", "config --file .gitmodules --get-regexp path", workingdir=self._abs_git_repo_path, outstream=outstream_buffer, logging_level=logging.NOTSET)
+            if exit_code != 0:
+                logging.warning(
+                    ".gitmodules file detected but an error occurred reading it. Git submodule paths will not be considered.")
+                return []
 
             submodule_paths = []
             for line in outstream_buffer.getvalue().strip().splitlines():
                 submodule_paths.append(
-                    os.path.normpath(os.path.join(self._abs_workspace_path, line.split()[1])))
+                    os.path.normpath(os.path.join(self._abs_git_repo_path, line.split()[1])))
 
             return submodule_paths
         else:
@@ -508,6 +524,10 @@ class UncrustifyCheck(ICiBuildPlugin):
                 f"{self._package_name} file count after plugin ignore file exclusion: {len(self._abs_file_paths_to_format)}")
 
         if not "SkipGitExclusions" in self._package_config or not self._package_config["SkipGitExclusions"]:
+            # Determine the git repository that contains this package. This is not necessarily
+            # the edk2 repository if the package is in a different repo (e.g. PACKAGES_PATH).
+            self._abs_git_repo_path = self._get_git_repo_path()
+
             # Remove files ignored by git
             logging.info(
                 f"{self._package_name} file count before git ignore file exclusion: {len(self._abs_file_paths_to_format)}")
