@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PLATFORM_BMC_READY_LIB_H_
-#define PLATFORM_BMC_READY_LIB_H_
+#pragma once
 
 /**
   This function checks whether BMC is ready for transaction or not.
@@ -21,5 +20,3 @@ EFIAPI
 PlatformBmcReady (
   VOID
   );
-
-#endif /* PLATFORM_BMC_READY_LIB_H_ */

@@ -32,6 +32,9 @@
   Core/PrivateInclude
 
 [LibraryClasses]
+  ##  @libraryclass  Provides GPT partition table parsing and validation routines.
+  GptLib|Include/Library/GptLib.h
+
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
@@ -881,6 +884,12 @@
   #   FALSE - PciBus driver doesn't probe non-standard granularity for PCI to PCI bridge I/O window.<BR>
   # @Prompt Enable PCI bridge IO alignment probe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x0001004e
+
+  ## Indicates if the PciBus driver scans functions 1..7 when function 0 is absent.<BR>
+  #   TRUE  - PciBus driver scans non-zero functions when Function 0 is absent.<BR>
+  #   FALSE - PciBus driver skips the device when Function 0 is absent.<BR>
+  # @Prompt Enable scanning PCI functions 1..7 without Function 0.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciScanFuncIfFunc0Absent|FALSE|BOOLEAN|0x0001007a
 
   ## Indicates if PEI phase StatusCode will be replayed in DXE phase.<BR><BR>
   #   TRUE  - Replays PEI phase StatusCode in DXE phased.<BR>
@@ -2096,7 +2105,7 @@
 
   ## SMBIOS version.
   # @Prompt SMBIOS version.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0303|UINT16|0x00010055
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0308|UINT16|0x00010055
 
   ## SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
   # @Prompt SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.

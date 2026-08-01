@@ -58,6 +58,12 @@ CONST EFI_PEI_PPI_DESCRIPTOR  mPpiListBootMode = {
 
 STATIC EFI_BOOT_MODE  mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 
+CONST EFI_PEI_PPI_DESCRIPTOR  mTpm2DiscoveredPpi = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gOvmfTpmDiscoveredPpiGuid,
+  NULL
+};
+
 /**
   Create system type  memory range hand off block.
 
@@ -312,6 +318,185 @@ ReportSystemMemorySize (
 }
 
 /**
+  Set up TPM resources from FDT.
+
+  @param  FdtBase       Fdt base address
+
+**/
+STATIC
+VOID
+SetupTPMResources (
+  VOID  *FdtBase
+  )
+{
+  INT32         Node, Prev;
+  INT32         Parent, Depth;
+  CONST CHAR8   *Compatible;
+  CONST CHAR8   *CompItem;
+  INT32         Len;
+  INT32         RangesLen;
+  CONST UINT8   *RegProp;
+  CONST UINT32  *RangesProp;
+  UINT64        TpmBase;
+  UINT64        TpmBaseSize;
+
+  //
+  // Empty TpmBaseSize indicates no TPM found.
+  //
+  TpmBase     = 0;
+  TpmBaseSize = 0;
+
+  //
+  // Set Parent to suppress incorrect compiler/analyzer warnings.
+  //
+  Parent = 0;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: FdtBase=%p, FdtCheckHeader=%d\n",
+    __func__,
+    FdtBase,
+    FdtCheckHeader (FdtBase)
+    ));
+
+  for (Prev = Depth = 0; ; Prev = Node) {
+    Node = FdtNextNode (FdtBase, Prev, &Depth);
+    if (Node < 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: FdtNextNode returned %d, stopping\n",
+        __func__,
+        Node
+        ));
+      break;
+    }
+
+    if (Depth == 1) {
+      Parent = Node;
+    }
+
+    Compatible = FdtGetProp (FdtBase, Node, "compatible", &Len);
+    if (Compatible != NULL) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: depth=%d node=%d compat=%a (len=%d)\n",
+        __func__,
+        Depth,
+        Node,
+        Compatible,
+        Len
+        ));
+    } else {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: depth=%d node=%d (no compatible)\n",
+        __func__,
+        Depth,
+        Node
+        ));
+    }
+
+    //
+    // Iterate over the NULL-separated items in the compatible string
+    //
+    for (CompItem = Compatible; CompItem != NULL && CompItem < Compatible + Len;
+         CompItem += 1 + AsciiStrLen (CompItem))
+    {
+      if (AsciiStrCmp (CompItem, "tcg,tpm-tis-mmio") == 0) {
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: found tpm node at depth %d\n",
+          __func__,
+          Depth
+          ));
+        RegProp = FdtGetProp (FdtBase, Node, "reg", &Len);
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: reg len=%d\n",
+          __func__,
+          Len
+          ));
+        ASSERT (Len == 8 || Len == 16);
+        if (Len == 8) {
+          TpmBase     = Fdt32ToCpu (*(UINT32 *)RegProp);
+          TpmBaseSize = Fdt32ToCpu (*(UINT32 *)((UINT8 *)RegProp + 4));
+        } else if (Len == 16) {
+          TpmBase     = Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)RegProp));
+          TpmBaseSize = Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)((UINT8 *)RegProp + 8)));
+        }
+
+        if (Depth > 1) {
+          //
+          // QEMU/mach-virt may put the TPM on the platform bus, in which case
+          // we have to take its 'ranges' property into account to translate the
+          // MMIO address. This consists of a <child base, parent base, size>
+          // tuple, where the child base and the size use the same number of
+          // cells as the 'reg' property above, and the parent base uses 2 cells
+          //
+          RangesProp = FdtGetProp (FdtBase, Parent, "ranges", &RangesLen);
+          ASSERT (RangesProp != NULL);
+
+          //
+          // a plain 'ranges' attribute without a value implies a 1:1 mapping
+          //
+          if (RangesLen != 0) {
+            //
+            // assume a single translated range with 2 cells for the parent base
+            //
+            if (RangesLen != Len + 2 * sizeof (UINT32)) {
+              DEBUG ((
+                DEBUG_WARN,
+                "%a: 'ranges' property has unexpected size %d\n",
+                __func__,
+                RangesLen
+                ));
+              break;
+            }
+
+            if (Len == 8) {
+              TpmBase -= Fdt32ToCpu (RangesProp[0]);
+            } else {
+              TpmBase -= Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)RangesProp));
+            }
+
+            //
+            // advance RangesProp to the parent bus address
+            //
+            RangesProp = (UINT32 *)((UINT8 *)RangesProp + Len / 2);
+            TpmBase   += Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)RangesProp));
+          }
+        }
+
+        break;
+      }
+    }
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: TpmBase=0x%lx TpmBaseSize=0x%lx\n",
+    __func__,
+    TpmBase,
+    TpmBaseSize
+    ));
+
+  if (TpmBaseSize > 0) {
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_MEMORY_MAPPED_IO,
+      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_TESTED,
+      TpmBase,
+      ALIGN_VALUE (TpmBaseSize, EFI_PAGE_SIZE)
+      );
+
+    ASSERT_EFI_ERROR ((EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase));
+    PeiServicesInstallPpi (&mTpm2DiscoveredPpi);
+  }
+}
+
+/**
   Perform Platform PEI initialization.
 
   @param  FileHandle      Handle of the file being invoked.
@@ -351,7 +536,7 @@ InitializePlatform (
   MiscInitialization ();
 
   AddFdtHob ();
-
+  SetupTPMResources ((VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress));
   //
   // Initialization MMU
   //

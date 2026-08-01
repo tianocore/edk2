@@ -3286,6 +3286,22 @@ PciExplainPci (
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_CLASS), gShellDebug1HiiHandle);
   PciPrintClassCode ((UINT8 *)Common->ClassCode, TRUE);
   ShellPrintDefaultEx (L"\r\n");
+
+  switch (HeaderType) {
+    case PciDevice:
+      PciExplainDeviceData (&ConfigSpace->NonCommon.Device, Address, IoDev);
+      break;
+
+    case PciP2pBridge:
+      PciExplainBridgeData (&ConfigSpace->NonCommon.Bridge, Address, IoDev);
+      break;
+
+    case PciCardBusBridge:
+      PciExplainCardBusData (&ConfigSpace->NonCommon.CardBus, Address, IoDev);
+      break;
+
+    default:;
+  }
 }
 
 /**

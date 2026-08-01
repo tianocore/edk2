@@ -1,0 +1,40 @@
+## @file
+#  Probe Library for mapping the virtio-mmio memory regions.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = VirtioMmioProbeLib
+  FILE_GUID                      = 4e2e15be-b53e-4a8f-acf9-98b2204a38b7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = VirtioMmioProbe
+
+[Sources]
+  VirtioMmioProbeLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DxeServicesTableLib
+  MapMmioLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Depex]
+  gFdtClientProtocolGuid

@@ -26,7 +26,6 @@
 //
 // Partition ID if FF-A support is enabled
 //
-STATIC UINT16  mPartId;
 STATIC UINT16  mStMmPartId;
 
 /**
@@ -139,16 +138,6 @@ InitializeFfaCommunication (
   EFI_STATUS              Status;
   EFI_FFA_PART_INFO_DESC  StmmPartInfo;
 
-  Status = ArmFfaLibPartitionIdGet (&mPartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Failed to get partition id. Status: %r\n",
-      Status
-      ));
-    return Status;
-  }
-
   Status = ArmFfaLibGetPartitionInfo (&gEfiMmCommunication2ProtocolGuid, &StmmPartInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -163,14 +152,12 @@ InitializeFfaCommunication (
   if ((StmmPartInfo.PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
     Status = EFI_UNSUPPORTED;
     DEBUG ((DEBUG_ERROR, "StandaloneMm doesn't receive DIRECT_MSG_REQ...\n"));
-    goto ErrorHandler;
+    return Status;
   }
 
   mStMmPartId = StmmPartInfo.PartitionId;
 
-ErrorHandler:
-  ArmFfaLibRxRelease (mPartId);
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -230,7 +217,7 @@ SendFfaMmCommunicate (
 
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the StMM SP since it is UP.
-    Status = ArmFfaLibRun (mStMmPartId, 0x00, NULL);
+    Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (CommunicateArgs.Header.x1), 0x00, &CommunicateArgs);
   }
 
   return Status;

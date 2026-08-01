@@ -1,0 +1,33 @@
+## @file
+#  Library that implements the Boot Sync Crypto interfaces.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaBootSyncCryptoLib
+  FILE_GUID                      = 234394BC-1D5D-4F6D-A890-259B166BCF0A
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmCcaBootSyncCryptoLib
+
+[Sources]
+  ArmCcaBootSyncCrypto.h
+  ArmCcaBootSyncCryptoLib.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  RngLib
+  MemoryAllocationLib

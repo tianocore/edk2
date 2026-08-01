@@ -43,34 +43,11 @@ ValidateSignalingFlags (
 }
 
 /**
-  Validate that the Reserved field has expected value.
-
-  @param [in] Ptr       Pointer to the start of the field data.
-  @param [in] Length    Length of the field.
-  @param [in] Context   Pointer to context specific information e.g. this
-                        could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateResField (
-  IN UINT8   *Ptr,
-  IN UINT32  Length,
-  IN VOID    *Context
-  )
-{
-  if (*Ptr != 0) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: Reserved bits in Flags must be 0");
-  }
-}
-
-/**
   An ACPI_PARSER array describing the AGDI Signaling Mode Flags field.
 **/
 STATIC CONST ACPI_PARSER  AgdiSignalingModeFlags[] = {
-  { L"Signaling Mode", 2, 0, L"%u", NULL, NULL, ValidateSignalingFlags, NULL },
-  { L"Reserved",       6, 2, L"%u", NULL, NULL, ValidateResField,       NULL },
+  { L"Signaling Mode", 2, 0, L"%u", NULL,             NULL, ValidateSignalingFlags, NULL },
+  { L"Reserved",       6, 2, NULL,  DumpReservedBits, NULL, ValidateReservedBits,   NULL },
 };
 
 /**

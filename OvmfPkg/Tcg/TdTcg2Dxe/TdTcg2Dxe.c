@@ -108,20 +108,21 @@ VARIABLE_TYPE  mVariableType[] = {
   { EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid },
 };
 
-EFI_CC_EVENTLOG_ACPI_TABLE  mTdxEventlogAcpiTemplate = {
+EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE  mTdxEventlogAcpiTemplate = {
   {
-    EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE,
+    EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_SIGNATURE,
     sizeof (mTdxEventlogAcpiTemplate),
-    EFI_CC_EVENTLOG_ACPI_TABLE_REVISION,
+    EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_REVISION,
     //
     // Compiler initializes the remaining bytes to 0
     // These fields should be filled in production
     //
   },
-  { EFI_CC_TYPE_TDX, 0 }, // CcType
-  0,                      // rsvd
-  0,                      // laml
-  0,                      // lasa
+  EFI_ACPI_6_5_CC_TYPE_TDX,        // CcType
+  0,                               // CC Sub Type
+  0,                               // Reserved
+  0,                               // laml
+  0,                               // lasa
 };
 
 EFI_HANDLE  mImageHandle;

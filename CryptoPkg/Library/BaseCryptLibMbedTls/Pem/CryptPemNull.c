@@ -67,3 +67,62 @@ EcGetPrivateKeyFromPem (
   ASSERT (FALSE);
   return FALSE;
 }
+
+/**
+   Retrieve the EdDSA Private Key from the password-protected PEM key data.
+
+   @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
+   @param[in]  PemSize        Size of the PEM key data in bytes.
+   @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
+   @param[out] EdDsaContext   Pointer to new-generated EdDSA context which contains the retrieved
+   EdDSA private key component. Use EdDsaFree() function to free the
+   resource.
+
+   If PemData is NULL, then return FALSE.
+   If EdDsaContext is NULL, then return FALSE.
+
+   @retval  TRUE   EdDSA Private Key was retrieved successfully.
+   @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EdDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EdDsaContext
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
+  Retrieve the ML-DSA Private Key from the password-protected PEM key data.
+
+  If PemData is NULL, then return FALSE.
+  If MlDsaContext is NULL, then return FALSE.
+
+  @param[in]  PemData       Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize       Size of the PEM key data in bytes.
+  @param[in]  Password      NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] MlDsaContext  Pointer to new-generated ML-DSA context which contains
+                            the retrieved ML-DSA private key. Use MlDsaFree() to free.
+
+  @retval  TRUE   ML-DSA Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+MlDsaGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **MlDsaContext
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}

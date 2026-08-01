@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef DXE_SERVICES_LIB_H_
-#define DXE_SERVICES_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -96,5 +95,3 @@ struct MockDxeServicesLib {
     )
     );
 };
-
-#endif

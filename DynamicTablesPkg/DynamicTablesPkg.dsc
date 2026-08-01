@@ -15,7 +15,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001a
   OUTPUT_DIRECTORY               = Build/DynamicTables
-  SUPPORTED_ARCHITECTURES        = AARCH64|X64
+  SUPPORTED_ARCHITECTURES        = AARCH64|X64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -66,5 +66,5 @@
 !ifdef STATIC_ANALYSIS
   # Check all rules
   # Inhibit C6305: Potential mismatch between sizeof and countof quantities.
-  *_VS2017_*_CC_FLAGS = /wd6305 /analyze
+  *_VS2019_*_CC_FLAGS = /wd6305 /analyze
 !endif
