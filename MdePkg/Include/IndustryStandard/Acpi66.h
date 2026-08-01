@@ -21,11 +21,34 @@
 ///
 /// _STA bit definitions ACPI 6.6 s6.3.7
 ///
+#define ACPI_AML_STA_DEVICE_STATUS_PRESENT  0x1
+/// @todo Remove this definition
 #define ACPI_AML_STA_DEVICE_STATUS_PRESET       0x1
 #define ACPI_AML_STA_DEVICE_STATUS_ENABLED      0x2
 #define ACPI_AML_STA_DEVICE_STATUS_UI           0x4
 #define ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING  0x8
 #define ACPI_AML_STA_DEVICE_STATUS_BATTERY      0x10
+
+///
+/// Supported Status bits (base).
+/// The battery bit is ignored and is reserved for
+/// "Control Method Battery Device (PNP0C0A)".
+///
+#define ACPI_AML_STA_BASE_SUPPORTED  (   \
+  ACPI_AML_STA_DEVICE_STATUS_PRESENT     |  \
+  ACPI_AML_STA_DEVICE_STATUS_ENABLED     |  \
+  ACPI_AML_STA_DEVICE_STATUS_UI          |  \
+  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING)
+
+///
+/// Supported Status bits.
+///
+#define ACPI_AML_STA_SUPPORTED  (           \
+  ACPI_AML_STA_DEVICE_STATUS_PRESENT     |  \
+  ACPI_AML_STA_DEVICE_STATUS_ENABLED     |  \
+  ACPI_AML_STA_DEVICE_STATUS_UI          |  \
+  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING |  \
+  ACPI_AML_STA_DEVICE_STATUS_BATTERY)
 
 ///
 /// _CSD Revision for ACPI 6.6

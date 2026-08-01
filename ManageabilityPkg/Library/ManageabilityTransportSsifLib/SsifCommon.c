@@ -58,8 +58,7 @@ SsifWriteRequest (
 {
   EFI_STATUS  Status;
   BOOLEAN     IsMultiPartWrite;
-  UINTN       Index;
-  UINTN       MiddleCount;
+  UINTN       BytesLeft;
   UINT8       SsifCmd;
   UINTN       WriteLen;
 
@@ -67,20 +66,19 @@ SsifWriteRequest (
     return EFI_INVALID_PARAMETER;
   }
 
-  MiddleCount      = 0;
-  IsMultiPartWrite = FALSE;
-  Status           = EFI_SUCCESS;
-
   if (RequestDataSize > IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) {
     IsMultiPartWrite = TRUE;
 
-    // Minus by one for the maximum integer the data type of MiddleCount presents.
-    // Plus by two for the WRITE start and end.
-    if (RequestDataSize > IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES * ((1 << 8) - 1 + 2)) {
-      DEBUG ((DEBUG_ERROR, "%a: The request data size exceeds the maximum transfer blocks: RequestDataSize = %d, maximum transfer blocks = %d.\n", __func__, RequestDataSize, (1 << 8) - 1 + 2));
+    if (RequestDataSize > mMaxRequestSize) {
+      DEBUG ((DEBUG_ERROR, "%a: The request data size exceeds the maximum input message size: RequestDataSize = %d, maximum input message size = %d.\n", __func__, RequestDataSize, mMaxRequestSize));
       return EFI_INVALID_PARAMETER;
     }
+  } else {
+    IsMultiPartWrite = FALSE;
+  }
 
+  if (IsMultiPartWrite) {
+    UINTN  MiddleCount;
     MiddleCount = ((RequestDataSize - 1) / IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) - 1;
 
     if (  ((MiddleCount == 0) && (mTransactionSupport == IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_SINGLE_PARTITION_RW))
@@ -93,61 +91,37 @@ SsifWriteRequest (
     WriteLen = IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES;
     SsifCmd  = IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_START;
   } else {
-    WriteLen = (UINT8)RequestDataSize;
+    WriteLen = RequestDataSize;
     SsifCmd  = IPMI_SSIF_SMBUS_CMD_SINGLE_PART_WRITE;
   }
 
-  SmBusWriteBlock (
-    SMBUS_LIB_ADDRESS (
-      IPMI_SSIF_BMC_SLAVE_ADDR_7BIT,
-      SsifCmd,
-      WriteLen,
-      mPecSupport
-      ),
-    RequestData,
-    &Status
-    );
-
-  if (  EFI_ERROR (Status)
-     || !IsMultiPartWrite)
+  for (BytesLeft = RequestDataSize, Status = EFI_SUCCESS;
+       (BytesLeft > 0) && !EFI_ERROR (Status);
+       BytesLeft -= MIN (BytesLeft, IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES))
   {
-    goto Exit;
-  }
+    // Check for SsifCmd transitions if not the first packet
+    if (BytesLeft < RequestDataSize) {
+      // Is this the End packet?
+      if (BytesLeft <= IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES) {
+        WriteLen = BytesLeft;
+        SsifCmd  = IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_END;
+      } else if (SsifCmd == IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_START) {
+        // Did we just write the Start packet of an operation with Middles?
+        SsifCmd = IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_MIDDLE;
+      }
+    }
 
-  for (Index = 1; Index <= MiddleCount; Index++) {
     SmBusWriteBlock (
       SMBUS_LIB_ADDRESS (
         IPMI_SSIF_BMC_SLAVE_ADDR_7BIT,
-        IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_MIDDLE,
+        SsifCmd,
         WriteLen,
         mPecSupport
         ),
-      &RequestData[Index * IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES],
+      &RequestData[RequestDataSize - BytesLeft],
       &Status
       );
-
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
   }
-
-  //
-  // Remain RequestData for END
-  //
-  WriteLen = RequestDataSize - (MiddleCount + 1) * IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES;
-  ASSERT (WriteLen > 0);
-  SmBusWriteBlock (
-    SMBUS_LIB_ADDRESS (
-      IPMI_SSIF_BMC_SLAVE_ADDR_7BIT,
-      IPMI_SSIF_SMBUS_CMD_MULTI_PART_WRITE_END,
-      WriteLen,
-      mPecSupport
-      ),
-    &RequestData[(MiddleCount + 1) * IPMI_SSIF_MAXIMUM_PACKET_SIZE_IN_BYTES],
-    &Status
-    );
-
-Exit:
 
   return Status;
 }
