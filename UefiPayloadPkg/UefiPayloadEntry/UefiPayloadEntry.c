@@ -190,6 +190,7 @@ FindFreeMemForHobCallback (
   )
 {
   EFI_STATUS        Status;
+  MEMORY_MAP_ENTRY  Entry;
   MEMORY_MAP_ENTRY  MemoryMapEntrySplit;
   UINTN             *HobMemBase = (UINTN *)Params;
 
@@ -208,55 +209,62 @@ FindFreeMemForHobCallback (
   }
 
   //
+  // Operate on a copy so the caller's memory map is not modified.
+  // SblParseLib passes pointers into the bootloader's HOB and the same
+  // array is walked again later to publish system memory resource HOBs.
+  //
+  Entry = *MemoryMapEntry;
+
+  //
   // Align on 1 MiB
   //
-  if (ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB) > MemoryMapEntry->Base) {
+  if (ALIGN_VALUE (Entry.Base, SIZE_1MB) > Entry.Base) {
     //
     // Skip too small
     //
-    if (ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB) >= (MemoryMapEntry->Base + MemoryMapEntry->Size)) {
+    if (ALIGN_VALUE (Entry.Base, SIZE_1MB) >= (Entry.Base + Entry.Size)) {
       return EFI_SUCCESS;
     }
 
-    MemoryMapEntry->Size -= ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB) - MemoryMapEntry->Base;
-    MemoryMapEntry->Base  = ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB);
+    Entry.Size -= ALIGN_VALUE (Entry.Base, SIZE_1MB) - Entry.Base;
+    Entry.Base  = ALIGN_VALUE (Entry.Base, SIZE_1MB);
   }
 
   //
   // Skip resources above 4GiB on x86_32
   //
-  if ((sizeof (UINTN) == 4) && (MemoryMapEntry->Base >= 0x100000000ULL)) {
+  if ((sizeof (UINTN) == 4) && (Entry.Base >= 0x100000000ULL)) {
     return EFI_SUCCESS;
   }
 
-  if ((sizeof (UINTN) == 4) && ((MemoryMapEntry->Base + MemoryMapEntry->Size) > 0x100000000ULL)) {
-    MemoryMapEntry->Size = 0x100000000ULL - MemoryMapEntry->Base;
+  if ((sizeof (UINTN) == 4) && ((Entry.Base + Entry.Size) > 0x100000000ULL)) {
+    Entry.Size = 0x100000000ULL - Entry.Base;
   }
 
   //
   // Skip too small
   //
-  if (MemoryMapEntry->Size < FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)) {
+  if (Entry.Size < FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)) {
     return EFI_SUCCESS;
   }
 
   //
   // Overlaps UefiPayload, split into smaller chunks
   //
-  if ((MemoryMapEntry->Base <= PcdGet32 (PcdPayloadFdMemBase)) &&
-      ((MemoryMapEntry->Base + MemoryMapEntry->Size) >= PcdGet32 (PcdPayloadFdMemBase)))
+  if ((Entry.Base <= PcdGet32 (PcdPayloadFdMemBase)) &&
+      ((Entry.Base + Entry.Size) >= PcdGet32 (PcdPayloadFdMemBase)))
   {
     MemoryMapEntrySplit.Type = E820_RAM;
-    MemoryMapEntrySplit.Base = MemoryMapEntry->Base;
+    MemoryMapEntrySplit.Base = Entry.Base;
     MemoryMapEntrySplit.Size = PcdGet32 (PcdPayloadFdMemBase) - MemoryMapEntrySplit.Base;
     Status                   = FindFreeMemForHobCallback (&MemoryMapEntrySplit, Params);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    if ((MemoryMapEntry->Base + MemoryMapEntry->Size) > (PcdGet32 (PcdPayloadFdMemBase) + PcdGet32 (PcdPayloadFdMemSize))) {
+    if ((Entry.Base + Entry.Size) > (PcdGet32 (PcdPayloadFdMemBase) + PcdGet32 (PcdPayloadFdMemSize))) {
       MemoryMapEntrySplit.Base = PcdGet32 (PcdPayloadFdMemBase) + PcdGet32 (PcdPayloadFdMemSize);
-      MemoryMapEntrySplit.Size = (MemoryMapEntry->Base + MemoryMapEntry->Size) - MemoryMapEntrySplit.Base;
+      MemoryMapEntrySplit.Size = (Entry.Base + Entry.Size) - MemoryMapEntrySplit.Base;
       Status                   = FindFreeMemForHobCallback (&MemoryMapEntrySplit, Params);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -266,7 +274,7 @@ FindFreeMemForHobCallback (
     return EFI_SUCCESS;
   }
 
-  *HobMemBase = MemoryMapEntry->Base;
+  *HobMemBase = Entry.Base;
 
   return EFI_ALREADY_STARTED;
 }
