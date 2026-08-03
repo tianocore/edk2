@@ -319,6 +319,8 @@ SecMapApicBaseUnencrypted (
   VOID
   )
 {
+  IA32_CR4            Cr4;
+  PAGING_MODE         PagingMode;
   PHYSICAL_ADDRESS    Cr3;
   UINT64              ApicAddress;
   VOID                *Buffer;
@@ -330,6 +332,9 @@ SecMapApicBaseUnencrypted (
   if (!SevEsIsEnabled ()) {
     return;
   }
+
+  Cr4.UintN  = AsmReadCr4 ();
+  PagingMode = Cr4.Bits.LA57 ? Paging5Level : Paging4Level;
 
   ApicAddress = (UINT64)GetLocalApicBaseAddress ();
   Buffer      = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecApicPageTableBase);
@@ -343,7 +348,7 @@ SecMapApicBaseUnencrypted (
 
   Status = PageTableMap (
              (UINTN *)&Cr3,
-             Paging4Level,
+             PagingMode,
              Buffer,
              &BufferSize,
              ApicAddress,
