@@ -14,15 +14,15 @@ on:
     branches: ['master']
 
 jobs:
-  build_vs2022:
+  build_vs2026:
     strategy:
       matrix:
-        os: [windows-2022]
+        os: [windows-2025]
         python-version: ['3.12']
-        tool-chain: ['VS2022']
+        tool-chain: ['VS2026']
         target: ['DEBUG']
         extra-build-args: ['FIT_BUILD=TRUE', 'FIT_BUILD=FALSE']
-    name: Build UPL VS2022
+    name: Build UPL VS2026
     uses: ./.github/workflows/BuildPlatform.yml
     with:
       runs-on: ${{ matrix.os }}

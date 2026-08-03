@@ -3,7 +3,7 @@
 
   Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
-  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -356,7 +356,8 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
   { "SerialNumber",               SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
   { "AssetTag",                   SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
   { "PartNumber",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
-  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString }
+  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "StaToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
 };
 
 /** A parser for EArchCommonObjCacheInfo.
@@ -1367,6 +1368,59 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemInfoParser[] = {
   { "Family",          SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
 };
 
+/** A parser for EArchCommonObjSystemEnclosureInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemEnclosureInfoParser[] = {
+  { "SystemEnclosureToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Manufacturer",              SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Type",                      sizeof (UINT8),           "0x%x", NULL        },
+  { "Version",                   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNum",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "AssetTag",                  SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "BootUpState",               sizeof (UINT8),           "0x%x", NULL        },
+  { "PowerSupplyState",          sizeof (UINT8),           "0x%x", NULL        },
+  { "ThermalState",              sizeof (UINT8),           "0x%x", NULL        },
+  { "SecurityStatus",            sizeof (UINT8),           "0x%x", NULL        },
+  { "OemDefined",                sizeof (UINT32),          "0x%x", NULL        },
+  { "Height",                    sizeof (UINT8),           "0x%x", NULL        },
+  { "NumberOfPowerCords",        sizeof (UINT8),           "0x%x", NULL        },
+  { "ContainedElementListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "SkuNum",                    SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "RackType",                  sizeof (UINT8),           "0x%x", NULL        },
+  { "RackHeight",                sizeof (UINT8),           "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjEnclosureElement.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonEnclosureElementParser[] = {
+  { "ContainedElementType",    sizeof (UINT8), "0x%x", NULL },
+  { "ContainedElementMinimum", sizeof (UINT8), "%u",   NULL },
+  { "ContainedElementMaximum", sizeof (UINT8), "%u",   NULL },
+};
+
+/** A parser for EArchCommonObjBaseboardContainedObject.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBaseboardContainedObjectParser[] = {
+  { "ContainedObjectToken", sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "GeneratorId",          sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
+};
+
+/** A parser for EArchCommonObjBaseboardInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBaseboardInfoParser[] = {
+  { "BaseboardInfoToken",       sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ChassisToken",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ContainedObjectListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Manufacturer",             SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ProductName",              SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Version",                  SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNum",                SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "AssetTag",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "FeatureFlag",              sizeof (UINT8),           "0x%x", NULL        },
+  { "LocationInChassis",        SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "BoardType",                sizeof (UINT8),           "0x%x", NULL        },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1442,6 +1496,10 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformation,               CmArchCommonAdditionalInformationParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationEntry,          CmArchCommonAdditionalInformationEntryParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationValue,          CmArchCommonAdditionalInformationValueParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemEnclosureInfo,                 CmArchCommonSystemEnclosureInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjEnclosureElement,                    CmArchCommonEnclosureElementParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBaseboardInfo,                       CmArchCommonBaseboardInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBaseboardContainedObject,            CmArchCommonBaseboardContainedObjectParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
