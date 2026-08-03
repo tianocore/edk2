@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/DiskIo2.h>
+#include <Protocol/PartitionInfo.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/UnicodeCollation.h>
 
