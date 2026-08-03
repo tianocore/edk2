@@ -880,7 +880,10 @@ FmpDeviceSetImageWithStatus (
    * NOTE:
    *     Next boot, This image accepted in Entry point.
    */
-  Status = FwuCommit (Handle, 1, 0, &CommitProgress, &CommitTotalWorks);
+  do {
+    Status = FwuCommit (Handle, 1, 0, &CommitProgress, &CommitTotalWorks);
+  } while (Status == EFI_TIMEOUT);
+
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
@@ -936,6 +939,10 @@ CancelUpdate:
   if (IS_FWU_FUNC_SUPPORTED (PSA_MM_FWU_COMMAND_CANCEL_STAGING)) {
     CancelStatus = FwuCancelStaging ();
     ASSERT (CancelStatus == EFI_SUCCESS);
+  }
+
+  if (Status == EFI_SECURITY_VIOLATION) {
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_AUTH_ERROR;
   }
 
   return Status;
