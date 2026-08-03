@@ -153,10 +153,12 @@ EDK II Contributed Files:
 Breaking Changes Documentation
 F: BREAKING-CHANGES.md
 R: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+R: Aaron Pop <aaronpop@microsoft.com> [apop5]
 
 VS Code PR Dashboard Notebook
 F: contrib/PullRequests.github-issues
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+M: Aaron Pop <aaronpop@microsoft.com> [apop5]
 
 EDK II Packages:
 ----------------
