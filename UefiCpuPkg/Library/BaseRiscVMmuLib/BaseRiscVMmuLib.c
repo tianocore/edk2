@@ -240,7 +240,7 @@ SetPpnToPte (
   UINT64  Ppn;
 
   Ppn = ((Address >> RISCV_MMU_PAGE_SHIFT) << PTE_PPN_SHIFT);
-  ASSERT (~(Ppn & ~PTE_PPN_MASK));
+  ASSERT (!(Ppn & ~PTE_PPN_MASK));
   Entry &= ~PTE_PPN_MASK;
   return Entry | Ppn;
 }
