@@ -7,6 +7,56 @@
 
 **/
 #include "BlSupportDxe.h"
+#include <Library/PcdLib.h>
+
+#define PAYLOAD_HIDPI_HORIZONTAL_RESOLUTION  1920
+#define PAYLOAD_HIDPI_VERTICAL_RESOLUTION    1080
+
+STATIC
+BOOLEAN
+TryGetWideAspectCappedViewportWidth (
+  IN  UINT32  HorizontalResolution,
+  IN  UINT32  VerticalResolution,
+  IN  UINT32  CapAspectWidth,
+  IN  UINT32  CapAspectHeight,
+  OUT UINT32  *ViewportWidth
+  )
+{
+  UINT64  CandidateWidth;
+
+  if ((ViewportWidth == NULL) ||
+      (HorizontalResolution == 0) ||
+      (VerticalResolution == 0) ||
+      (CapAspectWidth == 0) ||
+      (CapAspectHeight == 0))
+  {
+    return FALSE;
+  }
+
+  if (((UINT64)HorizontalResolution * CapAspectHeight) <= ((UINT64)VerticalResolution * CapAspectWidth)) {
+    return FALSE;
+  }
+
+  CandidateWidth = ((UINT64)VerticalResolution * CapAspectWidth) / CapAspectHeight;
+  CandidateWidth &= ~1ULL;
+  if ((CandidateWidth == 0) || (CandidateWidth >= HorizontalResolution)) {
+    return FALSE;
+  }
+
+  *ViewportWidth = (UINT32)CandidateWidth;
+  return TRUE;
+}
+
+STATIC
+BOOLEAN
+IsHiDpiFramebuffer (
+  IN UINT32  HorizontalResolution,
+  IN UINT32  VerticalResolution
+  )
+{
+  return (HorizontalResolution > PAYLOAD_HIDPI_HORIZONTAL_RESOLUTION) &&
+         (VerticalResolution > PAYLOAD_HIDPI_VERTICAL_RESOLUTION);
+}
 
 /**
   Main entry for the bootloader support DXE module.
@@ -32,20 +82,49 @@ BlDxeEntryPoint (
   FIRMWARE_INFO              *FirmwareInfo;
   EFI_SYSTEM_RESOURCE_TABLE  *Esrt;
   EFI_SYSTEM_RESOURCE_ENTRY  *Esre;
+  UINT32                     HorizontalResolution;
+  UINT32                     VerticalResolution;
+  UINT32                     SetupHorizontalResolution;
+  UINT32                     SetupVerticalResolution;
+  UINT32                     ViewportWidth;
 
   //
   // Find the frame buffer information and update PCDs
   //
   GuidHob = GetFirstGuidHob (&gEfiGraphicsInfoHobGuid);
   if (GuidHob != NULL) {
-    GfxInfo = (EFI_PEI_GRAPHICS_INFO_HOB *)GET_GUID_HOB_DATA (GuidHob);
-    Status  = PcdSet32S (PcdVideoHorizontalResolution, GfxInfo->GraphicsMode.HorizontalResolution);
+    GfxInfo              = (EFI_PEI_GRAPHICS_INFO_HOB *)GET_GUID_HOB_DATA (GuidHob);
+    HorizontalResolution = GfxInfo->GraphicsMode.HorizontalResolution;
+    VerticalResolution   = GfxInfo->GraphicsMode.VerticalResolution;
+    SetupHorizontalResolution = HorizontalResolution;
+    SetupVerticalResolution   = VerticalResolution;
+
+    if (FeaturePcdGet (PcdPayloadFbHiDpiWideAspectCapSupport) &&
+        TryGetWideAspectCappedViewportWidth (
+          SetupHorizontalResolution,
+          SetupVerticalResolution,
+          PcdGet32 (PcdPayloadFbHiDpiWideAspectCapWidth),
+          PcdGet32 (PcdPayloadFbHiDpiWideAspectCapHeight),
+          &ViewportWidth
+          ))
+    {
+      SetupHorizontalResolution = ViewportWidth;
+    }
+
+    if (IsHiDpiFramebuffer (HorizontalResolution, VerticalResolution) &&
+        ((SetupHorizontalResolution & 1) == 0) && ((SetupVerticalResolution & 1) == 0))
+    {
+      SetupHorizontalResolution /= 2;
+      SetupVerticalResolution   /= 2;
+    }
+
+    Status = PcdSet32S (PcdVideoHorizontalResolution, HorizontalResolution);
     ASSERT_EFI_ERROR (Status);
-    Status = PcdSet32S (PcdVideoVerticalResolution, GfxInfo->GraphicsMode.VerticalResolution);
+    Status = PcdSet32S (PcdVideoVerticalResolution, VerticalResolution);
     ASSERT_EFI_ERROR (Status);
-    Status = PcdSet32S (PcdSetupVideoHorizontalResolution, GfxInfo->GraphicsMode.HorizontalResolution);
+    Status = PcdSet32S (PcdSetupVideoHorizontalResolution, SetupHorizontalResolution);
     ASSERT_EFI_ERROR (Status);
-    Status = PcdSet32S (PcdSetupVideoVerticalResolution, GfxInfo->GraphicsMode.VerticalResolution);
+    Status = PcdSet32S (PcdSetupVideoVerticalResolution, SetupVerticalResolution);
     ASSERT_EFI_ERROR (Status);
   }
 
