@@ -67,6 +67,101 @@ EfiBootManagerRegisterLegacyBootSupport (
 }
 
 /**
+  Reset optional variables associated with the current boot.
+**/
+STATIC
+VOID
+BmResetCurrentBootOptionalVariables (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gRT->SetVariable (
+                  L"LoaderDevicePartUUID",
+                  &gEfiBootLoaderInterfaceGuid,
+                  0,
+                  0,
+                  NULL
+                  );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
+}
+
+/**
+  Set the Boot Loader Interface LoaderDevicePartUUID variable.
+
+  @param DevicePath  Device path for the loaded image.
+**/
+STATIC
+VOID
+BmSetLoaderDevicePartUuid (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
+  HARDDRIVE_DEVICE_PATH     *HardDrive;
+  CHAR16                    PartUuid[GUID_STRING_LENGTH + 1];
+
+  for (Node = DevicePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+    if ((DevicePathType (Node) != MEDIA_DEVICE_PATH) ||
+        (DevicePathSubType (Node) != MEDIA_HARDDRIVE_DP))
+    {
+      continue;
+    }
+
+    HardDrive = (HARDDRIVE_DEVICE_PATH *)Node;
+    if ((HardDrive->MBRType != MBR_TYPE_EFI_PARTITION_TABLE_HEADER) ||
+        (HardDrive->SignatureType != SIGNATURE_TYPE_GUID))
+    {
+      continue;
+    }
+
+    UnicodeSPrint (
+      PartUuid,
+      sizeof (PartUuid),
+      L"%g",
+      (EFI_GUID *)HardDrive->Signature
+      );
+    BmSetVariableAndReportStatusCodeOnError (
+      L"LoaderDevicePartUUID",
+      &gEfiBootLoaderInterfaceGuid,
+      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+      StrSize (PartUuid),
+      PartUuid
+      );
+    return;
+  }
+}
+
+/**
+  Clear current boot variables.
+**/
+STATIC
+VOID
+BmClearCurrentBootVariables (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  BmResetCurrentBootOptionalVariables ();
+
+  Status = gRT->SetVariable (
+                  L"BootCurrent",
+                  &gEfiGlobalVariableGuid,
+                  0,
+                  0,
+                  NULL
+                  );
+  //
+  // Deleting variable with current variable implementation shouldn't fail.
+  // When BootXXXX (e.g.: BootManagerMenu) boots BootYYYY, exiting BootYYYY causes BootCurrent deleted,
+  // exiting BootXXXX causes deleting BootCurrent returns EFI_NOT_FOUND.
+  //
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
+}
+
+/**
   Return TRUE when the boot option is auto-created instead of manually added.
 
   @param BootOption Pointer to the boot option to check.
@@ -1952,6 +2047,7 @@ EfiBootManagerBoot (
     sizeof (UINT16),
     &Uint16
     );
+  BmResetCurrentBootOptionalVariables ();
 
   //
   // 3. Signal the EVT_SIGNAL_READY_TO_BOOT event when we are about to load and execute
@@ -2013,6 +2109,9 @@ EfiBootManagerBoot (
                       FileSize,
                       &ImageHandle
                       );
+      if (!EFI_ERROR (Status)) {
+        BmSetLoaderDevicePartUuid (FilePath);
+      }
     }
 
     if (FileBuffer != NULL) {
@@ -2151,22 +2250,7 @@ EfiBootManagerBoot (
     ASSERT_EFI_ERROR (Status);
   }
 
-  //
-  // Clear Boot Current
-  //
-  Status = gRT->SetVariable (
-                  L"BootCurrent",
-                  &gEfiGlobalVariableGuid,
-                  0,
-                  0,
-                  NULL
-                  );
-  //
-  // Deleting variable with current variable implementation shouldn't fail.
-  // When BootXXXX (e.g.: BootManagerMenu) boots BootYYYY, exiting BootYYYY causes BootCurrent deleted,
-  // exiting BootXXXX causes deleting BootCurrent returns EFI_NOT_FOUND.
-  //
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
+  BmClearCurrentBootVariables ();
 }
 
 /**
