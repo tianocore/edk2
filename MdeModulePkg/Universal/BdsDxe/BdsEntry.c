@@ -277,28 +277,21 @@ BdsWaitForSingleEvent (
 }
 
 /**
-  The function reads user inputs.
+  Drain queued console input.
 
 **/
+STATIC
 VOID
-BdsReadKeys (
+BdsDrainConsoleInput (
   VOID
   )
 {
-  EFI_STATUS     Status;
   EFI_INPUT_KEY  Key;
-
-  if (PcdGetBool (PcdConInConnectOnDemand)) {
-    return;
-  }
+  EFI_STATUS     Status;
 
   while (gST->ConIn != NULL) {
     Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-
     if (EFI_ERROR (Status)) {
-      //
-      // No more keys.
-      //
       break;
     }
   }
@@ -325,9 +318,6 @@ BdsWait (
   while (TimeoutRemain != 0) {
     DEBUG ((DEBUG_INFO, "[Bds]BdsWait(%d)..Zzzz...\n", (UINTN)TimeoutRemain));
     PlatformBootManagerWaitCallback (TimeoutRemain);
-
-    BdsReadKeys (); // BUGBUG: Only reading can signal HotkeyTriggered
-                    //         Can be removed after all keyboard drivers invoke callback in timer callback.
 
     if (HotkeyTriggered != NULL) {
       Status = BdsWaitForSingleEvent (HotkeyTriggered, EFI_TIMER_PERIOD_SECONDS (1));
@@ -1042,6 +1032,12 @@ BdsEntry (
     }
 
     //
+    // A hotkey notification can leave the same key queued for ReadKeyStroke().
+    // Consume it before Enter can immediately select Continue in Front Page.
+    //
+    BdsDrainConsoleInput ();
+
+    //
     // Directly enter the setup page.
     //
     EfiBootManagerBoot (&BootManagerMenu);
@@ -1063,11 +1059,6 @@ BdsEntry (
     PERF_INMODULE_BEGIN ("BdsWait");
     BdsWait (HotkeyTriggered);
     PERF_INMODULE_END ("BdsWait");
-    //
-    // BdsReadKeys() can be removed after all keyboard drivers invoke callback in timer callback.
-    //
-    BdsReadKeys ();
-
     EfiBootManagerHotkeyBoot ();
 
     if (BootNext != NULL) {
