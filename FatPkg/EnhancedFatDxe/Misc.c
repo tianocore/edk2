@@ -458,6 +458,36 @@ FatFreeDirEnt (
 }
 
 /**
+  Return whether the volume is an EFI System Partition.
+
+  @param Volume - FAT file system volume.
+
+  @retval TRUE  - The volume is identified as an EFI System Partition.
+  @retval FALSE - The volume is not identified as an EFI System Partition.
+
+**/
+STATIC
+BOOLEAN
+FatIsEfiSystemPartition (
+  IN FAT_VOLUME  *Volume
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_PARTITION_INFO_PROTOCOL  *PartitionInfo;
+
+  Status = gBS->HandleProtocol (
+                  Volume->Handle,
+                  &gEfiPartitionInfoProtocolGuid,
+                  (VOID **)&PartitionInfo
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return (BOOLEAN)(PartitionInfo->System != 0);
+}
+
+/**
   Pre-ExitBootServices notification, signaled once per FAT volume. Context
   is the FAT_VOLUME this event was created for. This routine will flush any
   dirty caches for the volume.
@@ -489,6 +519,18 @@ FatOnBeforeExitBootServices (
   Status = FatAcquireLockOrFail ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "%a: FAT lock busy, skipping flush of %p\n", __func__, Volume->Handle));
+    return;
+  }
+
+  if (FatIsEfiSystemPartition (Volume)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: skipping pre-ExitBootServices flush for ESP %p\n",
+      __func__,
+      Volume->Handle
+      ));
+    Volume->CachingDisabled = TRUE;
+    FatReleaseLock ();
     return;
   }
 

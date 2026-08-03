@@ -78,6 +78,7 @@
   gEfiDiskIoProtocolGuid                ## TO_START
   gEfiDiskIo2ProtocolGuid               ## TO_START
   gEfiBlockIoProtocolGuid               ## TO_START
+  gEfiPartitionInfoProtocolGuid         ## SOMETIMES_CONSUMES
   gEfiSimpleFileSystemProtocolGuid      ## BY_START
   gEfiUnicodeCollation2ProtocolGuid     ## TO_START
 
