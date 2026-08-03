@@ -8,6 +8,10 @@
 
 #include "CapsuleOnDisk.h"
 
+#include <Library/HobLib.h>
+
+extern BOOLEAN  mDxeCapsuleLibEndOfDxe;
+
 /**
   Return if this capsule is a capsule name capsule, based upon CapsuleHeader.
 
@@ -20,6 +24,110 @@ BOOLEAN
 IsCapsuleNameCapsule (
   IN EFI_CAPSULE_HEADER  *CapsuleHeader
   );
+
+BOOLEAN
+IsValidCapsuleHeader (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN UINT64              CapsuleSize
+  );
+
+STATIC
+BOOLEAN
+CoDFileAttributeMatches (
+  IN UINT64  FileAttribute,
+  IN UINT64  FileAttr
+  )
+{
+  if ((FileAttribute & EFI_FILE_DIRECTORY) != 0) {
+    return FALSE;
+  }
+
+  if ((FileAttribute & FileAttr) != 0) {
+    return TRUE;
+  }
+
+  //
+  // Some FAT implementations report regular files without EFI_FILE_ARCHIVE.
+  // The caller has already opened the trusted capsule directory, so accept an
+  // attribute-less regular entry when looking for archive or system files.
+  //
+  return (FileAttribute == 0) &&
+         ((FileAttr & (EFI_FILE_ARCHIVE | EFI_FILE_SYSTEM)) != 0);
+}
+
+STATIC
+BOOLEAN
+CoDIsValidCapsuleImage (
+  IN VOID    *ImageAddress,
+  IN UINT64  ImageSize
+  )
+{
+  EFI_CAPSULE_HEADER  *CapsuleHeader;
+
+  if ((ImageAddress == NULL) ||
+      (ImageSize < sizeof (EFI_CAPSULE_HEADER)) ||
+      (ImageSize > MAX_UINTN))
+  {
+    return FALSE;
+  }
+
+  CapsuleHeader = ImageAddress;
+  if (CapsuleHeader->HeaderSize < sizeof (*CapsuleHeader)) {
+    return FALSE;
+  }
+
+  return IsValidCapsuleHeader (CapsuleHeader, ImageSize);
+}
+
+STATIC
+EFI_STATUS
+CoDFilterInvalidCapsuleImages (
+  IN OUT IMAGE_INFO  *CapsuleImages,
+  IN OUT UINTN       *CapsuleCount
+  )
+{
+  UINTN  Index;
+  UINTN  ValidCount;
+
+  if ((CapsuleImages == NULL) || (CapsuleCount == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ValidCount = 0;
+  for (Index = 0; Index < *CapsuleCount; Index++) {
+    if ((CapsuleImages[Index].FileInfo == NULL) ||
+        !CoDIsValidCapsuleImage (
+           CapsuleImages[Index].ImageAddress,
+           CapsuleImages[Index].FileInfo->FileSize
+           ))
+    {
+      if (CapsuleImages[Index].FileInfo != NULL) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a(): ignoring invalid capsule file %s\n",
+          __func__,
+          CapsuleImages[Index].FileInfo->FileName
+          ));
+        FreePool (CapsuleImages[Index].FileInfo);
+      }
+
+      if (CapsuleImages[Index].ImageAddress != NULL) {
+        FreePool (CapsuleImages[Index].ImageAddress);
+      }
+
+      continue;
+    }
+
+    if (ValidCount != Index) {
+      CapsuleImages[ValidCount] = CapsuleImages[Index];
+    }
+
+    ValidCount++;
+  }
+
+  *CapsuleCount = ValidCount;
+  return (ValidCount == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
+}
 
 /**
   Check the integrity of the capsule name capsule.
@@ -426,6 +534,96 @@ GetEfiSysPartitionFromDevPath (
   return EFI_NOT_FOUND;
 }
 
+STATIC
+BOOLEAN
+IsNetworkBootDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  BOOLEAN  NetworkPath;
+  BOOLEAN  StoragePath;
+  UINT8    SubType;
+
+  NetworkPath = FALSE;
+  StoragePath = FALSE;
+  while (!IsDevicePathEnd (DevicePath)) {
+    SubType = DevicePathSubType (DevicePath);
+    if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+        ((SubType == MEDIA_HARDDRIVE_DP) || (SubType == MEDIA_CDROM_DP)))
+    {
+      StoragePath = TRUE;
+    } else if (DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) {
+      switch (SubType) {
+        case MSG_INFINIBAND_DP:
+          if (DevicePathNodeLength (DevicePath) < sizeof (INFINIBAND_DEVICE_PATH)) {
+            NetworkPath = TRUE;
+            break;
+          }
+
+          if ((((INFINIBAND_DEVICE_PATH *)DevicePath)->ResourceFlags &
+               INFINIBAND_RESOURCE_FLAG_STORAGE_PROTOCOL) != 0)
+          {
+            StoragePath = TRUE;
+          }
+
+          if ((((INFINIBAND_DEVICE_PATH *)DevicePath)->ResourceFlags &
+               INFINIBAND_RESOURCE_FLAG_NETWORK_PROTOCOL) != 0)
+          {
+            NetworkPath = TRUE;
+          }
+
+          break;
+        case MSG_MAC_ADDR_DP:
+        case MSG_IPv4_DP:
+        case MSG_IPv6_DP:
+        case MSG_VLAN_DP:
+        case MSG_URI_DP:
+        case MSG_DNS_DP:
+        case MSG_WIFI_DP:
+          NetworkPath = TRUE;
+          break;
+        case MSG_ATAPI_DP:
+        case MSG_SCSI_DP:
+        case MSG_FIBRECHANNEL_DP:
+        case MSG_FIBRECHANNELEX_DP:
+        case MSG_ISCSI_DP:
+        case MSG_I2O_DP:
+        case MSG_DEVICE_LOGICAL_UNIT_DP:
+        case MSG_SATA_DP:
+        case MSG_SASEX_DP:
+        case MSG_NVME_NAMESPACE_DP:
+        case MSG_NVME_OF_NAMESPACE_DP:
+        case MSG_UFS_DP:
+        case MSG_SD_DP:
+        case MSG_EMMC_DP:
+          StoragePath = TRUE;
+          break;
+        default:
+          break;
+      }
+    }
+
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  //
+  // Controller-only paths may not identify their transport until connected.
+  // Reject only paths that are positively network boot and are not SAN-backed.
+  //
+  return NetworkPath && !StoragePath;
+}
+
+STATIC
+BOOLEAN
+IsMediaShortFormDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  return (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+         ((DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP) ||
+          (DevicePathSubType (DevicePath) == MEDIA_FILEPATH_DP));
+}
+
 /**
   This routine is called to get Simple File System protocol on the first EFI system partition found in
   active boot option. The boot option list is detemined in order by
@@ -438,6 +636,10 @@ GetEfiSysPartitionFromDevPath (
                                       On output, return the OptionNumber of the boot option where EFI
                                       system partition is got from.
   @param[out]      FsFsHandle         Simple File System Protocol found on first active EFI system partition
+  @param[in]       ConnectBootDevice  Connect the boot device before expanding
+                                      its media path.
+  @param[out]      ConnectAllNeeded   Set when an active media-only boot path
+                                      needs global device connection. Optional.
 
   @retval EFI_SUCCESS     Simple File System protocol found for EFI system partition
   @retval EFI_NOT_FOUND   No Simple File System protocol found for EFI system partition
@@ -447,16 +649,26 @@ EFI_STATUS
 GetEfiSysPartitionFromActiveBootOption (
   IN UINTN        MaxRetry,
   IN OUT UINT16   **LoadOptionNumber,
-  OUT EFI_HANDLE  *FsHandle
+  OUT EFI_HANDLE  *FsHandle,
+  IN BOOLEAN      ConnectBootDevice,
+  OUT BOOLEAN     *ConnectAllNeeded OPTIONAL
   )
 {
   EFI_STATUS                    Status;
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptionBuf;
   UINTN                         BootOptionNum;
   UINTN                         Index;
+  UINTN                         RetryCount;
+  UINTN                         DevicePathSize;
+  EFI_HANDLE                    DeviceHandle;
   EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath;
   EFI_DEVICE_PATH_PROTOCOL      *CurFullPath;
   EFI_DEVICE_PATH_PROTOCOL      *PreFullPath;
+
+  if (ConnectAllNeeded != NULL) {
+    *ConnectAllNeeded = FALSE;
+  }
 
   *FsHandle   = NULL;
   CurFullPath = NULL;
@@ -484,17 +696,53 @@ GetEfiSysPartitionFromActiveBootOption (
   //
   for (Index = 0; Index < BootOptionNum; Index++) {
     //
-    // Get the boot option from the link list
+    // Skip inactive boot options.
     //
-    DevicePath = BootOptionBuf[Index].FilePath;
+    if ((BootOptionBuf[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) {
+      continue;
+    }
+
+    RetryCount          = MaxRetry;
+    Status              = EFI_NOT_FOUND;
+    RemainingDevicePath = BootOptionBuf[Index].FilePath;
+    DevicePath          = GetNextDevicePathInstance (&RemainingDevicePath, &DevicePathSize);
+    if (DevicePath == NULL) {
+      continue;
+    }
 
     //
-    // Skip inactive or legacy boot options
+    // Only FilePathList[0] identifies the boot image. Later path instances are
+    // OSV-specific metadata and must not be connected as boot targets.
     //
-    if (((BootOptionBuf[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) ||
-        (DevicePathType (DevicePath) == BBS_DEVICE_PATH))
+    if ((DevicePathType (DevicePath) == BBS_DEVICE_PATH) ||
+        (ConnectBootDevice && IsNetworkBootDevicePath (DevicePath)))
     {
+      FreePool (DevicePath);
       continue;
+    }
+
+    //
+    // A file-path-only option does not identify a filesystem. Targeted and
+    // capsule-in-RAM lookups must not expand it to an unrelated ESP. The no-RAM
+    // legacy path retains global resolution for relocation compatibility.
+    //
+    if ((ConnectBootDevice || PcdGetBool (PcdCapsuleInRamSupport)) &&
+        (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+        (DevicePathSubType (DevicePath) == MEDIA_FILEPATH_DP))
+    {
+      if (ConnectBootDevice && (ConnectAllNeeded != NULL)) {
+        *ConnectAllNeeded = TRUE;
+      }
+
+      FreePool (DevicePath);
+      break;
+    }
+
+    if (ConnectBootDevice &&
+        IsMediaShortFormDevicePath (DevicePath) &&
+        (ConnectAllNeeded != NULL))
+    {
+      *ConnectAllNeeded = TRUE;
     }
 
     DEBUG_CODE_BEGIN ();
@@ -510,19 +758,57 @@ GetEfiSysPartitionFromActiveBootOption (
 
     DEBUG_CODE_END ();
 
+    if (ConnectBootDevice) {
+      //
+      // A disk-only boot option does not name the partition or filesystem,
+      // so expansion cannot find the ESP until the storage controller has
+      // produced those child handles.
+      //
+      DeviceHandle = NULL;
+      Status       = EfiBootManagerConnectDevicePath (DevicePath, &DeviceHandle);
+      if (!EFI_ERROR (Status) && (DeviceHandle != NULL)) {
+        gBS->ConnectController (DeviceHandle, NULL, NULL, TRUE);
+      }
+    }
+
     CurFullPath = NULL;
     //
     // Try every full device Path generated from bootoption
     //
     do {
       PreFullPath = CurFullPath;
-      CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath (DevicePath, CurFullPath);
+      if (ConnectBootDevice) {
+        CurFullPath = EfiBootManagerGetNextLoadOptionDevicePathNoConnectAll (
+                        DevicePath,
+                        CurFullPath
+                        );
+      } else {
+        CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath (DevicePath, CurFullPath);
+      }
 
       if (PreFullPath != NULL) {
         FreePool (PreFullPath);
       }
 
       if (CurFullPath == NULL) {
+        if (ConnectBootDevice && (RetryCount > 0))
+        {
+          //
+          // A slow device may not expose a path on the first connection.
+          // Retry the targeted connection before expanding the path again.
+          //
+          gBS->Stall (100000);
+          RetryCount--;
+          DeviceHandle = NULL;
+          Status       = EfiBootManagerConnectDevicePath (DevicePath, &DeviceHandle);
+          if (!EFI_ERROR (Status) && (DeviceHandle != NULL)) {
+            gBS->ConnectController (DeviceHandle, NULL, NULL, TRUE);
+          }
+
+          Status = EFI_NOT_READY;
+          continue;
+        }
+
         //
         // No Active EFI system partition is found in BootOption device path
         //
@@ -543,8 +829,8 @@ GetEfiSysPartitionFromActiveBootOption (
 
       //
       // Make sure the boot option device path connected.
-      // Only handle first device in boot option. Other optional device paths are described as OSV specific
-      // FullDevice could contain extra directory & file info. So don't check connection status here.
+      // FullDevice could contain extra directory and file information, so
+      // do not check connection status here.
       //
       EfiBootManagerConnectDevicePath (CurFullPath, NULL);
       Status = GetEfiSysPartitionFromDevPath (CurFullPath, FsHandle);
@@ -552,11 +838,12 @@ GetEfiSysPartitionFromActiveBootOption (
       //
       // Some relocation device like USB need more time to get enumerated
       //
-      while (EFI_ERROR (Status) && MaxRetry > 0) {
+      while (EFI_ERROR (Status) && RetryCount > 0) {
         EfiBootManagerConnectDevicePath (CurFullPath, NULL);
 
         //
-        // Search for EFI system partition protocol on full device path in Boot Option
+        // Search for EFI system partition protocol on full device path in
+        // Boot Option.
         //
         Status = GetEfiSysPartitionFromDevPath (CurFullPath, FsHandle);
         if (!EFI_ERROR (Status)) {
@@ -568,9 +855,11 @@ GetEfiSysPartitionFromActiveBootOption (
         // Stall 100ms if connection failed to ensure USB stack is ready
         //
         gBS->Stall (100000);
-        MaxRetry--;
+        RetryCount--;
       }
     } while (EFI_ERROR (Status));
+
+    FreePool (DevicePath);
 
     //
     // Find a qualified Simple File System
@@ -581,20 +870,21 @@ GetEfiSysPartitionFromActiveBootOption (
   }
 
   //
-  // Return the OptionNumber of the boot option where EFI system partition is got from
-  //
-  if (*LoadOptionNumber == NULL) {
-    *LoadOptionNumber = AllocateCopyPool (sizeof (UINT16), (UINT16 *)&BootOptionBuf[Index].OptionNumber);
-    if (*LoadOptionNumber == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-    }
-  }
-
-  //
   // No qualified EFI system partition found
   //
   if (*FsHandle == NULL) {
     Status = EFI_NOT_FOUND;
+  }
+
+  //
+  // Return the option number only after finding its EFI system partition.
+  // Index equals BootOptionNum when every boot option lookup failed.
+  //
+  if ((*LoadOptionNumber == NULL) && !EFI_ERROR (Status)) {
+    *LoadOptionNumber = AllocateCopyPool (sizeof (UINT16), (UINT16 *)&BootOptionBuf[Index].OptionNumber);
+    if (*LoadOptionNumber == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    }
   }
 
   DEBUG_CODE_BEGIN ();
@@ -710,7 +1000,7 @@ GetFileInfoListInAlphabetFromDir (
     //
     // Skip file with mismatching File attribute
     //
-    if ((FileInfo->Attribute & (FileAttr)) == 0) {
+    if (!CoDFileAttributeMatches (FileInfo->Attribute, FileAttr)) {
       continue;
     }
 
@@ -879,6 +1169,350 @@ EXIT:
   return Status;
 }
 
+STATIC
+VOID
+CoDFreeFileInfoList (
+  IN OUT LIST_ENTRY  *FileInfoList
+  )
+{
+  LIST_ENTRY       *Link;
+  FILE_INFO_ENTRY  *FileInfoEntry;
+
+  while (!IsListEmpty (FileInfoList)) {
+    Link = FileInfoList->ForwardLink;
+    RemoveEntryList (Link);
+
+    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
+    FreePool (FileInfoEntry->FileInfo);
+    FreePool (FileInfoEntry->FileNameFirstPart);
+    FreePool (FileInfoEntry->FileNameSecondPart);
+    FreePool (FileInfoEntry);
+  }
+}
+
+STATIC
+EFI_STATUS
+CoDOpenCapsuleDirectoryOnFs (
+  IN  EFI_HANDLE       FsHandle,
+  OUT EFI_FILE_HANDLE  *FileDir
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Fs;
+  EFI_FILE_HANDLE                  RootDir;
+
+  *FileDir = NULL;
+  RootDir  = NULL;
+
+  Status = gBS->HandleProtocol (FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = Fs->OpenVolume (Fs, &RootDir);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = RootDir->Open (
+                      RootDir,
+                      FileDir,
+                      EFI_CAPSULE_FILE_DIRECTORY,
+                      EFI_FILE_MODE_READ,
+                      0
+                      );
+  RootDir->Close (RootDir);
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+CoDCountCapsulesOnFs (
+  IN  EFI_HANDLE  FsHandle,
+  OUT UINTN       *ValidFileCount,
+  OUT UINTN       *CandidateFileCount
+  )
+{
+  EFI_STATUS          Status;
+  EFI_STATUS          FileStatus;
+  EFI_FILE_HANDLE     FileDir;
+  EFI_FILE_HANDLE     FileHandle;
+  LIST_ENTRY          FileInfoList;
+  LIST_ENTRY          *Link;
+  FILE_INFO_ENTRY     *FileInfoEntry;
+  EFI_FILE_INFO       *FileInfo;
+  EFI_CAPSULE_HEADER  CapsuleHeader;
+  UINTN               HeaderSize;
+
+  *ValidFileCount     = 0;
+  *CandidateFileCount = 0;
+  FileHandle          = NULL;
+
+  Status = CoDOpenCapsuleDirectoryOnFs (FsHandle, &FileDir);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = GetFileInfoListInAlphabetFromDir (
+             FileDir,
+             EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE,
+             &FileInfoList,
+             CandidateFileCount
+             );
+  if (EFI_ERROR (Status)) {
+    FileDir->Close (FileDir);
+    return Status;
+  }
+
+  for (Link = FileInfoList.ForwardLink; Link != &FileInfoList; Link = Link->ForwardLink) {
+    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
+    FileInfo      = FileInfoEntry->FileInfo;
+    if ((FileInfo->FileSize < sizeof (CapsuleHeader)) ||
+        (FileInfo->FileSize > MAX_UINTN))
+    {
+      continue;
+    }
+
+    FileStatus = FileDir->Open (
+                           FileDir,
+                           &FileHandle,
+                           FileInfo->FileName,
+                           EFI_FILE_MODE_READ,
+                           0
+                           );
+    if (EFI_ERROR (FileStatus)) {
+      continue;
+    }
+
+    HeaderSize = sizeof (CapsuleHeader);
+    FileStatus = FileHandle->Read (FileHandle, &HeaderSize, &CapsuleHeader);
+    FileHandle->Close (FileHandle);
+    FileHandle = NULL;
+    if (!EFI_ERROR (FileStatus) &&
+        (HeaderSize == sizeof (CapsuleHeader)) &&
+        CoDIsValidCapsuleImage (&CapsuleHeader, FileInfo->FileSize))
+    {
+      (*ValidFileCount)++;
+    }
+  }
+
+  FileDir->Close (FileDir);
+  CoDFreeFileInfoList (&FileInfoList);
+  return EFI_SUCCESS;
+}
+
+STATIC
+BOOLEAN
+CoDIsEfiSystemPartition (
+  IN EFI_HANDLE  FsHandle
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *Interface;
+
+  Status = gBS->HandleProtocol (FsHandle, &gEfiPartTypeSystemPartGuid, &Interface);
+  return !EFI_ERROR (Status);
+}
+
+/**
+  Select the filesystem containing capsule files.
+
+  The active boot option remains authoritative when it contains capsules.  In
+  capsule-in-RAM mode, connect devices and rescan EFI System Partitions when
+  that filesystem is not ready or has no candidates.  More than one fallback
+  ESP is rejected because there is no safe way to infer which one the OS used.
+  PreferredOptionNumber, when supplied, is updated with the allocation that
+  identifies a preferred filesystem found by the post-connect rescan.
+**/
+STATIC
+EFI_STATUS
+CoDSelectCapsuleFs (
+  IN  EFI_HANDLE  PreferredFsHandle OPTIONAL,
+  IN  UINTN       MaxRetry,
+  OUT EFI_HANDLE  *FsHandle,
+  OUT BOOLEAN     *UsedPreferred OPTIONAL,
+  IN OUT UINT16   **PreferredOptionNumber OPTIONAL,
+  OUT UINTN       *FileCount OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  *HandleBuffer;
+  EFI_HANDLE  FallbackFsHandle;
+  EFI_HANDLE  ResolvedFsHandle;
+  UINT16      *ResolvedOptionNumber;
+  UINTN       NumberOfHandles;
+  UINTN       Index;
+  UINTN       CandidateCount;
+  UINTN       ValidCount;
+  UINTN       Attempt;
+
+  *FsHandle = NULL;
+  if (UsedPreferred != NULL) {
+    *UsedPreferred = FALSE;
+  }
+
+  if (FileCount != NULL) {
+    *FileCount = 0;
+  }
+
+  if (PreferredFsHandle != NULL) {
+    Status = CoDCountCapsulesOnFs (PreferredFsHandle, &ValidCount, &CandidateCount);
+    //
+    // Keep the active ESP authoritative even when every candidate is
+    // malformed.  CoDGetAll() must select the directory to remove those files
+    // and prevent a persistent capsule retry loop.  Fallback ESPs below still
+    // require a structurally valid capsule.
+    //
+    if (!EFI_ERROR (Status) && (CandidateCount > 0)) {
+      *FsHandle = PreferredFsHandle;
+      if (UsedPreferred != NULL) {
+        *UsedPreferred = TRUE;
+      }
+
+      if (FileCount != NULL) {
+        *FileCount = CandidateCount;
+      }
+
+      return EFI_SUCCESS;
+    }
+  }
+
+  //
+  // Disk relocation records a boot option for later cleanup.  Do not select a
+  // filesystem unrelated to that option when capsule-in-RAM is disabled.
+  //
+  if (!PcdGetBool (PcdCapsuleInRamSupport)) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // ConnectAll() may dispatch option ROMs.  The first capsule pass runs before
+  // EndOfDxe and platform security lockdown, so defer the fallback until the
+  // documented second pass after EndOfDxe.  The preferred ESP path above stays
+  // available during the first pass.
+  //
+  if (!mDxeCapsuleLibEndOfDxe) {
+    return EFI_NOT_READY;
+  }
+
+  //
+  // A global connection pass can change the final handle graph and memory map.
+  // Preserve the platform's S4 resume policy even if OsIndications is stale.
+  //
+  if (GetBootModeHob () == BOOT_ON_S4_RESUME) {
+    return EFI_NOT_READY;
+  }
+
+  Attempt          = 0;
+  FallbackFsHandle = NULL;
+  do {
+    EfiBootManagerConnectAll ();
+
+    //
+    // Resolve the active ESP again because connecting devices may have exposed
+    // a more complete path than the initial boot-option lookup could find.
+    //
+    ResolvedFsHandle      = NULL;
+    ResolvedOptionNumber = NULL;
+    Status               = GetEfiSysPartitionFromActiveBootOption (
+                             0,
+                             &ResolvedOptionNumber,
+                             &ResolvedFsHandle,
+                             FALSE,
+                             NULL
+                             );
+    if (!EFI_ERROR (Status)) {
+      PreferredFsHandle = ResolvedFsHandle;
+      if (PreferredOptionNumber != NULL) {
+        if (*PreferredOptionNumber != NULL) {
+          FreePool (*PreferredOptionNumber);
+        }
+
+        *PreferredOptionNumber = ResolvedOptionNumber;
+        ResolvedOptionNumber   = NULL;
+      }
+    }
+
+    if (ResolvedOptionNumber != NULL) {
+      FreePool (ResolvedOptionNumber);
+    }
+
+    if (PreferredFsHandle != NULL) {
+      Status = CoDCountCapsulesOnFs (PreferredFsHandle, &ValidCount, &CandidateCount);
+      if (!EFI_ERROR (Status) && (CandidateCount > 0)) {
+        *FsHandle = PreferredFsHandle;
+        if (UsedPreferred != NULL) {
+          *UsedPreferred = TRUE;
+        }
+
+        if (FileCount != NULL) {
+          *FileCount = CandidateCount;
+        }
+
+        return EFI_SUCCESS;
+      }
+    }
+
+    HandleBuffer    = NULL;
+    NumberOfHandles = 0;
+    Status          = gBS->LocateHandleBuffer (
+                             ByProtocol,
+                             &gEfiSimpleFileSystemProtocolGuid,
+                             NULL,
+                             &NumberOfHandles,
+                             &HandleBuffer
+                             );
+    if (!EFI_ERROR (Status)) {
+      for (Index = 0; Index < NumberOfHandles; Index++) {
+        if ((HandleBuffer[Index] == PreferredFsHandle) ||
+            !CoDIsEfiSystemPartition (HandleBuffer[Index]))
+        {
+          continue;
+        }
+
+        Status = CoDCountCapsulesOnFs (HandleBuffer[Index], &ValidCount, &CandidateCount);
+        if (EFI_ERROR (Status) || (ValidCount == 0)) {
+          continue;
+        }
+
+        if ((FallbackFsHandle != NULL) &&
+            (FallbackFsHandle != HandleBuffer[Index]))
+        {
+          DEBUG ((DEBUG_ERROR, "%a(): capsule files found on multiple fallback ESPs\n", __func__));
+          FreePool (HandleBuffer);
+          return EFI_SECURITY_VIOLATION;
+        }
+
+        FallbackFsHandle = HandleBuffer[Index];
+      }
+
+      FreePool (HandleBuffer);
+    }
+
+    if (Attempt == MaxRetry) {
+      break;
+    }
+
+    gBS->Stall (100000);
+    Attempt++;
+  } while (TRUE);
+
+  if (FallbackFsHandle != NULL) {
+    Status = CoDCountCapsulesOnFs (FallbackFsHandle, &ValidCount, &CandidateCount);
+    if (!EFI_ERROR (Status) && (ValidCount > 0)) {
+      *FsHandle = FallbackFsHandle;
+      if (FileCount != NULL) {
+        *FileCount = CandidateCount;
+      }
+
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
 /**
   This routine is called to get all qualified image from file from an given directory
   in alphabetic order. All the file image is copied to allocated boottime memory.
@@ -1014,6 +1648,15 @@ GetFileImageInAlphabetFromDir (
 
   DEBUG_CODE_END ();
 
+  //
+  // Individual files can disappear or fail to read while enumerating the
+  // directory.  Preserve any complete images already loaded so a sibling I/O
+  // error cannot discard them after the source files are removed.
+  //
+  if (FileCount > 0) {
+    Status = EFI_SUCCESS;
+  }
+
 EXIT:
 
   *FilePtr = TempFilePtrBuf;
@@ -1043,6 +1686,7 @@ EXIT:
   @param[in] FileAttr             Attribute of files to be deleted
 
   @retval EFI_SUCCESS  Succeed to remove all files from an given directory.
+  @return              Error returned while opening or deleting a file.
 
 **/
 EFI_STATUS
@@ -1052,6 +1696,7 @@ RemoveFileFromDir (
   )
 {
   EFI_STATUS       Status;
+  EFI_STATUS       FileStatus;
   LIST_ENTRY       *Link;
   LIST_ENTRY       FileInfoList;
   EFI_FILE_HANDLE  FileHandle;
@@ -1084,6 +1729,7 @@ RemoveFileFromDir (
   //
   // Delete all files with given attribute in Dir
   //
+  Status = EFI_SUCCESS;
   for (Link = FileInfoList.ForwardLink; Link != &(FileInfoList); Link = Link->ForwardLink) {
     //
     // Get FileInfo from the link list
@@ -1091,37 +1737,125 @@ RemoveFileFromDir (
     FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
     FileInfo      = FileInfoEntry->FileInfo;
 
-    Status = Dir->Open (
-                    Dir,
-                    &FileHandle,
-                    FileInfo->FileName,
-                    EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
-                    0
-                    );
-    if (EFI_ERROR (Status)) {
+    FileStatus = Dir->Open (
+                         Dir,
+                         &FileHandle,
+                         FileInfo->FileName,
+                         EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+                         0
+                         );
+    if (EFI_ERROR (FileStatus)) {
+      if (!EFI_ERROR (Status)) {
+        Status = FileStatus;
+      }
+
       continue;
     }
 
-    Status = FileHandle->Delete (FileHandle);
+    FileStatus = FileHandle->Delete (FileHandle);
+    FileHandle = NULL;
+    if (FileStatus == EFI_WARN_DELETE_FAILURE) {
+      FileStatus = EFI_ACCESS_DENIED;
+    }
+
+    if (EFI_ERROR (FileStatus) && !EFI_ERROR (Status)) {
+      Status = FileStatus;
+    }
   }
 
 EXIT:
 
-  while (!IsListEmpty (&FileInfoList)) {
-    Link = FileInfoList.ForwardLink;
-    RemoveEntryList (Link);
-
-    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
-
-    FreePool (FileInfoEntry->FileInfo);
-    FreePool (FileInfoEntry);
-  }
-
+  CoDFreeFileInfoList (&FileInfoList);
   return Status;
 }
 
 /**
-  This routine is called to get all caspules from file. The capsule file image is
+  Check if any on-disk capsules are present.
+
+  @param[in]  MaxRetry          Max Connection Retry. Stall 100ms between each
+                                connection try to ensure devices like USB can
+                                get enumerated.
+  @param[in]  ConnectBootDevice Connect the active boot device before expanding
+                                its media path.
+  @param[out] BootDeviceReady   Set to TRUE when the active boot option's
+                                filesystem is available. Optional.
+  @param[out] ConnectAllNeeded  Set to TRUE when an active media-only boot path
+                                needs global device connection. Optional.
+
+  @retval TRUE   At least one potential on-disk capsule was found on a boot
+                 drive.
+  @retval FALSE  No capsule candidates were discovered on a boot drive.
+**/
+BOOLEAN
+EFIAPI
+CoDPresent (
+  IN  UINTN    MaxRetry,
+  IN  BOOLEAN  ConnectBootDevice,
+  OUT BOOLEAN  *BootDeviceReady OPTIONAL,
+  OUT BOOLEAN  *ConnectAllNeeded OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  ActiveFsHandle;
+  EFI_HANDLE  CapsuleFsHandle;
+  UINT16      *TempOptionNumber;
+  UINTN       FileCount;
+
+  if (BootDeviceReady != NULL) {
+    *BootDeviceReady = FALSE;
+  }
+
+  if (ConnectAllNeeded != NULL) {
+    *ConnectAllNeeded = FALSE;
+  }
+
+  if (!PcdGetBool (PcdCapsuleOnDiskSupport)) {
+    return FALSE;
+  }
+
+  TempOptionNumber = NULL;
+  ActiveFsHandle   = NULL;
+  CapsuleFsHandle  = NULL;
+  FileCount        = 0;
+
+  Status = GetEfiSysPartitionFromActiveBootOption (
+             MaxRetry,
+             &TempOptionNumber,
+             &ActiveFsHandle,
+             ConnectBootDevice,
+             ConnectAllNeeded
+             );
+  if (!EFI_ERROR (Status) && (BootDeviceReady != NULL)) {
+    *BootDeviceReady = TRUE;
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a(): active boot option lookup failed: %r\n", __func__, Status));
+  }
+
+  Status = CoDSelectCapsuleFs (
+             ActiveFsHandle,
+             MaxRetry,
+             &CapsuleFsHandle,
+             NULL,
+             NULL,
+             &FileCount
+             );
+  if (TempOptionNumber != NULL) {
+    FreePool (TempOptionNumber);
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a(): found no capsule filesystem: %r\n", __func__, Status));
+    return FALSE;
+  }
+
+  DEBUG ((DEBUG_INFO, "%a(): found %u potential on-disk capsule(s)\n", __func__, FileCount));
+  return FileCount > 0;
+}
+
+/**
+  This routine is called to get all capsules from file. The capsule file image is
   copied to BS memory. Caller is responsible to free them.
 
   @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
@@ -1131,11 +1865,13 @@ EXIT:
   @param[out]   FsHandle             File system handle
   @param[out]   LoadOptionNumber     OptionNumber of boot option
 
-  @retval EFI_SUCCESS  Succeed to get all capsules.
+  @retval EFI_SUCCESS              Succeed to get all capsules.
+  @retval EFI_WARN_DELETE_FAILURE  Valid capsules were loaded, but at least one source file could not be removed.
 
 **/
 EFI_STATUS
-GetAllCapsuleOnDisk (
+EFIAPI
+CoDGetAll (
   IN  UINTN       MaxRetry,
   OUT IMAGE_INFO  **CapsulePtr,
   OUT UINTN       *CapsuleNum,
@@ -1143,44 +1879,67 @@ GetAllCapsuleOnDisk (
   OUT UINT16      *LoadOptionNumber
   )
 {
-  EFI_STATUS                       Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Fs;
-  EFI_FILE_HANDLE                  RootDir;
-  EFI_FILE_HANDLE                  FileDir;
-  UINT16                           *TempOptionNumber;
+  EFI_STATUS       Status;
+  EFI_STATUS       RemoveStatus;
+  EFI_STATUS       ClearStatus;
+  EFI_HANDLE       ActiveFsHandle;
+  EFI_FILE_HANDLE  FileDir;
+  UINT16           *TempOptionNumber;
+  BOOLEAN          UsedPreferred;
+  BOOLEAN          AllCandidatesRead;
+  UINTN            CandidateCount;
+  UINTN            LoadedCandidateCount;
 
-  TempOptionNumber = NULL;
-  *CapsuleNum      = 0;
+  TempOptionNumber       = NULL;
+  ActiveFsHandle         = NULL;
+  FileDir                = NULL;
+  UsedPreferred          = FALSE;
+  AllCandidatesRead      = FALSE;
+  CandidateCount         = 0;
+  LoadedCandidateCount   = 0;
+  *CapsulePtr            = NULL;
+  *CapsuleNum            = 0;
+  *FsHandle              = NULL;
 
-  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &TempOptionNumber, FsHandle);
+  Status = GetEfiSysPartitionFromActiveBootOption (
+             MaxRetry,
+             &TempOptionNumber,
+             &ActiveFsHandle,
+             (BOOLEAN)(PcdGetBool (PcdCapsuleInRamSupport) &&
+                       FeaturePcdGet (PcdCapsuleOnDiskConnectBootDevice) &&
+                       !mDxeCapsuleLibEndOfDxe),
+             NULL
+             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    DEBUG ((DEBUG_INFO, "%a(): active boot option lookup failed: %r\n", __func__, Status));
   }
 
-  Status = gBS->HandleProtocol (*FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+  Status = CoDSelectCapsuleFs (
+             ActiveFsHandle,
+             MaxRetry,
+             FsHandle,
+             &UsedPreferred,
+             &TempOptionNumber,
+             &CandidateCount
+             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto EXIT;
   }
 
-  Status = Fs->OpenVolume (Fs, &RootDir);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (LoadOptionNumber != NULL) {
+    if (!UsedPreferred || (TempOptionNumber == NULL)) {
+      Status = EFI_UNSUPPORTED;
+      goto EXIT;
+    }
+
+    *LoadOptionNumber = *TempOptionNumber;
   }
 
-  Status = RootDir->Open (
-                      RootDir,
-                      &FileDir,
-                      EFI_CAPSULE_FILE_DIRECTORY,
-                      EFI_FILE_MODE_READ,
-                      0
-                      );
+  Status = CoDOpenCapsuleDirectoryOnFs (*FsHandle, &FileDir);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "CodLibGetAllCapsuleOnDisk fail to open RootDir!\n"));
-    RootDir->Close (RootDir);
-    return Status;
+    DEBUG ((DEBUG_ERROR, "%a(): failed to open capsule directory: %r\n", __func__, Status));
+    goto EXIT;
   }
-
-  RootDir->Close (RootDir);
 
   //
   // Only Load files with EFI_FILE_SYSTEM or EFI_FILE_ARCHIVE attribute
@@ -1193,20 +1952,81 @@ GetAllCapsuleOnDisk (
              CapsuleNum
              );
   DEBUG ((DEBUG_INFO, "GetFileImageInAlphabetFromDir status %x\n", Status));
+  if (!EFI_ERROR (Status)) {
+    LoadedCandidateCount = *CapsuleNum;
+    AllCandidatesRead    = (BOOLEAN)(LoadedCandidateCount == CandidateCount);
+    Status = CoDFilterInvalidCapsuleImages (*CapsulePtr, CapsuleNum);
+  }
 
   //
   // Always remove file to avoid deadloop in capsule process
   //
-  Status = RemoveFileFromDir (FileDir, EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE);
-  DEBUG ((DEBUG_INFO, "RemoveFileFromDir status %x\n", Status));
+  RemoveStatus = RemoveFileFromDir (FileDir, EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE);
+  DEBUG ((DEBUG_INFO, "RemoveFileFromDir status %x\n", RemoveStatus));
+  if (EFI_ERROR (RemoveStatus)) {
+    DEBUG ((DEBUG_ERROR, "%a(): failed to remove capsule files: %r\n", __func__, RemoveStatus));
+    if (AllCandidatesRead && CoDCheckCapsuleOnDiskFlag ()) {
+      //
+      // Every selected candidate was read.  Valid images remain in memory and
+      // malformed images were rejected, so an undeletable source must not keep
+      // the platform in the capsule boot path forever.
+      //
+      ClearStatus = CoDClearCapsuleOnDiskFlag ();
+      if (EFI_ERROR (ClearStatus)) {
+        DEBUG ((DEBUG_ERROR, "%a(): failed to retire capsule request: %r\n", __func__, ClearStatus));
+      }
+    }
+
+    if (*CapsuleNum > 0) {
+      //
+      // Preserve loaded images when cleanup is only partially successful.
+      // EFI_WARN_DELETE_FAILURE reports the cleanup problem without making
+      // callers discard capsules whose source files may already be gone.
+      //
+      Status = EFI_WARN_DELETE_FAILURE;
+    } else {
+      Status = RemoveStatus;
+    }
+  } else if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a(): removed invalid capsule files: %r\n", __func__, Status));
+  }
 
   FileDir->Close (FileDir);
 
-  if (LoadOptionNumber != NULL) {
-    *LoadOptionNumber = *TempOptionNumber;
+EXIT:
+  if (TempOptionNumber != NULL) {
+    FreePool (TempOptionNumber);
   }
 
   return Status;
+}
+
+/**
+  Free resources allocated by CoDGetAll.
+
+  @param[in]  ImageInfo  An array of data and information of files
+  @param[in]  Count      Length of the array.
+
+**/
+VOID
+EFIAPI
+CoDFreeImages (
+  IN IMAGE_INFO  *ImageInfo,
+  IN UINTN       Count
+  )
+{
+  UINTN  Index;
+
+  if (ImageInfo == NULL) {
+    return;
+  }
+
+  for (Index = 0; Index < Count; Index++) {
+    FreePool (ImageInfo[Index].ImageAddress);
+    FreePool (ImageInfo[Index].FileInfo);
+  }
+
+  FreePool (ImageInfo);
 }
 
 /**
@@ -1370,7 +2190,9 @@ CoDClearCapsuleOnDiskFlag (
                          sizeof (UINT64),
                          &OsIndication
                          );
-  ASSERT (!EFI_ERROR (Status));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Delete BootNext variable. Capsule Process may reset system, so can't rely on Bds to clear this variable
@@ -1382,9 +2204,7 @@ CoDClearCapsuleOnDiskFlag (
                   0,
                   NULL
                   );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_FOUND);
-
-  return EFI_SUCCESS;
+  return (Status == EFI_NOT_FOUND) ? EFI_SUCCESS : Status;
 }
 
 /**
@@ -1465,10 +2285,11 @@ RelocateCapsuleToDisk (
   //
   // 1. Load all Capsule On Disks in to memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - 0x%x\n", Status));
-    return EFI_NOT_FOUND;
+    DEBUG ((DEBUG_INFO, "RelocateCapsule: CoDGetAll Status - 0x%x\n", Status));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    return EFI_ERROR (Status) ? Status : EFI_NOT_FOUND;
   }
 
   //
@@ -1772,10 +2593,11 @@ RelocateCapsuleToRam (
   //
   // 1. Load all Capsule On Disks into memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - 0x%x\n", Status));
-    return EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "CoDGetAll Status - 0x%x\n", Status));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    return EFI_ERROR (Status) ? Status : EFI_NOT_FOUND;
   }
 
   //
@@ -1958,7 +2780,13 @@ CoDRemoveTempFile (
   //
   // Get the EFI file system from the boot option where the capsules are relocated
   //
-  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &LoadOptionNumber, &FsHandle);
+  Status = GetEfiSysPartitionFromActiveBootOption (
+             MaxRetry,
+             &LoadOptionNumber,
+             &FsHandle,
+             FALSE,
+             NULL
+             );
   if (EFI_ERROR (Status)) {
     goto EXIT;
   }

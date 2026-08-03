@@ -598,6 +598,7 @@ BmFindUsbDevice (
   @param FullPath      The full path returned by the routine in last call.
                        Set to NULL in first call.
   @param ShortformNode Pointer to the USB short-form device path node in the FilePath buffer.
+  @param ConnectAll    Whether short-form expansion may connect all devices.
 
   @return The next possible full path pointing to the load option.
           Caller is responsible to free the memory.
@@ -606,7 +607,8 @@ EFI_DEVICE_PATH_PROTOCOL *
 BmExpandUsbDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
   IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *ShortformNode
+  IN  EFI_DEVICE_PATH_PROTOCOL  *ShortformNode,
+  IN  BOOLEAN                   ConnectAll
   )
 {
   UINTN                     ParentDevicePathSize;
@@ -632,7 +634,7 @@ BmExpandUsbDevicePath (
       continue;
     }
 
-    NextFullPath = BmGetNextLoadOptionDevicePath (FilePath, NULL);
+    NextFullPath = BmGetNextLoadOptionDevicePath (FilePath, NULL, ConnectAll);
     FreePool (FilePath);
     if (NextFullPath == NULL) {
       //
@@ -664,6 +666,7 @@ BmExpandUsbDevicePath (
                        It could be a short-form device path.
   @param FullPath      The full path returned by the routine in last call.
                        Set to NULL in first call.
+  @param ConnectAll    Whether short-form expansion may connect all devices.
 
   @return The next possible full path pointing to the load option.
           Caller is responsible to free the memory.
@@ -671,7 +674,8 @@ BmExpandUsbDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 BmExpandFileDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath,
+  IN  BOOLEAN                   ConnectAll
   )
 {
   EFI_STATUS                Status;
@@ -683,7 +687,9 @@ BmExpandFileDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *NextFullPath;
   BOOLEAN                   GetNext;
 
-  EfiBootManagerConnectAll ();
+  if (ConnectAll) {
+    EfiBootManagerConnectAll ();
+  }
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleFileSystemProtocolGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
     HandleCount = 0;
@@ -738,6 +744,7 @@ BmExpandFileDevicePath (
                        It could be a short-form device path.
   @param FullPath      The full path returned by the routine in last call.
                        Set to NULL in first call.
+  @param ConnectAll    Whether short-form expansion may connect all devices.
 
   @return The next possible full path pointing to the load option.
           Caller is responsible to free the memory.
@@ -745,7 +752,8 @@ BmExpandFileDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 BmExpandUriDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath,
+  IN  BOOLEAN                   ConnectAll
   )
 {
   EFI_STATUS                Status;
@@ -756,7 +764,9 @@ BmExpandUriDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *RamDiskDevicePath;
   BOOLEAN                   GetNext;
 
-  EfiBootManagerConnectAll ();
+  if (ConnectAll) {
+    EfiBootManagerConnectAll ();
+  }
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiLoadFileProtocolGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
     HandleCount = 0;
@@ -865,12 +875,14 @@ BmCachePartitionDevicePath (
 
   @param FilePath      The device path pointing to a load option.
                        It could be a short-form device path.
+  @param ConnectAll    Whether short-form expansion may connect all devices.
 
   @return The full device path pointing to the load option.
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 BmExpandPartitionDevicePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN  BOOLEAN                   ConnectAll
   )
 {
   EFI_STATUS                Status;
@@ -941,7 +953,7 @@ BmExpandPartitionDevicePath (
           //   2. ACPI()/PCI()/ATA()/Partition()/Partition(A2)/EFI/BootX64.EFI
           // For simplicity, only #1 is returned.
           //
-          FullPath = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
+          FullPath = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL, ConnectAll);
           FreePool (TempDevicePath);
 
           if (FullPath != NULL) {
@@ -1010,7 +1022,7 @@ BmExpandPartitionDevicePath (
         // Find the matched partition device path
         //
         TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
-        FullPath       = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
+        FullPath       = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL, ConnectAll);
         FreePool (TempDevicePath);
 
         if (FullPath != NULL) {
@@ -1038,7 +1050,7 @@ BmExpandPartitionDevicePath (
     // If we found a matching BLOCK_IO handle or we've already
     // tried a ConnectAll, we are done searching.
     //
-    if (MatchFound || ConnectAllAttempted) {
+    if (MatchFound || ConnectAllAttempted || !ConnectAll) {
       break;
     }
 
@@ -1674,6 +1686,7 @@ EfiBootManagerGetLoadOptionBuffer (
                    It could be a short-form device path.
   @param FullPath  The full path returned by the routine in last call.
                    Set to NULL in first call.
+  @param ConnectAll Whether short-form expansion may connect all devices.
 
   @return The next possible full path pointing to the load option.
           Caller is responsible to free the memory.
@@ -1681,7 +1694,8 @@ EfiBootManagerGetLoadOptionBuffer (
 EFI_DEVICE_PATH_PROTOCOL *
 BmGetNextLoadOptionDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath,
+  IN  BOOLEAN                   ConnectAll
   )
 {
   EFI_HANDLE                Handle;
@@ -1713,7 +1727,7 @@ BmGetNextLoadOptionDevicePath (
     // Expand the Harddrive device path
     //
     if (FullPath == NULL) {
-      return BmExpandPartitionDevicePath (FilePath);
+      return BmExpandPartitionDevicePath (FilePath, ConnectAll);
     } else {
       return NULL;
     }
@@ -1723,14 +1737,14 @@ BmGetNextLoadOptionDevicePath (
     //
     // Expand the File-path device path
     //
-    return BmExpandFileDevicePath (FilePath, FullPath);
+    return BmExpandFileDevicePath (FilePath, FullPath, ConnectAll);
   } else if ((DevicePathType (FilePath) == MESSAGING_DEVICE_PATH) &&
              (DevicePathSubType (FilePath) == MSG_URI_DP))
   {
     //
     // Expand the URI device path
     //
-    return BmExpandUriDevicePath (FilePath, FullPath);
+    return BmExpandUriDevicePath (FilePath, FullPath, ConnectAll);
   } else {
     Node   = FilePath;
     Status = gBS->LocateDevicePath (&gEfiUsbIoProtocolGuid, &Node, &Handle);
@@ -1761,7 +1775,7 @@ BmGetNextLoadOptionDevicePath (
           BmConnectUsbShortFormDevicePath (FilePath);
         }
 
-        return BmExpandUsbDevicePath (FilePath, FullPath, Node);
+        return BmExpandUsbDevicePath (FilePath, FullPath, Node, ConnectAll);
       }
     }
   }
@@ -2717,7 +2731,31 @@ EfiBootManagerGetNextLoadOptionDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath
   )
 {
-  return BmGetNextLoadOptionDevicePath (FilePath, FullPath);
+  return BmGetNextLoadOptionDevicePath (FilePath, FullPath, TRUE);
+}
+
+/**
+  Get the next possible full path pointing to the load option.
+
+  Unlike EfiBootManagerGetNextLoadOptionDevicePath(), short-form expansion does
+  not call EfiBootManagerConnectAll().
+
+  @param FilePath  The device path pointing to a load option.
+                   It could be a short-form device path.
+  @param FullPath  The full path returned by the routine in last call.
+                   Set to NULL in first call.
+
+  @return The next possible full path pointing to the load option.
+          Caller is responsible to free the memory.
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+EfiBootManagerGetNextLoadOptionDevicePathNoConnectAll (
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FullPath
+  )
+{
+  return BmGetNextLoadOptionDevicePath (FilePath, FullPath, FALSE);
 }
 
 /**

@@ -769,6 +769,12 @@
   # @Prompt Enable update capsule across a system reset.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
 
+  ## Connect the active boot device while discovering Capsules On Disk before EndOfDxe.<BR><BR>
+  #  Device connection can discover and dispatch option ROMs. Platforms must only enable this
+  #  feature when an image-dispatch policy is active before Capsule On Disk discovery.<BR>
+  # @Prompt Connect the active boot device for early Capsule On Disk discovery.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskConnectBootDevice|FALSE|BOOLEAN|0x000100C8
+
   ## Indicates if all PCD PPI services will be enabled.<BR><BR>
   #   TRUE  - All PCD PPI services will be produced.<BR>
   #   FALSE - Minimal PCD PPI services (only GetService) will be produced.<BR>

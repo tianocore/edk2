@@ -1156,6 +1156,11 @@
                                                                                            "Note:<BR>"
                                                                                            "If Both Capsule In Ram and Capsule On Disk are provisioned at the same time, the Capsule On Disk will be bypassed."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleOnDiskConnectBootDevice_PROMPT  #language en-US "Connect the active boot device for early Capsule On Disk discovery"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleOnDiskConnectBootDevice_HELP  #language en-US   "Connect the active boot device while discovering Capsules On Disk before EndOfDxe.<BR>"
+                                                                                                      "Device connection can discover and dispatch option ROMs. Platforms must only enable this feature when an image-dispatch policy is active before Capsule On Disk discovery."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFwVolDxeMaxEncapsulationDepth_PROMPT #language en-US "Maximum permitted FwVol section nesting depth (exclusive)."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFwVolDxeMaxEncapsulationDepth_HELP   #language en-US "Maximum permitted encapsulation levels of sections in a firmware volume,<BR>"

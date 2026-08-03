@@ -129,6 +129,63 @@ VOID        **mCapsulePtr;
 CHAR16      **mCapsuleNamePtr;
 EFI_STATUS  *mCapsuleStatusArray;
 UINT32      mCapsuleTotalNumber;
+BOOLEAN     mCapsuleOnDiskDeferred;
+STATIC EFI_STATUS  mCapsuleOnDiskStatus;
+STATIC IMAGE_INFO  *mQueuedCapsuleOnDiskBuf;
+STATIC UINTN       mQueuedCapsuleOnDiskNum;
+
+/**
+  Queue loaded on-disk capsules when capsule array allocation must be retried.
+
+  CoDGetAll() may already have removed the source files.  Keep ownership of the
+  loaded images until a later capsule-processing pass can append them.
+
+  @param[in] CapsuleBuffer  Loaded capsule image information.
+  @param[in] CapsuleCount   Number of loaded capsule images.
+**/
+STATIC
+VOID
+QueueLoadedCapsulesOnDisk (
+  IN IMAGE_INFO  *CapsuleBuffer,
+  IN UINTN       CapsuleCount
+  )
+{
+  ASSERT (CapsuleBuffer != NULL);
+  ASSERT (CapsuleCount != 0);
+  ASSERT (mQueuedCapsuleOnDiskBuf == NULL);
+
+  mQueuedCapsuleOnDiskBuf = CapsuleBuffer;
+  mQueuedCapsuleOnDiskNum = CapsuleCount;
+  mCapsuleOnDiskDeferred  = TRUE;
+}
+
+/**
+  Take ownership of previously queued on-disk capsules.
+
+  @param[out] CapsuleBuffer  Loaded capsule image information.
+  @param[out] CapsuleCount   Number of loaded capsule images.
+
+  @retval TRUE   Queued capsules were returned.
+  @retval FALSE  No loaded capsules were queued.
+**/
+STATIC
+BOOLEAN
+TakeQueuedCapsulesOnDisk (
+  OUT IMAGE_INFO  **CapsuleBuffer,
+  OUT UINTN       *CapsuleCount
+  )
+{
+  if (mQueuedCapsuleOnDiskBuf == NULL) {
+    return FALSE;
+  }
+
+  *CapsuleBuffer              = mQueuedCapsuleOnDiskBuf;
+  *CapsuleCount               = mQueuedCapsuleOnDiskNum;
+  mQueuedCapsuleOnDiskBuf     = NULL;
+  mQueuedCapsuleOnDiskNum     = 0;
+  mCapsuleOnDiskDeferred      = FALSE;
+  return TRUE;
+}
 
 /**
   The firmware implements to process the capsule image.
@@ -225,11 +282,19 @@ InitCapsulePtr (
   UINTN                 CapsuleNameCapsuleTotalNumber;
   VOID                  **CapsuleNameCapsulePtr;
   EFI_PHYSICAL_ADDRESS  *CapsuleNameAddress;
+  EFI_STATUS            Status;
+  UINTN                 CapsuleOnDiskNum;
+  IMAGE_INFO            *CapsuleOnDiskBuf;
+  EFI_HANDLE            EspFsHandle;
 
   CapsuleNameNumber             = 0;
   CapsuleNameTotalNumber        = 0;
   CapsuleNameCapsuleTotalNumber = 0;
+  CapsuleOnDiskNum              = 0;
   CapsuleNameCapsulePtr         = NULL;
+  CapsuleOnDiskBuf              = NULL;
+  mCapsuleOnDiskDeferred        = FALSE;
+  mCapsuleOnDiskStatus          = EFI_SUCCESS;
 
   //
   // Find all capsule images from hob
@@ -249,6 +314,39 @@ InitCapsulePtr (
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
 
+  if (TakeQueuedCapsulesOnDisk (&CapsuleOnDiskBuf, &CapsuleOnDiskNum)) {
+    DEBUG ((DEBUG_INFO, "%a(): retrying %u queued on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
+  } else if (CoDCheckCapsuleOnDiskFlag ()) {
+    Status = CoDGetAll (
+               3,
+               &CapsuleOnDiskBuf,
+               &CapsuleOnDiskNum,
+               &EspFsHandle,
+               NULL
+               );
+    mCapsuleOnDiskStatus = Status;
+    if (EFI_ERROR (Status) || (CapsuleOnDiskBuf == NULL)) {
+      DEBUG ((DEBUG_WARN, "%a(): CoDGetAll Status: %r\n", __func__, Status));
+      mCapsuleOnDiskDeferred = (BOOLEAN)(Status == EFI_NOT_READY);
+      if (CapsuleOnDiskBuf != NULL) {
+        CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+        CapsuleOnDiskBuf = NULL;
+      }
+
+      CapsuleOnDiskNum = 0;
+    }
+  }
+
+  if (CapsuleOnDiskNum > (MAX_UINT32 - mCapsuleTotalNumber)) {
+    DEBUG ((DEBUG_ERROR, "%a(): too many capsules to initialize\n", __func__));
+    mCapsuleTotalNumber = 0;
+    QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    return;
+  }
+
+  mCapsuleTotalNumber += (UINT32)CapsuleOnDiskNum;
+  DEBUG ((DEBUG_INFO, "%a(): loaded %u on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
+
   DEBUG ((DEBUG_INFO, "mCapsuleTotalNumber - 0x%x\n", mCapsuleTotalNumber));
 
   if (mCapsuleTotalNumber == 0) {
@@ -262,12 +360,20 @@ InitCapsulePtr (
   if (mCapsulePtr == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate mCapsulePtr fail!\n"));
     mCapsuleTotalNumber = 0;
+    if (CapsuleOnDiskBuf != NULL) {
+      QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    }
+
     return;
   }
 
   mCapsuleStatusArray = (EFI_STATUS *)AllocateZeroPool (sizeof (EFI_STATUS) * mCapsuleTotalNumber);
   if (mCapsuleStatusArray == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate mCapsuleStatusArray fail!\n"));
+    if (CapsuleOnDiskBuf != NULL) {
+      QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    }
+
     FreePool (mCapsulePtr);
     mCapsulePtr         = NULL;
     mCapsuleTotalNumber = 0;
@@ -279,6 +385,10 @@ InitCapsulePtr (
   CapsuleNameCapsulePtr =  (VOID **)AllocateZeroPool (sizeof (VOID *) * CapsuleNameCapsuleTotalNumber);
   if (CapsuleNameCapsulePtr == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate CapsuleNameCapsulePtr fail!\n"));
+    if (CapsuleOnDiskBuf != NULL) {
+      QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    }
+
     FreePool (mCapsulePtr);
     FreePool (mCapsuleStatusArray);
     mCapsulePtr         = NULL;
@@ -317,6 +427,10 @@ InitCapsulePtr (
     mCapsuleNamePtr = (CHAR16 **)AllocateZeroPool (sizeof (CHAR16 *) * mCapsuleTotalNumber);
     if (mCapsuleNamePtr == NULL) {
       DEBUG ((DEBUG_ERROR, "Allocate mCapsuleNamePtr fail!\n"));
+      if (CapsuleOnDiskBuf != NULL) {
+        QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+      }
+
       FreePool (mCapsulePtr);
       FreePool (mCapsuleStatusArray);
       FreePool (CapsuleNameCapsulePtr);
@@ -338,7 +452,152 @@ InitCapsulePtr (
     mCapsuleNamePtr = NULL;
   }
 
+  if (CapsuleOnDiskBuf != NULL) {
+    for (Index2 = 0; Index2 < CapsuleOnDiskNum; Index2++) {
+      mCapsulePtr[Index++] = CapsuleOnDiskBuf[Index2].ImageAddress;
+      FreePool (CapsuleOnDiskBuf[Index2].FileInfo);
+    }
+
+    FreePool (CapsuleOnDiskBuf);
+  }
+
   FreePool (CapsuleNameCapsulePtr);
+}
+
+/**
+  Append capsules whose filesystem discovery was deferred until EndOfDxe.
+
+  @retval EFI_SUCCESS           Deferred capsules were appended.
+  @retval EFI_NOT_FOUND         No deferred capsules were found.
+  @retval EFI_OUT_OF_RESOURCES  The capsule arrays could not be extended.
+  @return                       Error returned by CoDGetAll().
+**/
+STATIC
+EFI_STATUS
+AppendDeferredCapsulesOnDisk (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  IMAGE_INFO  *CapsuleOnDiskBuf;
+  UINTN       CapsuleOnDiskNum;
+  EFI_HANDLE  EspFsHandle;
+  VOID        **NewCapsulePtr;
+  EFI_STATUS  *NewCapsuleStatusArray;
+  CHAR16      **NewCapsuleNamePtr;
+  UINT32      NewCapsuleTotalNumber;
+  UINTN       Index;
+
+  CapsuleOnDiskBuf      = NULL;
+  CapsuleOnDiskNum      = 0;
+  NewCapsulePtr         = NULL;
+  NewCapsuleStatusArray = NULL;
+  NewCapsuleNamePtr     = NULL;
+
+  if (TakeQueuedCapsulesOnDisk (&CapsuleOnDiskBuf, &CapsuleOnDiskNum)) {
+    DEBUG ((DEBUG_INFO, "%a(): retrying %u queued on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
+  } else {
+    Status = CoDGetAll (
+               3,
+               &CapsuleOnDiskBuf,
+               &CapsuleOnDiskNum,
+               &EspFsHandle,
+               NULL
+               );
+    mCapsuleOnDiskStatus = Status;
+    if (EFI_ERROR (Status) || (CapsuleOnDiskBuf == NULL)) {
+      DEBUG ((DEBUG_WARN, "%a(): CoDGetAll Status: %r\n", __func__, Status));
+      mCapsuleOnDiskDeferred = (BOOLEAN)(Status == EFI_NOT_READY);
+      if (CapsuleOnDiskBuf != NULL) {
+        CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+      }
+
+      return EFI_ERROR (Status) ? Status : EFI_NOT_FOUND;
+    }
+  }
+
+  if ((CapsuleOnDiskNum > (MAX_UINT32 - mCapsuleTotalNumber)) ||
+      ((mCapsuleTotalNumber + CapsuleOnDiskNum) > (MAX_UINTN / sizeof (*NewCapsulePtr))) ||
+      ((mCapsuleTotalNumber + CapsuleOnDiskNum) > (MAX_UINTN / sizeof (*NewCapsuleStatusArray))) ||
+      ((mCapsuleTotalNumber + CapsuleOnDiskNum) > (MAX_UINTN / sizeof (*NewCapsuleNamePtr))))
+  {
+    QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NewCapsuleTotalNumber = (UINT32)(mCapsuleTotalNumber + CapsuleOnDiskNum);
+  NewCapsulePtr = AllocateZeroPool (
+                    sizeof (*NewCapsulePtr) * NewCapsuleTotalNumber
+                    );
+  NewCapsuleStatusArray = AllocateZeroPool (
+                            sizeof (*NewCapsuleStatusArray) * NewCapsuleTotalNumber
+                            );
+  if (mCapsuleNamePtr != NULL) {
+    NewCapsuleNamePtr = AllocateZeroPool (
+                          sizeof (*NewCapsuleNamePtr) * NewCapsuleTotalNumber
+                          );
+  }
+
+  if ((NewCapsulePtr == NULL) ||
+      (NewCapsuleStatusArray == NULL) ||
+      ((mCapsuleNamePtr != NULL) && (NewCapsuleNamePtr == NULL)))
+  {
+    QueueLoadedCapsulesOnDisk (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    if (NewCapsulePtr != NULL) {
+      FreePool (NewCapsulePtr);
+    }
+
+    if (NewCapsuleStatusArray != NULL) {
+      FreePool (NewCapsuleStatusArray);
+    }
+
+    if (NewCapsuleNamePtr != NULL) {
+      FreePool (NewCapsuleNamePtr);
+    }
+
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopyMem (
+    NewCapsulePtr,
+    mCapsulePtr,
+    sizeof (*NewCapsulePtr) * mCapsuleTotalNumber
+    );
+  CopyMem (
+    NewCapsuleStatusArray,
+    mCapsuleStatusArray,
+    sizeof (*NewCapsuleStatusArray) * mCapsuleTotalNumber
+    );
+  if (NewCapsuleNamePtr != NULL) {
+    CopyMem (
+      NewCapsuleNamePtr,
+      mCapsuleNamePtr,
+      sizeof (*NewCapsuleNamePtr) * mCapsuleTotalNumber
+      );
+  }
+
+  for (Index = 0; Index < CapsuleOnDiskNum; Index++) {
+    NewCapsulePtr[mCapsuleTotalNumber + Index] = CapsuleOnDiskBuf[Index].ImageAddress;
+    NewCapsuleStatusArray[mCapsuleTotalNumber + Index] = EFI_NOT_READY;
+    FreePool (CapsuleOnDiskBuf[Index].FileInfo);
+  }
+
+  FreePool (CapsuleOnDiskBuf);
+  FreePool (mCapsulePtr);
+  FreePool (mCapsuleStatusArray);
+  if (mCapsuleNamePtr != NULL) {
+    FreePool (mCapsuleNamePtr);
+  }
+
+  mCapsulePtr              = NewCapsulePtr;
+  mCapsuleStatusArray      = NewCapsuleStatusArray;
+  mCapsuleNamePtr          = NewCapsuleNamePtr;
+  mCapsuleTotalNumber      = NewCapsuleTotalNumber;
+  mCapsuleOnDiskDeferred   = FALSE;
+  mCapsuleOnDiskStatus     = EFI_SUCCESS;
+
+  DEBUG ((DEBUG_INFO, "%a(): appended %u on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
+  return EFI_SUCCESS;
 }
 
 /**
@@ -507,15 +766,48 @@ ProcessTheseCapsules (
   ESRT_MANAGEMENT_PROTOCOL  *EsrtManagement;
   UINT16                    EmbeddedDriverCount;
   BOOLEAN                   ResetRequired;
+  BOOLEAN                   CapsulesLoadedAfterEndOfDxe;
   CHAR16                    *CapsuleName;
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32 (PcdStatusCodeSubClassCapsule) | PcdGet32 (PcdCapsuleStatusCodeProcessCapsulesBegin)));
 
+  CapsulesLoadedAfterEndOfDxe = FALSE;
   if (FirstRound) {
     InitCapsulePtr ();
+  } else if (PcdGetBool (PcdCapsuleOnDiskSupport)) {
+    if (mCapsuleTotalNumber == 0) {
+      InitCapsulePtr ();
+      CapsulesLoadedAfterEndOfDxe = (BOOLEAN)(mCapsuleTotalNumber != 0);
+    } else if (mCapsuleOnDiskDeferred) {
+      Status = AppendDeferredCapsulesOnDisk ();
+      if (EFI_ERROR (Status) &&
+          (Status != EFI_NOT_FOUND) &&
+          (Status != EFI_NOT_READY))
+      {
+        return Status;
+      }
+
+      CapsulesLoadedAfterEndOfDxe = (BOOLEAN)!EFI_ERROR (Status);
+    }
   }
 
   if (mCapsuleTotalNumber == 0) {
+    if (mCapsuleOnDiskDeferred) {
+      DEBUG ((DEBUG_INFO, "%a(): on-disk capsule discovery deferred until EndOfDxe\n", __func__));
+      return EFI_SUCCESS;
+    }
+
+    if (mCapsuleOnDiskStatus == EFI_NOT_FOUND) {
+      if (CoDCheckCapsuleOnDiskFlag ()) {
+        Status = CoDClearCapsuleOnDiskFlag ();
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      }
+    } else if (EFI_ERROR (mCapsuleOnDiskStatus)) {
+      return mCapsuleOnDiskStatus;
+    }
+
     //
     // We didn't find a hob, so had no errors.
     //
@@ -532,7 +824,7 @@ ProcessTheseCapsules (
   // Check the capsule flags,if contains CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE, install
   // capsuleTable to configure table with EFI_CAPSULE_GUID
   //
-  if (FirstRound) {
+  if (FirstRound || CapsulesLoadedAfterEndOfDxe) {
     PopulateCapsuleInConfigurationTable ();
   }
 
@@ -544,7 +836,9 @@ ProcessTheseCapsules (
   for (Index = 0; Index < mCapsuleTotalNumber; Index++) {
     CapsuleHeader = (EFI_CAPSULE_HEADER *)mCapsulePtr[Index];
     CapsuleName   = (mCapsuleNamePtr == NULL) ? NULL : mCapsuleNamePtr[Index];
-    if (CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
+    if ((mCapsuleStatusArray[Index] == EFI_NOT_READY) &&
+        CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid))
+    {
       DEBUG ((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
       DEBUG ((DEBUG_INFO, "Display logo capsule is found.\n"));
       Status                     = ProcessThisCapsuleImage (CapsuleHeader, CapsuleName, NULL);
@@ -686,7 +980,10 @@ ProcessCapsules (
     // Reboot System if and only if all capsule processed.
     // If not, defer reset to 2nd process.
     //
-    if (mNeedReset && AreAllImagesProcessed ()) {
+    if (mNeedReset && !mCapsuleOnDiskDeferred &&
+        (!CoDCheckCapsuleOnDiskFlag () || (mCapsuleTotalNumber != 0)) &&
+        AreAllImagesProcessed ())
+    {
       DoResetSystem ();
     }
   } else {
@@ -694,7 +991,7 @@ ProcessCapsules (
     //
     // Reboot System if required after all capsule processed
     //
-    if (mNeedReset) {
+    if (mNeedReset && !mCapsuleOnDiskDeferred) {
       DoResetSystem ();
     }
   }

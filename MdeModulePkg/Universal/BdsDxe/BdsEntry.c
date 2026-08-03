@@ -13,8 +13,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "Bds.h"
+#include "BootNextPolicy.h"
 #include "Language.h"
 #include "HwErrRecSupport.h"
+#include <Library/HobLib.h>
 #include <Library/VariablePolicyHelperLib.h>
 
 #define SET_BOOT_OPTION_SUPPORT_KEY_COUNT(a, c)  { \
@@ -702,10 +704,14 @@ BdsEntry (
   EFI_STATUS                      BootManagerMenuStatus;
   EFI_BOOT_MANAGER_LOAD_OPTION    PlatformDefaultBootOption;
   BOOLEAN                         PlatformDefaultBootOptionValid;
+  UINT16                          *CurrentBootNext;
+  BOOLEAN                         CapsuleDeliveryRequested;
 
-  HotkeyTriggered = NULL;
-  Status          = EFI_SUCCESS;
-  BootSuccess     = FALSE;
+  HotkeyTriggered          = NULL;
+  Status                   = EFI_SUCCESS;
+  BootSuccess              = FALSE;
+  CurrentBootNext          = NULL;
+  CapsuleDeliveryRequested = FALSE;
 
   //
   // Insert the performance probe
@@ -808,6 +814,19 @@ BdsEntry (
 
     BootNext = NULL;
   }
+
+  DataSize = sizeof (OsIndication);
+  Status   = gRT->GetVariable (
+                    EFI_OS_INDICATIONS_VARIABLE_NAME,
+                    &gEfiGlobalVariableGuid,
+                    NULL,
+                    &DataSize,
+                    &OsIndication
+                    );
+  CapsuleDeliveryRequested = (BOOLEAN)(
+                                        !EFI_ERROR (Status) &&
+                                        ((OsIndication & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) != 0)
+                                        );
 
   //
   // Initialize the platform language variables
@@ -1069,6 +1088,44 @@ BdsEntry (
     BdsReadKeys ();
 
     EfiBootManagerHotkeyBoot ();
+
+    DataSize = 0;
+    GetEfiGlobalVariable2 (
+      EFI_BOOT_NEXT_VARIABLE_NAME,
+      (VOID **)&CurrentBootNext,
+      &DataSize
+      );
+    if ((BootNext != NULL) &&
+        ((CurrentBootNext == NULL) ||
+         (DataSize != sizeof (UINT16)) ||
+         (*CurrentBootNext != *BootNext)))
+    {
+      //
+      // Platform policy cleared or replaced the cached request. A replacement
+      // remains non-volatile for the next boot and must not be consumed now.
+      //
+      FreePool (BootNext);
+      BootNext = NULL;
+    }
+
+    if (CurrentBootNext != NULL) {
+      FreePool (CurrentBootNext);
+      CurrentBootNext = NULL;
+    }
+
+    if (BdsShouldPreserveCapsuleBootNext (
+          BootNext != NULL,
+          CapsuleDeliveryRequested,
+          GetBootModeHob ()
+          ))
+    {
+      //
+      // Keep the capsule request for the next normal boot. Consuming BootNext
+      // would either replace an S4 resume or discard a deferred retry path.
+      //
+      FreePool (BootNext);
+      BootNext = NULL;
+    }
 
     if (BootNext != NULL) {
       //

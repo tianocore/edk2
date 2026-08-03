@@ -32,6 +32,8 @@
   HwErrRecSupport.h
   Language.c
   BdsEntry.c
+  BootNextPolicy.c
+  BootNextPolicy.h
 
 
 [Packages]
@@ -52,6 +54,7 @@
   UefiBootManagerLib
   VariablePolicyHelperLib
   PlatformBootManagerLib
+  HobLib
   PcdLib
   PrintLib
 

@@ -1,0 +1,29 @@
+## @file
+# Host tests for BDS BootNext preservation policy.
+#
+# Copyright (c) 2026, Star Labs Systems. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = BdsBootNextPolicyUnitTestHost
+  FILE_GUID                      = 2940E9C8-6F08-49AB-9E47-AF52FB0878AC
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  BootNextPolicy.c
+  BootNextPolicy.h
+  UnitTest/BdsBootNextPolicyUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  UnitTestLib
