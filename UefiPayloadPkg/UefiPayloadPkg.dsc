@@ -407,6 +407,7 @@
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
 !endif
   UefiCpuBaseArchSupportLib|UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
+  AcpiTableWalkLib|UefiPayloadPkg/Library/AcpiTableWalkLib/AcpiTableWalkLib.inf
 
 [LibraryClasses.X64]
   #

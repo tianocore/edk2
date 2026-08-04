@@ -25,80 +25,22 @@ ParseAcpiInfo (
   OUT  ACPI_BOARD_INFO  *AcpiBoardInfo
   )
 {
-  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER                                           *Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER                                                            *Rsdt;
-  UINT32                                                                                 *Entry32;
-  UINTN                                                                                  Entry32Num;
   EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE                                              *Fadt;
-  EFI_ACPI_DESCRIPTION_HEADER                                                            *Xsdt;
-  UINT64                                                                                 *Entry64;
-  UINTN                                                                                  Entry64Num;
-  UINTN                                                                                  Idx;
-  UINT32                                                                                 *Signature;
   EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER                         *MmCfgHdr;
   EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE  *MmCfgBase;
 
-  Rsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)AcpiTableBase;
-  DEBUG ((DEBUG_INFO, "Rsdp at 0x%p\n", Rsdp));
-  DEBUG ((DEBUG_INFO, "Rsdt at 0x%x, Xsdt at 0x%lx\n", Rsdp->RsdtAddress, Rsdp->XsdtAddress));
-
-  //
-  // Search Rsdt First
-  //
-  Fadt     = NULL;
-  MmCfgHdr = NULL;
-  Rsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->RsdtAddress);
-  if (Rsdt != NULL) {
-    Entry32    = (UINT32 *)(Rsdt + 1);
-    Entry32Num = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
-    for (Idx = 0; Idx < Entry32Num; Idx++) {
-      Signature = (UINT32 *)(UINTN)Entry32[Idx];
-      if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
-        DEBUG ((DEBUG_INFO, "Found Fadt in Rsdt\n"));
-      }
-
-      if (*Signature == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
-        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)Signature;
-        DEBUG ((DEBUG_INFO, "Found MM config address in Rsdt\n"));
-      }
-
-      if ((Fadt != NULL) && (MmCfgHdr != NULL)) {
-        goto Done;
-      }
-    }
-  }
-
-  //
-  // Search Xsdt Second
-  //
-  Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->XsdtAddress);
-  if (Xsdt != NULL) {
-    Entry64    = (UINT64 *)(Xsdt + 1);
-    Entry64Num = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
-    for (Idx = 0; Idx < Entry64Num; Idx++) {
-      Signature = (UINT32 *)(UINTN)ReadUnaligned64 (&Entry64[Idx]);
-      if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
-        DEBUG ((DEBUG_INFO, "Found Fadt in Xsdt\n"));
-      }
-
-      if (*Signature == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
-        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)Signature;
-        DEBUG ((DEBUG_INFO, "Found MM config address in Xsdt\n"));
-      }
-
-      if ((Fadt != NULL) && (MmCfgHdr != NULL)) {
-        goto Done;
-      }
-    }
-  }
+  Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)AcpiFindTableFromRsdp (
+                                                        AcpiTableBase,
+                                                        EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
+                                                        );
+  MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)AcpiFindTableFromRsdp (
+                                                                                 AcpiTableBase,
+                                                                                 EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE
+                                                                                 );
 
   if (Fadt == NULL) {
     return RETURN_NOT_FOUND;
   }
-
-Done:
 
   AcpiBoardInfo->PmCtrlRegBase   = Fadt->Pm1aCntBlk;
   AcpiBoardInfo->PmTimerRegBase  = Fadt->PmTmrBlk;

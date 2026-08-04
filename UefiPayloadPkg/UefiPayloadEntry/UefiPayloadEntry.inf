@@ -47,6 +47,7 @@
   UefiPayloadPkg/UefiPayloadPkg.dec
 
 [LibraryClasses]
+  AcpiTableWalkLib
   BaseMemoryLib
   DebugLib
   BaseLib

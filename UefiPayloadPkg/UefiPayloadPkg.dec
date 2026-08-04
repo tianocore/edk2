@@ -18,6 +18,8 @@
   Include
 
 [LibraryClasses]
+  ##  @libraryclass  Locate ACPI tables by signature via a bootloader-supplied RSDP.
+  AcpiTableWalkLib|Include/Library/AcpiTableWalkLib.h
   PayloadEntryHelperLib|Include/Library/PayloadEntryHelperLib.h
 
 [Guids]
