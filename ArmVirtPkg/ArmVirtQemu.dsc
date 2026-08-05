@@ -123,6 +123,10 @@
   GCC:*_*_AARCH64_PP_FLAGS = -DCAVIUM_ERRATUM_27456
 !endif
 
+  GCC:*_GCC_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
+  GCC:*_CLANGDWARF_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
+  CLANGPDB:*_*_*_DLINK_XIPFLAGS = /ALIGN:0x1000
+
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 ################################################################################
@@ -261,6 +265,9 @@
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
+
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
 
   #
   # ARM General Interrupt Controller
@@ -434,6 +441,10 @@
   #
   # Platform Driver
   #
+  ArmVirtPkg/QemuPlatformDxe/QemuPlatformDxe.inf {
+    <LibraryClasses>
+    NULL|OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
+  }
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0
