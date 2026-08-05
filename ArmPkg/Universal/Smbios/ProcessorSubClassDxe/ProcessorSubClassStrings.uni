@@ -21,4 +21,5 @@
 #string STR_PROCESSOR_SERIAL_NUMBER         #language en-US  "Not Specified"
 #string STR_PROCESSOR_ASSET_TAG             #language en-US  "Not Specified"
 #string STR_PROCESSOR_PART_NUMBER           #language en-US  "Not Specified"
+#string STR_PROCESSOR_SOCKET_TYPE           #language en-US  "Not Specified"
 #string STR_PROCESSOR_UNKNOWN               #language en-US  "Unknown"

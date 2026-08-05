@@ -39,6 +39,7 @@ typedef enum RiscVObjectID {
   ERiscVObjCmoInfo,                                              ///< 6 - RISC-V CMO Info
   ERiscVObjMmuInfo,                                              ///< 7 - RISC-V MMU Type Info
   ERiscVObjTimerInfo,                                            ///< 8 - RISC-V Timer Type Info
+  ERiscVObjProcessorSpecificBlockInfo,                           ///< 9 - RISC-V Processor Specific Block Info
   ERiscVObjMax
 } ERISCV_OBJECT_ID;
 
@@ -261,5 +262,27 @@ typedef struct CmRiscVTimerInfo {
   /// Time Base Frequency
   UINT64    TimeBaseFrequency;
 } CM_RISCV_TIMER_INFO;
+
+/** A structure that describes the
+    Processor Specific Block for Smbios type 44 record.
+
+    ID: ERiscVObjProcessorSpecificBlockInfo
+*/
+typedef struct CmRiscVProcessorSpecificBlockInfo {
+  /// Revision
+  UINT16    Revision;
+
+  /// The ID of this RISC-V hart.
+  UINT64    HartId;
+
+  /// Vendor ID.
+  UINT64    VendorId;
+
+  /// Machine Architecture ID.
+  UINT64    ArchId;
+
+  /// Machine Implementation ID.
+  UINT64    ImplId;
+} CM_RISCV_PROCESSOR_SPECIFIC_BLOCK_INFO;
 
 #pragma pack()

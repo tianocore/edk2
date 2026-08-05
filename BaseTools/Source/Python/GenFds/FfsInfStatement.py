@@ -159,7 +159,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
                         LibraryInstance[LibName] = LibraryModule
                         DependencyList.append(LibraryModule)
                 if DepexList:
-                    Dpx = DependencyExpression(DepexList, ModuleType, True)
+                    try:
+                        Dpx = DependencyExpression(DepexList, ModuleType, True)
+                    except Exception:
+                        GenFdsGlobalVariable.ErrorLogger("Failed to parse Depex for: %s\n" % self.InfFileName)
+                        raise
                     if len(Dpx.PostfixNotation) != 0:
                         # It means this module has DEPEX
                         self.FinalTargetSuffixMap['.depex'] = [os.path.join(self.EfiOutputPath, self.BaseName) + '.depex']

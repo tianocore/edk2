@@ -33,6 +33,7 @@
 
 [Sources]
   InternalCryptLib.h
+  KeyContext.h
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
@@ -63,6 +64,9 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSignNull.c
   Pk/CryptEc.c
+  Pk/CryptEdDsa.c
+  Pk/CryptMlDsa.c
+  Pk/CryptSlhDsa.c
   Pem/CryptPem.c
   Bn/CryptBn.c
 

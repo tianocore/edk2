@@ -872,7 +872,7 @@ PrepareVirtioSerialDevicePath (
 }
 
 EFI_STATUS
-PrepareVirtioKeyboardDevicePath (
+PrepareVirtioInputDevicePath (
   IN EFI_HANDLE  DeviceHandle
   )
 {
@@ -1070,8 +1070,8 @@ DetectAndPreparePlatformPciDevicePath (
   }
 
   if ((Pci->Hdr.VendorId == 0x1af4) && (Pci->Hdr.DeviceId == 0x1052)) {
-    DEBUG ((DEBUG_INFO, "Found virtio keyboard device\n"));
-    PrepareVirtioKeyboardDevicePath (Handle);
+    DEBUG ((DEBUG_INFO, "Found virtio input device\n"));
+    PrepareVirtioInputDevicePath (Handle);
     return EFI_SUCCESS;
   }
 

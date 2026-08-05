@@ -1,0 +1,29 @@
+## @file
+#  SMBIOS Type23 Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosType23LibArm
+  FILE_GUID      = 7227274f-7684-4744-bca9-2f8c113dbc72
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = SmbiosType23LibConstructor
+  DESTRUCTOR     = SmbiosType23LibDestructor
+
+[Sources]
+  SmbiosType23Generator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib
