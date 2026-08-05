@@ -219,7 +219,8 @@
             "sigle",            # SmBios.h
             "toleremce",        # IpmiNetFnStorage.h
             "unownered",        # TcgPhysicalPresence.h
-            "voilation"         # PciExpress*.h
+            "voilation",        # PciExpress*.h
+            "sslbi"             # Acpi*.h
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
@@ -241,6 +242,7 @@
 
     ## options defined .pytool/Plugin/MarkdownLintCheck
     "MarkdownLintCheck": {
+        "AuditOnly": True,          # If True, log all errors and then mark as skipped
         "IgnoreFiles": [ "Library/MipiSysTLib/mipisyst"  # submodule outside of control
         ]            # package root relative file, folder, or glob pattern to ignore
     }

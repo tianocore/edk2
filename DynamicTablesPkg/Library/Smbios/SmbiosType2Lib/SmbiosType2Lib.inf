@@ -1,0 +1,30 @@
+## @file
+#  SMBIOS Type 2 Table Generator
+#
+#  Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosType2Lib
+  FILE_GUID      = 46034810-da88-4cc7-83ef-d263b6575dc7
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = SmbiosType2LibConstructor
+  DESTRUCTOR     = SmbiosType2LibDestructor
+
+[Sources]
+  SmbiosType2Generator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib

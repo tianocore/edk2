@@ -3,6 +3,7 @@ The module to produce Usb Bus PPI.
 
 Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026 Dell Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -722,7 +723,7 @@ PeiUsbGetAllConfiguration (
   )
 {
   EFI_STATUS                 Status;
-  EFI_USB_CONFIG_DESCRIPTOR  *ConfigDesc;
+  EFI_USB_CONFIG_DESCRIPTOR  ConfigDescHeader;
   PEI_USB_IO_PPI             *UsbIoPpi;
   UINT16                     ConfigDescLength;
   UINT8                      *Ptr;
@@ -735,7 +736,7 @@ PeiUsbGetAllConfiguration (
   UsbIoPpi = &PeiUsbDevice->UsbIoPpi;
 
   //
-  // First get its 4-byte configuration descriptor
+  // First get its 4-byte configuration descriptor to learn TotalLength.
   //
   Status = PeiUsbGetDescriptor (
              PeiServices,
@@ -743,7 +744,7 @@ PeiUsbGetAllConfiguration (
              (USB_DT_CONFIG << 8), // Value
              0,                    // Index
              4,                    // Length
-             PeiUsbDevice->ConfigurationData
+             (UINT8 *)&ConfigDescHeader
              );
 
   if (EFI_ERROR (Status)) {
@@ -753,21 +754,18 @@ PeiUsbGetAllConfiguration (
 
   MicroSecondDelay (USB_GET_CONFIG_DESCRIPTOR_STALL);
 
-  ConfigDesc       = (EFI_USB_CONFIG_DESCRIPTOR *)PeiUsbDevice->ConfigurationData;
-  ConfigDescLength = ConfigDesc->TotalLength;
+  ConfigDescLength = ConfigDescHeader.TotalLength;
 
   //
   // Reject if TotalLength even cannot cover itself.
   //
-  if (ConfigDescLength < OFFSET_OF (EFI_USB_CONFIG_DESCRIPTOR, TotalLength) + sizeof (ConfigDesc->TotalLength)) {
+  if (ConfigDescLength < OFFSET_OF (EFI_USB_CONFIG_DESCRIPTOR, TotalLength) + sizeof (ConfigDescHeader.TotalLength)) {
     return EFI_DEVICE_ERROR;
   }
 
-  //
-  // Reject if TotalLength exceeds the PeiUsbDevice->ConfigurationData.
-  //
-  if (ConfigDescLength > sizeof (PeiUsbDevice->ConfigurationData)) {
-    return EFI_DEVICE_ERROR;
+  Status = PeiServicesAllocatePool (ConfigDescLength, (VOID **)&PeiUsbDevice->ConfigurationData);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //

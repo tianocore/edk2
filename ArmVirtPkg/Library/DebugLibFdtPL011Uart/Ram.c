@@ -20,6 +20,8 @@
 
 UINTN          mDebugLibFdtPL011UartAddress;
 RETURN_STATUS  mDebugLibFdtPL011UartPermanentStatus = RETURN_SUCCESS;
+BOOLEAN        mSerialDebugLevelSet;
+UINT32         mSerialDebugLevel;
 
 /**
   Statefully initialize both the library instance and the debug PL011 UART.
@@ -60,6 +62,11 @@ Initialize (
   if (DebugAddress == 0) {
     Status = RETURN_NOT_FOUND;
     goto Failed;
+  }
+
+  if (UartBase->DebugLevelSet) {
+    mSerialDebugLevelSet = TRUE;
+    mSerialDebugLevel    = UartBase->DebugLevel;
   }
 
   BaudRate         = (UINTN)PcdGet64 (PcdUartDefaultBaudRate);
@@ -121,4 +128,37 @@ DebugLibFdtPL011UartWrite (
   }
 
   return PL011UartWrite (mDebugLibFdtPL011UartAddress, Buffer, NumberOfBytes);
+}
+
+/**
+  Retrieve the serial debug print error level override.
+
+  @param[out] Value  On success, the debug log level bitmask.
+
+  @retval EFI_SUCCESS            The debug level was retrieved successfully.
+  @retval EFI_INVALID_PARAMETER  Value is NULL.
+  @retval EFI_NOT_FOUND          The debug level is not available.
+**/
+EFI_STATUS
+GetSerialDebugPrintErrorLevel (
+  OUT UINT32  *Value
+  )
+{
+  RETURN_STATUS  Status;
+
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = Initialize ();
+  if (RETURN_ERROR (Status)) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (mSerialDebugLevelSet) {
+    *Value = mSerialDebugLevel;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
 }

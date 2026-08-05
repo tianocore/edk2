@@ -1,16 +1,16 @@
-## @file
+##  @file
 #  Produces the UEFI Random Number Generator protocol
 #
-#  This module will leverage Intel Secure Key technology to produce the Random
-#  Number Generator protocol, which is used to provide high-quality random numbers
-#  for use in applications, or entropy for seeding other random number generators.
-#  Refer to http://software.intel.com/en-us/articles/intel-digital-random-number
-#  -generator-drng-software-implementation-guide/ for more information about Intel
-#  Secure Key technology.
+#  This module produces the Random Number Generator protocol, which is used to
+#  provide high-quality random numbers for use in applications, or entropy for
+#  seeding other random number generators. It relies on the platform RngLib and/or
+#  architecture specific instructions or firmware interface implementation to
+#  access the hardware random number source.
 #
 #  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+#
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -28,14 +28,14 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 RISCV64
 #
 
 [Sources.common]
   RngDxe.c
   RngDxeInternals.h
 
-[Sources.IA32, Sources.X64]
+[Sources.IA32, Sources.X64, Sources.RISCV64]
   Rand/RngDxe.c
   Rand/RdRand.c
   Rand/AesCore.c

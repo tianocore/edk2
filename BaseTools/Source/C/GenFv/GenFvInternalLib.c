@@ -333,6 +333,7 @@ Returns:
       if (XipFlag != NULL && stricmp (XipFlag, ",XIP") == 0) {
         *XipFlag = '\0';
         FvInfo->XipFile[Number + Index] = TRUE;
+        FvInfo->XipFileCount++;
       } else {
         FvInfo->XipFile[Number + Index] = FALSE;
       }
@@ -3464,10 +3465,12 @@ Returns:
   }
 
   //
-  // If ForceRebase Flag specified to TRUE, only rebase files marked with XIP.
+  // If ForceRebase Flag specified to TRUE and at least one file has XIP flag,
+  // use selective rebase: only rebase files marked with XIP.
+  // If no files have XIP flag, preserve legacy behavior: rebase all files.
   //
   if (FvInfo->ForceRebase == 1) {
-    if (!FvInfo->XipFile[FileIndex]) {
+    if (FvInfo->XipFileCount > 0 && !FvInfo->XipFile[FileIndex]) {
       return EFI_SUCCESS;
     }
   }
