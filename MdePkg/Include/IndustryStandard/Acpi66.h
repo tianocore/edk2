@@ -21,11 +21,34 @@
 ///
 /// _STA bit definitions ACPI 6.6 s6.3.7
 ///
+#define ACPI_AML_STA_DEVICE_STATUS_PRESENT  0x1
+/// @todo Remove this definition
 #define ACPI_AML_STA_DEVICE_STATUS_PRESET       0x1
 #define ACPI_AML_STA_DEVICE_STATUS_ENABLED      0x2
 #define ACPI_AML_STA_DEVICE_STATUS_UI           0x4
 #define ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING  0x8
 #define ACPI_AML_STA_DEVICE_STATUS_BATTERY      0x10
+
+///
+/// Supported Status bits (base).
+/// The battery bit is ignored and is reserved for
+/// "Control Method Battery Device (PNP0C0A)".
+///
+#define ACPI_AML_STA_BASE_SUPPORTED  (   \
+  ACPI_AML_STA_DEVICE_STATUS_PRESENT     |  \
+  ACPI_AML_STA_DEVICE_STATUS_ENABLED     |  \
+  ACPI_AML_STA_DEVICE_STATUS_UI          |  \
+  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING)
+
+///
+/// Supported Status bits.
+///
+#define ACPI_AML_STA_SUPPORTED  (           \
+  ACPI_AML_STA_DEVICE_STATUS_PRESENT     |  \
+  ACPI_AML_STA_DEVICE_STATUS_ENABLED     |  \
+  ACPI_AML_STA_DEVICE_STATUS_UI          |  \
+  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING |  \
+  ACPI_AML_STA_DEVICE_STATUS_BATTERY)
 
 ///
 /// _CSD Revision for ACPI 6.6
@@ -2391,6 +2414,40 @@ typedef struct {
 #define EFI_ACPI_6_6_HMAT_TYPE_MEMORY_SIDE_CACHE_INFO                      0x02
 
 ///
+/// HMAT Memory Proximity Domain Attributes Flags
+///
+#define EFI_ACPI_6_6_HMAT_PROXIMITY_DOMAIN_INITIATOR_VALID  1
+
+///
+/// HMAT System Locality Latency and Bandwidth Info Flags
+///
+#define EFI_ACPI_6_6_HMAT_MEMORY_HIERARCHY_MEMORY    0
+#define EFI_ACPI_6_6_HMAT_MEMORY_HIERARCHY_L1_CACHE  1
+#define EFI_ACPI_6_6_HMAT_MEMORY_HIERARCHY_L2_CACHE  2
+#define EFI_ACPI_6_6_HMAT_MEMORY_HIERARCHY_L3_CACHE  3
+
+#define EFI_ACPI_6_6_HMAT_ACCESS_ATTRIBUTES_MIN_TRANSFER_SIZE  0x10
+#define EFI_ACPI_6_6_HMAT_ACCESS_ATTRIBUTES_NON_SEQUENTIAL     0x20
+
+///
+/// HMAT System Locality Latency and Bandwidth Info Data Type
+///
+/// For Memory Hierarchy == 0
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_ACCESS_LATENCY    0
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_READ_LATENCY      1
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_WRITE_LATENCY     2
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_ACCESS_BANDWIDTH  3
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_READ_BANDWIDTH    4
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_WRITE_BANDWIDTH   5
+/// For Memory Hierarchy == 1, 2, or 3
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_HIT_ACCESS_LATENCY    0
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_HIT_READ_LATENCY      1
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_HIT_WRITE_LATENCY     2
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_HIT_ACCESS_BANDWIDTH  3
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_HIT_READ_BANDWIDTH    4
+#define EFI_ACPI_6_6_HMAT_SSLBI_DATA_TYPE_HIT_WRITE_BANDWIDTH   5
+
+///
 /// HMAT Structure Header
 ///
 typedef struct {
@@ -3232,6 +3289,37 @@ typedef struct {
 
 #define EFI_ACPI_6_6_RHCT_HART_INFO_NODE_STRUCTURE_VERSION  1
 
+///
+/// Confidential Computing Type definitions.
+///
+#define EFI_ACPI_6_6_CC_TYPE_NONE    0
+#define EFI_ACPI_6_6_CC_TYPE_SEV     1
+#define EFI_ACPI_6_6_CC_TYPE_TDX     2
+#define EFI_ACPI_6_6_CC_TYPE_APTEE   3
+#define EFI_ACPI_6_6_CC_TYPE_ARMCCA  4
+
+///
+/// Confidential Computing Event Log ACPI Table (CCEL).
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  /// Confidential Computing (CC) type.
+  UINT8                          Type;
+  /// Confidential Computing (CC) sub type.
+  UINT8                          SubType;
+  /// Reserved.
+  UINT16                         Reserved;
+  /// Log Area Minimum Length.
+  UINT64                         Laml;
+  /// Log Area Start Address.
+  UINT64                         Lasa;
+} EFI_ACPI_6_6_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE;
+
+///
+/// CCEL Revision (as defined in ACPI 6.6 spec.)
+///
+#define EFI_ACPI_6_6_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_REVISION  0x01
+
 //
 // Known table signatures
 //
@@ -3260,6 +3348,11 @@ typedef struct {
 /// "BGRT" Boot Graphics Resource Table
 ///
 #define EFI_ACPI_6_6_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE  SIGNATURE_32('B', 'G', 'R', 'T')
+
+///
+/// "CCEL" Confidential Compute Event Log Table
+///
+#define EFI_ACPI_6_6_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
 
 ///
 /// "CDIT" Component Distance Information Table

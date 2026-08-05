@@ -1,0 +1,34 @@
+## @file
+#  SMBIOS Type37 Table Generator.
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x0001001B
+  BASE_NAME       = SmbiosType37LibArm
+  FILE_GUID       = 73d3af03-d975-4678-acd5-cf72fecc207f
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = NULL|DXE_DRIVER
+  CONSTRUCTOR     = SmbiosType37LibConstructor
+  DESTRUCTOR      = SmbiosType37LibDestructor
+
+[Sources]
+  SmbiosType37Generator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+  gEdkiiDynamicTableFactoryProtocolGuid
