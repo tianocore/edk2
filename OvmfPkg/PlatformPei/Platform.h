@@ -62,7 +62,7 @@ PeiFvInitialization (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
-VOID
+EFI_STATUS
 MemTypeInfoInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
@@ -108,4 +108,10 @@ BuildPlatformInfoHob (
 VOID
 SevInitializeRam (
   VOID
+  );
+
+VOID
+CompleteInitialization (
+  IN EFI_HOB_PLATFORM_INFO   *PlatformInfoHob,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   );

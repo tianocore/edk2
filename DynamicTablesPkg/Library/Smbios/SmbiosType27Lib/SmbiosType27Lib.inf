@@ -1,0 +1,29 @@
+## @file
+#  SMBIOS Type27 Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosType27LibArm
+  FILE_GUID      = 1f38c754-dc37-4b0f-8972-be8f705f7839
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = SmbiosType27LibConstructor
+  DESTRUCTOR     = SmbiosType27LibDestructor
+
+[Sources]
+  SmbiosType27Generator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib

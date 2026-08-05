@@ -1,7 +1,7 @@
 /** @file
   Definitions of RedfishHttpDxe
 
-  Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2023-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -25,17 +25,19 @@
 #include <Library/RedfishDebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PrintLib.h>
+#include <Library/TimerLib.h>
 
 #include <Protocol/Http.h>
 #include <Protocol/EdkIIRedfishHttpProtocol.h>
 #include <Protocol/EdkIIRedfishCredential2.h>
 #include <Protocol/RestEx.h>
 
-#define REDFISH_HTTP_CACHE_LIST_SIZE      0x80
-#define REDFISH_ERROR_MSG_MAX             128
-#define REDFISH_DEBUG_STRING_LENGTH       200
-#define REDFISH_HOST_NAME_MAX             64   // IPv6 maximum length (39) + "https://" (8) + port number (maximum 5)
-#define REDFISH_HTTP_ERROR_REPORT         "Redfish HTTP %a failure(0x%x): %s"
-#define REDFISH_HTTP_CACHE_DEBUG          DEBUG_MANAGEABILITY
-#define REDFISH_HTTP_CACHE_DEBUG_DUMP     DEBUG_MANAGEABILITY
-#define REDFISH_HTTP_CACHE_DEBUG_REQUEST  DEBUG_MANAGEABILITY
+#define REDFISH_HTTP_CACHE_LIST_SIZE              0x80
+#define REDFISH_ERROR_MSG_MAX                     128
+#define REDFISH_DEBUG_STRING_LENGTH               200
+#define REDFISH_HOST_NAME_MAX                     64  // IPv6 maximum length (39) + "https://" (8) + port number (maximum 5)
+#define REDFISH_HTTP_ERROR_REPORT                 "Redfish HTTP %a failure(0x%x): %s"
+#define REDFISH_HTTP_CACHE_DEBUG                  DEBUG_MANAGEABILITY
+#define REDFISH_HTTP_CACHE_DEBUG_DUMP             DEBUG_MANAGEABILITY
+#define REDFISH_HTTP_CACHE_DEBUG_REQUEST          DEBUG_MANAGEABILITY
+#define REDFISH_HTTP_RESPONSE_TIME_DEBUG_ENABLED  0x0

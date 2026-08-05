@@ -9,6 +9,7 @@
 
 #include <PiPei.h>
 
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
@@ -17,9 +18,60 @@
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/FdtSerialPortAddressLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 
 #include <Guid/EarlyPL011BaseAddress.h>
 #include <Guid/FdtHob.h>
+
+//
+// Duplicated in ArmVirtPkg/Library/DebugLibFdtPL011Uart/Flash.c —
+// keep both copies in sync.
+//
+
+/**
+  Parse a serial debug level string.
+
+  Accepted values are "silent" (DEBUG_ERROR only), "verbose" (no
+  override), or a hex bitmask (e.g. "0x80000040").
+
+  @param[in]  String      NUL-terminated ASCII string to parse.
+  @param[out] DebugLevel  On success, the parsed debug level bitmask.
+
+  @retval TRUE   String was recognised; *DebugLevel is valid.
+  @retval FALSE  String is NULL, "verbose", or unrecognised; no override.
+**/
+STATIC
+BOOLEAN
+ParseSerialDebugLevel (
+  IN  CONST CHAR8  *String,
+  OUT UINT32       *DebugLevel
+  )
+{
+  UINT64  Value;
+  CHAR8   *End;
+
+  if ((String == NULL) || (DebugLevel == NULL)) {
+    return FALSE;
+  }
+
+  if (AsciiStrCmp (String, "silent") == 0) {
+    *DebugLevel = DEBUG_ERROR;
+    return TRUE;
+  }
+
+  if (AsciiStrCmp (String, "verbose") == 0) {
+    return FALSE;
+  }
+
+  if (!EFI_ERROR (AsciiStrHexToUint64S (String, &End, &Value)) &&
+      (*End == '\0'))
+  {
+    *DebugLevel = (UINT32)Value;
+    return TRUE;
+  }
+
+  return FALSE;
+}
 
 STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mTpm2DiscoveredPpi = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
@@ -56,6 +108,9 @@ PlatformPeim (
   CONST UINT32              *RangesProp;
   UINT64                    TpmBase;
   EFI_STATUS                Status;
+  CHAR8                     DebugLevelBuf[32];
+  UINTN                     DebugLevelBufSize;
+  CONST CHAR8               *DebugLevelStr;
 
   Base = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (Base != NULL);
@@ -123,6 +178,23 @@ PlatformPeim (
       UartHobData->DebugAddress
       ));
   }
+
+  DebugLevelBufSize = sizeof (DebugLevelBuf);
+  Status            = QemuFwCfgGetAsString (
+                        "opt/org.tianocore/DebugLevel",
+                        &DebugLevelBufSize,
+                        DebugLevelBuf
+                        );
+  if (!RETURN_ERROR (Status)) {
+    DebugLevelStr = DebugLevelBuf;
+  } else {
+    DebugLevelStr = (CONST CHAR8 *)PcdGetPtr (PcdSerialDebugPrintErrorLevel);
+  }
+
+  UartHobData->DebugLevelSet = ParseSerialDebugLevel (
+                                 DebugLevelStr,
+                                 &UartHobData->DebugLevel
+                                 );
 
   TpmBase = 0;
 

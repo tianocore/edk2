@@ -70,9 +70,9 @@ typedef enum StdSmbiosTableGeneratorId {
   EStdSmbiosTableIdType40,
   EStdSmbiosTableIdType41,
   EStdSmbiosTableIdType42,
-
-  // IDs 43 - 125 are reserved
-
+  // IDs 43 are reserved
+  EStdSmbiosTableIdType44 = (EStdSmbiosTableIdType00 + 44),
+  // IDs 45 - 125 are reserved
   EStdSmbiosTableIdType126 = (EStdSmbiosTableIdType00 + 126),
   EStdSmbiosTableIdType127,
   EStdSmbiosTableIdMax
@@ -211,7 +211,7 @@ typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_FREE_TABLE) (
   @return EFI_SUCCESS  If the table is generated successfully or other
                         failure codes as returned by the generator.
 **/
-typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_BUILD_TABLEEX) (
+typedef EFI_STATUS (EFIAPI *SMBIOS_TABLE_GENERATOR_BUILD_TABLEEX)(
   IN  CONST SMBIOS_TABLE_GENERATOR                         *Generator,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
   IN        CM_STD_OBJ_SMBIOS_TABLE_INFO          *CONST   SmbiosTableInfo,
@@ -239,7 +239,7 @@ typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_BUILD_TABLEEX) (
   @return  EFI_SUCCESS If freed successfully or other failure codes
                         as returned by the generator.
 **/
-typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_FREE_TABLEEX) (
+typedef EFI_STATUS (EFIAPI *SMBIOS_TABLE_GENERATOR_FREE_TABLEEX)(
   IN  CONST SMBIOS_TABLE_GENERATOR                        *Generator,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  TableFactoryProtocol,
   IN  CONST CM_STD_OBJ_SMBIOS_TABLE_INFO          *CONST  SmbiosTableInfo,

@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -179,6 +181,10 @@ ArmCallFfa (
   @param [in]    RequestVersion          Minimal request version
   @param [out]   CurrentVersion          Current major version
 
+  @retval EFI_SUCCESS              Success to get supported FF-A version.
+  @retval EFI_INVALID_PARAMETER    Invalid Parameter.
+  @retval EFI_UNSUPPORTED          FF-A isn't supported.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -189,6 +195,10 @@ ArmFfaLibGetVersion (
 {
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
+
+  if (CurrentVersion == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
@@ -202,9 +212,7 @@ ArmFfaLibGetVersion (
     return Status;
   }
 
-  if (CurrentVersion != NULL) {
-    *CurrentVersion = FfaArgs.Arg0;
-  }
+  *CurrentVersion = FfaArgs.Arg0;
 
   return EFI_SUCCESS;
 }
@@ -323,6 +331,13 @@ ArmFfaLibRxRelease (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RX_RELEASE;
+
+  /*
+   * Per Table 13.21: FFA_RX_RELEASE function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * PartId should be set to 0 in ARM_FID_FFA_RX_RELEASE.
+   */
+  PartId       = 0;
   FfaArgs.Arg1 = PartId;
 
   ArmCallFfa (&FfaArgs);
@@ -734,12 +749,12 @@ ArmFfaLibRun (
   ArmCallFfa (&FfaArgs);
 
   Status = FfaArgsToEfiStatus (&FfaArgs);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   if (DirectMsgArg != NULL) {
     ZeroMem (DirectMsgArg, sizeof (DIRECT_MSG_ARGS));
+
+    // Copy the FFA header to the direct message arguments
+    CopyMem (&(DirectMsgArg->Header), &FfaArgs, sizeof (DirectMsgArg->Header));
 
     if (FfaArgs.Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_RESP) {
       DirectMsgArg->Arg0 = FfaArgs.Arg3;
@@ -775,6 +790,8 @@ ArmFfaLibRun (
   @param [in]      Flags            Message flags
   @param [in, out] ImpDefArgs       Implemented defined arguments and
                                     Implemented defined return values
+                                    The header registers (x0-x2) will be initialized
+                                    with the values from DestPartId and Flags.
 
   @retval EFI_SUCCESS               Success
   @retval Others                    Error
@@ -816,6 +833,7 @@ ArmFfaLibMsgSendDirectReq (
 
   Status = FfaArgsToEfiStatus (&FfaArgs);
   if (EFI_ERROR (Status)) {
+    CopyMem (ImpDefArgs, &FfaArgs, sizeof (DIRECT_MSG_ARGS));
     return Status;
   }
 
@@ -835,6 +853,8 @@ ArmFfaLibMsgSendDirectReq (
   @param [in]       ServiceGuid      Service guid
   @param [in, out]  ImpDefArgs       Implemented defined arguments and
                                      Implemented defined return values
+                                     The header registers (x0-x3) will be
+                                     initialized with the values from DestPartId and ServiceGuid.
 
   @retval EFI_SUCCESS               Success
   @retval Others                    Error
@@ -900,6 +920,7 @@ ArmFfaLibMsgSendDirectReq2 (
 
   Status = FfaArgsToEfiStatus (&FfaArgs);
   if (EFI_ERROR (Status)) {
+    CopyMem (ImpDefArgs, &FfaArgs, sizeof (DIRECT_MSG_ARGS));
     return Status;
   }
 
@@ -1165,8 +1186,8 @@ GetRxTxBufferMinSizeAndAlign (
 
   MaxSize = ((MaxSize == 0) ? MAX_UINTN : (MaxSize * MinAndAlign));
 
-  if ((MinAndAlign > (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)) ||
-      (MaxSize < (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)))
+  if ((MinAndAlign > (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)))) ||
+      (MaxSize < (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)))))
   {
     DEBUG ((
       DEBUG_ERROR,

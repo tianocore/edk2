@@ -55,7 +55,7 @@ SwitchStack (
   //
   // New stack must be aligned with CPU_STACK_ALIGNMENT
   //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
+  ASSERT (ADDRESS_IS_ALIGNED (NewStack, CPU_STACK_ALIGNMENT));
 
   VA_START (Marker, NewStack);
 

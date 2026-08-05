@@ -331,12 +331,17 @@ GetEraseTypeRecord (
   *EraseTypeRecord = NULL;
 
   //
-  // Initial the comapre value.
+  // Initial the compare value.
   //
   switch (SearchType) {
     case SearchEraseTypeByType:
     case SearchEraseTypeByCommand:
     case SearchEraseTypeBySize:
+      //
+      // Although ValueToCompare is not used for these types, it must be
+      // initialized to avoid "variable may be used uninitialized" compiler warning.
+      //
+      ValueToCompare = 0;
       break;
     case SearchEraseTypeBySmallestSize:
       ValueToCompare = (UINT32)-1;
@@ -1544,15 +1549,16 @@ SpiReadSfdpPtp (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "%a: Fails to read SFDP parameter.\n", __func__));
         ASSERT_EFI_ERROR (Status);
+        return Status;
       }
 
       CurrentBuffer += Length;
     } else {
-      break;
+      return Status;
     }
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**

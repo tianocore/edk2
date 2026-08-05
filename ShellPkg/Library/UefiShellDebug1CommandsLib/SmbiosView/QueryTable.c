@@ -6,7 +6,7 @@
   Copyright (c) 2005 - 2024, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016-2019 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-  Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2023-2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -3246,33 +3246,6 @@ TABLE_ITEM  VPLocationTable[] = {
   },
   {
     0x03,
-    L" OK "
-  },
-  {
-    0x04,
-    L" Non-critical "
-  },
-  {
-    0x05,
-    L" Critical "
-  },
-  {
-    0x06,
-    L" Non-recoverable "
-  },
-};
-
-TABLE_ITEM  VPStatusTable[] = {
-  {
-    0x01,
-    L" Other "
-  },
-  {
-    0x02,
-    L" Unknown "
-  },
-  {
-    0x03,
     L" Processor "
   },
   {
@@ -3306,6 +3279,33 @@ TABLE_ITEM  VPStatusTable[] = {
   {
     0x0B,
     L" Add-in Card "
+  },
+};
+
+TABLE_ITEM  VPStatusTable[] = {
+  {
+    0x01,
+    L" Other "
+  },
+  {
+    0x02,
+    L" Unknown "
+  },
+  {
+    0x03,
+    L" OK "
+  },
+  {
+    0x04,
+    L" Non-critical "
+  },
+  {
+    0x05,
+    L" Critical "
+  },
+  {
+    0x06,
+    L" Non-recoverable "
   },
 };
 
@@ -3454,6 +3454,22 @@ TABLE_ITEM  TemperatureProbeLocTable[] = {
   {
     0x0B,
     L" Add-in Card "
+  },
+  {
+    0x0C,
+    L" Front Panel Board "
+  },
+  {
+    0x0D,
+    L" Back Panel Board "
+  },
+  {
+    0x0E,
+    L" Power System Board "
+  },
+  {
+    0x0F,
+    L" Drive Back Plane "
   },
 };
 
@@ -5020,7 +5036,7 @@ DisplayVPLocation (
 {
   UINT8  Loc;
 
-  Loc = (UINT8)((Key & 0xE0) >> 5);
+  Loc = (UINT8)(Key & 0x1F);
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_VOLTAGE_PROBE_LOC), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Loc, Option);
   PRINT_TABLE_ITEM (VPLocationTable, Loc);
@@ -5040,7 +5056,7 @@ DisplayVPStatus (
 {
   UINT8  Status;
 
-  Status = (UINT8)(Key & 0x1F);
+  Status = (UINT8)((Key & 0xE0) >> 5);
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_VOLTAGE_PROBE_STATUS), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Status, Option);
   PRINT_TABLE_ITEM (VPStatusTable, Status);
@@ -5101,7 +5117,7 @@ DisplayTemperatureProbeStatus (
   UINT8  Status;
 
   Status = (UINT8)((Key & 0xE0) >> 5);
-  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_TEMP_PROBE), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_TEMP_PROBE_STATUS), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Status, Option);
   PRINT_TABLE_ITEM (TemperatureProbeStatusTable, Status);
 }
@@ -5121,7 +5137,7 @@ DisplayTemperatureProbeLoc (
   UINT8  Loc;
 
   Loc = (UINT8)(Key & 0x1F);
-  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_VOLTAGE_PROBE_LOC), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_TEMP_PROBE_LOC), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Loc, Option);
   PRINT_TABLE_ITEM (TemperatureProbeLocTable, Loc);
 }

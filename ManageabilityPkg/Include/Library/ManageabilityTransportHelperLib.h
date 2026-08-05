@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_TRANSPORT_HELPER_LIB_H_
-#define MANAGEABILITY_TRANSPORT_HELPER_LIB_H_
+#pragma once
 
 #include <Library/ManageabilityTransportLib.h>
 
@@ -180,6 +179,7 @@ HelperManageabilityPayLoadDebugPrint (
 
 **/
 VOID
+EFIAPI
 HelperManageabilityDebugPrint (
   IN  VOID         *Payload,
   IN  UINT32       PayloadSize,
@@ -210,5 +210,3 @@ IpmiHelperCheckCompletionCode (
   OUT  CHAR16                                     **CompletionCodeStr,
   OUT  MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  *AdditionalStatus
   );
-
-#endif

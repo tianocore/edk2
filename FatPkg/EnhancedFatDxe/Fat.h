@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/DiskIo2.h>
@@ -388,6 +389,16 @@ struct _FAT_VOLUME {
   //
   VOID                               *CacheBuffer;
   DISK_CACHE                         DiskCache[CacheMaxType];
+
+  //
+  // Event signaled before ExitBootServices that flushes any dirty caches.
+  //
+  EFI_EVENT                          FlushEvent;
+
+  //
+  // A flag that disables caching on this volume.
+  //
+  BOOLEAN                            CachingDisabled;
 };
 
 //
@@ -845,6 +856,24 @@ FatSetVolumeError (
 EFI_STATUS
 FatIFileClose (
   FAT_IFILE  *IFile
+  );
+
+/**
+
+  Write back any dirty FAT metadata and disk-cache pages for the volume to
+  the underlying media.
+
+  @param  Volume                - The volume whose dirty cache should be flushed.
+  @param  Task                  - Point to task instance, may be NULL.
+
+  @retval EFI_SUCCESS           - Any dirty caches were flushed.
+  @return Others                - An I/O error occurred while writing back.
+
+**/
+EFI_STATUS
+FatFlushDirtyCache (
+  IN FAT_VOLUME  *Volume,
+  IN FAT_TASK    *Task
   );
 
 /**
@@ -2029,3 +2058,17 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gFatComponentName2;
 extern EFI_LOCK                      FatFsLock;
 extern EFI_LOCK                      FatTaskLock;
 extern EFI_FILE_PROTOCOL             FatFileInterface;
+
+/**
+  Notification callback for the pre-ExitBootServices event to flush any dirty caches.
+
+  @param Event   - The event that was signaled.
+  @param Context - The context of the event, which is the FAT_VOLUME for which to flush caches.
+
+**/
+VOID
+EFIAPI
+FatOnBeforeExitBootServices (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );

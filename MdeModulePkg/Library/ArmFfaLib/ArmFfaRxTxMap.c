@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -67,7 +69,7 @@ ArmFfaLibGetRxTxBuffers (
   }
 
   if (TxBufferSize != NULL) {
-    *TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    *TxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   }
 
   if (RxBuffer != NULL) {
@@ -75,7 +77,7 @@ ArmFfaLibGetRxTxBuffers (
   }
 
   if (RxBufferSize != NULL) {
-    *RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    *RxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   }
 
   return EFI_SUCCESS;
@@ -109,7 +111,7 @@ ArmFfaLibRxTxMap (
 
   TxBuffer   = (VOID *)(UINTN)PcdGet64 (PcdFfaTxBuffer);
   RxBuffer   = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
 
   /*
    * If someone already mapped Rx/Tx Buffers, return EFI_ALREADY_STARTED.
@@ -191,11 +193,16 @@ ArmFfaLibRxTxUnmap (
   VOID          *Buffers;
   UINT16        PartId;
 
-  ArmFfaLibGetPartId (&PartId);
-
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
+
+  /*
+   * Per Table 13.30: FFA_RXTX_UNMAP function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * PartId should be set to 0 in ARM_FID_FFA_RXTX_UNMAP.
+   */
+  PartId       = 0;
   FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
 
   ArmCallFfa (&FfaArgs);
@@ -236,9 +243,9 @@ UpdateRxTxBufferInfo (
   )
 {
   BufferInfo->TxBufferAddr = PcdGet64 (PcdFfaTxBuffer);
-  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->TxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   BufferInfo->RxBufferAddr = PcdGet64 (PcdFfaRxBuffer);
-  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
 }
 
 /**
@@ -260,7 +267,7 @@ FindRxTxBufferAllocationHob (
   UINT64                BufferSize;
 
   BufferBase = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFfaTxBuffer);
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)) * 2;
 
   return GetRxTxBufferAllocationHob (BufferBase, BufferSize, UseGuid);
 }
@@ -290,8 +297,6 @@ RemapFfaRxTxBuffer (
   EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
   UINT16                     PartId;
 
-  ArmFfaLibGetPartId (&PartId);
-
   RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
   if (RxTxBufferAllocationHob == NULL) {
     return EFI_NOT_FOUND;
@@ -301,6 +306,13 @@ RemapFfaRxTxBuffer (
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
+
+  /*
+   * Per Table 13.30: FFA_RXTX_UNMAP function syntax in
+   * DEN0077A_Firmware_Framework_Arm_A-profile_1.3_ALP1.pdf
+   * PartId should be set to 0 in ARM_FID_FFA_RXTX_UNMAP.
+   */
+  PartId       = 0;
   FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
 
   ArmCallFfa (&FfaArgs);
@@ -315,7 +327,7 @@ RemapFfaRxTxBuffer (
 
   NewBufferBase = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->RemapOffset;
   NewTxBuffer   = NewBufferBase;
-  NewRxBuffer   = NewTxBuffer + (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE);
+  NewRxBuffer   = NewTxBuffer + (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)));
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_MAP;

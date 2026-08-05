@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_CXLDXE_H_
-#define _EFI_CXLDXE_H_
+#pragma once
 
 #include "Protocol/CxlIo.h"
 #include <Protocol/PciIo.h>
@@ -329,5 +328,3 @@ CxlDriverBindingStop (
   IN  UINTN                       NumberOfChildren,
   IN  EFI_HANDLE                  *ChildHandleBuffer
   );
-
-#endif // _EFI_CXLDXE_H_

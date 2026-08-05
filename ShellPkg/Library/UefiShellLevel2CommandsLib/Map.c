@@ -698,9 +698,9 @@ PerformMappingDisplay (
 
   if (!Found) {
     if (Specific != NULL) {
-      ShellPrintHiiEx (gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", Specific);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", Specific);
     } else {
-      ShellPrintHiiEx (gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"map");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"map");
     }
   }
 

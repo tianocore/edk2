@@ -131,7 +131,6 @@ PxeBcMtftp6GetFileSize (
   EFI_STATUS           Status;
 
   *BufferSize               = 0;
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
   Packet                    = NULL;
   Option                    = NULL;
@@ -274,7 +273,6 @@ PxeBcMtftp6ReadFile (
   UINT8                WindowsizeBuf[10];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
@@ -363,7 +361,6 @@ PxeBcMtftp6WriteFile (
   UINT8                OptBuf[128];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
@@ -441,7 +438,6 @@ PxeBcMtftp6ReadDirectory (
   UINT8                WindowsizeBuf[10];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
@@ -610,7 +606,6 @@ PxeBcMtftp4GetFileSize (
   EFI_STATUS           Status;
 
   *BufferSize               = 0;
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
   Packet                    = NULL;
   Option                    = NULL;
@@ -753,7 +748,6 @@ PxeBcMtftp4ReadFile (
   UINT8                WindowsizeBuf[10];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
@@ -842,7 +836,6 @@ PxeBcMtftp4WriteFile (
   UINT8                OptBuf[128];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
@@ -920,7 +913,6 @@ PxeBcMtftp4ReadDirectory (
   UINT8                WindowsizeBuf[10];
   EFI_STATUS           Status;
 
-  Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;

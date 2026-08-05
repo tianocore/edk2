@@ -10,6 +10,8 @@
 #include <Library/DebugLib.h>
 
 #undef EDK2_OPENSSL_NOEC
+#include <openssl/opensslconf.h>
+#undef OPENSSL_NO_CAMELLIA
 
 #include <openssl/camellia.h>
 

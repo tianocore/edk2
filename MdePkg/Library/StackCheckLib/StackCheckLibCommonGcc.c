@@ -21,7 +21,7 @@ TriggerStackCookieInterrupt (
   VOID
   );
 
-VOID  *__stack_chk_guard = (VOID *)(UINTN)STACK_COOKIE_VALUE;
+__UINTPTR_TYPE__  __stack_chk_guard = (__UINTPTR_TYPE__)STACK_COOKIE_VALUE;
 
 /**
   This function gets called when a gcc/clang generated stack cookie fails. This implementation calls into a platform

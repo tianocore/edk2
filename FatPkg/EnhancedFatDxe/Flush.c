@@ -364,6 +364,57 @@ FatCheckVolumeRef (
 
 /**
 
+  Write back any dirty FAT metadata and disk-cache pages for the volume to
+  the underlying media.
+
+  @param  Volume                - The volume whose dirty cache should be flushed.
+  @param  Task                  - Point to task instance, may be NULL.
+
+  @retval EFI_SUCCESS           - Any dirty caches were flushed.
+  @return Others                - An I/O error occurred while writing back.
+
+**/
+EFI_STATUS
+FatFlushDirtyCache (
+  IN FAT_VOLUME  *Volume,
+  IN FAT_TASK    *Task
+  )
+{
+  EFI_STATUS  Status;
+
+  if (!Volume->Valid) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Update the free hint info. Volume->FreeInfoPos != 0
+  // indicates this a FAT32 volume
+  //
+  if (Volume->FreeInfoValid && Volume->FatDirty && Volume->FreeInfoPos) {
+    Status = FatDiskIo (Volume, WriteDisk, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, Task);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Update that the volume is not dirty
+  //
+  if (Volume->FatDirty && (Volume->FatType != Fat12)) {
+    Volume->FatDirty = FALSE;
+    Status           = FatAccessVolumeDirty (Volume, WriteFat, &Volume->NotDirtyValue);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Flush all dirty cache entries to disk
+  //
+  return FatVolumeFlushCache (Volume, Task);
+}
+
+/**
   Set error status for a specific OFile, reference checking the volume.
   If volume is already marked as invalid, and all resources are freed
   after reference checking, the file system protocol is uninstalled and
@@ -401,36 +452,14 @@ FatCleanupVolume (
   // volume be cleaned up even the volume is invalid.
   //
   FatCheckVolumeRef (Volume);
-  if (Volume->Valid) {
-    //
-    // Update the free hint info. Volume->FreeInfoPos != 0
-    // indicates this a FAT32 volume
-    //
-    if (Volume->FreeInfoValid && Volume->FatDirty && Volume->FreeInfoPos) {
-      Status = FatDiskIo (Volume, WriteDisk, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, Task);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-    }
 
-    //
-    // Update that the volume is not dirty
-    //
-    if (Volume->FatDirty && (Volume->FatType != Fat12)) {
-      Volume->FatDirty = FALSE;
-      Status           = FatAccessVolumeDirty (Volume, WriteFat, &Volume->NotDirtyValue);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-    }
-
-    //
-    // Flush all dirty cache entries to disk
-    //
-    Status = FatVolumeFlushCache (Volume, Task);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  //
+  // Write back any dirty FAT metadata and disk-cache pages. No-op when the
+  // volume is no longer Valid.
+  //
+  Status = FatFlushDirtyCache (Volume, Task);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //

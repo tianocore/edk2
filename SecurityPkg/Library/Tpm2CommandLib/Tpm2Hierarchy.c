@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
@@ -157,7 +158,7 @@ Tpm2SetPrimaryPolicy (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -239,7 +240,7 @@ Tpm2Clear (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -329,7 +330,7 @@ Tpm2ClearControl (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -428,7 +429,7 @@ Tpm2HierarchyChangeAuth (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -534,7 +535,7 @@ Tpm2ChangeEPS (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -632,7 +633,7 @@ Tpm2ChangePPS (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -734,7 +735,7 @@ Tpm2HierarchyControl (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 

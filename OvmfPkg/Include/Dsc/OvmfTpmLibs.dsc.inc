@@ -3,6 +3,7 @@
 ##
 
 [LibraryClasses]
+  Tpm2HelpLib|SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
 !if $(TPM2_ENABLE) == TRUE
 !if $(TPM1_ENABLE) == TRUE
   Tpm12CommandLib|SecurityPkg/Library/Tpm12CommandLib/Tpm12CommandLib.inf

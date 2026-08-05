@@ -204,6 +204,23 @@ SetGcdMemorySpaceAttributes (
 }
 
 /**
+  Checks if the specified ARM translation table attributes are cacheable memory.
+
+  @param[in]  Attributes  ARM memory attributes.
+
+  @retval TRUE if the attributes are cacheable, FALSE otherwise.
+**/
+STATIC
+BOOLEAN
+IsArmAttributeCacheable (
+  IN UINT64  Attributes
+  )
+{
+  return ((Attributes & TT_ATTR_INDX_MASK) == TT_ATTR_INDX_MEMORY_WRITE_THROUGH) ||
+         ((Attributes & TT_ATTR_INDX_MASK) == TT_ATTR_INDX_MEMORY_WRITE_BACK);
+}
+
+/**
   This function modifies the attributes for the memory region specified by BaseAddress and
   Length from their current attributes to the attributes specified by Attributes.
 
@@ -238,12 +255,13 @@ CpuSetMemoryAttributes (
   UINTN       RegionBaseAddress;
   UINTN       RegionLength;
   UINTN       RegionArmAttributes;
+  BOOLEAN     FlushCache;
 
   if (mIsFlushingGCD) {
     return EFI_SUCCESS;
   }
 
-  if ((BaseAddress & (SIZE_4KB - 1)) != 0) {
+  if (!IS_ALIGNED (BaseAddress, SIZE_4KB)) {
     // Minimum granularity is SIZE_4KB (4KB on ARM)
     DEBUG ((DEBUG_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum granularity is SIZE_4KB\n", BaseAddress, Length, EfiAttributes));
     return EFI_UNSUPPORTED;
@@ -261,8 +279,42 @@ CpuSetMemoryAttributes (
   if (EFI_ERROR (Status) || (RegionArmAttributes != ArmAttributes) ||
       ((BaseAddress + Length) > (RegionBaseAddress + RegionLength)))
   {
-    return ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
-  } else {
-    return EFI_SUCCESS;
+    //
+    // If the region was previously mapped as a cacheable normal memory,
+    // and is changed to device or non-cacheable memory, ensure any
+    // stale cache lines are written back and invalidated. If this is not done,
+    // depending on the caching behavior of the platform, dirty cache lines may
+    // be written back corrupting data in the future, or stale cache lines may
+    // persist if caching is enabled later. In scenarios where the caller didn't
+    // explicitly change the cacheability, ignore this. This could still lead to
+    // unexpected caches, but this is a necessary concession to incorrect behavior
+    // in higher-level components.
+    //
+    FlushCache = FALSE;
+    if (!EFI_ERROR (Status) &&
+        ((EfiAttributes & EFI_MEMORY_RP) == 0) &&
+        ((EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) != 0) &&
+        IsArmAttributeCacheable (RegionArmAttributes) &&
+        !IsArmAttributeCacheable (ArmAttributes))
+    {
+      FlushCache = TRUE;
+    }
+
+    Status = ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (FlushCache) {
+      //
+      // A data barrier is required to ensure that all page updates are complete and the TLB is flushed prior to the
+      // cache invalidation to avoid any unexpected cache lines being created.
+      //
+
+      ArmDataSynchronizationBarrier ();
+      WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)BaseAddress, (UINTN)Length);
+    }
   }
+
+  return EFI_SUCCESS;
 }

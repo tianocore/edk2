@@ -133,7 +133,7 @@ ValidatePhysicalRange (
   UINT64  Value;
 
   Value = *(UINT64 *)Ptr;
-  if ((Value == 0) || ((Value & (SIZE_64KB - 1)) != 0)) {
+  if ((Value == 0) || !IS_ALIGNED (Value, SIZE_64KB)) {
     IncrementErrorCount ();
     Print (L"\nERROR: Physical Range must be 64K aligned and cannot be zero.");
   }

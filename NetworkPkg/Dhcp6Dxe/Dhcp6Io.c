@@ -538,7 +538,9 @@ Dhcp6UpdateIaInfo (
   T1 = 0;
   T2 = 0;
 
-  ASSERT (Instance->Config != NULL);
+  if (Instance->Config == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
 
   // OptionLen is the length of the Options excluding the DHCP header.
   // Length of the EFI_DHCP6_PACKET from the first byte of the Header field to the last
@@ -750,6 +752,13 @@ Dhcp6SeekInnerOptionSafe (
     }
 
     IaInnerLenTmp -= DHCP6_SIZE_OF_COMBINED_IAID_T1_T2;
+
+    //
+    // Verify the declared inner length does not run past the option buffer.
+    //
+    if (IaInnerLenTmp > OptionLen - DHCP6_MIN_SIZE_OF_IA_NA) {
+      return EFI_DEVICE_ERROR;
+    }
   } else if (IaType == Dhcp6OptIata) {
     //
     // Verify the OptionLen is valid.
@@ -769,6 +778,13 @@ Dhcp6SeekInnerOptionSafe (
     }
 
     IaInnerLenTmp -= DHCP6_SIZE_OF_IAID;
+
+    //
+    // Verify the declared inner length does not run past the option buffer.
+    //
+    if (IaInnerLenTmp > OptionLen - DHCP6_MIN_SIZE_OF_IA_TA) {
+      return EFI_DEVICE_ERROR;
+    }
   } else {
     return EFI_DEVICE_ERROR;
   }
@@ -2299,8 +2315,6 @@ Dhcp6HandleReplyMsg (
   ASSERT (Instance->Config != NULL);
   ASSERT (Instance->IaCb.Ia != NULL);
   ASSERT (Packet != NULL);
-
-  Status = EFI_SUCCESS;
 
   if (Packet->Dhcp6.Header.MessageType != Dhcp6MsgReply) {
     return EFI_DEVICE_ERROR;

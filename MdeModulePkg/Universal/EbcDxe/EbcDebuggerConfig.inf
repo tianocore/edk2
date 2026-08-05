@@ -50,8 +50,5 @@
   gEfiDebuggerConfigurationProtocolGuid     ## CONSUMES
   gEfiShellParametersProtocolGuid           ## CONSUMES
 
-[Depex]
-  TRUE
-
 [UserExtensions.TianoCore."ExtraFiles"]
   EbcDebuggerConfigExtra.uni

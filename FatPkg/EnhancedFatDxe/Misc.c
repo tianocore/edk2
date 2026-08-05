@@ -331,6 +331,14 @@ FatDiskIo (
   //
   Status = EFI_VOLUME_CORRUPTED;
   if (Offset + BufferSize <= Volume->VolumeSize) {
+    if (Volume->CachingDisabled) {
+      //
+      // Caching has been turned off for this volume. Convert
+      // IO mode to raw disk access equivalent.
+      //
+      IoMode = (IO_MODE)RAW_ACCESS (IoMode);
+    }
+
     if (CACHE_ENABLED (IoMode)) {
       //
       // Access cache
@@ -450,6 +458,68 @@ FatFreeDirEnt (
 }
 
 /**
+  Pre-ExitBootServices notification, signaled once per FAT volume. Context
+  is the FAT_VOLUME this event was created for. This routine will flush any
+  dirty caches for the volume.
+
+  @param Event   - The event that was signaled.
+  @param Context - The context of the event, which is the FAT_VOLUME for which to flush caches.
+
+**/
+VOID
+EFIAPI
+
+FatOnBeforeExitBootServices (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  FAT_VOLUME  *Volume;
+  EFI_STATUS  Status;
+
+  Volume = (FAT_VOLUME *)Context;
+  if ((Volume == NULL) || (Volume->Signature != FAT_VOLUME_SIGNATURE)) {
+    return;
+  }
+
+  if (!Volume->Valid || Volume->ReadOnly || Volume->DiskError) {
+    return;
+  }
+
+  Status = FatAcquireLockOrFail ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: FAT lock busy, skipping flush of %p\n", __func__, Volume->Handle));
+    return;
+  }
+
+  //
+  // Flush any dirty caches. This will still leave all handles valid in case
+  // other callback intend on using the file system protocol to flush high
+  // level data in pre-ExitBootServices. Those callers will just have to
+  // explicitly flush/close the handles.
+  //
+  Status = FatFlushDirtyCache (Volume, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: FatFlushDirtyCache on %p returned %r\n",
+      __func__,
+      Volume->Handle,
+      Status
+      ));
+  }
+
+  //
+  // Disable caching from this point forward to ensure that any further writes
+  // don't get dropped.
+  //
+
+  Volume->CachingDisabled = TRUE;
+
+  FatReleaseLock ();
+}
+
+/**
 
   Free volume structure (including the contents of directory cache and disk cache).
 
@@ -461,6 +531,14 @@ FatFreeVolume (
   IN FAT_VOLUME  *Volume
   )
 {
+  //
+  // Close the per-volume pre-ExitBootServices event.
+  //
+  if (Volume->FlushEvent != NULL) {
+    gBS->CloseEvent (Volume->FlushEvent);
+    Volume->FlushEvent = NULL;
+  }
+
   //
   // Free disk cache
   //

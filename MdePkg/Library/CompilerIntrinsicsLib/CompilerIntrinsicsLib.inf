@@ -30,6 +30,9 @@
   AArch64/Atomics.S    | GCC
   AArch64/ashlti3.S    | GCC
 
+[Sources.LOONGARCH64]
+  LoongArch64/Ashlti3.S | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
 

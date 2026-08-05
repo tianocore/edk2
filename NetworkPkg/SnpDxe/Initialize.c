@@ -35,8 +35,6 @@ PxeInit (
     return EFI_DEVICE_ERROR;
   }
 
-  Status = EFI_SUCCESS;
-
   Cpb = Snp->Cpb;
   if (Snp->TxRxBufferSize != 0) {
     Status = Snp->PciIo->AllocateBuffer (
@@ -190,6 +188,7 @@ SnpUndi32Initialize (
   )
 {
   EFI_STATUS  EfiStatus;
+  EFI_STATUS  StnAddrStatus;
   SNP_DRIVER  *Snp;
   EFI_TPL     OldTpl;
 
@@ -255,6 +254,11 @@ SnpUndi32Initialize (
   //
   if (Snp->CableDetectSupported) {
     if (PxeInit (Snp, PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) == EFI_SUCCESS) {
+      StnAddrStatus = PxeGetStnAddr (Snp);
+      if (EFI_ERROR (StnAddrStatus)) {
+        DEBUG ((DEBUG_WARN, "%a: failed to refresh station address (%r)\n", __func__, StnAddrStatus));
+      }
+
       goto ON_EXIT;
     }
   }
@@ -273,6 +277,11 @@ SnpUndi32Initialize (
   //
   if (Snp->MediaStatusSupported) {
     PxeGetStatus (Snp, NULL, FALSE);
+  }
+
+  StnAddrStatus = PxeGetStnAddr (Snp);
+  if (EFI_ERROR (StnAddrStatus)) {
+    DEBUG ((DEBUG_WARN, "%a: failed to refresh station address (%r)\n", __func__, StnAddrStatus));
   }
 
 ON_EXIT:

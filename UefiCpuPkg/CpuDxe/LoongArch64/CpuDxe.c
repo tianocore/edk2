@@ -332,7 +332,7 @@ CpuSetMemoryAttributes (
   PageTable   = CsrRead (LOONGARCH_CSR_PGDL);
   PageWalkCfg = ((UINT64)CsrRead (LOONGARCH_CSR_PWCTL1)) << 32 | CsrRead (LOONGARCH_CSR_PWCTL0);
 
-  if ((BaseAddress & (EFI_PAGE_SIZE - 1)) != 0) {
+  if (!IS_ALIGNED (BaseAddress, EFI_PAGE_SIZE)) {
     //
     // Minimum granularity is SIZE_4KB.
     //
@@ -488,6 +488,17 @@ InitializeCpu (
   // Refresh GCD memory space map according to Default Paging.
   //
   RefreshGcdMemoryAttributes ();
+
+  //
+  // LoongArch page tables identity-map RAM from physical address 0 during
+  // early boot.  When DXE NULL pointer detection is enabled, explicitly make
+  // the first page read-protected after the CPU architectural protocol is
+  // installed, matching the generic DXE NULL pointer protection semantics.
+  //
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0) {
+    Status = CpuSetMemoryAttributes (&gCpu, 0, EFI_PAGE_SIZE, EFI_MEMORY_RP);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   Status = gCpu.RegisterInterruptHandler (
                   &gCpu,

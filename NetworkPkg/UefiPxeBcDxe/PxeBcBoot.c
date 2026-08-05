@@ -610,7 +610,6 @@ PxeBcDhcp6BootInfo (
 
   PxeBc       = &Private->PxeBc;
   Mode        = PxeBc->Mode;
-  Status      = EFI_SUCCESS;
   *BufferSize = 0;
 
   //

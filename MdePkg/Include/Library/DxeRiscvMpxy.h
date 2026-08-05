@@ -33,6 +33,19 @@ typedef enum {
 #define MPXY_MSG_PROTO_ATTR_END    0xffffffff
 
 /**
+  Initialize the MPXY library
+
+  @retval  EFI_SUCCESS            Library is successfully initialized.
+  @retval  EFI_ALREADY_STARTED    Library is already initialized.
+  @retval  EFI_OUT_OF_RESOURCES   Not enough memory to allocate.
+**/
+RETURN_STATUS
+EFIAPI
+SbiMpxyLibInit (
+  VOID
+  );
+
+/**
   Get the list of channels available on MPXY.
 
   @param[in] StartIndex - Index to start reading from. Initially it will be zero,

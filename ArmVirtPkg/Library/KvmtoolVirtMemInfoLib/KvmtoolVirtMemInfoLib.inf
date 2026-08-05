@@ -27,8 +27,6 @@
 
 [LibraryClasses]
   ArmLib
-  BaseLib
-  BaseMemoryLib
   DebugLib
   MemoryAllocationLib
   PcdLib
@@ -37,6 +35,7 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize

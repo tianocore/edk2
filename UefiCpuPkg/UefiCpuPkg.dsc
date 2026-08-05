@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -129,6 +130,7 @@
 [Components]
   UefiCpuPkg/Library/SecPeiDxeTimerLibUefiCpu/SecPeiDxeTimerLibUefiCpu.inf
   UefiCpuPkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLib.inf
+  UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/Application/Cpuid/Cpuid.inf
@@ -222,8 +224,9 @@
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf
 
 [Components.RISCV64]
-  UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf
   UefiCpuPkg/Library/BaseRiscVMmuLib/BaseRiscVMmuLib.inf
+  UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf
+  UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerSecLib.inf
   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf

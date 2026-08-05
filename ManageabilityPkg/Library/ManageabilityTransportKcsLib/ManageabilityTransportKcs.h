@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_TRANSPORT_KCS_LIB_H_
-#define MANAGEABILITY_TRANSPORT_KCS_LIB_H_
+#pragma once
 
 #include <Library/ManageabilityTransportLib.h>
 
@@ -107,5 +106,3 @@ KcsRegisterWrite8 (
   MANAGEABILITY_TRANSPORT_HARDWARE_IO  Address,
   UINT8                                Value
   );
-
-#endif

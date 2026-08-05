@@ -43,8 +43,6 @@
 
 [LibraryClasses]
   BaseLib
-
-[LibraryClasses]
   PcdLib
   DebugLib
   LocalApicLib

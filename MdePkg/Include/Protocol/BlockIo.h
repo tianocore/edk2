@@ -171,7 +171,8 @@ typedef struct {
   UINT32     IoAlign;
 
   ///
-  /// The last logical block address on the device.
+  /// The last logical block address on the device (inclusive).
+  /// This is generally the total number of user addressable blocks minus one.
   /// If the media changes, then this field is updated.
   ///
   EFI_LBA    LastBlock;
