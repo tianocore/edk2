@@ -72,7 +72,7 @@ EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
   { EfiMemoryMappedIOPortSpace, 0 },
   { EfiPalCode,                 0 },
   { EfiPersistentMemory,        0 },
-  { EfiGcdMemoryTypeUnaccepted, 0 },
+  { EfiUnacceptedMemoryType,    0 },
   { EfiMaxMemoryType,           0 }
 };
 //

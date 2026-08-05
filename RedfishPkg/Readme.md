@@ -167,7 +167,7 @@ Current RedfishPlatformHostInterfaceLib implementation of BMC-exposed USB NIC ca
 ## Connect to Redfish Service on EDK2 Emulator Platform
    1. Install the WinpCap and copy [SnpNt32Io.dll](https://github.com/tianocore/edk2-NetNt32Io) to the building directory of the Emulator platform. This is the emulated network interface for EDK2 Emulator Platform.
    ```C
-   e.g. %WORKSPACE%/Build/EmulatorX64/DEBUG_VS2015x86/X64
+   e.g. %WORKSPACE%/Build/EmulatorX64/DEBUG_VS2022/X64
    ```
 
    2. Enable below macros in EmulatorPkg.dsc

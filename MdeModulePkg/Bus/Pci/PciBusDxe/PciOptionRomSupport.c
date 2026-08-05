@@ -598,7 +598,7 @@ RomDecode (
     Value32 = RomBar | 0x1;
     PciIo->Pci.Write (
                  PciIo,
-                 (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint32,
+                 EfiPciIoWidthUint32,
                  RomBarIndex,
                  1,
                  &Value32
@@ -630,7 +630,7 @@ RomDecode (
     Value32 = 0xFFFFFFFE;
     PciIo->Pci.Write (
                  PciIo,
-                 (EFI_PCI_IO_PROTOCOL_WIDTH)EfiPciWidthUint32,
+                 EfiPciIoWidthUint32,
                  RomBarIndex,
                  1,
                  &Value32

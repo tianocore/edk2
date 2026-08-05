@@ -1,4 +1,4 @@
-# SplitFspBin.py is a python script to support some operations on Intel FSP 1.x/2.x image.
+# SplitFspBin.py is a python script to support some operations on Intel FSP 1.x/2.x image
 
 It supports:
 
@@ -16,7 +16,9 @@ FSP 1.x image is not supported by split command.
 To split individual FSP component in Intel FSP 2.x image, the following
 command can be used:
 
-   **python SplitFspBin.py split [-h] -f FSPBINARY [-o OUTPUTDIR] [-n NAMETEMPLATE]**
+```text
+   python SplitFspBin.py split [-h] -f FSPBINARY [-o OUTPUTDIR] [-n NAMETEMPLATE]
+```
 
 For example:
 
@@ -29,7 +31,9 @@ For example:
 To rebase one or multiple FSP components in Intel FSP 1.x/2.x image, the following
 command can be used:
 
-   **python SplitFspBin.py rebase [-h] -f FSPBINARY -c {t,m,s,o} [{t,m,s,o} ...] -b FSPBASE [FSPBASE ...] [-o OUTPUTDIR] [-n OUTPUTFILE]**
+```text
+   python SplitFspBin.py rebase [-h] -f FSPBINARY -c {t,m,s,o} [{t,m,s,o} ...] -b FSPBASE [FSPBASE ...] [-o OUTPUTDIR] [-n OUTPUTFILE]
+```
 
 For example:
 
@@ -50,7 +54,9 @@ For example:
 
 To generate Intel FSP 1.x/2.x C header file, the following command can be used:
 
-   **Python SplitFspBin.py genhdr [-h] -f FSPBINARY [-o OUTPUTDIR] [-n HFILENAME]**
+```text
+   Python SplitFspBin.py genhdr [-h] -f FSPBINARY [-o OUTPUTDIR] [-n HFILENAME]
+```
 
 For example:
 
@@ -63,7 +69,9 @@ For example:
 
 To display Intel FSP 1.x/2.x information headers, the following command can be used:
 
-   **Python SplitFspBin.py info [-h] -f FSPBINARY**
+```text
+   Python SplitFspBin.py info [-h] -f FSPBINARY
+```
 
 For example:
 

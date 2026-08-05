@@ -20,7 +20,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 LOONGARCH64
 #
 
 [Sources]
@@ -40,11 +40,17 @@
 [Sources.AARCH64]
   AArch64/DynamicCookieGcc.S | GCC
 
+[Sources.LOONGARCH64]
+  LoongArch64/DynamicCookieGcc.S | GCC
+
 [LibraryClasses]
   UefiBootServicesTableLib
   DebugLib
   BaseLib
   StackCheckLib
+
+[LibraryClasses.LOONGARCH64]
+  RngLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES

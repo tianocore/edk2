@@ -100,4 +100,11 @@ struct MockUefiBootServicesTableLib {
      IN  EFI_HANDLE  AgentHandle,
      IN  EFI_HANDLE  ControllerHandle)
     );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_InstallConfigurationTable,
+    (IN EFI_GUID  *Guid,
+     IN VOID      *Table)
+    );
 };
