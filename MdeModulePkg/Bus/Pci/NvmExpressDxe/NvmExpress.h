@@ -106,9 +106,9 @@ extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gNvmExpressDriverSupportedEfiV
 #define NVME_CONTROLLER_ID  0
 
 //
-// Time out value for Nvme transaction execution
+// Time out value for Nvme transaction execution (in seconds, from PcdNvmeGenericTimeout).
 //
-#define NVME_GENERIC_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (5)
+#define NVME_GENERIC_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (FixedPcdGet32 (PcdNvmeGenericTimeout))
 
 //
 // Nvme async transfer timer interval, set by experience.
