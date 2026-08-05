@@ -1,7 +1,7 @@
 /** @file
   FDT client library for motorola,mc146818 RTC driver
 
-  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, ARM Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,6 +10,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/MapMmioLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/FdtClient.h>
@@ -29,7 +30,8 @@
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   A parameter is invalid.
-  @retval EFI_NOT_FOUND           Flash device not found.
+  @retval EFI_NOT_FOUND           The requested GCD memory space could
+                                  not be found.
 **/
 STATIC
 EFI_STATUS
@@ -40,16 +42,15 @@ KvmtoolRtcMapMemory (
 {
   EFI_STATUS  Status;
 
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo,
-                  RtcPageBase,
-                  EFI_PAGE_SIZE,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
-                  );
+  Status = MapMmioMemory (
+             RtcPageBase,
+             EFI_PAGE_SIZE,
+             EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
+             );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "Failed to add memory space. Status = %r\n",
+      "Failed to map memory. Status = %r\n",
       Status
       ));
     return Status;
@@ -70,32 +71,6 @@ KvmtoolRtcMapMemory (
       "Failed to allocate memory space. Status = %r\n",
       Status
       ));
-    gDS->RemoveMemorySpace (
-           RtcPageBase,
-           EFI_PAGE_SIZE
-           );
-    return Status;
-  }
-
-  Status = gDS->SetMemorySpaceAttributes (
-                  RtcPageBase,
-                  EFI_PAGE_SIZE,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Failed to set memory attributes. Status = %r\n",
-      Status
-      ));
-    gDS->FreeMemorySpace (
-           RtcPageBase,
-           EFI_PAGE_SIZE
-           );
-    gDS->RemoveMemorySpace (
-           RtcPageBase,
-           EFI_PAGE_SIZE
-           );
   }
 
   return Status;
@@ -113,7 +88,8 @@ KvmtoolRtcMapMemory (
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   A parameter is invalid.
-  @retval EFI_NOT_FOUND           Flash device not found.
+  @retval EFI_NOT_FOUND           The requested GCD memory space could
+                                  not be found.
 **/
 EFI_STATUS
 EFIAPI

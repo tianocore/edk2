@@ -30,9 +30,11 @@
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid
+  gOvmfTpmDiscoveredPpiGuid
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -58,6 +60,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase

@@ -57,6 +57,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType17TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                   *CONST  This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL     *CONST  TableFactoryProtocol,
@@ -164,13 +165,13 @@ UpdateSmbiosType17Size (
   )
 {
   if (Size < SIZE_GRANULARITY_THRESHOLD) {
-    SmbiosRecord->Size  = Size / SIZE_1KB;
+    SmbiosRecord->Size  = (UINT16)(Size / SIZE_1KB);
     SmbiosRecord->Size |= SIZE_GRANULARITY_BITMASK;
   } else if (Size >= EXTENDED_SIZE_THRESHOLD) {
     SmbiosRecord->Size         = 0x7FFF;
-    SmbiosRecord->ExtendedSize = (Size / SIZE_1MB);
+    SmbiosRecord->ExtendedSize = (UINT32)(Size / SIZE_1MB);
   } else {
-    SmbiosRecord->Size = (Size / SIZE_1MB);
+    SmbiosRecord->Size = (UINT16)(Size / SIZE_1MB);
   }
 }
 
@@ -193,14 +194,14 @@ UpdateSmbiosType17Speed (
     SmbiosRecord->Speed         = EXTENDED_SPEED_THRESHOLD;
     SmbiosRecord->ExtendedSpeed = Speed;
   } else {
-    SmbiosRecord->Speed = Speed;
+    SmbiosRecord->Speed = (UINT16)Speed;
   }
 
   if (ConfiguredMemoryClockSpeed > EXTENDED_SPEED_THRESHOLD) {
     SmbiosRecord->ConfiguredMemoryClockSpeed    = EXTENDED_SPEED_THRESHOLD;
     SmbiosRecord->ExtendedConfiguredMemorySpeed = ConfiguredMemoryClockSpeed;
   } else {
-    SmbiosRecord->ConfiguredMemoryClockSpeed = ConfiguredMemoryClockSpeed;
+    SmbiosRecord->ConfiguredMemoryClockSpeed = (UINT16)ConfiguredMemoryClockSpeed;
   }
 }
 
@@ -250,6 +251,7 @@ UpdateSmbiosType17Rank (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType17TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
@@ -454,12 +456,12 @@ BuildSmbiosType17TableEx (
       MemoryDevicesInfo[Index].ModuleProductId;
     SmbiosRecord->DataWidth                     = MemoryDevicesInfo[Index].DataWidth;
     SmbiosRecord->TotalWidth                    = MemoryDevicesInfo[Index].TotalWidth;
-    SmbiosRecord->MemoryType                    = MemoryDevicesInfo[Index].MemoryType;
-    SmbiosRecord->FormFactor                    = MemoryDevicesInfo[Index].FormFactor;
+    SmbiosRecord->MemoryType                    = (UINT8)MemoryDevicesInfo[Index].MemoryType;
+    SmbiosRecord->FormFactor                    = (UINT8)MemoryDevicesInfo[Index].FormFactor;
     SmbiosRecord->MinimumVoltage                = MemoryDevicesInfo[Index].MinVolt;
     SmbiosRecord->MaximumVoltage                = MemoryDevicesInfo[Index].MaxVolt;
     SmbiosRecord->ConfiguredVoltage             = MemoryDevicesInfo[Index].ConfVolt;
-    SmbiosRecord->MemoryTechnology              = MemoryDevicesInfo[Index].MemoryTechnology;
+    SmbiosRecord->MemoryTechnology              = (UINT8)MemoryDevicesInfo[Index].MemoryTechnology;
     SmbiosRecord->TypeDetail                    = MemoryDevicesInfo[Index].TypeDetail;
     SmbiosRecord->MemoryOperatingModeCapability = MemoryDevicesInfo[Index].MemoryOperatingModeCapability;
     AddMemErrHandle (

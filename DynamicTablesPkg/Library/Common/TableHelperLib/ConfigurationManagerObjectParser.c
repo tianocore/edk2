@@ -3,7 +3,7 @@
 
   Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
-  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -36,6 +36,15 @@ STATIC
 VOID
 EFIAPI
 PrintChars (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr,
+  UINT32       Length
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintGuid (
   CONST CHAR8  *Format,
   UINT8        *Ptr,
   UINT32       Length
@@ -347,7 +356,8 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
   { "SerialNumber",               SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
   { "AssetTag",                   SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
   { "PartNumber",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
-  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString }
+  { "SocketType",                 SMBIOS_MAX_STRING_SIZE,   "%a",     PrintString },
+  { "StaToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
 };
 
 /** A parser for EArchCommonObjCacheInfo.
@@ -1223,6 +1233,59 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryArrayMappedAddressParser[] = {
   { "NumMemDevices",                 sizeof (UINT8),                "0x%u",  NULL },
 };
 
+/** A parser for CM_ARCH_COMMON_MEMORY_CHANNEL_DEVICE.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryChannelDeviceParser[] = {
+  { "DeviceLoad",            sizeof (UINT8),           "0x%u", NULL },
+  { "MemoryDeviceInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjMemoryChannelInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryChannelInfoParser[] = {
+  { "MemoryChannelToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "ChannelType",           sizeof (UINT8),           "0x%x", NULL },
+  { "MaximumChannelLoad",    sizeof (UINT8),           "0x%u", NULL },
+  { "MemoryDeviceListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjAdditionalInformation.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationParser[] = {
+  { "AdditionalInformationToken",          sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "AdditionalInformationEntryListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjAdditionalInformationEntry.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationEntryParser[] = {
+  { "ReferencedObjectToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ReferencedTableGeneratorId", sizeof (UINT32),          "0x%x", NULL        },
+  { "ReferencedOffset",           sizeof (UINT8),           "0x%x", NULL        },
+  { "EntryString",                SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ValueToken",                 sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+};
+
+/** A parser for EArchCommonObjAdditionalInformationValue.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationValueParser[] = {
+  { "Len",   sizeof (UINT8),                               "0x%x", NULL    },
+  { "Value", SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE, NULL,   HexDump },
+};
+
+/** A parser for EArchCommonObjMemoryDeviceMappedAddress.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
+  { "MemoryDeviceMappedAddressToken", sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "StartingAddress",                sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "EndingAddress",                  sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "MemoryDeviceInfoToken",          sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "MemoryArrayMappedAddressToken",  sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "PartitionRowPosition",           sizeof (UINT8),                "0x%u",  NULL },
+  { "InterleavePosition",             sizeof (UINT8),                "0x%u",  NULL },
+  { "InterleavedDataDepth",           sizeof (UINT8),                "0x%u",  NULL },
+};
+
 /** A parser for EArchCommonObjCoolingDeviceInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonCoolingDeviceInfoParser[] = {
@@ -1250,70 +1313,193 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonTemperatureProbeInfoParser[] = {
   { "NominalValue",          sizeof (UINT16),                          "0x%x", NULL        },
 };
 
+/** A parser for EArchCommonObjVoltageProbeInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonVoltageProbeInfoParser[] = {
+  { "VoltageProbeToken", sizeof (CM_OBJECT_TOKEN),             "0x%p", NULL        },
+  { "Description",       SMBIOS_MAX_STRING_SIZE,               NULL,   PrintString },
+  { "LocationAndStatus", sizeof (MISC_VOLTAGE_PROBE_LOCATION), "0x%x", NULL        },
+  { "MaximumValue",      sizeof (UINT16),                      "0x%x", NULL        },
+  { "MinimumValue",      sizeof (UINT16),                      "0x%x", NULL        },
+  { "Resolution",        sizeof (UINT16),                      "0x%x", NULL        },
+  { "Tolerance",         sizeof (UINT16),                      "0x%x", NULL        },
+  { "Accuracy",          sizeof (UINT16),                      "0x%x", NULL        },
+  { "OEMDefined",        sizeof (UINT32),                      "0x%x", NULL        },
+  { "NominalValue",      sizeof (UINT16),                      "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjElectricalCurrentProbeInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonElectricalCurrentProbeInfoParser[] = {
+  { "ElectricalCurrentProbeToken", sizeof (CM_OBJECT_TOKEN),                        "0x%p", NULL        },
+  { "Description",                 SMBIOS_MAX_STRING_SIZE,                          NULL,   PrintString },
+  { "LocationAndStatus",           sizeof (MISC_ELECTRICAL_CURRENT_PROBE_LOCATION), "0x%x", NULL        },
+  { "MaximumValue",                sizeof (UINT16),                                 "0x%x", NULL        },
+  { "MinimumValue",                sizeof (UINT16),                                 "0x%x", NULL        },
+  { "Resolution",                  sizeof (UINT16),                                 "0x%x", NULL        },
+  { "Tolerance",                   sizeof (UINT16),                                 "0x%x", NULL        },
+  { "Accuracy",                    sizeof (UINT16),                                 "0x%x", NULL        },
+  { "OEMDefined",                  sizeof (UINT32),                                 "0x%x", NULL        },
+  { "NominalValue",                sizeof (UINT16),                                 "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjSystemResetInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemResetInfoParser[] = {
+  { "SystemResetToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "Capabilities",     sizeof (UINT8),           "0x%x", NULL },
+  { "ResetCount",       sizeof (UINT16),          "0x%x", NULL },
+  { "ResetLimit",       sizeof (UINT16),          "0x%x", NULL },
+  { "TimerInterval",    sizeof (UINT16),          "0x%x", NULL },
+  { "Timeout",          sizeof (UINT16),          "0x%x", NULL },
+};
+
+/** A parser for EArchCommonObjSystemInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemInfoParser[] = {
+  { "SystemInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Manufacturer",    SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ProductName",     SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Version",         SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNum",       SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Uuid",            sizeof (GUID),            NULL,   PrintGuid   },
+  { "WakeUpType",      sizeof (UINT8),           "0x%x", NULL        },
+  { "SkuNum",          SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Family",          SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+};
+
+/** A parser for EArchCommonObjSystemEnclosureInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemEnclosureInfoParser[] = {
+  { "SystemEnclosureToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Manufacturer",              SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Type",                      sizeof (UINT8),           "0x%x", NULL        },
+  { "Version",                   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNum",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "AssetTag",                  SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "BootUpState",               sizeof (UINT8),           "0x%x", NULL        },
+  { "PowerSupplyState",          sizeof (UINT8),           "0x%x", NULL        },
+  { "ThermalState",              sizeof (UINT8),           "0x%x", NULL        },
+  { "SecurityStatus",            sizeof (UINT8),           "0x%x", NULL        },
+  { "OemDefined",                sizeof (UINT32),          "0x%x", NULL        },
+  { "Height",                    sizeof (UINT8),           "0x%x", NULL        },
+  { "NumberOfPowerCords",        sizeof (UINT8),           "0x%x", NULL        },
+  { "ContainedElementListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "SkuNum",                    SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "RackType",                  sizeof (UINT8),           "0x%x", NULL        },
+  { "RackHeight",                sizeof (UINT8),           "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjEnclosureElement.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonEnclosureElementParser[] = {
+  { "ContainedElementType",    sizeof (UINT8), "0x%x", NULL },
+  { "ContainedElementMinimum", sizeof (UINT8), "%u",   NULL },
+  { "ContainedElementMaximum", sizeof (UINT8), "%u",   NULL },
+};
+
+/** A parser for EArchCommonObjBaseboardContainedObject.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBaseboardContainedObjectParser[] = {
+  { "ContainedObjectToken", sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "GeneratorId",          sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
+};
+
+/** A parser for EArchCommonObjBaseboardInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBaseboardInfoParser[] = {
+  { "BaseboardInfoToken",       sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ChassisToken",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ContainedObjectListToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Manufacturer",             SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ProductName",              SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Version",                  SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNum",                SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "AssetTag",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "FeatureFlag",              sizeof (UINT8),           "0x%x", NULL        },
+  { "LocationInChassis",        SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "BoardType",                sizeof (UINT8),           "0x%x", NULL        },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjReserved),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPowerManagementProfileInfo,   CmArchCommonPowerManagementProfileInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjSerialPortInfo,               CmArchCommonSerialPortInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjConsolePortInfo,              CmArchCommonSerialPortInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjSerialDebugPortInfo,          CmArchCommonSerialPortInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjHypervisorVendorIdentity,     CmArchCommonHypervisorVendorIdentityParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjFixedFeatureFlags,            CmArchCommonFixedFeatureFlagsParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCmRef,                        CmArchCommonObjRefParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPciConfigSpaceInfo,           CmArchCommonPciConfigSpaceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPciAddressMapInfo,            CmArchCommonPciAddressMapInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPciInterruptMapInfo,          CmArchCommonPciInterruptMapInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryAffinityInfo,           CmArchCommonMemoryAffinityInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjDeviceHandleAcpi,             CmArchCommonDeviceHandleAcpiParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjDeviceHandlePci,              CmArchCommonDeviceHandlePciParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericInitiatorAffinityInfo, CmArchCommonGenericInitiatorAffinityInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjLpiInfo,                      CmArchCommonLpiInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjProcHierarchyInfo,            CmArchCommonProcHierarchyInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCacheInfo,                    CmArchCommonCacheInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCpcInfo,                      CmArchCommonCpcInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType0Info,         CmArchCommonPccSubspaceType0InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType1Info,         CmArchCommonPccSubspaceType1InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType2Info,         CmArchCommonPccSubspaceType2InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType3Info,         CmArchCommonPccSubspaceType34InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType4Info,         CmArchCommonPccSubspaceType34InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType5Info,         CmArchCommonPccSubspaceType5InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPsdInfo,                      CmArchCommonPsdInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2InterfaceInfo,            CmArchCommonTpm2InterfaceInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterfaceInfo,            CmArchCommonSpmiInterfaceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterruptDeviceInfo,      CmArchCommonSpmiInterruptDeviceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCstInfo,                      CmArchCommonCstInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCsdInfo,                      CmArchCommonCsdInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPctInfo,                      CmArchCommonPctInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPssInfo,                      CmArchCommonPssInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPpcInfo,                      CmArchCommonPpcInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjStaInfo,                      CmArchCommonStaInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryRangeDescriptor,        CmArchCommonObjMemoryRangeDescriptor),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericDbg2DeviceInfo,        CmArchCommonObjDbg2DeviceInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCxlHostBridgeInfo,            CmArchCommonObjCxlHostBridgeInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCxlFixedMemoryWindowInfo,     CmArchCommonObjCxlFixedMemoryWindowInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjProximityDomainInfo,          CmArchCommonProximityDomainInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjProximityDomainRelationInfo,  CmArchCommonProximityDomainRelationInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemLocalityInfo,           CmArchCommonSystemLocalityInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryProximityDomainAttrInfo,CmArchCommonMemoryProximityDomainAttrInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryLatBwInfo,              CmArchCommonMemoryLatBwInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,              CmArchCommonMemoryCacheInfo),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                     CmArchCommonObjSpcrInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,               CmArchCommonObjTpm2DeviceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,       CmArchCommonPciConfigSpaceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,              CmArchCommonObjPciRootPortInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciRootPortInfo,     CmArchCommonObjErrSourcePciRootPortInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciDeviceInfo,       CmArchCommonObjErrSourcePciDeviceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciBridgeInfo,       CmArchCommonObjErrSourcePciBridgeInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwInfo,       CmArchCommonObjErrSourceGenericHwInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,   CmArchCommonObjErrSourceGenericHwVer2InfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjEinjInstructionsInfo,         CmArchCommonObjEinjInstructionsInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPlatformFwInfo,               CmArchCommonPlatformFwInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,          CmArchCommonPhysicalMemoryArrayParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceInfo,             CmArchCommonMemoryDeviceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,     CmArchCommonMemoryArrayMappedAddressParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjCoolingDeviceInfo,            CmArchCommonCoolingDeviceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjTemperatureProbeInfo,         CmArchCommonTemperatureProbeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPowerManagementProfileInfo,          CmArchCommonPowerManagementProfileInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSerialPortInfo,                      CmArchCommonSerialPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjConsolePortInfo,                     CmArchCommonSerialPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSerialDebugPortInfo,                 CmArchCommonSerialPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjHypervisorVendorIdentity,            CmArchCommonHypervisorVendorIdentityParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjFixedFeatureFlags,                   CmArchCommonFixedFeatureFlagsParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCmRef,                               CmArchCommonObjRefParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPciConfigSpaceInfo,                  CmArchCommonPciConfigSpaceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPciAddressMapInfo,                   CmArchCommonPciAddressMapInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPciInterruptMapInfo,                 CmArchCommonPciInterruptMapInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryAffinityInfo,                  CmArchCommonMemoryAffinityInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjDeviceHandleAcpi,                    CmArchCommonDeviceHandleAcpiParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjDeviceHandlePci,                     CmArchCommonDeviceHandlePciParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericInitiatorAffinityInfo,        CmArchCommonGenericInitiatorAffinityInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjLpiInfo,                             CmArchCommonLpiInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjProcHierarchyInfo,                   CmArchCommonProcHierarchyInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCacheInfo,                           CmArchCommonCacheInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCpcInfo,                             CmArchCommonCpcInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType0Info,                CmArchCommonPccSubspaceType0InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType1Info,                CmArchCommonPccSubspaceType1InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType2Info,                CmArchCommonPccSubspaceType2InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType3Info,                CmArchCommonPccSubspaceType34InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType4Info,                CmArchCommonPccSubspaceType34InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType5Info,                CmArchCommonPccSubspaceType5InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPsdInfo,                             CmArchCommonPsdInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2InterfaceInfo,                   CmArchCommonTpm2InterfaceInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterfaceInfo,                   CmArchCommonSpmiInterfaceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterruptDeviceInfo,             CmArchCommonSpmiInterruptDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCstInfo,                             CmArchCommonCstInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCsdInfo,                             CmArchCommonCsdInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPctInfo,                             CmArchCommonPctInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPssInfo,                             CmArchCommonPssInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPpcInfo,                             CmArchCommonPpcInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjStaInfo,                             CmArchCommonStaInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryRangeDescriptor,               CmArchCommonObjMemoryRangeDescriptor),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericDbg2DeviceInfo,               CmArchCommonObjDbg2DeviceInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCxlHostBridgeInfo,                   CmArchCommonObjCxlHostBridgeInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCxlFixedMemoryWindowInfo,            CmArchCommonObjCxlFixedMemoryWindowInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjProximityDomainInfo,                 CmArchCommonProximityDomainInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjProximityDomainRelationInfo,         CmArchCommonProximityDomainRelationInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemLocalityInfo,                  CmArchCommonSystemLocalityInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryProximityDomainAttrInfo,       CmArchCommonMemoryProximityDomainAttrInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryLatBwInfo,                     CmArchCommonMemoryLatBwInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,                     CmArchCommonMemoryCacheInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                            CmArchCommonObjSpcrInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,                      CmArchCommonObjTpm2DeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,              CmArchCommonPciConfigSpaceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,                     CmArchCommonObjPciRootPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciRootPortInfo,            CmArchCommonObjErrSourcePciRootPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciDeviceInfo,              CmArchCommonObjErrSourcePciDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciBridgeInfo,              CmArchCommonObjErrSourcePciBridgeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwInfo,              CmArchCommonObjErrSourceGenericHwInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,          CmArchCommonObjErrSourceGenericHwVer2InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjEinjInstructionsInfo,                CmArchCommonObjEinjInstructionsInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPlatformFwInfo,                      CmArchCommonPlatformFwInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,                 CmArchCommonPhysicalMemoryArrayParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceInfo,                    CmArchCommonMemoryDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,            CmArchCommonMemoryArrayMappedAddressParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCoolingDeviceInfo,                   CmArchCommonCoolingDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTemperatureProbeInfo,                CmArchCommonTemperatureProbeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjVoltageProbeInfo,                    CmArchCommonVoltageProbeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjElectricalCurrentProbeInfo,          CmArchCommonElectricalCurrentProbeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemResetInfo,                     CmArchCommonSystemResetInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceMappedAddress,           CmArchCommonMemoryDeviceMappedAddressParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryChannelInfo,                   CmArchCommonMemoryChannelInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryChannelDevice,                 CmArchCommonMemoryChannelDeviceParser),
+  CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjProcessorSpecificBlockInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemInfo,                          CmArchCommonSystemInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformation,               CmArchCommonAdditionalInformationParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationEntry,          CmArchCommonAdditionalInformationEntryParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjAdditionalInformationValue,          CmArchCommonAdditionalInformationValueParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemEnclosureInfo,                 CmArchCommonSystemEnclosureInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjEnclosureElement,                    CmArchCommonEnclosureElementParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBaseboardInfo,                       CmArchCommonBaseboardInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBaseboardContainedObject,            CmArchCommonBaseboardContainedObjectParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -1708,6 +1894,29 @@ PrintString (
   }
 
   DEBUG ((DEBUG_INFO, "%a", Ptr));
+}
+
+/** Print GUID data.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the GUID.
+  @param [in]  Length  Length of the field.
+**/
+STATIC
+VOID
+EFIAPI
+PrintGuid (
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr,
+  IN UINT32       Length
+  )
+{
+  if ((Ptr == NULL) || (Length != sizeof (GUID))) {
+    ASSERT (0);
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "%g", (GUID *)Ptr));
 }
 
 /** Print string from pointer.

@@ -17,6 +17,7 @@
 #define ACPI_GAS8(Address)   { EFI_ACPI_5_0_SYSTEM_MEMORY,  8, 0, EFI_ACPI_5_0_BYTE,      Address }
 #define ACPI_GAS16(Address)  { EFI_ACPI_5_0_SYSTEM_MEMORY, 16, 0, EFI_ACPI_5_0_WORD,      Address }
 #define ACPI_GAS32(Address)  { EFI_ACPI_5_0_SYSTEM_MEMORY, 32, 0, EFI_ACPI_5_0_DWORD,     Address }
+#define ACPI_GAS64(Address)  { EFI_ACPI_5_0_SYSTEM_MEMORY, 64, 0, EFI_ACPI_5_0_QWORD,     Address }
 #define ACPI_GASN(Address)   { EFI_ACPI_5_0_SYSTEM_MEMORY,  0, 0, EFI_ACPI_5_0_DWORD,     Address }
 
 //

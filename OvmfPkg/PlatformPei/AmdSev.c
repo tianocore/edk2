@@ -148,7 +148,17 @@ AmdSevSnpInitialize (
       ResourceHob = Hob.ResourceDescriptor;
 
       if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
-        if (ResourceHob->PhysicalStart >= SIZE_4GB) {
+        //
+        // Defer acceptance of memory above 4GB, which the OS accepts lazily.
+        // Specific Purpose Memory (E820 Soft Reserved) is excepted: it must
+        // keep the EFI_RESOURCE_SYSTEM_MEMORY type so its SPECIAL_PURPOSE
+        // attribute reaches the EFI memory map, and it is never handed to the
+        // OS allocator, so it would never be accepted lazily.  Pre-validate
+        // it in place, like sub-4GB memory.
+        //
+        if ((ResourceHob->PhysicalStart >= SIZE_4GB) &&
+            ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == 0))
+        {
           ResourceHob->ResourceType = EFI_RESOURCE_MEMORY_UNACCEPTED;
           continue;
         }

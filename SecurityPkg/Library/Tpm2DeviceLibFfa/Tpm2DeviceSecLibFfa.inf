@@ -26,7 +26,7 @@
 [Sources.common]
   Tpm2DeviceLibFfa.c
   Tpm2ServiceFfaRaw.c
-  Tpm2DeviceLibFfaBase.c
+  Tpm2DeviceSecLibFfaBase.c
   Tpm2Ptp.c
   Tpm2DeviceLibFfa.h
   Tpm2InfoSecFfa.c

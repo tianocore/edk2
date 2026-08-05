@@ -405,17 +405,14 @@ ShellMmLocateIoProtocol (
   return TRUE;
 }
 
-/**
-  Function for 'mm' command.
+/** Main function of the 'Mm' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunMm (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdMm (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS                       Status;
@@ -430,8 +427,6 @@ ShellCommandRunMm (
   BOOLEAN                          Complete;
   CHAR16                           *InputStr;
   BOOLEAN                          Interactive;
-  LIST_ENTRY                       *Package;
-  CHAR16                           *ProblemParam;
   SHELL_STATUS                     ShellStatus;
   CONST CHAR16                     *Temp;
   BOOLEAN                          HasPciRootBridgeIo;
@@ -443,6 +438,224 @@ ShellCommandRunMm (
   Size        = 1;
   AccessType  = ShellMmMemory;
 
+  if (ShellCommandLineGetCount (Package) < 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mm");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetCount (Package) > 3) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetFlag (Package, L"-w") && (ShellCommandLineGetValue (Package, L"-w") == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"mm", L"-w");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-mmio")) {
+    AccessType = ShellMmMemoryMappedIo;
+    if (  ShellCommandLineGetFlag (Package, L"-mem")
+       || ShellCommandLineGetFlag (Package, L"-io")
+       || ShellCommandLineGetFlag (Package, L"-pci")
+       || ShellCommandLineGetFlag (Package, L"-pcie")
+          )
+    {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+      return SHELL_INVALID_PARAMETER;
+    }
+  } else if (ShellCommandLineGetFlag (Package, L"-mem")) {
+    AccessType = ShellMmMemory;
+    if (  ShellCommandLineGetFlag (Package, L"-io")
+       || ShellCommandLineGetFlag (Package, L"-pci")
+       || ShellCommandLineGetFlag (Package, L"-pcie")
+          )
+    {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+      return SHELL_INVALID_PARAMETER;
+    }
+  } else if (ShellCommandLineGetFlag (Package, L"-io")) {
+    AccessType = ShellMmIo;
+    if (  ShellCommandLineGetFlag (Package, L"-pci")
+       || ShellCommandLineGetFlag (Package, L"-pcie")
+          )
+    {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+      return SHELL_INVALID_PARAMETER;
+    }
+  } else if (ShellCommandLineGetFlag (Package, L"-pci")) {
+    AccessType = ShellMmPci;
+    if (ShellCommandLineGetFlag (Package, L"-pcie")
+        )
+    {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
+      return SHELL_INVALID_PARAMETER;
+    }
+  } else if (ShellCommandLineGetFlag (Package, L"-pcie")) {
+    AccessType = ShellMmPciExpress;
+  }
+
+  //
+  // Non interactive for a script file or for the specific parameter
+  //
+  Interactive = TRUE;
+  if (gEfiShellProtocol->BatchIsActive () || ShellCommandLineGetFlag (Package, L"-n")) {
+    Interactive = FALSE;
+  }
+
+  Temp = ShellCommandLineGetValue (Package, L"-w");
+  if (Temp != NULL) {
+    Size = ShellStrToUintn (Temp);
+  }
+
+  if ((Size != 1) && (Size != 2) && (Size != 4) && (Size != 8)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"mm", Temp, L"-w");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Temp = ShellCommandLineGetRawValue (Package, 1);
+  if (Temp == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", L"NULL");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = ShellConvertStringToUint64 (Temp, &Address, TRUE, FALSE);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if ((Address & (Size - 1)) != 0) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_NOT_ALIGNED), gShellDebug1HiiHandle, L"mm", Address);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // locate IO protocol interface
+  //
+  HasPciRootBridgeIo = ShellMmLocateIoProtocol (AccessType, Address, &CpuIo, &PciRootBridgeIo);
+  if ((AccessType == ShellMmPci) || (AccessType == ShellMmPciExpress)) {
+    if (!HasPciRootBridgeIo) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"mm");
+      return SHELL_NOT_FOUND;
+    }
+
+    if (PciRootBridgeIo == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_PCIE_ADDRESS_RANGE), gShellDebug1HiiHandle, L"mm", Address);
+      return SHELL_INVALID_PARAMETER;
+    }
+  }
+
+  //
+  // Mode 1: Directly set a value
+  //
+  Temp = ShellCommandLineGetRawValue (Package, 2);
+  if (Temp != NULL) {
+    Status = ShellConvertStringToUint64 (Temp, &Value, TRUE, FALSE);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
+      return SHELL_INVALID_PARAMETER;
+    }
+
+    if (Value > mShellMmMaxNumber[Size]) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
+      return SHELL_INVALID_PARAMETER;
+    }
+
+    ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Value);
+    return ShellStatus;
+  }
+
+  //
+  // Mode 2: Directly show a value
+  //
+  if (!Interactive) {
+    if (!gEfiShellProtocol->BatchIsActive ()) {
+      ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
+    }
+
+    ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
+
+    if (!gEfiShellProtocol->BatchIsActive ()) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
+    }
+
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
+    ShellPrintDefaultEx (L"\r\n");
+    return ShellStatus;
+  }
+
+  //
+  // Mode 3: Show or set values in interactive mode
+  //
+  Complete = FALSE;
+  do {
+    ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
+    ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
+    ShellPrintDefaultEx (L" > ");
+    //
+    // wait user input to modify
+    //
+    if (InputStr != NULL) {
+      FreePool (InputStr);
+      InputStr = NULL;
+    }
+
+    ShellPromptForResponse (ShellPromptResponseTypeFreeform, NULL, (VOID **)&InputStr);
+
+    if (InputStr != NULL) {
+      //
+      // skip space characters
+      //
+      for (Index = 0; InputStr[Index] == ' '; Index++) {
+      }
+
+      if (InputStr[Index] != CHAR_NULL) {
+        if ((InputStr[Index] == '.') || (InputStr[Index] == 'q') || (InputStr[Index] == 'Q')) {
+          Complete = TRUE;
+        } else if (!EFI_ERROR (ShellConvertStringToUint64 (InputStr + Index, &Buffer, TRUE, TRUE)) &&
+                   (Buffer <= mShellMmMaxNumber[Size])
+                   )
+        {
+          ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Buffer);
+        } else {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");
+          continue;
+        }
+      }
+    }
+
+    Address += Size;
+    ShellPrintDefaultEx (L"\r\n");
+  } while (!Complete);
+
+  ASSERT (ShellStatus == SHELL_SUCCESS);
+
+  if (InputStr != NULL) {
+    FreePool (InputStr);
+  }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'mm' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunMm (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
   //
   // Parse arguments
   //
@@ -452,226 +665,16 @@ ShellCommandRunMm (
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetCount (Package) < 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"mm");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    } else if (ShellCommandLineGetCount (Package) > 3) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    } else if (ShellCommandLineGetFlag (Package, L"-w") && (ShellCommandLineGetValue (Package, L"-w") == NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"mm", L"-w");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    } else {
-      if (ShellCommandLineGetFlag (Package, L"-mmio")) {
-        AccessType = ShellMmMemoryMappedIo;
-        if (  ShellCommandLineGetFlag (Package, L"-mem")
-           || ShellCommandLineGetFlag (Package, L"-io")
-           || ShellCommandLineGetFlag (Package, L"-pci")
-           || ShellCommandLineGetFlag (Package, L"-pcie")
-              )
-        {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      } else if (ShellCommandLineGetFlag (Package, L"-mem")) {
-        AccessType = ShellMmMemory;
-        if (  ShellCommandLineGetFlag (Package, L"-io")
-           || ShellCommandLineGetFlag (Package, L"-pci")
-           || ShellCommandLineGetFlag (Package, L"-pcie")
-              )
-        {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      } else if (ShellCommandLineGetFlag (Package, L"-io")) {
-        AccessType = ShellMmIo;
-        if (  ShellCommandLineGetFlag (Package, L"-pci")
-           || ShellCommandLineGetFlag (Package, L"-pcie")
-              )
-        {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      } else if (ShellCommandLineGetFlag (Package, L"-pci")) {
-        AccessType = ShellMmPci;
-        if (ShellCommandLineGetFlag (Package, L"-pcie")
-            )
-        {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"mm");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      } else if (ShellCommandLineGetFlag (Package, L"-pcie")) {
-        AccessType = ShellMmPciExpress;
-      }
-    }
 
-    //
-    // Non interactive for a script file or for the specific parameter
-    //
-    Interactive = TRUE;
-    if (gEfiShellProtocol->BatchIsActive () || ShellCommandLineGetFlag (Package, L"-n")) {
-      Interactive = FALSE;
-    }
-
-    Temp = ShellCommandLineGetValue (Package, L"-w");
-    if (Temp != NULL) {
-      Size = ShellStrToUintn (Temp);
-    }
-
-    if ((Size != 1) && (Size != 2) && (Size != 4) && (Size != 8)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"mm", Temp, L"-w");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    Temp = ShellCommandLineGetRawValue (Package, 1);
-    if (Temp == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", L"NULL");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    Status = ShellConvertStringToUint64 (Temp, &Address, TRUE, FALSE);
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    if ((Address & (Size - 1)) != 0) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_NOT_ALIGNED), gShellDebug1HiiHandle, L"mm", Address);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    //
-    // locate IO protocol interface
-    //
-    HasPciRootBridgeIo = ShellMmLocateIoProtocol (AccessType, Address, &CpuIo, &PciRootBridgeIo);
-    if ((AccessType == ShellMmPci) || (AccessType == ShellMmPciExpress)) {
-      if (!HasPciRootBridgeIo) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"mm");
-        ShellStatus = SHELL_NOT_FOUND;
-        goto Done;
-      }
-
-      if (PciRootBridgeIo == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_PCIE_ADDRESS_RANGE), gShellDebug1HiiHandle, L"mm", Address);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-    }
-
-    //
-    // Mode 1: Directly set a value
-    //
-    Temp = ShellCommandLineGetRawValue (Package, 2);
-    if (Temp != NULL) {
-      Status = ShellConvertStringToUint64 (Temp, &Value, TRUE, FALSE);
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      if (Value > mShellMmMaxNumber[Size]) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Value);
-      goto Done;
-    }
-
-    //
-    // Mode 2: Directly show a value
-    //
-    if (!Interactive) {
-      if (!gEfiShellProtocol->BatchIsActive ()) {
-        ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
-      }
-
-      ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
-
-      if (!gEfiShellProtocol->BatchIsActive ()) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
-      }
-
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
-      ShellPrintDefaultEx (L"\r\n");
-      goto Done;
-    }
-
-    //
-    // Mode 3: Show or set values in interactive mode
-    //
-    Complete = FALSE;
-    do {
-      ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
-      ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
-      ShellPrintDefaultEx (L" > ");
-      //
-      // wait user input to modify
-      //
-      if (InputStr != NULL) {
-        FreePool (InputStr);
-        InputStr = NULL;
-      }
-
-      ShellPromptForResponse (ShellPromptResponseTypeFreeform, NULL, (VOID **)&InputStr);
-
-      if (InputStr != NULL) {
-        //
-        // skip space characters
-        //
-        for (Index = 0; InputStr[Index] == ' '; Index++) {
-        }
-
-        if (InputStr[Index] != CHAR_NULL) {
-          if ((InputStr[Index] == '.') || (InputStr[Index] == 'q') || (InputStr[Index] == 'Q')) {
-            Complete = TRUE;
-          } else if (!EFI_ERROR (ShellConvertStringToUint64 (InputStr + Index, &Buffer, TRUE, TRUE)) &&
-                     (Buffer <= mShellMmMaxNumber[Size])
-                     )
-          {
-            ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, FALSE, Address, Size, &Buffer);
-          } else {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ERROR), gShellDebug1HiiHandle, L"mm");
-            continue;
-          }
-        }
-      }
-
-      Address += Size;
-      ShellPrintDefaultEx (L"\r\n");
-    } while (!Complete);
+    return ShellStatus;
   }
 
-  ASSERT (ShellStatus == SHELL_SUCCESS);
+  ShellStatus = MainCmdMm (Package);
 
-Done:
-  if (InputStr != NULL) {
-    FreePool (InputStr);
-  }
-
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   return ShellStatus;
 }

@@ -6,6 +6,10 @@
   condition may be report a unit test failure and continue with additional unit
   tests.
 
+  A NULL pointer write is used to generate the exception because it produces
+  a fatal CPU exception (translation/page fault) on every architecture
+  supported by EDK II host-based testing.
+
   Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -17,30 +21,38 @@ extern "C" {
   #include <Library/DebugLib.h>
 }
 
-UINTN
-DivideWithNoParameterChecking (
-  UINTN  Dividend,
-  UINTN  Divisor
+VOID
+WriteByteWithNoParameterChecking (
+  VOID   *Address,
+  UINT8  Value
   )
 {
   //
-  // Perform integer division with no check for divide by zero
+  // Perform a byte write to the supplied address with no validity check.
   //
-  return (Dividend / Divisor);
+  *(volatile UINT8 *)Address = Value;
 }
 
 /**
-  Sample unit test that generates an unexpected exception
+  Sample unit test that generates an unexpected exception by writing to a
+  NULL pointer.
 **/
 TEST (ExceptionTest, GenerateExceptionExpectTestFail) {
+  UINT8  LocalByte;
+
+  LocalByte = 0;
+
   //
   // Assertion that passes without generating an exception
   //
-  EXPECT_EQ (DivideWithNoParameterChecking (20, 1), (UINTN)20);
+  WriteByteWithNoParameterChecking (&LocalByte, 0xA5);
+  EXPECT_EQ (LocalByte, (UINT8)0xA5);
   //
-  // Assertion that generates divide by zero exception before result evaluated
+  // Assertion that generates a NULL pointer access exception before the
+  // following EXPECT_EQ result is evaluated
   //
-  EXPECT_EQ (DivideWithNoParameterChecking (20, 0), MAX_UINTN);
+  WriteByteWithNoParameterChecking (NULL, 0xA5);
+  EXPECT_EQ (LocalByte, (UINT8)0xA5);
 }
 
 int

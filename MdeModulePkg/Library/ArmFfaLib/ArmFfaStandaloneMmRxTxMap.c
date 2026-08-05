@@ -140,7 +140,7 @@ ArmFfaLibRxTxMap (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   TxBuffer   = Buffers;
   RxBuffer   = Buffers + BufferSize;
 

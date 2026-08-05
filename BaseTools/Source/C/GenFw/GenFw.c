@@ -89,6 +89,7 @@ UINT32 mOutImageType = FW_DUMMY_IMAGE;
 BOOLEAN mIsConvertXip = FALSE;
 BOOLEAN mExportFlag = FALSE;
 BOOLEAN mNoNxCompat = FALSE;
+BOOLEAN mBuildIdFlag = FALSE;
 
 STATIC
 EFI_STATUS
@@ -290,6 +291,10 @@ Returns:
   fprintf (stdout, "  --nonxcompat          Do not set the IMAGE_DLLCHARACTERISTICS_NX_COMPAT bit \n\
                         of the optional header in the PE header even if the \n\
                         requirements are met.\n");
+  fprintf (stdout, "  --build-id            Preserve the .build-id section from the ELF image\n\
+                        and copy it to a .bldid section in the PE image.\n\
+                        This option can be used together with -e or -t.\n\
+                        It doesn't work for other options.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -1573,6 +1578,13 @@ Returns:
       mNoNxCompat = TRUE;
       argc --;
       argv ++;
+      continue;
+    }
+
+    if (stricmp (argv[0], "--build-id") == 0) {
+      mBuildIdFlag = TRUE;
+      argc--;
+      argv++;
       continue;
     }
 

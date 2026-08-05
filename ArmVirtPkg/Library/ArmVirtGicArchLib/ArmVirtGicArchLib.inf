@@ -3,6 +3,7 @@
 #  Component description file for ArmVirtGicArchLib module
 #
 #  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -24,6 +25,7 @@
   BaseLib
   DebugLib
   PcdLib
+  MapMmioLib
   UefiBootServicesTableLib
 
 [Packages]
@@ -31,6 +33,7 @@
   ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [Protocols]
   gFdtClientProtocolGuid                                ## CONSUMES

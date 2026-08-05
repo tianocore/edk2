@@ -29,8 +29,11 @@
   MdePkg/MdePkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
 
+[Guids]
+  gEfiHobListGuid
 
 [LibraryClasses]
+  UefiLib
   BaseMemoryLib
   DebugLib
   DxeHobListLib
