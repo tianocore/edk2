@@ -1008,7 +1008,7 @@ NonCoherentPciIoFreeBuffer (
     }
   }
 
-  if (!Found) {
+  if (!Found || (Alloc == NULL)) {
     ASSERT_EFI_ERROR (EFI_NOT_FOUND);
     return EFI_NOT_FOUND;
   }
