@@ -19,6 +19,8 @@
 [Sources]
   IortGenerator.c
   IortGenerator.h
+  IwbDeviceTable.c
+  IwbDeviceTableTemplate.asl
 
 [Packages]
   MdePkg/MdePkg.dec
