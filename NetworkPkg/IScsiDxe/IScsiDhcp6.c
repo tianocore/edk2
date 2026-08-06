@@ -37,7 +37,7 @@ IScsiDhcp6ExtractRootPath (
   ISCSI_ROOT_PATH_FIELD        Fields[RP_FIELD_IDX_MAX];
   ISCSI_ROOT_PATH_FIELD        *Field;
   UINT32                       FieldIndex;
-  UINT8                        Index;
+  UINTN                        Index;
   ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
   EFI_IP_ADDRESS               Ip;
   UINT8                        IpMode;
@@ -88,8 +88,17 @@ IScsiDhcp6ExtractRootPath (
   Fields[RP_FIELD_IDX_SERVERNAME].Str = &TmpStr[Index];
 
   if (!ConfigNvData->DnsMode) {
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER)) {
       Index++;
+    }
+
+    if ((Index >= Length) ||
+        ((Index + 1) >= Length) ||
+        (TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER) ||
+        (TmpStr[Index + 1] != ISCSI_ROOT_PATH_FIELD_DELIMITER))
+    {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
 
     //
@@ -98,8 +107,13 @@ IScsiDhcp6ExtractRootPath (
     TmpStr[Index] = '\0';
     Index        += 2;
   } else {
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
       Index++;
+    }
+
+    if ((Index >= Length) || (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
 
     //
@@ -109,7 +123,7 @@ IScsiDhcp6ExtractRootPath (
     Index        += 1;
   }
 
-  Fields[RP_FIELD_IDX_SERVERNAME].Len = (UINT8)AsciiStrLen (Fields[RP_FIELD_IDX_SERVERNAME].Str);
+  Fields[RP_FIELD_IDX_SERVERNAME].Len = AsciiStrLen (Fields[RP_FIELD_IDX_SERVERNAME].Str);
 
   //
   // Extract others fields in the Root Path option string.
@@ -119,18 +133,18 @@ IScsiDhcp6ExtractRootPath (
       Fields[FieldIndex].Str = &TmpStr[Index];
     }
 
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
       Index++;
     }
 
-    if (TmpStr[Index] == ISCSI_ROOT_PATH_FIELD_DELIMITER) {
+    if ((Index < Length) && (TmpStr[Index] == ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
       if (FieldIndex != RP_FIELD_IDX_TARGETNAME) {
         TmpStr[Index] = '\0';
         Index++;
       }
 
       if (Fields[FieldIndex].Str != NULL) {
-        Fields[FieldIndex].Len = (UINT8)AsciiStrLen (Fields[FieldIndex].Str);
+        Fields[FieldIndex].Len = AsciiStrLen (Fields[FieldIndex].Str);
       }
     }
   }
