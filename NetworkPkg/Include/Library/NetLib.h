@@ -634,7 +634,7 @@ PseudoRandomU32 (
 //
 #define NET_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead) \
   for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink; \
-      Entry != (ListHead); \
+      Entry != (ListHead) && Entry != NULL && NextEntry != NULL; \
       Entry = NextEntry, NextEntry = Entry->ForwardLink \
      )
 
