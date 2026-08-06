@@ -2776,6 +2776,7 @@ DriverEntry (
   EFI_TCG2_EVENT_ALGORITHM_BITMAP  TpmHashAlgorithmBitmap;
   UINT32                           ActivePCRBanks;
   UINT32                           NumberOfPCRBanks;
+  UINT32                           Tpm2PcrMask;
 
   mImageHandle = ImageHandle;
 
@@ -2882,6 +2883,27 @@ DriverEntry (
   DEBUG ((DEBUG_INFO, "Tcg2.HashAlgorithmBitmap - 0x%08x\n", mTcgDxeData.BsCap.HashAlgorithmBitmap));
   DEBUG ((DEBUG_INFO, "Tcg2.NumberOfPCRBanks      - 0x%08x\n", mTcgDxeData.BsCap.NumberOfPCRBanks));
   DEBUG ((DEBUG_INFO, "Tcg2.ActivePcrBanks        - 0x%08x\n", mTcgDxeData.BsCap.ActivePcrBanks));
+
+  //
+  // UEFI payloads do not run Tcg2Pei, so DXE constrains the TPM hash mask.
+  //
+  Tpm2PcrMask = PcdGet32 (PcdTpm2HashMask);
+  if (Tpm2PcrMask == 0) {
+    Tpm2PcrMask = mTcgDxeData.BsCap.ActivePcrBanks;
+  } else {
+    Tpm2PcrMask &= mTcgDxeData.BsCap.ActivePcrBanks;
+  }
+
+  if (Tpm2PcrMask == 0) {
+    DEBUG ((DEBUG_ERROR, "%a - No viable PCRs active\n", __func__));
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Tpm2PcrMask != PcdGet32 (PcdTpm2HashMask)) {
+    Status = PcdSet32S (PcdTpm2HashMask, Tpm2PcrMask);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   if (mTcgDxeData.BsCap.TPMPresentFlag) {
     //

@@ -21,7 +21,7 @@ typedef struct {
 
 typedef struct {
   UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
-  UINTN                               Count;
+  UINT32                              Count;
   UPL_SEGMENT_INFO                    SegmentInfo[0];
 } UPL_PCI_SEGMENT_INFO_HOB;
 #pragma pack()

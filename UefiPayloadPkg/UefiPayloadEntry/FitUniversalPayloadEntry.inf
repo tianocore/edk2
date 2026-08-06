@@ -69,6 +69,7 @@
   PcdLib
   StackCheckLib
   MemoryAllocationLib
+  BlParseLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -87,6 +88,8 @@
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
   gUniversalPayloadDeviceTreeGuid
+  gEfiFirmwareInfoHobGuid
+  gEfiSmmStoreInfoHobGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
@@ -116,6 +119,7 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
   gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4305
