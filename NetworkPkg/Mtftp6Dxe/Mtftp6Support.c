@@ -1135,7 +1135,14 @@ Mtftp6OperationStart (
 
   if (Token->Event == NULL) {
     while (Token->Status == EFI_NOT_READY) {
+      //
+      // If disconnect occurs outside the execution of This->Poll(),
+      // then Token->Poll() will execute and get a non-EFI_NOT_READY
+      // status that breaks the loop.
+      //
+      Instance->OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
       This->Poll (This);
+      gBS->RestoreTPL (Instance->OldTpl);
     }
 
     return Token->Status;
