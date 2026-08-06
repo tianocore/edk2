@@ -1,7 +1,7 @@
 /** @file
   RedfishHttpOperation handles HTTP operations.
 
-  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2024-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -372,7 +372,10 @@ BuildRequestMessage (
     }
 
     if (Request->ContentLength == 0) {
-      Request->ContentLength =  AsciiStrLen (Request->Content);
+      //
+      // Use AsciiStrnLenS to get the length of the content string safely. And it won't trigger assertion when the content is oversize.
+      //
+      Request->ContentLength =  AsciiStrnLenS (Request->Content, REDFISH_HTTP_CONTENT_LENGTH_MAXIMUM);
     }
 
     AsciiSPrint (
