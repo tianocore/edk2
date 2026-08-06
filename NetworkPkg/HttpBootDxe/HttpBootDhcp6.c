@@ -513,7 +513,11 @@ HttpBootDhcp6CallBack (
 
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
   @param[in]  TimeOutInSecond     Timeout value in seconds.
+  @param[in]  Address             The station IPv6 address to look up the on-link prefix length for.
   @param[out] GatewayAddr         Pointer to store the gateway IP address.
+  @param[out] PrefixLength        Pointer to store the longest on-link prefix length that matches
+                                  Address. Set to 0 if no matching on-link prefix is found, in which
+                                  case the caller falls back to the default prefix length.
 
   @retval     EFI_SUCCESS         Found a valid gateway address successfully.
   @retval     EFI_TIMEOUT         The operation is time out.
@@ -524,7 +528,9 @@ EFI_STATUS
 HttpBootCheckRouteTable (
   IN  HTTP_BOOT_PRIVATE_DATA  *Private,
   IN  UINTN                   TimeOutInSecond,
-  OUT EFI_IPv6_ADDRESS        *GatewayAddr
+  IN  EFI_IPv6_ADDRESS        *Address,
+  OUT EFI_IPv6_ADDRESS        *GatewayAddr,
+  OUT UINT8                   *PrefixLength
   )
 {
   EFI_STATUS         Status;
@@ -534,16 +540,21 @@ HttpBootCheckRouteTable (
   EFI_EVENT          TimeOutEvt;
   UINTN              RetryCount;
   BOOLEAN            GatewayIsFound;
+  BOOLEAN            PrefixLengthFound;
 
   ASSERT (GatewayAddr != NULL);
   ASSERT (Private != NULL);
+  ASSERT (Address != NULL);
+  ASSERT (PrefixLength != NULL);
 
-  Ip6            = Private->Ip6;
-  GatewayIsFound = FALSE;
-  RetryCount     = 0;
-  TimeOutEvt     = NULL;
-  Status         = EFI_SUCCESS;
+  Ip6               = Private->Ip6;
+  GatewayIsFound    = FALSE;
+  PrefixLengthFound = FALSE;
+  RetryCount        = 0;
+  TimeOutEvt        = NULL;
+  Status            = EFI_SUCCESS;
   ZeroMem (GatewayAddr, sizeof (EFI_IPv6_ADDRESS));
+  *PrefixLength = 0;
 
   while (TRUE) {
     Status = Ip6->GetModeData (Ip6, &Ip6ModeData, NULL, NULL);
@@ -559,6 +570,27 @@ HttpBootCheckRouteTable (
         IP6_COPY_ADDRESS (GatewayAddr, &Ip6ModeData.RouteTable[Index].Gateway);
         GatewayIsFound = TRUE;
         break;
+      }
+    }
+
+    //
+    // Find the longest on-link prefix that matches the station IP. This is needed
+    // when the router uses a non-default prefix length (e.g. /124); overlapping
+    // prefixes are resolved by picking the most specific (longest) match. Once found,
+    // skip rescanning the prefix table on subsequent retries of this loop.
+    //
+    if (!PrefixLengthFound) {
+      for (Index = 0; Index < Ip6ModeData.PrefixCount; Index++) {
+        if (NetIp6IsNetEqual (
+              Address,
+              &Ip6ModeData.PrefixTable[Index].Address,
+              Ip6ModeData.PrefixTable[Index].PrefixLength
+              ) &&
+            (Ip6ModeData.PrefixTable[Index].PrefixLength > *PrefixLength))
+        {
+          *PrefixLength     = Ip6ModeData.PrefixTable[Index].PrefixLength;
+          PrefixLengthFound = TRUE;
+        }
       }
     }
 
@@ -627,6 +659,12 @@ ON_EXIT:
     Status = EFI_SUCCESS;
   } else if (RetryCount == TimeOutInSecond) {
     Status = EFI_TIMEOUT;
+  }
+
+  if (PrefixLengthFound) {
+    DEBUG ((DEBUG_INFO, "HttpBootCheckRouteTable: found on-link prefix length %d.\n", *PrefixLength));
+  } else {
+    DEBUG ((DEBUG_INFO, "HttpBootCheckRouteTable: no matching on-link prefix, falling back to default.\n"));
   }
 
   return Status;
@@ -780,6 +818,7 @@ HttpBootSetIp6Address (
   UINTN                          DataSize;
   BOOLEAN                        IsAddressOk;
   UINTN                          Index;
+  UINT8                          PrefixLength;
 
   ASSERT (Private->UsingIpv6);
 
@@ -807,11 +846,19 @@ HttpBootSetIp6Address (
   //
   // Retrieve the gateway address from IP6 route table.
   //
-  Status = HttpBootCheckRouteTable (Private, HTTP_BOOT_IP6_ROUTE_TABLE_TIMEOUT, &GatewayAddr);
+  Status = HttpBootCheckRouteTable (Private, HTTP_BOOT_IP6_ROUTE_TABLE_TIMEOUT, &Private->StationIp.v6, &GatewayAddr, &PrefixLength);
   if (EFI_ERROR (Status)) {
     Private->NoGateway = TRUE;
   } else {
     IP6_COPY_ADDRESS (&Private->GatewayIp.v6, &GatewayAddr);
+  }
+
+  //
+  // Use the prefix length from the router advertisement if available,
+  // so that a non-default prefix (e.g. /124) is correctly applied.
+  //
+  if (PrefixLength != 0) {
+    CfgAddr.PrefixLength = PrefixLength;
   }
 
   //
