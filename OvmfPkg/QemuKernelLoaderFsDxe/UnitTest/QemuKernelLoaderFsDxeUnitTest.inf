@@ -1,0 +1,48 @@
+## @file
+# Host-based unit test for QemuKernelLoaderFsDxe blob fetching.
+#
+# Copyright (c) 2026, Canonical Ltd. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = QemuKernelLoaderFsDxeUnitTest
+  FILE_GUID                      = 6E2D9C7A-1F0B-4B3E-9C2A-7C5E1A4D8B30
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  QemuKernelLoaderFsDxeUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  UnitTestLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiIgvmDataHobGuid
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
