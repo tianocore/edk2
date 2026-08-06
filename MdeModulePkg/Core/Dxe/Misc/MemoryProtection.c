@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DxeMemoryProtectionHobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
@@ -61,8 +62,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
-
-UINT32  mImageProtectionPolicy;
 
 extern LIST_ENTRY  mGcdMemorySpaceMap;
 
@@ -130,10 +129,12 @@ GetProtectionPolicyFromImageType (
   IN UINT32  ImageType
   )
 {
-  if ((ImageType & mImageProtectionPolicy) == 0) {
-    return DO_NOT_PROTECT;
-  } else {
+  if (((ImageType == IMAGE_UNKNOWN) && gDxeMps.ImageProtectionPolicy.Fields.ProtectImageFromUnknown) ||
+      ((ImageType == IMAGE_FROM_FV) && gDxeMps.ImageProtectionPolicy.Fields.ProtectImageFromFv))
+  {
     return PROTECT_IF_ALIGNED_ELSE_ALLOW;
+  } else {
+    return DO_NOT_PROTECT;
   }
 }
 
@@ -151,9 +152,13 @@ GetUefiImageProtectionPolicy (
   IN EFI_DEVICE_PATH_PROTOCOL   *LoadedImageDevicePath
   )
 {
-  BOOLEAN  InSmm;
-  UINT32   ImageType;
-  UINT32   ProtectionPolicy;
+  BOOLEAN                         InSmm;
+  UINT32                          ImageType;
+  UINT32                          ProtectionPolicy;
+  DXE_MEMORY_PROTECTION_SETTINGS  *Settings;
+  VOID                            *Hob;
+
+  Settings = NULL;
 
   //
   // Check SMM
@@ -171,6 +176,25 @@ GetUefiImageProtectionPolicy (
   // Check DevicePath
   //
   if (LoadedImage == gDxeCoreLoadedImage) {
+    // If the image is DxeCore, DxeMemoryProtectionHobLib entry point has not
+    // yet executed and so gDxeMps is not yet valid. Get the memory protection
+    // HOB directly and check if DxeCore should be protected.
+    Hob = GetFirstGuidHob (&gDxeMemoryProtectionSettingsGuid);
+    if (Hob != NULL) {
+      Settings = (DXE_MEMORY_PROTECTION_SETTINGS *)GET_GUID_HOB_DATA (Hob);
+      if (Settings->StructVersion == DXE_MEMORY_PROTECTION_SETTINGS_CURRENT_VERSION) {
+        // Valid settings
+      } else {
+        Settings = NULL;
+      }
+    }
+
+    if (Settings != NULL) {
+      if (Settings->ImageProtectionPolicy.Fields.ProtectImageFromFv == 1) {
+        return PROTECT_IF_ALIGNED_ELSE_ALLOW;
+      }
+    }
+
     ImageType = IMAGE_FROM_FV;
   } else {
     ImageType = GetImageType (LoadedImageDevicePath);
@@ -517,7 +541,7 @@ UnprotectUefiImage (
   IMAGE_PROPERTIES_RECORD  *ImageRecord;
   LIST_ENTRY               *ImageRecordLink;
 
-  if (PcdGet32 (PcdImageProtectionPolicy) != 0) {
+  if (gDxeMps.ImageProtectionPolicy.Data != 0) {
     for (ImageRecordLink = mProtectedImageRecordList.ForwardLink;
          ImageRecordLink != &mProtectedImageRecordList;
          ImageRecordLink = ImageRecordLink->ForwardLink)
@@ -554,21 +578,11 @@ GetPermissionAttributeForMemoryType (
   IN EFI_MEMORY_TYPE  MemoryType
   )
 {
-  UINT64  TestBit;
-
-  if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
-    TestBit = BIT63;
-  } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
-    TestBit = BIT62;
-  } else {
-    TestBit = LShiftU64 (1, MemoryType);
-  }
-
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
+  if (GetDxeMemoryTypeSettingFromBitfield (MemoryType, gDxeMps.NxProtectionPolicy)) {
     return EFI_MEMORY_XP;
-  } else {
-    return 0;
   }
+
+  return 0;
 }
 
 /**
@@ -678,7 +692,7 @@ MergeMemoryMapForProtectionPolicy (
 
 /**
   Remove exec permissions from all regions whose type is identified by
-  PcdDxeNxMemoryProtectionPolicy.
+  gDxeMps.NxProtectionPolicy.
 **/
 STATIC
 VOID
@@ -733,7 +747,7 @@ InitializeDxeNxMemoryProtectionPolicy (
   ASSERT_EFI_ERROR (Status);
 
   StackBase = 0;
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (gDxeMps.CpuStackGuard) {
     //
     // Get the base of stack from Hob.
     //
@@ -791,7 +805,7 @@ InitializeDxeNxMemoryProtectionPolicy (
       // enabled.
       //
       if ((MemoryMapEntry->PhysicalStart == 0) &&
-          (PcdGet8 (PcdNullPointerDetectionPropertyMask) != 0))
+          (gDxeMps.NullPointerDetectionPolicy.Data != 0))
       {
         ASSERT (MemoryMapEntry->NumberOfPages > 0);
         SetUefiImageMemoryAttributes (
@@ -809,7 +823,7 @@ InitializeDxeNxMemoryProtectionPolicy (
           ((StackBase >= MemoryMapEntry->PhysicalStart) &&
            (StackBase <  MemoryMapEntry->PhysicalStart +
             LShiftU64 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT))) &&
-          PcdGetBool (PcdCpuStackGuard))
+          gDxeMps.CpuStackGuard)
       {
         SetUefiImageMemoryAttributes (
           StackBase,
@@ -904,7 +918,7 @@ MemoryProtectionCpuArchProtocolNotify (
   //
   // Apply the memory protection policy on non-BScode/RTcode regions.
   //
-  if (PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0) {
+  if (gDxeMps.NxProtectionPolicy.Data != 0) {
     InitializeDxeNxMemoryProtectionPolicy ();
   }
 
@@ -913,7 +927,7 @@ MemoryProtectionCpuArchProtocolNotify (
   //
   HeapGuardCpuArchProtocolNotify ();
 
-  if (mImageProtectionPolicy == 0) {
+  if (gDxeMps.ImageProtectionPolicy.Data == 0) {
     goto Done;
   }
 
@@ -976,7 +990,7 @@ MemoryProtectionExitBootServicesCallback (
   // delay setting protections on RT code pages until after SetVirtualAddressMap().
   // OS may set protection on RT based upon EFI_MEMORY_ATTRIBUTES_TABLE later.
   //
-  if (mImageProtectionPolicy != 0) {
+  if (gDxeMps.ImageProtectionPolicy.Data != 0) {
     for (Link = gRuntime->ImageHead.ForwardLink; Link != &gRuntime->ImageHead; Link = Link->ForwardLink) {
       RuntimeImage = BASE_CR (Link, EFI_RUNTIME_IMAGE_ENTRY, Link);
       SetUefiImageMemoryAttributes ((UINT64)(UINTN)RuntimeImage->ImageBase, ALIGN_VALUE (RuntimeImage->ImageSize, EFI_PAGE_SIZE), 0);
@@ -1081,8 +1095,6 @@ CoreInitializeMemoryProtection (
   EFI_EVENT   EndOfDxeEvent;
   VOID        *Registration;
 
-  mImageProtectionPolicy = PcdGet32 (PcdImageProtectionPolicy);
-
   InitializeListHead (&mProtectedImageRecordList);
 
   //
@@ -1150,9 +1162,7 @@ CoreInitializeMemoryProtection (
   //
   // Register a callback to disable NULL pointer detection at EndOfDxe
   //
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7))
-      == (BIT0|BIT7))
-  {
+  if (gDxeMps.NullPointerDetectionPolicy.Fields.DisableEndOfDxe) {
     Status = CoreCreateEventEx (
                EVT_NOTIFY_SIGNAL,
                TPL_NOTIFY,
@@ -1235,7 +1245,7 @@ ApplyMemoryProtectionPolicy (
   //
   // Check if a DXE memory protection policy has been configured
   //
-  if (PcdGet64 (PcdDxeNxMemoryProtectionPolicy) == 0) {
+  if (!gDxeMps.NxProtectionPolicy.Data) {
     return EFI_SUCCESS;
   }
 
