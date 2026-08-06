@@ -5,6 +5,7 @@
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -159,6 +160,7 @@
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
+  VariableStorageRouterLib|MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseTraditionalMmLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -181,6 +183,7 @@
   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
   VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   VarCheckHiiLib|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibStandaloneMm.inf
+  VariableStorageRouterLib|MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseStandaloneMmLib.inf
 
 [LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -472,6 +475,13 @@
   }
 
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
+  MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseStandaloneMmLib.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStorageFvbStandaloneMm.inf {
+    <LibraryClasses>
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
+      NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+  }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
 !endif
@@ -481,13 +491,15 @@
   MdeModulePkg/Application/SmiHandlerProfileInfo/SmiHandlerProfileInfo.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
+  MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseTraditionalMmLib.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStorageFvbTraditionalMm.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
       NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   }
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf

@@ -4,6 +4,7 @@
 
 Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved. <BR>
 Copyright (c) 2018, Linaro, Ltd. All rights reserved. <BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -99,18 +100,4 @@ VariableServiceInitialize (
   )
 {
   return MmVariableServiceInitialize ();
-}
-
-/**
-  Whether the MOR variable is legitimate or not.
-
-  @retval TRUE  MOR Variable is legitimate.
-  @retval FALSE MOR Variable in not legitimate.
-**/
-BOOLEAN
-VariableIsMorVariableLegitimate (
-  VOID
-  )
-{
-  return TRUE;
 }

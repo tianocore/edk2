@@ -1,0 +1,45 @@
+## @file
+#  Variable Storage Base Library which uses FVB.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = VariableStorageRouterBaseLib
+  MODULE_UNI_FILE                = VariableStorageRouterBaseLib.uni
+  FILE_GUID                      = 5481529a-380d-11f1-8961-ab5d0e6d80c1
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VariableStorageLib|MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  CONSTRUCTOR                    = VariableStorageRouterBaseLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  VariableStorageRouterBase.c
+  VariableStorageRouterBaseStandaloneMmLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MmServicesTableLib
+
+[Protocols]
+  gEdkiiVariableStorageProtocolGuid            ## COUNSUMES
+
+[Depex]
+  gEdkiiVariableStorageProtocolGuid
