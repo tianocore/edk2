@@ -1425,7 +1425,7 @@ PxeBcStart (
     Private->PxeBc.Mode         = &Private->Mode;
     Private->Mode.Ipv6Supported = TRUE;
     Private->Mode.AutoArp       = TRUE;
-    Private->Mode.TTL           = DEFAULT_TTL;
+    Private->Mode.TTL           = PXEBC_DEFAULT_TTL;
     Private->Mode.ToS           = DEFAULT_ToS;
 
     //

@@ -244,6 +244,9 @@ SnpUndi32StationAddress (
     Status = PxeSetStnAddr (Snp, NULL);
   } else {
     Status = PxeSetStnAddr (Snp, New);
+    if (Status == EFI_DEVICE_ERROR) {
+      Status = EFI_UNSUPPORTED;
+    }
   }
 
 ON_EXIT:

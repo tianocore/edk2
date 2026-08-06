@@ -61,6 +61,7 @@ typedef struct _PXEBC_VIRTUAL_NIC       PXEBC_VIRTUAL_NIC;
 #include "PxeBcSupport.h"
 
 #define PXEBC_DEFAULT_HOPLIMIT      64
+#define PXEBC_DEFAULT_TTL           16
 #define PXEBC_DEFAULT_LIFETIME      50000      // 50 ms, unit is microsecond
 #define PXEBC_UDP_TIMEOUT           30000000   // 3 seconds, unit is 100nanosecond
 #define PXEBC_DAD_ADDITIONAL_DELAY  30000000   // 3 seconds
