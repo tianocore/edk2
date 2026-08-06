@@ -32,6 +32,10 @@ ASM_FUNC(_ModuleEntryPoint)
 
   bl    ASM_PFX(DiscoverDramFromDt)
 
+  // Check if we are in a Realm and configure
+  // the System Memory as Protected RAM.
+  bl    ASM_PFX(ArmCcaConfigureSystemMemory)
+
   // Get ID of this CPU in Multicore system
   bl    ASM_PFX(ArmReadMpidr)
   // Keep a copy of the MpId register value
