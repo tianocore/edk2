@@ -1995,7 +1995,8 @@ typedef enum {
   MemoryTypeDdr5                     = 0x22,
   MemoryTypeLpddr5                   = 0x23,
   MemoryTypeHBM3                     = 0x24,
-  MemoryTypeMrDimm                   = 0x25  ///< SMBIOS spec 3.9.0 CR248
+  MemoryTypeMrDimm                   = 0x25, ///< SMBIOS spec 3.9.0 CR248
+  MemoryTypeLpddr6                   = 0x26  ///< SMBIOS spec 3.10
 } MEMORY_DEVICE_TYPE;
 
 ///
