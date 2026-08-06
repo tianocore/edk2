@@ -131,6 +131,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
   EArchCommonObjBaseboardInfo,                  ///< 73 - Baseboard Info
   EArchCommonObjBaseboardContainedObject,       ///< 74 - Baseboard Contained Object
+  EArchCommonObjSystemBootInfo,                 ///< 75 - System Boot Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1951,5 +1952,19 @@ typedef struct CmArchCommonBaseboardInfo {
   /// Baseboard type as defined by SMBIOS Type 2.
   UINT8              BoardType;
 } CM_ARCH_COMMON_BASEBOARD_INFO;
+
+/** A structure that describes System Boot Information.
+
+  SMBIOS Specification v3.9.0 Type 32
+
+  ID: EArchCommonObjSystemBootInfo
+**/
+typedef struct CmArchCommonSystemBootInfo {
+  /// CM Object Token uniquely identifying this System Boot Information.
+  CM_OBJECT_TOKEN    SystemBootInfoToken;
+
+  /// System boot status as defined by SMBIOS Type 32.
+  UINT8              BootStatus;
+} CM_ARCH_COMMON_SYSTEM_BOOT_INFO;
 
 #pragma pack()
