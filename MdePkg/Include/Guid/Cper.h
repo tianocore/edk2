@@ -1026,10 +1026,10 @@ typedef union {
 ///
 /// The type of error that occurred in ARM Processor Error section.
 ///@{
-#define EFI_ARM_PROC_ERROR_INFO_TYPE_CACHE       0x00
-#define EFI_ARM_PROC_ERROR_INFO_TYPE_TLB         0x01
-#define EFI_ARM_PROC_ERROR_INFO_TYPE_BUS         0x02
-#define EFI_ARM_PROC_ERROR_INFO_TYPE_MICRO_ARCH  0x03
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_CACHE       BIT0
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_TLB         BIT1
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_BUS         BIT2
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_MICRO_ARCH  BIT3
 
 ///
 /// The flags to define the error atrributes in ARM Processor Error Information
@@ -1041,7 +1041,7 @@ typedef union {
 #define EFI_ARM_PROC_ERROR_INFO_FLAG_OVERFLOW_FLAG              BIT3
 ///@}
 
-#define EFI_ARM_PROCESSOR_ERROR_INFO_STRUCTURE_REVISION  0
+#define EFI_ARM_PROCESSOR_ERROR_INFO_STRUCTURE_REVISION  1
 
 ///
 /// ARM Processor Error Information Structure
