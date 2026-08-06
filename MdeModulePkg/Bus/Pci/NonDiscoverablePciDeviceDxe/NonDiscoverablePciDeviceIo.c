@@ -15,11 +15,14 @@
 
 #include <Protocol/PciRootBridgeIo.h>
 
+#include <Library/IoMmuLib.h>
+
 typedef struct {
   EFI_PHYSICAL_ADDRESS             AllocAddress;
   VOID                             *HostAddress;
   EFI_PCI_IO_PROTOCOL_OPERATION    Operation;
   UINTN                            NumberOfBytes;
+  VOID                             *IoMmuContext;
 } NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO;
 
 /**
@@ -693,6 +696,143 @@ PciIoCopyMem (
 }
 
 /**
+  Translate a PCI IO bus master operation into the equivalent IOMMU operation
+  and access attributes, install an IOMMU mapping for HostAddress and set the
+  access attributes on the resulting mapping.
+
+  On success, MapInfo->IoMmuContext holds the mapping handle that
+  PciIoUnmapIoMmu() can later release. On failure, no IOMMU mapping is leaked.
+
+  @param[in]      Dev               The non-discoverable PCI device.
+  @param[in]      Operation         The PCI IO bus master operation.
+  @param[in]      IoMmuHostAddress  Host address to be mapped through the IOMMU.
+  @param[in,out]  NumberOfBytes     Length of the mapping.
+  @param[in,out]  DeviceAddress     Resulting device address.
+  @param[in,out]  MapInfo           Map info structure; MapInfo->IoMmuContext is
+                                    populated on success.
+
+  @retval EFI_SUCCESS            Mapping established and attributes set.
+  @retval EFI_INVALID_PARAMETER  Operation is not a valid bus master operation.
+  @retval Other                  Error returned by the IOMMU library.
+**/
+STATIC
+EFI_STATUS
+PciIoMapIoMmu (
+  IN     NON_DISCOVERABLE_PCI_DEVICE           *Dev,
+  IN     EFI_PCI_IO_PROTOCOL_OPERATION         Operation,
+  IN     VOID                                  *IoMmuHostAddress,
+  IN OUT UINTN                                 *NumberOfBytes,
+  IN OUT EFI_PHYSICAL_ADDRESS                  *DeviceAddress,
+  IN OUT NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo
+  )
+{
+  EFI_STATUS             Status;
+  EDKII_IOMMU_OPERATION  IoMmuOperation;
+  UINT64                 IoMmuAttribute;
+  BOOLEAN                DualAddressCycle;
+
+  if ((Operation >= EfiPciIoOperationMaximum) || (Dev == NULL) || (IoMmuHostAddress == NULL) ||
+      (NumberOfBytes == NULL) || (DeviceAddress == NULL) || (MapInfo == NULL))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DualAddressCycle = (Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) != 0;
+
+  switch (Operation) {
+    case EfiPciIoOperationBusMasterRead:
+      IoMmuOperation = DualAddressCycle ? EdkiiIoMmuOperationBusMasterRead64
+                                         : EdkiiIoMmuOperationBusMasterRead;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_READ;
+      break;
+
+    case EfiPciIoOperationBusMasterWrite:
+      IoMmuOperation = DualAddressCycle ? EdkiiIoMmuOperationBusMasterWrite64
+                                         : EdkiiIoMmuOperationBusMasterWrite;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_WRITE;
+      break;
+
+    case EfiPciIoOperationBusMasterCommonBuffer:
+      IoMmuOperation = DualAddressCycle ? EdkiiIoMmuOperationBusMasterCommonBuffer64
+                                         : EdkiiIoMmuOperationBusMasterCommonBuffer;
+      IoMmuAttribute = EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE;
+      break;
+
+    default:
+      DEBUG ((DEBUG_ERROR, "%a - Invalid operation %d\n", __func__, Operation));
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+  }
+
+  Status = IoMmuMap (
+             IoMmuOperation,
+             IoMmuHostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             &MapInfo->IoMmuContext
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuMap failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Status = IoMmuSetAttribute (
+             Dev->Handle,
+             MapInfo->IoMmuContext,
+             IoMmuAttribute
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttribute failed.\n", __func__));
+    ASSERT (FALSE);
+    IoMmuUnmap (MapInfo->IoMmuContext);
+    MapInfo->IoMmuContext = NULL;
+  }
+
+  return Status;
+}
+
+/**
+  Reverse a previous PciIoMapIoMmu() call by clearing the IOMMU access
+  attributes and tearing down the mapping.
+
+  @param[in] Dev      The non-discoverable PCI device.
+  @param[in] MapInfo  Map info structure populated by PciIoMapIoMmu().
+
+  @retval EFI_SUCCESS  The mapping has been released.
+  @retval Other        Error returned by the IOMMU library.
+**/
+STATIC
+EFI_STATUS
+PciIoUnmapIoMmu (
+  IN NON_DISCOVERABLE_PCI_DEVICE           *Dev,
+  IN NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((Dev == NULL) || (MapInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = IoMmuSetAttribute (Dev->Handle, MapInfo->IoMmuContext, 0);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuSetAttribute failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Status = IoMmuUnmap (MapInfo->IoMmuContext);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - IoMmuUnmap failed.\n", __func__));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Provides the PCI controller-specific addresses needed to access system memory.
 
   @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
@@ -726,6 +866,7 @@ CoherentPciIoMap (
   NON_DISCOVERABLE_PCI_DEVICE           *Dev;
   EFI_STATUS                            Status;
   NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
+  VOID                                  *IoMmuHostAddress;
 
   if ((Operation != EfiPciIoOperationBusMasterRead) &&
       (Operation != EfiPciIoOperationBusMasterWrite) &&
@@ -742,6 +883,16 @@ CoherentPciIoMap (
     return EFI_INVALID_PARAMETER;
   }
 
+  MapInfo = AllocatePool (sizeof *MapInfo);
+  if (MapInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  MapInfo->AllocAddress  = MAX_UINT32;
+  MapInfo->HostAddress   = HostAddress;
+  MapInfo->Operation     = Operation;
+  MapInfo->NumberOfBytes = *NumberOfBytes;
+  MapInfo->IoMmuContext  = NULL;
   //
   // If HostAddress exceeds 4 GB, and this device does not support 64-bit DMA
   // addressing, we need to allocate a bounce buffer and copy over the data.
@@ -754,18 +905,9 @@ CoherentPciIoMap (
     // Bounce buffering is not possible for consistent mappings
     //
     if (Operation == EfiPciIoOperationBusMasterCommonBuffer) {
-      return EFI_UNSUPPORTED;
+      Status = EFI_UNSUPPORTED;
+      goto ErrorExit;
     }
-
-    MapInfo = AllocatePool (sizeof *MapInfo);
-    if (MapInfo == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    MapInfo->AllocAddress  = MAX_UINT32;
-    MapInfo->HostAddress   = HostAddress;
-    MapInfo->Operation     = Operation;
-    MapInfo->NumberOfBytes = *NumberOfBytes;
 
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
@@ -779,8 +921,8 @@ CoherentPciIoMap (
       // 4 GB to begin with. There is not much we can do about that other than
       // fail the map request.
       //
-      FreePool (MapInfo);
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto ErrorExit;
     }
 
     if (Operation == EfiPciIoOperationBusMasterRead) {
@@ -791,14 +933,32 @@ CoherentPciIoMap (
              );
     }
 
-    *DeviceAddress = MapInfo->AllocAddress;
-    *Mapping       = MapInfo;
+    *DeviceAddress   = MapInfo->AllocAddress;
+    IoMmuHostAddress = (VOID *)(UINTN)MapInfo->AllocAddress;
   } else {
-    *DeviceAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
-    *Mapping       = NULL;
+    *DeviceAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
+    IoMmuHostAddress = HostAddress;
+  }
+
+  *Mapping = MapInfo;
+
+  Status = PciIoMapIoMmu (
+             Dev,
+             Operation,
+             IoMmuHostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             MapInfo
+             );
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
   }
 
   return EFI_SUCCESS;
+
+ErrorExit:
+  FreePool (MapInfo);
+  return Status;
 }
 
 /**
@@ -819,9 +979,25 @@ CoherentPciIoUnmap (
   )
 {
   NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
+  NON_DISCOVERABLE_PCI_DEVICE           *Dev;
+  EFI_STATUS                            Status;
+
+  if (Mapping == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   MapInfo = Mapping;
-  if (MapInfo != NULL) {
+  Dev     = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO (This);
+
+  Status = PciIoUnmapIoMmu (Dev, MapInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Only copy the data back and free for the bounce buffer case.
+  if (((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0) &&
+      ((EFI_PHYSICAL_ADDRESS)(UINTN)MapInfo->HostAddress + MapInfo->NumberOfBytes > SIZE_4GB))
+  {
     if (MapInfo->Operation == EfiPciIoOperationBusMasterWrite) {
       gBS->CopyMem (
              MapInfo->HostAddress,
@@ -834,8 +1010,9 @@ CoherentPciIoUnmap (
            MapInfo->AllocAddress,
            EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes)
            );
-    FreePool (MapInfo);
   }
+
+  FreePool (MapInfo);
 
   return EFI_SUCCESS;
 }
@@ -1272,6 +1449,7 @@ NonCoherentPciIoMap (
   VOID                                  *AllocAddress;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR       GcdDescriptor;
   BOOLEAN                               Bounce;
+  VOID                                  *IoMmuHostAddress;
 
   if ((HostAddress   == NULL) ||
       (NumberOfBytes == NULL) ||
@@ -1296,6 +1474,7 @@ NonCoherentPciIoMap (
   MapInfo->HostAddress   = HostAddress;
   MapInfo->Operation     = Operation;
   MapInfo->NumberOfBytes = *NumberOfBytes;
+  MapInfo->IoMmuContext  = NULL;
 
   Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO (This);
 
@@ -1345,7 +1524,7 @@ NonCoherentPciIoMap (
   if (Bounce) {
     if (Operation == EfiPciIoOperationBusMasterCommonBuffer) {
       Status = EFI_DEVICE_ERROR;
-      goto FreeMapInfo;
+      goto ErrorExit;
     }
 
     Status = NonCoherentPciIoAllocateBuffer (
@@ -1357,7 +1536,7 @@ NonCoherentPciIoMap (
                EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE
                );
     if (EFI_ERROR (Status)) {
-      goto FreeMapInfo;
+      goto ErrorExit;
     }
 
     MapInfo->AllocAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress;
@@ -1365,10 +1544,12 @@ NonCoherentPciIoMap (
       gBS->CopyMem (AllocAddress, HostAddress, *NumberOfBytes);
     }
 
-    *DeviceAddress = MapInfo->AllocAddress;
+    *DeviceAddress   = MapInfo->AllocAddress;
+    IoMmuHostAddress = (VOID *)(UINTN)MapInfo->AllocAddress;
   } else {
     MapInfo->AllocAddress = 0;
     *DeviceAddress        = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
+    IoMmuHostAddress      = HostAddress;
 
     //
     // We are not using a bounce buffer: the mapping is sufficiently
@@ -1389,9 +1570,22 @@ NonCoherentPciIoMap (
   }
 
   *Mapping = MapInfo;
+
+  Status = PciIoMapIoMmu (
+             Dev,
+             Operation,
+             IoMmuHostAddress,
+             NumberOfBytes,
+             DeviceAddress,
+             MapInfo
+             );
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+
   return EFI_SUCCESS;
 
-FreeMapInfo:
+ErrorExit:
   FreePool (MapInfo);
 
   return Status;
@@ -1415,12 +1609,21 @@ NonCoherentPciIoUnmap (
   )
 {
   NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
+  NON_DISCOVERABLE_PCI_DEVICE           *Dev;
+  EFI_STATUS                            Status;
 
   if (Mapping == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
   MapInfo = Mapping;
+  Dev     = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO (This);
+
+  Status = PciIoUnmapIoMmu (Dev, MapInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   if (MapInfo->AllocAddress != 0) {
     //
     // We are using a bounce buffer: copy back the data if necessary,

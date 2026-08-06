@@ -142,6 +142,8 @@ NonCoherentIoMmuMap (
            DmaOperation,
            HostAddress,
            NumberOfBytes,
+           0, // IommuBase=0 opts out of IoMmu programming
+           0, // DmaId unused
            DeviceAddress,
            Mapping
            );
