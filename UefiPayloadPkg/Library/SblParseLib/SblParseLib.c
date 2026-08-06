@@ -94,8 +94,9 @@ ParseMemoryInfo (
   IN  VOID                  *Params
   )
 {
-  MEMORY_MAP_INFO  *MemoryMapInfo;
-  UINTN            Idx;
+  MEMORY_MAP_INFO     *MemoryMapInfo;
+  BL_MEMORY_MAP_ENTRY  MemoryMap;
+  UINTN                Idx;
 
   MemoryMapInfo = (MEMORY_MAP_INFO *)GetGuidHobDataFromSbl (&gLoaderMemoryMapInfoGuid);
   if (MemoryMapInfo == NULL) {
@@ -104,7 +105,15 @@ ParseMemoryInfo (
   }
 
   for (Idx = 0; Idx < MemoryMapInfo->Count; Idx++) {
-    MemInfoCallback (&MemoryMapInfo->Entry[Idx], Params);
+    MemoryMap.Base = MemoryMapInfo->Entry[Idx].Base;
+    MemoryMap.Size = MemoryMapInfo->Entry[Idx].Size;
+    MemoryMap.Type = MemoryMapInfo->Entry[Idx].Type;
+    MemoryMap.Flag = MemoryMapInfo->Entry[Idx].Flag;
+    MemInfoCallback (&MemoryMap, Params);
+    MemoryMapInfo->Entry[Idx].Base = MemoryMap.Base;
+    MemoryMapInfo->Entry[Idx].Size = MemoryMap.Size;
+    MemoryMapInfo->Entry[Idx].Type = (UINT8)MemoryMap.Type;
+    MemoryMapInfo->Entry[Idx].Flag = MemoryMap.Flag;
   }
 
   return RETURN_SUCCESS;
