@@ -101,6 +101,7 @@ TransferTdxHobList (
   while (!END_OF_HOB_LIST (Hob)) {
     switch (Hob.Header->HobType) {
       case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR:
+      case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2:
         ResourceType      = Hob.ResourceDescriptor->ResourceType;
         ResourceAttribute = Hob.ResourceDescriptor->ResourceAttribute;
 

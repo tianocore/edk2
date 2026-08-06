@@ -703,7 +703,7 @@ PeiLoadFixAddressHook (
     //
     // See if this is a resource descriptor HOB
     //
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       ResourceHob = Hob.ResourceDescriptor;
       //
       // If range described in this HOB is not system memory or higher than MAX_ADDRESS, ignored.
@@ -722,14 +722,14 @@ PeiLoadFixAddressHook (
         //
         // See if this is a resource descriptor HOB
         //
-        if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        if (IS_RESOURCE_DESCRIPTOR_HOB (NextHob)) {
           NextResourceHob = NextHob.ResourceDescriptor;
           //
           // test if range described in this NextResourceHob is system memory and have the same attribute.
           // Note: Here is a assumption that system memory should always be healthy even without test.
           //
           if ((NextResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-              (((NextResourceHob->ResourceAttribute^ResourceHob->ResourceAttribute) & (~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0))
+              (((GET_RESOURCE_HOB_ATTRIBUTE (NextHob)^GET_RESOURCE_HOB_ATTRIBUTE (Hob)) & (~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0))
           {
             //
             // See if the memory range described in ResourceHob and NextResourceHob is adjacent
@@ -773,7 +773,7 @@ PeiLoadFixAddressHook (
         //
         // See if this is a resource descriptor HOB
         //
-        if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        if (IS_RESOURCE_DESCRIPTOR_HOB (NextHob)) {
           NextResourceHob = NextHob.ResourceDescriptor;
           //
           // If range described in this HOB is not system memory or higher than MAX_ADDRESS, ignored.
@@ -794,7 +794,7 @@ PeiLoadFixAddressHook (
             if (MemoryHob->AllocDescriptor.MemoryBaseAddress > NextResourceHob->PhysicalStart) {
               BuildResourceDescriptorHob (
                 EFI_RESOURCE_SYSTEM_MEMORY,
-                NextResourceHob->ResourceAttribute,
+                GET_RESOURCE_HOB_ATTRIBUTE (NextHob),
                 NextResourceHob->PhysicalStart,
                 (MemoryHob->AllocDescriptor.MemoryBaseAddress - NextResourceHob->PhysicalStart)
                 );
@@ -803,7 +803,7 @@ PeiLoadFixAddressHook (
             if (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength < NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength) {
               BuildResourceDescriptorHob (
                 EFI_RESOURCE_SYSTEM_MEMORY,
-                NextResourceHob->ResourceAttribute,
+                GET_RESOURCE_HOB_ATTRIBUTE (NextHob),
                 MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength,
                 (NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength -(MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength))
                 );
@@ -842,7 +842,7 @@ PeiLoadFixAddressHook (
       //
       // See if this is a resource descriptor HOB
       //
-      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
         ResourceHob = Hob.ResourceDescriptor;
         //
         // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
@@ -878,7 +878,7 @@ PeiLoadFixAddressHook (
         //
         // See if this is a resource descriptor HOB
         //
-        if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
           ResourceHob = Hob.ResourceDescriptor;
           //
           // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
@@ -919,7 +919,7 @@ PeiLoadFixAddressHook (
       //
       // See if this is a resource descriptor HOB
       //
-      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
         ResourceHob = Hob.ResourceDescriptor;
         //
         // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS

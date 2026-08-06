@@ -65,8 +65,11 @@ IsNonMmramLoggingAddress (
 {
   EFI_PEI_HOB_POINTERS  Hob;
 
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     if ((Address >= Hob.ResourceDescriptor->PhysicalStart) && (Address < Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength)) {
       if ((Hob.ResourceDescriptor->ResourceAttribute & MM_RESOURCE_ATTRIBUTE_LOGGING) != 0) {
         return TRUE;
@@ -74,9 +77,6 @@ IsNonMmramLoggingAddress (
 
       return FALSE;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   return FALSE;
@@ -97,14 +97,14 @@ IsSmmCommBufferForbiddenAddress (
 {
   EFI_PEI_HOB_POINTERS  Hob;
 
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     if ((Address >= Hob.ResourceDescriptor->PhysicalStart) && (Address < Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength)) {
       return FALSE;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   return TRUE;
@@ -137,9 +137,12 @@ BuildMemoryMapFromResDescHobs (
   //
   // Get the count.
   //
-  Count   = 0;
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
+  Count = 0;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     if ((Hob.ResourceDescriptor->ResourceAttribute & MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
       ResourceHobEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
 
@@ -154,9 +157,6 @@ BuildMemoryMapFromResDescHobs (
       //
       Count++;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   *MemoryRegionCount = Count;
@@ -164,9 +164,12 @@ BuildMemoryMapFromResDescHobs (
   *MemoryRegion = (MM_CPU_MEMORY_REGION *)AllocateZeroPool (sizeof (MM_CPU_MEMORY_REGION) * Count);
   ASSERT (*MemoryRegion != NULL);
 
-  Index   = 0;
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
+  Index = 0;
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     if ((Hob.ResourceDescriptor->ResourceAttribute & MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
       ASSERT (Index < Count);
       (*MemoryRegion)[Index].Base      = Hob.ResourceDescriptor->PhysicalStart;
@@ -178,9 +181,6 @@ BuildMemoryMapFromResDescHobs (
 
       Index++;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   return;
