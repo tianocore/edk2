@@ -37,7 +37,7 @@
 ///      The resulting MMI will occur every 64ms with the child called back on
 ///      every 47th MMI.
 ///      NOTE: the child driver should be aware that this will result in more
-///        MMIs occuring during system runtime which can negatively impact system
+///        MMIs occurring during system runtime which can negatively impact system
 ///        performance.
 ///
 typedef struct {

@@ -169,7 +169,7 @@ ASM_PFX(CommonIdtEntry):
 ;;              rflags from interrupted task
 ;;              CS from interrupted task
 ;;              RIP from interrupted task
-;;              Error code <-------------------- Only present for some exeption types
+;;              Error code <-------------------- Only present for some exception types
 ;;
 ;;              Vector Number <----------------- pushed in our IDT Entry
 ;;
