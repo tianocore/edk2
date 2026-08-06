@@ -2,7 +2,7 @@
 # This file is used to parse meta files
 #
 # Copyright (c) 2008 - 2025, Intel Corporation. All rights reserved.<BR>
-# (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2015-2026 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -1379,6 +1379,7 @@ class DscParser(MetaFileParser):
         self._Table = MetaFileStorage(self._RawTable.DB, self.MetaFile, MODEL_FILE_DSC, True)
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
+        self._Enabled = 1
         self._FileWithError = self.MetaFile
         self._FileLocalMacros = {}
         self._SectionsMacroDict.clear()
@@ -1389,6 +1390,18 @@ class DscParser(MetaFileParser):
         self._Content = self._RawTable.GetAll()
         self._ContentIndex = 0
         self._InSubsection = False
+
+        AlwaysProcessItemType = {
+            MODEL_META_DATA_SECTION_HEADER,
+            MODEL_META_DATA_SUBSECTION_HEADER,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_IF,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_IFDEF,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_IFNDEF,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF,
+        }
+
         while self._ContentIndex < len(self._Content) :
             Id, self._ItemType, V1, V2, V3, S1, S2, S3, Owner, self._From, \
                 LineStart, ColStart, LineEnd, ColEnd, Enabled = self._Content[self._ContentIndex]
@@ -1437,7 +1450,8 @@ class DscParser(MetaFileParser):
             else:
                 self._InSubsection = False
             try:
-                Processer[self._ItemType]()
+                if self._Enabled or self._ItemType in AlwaysProcessItemType:
+                    Processer[self._ItemType]()
             except EvaluationException as Excpt:
                 #
                 # Only catch expression evaluation error here. We need to report
@@ -1492,8 +1506,6 @@ class DscParser(MetaFileParser):
         self._PostProcessed = True
         self._Content = None
     def _ProcessError(self):
-        if not self._Enabled:
-            return
         EdkLogger.error('Parser', ERROR_STATEMENT, self._ValueList[1], File=self.MetaFile, Line=self._LineIndex + 1)
 
     def __ProcessSectionHeader(self):
@@ -1531,9 +1543,6 @@ class DscParser(MetaFileParser):
                     GlobalData.gPlatformOtherPcds[Name] = (CleanString(Content[Line - 1]), PcdLine, PcdType)
 
     def __ProcessDefine(self):
-        if not self._Enabled:
-            return
-
         Type, Name, Value = self._ValueList
         Value = ReplaceMacro(Value, self._Macros, False)
         #
@@ -1627,47 +1636,42 @@ class DscParser(MetaFileParser):
             # First search the include file under the same directory as DSC file
             #
             IncludedFile1 = PathClass(IncludedFile, self.MetaFile.Dir)
-            if self._Enabled:
-                ErrorCode, ErrorInfo1 = IncludedFile1.Validate()
+            ErrorCode, ErrorInfo1 = IncludedFile1.Validate()
+            if ErrorCode != 0:
+                #
+                # Also search file under the WORKSPACE directory
+                #
+                IncludedFile1 = PathClass(IncludedFile, GlobalData.gWorkspace)
+                ErrorCode, ErrorInfo2 = IncludedFile1.Validate()
                 if ErrorCode != 0:
-                    #
-                    # Also search file under the WORKSPACE directory
-                    #
-                    IncludedFile1 = PathClass(IncludedFile, GlobalData.gWorkspace)
-                    ErrorCode, ErrorInfo2 = IncludedFile1.Validate()
-                    if ErrorCode != 0:
-                        EdkLogger.error('parser', ErrorCode, File=self._FileWithError,
-                                        Line=self._LineIndex + 1, ExtraData=ErrorInfo1 + "\n" + ErrorInfo2)
-
-                self._FileWithError = IncludedFile1
-
-                FromItem = self._Content[self._ContentIndex - 1][0]
-                if self._InSubsection:
-                    Owner = self._Content[self._ContentIndex - 1][8]
-                else:
-                    Owner = self._Content[self._ContentIndex - 1][0]
-                IncludedFileTable = MetaFileStorage(self._RawTable.DB, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
-                Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
-                                   Owner=Owner, From=FromItem)
-
-                self.IncludedFiles.add (IncludedFile1)
-
-                # set the parser status with current status
-                Parser._SectionName = self._SectionName
-                Parser._SubsectionType = self._SubsectionType
-                Parser._InSubsection = self._InSubsection
-                Parser._SectionType = self._SectionType
-                Parser._Scope = self._Scope
-                Parser._Enabled = self._Enabled
-                # Parse the included file
-                Parser.StartParse()
-                # Insert all records in the table for the included file into dsc file table
-                Records = IncludedFileTable.GetAll()
-                if Records:
-                    self._Content[self._ContentIndex:self._ContentIndex] = Records
-                    self._Content.pop(self._ContentIndex - 1)
-                    self._ValueList = None
-                    self._ContentIndex -= 1
+                    EdkLogger.error('parser', ErrorCode, File=self._FileWithError,
+                                    Line=self._LineIndex + 1, ExtraData=ErrorInfo1 + "\n" + ErrorInfo2)
+            self._FileWithError = IncludedFile1
+            FromItem = self._Content[self._ContentIndex - 1][0]
+            if self._InSubsection:
+                Owner = self._Content[self._ContentIndex - 1][8]
+            else:
+                Owner = self._Content[self._ContentIndex - 1][0]
+            IncludedFileTable = MetaFileStorage(self._RawTable.DB, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
+            Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
+                               Owner=Owner, From=FromItem)
+            self.IncludedFiles.add (IncludedFile1)
+            # set the parser status with current status
+            Parser._SectionName = self._SectionName
+            Parser._SubsectionType = self._SubsectionType
+            Parser._InSubsection = self._InSubsection
+            Parser._SectionType = self._SectionType
+            Parser._Scope = self._Scope
+            Parser._Enabled = self._Enabled
+            # Parse the included file
+            Parser.StartParse()
+            # Insert all records in the table for the included file into dsc file table
+            Records = IncludedFileTable.GetAll()
+            if Records:
+                self._Content[self._ContentIndex:self._ContentIndex] = Records
+                self._Content.pop(self._ContentIndex - 1)
+                self._ValueList = None
+                self._ContentIndex -= 1
 
     def __ProcessPackages(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
@@ -1712,10 +1716,9 @@ class DscParser(MetaFileParser):
         if ValList[Index] == 'False':
             ValList[Index] = '0'
 
-        if (not self._DirectiveEvalStack) or (False not in self._DirectiveEvalStack):
-            if not self._InSubsection:
-                GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
-                self._Symbols[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
+        if not self._InSubsection:
+            GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
+            self._Symbols[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
         try:
             self._ValueList[2] = '|'.join(ValList)
         except Exception:
