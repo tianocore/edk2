@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_IPMI_COMMAND_LIB_H_
-#define MOCK_IPMI_COMMAND_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -359,5 +358,3 @@ struct MockIpmiCommandLib {
     )
     );
 };
-
-#endif
