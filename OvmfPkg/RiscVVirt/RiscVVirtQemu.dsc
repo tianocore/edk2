@@ -457,6 +457,11 @@
   OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   #
+  # Hash2 protocol, needed to dispatch TcpDxe
+  #
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
