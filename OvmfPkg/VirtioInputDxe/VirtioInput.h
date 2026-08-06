@@ -18,6 +18,9 @@
 #include <Protocol/SimpleTextInEx.h>
 
 #include <IndustryStandard/Virtio.h>
+#include <IndustryStandard/VirtioInput.h>
+
+#include <Library/VirtioLib.h>
 
 #include "VirtioKeyCodes.h"
 
@@ -34,6 +37,13 @@
 
 // Key code 0x100 ~ 0x15f range is for all kinds of button events.
 #define IS_BUTTON_CODE(Code)  (((Code) >= BTN_MISC) && ((Code) < KEY_OK))
+
+#define KEYBOARD_EFI_KEY_MAX_COUNT  256
+typedef struct {
+  EFI_KEY_DATA    Buffer[KEYBOARD_EFI_KEY_MAX_COUNT];
+  UINTN           Head;
+  UINTN           Tail;
+} EFI_KEY_QUEUE;
 
 typedef struct {
   UINTN                      Signature;
@@ -81,10 +91,16 @@ typedef struct {
   BOOLEAN                              HasKeyboard;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL       Txt;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TxtEx;
-  EFI_INPUT_KEY                        LastKey;
   LIST_ENTRY                           KeyNotifyList;
+  EFI_EVENT                            KeyNotifyProcessEvent;
   BOOLEAN                              KeyActive[MAX_KEYBOARD_CODE + 1]; // Key modifiers
-  BOOLEAN                              KeyReady;
+  EFI_KEY_QUEUE                        KeyQueue;
+  EFI_KEY_QUEUE                        KeyQueueForNotify;
+
+  BOOLEAN                              CapsLock;
+  BOOLEAN                              NumLock;
+  BOOLEAN                              ScrollLock;
+  BOOLEAN                              SupportPartialKeys;
 
   // Mouse implementation
   BOOLEAN                              HasMouse;
@@ -112,7 +128,8 @@ typedef struct {
           CR (a, VIRTIO_INPUT_DEV, AbsolutePointer, VIRTIO_INPUT_SIG)
 
 // Bellow candidates to be included as Linux header
-#define KEY_PRESSED  1
+#define KEY_RELEASED  0
+#define KEY_PRESSED   1
 
 //
 // VirtioInput.c
@@ -154,6 +171,13 @@ VirtioKeyboardInit (
 VOID
 VirtioKeyboardUninit (
   IN OUT VIRTIO_INPUT_DEV  *Dev
+  );
+
+VOID
+EFIAPI
+VirtioKeyboardNotifyHandler (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 //
