@@ -38,6 +38,8 @@
 
 [Sources]
   VariableSmmRuntimeDxe.c
+  VariableSmmRuntimeDxeHook.c
+  VariableSmmRuntimeDxeHookInternal.h
   PrivilegePolymorphic.h
   Measurement.c
   VariableParsing.c
@@ -72,10 +74,12 @@
   ## UNDEFINED # Used to do smm communication
   gEfiSmmVariableProtocolGuid
   gEdkiiVariableLockProtocolGuid                ## PRODUCES
+  gEdkiiVariableSmmRuntimeDxeHookProtocolGuid   ## SOMETIMES_CONSUMES ## NOTIFY
   gEdkiiVarCheckProtocolGuid                    ## PRODUCES
   gEdkiiVariablePolicyProtocolGuid              ## PRODUCES
 
 [FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableSmmRuntimeDxeHook         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
 
 [Pcd]

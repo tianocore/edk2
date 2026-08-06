@@ -44,6 +44,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PrivilegePolymorphic.h"
 #include "VariableParsing.h"
+#include "VariableSmmRuntimeDxeHookInternal.h"
 
 EFI_HANDLE                      mHandle                    = NULL;
 EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable              = NULL;
@@ -1154,6 +1155,7 @@ RuntimeServiceSetVariable (
   UINTN                                     PayloadSize;
   SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE  *SmmVariableHeader;
   UINTN                                     VariableNameSize;
+  BOOLEAN                                   HookInvoked;
 
   //
   // Check input parameters.
@@ -1176,6 +1178,21 @@ RuntimeServiceSetVariable (
       (DataSize > mVariableBufferPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) - VariableNameSize))
   {
     return EFI_INVALID_PARAMETER;
+  }
+
+  HookInvoked = FALSE;
+  if (FeaturePcdGet (PcdEnableVariableSmmRuntimeDxeHook)) {
+    Status = VariableRuntimeHookPreSetVariable (
+               VariableName,
+               VendorGuid,
+               Attributes,
+               DataSize,
+               Data,
+               &HookInvoked
+               );
+    if (Status != EFI_SUCCESS) {
+      return Status;
+    }
   }
 
   AcquireLockOnlyAtBootTime (&mVariableServicesLock);
@@ -1206,6 +1223,10 @@ RuntimeServiceSetVariable (
 
 Done:
   ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+
+  if (FeaturePcdGet (PcdEnableVariableSmmRuntimeDxeHook)) {
+    VariableRuntimeHookPostSetVariable (HookInvoked, Status);
+  }
 
   if (!EfiAtRuntime ()) {
     if (!EFI_ERROR (Status)) {
@@ -1307,6 +1328,10 @@ OnExitBootServices (
   IN      VOID       *Context
   )
 {
+  if (FeaturePcdGet (PcdEnableVariableSmmRuntimeDxeHook)) {
+    VariableRuntimeHookStopDiscovery ();
+  }
+
   //
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE.
@@ -1388,6 +1413,9 @@ VariableAddressChangeEvent (
   EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeHobCacheBuffer);
   EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeNvCacheBuffer);
   EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeVolatileCacheBuffer);
+  if (FeaturePcdGet (PcdEnableVariableSmmRuntimeDxeHook)) {
+    VariableRuntimeHookConvertPointers ();
+  }
 }
 
 /**
@@ -1961,13 +1989,21 @@ VariableSmmRuntimeInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID       *SmmVariableRegistration;
-  VOID       *SmmVariableWriteRegistration;
-  EFI_EVENT  OnReadyToBootEvent;
-  EFI_EVENT  ExitBootServiceEvent;
-  EFI_EVENT  LegacyBootEvent;
+  VOID        *SmmVariableRegistration;
+  VOID        *SmmVariableWriteRegistration;
+  EFI_EVENT   OnReadyToBootEvent;
+  EFI_EVENT   ExitBootServiceEvent;
+  EFI_EVENT   LegacyBootEvent;
+  EFI_STATUS  Status;
 
   EfiInitializeLock (&mVariableServicesLock, TPL_NOTIFY);
+
+  if (FeaturePcdGet (PcdEnableVariableSmmRuntimeDxeHook)) {
+    Status = VariableRuntimeHookInitialize ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "Variable runtime hook discovery failed: %r\n", Status));
+    }
+  }
 
   //
   // Smm variable service is ready

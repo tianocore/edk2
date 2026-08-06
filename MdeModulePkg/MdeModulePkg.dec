@@ -639,6 +639,10 @@
   #  Include/Protocol/VariableLock.h
   gEdkiiVariableLockProtocolGuid = { 0xcd3d0a05, 0x9e24, 0x437c, { 0xa8, 0x91, 0x1e, 0xe0, 0x53, 0xdb, 0x76, 0x38 }}
 
+  ## Optional hooks around runtime SetVariable() MM communication.
+  # Include/Protocol/VariableSmmRuntimeDxeHook.h
+  gEdkiiVariableSmmRuntimeDxeHookProtocolGuid = { 0xdeddcd7a, 0xd76d, 0x46a3, { 0xba, 0xa5, 0xbf, 0x25, 0x50, 0x77, 0xdc, 0x10 }}
+
   ## Include/Protocol/VarCheck.h
   gEdkiiVarCheckProtocolGuid     = { 0xaf23b340, 0x97b4, 0x4685, { 0x8d, 0x4f, 0xa3, 0xf2, 0x81, 0x69, 0xb2, 0x1d } }
 
@@ -800,6 +804,12 @@
   #   FALSE - The UEFI variable runtime cache is disabled.<BR>
   # @Prompt Enable the UEFI variable runtime cache.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|TRUE|BOOLEAN|0x00010039
+
+  ## Indicates if optional hooks around runtime SetVariable() MM communication are enabled.<BR><BR>
+  #   TRUE  - Discover and invoke the variable runtime hook protocol.<BR>
+  #   FALSE - Do not discover or invoke the variable runtime hook protocol.<BR>
+  # @Prompt Enable variable runtime hooks.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableSmmRuntimeDxeHook|FALSE|BOOLEAN|0x00010043
 
   ## Indicates if the statistics about variable usage will be collected. This information is
   #  stored as a vendor configuration table into the EFI system table.
