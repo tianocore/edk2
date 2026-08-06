@@ -435,8 +435,11 @@ GraphicsOutputDriverBindingStart (
             }
 
             if (DeviceInfo->BarIndex == MAX_UINT8) {
-              if (Resources->AddrRangeMin == GraphicsInfo->FrameBufferBase) {
-                FrameBufferBase = Resources->AddrRangeMin;
+              if (  (GraphicsInfo->FrameBufferBase >= Resources->AddrRangeMin)
+                 && (GraphicsInfo->FrameBufferBase - Resources->AddrRangeMin <=
+                     Resources->AddrLen - GraphicsInfo->FrameBufferSize))
+              {
+                FrameBufferBase = GraphicsInfo->FrameBufferBase;
                 break;
               }
             } else {
