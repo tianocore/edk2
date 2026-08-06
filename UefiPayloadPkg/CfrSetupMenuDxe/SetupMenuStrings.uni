@@ -1,0 +1,15 @@
+///** @file
+//  String definitions for the CFR Setup Menu.
+//**/
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_CFR_MENU_TITLE  #language en-US  "Platform Setup Menu"
+                            #language fr-FR  "Platform Setup Menu"
+#string STR_CFR_MENU_HELP   #language en-US  "This menu lets you configure the bootloader options"
+                            #language fr-FR  "This menu lets you configure the bootloader options"
+#string STR_EMPTY_STRING    #language en-US  ""
+                            #language fr-FR  ""
+#string STR_INVALID_STRING  #language en-US  "INVALID"
+                            #language fr-FR  "INVALID"
