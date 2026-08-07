@@ -20,10 +20,34 @@
 
 STATIC UINT64   mCurrentAttr              = 0;
 STATIC BOOLEAN  mCurrentAttrRead          = FALSE;
-STATIC UINT64   mSevEncryptionMask        = 0;
-STATIC BOOLEAN  mSevEncryptionMaskSaved   = FALSE;
 STATIC BOOLEAN  mSevSnpCoherencySfwNo     = FALSE;
 STATIC BOOLEAN  mSevSnpCoherencySfwNoRead = FALSE;
+
+/**
+   Read the workarea to determine whether SEV is enabled. If enabled,
+   then return the SevEsWorkArea pointer.
+
+  **/
+STATIC
+SEC_SEV_ES_WORK_AREA *
+EFIAPI
+GetSevEsWorkArea (
+  VOID
+  )
+{
+  OVMF_WORK_AREA  *WorkArea;
+
+  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+
+  //
+  // If its not SEV guest then SevEsWorkArea is not valid.
+  //
+  if ((WorkArea == NULL) || (WorkArea->Header.GuestType != CcGuestTypeAmdSev)) {
+    return NULL;
+  }
+
+  return (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+}
 
 /**
   The function check if the specified Attr is set.
@@ -160,12 +184,14 @@ MemEncryptSevGetEncryptionMask (
   VOID
   )
 {
-  if (!mSevEncryptionMaskSaved) {
-    mSevEncryptionMask      = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask);
-    mSevEncryptionMaskSaved = TRUE;
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+
+  SevEsWorkArea = GetSevEsWorkArea ();
+  if (SevEsWorkArea == NULL) {
+    return 0;
   }
 
-  return mSevEncryptionMask;
+  return SevEsWorkArea->EncryptionMask;
 }
 
 /**

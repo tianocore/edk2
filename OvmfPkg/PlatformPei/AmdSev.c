@@ -583,5 +583,17 @@ SevInitializeRam (
       (UINT64)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaSize),
       EfiReservedMemoryType
       );
+
+    //
+    // The worker area is populated with the encryption mask for SEV. The Dxe
+    // phase needs to access to the encryption mask to update/check the C-bit
+    // in the page table entries. Preserve the work area so that the Dxe phase
+    // can simply lookup the encryption mask.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
+      (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
+      EfiReservedMemoryType
+      );
   }
 }
