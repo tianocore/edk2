@@ -210,6 +210,7 @@ MmcTransferBlock (
         break;  // Prevents delay once finished
       }
     }
+    gBS->Stall (1);
   }
 
   if (BufferSize > This->Media->BlockSize) {
@@ -323,6 +324,7 @@ MmcIoBlocks (
       if (!EFI_ERROR (Status)) {
         MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1, Response);
       }
+      gBS->Stall (1);
     }
 
     if (0 >= Timeout) {

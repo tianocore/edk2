@@ -596,6 +596,10 @@ MmcIdentificationMode (
       return Status;
     }
 
+    if (!OcrResponse.Ocr.PowerUp) {
+        gBS->Stall (1);
+    }
+
     Timeout--;
   } while (!OcrResponse.Ocr.PowerUp && (Timeout > 0));
 
