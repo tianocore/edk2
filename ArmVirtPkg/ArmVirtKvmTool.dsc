@@ -111,14 +111,8 @@
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|1
-
-  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
-
-  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
 
   #
   # TTY Terminal Type
@@ -129,7 +123,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
 
   #
@@ -161,30 +154,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
 
 [PcdsDynamicDefault.common]
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
-
-  #
-  # ARM General Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
-
-  #
-  # PCI settings
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
-
-  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
-  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
-
-  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
-
   #
   # Set video resolution for boot options and for text setup.
   # PlatformDxe can set the former at runtime.
@@ -193,14 +162,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
-
-  # Setup Flash storage variables
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x40000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x40000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x40000
 
   # Define PCD for emulating Runtime Variable storage when
   # CFI flash is absent.
@@ -233,14 +194,6 @@
   #
   # Architectural Protocols
   #
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  }
-
-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/NorFlashKvmtoolLib/NorFlashKvmtoolLib.inf
@@ -250,13 +203,6 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/KvmtoolRtcFdtClientLib/KvmtoolRtcFdtClientLib.inf
   }
-
-  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
-    <LibraryClasses>
-      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  }
-
 
   #
   # Platform Driver
