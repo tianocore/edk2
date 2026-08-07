@@ -325,7 +325,7 @@ MmcIoBlocks (
       }
     }
 
-    if (0 == Timeout) {
+    if (0 >= Timeout) {
       DEBUG ((DEBUG_ERROR, "The Card is busy\n"));
       return EFI_NOT_READY;
     }
