@@ -1041,8 +1041,7 @@ typedef union {
 #define EFI_ARM_PROC_ERROR_INFO_FLAG_OVERFLOW_FLAG              BIT3
 ///@}
 
-#define EFI_ARM_PROCESSOR_ERROR_INFO_STRUCTURE_REVISION  0
-
+#define EFI_ARM_PROCESSOR_ERROR_INFO_STRUCTURE_REVISION  1  // [CODE FIRST] 12708
 ///
 /// ARM Processor Error Information Structure
 ///
