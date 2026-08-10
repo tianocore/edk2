@@ -469,6 +469,23 @@ STATIC CONST CM_OBJ_PARSER  CmArmProcessorSpecificSubDataArchInfoParser[] = {
   { "IdAA64Zfr0",  sizeof (UINT64), "0x%llx", NULL },
 };
 
+/** A parser for EArmObjCoresightPmuInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmCoresightPmuInfoParser[] = {
+  { "Flags",                  sizeof (UINT8),           "0x%x",   NULL        },
+  { "Type",                   sizeof (UINT16),          "0x%x",   NULL        },
+  { "Identifier",             sizeof (UINT32),          "0x%x",   NULL        },
+  { "BaseAddress0",           sizeof (UINT64),          "0x%llx", NULL        },
+  { "BaseAddress1",           sizeof (UINT64),          "0x%llx", NULL        },
+  { "OverflowInterrupt",      sizeof (UINT32),          "0x%x",   NULL        },
+  { "OverflowInterruptFlags", sizeof (UINT32),          "0x%x",   NULL        },
+  { "ProcNodeToken",          sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "TypeInstanceToken",      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL        },
+  { "AcpiDeviceHid",          sizeof (CHAR8) * 9,       "0x%a",   PrintString },
+  { "AcpiDeviceUid",          sizeof (UINT32),          "0x%x",   NULL        },
+  { "ImplementationId",       sizeof (UINT32),          "0x%x",   NULL        },
+};
+
 /** A parser for EArmObjCmn600Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmn600InfoParser[] = {
@@ -1588,6 +1605,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuRegInfo,                CmArmDmc620PmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificBlockInfo,      CmArmProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificSubDataArchInfo,CmArmProcessorSpecificSubDataArchInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjCoresightPmuInfo,                CmArmCoresightPmuInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
