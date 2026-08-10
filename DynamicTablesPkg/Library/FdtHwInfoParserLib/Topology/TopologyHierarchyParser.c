@@ -14,6 +14,7 @@
 #include "CmObjectDescUtility.h"
 #include "Topology/TopologyHierarchyParser.h"
 #include "Topology/TopologyParser.h"
+#include "Topology/TopologyUtility.h"
 
 /** Count the number of nodes in a DT subtree.
 
@@ -112,6 +113,59 @@ HasTopLevelSocketNodes (
   return EFI_SUCCESS;
 }
 
+/** Populate the direct CPU child nodes below "\cpus".
+
+  @param [in] Fdt       Pointer to the Flattened Device Tree.
+  @param [in] CpusNode  Offset of the "\cpus" node.
+  @param [in] CpuCount  Number of CPU nodes.
+  @param [in] CpuNodes  On input, optional caller-allocated storage. On
+                        output, populated with the discovered CPU nodes.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No CPU nodes were found.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+PopulateCpuNodes (
+  IN      CONST VOID    *Fdt,
+  IN            INT32   CpusNode,
+  IN            UINT32  CpuCount,
+  IN            INT32   *CpuNodes
+  )
+{
+  INT32   CpuNode;
+  UINT32  Count;
+
+  if ((Fdt == NULL) || (CpuCount == 0) || (CpuNodes == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Count = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    if (!IsCpuDeviceNode (Fdt, CpuNode, NULL)) {
+      continue;
+    }
+
+    if (Count >= CpuCount) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    CpuNodes[Count] = CpuNode;
+    Count++;
+  }
+
+  if (Count != CpuCount) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Allocate buffers owned by the topology parser context.
 
   This helper discovers the CPUs present under "\cpus", derives the processor
@@ -143,6 +197,7 @@ AllocateTopologyContext (
 {
   EFI_STATUS  Status;
   UINT32      NodeCapacity;
+  UINT32      Index;
 
   if ((Context == NULL) || (Fdt == NULL)) {
     ASSERT (FALSE);
@@ -153,6 +208,24 @@ AllocateTopologyContext (
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return Status;
+  }
+
+  Context->CpuNodes = AllocateZeroPool (sizeof (*Context->CpuNodes) * Context->CpuCount);
+  if (Context->CpuNodes == NULL) {
+    ASSERT (FALSE);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = PopulateCpuNodes (Fdt, CpusNode, Context->CpuCount, Context->CpuNodes);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  // Check the default mask size can cover all the CPUs.
+  if ((Context->CpuCount + 63) / 64 > TOPOLOGY_MASK_SIZE) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
   }
 
   if (CpuMapNode >= 0) {
@@ -173,16 +246,83 @@ AllocateTopologyContext (
     NodeCapacity = Context->CpuCount + 1;
   }
 
-  Context->ProcHierarchyInfo = AllocateZeroPool (
-                                 sizeof (*Context->ProcHierarchyInfo) * NodeCapacity
-                                 );
-  if (Context->ProcHierarchyInfo == NULL) {
+  Context->ProcHierarchyBuffers = AllocateZeroPool (
+                                    sizeof (*Context->ProcHierarchyBuffers) * NodeCapacity
+                                    );
+  if (Context->ProcHierarchyBuffers == NULL) {
     ASSERT (FALSE);
     return EFI_OUT_OF_RESOURCES;
   }
 
+  for (Index = 0; Index < NodeCapacity; Index++) {
+    Context->ProcHierarchyBuffers[Index].ParentIndex = TOPOLOGY_INVALID_INDEX;
+    Context->ProcHierarchyBuffers[Index].CpuNode     = -1;
+  }
+
   Context->ProcHierarchyCount = NodeCapacity;
   return EFI_SUCCESS;
+}
+
+/** Find the index of a CPU DT node.
+
+  @param [in]  Context   Topology parser context.
+  @param [in]  CpuNode   CPU DT node offset.
+  @param [out] CpuIndex  CPU index.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The CPU node is not tracked in the context.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+FindCpuIndex (
+  IN  CONST TOPOLOGY_PARSER_CONTEXT  *Context,
+  IN        INT32                    CpuNode,
+  OUT       UINT32                   *CpuIndex
+  )
+{
+  UINT32  Index;
+
+  if ((Context == NULL) || (CpuIndex == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < Context->CpuCount; Index++) {
+    if (Context->CpuNodes[Index] == CpuNode) {
+      *CpuIndex = Index;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/** Propagate CPU ownership from a leaf to its ancestor hierarchy nodes.
+
+  @param [in, out] Context    Topology parser context.
+  @param [in]      NodeIndex  Leaf processor hierarchy node index.
+  @param [in]      CpuIndex   CPU index.
+**/
+STATIC
+VOID
+EFIAPI
+PropagateCpuToAncestors (
+  IN OUT TOPOLOGY_PARSER_CONTEXT  *Context,
+  IN     UINT32                   NodeIndex,
+  IN     UINT32                   CpuIndex
+  )
+{
+  UINT64  *CpuMask;
+
+  ASSERT (Context != NULL);
+
+  while (NodeIndex != TOPOLOGY_INVALID_INDEX) {
+    CpuMask = GetProcHierarchyCpuMask (Context, NodeIndex);
+    SetCpuMaskBit (CpuMask, CpuIndex);
+    NodeIndex = (UINT32)Context->ProcHierarchyBuffers[NodeIndex].ParentIndex;
+  }
 }
 
 /**
@@ -244,7 +384,7 @@ SetProcHierarchyProcessorId (
   }
 
   for (Index = 0; Index < Context->ProcHierarchyCount; Index++) {
-    Context->ProcHierarchyInfo[Index].ProcessorId = SocId;
+    Context->ProcHierarchyBuffers[Index].Info.ProcessorId = SocId;
   }
 }
 
@@ -310,7 +450,7 @@ AppendProcHierarchyNode (
   }
 
   NodeIndex = Context->CurrProcHierarchyIndex;
-  Node      = &Context->ProcHierarchyInfo[NodeIndex];
+  Node      = &Context->ProcHierarchyBuffers[NodeIndex].Info;
   ZeroMem (Node, sizeof (*Node));
   Node->Token = CreateProcHierarchyToken (NodeIndex);
 
@@ -318,9 +458,12 @@ AppendProcHierarchyNode (
   // Note: PPTT_VALID_FLAG_MASK should depend on the generation of
   // a SSDT CPU TOPOLOGY table. Assume it is always generated.
   //
-  Node->Flags             = Flags | PPTT_VALID_FLAG_MASK;
-  Node->ParentToken       = ParentToken;
-  Node->AcpiIdObjectToken = AcpiIdObjectToken;
+  Node->Flags                                          = Flags | PPTT_VALID_FLAG_MASK;
+  Node->ParentToken                                    = ParentToken;
+  Node->AcpiIdObjectToken                              = AcpiIdObjectToken;
+  Context->ProcHierarchyBuffers[NodeIndex].ParentIndex = (INT32)ParentIndex;
+  Context->ProcHierarchyBuffers[NodeIndex].Depth       = (ParentIndex == TOPOLOGY_INVALID_INDEX) ? 0 : (Context->ProcHierarchyBuffers[ParentIndex].Depth + 1);
+  Context->ProcHierarchyBuffers[NodeIndex].CpuNode     = -1;
 
   Context->CurrProcHierarchyIndex++;
   *ProcHierarchyNode      = Node;
@@ -356,6 +499,7 @@ AddCpuCpuCount (
   CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcHierarchyNode;
   UINT32                              CurrProcHierarchyIndex;
   UINT32                              Flags;
+  UINT32                              CpuIndex;
 
   Flags = PPTT_LEAF_FLAG_MASK;
   if (IsThread) {
@@ -375,6 +519,15 @@ AddCpuCpuCount (
     ASSERT (FALSE);
     return Status;
   }
+
+  Status = FindCpuIndex (Context, CpuNode, &CpuIndex);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Context->ProcHierarchyBuffers[CurrProcHierarchyIndex].CpuNode = CpuNode;
+  PropagateCpuToAncestors (Context, CurrProcHierarchyIndex, CpuIndex);
 
   return EFI_SUCCESS;
 }
@@ -506,7 +659,7 @@ CreateFlatTopology (
     Status = AddCpuCpuCount (
                Context,
                PackageIndex,
-               Context->ProcHierarchyInfo[PackageIndex].Token,
+               Context->ProcHierarchyBuffers[PackageIndex].Info.Token,
                CpuNode,
                FALSE
                );

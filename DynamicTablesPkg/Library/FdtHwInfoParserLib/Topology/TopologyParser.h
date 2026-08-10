@@ -20,6 +20,45 @@
 // Invalid Fdt index.
 #define TOPOLOGY_INVALID_INDEX  MAX_UINT32
 
+//
+// Number of UINT64 words needed to represent CpuCount CPUs as a bitmask.
+// Currently set to 4, i.e. 256 (=4 * 64) CPUs
+//
+#define TOPOLOGY_MASK_SIZE  4U
+
+/** Buffered representation of one processor-hierarchy node.
+
+  Each entry carries the CM_ARCH_COMMON_PROC_HIERARCHY_INFO object that will
+  be published along with parser-only metadata used to resolve parents,
+  ownership, and CPU sharing.
+**/
+typedef struct {
+  ///
+  /// Buffered processor hierarchy object to be published.
+  ///
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO    Info;
+
+  ///
+  /// CPU-sharing mask for this processor hierarchy node.
+  ///
+  UINT64                                CpuMasks[TOPOLOGY_MASK_SIZE];
+
+  ///
+  /// Parent index for this processor hierarchy entry.
+  ///
+  INT32                                 ParentIndex;
+
+  ///
+  /// Depth of this processor hierarchy node.
+  ///
+  UINT32                                Depth;
+
+  ///
+  /// Back-reference from hierarchy leaf nodes to the DT CPU node.
+  ///
+  INT32                                 CpuNode;
+} TOPOLOGY_PROC_HIERARCHY_BUFFERS;
+
 /** Working state for building processor-hierarchy and cache objects from DT.
 
   The context owns all temporary arrays used while deriving topology and cache
@@ -31,28 +70,33 @@ typedef struct {
   ///
   /// Parser instance used to access the DT and publish generated CM objects.
   ///
-  FDT_HW_INFO_PARSER_HANDLE             FdtParserHandle;
+  FDT_HW_INFO_PARSER_HANDLE          FdtParserHandle;
 
   ///
   /// Number of leaf nodes, i.e. cpus or threads.
   ///
-  UINT32                                CpuCount;
+  UINT32                             CpuCount;
 
   ///
   /// Number of processor hierarchy entries.
   ///
-  UINT32                                ProcHierarchyCount;
+  UINT32                             ProcHierarchyCount;
 
   ///
   /// Current index of the processor hierarchy entry being populated.
   /// This is a convenient context variable.
   ///
-  UINT32                                CurrProcHierarchyIndex;
+  UINT32                             CurrProcHierarchyIndex;
 
   ///
-  /// Buffered processor hierarchy objects to be published.
+  /// Buffered processor hierarchy objects and metadata arrays.
   ///
-  CM_ARCH_COMMON_PROC_HIERARCHY_INFO    *ProcHierarchyInfo;
+  TOPOLOGY_PROC_HIERARCHY_BUFFERS    *ProcHierarchyBuffers;
+
+  ///
+  /// Ordered list of CPU DT nodes under "\cpus".
+  ///
+  INT32                              *CpuNodes;
 } TOPOLOGY_PARSER_CONTEXT;
 
 /** Processor topology parser.

@@ -11,6 +11,7 @@
 
 #include "Topology/TopologyHierarchyParser.h"
 #include "Topology/TopologyParser.h"
+#include "Topology/TopologyUtility.h"
 #include "CmObjectDescUtility.h"
 
 /** Free memory owned by a topology parser context.
@@ -28,8 +29,12 @@ FreeTopologyContext (
     return;
   }
 
-  if (Context->ProcHierarchyInfo != NULL) {
-    FreePool (Context->ProcHierarchyInfo);
+  if (Context->ProcHierarchyBuffers != NULL) {
+    FreePool (Context->ProcHierarchyBuffers);
+  }
+
+  if (Context->CpuNodes != NULL) {
+    FreePool (Context->CpuNodes);
   }
 }
 
@@ -88,9 +93,9 @@ TopologyInfoParser (
     Status = AddSingleCmObjWithToken (
                Context.FdtParserHandle,
                CREATE_CM_ARCH_COMMON_OBJECT_ID (EArchCommonObjProcHierarchyInfo),
-               &Context.ProcHierarchyInfo[Index],
-               sizeof (Context.ProcHierarchyInfo[Index]),
-               Context.ProcHierarchyInfo[Index].Token
+               &Context.ProcHierarchyBuffers[Index].Info,
+               sizeof (Context.ProcHierarchyBuffers[Index].Info),
+               Context.ProcHierarchyBuffers[Index].Info.Token
                );
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);

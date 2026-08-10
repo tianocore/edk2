@@ -29,6 +29,8 @@
   Topology/TopologyHierarchyParser.h
   Topology/TopologyParser.c
   Topology/TopologyParser.h
+  Topology/TopologyUtility.c
+  Topology/TopologyUtility.h
   Pci/PciConfigSpaceParser.c
   Pci/PciConfigSpaceParser.h
   Serial/SerialPortParser.c
