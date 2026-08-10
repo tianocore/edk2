@@ -502,6 +502,38 @@ FdtGetInterruptMap (
   OUT       INTERRUPT_MAP_ENTRY_INFO  *Entry
   );
 
+/** Resolve an interrupt specifier for a node through interrupt nexus nodes.
+
+  If the interrupt parent domain of Node is already an interrupt-controller,
+  the requested interrupt specifier is returned directly from the node
+  "interrupts" property. Otherwise, the interrupt specifier is resolved
+  recursively through one or more parent nexus "interrupt-map" properties
+  until a final interrupt-controller is reached.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node            Node to get the interrupt from.
+  @param [in]  Index           Index of the interrupt to get.
+  @param [out] Interrupt       If success, contains the resolved interrupt
+                               specifier.
+  @param [out] InterruptCells  If success, contains the "#interrupt-cells"
+                               value of the final interrupt-controller.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested interrupt was not found.
+  @retval EFI_UNSUPPORTED         Unsupported interrupt-map format.
+**/
+EFI_STATUS
+EFIAPI
+FdtResolveInterrupt (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT CONST UINT32  **Interrupt,
+  OUT       INT32   *InterruptCells
+  );
+
 /** Get the "#address-cells" and/or "#size-cells" property of the node.
 
   According to the Device Tree specification, s2.3.5 "#address-cells and
