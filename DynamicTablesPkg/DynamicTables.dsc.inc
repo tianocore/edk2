@@ -130,6 +130,7 @@
   DynamicTablesPkg/Library/Acpi/Arm/AcpiGtdtLibArm/AcpiGtdtLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiMadtLibArm/AcpiMadtLibArm.inf
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiApmtLibArm/AcpiApmtLibArm.inf
 
   # AML Fixup (Arm specific)
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmn600LibArm/SsdtCmn600LibArm.inf
@@ -162,6 +163,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiGtdtLibArm/AcpiGtdtLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiMadtLibArm/AcpiMadtLibArm.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiApmtLibArm/AcpiApmtLibArm.inf
 
       # AML Fixup
       #  Common
