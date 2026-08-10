@@ -38,6 +38,7 @@
     UINT32  ProximityDomain;                  // {default = 0}
     UINT32  ClockDomain;                      // {default = 0}
     UINT32  AffinityFlags;                    // {default = 0}
+    UINT16  TrbeInterrupt;                    // {default = 0}
   } CM_ARM_GICC_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
