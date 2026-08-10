@@ -1174,6 +1174,230 @@ FdtGetInterruptMap (
   return EFI_NOT_FOUND;
 }
 
+/** Resolve a child interrupt specifier through interrupt nexus nodes.
+
+  This helper supports nexus nodes whose interrupt-map matching does not depend
+  on child unit-address cells. If an interrupt-map entry targets another nexus,
+  resolution continues recursively until a real interrupt-controller is found.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  NexusNode       Offset of the interrupt nexus or controller
+                               node.
+  @param [in]  InterruptData   Pointer to the child interrupt specifier.
+  @param [in]  InputInterruptCells Number of cells in InterruptData.
+  @param [out] Interrupt       If success, points at the resolved interrupt
+                               specifier for the final controller.
+  @param [out] InterruptCells  If success, number of cells in Interrupt.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No matching interrupt-map entry found.
+  @retval EFI_UNSUPPORTED         Unsupported interrupt-map format.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+FdtResolveInterruptInternal (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   NexusNode,
+  IN  CONST UINT32  *InterruptData,
+  IN        INT32   InputInterruptCells,
+  OUT CONST UINT32  **Interrupt,
+  OUT       INT32   *InterruptCells
+  )
+{
+  EFI_STATUS                Status;
+  INTERRUPT_MAP_ENTRY_INFO  MapEntry;
+  CONST UINT32              *MapMask;
+  INT32                     ChildAddressCells;
+  INT32                     MapMaskSize;
+  UINT32                    ChildCells;
+  UINT32                    EntryIndex;
+  UINT32                    Index;
+
+  if ((Fdt == NULL) ||
+      (InterruptData == NULL) ||
+      (Interrupt == NULL) ||
+      (InterruptCells == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (FdtNodeHasProperty (Fdt, NexusNode, "interrupt-controller")) {
+    *Interrupt      = InterruptData;
+    *InterruptCells = InputInterruptCells;
+    return EFI_SUCCESS;
+  }
+
+  ChildAddressCells = FdtAddressCells (Fdt, NexusNode);
+  if (ChildAddressCells < 0) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  //
+  // An "interrupt-map" child-side key is encoded as:
+  // <child-unit-address child-interrupt-specifier>.
+  //
+  ChildCells = (UINT32)ChildAddressCells + (UINT32)InputInterruptCells;
+  if ((UINT32)ChildAddressCells > FDT_MAX_NCELLS) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  //
+  // The "interrupt-map-mask" is used to mask children ids:
+  // <child-unit-address child-interrupt-specifier>.
+  //
+  MapMask = FdtGetProp (Fdt, NexusNode, "interrupt-map-mask", &MapMaskSize);
+  if ((MapMask == NULL) || (MapMaskSize != (INT32)(ChildCells * sizeof (UINT32)))) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  //
+  // Child unit-address translation across intermediate buses is not handled
+  // here. Support the common case where the interrupt-map ignores it.
+  //
+  for (Index = 0; Index < (UINT32)ChildAddressCells; Index++) {
+    if (Fdt32ToCpu (MapMask[Index]) != 0) {
+      return EFI_UNSUPPORTED;
+    }
+  }
+
+  for (EntryIndex = 0; ; EntryIndex++) {
+    INT32  ParentNode;
+
+    Status = FdtGetInterruptMap (Fdt, NexusNode, EntryIndex, TRUE, &MapEntry);
+    if (Status == EFI_NOT_FOUND) {
+      break;
+    } else if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (FALSE);
+      return Status;
+    }
+
+    if ((MapEntry.ChildAddressCells != ChildAddressCells) ||
+        (MapEntry.ChildInterruptCells != InputInterruptCells))
+    {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    for (Index = 0; Index < (UINT32)InputInterruptCells; Index++) {
+      if (MapEntry.ChildInterrupt[Index] !=
+          (Fdt32ToCpu (InterruptData[Index]) &
+           Fdt32ToCpu (MapMask[(UINT32)ChildAddressCells + Index])))
+      {
+        //
+        // This helper only supports nexus mappings that ignore the child
+        // unit-address, so only the interrupt specifier cells come from
+        // InterruptData.
+        //
+        break;
+      }
+    }
+
+    if (Index == (UINT32)InputInterruptCells) {
+      ParentNode = FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*MapEntry.InterruptParent));
+      if (ParentNode < 0) {
+        ASSERT (FALSE);
+        return EFI_ABORTED;
+      }
+
+      return FdtResolveInterruptInternal (
+               Fdt,
+               ParentNode,
+               MapEntry.ParentInterrupt,
+               MapEntry.ParentInterruptCells,
+               Interrupt,
+               InterruptCells
+               );
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/** Resolve an interrupt specifier for a node through interrupt nexus nodes.
+
+  If the interrupt parent domain of Node is already an interrupt-controller,
+  the requested interrupt specifier is returned directly from the node
+  "interrupts" property. Otherwise, the interrupt specifier is resolved
+  recursively through one or more parent nexus "interrupt-map" properties
+  until a final interrupt-controller is reached.
+
+  @param [in]  Fdt        Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node       Node to get the interrupt from.
+  @param [in]  Index      Index of the interrupt to get.
+  @param [out] Interrupt  If success, contains the resolved interrupt
+                          specifier.
+  @param [out] InterruptCells If success, number of cells in Interrupt.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested interrupt was not found.
+  @retval EFI_UNSUPPORTED         Unsupported interrupt-map format.
+**/
+EFI_STATUS
+EFIAPI
+FdtResolveInterrupt (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT CONST UINT32  **Interrupt,
+  OUT       INT32   *InterruptCells
+  )
+{
+  EFI_STATUS    Status;
+  INT32         IntcNode;
+  INT32         IntCells;
+  CONST UINT32  *InterruptData;
+  INT32         DataSize;
+  UINTN         EntryOffset;
+
+  if ((Fdt == NULL) || (Interrupt == NULL) || (InterruptCells == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = FdtGetIntDomainNode (Fdt, Node, &IntcNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, FALSE, &IntCells);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  InterruptData = FdtGetProp (Fdt, Node, "interrupts", &DataSize);
+  if ((InterruptData == NULL) || (DataSize <= 0)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  EntryOffset = (UINTN)Index * (UINTN)IntCells;
+  if ((EntryOffset + (UINTN)IntCells) > ((UINTN)DataSize / sizeof (UINT32))) {
+    return EFI_NOT_FOUND;
+  }
+
+  InterruptData += EntryOffset;
+
+  return FdtResolveInterruptInternal (
+           Fdt,
+           IntcNode,
+           InterruptData,
+           IntCells,
+           Interrupt,
+           InterruptCells
+           );
+}
+
 /** Get the "#address-cells" and/or "#size-cells" property of the node.
 
   According to the Device Tree specification, s2.3.5 "#address-cells and

@@ -52,11 +52,9 @@ TimerNodeParser (
 {
   EFI_STATUS    Status;
   CONST UINT32  *Data;
-  INT32         IntcNode;
-  UINT32        GicVersion;
+  CONST UINT32  *DecodedInterruptData;
+  INT32         DecodedInterruptCells;
   INT32         DataSize;
-  INT32         IntCells;
-  INT32         IntCount;
   UINT32        AlwaysOnTimerFlag;
 
   if ((Fdt == NULL) ||
@@ -73,92 +71,94 @@ TimerNodeParser (
     AlwaysOnTimerFlag = BIT2;
   }
 
-  // Get the associated interrupt-controller.
-  Status = FdtGetIntControllerNode (Fdt, TimerNode, &IntcNode);
-  if (EFI_ERROR (Status)) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtSecureTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     ASSERT (0);
     return Status;
-  }
-
-  // Check that the interrupt-controller node is a Gic.
-  Status = GetGicVersion (Fdt, IntcNode, &GicVersion);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, FALSE, &IntCells);
-  if (EFI_ERROR (Status) || (IntCells == 0)) {
-    ASSERT (0);
-    ASSERT (IntCells != 0);
-    if (Status == EFI_NOT_FOUND) {
-      // Should have found the node.
-      Status = EFI_ABORTED;
-    }
-
-    return Status;
-  }
-
-  Data     = FdtGetProp (Fdt, TimerNode, "interrupts", &DataSize);
-  IntCount = DataSize / IntCells / sizeof (UINT32);
-  if ((Data == NULL) ||
-      (IntCount > FdtMaxTimerItem))
-  {
-    // If error or not FdtMaxTimerItem interrupts.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  if ((IntCount > FdtSecureTimerIrq)) {
-    GenericTimerInfo->SecurePL1TimerGSIV =
-      FdtGetInterruptId (&Data[FdtSecureTimerIrq * IntCells], DataSize);
-    GenericTimerInfo->SecurePL1TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtSecureTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
+  } else if (Status == EFI_NOT_FOUND) {
+    GenericTimerInfo->SecurePL1TimerGSIV  = 0;
+    GenericTimerInfo->SecurePL1TimerFlags = 0;
   } else {
-    // No timer, no luck
-    ASSERT (0);
-    return EFI_ABORTED;
+    GenericTimerInfo->SecurePL1TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->SecurePL1TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  if ((IntCount > FdtNonSecureTimerIrq)) {
-    GenericTimerInfo->NonSecurePL1TimerGSIV =
-      FdtGetInterruptId (&Data[FdtNonSecureTimerIrq * IntCells], DataSize);
-    GenericTimerInfo->NonSecurePL1TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtNonSecureTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
-  } else {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtNonSecureTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT (0);
+    return Status;
+  } else if (Status == EFI_NOT_FOUND) {
     GenericTimerInfo->NonSecurePL1TimerGSIV  = 0;
     GenericTimerInfo->NonSecurePL1TimerFlags = 0;
+  } else {
+    GenericTimerInfo->NonSecurePL1TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->NonSecurePL1TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  if ((IntCount > FdtVirtualTimerIrq)) {
-    GenericTimerInfo->VirtualTimerGSIV =
-      FdtGetInterruptId (&Data[FdtVirtualTimerIrq * IntCells], DataSize);
-    GenericTimerInfo->VirtualTimerFlags =
-      FdtGetInterruptFlags (&Data[FdtVirtualTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
-  } else {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtVirtualTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT (FALSE);
+    return Status;
+  } else if (Status == EFI_NOT_FOUND) {
     GenericTimerInfo->VirtualTimerGSIV  = 0;
     GenericTimerInfo->VirtualTimerFlags = 0;
+  } else {
+    GenericTimerInfo->VirtualTimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->VirtualTimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  if ((IntCount > FdtHypervisorTimerIrq)) {
-    GenericTimerInfo->NonSecurePL2TimerGSIV =
-      FdtGetInterruptId (&Data[FdtHypervisorTimerIrq * IntCells], DataSize);
-    GenericTimerInfo->NonSecurePL2TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtHypervisorTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
-  } else {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtHypervisorTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT (0);
+    return Status;
+  } else if (Status == EFI_NOT_FOUND) {
     GenericTimerInfo->NonSecurePL2TimerGSIV  = 0;
     GenericTimerInfo->NonSecurePL2TimerFlags = 0;
+  } else {
+    GenericTimerInfo->NonSecurePL2TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->NonSecurePL2TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  if ((IntCount > FdtHypervisorVTimerIrq)) {
-    GenericTimerInfo->VirtualPL2TimerGSIV =
-      FdtGetInterruptId (&Data[FdtHypervisorVTimerIrq * IntCells], DataSize);
-    GenericTimerInfo->VirtualPL2TimerFlags =
-      FdtGetInterruptFlags (&Data[FdtHypervisorVTimerIrq * IntCells], DataSize) | AlwaysOnTimerFlag;
-  } else {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtHypervisorVTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT (0);
+    return Status;
+  } else if (Status == EFI_NOT_FOUND) {
     GenericTimerInfo->VirtualPL2TimerGSIV  = 0;
     GenericTimerInfo->VirtualPL2TimerFlags = 0;
+  } else {
+    GenericTimerInfo->VirtualPL2TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->VirtualPL2TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
   // Setup default values

@@ -90,13 +90,13 @@ SerialPortNodeParser (
   IN  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo
   )
 {
-  EFI_STATUS   Status;
-  INT32        IntcNode;
-  CONST UINT8  *SizeValue;
-
-  INT32  AddressCells;
-  INT32  SizeCells;
-  INT32  IntCells;
+  EFI_STATUS    Status;
+  INT32         IntcNode;
+  CONST UINT8   *SizeValue;
+  CONST UINT32  *DecodedInterruptData;
+  INT32         DecodedInterruptCells;
+  INT32         AddressCells;
+  INT32         SizeCells;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -166,21 +166,19 @@ SerialPortNodeParser (
     return Status;
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, FALSE, &IntCells);
+  Status = FdtResolveInterrupt (
+             Fdt,
+             SerialPortNode,
+             0,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
   }
 
-  Data = FdtGetProp (Fdt, SerialPortNode, "interrupts", &DataSize);
-  if ((Data == NULL) || (DataSize != (IntCells * sizeof (UINT32)))) {
-    // If error or not 1 interrupt.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  SerialPortInfo->Interrupt = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
+  SerialPortInfo->Interrupt = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
 
   /*
    * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.

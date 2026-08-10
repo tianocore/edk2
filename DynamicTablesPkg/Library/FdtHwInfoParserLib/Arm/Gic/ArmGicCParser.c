@@ -289,52 +289,49 @@ GicCIntcNodeParser (
   )
 {
   EFI_STATUS        Status;
-  INT32             IntCells;
   CM_ARM_GICC_INFO  *GicCInfo;
 
-  CONST UINT8  *Data;
-  INT32        DataSize;
-  UINT32       MaintenanceInterrupt;
-  UINT32       Flags;
+  CONST UINT32  *DecodedInterruptData;
+  INT32         DecodedInterruptCells;
+  UINT32        MaintenanceInterrupt;
+  UINT32        Flags;
 
   if (GicCCmObjDesc == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, FALSE, &IntCells);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
   // Get the GSIV maintenance interrupt.
   // According to the DT bindings, this could be the:
   // "Interrupt source of the parent interrupt controller on secondary GICs"
   // but it is assumed that only one Gic is available.
-  Data = FdtGetProp (Fdt, GicIntcNode, "interrupts", &DataSize);
-  if ((Data != NULL) && (DataSize == (IntCells * sizeof (UINT32)))) {
-    MaintenanceInterrupt = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
-    Flags                = DT_IRQ_IS_EDGE_TRIGGERED (
-                             Fdt32ToCpu (((UINT32 *)Data)[IRQ_FLAGS_OFFSET])
-                             ) ?
-                           EFI_ACPI_6_3_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS :
-                           0;
-    for (GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data; CpuCount--; GicCInfo++) {
-      GicCInfo->VGICMaintenanceInterrupt = MaintenanceInterrupt;
-      GicCInfo->Flags                   |= Flags;
-    }
-
-    return Status;
-  } else if (DataSize < 0) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             GicIntcNode,
+             0,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (Status == EFI_NOT_FOUND) {
     // This property is optional and was not found. Just return.
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
     return Status;
   }
 
-  // The property exists and its size doesn't match for one interrupt.
-  ASSERT (0);
-  return EFI_ABORTED;
+  MaintenanceInterrupt = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+  Flags                = DT_IRQ_IS_EDGE_TRIGGERED (
+                           Fdt32ToCpu (DecodedInterruptData[IRQ_FLAGS_OFFSET])
+                           ) ?
+                         EFI_ACPI_6_3_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS :
+                         0;
+  for (GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data; CpuCount--; GicCInfo++) {
+    GicCInfo->VGICMaintenanceInterrupt = MaintenanceInterrupt;
+    GicCInfo->Flags                   |= Flags;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /** Parse a Gic compatible interrupt-controller node,
@@ -692,14 +689,13 @@ GicCPmuNodeParser (
   )
 {
   EFI_STATUS        Status;
-  INT32             IntCells;
   INT32             PmuNode;
   UINT32            PmuNodeCount;
   UINT32            PmuIrq;
   UINT32            Index;
   CM_ARM_GICC_INFO  *GicCInfo;
-  CONST UINT8       *Data;
-  INT32             DataSize;
+  CONST UINT32      *DecodedInterruptData;
+  INT32             DecodedInterruptCells;
 
   if (GicCCmObjDesc == NULL) {
     ASSERT (GicCCmObjDesc != NULL);
@@ -739,44 +735,88 @@ GicCPmuNodeParser (
     }
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, FALSE, &IntCells);
+  //
+  // There must be either:
+  // - 1 interrupt per core
+  // - 1 common interrupt
+  //
+
+  Status = FdtResolveInterrupt (
+             Fdt,
+             PmuNode,
+             0,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
 
-  Data = FdtGetProp (Fdt, PmuNode, "interrupts", &DataSize);
-  if ((Data == NULL) || ((DataSize != (GicCCmObjDesc->Count * IntCells * sizeof (UINT32))) && (DataSize != (IntCells * sizeof (UINT32))))) {
-    // If error, not 1 interrupt or not 1 interrupt per core.
-    ASSERT (Data != NULL);
-    ASSERT (DataSize == (IntCells * sizeof (UINT32)) || DataSize == (GicCCmObjDesc->Count * IntCells * sizeof (UINT32)));
-    return EFI_ABORTED;
-  }
+  PmuIrq = FdtGetInterruptId ((CONST UINT32 *)DecodedInterruptData, DecodedInterruptCells);
 
-  if (DataSize == (IntCells * sizeof (UINT32))) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             PmuNode,
+             1,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (Status == EFI_NOT_FOUND) {
     // One shared PMU IRQ
-    PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
+    Status = FdtResolveInterrupt (
+               Fdt,
+               PmuNode,
+               0,
+               &DecodedInterruptData,
+               &DecodedInterruptCells
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
+    //
     // Only supports PPI 23 for now.
     // According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23. A non BSA
     // compliant system may assign a different IRQ for the PMU, however this
     // is not implemented for now.
+    //
     if (PmuIrq != BSA_PMU_IRQ) {
       ASSERT (PmuIrq == BSA_PMU_IRQ);
       return EFI_ABORTED;
     }
 
+    //
+    // One common interrupt.
+    //
     for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
       GicCInfo[Index].PerformanceInterruptGsiv = PmuIrq;
     }
-  } else {
-    // One PMU IRQ per core
-    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)Data, DataSize);
 
-      Data += IntCells * sizeof (UINT32);
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // One PMU IRQ per core.
+  //
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    Status = FdtResolveInterrupt (
+               Fdt,
+               PmuNode,
+               Index,
+               &DecodedInterruptData,
+               &DecodedInterruptCells
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return EFI_ABORTED;
     }
+
+    GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)DecodedInterruptData, DecodedInterruptCells);
   }
 
   return EFI_SUCCESS;
