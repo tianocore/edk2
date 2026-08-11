@@ -15,6 +15,7 @@ UefiMain (
   (VOID)ImageHandle;
 
   Print (L"\r\n");
+  Print (L"Ahihiiii");
   Print (L"====================================\r\n");
   Print (L" Hello from Thanh Lam's UEFI App!\r\n");
   Print (L"====================================\r\n");
