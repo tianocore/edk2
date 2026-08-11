@@ -777,6 +777,7 @@
 #
 ################################################################################
 [Components]
+  MyPkg/Application/MyHello/MyHello.inf
   OvmfPkg/ResetVector/ResetVector.inf
 
   #
