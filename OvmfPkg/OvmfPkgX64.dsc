@@ -868,6 +868,7 @@
   #
   # DXE Phase modules
   #
+  MyPkg/Drivers/BootCounterDxe/BootCounterDxe.inf
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf

@@ -3,3 +3,9 @@
   PACKAGE_NAME      = MyPkg
   PACKAGE_GUID      = 8C8E7C68-49E0-4BF9-A0B4-60A738FC7382
   PACKAGE_VERSION   = 0.1
+
+[Includes]
+  Include
+
+[Guids]
+  gMyBootTrackerGuid = {  0x417d3df1,  0x0d0a,  0x4c79, { 0xa3, 0xc4, 0x87, 0x4a, 0x6f, 0xd1, 0xf3, 0x0d } }

@@ -1,0 +1,27 @@
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BootCounterDxe
+  FILE_GUID      = 49A11833-D9E2-4C3B-B9CC-A3C45B0D0BB6
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = BootCounterDxeEntryPoint
+
+[Sources]
+  BootCounterDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MyPkg/MyPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  DebugLib
+
+[Guids]
+  gMyBootTrackerGuid
+
+[Depex]
+  TRUE
