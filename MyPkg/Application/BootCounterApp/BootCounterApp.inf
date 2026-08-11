@@ -1,0 +1,22 @@
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BootCounterApp
+  FILE_GUID      = da5d5dd6-dbf5-48c7-972b-08ad822273e8
+  MODULE_TYPE    = UEFI_APPLICATION
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = UefiMain
+
+[Sources]
+  BootCounterApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MyPkg/MyPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+
+[Guids]
+  gMyBootTrackerGuid
