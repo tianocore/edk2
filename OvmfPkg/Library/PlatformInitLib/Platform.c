@@ -1003,7 +1003,7 @@ PlatformInitEmuVariableNvStore (
   ASSERT (Size < EmuVariableNvStoreSize);
 
   if (!PlatformValidateNvVarStore (Base, PcdGet32 (PcdCfvRawDataSize))) {
-    ASSERT (FALSE);
+    DEBUG ((DEBUG_ERROR, "Invalid FlashNvStorage, EmuVariableNvStore not initialized.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
