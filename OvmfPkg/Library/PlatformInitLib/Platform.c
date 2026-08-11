@@ -787,6 +787,8 @@ PlatformValidateNvVarStore (
   UINTN                          VariableBase;
   UINT32                         VariableOffset;
   UINT32                         VariableOffsetBeforeAlign;
+  UINT32                         VariableNameSize;
+  UINT32                         VariableDataSize;
   EFI_FIRMWARE_VOLUME_HEADER     *NvVarStoreFvHeader;
   VARIABLE_STORE_HEADER          *NvVarStoreHeader;
   AUTHENTICATED_VARIABLE_HEADER  *VariableHeader;
@@ -888,17 +890,26 @@ RETRY:
 
       VariableOffset = NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
     } else {
-      if (!((VariableHeader->State == VAR_HEADER_VALID_ONLY) ||
-            (VariableHeader->State == VAR_ADDED) ||
-            (VariableHeader->State == (VAR_ADDED & VAR_DELETED)) ||
-            (VariableHeader->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION)) ||
-            (VariableHeader->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION & VAR_DELETED))))
-      {
-        DEBUG ((DEBUG_ERROR, "NvVarStore Variable header State was invalid.\n"));
-        return FALSE;
+      if (VariableHeader->State == 0xFF) {
+        DEBUG ((DEBUG_INFO, "NvVarStore variable header State is unwritten.\n"));
+        VariableNameSize = 0;
+        VariableDataSize = 0;
+      } else {
+        if (!((VariableHeader->State == VAR_HEADER_VALID_ONLY) ||
+              (VariableHeader->State == VAR_ADDED) ||
+              (VariableHeader->State == (VAR_ADDED & VAR_DELETED)) ||
+              (VariableHeader->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION)) ||
+              (VariableHeader->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION & VAR_DELETED))))
+        {
+          DEBUG ((DEBUG_ERROR, "NvVarStore Variable header State was invalid.\n"));
+          return FALSE;
+        }
+
+        VariableNameSize = VariableHeader->NameSize;
+        VariableDataSize = VariableHeader->DataSize;
       }
 
-      VariableOffset += sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableHeader->NameSize + VariableHeader->DataSize;
+      VariableOffset += sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableNameSize + VariableDataSize;
       // Verify VariableOffset should be less than or equal NvVarStoreHeader->Size - sizeof(VARIABLE_STORE_HEADER)
       if (VariableOffset > (NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER))) {
         DEBUG ((DEBUG_ERROR, "NvVarStore Variable header VariableOffset was invalid.\n"));
