@@ -1,7 +1,7 @@
 /** @file
   Definitions of RedfishHttpOperation
 
-  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2024-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,6 +19,7 @@
 #define REDFISH_HTTP_HEADER_CONNECTION_STR       "Connection"
 #define REDFISH_HTTP_HEADER_CONNECTION_VALUE     "Keep-Alive"
 #define REDFISH_HTTP_CONTENT_ENCODING_NONE       "None"
+#define REDFISH_HTTP_CONTENT_LENGTH_MAXIMUM      0xA00000  // 10MB in bytes is 0xA00000 in hex
 #define ASCII_STR_DUPLICATE(a)  (AllocateCopyPool (AsciiStrSize ((a)), (a)))
 
 /**
