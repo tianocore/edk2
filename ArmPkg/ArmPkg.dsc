@@ -152,7 +152,6 @@
   ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
-  ArmPkg/Drivers/SmmuDxe/SmmuDxe.inf
 
   ArmPkg/Library/FmpDevicePsaFwuLib/FmpDevicePsaFwuLib.inf
 
