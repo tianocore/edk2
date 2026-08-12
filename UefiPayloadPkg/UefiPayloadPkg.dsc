@@ -202,6 +202,15 @@
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
   MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
 
+# Force non-runtime PE/COFF sections to be aligned at 4KB boundaries so
+# DXE Core can apply page-level image protection, including NX.
+[BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+  XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+  XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+  MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+
 [BuildOptions.IA32.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.X64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
 
