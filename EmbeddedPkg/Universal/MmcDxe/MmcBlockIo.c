@@ -250,10 +250,10 @@ MmcIoBlocks (
   UINTN                  BytesRemainingToBeTransfered;
   UINTN                  BlockCount;
   UINTN                  ConsumeSize;
-  UINT32                 MaxBlock;
+  UINTN                  MaxBlock;
   UINTN                  RemainingBlock;
 
-  BlockCount      = 1;
+  MaxBlock        = 1;
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
   ASSERT (MmcHostInstance != NULL);
   MmcHost = MmcHostInstance->MmcHost;
@@ -283,7 +283,7 @@ MmcIoBlocks (
   }
 
   if (MMC_HOST_HAS_ISMULTIBLOCK (MmcHost) && MmcHost->IsMultiBlock (MmcHost)) {
-    BlockCount = BufferSize / This->Media->BlockSize;
+    MaxBlock = BufferSize / This->Media->BlockSize;
   }
 
   // All blocks must be within the device
@@ -300,16 +300,14 @@ MmcIoBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Max block number in single cmd is 65535 blocks.
-  MaxBlock                     = 0xFFFF;
-  RemainingBlock               = BlockCount;
+  RemainingBlock               = BufferSize / This->Media->BlockSize;
   BytesRemainingToBeTransfered = BufferSize;
   while (BytesRemainingToBeTransfered > 0) {
-    if (RemainingBlock <= MaxBlock) {
-      BlockCount = RemainingBlock;
-    } else {
-      BlockCount = MaxBlock;
-    }
+    //
+    // Max block number in single cmd is 65535 blocks.
+    // Access as many blocks as possible.
+    //
+    BlockCount = MIN (MaxBlock, MIN (RemainingBlock, 0xFFFF));
 
     // Check if the Card is in Ready status
     CmdArg      = MmcHostInstance->CardInfo.RCA << 16;
