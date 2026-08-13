@@ -17,6 +17,7 @@
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
 #include <ConfidentialComputingGuestAttr.h>
+#include "PeiDxeMemEncryptSevLibInternal.h"
 
 STATIC UINT64   mCurrentAttr              = 0;
 STATIC BOOLEAN  mCurrentAttrRead          = FALSE;
