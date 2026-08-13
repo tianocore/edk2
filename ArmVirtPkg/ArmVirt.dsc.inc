@@ -157,6 +157,7 @@ DEFINE FD_SIZE_IN_MB    = 3
 
   PlatformPeiLib|ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmVirtPkg/Library/ArmVirtMemoryInitPeiLib/ArmVirtMemoryInitPeiLib.inf
+  PlatformMemoryProtectionLib|OvmfPkg/Library/PlatformMemoryProtectionLib/PlatformMemoryProtectionLib.inf
   ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
 
   # ARM PL031 RTC Driver
