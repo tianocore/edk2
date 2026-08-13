@@ -1837,6 +1837,14 @@ STATIC CONST CM_OBJ_PARSER  CmX64Ia32ErrSourceNmiInfoParser[] = {
   { "MaxRawDataLength", 4,                                "0x%x",NULL },
 };
 
+/** A parser for CmX64ProcessorSpecificBlockInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ProcessorSpecificBlockInfoParser[] = {
+  { "BlockIdentifier",        sizeof (UINT8),  "0x%x", NULL },
+  { "Revision",               sizeof (UINT16), "0x%x", NULL },
+  { "UseConditionAttributes", sizeof (UINT32), "0x%x", NULL },
+};
+
 /** A parser for X64 namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
@@ -1864,6 +1872,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32CorrectedMachineCheckInfo,CmX64Ia32ErrSourceCorrectedMachineCheckInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32DeferredMachineCheckInfo, CmX64Ia32ErrSourceDeferredMachineCheckInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32NmiInfo,                  CmX64Ia32ErrSourceNmiInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjProcessorSpecificBlockInfo,            CmX64ProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 
