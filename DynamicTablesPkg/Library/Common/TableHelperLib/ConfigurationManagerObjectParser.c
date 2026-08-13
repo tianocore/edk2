@@ -434,6 +434,15 @@ STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuRegInfoParser[] = {
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
+/** A parser for EArmObjProcessorSpecificBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmProcessorSpecificBlockInfoParser[] = {
+  { "Revision",     sizeof (UINT16),                               "0x%x", NULL },
+  { "VendorId",     sizeof (UINT16),                               "0x%x", NULL },
+  { "SubType",      sizeof (ARM_PROCESSOR_SPECIFIC_DATA_SUB_TYPE), "0x%x", NULL },
+  { "SubDataToken", sizeof (CM_OBJECT_TOKEN),                      "0x%p", NULL },
+};
+
 /** A parser for EArmObjProcessorSpecificSubDataArchInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmProcessorSpecificSubDataArchInfoParser[] = {
@@ -1558,6 +1567,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjEtInfo,                          CmArmEtInfo),
   CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuSocketInfo,             CmArmDmc620PmuSocketInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuRegInfo,                CmArmDmc620PmuRegInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificBlockInfo,      CmArmProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificSubDataArchInfo,CmArmProcessorSpecificSubDataArchInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
