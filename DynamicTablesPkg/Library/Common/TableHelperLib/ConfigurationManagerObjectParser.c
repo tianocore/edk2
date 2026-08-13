@@ -1069,6 +1069,16 @@ STATIC CONST CM_OBJ_PARSER  CmRiscVTimerInfoParser[] = {
   { "Timer Base Frequency", 8, "0x%lx", NULL },
 };
 
+/** A parser for ERiscVObjProcessorSpecificBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVProcessorSpecificBlockInfoParser[] = {
+  { "Revision", sizeof (UINT16), "0x%x",  NULL },
+  { "HartId",   sizeof (UINT64), "0x%lx", NULL },
+  { "VendorId", sizeof (UINT64), "0x%lx", NULL },
+  { "ArchId",   sizeof (UINT64), "0x%lx", NULL },
+  { "ImplId",   sizeof (UINT64), "0x%lx", NULL },
+};
+
 /** A Parser for EArchCommonObjTpm2DeviceInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonObjTpm2DeviceInfoParser[] = {
@@ -1880,14 +1890,15 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  RiscVNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (ERiscVObjReserved),
-  CM_PARSER_ADD_OBJECT (ERiscVObjRintcInfo,         CmRiscVRintcInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjImsicInfo,         CmRiscVImsicInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjAplicInfo,         CmRiscVAplicInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjPlicInfo,          CmRiscVPlicInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjIsaStringInfo,     CmRiscVIsaStringInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjCmoInfo,           CmRiscVCmoInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjMmuInfo,           CmRiscVMmuInfoParser),
-  CM_PARSER_ADD_OBJECT (ERiscVObjTimerInfo,         CmRiscVTimerInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjRintcInfo,                 CmRiscVRintcInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjImsicInfo,                 CmRiscVImsicInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjAplicInfo,                 CmRiscVAplicInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjPlicInfo,                  CmRiscVPlicInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjIsaStringInfo,             CmRiscVIsaStringInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjCmoInfo,                   CmRiscVCmoInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjMmuInfo,                   CmRiscVMmuInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjTimerInfo,                 CmRiscVTimerInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjProcessorSpecificBlockInfo,CmRiscVProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (ERiscVObjMax)
 };
 
