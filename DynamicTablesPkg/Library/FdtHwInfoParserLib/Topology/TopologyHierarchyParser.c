@@ -8,9 +8,9 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
-#include <Library/SmbiosSmcLib.h>
 #include <IndustryStandard/Acpi63.h>
 
+#include "ArchUtility.h"
 #include "CmObjectDescUtility.h"
 #include "Topology/TopologyHierarchyParser.h"
 #include "Topology/TopologyParser.h"
@@ -183,6 +183,37 @@ AllocateTopologyContext (
 
   Context->ProcHierarchyCount = NodeCapacity;
   return EFI_SUCCESS;
+}
+
+/** Set ProcessorId for all processor hierarchy nodes.
+
+  Indeed, Device Tree does not provide a standard socket/package identifier.
+
+  @param [in, out] Context  Topology parser context.
+**/
+STATIC
+VOID
+EFIAPI
+SetProcHierarchyProcessorId (
+  IN OUT TOPOLOGY_PARSER_CONTEXT  *Context
+  )
+{
+  UINT64  SocId;
+  UINT32  Index;
+
+  if (Context == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  if (EFI_ERROR (GetSocId (&SocId))) {
+    DEBUG ((DEBUG_WARN, "Could not get SocId.\n"));
+    return;
+  }
+
+  for (Index = 0; Index < Context->ProcHierarchyCount; Index++) {
+    Context->ProcHierarchyInfo[Index].ProcessorId = SocId;
+  }
 }
 
 /** Append a processor hierarchy node to the topology buffer.
@@ -576,5 +607,6 @@ CreateProcHierarchyInfo (
     return EFI_ABORTED;
   }
 
+  SetProcHierarchyProcessorId (Context);
   return EFI_SUCCESS;
 }
