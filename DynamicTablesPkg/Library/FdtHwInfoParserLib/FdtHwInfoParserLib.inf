@@ -80,3 +80,6 @@
   DebugLib
   FdtLib
   MemoryAllocationLib
+
+[LibraryClasses.AARCH64]
+  ArmSmcccSocIdLib

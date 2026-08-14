@@ -8,7 +8,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
-#include <Library/SmbiosSmcLib.h>
+#include <Library/ArmSmcccSocIdLib.h>
 #include <IndustryStandard/Acpi63.h>
 
 #include "CmObjectDescUtility.h"
@@ -183,6 +183,69 @@ AllocateTopologyContext (
 
   Context->ProcHierarchyCount = NodeCapacity;
   return EFI_SUCCESS;
+}
+
+/**
+  Return the SoC ID formatted for the SMBIOS Type 4 Processor ID field.
+
+  @param[out] ProcessorId  Pointer to the SMBIOS Processor ID.
+
+  @retval EFI_SUCCESS            The Processor ID was returned successfully.
+  @retval EFI_INVALID_PARAMETER  ProcessorId is NULL.
+  @retval EFI_UNSUPPORTED        The SMCCC Architecture SoC ID interface is
+                                 unsupported or an SoC ID call failed.
+**/
+STATIC
+EFI_STATUS
+GetSocId (
+  OUT UINT64  *ProcessorId
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      Jep106Code;
+  UINT32      SocRevision;
+
+  if (ProcessorId == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ArmSmcccGetSocId (&Jep106Code, &SocRevision);
+  if (!EFI_ERROR (Status)) {
+    *ProcessorId = ((UINT64)SocRevision << 32) | Jep106Code;
+  }
+
+  return Status;
+}
+
+/** Set ProcessorId for all processor hierarchy nodes.
+
+  Indeed, Device Tree does not provide a standard socket/package identifier.
+
+  @param [in, out] Context  Topology parser context.
+**/
+STATIC
+VOID
+EFIAPI
+SetProcHierarchyProcessorId (
+  IN OUT TOPOLOGY_PARSER_CONTEXT  *Context
+  )
+{
+  UINT64  SocId;
+  UINT32  Index;
+
+  if (Context == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  if (EFI_ERROR (GetSocId (&SocId))) {
+    DEBUG ((DEBUG_WARN, "Could not get SocId.\n"));
+    return;
+  }
+
+  for (Index = 0; Index < Context->ProcHierarchyCount; Index++) {
+    Context->ProcHierarchyInfo[Index].ProcessorId = SocId;
+  }
 }
 
 /** Create a deterministic abstract token for a processor hierarchy node.
@@ -590,5 +653,6 @@ CreateProcHierarchyInfo (
     return EFI_ABORTED;
   }
 
+  SetProcHierarchyProcessorId (Context);
   return EFI_SUCCESS;
 }
