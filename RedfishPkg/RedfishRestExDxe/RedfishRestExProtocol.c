@@ -533,20 +533,18 @@ RedfishRestExGetService (
   RESTEX_INSTANCE           *Instance;
   EFI_REST_EX_SERVICE_INFO  *ServiceInfo;
 
-  ServiceInfo = NULL;
-
   if ((This == NULL) || (RestExServiceInfo == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
-  Instance = RESTEX_INSTANCE_FROM_THIS (This);
 
   ServiceInfo = AllocateZeroPool (sizeof (EFI_REST_EX_SERVICE_INFO));
   if (ServiceInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+  Instance = RESTEX_INSTANCE_FROM_THIS (This);
 
   CopyMem (ServiceInfo, &(Instance->Service->RestExServiceInfo), sizeof (EFI_REST_EX_SERVICE_INFO));
 
