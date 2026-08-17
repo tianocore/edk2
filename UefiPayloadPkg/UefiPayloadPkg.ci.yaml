@@ -87,6 +87,8 @@
         "AuditOnly": True,           # Fails right now with over 270 errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [             # words to extend to the dictionary for this package
+            "lapic",
+            "mcopy",
             "mmconfig",
             "tolud"
         ],
