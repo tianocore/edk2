@@ -1,28 +1,28 @@
 /** @file
-  SSDT CMN-600 Template
+  SSDT CMN Template
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
   - Arm CoreLink CMN-600 Coherent Mesh Network Technical Reference Manual r3p0
-  - Generic ACPI for Arm Components 1.0 Platform Design Document
+  - Generic ACPI for Arm Components 1.3 Platform Design Document
 
   @par Glossary:
     - {template} - Data fixed up using AML Fixup APIs.
     - {codegen}  - Data generated using AML Codegen APIs.
 **/
 
-DefinitionBlock ("SsdtCmn600.aml", "SSDT", 2, "ARMLTD", "CMN-600", 1) {
+DefinitionBlock ("SsdtCmn.aml", "SSDT", 2, "ARMLTD", "CMN", 1) {
   Scope (_SB) {
-    // CMN-600 device object for a X * Y mesh, where (X >= 4) || (Y >= 4).
+    // CMN device object.
     Device (CMN0) {                        // {template}
-      Name (_HID, "ARMHC600")
+      Name (_HID, "ARMHC600")              // {template}
       Name (_UID, 0x0)                     // {template}
 
       Name (_CRS, ResourceTemplate () {
-        // Descriptor for 256 MB of the CFG region at offset PERIPHBASE.
+        // Descriptor for the CMN configuration region.
         QWordMemory (
           ResourceConsumer,                // bit 0 of general flags is 0.
           PosDecode,

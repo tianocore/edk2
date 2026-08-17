@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager object token fixer
 
-  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -235,7 +235,7 @@ CM_OBJECT_TOKEN_FIXER  ArmTokenFixer[EArmObjMax] = {
   NULL,                             ///< 17 - GIC ITS Identifier Array
   NULL,                             ///< 18 - ID Mapping Array
   NULL,                             ///< 19 - SMMU Interrupt Array
-  NULL,                             ///< 20 - CMN-600 Info
+  NULL,                             ///< 20 - CMN Info
   NULL,                             ///< 21 - Reserved Memory Range Node
   NULL,                             ///< 22 - Memory Range Descriptor
   NULL                              ///< 23 - Embedded Trace Extension/Module Info
