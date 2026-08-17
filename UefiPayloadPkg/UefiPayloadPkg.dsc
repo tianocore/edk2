@@ -204,8 +204,10 @@
 
 [BuildOptions.AARCH64]
   GCC:*_*_*_CC_FLAGS         = -mstrict-align
+!if $(CHAINLOAD_DEFAULTS) == FALSE
   GCC:*_GCC_*_CC_FLAGS         = -mcmodel=tiny
   GCC:*_CLANGDWARF_*_CC_FLAGS  = -mcmodel=tiny
+!endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
@@ -1385,3 +1387,20 @@
   }
 
 !endif
+
+#
+# ChainloadApp: UEFI-hosted payload launcher.  Always compiled so CI
+# covers it; without a generated EmbeddedPayload.h it links against
+# the in-tree stub and refuses to hand off at run time.  See
+# BuildChainloadEmbedded.sh for the two-stage embedded build.
+#
+[Components.X64, Components.AARCH64]
+  UefiPayloadPkg/ChainloadApp/ChainloadApp.inf {
+    <LibraryClasses>
+      #
+      # ChainloadApp runs under the outer firmware and must not pull
+      # in the payload's HOB-driven SerialPortLib (no HOB list yet).
+      # Route DEBUG() through the outer firmware's ConOut instead.
+      #
+      DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  }

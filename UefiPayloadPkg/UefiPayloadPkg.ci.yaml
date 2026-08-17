@@ -21,6 +21,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "ChainloadApp/EmbeddedPayloadStub.h",
             "Tools/",
             "Include/Coreboot.h",
             "Library/CbParseLib/CbParseLib.c",
