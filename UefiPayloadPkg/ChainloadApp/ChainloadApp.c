@@ -34,6 +34,8 @@
 #include <UniversalPayload/SerialPortInfo.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/PeImage.h>
 #include <UniversalPayload/ExtraData.h>
 #include <UniversalPayload/SmbiosTable.h>
@@ -398,6 +400,120 @@ ParseSpcrSerial (
   }
 
   return TRUE;
+}
+
+/**
+  Re-enable memory-space decoding on the SPCR PCI serial device.
+
+  Some outer firmware leaves the SPCR UART's memory decode disabled by
+  the time the payload's first output is attempted: when the SPCR
+  console is a PCI device, EFI_PCI_COMMAND_MEMORY_SPACE is observed
+  clear in its command register once the outer ExitBootServices() has
+  returned, so BAR0 no longer decodes.  Payload output is then dropped
+  silently -- with the MMU on or off, the access simply goes nowhere --
+  until the payload's own PCI enumeration re-enables the device, which
+  is well after the SEC/PEI/early-DXE window where the interesting
+  output is produced.  Re-enabling the decode here makes that early
+  output visible.
+
+  What clears it has not been established, and no mechanism is claimed
+  here.  It is not upstream MdeModulePkg/Bus/Pci/PciBusDxe, which
+  registers no ExitBootServices event at all.  Because the behaviour
+  looks like a property of a particular outer firmware rather than of
+  edk2, and because the only benefit is visible debug output, the caller
+  invokes this in DEBUG builds only.
+
+  The device's ECAM aperture is taken from the ACPI MCFG and
+  EFI_PCI_COMMAND_MEMORY_SPACE is set with a raw ECAM
+  read-modify-write.  No boot services are used, so this is legal after
+  ExitBootServices().  If the SPCR is absent or too short to cover the
+  PCI fields, describes a non-PCI UART (either 0xFFFF sentinel), names a
+  device or function number outside the architectural range, or the MCFG
+  has no allocation covering the device, the call is a no-op: there is
+  nothing that could report a failure in this phase, and the only
+  consequence is the loss of early payload output.
+
+  @param[in] Rsdp  Physical address of the ACPI RSDP, or 0.
+**/
+STATIC
+VOID
+EnableSpcrPciSerialDecode (
+  IN EFI_PHYSICAL_ADDRESS  Rsdp
+  )
+{
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE                                         *Spcr;
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER                         *Mcfg;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE  *Alloc;
+  UINTN                                                                                  Count;
+  UINTN                                                                                  Idx;
+  UINTN                                                                                  CfgBase;
+  volatile UINT16                                                                        *Cmd;
+
+  Spcr = (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE *)AcpiFindTableFromRsdp (
+                                                             Rsdp,
+                                                             EFI_ACPI_2_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE
+                                                             );
+  if (Spcr == NULL) {
+    return;
+  }
+
+  //
+  // Nothing requires Spcr->Header.Length to cover the PCI fields, so
+  // check it before reading any of them.  PciSegment is the last one
+  // this function reads.
+  //
+  if (Spcr->Header.Length <
+      (OFFSET_OF (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE, PciSegment) + sizeof (Spcr->PciSegment)))
+  {
+    return;
+  }
+
+  //
+  // The SPCR specification pairs the two 0xFFFF sentinels to mean "not
+  // a PCI device"; either one on its own is enough to stop here.
+  //
+  if ((Spcr->PciDeviceId == 0xFFFF) || (Spcr->PciVendorId == 0xFFFF)) {
+    return;
+  }
+
+  //
+  // Firmware that means "not a PCI device" sometimes writes 0xFF into
+  // the device and function fields rather than the zero the
+  // specification asks for.  Shifted into an ECAM offset that lands
+  // megabytes past the aperture the loop below matches, so refuse
+  // anything outside the architectural 5-bit device / 3-bit function
+  // range rather than masking it and writing to some other device.
+  //
+  if ((Spcr->PciDeviceNumber > PCI_MAX_DEVICE) || (Spcr->PciFunctionNumber > PCI_MAX_FUNC)) {
+    return;
+  }
+
+  Mcfg = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)AcpiFindTableFromRsdp (
+                                                                             Rsdp,
+                                                                             EFI_ACPI_2_0_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_SIGNATURE
+                                                                             );
+  if ((Mcfg == NULL) || (Mcfg->Header.Length <= sizeof (*Mcfg))) {
+    return;
+  }
+
+  Alloc = (VOID *)(Mcfg + 1);
+  Count = (Mcfg->Header.Length - sizeof (*Mcfg)) / sizeof (*Alloc);
+  for (Idx = 0; Idx < Count; Idx++) {
+    if ((Alloc[Idx].PciSegmentGroupNumber == Spcr->PciSegment) &&
+        (Spcr->PciBusNumber >= Alloc[Idx].StartBusNumber) &&
+        (Spcr->PciBusNumber <= Alloc[Idx].EndBusNumber))
+    {
+      CfgBase = (UINTN)Alloc[Idx].BaseAddress
+                + ((UINTN)(Spcr->PciBusNumber - Alloc[Idx].StartBusNumber) << 20)
+                + ((UINTN)Spcr->PciDeviceNumber << 15)
+                + ((UINTN)Spcr->PciFunctionNumber << 12);
+      Cmd = (volatile UINT16 *)(CfgBase + PCI_COMMAND_OFFSET);
+      MemoryFence ();
+      *Cmd = *Cmd | EFI_PCI_COMMAND_MEMORY_SPACE;
+      MemoryFence ();
+      return;
+    }
+  }
 }
 
 /**
@@ -1342,6 +1458,23 @@ ChainloadEntry (
     DEBUG ((DEBUG_ERROR, "ChainloadApp: ExitBootServices failed: %r\n", Status));
     CpuDeadLoop ();
   }
+
+  //
+  // Turn memory decoding back on for the SPCR PCI serial device so that
+  // the payload's debug output is visible from its very first
+  // instruction.  This runs on the outer firmware's translation --
+  // our own tables are installed just below -- so both the ACPI
+  // tables and the ECAM aperture are still reachable.
+  //
+  // This exists only to make payload DEBUG output visible, so it is
+  // gated on DEBUG_CODE: a RELEASE payload emits no debug output, and
+  // walking two ACPI tables to write a device's config space after
+  // ExitBootServices() for no benefit is not something a production
+  // image should do.
+  //
+  DEBUG_CODE (
+    EnableSpcrPciSerialDecode (AcpiRsdp);
+    );
 
   JumpToPayload (
     (UINTN)StackAddress + PAYLOAD_STACK_SIZE,
