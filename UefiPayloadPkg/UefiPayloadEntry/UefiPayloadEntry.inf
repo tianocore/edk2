@@ -62,6 +62,10 @@
   UefiCpuBaseArchSupportLib
   MemoryAllocationLib
 
+[LibraryClasses.AARCH64]
+  ArmMmuLib
+  ArmLib
+
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiFirmwareFileSystem2Guid

@@ -87,7 +87,8 @@
         "AuditOnly": True,           # Fails right now with over 270 errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [             # words to extend to the dictionary for this package
-            "mmconfig"
+            "mmconfig",
+            "tolud"
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

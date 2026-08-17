@@ -133,11 +133,16 @@ MemInfoCallbackMmio (
     // It's in DRAM and thus must be reserved
     //
     Type = EFI_RESOURCE_MEMORY_RESERVED;
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   } else if ((MemoryMapEntry->Base < 0x100000000ULL) && (MemoryMapEntry->Base >= mTopOfLowerUsableDram)) {
     //
-    // It's not in DRAM, must be MMIO
+    // On x86, reserved ranges above TOLUD and below 4 GiB are the
+    // MMIO hole.  This heuristic does not apply on AArch64 where
+    // DRAM commonly starts at or above 1 GiB and the payload FV
+    // itself is a reserved range in that window.
     //
     Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+ #endif
   } else {
     Type = EFI_RESOURCE_MEMORY_RESERVED;
   }
@@ -811,9 +816,12 @@ BuildGenericHob (
   IN UINTN  PayloadFvSize
   )
 {
-  UINT8                        PhysicalAddressBits;
-  UINTN                        Index;
+  UINT8  PhysicalAddressBits;
+  UINTN  Index;
+
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
+ #endif
 
   // The UEFI payload FV
   BuildMemoryAllocationHob (PayloadFvBase, PayloadFvSize, EfiBootServicesData);
@@ -847,8 +855,9 @@ BuildGenericHob (
   PhysicalAddressBits = ArchGetPhysicalAddressBits ();
   BuildCpuHob (PhysicalAddressBits, 16);
 
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   //
-  // Report Local APIC range, cause sbl HOB to be NULL, comment now
+  // Report Local APIC range (x86-only)
   //
   ResourceAttribute = (
                        EFI_RESOURCE_ATTRIBUTE_PRESENT |
@@ -858,6 +867,7 @@ BuildGenericHob (
                        );
   BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_MAPPED_IO, ResourceAttribute, 0xFEC80000, SIZE_512KB);
   BuildMemoryAllocationHob (0xFEC80000, SIZE_512KB, EfiMemoryMappedIO);
+ #endif
 }
 
 /**
@@ -1026,11 +1036,13 @@ _ModuleEntryPoint (
     HobInfo->BootMode = BOOT_ON_FLASH_UPDATE;
   }
 
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   //
   // Mask off all legacy 8259 interrupt sources
   //
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
+ #endif
 
   Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);

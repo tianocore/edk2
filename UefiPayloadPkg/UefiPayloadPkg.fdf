@@ -13,7 +13,16 @@
 DEFINE FD_BASE       = 0x00800000
 DEFINE FD_BLOCK_SIZE = 0x00001000
 
+!if "AARCH64" IN "$(ARCH)"
+# ArmMmuLib and friends add ~2 MiB over the X64 build.
 !if $(TARGET) == "NOOPT"
+DEFINE FD_SIZE     = 0x00950000
+DEFINE NUM_BLOCKS  = 0x950
+!else
+DEFINE FD_SIZE     = 0x00900000
+DEFINE NUM_BLOCKS  = 0x900
+!endif
+!elseif $(TARGET) == "NOOPT"
 DEFINE FD_SIZE     = 0x00850000
 DEFINE NUM_BLOCKS  = 0x850
 !else
