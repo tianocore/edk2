@@ -25,6 +25,7 @@
 [Sources]
   ChainloadApp.c
   EmbeddedPayloadStub.h
+  PciBarFixup.c
 
 [Sources.X64]
   X64/PayloadEntry.nasm

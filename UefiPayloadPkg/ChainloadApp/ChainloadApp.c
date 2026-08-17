@@ -41,6 +41,16 @@
 #include <UniversalPayload/SmbiosTable.h>
 #include <UniversalPayload/AcpiTable.h>
 
+//
+// PciBarFixup.c: program endpoint BARs the outer firmware left at
+// zero, through ECAM located from the ACPI MCFG, so the payload's
+// light enumeration finds them assigned.
+//
+VOID
+FixupUnassignedBars (
+  VOID
+  );
+
 #if defined (MDE_CPU_X64)
   #include <Register/Intel/Cpuid.h>
 #endif
@@ -1212,6 +1222,15 @@ ChainloadEntry (
   }
 
   Print (L"ChainloadApp: ACPI RSDP 0x%lx  SMBIOS 0x%lx\n", AcpiRsdp, SmbiosTable);
+
+  //
+  // Program endpoint BARs the outer firmware left at zero, through
+  // ECAM located from the ACPI MCFG, while boot services are still
+  // available.  The payload's light enumeration then finds
+  // every BAR assigned, exactly as if the outer firmware had finished
+  // the job itself.
+  //
+  FixupUnassignedBars ();
 
   //
   // Reserve memory for the FV image at PcdPayloadFdMemBase so that the
