@@ -37,8 +37,8 @@ EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
 **/
 EFI_STATUS
 MemInfoCallbackMmio (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
   EFI_PHYSICAL_ADDRESS         Base;
@@ -55,7 +55,9 @@ MemInfoCallbackMmio (
   //
   // Skip types already handled in MemInfoCallback
   //
-  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI)) {
+  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI) ||
+      (MemoryMapEntry->Type == E820_SOFT_RESERVED))
+  {
     return EFI_SUCCESS;
   }
 
@@ -116,8 +118,8 @@ MemInfoCallbackMmio (
 **/
 EFI_STATUS
 FindToludCallback (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
   //
@@ -185,13 +187,13 @@ FindToludCallback (
 **/
 EFI_STATUS
 FindFreeMemForHobCallback (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
-  EFI_STATUS        Status;
-  MEMORY_MAP_ENTRY  MemoryMapEntrySplit;
-  UINTN             *HobMemBase = (UINTN *)Params;
+  EFI_STATUS           Status;
+  BL_MEMORY_MAP_ENTRY  MemoryMapEntrySplit;
+  UINTN                *HobMemBase = (UINTN *)Params;
 
   //
   // Found new base, nothing to do
@@ -284,8 +286,8 @@ FindFreeMemForHobCallback (
 **/
 EFI_STATUS
 MemInfoCallback (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
   EFI_PHYSICAL_ADDRESS         Base;
@@ -298,7 +300,7 @@ MemInfoCallback (
   // It will be added later.
   //
   if ((MemoryMapEntry->Type != E820_RAM) && (MemoryMapEntry->Type != E820_ACPI) &&
-      (MemoryMapEntry->Type != E820_NVS))
+      (MemoryMapEntry->Type != E820_NVS) && (MemoryMapEntry->Type != E820_SOFT_RESERVED))
   {
     return RETURN_SUCCESS;
   }
@@ -314,6 +316,10 @@ MemInfoCallback (
               EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
               EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
               EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
+
+  if (MemoryMapEntry->Type == E820_SOFT_RESERVED) {
+    Attribute |= EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE;
+  }
 
   BuildResourceDescriptorHob (Type, Attribute, (EFI_PHYSICAL_ADDRESS)Base, Size);
   DEBUG ((DEBUG_INFO, "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
