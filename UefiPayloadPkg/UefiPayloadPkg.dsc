@@ -1403,4 +1403,11 @@
       # Route DEBUG() through the outer firmware's ConOut instead.
       #
       DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+      #
+      # ArmMmuLib allocates translation-table pages via
+      # MemoryAllocationLib::AllocatePages().  Redirect those to
+      # EfiReservedMemoryType so the payload's memory-map HOB reports
+      # them as Reserved and DXE cannot allocate over the live tables.
+      #
+      MemoryAllocationLib|UefiPayloadPkg/ChainloadApp/ReservedUefiMemoryAllocationLib.inf
   }
