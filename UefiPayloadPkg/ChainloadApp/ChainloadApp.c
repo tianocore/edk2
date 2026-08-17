@@ -33,6 +33,7 @@
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/SerialPortInfo.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/SmBios.h>
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 #include <IndustryStandard/Pci22.h>
@@ -286,6 +287,106 @@ RecordBootTimeReservation (
 }
 
 /**
+  Pin the outer firmware's SMBIOS entry point and structure table as
+  boot-time reservations.
+
+  On an edk2-based outer firmware, SmbiosDxe allocates both the
+  entry-point structure and the structure table it points to as
+  EfiRuntimeServicesData (SmbiosCreateTable() /
+  SmbiosCreate64BitTable() in
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.c), and this change
+  reclassifies EfiRuntimeServicesData to usable RAM.  The
+  payload's SmbiosDxe copies every record out during DXE dispatch,
+  but until it does the outer entry point and structure table must
+  not be allocated over.  Pinning them here makes the payload publish
+  each as SYSTEM_MEMORY with an EfiBootServicesData memory-allocation
+  HOB, so DxeCore keeps off them and the OS reclaims them at
+  ExitBootServices().
+
+  Both anchor variants are handled: SMBIOS 3.0 (_SM3_) carries a
+  64-bit TableAddress and 32-bit TableMaximumSize; SMBIOS 2.x (_SM_)
+  carries a 32-bit TableAddress and 16-bit TableLength.  The entry
+  point and the structure table may be separate allocations, so both
+  are pinned; the extents are read from the entry point rather than
+  guessed.  An anchor that does not begin with either signature is
+  left alone: some non-edk2 outer firmwares place the SMBIOS anchor
+  outside RT_Data (F-segment shadow, ACPI NVS), and pinning
+  irrelevant memory would only cost parity.
+
+  @param[in] SmbiosTable  Physical address of the outer firmware's
+                          SMBIOS entry-point structure, or 0.
+**/
+STATIC
+VOID
+RecordSmbiosBootTimeReservation (
+  IN EFI_PHYSICAL_ADDRESS  SmbiosTable
+  )
+{
+  SMBIOS_TABLE_ENTRY_POINT      *Ep2;
+  SMBIOS_TABLE_3_0_ENTRY_POINT  *Ep3;
+  EFI_PHYSICAL_ADDRESS          EpBase;
+  EFI_PHYSICAL_ADDRESS          TableBase;
+  UINTN                         EpLen;
+  UINT64                        TableLen;
+
+  if (SmbiosTable == 0) {
+    return;
+  }
+
+  Ep3 = (SMBIOS_TABLE_3_0_ENTRY_POINT *)(UINTN)SmbiosTable;
+  Ep2 = (SMBIOS_TABLE_ENTRY_POINT *)(UINTN)SmbiosTable;
+
+  if (CompareMem (
+        Ep3->AnchorString,
+        SMBIOS_3_0_ANCHOR_STRING,
+        SMBIOS_3_0_ANCHOR_STRING_LENGTH
+        ) == 0)
+  {
+    EpLen     = Ep3->EntryPointLength;
+    TableBase = Ep3->TableAddress;
+    TableLen  = Ep3->TableMaximumSize;
+  } else if (CompareMem (
+               Ep2->AnchorString,
+               SMBIOS_ANCHOR_STRING,
+               SMBIOS_ANCHOR_STRING_LENGTH
+               ) == 0)
+  {
+    EpLen     = Ep2->EntryPointLength;
+    TableBase = Ep2->TableAddress;
+    TableLen  = Ep2->TableLength;
+  } else {
+    return;
+  }
+
+  //
+  // Pin whole pages: the payload's memory-allocation HOB and
+  // FindFreeMemForHobCallback() operate at page granularity.
+  //
+  EpBase = SmbiosTable & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
+  RecordBootTimeReservation (
+    EpBase,
+    EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES ((SmbiosTable - EpBase) + EpLen))
+    );
+
+  if ((TableBase != 0) && (TableLen != 0)) {
+    EpBase = TableBase & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
+    RecordBootTimeReservation (
+      EpBase,
+      EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES ((TableBase - EpBase) + TableLen))
+      );
+  }
+
+  Print (
+    L"ChainloadApp: SMBIOS entry point 0x%lx (%lu bytes), "
+    L"structure table 0x%lx (%lu bytes) pinned as boot-time\n",
+    SmbiosTable,
+    (UINT64)EpLen,
+    TableBase,
+    TableLen
+    );
+}
+
+/**
   Return whether a Reserved outer memory-map descriptor is entirely
   covered by the recorded boot-time reservations.
 
@@ -369,6 +470,23 @@ EfiTypeToSblEntry (
     case EfiBootServicesData:
     case EfiLoaderCode:
     case EfiLoaderData:
+    //
+    // The outer firmware's runtime services do not survive the
+    // chainload: ExitBootServices() has already returned, its System
+    // Table is discarded, and the payload's DxeCore installs a fresh
+    // gRT with its own SetVirtualAddressMap().  Nothing on the far
+    // side of JumpToPayload() can call into these ranges.  The RSDP
+    // handoff points into EfiACPIReclaimMemory / EfiACPIMemoryNVS on
+    // an edk2 outer firmware, which are preserved.  The SMBIOS
+    // handoff, however, points into EfiRuntimeServicesData on an
+    // edk2 outer firmware; those pages are pinned via
+    // gLoaderBootTimeReservationGuid so the payload's DXE cannot
+    // allocate over them until its own SmbiosDxe has copied out.
+    // Reserving the whole range would make the OS pay for two
+    // firmwares' runtimes when only the payload's is live.
+    //
+    case EfiRuntimeServicesCode:
+    case EfiRuntimeServicesData:
       *Type = 1;
       break;
     case EfiACPIReclaimMemory:
@@ -1382,6 +1500,16 @@ ChainloadEntry (
   }
 
   Print (L"ChainloadApp: ACPI RSDP 0x%lx  SMBIOS 0x%lx\n", AcpiRsdp, SmbiosTable);
+
+  //
+  // On an edk2 outer firmware the SMBIOS entry point and structure
+  // table live in EfiRuntimeServicesData, which this application
+  // reports as usable RAM.  Pin both so the payload's DXE
+  // cannot allocate over them until its own SmbiosDxe has copied out.
+  // The RSDP is not pinned: edk2's AcpiTableDxe places it in
+  // EfiACPIReclaimMemory / EfiACPIMemoryNVS, which are preserved.
+  //
+  RecordSmbiosBootTimeReservation (SmbiosTable);
 
   //
   // Program endpoint BARs the outer firmware left at zero, through
