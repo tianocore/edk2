@@ -63,6 +63,7 @@
   gEfiSmbios3TableGuid
   gUniversalPayloadExtraDataGuid
   gLoaderMemoryMapInfoGuid
+  gLoaderBootTimeReservationGuid
   gUefiSerialPortInfoGuid
   gUniversalPayloadSerialPortInfoGuid
   gUniversalPayloadSmbiosTableGuid

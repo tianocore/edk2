@@ -40,6 +40,7 @@
 #include <UniversalPayload/ExtraData.h>
 #include <UniversalPayload/SmbiosTable.h>
 #include <UniversalPayload/AcpiTable.h>
+#include <Guid/BootTimeReservationGuid.h>
 
 //
 // PciBarFixup.c: program endpoint BARs the outer firmware left at
@@ -81,6 +82,26 @@ FixupUnassignedBars (
 #define HOB_LIST_SIZE        (EFI_PAGES_TO_SIZE (HOB_LIST_PAGES))
 #define PAYLOAD_STACK_PAGES  4
 #define PAYLOAD_STACK_SIZE   (EFI_PAGES_TO_SIZE (PAYLOAD_STACK_PAGES))
+
+//
+// Boot-time-only reservations: the FV copy, the HOB list buffer, the
+// payload's initial stack and, on AArch64, every translation-table
+// page.  All are allocated as EfiReservedMemoryType so they appear as
+// isolated Reserved records in the outer memory-map snapshot and are
+// therefore never selected as free RAM by the payload's HOB-memory
+// search; but none of them needs to survive past the OS's
+// ExitBootServices(), so they are handed to the payload in a
+// gLoaderBootTimeReservationGuid HOB and the payload publishes each as
+// SYSTEM_MEMORY pinned by an EfiBootServicesData memory-allocation
+// HOB.  The bound comfortably covers the FV/HOB/stack plus every
+// translation-table page ArmMmuLib may allocate for the outer GCD
+// map; on X64 no page tables are recorded and only three entries are
+// used.
+//
+#define MAX_BOOT_TIME_RESERVATIONS  128
+
+STATIC LOADER_BOOT_TIME_RESERVATION_ENTRY  mBootTimeReservation[MAX_BOOT_TIME_RESERVATIONS];
+STATIC UINTN                               mBootTimeReservationCount;
 
 //
 // A single HOB's length is UINT16 and must be 8-byte aligned (PI 5.2).
@@ -230,6 +251,91 @@ EmitGuidHob (
 
   CopyGuid (&GuidHob->Name, Guid);
   return GuidHob + 1;
+}
+
+/**
+  Record one boot-time-only reservation for the
+  gLoaderBootTimeReservationGuid HOB.
+
+  @param[in] Base  Physical base of the allocation.
+  @param[in] Size  Size in bytes (page-aligned).
+**/
+STATIC
+VOID
+RecordBootTimeReservation (
+  IN EFI_PHYSICAL_ADDRESS  Base,
+  IN UINT64                Size
+  )
+{
+  if (mBootTimeReservationCount >= MAX_BOOT_TIME_RESERVATIONS) {
+    //
+    // Overflow means some reservations stay Reserved forever.  That
+    // is only a memory-parity loss, not a correctness problem, so a
+    // diagnostic is enough.
+    //
+    Print (
+      L"ChainloadApp: boot-time reservation table full at 0x%lx\n",
+      Base
+      );
+    return;
+  }
+
+  mBootTimeReservation[mBootTimeReservationCount].Base = Base;
+  mBootTimeReservation[mBootTimeReservationCount].Size = Size;
+  mBootTimeReservationCount++;
+}
+
+/**
+  Return whether a Reserved outer memory-map descriptor is entirely
+  covered by the recorded boot-time reservations.
+
+  The four allocations are made back to back with AllocateMaxAddress
+  and, on AArch64, AllocateAnyPages, so the outer memory map typically
+  reports one coalesced EfiReservedMemoryType descriptor covering all
+  of them; but no assumption is made about that: any Reserved
+  descriptor whose whole span lies inside recorded reservations is
+  reclassified.  A partial overlap is left as Reserved.
+
+  @param[in] Base  Descriptor start.
+  @param[in] End   Descriptor end (exclusive).
+
+  @retval TRUE   Every page in [Base,End) is a recorded reservation.
+  @retval FALSE  At least one page is not.
+**/
+STATIC
+BOOLEAN
+IsBootTimeReservation (
+  IN EFI_PHYSICAL_ADDRESS  Base,
+  IN EFI_PHYSICAL_ADDRESS  End
+  )
+{
+  EFI_PHYSICAL_ADDRESS  Cursor;
+  UINTN                 Index;
+  BOOLEAN               Advanced;
+
+  if (mBootTimeReservationCount == 0) {
+    return FALSE;
+  }
+
+  Cursor = Base;
+  while (Cursor < End) {
+    Advanced = FALSE;
+    for (Index = 0; Index < mBootTimeReservationCount; Index++) {
+      if ((Cursor >= mBootTimeReservation[Index].Base) &&
+          (Cursor < (mBootTimeReservation[Index].Base + mBootTimeReservation[Index].Size)))
+      {
+        Cursor   = mBootTimeReservation[Index].Base + mBootTimeReservation[Index].Size;
+        Advanced = TRUE;
+        break;
+      }
+    }
+
+    if (!Advanced) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
 }
 
 /**
@@ -593,11 +699,13 @@ IsReservedInMemoryMap (
   The FV image, HOB list buffer, payload stack and (on AArch64) the
   translation-table pages are allocated as EfiReservedMemoryType
   before the caller takes its memory-map snapshot, so the snapshot
-  already describes all of them and EfiTypeToSblEntry()
-  maps them to SBL type 2 (Reserved); the payload's free-memory search
-  therefore cannot select them.  No separate records are injected for
-  them, and this function asserts that the snapshot really does report
-  them as Reserved.
+  already describes all of them.  This function asserts that the
+  snapshot really does report them as Reserved, then reclassifies
+  those Reserved records to SBL type 1 (RAM) and emits a
+  gLoaderBootTimeReservationGuid HOB naming them, so the payload
+  publishes them as EFI_RESOURCE_SYSTEM_MEMORY pinned by an
+  EfiBootServicesData allocation HOB and the OS reclaims them after
+  ExitBootServices().
 
   @param[in] HobList         Pre-allocated HOB list buffer (Reserved memory).
   @param[in] HobBufSize      Size of HobList in bytes.
@@ -642,6 +750,7 @@ BuildPayloadHobList (
   UNIVERSAL_PAYLOAD_EXTRA_DATA        *ExtraData;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE      *SmbiosHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE        *AcpiHob;
+  LOADER_BOOT_TIME_RESERVATION        *BootTimeRes;
   SERIAL_PORT_INFO                    *SblSerial;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UplSerial;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  Serial;
@@ -743,15 +852,18 @@ BuildPayloadHobList (
   // SBL memory-map GUID HOB.  The FV image, HOB list buffer, payload
   // stack and (on AArch64) the translation-table pages were allocated
   // as EfiReservedMemoryType before the caller took its snapshot, so
-  // the snapshot already reports all of them and
-  // EfiTypeToSblEntry() maps them to SBL type 2 (Reserved).  Emitting
-  // separate records for them would produce exact duplicates:
-  // MemInfoCallbackMmio() in the payload calls
-  // BuildResourceDescriptorHob() once per record with no dedup and no
-  // overlap check, so on X64 the second copy is silently rejected by
-  // CoreInternalAddMemorySpace() and on AArch64 ConfigureMmuFromHobs()
-  // builds overlapping region descriptors from it.  Assert the
-  // expectation rather than adding a second copy.
+  // the snapshot reports them as one or more Reserved descriptors.
+  // Allocating them Reserved keeps them from coalescing with adjacent
+  // conventional memory in the outer memory map, so each Reserved
+  // descriptor covering only launcher allocations stays smaller than
+  // PcdSystemMemoryUefiRegionSize and FindFreeMemForHobCallback()
+  // never selects it; the payload additionally excludes ranges the
+  // gLoaderBootTimeReservationGuid HOB names.  Below, any Reserved
+  // descriptor entirely covered by recorded boot-time reservations is
+  // reclassified to SBL type 1 (RAM), so the payload publishes it as
+  // EFI_RESOURCE_SYSTEM_MEMORY, pins it with an EfiBootServicesData
+  // memory-allocation HOB, and the OS reclaims it after
+  // ExitBootServices().
   //
   // The GCD MMIO regions are recorded as MMIO, including the ECAM
   // window: the payload maps the resulting MEMORY_RESERVED resource as
@@ -847,6 +959,24 @@ BuildPayloadHobList (
       &MemMapInfo->Entry[EntryIndex].Type,
       &MemMapInfo->Entry[EntryIndex].Flag
       );
+
+    //
+    // A Reserved descriptor entirely covered by our own boot-time
+    // reservations is DRAM the OS may reclaim after ExitBootServices():
+    // report it as SBL type 1 so the payload publishes it as
+    // SYSTEM_MEMORY.  The gLoaderBootTimeReservationGuid HOB below
+    // tells the payload to keep it out of its HOB-memory search and to
+    // pin it with an EfiBootServicesData memory-allocation HOB.
+    //
+    if ((Entry->Type == EfiReservedMemoryType) &&
+        IsBootTimeReservation (
+          Entry->PhysicalStart,
+          Entry->PhysicalStart + EFI_PAGES_TO_SIZE (Entry->NumberOfPages)
+          ))
+    {
+      MemMapInfo->Entry[EntryIndex].Type = 1;
+    }
+
     EntryIndex++;
   }
 
@@ -879,6 +1009,36 @@ BuildPayloadHobList (
   }
 
   MemMapInfo->Count = (UINT32)EntryIndex;
+
+  //
+  // Boot-time reservation GUID HOB: the payload excludes each range
+  // from FindFreeMemForHobCallback() and pins each with an
+  // EfiBootServicesData memory-allocation HOB.  A payload that does
+  // not know the GUID sees the ranges as ordinary SBL type 1 RAM
+  // records, each far smaller than PcdSystemMemoryUefiRegionSize and
+  // therefore already unpickable by the HOB-memory search.
+  //
+  if (mBootTimeReservationCount > 0) {
+    BootTimeRes = EmitGuidHob (
+                    HobList,
+                    &HobOffset,
+                    HobLimit,
+                    &gLoaderBootTimeReservationGuid,
+                    sizeof (LOADER_BOOT_TIME_RESERVATION) +
+                    mBootTimeReservationCount * sizeof (LOADER_BOOT_TIME_RESERVATION_ENTRY)
+                    );
+    if (BootTimeRes == NULL) {
+      return EFI_BUFFER_TOO_SMALL;
+    }
+
+    BootTimeRes->Revision = 1;
+    BootTimeRes->Count    = (UINT32)mBootTimeReservationCount;
+    CopyMem (
+      BootTimeRes->Entry,
+      mBootTimeReservation,
+      mBootTimeReservationCount * sizeof (LOADER_BOOT_TIME_RESERVATION_ENTRY)
+      );
+  }
 
   if (Serial.RegisterBase != 0) {
     //
@@ -1242,8 +1402,8 @@ ChainloadEntry (
   // used.  The ExtraData HOB records the actual FV base, so nothing
   // downstream still assumes the PCD value.  The HOB list and payload
   // stack are also placed below 4 GiB.  All three are typed as
-  // EfiReservedMemoryType so that they survive as SBL type 2 (Reserved)
-  // in the memory-map HOB.
+  // EfiReservedMemoryType; IsBootTimeReservation() later reports them
+  // as SBL type 1 (RAM) with a matching allocation HOB to pin them.
   //
   FvAddress = PcdGet32 (PcdPayloadFdMemBase);
   Status    = gBS->AllocatePages (AllocateAddress, EfiReservedMemoryType, FvPages, &FvAddress);
@@ -1266,6 +1426,7 @@ ChainloadEntry (
 
   CopyMem ((VOID *)(UINTN)FvAddress, EmbeddedFv, FvSize);
   Print (L"ChainloadApp: FV 0x%lx bytes copied to 0x%lx\n", (UINT64)FvSize, FvAddress);
+  RecordBootTimeReservation (FvAddress, EFI_PAGES_TO_SIZE (FvPages));
 
   HobAddress = MAX_UINT32;
   Status     = gBS->AllocatePages (AllocateMaxAddress, EfiReservedMemoryType, HOB_LIST_PAGES, &HobAddress);
@@ -1277,6 +1438,7 @@ ChainloadEntry (
 
   HobList = (VOID *)(UINTN)HobAddress;
   ZeroMem (HobList, HOB_LIST_SIZE);
+  RecordBootTimeReservation (HobAddress, HOB_LIST_SIZE);
 
   StackAddress = MAX_UINT32;
   Status       = gBS->AllocatePages (AllocateMaxAddress, EfiReservedMemoryType, PAYLOAD_STACK_PAGES, &StackAddress);
@@ -1285,6 +1447,8 @@ ChainloadEntry (
     Print (L"ChainloadApp: stack AllocatePages failed: %r\n", Status);
     goto FreeReserved;
   }
+
+  RecordBootTimeReservation (StackAddress, PAYLOAD_STACK_SIZE);
 
   //
   // Fetch the GCD memory space map.  On AArch64 it drives the
@@ -1359,7 +1523,13 @@ ChainloadEntry (
     goto FreeReserved;
   }
 
-  Print (L"ChainloadApp: HOB list at 0x%lx, stack at 0x%lx\n", HobAddress, StackAddress);
+  Print (
+    L"ChainloadApp: HOB list at 0x%lx, stack at 0x%lx, %lu boot-time reservation%s\n",
+    HobAddress,
+    StackAddress,
+    (UINT64)mBootTimeReservationCount,
+    (mBootTimeReservationCount == 1) ? L"" : L"s"
+    );
 
   //
   // Locate the SEC-core PE/COFF image inside the copied FV, then use

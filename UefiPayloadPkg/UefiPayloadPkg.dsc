@@ -1406,8 +1406,11 @@
       #
       # ArmMmuLib allocates translation-table pages via
       # MemoryAllocationLib::AllocatePages().  Redirect those to
-      # EfiReservedMemoryType so the payload's memory-map HOB reports
-      # them as Reserved and DXE cannot allocate over the live tables.
+      # EfiReservedMemoryType so they stay isolated in the outer
+      # memory-map snapshot and cannot be selected as HOB memory,
+      # and record each one so ChainloadApp can hand the payload an
+      # explicit boot-time reservation list to publish as
+      # EfiBootServicesData.
       #
       MemoryAllocationLib|UefiPayloadPkg/ChainloadApp/ReservedUefiMemoryAllocationLib.inf
   }

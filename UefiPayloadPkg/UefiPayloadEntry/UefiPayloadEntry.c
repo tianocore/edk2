@@ -8,11 +8,23 @@
 **/
 
 #include <Guid/MemoryTypeInformation.h>
+#include <Guid/BootTimeReservationGuid.h>
 #include <Library/BaseArchLibSupport.h>
 #include "UefiPayloadEntry.h"
 
 STATIC UINT32   mTopOfLowerUsableDram = 0;
 STATIC BOOLEAN  mMcfgResourceHobBuilt = FALSE;
+
+//
+// Boot-time reservations from the launcher's
+// gLoaderBootTimeReservationGuid HOB, if it emitted one.
+// FindFreeMemForHobCallback() excludes ranges overlapping any of
+// these; BuildGenericHob() pins each with an EfiBootServicesData
+// memory-allocation HOB.  A launcher that does not emit the HOB
+// (Slim Bootloader, coreboot) leaves both NULL/0.
+//
+STATIC LOADER_BOOT_TIME_RESERVATION_ENTRY  *mBootTimeReservation;
+STATIC UINTN                               mBootTimeReservationCount;
 
 EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
   { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory)   },
@@ -222,6 +234,36 @@ FindToludCallback (
 }
 
 /**
+   Return whether a range overlaps any of the launcher's boot-time
+   reservations.
+
+   @param[in] Base  Range start.
+   @param[in] End   Range end (exclusive).
+
+   @retval TRUE   The range overlaps a boot-time reservation.
+   @retval FALSE  It does not, or no launcher published any.
+**/
+STATIC
+BOOLEAN
+OverlapsBootTimeReservation (
+  IN UINT64  Base,
+  IN UINT64  End
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < mBootTimeReservationCount; Index++) {
+    if ((Base < (mBootTimeReservation[Index].Base + mBootTimeReservation[Index].Size)) &&
+        (End > mBootTimeReservation[Index].Base))
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
    Callback function to find free and usable DRAM for HOB
    The memory region returned will have at least PcdSystemMemoryUefiRegionSize bytes
    and will be aligned to 1 MiB.
@@ -297,6 +339,24 @@ FindFreeMemForHobCallback (
   // Skip too small
   //
   if (Entry.Size < FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // A ChainloadApp launcher reports its own FV/HOB/stack/page-table
+  // allocations as SBL type 1 records so they become SYSTEM_MEMORY
+  // rather than MEMORY_RESERVED.  They are still live: HOB memory
+  // must not land on any of them.  What actually protects them is
+  // the BuildMemoryAllocationHob() pin in BuildGenericHob() below;
+  // this check is belt-and-braces so an SBL type-1 entry that
+  // overlapped one is skipped outright rather than split.  The
+  // launcher emits one SBL entry per outer memory-map descriptor
+  // and never merges Reserved with Conventional, so on today's
+  // launcher this check does not fire.  A launcher that emits no
+  // gLoaderBootTimeReservationGuid HOB (Slim Bootloader, coreboot)
+  // never enters this branch.
+  //
+  if (OverlapsBootTimeReservation (Entry.Base, Entry.Base + Entry.Size)) {
     return EFI_SUCCESS;
   }
 
@@ -634,6 +694,59 @@ FindBootloaderExtraDataHob (
 }
 
 /**
+  Locate the launcher's boot-time reservation HOB, if it published one.
+
+  @param[in]  BootloaderParameter  Bootloader-provided argument.
+  @param[out] Count                Entry count, clamped to what the
+                                   HOB's own data size can hold.
+
+  @return  First reservation entry, or NULL if the launcher did not
+           hand over a PEI HOB list carrying the GUID HOB.
+**/
+STATIC
+LOADER_BOOT_TIME_RESERVATION_ENTRY *
+FindBootloaderBootTimeReservationHob (
+  IN  UINTN  BootloaderParameter,
+  OUT UINTN  *Count
+  )
+{
+  EFI_PEI_HOB_POINTERS          BlHob;
+  LOADER_BOOT_TIME_RESERVATION  *BootTimeRes;
+  UINTN                         DataSize;
+
+  *Count = 0;
+
+  BlHob.Raw = (UINT8 *)BootloaderParameter;
+  if ((BlHob.Raw == NULL) ||
+      (BlHob.Header->HobType != EFI_HOB_TYPE_HANDOFF) ||
+      (BlHob.Header->HobLength != sizeof (EFI_HOB_HANDOFF_INFO_TABLE)))
+  {
+    return NULL;
+  }
+
+  BlHob.Raw = GetNextGuidHob (&gLoaderBootTimeReservationGuid, BlHob.Raw);
+  if (BlHob.Raw == NULL) {
+    return NULL;
+  }
+
+  BootTimeRes = (LOADER_BOOT_TIME_RESERVATION *)GET_GUID_HOB_DATA (BlHob.Raw);
+  DataSize    = GET_GUID_HOB_DATA_SIZE (BlHob.Raw);
+  if ((DataSize < sizeof (LOADER_BOOT_TIME_RESERVATION)) ||
+      (BootTimeRes->Revision != 1))
+  {
+    return NULL;
+  }
+
+  *Count = MIN (
+             (UINTN)BootTimeRes->Count,
+             (DataSize - sizeof (LOADER_BOOT_TIME_RESERVATION)) /
+             sizeof (LOADER_BOOT_TIME_RESERVATION_ENTRY)
+             );
+
+  return BootTimeRes->Entry;
+}
+
+/**
   Locate the payload FV base and size from the bootloader's ExtraData
   HOB, if it published one.
 
@@ -699,10 +812,37 @@ BuildGenericHob (
   )
 {
   UINT8                        PhysicalAddressBits;
+  UINTN                        Index;
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
 
   // The UEFI payload FV
   BuildMemoryAllocationHob (PayloadFvBase, PayloadFvSize, EfiBootServicesData);
+
+  //
+  // Pin every launcher boot-time reservation with an
+  // EfiBootServicesData memory-allocation HOB so that DXE never
+  // allocates over the launcher's HOB list, initial stack or (on
+  // AArch64) live translation tables.  The FV was pinned just above,
+  // so the entry naming it is skipped.  A launcher that emitted no
+  // gLoaderBootTimeReservationGuid HOB leaves the count at 0.
+  //
+  for (Index = 0; Index < mBootTimeReservationCount; Index++) {
+    if (mBootTimeReservation[Index].Base == PayloadFvBase) {
+      continue;
+    }
+
+    BuildMemoryAllocationHob (
+      mBootTimeReservation[Index].Base,
+      mBootTimeReservation[Index].Size,
+      EfiBootServicesData
+      );
+    DEBUG ((
+      DEBUG_INFO,
+      "boot-time reservation: base = 0x%lx, size = 0x%lx\n",
+      mBootTimeReservation[Index].Base,
+      mBootTimeReservation[Index].Size
+      ));
+  }
 
   PhysicalAddressBits = ArchGetPhysicalAddressBits ();
   BuildCpuHob (PhysicalAddressBits, 16);
@@ -764,6 +904,17 @@ _ModuleEntryPoint (
     PayloadFvBase = PcdGet32 (PcdPayloadFdMemBase);
     PayloadFvSize = PcdGet32 (PcdPayloadFdMemSize);
   }
+
+  //
+  // If the launcher published boot-time reservations, cache them so
+  // FindFreeMemForHobCallback() below excludes those ranges from the
+  // HOB-memory search.  A launcher that did not (Slim Bootloader,
+  // coreboot) leaves the count at 0 and nothing changes.
+  //
+  mBootTimeReservation = FindBootloaderBootTimeReservationHob (
+                           BootloaderParameter,
+                           &mBootTimeReservationCount
+                           );
 
   // HOB region is used for HOB and memory allocation for this module
   MemBase    = PayloadFvBase;
