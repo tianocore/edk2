@@ -6,11 +6,63 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/FdtSerialPortAddressLib.h>
 #include <Library/PL011UartLib.h>
 #include <Library/PcdLib.h>
 
 #include "Write.h"
+
+//
+// Duplicated in ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.c —
+// keep both copies in sync.
+//
+
+/**
+  Parse a serial debug level string.
+
+  Accepted values are "silent" (DEBUG_ERROR only), "verbose" (no
+  override), or a hex bitmask (e.g. "0x80000040").
+
+  @param[in]  String      NUL-terminated ASCII string to parse.
+  @param[out] DebugLevel  On success, the parsed debug level bitmask.
+
+  @retval TRUE   String was recognised; *DebugLevel is valid.
+  @retval FALSE  String is NULL, "verbose", or unrecognised; no override.
+**/
+STATIC
+BOOLEAN
+ParseSerialDebugLevel (
+  IN  CONST CHAR8  *String,
+  OUT UINT32       *DebugLevel
+  )
+{
+  UINT64  Value;
+  CHAR8   *End;
+
+  if ((String == NULL) || (DebugLevel == NULL)) {
+    return FALSE;
+  }
+
+  if (AsciiStrCmp (String, "silent") == 0) {
+    *DebugLevel = DEBUG_ERROR;
+    return TRUE;
+  }
+
+  if (AsciiStrCmp (String, "verbose") == 0) {
+    return FALSE;
+  }
+
+  if (!EFI_ERROR (AsciiStrHexToUint64S (String, &End, &Value)) &&
+      (*End == '\0'))
+  {
+    *DebugLevel = (UINT32)Value;
+    return TRUE;
+  }
+
+  return FALSE;
+}
 
 /**
   (Copied from SerialPortWrite() in "MdePkg/Include/Library/SerialPortLib.h" at
@@ -104,4 +156,36 @@ DebugLibFdtPL011UartWrite (
   }
 
   return PL011UartWrite ((UINTN)DebugAddress, Buffer, NumberOfBytes);
+}
+
+/**
+  Retrieve the serial debug print error level override.
+
+  The flash variant parses the compile-time PCD only.  The fw_cfg
+  override is not available in SEC/PEI_CORE phases.
+
+  @param[out] Value  On success, the debug log level bitmask.
+
+  @retval EFI_SUCCESS    The debug level was retrieved successfully.
+  @retval EFI_INVALID_PARAMETER  Value is NULL.
+  @retval EFI_NOT_FOUND  No override is configured (e.g. "verbose").
+**/
+EFI_STATUS
+GetSerialDebugPrintErrorLevel (
+  OUT UINT32  *Value
+  )
+{
+  CONST CHAR8  *String;
+
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  String = (CONST CHAR8 *)PcdGetPtr (PcdSerialDebugPrintErrorLevel);
+
+  if (ParseSerialDebugLevel (String, Value)) {
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
 }

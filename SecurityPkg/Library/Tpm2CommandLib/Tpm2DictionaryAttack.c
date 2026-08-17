@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
@@ -85,7 +86,7 @@ Tpm2DictionaryAttackLockReset (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -167,7 +168,7 @@ Tpm2DictionaryAttackParameters (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 

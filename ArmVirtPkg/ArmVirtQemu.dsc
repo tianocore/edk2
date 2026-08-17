@@ -78,6 +78,7 @@
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
+  Tpm2HelpLib|SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
   Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
@@ -146,6 +147,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 !endif
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|TRUE
 
 [PcdsFixedAtBuild.common]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x00000000
@@ -436,7 +438,7 @@
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0
   }
-  OvmfPkg/VirtioKeyboardDxe/VirtioKeyboard.inf
+  OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {

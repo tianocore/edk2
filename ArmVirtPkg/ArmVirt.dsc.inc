@@ -51,6 +51,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 !else
@@ -120,6 +121,8 @@ DEFINE FD_SIZE_IN_MB    = 3
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgLibNull.inf
+  QemuFwCfgSimpleParserLib|OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
 
   #
   # Misc
@@ -279,6 +282,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  MapMmioLib|OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
@@ -286,6 +290,7 @@ DEFINE FD_SIZE_IN_MB    = 3
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  MapMmioLib|OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DxeRuntimeDebugLibFdtPL011Uart.inf
 !endif
@@ -378,8 +383,8 @@ DEFINE FD_SIZE_IN_MB    = 3
   # (the memory used, and the free memory that was prereserved
   # but not used).
   #
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|4
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x3C
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|600
@@ -387,7 +392,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|1500
 !else
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|300
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|150
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x424
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|1000
 !endif
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|12000
@@ -480,7 +485,11 @@ DEFINE FD_SIZE_IN_MB    = 3
   #
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 !if $(ENABLE_VIRTIO)
-  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf {
+    <LibraryClasses>
+    NULL|OvmfPkg/Library/VirtioMmioProbeLib/VirtioMmioProbeLib.inf
+  }
+
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MANAGEABILITY_EDKII_PLDM_COMMON_H_
-#define MANAGEABILITY_EDKII_PLDM_COMMON_H_
+#pragma once
 
 #include <IndustryStandard/Pldm.h>
 #include <Library/ManageabilityTransportLib.h>
@@ -116,5 +115,3 @@ CommonPldmSubmitCommand (
   OUT    UINT8                          *ResponseData OPTIONAL,
   IN OUT UINT32                         *ResponseDataSize
   );
-
-#endif // MANAGEABILITY_EDKII_PLDM_COMMON_H_

@@ -29,7 +29,7 @@ TPM2_HASH_MASK  mTpm2HashMask[] = {
 };
 
 /**
-  The function get hash mask info from algorithm.
+  The function get hash mask info from GUID.
 
   @param HashGuid Hash Guid
 
@@ -37,7 +37,7 @@ TPM2_HASH_MASK  mTpm2HashMask[] = {
 **/
 UINT32
 EFIAPI
-Tpm2GetHashMaskFromAlgo (
+Tpm2GetHashMaskFromGuid (
   IN EFI_GUID  *HashGuid
   )
 {

@@ -45,6 +45,7 @@ ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3 = 5010
 ERROR_INCLUDE_FILE_CHECK_ALL = 6000
 ERROR_INCLUDE_FILE_CHECK_DATA = 6004
 ERROR_INCLUDE_FILE_CHECK_NAME = 6005
+ERROR_INCLUDE_FILE_CHECK_PRAGMA_ONCE = 6006
 
 ERROR_DECLARATION_DATA_TYPE_CHECK_ALL = 7000
 ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE = 7001
@@ -139,6 +140,7 @@ gEccErrorMessage = {
     ERROR_INCLUDE_FILE_CHECK_ALL : "",
     ERROR_INCLUDE_FILE_CHECK_DATA : "Include files should contain only public or only private data and cannot contain code or define data variables",
     ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the include file with same names",
+    ERROR_INCLUDE_FILE_CHECK_PRAGMA_ONCE : "Include files should use '#pragma once' instead of a traditional #ifndef/#define include guard",
 
     ERROR_DECLARATION_DATA_TYPE_CHECK_ALL : "",
     ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE : "There should be no use of int, unsigned, char, void, long in any .c, .h or .asl files",

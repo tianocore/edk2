@@ -137,3 +137,33 @@ AmlSetRdListCheckSum (
   IN  AML_OBJECT_NODE  *BufferOpNode,
   IN  UINT8            CheckSum
   );
+
+/** Check Address Space Descriptor Fields.
+
+  Cf. ACPI 6.4 Table 6.44:
+  "Valid Combination of Address Space Descriptor Fields"
+
+  See ACPI 6.4 spec, s19.6.36 for more.
+
+  @param [in]  IsMinFixed           Minimum address is fixed.
+  @param [in]  IsMaxFixed           Maximum address is fixed.
+  @param [in]  AddressGranularity   Address granularity.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  AddressTranslation   Address translation.
+  @param [in]  RangeLength          Range length.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+CheckAddressSpaceFields (
+  IN  BOOLEAN  IsMinFixed,
+  IN  BOOLEAN  IsMaxFixed,
+  IN  UINT64   AddressGranularity,
+  IN  UINT64   AddressMinimum,
+  IN  UINT64   AddressMaximum,
+  IN  UINT64   AddressTranslation,
+  IN  UINT64   RangeLength
+  );

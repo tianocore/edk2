@@ -72,6 +72,7 @@
   gEfiFileInfoGuid                      ## SOMETIMES_CONSUMES   ## UNDEFINED
   gEfiFileSystemInfoGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
   gEfiFileSystemVolumeLabelInfoIdGuid   ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiEventBeforeExitBootServicesGuid   ## CONSUMES             ## Event
 
 [Protocols]
   gEfiDiskIoProtocolGuid                ## TO_START

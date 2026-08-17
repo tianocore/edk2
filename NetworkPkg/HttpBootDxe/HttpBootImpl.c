@@ -432,8 +432,7 @@ HttpBootGetBootFileCaller (
         if (*BufferSize < Private->BootFileSize) {
           *BufferSize = Private->BootFileSize;
           *ImageType  = Private->ImageType;
-          Status      = EFI_BUFFER_TOO_SMALL;
-          return Status;
+          return EFI_BUFFER_TOO_SMALL;
         }
 
         //
@@ -448,10 +447,14 @@ HttpBootGetBootFileCaller (
                      ImageType
                      );
           if (!EFI_ERROR (Status) ||
-              ((Status != EFI_TIMEOUT) && (Status != EFI_DEVICE_ERROR)) ||
-              (Retries >= PcdGet32 (PcdMaxHttpResumeRetries)))
+              ((Status != EFI_TIMEOUT) && (Status != EFI_DEVICE_ERROR)))
           {
-            break;
+            return Status;
+          }
+
+          if (Retries == PcdGet32 (PcdMaxHttpResumeRetries)) {
+            DEBUG ((DEBUG_ERROR, "HttpBootGetBootFileCaller: Error downloading NBP file, even after trying to resume %d times.\n", Retries));
+            return Status;
           }
 
           //
@@ -463,23 +466,22 @@ HttpBootGetBootFileCaller (
           HttpIoDestroyIo (&Private->HttpIo);
           Status = HttpBootCreateHttpIo (Private);
           if (EFI_ERROR (Status)) {
-            break;
+            return Status;
           }
 
           DEBUG ((DEBUG_WARN | DEBUG_INFO, "HttpBootGetBootFileCaller: NBP file download interrupted, will try to resume the operation.\n"));
           gBS->Stall (1000 * 1000 * PcdGet32 (PcdHttpDelayBetweenResumeRetries));
         }
 
-        if (EFI_ERROR (Status) && (Retries >= PcdGet32 (PcdMaxHttpResumeRetries))) {
-          DEBUG ((DEBUG_ERROR, "HttpBootGetBootFileCaller: Error downloading NBP file, even after trying to resume %d times.\n", Retries));
-        }
-
-        return Status;
+        //
+        // Only reach here if the for loop above is not executed, which means PcdMaxHttpResumeRetries is 0.
+        //
+        return EFI_UNSUPPORTED;
 
       case GetBootFileError:
       default:
         AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
-        return Status;
+        return EFI_UNSUPPORTED;
     }
   }
 }

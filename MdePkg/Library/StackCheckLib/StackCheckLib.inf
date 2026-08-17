@@ -30,6 +30,9 @@
   AArch64/StackCookieInterrupt.S   |GCC
   AArch64/StackCookieInterrupt.asm |MSFT
 
+[Sources.LOONGARCH64]
+  LoongArch64/StackCookieInterrupt.S | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
 

@@ -155,6 +155,7 @@ SbiMpxyGetShmemSize (
     return EFI_SUCCESS;
   }
 
+  *ShmemSize = 0;
   return TranslateError (Ret.Error);
 }
 

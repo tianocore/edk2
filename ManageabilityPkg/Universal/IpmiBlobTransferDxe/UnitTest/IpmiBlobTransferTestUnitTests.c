@@ -74,11 +74,10 @@ GoodCrc (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8   Data[5];
+  UINT8   Data[5] = { 0x12, 0x34, 0x56, 0x78, 0x90 };
   UINTN   DataSize;
   UINT16  Crc;
 
-  Data     = { 0x12, 0x34, 0x56, 0x78, 0x90 };
   DataSize = sizeof (Data);
 
   Crc = CalculateCrc16Ccitt (Data, DataSize);
@@ -105,11 +104,10 @@ BadCrc (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8   Data[5];
+  UINT8   Data[5] = { 0x12, 0x34, 0x56, 0x78, 0x90 };
   UINTN   DataSize;
   UINT16  Crc;
 
-  Data     = { 0x12, 0x34, 0x56, 0x78, 0x90 };
   DataSize = sizeof (Data);
 
   Crc = CalculateCrc16Ccitt (Data, DataSize);
@@ -152,6 +150,177 @@ SendIpmiBadCompletion (
 
   UT_ASSERT_STATUS_EQUAL (Status, EFI_PROTOCOL_ERROR);
   FreePool (MockResponseResults);
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiResponseTooShort (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+  UINT32      MockResponseSize = 0;
+
+  // Too short for completion code
+  MockResponseSize = 0;
+  ResponseDataSize = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+
+  MockIpmiSubmitCommand (NULL, MockResponseSize, EFI_SUCCESS);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (10);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_PROTOCOL_ERROR);
+
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiResponseTooShortForOen (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+  VOID        *MockResponseResults = NULL;
+  UINT32      MockResponseSize     = 1;
+
+  // Only has completion code, too short for OEN
+  MockResponseResults           = (UINT8 *)AllocateZeroPool (MockResponseSize);
+  ResponseDataSize              = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *(UINT8 *)MockResponseResults = 0; // Success completion code
+
+  MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, MockResponseSize, EFI_SUCCESS);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (10);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_PROTOCOL_ERROR);
+
+  FreePool (MockResponseResults);
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiResponseTooLarge (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+  VOID        *MockResponseResults = NULL;
+  UINT8       LargeResponse[]      = {
+    0x00,                  // CompletionCode
+    0xCF, 0xC2, 0x00,      // OpenBMC OEN
+    0x00, 0x00,            // CRC (doesn't matter as we fail before check)
+    0x01, 0x02, 0x03, 0x04 // Data
+  };
+
+  // Response says 4 bytes of data, but caller only provides 2 bytes buffer
+  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (LargeResponse));
+  ResponseDataSize    = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *ResponseDataSize   = 2; // Caller buffer size
+  CopyMem (MockResponseResults, LargeResponse, sizeof (LargeResponse));
+
+  // We need valid CRC for it to reach the size check
+  UINT16  CorrectCrc = CalculateCrc16Ccitt (LargeResponse + 6, 4);
+
+  CopyMem (MockResponseResults + 4, &CorrectCrc, sizeof (UINT16));
+
+  MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, sizeof (LargeResponse), EFI_SUCCESS);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (*ResponseDataSize);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_BUFFER_TOO_SMALL);
+
+  FreePool (MockResponseResults);
+  FreePool (ResponseDataSize);
+  FreePool (ResponseData);
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+SendIpmiSubmitCommandError (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VOID        *ResponseData;
+  UINT32      *ResponseDataSize;
+  EFI_STATUS  Status;
+
+  ResponseDataSize  = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *ResponseDataSize = 10;
+
+  MockIpmiSubmitCommand (NULL, 0, EFI_DEVICE_ERROR);
+
+  ResponseData = (UINT8 *)AllocateZeroPool (*ResponseDataSize);
+  Status       = IpmiBlobTransferSendIpmi (IpmiBlobTransferSubcommandGetCount, NULL, 0, ResponseData, ResponseDataSize);
+
+  UT_ASSERT_STATUS_EQUAL (Status, EFI_DEVICE_ERROR);
+
   FreePool (ResponseDataSize);
   FreePool (ResponseData);
   return UNIT_TEST_PASSED;
@@ -265,7 +434,7 @@ SendIpmiBadCrcResponse (
   EFI_STATUS  Status;
   VOID        *MockResponseResults;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (BAD_CRC_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (BAD_CRC_RESPONSE_SIZE);
   ResponseDataSize    = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
   CopyMem (MockResponseResults, &BadCrcResponse, BAD_CRC_RESPONSE_SIZE);
 
@@ -315,8 +484,9 @@ SendIpmiValidCountResponse (
   EFI_STATUS  Status;
   VOID        *MockResponseResults;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_GET_COUNT_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_GET_COUNT_RESPONSE_SIZE);
   ResponseDataSize    = (UINT32 *)AllocateZeroPool (sizeof (UINT32));
+  *ResponseDataSize   = sizeof (ValidGetCountResponse);
   CopyMem (MockResponseResults, &ValidGetCountResponse, VALID_GET_COUNT_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_GET_COUNT_RESPONSE_SIZE, EFI_SUCCESS);
@@ -357,7 +527,7 @@ GetCountValidCountResponse (
   VOID        *MockResponseResults;
 
   Count               = 0;
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_GET_COUNT_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_GET_COUNT_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidGetCountResponse, VALID_GET_COUNT_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_GET_COUNT_RESPONSE_SIZE, EFI_SUCCESS);
@@ -404,7 +574,7 @@ EnumerateValidResponse (
   CHAR8       *BlobId;
   VOID        *MockResponseResults;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_ENUMERATE_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_ENUMERATE_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidEnumerateResponse, VALID_ENUMERATE_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_ENUMERATE_RESPONSE_SIZE, EFI_SUCCESS);
@@ -441,23 +611,12 @@ EnumerateInvalidBuffer (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  CHAR8       *BlobId;
-  EFI_STATUS  Status;
-  VOID        *MockResponseResults;
-
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_ENUMERATE_RESPONSE_SIZE));
-  CopyMem (MockResponseResults, &ValidEnumerateResponse, VALID_ENUMERATE_RESPONSE_SIZE);
-
-  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_ENUMERATE_RESPONSE_SIZE, EFI_SUCCESS);
-  if (EFI_ERROR (Status)) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
+  CHAR8  *BlobId;
 
   BlobId = NULL;
 
   UT_EXPECT_ASSERT_FAILURE (IpmiBlobTransferEnumerate (0, BlobId), NULL);
 
-  FreePool (MockResponseResults);
   return UNIT_TEST_PASSED;
 }
 
@@ -509,25 +668,28 @@ OpenValidResponse (
   // So we'll push three Ipmi responses in this case
   //
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_OPEN_RESPONSE_SIZE));
-
-  CopyMem (MockResponseResults, &ValidOpenResponse, VALID_OPEN_RESPONSE_SIZE);
-  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_OPEN_RESPONSE_SIZE, EFI_SUCCESS);
-  if (EFI_ERROR (Status)) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  MockResponseResults2 = (UINT8 *)AllocateZeroPool (sizeof (VALID_ENUMERATE_RESPONSE_SIZE));
-  CopyMem (MockResponseResults2, &ValidEnumerateResponse, VALID_ENUMERATE_RESPONSE_SIZE);
-  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults2, VALID_ENUMERATE_RESPONSE_SIZE, EFI_SUCCESS);
-  if (EFI_ERROR (Status)) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  MockResponseResults3 = (UINT8 *)AllocateZeroPool (sizeof (VALID_GET_COUNT_RESPONSE_SIZE));
+  // Queue order must be: GetCount, Enumerate, Open
+  MockResponseResults3 = (UINT8 *)AllocateZeroPool (VALID_GET_COUNT_RESPONSE_SIZE);
   CopyMem (MockResponseResults3, &ValidGetCountResponse, VALID_GET_COUNT_RESPONSE_SIZE);
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults3, VALID_GET_COUNT_RESPONSE_SIZE, EFI_SUCCESS);
   if (EFI_ERROR (Status)) {
+    return UNIT_TEST_ERROR_TEST_FAILED;
+  }
+
+  MockResponseResults2 = (UINT8 *)AllocateZeroPool (VALID_ENUMERATE_RESPONSE_SIZE);
+  CopyMem (MockResponseResults2, &ValidEnumerateResponse, VALID_ENUMERATE_RESPONSE_SIZE);
+  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults2, VALID_ENUMERATE_RESPONSE_SIZE, EFI_SUCCESS);
+  if (EFI_ERROR (Status)) {
+    FreePool (MockResponseResults3);
+    return UNIT_TEST_ERROR_TEST_FAILED;
+  }
+
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_OPEN_RESPONSE_SIZE);
+  CopyMem (MockResponseResults, &ValidOpenResponse, VALID_OPEN_RESPONSE_SIZE);
+  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_OPEN_RESPONSE_SIZE, EFI_SUCCESS);
+  if (EFI_ERROR (Status)) {
+    FreePool (MockResponseResults2);
+    FreePool (MockResponseResults3);
     return UNIT_TEST_ERROR_TEST_FAILED;
   }
 
@@ -538,6 +700,8 @@ OpenValidResponse (
   UT_ASSERT_STATUS_EQUAL (Status, EFI_SUCCESS);
   UT_ASSERT_EQUAL (SessionId, 3);
   FreePool (MockResponseResults);
+  FreePool (MockResponseResults2);
+  FreePool (MockResponseResults3);
   return UNIT_TEST_PASSED;
 }
 
@@ -570,11 +734,10 @@ ReadValidResponse (
 {
   EFI_STATUS  Status;
   UINT8       *ResponseData;
-  UINT8       ExpectedDataResponse[4];
+  UINT8       ExpectedDataResponse[4] = { 0x00, 0x01, 0x02, 0x03 };
   VOID        *MockResponseResults;
 
-  ExpectedDataResponse = { 0x00, 0x01, 0x02, 0x03 };
-  MockResponseResults  = (UINT8 *)AllocateZeroPool (sizeof (VALID_READ_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_READ_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidReadResponse, VALID_READ_RESPONSE_SIZE);
   ResponseData = AllocateZeroPool (sizeof (ValidReadResponse));
 
@@ -610,22 +773,12 @@ ReadInvalidBuffer (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8       *ResponseData;
-  EFI_STATUS  Status;
-  VOID        *MockResponseResults;
+  UINT8  *ResponseData;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_READ_RESPONSE_SIZE));
-  CopyMem (MockResponseResults, &ValidReadResponse, VALID_READ_RESPONSE_SIZE);
   ResponseData = NULL;
-
-  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_READ_RESPONSE_SIZE, EFI_SUCCESS);
-  if (EFI_ERROR (Status)) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
 
   UT_EXPECT_ASSERT_FAILURE (IpmiBlobTransferRead (0, 0, 4, ResponseData), NULL);
 
-  FreePool (MockResponseResults);
   return UNIT_TEST_PASSED;
 }
 
@@ -648,11 +801,10 @@ WriteValidResponse (
   )
 {
   EFI_STATUS  Status;
-  UINT8       SendData[4];
+  UINT8       SendData[4] = { 0x00, 0x01, 0x02, 0x03 };
   VOID        *MockResponseResults;
 
-  SendData            = { 0x00, 0x01, 0x02, 0x03 };
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_NODATA_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_NODATA_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidNoDataResponse, VALID_NODATA_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_NODATA_RESPONSE_SIZE, EFI_SUCCESS);
@@ -686,11 +838,10 @@ CommitValidResponse (
   )
 {
   EFI_STATUS  Status;
-  UINT8       SendData[4];
+  UINT8       SendData[4] = { 0x00, 0x01, 0x02, 0x03 };
   VOID        *MockResponseResults;
 
-  SendData            = { 0x00, 0x01, 0x02, 0x03 };
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_NODATA_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_NODATA_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidNoDataResponse, VALID_NODATA_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_NODATA_RESPONSE_SIZE, EFI_SUCCESS);
@@ -726,7 +877,7 @@ CloseValidResponse (
   EFI_STATUS  Status;
   VOID        *MockResponseResults;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_NODATA_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_NODATA_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidNoDataResponse, VALID_NODATA_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_NODATA_RESPONSE_SIZE, EFI_SUCCESS);
@@ -762,7 +913,7 @@ DeleteValidResponse (
   EFI_STATUS  Status;
   VOID        *MockResponseResults;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_NODATA_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_NODATA_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidNoDataResponse, VALID_NODATA_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_NODATA_RESPONSE_SIZE, EFI_SUCCESS);
@@ -812,18 +963,17 @@ BlobStatValidResponse (
   UINT32      *Size;
   UINT8       *MetadataLength;
   UINT8       *Metadata;
-  UINT8       *ExpectedMetadata;
+  UINT8       ExpectedMetadata[4] = { 0x06, 0x07, 0x08, 0x09 };
   CHAR8       *BlobId;
   VOID        *MockResponseResults;
 
-  BlobState        = AllocateZeroPool (sizeof (UINT16));
-  Size             = AllocateZeroPool (sizeof (UINT32));
-  BlobId           = "BlobId";
-  MetadataLength   = AllocateZeroPool (sizeof (UINT8));
-  Metadata         = AllocateZeroPool (4 * sizeof (UINT8));
-  ExpectedMetadata = AllocateZeroPool (4 * sizeof (UINT8));
+  BlobState      = AllocateZeroPool (sizeof (UINT16));
+  Size           = AllocateZeroPool (sizeof (UINT32));
+  BlobId         = "BlobId";
+  MetadataLength = AllocateZeroPool (sizeof (UINT8));
+  Metadata       = AllocateZeroPool (4 * sizeof (UINT8));
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_BLOB_STAT_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_BLOB_STAT_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidBlobStatResponse, VALID_BLOB_STAT_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_BLOB_STAT_RESPONSE_SIZE, EFI_SUCCESS);
@@ -864,23 +1014,12 @@ BlobStatInvalidBuffer (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8       *Metadata;
-  EFI_STATUS  Status;
-  VOID        *MockResponseResults;
+  UINT8  *Metadata;
 
   Metadata = NULL;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_BLOB_STAT_RESPONSE_SIZE));
-  CopyMem (MockResponseResults, &ValidBlobStatResponse, VALID_BLOB_STAT_RESPONSE_SIZE);
-
-  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_BLOB_STAT_RESPONSE_SIZE, EFI_SUCCESS);
-  if (EFI_ERROR (Status)) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
   UT_EXPECT_ASSERT_FAILURE (IpmiBlobTransferStat (NULL, 0, 0, 0, Metadata), NULL);
 
-  FreePool (MockResponseResults);
   return UNIT_TEST_PASSED;
 }
 
@@ -907,16 +1046,15 @@ SessionStatValidResponse (
   UINT32      *Size;
   UINT8       *MetadataLength;
   UINT8       *Metadata;
-  UINT8       *ExpectedMetadata;
+  UINT8       ExpectedMetadata[4] = { 0x06, 0x07, 0x08, 0x09 };
   VOID        *MockResponseResults;
 
-  BlobState        = AllocateZeroPool (sizeof (UINT16));
-  Size             = AllocateZeroPool (sizeof (UINT32));
-  MetadataLength   = AllocateZeroPool (sizeof (UINT8));
-  Metadata         = AllocateZeroPool (4 * sizeof (UINT8));
-  ExpectedMetadata = AllocateZeroPool (4 * sizeof (UINT8));
+  BlobState      = AllocateZeroPool (sizeof (UINT16));
+  Size           = AllocateZeroPool (sizeof (UINT32));
+  MetadataLength = AllocateZeroPool (sizeof (UINT8));
+  Metadata       = AllocateZeroPool (4 * sizeof (UINT8));
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_BLOB_STAT_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_BLOB_STAT_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidBlobStatResponse, VALID_BLOB_STAT_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_BLOB_STAT_RESPONSE_SIZE, EFI_SUCCESS);
@@ -957,23 +1095,12 @@ SessionStatInvalidBuffer (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8       *Metadata;
-  EFI_STATUS  Status;
-  VOID        *MockResponseResults;
+  UINT8  *Metadata;
 
   Metadata = NULL;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_BLOB_STAT_RESPONSE_SIZE));
-  CopyMem (MockResponseResults, &ValidBlobStatResponse, VALID_BLOB_STAT_RESPONSE_SIZE);
-
-  Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_BLOB_STAT_RESPONSE_SIZE, EFI_SUCCESS);
-  if (EFI_ERROR (Status)) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
   UT_EXPECT_ASSERT_FAILURE (IpmiBlobTransferSessionStat (0, 0, 0, 0, Metadata), NULL);
 
-  FreePool (MockResponseResults);
   return UNIT_TEST_PASSED;
 }
 
@@ -998,7 +1125,7 @@ WriteMetaValidResponse (
   EFI_STATUS  Status;
   VOID        *MockResponseResults;
 
-  MockResponseResults = (UINT8 *)AllocateZeroPool (sizeof (VALID_NODATA_RESPONSE_SIZE));
+  MockResponseResults = (UINT8 *)AllocateZeroPool (VALID_NODATA_RESPONSE_SIZE);
   CopyMem (MockResponseResults, &ValidNoDataResponse, VALID_NODATA_RESPONSE_SIZE);
 
   Status = MockIpmiSubmitCommand ((UINT8 *)MockResponseResults, VALID_NODATA_RESPONSE_SIZE, EFI_SUCCESS);
@@ -1055,6 +1182,10 @@ SetupAndRunUnitTests (
   Status = AddTestCase (IpmiBlobTransfer, "Test Bad CRC Calculation", "BadCrc", BadCrc, NULL, NULL, NULL);
   // IpmiBlobTransferSendIpmi
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns bad completion", "SendIpmiBadCompletion", SendIpmiBadCompletion, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns response too short", "SendIpmiResponseTooShort", SendIpmiResponseTooShort, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns response too short for OEN", "SendIpmiResponseTooShortForOen", SendIpmiResponseTooShortForOen, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns response too large for buffer", "SendIpmiResponseTooLarge", SendIpmiResponseTooLarge, NULL, NULL, NULL);
+  Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns error from SubmitCommand", "SendIpmiSubmitCommandError", SendIpmiSubmitCommandError, NULL, NULL, NULL);
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns successfully with no data", "SendIpmiNoDataResponse", SendIpmiNoDataResponse, NULL, NULL, NULL);
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns successfully with bad OEN", "SendIpmiBadOenResponse", SendIpmiBadOenResponse, NULL, NULL, NULL);
   Status = AddTestCase (IpmiBlobTransfer, "Send IPMI returns successfully with bad CRC", "SendIpmiBadCrcResponse", SendIpmiBadCrcResponse, NULL, NULL, NULL);

@@ -11,8 +11,6 @@
 set SCRIPT_ERROR=0
 if "%1"=="" goto main
 if /I "%1"=="VS2019" goto VS2019Vars
-if /I "%1"=="VS2017" goto VS2017Vars
-if /I "%1"=="VS2015" goto VS2015Vars
 
 :set_vsvars
 if defined VCINSTALLDIR goto :EOF
@@ -62,26 +60,6 @@ if defined VCINSTALLDIR goto :done
     )
   )
   if /I "%1"=="VS2019" goto ToolNotInstall
-
-  :VS2017Vars
-  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
-    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
-      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16
-    ) else (
-      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 15,16
-    )
-  )
-  if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
-    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\BuildTools" (
-      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16
-    ) else (
-      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 15,16
-    )
-  )
-  if /I "%1"=="VS2017" goto ToolNotInstall
-
-  :VS2015Vars
-  if defined VS140COMNTOOLS (call :read_vsvars  "%VS140COMNTOOLS%") else (if /I "%1"=="VS2015" goto ToolNotInstall)
 
 :done
 set GET_VSVARS_BAT_CHECK_DIR=

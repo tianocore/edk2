@@ -122,6 +122,30 @@ FatAllocateVolume (
   DEBUG ((DEBUG_INIT, "Installed Fat filesystem on %p\n", Handle));
   Volume->Valid = TRUE;
 
+  //
+  // Create a pre-ExitBootServices event for this volume to flush any dirty caches so
+  // they are not lost. before ExitBootServices is required because the underlying
+  // Block-io and device protocols may not be available later than this.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  FatOnBeforeExitBootServices,
+                  Volume,
+                  &gEfiEventBeforeExitBootServicesGuid,
+                  &Volume->FlushEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: CreateEventEx for pre-ExitBootServices failed (%r), dirty caches will not be flushed on exit!\n",
+      __func__,
+      Status
+      ));
+    Volume->FlushEvent = NULL;
+    Status             = EFI_SUCCESS;
+  }
+
 Done:
   if (EFI_ERROR (Status)) {
     FatFreeVolume (Volume);

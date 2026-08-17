@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
-  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -19,6 +19,37 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
+#include <IndustryStandard/SmBios.h>
+
+///
+/// Maximum storage size, including the terminating NULL, for SMBIOS strings
+/// represented inline in Configuration Manager objects. This is a
+/// DynamicTablesPkg implementation limit.
+///
+/// The legacy 64-character constraint from SMBIOS 2.6 was required for MIF
+/// compatibility and does not apply to SMBIOS 2.7 or later tables.
+///
+#define SMBIOS_MAX_STRING_SIZE  (1024)
+
+// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
+#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
+
+/**
+  Maximum number of Value bytes that can fit in a single-entry SMBIOS Type 40
+  formatted structure.
+
+  The SMBIOS formatted length is limited to MAX_UINT8. Five bytes are required
+  for the SMBIOS Type 40 header and NumberOfAdditionalInformationEntries, and
+  five bytes are required for the fixed portion of an Additional Information
+  Entry:
+
+    MAX_UINT8 - 5 - 5 = 245 bytes.
+
+  A Type 40 structure containing multiple entries may have a smaller effective
+  maximum per entry. The generator must therefore also validate the aggregate
+  formatted length.
+**/
+#define SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE  245
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -83,6 +114,23 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
   EArchCommonObjMemoryDeviceInfo,               ///< 56 - Memory Device Info
   EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
+  EArchCommonObjCoolingDeviceInfo,              ///< 58 - Cooling Device Info
+  EArchCommonObjTemperatureProbeInfo,           ///< 59 - Temperature Probe Info
+  EArchCommonObjVoltageProbeInfo,               ///< 60 - Voltage Probe Info
+  EArchCommonObjElectricalCurrentProbeInfo,     ///< 61 - Electrical Current Probe Info
+  EArchCommonObjSystemResetInfo,                ///< 62 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,      ///< 63 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,              ///< 64 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,            ///< 65 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,     ///< 66 - Processor specific data Info
+  EArchCommonObjSystemInfo,                     ///< 67 - System Info
+  EArchCommonObjAdditionalInformation,          ///< 68 - Additional Information
+  EArchCommonObjAdditionalInformationEntry,     ///< 69 - Additional Information Entry
+  EArchCommonObjAdditionalInformationValue,     ///< 70 - Additional Information Value
+  EArchCommonObjSystemEnclosureInfo,            ///< 71 - System Enclosure Info
+  EArchCommonObjEnclosureElement,               ///< 72 - System Enclosure Contained Element
+  EArchCommonObjBaseboardInfo,                  ///< 73 - Baseboard Info
+  EArchCommonObjBaseboardContainedObject,       ///< 74 - Baseboard Contained Object
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -448,8 +496,6 @@ typedef struct CmArchCommonLpiInfo {
   CHAR8                                     StateName[16];
 } CM_ARCH_COMMON_LPI_INFO;
 
-#define SMBIOS_MAX_STRING_SIZE  (1024)
-
 /** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
 
     ID: EArchCommonObjProcHierarchyInfo
@@ -507,6 +553,11 @@ typedef struct CmArchCommonProcHierarchyInfo {
   CHAR8              PartNumber[SMBIOS_MAX_STRING_SIZE];
   /// SMBIOS: String stating processor socket type.
   CHAR8              SocketType[SMBIOS_MAX_STRING_SIZE];
+
+  /** Optional field: Reference Token for _STA info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_STA_INFO object.
+   */
+  CM_OBJECT_TOKEN    StaToken;
 } CM_ARCH_COMMON_PROC_HIERARCHY_INFO;
 
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT
@@ -968,9 +1019,6 @@ typedef struct CmArchCommonCxlHostBridgeInfo {
   /// Base address of the component registers.
   UINT64             ComponentRegisterBase;
 } CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO;
-
-// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
-#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
 
 /** A structure that describes the CXL Fixed Memory Window Structure (Type 1).
 
@@ -1463,5 +1511,445 @@ typedef struct CmArchCommonMemoryArrayMappedAddress {
   /// Number of memory devices that form a row in the address partition.
   UINT8                   NumMemDevices;
 } CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device Mapped Address.
+
+  SMBIOS Specification v3.9.0 Type 20
+
+  ID: EArchCommonObjMemoryDeviceMappedAddress
+**/
+typedef struct CmArchCommonMemoryDeviceMappedAddress {
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryDeviceMappedAddressToken;
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token of the associated Memory Device.
+  CM_OBJECT_TOKEN         MemoryDeviceInfoToken;
+  /// CM Object Token of the associated Memory Array Mapped Address.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Identifies the position of the referenced memory device in a row.
+  /// Set to 0xFF if unknown.
+  UINT8                   PartitionRowPosition;
+  /// Identifies the position of the referenced memory device in an interleave.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavePosition;
+  /// Number of consecutive rows from the referenced memory device.
+  /// Set to 0xFF if unknown.
+  UINT8                   InterleavedDataDepth;
+} CM_ARCH_COMMON_MEMORY_DEVICE_MAPPED_ADDRESS;
+
+/** A structure that describes a Memory Device entry associated with a
+  Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelDevice
+**/
+typedef struct CmArchCommonMemoryChannelDevice {
+  /// The load on the channel represented by the associated memory device.
+  UINT8              DeviceLoad;
+
+  /// CM Object Token of the associated SMBIOS Type 17 Memory Device.
+  CM_OBJECT_TOKEN    MemoryDeviceInfoToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_DEVICE;
+
+/** A structure that describes a Memory Channel.
+
+  SMBIOS Specification v3.9.0 Type 37
+
+  ID: EArchCommonObjMemoryChannelInfo
+**/
+typedef struct CmArchCommonMemoryChannelInfo {
+  /// CM Object Token uniquely identifying this memory channel.
+  CM_OBJECT_TOKEN    MemoryChannelToken;
+
+  /// Type of the memory channel.
+  UINT8              ChannelType;
+
+  /// Maximum load supported by the memory channel.
+  UINT8              MaximumChannelLoad;
+
+  /// Token referencing an array of Memory Channel Device entries.
+  CM_OBJECT_TOKEN    MemoryDeviceListToken;
+} CM_ARCH_COMMON_MEMORY_CHANNEL_INFO;
+
+/** A structure that describes cooling device.
+
+  SMBIOS Specification v3.9.0 Type 27
+
+  ID: EArchCommonObjCoolingDeviceInfo
+**/
+typedef struct CmArchCommonCoolingDeviceInfo {
+  /// CM Object Token uniquely identifying this cooling device info.
+  CM_OBJECT_TOKEN             Token;
+  /// CM Object Token uniquely identifying temperature probe associated with this device
+  CM_OBJECT_TOKEN             TemperatureProbeToken;
+  /// Type and Status of the cooling device
+  MISC_COOLING_DEVICE_TYPE    DeviceTypeAndStatus;
+  /// Cooling unit group number
+  UINT8                       CoolingUnitGroup;
+  /// OEM defined information
+  UINT32                      OEMDefined;
+  /// Nominal speed for the cooling device in revolutions per minute
+  /// A value of 0x8000 indicates unknown or non-rotating.
+  UINT16                      NominalSpeed;
+  /// Description of the cooling device
+  CHAR8                       Description[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_COOLING_DEVICE_INFO;
+
+/** A structure that describes a temperature probe.
+
+  SMBIOS Specification v3.9.0 Type 28
+
+  ID: EArchCommonObjTemperatureProbeInfo
+**/
+typedef struct CmArchCommonTemperatureProbeInfo {
+  /// CM Object Token uniquely identifying this temperature probe.
+  CM_OBJECT_TOKEN                    TemperatureProbeToken;
+
+  /// Description of the temperature probe or its location.
+  CHAR8                              Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Location and status of the temperature probe.
+  MISC_TEMPERATURE_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum value readable by the probe, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             MaximumValue;
+
+  /// Minimum value readable by the probe, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             MinimumValue;
+
+  /// Resolution for the probe reading, in 1/1000 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Resolution;
+
+  /// Tolerance for the probe reading, plus/minus 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Tolerance;
+
+  /// Accuracy for the probe reading, in plus/minus 1/100 percent.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                             OemDefined;
+
+  /// Nominal temperature value, in 1/10 degrees C.
+  /// A value of 0x8000 indicates unknown.
+  UINT16                             NominalValue;
+} CM_ARCH_COMMON_TEMPERATURE_PROBE_INFO;
+
+/** A structure that describes a voltage probe.
+
+  SMBIOS Specification v3.9.0 Type 26
+
+  ID: EArchCommonObjVoltageProbeInfo
+**/
+typedef struct CmArchCommonVoltageProbeInfo {
+  /// Token identifying this voltage probe CM object.
+  CM_OBJECT_TOKEN                VoltageProbeToken;
+
+  /// String describing the voltage probe or its location.
+  CHAR8                          Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Probe location and status encoded as SMBIOS Type 26 Location and Status.
+  MISC_VOLTAGE_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         MaximumValue;
+
+  /// Minimum voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         MinimumValue;
+
+  /// Resolution in tenths of millivolts, or 0x8000 if unknown.
+  UINT16                         Resolution;
+
+  /// Tolerance in plus/minus millivolts, or 0x8000 if unknown.
+  UINT16                         Tolerance;
+
+  /// Accuracy in plus/minus 1/100th percent, or 0x8000 if unknown.
+  UINT16                         Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                         OEMDefined;
+
+  /// Nominal voltage in millivolts, or 0x8000 if unknown.
+  UINT16                         NominalValue;
+} CM_ARCH_COMMON_VOLTAGE_PROBE_INFO;
+
+/** A structure that describes an electrical current probe.
+
+  SMBIOS Specification v3.9.0 Type 29
+
+  ID: EArchCommonObjElectricalCurrentProbeInfo
+**/
+typedef struct CmArchCommonElectricalCurrentProbeInfo {
+  /// Token identifying this electrical current probe CM object.
+  CM_OBJECT_TOKEN                           ElectricalCurrentProbeToken;
+
+  /// String describing the electrical current probe or its location.
+  CHAR8                                     Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// Probe location and status encoded as SMBIOS Type 29 Location and Status.
+  MISC_ELECTRICAL_CURRENT_PROBE_LOCATION    LocationAndStatus;
+
+  /// Maximum current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    MaximumValue;
+
+  /// Minimum current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    MinimumValue;
+
+  /// Resolution in tenths of milliamperes, or 0x8000 if unknown.
+  UINT16                                    Resolution;
+
+  /// Tolerance in plus/minus milliamperes, or 0x8000 if unknown.
+  UINT16                                    Tolerance;
+
+  /// Accuracy in plus/minus 1/100th percent, or 0x8000 if unknown.
+  UINT16                                    Accuracy;
+
+  /// OEM- or firmware vendor-specific information.
+  UINT32                                    OEMDefined;
+
+  /// Nominal current in milliamperes, or 0x8000 if unknown.
+  UINT16                                    NominalValue;
+} CM_ARCH_COMMON_ELECTRICAL_CURRENT_PROBE_INFO;
+
+/** A structure that describes system reset information.
+
+  SMBIOS Specification v3.9.0 Type 23
+
+  ID: EArchCommonObjSystemResetInfo
+**/
+typedef struct CmArchCommonSystemResetInfo {
+  /// Token identifying this system reset CM object.
+  CM_OBJECT_TOKEN    SystemResetToken;
+
+  /// System reset capability flags as defined by SMBIOS Type 23.
+  UINT8              Capabilities;
+
+  /// Number of automatic system resets since the last intentional reset.
+  UINT16             ResetCount;
+
+  /// Number of consecutive automatic reset attempts allowed.
+  UINT16             ResetLimit;
+
+  /// Watchdog timer interval.
+  UINT16             TimerInterval;
+
+  /// Timeout value used by the watchdog timer.
+  UINT16             Timeout;
+} CM_ARCH_COMMON_SYSTEM_RESET_INFO;
+
+/** A structure that describes processor specific data.
+
+  SMBIOS Specification v3.9.0 Type 44
+
+  ID: EArchCommonObjProcessorSpecificBlockInfo
+**/
+typedef struct CmArchCommonProcessorSpecificBlockInfo {
+  /// CM Object Token uniquely identifying this processor specific block info.
+  CM_OBJECT_TOKEN                       Token;
+
+  /// Relevant Process Hierarchy Socket Token.
+  CM_OBJECT_TOKEN                       ProcSocketToken;
+
+  /// Processor Architecture Type.
+  PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE    ProcArchType;
+
+  /// Token array for architecture specific Processor Data.
+  CM_OBJECT_TOKEN                       ArchProcessorSpecificDataToken;
+} CM_ARCH_COMMON_PROCESSOR_SPECIFIC_BLOCK_INFO;
+
+/** A structure that describes System Information.
+
+  SMBIOS Specification v3.9.0 Type 1
+
+  ID: EArchCommonObjSystemInfo
+**/
+typedef struct CmArchCommonSystemInfo {
+  /// CM Object Token uniquely identifying this System Information entry.
+  CM_OBJECT_TOKEN    SystemInfoToken;
+  /// Manufacturer of the system.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Product name of the system.
+  CHAR8              ProductName[SMBIOS_MAX_STRING_SIZE];
+  /// Version of the system.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the system.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Universal unique ID of the system.
+  GUID               Uuid;
+  /// Identifies the event that caused the system to power up.
+  UINT8              WakeUpType;
+  /// SKU number of the system.
+  CHAR8              SkuNum[SMBIOS_MAX_STRING_SIZE];
+  /// Family that the system belongs to.
+  CHAR8              Family[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_SYSTEM_INFO;
+
+/** A structure that describes SMBIOS Additional Information.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformation
+**/
+typedef struct CmArchCommonAdditionalInformation {
+  /// CM Object Token uniquely identifying this Additional Information structure.
+  CM_OBJECT_TOKEN    AdditionalInformationToken;
+
+  /// Token referencing an array of Additional Information Entry structures.
+  CM_OBJECT_TOKEN    AdditionalInformationEntryListToken;
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION;
+
+/** A structure that describes an Additional Information Entry.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformationEntry
+**/
+typedef struct CmArchCommonAdditionalInformationEntry {
+  /// CM Object Token of the SMBIOS structure referenced by this entry.
+  CM_OBJECT_TOKEN    ReferencedObjectToken;
+
+  /// SMBIOS table generator ID for the referenced structure.
+  /// Allows to find the handle of the Smbios table to update.
+  UINT32             ReferencedTableGeneratorId;
+
+  /// Offset of the referenced field in the referenced SMBIOS structure.
+  UINT8              ReferencedOffset;
+
+  /// String describing the additional information entry.
+  /// Optional for SMBIOS spec. update already proposed.
+  CHAR8              EntryString[SMBIOS_MAX_STRING_SIZE];
+
+  /// Token referencing an Additional Information Value structure.
+  CM_OBJECT_TOKEN    ValueToken;
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION_ENTRY;
+
+/** A structure that describes an Additional Information Value.
+
+  SMBIOS Specification v3.9.0 Type 40
+
+  ID: EArchCommonObjAdditionalInformationValue
+**/
+typedef struct CmArchCommonAdditionalInformationValue {
+  /// Number of valid bytes in the Value array.
+  UINT8    Len;
+
+  /// Additional Information Value bytes.
+  UINT8    Value[SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE];
+} CM_ARCH_COMMON_ADDITIONAL_INFORMATION_VALUE;
+
+/** A structure that describes a System Enclosure Contained Element.
+
+  SMBIOS Specification v3.9.0 Type 3
+
+  ID: EArchCommonObjEnclosureElement
+**/
+typedef struct CmArchCommonEnclosureElement {
+  /// The contained element type.
+  UINT8    ContainedElementType;
+
+  /// Minimum number of the element type required for proper operation.
+  UINT8    ContainedElementMinimum;
+
+  /// Maximum number of the element type that can be installed.
+  UINT8    ContainedElementMaximum;
+} CM_ARCH_COMMON_ENCLOSURE_ELEMENT;
+
+/** A structure that describes System Enclosure Information.
+
+  SMBIOS Specification v3.9.0 Type 3
+
+  ID: EArchCommonObjSystemEnclosureInfo
+**/
+typedef struct CmArchCommonSystemEnclosureInfo {
+  /// CM Object Token uniquely identifying this System Enclosure entry.
+  CM_OBJECT_TOKEN    SystemEnclosureToken;
+  /// Manufacturer of the enclosure.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Chassis type with the lock-present bit in bit 7.
+  UINT8              Type;
+  /// Version of the enclosure.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the enclosure.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset tag of the enclosure.
+  CHAR8              AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Boot-up state as defined by SMBIOS Type 3.
+  UINT8              BootUpState;
+  /// Power supply state as defined by SMBIOS Type 3.
+  UINT8              PowerSupplyState;
+  /// Thermal state as defined by SMBIOS Type 3.
+  UINT8              ThermalState;
+  /// Security status as defined by SMBIOS Type 3.
+  UINT8              SecurityStatus;
+  /// OEM-defined value.
+  UINT32             OemDefined;
+  /// Height of the enclosure in rack units.
+  UINT8              Height;
+  /// Number of power cords associated with the enclosure.
+  UINT8              NumberOfPowerCords;
+  /// Token referencing an array of System Enclosure Contained Elements.
+  /// CM_NULL_TOKEN indicates that no contained elements are supplied.
+  CM_OBJECT_TOKEN    ContainedElementListToken;
+  /// SKU number of the enclosure.
+  CHAR8              SkuNum[SMBIOS_MAX_STRING_SIZE];
+  /// Rack type as defined by SMBIOS Type 3.
+  UINT8              RackType;
+  /// Rack height in rack units when Height is 0xFF.
+  UINT8              RackHeight;
+} CM_ARCH_COMMON_SYSTEM_ENCLOSURE_INFO;
+
+/** A structure that identifies an SMBIOS object contained by a Baseboard.
+
+  SMBIOS Specification v3.9.0 Type 2
+
+  ID: EArchCommonObjBaseboardContainedObject
+**/
+typedef struct CmArchCommonBaseboardContainedObject {
+  /// CM Object Token identifying the contained SMBIOS object.
+  CM_OBJECT_TOKEN              ContainedObjectToken;
+  /// Generator ID for the contained SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    GeneratorId;
+} CM_ARCH_COMMON_BASEBOARD_CONTAINED_OBJECT;
+
+/** A structure that describes Baseboard (or Module) Information.
+
+  SMBIOS Specification v3.9.0 Type 2
+
+  ID: EArchCommonObjBaseboardInfo
+**/
+typedef struct CmArchCommonBaseboardInfo {
+  /// CM Object Token uniquely identifying this Baseboard entry.
+  CM_OBJECT_TOKEN    BaseboardInfoToken;
+  /// CM Object Token identifying the containing System Enclosure.
+  /// CM_NULL_TOKEN indicates that no enclosure reference is supplied.
+  CM_OBJECT_TOKEN    ChassisToken;
+  /// Token referencing an array of Baseboard Contained Objects.
+  /// CM_NULL_TOKEN indicates that no contained objects are supplied.
+  CM_OBJECT_TOKEN    ContainedObjectListToken;
+  /// Manufacturer of the Baseboard.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// Product name of the Baseboard.
+  CHAR8              ProductName[SMBIOS_MAX_STRING_SIZE];
+  /// Version of the Baseboard.
+  CHAR8              Version[SMBIOS_MAX_STRING_SIZE];
+  /// Serial number of the Baseboard.
+  CHAR8              SerialNum[SMBIOS_MAX_STRING_SIZE];
+  /// Asset tag of the Baseboard.
+  CHAR8              AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// Baseboard feature flags as defined by SMBIOS Type 2.
+  UINT8              FeatureFlag;
+  /// Location of the Baseboard within the chassis.
+  CHAR8              LocationInChassis[SMBIOS_MAX_STRING_SIZE];
+  /// Baseboard type as defined by SMBIOS Type 2.
+  UINT8              BoardType;
+} CM_ARCH_COMMON_BASEBOARD_INFO;
 
 #pragma pack()

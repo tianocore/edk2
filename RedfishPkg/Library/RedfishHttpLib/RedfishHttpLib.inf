@@ -37,7 +37,3 @@
 
 [Protocols]
   gEdkIIRedfishHttpProtocolGuid   ## CONSUMES ##
-
-[depex]
-  TRUE
-

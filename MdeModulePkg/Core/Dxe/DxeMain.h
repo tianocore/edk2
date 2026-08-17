@@ -86,6 +86,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/OrderedCollectionLib.h>
 
+#include <MemoryBin.h>
+
 //
 // attributes for reserved memory before it is promoted to system memory
 //
@@ -258,6 +260,10 @@ extern EFI_GUID                   *gDxeCoreFileName;
 extern EFI_LOADED_IMAGE_PROTOCOL  *gDxeCoreLoadedImage;
 
 extern EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1];
+extern BOOLEAN                      mMemoryTypeInformationInitialized;
+extern EFI_MEMORY_TYPE_STATISTICS   mMemoryTypeStatistics[EfiMaxMemoryType + 1];
+extern EFI_PHYSICAL_ADDRESS         mDefaultMaximumAddress;
+extern EFI_PHYSICAL_ADDRESS         mDefaultBaseAddress;
 
 extern BOOLEAN                    gDispatcherRunning;
 extern EFI_RUNTIME_ARCH_PROTOCOL  gRuntimeTemplate;
@@ -277,12 +283,6 @@ extern BOOLEAN                                     gLoadFixedAddressCodeMemoryRe
 VOID
 CoreInitializePool (
   VOID
-  );
-
-VOID
-CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS  Start,
-  IN UINT64                Length
   );
 
 /**
@@ -2801,23 +2801,4 @@ MergeMemoryMap (
 EFI_STATUS
 CoreInitializeHandleServices (
   VOID
-  );
-
-/**
-  Calculate total memory bin size needed.
-
-  @param BinTop                The top address of the memory bins. This is an optional parameter.
-                               When NULL, the returned size meets the alignment requirements as long as
-                               the base address selected also meets the alignment requirements. When
-                               non-NULL, then the returned BinTop value and the returned size both meet
-                               the alignment requirements. When non-NULL, this will be updated on
-                               output to the new top address of the memory bins that must be used to
-                               satisfy alignment requirements.
-
-  @return The total memory bin size needed.
-
-**/
-UINT64
-CalculateTotalMemoryBinSizeNeeded (
-  IN OUT OPTIONAL EFI_PHYSICAL_ADDRESS  *BinTop
   );

@@ -538,6 +538,48 @@ AmlUpdateRdInterrupt (
   IN  UINT32                Irq
   );
 
+/** Update the base address and length of a DWord resource data node.
+
+  @ingroup UserApis
+
+  @param  [in] DWordRdNode         Pointer a DWord resource data
+                                   node.
+  @param  [in] BaseAddress         Base address.
+  @param  [in] BaseAddressLength   Base address length.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+**/
+EFI_STATUS
+EFIAPI
+AmlUpdateRdDWord (
+  IN  AML_DATA_NODE_HANDLE  DWordRdNode,
+  IN  UINT32                BaseAddress,
+  IN  UINT32                BaseAddressLength
+  );
+
+/** Update the base address and length of a Word resource data node.
+
+  @ingroup UserApis
+
+  @param  [in] WordRdNode          Pointer a Word resource data
+                                   node.
+  @param  [in] BaseAddress         Base address.
+  @param  [in] BaseAddressLength   Base address length.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+**/
+EFI_STATUS
+EFIAPI
+AmlUpdateRdWord (
+  IN  AML_DATA_NODE_HANDLE  WordRdNode,
+  IN  UINT16                BaseAddress,
+  IN  UINT16                BaseAddressLength
+  );
+
 /** Update the base address and length of a QWord resource data node.
 
   @ingroup UserApis
@@ -1405,6 +1447,50 @@ AmlCodeGenScope (
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
 
+/** AML code generation for a Method object node.
+
+  AmlCodeGenMethod ("MET0", 1, TRUE, 3, ParentNode, NewObjectNode) is
+  equivalent of the following ASL code:
+    Method(MET0, 1, Serialized, 3) {}
+
+  ACPI 6.4, s20.2.5.2 "Named Objects Encoding":
+    DefMethod := MethodOp PkgLength NameString MethodFlags TermList
+    MethodOp := 0x14
+
+  The ASL parameters "ReturnType" and "ParameterTypes" are not asked
+  in this function. They are optional parameters in ASL.
+
+  @param [in]  NameString     The new Method's name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "MET0", "_SB.MET0", etc.
+                              The input string is copied.
+  @param [in]  NumArgs        Number of arguments.
+                              Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized   TRUE is equivalent to Serialized.
+                              FALSE is equivalent to NotSerialized.
+                              Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel      Synchronization level for the method.
+                              Must be 0 <= SyncLevel <= 15.
+                              Default is 0 in ASL.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewObjectNode  If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethod (
+  IN  CONST CHAR8                   *NameString,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
+  );
+
 /** AML code generation for a method returning a NameString.
 
   AmlCodeGenMethodRetNameString (
@@ -1498,6 +1584,57 @@ EFIAPI
 AmlCodeGenMethodRetInteger (
   IN  CONST CHAR8                   *MethodNameString,
   IN        UINT64                  ReturnedInteger,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        AML_NODE_HANDLE         ParentNode           OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode        OPTIONAL
+  );
+
+/** AML code generation for a method returning a Buffer.
+
+  AmlCodeGenMethodRetBuffer (
+    "_MAT", ReturnedBuffer, ReturnedBufferSize, 1, TRUE, 0, ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(_MAT, 1, Serialized, 0) {
+      Return (Buffer (ReturnedBufferSize) {...})
+    }
+
+  To return an empty buffer, call the function with
+  (ReturnedBuffer=NULL, ReturnedBufferSize=0).
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  ReturnedBuffer       The buffer returned by the method.
+                                    The input buffer is copied.
+                                    NULL if an empty buffer is returned.
+  @param [in]  ReturnedBufferSize   Size of ReturnedBuffer.
+                                    Must be 0 if ReturnedBuffer is NULL.
+  @param [in]  NumArgs              Number of arguments.
+                                    Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodRetBuffer (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST UINT8                   *ReturnedBuffer,
+  IN        UINT32                  ReturnedBufferSize,
   IN        UINT8                   NumArgs,
   IN        BOOLEAN                 IsSerialized,
   IN        UINT8                   SyncLevel,

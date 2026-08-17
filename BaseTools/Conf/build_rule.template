@@ -290,7 +290,7 @@
     <Command.GCC>
         $(RM) ${dst}
         "$(SLINK)" cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
-    
+
     <Command.XCODE>
         "$(SLINK)" $(SLINK_FLAGS) ${dst} -filelist $(OBJECT_FILES_LIST)
 
@@ -321,8 +321,8 @@
 
     <Command.XCODE>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
-    
-    
+
+
 [Static-Library-File.SEC, Static-Library-File.PEI_CORE, Static-Library-File.PEIM]
     <InputFile>
         *.lib
@@ -387,8 +387,8 @@
 
     <Command.XCODE>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS)  $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
-      
-      
+
+
 [Dynamic-Library-File]
     <InputFile>
         ?.dll
@@ -403,7 +403,7 @@
         $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
+        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR)
 
     <Command.GCC, Command.CLANGDWARF>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
@@ -420,7 +420,7 @@
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR)
-        
+
     <Command.XCODE>
         # tool to convert Mach-O to PE/COFF
         "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
@@ -460,14 +460,14 @@
     <Command.MSFT, Command.INTEL>
         Trim --asl-file --asl-deps -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(ASLPP)" $(DEPS_FLAGS) $(ASLPP_FLAGS) $(INC) /I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
-        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
+        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
         "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
         $(CP) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
 
     <Command.GCC>
         Trim --asl-file --asl-deps -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(ASLPP)" $(DEPS_FLAGS) $(ASLPP_FLAGS) $(INC) -I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
-        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
+        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
         "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
         $(CP) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
 
@@ -531,13 +531,13 @@
         "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 
-    <Command.XCODE>        
+    <Command.XCODE>
         "$(ASLCC)" $(DEPS_FLAGS) -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj  $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
         "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.pecoff
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.pecoff $(GENFW_FLAGS)
-      
-      
+
+
 [Masm16-Code-File]
     <InputFile>
         ?.asm16, ?.Asm16, ?.ASM16, ?.s16, ?.S16
@@ -562,7 +562,7 @@
       Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
       "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
       "$(DLINK)" -o ${dst} $(DLINK_FLAGS) --start-group $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj --end-group
-     
+
     <Command.XCODE>
       Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
       "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
@@ -570,7 +570,7 @@
       "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
       "$(SLINK)" $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
       otool -t $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib | hex2bin.py ${dst}
-      
+
 
 [Nasm-to-Binary-Code-File]
     <InputFile>

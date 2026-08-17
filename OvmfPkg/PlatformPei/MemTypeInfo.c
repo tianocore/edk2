@@ -183,10 +183,15 @@ OnReadOnlyVariable2Available (
   IN VOID                       *Ppi
   )
 {
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
   DEBUG ((DEBUG_VERBOSE, "%a\n", __func__));
 
   RefreshMemTypeInfo (Ppi);
   BuildMemTypeInfoHob ();
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  CompleteInitialization ((EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob), (CONST EFI_PEI_SERVICES **)PeiServices);
+
   return EFI_SUCCESS;
 }
 
@@ -201,12 +206,13 @@ STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mReadOnlyVariable2Notify = {
   OnReadOnlyVariable2Available              // Notify
 };
 
-VOID
+EFI_STATUS
 MemTypeInfoInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                       Status;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *ReadOnlyVariable2;
 
   if (!PlatformInfoHob->SmmSmramRequire) {
     //
@@ -214,7 +220,23 @@ MemTypeInfoInitialization (
     // the default memory type information HOB right away.
     //
     BuildMemTypeInfoHob ();
-    return;
+    return EFI_SUCCESS;
+  }
+
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReadOnlyVariable2PpiGuid,
+             0,
+             NULL,
+             (VOID **)&ReadOnlyVariable2
+             );
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // EFI_PEI_READ_ONLY_VARIABLE2_PPI is already available; use it now.
+    //
+    RefreshMemTypeInfo (ReadOnlyVariable2);
+    BuildMemTypeInfoHob ();
+    return EFI_SUCCESS;
   }
 
   Status = PeiServicesNotifyPpi (&mReadOnlyVariable2Notify);
@@ -228,4 +250,7 @@ MemTypeInfoInitialization (
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
+
+  // Return that we're not ready yet so that the dispatcher can dispatch the variable PEIM first
+  return EFI_NOT_READY;
 }
