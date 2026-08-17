@@ -25,6 +25,7 @@
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PeCoffLib.h>
+#include <Library/AcpiTableWalkLib.h>
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
 #include <Guid/MemoryMapInfoGuid.h>
@@ -32,6 +33,7 @@
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/SerialPortInfo.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <IndustryStandard/PeImage.h>
 #include <UniversalPayload/ExtraData.h>
 #include <UniversalPayload/SmbiosTable.h>
@@ -315,6 +317,90 @@ GetPhysicalAddressBits (
 }
 
 /**
+  Derive the payload's serial-port HOB fields from the ACPI SPCR.
+
+  Only 16550-compatible interface types are handled; anything else
+  falls back to the caller's default (0x3F8 port I/O on X64,
+  PcdSerialRegisterBase on AArch64).
+
+  @param[in]  Rsdp    Physical address of the ACPI RSDP.
+  @param[out] Serial  Populated on success.
+
+  @retval TRUE   SPCR found and translated.
+  @retval FALSE  No SPCR or unsupported interface type.
+**/
+STATIC
+BOOLEAN
+ParseSpcrSerial (
+  IN  EFI_PHYSICAL_ADDRESS                Rsdp,
+  OUT UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *Serial
+  )
+{
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  *Spcr;
+
+  Spcr = (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE *)AcpiFindTableFromRsdp (
+                                                             Rsdp,
+                                                             EFI_ACPI_2_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE
+                                                             );
+  if (Spcr == NULL) {
+    return FALSE;
+  }
+
+  //
+  // Nothing requires Spcr->Header.Length to cover the fields read
+  // below, so check it before touching any of them.  BaudRate is the
+  // last field this function reads.
+  //
+  if (Spcr->Header.Length <
+      (OFFSET_OF (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE, BaudRate) + sizeof (Spcr->BaudRate)))
+  {
+    return FALSE;
+  }
+
+  switch (Spcr->InterfaceType) {
+    case EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550:
+    case EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16450:
+    case EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_NVIDIA_16550_UART:
+    case EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550_WITH_GAS:
+      break;
+    default:
+      return FALSE;
+  }
+
+  ZeroMem (Serial, sizeof (*Serial));
+  Serial->Header.Revision = UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION;
+  Serial->Header.Length   = sizeof (*Serial);
+  Serial->UseMmio         = (BOOLEAN)(Spcr->BaseAddress.AddressSpaceId == EFI_ACPI_6_5_SYSTEM_MEMORY);
+  Serial->RegisterBase    = Spcr->BaseAddress.Address;
+  //
+  // ACPI GAS AccessSize is the width of a single access, not the spacing
+  // between registers, so treating it as the 16550 register stride is an
+  // inference rather than something SPCR states.  It is the only signal
+  // SPCR carries, and it is the same inference Linux makes: its SPCR
+  // handling selects the mmio32 variant when access_width >= 3.
+  //
+  Serial->RegisterStride = (Spcr->BaseAddress.AccessSize > 1) ?
+                           (UINT8)(1U << (Spcr->BaseAddress.AccessSize - 1)) : 1;
+  //
+  // SPCR encodes baud rate as an enumeration.
+  //
+  switch (Spcr->BaudRate) {
+    case 3:  Serial->BaudRate = 9600;
+      break;
+    case 4:  Serial->BaudRate = 19200;
+      break;
+    case 6:  Serial->BaudRate = 57600;
+      break;
+    case 7:  Serial->BaudRate = 115200;
+      break;
+    default: Serial->BaudRate = 115200;
+      break;
+  }
+
+  return TRUE;
+}
+
+/**
   Check whether a range is described by the outer firmware's memory-map
   snapshot as EfiReservedMemoryType.
 
@@ -451,20 +537,31 @@ BuildPayloadHobList (
   DescCount = MemoryMapSize / DescriptorSize;
 
   //
-  // Serial console.  Default to the legacy 0x3F8 I/O port on X64.  On
-  // other architectures Serial stays zeroed, neither serial HOB is
-  // emitted below, and the payload falls back to its built-in
-  // PcdSerialRegisterBase.
+  // Serial console.  Prefer the ACPI SPCR: on AArch64 the UART is
+  // MMIO-mapped and its base varies per platform, so a hardcoded
+  // address is wrong on anything but QEMU virt.  When no SPCR is
+  // found fall back to the legacy 0x3F8 I/O port on X64; on other
+  // architectures the payload falls back to PcdSerialRegisterBase.
   //
   ZeroMem (&Serial, sizeof (Serial));
+  if (!ParseSpcrSerial (AcpiRsdp, &Serial)) {
  #if defined (MDE_CPU_X64)
-  Serial.Header.Revision = UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION;
-  Serial.Header.Length   = sizeof (Serial);
-  Serial.UseMmio         = FALSE;
-  Serial.RegisterStride  = 1;
-  Serial.BaudRate        = 115200;
-  Serial.RegisterBase    = 0x3F8;
+    Serial.Header.Revision = UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION;
+    Serial.Header.Length   = sizeof (Serial);
+    Serial.UseMmio         = FALSE;
+    Serial.RegisterStride  = 1;
+    Serial.BaudRate        = 115200;
+    Serial.RegisterBase    = 0x3F8;
+ #else
+    //
+    // The 0x3F8 fallback is x86-only, so Serial stays zeroed, neither
+    // serial HOB is emitted below, and the payload uses its built-in
+    // PcdSerialRegisterBase.  That is the intent, but it is also the case
+    // where a user gets no console and no explanation, so say so.
+    //
+    Print (L"ChainloadApp: no usable SPCR; payload will use its built-in serial defaults\n");
  #endif
+  }
 
   //
   // Handoff HOB.  EfiFreeMemoryTop/Bottom are fixed up after all HOBs

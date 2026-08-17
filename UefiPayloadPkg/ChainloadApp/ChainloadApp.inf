@@ -50,6 +50,7 @@
   CacheMaintenanceLib
   PeCoffGetEntryPointLib
   PeCoffLib
+  AcpiTableWalkLib
 
 [LibraryClasses.AARCH64]
   ArmLib
