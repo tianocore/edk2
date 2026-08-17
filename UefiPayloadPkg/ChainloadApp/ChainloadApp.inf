@@ -38,6 +38,9 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
 
+[Packages.AARCH64]
+  UefiCpuPkg/UefiCpuPkg.dec
+
 [LibraryClasses]
   UefiApplicationEntryPoint
   UefiBootServicesTableLib
@@ -55,6 +58,7 @@
 
 [LibraryClasses.AARCH64]
   ArmLib
+  ArmMmuLib
 
 [Guids]
   gEfiAcpiTableGuid
