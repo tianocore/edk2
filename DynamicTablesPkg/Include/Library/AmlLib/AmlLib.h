@@ -1602,6 +1602,45 @@ AmlCodeGenStoreToName (
   OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
+/** AML code generation for an If object.
+
+  Creates an If object using PredicateNode as its predicate. Additional
+  executable statements can subsequently be appended to the returned node.
+
+  AmlCodeGenIf (
+    PredicateNode,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    If (Predicate)
+    {
+    }
+
+  The function takes ownership of PredicateNode.
+
+  @ingroup CodeGenApis
+
+  @param [in]  PredicateNode  AML node representing the If predicate.
+                              The node is deleted if an error occurs.
+  @param [in]  ParentNode     Optional parent executable statement node.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              If node.
+
+  @retval EFI_SUCCESS            The If object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenIf (
+  IN  AML_NODE_HANDLE         PredicateNode,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is

@@ -2099,6 +2099,125 @@ exit_handler:
   return Status;
 }
 
+/** AML code generation for an If object.
+
+  AmlCodeGenIf (
+    PredicateNode,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    If (Predicate)
+    {
+    }
+
+  Creates an If object using PredicateNode as its predicate. Additional
+  executable statements can subsequently be appended to the returned node.
+
+  The function takes ownership of PredicateNode.
+
+  @param [in]  PredicateNode  AML node representing the If predicate.
+  @param [in]  ParentNode     Optional parent executable statement node.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              If node.
+
+  @retval EFI_SUCCESS            The If object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenIf (
+  IN  AML_NODE_HEADER  *PredicateNode,
+  IN  AML_NODE_HEADER  *ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE  **NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *IfNode;
+  UINT32           PredicateSize;
+  UINT32           PkgLength;
+
+  IfNode        = NULL;
+  PredicateSize = 0;
+  PkgLength     = 0;
+
+  if ((PredicateNode == NULL) ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlComputeSize (
+             PredicateNode,
+             &PredicateSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlComputePkgLength (
+             PredicateSize,
+             &PkgLength
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (
+               AML_IF_OP,
+               0
+               ),
+             PkgLength,
+             &IfNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             IfNode,
+             EAmlParseIndexTerm0,
+             PredicateNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  PredicateNode = NULL;
+
+  Status = LinkNode (
+             IfNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  IfNode = NULL;
+
+exit_handler:
+  if (PredicateNode != NULL) {
+    AmlDeleteTree (PredicateNode);
+  }
+
+  if (IfNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)IfNode);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
