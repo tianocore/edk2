@@ -1,7 +1,7 @@
 /** @file
   AML Code Generation.
 
-  Copyright (c) 2020 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (C) 2023 - 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -5326,18 +5326,6 @@ AmlCodeGenNotifyNode (
 
   if ((NotifyObjectNode == NULL) || (ValueObjectNode == NULL) ||
       ((ParentNode == NULL) && (NewObjectNode == NULL)))
-  {
-    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
-    Status = EFI_INVALID_PARAMETER;
-    goto error_handler;
-  }
-
-  if ((ParentNode != NULL) &&
-      !AmlNodeCompareOpCode (
-         (AML_OBJECT_NODE *)ParentNode,
-         AML_METHOD_OP,
-         0
-         ))
   {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     Status = EFI_INVALID_PARAMETER;
