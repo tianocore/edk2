@@ -131,6 +131,29 @@ typedef union {
   VOID      *Buffer;
 } AML_METHOD_PARAM_DATA;
 
+/** AML Field access types. */
+typedef enum {
+  AmlFieldAccessAny    = 0,
+  AmlFieldAccessByte   = 1,
+  AmlFieldAccessWord   = 2,
+  AmlFieldAccessDWord  = 3,
+  AmlFieldAccessQWord  = 4,
+  AmlFieldAccessBuffer = 5
+} AML_FIELD_ACCESS_TYPE;
+
+/** AML Field lock rules. */
+typedef enum {
+  AmlFieldNoLock = 0,
+  AmlFieldLock   = 1
+} AML_FIELD_LOCK_RULE;
+
+/** AML Field update rules. */
+typedef enum {
+  AmlFieldUpdatePreserve     = 0,
+  AmlFieldUpdateWriteAsOnes  = 1,
+  AmlFieldUpdateWriteAsZeros = 2
+} AML_FIELD_UPDATE_RULE;
+
 /** structure to hold AML method parameter types
   Type  -   Type of parameter
   Data  -   holds data of parameter
@@ -1412,6 +1435,53 @@ AmlCodeGenOperationRegion (
   IN        UINT8                   RegionSpace,
   IN        UINT64                  RegionOffset,
   IN        UINT64                  RegionLength,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for an empty Field object node.
+
+  AmlCodeGenField (
+    "REG0",
+    AmlFieldAccessDWord,
+    AmlFieldNoLock,
+    AmlFieldUpdatePreserve,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    Field (REG0, DWordAcc, NoLock, Preserve)
+    {
+    }
+
+  Field elements can subsequently be appended to the returned Field node.
+
+  @ingroup CodeGenApis
+
+  @param [in]  RegionName     Name of the associated OperationRegion.
+                              Must be a NULL-terminated ASL NameString.
+                              The input string is copied.
+  @param [in]  AccessType     Access width used for the Field.
+  @param [in]  LockRule       Field locking rule.
+  @param [in]  UpdateRule     Field update rule.
+  @param [in]  ParentNode     Optional parent node to which the Field is
+                              appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              Field node.
+
+  @retval EFI_SUCCESS            The Field was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenField (
+  IN  CONST CHAR8                   *RegionName,
+  IN        AML_FIELD_ACCESS_TYPE   AccessType,
+  IN        AML_FIELD_LOCK_RULE     LockRule,
+  IN        AML_FIELD_UPDATE_RULE   UpdateRule,
   IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );

@@ -21,6 +21,12 @@
 #include <String/AmlString.h>
 #include <Utils/AmlUtility.h>
 
+#define AML_FIELD_FLAGS_ACCESS_TYPE_MASK   0x0F
+#define AML_FIELD_FLAGS_LOCK_RULE_MASK     0x01
+#define AML_FIELD_FLAGS_LOCK_RULE_SHIFT    4
+#define AML_FIELD_FLAGS_UPDATE_RULE_MASK   0x03
+#define AML_FIELD_FLAGS_UPDATE_RULE_SHIFT  5
+
 /** Utility function to link a node when returning from a CodeGen function.
 
   @param [in]  Node           Newly created node.
@@ -1419,6 +1425,204 @@ exit_handler:
 
   if (OperationRegionNode != NULL) {
     AmlDeleteTree ((AML_NODE_HEADER *)OperationRegionNode);
+  }
+
+  return Status;
+}
+
+/** AML code generation for an empty Field object node.
+
+  AmlCodeGenField (
+    "REG0",
+    AmlFieldAccessDWord,
+    AmlFieldNoLock,
+    AmlFieldUpdatePreserve,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    Field (REG0, DWordAcc, NoLock, Preserve)
+    {
+    }
+
+  Field elements can subsequently be appended to the returned Field node.
+
+  @param [in]  RegionName     Name of the associated OperationRegion.
+                              Must be a NULL-terminated ASL NameString.
+                              The input string is copied.
+  @param [in]  AccessType     Access width used for the Field.
+  @param [in]  LockRule       Field locking rule.
+  @param [in]  UpdateRule     Field update rule.
+  @param [in]  ParentNode     Optional parent node to which the Field is
+                              appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              Field node.
+
+  @retval EFI_SUCCESS            The Field was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenField (
+  IN  CONST CHAR8                  *RegionName,
+  IN        AML_FIELD_ACCESS_TYPE  AccessType,
+  IN        AML_FIELD_LOCK_RULE    LockRule,
+  IN        AML_FIELD_UPDATE_RULE  UpdateRule,
+  IN        AML_NODE_HEADER        *ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE        **NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *FieldNode;
+  AML_DATA_NODE    *RegionNameNode;
+  AML_DATA_NODE    *FieldFlagsNode;
+  CHAR8            *AmlRegionName;
+  UINT32           AmlRegionNameSize;
+  UINT32           PkgLength;
+  UINT8            FieldFlags;
+
+  if ((RegionName == NULL) ||
+      (AccessType > AmlFieldAccessBuffer) ||
+      (LockRule > AmlFieldLock) ||
+      (UpdateRule > AmlFieldUpdateWriteAsZeros) ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FieldNode      = NULL;
+  RegionNameNode = NULL;
+  FieldFlagsNode = NULL;
+  AmlRegionName  = NULL;
+
+  Status = ConvertAslNameToAmlName (
+             RegionName,
+             &AmlRegionName
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlGetNameStringSize (
+             AmlRegionName,
+             &AmlRegionNameSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlComputePkgLength (
+             AmlRegionNameSize + sizeof (FieldFlags),
+             &PkgLength
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (
+               AML_EXT_OP,
+               AML_EXT_FIELD_OP
+               ),
+             PkgLength,
+             &FieldNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlRegionName,
+             AmlRegionNameSize,
+             &RegionNameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             FieldNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)RegionNameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  RegionNameNode = NULL;
+
+  FieldFlags = (UINT8)(
+                       ((UINT8)AccessType &
+                        AML_FIELD_FLAGS_ACCESS_TYPE_MASK) |
+                       (((UINT8)LockRule &
+                         AML_FIELD_FLAGS_LOCK_RULE_MASK) <<
+                        AML_FIELD_FLAGS_LOCK_RULE_SHIFT) |
+                       (((UINT8)UpdateRule &
+                         AML_FIELD_FLAGS_UPDATE_RULE_MASK) <<
+                        AML_FIELD_FLAGS_UPDATE_RULE_SHIFT)
+                       );
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeUInt,
+             &FieldFlags,
+             sizeof (FieldFlags),
+             &FieldFlagsNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             FieldNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER *)FieldFlagsNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  FieldFlagsNode = NULL;
+
+  Status = LinkNode (
+             FieldNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  FieldNode = NULL;
+
+exit_handler:
+  if (AmlRegionName != NULL) {
+    FreePool (AmlRegionName);
+  }
+
+  if (RegionNameNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)RegionNameNode);
+  }
+
+  if (FieldFlagsNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)FieldFlagsNode);
+  }
+
+  if (FieldNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)FieldNode);
   }
 
   return Status;
