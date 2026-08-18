@@ -1705,6 +1705,188 @@ AmlCodeGenFieldElemReserved (
   return EFI_SUCCESS;
 }
 
+/** AML code generation for a NamedField element.
+
+  AmlCodeGenFieldElemNamed (
+    "FLD0",
+    32,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to the following element in an ASL Field declaration:
+
+    FLD0, 32
+
+  Adds a named field of FieldBitLength bits to a Field list.
+
+  @param [in]  FieldName      Name of the field element.
+  @param [in]  FieldBitLength Length of the field element in bits.
+  @param [in]  ParentNode     Field node to which the NamedField is appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              NamedField node.
+
+  @retval EFI_SUCCESS            The NamedField was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenFieldElemNamed (
+  IN  CONST CHAR8            *FieldName,
+  IN        UINT32           FieldBitLength,
+  IN        AML_OBJECT_NODE  *ParentNode,
+  OUT       AML_OBJECT_NODE  **NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *NamedFieldNode;
+  AML_DATA_NODE    *FieldNameNode;
+  AML_DATA_NODE    *FieldLengthNode;
+  CHAR8            *AmlFieldName;
+  UINT32           AmlFieldNameSize;
+  UINT32           FieldNameSize;
+  UINT8            FieldLengthBuffer[4];
+  UINT8            FieldLengthSize;
+
+  NamedFieldNode  = NULL;
+  FieldNameNode   = NULL;
+  FieldLengthNode = NULL;
+  AmlFieldName    = NULL;
+
+  if ((FieldName == NULL) ||
+      !AslIsNameSeg (FieldName, &FieldNameSize) ||
+      (FieldName[FieldNameSize] != '\0') ||
+      (FieldBitLength == 0) ||
+      (ParentNode == NULL) ||
+      !AmlNodeHasAttribute (
+         ParentNode,
+         AML_HAS_FIELD_LIST
+         ))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ConvertAslNameToAmlName (
+             FieldName,
+             &AmlFieldName
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlGetNameStringSize (
+             AmlFieldName,
+             &AmlFieldNameSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetFieldEncodingByOpCode (
+               AML_FIELD_NAMED_OP,
+               0
+               ),
+             0,
+             &NamedFieldNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlFieldName,
+             AmlFieldNameSize,
+             &FieldNameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             NamedFieldNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)FieldNameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  FieldNameNode = NULL;
+
+  FieldLengthSize = AmlSetPkgLength (
+                      FieldBitLength,
+                      FieldLengthBuffer
+                      );
+  if (FieldLengthSize == 0) {
+    Status = EFI_INVALID_PARAMETER;
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeFieldPkgLen,
+             FieldLengthBuffer,
+             FieldLengthSize,
+             &FieldLengthNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             NamedFieldNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER *)FieldLengthNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  FieldLengthNode = NULL;
+
+  Status = LinkNode (
+             NamedFieldNode,
+             (AML_NODE_HEADER *)ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  NamedFieldNode = NULL;
+
+exit_handler:
+  if (AmlFieldName != NULL) {
+    FreePool (AmlFieldName);
+  }
+
+  if (FieldNameNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)FieldNameNode);
+  }
+
+  if (FieldLengthNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)FieldLengthNode);
+  }
+
+  if (NamedFieldNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)NamedFieldNode);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is

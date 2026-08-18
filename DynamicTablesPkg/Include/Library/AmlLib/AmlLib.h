@@ -1522,6 +1522,42 @@ AmlCodeGenFieldElemReserved (
   OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
+/** AML code generation for a NamedField element.
+
+  AmlCodeGenFieldElemNamed (
+    "FLD0",
+    32,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to the following element in an ASL Field declaration:
+
+    FLD0, 32
+
+  @ingroup CodeGenApis
+
+  @param [in]  FieldName      Name of the field element. This must be a valid
+                              ASL NameSeg containing at most four characters.
+                              The input string is copied.
+  @param [in]  FieldBitLength Length of the field element in bits.
+  @param [in]  ParentNode     Field node to which the NamedField is appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              NamedField node.
+
+  @retval EFI_SUCCESS            The NamedField was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenFieldElemNamed (
+  IN  CONST CHAR8                   *FieldName,
+  IN        UINT32                  FieldBitLength,
+  IN        AML_OBJECT_NODE_HANDLE  ParentNode,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
