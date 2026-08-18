@@ -1628,6 +1628,83 @@ exit_handler:
   return Status;
 }
 
+/** AML code generation for a ReservedField element (ASL: Offset ()).
+
+  AmlCodeGenFieldElemReserved (64, ParentNode, NewObjectNode);
+
+  is equivalent to the following ASL code when the current Field position
+  is zero:
+
+    Offset (0x08),
+
+  Adds an unnamed reserved range of ReservedBitLength bits to a Field
+  list.
+
+  A ReservedField can be used to implement an ASL Offset() declaration.
+  The caller is responsible for calculating the number of bits between
+  the current Field position and the requested byte offset.
+
+  @param [in]  ReservedBitLength  Number of bits in the reserved range.
+  @param [in]  ParentNode         Field node to which the ReservedField is
+                                  appended.
+  @param [out] NewObjectNode      Optional pointer that receives the created
+                                  ReservedField node.
+
+  @retval EFI_SUCCESS            The ReservedField was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenFieldElemReserved (
+  IN  UINT32           ReservedBitLength,
+  IN  AML_OBJECT_NODE  *ParentNode,
+  OUT AML_OBJECT_NODE  **NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ReservedFieldNode;
+
+  ReservedFieldNode = NULL;
+
+  if ((ReservedBitLength == 0) ||
+      (ParentNode == NULL) ||
+      !AmlNodeHasAttribute (
+         ParentNode,
+         AML_HAS_FIELD_LIST
+         ))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetFieldEncodingByOpCode (
+               AML_FIELD_RESERVED_OP,
+               0
+               ),
+             ReservedBitLength,
+             &ReservedFieldNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = LinkNode (
+             ReservedFieldNode,
+             (AML_NODE_HEADER *)ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    AmlDeleteTree ((AML_NODE_HEADER *)ReservedFieldNode);
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
