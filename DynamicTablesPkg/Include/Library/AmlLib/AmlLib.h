@@ -1,7 +1,7 @@
 /** @file
   AML Lib.
 
-  Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (C) 2023 - 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1361,6 +1361,59 @@ AmlAddPrtEntry (
   IN  CONST CHAR8                   *LinkName,
   IN        UINT32                  SourceIndex,
   IN        AML_OBJECT_NODE_HANDLE  PrtNameNode
+  );
+
+/** AML code generation for an OperationRegion object node.
+
+  AmlCodeGenOperationRegion (
+    "REG0",
+    RegionSpace,
+    RegionOffset,
+    RegionLength,
+    ParentNode,
+    NewObjectNode
+    );
+
+  generates an OperationRegion equivalent to:
+
+    OperationRegion (
+      REG0,
+      RegionSpace,
+      RegionOffset,
+      RegionLength
+      )
+
+  where RegionSpace, RegionOffset, and RegionLength represent the values
+  supplied to the function.
+
+  @ingroup CodeGenApis
+
+  @param [in]  RegionName     Name of the OperationRegion.
+                              Must be a NULL-terminated ASL NameString.
+                              The input string is copied.
+  @param [in]  RegionSpace    Address space containing the region.
+  @param [in]  RegionOffset   Integer value used as the region offset.
+                              For SystemMemory, this is normally the physical
+                              base address of the region.
+  @param [in]  RegionLength   Integer length of the region in bytes.
+  @param [in]  ParentNode     Optional parent node to which the OperationRegion
+                              is appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              OperationRegion node.
+
+  @retval EFI_SUCCESS            The OperationRegion was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenOperationRegion (
+  IN  CONST CHAR8                   *RegionName,
+  IN        UINT8                   RegionSpace,
+  IN        UINT64                  RegionOffset,
+  IN        UINT64                  RegionLength,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
 /** AML code generation for a Device object node.

@@ -1191,6 +1191,239 @@ exit_handler:
   return Status;
 }
 
+/** AML code generation for an OperationRegion object node.
+
+  AmlCodeGenOperationRegion (
+    "REG0",
+    RegionSpace,
+    RegionOffset,
+    RegionLength,
+    ParentNode,
+    NewObjectNode
+    );
+
+  generates an OperationRegion equivalent to:
+
+    OperationRegion (
+      REG0,
+      RegionSpace,
+      RegionOffset,
+      RegionLength
+      )
+
+  where RegionSpace, RegionOffset, and RegionLength represent the values
+  supplied to the function.
+
+  @param [in]  RegionName     Name of the OperationRegion.
+                              Must be a NULL-terminated ASL NameString.
+                              The input string is copied.
+  @param [in]  RegionSpace    Address space containing the region.
+  @param [in]  RegionOffset   Integer value used as the region offset.
+                              For SystemMemory, this is normally the physical
+                              base address of the region.
+  @param [in]  RegionLength   Integer length of the region in bytes.
+  @param [in]  ParentNode     Optional parent node to which the OperationRegion
+                              is appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              OperationRegion node.
+
+  @retval EFI_SUCCESS            The OperationRegion was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenOperationRegion (
+  IN  CONST CHAR8            *RegionName,
+  IN        UINT8            RegionSpace,
+  IN        UINT64           RegionOffset,
+  IN        UINT64           RegionLength,
+  IN        AML_NODE_HEADER  *ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE  **NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *OperationRegionNode;
+  AML_OBJECT_NODE  *RegionOffsetNode;
+  AML_OBJECT_NODE  *RegionLengthNode;
+  AML_DATA_NODE    *RegionNameNode;
+  AML_DATA_NODE    *RegionSpaceNode;
+  CHAR8            *AmlRegionName;
+  UINT32           AmlRegionNameSize;
+
+  if ((RegionName == NULL) ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  OperationRegionNode = NULL;
+  RegionOffsetNode    = NULL;
+  RegionLengthNode    = NULL;
+  RegionNameNode      = NULL;
+  RegionSpaceNode     = NULL;
+  AmlRegionName       = NULL;
+
+  Status = ConvertAslNameToAmlName (
+             RegionName,
+             &AmlRegionName
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlGetNameStringSize (
+             AmlRegionName,
+             &AmlRegionNameSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (
+               AML_EXT_OP,
+               AML_EXT_REGION_OP
+               ),
+             0,
+             &OperationRegionNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlRegionName,
+             AmlRegionNameSize,
+             &RegionNameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             OperationRegionNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)RegionNameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  RegionNameNode = NULL;
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeUInt,
+             &RegionSpace,
+             sizeof (RegionSpace),
+             &RegionSpaceNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             OperationRegionNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER *)RegionSpaceNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  RegionSpaceNode = NULL;
+
+  Status = AmlCodeGenInteger (
+             RegionOffset,
+             &RegionOffsetNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             OperationRegionNode,
+             EAmlParseIndexTerm2,
+             (AML_NODE_HEADER *)RegionOffsetNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  RegionOffsetNode = NULL;
+
+  Status = AmlCodeGenInteger (
+             RegionLength,
+             &RegionLengthNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             OperationRegionNode,
+             EAmlParseIndexTerm3,
+             (AML_NODE_HEADER *)RegionLengthNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  RegionLengthNode = NULL;
+
+  Status = LinkNode (
+             OperationRegionNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  OperationRegionNode = NULL;
+
+exit_handler:
+  if (AmlRegionName != NULL) {
+    FreePool (AmlRegionName);
+  }
+
+  if (RegionNameNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)RegionNameNode);
+  }
+
+  if (RegionSpaceNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)RegionSpaceNode);
+  }
+
+  if (RegionOffsetNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)RegionOffsetNode);
+  }
+
+  if (RegionLengthNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)RegionLengthNode);
+  }
+
+  if (OperationRegionNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)OperationRegionNode);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
