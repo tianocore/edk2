@@ -1887,6 +1887,218 @@ exit_handler:
   return Status;
 }
 
+/** AML code generation for a Store operation with a typed source and a
+    named target.
+
+  AML_METHOD_PARAM  Source;
+
+  Source.Type         = AmlMethodParamTypeInteger;
+  Source.Data.Integer = 1;
+  Source.DataSize     = 0;
+
+  AmlCodeGenStoreToName (
+    Source,
+    "FLD0",
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    Store (One, FLD0)
+
+  Integer, method argument, and local variable sources are supported.
+
+  @param [in]  Source         Source operand to store.
+  @param [in]  TargetName     NameString identifying the target object.
+                              The input string is copied.
+  @param [in]  ParentNode     Optional parent executable statement node.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              Store node.
+
+  @retval EFI_SUCCESS            The Store object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenStoreToName (
+  IN  AML_METHOD_PARAM  Source,
+  IN  CONST CHAR8       *TargetName,
+  IN  AML_NODE_HEADER   *ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE   **NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *StoreNode;
+  AML_OBJECT_NODE  *SourceNode;
+  AML_DATA_NODE    *TargetNode;
+  CHAR8            *AmlTargetName;
+  UINT32           AmlTargetNameSize;
+
+  StoreNode     = NULL;
+  SourceNode    = NULL;
+  TargetNode    = NULL;
+  AmlTargetName = NULL;
+
+  if ((TargetName == NULL) ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (Source.Type) {
+    case AmlMethodParamTypeInteger:
+      Status = AmlCodeGenInteger (
+                 Source.Data.Integer,
+                 &SourceNode
+                 );
+      break;
+
+    case AmlMethodParamTypeArg:
+      if (Source.Data.Arg > (UINT8)(AML_ARG6 - AML_ARG0)) {
+        ASSERT (0);
+        Status = EFI_INVALID_PARAMETER;
+        goto exit_handler;
+      }
+
+      Status = AmlCreateObjectNode (
+                 AmlGetByteEncodingByOpCode (
+                   AML_ARG0 + Source.Data.Arg,
+                   0
+                   ),
+                 0,
+                 &SourceNode
+                 );
+      break;
+
+    case AmlMethodParamTypeLocal:
+      if (Source.Data.Local > (UINT8)(AML_LOCAL7 - AML_LOCAL0)) {
+        ASSERT (0);
+        Status = EFI_INVALID_PARAMETER;
+        goto exit_handler;
+      }
+
+      Status = AmlCreateObjectNode (
+                 AmlGetByteEncodingByOpCode (
+                   AML_LOCAL0 + Source.Data.Local,
+                   0
+                   ),
+                 0,
+                 &SourceNode
+                 );
+      break;
+
+    default:
+      ASSERT (0);
+      Status = EFI_INVALID_PARAMETER;
+      goto exit_handler;
+  }
+
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = ConvertAslNameToAmlName (
+             TargetName,
+             &AmlTargetName
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlGetNameStringSize (
+             AmlTargetName,
+             &AmlTargetNameSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlTargetName,
+             AmlTargetNameSize,
+             &TargetNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (
+               AML_STORE_OP,
+               0
+               ),
+             0,
+             &StoreNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             StoreNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)SourceNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  SourceNode = NULL;
+
+  Status = AmlSetFixedArgument (
+             StoreNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER *)TargetNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  TargetNode = NULL;
+
+  Status = LinkNode (
+             StoreNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  StoreNode = NULL;
+
+exit_handler:
+  if (AmlTargetName != NULL) {
+    FreePool (AmlTargetName);
+  }
+
+  if (SourceNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)SourceNode);
+  }
+
+  if (TargetNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)TargetNode);
+  }
+
+  if (StoreNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)StoreNode);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is

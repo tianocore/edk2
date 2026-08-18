@@ -1558,6 +1558,50 @@ AmlCodeGenFieldElemNamed (
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
+/** AML code generation for a Store operation with a typed source and a
+    named target.
+
+  AML_METHOD_PARAM  Source;
+
+  Source.Type         = AmlMethodParamTypeInteger;
+  Source.Data.Integer = 1;
+  Source.DataSize     = 0;
+
+  AmlCodeGenStoreToName (
+    Source,
+    "FLD0",
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    Store (One, FLD0)
+
+  Integer, method argument, and local variable sources are supported.
+
+  @ingroup CodeGenApis
+
+  @param [in]  Source         Source operand to store.
+  @param [in]  TargetName     NameString identifying the target object.
+                              The input string is copied.
+  @param [in]  ParentNode     Optional parent executable statement node.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              Store node.
+
+  @retval EFI_SUCCESS            The Store object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenStoreToName (
+  IN  AML_METHOD_PARAM        Source,
+  IN  CONST CHAR8             *TargetName,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
