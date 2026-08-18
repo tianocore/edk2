@@ -2397,6 +2397,35 @@ AmlCodeGenRdUartSerialBusV2 (
   OUT AML_DATA_NODE_HANDLE    *NewRdNode OPTIONAL
   );
 
+/** AML code generation for a Notify object.
+
+  Generates one of:
+
+    Notify (NameString, Value)
+    Notify (Local, Value)
+    Notify (Arg, Value)
+
+  @ingroup CodeGenApis
+
+  @param [in]  NotifyObjectParam  Object to be notified.
+  @param [in]  NotifyValue        Notification value.
+  @param [in]  ParentNode         Optional parent executable statement node.
+  @param [out] NewObjectNode      Optional pointer that receives the created
+                                  Notify node.
+
+  @retval EFI_SUCCESS            The Notify object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenNotify (
+  IN  AML_METHOD_PARAM        NotifyObjectParam,
+  IN  UINT8                   NotifyValue,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation to create a method with Notify call.
 
   Example 1:
