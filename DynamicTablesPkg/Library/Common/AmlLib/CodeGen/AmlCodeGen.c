@@ -2218,6 +2218,190 @@ exit_handler:
   return Status;
 }
 
+/** AML code generation for a logical equality expression.
+
+  AML_METHOD_PARAM  LeftOperand  = { 0 };
+  AML_METHOD_PARAM  RightOperand = { 0 };
+
+  LeftOperand.Type     = AmlMethodParamTypeArg;
+  LeftOperand.Data.Arg = 0;
+
+  RightOperand.Type         = AmlMethodParamTypeInteger;
+  RightOperand.Data.Integer = 1;
+
+  AmlCodeGenEqual (
+    LeftOperand,
+    RightOperand,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    LEqual (Arg0, One)
+
+  Integer, method argument, and local variable operands are supported.
+
+  @ingroup CodeGenApis
+
+  @param [in]  LeftOperand    Left operand of the equality expression.
+  @param [in]  RightOperand   Right operand of the equality expression.
+  @param [in]  ParentNode     Optional parent node.
+  @param [out] NewObjectNode  On success, receives the created equality node.
+
+  @retval EFI_SUCCESS            The equality expression was created
+                                  successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenEqual (
+  IN  AML_METHOD_PARAM        LeftOperand,
+  IN  AML_METHOD_PARAM        RightOperand,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  )
+{
+  EFI_STATUS        Status;
+  UINTN             Index;
+  AML_METHOD_PARAM  Operands[2];
+  AML_OBJECT_NODE   *OperandNodes[2];
+  AML_OBJECT_NODE   *EqualNode;
+
+  Operands[0]     = LeftOperand;
+  Operands[1]     = RightOperand;
+  OperandNodes[0] = NULL;
+  OperandNodes[1] = NULL;
+  EqualNode       = NULL;
+
+  if ((ParentNode == NULL) && (NewObjectNode == NULL)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (Operands); Index++) {
+    switch (Operands[Index].Type) {
+      case AmlMethodParamTypeInteger:
+        Status = AmlCodeGenInteger (
+                   Operands[Index].Data.Integer,
+                   &OperandNodes[Index]
+                   );
+        break;
+
+      case AmlMethodParamTypeArg:
+        if (Operands[Index].Data.Arg > (UINT8)(AML_ARG6 - AML_ARG0)) {
+          ASSERT (0);
+          Status = EFI_INVALID_PARAMETER;
+          goto exit_handler;
+        }
+
+        Status = AmlCreateObjectNode (
+                   AmlGetByteEncodingByOpCode (
+                     AML_ARG0 + Operands[Index].Data.Arg,
+                     0
+                     ),
+                   0,
+                   &OperandNodes[Index]
+                   );
+        break;
+
+      case AmlMethodParamTypeLocal:
+        if (Operands[Index].Data.Local >
+            (UINT8)(AML_LOCAL7 - AML_LOCAL0))
+        {
+          ASSERT (0);
+          Status = EFI_INVALID_PARAMETER;
+          goto exit_handler;
+        }
+
+        Status = AmlCreateObjectNode (
+                   AmlGetByteEncodingByOpCode (
+                     AML_LOCAL0 + Operands[Index].Data.Local,
+                     0
+                     ),
+                   0,
+                   &OperandNodes[Index]
+                   );
+        break;
+
+      default:
+        ASSERT (0);
+        Status = EFI_INVALID_PARAMETER;
+        goto exit_handler;
+    }
+
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto exit_handler;
+    }
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (
+               AML_LEQUAL_OP,
+               0
+               ),
+             0,
+             &EqualNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             EqualNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)OperandNodes[0]
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  OperandNodes[0] = NULL;
+
+  Status = AmlSetFixedArgument (
+             EqualNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER *)OperandNodes[1]
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  OperandNodes[1] = NULL;
+
+  Status = LinkNode (
+             EqualNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  EqualNode = NULL;
+
+exit_handler:
+  if (OperandNodes[0] != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)OperandNodes[0]);
+  }
+
+  if (OperandNodes[1] != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)OperandNodes[1]);
+  }
+
+  if (EqualNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)EqualNode);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is

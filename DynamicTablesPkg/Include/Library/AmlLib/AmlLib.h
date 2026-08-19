@@ -1641,6 +1641,51 @@ AmlCodeGenIf (
   OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
+/** AML code generation for a logical equality expression.
+
+  AML_METHOD_PARAM  LeftOperand  = { 0 };
+  AML_METHOD_PARAM  RightOperand = { 0 };
+
+  LeftOperand.Type     = AmlMethodParamTypeArg;
+  LeftOperand.Data.Arg = 0;
+
+  RightOperand.Type         = AmlMethodParamTypeInteger;
+  RightOperand.Data.Integer = 1;
+
+  AmlCodeGenEqual (
+    LeftOperand,
+    RightOperand,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    LEqual (Arg0, One)
+
+  Integer, method argument, and local variable operands are supported.
+
+  @ingroup CodeGenApis
+
+  @param [in]  LeftOperand    Left operand of the equality expression.
+  @param [in]  RightOperand   Right operand of the equality expression.
+  @param [in]  ParentNode     Optional parent node.
+  @param [out] NewObjectNode  On success, receives the created equality node.
+
+  @retval EFI_SUCCESS            The equality expression was created
+                                  successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenEqual (
+  IN  AML_METHOD_PARAM        LeftOperand,
+  IN  AML_METHOD_PARAM        RightOperand,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
