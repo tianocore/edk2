@@ -514,10 +514,6 @@ UpdateRegionMappingRecursive (
         EntryValue |= PAGE_GLOBAL;
       }
 
-      if ((AttributeSetMask & PAGE_NO_READ) != 0) {
-        EntryValue &= ~(PAGE_PRESENT | PAGE_VALID);
-      }
-
       ReplaceTableEntry (Entry, EntryValue, RegionStart, TableIsLive);
     }
   }
