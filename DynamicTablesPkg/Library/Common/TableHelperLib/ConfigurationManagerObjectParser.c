@@ -1583,6 +1583,47 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiNetworkDeviceDescPciInfoParser[] = {
   { "IpmiToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL    },
 };
 
+/** A parser for EArchCommonObjGedDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGedDeviceInfoParser[] = {
+  { "Id",             sizeof (UINT32),          "0x%x", NULL },
+  {
+    "RegisterRegion",
+    sizeof (CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR),
+    NULL,
+    NULL,
+    CmArchCommonObjMemoryRangeDescriptor,
+    ARRAY_SIZE (CmArchCommonObjMemoryRangeDescriptor)
+  },
+  { "EventInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjGedEventInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGedEventInfoParser[] = {
+  {
+    "EventInterrupt",
+    sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL,
+    NULL,
+    CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser)
+  },
+  { "Shared",          sizeof (BOOLEAN),         "%u",   NULL },
+  { "ActionInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjGedActionInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGedActionInfoParser[] = {
+  { "ActionType",       sizeof (CM_ARCH_COMMON_GED_ACTION_TYPE), "0x%x",   NULL           },
+  { "RegisterOffset",   sizeof (UINT64),                         "0x%llx", NULL           },
+  { "RegisterBitWidth", sizeof (UINT32),                         "%u",     NULL           },
+  { "Value",            sizeof (UINT64),                         "0x%llx", NULL           },
+  { "NotifyObject",     sizeof (CONST CHAR8 *),                  NULL,     PrintStringPtr },
+  { "NotifyValue",      sizeof (UINT8),                          "0x%x",   NULL           },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1671,6 +1712,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiProtocolRedfishOverIpDataInfo,CmArchCommonMchiProtocolRedfishOverIpDataInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescUsbInfo,     CmArchCommonMchiNetworkDeviceDescUsbInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescPciInfo,     CmArchCommonMchiNetworkDeviceDescPciInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGedDeviceInfo,                    CmArchCommonGedDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGedEventInfo,                     CmArchCommonGedEventInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGedActionInfo,                    CmArchCommonGedActionInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
