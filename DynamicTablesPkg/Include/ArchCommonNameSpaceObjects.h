@@ -150,6 +150,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 81 - Redfish Over Ip Protocol Info.
   EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 82 - MCHI USB Network Device descriptor info
   EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 83 - MCHI PCI/PCIe Network Device descriptor info
+  EArchCommonObjGedDeviceInfo,                     ///< 84 - GED Device Info
+  EArchCommonObjGedEventInfo,                      ///< 85 - GED Event Info
+  EArchCommonObjGedActionInfo,                     ///< 86 - GED Action Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2168,5 +2171,81 @@ typedef struct CmArchCommonMchiNetworkDeviceDescPciInfo {
   ///
   CM_OBJECT_TOKEN    IpmiToken;
 } CM_ARCH_COMMON_MCHI_NETWORK_DEVICE_DESC_PCI_INFO;
+
+/** Actions supported by a Generic Event Device event handler. */
+typedef enum {
+  GedActionWriteRegister = 0,
+  GedActionNotify,
+  GedActionMax
+} CM_ARCH_COMMON_GED_ACTION_TYPE;
+
+/** A structure that describes a Generic Event Device.
+
+  ID: EArchCommonObjGedDeviceInfo
+*/
+typedef struct CmArchCommonGedDeviceInfo {
+  /// Unique identifier used to generate the GED NameSeg and _UID.
+  ///
+  /// An Id in the range 0x0 to 0xF generates GED0 to GEDF.
+  UINT32                                    Id;
+
+  /// System memory region containing the GED event registers.
+  CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR    RegisterRegion;
+
+  /// Token identifying the associated GED event objects.
+  CM_OBJECT_TOKEN                           EventInfoToken;
+} CM_ARCH_COMMON_GED_DEVICE_INFO;
+
+/** A structure that describes an event handled by a Generic Event Device.
+
+  ID: EArchCommonObjGedEventInfo
+*/
+typedef struct CmArchCommonGedEventInfo {
+  /// Interrupt associated with the event.
+  ///
+  /// The interrupt number is passed to _EVT through Arg0.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    EventInterrupt;
+
+  /// TRUE if the interrupt resource may be shared.
+  BOOLEAN                             Shared;
+
+  /// Token identifying the actions performed for this event.
+  CM_OBJECT_TOKEN                     ActionInfoToken;
+} CM_ARCH_COMMON_GED_EVENT_INFO;
+
+/** A structure that describes an action performed by a GED event handler.
+
+  ID: EArchCommonObjGedActionInfo
+*/
+typedef struct CmArchCommonGedActionInfo {
+  /// Type of action represented by this object.
+  CM_ARCH_COMMON_GED_ACTION_TYPE    ActionType;
+
+  /// Byte offset of the target register within RegisterRegion.
+  ///
+  /// This field is used by GedActionWriteRegister.
+  UINT64                            RegisterOffset;
+
+  /// Width of the target register in bits.
+  ///
+  /// Supported values are 8, 16, 32 and 64.
+  /// This field is used by GedActionWriteRegister.
+  UINT32                            RegisterBitWidth;
+
+  /// Value written to the target register.
+  ///
+  /// This field is used by GedActionWriteRegister.
+  UINT64                            Value;
+
+  /// ASL NameString identifying the object to notify.
+  ///
+  /// This field is used by GedActionNotify.
+  CONST CHAR8                       *NotifyObject;
+
+  /// Value passed to the Notify operator.
+  ///
+  /// This field is used by GedActionNotify.
+  UINT8                             NotifyValue;
+} CM_ARCH_COMMON_GED_ACTION_INFO;
 
 #pragma pack()
