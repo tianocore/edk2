@@ -197,6 +197,9 @@ Ip4Config2ReadConfigData (
   UINTN                    Index;
   IP4_CONFIG2_DATA_RECORD  DataRecord;
   CHAR8                    *Data;
+  UINTN                    RecordArraySize;
+
+  Variable = NULL;
 
   //
   // Try to read the configuration variable.
@@ -229,25 +232,50 @@ Ip4Config2ReadConfigData (
     if (EFI_ERROR (Status) || ((UINT16)(~NetblockChecksum ((UINT8 *)Variable, (UINT32)VarSize)) != 0)) {
       //
       // GetVariable still error or the variable is corrupted.
-      // Fall back to the default value.
       //
-      FreePool (Variable);
-
-      //
-      // Remove the problematic variable and return EFI_NOT_FOUND, a new
-      // variable will be set again.
-      //
-      gRT->SetVariable (
-             VarName,
-             &gEfiIp4Config2ProtocolGuid,
-             IP4_CONFIG2_VARIABLE_ATTRIBUTE,
-             0,
-             NULL
-             );
-
-      return EFI_NOT_FOUND;
+      goto Error;
     }
 
+    //
+    // Validate the header and DataRecord array fit in the returned buffer
+    // before using DataRecordCount as a loop bound.
+    //
+    if (VarSize < OFFSET_OF (IP4_CONFIG2_VARIABLE, DataRecord)) {
+      goto Error;
+    }
+
+    RecordArraySize = VarSize - OFFSET_OF (IP4_CONFIG2_VARIABLE, DataRecord);
+    if ((UINTN)Variable->DataRecordCount > RecordArraySize / sizeof (IP4_CONFIG2_DATA_RECORD)) {
+      goto Error;
+    }
+
+    for (Index = 0; Index < Variable->DataRecordCount; Index++) {
+      CopyMem (&DataRecord, &Variable->DataRecord[Index], sizeof (DataRecord));
+
+      if ((UINT32)DataRecord.DataType >= Ip4Config2DataTypeMaximum) {
+        goto Error;
+      }
+
+      DataItem = &Instance->DataItem[DataRecord.DataType];
+      if (DATA_ATTRIB_SET (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED) &&
+          (DataItem->DataSize != DataRecord.DataSize)
+          )
+      {
+        continue;
+      }
+
+      if ((DataRecord.Offset > VarSize) ||
+          (DataRecord.DataSize > VarSize - DataRecord.Offset))
+      {
+        goto Error;
+      }
+    }
+
+    //
+    // Apply records only after the entire variable has been validated so a
+    // later corrupt record cannot leave Instance->DataItem[] half-updated
+    // before Error: deletes the variable and returns EFI_NOT_FOUND.
+    //
     for (Index = 0; Index < Variable->DataRecordCount; Index++) {
       CopyMem (&DataRecord, &Variable->DataRecord[Index], sizeof (DataRecord));
 
@@ -287,6 +315,28 @@ Ip4Config2ReadConfigData (
   }
 
   return Status;
+
+Error:
+  //
+  // Fall back to the default value.
+  //
+  if (Variable != NULL) {
+    FreePool (Variable);
+  }
+
+  //
+  // Remove the problematic variable and return EFI_NOT_FOUND, a new
+  // variable will be set again.
+  //
+  gRT->SetVariable (
+         VarName,
+         &gEfiIp4Config2ProtocolGuid,
+         IP4_CONFIG2_VARIABLE_ATTRIBUTE,
+         0,
+         NULL
+         );
+
+  return EFI_NOT_FOUND;
 }
 
 /**
