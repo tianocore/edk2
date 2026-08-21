@@ -1304,6 +1304,12 @@ HttpBootDxeDriverEntryPoint (
 {
   EFI_STATUS  Status;
 
+  if ((PcdGetBool (PcdIPv4HttpSupport) == FALSE) &&
+      (PcdGetBool (PcdIPv6HttpSupport) == FALSE))
+  {
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // Install UEFI Driver Model protocol(s).
   //
