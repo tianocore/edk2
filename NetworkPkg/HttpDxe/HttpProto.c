@@ -1049,6 +1049,30 @@ HttpCloseConnection (
 }
 
 /**
+  Read and validate the HTTP TCP/TLS connection timeout.
+
+  @param[out] ConnectionTimeout  The connection timeout in seconds.
+
+  @retval EFI_SUCCESS            The timeout is valid.
+  @retval EFI_INVALID_PARAMETER  The timeout is zero.
+
+**/
+STATIC
+EFI_STATUS
+HttpGetConnectionTimeout (
+  OUT UINT32  *ConnectionTimeout
+  )
+{
+  *ConnectionTimeout = PcdGet32 (PcdHttpConnectionTimeout);
+  if (*ConnectionTimeout == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid PcdHttpConnectionTimeout: %u seconds\n", __func__, *ConnectionTimeout));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Configure TCP4 protocol child.
 
   @param[in]  HttpInstance       The HTTP instance private data.
@@ -1068,6 +1092,12 @@ HttpConfigureTcp4 (
   EFI_TCP4_CONFIG_DATA   *Tcp4CfgData;
   EFI_TCP4_ACCESS_POINT  *Tcp4AP;
   EFI_TCP4_OPTION        *Tcp4Option;
+  UINT32                 ConnectionTimeout;
+
+  Status = HttpGetConnectionTimeout (&ConnectionTimeout);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   ASSERT (HttpInstance != NULL);
 
@@ -1094,7 +1124,7 @@ HttpConfigureTcp4 (
   Tcp4Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
-  Tcp4Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
+  Tcp4Option->ConnectionTimeout   = ConnectionTimeout;
   Tcp4Option->DataRetries         = HTTP_DATA_RETRIES;
   Tcp4Option->FinTimeout          = HTTP_FIN_TIMEOUT;
   Tcp4Option->KeepAliveProbes     = HTTP_KEEP_ALIVE_PROBES;
@@ -1157,6 +1187,12 @@ HttpConfigureTcp6 (
   EFI_TCP6_CONFIG_DATA   *Tcp6CfgData;
   EFI_TCP6_ACCESS_POINT  *Tcp6Ap;
   EFI_TCP6_OPTION        *Tcp6Option;
+  UINT32                 ConnectionTimeout;
+
+  Status = HttpGetConnectionTimeout (&ConnectionTimeout);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   ASSERT (HttpInstance != NULL);
 
@@ -1178,7 +1214,7 @@ HttpConfigureTcp6 (
   Tcp6Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
-  Tcp6Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
+  Tcp6Option->ConnectionTimeout   = ConnectionTimeout;
   Tcp6Option->DataRetries         = HTTP_DATA_RETRIES;
   Tcp6Option->FinTimeout          = HTTP_FIN_TIMEOUT;
   Tcp6Option->KeepAliveProbes     = HTTP_KEEP_ALIVE_PROBES;
@@ -1240,6 +1276,12 @@ HttpConnectTcp4 (
 {
   EFI_STATUS                 Status;
   EFI_TCP4_CONNECTION_STATE  Tcp4State;
+  UINT32                     ConnectionTimeout;
+
+  Status = HttpGetConnectionTimeout (&ConnectionTimeout);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if ((HttpInstance->State < HTTP_STATE_TCP_CONFIGED) || (HttpInstance->Tcp4 == NULL)) {
     return EFI_NOT_READY;
@@ -1296,7 +1338,7 @@ HttpConnectTcp4 (
     //
     // Start the timer, and wait Timeout seconds for connection.
     //
-    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_CONNECTION_TIMEOUT * TICKS_PER_SECOND);
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, MultU64x32 (ConnectionTimeout, TICKS_PER_SECOND));
     if (EFI_ERROR (Status)) {
       TlsCloseTxRxEvent (HttpInstance);
       return Status;
@@ -1336,6 +1378,12 @@ HttpConnectTcp6 (
 {
   EFI_STATUS                 Status;
   EFI_TCP6_CONNECTION_STATE  Tcp6State;
+  UINT32                     ConnectionTimeout;
+
+  Status = HttpGetConnectionTimeout (&ConnectionTimeout);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if ((HttpInstance->State < HTTP_STATE_TCP_CONFIGED) || (HttpInstance->Tcp6 == NULL)) {
     return EFI_NOT_READY;
@@ -1393,7 +1441,7 @@ HttpConnectTcp6 (
     //
     // Start the timer, and wait Timeout seconds for connection.
     //
-    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_CONNECTION_TIMEOUT * TICKS_PER_SECOND);
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, MultU64x32 (ConnectionTimeout, TICKS_PER_SECOND));
     if (EFI_ERROR (Status)) {
       TlsCloseTxRxEvent (HttpInstance);
       return Status;

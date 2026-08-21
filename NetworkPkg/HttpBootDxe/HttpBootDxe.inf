@@ -98,6 +98,12 @@
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections           ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout                  ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp4DiscoverTimeout   ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp4DiscoverTryCount  ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitInitialRetransmissionTime    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitMaximumRetransmissionCount   ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitMaximumRetransmissionTime    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitMaximumRetransmissionDuration ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpResumeRetries           ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpDelayBetweenResumeRetries  ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4HttpSupport                ## CONSUMES
