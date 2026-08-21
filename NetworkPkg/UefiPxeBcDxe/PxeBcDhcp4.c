@@ -22,11 +22,6 @@ UINT8  mInterestedDhcp4Tags[PXEBC_DHCP4_TAG_INDEX_MAX] = {
   DHCP4_TAG_BOOTFILE
 };
 
-//
-// There are 4 times retries with the value of 4, 8, 16 and 32, refers to PXE2.1 spec.
-//
-UINT32  mPxeDhcpTimeout[4] = { 4, 8, 16, 32 };
-
 /**
   Parse a certain dhcp4 option by OptTag in Buffer, and return with start pointer.
 
@@ -1664,10 +1659,28 @@ PxeBcDhcp4Dora (
   EFI_DHCP4_PACKET_OPTION  *OptList[PXEBC_DHCP4_OPTION_MAX_NUM];
   UINT8                    Buffer[PXEBC_DHCP4_OPTION_MAX_SIZE];
   UINT32                   OptCount;
+  UINT32                   DiscoverTryCount;
+  UINT32                   *DiscoverTimeout;
   EFI_STATUS               Status;
 
   ASSERT (Dhcp4 != NULL);
   PxeMode = Private->PxeBc.Mode;
+
+  DiscoverTryCount = PcdGet32 (PcdPxeDhcp4DiscoverTryCount);
+  if ((PcdGetSize (PcdPxeDhcp4DiscoverTimeout) % sizeof (UINT32) != 0) ||
+      (DiscoverTryCount == 0) ||
+      (DiscoverTryCount > (PcdGetSize (PcdPxeDhcp4DiscoverTimeout) / sizeof (UINT32))))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DiscoverTimeout = AllocateCopyPool (
+                      DiscoverTryCount * sizeof (UINT32),
+                      PcdGetPtr (PcdPxeDhcp4DiscoverTimeout)
+                      );
+  if (DiscoverTimeout == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Build option list for the request packet.
@@ -1682,13 +1695,14 @@ PxeBcDhcp4Dora (
   Config.OptionList       = OptList;
   Config.Dhcp4Callback    = PxeBcDhcp4CallBack;
   Config.CallbackContext  = Private;
-  Config.DiscoverTryCount = PXEBC_DHCP_RETRIES;
-  Config.DiscoverTimeout  = mPxeDhcpTimeout;
+  Config.DiscoverTryCount = DiscoverTryCount;
+  Config.DiscoverTimeout  = DiscoverTimeout;
 
   //
   // Configure the DHCPv4 instance for PXE boot.
   //
   Status = Dhcp4->Configure (Dhcp4, &Config);
+  FreePool (DiscoverTimeout);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }

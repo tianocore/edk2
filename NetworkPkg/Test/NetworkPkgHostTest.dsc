@@ -94,3 +94,7 @@
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2
   gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType|0x4
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitInitialRetransmissionTime|4
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionCount|4
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionTime|32
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionDuration|60

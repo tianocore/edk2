@@ -44,6 +44,10 @@ VERSION_STRING = 1.0
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitInitialRetransmissionTime
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionCount
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionTime
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionDuration
 
 [Guids]
   gZeroGuid
