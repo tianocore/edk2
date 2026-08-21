@@ -1154,7 +1154,7 @@ ArmCcaSetMemoryProtectionAttribute (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!ArmHasRme ()) {
+  if (!ArmCcaIsRealm ()) {
     return EFI_UNSUPPORTED;
   }
 
