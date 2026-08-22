@@ -6,6 +6,8 @@
 
 **/
 
+#include <Library/PcdLib.h>
+
 #include "CpuDxe.h"
 #include "CpuMp.h"
 #include "CpuPageTable.h"
@@ -1031,7 +1033,9 @@ InitializeCpu (
   //
   // Install EFI memory attribute Protocol
   //
-  InstallEfiMemoryAttributeProtocol (mCpuHandle);
+  if (PcdGetBool (PcdProduceMemoryAttributeProtocol)) {
+    InstallEfiMemoryAttributeProtocol (mCpuHandle);
+  }
 
   //
   // Refresh GCD memory space map according to MTRR value.

@@ -75,7 +75,7 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
-  gEfiMemoryAttributeProtocolGuid               ## PRODUCES
+  gEfiMemoryAttributeProtocolGuid               ## SOMETIMES_PRODUCES
   gEfiMpServiceProtocolGuid                     ## PRODUCES
   gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
@@ -94,6 +94,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdProduceMemoryAttributeProtocol           ## CONSUMES
 
 [Pcd.LoongArch64]
   gUefiCpuPkgTokenSpaceGuid.PcdLoongArchExceptionVectorBaseAddress      ## CONSUMES

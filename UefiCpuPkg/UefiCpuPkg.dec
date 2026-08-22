@@ -289,6 +289,18 @@
   # @Prompt Configure max mapping address in page table before Temp Ram Exit.
   gUefiCpuPkgTokenSpaceGuid.PcdMaxMappingAddressBeforeTempRamExit|0xFFFFFFFFFFFFFFFF|UINT64|0x30002008
 
+  ## Indicates whether CpuDxe produces the EFI Memory Attribute Protocol.
+  #  Platforms that hand off page tables from an earlier boot stage (e.g. a
+  #  coreboot/UEFI payload) may map memory with coarse or mixed attributes that
+  #  the protocol implementation cannot describe accurately. Because DxeCore
+  #  consults the protocol in CoreFreePages(), an inaccurate GetMemoryAttributes()
+  #  result causes freed pages to be leaked. Such platforms can set this to FALSE
+  #  to keep the protocol unpublished.<BR><BR>
+  #   TRUE  - CpuDxe installs gEfiMemoryAttributeProtocolGuid.<BR>
+  #   FALSE - CpuDxe does not install the protocol.<BR>
+  # @Prompt Produce the EFI Memory Attribute Protocol.
+  gUefiCpuPkgTokenSpaceGuid.PcdProduceMemoryAttributeProtocol|TRUE|BOOLEAN|0x30002009
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC

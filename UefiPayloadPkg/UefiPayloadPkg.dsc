@@ -669,6 +669,13 @@
   ## Whether allows PCI RB to allocate DMA memory above 4GB
   gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE
 
+!if $(BOOTLOADER) == "COREBOOT"
+  # Do not publish the EFI Memory Attribute Protocol: the page tables handed off
+  # by coreboot use coarse/mixed attributes that CpuDxe cannot report accurately,
+  # which would cause DxeCore CoreFreePages() to leak freed pages.
+  gUefiCpuPkgTokenSpaceGuid.PcdProduceMemoryAttributeProtocol|FALSE
+!endif
+
 [PcdsFixedAtBuild.AARCH64]
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
