@@ -62,6 +62,7 @@
 //
 // SD Host Controller bits to HOST_CTRL2 register
 //
+#define SD_MMC_HC_CTRL_1V8_SIGNAL  0x0008
 #define SD_MMC_HC_CTRL_UHS_MASK    0x0007
 #define SD_MMC_HC_CTRL_UHS_SDR12   0x0000
 #define SD_MMC_HC_CTRL_UHS_SDR25   0x0001
@@ -556,6 +557,25 @@ SdMmcHcInitPowerVoltage (
   IN EFI_PCI_IO_PROTOCOL  *PciIo,
   IN UINT8                Slot,
   IN SD_MMC_HC_SLOT_CAP   Capability
+  );
+
+/**
+  Set the voltage regulator for I/O signaling.
+
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] Voltage        The signaling voltage.
+
+  @retval EFI_SUCCESS       The voltage is supplied successfully.
+  @retval Others            The voltage isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcSetSignalingVoltage (
+  IN EFI_HANDLE                ControllerHandle,
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN UINT8                     Slot,
+  IN SD_MMC_SIGNALING_VOLTAGE  Voltage
   );
 
 /**
