@@ -1460,6 +1460,8 @@ AmlCodeGenScope (
   The ASL parameters "ReturnType" and "ParameterTypes" are not asked
   in this function. They are optional parameters in ASL.
 
+  @ingroup CodeGenApis
+
   @param [in]  NameString     The new Method's name.
                               Must be a NULL-terminated ASL NameString
                               e.g.: "MET0", "_SB.MET0", etc.
@@ -1557,6 +1559,8 @@ AmlCodeGenMethodRetNameString (
   The ASL parameters "ReturnType" and "ParameterTypes" are not asked
   in this function. They are optional parameters in ASL.
 
+  @ingroup CodeGenApis
+
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
                                     e.g.: "MET0", "_SB.MET0", etc.
@@ -1603,6 +1607,8 @@ AmlCodeGenMethodRetInteger (
 
   To return an empty buffer, call the function with
   (ReturnedBuffer=NULL, ReturnedBufferSize=0).
+
+  @ingroup CodeGenApis
 
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
@@ -1655,6 +1661,8 @@ AmlCodeGenMethodRetBuffer (
 
   The ASL parameters "ReturnType" and "ParameterTypes" are not asked
   in this function. They are optional parameters in ASL.
+
+  @ingroup CodeGenApis
 
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
@@ -1922,6 +1930,7 @@ AmlCreateCpcNode (
 
 /** AML code generation to add a NameString to the package in a named node.
 
+  @ingroup CodeGenApis
 
   @param [in]  NameString     NameString to add
   @param [in]  NamedNode      Node to add the string to the included package.
@@ -2018,6 +2027,8 @@ AmlAddIntegerToNamedPackage (
       MET3 (Arg0, 0x0100)
     }
 
+  @ingroup CodeGenApis
+
   @param [in]  MethodNameString  The method name to be called or invoked.
   @param [in]  NumArgs           Number of arguments to be passed,
                                  0 to 7 are permissible values.
@@ -2087,6 +2098,8 @@ AmlCreatePsdNode (
 
   Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States)
 
+  @ingroup CodeGenApis
+
   @param [in]  CstNameString  The new CST 's object name.
                               Must be a NULL-terminated ASL NameString
                               e.g.: "_CST", "DEV0.CSTP", etc.
@@ -2119,6 +2132,8 @@ AmlCreateCstNode (
   }
 
   Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States).
+
+  @ingroup CodeGenApis
 
   @param [in]  CstInfo                    CstInfo object
   @param [in]  CstNode                    Cst node created with the function
@@ -2275,6 +2290,8 @@ AmlCreatePssNode (
      and initially contain a "ResourceTemplate ()".
    - returned through the NewRdNode parameter.
 
+  @ingroup CodeGenApis
+
   @param  [in]  IsEdgeTriggered The interrupt is edge triggered or
                                 level triggered.
   @param  [in]  IsActiveLow     The interrupt is active-high or active-low.
@@ -2317,6 +2334,8 @@ AmlCodeGenRdIrq (
      In such case NameOpNode must be defined by a the "Name ()" ASL statement
      and initially contain a "ResourceTemplate ()".
    - returned through the NewRdNode parameter.
+
+  @ingroup CodeGenApis
 
   @param [in]  InitialBaudRate           Initial baud rate.
   @param [in]  BitsPerByte               Number of bits per byte.
@@ -2415,6 +2434,8 @@ AmlCodeGenRdUartSerialBusV2 (
   It assumes that NameString, Local, and Arg objects reference valid device,
   processor, or thermal zone objects.
 
+  @ingroup CodeGenApis
+
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
                                     e.g.: "MET0", "_SB.MET0", etc.
@@ -2489,6 +2510,8 @@ AmlCodeGenMethodNotifyList (
     {
       Return (MET3 (Arg0, 0x0100) )
     }
+
+  @ingroup CodeGenApis
 
   @param [in] MethodNameString  The method name to be returned.
   @param [in] NumArgs           Number of arguments to be passed,
