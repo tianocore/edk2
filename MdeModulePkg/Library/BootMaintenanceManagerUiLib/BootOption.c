@@ -340,6 +340,10 @@ BOpt_GetBootOptions (
 
   BootOption = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
   for (Index = 0; Index < BootOrderListSize / sizeof (UINT16); Index++) {
+    if (BootOption == NULL) {
+      continue;
+    }
+
     //
     // Don't display the hidden/inactive boot option
     //
@@ -363,7 +367,10 @@ BOpt_GetBootOptions (
     }
 
     NewMenuEntry = BOpt_CreateMenuEntry (BM_LOAD_CONTEXT_SELECT);
-    ASSERT (NULL != NewMenuEntry);
+    if (NewMenuEntry == NULL) {
+      ASSERT (NULL != NewMenuEntry);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     NewLoadContext = (BM_LOAD_CONTEXT *)NewMenuEntry->VariableContext;
 
@@ -813,7 +820,7 @@ GetBootOrder (
   )
 {
   BMM_FAKE_NV_DATA  *BmmConfig;
-  UINT16            Index;
+  UINTN             Index;
   UINT16            OptionOrderIndex;
   UINTN             DeviceType;
   BM_MENU_ENTRY     *NewMenuEntry;
@@ -860,8 +867,8 @@ GetDriverOrder (
   )
 {
   BMM_FAKE_NV_DATA  *BmmConfig;
-  UINT16            Index;
-  UINT16            OptionOrderIndex;
+  UINTN             Index;
+  UINTN             OptionOrderIndex;
   UINTN             DeviceType;
   BM_MENU_ENTRY     *NewMenuEntry;
   BM_LOAD_CONTEXT   *NewLoadContext;
