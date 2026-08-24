@@ -5295,6 +5295,9 @@ error_handler:
     It assumes that NameString, Local, and Arg objects reference valid device,
     processor, or thermal zone objects.
 
+  This function takes ownership of NotifyObjectNode and ValueObjectNode,
+  regardless of whether node generation succeeds or fails.
+
   @param [in]  NotifyObjectNode   Object node be notified
   @param [in]  ValueObjectNode    Notify value object.
   @param [in]  ParentNode         If provided, set ParentNode as the parent
@@ -5319,11 +5322,14 @@ AmlCodeGenNotifyNode (
   AML_OBJECT_NODE  *ObjectNode;
   EFI_STATUS       Status;
 
+  ObjectNode = NULL;
+
   if ((NotifyObjectNode == NULL) || (ValueObjectNode == NULL) ||
       ((ParentNode == NULL) && (NewObjectNode == NULL)))
   {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto error_handler;
   }
 
   if ((ParentNode != NULL) &&
@@ -5334,18 +5340,18 @@ AmlCodeGenNotifyNode (
          ))
   {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto error_handler;
   }
 
-  ObjectNode = NULL;
-  Status     = AmlCreateObjectNode (
-                 AmlGetByteEncodingByOpCode (AML_NOTIFY_OP, 0),
-                 0,
-                 &ObjectNode
-                 );
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (AML_NOTIFY_OP, 0),
+             0,
+             &ObjectNode
+             );
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
-    return Status;
+    goto error_handler;
   }
 
   Status = AmlSetFixedArgument (
@@ -5358,6 +5364,8 @@ AmlCodeGenNotifyNode (
     goto error_handler;
   }
 
+  NotifyObjectNode = NULL;
+
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm1,
@@ -5367,6 +5375,8 @@ AmlCodeGenNotifyNode (
     ASSERT_EFI_ERROR (Status);
     goto error_handler;
   }
+
+  ValueObjectNode = NULL;
 
   Status = LinkNode (
              (AML_OBJECT_NODE_HANDLE)ObjectNode,
@@ -5381,6 +5391,14 @@ AmlCodeGenNotifyNode (
   return Status;
 
 error_handler:
+  if (NotifyObjectNode != NULL) {
+    AmlDeleteTree (NotifyObjectNode);
+  }
+
+  if (ValueObjectNode != NULL) {
+    AmlDeleteTree (ValueObjectNode);
+  }
+
   if (ObjectNode != NULL) {
     AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
@@ -5549,13 +5567,17 @@ AmlCodeGenNotify (
              ParentNode,
              NewObjectNode
              );
+  //
+  // AmlCodeGenNotifyNode() owns both operand nodes.
+  //
+
+  NotifyObject    = NULL;
+  ValueObjectNode = NULL;
+
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     goto exit_handler;
   }
-
-  NotifyObject    = NULL;
-  ValueObjectNode = NULL;
 
 exit_handler:
 
