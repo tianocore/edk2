@@ -102,13 +102,18 @@ ProcessCommunicationBuffer (
   CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
   if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid)) {
     CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
-    if (CommunicateHeaderV3->BufferSize < sizeof (EFI_MM_COMMUNICATE_HEADER_V3) + CommunicateHeaderV3->MessageSize) {
+
+    Status = SafeUintnAdd (sizeof (EFI_MM_COMMUNICATE_HEADER_V3), CommunicateHeaderV3->MessageSize, &BufferSize);
+    if (EFI_ERROR (Status) || (CommunicateHeaderV3->BufferSize < BufferSize)) {
       return EFI_INVALID_PARAMETER;
     }
 
     BufferSize = ((EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer)->BufferSize;
   } else {
-    BufferSize = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+    Status = SafeUintnAdd (OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data), (UINTN)CommunicateHeader->MessageLength, &BufferSize);
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   if (BufferSize > EFI_PAGES_TO_SIZE (mMmCommonBuffer.NumberOfPages)) {
@@ -139,6 +144,10 @@ ProcessCommunicationBuffer (
   Status = mSmmControl2->Trigger (mSmmControl2, NULL, NULL, FALSE, 0);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
+  }
+
+  if (CommonBufferStatus->ReturnBufferSize > BufferSize) {
+    return EFI_BAD_BUFFER_SIZE;
   }
 
   //
