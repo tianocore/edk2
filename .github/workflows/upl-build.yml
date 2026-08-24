@@ -31,7 +31,6 @@ jobs:
       tool-chain: ${{ matrix.tool-chain }}
       target: ${{ matrix.target }}
       extra-build-args: ${{ matrix.extra-build-args }}
-      extra-pip-requirements: 'pefile pylibfdt'
       extra-artifact-path: |
         Build/**/*.elf
         Build/**/*.fit
@@ -54,7 +53,6 @@ jobs:
       tool-chain: ${{ matrix.tool-chain }}
       target: ${{ matrix.target }}
       extra-build-args: ${{ matrix.extra-build-args }}
-      extra-pip-requirements: 'pefile pylibfdt'
       extra-setup-cmd: 'sudo dnf install -y llvm clang llvm-libs llvm-devel lldb'
       extra-artifact-path: |
         Build/**/*.elf
