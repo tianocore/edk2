@@ -1,0 +1,19 @@
+// /** @file
+// Dynamic HII Root Form Generator.
+//
+// Top level form that references all other dynamically
+// generated forms.
+//
+// Copyright (c) 2026, Arm Limited. All rights reserved.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// --*/
+
+#langdef en-US  "English"
+
+#string STR_MODULE_ABSTRACT                     #language en-US "Root form generator"
+#string STR_MODULE_DESCRIPTION                  #language en-US "Top level form for referencing all other generated forms."
+#string STR_PLAT_CFG_FORM_SET_TITLE             #language en-US "Dynamic Platform Configuration"
+#string STR_PLAT_CFG_FORM_SET_TITLE_HELP        #language en-US "Dynamic Platform Configuration"
+#string STR_PLAT_CFG_FORM_TITLE                 #language en-US "Dynamic Platform Configuration"

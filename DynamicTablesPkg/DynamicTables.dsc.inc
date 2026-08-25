@@ -95,6 +95,9 @@
   #
   DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
 
+  #  HII Form Generators
+  DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
+
 [Components.X64]
   #
   # Generators (X64 specific)
@@ -133,6 +136,9 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
       #  X64 specific
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
+
+      #  HII Form Generators
+      NULL|DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
   }
 
 [Components.AARCH64]
@@ -216,6 +222,9 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
+
+      #  HII Form Generators
+      NULL|DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
   }
 
 [Components.RISCV64]
