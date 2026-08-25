@@ -53,7 +53,7 @@ FdtNodeHasName (
     return FALSE;
   }
 
-  // SearchName must be longer than the node name.
+  // SearchName must be shorter than the node name.
   if (Length > AsciiStrLen (NodeName)) {
     return FALSE;
   }
@@ -71,6 +71,80 @@ FdtNodeHasName (
   }
 
   return FALSE;
+}
+
+/** Check whether a node has the input name.
+
+  Some node names follow a convention where
+  an Id is added at the end of the name. E.g.
+  "socketN", "clusterN", "coreN", "threadN".
+  If set to TRUE, check that:
+  - the node name starts with SearchName
+  - the chars after SearchName are numbers
+  - there is at least one number after SearchName
+
+  @param [in]  Fdt          Pointer to a Flattened Device Tree.
+  @param [in]  Node         Offset of the node to check the name.
+  @param [in]  SearchName   Node name to search.
+                            This is a NULL terminated string.
+
+  @retval True    The node has the input name.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+FdtNodeHasNameExt (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *SearchName
+  )
+{
+  CONST CHAR8  *NodeName;
+  UINT32       Length;
+  BOOLEAN      FoundId;
+
+  if ((Fdt == NULL) ||
+      (SearchName == NULL))
+  {
+    ASSERT (FALSE);
+    return FALSE;
+  }
+
+  // Always compare the whole string. Don't stop at the "@" char.
+  Length = (UINT32)AsciiStrLen (SearchName);
+
+  // Get the address of the node name.
+  NodeName = FdtOffsetPointer (Fdt, Node + FDT_TAGSIZE, Length + 1);
+  if (NodeName == NULL) {
+    return FALSE;
+  }
+
+  // SearchName must be shorter than the node name.
+  if (Length > AsciiStrLen (NodeName)) {
+    return FALSE;
+  }
+
+  if (AsciiStrnCmp (NodeName, SearchName, Length) != 0) {
+    return FALSE;
+  }
+
+  FoundId = FALSE;
+
+  while (TRUE) {
+    if (NodeName[Length] == '\0') {
+      break;
+    }
+
+    // Not a number.
+    if (!((NodeName[Length] >= '0') && (NodeName[Length] <= '9'))) {
+      return FALSE;
+    }
+
+    FoundId = TRUE;
+    Length++;
+  } // while
+
+  return FoundId;
 }
 
 /** Iterate through the list of strings in the Context,

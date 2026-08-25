@@ -145,6 +145,32 @@ FdtNodeHasName (
   IN  CONST VOID   *SearchName
   );
 
+/** Check whether a node has the input name.
+
+  Some node names follow a convention where
+  an Id is added at the end of the name. E.g.
+  "socketN", "clusterN", "coreN", "threadN".
+  If set to TRUE, check that:
+  - the node name starts with SearchName
+  - the chars after SearchName are numbers
+  - there is at least one number after SearchName
+
+  @param [in]  Fdt          Pointer to a Flattened Device Tree.
+  @param [in]  Node         Offset of the node to check the name.
+  @param [in]  SearchName   Node name to search.
+                            This is a NULL terminated string.
+
+  @retval True    The node has the input name.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+FdtNodeHasNameExt (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *SearchName
+  );
+
 /** Iterate through the list of strings in the Context,
     and check whether at least one string is matching the
     "compatible" property of the node.
