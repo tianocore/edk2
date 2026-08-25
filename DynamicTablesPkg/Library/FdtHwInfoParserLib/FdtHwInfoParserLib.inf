@@ -25,6 +25,10 @@
   FdtHwInfoParser.h
   FdtUtility.c
   FdtUtility.h
+  Topology/TopologyHierarchyParser.c
+  Topology/TopologyHierarchyParser.h
+  Topology/TopologyParser.c
+  Topology/TopologyParser.h
   Pci/PciConfigSpaceParser.c
   Pci/PciConfigSpaceParser.h
   Serial/SerialPortParser.c
