@@ -97,6 +97,7 @@
 
   #  HII Form Generators
   DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
+  DynamicTablesPkg/Library/Hii/CpuFormGenerator/CpuFormGenerator.inf
 
 [Components.X64]
   #
@@ -139,6 +140,7 @@
 
       #  HII Form Generators
       NULL|DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
+      NULL|DynamicTablesPkg/Library/Hii/CpuFormGenerator/CpuFormGenerator.inf
   }
 
 [Components.AARCH64]
@@ -225,6 +227,7 @@
 
       #  HII Form Generators
       NULL|DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
+      NULL|DynamicTablesPkg/Library/Hii/CpuFormGenerator/CpuFormGenerator.inf
   }
 
 [Components.RISCV64]
