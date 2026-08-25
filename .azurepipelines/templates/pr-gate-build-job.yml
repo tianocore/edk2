@@ -85,15 +85,18 @@ jobs:
         Build.Pkgs: 'SecurityPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
-      TARGET_UEFIPAYLOAD_IA32_X64:
-        Build.Pkgs: 'UefiPayloadPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
-        Build.Archlist: 'IA32,X64'
-      ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
-        TARGET_UEFIPAYLOAD_AARCH64_GCC_ONLY:
-          Build.Pkgs: 'UefiPayloadPkg'
-          Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
-          Build.Archlist: 'AARCH64'
+        # UefiPayloadPkg is removed since its build depends on pylibfdt which currently fails to
+        # install. These can be re-enabled when a long-term solution is found where the risk of
+        # breaking the build is mitigated.
+      # TARGET_UEFIPAYLOAD_IA32_X64:
+      #   Build.Pkgs: 'UefiPayloadPkg'
+      #   Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      #   Build.Archlist: 'IA32,X64'
+      # ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
+      #   TARGET_UEFIPAYLOAD_AARCH64_GCC_ONLY:
+      #     Build.Pkgs: 'UefiPayloadPkg'
+      #     Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      #     Build.Archlist: 'AARCH64'
       ${{ if or(eq(parameters.tool_chain_tag, 'GCC'), startsWith(parameters.tool_chain_tag, 'VS')) }}:
         TARGET_PLATFORMS:
           # For Platforms only check code. Leave it to Platform CI
