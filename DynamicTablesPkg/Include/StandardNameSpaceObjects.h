@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
