@@ -13,8 +13,7 @@
 //
 // Global Variables
 //
-STATIC BOOLEAN           mInterruptState = FALSE;
-STATIC EFI_HANDLE        mCpuHandle      = NULL;
+STATIC EFI_HANDLE        mCpuHandle = NULL;
 STATIC UINTN             mBootHartId;
 RISCV_EFI_BOOT_PROTOCOL  gRiscvBootProtocol;
 
@@ -123,7 +122,6 @@ CpuEnableInterrupt (
   )
 {
   EnableInterrupts ();
-  mInterruptState = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -143,7 +141,6 @@ CpuDisableInterrupt (
   )
 {
   DisableInterrupts ();
-  mInterruptState = FALSE;
   return EFI_SUCCESS;
 }
 
@@ -168,7 +165,7 @@ CpuGetInterruptState (
     return EFI_INVALID_PARAMETER;
   }
 
-  *State = mInterruptState;
+  *State = GetInterruptState ();
   return EFI_SUCCESS;
 }
 

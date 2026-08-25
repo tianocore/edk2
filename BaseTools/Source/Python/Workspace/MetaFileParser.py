@@ -1728,6 +1728,26 @@ class DscParser(MetaFileParser):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=False)
                            for Value in self._ValueList]
 
+    ## Find the file a record's line number refers to
+    #
+    # !include'd records are spliced into the including file's record list, so
+    # a record's line number is not necessarily an offset into self.MetaFile.
+    # Callers reporting a line number to the user should report this path with
+    # it rather than assuming the top-level DSC.
+    #
+    # @param RecordId:   ID of the record to locate
+    #
+    # @retval:       Path of the file the record was parsed from
+    #
+    def GetOriginFile(self, RecordId):
+        for Table in (self._Table, self._RawTable):
+            if Table is None:
+                continue
+            OriginFile = Table.GetOriginFile(RecordId)
+            if OriginFile is not None:
+                return OriginFile
+        return self.MetaFile
+
     def DisableOverrideComponent(self,module_id):
         for ori_id in self._IdMapping:
             if self._IdMapping[ori_id] == module_id:

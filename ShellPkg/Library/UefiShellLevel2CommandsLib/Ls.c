@@ -984,7 +984,6 @@ MainCmdLs (
     if (StrStr (PathName, L":") == NULL) {
       StrnCatGrow (&FullPath, &Size, gEfiShellProtocol->GetCurDir (NULL), 0);
       if (FullPath == NULL) {
-        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 
@@ -994,7 +993,6 @@ MainCmdLs (
 
     StrnCatGrow (&FullPath, &Size, PathName, 0);
     if (FullPath == NULL) {
-      ShellCommandLineFreeVarList (Package);
       return SHELL_OUT_OF_RESOURCES;
     }
 
@@ -1011,7 +1009,6 @@ MainCmdLs (
       StrnCatGrow (&SearchString, NULL, FullPath, 0);
       if (SearchString == NULL) {
         FreePool (FullPath);
-        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 

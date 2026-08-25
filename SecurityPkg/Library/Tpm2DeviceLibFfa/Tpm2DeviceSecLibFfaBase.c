@@ -14,8 +14,6 @@
 #include <Library/Tpm2DeviceLib.h>
 #include "Tpm2DeviceLibFfa.h"
 
-UINT8  mCRBIdleByPass;
-
 /**
   Return cached PTP CRB interface IdleByPass state.
 
@@ -26,7 +24,7 @@ GetCachedIdleByPass (
   VOID
   )
 {
-  return mCRBIdleByPass;
+  return Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
 }
 
 /**
@@ -42,20 +40,9 @@ InternalTpm2DeviceLibFfaConstructor (
   VOID
   )
 {
-  EFI_STATUS  Status;
-
-  mCRBIdleByPass = 0xFF;
-
   if (PcdGet64 (PcdTpmBaseAddress) == 0) {
     return EFI_NO_MAPPING;
   }
 
-  Status = ValidateTpmInterfaceType ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  mCRBIdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
-
-  return EFI_SUCCESS;
+  return ValidateTpmInterfaceType ();
 }
