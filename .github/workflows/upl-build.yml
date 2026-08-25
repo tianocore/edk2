@@ -8,10 +8,15 @@
 ##
 name: UPL Build
 
+# The push trigger is disabled since the UefiPayloadPkg build depends on pylibfdt which
+# currently fails to install. workflow_dispatch is left as that still allows the workflow
+# to be run manually. It also allows the workflow to be excluded from automatic triggers
+# at the workflow level instead of at the job level which would require more changes in
+# the file.
 on:
   workflow_dispatch:
-  push:
-    branches: ['master']
+  # push:
+  #   branches: ['master']
 
 jobs:
   build_vs2026:
