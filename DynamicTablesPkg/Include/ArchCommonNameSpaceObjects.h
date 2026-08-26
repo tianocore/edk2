@@ -154,6 +154,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjBiosLanguage,                      ///< 86 - BIOS Language
   EArchCommonObjSystemBootInfo,                    ///< 87 - System Boot Information
   EArchCommonObjOnboardDeviceInfo,                 ///< 88 - Onboard Device Extended Information
+  EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1375,6 +1376,20 @@ typedef struct {
   UINT64                                    Value;
   UINT64                                    Mask;
 } CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
+
+/** A structure that describes the Boot Error Region referenced by the BERT.
+
+  Cf. ACPI 6.6, s18.3.1.
+
+  ID: EArchCommonObjBootErrorRegionInfo
+*/
+typedef struct CmArchCommonBootErrorRegionInfo {
+  /// 64-bit physical address of the Boot Error Region.
+  UINT64    BootErrorRegion;
+
+  /// Length, in bytes, of the Boot Error Region.
+  UINT32    BootErrorRegionLength;
+} CM_ARCH_COMMON_BOOT_ERROR_REGION_INFO;
 
 /** A structure that describes BIOS Information.
 
