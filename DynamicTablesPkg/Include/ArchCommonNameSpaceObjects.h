@@ -150,6 +150,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 82 - Redfish Over Ip Protocol Info.
   EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 83 - MCHI USB Network Device descriptor info
   EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 84 - MCHI PCI/PCIe Network Device descriptor info
+  EArchCommonObjBootErrorRegionInfo,               ///< 85 - Boot Error Region Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1371,6 +1372,20 @@ typedef struct {
   UINT64                                    Value;
   UINT64                                    Mask;
 } CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
+
+/** A structure that describes the Boot Error Region referenced by the BERT.
+
+  Cf. ACPI 6.6, s18.3.1.
+
+  ID: EArchCommonObjBootErrorRegionInfo
+*/
+typedef struct CmArchCommonBootErrorRegionInfo {
+  /// 64-bit physical address of the Boot Error Region.
+  UINT64    BootErrorRegion;
+
+  /// Length, in bytes, of the Boot Error Region.
+  UINT32    BootErrorRegionLength;
+} CM_ARCH_COMMON_BOOT_ERROR_REGION_INFO;
 
 /** A structure that describes BIOS Information.
 
