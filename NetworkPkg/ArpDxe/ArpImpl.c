@@ -2,6 +2,7 @@
   The implementation of the ARP protocol.
 
 Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1097,6 +1098,7 @@ ArpSendFrame (
   if (Packet == NULL) {
     DEBUG ((DEBUG_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
     ASSERT (Packet != NULL);
+    goto CLEAN_EXIT;
   }
 
   TmpPtr = Packet;
@@ -1606,7 +1608,7 @@ ArpFindCacheEntry (
   //
   // Allocate buffer to copy the found entries.
   //
-  FindData = AllocatePool (FoundCount * FoundEntryLength);
+  FindData = AllocatePool ((UINTN)FoundCount * FoundEntryLength);
   if (FindData == NULL) {
     DEBUG ((DEBUG_ERROR, "ArpFindCacheEntry: Failed to allocate memory.\n"));
     Status = EFI_OUT_OF_RESOURCES;
