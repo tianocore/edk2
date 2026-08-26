@@ -398,6 +398,11 @@
   # messages will be overwritten by more recent messages.
   gUefiOvmfPkgTokenSpaceGuid.PcdMemDebugLogPages|32|UINT32|0x7c
 
+  ## The base address where the SMBIOS 3.0 tables placed by cloud-hypervisor
+  #  can be found. Defaults to 0xf0000, the address used on
+  #  X64; other CloudHv platforms (e.g. ArmVirtCloudHv) may override this.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCloudHvSmbiosBaseAddress|0xf0000|UINT64|0x81
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
