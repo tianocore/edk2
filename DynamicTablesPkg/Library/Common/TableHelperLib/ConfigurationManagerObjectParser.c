@@ -1268,6 +1268,13 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjEinjInstructionsInfoParser[] = {
   { "Mask",            8,                                               "0x%llx", NULL },
 };
 
+/** A parser for CmArchCommonBootErrorRegionInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBootErrorRegionInfoParser[] = {
+  { "BootErrorRegion",       8, "0x%llx", NULL },
+  { "BootErrorRegionLength", 4, "0x%x",   NULL },
+};
+
 /** A parser for EArchCommonObjPlatformFwInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonPlatformFwInfoParser[] = {
@@ -1759,6 +1766,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguage,                     CmArchCommonBiosLanguageParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemBootInfo,                   CmArchCommonSystemBootInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjOnboardDeviceInfo,                CmArchCommonOnboardDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBootErrorRegionInfo,              CmArchCommonBootErrorRegionInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
