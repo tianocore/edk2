@@ -1277,6 +1277,17 @@ ProgramBar (
   Address = Base + Node->Offset;
 
   //
+  // If EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL supplied a fixed
+  // base address (_MIF|_MAF in the ACPI descriptor), use it directly.
+  //
+  if (Node->PciDev->PciBar[Node->Bar].HasFixedBaseAddress) {
+    Address = Node->PciDev->PciBar[Node->Bar].FixedBaseAddress;
+    DEBUG ((DEBUG_INFO,
+            "PciBus: BAR[%d] fixed address 0x%016Lx (GCD 0x%016Lx)\n",
+            Node->Bar, Address, Base + Node->Offset));
+  }
+
+  //
   // Indicate pci bus driver has allocated
   // resource for this device
   // It might be a temporary solution here since
