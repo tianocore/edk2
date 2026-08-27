@@ -1395,6 +1395,57 @@ PciAcpiInitialization (
   IoOr16 ((PciRead32 (Pmba) & ~BIT0) + 4, BIT0);
 }
 
+STATIC
+EFI_STATUS
+ConnectPciDevice (
+  IN EFI_HANDLE  Handle,
+  IN CHAR16      *ClassStr
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  CHAR16                    *DevPathStr;
+
+  DevicePath = NULL;
+  Status     = gBS->HandleProtocol (
+                      Handle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Print Device Path
+  //
+  DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
+  if (DevPathStr != NULL) {
+    DEBUG ((DEBUG_INFO, "Found %s device: %s\n", ClassStr, DevPathStr));
+    FreePool (DevPathStr);
+  }
+
+  return gBS->ConnectController (Handle, NULL, NULL, TRUE);
+}
+
+EFI_STATUS
+EFIAPI
+ConnectRecursivelyIfXenPciDevice (
+  IN EFI_HANDLE           Handle,
+  IN EFI_PCI_IO_PROTOCOL  *Instance,
+  IN PCI_TYPE00           *PciHeader
+  )
+{
+  //
+  // Recognize Xen PCI devices
+  //
+  if (IS_CLASS2 (PciHeader, 0xFF, 0x80)) {
+    return ConnectPciDevice (Handle, L"Xen");
+  }
+
+  return EFI_SUCCESS;
+}
+
 EFI_STATUS
 EFIAPI
 ConnectRecursivelyIfPciMassStorage (
@@ -1403,47 +1454,11 @@ ConnectRecursivelyIfPciMassStorage (
   IN PCI_TYPE00           *PciHeader
   )
 {
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  CHAR16                    *DevPathStr;
-
   //
-  // Recognize PCI Mass Storage, and Xen PCI devices
+  // Recognize PCI Mass Storage
   //
-  if (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ||
-      (XenDetected () && IS_CLASS2 (PciHeader, 0xFF, 0x80)))
-  {
-    DevicePath = NULL;
-    Status     = gBS->HandleProtocol (
-                        Handle,
-                        &gEfiDevicePathProtocolGuid,
-                        (VOID *)&DevicePath
-                        );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Print Device Path
-    //
-    DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
-    if (DevPathStr != NULL) {
-      DEBUG ((
-        DEBUG_INFO,
-        "Found %s device: %s\n",
-        (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ?
-         L"Mass Storage" :
-         L"Xen"
-        ),
-        DevPathStr
-        ));
-      FreePool (DevPathStr);
-    }
-
-    Status = gBS->ConnectController (Handle, NULL, NULL, TRUE);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  if (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE)) {
+    return ConnectPciDevice (Handle, L"Mass Storage");
   }
 
   return EFI_SUCCESS;
@@ -1511,6 +1526,14 @@ VOID
 PlatformBdsRestoreNvVarsFromHardDisk (
   )
 {
+  //
+  // Xen HVM exposes disk through both PV and emulated block device.
+  // Enumerate PV devices first to make the PV one takes precedence.
+  //
+  if (XenDetected ()) {
+    VisitAllPciInstances (ConnectRecursivelyIfXenPciDevice);
+  }
+
   VisitAllPciInstances (ConnectRecursivelyIfPciMassStorage);
   VisitAllInstancesOfProtocol (
     &gEfiSimpleFileSystemProtocolGuid,
