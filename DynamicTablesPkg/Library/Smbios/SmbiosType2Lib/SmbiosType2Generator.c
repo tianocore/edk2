@@ -195,8 +195,8 @@ BuildSmbiosType2TableEx (
   }
 
   if ((BaseboardInfo == NULL) ||
-      (BaseboardCount > (MAX_UINTN / sizeof (*TableList))) ||
-      (BaseboardCount > (MAX_UINTN / sizeof (*CmObjectList))))
+      (BaseboardCount > (MAX_UINT32 / sizeof (*TableList))) ||
+      (BaseboardCount > (MAX_UINT32 / sizeof (*CmObjectList))))
   {
     DEBUG ((DEBUG_ERROR, "%a: Invalid Baseboard object list\n", __func__));
     return EFI_INVALID_PARAMETER;
