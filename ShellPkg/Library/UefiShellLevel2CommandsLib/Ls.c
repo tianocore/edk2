@@ -709,6 +709,8 @@ PrintLsOutputRec (
     return ShellStatus;
   }
 
+  ListHead = NULL;
+
   Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR (Status)) {
     SHELL_FREE_NON_NULL (CorrectedPath);
