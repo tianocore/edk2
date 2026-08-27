@@ -2130,6 +2130,7 @@ AmlCodeGenDevice (
   AML_DATA_NODE    *DataNode;
   CHAR8            *AmlNameString;
   UINT32           AmlNameStringSize;
+  UINT32           PkgLen;
 
   if ((NameString == NULL)  ||
       ((ParentNode == NULL) && (NewObjectNode == NULL)))
@@ -2154,9 +2155,18 @@ AmlCodeGenDevice (
     goto error_handler1;
   }
 
+  Status = AmlComputePkgLength (
+             AmlNameStringSize,
+             &PkgLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
   Status = AmlCreateObjectNode (
              AmlGetByteEncodingByOpCode (AML_EXT_OP, AML_EXT_DEVICE_OP),
-             AmlNameStringSize + AmlComputePkgLengthWidth (AmlNameStringSize),
+             PkgLen,
              &ObjectNode
              );
   if (EFI_ERROR (Status)) {
@@ -2246,6 +2256,7 @@ AmlCodeGenThermalZone (
   AML_DATA_NODE    *DataNode;
   CHAR8            *AmlNameString;
   UINT32           AmlNameStringSize;
+  UINT32           PkgLen;
 
   if ((NameString == NULL)  ||
       ((ParentNode == NULL) && (NewObjectNode == NULL)))
@@ -2270,9 +2281,18 @@ AmlCodeGenThermalZone (
     goto error_handler1;
   }
 
+  Status = AmlComputePkgLength (
+             AmlNameStringSize,
+             &PkgLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
   Status = AmlCreateObjectNode (
              AmlGetByteEncodingByOpCode (AML_EXT_OP, AML_EXT_THERMAL_ZONE_OP),
-             AmlNameStringSize + AmlComputePkgLengthWidth (AmlNameStringSize),
+             PkgLen,
              &ObjectNode
              );
   if (EFI_ERROR (Status)) {
@@ -2360,6 +2380,7 @@ AmlCodeGenScope (
   AML_DATA_NODE    *DataNode;
   CHAR8            *AmlNameString;
   UINT32           AmlNameStringSize;
+  UINT32           PkgLen;
 
   if ((NameString == NULL)  ||
       ((ParentNode == NULL) && (NewObjectNode == NULL)))
@@ -2384,9 +2405,18 @@ AmlCodeGenScope (
     goto error_handler1;
   }
 
+  Status = AmlComputePkgLength (
+             AmlNameStringSize,
+             &PkgLen
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
   Status = AmlCreateObjectNode (
              AmlGetByteEncodingByOpCode (AML_SCOPE_OP, 0),
-             AmlNameStringSize + AmlComputePkgLengthWidth (AmlNameStringSize),
+             PkgLen,
              &ObjectNode
              );
   if (EFI_ERROR (Status)) {
