@@ -102,6 +102,7 @@
            "ARMHD",                  # ARMHD620
            "ARMLTD",
            "AMLDBG",
+           "ARMHE",                  # ARMHE001
            "EISAID",
            "cacheablity",
            "cavium",
@@ -125,6 +126,8 @@
            "NUVIA",
            "PASID",
            "PERIPHBASE",
+           "PMIIDR",
+           "PMPIDR",
            "phandle",
            "pytool",
            "Rdword",
