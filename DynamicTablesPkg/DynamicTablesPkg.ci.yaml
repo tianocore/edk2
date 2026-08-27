@@ -113,6 +113,7 @@
            "deviceid",
            "EArch",
            "edynamic",
+           "eloongarch",
            "eventq",
            "EOBJECT",
            "gerror",

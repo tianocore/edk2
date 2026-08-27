@@ -233,6 +233,11 @@
 
 [Components.LOONGARCH64]
   #
+  # Generators (LoongArch64 specific)
+  #
+  DynamicTablesPkg/Library/Acpi/LoongArch64/AcpiMadtLibLoongArch64/AcpiMadtLibLoongArch64.inf
+
+  #
   # Dynamic Table Factory Dxe
   #
   DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
@@ -244,6 +249,8 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiPpttLib/AcpiPpttLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiRawLib/AcpiRawLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSlitLib/AcpiSlitLib.inf
+      #   LoongArch64 specific
+      NULL|DynamicTablesPkg/Library/Acpi/LoongArch64/AcpiMadtLibLoongArch64/AcpiMadtLibLoongArch64.inf
 
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
