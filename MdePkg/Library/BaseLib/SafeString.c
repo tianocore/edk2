@@ -2606,6 +2606,169 @@ AsciiStrHexToUint64S (
 }
 
 /**
+  Convert a Null-terminated ASCII string to a value of type UINTN.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base. Leading space characters
+  (as defined by AsciiIsSpace()) are skipped, followed by an optional '+' or
+  '-' sign. If Base is 0, the radix is detected from the string prefix
+  ("0x"/"0X" for 16, "0b"/"0B" for 2, a leading "0" for 8, otherwise 10).
+  The function stops at the first character that is not a valid digit for
+  the resulting radix, or at the Null-terminator, whichever comes first.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer.
+
+  If the number represented by String overflows according to the range
+  defined by UINTN, then MAX_UINTN is stored at the location pointed to by
+  Data and RETURN_UNSUPPORTED is returned.
+
+  @param  String                   Pointer to a Null-terminated ASCII string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Base                     The radix to use, or 0 to auto-detect.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumAsciiStringLength is not zero,
+                                   and String contains more than
+                                   PcdMaximumAsciiStringLength ASCII
+                                   characters, not including the
+                                   Null-terminator.
+                                   If Base is not 0 and not in the range 2..36.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINTN.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrToUlS (
+  IN  CONST CHAR8  *String,
+  OUT       CHAR8  **EndPointer   OPTIONAL,
+  IN        UINTN  Base,
+  OUT       UINTN  *Data
+  )
+{
+  BOOLEAN  Negate;
+  BOOLEAN  Overflow;
+  UINTN    Val;
+
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. Base shall be 0, or in the range 2..36.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK (((Base == 0) || ((Base >= 2) && (Base <= 36))), RETURN_INVALID_PARAMETER);
+
+  //
+  // 3. The length of String shall not be greater than ASCII_RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((AsciiStrnLenS (String, ASCII_RSIZE_MAX + 1) <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *)String;
+  }
+
+  Negate   = FALSE;
+  Overflow = FALSE;
+  Val      = 0;
+
+  //
+  // Skip whitespace
+  //
+  while (AsciiIsSpace (*String)) {
+    String++;
+  }
+
+  //
+  // Check for + or - prefixes
+  //
+  if (*String == '-') {
+    Negate = TRUE;
+    String++;
+  } else if (*String == '+') {
+    String++;
+  }
+
+  //
+  // Consume the start, autodetecting base if needed
+  //
+  if ((String[0] == '0') && ((String[1] == 'x') || (String[1] == 'X')) && ((Base == 0) || (Base == 16))) {
+    // Hex
+    String += 2;
+    Base    = 16;
+  } else if ((String[0] == '0') && ((String[1] == 'b') || (String[1] == 'B')) && ((Base == 0) || (Base == 2))) {
+    // Binary (standard pending C23)
+    String += 2;
+    Base    = 2;
+  } else if ((String[0] == '0') && ((Base == 0) || (Base == 8))) {
+    // Octal
+    String++;
+    Base = 8;
+  } else if (Base == 0) {
+    // Assume decimal
+    Base = 10;
+  }
+
+  while (TRUE) {
+    INTN   Digit;
+    CHAR8  C;
+    UINTN  NewVal;
+
+    C     = *String;
+    Digit = -1;
+
+    if ((C >= '0') && (C <= '9')) {
+      Digit = C - '0';
+    } else if ((C >= 'a') && (C <= 'z')) {
+      Digit = C - 'a' + 10;
+    } else if ((C >= 'A') && (C <= 'Z')) {
+      Digit = C - 'A' + 10;
+    }
+
+    if ((Digit == -1) || ((UINTN)Digit >= Base)) {
+      //
+      // Note that this case also handles the '\0'
+      //
+      break;
+    }
+
+    if (Val > (MAX_UINTN - (UINTN)Digit) / Base) {
+      Overflow = TRUE;
+    }
+
+    NewVal = Val * Base + Digit;
+    Val    = NewVal;
+
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *)String;
+  }
+
+  if (Overflow) {
+    *Data = MAX_UINTN;
+    return RETURN_UNSUPPORTED;
+  }
+
+  if (Negate) {
+    Val = (UINTN)(0 - Val);
+  }
+
+  *Data = Val;
+
+  return RETURN_SUCCESS;
+}
+
+/**
   Convert a Null-terminated Unicode string to a Null-terminated
   ASCII string.
 

@@ -774,6 +774,51 @@ AsciiIsSpace (
 }
 
 /**
+  Convert a Null-terminated ASCII string to a value of type UINTN.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base. Leading space characters
+  (as defined by AsciiIsSpace()) are skipped, followed by an optional '+' or
+  '-' sign. If Base is 0, the radix is detected from the string prefix
+  ("0x"/"0X" for 16, "0b"/"0B" for 2, a leading "0" for 8, otherwise 10).
+  The function stops at the first character that is not a valid digit for
+  the resulting radix, or at the Null-terminator, whichever comes first.
+
+  If EndPtr is not NULL, a pointer to the character that stopped the scan is
+  stored at the location pointed to by EndPtr.
+
+  This function is a wrapper around AsciiStrToUlS(). Any error condition
+  documented for AsciiStrToUlS() (see its RETURN_INVALID_PARAMETER and
+  RETURN_UNSUPPORTED cases) causes 0 to be returned instead, except that on
+  overflow MAX_UINTN is returned as documented by AsciiStrToUlS().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use, or 0 to auto-detect.
+
+  @retval Value translated from String.
+
+**/
+UINTN
+EFIAPI
+AsciiStrToUl (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  )
+{
+  UINTN          Result;
+  RETURN_STATUS  Status;
+
+  Status = AsciiStrToUlS (String, EndPtr, Base, &Result);
+  if (Status == RETURN_INVALID_PARAMETER) {
+    Result = 0;
+  }
+
+  return Result;
+}
+
+/**
   Convert a ASCII character to numerical value.
 
   This internal function only deal with Unicode character
