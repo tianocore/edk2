@@ -755,6 +755,25 @@ AsciiCharToUpper (
 }
 
 /**
+  Checks if an ASCII character is a space character as defined by the ISO C
+  isspace() function ('\t', '\n', '\v', '\f', '\r' or ' ').
+
+  @param  Chr   One ASCII character.
+
+  @retval TRUE  If the Chr is a space character.
+  @retval FALSE If the Chr is not a space character.
+
+**/
+BOOLEAN
+EFIAPI
+AsciiIsSpace (
+  IN      CHAR8  Chr
+  )
+{
+  return (BOOLEAN)(Chr == '\t' || Chr == '\n' || Chr == '\v' || Chr == '\f' || Chr == '\r' || Chr == ' ');
+}
+
+/**
   Convert a ASCII character to numerical value.
 
   This internal function only deal with Unicode character

@@ -2698,6 +2698,22 @@ AsciiCharToUpper (
   );
 
 /**
+  Checks if an ASCII character is a space character as defined by the ISO C
+  isspace() function ('\t', '\n', '\v', '\f', '\r' or ' ').
+
+  @param  Chr   One ASCII character.
+
+  @retval TRUE  If the Chr is a space character.
+  @retval FALSE If the Chr is not a space character.
+
+**/
+BOOLEAN
+EFIAPI
+AsciiIsSpace (
+  IN      CHAR8  Chr
+  );
+
+/**
   Convert binary data to a Base64 encoded ascii string based on RFC4648.
 
   Produce a Null-terminated Ascii string in the output buffer specified by Destination and DestinationSize.
