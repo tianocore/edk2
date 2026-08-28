@@ -51,6 +51,8 @@
   Pk/CryptPkcs1OaepNull.c
   Pk/CryptPkcs5Pbkdf2Null.c
   Pk/CryptPkcs7SignNull.c
+  Pk/CryptPkcs7EncryptNull.c
+  Pk/CryptPkcs7DecryptNull.c
   Pk/CryptPkcs7VerifyCommon.c
   Pk/CryptPkcs7VerifyBase.c
   Pk/CryptPkcs7VerifyEku.c
@@ -61,6 +63,9 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSignNull.c
   Pk/CryptEcNull.c
+  Pk/CryptEdDsaNull.c
+  Pk/CryptMlDsaNull.c
+  Pk/CryptSlhDsaNull.c
   Pem/CryptPemNull.c
   Rand/CryptRandNull.c
   Bn/CryptBnNull.c
