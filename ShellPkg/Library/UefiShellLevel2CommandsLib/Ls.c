@@ -709,6 +709,8 @@ PrintLsOutputRec (
     return ShellStatus;
   }
 
+  ListHead = NULL;
+
   Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR (Status)) {
     SHELL_FREE_NON_NULL (CorrectedPath);
@@ -984,7 +986,6 @@ MainCmdLs (
     if (StrStr (PathName, L":") == NULL) {
       StrnCatGrow (&FullPath, &Size, gEfiShellProtocol->GetCurDir (NULL), 0);
       if (FullPath == NULL) {
-        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 
@@ -994,7 +995,6 @@ MainCmdLs (
 
     StrnCatGrow (&FullPath, &Size, PathName, 0);
     if (FullPath == NULL) {
-      ShellCommandLineFreeVarList (Package);
       return SHELL_OUT_OF_RESOURCES;
     }
 
@@ -1011,7 +1011,6 @@ MainCmdLs (
       StrnCatGrow (&SearchString, NULL, FullPath, 0);
       if (SearchString == NULL) {
         FreePool (FullPath);
-        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 
