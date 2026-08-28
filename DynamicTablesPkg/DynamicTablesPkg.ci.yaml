@@ -102,6 +102,7 @@
            "ARMHD",                  # ARMHD620
            "ARMLTD",
            "AMLDBG",
+           "ARMHE",                  # ARMHE001
            "EISAID",
            "cacheablity",
            "cavium",
@@ -112,6 +113,7 @@
            "deviceid",
            "EArch",
            "edynamic",
+           "eloongarch",
            "eventq",
            "EOBJECT",
            "gerror",
@@ -125,6 +127,8 @@
            "NUVIA",
            "PASID",
            "PERIPHBASE",
+           "PMIIDR",
+           "PMPIDR",
            "phandle",
            "pytool",
            "Rdword",
