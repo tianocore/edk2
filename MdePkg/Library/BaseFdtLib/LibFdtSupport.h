@@ -61,19 +61,6 @@ strchr     (
   );
 
 char *
-fdt_strrchr    (
-  const char *,
-  int
-  );
-
-unsigned long
-fdt_strtoul     (
-  const char *,
-  char **,
-  int
-  );
-
-char *
 strcpy (
   char        *strDest,
   const char  *strSource
@@ -90,5 +77,5 @@ strcpy (
 #define strlen(str)                   (size_t)(AsciiStrLen(str))
 #define strnlen(str, count)           (size_t)(AsciiStrnLenS(str, count))
 #define strchr(str, ch)               ScanMem8(str, AsciiStrSize (str), (UINT8)ch)
-#define strrchr(str, ch)              fdt_strrchr(str, ch)
-#define strtoul(ptr, end_ptr, base)   fdt_strtoul(ptr, end_ptr, base)
+#define strrchr(str, ch)              AsciiStrRChr(str, (CHAR8)(ch))
+#define strtoul(ptr, end_ptr, base)   AsciiStrToUl(ptr, end_ptr, base)
