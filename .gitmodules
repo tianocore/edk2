@@ -38,3 +38,6 @@
 [submodule "TcgTpmPkg/Library/TpmLib/TPM"]
 	path = TcgTpmPkg/Library/TpmLib/TPM
 	url = https://github.com/TrustedComputingGroup/TPM
+[submodule "MdePkg/Library/ArmTransferListLib/libtl"]
+	path = MdePkg/Library/ArmTransferListLib/libtl
+	url = https://review.trustedfirmware.org/shared/transfer-list-library.git
