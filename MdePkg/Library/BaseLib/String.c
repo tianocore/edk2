@@ -774,6 +774,134 @@ AsciiIsSpace (
 }
 
 /**
+  Convert a Null-terminated ASCII string to a value of type UINTN.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base, which must be 0, 10, or 16.
+  Leading space characters (as defined by AsciiIsSpace()) are skipped. If
+  Base is 0, the radix is detected from the string prefix: "0x" or "0X"
+  selects 16, otherwise 10 is used.
+
+  This function is a thin wrapper around AsciiStrHexToUintnS() and
+  AsciiStrDecimalToUintnS(). See those functions for the exact parsing rules,
+  the EndPtr behavior, and the overflow behavior.
+
+  If String is NULL, then ASSERT().
+  If Base is not 0, 10, or 16, then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use: 0 to auto-detect, 10, or 16.
+
+  @retval Value translated from String.
+
+**/
+UINTN
+EFIAPI
+AsciiStrToUintn (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  )
+{
+  CONST CHAR8    *Str;
+  UINTN          Result;
+  RETURN_STATUS  Status;
+
+  ASSERT (String != NULL);
+  ASSERT ((Base == 0) || (Base == 10) || (Base == 16));
+
+  Str = String;
+  while (AsciiIsSpace (*Str)) {
+    Str++;
+  }
+
+  if (Base == 0) {
+    if ((Str[0] == '0') && ((Str[1] == 'x') || (Str[1] == 'X'))) {
+      Base = 16;
+    } else {
+      Base = 10;
+    }
+  }
+
+  if (Base == 16) {
+    Status = AsciiStrHexToUintnS (Str, EndPtr, &Result);
+  } else {
+    Status = AsciiStrDecimalToUintnS (Str, EndPtr, &Result);
+  }
+
+  if (Status == RETURN_INVALID_PARAMETER) {
+    Result = 0;
+  }
+
+  return Result;
+}
+
+/**
+  Convert a Null-terminated ASCII string to a value of type UINT64.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base, which must be 0, 10, or 16.
+  Leading space characters (as defined by AsciiIsSpace()) are skipped. If
+  Base is 0, the radix is detected from the string prefix: "0x" or "0X"
+  selects 16, otherwise 10 is used.
+
+  This function is a thin wrapper around AsciiStrHexToUint64S() and
+  AsciiStrDecimalToUint64S(). See those functions for the exact parsing
+  rules, the EndPtr behavior, and the overflow behavior.
+
+  If String is NULL, then ASSERT().
+  If Base is not 0, 10, or 16, then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use: 0 to auto-detect, 10, or 16.
+
+  @retval Value translated from String.
+
+**/
+UINT64
+EFIAPI
+AsciiStrToUint64 (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  )
+{
+  CONST CHAR8    *Str;
+  UINT64         Result;
+  RETURN_STATUS  Status;
+
+  ASSERT (String != NULL);
+  ASSERT ((Base == 0) || (Base == 10) || (Base == 16));
+
+  Str = String;
+  while (AsciiIsSpace (*Str)) {
+    Str++;
+  }
+
+  if (Base == 0) {
+    if ((Str[0] == '0') && ((Str[1] == 'x') || (Str[1] == 'X'))) {
+      Base = 16;
+    } else {
+      Base = 10;
+    }
+  }
+
+  if (Base == 16) {
+    Status = AsciiStrHexToUint64S (Str, EndPtr, &Result);
+  } else {
+    Status = AsciiStrDecimalToUint64S (Str, EndPtr, &Result);
+  }
+
+  if (Status == RETURN_INVALID_PARAMETER) {
+    Result = 0;
+  }
+
+  return Result;
+}
+
+/**
   Convert a ASCII character to numerical value.
 
   This internal function only deal with Unicode character

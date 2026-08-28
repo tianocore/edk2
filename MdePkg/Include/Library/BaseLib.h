@@ -2714,6 +2714,68 @@ AsciiIsSpace (
   );
 
 /**
+  Convert a Null-terminated ASCII string to a value of type UINTN.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base, which must be 0, 10, or 16.
+  Leading space characters (as defined by AsciiIsSpace()) are skipped. If
+  Base is 0, the radix is detected from the string prefix: "0x" or "0X"
+  selects 16, otherwise 10 is used.
+
+  This function is a thin wrapper around AsciiStrHexToUintnS() and
+  AsciiStrDecimalToUintnS(). See those functions for the exact parsing rules,
+  the EndPtr behavior, and the overflow behavior.
+
+  If String is NULL, then ASSERT().
+  If Base is not 0, 10, or 16, then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use: 0 to auto-detect, 10, or 16.
+
+  @retval Value translated from String.
+
+**/
+UINTN
+EFIAPI
+AsciiStrToUintn (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  );
+
+/**
+  Convert a Null-terminated ASCII string to a value of type UINT64.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base, which must be 0, 10, or 16.
+  Leading space characters (as defined by AsciiIsSpace()) are skipped. If
+  Base is 0, the radix is detected from the string prefix: "0x" or "0X"
+  selects 16, otherwise 10 is used.
+
+  This function is a thin wrapper around AsciiStrHexToUint64S() and
+  AsciiStrDecimalToUint64S(). See those functions for the exact parsing
+  rules, the EndPtr behavior, and the overflow behavior.
+
+  If String is NULL, then ASSERT().
+  If Base is not 0, 10, or 16, then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use: 0 to auto-detect, 10, or 16.
+
+  @retval Value translated from String.
+
+**/
+UINT64
+EFIAPI
+AsciiStrToUint64 (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  );
+
+/**
   Convert binary data to a Base64 encoded ascii string based on RFC4648.
 
   Produce a Null-terminated Ascii string in the output buffer specified by Destination and DestinationSize.
