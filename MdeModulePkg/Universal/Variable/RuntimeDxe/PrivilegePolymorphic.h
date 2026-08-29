@@ -8,6 +8,7 @@
 
   Copyright (c) 2017, Red Hat, Inc.<BR>
   Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -163,4 +164,19 @@ VariableSmmIsNonPrimaryBufferValid (
 BOOLEAN
 VariableIsMorVariableLegitimate (
   VOID
+  );
+
+/**
+  Initailize Variable Stoarge.
+
+  @param  [in]  ImageHandle      The firmware allocated handle for the EFI image
+
+  @retval EFI_SUCCESS            Success
+  @retval Others                 Error
+
+**/
+EFI_STATUS
+EFIAPI
+VariableStorageFvbInitialize (
+  IN EFI_HANDLE  ImageHandle
   );
