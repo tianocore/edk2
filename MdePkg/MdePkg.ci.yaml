@@ -187,6 +187,7 @@
             # identifiers that will be removed.
             "ahthentication",   # Nvme.h
             "algortihm",        # Hash.h
+            "amcas",            # Cpucfg.h
             "cachable",         # Tpm2Acpi.h
             "capablities",      # PciExpress*.h
             "capablity",        # Acpi10.h
@@ -199,10 +200,14 @@
             "egres",            # PciExpress21.h
             "extenion",         # HiiImageDecoder.h
             "extented",         # Cxl30.h
+            "frecipe",          # Cpucfg.h
+            "frsqrte",          # Cpucfg.h
             "identifer",        # Acpi*.h, Cxl*.h
             "implemenation",    # Udf.h
             "initialzation",    # Cxl20.h
             "interal",          # Tpm12.h
+            "lamcas",           # Cpucfg.h
+            "llacq",            # Cpucfg.h
             "magik",            # Dhcp4.h, PxeBaseCode.h
             "managment",        # SmBios.h
             "mutil",            # SmBios.h
@@ -215,12 +220,17 @@
             "researved",        # TcgStorageOpal.h
             "reservd",          # ArmFfaMemMgmt.h, IpmiNetFnTransport.h
             "revison",          # Atapi.h
+            "screl",            # Cpucfg.h
             "sence",            # Atapi.h
             "sigle",            # SmBios.h
             "toleremce",        # IpmiNetFnStorage.h
             "unownered",        # TcgPhysicalPresence.h
+            "vfrecipe",         # Cpucfg.h
+            "vfrsqrte",         # Cpucfg.h
             "voilation",        # PciExpress*.h
-            "sslbi"             # Acpi*.h
+            "sslbi",            # Acpi*.h
+            "xvfrecipe",        # Cpucfg.h
+            "xvfrsqrte"         # Cpucfg.h
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
