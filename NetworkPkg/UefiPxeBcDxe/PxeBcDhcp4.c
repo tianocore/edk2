@@ -1368,7 +1368,7 @@ PxeBcDhcp4Discover (
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  Token;
   BOOLEAN                           IsBCast;
   EFI_STATUS                        Status;
-  UINT16                            RepIndex;
+  UINT32                            RepIndex;
   UINT16                            SrvIndex;
   UINT16                            TryIndex;
   EFI_DHCP4_LISTEN_POINT            ListenPoint;
