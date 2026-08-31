@@ -69,6 +69,7 @@ HashStart (
   HASH_HANDLE  *HashCtx;
   UINTN        Index;
   UINT32       HashMask;
+  EFI_STATUS   Status;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -85,7 +86,11 @@ HashStart (
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
     HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
-      mHashInterface[Index].HashInit (&HashCtx[Index]);
+      Status = mHashInterface[Index].HashInit (&HashCtx[Index]);
+      if (EFI_ERROR (Status)) {
+        FreePool (HashCtx);
+        return Status;
+      }
     }
   }
 
@@ -282,8 +287,16 @@ HashAndExtend (
 
   CheckSupportedHashMaskMismatch ();
 
-  HashStart (&HashHandle);
-  HashUpdate (HashHandle, DataToHash, DataToHashLen);
+  Status = HashStart (&HashHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = HashUpdate (HashHandle, DataToHash, DataToHashLen);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = HashCompleteAndExtend (HashHandle, PcrIndex, NULL, 0, DigestList);
 
   return Status;
