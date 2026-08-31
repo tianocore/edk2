@@ -37,7 +37,7 @@ IScsiDhcp6ExtractRootPath (
   ISCSI_ROOT_PATH_FIELD        Fields[RP_FIELD_IDX_MAX];
   ISCSI_ROOT_PATH_FIELD        *Field;
   UINT32                       FieldIndex;
-  UINT8                        Index;
+  UINT16                       Index;
   ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
   EFI_IP_ADDRESS               Ip;
   UINT8                        IpMode;
