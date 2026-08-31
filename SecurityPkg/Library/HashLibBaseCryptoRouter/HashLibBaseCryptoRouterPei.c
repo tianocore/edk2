@@ -142,6 +142,7 @@ HashStart (
   HASH_HANDLE         *HashCtx;
   UINTN               Index;
   UINT32              HashMask;
+  EFI_STATUS          Status;
 
   HashInterfaceHob = InternalGetHashInterfaceHob (&gEfiCallerIdGuid);
   if (HashInterfaceHob == NULL) {
@@ -163,7 +164,11 @@ HashStart (
   for (Index = 0; Index < HashInterfaceHob->HashInterfaceCount; Index++) {
     HashMask = Tpm2GetHashMaskFromGuid (&HashInterfaceHob->HashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
-      HashInterfaceHob->HashInterface[Index].HashInit (&HashCtx[Index]);
+      Status = HashInterfaceHob->HashInterface[Index].HashInit (&HashCtx[Index]);
+      if (EFI_ERROR (Status)) {
+        FreePool (HashCtx);
+        return Status;
+      }
     }
   }
 
@@ -311,8 +316,16 @@ HashAndExtend (
 
   CheckSupportedHashMaskMismatch (HashInterfaceHob);
 
-  HashStart (&HashHandle);
-  HashUpdate (HashHandle, DataToHash, DataToHashLen);
+  Status = HashStart (&HashHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = HashUpdate (HashHandle, DataToHash, DataToHashLen);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = HashCompleteAndExtend (HashHandle, PcrIndex, NULL, 0, DigestList);
 
   return Status;
