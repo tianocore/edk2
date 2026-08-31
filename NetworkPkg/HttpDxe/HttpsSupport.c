@@ -388,7 +388,7 @@ TlsConfigCertificate (
   EFI_STATUS          Status;
   UINT8               *CACert;
   UINTN               CACertSize;
-  UINT32              Index;
+  UINTN               Index;
   EFI_SIGNATURE_LIST  *CertList;
   EFI_SIGNATURE_DATA  *Cert;
   UINTN               CertArraySizeInBytes;

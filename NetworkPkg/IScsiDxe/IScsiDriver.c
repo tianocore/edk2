@@ -361,7 +361,7 @@ IScsiStart (
   LIST_ENTRY                       *NextEntry;
   ISCSI_ATTEMPT_CONFIG_NVDATA      *AttemptConfigData;
   ISCSI_SESSION                    *Session;
-  UINT8                            Index;
+  UINTN                            Index;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *ExistIScsiExtScsiPassThru;
   ISCSI_DRIVER_DATA                *ExistPrivate;
   UINT8                            *AttemptConfigOrder;
