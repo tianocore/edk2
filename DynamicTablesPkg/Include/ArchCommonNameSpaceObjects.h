@@ -155,6 +155,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSystemBootInfo,                    ///< 87 - System Boot Information
   EArchCommonObjOnboardDeviceInfo,                 ///< 88 - Onboard Device Extended Information
   EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
+  EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1390,6 +1391,32 @@ typedef struct CmArchCommonBootErrorRegionInfo {
   /// Length, in bytes, of the Boot Error Region.
   UINT32    BootErrorRegionLength;
 } CM_ARCH_COMMON_BOOT_ERROR_REGION_INFO;
+
+/** A structure that describes an ERST Serialization Instruction Entry.
+
+  Cf. ACPI 6.6, s18.5.1.2.
+
+  ID: EArchCommonObjErstInstructionsInfo
+*/
+typedef struct CmArchCommonErstInstructionsInfo {
+  /// Serialization action to which this instruction belongs.
+  UINT8                                     SerializationAction;
+
+  /// Serialization instruction to execute.
+  UINT8                                     Instruction;
+
+  /// Flags that qualify the serialization instruction.
+  UINT8                                     Flags;
+
+  /// Register region used by the serialization instruction.
+  EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE    RegisterRegion;
+
+  /// Value used by instructions that consume an immediate value.
+  UINT64                                    Value;
+
+  /// Mask selecting the relevant bits within the register region.
+  UINT64                                    Mask;
+} CM_ARCH_COMMON_ERST_INSTRUCTIONS_INFO;
 
 /** A structure that describes BIOS Information.
 

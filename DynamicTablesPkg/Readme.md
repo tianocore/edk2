@@ -78,6 +78,7 @@ The framework currently supports the following table generators:
 * HEST - Hardware Error Source Table
 * EINJ - APEI Error Injection Table
 * BERT - Boot Error Record Table
+* ERST - Error Record Serialization Table
 
 ## Dynamic AML
 
