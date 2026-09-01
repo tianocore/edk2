@@ -32,7 +32,12 @@ GicV3Supported (
   // feature is implemented on the CPU. This is also convenient as our GICv3
   // driver requires SRE. If only Memory mapped access is available we try to
   // drive the GIC as a v2.
-  if (ArmHasGicSystemRegisters ()) {
+  //
+  // Some platforms present a functional GICv3 even though ID_AA64PFR0_EL1.GIC
+  // returns 0. This includes QEMU on Apple's HVF, where the host CPU has an AIC
+  // rather than a GIC, and the ID registers are passed through unmodified. We
+  // must therefore also check PcdGicRedistributorsBase to determine support.
+  if (ArmHasGicSystemRegisters () || (PcdGet64 (PcdGicRedistributorsBase) != 0)) {
     // Make sure System Register access is enabled (SRE). This depends on the
     // higher privilege level giving us permission, otherwise we will either
     // cause an exception here, or the write doesn't stick in which case we need
