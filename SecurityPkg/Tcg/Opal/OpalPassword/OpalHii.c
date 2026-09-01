@@ -113,7 +113,7 @@ GetSavedOpalRequest (
 
   TempVariable = Variable;
   while ((VariableSize > sizeof (OPAL_REQUEST_VARIABLE)) &&
-         (VariableSize >= TempVariable->Length) &&
+         (VariableSize >= (UINTN)TempVariable->Length) &&
          (TempVariable->Length > sizeof (OPAL_REQUEST_VARIABLE)))
   {
     DevicePathInVariable     = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)TempVariable + sizeof (OPAL_REQUEST_VARIABLE));
@@ -193,7 +193,7 @@ SaveOpalRequest (
     TempVariable     = Variable;
     TempVariableSize = VariableSize;
     while ((TempVariableSize > sizeof (OPAL_REQUEST_VARIABLE)) &&
-           (TempVariableSize >= TempVariable->Length) &&
+           (TempVariableSize >= (UINTN)TempVariable->Length) &&
            (TempVariable->Length > sizeof (OPAL_REQUEST_VARIABLE)))
     {
       DevicePathInVariable     = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)TempVariable + sizeof (OPAL_REQUEST_VARIABLE));
