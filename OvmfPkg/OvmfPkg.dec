@@ -398,6 +398,9 @@
   # messages will be overwritten by more recent messages.
   gUefiOvmfPkgTokenSpaceGuid.PcdMemDebugLogPages|32|UINT32|0x7c
 
+  ## The base address of the Goldfidh RTC
+  gUefiOvmfPkgTokenSpaceGuid.PcdGoldfishRtcRegBase|0|UINT32|0x100
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
