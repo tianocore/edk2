@@ -517,9 +517,14 @@ DEFINE FD_SIZE_IN_MB    = 3
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
-  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
+  ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmVirtGicArchLib/ArmVirtGicArchLib.inf
+      NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV2DepexLib.inf
+  }
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV3DepexLib.inf
   }
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
     <LibraryClasses>
