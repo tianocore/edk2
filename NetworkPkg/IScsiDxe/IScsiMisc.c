@@ -810,7 +810,7 @@ IScsiRemoveNic (
 **/
 EFI_STATUS
 IScsiCreateAttempts (
-  IN UINTN  AttemptNum
+  IN UINT8  AttemptNum
   )
 {
   ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptConfigData;
