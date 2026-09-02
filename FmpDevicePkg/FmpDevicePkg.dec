@@ -48,14 +48,13 @@
   #                  from firmware device.
   FmpDependencyDeviceLib|Include/Library/FmpDependencyDeviceLib.h
 
-[LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
   #                  Payload Header.  The structure is not included in the
   #                  library class.  Instead, services are provided to retrieve
   #                  information from the FMP Payload Header.  If information is
   #                  added to the FMP Payload Header, then new services may be
   #                  added to this library class to retrieve the new information.
-  FmpPayloadHeaderLib|PrivateInclude/Library/FmpPayloadHeaderLib.h
+  FmpPayloadHeaderLib|Include/Library/FmpPayloadHeaderLib.h
 
 [Guids]
   ## Firmware Management Protocol Device Package Token Space GUID
@@ -76,6 +75,21 @@
   #            all services except GetImageInfo().<BR>
   # @Prompt Firmware Device Storage Access Enabled.
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable|TRUE|BOOLEAN|0x40000011
+
+  ## Indicates whether to defer Image Authentication to
+  #  FmpDeviceSetImage() (FmpDeviceSetImageWithStatus()) so that
+  #  authentication can be performed in a platform-specific manner.
+  #  For example, authentication may be performed using platform-specific
+  #  certificate storage.
+  #  Since authentication is deferred to the platform function,
+  #  the FmpHeader containing authentication information will be delivered
+  #  to it when this option is enabled.
+  #
+  #    TRUE  - Image Authentication will be deferred.<BR>
+  #    FALSE - Image Authentication will be performed by common function --
+  #            CheckTheImageInternal(). <BR>
+  # @Prompt Deferred Image Authentication is disabled.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceDeferImageAuthToSetImage|FALSE|BOOLEAN|0x40000012
 
 [PcdsFixedAtBuild]
   ## The SHA-256 hash of a PKCS7 test key that is used to detect if a test key
