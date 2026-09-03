@@ -400,6 +400,7 @@ F: MdeModulePkg/Include/*/*Var*.h
 F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: Universal Payload definitions
