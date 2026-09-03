@@ -1377,6 +1377,7 @@ class DscParser(MetaFileParser):
         }
 
         self._Table = MetaFileStorage(self._RawTable.DB, self.MetaFile, MODEL_FILE_DSC, True)
+        self._IdMapping = {-1:-1}
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
         self._FileWithError = self.MetaFile
@@ -1399,17 +1400,6 @@ class DscParser(MetaFileParser):
             self._ContentIndex += 1
 
             self._Scope = [[S1, S2, S3]]
-            #
-            # Expand macros in arch field for all records so that per-module
-            # sub-items (e.g. <LibraryClasses> under [Components.$(PEI_ARCH)])
-            # resolve correctly, not just the Component record itself.
-            #
-            self._Scope[0][0] = ReplaceMacro(self._Scope[0][0], self._Macros)
-            if '$(' in self._Scope[0][0] and S1 != TAB_ARCH_COMMON:
-                EdkLogger.warn("Parser",
-                               "Macro in arch field was not resolved. "
-                               "'%s' used in section header is not defined." % S1,
-                               File=self._FileWithError, Line=LineStart)
             #
             # For !include directive, handle it specially,
             # merge arch and module type in case of duplicate items
@@ -1469,6 +1459,8 @@ class DscParser(MetaFileParser):
                 continue
 
             NewOwner = self._IdMapping.get(Owner, -1)
+            if NewOwner > 0:
+                self.__ExpandArchitectureScope()
             self._Enabled = int((not self._DirectiveEvalStack) or (False not in self._DirectiveEvalStack))
             self._LastItem = self._Store(
                                 self._ItemType,
@@ -1723,6 +1715,16 @@ class DscParser(MetaFileParser):
 
     def __ProcessComponent(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
+        self.__ExpandArchitectureScope()
+
+    def __ExpandArchitectureScope(self):
+        OriginalArch = self._Scope[0][0]
+        self._Scope[0][0] = ReplaceMacro(OriginalArch, self._Macros)
+        if '$(' in self._Scope[0][0] and OriginalArch != TAB_ARCH_COMMON:
+            EdkLogger.warn("Parser",
+                           "Macro in arch field was not resolved. "
+                           "'%s' used in section header is not defined." % OriginalArch,
+                           File=self._FileWithError, Line=self._LineIndex + 1)
 
     def __ProcessBuildOption(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=False)
