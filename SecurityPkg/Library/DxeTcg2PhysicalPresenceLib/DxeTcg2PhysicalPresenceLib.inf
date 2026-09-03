@@ -51,7 +51,6 @@
   Tpm2CommandLib
   Tcg2PpVendorLib
   VariablePolicyHelperLib
-  Tcg2PhysicalPresencePromptLib
 
 [Protocols]
   gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES
