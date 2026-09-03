@@ -1317,12 +1317,12 @@ HiiValueToRedfishValue (
         break;
       }
 
-      RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringId);
+      RedfishValue->Value.Buffer = HiiGetRedfishAsciiStringUncached (HiiHandle, FullSchema, StringId);
       if (RedfishValue->Value.Buffer == NULL) {
         //
         // No x-UEFI-redfish string defined. Try to get string in English.
         //
-        RedfishValue->Value.Buffer = HiiGetEnglishAsciiString (HiiHandle, StringId);
+        RedfishValue->Value.Buffer = HiiGetEnglishAsciiStringUncached (HiiHandle, StringId);
         if (RedfishValue->Value.Buffer == NULL) {
           DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
           Status = EFI_OUT_OF_RESOURCES;
@@ -1415,13 +1415,13 @@ HiiValueToRedfishValue (
           ASSERT (FALSE);
         }
 
-        RedfishValue->Value.StringArray[Index] = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringIdArray[Index]);
+        RedfishValue->Value.StringArray[Index] = HiiGetRedfishAsciiStringUncached (HiiHandle, FullSchema, StringIdArray[Index]);
         if (RedfishValue->Value.StringArray[Index] == NULL) {
           DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
           //
           // No x-UEFI-redfish string defined. Try to get string in English.
           //
-          RedfishValue->Value.StringArray[Index] = HiiGetEnglishAsciiString (HiiHandle, StringIdArray[Index]);
+          RedfishValue->Value.StringArray[Index] = HiiGetEnglishAsciiStringUncached (HiiHandle, StringIdArray[Index]);
           if (RedfishValue->Value.StringArray[Index] == NULL) {
             DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
             Status = EFI_OUT_OF_RESOURCES;
@@ -1445,13 +1445,13 @@ HiiValueToRedfishValue (
         break;
       }
 
-      RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, HiiStatement->ExtraData.TextTwo);
+      RedfishValue->Value.Buffer = HiiGetRedfishAsciiStringUncached (HiiHandle, FullSchema, HiiStatement->ExtraData.TextTwo);
       if (RedfishValue->Value.Buffer == NULL) {
         DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
         //
         // No x-UEFI-redfish string defined. Try to get string in English.
         //
-        RedfishValue->Value.Buffer = HiiGetEnglishAsciiString (HiiHandle, HiiStatement->ExtraData.TextTwo);
+        RedfishValue->Value.Buffer = HiiGetEnglishAsciiStringUncached (HiiHandle, HiiStatement->ExtraData.TextTwo);
       }
 
       if (RedfishValue->Value.Buffer == NULL) {
