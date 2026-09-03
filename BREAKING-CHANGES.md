@@ -47,7 +47,53 @@ None
 
 #### edk2-stable202611: Changes without Removal
 
-None
+##### Breaking Change: Rename the DMC-620 PMU Dynamic Tables interfaces
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13070](https://github.com/tianocore/edk2/issues/13070)
+- **Pull Request**: [tianocore/edk2#12994](https://github.com/tianocore/edk2/pull/12994)
+- **Type**: Source-Level (Non-removal) - Public identifier, structure,
+  structure member, generator symbol, file, and library path rename
+
+**What changed**: The DMC-620 PMU Dynamic Tables interfaces and SSDT
+generator were renamed to use the DMC PMU terminology adopted by the
+ACPI for Arm Components 1.3 Platform Design Document. The
+table-generator ID, Configuration Manager object IDs and structures,
+structure member, generator symbol, source files and library path were
+renamed. The generated AML, `ARMHD620` hardware identifier and generator
+behaviour are unchanged.
+
+**Why it changed**: ACPI for Arm Components 1.3 updates the relevant
+section and interface terminology from “DMC620 Memory Controller” and
+“DMC620 PMU” to “DMC Memory Controller” and “DMC PMU”. The edk2
+interfaces are renamed to align with the terminology used by the latest
+specification.
+
+**What replaces it**:
+
+- `EStdAcpiTableIdSsdtDmc620Pmu` is replaced by
+  `EStdAcpiTableIdSsdtDmcPmu`.
+- `EArmObjDmc620PmuSocketInfo` is replaced by
+  `EArmObjDmcPmuSocketInfo`.
+- `EArmObjDmc620PmuRegInfo` is replaced by `EArmObjDmcPmuRegInfo`.
+- `CM_ARM_DMC620_PMU_REG_INFO` is replaced by
+  `CM_ARM_DMC_PMU_REG_INFO`.
+- `CM_ARM_DMC620_INFO` is replaced by `CM_ARM_DMC_INFO`.
+- `Dmc620PmuRegInfoToken` is replaced by `DmcPmuRegInfoToken`.
+- `SsdtDmc620PmuGenerator` is replaced by `SsdtDmcPmuGenerator`.
+- `AcpiSsdtDmc620PmuLibArm` is replaced by `AcpiSsdtDmcPmuLibArm`.
+
+**How to migrate**: Replace the DMC-620-specific identifiers, structure
+names, structure member, generator symbol, filenames and library path with
+the DMC PMU equivalents listed above. No platform-data or behavioural changes
+are required.
+
+**Breaking conditions**: This affects out-of-tree platforms that consume
+the DMC-620 PMU Configuration Manager interfaces or reference the old
+generator symbol, filenames or library path. No consumer was found in the
+current edk2 or edk2-platforms repositories.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
 
 ### edk2-stable202611: Behavioral Breaking Changes
 
