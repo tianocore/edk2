@@ -1936,7 +1936,7 @@ Returns:
   //
   if (SectType != EFI_SECTION_ALL) {
     SectionHeader = (EFI_COMMON_SECTION_HEADER *)OutFileBuffer;
-    InputLength = *(UINT32 *)SectionHeader->Size & 0x00ffffff;
+    InputLength = SECTION_SIZE (SectionHeader);
     if (InputLength == 0xffffff) {
       InputLength = ((EFI_COMMON_SECTION_HEADER2 *)SectionHeader)->ExtendedSize;
     }
