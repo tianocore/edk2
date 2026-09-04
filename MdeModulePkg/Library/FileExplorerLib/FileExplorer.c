@@ -87,6 +87,18 @@ LibCreateNewFile (
   );
 
 /**
+  Navigate to the parent of the directory currently displayed.
+
+  @retval  EFI_SUCCESS   The parent location was displayed successfully.
+  @retval  other errors  Error occurred when opening or parsing the parent.
+
+**/
+EFI_STATUS
+LibGoUpOneLevel (
+  VOID
+  );
+
+/**
   This function allows a caller to extract the current configuration for one
   or more named elements from the target driver.
 
@@ -273,7 +285,12 @@ LibCallback (
       return EFI_INVALID_PARAMETER;
     }
 
-    if (QuestionId >= FILE_OPTION_OFFSET) {
+    if (QuestionId == KEY_VALUE_UP_ONE_LEVEL) {
+      Status = LibGoUpOneLevel ();
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    } else if (QuestionId >= FILE_OPTION_OFFSET) {
       LibGetDevicePath (QuestionId);
       Status = LibUpdateFileExplorer (QuestionId);
       if (EFI_ERROR (Status)) {
@@ -529,6 +546,55 @@ LibStrDuplicate (
 }
 
 /**
+  Return the parent directory of an absolute file path.
+
+  The parent of a top level path (e.g. "\" or "\Name") is the volume root "\".
+
+  @param Path            The absolute path whose parent is requested.
+
+  @return A newly allocated string holding the parent path, or NULL on failure.
+          Caller is responsible to free the returned string.
+
+**/
+CHAR16 *
+LibGetParentPath (
+  IN CHAR16  *Path
+  )
+{
+  CHAR16  *Parent;
+  UINTN   Index;
+  UINTN   LastSlash;
+
+  if (Path == NULL) {
+    return NULL;
+  }
+
+  LastSlash = 0;
+  for (Index = 0; Path[Index] != L'\0'; Index++) {
+    if (Path[Index] == L'\\') {
+      LastSlash = Index;
+    }
+  }
+
+  //
+  // Only a leading backslash was found (root or a top level entry): parent is "\".
+  //
+  if (LastSlash == 0) {
+    return LibStrDuplicate (L"\\");
+  }
+
+  Parent = AllocateZeroPool ((LastSlash + 1) * sizeof (CHAR16));
+  if (Parent == NULL) {
+    return NULL;
+  }
+
+  CopyMem (Parent, Path, LastSlash * sizeof (CHAR16));
+  Parent[LastSlash] = L'\0';
+
+  return Parent;
+}
+
+/**
 
   Function gets the file information from an open file descriptor, and stores it
   in a buffer allocated from pool.
@@ -781,6 +847,17 @@ LibFindFileSystem (
 
   NoSimpleFsHandles = 0;
   OptionNumber      = 0;
+
+  //
+  // Showing the volume list: no directory is active, so no "Up" entry is offered.
+  //
+  if (gFileExplorerPrivate.CurDirPath != NULL) {
+    FreePool (gFileExplorerPrivate.CurDirPath);
+    gFileExplorerPrivate.CurDirPath = NULL;
+  }
+
+  gFileExplorerPrivate.CurDirHandle    = NULL;
+  gFileExplorerPrivate.CurDeviceHandle = NULL;
 
   //
   // Locate Handles that support Simple File System protocol
@@ -1155,6 +1232,18 @@ LibFindFiles (
 
   OptionNumber = 0;
 
+  //
+  // Remember the directory being displayed so a synthetic "Up one level" entry
+  // can navigate back to its parent (or the volume list at a volume root).
+  //
+  if (gFileExplorerPrivate.CurDirPath != NULL) {
+    FreePool (gFileExplorerPrivate.CurDirPath);
+  }
+
+  gFileExplorerPrivate.CurDirPath      = LibStrDuplicate (FileName);
+  gFileExplorerPrivate.CurDirHandle    = FileHandle;
+  gFileExplorerPrivate.CurDeviceHandle = DeviceHandle;
+
   DirBufferSize = sizeof (EFI_FILE_INFO) + 1024;
   DirInfo       = AllocateZeroPool (DirBufferSize);
   if (DirInfo == NULL) {
@@ -1191,6 +1280,15 @@ LibFindFiles (
       if (!(((DirInfo->Attribute & EFI_FILE_DIRECTORY) != 0) || LibIsSupportedFileType (DirInfo->FileName))) {
         //
         // Slip file unless it is a directory entry or a .EFI file
+        //
+        continue;
+      }
+
+      if ((StrCmp (DirInfo->FileName, L".") == 0) || (StrCmp (DirInfo->FileName, L"..") == 0)) {
+        //
+        // Skip the on-disk "." and ".." entries (present on FAT sub-directories but
+        // not on the volume root or on other file systems). Parent navigation is
+        // provided uniformly by the synthetic "Up one level" entry instead.
         //
         continue;
       }
@@ -1329,6 +1427,22 @@ LibUpdateFileExplorePage (
 
   mQuestionIdUpdate += QUESTION_ID_UPDATE_STEP;
 
+  //
+  // When a directory is being displayed, offer a synthetic "Up one level" entry
+  // so the user can return to the parent directory (or the volume list at a
+  // volume root) without having to exit the file explorer entirely.
+  //
+  if (gFileExplorerPrivate.CurDirPath != NULL) {
+    HiiCreateGotoOpCode (
+      mLibStartOpCodeHandle,
+      FORM_FILE_EXPLORER_ID,
+      STRING_TOKEN (STR_UP_ONE_LEVEL),
+      STRING_TOKEN (STR_UP_ONE_LEVEL_HELP),
+      EFI_IFR_FLAG_CALLBACK,
+      KEY_VALUE_UP_ONE_LEVEL
+      );
+  }
+
   for (Index = 0; Index < MenuOption->MenuNumber; Index++) {
     NewMenuEntry   = LibGetMenuEntry (MenuOption, Index);
     NewFileContext = (FILE_CONTEXT *)NewMenuEntry->VariableContext;
@@ -1435,6 +1549,107 @@ LibUpdateFileExplorer (
 
     LibDestroyMenuEntry (NewMenuEntry);
   }
+
+  return Status;
+}
+
+/**
+  Navigate to the parent of the directory currently displayed.
+
+  When the volume root is displayed, the volume (file system) list is shown
+  instead. Does nothing when the volume list is already displayed.
+
+  @retval  EFI_SUCCESS   The parent location was displayed successfully.
+  @retval  other errors  Error occurred when opening or parsing the parent.
+
+**/
+EFI_STATUS
+LibGoUpOneLevel (
+  VOID
+  )
+{
+  EFI_STATUS       Status;
+  CHAR16           *ParentPath;
+  EFI_FILE_HANDLE  RootHandle;
+  EFI_FILE_HANDLE  ParentHandle;
+  EFI_HANDLE       DeviceHandle;
+
+  //
+  // Already at the volume list: nothing above it.
+  //
+  if (gFileExplorerPrivate.CurDirPath == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // At a volume root: go back to the volume (file system) list.
+  //
+  if (StrCmp (gFileExplorerPrivate.CurDirPath, L"\\") == 0) {
+    if (gFileExplorerPrivate.CurDirHandle != NULL) {
+      gFileExplorerPrivate.CurDirHandle->Close (gFileExplorerPrivate.CurDirHandle);
+      gFileExplorerPrivate.CurDirHandle = NULL;
+    }
+
+    LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
+    Status = LibFindFileSystem ();
+    if (!EFI_ERROR (Status)) {
+      LibUpdateFileExplorePage ();
+    }
+
+    return Status;
+  }
+
+  //
+  // In a sub-directory: open and display its parent.
+  //
+  DeviceHandle = gFileExplorerPrivate.CurDeviceHandle;
+  ParentPath   = LibGetParentPath (gFileExplorerPrivate.CurDirPath);
+  if (ParentPath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  RootHandle = LibOpenRoot (DeviceHandle);
+  if (RootHandle == NULL) {
+    FreePool (ParentPath);
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (StrCmp (ParentPath, L"\\") == 0) {
+    ParentHandle = RootHandle;
+  } else {
+    Status = RootHandle->Open (
+                           RootHandle,
+                           &ParentHandle,
+                           ParentPath,
+                           EFI_FILE_READ_ONLY,
+                           0
+                           );
+    RootHandle->Close (RootHandle);
+    if (EFI_ERROR (Status)) {
+      FreePool (ParentPath);
+      return Status;
+    }
+  }
+
+  //
+  // Release the directory being left before its handle reference is overwritten.
+  //
+  if (gFileExplorerPrivate.CurDirHandle != NULL) {
+    gFileExplorerPrivate.CurDirHandle->Close (gFileExplorerPrivate.CurDirHandle);
+    gFileExplorerPrivate.CurDirHandle = NULL;
+  }
+
+  LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
+
+  Status = LibFindFiles (ParentHandle, ParentPath, DeviceHandle);
+  if (!EFI_ERROR (Status)) {
+    LibUpdateFileExplorePage ();
+  } else {
+    LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
+    ParentHandle->Close (ParentHandle);
+  }
+
+  FreePool (ParentPath);
 
   return Status;
 }
@@ -1556,6 +1771,22 @@ Done:
   }
 
   LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
+
+  //
+  // Release the directory currently displayed. Its handle is shared by the (now
+  // freed) child entries, which are non-root and therefore never close it.
+  //
+  if (gFileExplorerPrivate.CurDirHandle != NULL) {
+    gFileExplorerPrivate.CurDirHandle->Close (gFileExplorerPrivate.CurDirHandle);
+    gFileExplorerPrivate.CurDirHandle = NULL;
+  }
+
+  if (gFileExplorerPrivate.CurDirPath != NULL) {
+    FreePool (gFileExplorerPrivate.CurDirPath);
+    gFileExplorerPrivate.CurDirPath = NULL;
+  }
+
+  gFileExplorerPrivate.CurDeviceHandle = NULL;
 
   if (FileName != NULL) {
     FreePool (FileName);
