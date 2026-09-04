@@ -11,6 +11,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/BlParseLib.h>
@@ -118,6 +119,88 @@ IsValidCbTable (
 }
 
 /**
+  Resolve the bounded coreboot table described by a direct UPL FDT.
+
+  @param  Fdt               Pointer to the UPL FDT.
+
+  @retval NULL              The FDT has no valid coreboot table.
+  @retval Others            Pointer to the coreboot table.
+
+**/
+STATIC
+struct cb_header *
+GetCbTableFromFdt (
+  IN VOID  *Fdt
+  )
+{
+  INT32               CorebootNode;
+  INT32               FirmwareNode;
+  INT32               PropertyLength;
+  CONST FDT_PROPERTY  *Property;
+  CONST UINT64        *Reg;
+  UINT64              CbMemAddress;
+  UINT64              CbMemEnd;
+  UINT64              CbMemSize;
+  UINT64              TableAddress;
+  UINT64              TableEnd;
+  UINT64              TableSize;
+  struct cb_header    *Header;
+
+  if ((Fdt == NULL) || (FdtCheckHeader (Fdt) != 0)) {
+    return NULL;
+  }
+
+  FirmwareNode = FdtSubnodeOffsetNameLen (Fdt, 0, "firmware", sizeof ("firmware") - 1);
+  if (FirmwareNode < 0) {
+    return NULL;
+  }
+
+  CorebootNode = FdtSubnodeOffsetNameLen (
+                   Fdt,
+                   FirmwareNode,
+                   "coreboot",
+                   sizeof ("coreboot") - 1
+                   );
+  if (CorebootNode < 0) {
+    return NULL;
+  }
+
+  Property = FdtGetProperty (Fdt, CorebootNode, "reg", &PropertyLength);
+  if ((Property == NULL) || (PropertyLength != (4 * sizeof (UINT64)))) {
+    return NULL;
+  }
+
+  Reg          = (CONST UINT64 *)Property->Data;
+  TableAddress = Fdt64ToCpu (ReadUnaligned64 (&Reg[0]));
+  TableSize    = Fdt64ToCpu (ReadUnaligned64 (&Reg[1]));
+  CbMemAddress = Fdt64ToCpu (ReadUnaligned64 (&Reg[2]));
+  CbMemSize    = Fdt64ToCpu (ReadUnaligned64 (&Reg[3]));
+
+  if ((TableAddress > MAX_UINTN) || (TableSize < sizeof (*Header)) ||
+      (TableAddress > (MAX_UINT64 - TableSize)) ||
+      (CbMemAddress > (MAX_UINT64 - CbMemSize)))
+  {
+    return NULL;
+  }
+
+  TableEnd = TableAddress + TableSize;
+  CbMemEnd = CbMemAddress + CbMemSize;
+  if ((TableAddress < CbMemAddress) || (TableEnd > CbMemEnd)) {
+    return NULL;
+  }
+
+  Header = (struct cb_header *)(UINTN)TableAddress;
+  if ((Header->header_bytes != sizeof (*Header)) ||
+      (Header->table_bytes > (TableSize - Header->header_bytes)) ||
+      !IsValidCbTable (Header))
+  {
+    return NULL;
+  }
+
+  return Header;
+}
+
+/**
   This function retrieves the parameter base address from boot loader.
 
   This function will get bootloader specific parameter address for UEFI payload.
@@ -145,6 +228,13 @@ GetParameterBase (
   //
   Header = (struct cb_header *)(UINTN)GET_BOOTLOADER_PARAMETER ();
   if (IsValidCbTable (Header)) {
+    return Header;
+  }
+
+  Header = GetCbTableFromFdt ((VOID *)(UINTN)GET_BOOTLOADER_PARAMETER ());
+  if (Header != NULL) {
+    Status = PcdSet64S (PcdBootloaderParameter, (UINTN)Header);
+    ASSERT_EFI_ERROR (Status);
     return Header;
   }
 
@@ -220,6 +310,9 @@ FindCbTag (
   UINTN             Idx;
 
   Header = (struct cb_header *)GetParameterBase ();
+  if (Header == NULL) {
+    return NULL;
+  }
 
   TagPtr = NULL;
   TmpPtr = (UINT8 *)Header + Header->header_bytes;
