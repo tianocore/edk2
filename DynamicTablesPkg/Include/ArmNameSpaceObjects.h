@@ -56,6 +56,8 @@ typedef enum ArmObjectID {
   EArmObjProcessorSpecificBlockInfo,                           ///< 26 - Processor Specific Block.
   EArmObjProcessorSpecificSubDataArchInfo,                     ///< 27 - Processor Specific Sub Data (ArchData)
   EArmObjCoresightPmuInfo,                                     ///< 28 - Coresight PMU Info
+  EArmObjBmuSocketInfo,                                        ///< 29 - BMU Socket Info
+  EArmObjBmuRegInfo,                                           ///< 30 - BMU Reg Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -934,5 +936,37 @@ typedef struct CmArmCoresightPmuInfo {
   ///
   UINT32             ImplementationId;
 } CM_ARM_CORESIGHT_PMU_INFO;
+
+/** A structure that describes the BMU hardware
+    registers and interrupt.
+
+    ID: EArmObjBmuRegInfo
+*/
+typedef struct CmArmBmuRegInfo {
+  /// The Base address of BMU register space.
+  UINT64                       BaseAddress;
+
+  /// Length of the BMU registers
+  UINT64                       Length;
+
+  /// The BMU interrupt descriptor
+  CM_ARM_EXTENDED_INTERRUPT    BmuIntr;
+
+  /// TRUE if the BMU interrupt may be shared.
+  BOOLEAN                      Shared;
+} CM_ARM_BMU_REG_INFO;
+
+/** A structure that describes the BMU hardware
+    on a socket.
+
+    ID: EArmObjBmuSocketInfo
+*/
+typedef struct CmArmBmuSocketInfo {
+  /// Number of devices on this socket
+  UINT8              NumDevices;
+
+  /// Array of BMU devices on this socket
+  CM_OBJECT_TOKEN    BmuRegInfoToken;
+} CM_ARM_BMU_INFO;
 
 #pragma pack()

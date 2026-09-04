@@ -488,6 +488,23 @@ STATIC CONST CM_OBJ_PARSER  CmArmCoresightPmuInfoParser[] = {
   { "ImplementationId",       sizeof (UINT32),          "0x%x",   NULL        },
 };
 
+/** A parser for EArmObjBmuSocketInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmObjBmuSocketInfoParser[] = {
+  { "NumDevices",      1,                        "0x%x", NULL },
+  { "BmuRegInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjBmuRegInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmBmuRegInfoParser[] = {
+  { "BaseAddress",       8,                "0x%llx", NULL },
+  { "Length",            8,                "0x%llx", NULL },
+  { "BmuIntr.Interrupt", 4,                "0x%x",   NULL },
+  { "BmuIntr.Flags",     4,                "0x%x",   NULL },
+  { "Shared",            sizeof (BOOLEAN), "0x%x",   NULL },
+};
+
 /** A parser for EArmObjCmn600Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmn600InfoParser[] = {
@@ -1706,6 +1723,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificBlockInfo,      CmArmProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificSubDataArchInfo,CmArmProcessorSpecificSubDataArchInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCoresightPmuInfo,                CmArmCoresightPmuInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjBmuSocketInfo,                   CmArmObjBmuSocketInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
