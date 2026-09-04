@@ -29,6 +29,17 @@ ASM_PFX(_ModuleEntryPoint):
   li.w     $a0, 0x1FFF
   bl       DisableLocalInterrupts
 
+  /* Clear per-CPU scratch registers left by the previous boot */
+  csrwr    $zero, LOONGARCH_CSR_KS0
+  csrwr    $zero, LOONGARCH_CSR_KS1
+  csrwr    $zero, LOONGARCH_CSR_KS2
+  csrwr    $zero, LOONGARCH_CSR_KS3
+  csrwr    $zero, LOONGARCH_CSR_KS4
+  csrwr    $zero, LOONGARCH_CSR_KS5
+  csrwr    $zero, LOONGARCH_CSR_KS6
+  csrwr    $zero, LOONGARCH_CSR_KS7
+  csrwr    $zero, LOONGARCH_CSR_KS8
+
   /* Read physical cpu number id */
   bl       GetApicId
   li.d     $t0, BOOTCORE_ID  //0
