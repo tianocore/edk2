@@ -12,7 +12,7 @@
   PLATFORM_VERSION        = 0.1
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/UefiCpuPkg/HostTest
-  SUPPORTED_ARCHITECTURES = IA32|X64
+  SUPPORTED_ARCHITECTURES = IA32|X64|AARCH64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -23,17 +23,19 @@
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf
-  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+  TimerLib|UnitTestFrameworkPkg/Library/Posix/TimerLibPosix/TimerLibPosix.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [PcdsPatchableInModule]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0
 
-[Components]
+[Components.IA32, Components.X64]
   #
   # Build HOST_APPLICATION that tests the MtrrLib
   #
   UefiCpuPkg/Library/MtrrLib/UnitTest/MtrrLibUnitTestHost.inf
 
+[Components]
   #
   # Build HOST_APPLICATION that tests the CpuPageTableLib
   #
