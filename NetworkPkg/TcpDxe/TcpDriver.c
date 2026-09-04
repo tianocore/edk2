@@ -83,12 +83,6 @@ EFI_SERVICE_BINDING_PROTOCOL  gTcpServiceBinding = {
   TcpServiceBindingDestroyChild
 };
 
-//
-// This is the handle for the Hash2ServiceBinding Protocol instance this driver produces
-// if the platform does not provide one.
-//
-EFI_HANDLE  mHash2ServiceHandle = NULL;
-
 /**
   Create and start the heartbeat timer for the TCP driver.
 
@@ -265,6 +259,7 @@ TcpCreateService (
   IP_IO_OPEN_DATA               OpenData;
   EFI_SERVICE_BINDING_PROTOCOL  *Hash2ServiceBinding;
   EFI_HASH2_PROTOCOL            *Hash2Protocol;
+  EFI_HANDLE                    Hash2ChildHandle;
 
   if (IpVersion == IP_VERSION_4) {
     IpServiceBindingGuid  = &gEfiIp4ServiceBindingProtocolGuid;
@@ -298,28 +293,27 @@ TcpCreateService (
     return EFI_UNSUPPORTED;
   }
 
-  Status = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
-  if (EFI_ERROR (Status)) {
+  Hash2ChildHandle    = NULL;
+  Hash2ServiceBinding = NULL;
+  Status              = gBS->LocateProtocol (
+                               &gEfiHash2ServiceBindingProtocolGuid,
+                               NULL,
+                               (VOID **)&Hash2ServiceBinding
+                               );
+  if (!EFI_ERROR (Status) && (Hash2ServiceBinding != NULL) && (Hash2ServiceBinding->CreateChild != NULL)) {
     //
-    // If we can't find the Hashing protocol, then we need to create one.
+    // Create a dedicated Hash2 child for this TCP service instance.
     //
-
-    //
-    // Platform is expected to publish the hash service binding protocol to support TCP.
-    //
-    Status = gBS->LocateProtocol (
-                    &gEfiHash2ServiceBindingProtocolGuid,
-                    NULL,
-                    (VOID **)&Hash2ServiceBinding
-                    );
-    if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->CreateChild == NULL)) {
+    Status = Hash2ServiceBinding->CreateChild (Hash2ServiceBinding, &Hash2ChildHandle);
+    if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
-
+  } else {
     //
-    // Create an instance of the hash protocol for this controller.
+    // No Hash2ServiceBinding; verify the platform provides Hash2 directly.
     //
-    Status = Hash2ServiceBinding->CreateChild (Hash2ServiceBinding, &mHash2ServiceHandle);
+    Hash2ServiceBinding = NULL;
+    Status              = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
@@ -330,8 +324,14 @@ TcpCreateService (
   //
   TcpServiceData = AllocateZeroPool (sizeof (TCP_SERVICE_DATA));
   if (TcpServiceData == NULL) {
+    if ((Hash2ServiceBinding != NULL) && (Hash2ServiceBinding->DestroyChild != NULL)) {
+      Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, Hash2ChildHandle);
+    }
+
     return EFI_OUT_OF_RESOURCES;
   }
+
+  TcpServiceData->Hash2ServiceHandle = Hash2ChildHandle;
 
   TcpServiceData->Signature           = TCP_DRIVER_SIGNATURE;
   TcpServiceData->ControllerHandle    = Controller;
@@ -394,6 +394,14 @@ TcpCreateService (
   return EFI_SUCCESS;
 
 ON_ERROR:
+
+  if (TcpServiceData->Hash2ServiceHandle != NULL) {
+    if ((Hash2ServiceBinding != NULL) && (Hash2ServiceBinding->DestroyChild != NULL)) {
+      Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, TcpServiceData->Hash2ServiceHandle);
+    }
+
+    TcpServiceData->Hash2ServiceHandle = NULL;
+  }
 
   if (TcpServiceData->IpIo != NULL) {
     IpIoDestroy (TcpServiceData->IpIo);
@@ -493,30 +501,6 @@ TcpDestroyService (
     return EFI_SUCCESS;
   }
 
-  //
-  // Destroy the Hash2ServiceBinding instance if it is created by Tcp driver.
-  //
-  if (mHash2ServiceHandle != NULL) {
-    Status = gBS->LocateProtocol (
-                    &gEfiHash2ServiceBindingProtocolGuid,
-                    NULL,
-                    (VOID **)&Hash2ServiceBinding
-                    );
-    if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->DestroyChild == NULL)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    //
-    // Destroy the instance of the hashing protocol for this controller.
-    //
-    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, mHash2ServiceHandle);
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    mHash2ServiceHandle = NULL;
-  }
-
   Status = gBS->OpenProtocol (
                   NicHandle,
                   ServiceBindingGuid,
@@ -552,6 +536,24 @@ TcpDestroyService (
            ServiceBinding,
            NULL
            );
+
+    if (TcpServiceData->Hash2ServiceHandle != NULL) {
+      Status = gBS->LocateProtocol (
+                      &gEfiHash2ServiceBindingProtocolGuid,
+                      NULL,
+                      (VOID **)&Hash2ServiceBinding
+                      );
+      if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->DestroyChild == NULL)) {
+        return EFI_UNSUPPORTED;
+      }
+
+      Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, TcpServiceData->Hash2ServiceHandle);
+      if (EFI_ERROR (Status)) {
+        return EFI_UNSUPPORTED;
+      }
+
+      TcpServiceData->Hash2ServiceHandle = NULL;
+    }
 
     //
     // Destroy the IpIO consumed by TCP driver
