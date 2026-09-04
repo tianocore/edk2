@@ -1146,6 +1146,7 @@ ParseDnsResponse (
   UINT32  RRCount;
   UINT32  AnswerSectionNum;
   UINT32  CNameTtl;
+  UINT32  LabelSize;
 
   EFI_IPv4_ADDRESS  *HostAddr4;
   EFI_IPv6_ADDRESS  *HostAddr6;
@@ -1397,22 +1398,64 @@ ParseDnsResponse (
       *Completed = FALSE;
       Status     = EFI_ABORTED;
       goto ON_EXIT;
-    } else {
-      RemainingLength -= (sizeof (UINT16) + sizeof (DNS_ANSWER_SECTION));
     }
 
     //
-    // Answer name should be PTR, else EFI_UNSUPPORTED returned.
+    // Answer name should be PTR.
     //
     if ((*(UINT8 *)AnswerName & 0xC0) != 0xC0) {
-      Status = EFI_UNSUPPORTED;
-      goto ON_EXIT;
+      //
+      // Some DNS servers may respond with uncompressed domain name.
+      // Skip the domain labels, the last label is a zero length label.
+      // (RFC1035 - 4.1.4. Message compression)
+      //
+      while (TRUE) {
+        if (RemainingLength < sizeof (UINT8)) {
+          *Completed = FALSE;
+          Status     = EFI_ABORTED;
+          goto ON_EXIT;
+        }
+
+        LabelSize        = *(UINT8 *)AnswerName;
+        AnswerName      += sizeof (UINT8);
+        RemainingLength -= sizeof (UINT8);
+        if (LabelSize == 0) {
+          break;
+        }
+
+        // Label size cannot be greater than DNS_MAXIMUM_LABEL_LEN (63),
+        // because the last two bits (7 and 6) of label size must be zero.
+        if ((LabelSize > DNS_MAXIMUM_LABEL_LEN) || (RemainingLength < LabelSize)) {
+          *Completed = FALSE;
+          Status     = EFI_ABORTED;
+          goto ON_EXIT;
+        }
+
+        // Skip this domain label.
+        AnswerName      += LabelSize;
+        RemainingLength -= LabelSize;
+      }
+
+      if (RemainingLength < sizeof (DNS_ANSWER_SECTION)) {
+        *Completed = FALSE;
+        Status     = EFI_ABORTED;
+        goto ON_EXIT;
+      }
+
+      RemainingLength -= sizeof (DNS_ANSWER_SECTION);
+
+      // Get Answer section.
+      AnswerSection = (DNS_ANSWER_SECTION *)AnswerName;
+    } else {
+      RemainingLength -= (sizeof (UINT16) + sizeof (DNS_ANSWER_SECTION));
+
+      // Get Answer section.
+      AnswerSection = (DNS_ANSWER_SECTION *)(AnswerName + sizeof (UINT16));
     }
 
     //
-    // Get Answer section.
+    // Convert Answer section endianess.
     //
-    AnswerSection             = (DNS_ANSWER_SECTION *)(AnswerName + sizeof (UINT16));
     AnswerSection->Type       = NTOHS (AnswerSection->Type);
     AnswerSection->Class      = NTOHS (AnswerSection->Class);
     AnswerSection->Ttl        = NTOHL (AnswerSection->Ttl);
