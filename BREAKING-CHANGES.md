@@ -47,7 +47,38 @@ None
 
 #### edk2-stable202611: Changes without Removal
 
-None
+##### Breaking Change: Add ArmCcaLib dependency to ArmMmuLib
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13024](https://github.com/tianocore/edk2/issues/13024)
+- **Pull Request**: [tianocore/edk2#12893](https://github.com/tianocore/edk2/pull/12893)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition (single expected instance)
+
+**What changed**: The AArch64 `ArmMmuLib` instances `ArmMmuBaseLib` and `ArmMmuPeiLib` gained a
+required dependency on the `ArmCcaLib` library class declared in `MdeModulePkg`. Platforms
+that use these `ArmMmuLib` instances must resolve `ArmCcaLib` in their DSC or the build
+fails with an unresolved library class.
+
+Library class dependency case: Single expected instance.
+Platforms that do not support Arm CCA should use the Null implementation provided at
+`MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf`.
+Platforms supporting Arm CCA should use the appropriate CCA-aware `ArmCcaLib` implementation.
+
+**Why it changed**: `ArmMmuLib` needs to determine the Arm CCA Realm protection attribute when
+creating or updating AArch64 translation-table entries. Using `ArmCcaLib` allows the MMU
+library to obtain the Realm execution state and protection attribute through a common
+abstraction while retaining unchanged behavior on platforms that do not support Arm CCA.
+
+**What replaces it**: Nothing is removed. `ArmCcaLib` becomes an additional required dependency
+of the affected `ArmMmuLib` instances.
+
+**How to migrate**: Platforms using `ArmMmuBaseLib` or `ArmMmuPeiLib` must add an `ArmCcaLib`
+mapping to their DSC.
+Platforms that do not support Arm CCA should add:
+   `ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf`
+
+Platforms supporting Arm CCA should instead map `ArmCcaLib` to the appropriate CCA-aware
+implementation.
 
 ### edk2-stable202611: Behavioral Breaking Changes
 

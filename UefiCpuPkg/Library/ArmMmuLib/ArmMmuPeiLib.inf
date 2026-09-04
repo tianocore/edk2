@@ -23,10 +23,12 @@
   AArch64/ArmMmuLibReplaceEntry.S
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
+  ArmCcaLib
   ArmLib
   CacheMaintenanceLib
   HobLib
