@@ -428,6 +428,10 @@
   # {da383315-906b-486f-80db-847f268451e4}
   gNVMeEnableCompleteEventGroupGuid = { 0xda383315, 0x906b, 0x486f, { 0x80, 0xdb, 0x84, 0x7f, 0x26, 0x84, 0x51, 0xe4 } }
 
+  ## Include/Guid/CompatibilityModeActivatedEvent.h
+  # This GUID is used to trigger the event group when the compatibility mode is activated.
+  gCompatibilityModeActivatedEventGuid = { 0x209BA820, 0xCE32, 0x49E1, { 0x95, 0xAE, 0x39, 0x43, 0x3D, 0xEF, 0xD5, 0xEE } }
+
   ## Used (similar to Variable Services) to communicate policies to the enforcement engine.
   # {DA1B0D11-D1A7-46C4-9DC9-F3714875C6EB}
   gVarCheckPolicyLibMmiHandlerGuid = { 0xda1b0d11, 0xd1a7, 0x46c4, { 0x9d, 0xc9, 0xf3, 0x71, 0x48, 0x75, 0xc6, 0xeb }}
