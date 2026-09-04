@@ -196,8 +196,11 @@ GetResourceDescriptor (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceDescriptor = NULL;
 
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     DEBUG ((
       DEBUG_INFO,
       "%a:%d: resource type 0x%x %llx %llx\n",
@@ -215,9 +218,6 @@ GetResourceDescriptor (
       ResourceDescriptor = Hob.ResourceDescriptor;
       break;
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   return ResourceDescriptor;
@@ -242,8 +242,11 @@ GetHighestResourceDescriptor (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceDescriptor = NULL;
 
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-  while (Hob.Raw != NULL) {
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     if ((Hob.ResourceDescriptor->ResourceType == Type) &&
         (Hob.ResourceDescriptor->PhysicalStart < End))
     {
@@ -253,9 +256,6 @@ GetHighestResourceDescriptor (
         ResourceDescriptor = Hob.ResourceDescriptor;
       }
     }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
   return ResourceDescriptor;
@@ -285,7 +285,7 @@ SetMmioSharedBit (
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (  (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR)
+    if (  IS_RESOURCE_DESCRIPTOR_HOB (Hob)
        && (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO))
     {
       MemEncryptTdxSetPageSharedBit (
