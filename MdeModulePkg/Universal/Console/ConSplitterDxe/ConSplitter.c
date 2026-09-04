@@ -2531,13 +2531,13 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 
   ConOutNumOfConsoles = mConOut.CurrentNumberOfConsoles;
   StdErrNumOfConsoles = mStdErr.CurrentNumberOfConsoles;
-  ConOutTextOutList   = mConOut.TextOutList;
-  StdErrTextOutList   = mStdErr.TextOutList;
 
   Indexi              = 0;
+  ConOutTextOutList   = mConOut.TextOutList;
   FoundTheSameTextOut = FALSE;
   while ((Indexi < ConOutNumOfConsoles) && (!FoundTheSameTextOut)) {
-    Indexj = 0;
+    Indexj            = 0;
+    StdErrTextOutList = mStdErr.TextOutList;
     while (Indexj < StdErrNumOfConsoles) {
       if (ConOutTextOutList->TextOut == StdErrTextOutList->TextOut) {
         FoundTheSameTextOut = TRUE;
