@@ -220,23 +220,35 @@ struct _IP6_SERVICE {
   EFI_MANAGED_NETWORK_PROTOCOL       *Mnp;
 
   EFI_MANAGED_NETWORK_CONFIG_DATA    MnpConfigData;
-  EFI_SIMPLE_NETWORK_MODE            SnpMode;
 
-  EFI_EVENT                          Timer;
-  EFI_EVENT                          FasterTimer;
+  //
+  // SnpMode is a cached copy of the SNP device configuration data (MAC address,
+  // media header size, hardware address size, interface type, etc.). This copy is
+  // obtained during service initialization via GetModeData.
+  //
+  // IMPORTANT: This cached data becomes STALE if MnpConfigure() is called, as
+  // MnpConfigure triggers SNP Start/Initialize which may finalize or alter mode
+  // fields not set before Start. Code that calls MnpConfigure must refetch the
+  // SNP mode data via GetModeData after reconfiguration to ensure values like
+  // MediaHeaderSize, CurrentAddress, and HwAddressSize remain valid.
+  //
+  EFI_SIMPLE_NETWORK_MODE    SnpMode;
+
+  EFI_EVENT                  Timer;
+  EFI_EVENT                  FasterTimer;
 
   //
   // IPv6 Configuration Protocol instance
   //
-  IP6_CONFIG_INSTANCE                Ip6ConfigInstance;
+  IP6_CONFIG_INSTANCE        Ip6ConfigInstance;
 
   //
   // The string representation of the current mac address of the
   // NIC this IP6_SERVICE works on.
   //
-  CHAR16                             *MacString;
-  UINT32                             MaxPacketSize;
-  UINT32                             OldMaxPacketSize;
+  CHAR16                     *MacString;
+  UINT32                     MaxPacketSize;
+  UINT32                     OldMaxPacketSize;
 };
 
 /**
