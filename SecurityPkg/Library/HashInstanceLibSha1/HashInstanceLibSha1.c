@@ -56,7 +56,10 @@ Sha1HashInit (
 
   CtxSize = Sha1GetContextSize ();
   Sha1Ctx = AllocatePool (CtxSize);
-  ASSERT (Sha1Ctx != NULL);
+  if (Sha1Ctx == NULL) {
+    ASSERT (Sha1Ctx != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Sha1Init (Sha1Ctx);
 
