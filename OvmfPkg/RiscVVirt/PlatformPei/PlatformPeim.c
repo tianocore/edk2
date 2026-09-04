@@ -120,8 +120,9 @@ SetupTPMResources (
   UINT64        TpmBaseSize;
 
   //
-  // Empty TpmBaseSize indicates no TPM found.
+  // Empty TpmBase and TpmBaseSize indicates no TPM found.
   //
+  TpmBase     = 0;
   TpmBaseSize = 0;
 
   //
