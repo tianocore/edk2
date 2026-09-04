@@ -36,6 +36,8 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE CC_MEASUREMENT_ENABLE   = TRUE
   DEFINE DEBUG_TO_MEM            = FALSE
+  # Allow OVMF to enumerate and boot from PCI UFS logical units.
+  DEFINE UFS_ENABLE              = TRUE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
@@ -987,6 +989,10 @@
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+!if $(UFS_ENABLE) == TRUE
+  MdeModulePkg/Bus/Pci/UfsPciHcDxe/UfsPciHcDxe.inf
+  MdeModulePkg/Bus/Ufs/UfsPassThruDxe/UfsPassThruDxe.inf
+!endif
   MdeModulePkg/Bus/Pci/CxlDxe/CxlDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
