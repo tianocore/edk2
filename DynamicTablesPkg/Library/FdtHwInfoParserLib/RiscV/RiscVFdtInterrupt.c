@@ -16,16 +16,19 @@
 /** Get the interrupt Id of an interrupt described in a fdt.
 
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt id.
 **/
 UINT32
 EFIAPI
 FdtGetInterruptId (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   )
 {
   ASSERT (Data != NULL);
+  ASSERT (Size >= RISCV_IRQ_NUMBER_OFFSET);
 
   return Fdt32ToCpu (Data[RISCV_IRQ_NUMBER_OFFSET]);
 }
@@ -33,19 +36,22 @@ FdtGetInterruptId (
 /** Get the ACPI interrupt flags of an interrupt described in a fdt.
 
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt flags (for ACPI).
 **/
 UINT32
 EFIAPI
 FdtGetInterruptFlags (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   )
 {
   UINT32  IrqFlags;
   UINT32  AcpiIrqFlags;
 
   ASSERT (Data != NULL);
+  ASSERT (Size >= RISCV_IRQ_FLAGS_OFFSET);
 
   IrqFlags = Fdt32ToCpu (Data[RISCV_IRQ_FLAGS_OFFSET]);
 

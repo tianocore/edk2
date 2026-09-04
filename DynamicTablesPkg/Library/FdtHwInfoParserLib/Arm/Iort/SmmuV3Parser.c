@@ -1,7 +1,7 @@
 /** @file
   Arm SMMUv3 IORT parser.
 
-  Copyright (c) 2025, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2025 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -62,7 +62,7 @@ FdtGetInterruptFromName (
     return 0;
   }
 
-  return FdtGetInterruptId (&Interrupts[StrIndex * IntCells]);
+  return FdtGetInterruptId (&Interrupts[StrIndex * IntCells], IntCells);
 }
 
 /** List of "compatible" property values for SmmuV3 nodes.
@@ -297,10 +297,9 @@ SmmuV3NodeParser (
 {
   EFI_STATUS         Status;
   CONST UINT32       *Data;
-  INT32              IntcNode;
   INT32              DataSize;
   INT32              IntCells;
-  INT32              AddressCells;
+  UINT64             BaseAddressSize;
   CONST UINT8        *InterruptNames;
   INT32              InterruptNamesSize;
   CM_ARM_ID_MAPPING  *IdMappings;
@@ -314,21 +313,8 @@ SmmuV3NodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  AddressCells = FdtAddressCells (Fdt, SmmuV3Node);
-  if (AddressCells < 0) {
-    ASSERT (AddressCells >= 0);
-    return EFI_ABORTED;
-  }
-
-  // Get the associated interrupt-controller.
-  Status = FdtGetIntcParentNode (Fdt, SmmuV3Node, &IntcNode);
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
-    return Status;
-  }
-
   // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, &IntCells);
+  Status = FdtGetInterruptCellsInfo (Fdt, SmmuV3Node, TRUE, &IntCells);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     if (Status == EFI_NOT_FOUND) {
@@ -375,16 +361,16 @@ SmmuV3NodeParser (
     SmmuV3Info->Model = EFI_ACPI_IORT_SMMUv3_MODEL_CAVIUM_CN99XX;
   }
 
-  Data = FdtGetProp (Fdt, SmmuV3Node, "reg", &DataSize);
-  if (Data == NULL) {
-    ASSERT (Data != NULL);
-    return EFI_ABORTED;
-  }
-
-  if (AddressCells == 2) {
-    SmmuV3Info->BaseAddress = Fdt64ToCpu (*((UINT64 *)Data));
-  } else {
-    SmmuV3Info->BaseAddress = Fdt32ToCpu (*((UINT32 *)Data));
+  Status = FdtGetTranslatedReg (
+             Fdt,
+             SmmuV3Node,
+             0,
+             &SmmuV3Info->BaseAddress,
+             &BaseAddressSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   Status = FindIommuMsiMapForSmmuV3 (Fdt, SmmuV3Node, &IommuMapData, &IommuMapSize, &MsiMapData, &MsiMapSize);
