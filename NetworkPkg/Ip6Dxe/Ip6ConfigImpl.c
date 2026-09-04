@@ -357,6 +357,9 @@ Ip6ConfigReadConfigData (
   UINTN                   Index;
   IP6_CONFIG_DATA_RECORD  DataRecord;
   CHAR8                   *Data;
+  UINTN                   RecordArraySize;
+
+  Variable = NULL;
 
   //
   // Try to read the configuration variable.
@@ -394,7 +397,44 @@ Ip6ConfigReadConfigData (
     }
 
     //
-    // Get the IAID we use.
+    // Validate the header and DataRecord array fit in the returned buffer
+    // before using DataRecordCount as a loop bound.
+    //
+    if (VarSize < OFFSET_OF (IP6_CONFIG_VARIABLE, DataRecord)) {
+      goto Error;
+    }
+
+    RecordArraySize = VarSize - OFFSET_OF (IP6_CONFIG_VARIABLE, DataRecord);
+    if ((UINTN)Variable->DataRecordCount > RecordArraySize / sizeof (IP6_CONFIG_DATA_RECORD)) {
+      goto Error;
+    }
+
+    for (Index = 0; Index < Variable->DataRecordCount; Index++) {
+      CopyMem (&DataRecord, &Variable->DataRecord[Index], sizeof (DataRecord));
+
+      if ((UINT32)DataRecord.DataType >= Ip6ConfigDataTypeMaximum) {
+        goto Error;
+      }
+
+      DataItem = &Instance->DataItem[DataRecord.DataType];
+      if (DATA_ATTRIB_SET (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED) &&
+          (DataItem->DataSize != DataRecord.DataSize)
+          )
+      {
+        continue;
+      }
+
+      if ((DataRecord.Offset > VarSize) ||
+          (DataRecord.DataSize > VarSize - DataRecord.Offset))
+      {
+        goto Error;
+      }
+    }
+
+    //
+    // Apply records only after the entire variable has been validated so a
+    // later corrupt record cannot leave Instance->DataItem[] half-updated
+    // before Error: deletes the variable and returns EFI_NOT_FOUND.
     //
     Instance->IaId = Variable->IaId;
 
@@ -415,12 +455,7 @@ Ip6ConfigReadConfigData (
       if (!DATA_ATTRIB_SET (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED)) {
         //
         // This data item has variable length data.
-        // Check that the length is contained within the variable before allocating.
         //
-        if (DataRecord.DataSize > VarSize - DataRecord.Offset) {
-          goto Error;
-        }
-
         DataItem->Data.Ptr = AllocatePool (DataRecord.DataSize);
         if (DataItem->Data.Ptr == NULL) {
           //
