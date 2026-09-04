@@ -485,6 +485,8 @@ ParseOptions (
           *BootMode = BOOT_ON_S4_RESUME;
         } else if (AsciiStrCmp (TempStr, "s3") == 0) {
           *BootMode = BOOT_ON_S3_RESUME;
+        } else if (AsciiStrCmp (TempStr, "flash-update") == 0) {
+          *BootMode = BOOT_ON_FLASH_UPDATE;
         }
       }
     }
