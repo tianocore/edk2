@@ -73,6 +73,7 @@ _______________________________________________________________________________
       26 - SSDT DMC
       27 - HEST
       28 - EINJ
+      32 - ERST
 
     Standard SMBIOS Table IDs:
        0 - Reserved
