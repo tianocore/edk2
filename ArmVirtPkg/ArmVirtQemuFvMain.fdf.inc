@@ -109,6 +109,7 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
   INF OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+  INF OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 

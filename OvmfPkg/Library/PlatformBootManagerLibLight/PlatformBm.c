@@ -478,6 +478,21 @@ IsVirtioPciSerial (
 }
 
 /**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio input device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciInput (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtioPci (Handle, ReportText, VIRTIO_SUBSYSTEM_INPUT);
+}
+
+/**
   This CALLBACK_FUNCTION attempts to connect a handle non-recursively, asking
   the matching driver to produce all first-level child handles.
 **/
@@ -820,6 +835,11 @@ PlatformBootManagerBeforeConsole (
   FilterAndProcess (&gEfiGraphicsOutputProtocolGuid, NULL, AddOutput);
 
   //
+  // Find all virtio-input PCI devices and connect them non-recursively.
+  //
+  FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciInput, Connect);
+
+  //
   // Add the hardcoded short-form USB keyboard device path to ConIn.
   //
   EfiBootManagerUpdateConsoleVariable (
@@ -850,6 +870,13 @@ PlatformBootManagerBeforeConsole (
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole,
     NULL
     );
+
+  //
+  // Walk over all instances of gEfiSimpleTextInProtocolGuid protocol
+  // and wire them to ConIn, then walk over all instances of
+  // gEfiSimpleTextOutProtocolGuid and set them up as ConOut / ErrOut.
+  //
+  EfiBootManagerConnectAllConsoles ();
 
   //
   // Set the front page timeout from the QEMU configuration.

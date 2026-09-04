@@ -251,6 +251,7 @@
   # Platform Driver
   #
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+  OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
