@@ -39,6 +39,7 @@
   UefiCpuPkg/UefiCpuPkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
 [LibraryClasses]
+  AcpiTableWalkLib
   BaseMemoryLib
   DebugLib
   BaseLib
@@ -51,6 +52,10 @@
   StackCheckLib
   UefiCpuBaseArchSupportLib
   MemoryAllocationLib
+
+[LibraryClasses.AARCH64]
+  ArmMmuLib
+  ArmLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid

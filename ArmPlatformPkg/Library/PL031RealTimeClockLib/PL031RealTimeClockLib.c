@@ -321,7 +321,8 @@ LibRtcInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Desc;
 
   // Initialize RTC Base Address
   mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
@@ -333,7 +334,68 @@ LibRtcInitialize (
                   SIZE_4KB,
                   EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
                   );
-  if (EFI_ERROR (Status)) {
+  if (Status == EFI_ACCESS_DENIED) {
+    //
+    // The range is already present in the GCD map, e.g. because a
+    // preceding platform driver or the payload's own MMIO discovery
+    // added it.  That is only acceptable if the existing descriptor
+    // is MMIO; refuse to touch anything else.
+    //
+    Status = gDS->GetMemorySpaceDescriptor (mPL031RtcBase, &Desc);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // AddMemorySpace() reports EFI_ACCESS_DENIED if any part of the
+    // requested range is already present, while GetMemorySpaceDescriptor()
+    // only returns the descriptor that contains the base address.  The
+    // descriptor therefore says nothing about the rest of the range: a
+    // request that straddles this descriptor and another one would be
+    // accepted on the strength of the first descriptor alone.  Require the
+    // whole range to lie inside it.
+    //
+    if ((Desc.BaseAddress > mPL031RtcBase) ||
+        ((Desc.BaseAddress + Desc.Length) <
+         ((UINT64)mPL031RtcBase + SIZE_4KB)))
+    {
+      return EFI_ACCESS_DENIED;
+    }
+
+    if ((Desc.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) ||
+        (Desc.ImageHandle != NULL))
+    {
+      return EFI_ACCESS_DENIED;
+    }
+
+    //
+    // A pre-existing MMIO descriptor need not carry every capability that
+    // the SetMemorySpaceAttributes() call below requests, and
+    // CoreSetMemorySpaceAttributes() rejects any attribute that is absent
+    // from Capabilities with EFI_UNSUPPORTED.  Add the full set that is
+    // about to be requested, not just EFI_MEMORY_RUNTIME.
+    //
+    if ((Desc.Capabilities &
+         (EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP)) !=
+        (EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP))
+    {
+      Status = gDS->SetMemorySpaceCapabilities (
+                      mPL031RtcBase,
+                      SIZE_4KB,
+                      Desc.Capabilities | EFI_MEMORY_UC |
+                      EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: SetMemorySpaceCapabilities() failed: %r\n",
+          __func__,
+          Status
+          ));
+        return Status;
+      }
+    }
+  } else if (EFI_ERROR (Status)) {
     return Status;
   }
 

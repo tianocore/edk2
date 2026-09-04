@@ -8,10 +8,23 @@
 **/
 
 #include <Guid/MemoryTypeInformation.h>
+#include <Guid/BootTimeReservationGuid.h>
 #include <Library/BaseArchLibSupport.h>
 #include "UefiPayloadEntry.h"
 
-STATIC UINT32  mTopOfLowerUsableDram = 0;
+STATIC UINT32   mTopOfLowerUsableDram = 0;
+STATIC BOOLEAN  mMcfgResourceHobBuilt = FALSE;
+
+//
+// Boot-time reservations from the launcher's
+// gLoaderBootTimeReservationGuid HOB, if it emitted one.
+// FindFreeMemForHobCallback() excludes ranges overlapping any of
+// these; BuildGenericHob() pins each with an EfiBootServicesData
+// memory-allocation HOB.  A launcher that does not emit the HOB
+// (Slim Bootloader, coreboot) leaves both NULL/0.
+//
+STATIC LOADER_BOOT_TIME_RESERVATION_ENTRY  *mBootTimeReservation;
+STATIC UINTN                               mBootTimeReservationCount;
 
 EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
   { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory)   },
@@ -53,6 +66,20 @@ MemInfoCallbackMmio (
   }
 
   //
+  // Note any entry that overlaps the ECAM window, whether or not it
+  // starts at exactly its base.  BuildHobFromBl() publishes the window
+  // from ACPI MCFG only when nothing in the bootloader's map covered it,
+  // because CoreInitializeGcdServices() does not tolerate overlapping
+  // resource descriptor HOBs.
+  //
+  if ((AcpiBoardInfo->PcieBaseSize != 0) &&
+      (MemoryMapEntry->Base < (AcpiBoardInfo->PcieBaseAddress + AcpiBoardInfo->PcieBaseSize)) &&
+      ((MemoryMapEntry->Base + MemoryMapEntry->Size) > AcpiBoardInfo->PcieBaseAddress))
+  {
+    mMcfgResourceHobBuilt = TRUE;
+  }
+
+  //
   // Skip types already handled in MemInfoCallback
   //
   if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI)) {
@@ -61,7 +88,44 @@ MemInfoCallbackMmio (
 
   if (MemoryMapEntry->Base == AcpiBoardInfo->PcieBaseAddress) {
     //
-    // MMCONF is always MMIO
+    // MMCONF is always MMIO.  Optionally surface it as Reserved instead;
+    // see PcdPublishMcfgAsReservedMemory in UefiPayloadPkg.dec for why an
+    // OS may need that.  This check runs before the MEM_MAP_FLAG_MMIO
+    // branch below because a bootloader that discovers MMIO from the
+    // outer firmware's GCD map will emit the ECAM window with that flag
+    // set.
+    //
+    if (FeaturePcdGet (PcdPublishMcfgAsReservedMemory)) {
+      //
+      // Reserved so Linux accepts it, but it is still device memory:
+      // advertise UNCACHEABLE only so that a consumer building page
+      // tables from these HOBs does not map config space write-back.
+      //
+      Type = EFI_RESOURCE_MEMORY_RESERVED;
+      BuildResourceDescriptorHob (
+        Type,
+        EFI_RESOURCE_ATTRIBUTE_PRESENT |
+        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+        EFI_RESOURCE_ATTRIBUTE_TESTED |
+        EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE,
+        (EFI_PHYSICAL_ADDRESS)MemoryMapEntry->Base,
+        MemoryMapEntry->Size
+        );
+      DEBUG ((
+        DEBUG_INFO,
+        "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x (MMCONF, UC-only)\n",
+        MemoryMapEntry->Base,
+        MemoryMapEntry->Size,
+        Type
+        ));
+      return EFI_SUCCESS;
+    } else {
+      Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+    }
+  } else if ((MemoryMapEntry->Flag & MEM_MAP_FLAG_MMIO) != 0) {
+    //
+    // The bootloader explicitly marked this range as device MMIO, so
+    // take it at its word instead of guessing from the address.
     //
     Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
   } else if (MemoryMapEntry->Base < mTopOfLowerUsableDram) {
@@ -69,11 +133,16 @@ MemInfoCallbackMmio (
     // It's in DRAM and thus must be reserved
     //
     Type = EFI_RESOURCE_MEMORY_RESERVED;
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   } else if ((MemoryMapEntry->Base < 0x100000000ULL) && (MemoryMapEntry->Base >= mTopOfLowerUsableDram)) {
     //
-    // It's not in DRAM, must be MMIO
+    // On x86, reserved ranges above TOLUD and below 4 GiB are the
+    // MMIO hole.  This heuristic does not apply on AArch64 where
+    // DRAM commonly starts at or above 1 GiB and the payload FV
+    // itself is a reserved range in that window.
     //
     Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+ #endif
   } else {
     Type = EFI_RESOURCE_MEMORY_RESERVED;
   }
@@ -170,6 +239,36 @@ FindToludCallback (
 }
 
 /**
+   Return whether a range overlaps any of the launcher's boot-time
+   reservations.
+
+   @param[in] Base  Range start.
+   @param[in] End   Range end (exclusive).
+
+   @retval TRUE   The range overlaps a boot-time reservation.
+   @retval FALSE  It does not, or no launcher published any.
+**/
+STATIC
+BOOLEAN
+OverlapsBootTimeReservation (
+  IN UINT64  Base,
+  IN UINT64  End
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < mBootTimeReservationCount; Index++) {
+    if ((Base < (mBootTimeReservation[Index].Base + mBootTimeReservation[Index].Size)) &&
+        (End > mBootTimeReservation[Index].Base))
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
    Callback function to find free and usable DRAM for HOB
    The memory region returned will have at least PcdSystemMemoryUefiRegionSize bytes
    and will be aligned to 1 MiB.
@@ -190,6 +289,7 @@ FindFreeMemForHobCallback (
   )
 {
   EFI_STATUS        Status;
+  MEMORY_MAP_ENTRY  Entry;
   MEMORY_MAP_ENTRY  MemoryMapEntrySplit;
   UINTN             *HobMemBase = (UINTN *)Params;
 
@@ -208,55 +308,80 @@ FindFreeMemForHobCallback (
   }
 
   //
+  // Operate on a copy so the caller's memory map is not modified.
+  // SblParseLib passes pointers into the bootloader's HOB and the same
+  // array is walked again later to publish system memory resource HOBs.
+  //
+  Entry = *MemoryMapEntry;
+
+  //
   // Align on 1 MiB
   //
-  if (ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB) > MemoryMapEntry->Base) {
+  if (ALIGN_VALUE (Entry.Base, SIZE_1MB) > Entry.Base) {
     //
     // Skip too small
     //
-    if (ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB) >= (MemoryMapEntry->Base + MemoryMapEntry->Size)) {
+    if (ALIGN_VALUE (Entry.Base, SIZE_1MB) >= (Entry.Base + Entry.Size)) {
       return EFI_SUCCESS;
     }
 
-    MemoryMapEntry->Size -= ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB) - MemoryMapEntry->Base;
-    MemoryMapEntry->Base  = ALIGN_VALUE (MemoryMapEntry->Base, SIZE_1MB);
+    Entry.Size -= ALIGN_VALUE (Entry.Base, SIZE_1MB) - Entry.Base;
+    Entry.Base  = ALIGN_VALUE (Entry.Base, SIZE_1MB);
   }
 
   //
   // Skip resources above 4GiB on x86_32
   //
-  if ((sizeof (UINTN) == 4) && (MemoryMapEntry->Base >= 0x100000000ULL)) {
+  if ((sizeof (UINTN) == 4) && (Entry.Base >= 0x100000000ULL)) {
     return EFI_SUCCESS;
   }
 
-  if ((sizeof (UINTN) == 4) && ((MemoryMapEntry->Base + MemoryMapEntry->Size) > 0x100000000ULL)) {
-    MemoryMapEntry->Size = 0x100000000ULL - MemoryMapEntry->Base;
+  if ((sizeof (UINTN) == 4) && ((Entry.Base + Entry.Size) > 0x100000000ULL)) {
+    Entry.Size = 0x100000000ULL - Entry.Base;
   }
 
   //
   // Skip too small
   //
-  if (MemoryMapEntry->Size < FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)) {
+  if (Entry.Size < FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // A ChainloadApp launcher reports its own FV/HOB/stack/page-table
+  // allocations as SBL type 1 records so they become SYSTEM_MEMORY
+  // rather than MEMORY_RESERVED.  They are still live: HOB memory
+  // must not land on any of them.  What actually protects them is
+  // the BuildMemoryAllocationHob() pin in BuildGenericHob() below;
+  // this check is belt-and-braces so an SBL type-1 entry that
+  // overlapped one is skipped outright rather than split.  The
+  // launcher emits one SBL entry per outer memory-map descriptor
+  // and never merges Reserved with Conventional, so on today's
+  // launcher this check does not fire.  A launcher that emits no
+  // gLoaderBootTimeReservationGuid HOB (Slim Bootloader, coreboot)
+  // never enters this branch.
+  //
+  if (OverlapsBootTimeReservation (Entry.Base, Entry.Base + Entry.Size)) {
     return EFI_SUCCESS;
   }
 
   //
   // Overlaps UefiPayload, split into smaller chunks
   //
-  if ((MemoryMapEntry->Base <= PcdGet32 (PcdPayloadFdMemBase)) &&
-      ((MemoryMapEntry->Base + MemoryMapEntry->Size) >= PcdGet32 (PcdPayloadFdMemBase)))
+  if ((Entry.Base <= PcdGet32 (PcdPayloadFdMemBase)) &&
+      ((Entry.Base + Entry.Size) >= PcdGet32 (PcdPayloadFdMemBase)))
   {
     MemoryMapEntrySplit.Type = E820_RAM;
-    MemoryMapEntrySplit.Base = MemoryMapEntry->Base;
+    MemoryMapEntrySplit.Base = Entry.Base;
     MemoryMapEntrySplit.Size = PcdGet32 (PcdPayloadFdMemBase) - MemoryMapEntrySplit.Base;
     Status                   = FindFreeMemForHobCallback (&MemoryMapEntrySplit, Params);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    if ((MemoryMapEntry->Base + MemoryMapEntry->Size) > (PcdGet32 (PcdPayloadFdMemBase) + PcdGet32 (PcdPayloadFdMemSize))) {
+    if ((Entry.Base + Entry.Size) > (PcdGet32 (PcdPayloadFdMemBase) + PcdGet32 (PcdPayloadFdMemSize))) {
       MemoryMapEntrySplit.Base = PcdGet32 (PcdPayloadFdMemBase) + PcdGet32 (PcdPayloadFdMemSize);
-      MemoryMapEntrySplit.Size = (MemoryMapEntry->Base + MemoryMapEntry->Size) - MemoryMapEntrySplit.Base;
+      MemoryMapEntrySplit.Size = (Entry.Base + Entry.Size) - MemoryMapEntrySplit.Base;
       Status                   = FindFreeMemForHobCallback (&MemoryMapEntrySplit, Params);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -266,7 +391,7 @@ FindFreeMemForHobCallback (
     return EFI_SUCCESS;
   }
 
-  *HobMemBase = MemoryMapEntry->Base;
+  *HobMemBase = Entry.Base;
 
   return EFI_ALREADY_STARTED;
 }
@@ -348,6 +473,7 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_INFO_HOB         *NewGfxInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  GfxDeviceInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *NewGfxDeviceInfo;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE    SmBiosTable;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE    *SmBiosTableHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE      *AcpiTableHob;
 
@@ -415,13 +541,14 @@ BuildHobFromBl (
   //
   // Create SmBios table Hob
   //
-  SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
-  ASSERT (SmBiosTableHob != NULL);
-  SmBiosTableHob->Header.Revision = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
-  SmBiosTableHob->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
-  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
-  Status = ParseSmbiosTable (SmBiosTableHob);
+  ZeroMem (&SmBiosTable, sizeof (SmBiosTable));
+  Status = ParseSmbiosTable (&SmBiosTable);
   if (!EFI_ERROR (Status)) {
+    SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+    ASSERT (SmBiosTableHob != NULL);
+    SmBiosTableHob->Header.Revision  = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
+    SmBiosTableHob->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
+    SmBiosTableHob->SmBiosEntryPoint = SmBiosTable.SmBiosEntryPoint;
     DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx\n", SmBiosTableHob->SmBiosEntryPoint));
   }
 
@@ -454,6 +581,40 @@ BuildHobFromBl (
   }
 
   //
+  // The bootloader's memory map may not cover the ECAM range at all,
+  // in which case MemInfoCallbackMmio() never fires for it.  Publish
+  // the range parsed from ACPI MCFG so that it is present in the GCD
+  // memory map (and, on AArch64, in the payload page tables) before
+  // PciHostBridgeDxe touches config space.
+  //
+  // Gated on the same PCD as the Reserved publication above: a platform
+  // that leaves the PCD at its default keeps the memory map it always
+  // had, and one that describes the window inside a larger range does
+  // not get a second, overlapping descriptor for it.
+  //
+  if (FeaturePcdGet (PcdPublishMcfgAsReservedMemory) &&
+      (AcpiBoardInfo->PcieBaseAddress != 0) &&
+      (AcpiBoardInfo->PcieBaseSize != 0) &&
+      !mMcfgResourceHobBuilt)
+  {
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_MEMORY_RESERVED,
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_TESTED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE,
+      (EFI_PHYSICAL_ADDRESS)AcpiBoardInfo->PcieBaseAddress,
+      AcpiBoardInfo->PcieBaseSize
+      );
+    DEBUG ((
+      DEBUG_INFO,
+      "buildhob: base = 0x%lx, size = 0x%lx (MMCONF from ACPI MCFG)\n",
+      AcpiBoardInfo->PcieBaseAddress,
+      AcpiBoardInfo->PcieBaseSize
+      ));
+  }
+
+  //
   // Parse the misc info provided by bootloader
   //
   Status = ParseMiscInfo ();
@@ -483,25 +644,220 @@ BuildHobFromBl (
 }
 
 /**
-  This function will build some generic HOBs that doesn't depend on information from bootloaders.
+  Locate the bootloader's ExtraData HOB and report how many entries it
+  actually has room for.
 
+  Only bootloaders that hand over a PEI-format HOB list (Slim Bootloader
+  and compatible frontends such as ChainloadApp) can carry an ExtraData
+  HOB. coreboot passes a coreboot table pointer, which fails the handoff
+  header check and returns NULL.
+
+  @param[in]  BootloaderParameter  Bootloader-provided argument.
+  @param[out] Count                Entry count, clamped to what the HOB's
+                                   own data size can hold.
+
+  @return  The ExtraData structure, or NULL if the bootloader did not hand
+           over a PEI HOB list carrying one.
+**/
+STATIC
+UNIVERSAL_PAYLOAD_EXTRA_DATA *
+FindBootloaderExtraDataHob (
+  IN  UINTN  BootloaderParameter,
+  OUT UINTN  *Count
+  )
+{
+  EFI_PEI_HOB_POINTERS          BlHob;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
+  UINTN                         DataSize;
+
+  BlHob.Raw = (UINT8 *)BootloaderParameter;
+  if ((BlHob.Raw == NULL) ||
+      (BlHob.Header->HobType != EFI_HOB_TYPE_HANDOFF) ||
+      (BlHob.Header->HobLength != sizeof (EFI_HOB_HANDOFF_INFO_TABLE)))
+  {
+    return NULL;
+  }
+
+  BlHob.Raw = GetNextGuidHob (&gUniversalPayloadExtraDataGuid, BlHob.Raw);
+  if (BlHob.Raw == NULL) {
+    return NULL;
+  }
+
+  ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (BlHob.Raw);
+  DataSize  = GET_GUID_HOB_DATA_SIZE (BlHob.Raw);
+  if (DataSize < sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA)) {
+    return NULL;
+  }
+
+  *Count = MIN (
+             (UINTN)ExtraData->Count,
+             (DataSize - sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA)) /
+             sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY)
+             );
+
+  return ExtraData;
+}
+
+/**
+  Locate the launcher's boot-time reservation HOB, if it published one.
+
+  @param[in]  BootloaderParameter  Bootloader-provided argument.
+  @param[out] Count                Entry count, clamped to what the
+                                   HOB's own data size can hold.
+
+  @return  First reservation entry, or NULL if the launcher did not
+           hand over a PEI HOB list carrying the GUID HOB.
+**/
+STATIC
+LOADER_BOOT_TIME_RESERVATION_ENTRY *
+FindBootloaderBootTimeReservationHob (
+  IN  UINTN  BootloaderParameter,
+  OUT UINTN  *Count
+  )
+{
+  EFI_PEI_HOB_POINTERS          BlHob;
+  LOADER_BOOT_TIME_RESERVATION  *BootTimeRes;
+  UINTN                         DataSize;
+
+  *Count = 0;
+
+  BlHob.Raw = (UINT8 *)BootloaderParameter;
+  if ((BlHob.Raw == NULL) ||
+      (BlHob.Header->HobType != EFI_HOB_TYPE_HANDOFF) ||
+      (BlHob.Header->HobLength != sizeof (EFI_HOB_HANDOFF_INFO_TABLE)))
+  {
+    return NULL;
+  }
+
+  BlHob.Raw = GetNextGuidHob (&gLoaderBootTimeReservationGuid, BlHob.Raw);
+  if (BlHob.Raw == NULL) {
+    return NULL;
+  }
+
+  BootTimeRes = (LOADER_BOOT_TIME_RESERVATION *)GET_GUID_HOB_DATA (BlHob.Raw);
+  DataSize    = GET_GUID_HOB_DATA_SIZE (BlHob.Raw);
+  if ((DataSize < sizeof (LOADER_BOOT_TIME_RESERVATION)) ||
+      (BootTimeRes->Revision != 1))
+  {
+    return NULL;
+  }
+
+  *Count = MIN (
+             (UINTN)BootTimeRes->Count,
+             (DataSize - sizeof (LOADER_BOOT_TIME_RESERVATION)) /
+             sizeof (LOADER_BOOT_TIME_RESERVATION_ENTRY)
+             );
+
+  return BootTimeRes->Entry;
+}
+
+/**
+  Locate the payload FV base and size from the bootloader's ExtraData
+  HOB, if it published one.
+
+  @param[in]  BootloaderParameter  Bootloader-provided argument.
+  @param[out] FvBase               ExtraData "uefi_fv" entry base.
+  @param[out] FvSize               ExtraData "uefi_fv" entry size.
+
+  @retval TRUE   The bootloader supplied an ExtraData FV location.
+  @retval FALSE  No usable ExtraData "uefi_fv" entry.
+**/
+STATIC
+BOOLEAN
+FindPayloadFvFromBootloader (
+  IN  UINTN  BootloaderParameter,
+  OUT UINTN  *FvBase,
+  OUT UINTN  *FvSize
+  )
+{
+  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
+  UINTN                         Count;
+  UINTN                         Index;
+
+  Count     = 0;
+  ExtraData = FindBootloaderExtraDataHob (BootloaderParameter, &Count);
+  if (ExtraData == NULL) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < Count; Index++) {
+    if (AsciiStrnCmp (
+          ExtraData->Entry[Index].Identifier,
+          "uefi_fv",
+          sizeof (ExtraData->Entry[Index].Identifier)
+          ) == 0)
+    {
+      if (ExtraData->Entry[Index].Size == 0) {
+        DEBUG ((DEBUG_ERROR, "%a: uefi_fv ExtraData entry has zero size\n", __func__));
+        return FALSE;
+      }
+
+      *FvBase = (UINTN)ExtraData->Entry[Index].Base;
+      *FvSize = (UINTN)ExtraData->Entry[Index].Size;
+
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+  This function will build the HOBs that every payload needs regardless of
+  which bootloader it was launched from: the payload FV reservation and the
+  CPU HOB, plus the Local APIC range on x86.
+
+  @param[in] PayloadFvBase  Base of the payload FV to reserve.
+  @param[in] PayloadFvSize  Size of the payload FV to reserve.
 **/
 VOID
 BuildGenericHob (
-  VOID
+  IN UINTN  PayloadFvBase,
+  IN UINTN  PayloadFvSize
   )
 {
-  UINT8                        PhysicalAddressBits;
+  UINT8  PhysicalAddressBits;
+  UINTN  Index;
+
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
+ #endif
 
   // The UEFI payload FV
-  BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
+  BuildMemoryAllocationHob (PayloadFvBase, PayloadFvSize, EfiBootServicesData);
+
+  //
+  // Pin every launcher boot-time reservation with an
+  // EfiBootServicesData memory-allocation HOB so that DXE never
+  // allocates over the launcher's HOB list, initial stack or (on
+  // AArch64) live translation tables.  The FV was pinned just above,
+  // so the entry naming it is skipped.  A launcher that emitted no
+  // gLoaderBootTimeReservationGuid HOB leaves the count at 0.
+  //
+  for (Index = 0; Index < mBootTimeReservationCount; Index++) {
+    if (mBootTimeReservation[Index].Base == PayloadFvBase) {
+      continue;
+    }
+
+    BuildMemoryAllocationHob (
+      mBootTimeReservation[Index].Base,
+      mBootTimeReservation[Index].Size,
+      EfiBootServicesData
+      );
+    DEBUG ((
+      DEBUG_INFO,
+      "boot-time reservation: base = 0x%lx, size = 0x%lx\n",
+      mBootTimeReservation[Index].Base,
+      mBootTimeReservation[Index].Size
+      ));
+  }
 
   PhysicalAddressBits = ArchGetPhysicalAddressBits ();
   BuildCpuHob (PhysicalAddressBits, 16);
 
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   //
-  // Report Local APIC range, cause sbl HOB to be NULL, comment now
+  // Report Local APIC range (x86-only)
   //
   ResourceAttribute = (
                        EFI_RESOURCE_ATTRIBUTE_PRESENT |
@@ -511,6 +867,7 @@ BuildGenericHob (
                        );
   BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_MAPPED_IO, ResourceAttribute, 0xFEC80000, SIZE_512KB);
   BuildMemoryAllocationHob (0xFEC80000, SIZE_512KB, EfiMemoryMappedIO);
+ #endif
 }
 
 /**
@@ -535,6 +892,12 @@ _ModuleEntryPoint (
   SERIAL_PORT_INFO                    SerialPortInfo;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
   EFI_HOB_HANDOFF_INFO_TABLE          *HobInfo;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA        *ExtraData;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA        *NewExtraData;
+  UINTN                               ExtraDataSize;
+  UINTN                               ExtraDataCount;
+  UINTN                               PayloadFvBase;
+  UINTN                               PayloadFvSize;
 
   Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
   ASSERT_EFI_ERROR (Status);
@@ -542,8 +905,29 @@ _ModuleEntryPoint (
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
 
+  //
+  // Determine the payload FV location. If the bootloader relocated the
+  // FV and published an ExtraData HOB, honour that; otherwise fall back
+  // to the build-time PCD.
+  //
+  if (!FindPayloadFvFromBootloader (BootloaderParameter, &PayloadFvBase, &PayloadFvSize)) {
+    PayloadFvBase = PcdGet32 (PcdPayloadFdMemBase);
+    PayloadFvSize = PcdGet32 (PcdPayloadFdMemSize);
+  }
+
+  //
+  // If the launcher published boot-time reservations, cache them so
+  // FindFreeMemForHobCallback() below excludes those ranges from the
+  // HOB-memory search.  A launcher that did not (Slim Bootloader,
+  // coreboot) leaves the count at 0 and nothing changes.
+  //
+  mBootTimeReservation = FindBootloaderBootTimeReservationHob (
+                           BootloaderParameter,
+                           &mBootTimeReservationCount
+                           );
+
   // HOB region is used for HOB and memory allocation for this module
-  MemBase    = PcdGet32 (PcdPayloadFdMemBase);
+  MemBase    = PayloadFvBase;
   HobMemBase = 0;
 
   //
@@ -553,7 +937,7 @@ _ModuleEntryPoint (
 
   ASSERT (HobMemBase != 0);
   if (HobMemBase == 0) {
-    HobMemBase = ALIGN_VALUE (MemBase + PcdGet32 (PcdPayloadFdMemSize), SIZE_1MB);
+    HobMemBase = ALIGN_VALUE (MemBase + PayloadFvSize, SIZE_1MB);
   }
 
   HobMemTop = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -596,8 +980,39 @@ _ModuleEntryPoint (
     return Status;
   }
 
+  //
+  // Republish the ExtraData HOB in the new HOB list so that DXE-phase
+  // consumers can locate the relocated payload FV.  LoadDxeCore() does
+  // not read it: the FV was resolved once, above.
+  //
+  ExtraDataCount = 0;
+  ExtraData      = FindBootloaderExtraDataHob (BootloaderParameter, &ExtraDataCount);
+  if (ExtraData != NULL) {
+    ExtraDataSize = sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) +
+                    ExtraDataCount * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY);
+    NewExtraData = BuildGuidHob (&gUniversalPayloadExtraDataGuid, ExtraDataSize);
+    ASSERT (NewExtraData != NULL);
+    if (NewExtraData == NULL) {
+      //
+      // Not fatal: the FV was already resolved and reserved.  Only
+      // DXE-phase consumers of the HOB lose out, so say so and go on.
+      //
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: failed to build ExtraData HOB of 0x%x bytes\n",
+        __func__,
+        (UINT32)ExtraDataSize
+        ));
+    } else {
+      CopyMem (NewExtraData, ExtraData, ExtraDataSize);
+      NewExtraData->Count         = (UINT32)ExtraDataCount;
+      NewExtraData->Header.Length = (UINT16)ExtraDataSize;
+      DEBUG ((DEBUG_INFO, "Copied ExtraData HOB with %u entries\n", (UINT32)ExtraDataCount));
+    }
+  }
+
   // Build other HOBs required by DXE
-  BuildGenericHob ();
+  BuildGenericHob (PayloadFvBase, PayloadFvSize);
 
   //
   // Create Memory Type Information HOB
@@ -609,7 +1024,7 @@ _ModuleEntryPoint (
     );
 
   // Load the DXE Core
-  Status = LoadDxeCore (&DxeCoreEntryPoint);
+  Status = LoadDxeCore ((EFI_FIRMWARE_VOLUME_HEADER *)PayloadFvBase, &DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((DEBUG_INFO, "DxeCoreEntryPoint = 0x%lx\n", DxeCoreEntryPoint));
@@ -621,11 +1036,13 @@ _ModuleEntryPoint (
     HobInfo->BootMode = BOOT_ON_FLASH_UPDATE;
   }
 
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   //
   // Mask off all legacy 8259 interrupt sources
   //
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
+ #endif
 
   Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);

@@ -21,6 +21,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "ChainloadApp/EmbeddedPayloadStub.h",
             "Tools/",
             "Include/Coreboot.h",
             "Library/CbParseLib/CbParseLib.c",
@@ -85,7 +86,12 @@
     "SpellCheck": {
         "AuditOnly": True,           # Fails right now with over 270 errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
-        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "ExtendWords": [             # words to extend to the dictionary for this package
+            "lapic",
+            "mcopy",
+            "mmconfig",
+            "tolud"
+        ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
     },

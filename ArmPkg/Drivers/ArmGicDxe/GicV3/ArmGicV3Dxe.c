@@ -39,14 +39,25 @@ STATIC UINTN                       mGicMaxSpiIntId;
 STATIC UINTN                       mGicMaxExtSpiIntId;
 
 /**
- * Return the base address of the GIC redistributor for the current CPU
- *
- * @retval Base address of the associated GIC Redistributor
- */
+  Return the base address of the GIC redistributor for the current CPU.
+
+  @param[in]   GicRedistributorBase  Base address of the first GIC
+                                     redistributor frame in the discovery
+                                     range.
+  @param[out]  Base                  On success, the base address of the GIC
+                                     redistributor associated with the
+                                     current CPU.
+
+  @retval EFI_SUCCESS       The redistributor of the current CPU was found.
+  @retval EFI_DEVICE_ERROR  A redistributor frame could not be mapped.
+  @retval EFI_NOT_FOUND     No redistributor frame matches the affinity of
+                            the current CPU.
+**/
 STATIC
-UINTN
+EFI_STATUS
 GicGetCpuRedistributorBase (
-  IN UINTN  GicRedistributorBase
+  IN  UINTN  GicRedistributorBase,
+  OUT UINTN  *Base
   )
 {
   UINTN       MpId;
@@ -80,14 +91,14 @@ GicGetCpuRedistributorBase (
         GicCpuRedistributorBase,
         Status
         ));
-      ASSERT_EFI_ERROR (Status);
-      return 0;
+      return EFI_DEVICE_ERROR;
     }
 
     TypeRegister = MmioRead64 (GicCpuRedistributorBase + ARM_GICR_TYPER);
     Affinity     = ARM_GICR_TYPER_GET_AFFINITY (TypeRegister);
     if (Affinity == CpuAffinity) {
-      return GicCpuRedistributorBase;
+      *Base = GicCpuRedistributorBase;
+      return EFI_SUCCESS;
     }
 
     // Move to the next GIC Redistributor frame.
@@ -102,8 +113,13 @@ GicGetCpuRedistributorBase (
   } while ((TypeRegister & ARM_GICR_TYPER_LAST) == 0);
 
   // The Redistributor has not been found for the current CPU
-  ASSERT_EFI_ERROR (EFI_NOT_FOUND);
-  return 0;
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: No GICv3 redistributor found for CPU with affinity 0x%lx\n",
+    __func__,
+    (UINT64)CpuAffinity
+    ));
+  return EFI_NOT_FOUND;
 }
 
 typedef enum {
@@ -784,7 +800,13 @@ GicV3DxeInitialize (
     return Status;
   }
 
-  mGicRedistributorBase = GicGetCpuRedistributorBase (PcdGet64 (PcdGicRedistributorsBase));
+  Status = GicGetCpuRedistributorBase (
+             (UINTN)PcdGet64 (PcdGicRedistributorsBase),
+             &mGicRedistributorBase
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   RegValue = ArmGicV3GetControlSystemRegisterEnable ();
   if ((RegValue & ICC_SRE_EL2_SRE) == 0) {
