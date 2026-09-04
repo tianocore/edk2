@@ -30,17 +30,8 @@ MmFoundationEntryRegister (
   IN EFI_MM_ENTRY_POINT                   MmEntryPoint
   );
 
-//
-// On ARM platforms every event is expected to have a GUID associated with
-// it. It will be used by the MM Entry point to find the handler for the
-// event. It will either be populated in a EFI_MM_COMMUNICATE_HEADER by the
-// caller of the event (e.g. MM_COMMUNICATE SMC) or by the CPU driver
-// (e.g. during an asynchronous event). In either case, this context is
-// maintained in single global variable because StandaloneMm is UP-migratable
-// (which means it cannot run concurrently)
-//
-STATIC EFI_MM_COMMUNICATE_HEADER     *mGuidedEventContext = NULL;
-STATIC CONST ARM_MM_HANDLER_CONTEXT  *mMmHandlerContext   = NULL;
+EFI_MM_COMMUNICATE_HEADER  *mGuidedEventContext    = NULL;
+UINT64                     mGuidedEventContextSize = 0;
 
 EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
   0,
@@ -51,7 +42,8 @@ EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  mPiMmCpuDriverEpProtocol = {
   PiMmStandaloneMmCpuDriverEntry
 };
 
-STATIC EFI_MM_ENTRY_POINT  mMmEntryPoint = NULL;
+STATIC EFI_MM_ENTRY_POINT            mMmEntryPoint      = NULL;
+STATIC CONST ARM_MM_HANDLER_CONTEXT  *mMmHandlerContext = NULL;
 
 /**
   The PI Standalone MM entry point for the CPU driver.
@@ -76,6 +68,8 @@ PiMmStandaloneMmCpuDriverEntry (
   UINTN                 CommBufferSize;
 
   Status = EFI_SUCCESS;
+
+  ASSERT (mGuidedEventContext != NULL);
 
   // Perform parameter validation.
   if ((MmHandlerContext == NULL) || (CommBufferAddr == (UINTN)NULL)) {
@@ -104,18 +98,6 @@ PiMmStandaloneMmCpuDriverEntry (
 
   // Now that the secure world can see the normal world buffer, allocate
   // memory to copy the communication buffer to the secure world.
-  Status = mMmst->MmAllocatePool (
-                    EfiRuntimeServicesData,
-                    CommBufferSize,
-                    (VOID **)&mGuidedEventContext
-                    );
-
-  if (EFI_ERROR (Status)) {
-    mGuidedEventContext = NULL;
-    DEBUG ((DEBUG_ERROR, "%a: Mem alloc failed\n", __func__));
-    return Status;
-  }
-
   CopyMem (mGuidedEventContext, (CONST VOID *)CommBufferAddr, CommBufferSize);
   mMmHandlerContext = MmHandlerContext;
 
@@ -136,11 +118,10 @@ PiMmStandaloneMmCpuDriverEntry (
 
   // Free the memory allocation done earlier and reset the per-cpu context
   CopyMem ((VOID *)CommBufferAddr, (CONST VOID *)mGuidedEventContext, CommBufferSize);
+  ZeroMem (mGuidedEventContext, mGuidedEventContextSize);
 
-  Status = mMmst->MmFreePool ((VOID *)mGuidedEventContext);
   ASSERT_EFI_ERROR (Status);
-  mGuidedEventContext = NULL;
-  mMmHandlerContext   = NULL;
+  mMmHandlerContext = NULL;
 
   return Status;
 }
