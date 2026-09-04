@@ -98,7 +98,11 @@ ExtractFileNameFromDevicePath (
 
   ASSERT (DevicePath != NULL);
 
-  String      = DevicePathToStr (DevicePath);
+  String = DevicePathToStr (DevicePath);
+  if (String == NULL) {
+    return NULL;
+  }
+
   MatchString = String;
   LastMatch   = String;
   FileName    = NULL;
