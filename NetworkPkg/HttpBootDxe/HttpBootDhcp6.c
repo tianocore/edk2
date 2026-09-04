@@ -1067,10 +1067,18 @@ HttpBootDhcp6Sarr (
   Config.IaDescriptor.IaId     = Random;
   Config.IaDescriptor.Type     = EFI_DHCP6_IA_TYPE_NA;
   Config.SolicitRetransmission = Retransmit;
-  Retransmit->Irt              = 4;
-  Retransmit->Mrc              = 4;
-  Retransmit->Mrt              = 32;
-  Retransmit->Mrd              = 60;
+  Retransmit->Irt              = PcdGet32 (PcdHttpBootDhcp6SolicitInitialRetransmissionTime);
+  Retransmit->Mrc              = PcdGet32 (PcdHttpBootDhcp6SolicitMaximumRetransmissionCount);
+  Retransmit->Mrt              = PcdGet32 (PcdHttpBootDhcp6SolicitMaximumRetransmissionTime);
+  Retransmit->Mrd              = PcdGet32 (PcdHttpBootDhcp6SolicitMaximumRetransmissionDuration);
+
+  //
+  // The EFI_DHCP6_PROTOCOL requires at least one retransmission limit.
+  //
+  if ((Retransmit->Mrc == 0) && (Retransmit->Mrd == 0)) {
+    FreePool (Retransmit);
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Configure the DHCPv6 instance for HTTP boot.
