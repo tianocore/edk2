@@ -730,7 +730,7 @@ EFI_STATUS
   device path. If there is an exact match, the mapping is returned and *DevicePath
   points to the end-of-device-path node.
 
-  If there are multiple map names they will be semi-colon seperated in the
+  If there are multiple map names they will be semi-colon separated in the
   NULL-terminated string.
 
   @param[in, out] DevicePath     On entry, points to a device path pointer. On

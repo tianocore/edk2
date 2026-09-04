@@ -45,7 +45,7 @@ WifiMgrInternalEmptyFunction (
 }
 
 /**
-  Convert the mac address into a hexadecimal encoded ":" seperated string.
+  Convert the mac address into a hexadecimal encoded ":" separated string.
 
   @param[in]  Mac     The mac address.
   @param[in]  StrSize The size, in bytes, of the output buffer specified by Str.

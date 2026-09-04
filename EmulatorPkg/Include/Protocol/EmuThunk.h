@@ -175,7 +175,7 @@ VOID
   Enumerates the current set of protocol instances that abstract OS services from EFI.
 
   A given protocol can have multiple instances. Usually a protocol is configured via a
-  single PCD string. The data associated for each instance is seperated via a ! in the string.
+  single PCD string. The data associated for each instance is separated via a ! in the string.
   EMU_IO_THUNK_PROTOCOL_CLOSE.ConfigString will contain the information in the PCD string up to the next !.
   Thus each instance has a unique ConfigString.
 
