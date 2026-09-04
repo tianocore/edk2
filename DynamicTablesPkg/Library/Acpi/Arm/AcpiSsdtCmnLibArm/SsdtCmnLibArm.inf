@@ -1,25 +1,25 @@
 ## @file
-# Ssdt CMN-600 Table Generator
+# Ssdt CMN Table Generator
 #
-#  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
   INF_VERSION    = 0x0001001B
-  BASE_NAME      = SsdtCmn600LibArm
+  BASE_NAME      = SsdtCmnLibArm
   FILE_GUID      = CEDB450D-8F0E-4ACC-8FB7-F72EC7D216A4
   VERSION_STRING = 1.0
   MODULE_TYPE    = DXE_DRIVER
   LIBRARY_CLASS  = NULL|DXE_DRIVER
-  CONSTRUCTOR    = AcpiSsdtCmn600LibConstructor
-  DESTRUCTOR     = AcpiSsdtCmn600LibDestructor
+  CONSTRUCTOR    = AcpiSsdtCmnLibConstructor
+  DESTRUCTOR     = AcpiSsdtCmnLibDestructor
 
 [Sources]
-  SsdtCmn600Generator.c
-  SsdtCmn600Generator.h
-  SsdtCmn600Template.asl
+  SsdtCmnGenerator.c
+  SsdtCmnGenerator.h
+  SsdtCmnTemplate.asl
 
 [Packages]
   MdePkg/MdePkg.dec

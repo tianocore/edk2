@@ -47,7 +47,50 @@ None
 
 #### edk2-stable202611: Changes without Removal
 
-None
+##### Breaking Change: Generalize the CMN SSDT generator
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13060](https://github.com/tianocore/edk2/issues/13060)
+- **Pull Request**: [tianocore/edk2#13019](https://github.com/tianocore/edk2/pull/13019)
+- **Type**: Source-Level (Non-removal) - Public identifier rename,
+  structure layout change, and library path rename
+
+**What changed**: The CMN-600-specific Dynamic Tables interfaces and
+generator were generalized to support CMN-600, CMN-650, CMN-700 and
+CMN-S3. The Configuration Manager object, table-generator ID, structure,
+generator symbols and library paths now use generic CMN terminology.
+The generic CMN information structure also identifies the CMN
+implementation and describes the optional ROOT resource length.
+
+**Why it changed**: The existing generator names and interfaces implied
+that only CMN-600 was supported. Generalizing them allows one generator
+to describe multiple CMN implementations while retaining the existing
+CMN-600 table-generation behaviour.
+
+**What replaces it**:
+
+- `EStdAcpiTableIdSsdtCmn600` is replaced by
+  `EStdAcpiTableIdSsdtCmn`.
+- `EArmObjCmn600Info` is replaced by `EArmObjCmnInfo`.
+- `CM_ARM_CMN_600_INFO` is replaced by `CM_ARM_CMN_INFO`.
+- The `AcpiSsdtCmn600LibArm` generator is replaced by
+  `AcpiSsdtCmnLibArm`.
+
+**How to migrate**: Replace the CMN-600-specific identifiers, structure
+name, generator symbols and library paths with their generic CMN
+equivalents. Initialize `CmnType` to the appropriate `ARM_CMN_TYPE`.
+For an existing CMN-600 description, set `CmnType` to
+`ArmCmnType600` and `RootNodeBaseAddressLength` to the CMN-600 ROOT
+region length. For CMN implementations without a separate ROOT
+resource, set `RootNodeBaseAddress` and `RootNodeBaseAddressLength`
+to zero.
+
+**Breaking conditions**: This affects out-of-tree platforms that consume
+the CMN-600 Dynamic Tables Configuration Manager object or reference the
+CMN-600 generator library path. No consumer was found in the current
+edk2-platforms repository.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
 
 ### edk2-stable202611: Behavioral Breaking Changes
 

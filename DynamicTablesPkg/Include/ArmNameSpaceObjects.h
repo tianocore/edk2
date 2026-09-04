@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -47,7 +47,7 @@ typedef enum ArmObjectID {
   EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
   EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
-  EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
+  EArmObjCmnInfo,                                              ///< 20 - CMN Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
@@ -663,37 +663,48 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
-/** A structure that describes the CMN-600 hardware.
+/** CMN implementation types. */
+typedef enum ArmCmnType {
+  ArmCmnType600,
+  ArmCmnType650,
+  ArmCmnType700,
+  ArmCmnTypeS3,
+  ArmCmnTypeMax
+} ARM_CMN_TYPE;
 
-    ID: EArmObjCmn600Info
+/** A structure that describes CMN hardware.
+
+    ID: EArmObjCmnInfo
 */
-typedef struct CmArmCmn600Info {
+typedef struct CmArmCmnInfo {
   /// The PERIPHBASE address.
   /// Corresponds to the Configuration Node Region (CFGR) base address.
-  UINT64    PeriphBaseAddress;
+  UINT64                       PeriphBaseAddress;
 
   /// The PERIPHBASE address length.
   /// Corresponds to the CFGR base address length.
-  UINT64    PeriphBaseAddressLength;
+  UINT64                       PeriphBaseAddressLength;
 
   /// The ROOTNODEBASE address.
   /// Corresponds to the Root node (ROOT) base address.
-  UINT64    RootNodeBaseAddress;
+  /// Required only for CMN-600; must be zero for other CMN types.
+  UINT64                       RootNodeBaseAddress;
 
-  /// The Debug and Trace Logic Controller (DTC) count.
-  /// CMN-600 can have maximum 4 DTCs.
-  UINT8     DtcCount;
+  /// Number of Debug and Trace Logic Controller interrupts.
+  /// A maximum of four DTC interrupts can be described.
+  UINT8                        DtcCount;
 
-  /// DTC Interrupt list.
-  /// The first interrupt resource descriptor pertains to
-  /// DTC[0], the second to DTC[1] and so on.
-  /// DtcCount determines the number of DTC Interrupts that
-  /// are populated. If DTC count is 2 then DtcInterrupt[2]
-  /// and DtcInterrupt[3] are ignored.
-  /// Note: The size of CM_ARM_CMN_600_INFO structure remains
-  /// constant and does not vary with the DTC count.
+  /// DTC interrupt descriptors.
+  /// Entries must be ordered by increasing hardware-assigned DTC Logical ID.
+  /// DtcCount determines the number of valid entries.
   CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
-} CM_ARM_CMN_600_INFO;
+
+  /// CMN implementation type.
+  ARM_CMN_TYPE                 CmnType;
+
+  /// Length of the optional root-node region. Zero means no ROOT resource.
+  UINT64                       RootNodeBaseAddressLength;
+} CM_ARM_CMN_INFO;
 
 /** A structure that describes the DMC620 PMU hardware
     registers and interrupt.
