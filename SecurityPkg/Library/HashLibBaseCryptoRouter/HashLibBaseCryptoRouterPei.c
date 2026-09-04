@@ -106,7 +106,10 @@ CheckSupportedHashMaskMismatch (
   HASH_INTERFACE_HOB  *HashInterfaceHobLast;
 
   HashInterfaceHobLast = InternalGetHashInterfaceHob (&gZeroGuid);
-  ASSERT (HashInterfaceHobLast != NULL);
+  if (HashInterfaceHobLast == NULL) {
+    ASSERT (HashInterfaceHobLast != NULL);
+    return;
+  }
 
   if ((HashInterfaceHobLast->SupportedHashMask != 0) &&
       (HashInterfaceHobCurrent->SupportedHashMask != HashInterfaceHobLast->SupportedHashMask))
@@ -152,7 +155,10 @@ HashStart (
   CheckSupportedHashMaskMismatch (HashInterfaceHob);
 
   HashCtx = AllocatePool (sizeof (*HashCtx) * HashInterfaceHob->HashInterfaceCount);
-  ASSERT (HashCtx != NULL);
+  if (HashCtx == NULL) {
+    ASSERT (HashCtx != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   for (Index = 0; Index < HashInterfaceHob->HashInterfaceCount; Index++) {
     HashMask = Tpm2GetHashMaskFromGuid (&HashInterfaceHob->HashInterface[Index].HashGuid);
