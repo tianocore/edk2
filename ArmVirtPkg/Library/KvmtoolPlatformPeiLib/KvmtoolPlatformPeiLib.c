@@ -19,6 +19,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 
 /** Initialise Platform HOBs
 
@@ -82,6 +83,13 @@ PlatformPeim (
     ASSERT (0);
     return (EFI_STATUS)RetStatus;
   }
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. If no fw_cfg
+  // selector is present (or fw_cfg is not available on this platform), no HOB
+  // is produced and the memory protection PCDs are used as a fallback.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
 
   return EFI_SUCCESS;
 }

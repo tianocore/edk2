@@ -57,6 +57,7 @@
   ResourcePublicationLib
   PeiServicesLib
   PeimEntryPoint
+  PlatformMemoryProtectionLib
   QemuFwCfgS3Lib
   MtrrLib
   MemEncryptSevLib

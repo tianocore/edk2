@@ -253,8 +253,8 @@ DebugExceptionHandler (
   UINTN  PFEntry;
 
   if (!mSmmProfileStart &&
-      !HEAP_GUARD_NONSTOP_MODE &&
-      !NULL_DETECTION_NONSTOP_MODE)
+      !gMmMps.HeapGuardPolicy.Fields.NonStopMode &&
+      !gMmMps.NullDetectionNonStopMode)
   {
     return;
   }
@@ -619,7 +619,7 @@ SmmProfileUpdateMemoryAttributes (
   //
   // [0, 4k] may be non-present.
   //
-  PreviousAddress = ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
+  PreviousAddress = (gMmMps.NullPointerDetectionPolicy) ? BASE_4KB : 0;
 
   for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
     MemoryAttrMask = 0;
@@ -1049,8 +1049,8 @@ InitSmmProfile (
   // Skip SMM profile initialization if feature is disabled
   //
   if (!mSmmProfileEnabled &&
-      !HEAP_GUARD_NONSTOP_MODE &&
-      !NULL_DETECTION_NONSTOP_MODE)
+      !gMmMps.HeapGuardPolicy.Fields.NonStopMode &&
+      !gMmMps.NullDetectionNonStopMode)
   {
     return;
   }

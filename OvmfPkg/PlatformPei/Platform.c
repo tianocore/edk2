@@ -26,6 +26,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
@@ -358,7 +359,23 @@ InitializePlatform (
   EFI_STATUS             Status;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+
   PlatformInfoHob = BuildPlatformInfoHob ();
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. This must run
+  // after the PlatformInfo HOB is built, because the PEI fw_cfg library keeps
+  // its availability state inside that HOB.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
+
+  //
+  // On platforms that use traditional SMM or Standalone MM, also build the MM
+  // memory protection settings HOB from the same fw_cfg selector.
+  //
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    PlatformBuildMmMemoryProtectionSettingsHob ();
+  }
 
   if (TdIsEnabled ()) {
     TdxHelperBuildGuidHobForTdxMeasurement ();

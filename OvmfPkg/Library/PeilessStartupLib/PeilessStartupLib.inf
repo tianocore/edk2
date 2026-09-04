@@ -58,6 +58,7 @@
   QemuFwCfgSimpleParserLib
   PlatformInitLib
   MemDebugLogLib
+  PlatformMemoryProtectionLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
