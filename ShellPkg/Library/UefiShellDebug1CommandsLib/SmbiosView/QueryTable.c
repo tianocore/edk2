@@ -2901,6 +2901,10 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     MemoryTypeMrDimm,
     L"  MRDIMM (Multi-Channel RDIMM)"
+  },
+  {
+    MemoryTypeLpddr6,
+    L"  LPDDR6"
   }
 };
 
