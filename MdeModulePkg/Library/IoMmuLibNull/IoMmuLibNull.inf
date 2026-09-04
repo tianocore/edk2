@@ -1,0 +1,25 @@
+## @file
+#  IoMmuLibNull - NULL instance of IoMmuLib for platforms without an IOMMU.
+#
+#  Copyright (c) Microsoft Corporation.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001E
+  BASE_NAME                      = IoMmuLibNull
+  FILE_GUID                      = 743616a1-4fe5-41c2-9534-e222f6f61081
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IoMmuLib
+
+[Sources]
+  IoMmuLibNull.c
+
+[LibraryClasses]
+  BaseLib
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
