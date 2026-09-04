@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Driver provides the IOMMU Absent protcol support
+#  for PciHostBridgeIo and others drivers for
+#  guest VMs for which confidential computing support
+#  has not yet been enabled.
+#
+#  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = IoMmuAbsentDxe
+  FILE_GUID                      = 00b68c72-1ae5-49ee-ae28-47a307367b93
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IoMmuAbsentDxeEntryPoint
+
+[Sources.RISCV64, Sources.LOONGARCH64]
+  IoMmuAbsentDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses.common]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gIoMmuAbsentProtocolGuid                    ## SOMETIME_PRODUCES
+
+[Depex]
+  TRUE

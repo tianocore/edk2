@@ -203,6 +203,8 @@ QemuFwCfgInitialize (
           InternalQemuFwCfgWriteBytes = DmaWriteBytes;
           InternalQemuFwCfgSkipBytes  = DmaSkipBytes;
         }
+
+        InternalInitIoMmu ();
       }
     } else {
       mFwCfgSelectorAddress = 0;
