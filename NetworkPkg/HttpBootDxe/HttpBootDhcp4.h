@@ -164,7 +164,7 @@ typedef union {
    sizeof (EFI_DHCP4_PACKET_OPTION) + (Opt)->Length - 1)
 
 #define GET_OPTION_BUFFER_LEN(Pkt) \
-  ((Pkt)->Length - sizeof (EFI_DHCP4_HEADER) - 4)
+  ((Pkt)->Length - sizeof (EFI_DHCP4_HEADER) - sizeof ((Pkt)->Dhcp4.Magik))
 
 #define DEFAULT_CLASS_ID_DATA  "HTTPClient:Arch:xxxxx:UNDI:003000"
 #define DEFAULT_UNDI_TYPE      1
