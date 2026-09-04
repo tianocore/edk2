@@ -1,9 +1,12 @@
 /** @file
   TPM2.0 Specification data structures
   (Trusted Platform Module Library Specification, Family "2.0", Level 00, Revision 00.96,
-  @http://www.trustedcomputinggroup.org/resources/tpm_library_specification)
+  @https://trustedcomputinggroup.org/resource/tpm-library-specification/)
 
-  Check http://trustedcomputinggroup.org for latest specification updates.
+  (Trusted Computing Group Algorithm Registry, Version 2.0,
+  @https://trustedcomputinggroup.org/resource/tcg-algorithm-registry/)
+
+  Check https://trustedcomputinggroup.org for latest specification updates.
 
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -165,6 +168,7 @@ typedef UINT16 TPM_ALG_ID;
 #define TPM_ALG_ERROR  (TPM_ALG_ID)(0x0000)
 #define TPM_ALG_FIRST  (TPM_ALG_ID)(0x0001)
 // #define TPM_ALG_RSA            (TPM_ALG_ID)(0x0001)
+#define TPM_ALG_TDES  (TPM_ALG_ID)(0x0003)
 // #define TPM_ALG_SHA            (TPM_ALG_ID)(0x0004)
 #define TPM_ALG_SHA1  (TPM_ALG_ID)(0x0004)
 // #define TPM_ALG_HMAC           (TPM_ALG_ID)(0x0005)
@@ -175,6 +179,7 @@ typedef UINT16 TPM_ALG_ID;
 #define TPM_ALG_SHA256          (TPM_ALG_ID)(0x000B)
 #define TPM_ALG_SHA384          (TPM_ALG_ID)(0x000C)
 #define TPM_ALG_SHA512          (TPM_ALG_ID)(0x000D)
+#define TPM_ALG_SHA256_192      (TPM_ALG_ID)(0x000E)
 #define TPM_ALG_NULL            (TPM_ALG_ID)(0x0010)
 #define TPM_ALG_SM3_256         (TPM_ALG_ID)(0x0012)
 #define TPM_ALG_SM4             (TPM_ALG_ID)(0x0013)
@@ -188,17 +193,55 @@ typedef UINT16 TPM_ALG_ID;
 #define TPM_ALG_SM2             (TPM_ALG_ID)(0x001B)
 #define TPM_ALG_ECSCHNORR       (TPM_ALG_ID)(0x001C)
 #define TPM_ALG_ECMQV           (TPM_ALG_ID)(0x001D)
+#define TPM_ALG_HKDF            (TPM_ALG_ID)(0x001F)
 #define TPM_ALG_KDF1_SP800_56a  (TPM_ALG_ID)(0x0020)
 #define TPM_ALG_KDF2            (TPM_ALG_ID)(0x0021)
 #define TPM_ALG_KDF1_SP800_108  (TPM_ALG_ID)(0x0022)
 #define TPM_ALG_ECC             (TPM_ALG_ID)(0x0023)
 #define TPM_ALG_SYMCIPHER       (TPM_ALG_ID)(0x0025)
+#define TPM_ALG_CAMELLIA        (TPM_ALG_ID)(0x0026)
+#define TPM_ALG_SHA3_256        (TPM_ALG_ID)(0x0027)
+#define TPM_ALG_SHA3_384        (TPM_ALG_ID)(0x0028)
+#define TPM_ALG_SHA3_512        (TPM_ALG_ID)(0x0029)
+#define TPM_ALG_SHAKE128        (TPM_ALG_ID)(0x002A)
+#define TPM_ALG_SHAKE256        (TPM_ALG_ID)(0x002B)
+#define TPM_ALG_SHAKE256_192    (TPM_ALG_ID)(0x002C)
+#define TPM_ALG_SHAKE256_256    (TPM_ALG_ID)(0x002D)
+#define TPM_ALG_SHAKE256_512    (TPM_ALG_ID)(0x002E)
+#define TPM_ALG_CMAC            (TPM_ALG_ID)(0x003F)
 #define TPM_ALG_CTR             (TPM_ALG_ID)(0x0040)
 #define TPM_ALG_OFB             (TPM_ALG_ID)(0x0041)
 #define TPM_ALG_CBC             (TPM_ALG_ID)(0x0042)
 #define TPM_ALG_CFB             (TPM_ALG_ID)(0x0043)
 #define TPM_ALG_ECB             (TPM_ALG_ID)(0x0044)
-#define TPM_ALG_LAST            (TPM_ALG_ID)(0x0044)
+#define TPM_ALG_CCM             (TPM_ALG_ID)(0x0050)
+#define TPM_ALG_GCM             (TPM_ALG_ID)(0x0051)
+#define TPM_ALG_KW              (TPM_ALG_ID)(0x0052)
+#define TPM_ALG_KWP             (TPM_ALG_ID)(0x0053)
+#define TPM_ALG_EAX             (TPM_ALG_ID)(0x0054)
+#define TPM_ALG_EDDSA           (TPM_ALG_ID)(0x0060)
+#define TPM_ALG_HASH_EDDSA      (TPM_ALG_ID)(0x0061)
+#define TPM_ALG_RSASVE_KEM      (TPM_ALG_ID)(0x0062)
+#define TPM_ALG_ECDH_KEM        (TPM_ALG_ID)(0x0063)
+#define TPM_ALG_LMS             (TPM_ALG_ID)(0x0070)
+#define TPM_ALG_XMSS            (TPM_ALG_ID)(0x0071)
+#define TPM_ALG_LMOTS           (TPM_ALG_ID)(0x0072)
+#define TPM_ALG_WOTSP           (TPM_ALG_ID)(0x0073)
+#define TPM_ALG_KEYEDXOF        (TPM_ALG_ID)(0x0080)
+#define TPM_ALG_KMACXOF128      (TPM_ALG_ID)(0x0081)
+#define TPM_ALG_KMACXOF256      (TPM_ALG_ID)(0x0082)
+#define TPM_ALG_KMAC128         (TPM_ALG_ID)(0x0090)
+#define TPM_ALG_KMAC256         (TPM_ALG_ID)(0x0091)
+#define TPM_ALG_MLKEM           (TPM_ALG_ID)(0x00A0)
+#define TPM_ALG_MLDSA           (TPM_ALG_ID)(0x00A1)
+#define TPM_ALG_HASH_MLDSA      (TPM_ALG_ID)(0x00A2)
+#define TPM_ALG_SLHDSA          (TPM_ALG_ID)(0x00A3)
+#define TPM_ALG_HASH_SLHDSA     (TPM_ALG_ID)(0x00A4)
+#define TPM_ALG_ASCON_AEAD      (TPM_ALG_ID)(0x00B0)
+#define TPM_ALG_ASCON_HASH256   (TPM_ALG_ID)(0x00B1)
+#define TPM_ALG_ASCON_XOF128    (TPM_ALG_ID)(0x00B2)
+#define TPM_ALG_ASCON_CXOF128   (TPM_ALG_ID)(0x00B3)
+#define TPM_ALG_LAST            (TPM_ALG_ID)(0x00B3)
 
 // Table 8 - TPM_ECC_CURVE Constants
 typedef UINT16 TPM_ECC_CURVE;
