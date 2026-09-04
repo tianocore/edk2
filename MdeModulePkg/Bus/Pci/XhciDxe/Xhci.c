@@ -1072,6 +1072,21 @@ XhcControlTransfer (
         // Default to use AlternateSetting 0 for all interfaces.
         //
         Xhc->UsbDevContext[SlotId].ActiveAlternateSetting = AllocateZeroPool (Xhc->UsbDevContext[SlotId].ConfDesc[Index]->NumInterfaces * sizeof (UINT8));
+      } else if (*DataLength == 8) {
+        //
+        // Allow the initial 8-byte probe issued by UsbGetOneConfig() to read
+        // TotalLength. To distinguish the valid initial probe request from an invalid
+        // descriptor transfer, explicitly allow the 8-byte request used to
+        // retrieve TotalLength and report an error for any other size mismatch.
+        //
+      } else {
+        //
+        // Descriptor length mismatch on the full-length request indicating corrupt descriptor,
+        // treat as ERROR
+        DEBUG ((DEBUG_ERROR, "XHCI: Invalid configuration descriptor length: received %u, expected %u\n", (UINT32)*DataLength, (UINT32)((UINT16 *)Data)[1]));
+        Status          = EFI_DEVICE_ERROR;
+        *TransferResult = EFI_USB_ERR_SYSTEM;
+        goto ON_EXIT;
       }
     } else if (((DescriptorType == USB_DESC_TYPE_HUB) ||
                 (DescriptorType == USB_DESC_TYPE_HUB_SUPER_SPEED)) && (*DataLength > 2))
@@ -1106,6 +1121,12 @@ XhcControlTransfer (
     // Hook Set_Config request from UsbBus as we need configure device endpoint.
     //
     for (Index = 0; Index < Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations; Index++) {
+      if (Xhc->UsbDevContext[SlotId].ConfDesc[Index] == NULL) {
+        // ConfDesc[Index] is NULL because GET_DESCRIPTOR failed with mismatch size.
+        DEBUG ((DEBUG_ERROR, "XhcControlTransfer: ConfDesc[%d] is NULL\n", Index));
+        continue;
+      }
+
       if (Xhc->UsbDevContext[SlotId].ConfDesc[Index]->ConfigurationValue == (UINT8)Request->Value) {
         if (Xhc->HcCParams.Data.Csz == 0) {
           Status = XhcSetConfigCmd (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Index]);
