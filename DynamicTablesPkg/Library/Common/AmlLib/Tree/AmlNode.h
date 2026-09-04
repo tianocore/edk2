@@ -36,6 +36,7 @@ AmlCreateRootNode (
   @param  [in]  AmlByteEncoding   Byte encoding entry.
   @param  [in]  PkgLength         PkgLength of the node if the AmlByteEncoding
                                   has the PkgLen attribute.
+                                  Must be less than 2^28.
                                   0 otherwise.
   @param  [out] NewObjectNodePtr  If success, contains the created
                                   AML_OBJECT_NODE.

@@ -1,0 +1,32 @@
+## @file
+# SSDT Generic Event Device Generator
+#
+# Copyright (c) 2026, ARM Limited. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtGedLib
+  FILE_GUID      = 9da14e0d-5891-4ac7-b215-d711d0322b48
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtGedLibConstructor
+  DESTRUCTOR     = AcpiSsdtGedLibDestructor
+
+[Sources]
+  SsdtGedGenerator.c
+  SsdtGedGenerator.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AmlLib
+  BaseLib
+  MemoryAllocationLib
+  PrintLib
+  TableHelperLib
