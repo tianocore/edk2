@@ -17,8 +17,7 @@
   FILE_GUID                      = 31479AFD-B06F-4E4A-863B-A8F7E7710778
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EmuThunkLib
-
+  LIBRARY_CLASS                  = EmuThunkLib|DXE_CORE DXE_RUNTIME_DRIVER DXE_DRIVER UEFI_DRIVER
   CONSTRUCTOR                    = DxeEmuLibConstructor
 
 

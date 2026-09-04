@@ -54,6 +54,7 @@
   HobPrintLib
   ImagePropertiesRecordLib
   PerformanceLib
+  SafeIntLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister

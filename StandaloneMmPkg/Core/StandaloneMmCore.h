@@ -47,6 +47,7 @@
 #include <Library/StandaloneMmMemLib.h>
 #include <Library/HobLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/SafeIntLib.h>
 
 #include "StandaloneMmCorePrivateData.h"
 

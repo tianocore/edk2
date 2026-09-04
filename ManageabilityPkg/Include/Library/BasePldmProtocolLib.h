@@ -19,6 +19,7 @@
   @retval EFI_INVALID_PARAMETER  The terminus is set unsuccessfully.
 **/
 EFI_STATUS
+EFIAPI
 PldmSetTerminus (
   IN  UINT8  SourceId,
   IN  UINT8  DestinationId
@@ -44,6 +45,7 @@ PldmSetTerminus (
   @retval EFI_OUT_OF_RESOURCES   The resource allocation is out of resource or data size error.
 **/
 EFI_STATUS
+EFIAPI
 PldmSubmitCommand (
   IN     UINT8   PldmType,
   IN     UINT8   Command,
