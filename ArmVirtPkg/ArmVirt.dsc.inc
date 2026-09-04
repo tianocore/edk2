@@ -522,7 +522,7 @@ DEFINE FD_SIZE_IN_MB    = 3
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV2DepexLib.inf
   }
-  ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf {
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV3DepexLib.inf
   }
