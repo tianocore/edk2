@@ -783,6 +783,7 @@ PreparePciDisplayDevicePath (
   DevicePath = GopDevicePath;
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }
