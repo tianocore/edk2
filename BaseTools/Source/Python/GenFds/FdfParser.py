@@ -484,6 +484,148 @@ class FdfParser:
         elif len(ItemList) > 0:
             self._CurSection = [ItemList[0], 'DUMMY', TAB_COMMON]
 
+    def _IsTokenAtStartOfLine(self):
+        TokenStart = self.CurrentOffsetWithinLine - len(self._Token)
+        return not "".join(self._CurrentLine()[:TokenStart]).strip()
+
+    def _GetPreprocessorMacroValue(self, Macro, LocalMacroDict = None):
+        if LocalMacroDict is None:
+            return self._GetMacroValue(Macro)
+
+        MacroValue = GlobalData.gPlatformDefines.get(Macro)
+        CommonMacros = LocalMacroDict.get((TAB_COMMON, TAB_COMMON, TAB_COMMON))
+        if CommonMacros and Macro in CommonMacros:
+            MacroValue = CommonMacros[Macro]
+        SectionMacros = LocalMacroDict.get(tuple(self._CurSection))
+        if SectionMacros and Macro in SectionMacros:
+            MacroValue = SectionMacros[Macro]
+        if Macro in GlobalData.gGlobalDefines:
+            MacroValue = GlobalData.gGlobalDefines[Macro]
+        if Macro in GlobalData.gCommandLineDefines:
+            MacroValue = GlobalData.gCommandLineDefines[Macro]
+        return MacroValue
+
+    @staticmethod
+    def _MergeConditionalMacroDict(TargetMacroDict, SourceMacroDict):
+        for Scope, Macros in SourceMacroDict.items():
+            TargetMacroDict.setdefault(Scope, {}).update(Macros)
+
+    @staticmethod
+    def _GetConditionalMacroDict(MacroDict, IfList):
+        ConditionalMacroDict = {
+            Scope: Macros.copy() for Scope, Macros in MacroDict.items()
+        }
+        for Item in IfList:
+            FdfParser._MergeConditionalMacroDict(ConditionalMacroDict, Item[3])
+        return ConditionalMacroDict
+
+    def _ExpandPreprocessorMacros(
+        self,
+        Text,
+        LocalMacroDict = None,
+        RequireDefined = False,
+    ):
+        ResolvedMacros = {}
+        ActiveMacros = set()
+        ExpansionStack = [[None, Text, 0]]
+
+        while ExpansionStack:
+            Macro, ExpandedText, PreIndex = ExpansionStack[-1]
+            StartPos = ExpandedText.find('$(', PreIndex)
+            EndPos = ExpandedText.find(')', StartPos + 2)
+            if StartPos == -1 or EndPos == -1:
+                ExpansionStack.pop()
+                if Macro is None:
+                    return ExpandedText
+                ActiveMacros.remove(Macro)
+                ResolvedMacros[Macro] = ExpandedText
+                continue
+
+            NestedMacro = ExpandedText[StartPos + 2:EndPos]
+            if NestedMacro in ResolvedMacros:
+                MacroValue = ResolvedMacros[NestedMacro]
+                ExpansionStack[-1][1] = (
+                    ExpandedText[:StartPos] + MacroValue + ExpandedText[EndPos + 1:]
+                )
+                ExpansionStack[-1][2] = StartPos + len(MacroValue)
+                continue
+
+            MacroValue = self._GetPreprocessorMacroValue(NestedMacro, LocalMacroDict)
+            if MacroValue is None:
+                if RequireDefined:
+                    raise Warning(
+                        "The Macro %s is not defined" % NestedMacro,
+                        self.FileName,
+                        self.CurrentLineNumber,
+                    )
+                ExpansionStack[-1][2] = EndPos + 1
+                continue
+
+            if NestedMacro in ActiveMacros:
+                raise Warning(
+                    "Cyclic macro expansion",
+                    self.FileName,
+                    self.CurrentLineNumber,
+                )
+            ActiveMacros.add(NestedMacro)
+            ExpansionStack.append([NestedMacro, MacroValue, 0])
+
+        return Text
+
+    def _RejectMacroGeneratedDirective(self, LocalMacroDict = None):
+        OriginalLine = "".join(self._CurrentLine())
+        ExpandedLine = self._ExpandPreprocessorMacros(OriginalLine, LocalMacroDict)
+
+        OriginalTokens = OriginalLine.lstrip().split(maxsplit=1)
+        ExpandedTokens = ExpandedLine.lstrip().split(maxsplit=1)
+        OriginalToken = OriginalTokens[0].lower() if OriginalTokens else ''
+        ExpandedToken = ExpandedTokens[0].lower() if ExpandedTokens else ''
+        Directives = {
+            TAB_DEFINE.lower(),
+            'set',
+            TAB_INCLUDE,
+            TAB_IF,
+            TAB_IF_DEF,
+            TAB_IF_N_DEF,
+            TAB_ELSE_IF,
+            TAB_ELSE,
+            TAB_END_IF,
+            TAB_ERROR.lower(),
+        }
+        OriginalIsDirective = (
+            OriginalToken.startswith(TAB_SECTION_START) or OriginalToken in Directives
+        )
+        ExpandedIsDirective = (
+            ExpandedToken.startswith(TAB_SECTION_START) or ExpandedToken in Directives
+        )
+        if not OriginalIsDirective and ExpandedIsDirective:
+            raise Warning(
+                "macro expansion cannot generate a section header or preprocessing directive",
+                self.FileName,
+                self.CurrentLineNumber,
+            )
+
+    def _TryParseSectionHeader(self):
+        if (
+            not self._Token.startswith(TAB_SECTION_START)
+            or not self._IsTokenAtStartOfLine()
+        ):
+            return False
+
+        Header = self._Token
+        if not Header.endswith(TAB_SECTION_END):
+            RemainingLine = "".join(self._CurrentLine()[self.CurrentOffsetWithinLine:])
+            EndOffset = RemainingLine.find(TAB_SECTION_END)
+            if EndOffset == -1:
+                raise Warning.ExpectedBracketClose(self.FileName, self.CurrentLineNumber)
+            Header += RemainingLine[:EndOffset + 1]
+            self.CurrentOffsetWithinLine += EndOffset + 1
+
+        if Header.find('$(') != -1:
+            raise Warning("macro cannot be used in section header", self.FileName, self.CurrentLineNumber)
+        self._SectionHeaderParser(Header)
+        return True
+
     ## PreprocessFile() method
     #
     #   Preprocess file contents, replace comments with spaces.
@@ -558,44 +700,122 @@ class FdfParser:
     def PreprocessIncludeFile(self):
       # nested include support
         Processed = False
+        self._CurSection = []
         MacroDict = {}
+        PcdDict = {}
+        IfList = []
         while self._GetNextToken():
 
-            if self._Token == TAB_DEFINE:
+            AtLineStart = self._IsTokenAtStartOfLine()
+            if AtLineStart and self._Token in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF}:
+                ConditionalMacroDict = self._GetConditionalMacroDict(MacroDict, IfList)
+                DirectiveLine = self.CurrentLineNumber
+                CondLabel = self._Token
+                Expression = self._GetExpression()
+                if CondLabel == TAB_IF:
+                    ConditionSatisfied = self._EvaluateConditional(
+                        Expression,
+                        DirectiveLine,
+                        'eval',
+                        LocalMacroDict=ConditionalMacroDict,
+                        LocalPcdDict=PcdDict,
+                    )
+                else:
+                    ConditionSatisfied = self._EvaluateConditional(
+                        Expression,
+                        DirectiveLine,
+                        'in',
+                        LocalMacroDict=ConditionalMacroDict,
+                        LocalPcdDict=PcdDict,
+                    )
+                    if CondLabel == TAB_IF_N_DEF:
+                        ConditionSatisfied = not ConditionSatisfied
+                IfList.append([None, ConditionSatisfied, ConditionSatisfied, {}])
+                continue
+
+            if AtLineStart and self._Token in {TAB_ELSE_IF, TAB_ELSE}:
+                if not IfList:
+                    raise Warning("Missing !if statement", self.FileName, self.CurrentLineNumber)
+                if IfList[-1][1] and len(IfList) > 1:
+                    self._MergeConditionalMacroDict(IfList[-2][3], IfList[-1][3])
+                IfList[-1][3] = {}
+                ConditionalMacroDict = self._GetConditionalMacroDict(MacroDict, IfList)
+                if IfList[-1][1] or IfList[-1][2]:
+                    IfList[-1][1] = False
+                else:
+                    ConditionSatisfied = True
+                    if self._Token == TAB_ELSE_IF:
+                        Expression = self._GetExpression()
+                        ConditionSatisfied = self._EvaluateConditional(
+                            Expression,
+                            self.CurrentLineNumber,
+                            'eval',
+                            LocalMacroDict=ConditionalMacroDict,
+                            LocalPcdDict=PcdDict,
+                        )
+                    IfList[-1][1] = ConditionSatisfied
+                    IfList[-1][2] = ConditionSatisfied
+                continue
+
+            if AtLineStart and self._Token == TAB_END_IF:
+                if not IfList:
+                    raise Warning("Missing !if statement", self.FileName, self.CurrentLineNumber)
+                CompletedIf = IfList.pop()
+                if CompletedIf[1] and IfList:
+                    self._MergeConditionalMacroDict(IfList[-1][3], CompletedIf[3])
+                continue
+
+            Active = self._GetIfListCurrentItemStat(IfList)
+            if Active and AtLineStart and self._Token.startswith('$('):
+                ConditionalMacroDict = self._GetConditionalMacroDict(MacroDict, IfList)
+                self._RejectMacroGeneratedDirective(ConditionalMacroDict)
+            if Active and self._TryParseSectionHeader():
+                continue
+
+            if AtLineStart and self._Token == TAB_DEFINE:
                 if not self._GetNextToken():
                     raise Warning.Expected("Macro name", self.FileName, self.CurrentLineNumber)
                 Macro = self._Token
                 if not self._IsToken(TAB_EQUAL_SPLIT):
                     raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
                 Value = self._GetExpression()
-                MacroDict[Macro] = Value
+                if Active:
+                    TargetMacroDict = MacroDict
+                else:
+                    TargetMacroDict = IfList[-1][3]
+                TargetMacroDict.setdefault(tuple(self._CurSection), {})[Macro] = Value
 
-            elif self._Token == TAB_INCLUDE:
+            elif AtLineStart and self._Token == 'SET':
+                if not Active:
+                    continue
+                PcdPair = self._GetNextPcdSettings()
+                PcdName = "%s.%s" % (PcdPair[1], PcdPair[0])
+                if not self._IsToken(TAB_EQUAL_SPLIT):
+                    raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
+                Value = self._GetExpression()
+                ConditionalMacroDict = self._GetConditionalMacroDict(MacroDict, IfList)
+                Value = self._EvaluateConditional(
+                    Value,
+                    self.CurrentLineNumber,
+                    'eval',
+                    True,
+                    ConditionalMacroDict,
+                    PcdDict,
+                )
+                PcdDict[PcdName] = Value
+
+            elif AtLineStart and self._Token == TAB_INCLUDE:
+                ConditionalMacroDict = self._GetConditionalMacroDict(MacroDict, IfList)
                 Processed = True
                 IncludeLine = self.CurrentLineNumber
                 IncludeOffset = self.CurrentOffsetWithinLine - len(TAB_INCLUDE)
                 if not self._GetNextToken():
                     raise Warning.Expected("include file name", self.FileName, self.CurrentLineNumber)
-                IncFileName = self._Token
-                PreIndex = 0
-                StartPos = IncFileName.find('$(', PreIndex)
-                EndPos = IncFileName.find(')', StartPos+2)
-                while StartPos != -1 and EndPos != -1:
-                    Macro = IncFileName[StartPos+2: EndPos]
-                    MacroVal = self._GetMacroValue(Macro)
-                    if not MacroVal:
-                        if Macro in MacroDict:
-                            MacroVal = MacroDict[Macro]
-                    if MacroVal is not None:
-                        IncFileName = IncFileName.replace('$(' + Macro + ')', MacroVal, 1)
-                        if MacroVal.find('$(') != -1:
-                            PreIndex = StartPos
-                        else:
-                            PreIndex = StartPos + len(MacroVal)
-                    else:
-                        raise Warning("The Macro %s is not defined" %Macro, self.FileName, self.CurrentLineNumber)
-                    StartPos = IncFileName.find('$(', PreIndex)
-                    EndPos = IncFileName.find(')', StartPos+2)
+                IncFileName = self._ExpandPreprocessorMacros(
+                    self._Token,
+                    ConditionalMacroDict,
+                    True,
+                )
 
                 IncludedFile = NormPath(IncFileName)
                 #
@@ -631,6 +851,15 @@ class FdfParser:
 
                 CurrentLine = self.CurrentLineNumber
                 CurrentOffset = self.CurrentOffsetWithinLine
+                if IncFileProfile.FileLinesList:
+                    CurrentProfile = self.Profile
+                    try:
+                        self.Profile = IncFileProfile
+                        self._StringToList()
+                        self.PreprocessFile()
+                    finally:
+                        self.Profile = CurrentProfile
+                        self.Rewind(CurrentLine, CurrentOffset)
                 # list index of the insertion, note that line number is 'CurrentLine + 1'
                 InsertAtLine = CurrentLine
                 ParentProfile = GetParentAtLine (CurrentLine)
@@ -662,7 +891,10 @@ class FdfParser:
             if Processed: # Nested and back-to-back support
                 self.Rewind(DestLine = IncFileProfile.InsertStartLineNumber - 1)
                 Processed = False
+        if IfList:
+            raise Warning("Missing !endif", self.FileName, self.CurrentLineNumber)
         # Preprocess done.
+        self._CurSection = []
         self.Rewind()
 
     @staticmethod
@@ -689,42 +921,24 @@ class FdfParser:
         RegionLayoutLine = 0
         ReplacedLine = -1
         while self._GetNextToken():
+            AtLineStart = self._IsTokenAtStartOfLine()
             # Determine section name and the location dependent macro
             if self._GetIfListCurrentItemStat(IfList):
-                if self._Token.startswith(TAB_SECTION_START):
-                    Header = self._Token
-                    if not self._Token.endswith(TAB_SECTION_END):
-                        self._SkipToToken(TAB_SECTION_END)
-                        Header += self._SkippedChars
-                    if Header.find('$(') != -1:
-                        raise Warning("macro cannot be used in section header", self.FileName, self.CurrentLineNumber)
-                    self._SectionHeaderParser(Header)
+                if AtLineStart and self._Token.startswith('$('):
+                    self._RejectMacroGeneratedDirective()
+                if self._TryParseSectionHeader():
                     continue
                 # Replace macros except in RULE section or out of section
                 elif self._CurSection and ReplacedLine != self.CurrentLineNumber:
                     ReplacedLine = self.CurrentLineNumber
                     self._UndoToken()
                     CurLine = self.Profile.FileLinesList[ReplacedLine - 1]
-                    PreIndex = 0
-                    StartPos = CurLine.find('$(', PreIndex)
-                    EndPos = CurLine.find(')', StartPos+2)
-                    while StartPos != -1 and EndPos != -1 and self._Token not in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF, TAB_ELSE_IF}:
-                        MacroName = CurLine[StartPos+2: EndPos]
-                        MacroValue = self._GetMacroValue(MacroName)
-                        if MacroValue is not None:
-                            CurLine = CurLine.replace('$(' + MacroName + ')', MacroValue, 1)
-                            if MacroValue.find('$(') != -1:
-                                PreIndex = StartPos
-                            else:
-                                PreIndex = StartPos + len(MacroValue)
-                        else:
-                            PreIndex = EndPos + 1
-                        StartPos = CurLine.find('$(', PreIndex)
-                        EndPos = CurLine.find(')', StartPos+2)
+                    if self._Token not in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF, TAB_ELSE_IF}:
+                        CurLine = self._ExpandPreprocessorMacros(CurLine)
                     self.Profile.FileLinesList[ReplacedLine - 1] = CurLine
                     continue
 
-            if self._Token == TAB_DEFINE:
+            if AtLineStart and self._Token == TAB_DEFINE:
                 if self._GetIfListCurrentItemStat(IfList):
                     if not self._CurSection:
                         raise Warning("macro cannot be defined in Rule section or out of section", self.FileName, self.CurrentLineNumber)
@@ -739,7 +953,7 @@ class FdfParser:
                     Value = self._GetExpression()
                     self._SetMacroValue(Macro, Value)
                     self._WipeOffArea.append(((DefineLine, DefineOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-            elif self._Token == 'SET':
+            elif AtLineStart and self._Token == 'SET':
                 if not self._GetIfListCurrentItemStat(IfList):
                     continue
                 SetLine = self.CurrentLineNumber - 1
@@ -760,7 +974,7 @@ class FdfParser:
                 self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
 
                 self._WipeOffArea.append(((SetLine, SetOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-            elif self._Token in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF}:
+            elif AtLineStart and self._Token in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF}:
                 IfStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self._Token))
                 IfList.append([IfStartPos, None, None])
 
@@ -778,7 +992,7 @@ class FdfParser:
                 IfList[-1] = [IfList[-1][0], ConditionSatisfied, BranchDetermined]
                 if ConditionSatisfied:
                     self._WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-            elif self._Token in {TAB_ELSE_IF, TAB_ELSE}:
+            elif AtLineStart and self._Token in {TAB_ELSE_IF, TAB_ELSE}:
                 ElseStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self._Token))
                 if len(IfList) <= 0:
                     raise Warning("Missing !if statement", self.FileName, self.CurrentLineNumber)
@@ -800,7 +1014,7 @@ class FdfParser:
                         else:
                             IfList[-1][2] = True
                             self._WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-            elif self._Token == '!endif':
+            elif AtLineStart and self._Token == TAB_END_IF:
                 if len(IfList) <= 0:
                     raise Warning("Missing !if statement", self.FileName, self.CurrentLineNumber)
                 if IfList[-1][1]:
@@ -834,28 +1048,37 @@ class FdfParser:
             raise Warning("Missing !endif", self.FileName, self.CurrentLineNumber)
         self.Rewind()
 
-    def _CollectMacroPcd(self):
+    def _CollectMacroPcd(self, LocalMacroDict = None, LocalPcdDict = None):
         MacroDict = {}
 
         # PCD macro
         MacroDict.update(GlobalData.gPlatformPcds)
-        MacroDict.update(self._PcdDict)
+        if LocalPcdDict is None:
+            MacroDict.update(self._PcdDict)
+        else:
+            MacroDict.update(LocalPcdDict)
 
         # Lowest priority
         MacroDict.update(GlobalData.gPlatformDefines)
 
         if self._CurSection:
             # Defines macro
-            ScopeMacro = self._MacroDict[TAB_COMMON, TAB_COMMON, TAB_COMMON]
+            if LocalMacroDict is None:
+                ScopeMacro = self._MacroDict[TAB_COMMON, TAB_COMMON, TAB_COMMON]
+            else:
+                ScopeMacro = LocalMacroDict.get((TAB_COMMON, TAB_COMMON, TAB_COMMON))
             if ScopeMacro:
                 MacroDict.update(ScopeMacro)
 
             # Section macro
-            ScopeMacro = self._MacroDict[
-                        self._CurSection[0],
-                        self._CurSection[1],
-                        self._CurSection[2]
-            ]
+            if LocalMacroDict is None:
+                ScopeMacro = self._MacroDict[
+                            self._CurSection[0],
+                            self._CurSection[1],
+                            self._CurSection[2]
+                ]
+            else:
+                ScopeMacro = LocalMacroDict.get(tuple(self._CurSection))
             if ScopeMacro:
                 MacroDict.update(ScopeMacro)
 
@@ -871,8 +1094,16 @@ class FdfParser:
 
         return MacroDict
 
-    def _EvaluateConditional(self, Expression, Line, Op = None, Value = None):
-        MacroPcdDict = self._CollectMacroPcd()
+    def _EvaluateConditional(
+        self,
+        Expression,
+        Line,
+        Op = None,
+        Value = None,
+        LocalMacroDict = None,
+        LocalPcdDict = None,
+    ):
+        MacroPcdDict = self._CollectMacroPcd(LocalMacroDict, LocalPcdDict)
         if Op == 'eval':
             try:
                 if Value:
