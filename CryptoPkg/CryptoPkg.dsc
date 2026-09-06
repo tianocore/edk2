@@ -90,6 +90,19 @@
   DEFINE  MM_STANDALONE_STD_ACCEL_GUID  = 9EF13BFA-912E-4589-8D6A-3ECCF1156B5E
   DEFINE  MM_STANDALONE_FULL_ACCEL_GUID = 0A13116A-D6BF-4E4A-90DC-615C4C0A711D
 
+#
+# FILE_GUID values for the MbedTls-based Crypto drivers. These are built
+# alongside the OpenSSL drivers in the same DSC, so they need unique GUIDs.
+#
+  DEFINE  MBED_PEI_ALL_GUID     = 8DF53C2E-3380-495F-A8B7-370CFE28E1C6
+  DEFINE  MBED_PEI_NONE_GUID    = E5A97EE3-71CC-407F-9DA9-6BE0C8A6C7DF
+  DEFINE  MBED_PEI_MIN_GUID     = 0F5827A9-35FD-4F41-8D38-9BAFCE594D31
+  DEFINE  MBED_DXE_ALL_GUID     = D9444B06-060D-42C5-9344-F04707BE0169
+  DEFINE  MBED_DXE_NONE_GUID    = C7A340F4-A6CC-4F95-A2DA-42BEA4C3944A
+  DEFINE  MBED_DXE_MIN_GUID     = DDF5BE9E-159A-4B77-B6D7-82B84B5763A2
+  DEFINE  MBED_SMM_ALL_GUID     = A3542CE8-77F7-49DC-A834-45D37D2EC1FA
+  DEFINE  MBED_SMM_NONE_GUID    = 6DCB3127-01E7-4131-A487-DC77A965A541
+  DEFINE  MBED_SMM_MIN_GUID     = 85F7EA15-3A2B-474A-8875-180542CD6BF3
 
 !if $(CRYPTO_SERVICES) == TARGET_UNIT_TESTS
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
@@ -482,6 +495,40 @@
       CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
       CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
+
+  #
+  # CryptoPei built on the MbedTls-based.
+  #
+[Components.IA32, Components.X64]
+  CryptoPkg/Driver/CryptoPei.inf {
+    <Defines>
+      !if "$(CRYPTO_SERVICES)" == "ALL"
+        FILE_GUID = $(MBED_PEI_ALL_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "NONE"
+        FILE_GUID = $(MBED_PEI_NONE_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "MIN_PEI"
+        FILE_GUID = $(MBED_PEI_MIN_GUID)
+      !endif
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/PeiCryptLib.inf
+      MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
+  }
+
+[Components.AARCH64]
+  CryptoPkg/Driver/CryptoPei.inf {
+    <Defines>
+      !if "$(CRYPTO_SERVICES)" == "ALL"
+        FILE_GUID = $(MBED_PEI_ALL_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "NONE"
+        FILE_GUID = $(MBED_PEI_NONE_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "MIN_PEI"
+        FILE_GUID = $(MBED_PEI_MIN_GUID)
+      !endif
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/PeiCryptLib.inf
+      MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
+      PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  }
 !endif
 
 #
@@ -667,6 +714,40 @@
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
       CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
       CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
+  }
+
+  #
+  # CryptoDxe/CryptoSmm  built on the MbedTls-based.
+  #
+[Components.IA32, Components.X64, Components.AARCH64]
+  CryptoPkg/Driver/CryptoDxe.inf {
+    <Defines>
+      !if "$(CRYPTO_SERVICES)" == "ALL"
+        FILE_GUID = $(MBED_DXE_ALL_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "NONE"
+        FILE_GUID = $(MBED_DXE_NONE_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "MIN_DXE_MIN_SMM"
+        FILE_GUID = $(MBED_DXE_MIN_GUID)
+      !endif
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
+      MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
+      TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+  }
+
+[Components.IA32, Components.X64]
+  CryptoPkg/Driver/CryptoSmm.inf {
+    <Defines>
+      !if "$(CRYPTO_SERVICES)" == "ALL"
+        FILE_GUID = $(MBED_SMM_ALL_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "NONE"
+        FILE_GUID = $(MBED_SMM_NONE_GUID)
+      !elseif "$(CRYPTO_SERVICES)" == "MIN_DXE_MIN_SMM"
+        FILE_GUID = $(MBED_SMM_MIN_GUID)
+      !endif
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/SmmCryptLib.inf
+      MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
   }
 !endif
 

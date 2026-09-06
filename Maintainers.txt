@@ -225,6 +225,7 @@ F: EmulatorPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/platform-ports/emulator_pkg.html
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+M: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 S: Maintained
 
 EmulatorPkg: Redfish-related modules

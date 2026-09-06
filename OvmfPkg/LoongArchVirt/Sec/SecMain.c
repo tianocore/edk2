@@ -207,7 +207,7 @@ FindFfsFileAndSection (
     }
 
     File = (EFI_FFS_FILE_HEADER *)(UINTN)CurrentAddress;
-    Size = *(UINT32 *)File->Size & 0xffffff;
+    Size = FFS_FILE_SIZE (File);
     if (Size < (sizeof (*File) + sizeof (EFI_COMMON_SECTION_HEADER))) {
       return EFI_VOLUME_CORRUPTED;
     }

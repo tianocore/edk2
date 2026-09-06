@@ -20,10 +20,8 @@
 
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
-  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-
-[LibraryClasses.AARCH64]
-  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  TimerLib|UnitTestFrameworkPkg/Library/Posix/TimerLibPosix/TimerLibPosix.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [Components]
   SecurityPkg/Library/SecureBootVariableLib/UnitTest/MockUefiRuntimeServicesTableLib.inf

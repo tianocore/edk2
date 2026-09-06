@@ -16,32 +16,7 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
-
-/**
-   Read the workarea to determine whether SEV is enabled. If enabled,
-   then return the SevEsWorkArea pointer.
-
-  **/
-STATIC
-SEC_SEV_ES_WORK_AREA *
-EFIAPI
-GetSevEsWorkArea (
-  VOID
-  )
-{
-  OVMF_WORK_AREA  *WorkArea;
-
-  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
-
-  //
-  // If its not SEV guest then SevEsWorkArea is not valid.
-  //
-  if ((WorkArea == NULL) || (WorkArea->Header.GuestType != CcGuestTypeAmdSev)) {
-    return NULL;
-  }
-
-  return (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
-}
+#include "PeiDxeMemEncryptSevLibInternal.h"
 
 /**
   Read the SEV Status MSR value from the workarea

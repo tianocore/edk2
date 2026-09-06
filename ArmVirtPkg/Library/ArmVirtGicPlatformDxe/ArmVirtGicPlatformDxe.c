@@ -3,13 +3,13 @@
 
   Copyright (c) 2015 - 2016, Linaro Ltd. All rights reserved.<BR>
   Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2026, Google LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Base.h>
-#include <Uefi.h>
+#include <PiDxe.h>
 
 #include <Library/ArmGicLib.h>
 #include <Library/BaseLib.h>
@@ -20,10 +20,11 @@
 
 #include <Protocol/FdtClient.h>
 
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
-ArmVirtGicArchLibConstructor (
-  VOID
+ArmVirtGicPlatformDxeInitialize (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   FDT_CLIENT_PROTOCOL  *FdtClient;
@@ -35,6 +36,8 @@ ArmVirtGicArchLibConstructor (
   UINT64               DistBase, CpuBase, RedistBase;
   UINT64               DistSize, CpuSize, RedistSize;
   RETURN_STATUS        PcdStatus;
+  EFI_HANDLE           Handle;
+  CONST EFI_GUID       *DepexGuid;
 
   Status = gBS->LocateProtocol (
                   &gFdtClientProtocolGuid,
@@ -122,7 +125,7 @@ ArmVirtGicArchLibConstructor (
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return (RETURN_STATUS)Status;
+        return Status;
       }
 
       Status = MapMmioMemory (
@@ -132,9 +135,10 @@ ArmVirtGicArchLibConstructor (
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return (RETURN_STATUS)Status;
+        return Status;
       }
 
+      DepexGuid = &gArmVirtPlatformHasGicV3;
       break;
 
     case 2:
@@ -159,7 +163,7 @@ ArmVirtGicArchLibConstructor (
       PcdStatus = PcdSet64S (PcdGicInterruptInterfaceBase, CpuBase);
       ASSERT_RETURN_ERROR (PcdStatus);
 
-      DEBUG ((DEBUG_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
+      DEBUG ((DEBUG_INFO, "Found GICv2 @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
 
       Status = MapMmioMemory (
                  DistBase,
@@ -168,7 +172,7 @@ ArmVirtGicArchLibConstructor (
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return (RETURN_STATUS)Status;
+        return Status;
       }
 
       Status = MapMmioMemory (
@@ -178,15 +182,20 @@ ArmVirtGicArchLibConstructor (
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return (RETURN_STATUS)Status;
+        return Status;
       }
 
+      DepexGuid = &gArmVirtPlatformHasGicV2;
       break;
 
     default:
       DEBUG ((DEBUG_ERROR, "%a: No GIC revision specified!\n", __func__));
-      return RETURN_NOT_FOUND;
+      return EFI_NOT_FOUND;
   }
 
-  return RETURN_SUCCESS;
+  Handle = NULL;
+  Status = gBS->InstallMultipleProtocolInterfaces (&Handle, DepexGuid, NULL, NULL);
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_REQUEST_UNLOAD_IMAGE;
 }
