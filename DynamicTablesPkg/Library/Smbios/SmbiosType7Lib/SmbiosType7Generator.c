@@ -641,7 +641,13 @@ BuildSmbiosType7TableEx (
           SmbiosRecord->SystemCacheType = CacheTypeOther;
         }
 
-        SmbiosRecord->Associativity = CacheAssociativityOther;
+        // Preserve the associativity when all caches being aggregated have
+        // the same associativity.
+        if (SmbiosRecord->Associativity !=
+            GetCacheAssociativity (CacheNode->Associativity))
+        {
+          SmbiosRecord->Associativity = CacheAssociativityOther;
+        }
       } else {
         // No previously seen cache at this level, create new table entry
         Status = StringTableInitialize (&StrTable, SMBIOS_TYPE7_MAX_STRINGS);
