@@ -168,7 +168,7 @@ IScsiDhcp6ExtractRootPath (
     }
 
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
-    ConfigNvData->TargetUrl[Field->Len + 1] = '\0';
+    ConfigNvData->TargetUrl[Field->Len] = '\0';
   } else {
     ZeroMem (&ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
     Status = IScsiAsciiStrToIp (Field->Str, IpMode, &Ip);
