@@ -890,7 +890,10 @@ TcpFormatNetbuf (
 
   Seg  = TCPSEG_NETBUF (Nbuf);
   Head = (TCP_HEAD *)NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (Head != NULL);
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    return NULL;
+  }
 
   Nbuf->Tcp = Head;
 
@@ -1146,7 +1149,11 @@ TcpResetConnection (
                         NET_BUF_TAIL
                         );
 
-  ASSERT (Nhead != NULL);
+  if (Nhead == NULL) {
+    ASSERT (Nhead != NULL);
+    NetbufFree (Nbuf);
+    return;
+  }
 
   Nbuf->Tcp = Nhead;
 
