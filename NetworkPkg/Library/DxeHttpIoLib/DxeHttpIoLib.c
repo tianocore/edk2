@@ -535,12 +535,20 @@ HttpIoSendChunkedTransfer (
       }
 
       NewHeaders = AllocateZeroPool ((RequestMessage->HeaderCount + AddNewHeader) * sizeof (EFI_HTTP_HEADER));
+      if (NewHeaders == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem ((VOID *)NewHeaders, (VOID *)RequestMessage->Headers, RequestMessage->HeaderCount * sizeof (EFI_HTTP_HEADER));
       if (AddNewHeader == 0) {
         //
         // Override content-length to Transfer-Encoding.
         //
-        ContentLengthHeader             = HttpFindHeader (RequestMessage->HeaderCount, NewHeaders, HTTP_HEADER_CONTENT_LENGTH);
+        ContentLengthHeader = HttpFindHeader (RequestMessage->HeaderCount, NewHeaders, HTTP_HEADER_CONTENT_LENGTH);
+        if (ContentLengthHeader == NULL) {
+          return EFI_INVALID_PARAMETER;
+        }
+
         ContentLengthHeader->FieldName  = NULL;
         ContentLengthHeader->FieldValue = NULL;
       } else {
