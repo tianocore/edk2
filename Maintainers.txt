@@ -19,7 +19,6 @@ Maintainers Wanted:
 
   - NetworkPkg
   - SecurityPkg
-  - ShellPkg
 
 Descriptions of section entries:
 
@@ -660,7 +659,7 @@ R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 ShellPkg
 F: ShellPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
-R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/
