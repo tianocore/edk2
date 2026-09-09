@@ -291,6 +291,10 @@ EfiHttpRequest (
   // Only support GET, HEAD, DELETE, CONNECT, PATCH, PUT and POST method in current implementation.
   //
   if (Request != NULL) {
+    if (Request->Url == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     switch (Request->Method) {
       case HttpMethodGet:
       case HttpMethodHead:
@@ -381,12 +385,21 @@ EfiHttpRequest (
       HttpInstance->UrlLen = UrlLen;
     }
 
+    if (Url == NULL) {
+      return EFI_DEVICE_ERROR;
+    }
+
     UnicodeStrToAsciiStrS (Request->Url, Url, UrlLen);
 
     //
     // In case of HTTP Connect, parse proxy URI from Request.
     //
     if (Request->Method == HttpMethodConnect) {
+      if ((ConnRequest == NULL) || (ConnRequest->ProxyUrl == NULL)) {
+        ASSERT ((ConnRequest != NULL) && (ConnRequest->ProxyUrl != NULL));
+        return EFI_INVALID_PARAMETER;
+      }
+
       ProxyUrl    = HttpInstance->ProxyUrl;
       ProxyUrlLen = StrLen (ConnRequest->ProxyUrl) + 1;
       if (ProxyUrlLen > HttpInstance->ProxyUrlLen) {
@@ -403,6 +416,11 @@ EfiHttpRequest (
         HttpInstance->ProxyUrlLen = ProxyUrlLen;
       }
 
+      if (ProxyUrl == NULL) {
+        ASSERT (ProxyUrl != NULL);
+        return EFI_DEVICE_ERROR;
+      }
+
       UnicodeStrToAsciiStrS (ConnRequest->ProxyUrl, ProxyUrl, ProxyUrlLen);
     }
 
@@ -411,6 +429,11 @@ EfiHttpRequest (
     // be able to determine whether to use http or https.
     //
     if (Request->Method == HttpMethodConnect) {
+      if (ProxyUrl == NULL) {
+        ASSERT (ProxyUrl != NULL);
+        return EFI_DEVICE_ERROR;
+      }
+
       HttpInstance->UseHttps = IsHttpsUrl (ProxyUrl);
     } else {
       HttpInstance->UseHttps = IsHttpsUrl (Url);
@@ -688,8 +711,20 @@ EfiHttpRequest (
       goto Error3;
     }
 
+    if (HttpInstance->EndPointHostName == NULL) {
+      ASSERT (HttpInstance->EndPointHostName != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto Error3;
+    }
+
     Status = HttpUrlGetPort (Url, EndPointUrlParser, &EndPointRemotePort);
     if (EFI_ERROR (Status)) {
+      if (Url == NULL) {
+        ASSERT (Url != NULL);
+        Status = EFI_DEVICE_ERROR;
+        goto Error3;
+      }
+
       if (IsHttpsUrl (Url)) {
         EndPointRemotePort = HTTPS_DEFAULT_PORT;
       } else {
@@ -717,7 +752,7 @@ EfiHttpRequest (
     HttpUrlFreeParser (EndPointUrlParser);
   } else {
     FileUrl = Url;
-    if ((Url != NULL) && (*FileUrl != '/')) {
+    if ((FileUrl != NULL) && (*FileUrl != '/')) {
       //
       // Convert the absolute-URI to the absolute-path
       //
@@ -1201,7 +1236,12 @@ HttpResponseWorker (
       goto Error;
     }
 
-    ASSERT (HttpHeaders != NULL);
+    if ((HttpHeaders == NULL) || (EndofHeader == NULL)) {
+      ASSERT (HttpHeaders != NULL);
+      ASSERT (EndofHeader != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto Error;
+    }
 
     //
     // Cache the part of body.
