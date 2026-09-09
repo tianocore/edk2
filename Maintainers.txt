@@ -183,6 +183,7 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 BaseTools
 F: BaseTools/
