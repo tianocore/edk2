@@ -557,7 +557,7 @@ CheckSignatureListFormat (
   // Walk through the input signature list and check the data format.
   // If any signature is incorrectly formed, the whole check will fail.
   //
-  while ((SigDataSize > 0) && (SigDataSize >= SigList->SignatureListSize)) {
+  while ((SigDataSize > 0) && (SigDataSize >= (UINTN)SigList->SignatureListSize)) {
     for (Index = 0; Index < (sizeof (mSupportSigItem) / sizeof (EFI_SIGNATURE_ITEM)); Index++ ) {
       if (CompareGuid (&SigList->SignatureType, &mSupportSigItem[Index].SigType)) {
         //
