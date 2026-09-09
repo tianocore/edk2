@@ -147,6 +147,7 @@ HttpUrlGetIp6 (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or Port is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No port number in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  @retval EFI_UNSUPPORTED          The port number exceeds the range of UINTN.
 
 **/
 EFI_STATUS
