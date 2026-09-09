@@ -257,11 +257,6 @@ Ip4Reassemble (
   }
 
   //
-  // Assemble shouldn't be NULL here
-  //
-  ASSERT (Assemble != NULL);
-
-  //
   // Find the point to insert the packet: before the first
   // fragment with THIS.Start < CUR.Start. the previous one
   // has PREV.Start <= THIS.Start < CUR.Start.
@@ -862,7 +857,11 @@ Ip4AccpetFrame (
   }
 
   Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Head != NULL);
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    goto RESTART;
+  }
+
   OptionLen = (Head->HeadLen << 2) - IP4_MIN_HEADLEN;
   if (OptionLen > 0) {
     Option = (UINT8 *)(Head + 1);
@@ -916,7 +915,11 @@ Ip4AccpetFrame (
     }
 
     Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
-    ASSERT (Head != NULL);
+    if (Head == NULL) {
+      ASSERT (Head != NULL);
+      goto RESTART;
+    }
+
     Status = Ip4PreProcessPacket (
                IpSb,
                &Packet,
@@ -1306,7 +1309,11 @@ Ip4InstanceDeliverPacket (
         // may be not continuous before the data.
         //
         Head = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
-        ASSERT (Head != NULL);
+        if (Head == NULL) {
+          ASSERT (Head != NULL);
+          NetbufFree (Dup);
+          return EFI_OUT_OF_RESOURCES;
+        }
 
         Dup->Ip.Ip4 = (IP4_HEAD *)Head;
 
