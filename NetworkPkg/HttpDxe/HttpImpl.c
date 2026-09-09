@@ -291,6 +291,10 @@ EfiHttpRequest (
   // Only support GET, HEAD, DELETE, CONNECT, PATCH, PUT and POST method in current implementation.
   //
   if (Request != NULL) {
+    if (Request->Url == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     switch (Request->Method) {
       case HttpMethodGet:
       case HttpMethodHead:
@@ -367,7 +371,7 @@ EfiHttpRequest (
     //
     Url    = HttpInstance->Url;
     UrlLen = StrLen (Request->Url) + 1;
-    if (UrlLen > HttpInstance->UrlLen) {
+    if ((Url == NULL) || (UrlLen > HttpInstance->UrlLen)) {
       Url = AllocateZeroPool (UrlLen);
       if (Url == NULL) {
         return EFI_OUT_OF_RESOURCES;
@@ -389,7 +393,7 @@ EfiHttpRequest (
     if (Request->Method == HttpMethodConnect) {
       ProxyUrl    = HttpInstance->ProxyUrl;
       ProxyUrlLen = StrLen (ConnRequest->ProxyUrl) + 1;
-      if (ProxyUrlLen > HttpInstance->ProxyUrlLen) {
+      if ((ProxyUrl == NULL) || (ProxyUrlLen > HttpInstance->ProxyUrlLen)) {
         ProxyUrl = AllocateZeroPool (ProxyUrlLen);
         if (ProxyUrl == NULL) {
           return EFI_OUT_OF_RESOURCES;
@@ -717,7 +721,7 @@ EfiHttpRequest (
     HttpUrlFreeParser (EndPointUrlParser);
   } else {
     FileUrl = Url;
-    if ((Url != NULL) && (*FileUrl != '/')) {
+    if ((FileUrl != NULL) && (*FileUrl != '/')) {
       //
       // Convert the absolute-URI to the absolute-path
       //
@@ -1201,7 +1205,12 @@ HttpResponseWorker (
       goto Error;
     }
 
-    ASSERT (HttpHeaders != NULL);
+    if ((HttpHeaders == NULL) || (EndofHeader == NULL)) {
+      ASSERT (HttpHeaders != NULL);
+      ASSERT (EndofHeader != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto Error;
+    }
 
     //
     // Cache the part of body.
