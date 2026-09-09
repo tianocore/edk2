@@ -419,16 +419,16 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInitiatorAffinityInfoParser[] = {
   { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
-/** A parser for EArmObjDmc620PmuSocketInfo.
+/** A parser for EArmObjDmcPmuSocketInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuSocketInfoParser[] = {
-  { "NumDevices",            1,                        "0x%x", NULL },
-  { "Dmc620PmuRegInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+STATIC CONST CM_OBJ_PARSER  CmArmDmcPmuSocketInfoParser[] = {
+  { "NumDevices",         1,                        "0x%x", NULL },
+  { "DmcPmuRegInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
-/** A parser for EArmObjDmc620PmuRegInfo.
+/** A parser for EArmObjDmcPmuRegInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuRegInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArmDmcPmuRegInfoParser[] = {
   { "BaseAddress", 8,                                         "0x%llx", NULL },
   { "Length",      8,                                         "0x%llx", NULL },
   { "PmuIntr",     sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
@@ -1701,8 +1701,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                             CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,           CmArmMemoryRangeDescriptorInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjEtInfo,                          CmArmEtInfo),
-  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuSocketInfo,             CmArmDmc620PmuSocketInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuRegInfo,                CmArmDmc620PmuRegInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjDmcPmuSocketInfo,                CmArmDmcPmuSocketInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjDmcPmuRegInfo,                   CmArmDmcPmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificBlockInfo,      CmArmProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificSubDataArchInfo,CmArmProcessorSpecificSubDataArchInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCoresightPmuInfo,                CmArmCoresightPmuInfoParser),

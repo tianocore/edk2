@@ -1,12 +1,12 @@
 /** @file
-  SSDT DMC620 AML Table Generator.
+  SSDT DMC AML Table Generator.
 
   Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-  - Arm CoreLink DMC-620 Dynamic Memory Controller Technical Reference Manual r1p0
+  - Arm CoreLink DMC Dynamic Memory Controller Technical Reference Manual r1p0
   - ACPI for the Arm Components 1.2 EAC1 Platform Design Document,
       dated July 2025.
     (https://developer.arm.com/documentation/den0093/1-2eac1/)
@@ -23,39 +23,39 @@
 #include <Library/AmlLib/AmlLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 #include <Library/TableHelperLib.h>
-#include "SsdtDmc620PmuGenerator.h"
+#include "SsdtDmcPmuGenerator.h"
 
-/** SSDT DMC620 PMU Table Generator.
+/** SSDT DMC PMU Table Generator.
 
   Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjDmc620SocketInfo
-  - EArmObjDmc620PmuRegInfo
+  - EArmObjDmcPmuSocketInfo
+  - EArmObjDmcPmuRegInfo
 */
 
-/** This macro expands to a function that retrieves the DMC620 PMU
+/** This macro expands to a function that retrieves the DMC PMU
     Socket Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjDmc620PmuSocketInfo,
-  CM_ARM_DMC620_INFO
+  EArmObjDmcPmuSocketInfo,
+  CM_ARM_DMC_INFO
   );
 
-/** This macro expands to a function that retrieves the DMC620 PMU
+/** This macro expands to a function that retrieves the DMC PMU
     Register Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjDmc620PmuRegInfo,
-  CM_ARM_DMC620_PMU_REG_INFO
+  EArmObjDmcPmuRegInfo,
+  CM_ARM_DMC_PMU_REG_INFO
   );
 
-/** Check the DMC620 PMU Information for a given socket.
+/** Check the DMC PMU Information for a given socket.
 
-  @param [in] Dmc620PmuRegInfo         Array of DMC620 information structure.
-  @param [in] DevCount                 Count of DMC620 devices to validate.
+  @param [in] DmcPmuRegInfo            Array of DMC information structure.
+  @param [in] DevCount                 Count of DMC devices to validate.
 
   @retval  EFI_SUCCESS            The function completed successfully.
   @retval  EFI_INVALID_PARAMETER  Invalid parameter.
@@ -63,46 +63,46 @@ GET_OBJECT_LIST (
 STATIC
 EFI_STATUS
 EFIAPI
-ValidateDmc620PmuInfo (
-  IN  CONST CM_ARM_DMC620_PMU_REG_INFO  *CONST  Dmc620PmuRegInfo,
-  IN        UINT32                              DevCount
+ValidateDmcPmuInfo (
+  IN  CONST CM_ARM_DMC_PMU_REG_INFO  *CONST  DmcPmuRegInfo,
+  IN        UINT32                           DevCount
   )
 {
   UINT32                                  DevNum;
-  CONST CM_ARM_DMC620_PMU_REG_INFO        *RegInfo;
+  CONST CM_ARM_DMC_PMU_REG_INFO           *RegInfo;
   CONST CM_ARCH_COMMON_GENERIC_INTERRUPT  *PmuIntr;
 
-  if ((Dmc620PmuRegInfo == NULL) || (DevCount == 0)) {
+  if ((DmcPmuRegInfo == NULL) || (DevCount == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
   for (DevNum = 0; DevNum < DevCount; DevNum++) {
-    RegInfo = &Dmc620PmuRegInfo[DevNum];
+    RegInfo = &DmcPmuRegInfo[DevNum];
     // Check Base address is initialized
     if (RegInfo->BaseAddress == 0) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: Invalid PMU Base Address.\n"
+        "ERROR: SSDT-DMC: Invalid PMU Base Address.\n"
         ));
       goto error_handler;
     }
 
-    if (RegInfo->Length != DMC620_PERIPHBASE_MAX_ADDRESS_LENGTH) {
+    if (RegInfo->Length != DMC_PERIPHBASE_MAX_ADDRESS_LENGTH) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: Invalid PMU Length.\n"
+        "ERROR: SSDT-DMC: Invalid PMU Length.\n"
         ));
       goto error_handler;
     }
 
-    // The PMU registers in the DMC620 start at an offset of
+    // The PMU registers in the DMC start at an offset of
     // 0xA00. Check that that is so.
-    if ((RegInfo->BaseAddress & DMC620_REGISTER_SPACE_MASK) !=
-        DMC620_PMU_ADDRESS_OFFSET)
+    if ((RegInfo->BaseAddress & DMC_REGISTER_SPACE_MASK) !=
+        DMC_PMU_ADDRESS_OFFSET)
     {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: PMU Address offset must be 0xA00.\n"
+        "ERROR: SSDT-DMC: PMU Address offset must be 0xA00.\n"
         ));
       goto error_handler;
     }
@@ -111,7 +111,7 @@ ValidateDmc620PmuInfo (
     if ((PmuIntr->Flags & BIT0) != 0) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC-620: PMU Interrupt must be Level Triggered.\n"
+        "ERROR: SSDT-DMC: PMU Interrupt must be Level Triggered.\n"
         ));
       goto error_handler;
     }
@@ -119,7 +119,7 @@ ValidateDmc620PmuInfo (
     if ((PmuIntr->Flags & BIT1) != 0) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC-620: PMU Interrupt must be Active High.\n"
+        "ERROR: SSDT-DMC: PMU Interrupt must be Active High.\n"
         ));
       goto error_handler;
     }
@@ -149,7 +149,7 @@ error_handler:
 /**
   Create the _CRS (Current Resource Settings) AML node for the device.
 
-  @param [in]  Dmc620PmuRegInfo   Pointer to the register info structure.
+  @param [in]  DmcPmuRegInfo   Pointer to the register info structure.
   @param [in]  DeviceNode         AML device node handle.
 
   @retval EFI_SUCCESS           The CRS node was created successfully.
@@ -158,9 +158,9 @@ error_handler:
 STATIC
 EFI_STATUS
 EFIAPI
-CreateDmc620PmuCrs (
-  IN CONST CM_ARM_DMC620_PMU_REG_INFO        *CONST  Dmc620PmuRegInfo,
-  IN       AML_OBJECT_NODE_HANDLE                    DeviceNode
+CreateDmcPmuCrs (
+  IN CONST CM_ARM_DMC_PMU_REG_INFO        *CONST  DmcPmuRegInfo,
+  IN       AML_OBJECT_NODE_HANDLE                 DeviceNode
   )
 {
   UINT32                  Intr;
@@ -173,15 +173,15 @@ CreateDmc620PmuCrs (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _CRS Node."
+      "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _CRS Node."
       " Status = %r\n",
       Status
       ));
     return Status;
   }
 
-  BaseAddress = Dmc620PmuRegInfo->BaseAddress;
-  Length      = Dmc620PmuRegInfo->Length;
+  BaseAddress = DmcPmuRegInfo->BaseAddress;
+  Length      = DmcPmuRegInfo->Length;
   Status      = AmlCodeGenRdQWordMemory (
                   FALSE,
                   TRUE,
@@ -211,7 +211,7 @@ CreateDmc620PmuCrs (
     return Status;
   }
 
-  Intr   = Dmc620PmuRegInfo->PmuIntr.Interrupt;
+  Intr   = DmcPmuRegInfo->PmuIntr.Interrupt;
   Status = AmlCodeGenRdInterrupt (
              TRUE,
              FALSE,
@@ -235,9 +235,9 @@ CreateDmc620PmuCrs (
   return EFI_SUCCESS;
 }
 
-/** Build a SSDT table describing the DMC620 PMU register space.
+/** Build a SSDT table describing the DMC PMU register space.
 
-  Add device nodes describing the DMC620 PMU register space, one
+  Add device nodes describing the DMC PMU register space, one
   socket at a time.
 
   @param [in]  Uid               For this socket, generate UID ids
@@ -246,7 +246,7 @@ CreateDmc620PmuCrs (
                                  present.
   @param [in]  DevCount          Number of devices on this socket.
   @param [in]  ScopeNode         AML System Bus node handle.
-  @param [in]  Dmc620PmuRegInfo  Array of DMC620 information structure.
+  @param [in]  DmcPmuRegInfo  Array of DMC information structure.
 
   @retval EFI_SUCCESS            Device nodes added successfully.
   @retval Others                 Failed to create the device nodes.
@@ -254,12 +254,12 @@ CreateDmc620PmuCrs (
 STATIC
 EFI_STATUS
 EFIAPI
-BuildDmc620PmuSocket (
-  IN       UINT64                                    Uid,
-  IN CONST UINT32                                    SockNum,
-  IN CONST UINT32                                    DevCount,
-  IN CONST AML_OBJECT_NODE_HANDLE                    ScopeNode,
-  IN CONST CM_ARM_DMC620_PMU_REG_INFO        *CONST  Dmc620PmuRegInfo
+BuildDmcPmuSocket (
+  IN       UINT64                                 Uid,
+  IN CONST UINT32                                 SockNum,
+  IN CONST UINT32                                 DevCount,
+  IN CONST AML_OBJECT_NODE_HANDLE                 ScopeNode,
+  IN CONST CM_ARM_DMC_PMU_REG_INFO        *CONST  DmcPmuRegInfo
   )
 {
   UINT32                  DevNum;
@@ -268,12 +268,12 @@ BuildDmc620PmuSocket (
   EFI_STATUS              Status;
   AML_OBJECT_NODE_HANDLE  DeviceNode;
 
-  // Validate the DMC620 Info and get the number of devices.
-  Status = ValidateDmc620PmuInfo (Dmc620PmuRegInfo, DevCount);
+  // Validate the DMC Info and get the number of devices.
+  Status = ValidateDmcPmuInfo (DmcPmuRegInfo, DevCount);
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620: Invalid DMC620 PMU information. Status = %r\n",
+      "ERROR: SSDT-DMC: Invalid DMC PMU information. Status = %r\n",
       Status
       ));
     return Status;
@@ -291,7 +291,7 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: Failed to create AML Device Node."
+        "ERROR: SSDT-DMC: Failed to create AML Device Node."
         " Status = %r\n",
         Status
         ));
@@ -307,7 +307,7 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _HID Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _HID Node."
         " Status = %r\n",
         Status
         ));
@@ -323,7 +323,7 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _CID Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _CID Node."
         " Status = %r\n",
         Status
         ));
@@ -334,7 +334,7 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _UID Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _UID Node."
         " Status = %r\n",
         Status
         ));
@@ -345,7 +345,7 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _CCA Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _CCA Node."
         " Status = %r\n",
         Status
         ));
@@ -362,7 +362,7 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _STR Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _STR Node."
         " Status = %r\n",
         Status
         ));
@@ -381,18 +381,18 @@ BuildDmc620PmuSocket (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _STA Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _STA Node."
         " Status = %r\n",
         Status
         ));
       return Status;
     }
 
-    Status = CreateDmc620PmuCrs (&Dmc620PmuRegInfo[DevNum], DeviceNode);
+    Status = CreateDmcPmuCrs (&DmcPmuRegInfo[DevNum], DeviceNode);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to create AML _CRS Node."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to create AML _CRS Node."
         " Status = %r\n",
         Status
         ));
@@ -403,7 +403,7 @@ BuildDmc620PmuSocket (
   return EFI_SUCCESS;
 }
 
-/** Construct SSDT tables for describing DMC620 PMU interface.
+/** Construct SSDT tables for describing DMC PMU interface.
 
   This function invokes the Configuration Manager protocol interface
   to get the required hardware information for generating the ACPI
@@ -425,23 +425,23 @@ BuildDmc620PmuSocket (
 STATIC
 EFI_STATUS
 EFIAPI
-BuildSsdtDmc620PmuTable (
+BuildSsdtDmcPmuTable (
   IN  CONST ACPI_TABLE_GENERATOR                           *This,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
   OUT       EFI_ACPI_DESCRIPTION_HEADER                    **Table
   )
 {
-  AML_ROOT_NODE_HANDLE        RootNode;
-  AML_OBJECT_NODE_HANDLE      ScopeNode;
-  EFI_STATUS                  Status;
-  EFI_STATUS                  Status1;
-  UINT64                      Uid;
-  UINT32                      DevCount;
-  UINT32                      SockNum;
-  UINT32                      SocketCount;
-  CM_ARM_DMC620_PMU_REG_INFO  *Dmc620PmuRegInfo;
-  CM_ARM_DMC620_INFO          *Dmc620PmuSockInfo;
+  AML_ROOT_NODE_HANDLE     RootNode;
+  AML_OBJECT_NODE_HANDLE   ScopeNode;
+  EFI_STATUS               Status;
+  EFI_STATUS               Status1;
+  UINT64                   Uid;
+  UINT32                   DevCount;
+  UINT32                   SockNum;
+  UINT32                   SocketCount;
+  CM_ARM_DMC_PMU_REG_INFO  *DmcPmuRegInfo;
+  CM_ARM_DMC_INFO          *DmcPmuSockInfo;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -452,16 +452,16 @@ BuildSsdtDmc620PmuTable (
 
   *Table = NULL;
 
-  Status = GetEArmObjDmc620PmuSocketInfo (
+  Status = GetEArmObjDmcPmuSocketInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
-             &Dmc620PmuSockInfo,
+             &DmcPmuSockInfo,
              &SocketCount
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620: Failed to get the DMC620 Socket information."
+      "ERROR: SSDT-DMC: Failed to get the DMC Socket information."
       " Status = %r\n",
       Status
       ));
@@ -471,7 +471,7 @@ BuildSsdtDmc620PmuTable (
   if (SocketCount == 0) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620: Invalid DMC620 Socket information.\n"
+      "ERROR: SSDT-DMC: Invalid DMC Socket information.\n"
       ));
     return EFI_INVALID_PARAMETER;
   }
@@ -479,14 +479,14 @@ BuildSsdtDmc620PmuTable (
   Status = AmlCodeGenDefinitionBlock (
              "SSDT",
              "ARMLTD",
-             "DMC-620",
+             "DMC-",
              0x01,
              &RootNode
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620: Failed to create AML Definition Block."
+      "ERROR: SSDT-DMC: Failed to create AML Definition Block."
       " Status = %r\n",
       Status
       ));
@@ -498,7 +498,7 @@ BuildSsdtDmc620PmuTable (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620: Failed to create AML Scope Node."
+      "ERROR: SSDT-DMC: Failed to create AML Scope Node."
       " Status = %r\n",
       Status
       ));
@@ -508,17 +508,17 @@ BuildSsdtDmc620PmuTable (
   Uid = 0;
   for (SockNum = 0; SockNum < SocketCount; SockNum++) {
     DevCount = 0;
-    Status   = GetEArmObjDmc620PmuRegInfo (
+    Status   = GetEArmObjDmcPmuRegInfo (
                  CfgMgrProtocol,
-                 Dmc620PmuSockInfo[SockNum].Dmc620PmuRegInfoToken,
-                 &Dmc620PmuRegInfo,
+                 DmcPmuSockInfo[SockNum].DmcPmuRegInfoToken,
+                 &DmcPmuRegInfo,
                  &DevCount
                  );
 
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: Failed to get the DMC620 per socket device information.\n"
+        "ERROR: SSDT-DMC: Failed to get the DMC per socket device information.\n"
         " Status = %r\n",
         Status
         ));
@@ -526,26 +526,26 @@ BuildSsdtDmc620PmuTable (
       goto error_handler;
     }
 
-    if ((DevCount == 0) || (Dmc620PmuSockInfo[SockNum].NumDevices != DevCount)) {
+    if ((DevCount == 0) || (DmcPmuSockInfo[SockNum].NumDevices != DevCount)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: Invalid DMC620 device information.\n"
+        "ERROR: SSDT-DMC: Invalid DMC device information.\n"
         ));
       ASSERT_EFI_ERROR (Status);
       goto error_handler;
     }
 
-    Status = BuildDmc620PmuSocket (
+    Status = BuildDmcPmuSocket (
                Uid,
                SockNum,
                DevCount,
                ScopeNode,
-               Dmc620PmuRegInfo
+               DmcPmuRegInfo
                );
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620: Failed to build table for DMC620."
+        "ERROR: SSDT-DMC: Failed to build table for DMC."
         " Status = %r\n",
         Status
         ));
@@ -563,7 +563,7 @@ BuildSsdtDmc620PmuTable (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SSDT-DMC620: Failed to Serialize SSDT Table Data."
+      "ERROR: SSDT-DMC: Failed to Serialize SSDT Table Data."
       " Status = %r\n",
       Status
       ));
@@ -578,7 +578,7 @@ error_handler:
     if (EFI_ERROR (Status1)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SSDT-DMC620-AML-CODEGEN: Failed to cleanup AML tree."
+        "ERROR: SSDT-DMC-AML-CODEGEN: Failed to cleanup AML tree."
         " Status = %r\n",
         Status1
         ));
@@ -588,7 +588,7 @@ error_handler:
   return Status;
 }
 
-/** Free any resources allocated for constructing the SSDT tables for DMC620 PMU.
+/** Free any resources allocated for constructing the SSDT tables for DMC PMU.
 
   @param [in]      This           Pointer to the ACPI table generator.
   @param [in]      AcpiTableInfo  Pointer to the ACPI Table Info.
@@ -602,7 +602,7 @@ error_handler:
 STATIC
 EFI_STATUS
 EFIAPI
-FreeSsdtDmc620PmuTableRes (
+FreeSsdtDmcPmuTableRes (
   IN      CONST ACPI_TABLE_GENERATOR                   *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -616,7 +616,7 @@ FreeSsdtDmc620PmuTableRes (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   if ((Table == NULL) || (*Table == NULL)) {
-    DEBUG ((DEBUG_ERROR, "ERROR: SSDT-DMC620: Invalid Table Pointer\n"));
+    DEBUG ((DEBUG_ERROR, "ERROR: SSDT-DMC: Invalid Table Pointer\n"));
     ASSERT ((Table != NULL) && (*Table != NULL));
     return EFI_INVALID_PARAMETER;
   }
@@ -629,17 +629,17 @@ FreeSsdtDmc620PmuTableRes (
 
 /** This macro defines the Raw Generator revision.
 */
-#define SSDT_DMC620_PMU_GENERATOR_REVISION  CREATE_REVISION (1, 0)
+#define SSDT_DMC_PMU_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the Raw Table Generator.
 */
 STATIC
 CONST
-ACPI_TABLE_GENERATOR  SsdtDmc620PmuGenerator = {
+ACPI_TABLE_GENERATOR  SsdtDmcPmuGenerator = {
   // Generator ID
-  CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdtDmc620Pmu),
+  CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdtDmcPmu),
   // Generator Description
-  L"ACPI.STD.SSDT.DMC620.PMU.GENERATOR",
+  L"ACPI.STD.SSDT.DMC.PMU.GENERATOR",
   // ACPI Table Signature
   EFI_ACPI_6_6_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
   // ACPI Table Revision - Unused
@@ -649,11 +649,11 @@ ACPI_TABLE_GENERATOR  SsdtDmc620PmuGenerator = {
   // Creator ID
   TABLE_GENERATOR_CREATOR_ID_ARM,
   // Creator Revision
-  SSDT_DMC620_PMU_GENERATOR_REVISION,
+  SSDT_DMC_PMU_GENERATOR_REVISION,
   // Build table function.
-  BuildSsdtDmc620PmuTable,
+  BuildSsdtDmcPmuTable,
   // Free table function.
-  FreeSsdtDmc620PmuTableRes,
+  FreeSsdtDmcPmuTableRes,
   // Build Table function. Extended version not needed.
   NULL,
   // Free Resource function. Extended version not needed.
@@ -672,17 +672,17 @@ ACPI_TABLE_GENERATOR  SsdtDmc620PmuGenerator = {
 **/
 EFI_STATUS
 EFIAPI
-AcpiSsdtDmc620PmuConstructor (
+AcpiSsdtDmcPmuConstructor (
   IN  EFI_HANDLE        ImageHandle,
   IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
 
-  Status = RegisterAcpiTableGenerator (&SsdtDmc620PmuGenerator);
+  Status = RegisterAcpiTableGenerator (&SsdtDmcPmuGenerator);
   DEBUG ((
     DEBUG_INFO,
-    "SSDT-DMC620: Register Generator. Status = %r\n",
+    "SSDT-DMC: Register Generator. Status = %r\n",
     Status
     ));
   ASSERT_EFI_ERROR (Status);
@@ -700,17 +700,17 @@ AcpiSsdtDmc620PmuConstructor (
 **/
 EFI_STATUS
 EFIAPI
-AcpiSsdtDmc620PmuDestructor (
+AcpiSsdtDmcPmuDestructor (
   IN  EFI_HANDLE        ImageHandle,
   IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
 
-  Status = DeregisterAcpiTableGenerator (&SsdtDmc620PmuGenerator);
+  Status = DeregisterAcpiTableGenerator (&SsdtDmcPmuGenerator);
   DEBUG ((
     DEBUG_INFO,
-    "SSDT-DMC620: Deregister Generator. Status = %r\n",
+    "SSDT-DMC: Deregister Generator. Status = %r\n",
     Status
     ));
   ASSERT_EFI_ERROR (Status);
