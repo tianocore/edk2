@@ -134,7 +134,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
-  INF ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
+  INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 

@@ -774,9 +774,11 @@ PatchSmmSaveStateMap (
   )
 {
   UINTN  Index;
+  UINTN  TopTileIndex;
   UINTN  TileCodeSize;
   UINTN  TileDataSize;
   UINTN  TileSize;
+  UINTN  DataSize;
   UINTN  PageTableBase;
 
   TileCodeSize  = GetSmiHandlerSize ();
@@ -788,7 +790,20 @@ PatchSmmSaveStateMap (
   PageTableBase = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
 
   DEBUG ((DEBUG_INFO, "PatchSmmSaveStateMap:\n"));
-  for (Index = 0; Index < mMaxNumberOfCpus - 1; Index++) {
+
+  //
+  // SmBase[] is indexed by processor, so its physical address order is not
+  // guaranteed. Find the top tile before extending its data range to the end
+  // of the 32KB region.
+  //
+  TopTileIndex = 0;
+  for (Index = 1; Index < mMaxNumberOfCpus; Index++) {
+    if (mCpuHotPlugData.SmBase[Index] > mCpuHotPlugData.SmBase[TopTileIndex]) {
+      TopTileIndex = Index;
+    }
+  }
+
+  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     //
     // Code
     //
@@ -812,13 +827,23 @@ PatchSmmSaveStateMap (
       );
 
     //
+    // Only the physically top tile owns the extended data tail up to the
+    // end of the 32KB region.
+    //
+    if (Index == TopTileIndex) {
+      DataSize = SIZE_32KB - TileCodeSize;
+    } else {
+      DataSize = TileSize - TileCodeSize;
+    }
+
+    //
     // Data
     //
     ConvertMemoryPageAttributes (
       PageTableBase,
       mPagingMode,
       mCpuHotPlugData.SmBase[Index] + SMM_HANDLER_OFFSET + TileCodeSize,
-      TileSize - TileCodeSize,
+      DataSize,
       EFI_MEMORY_RO,
       FALSE,
       NULL
@@ -827,56 +852,12 @@ PatchSmmSaveStateMap (
       PageTableBase,
       mPagingMode,
       mCpuHotPlugData.SmBase[Index] + SMM_HANDLER_OFFSET + TileCodeSize,
-      TileSize - TileCodeSize,
+      DataSize,
       EFI_MEMORY_XP,
       TRUE,
       NULL
       );
   }
-
-  //
-  // Code
-  //
-  ConvertMemoryPageAttributes (
-    PageTableBase,
-    mPagingMode,
-    mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET,
-    TileCodeSize,
-    EFI_MEMORY_RO,
-    TRUE,
-    NULL
-    );
-  ConvertMemoryPageAttributes (
-    PageTableBase,
-    mPagingMode,
-    mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET,
-    TileCodeSize,
-    EFI_MEMORY_XP,
-    FALSE,
-    NULL
-    );
-
-  //
-  // Data
-  //
-  ConvertMemoryPageAttributes (
-    PageTableBase,
-    mPagingMode,
-    mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET + TileCodeSize,
-    SIZE_32KB - TileCodeSize,
-    EFI_MEMORY_RO,
-    FALSE,
-    NULL
-    );
-  ConvertMemoryPageAttributes (
-    PageTableBase,
-    mPagingMode,
-    mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET + TileCodeSize,
-    SIZE_32KB - TileCodeSize,
-    EFI_MEMORY_XP,
-    TRUE,
-    NULL
-    );
 
   FlushTlbForAll ();
 }
