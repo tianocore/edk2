@@ -858,12 +858,23 @@ IScsiStart (
       goto ON_ERROR;
     }
 
+    if (ExistPrivate == NULL) {
+      ASSERT (ExistPrivate != NULL);
+      Status = EFI_NOT_FOUND;
+      goto ON_ERROR;
+    }
+
     for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
       if ((AttemptConfigOrder[Index] == mPrivate->BootSelectedIndex) ||
           (AttemptConfigOrder[Index] == BootSelected))
       {
         break;
       }
+    }
+
+    if (Index == AttemptConfigOrderSize / sizeof (UINT8)) {
+      Status = EFI_NOT_FOUND;
+      goto ON_ERROR;
     }
 
     if (mPrivate->EnableMpio) {
