@@ -41,6 +41,7 @@ UINT8  IpmiCompletionCodeMappingEntries = sizeof (IpmiCompletionCodeMapping) / s
 
 **/
 EFI_STATUS
+EFIAPI
 IpmiHelperCheckCompletionCode (
   IN   UINT8                                      CompletionCode,
   OUT  CHAR16                                     **CompletionCodeStr,

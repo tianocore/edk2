@@ -527,6 +527,10 @@ ValidateMmCommBufferAddr (
         &gEfiMmCommunicateHeaderV3Guid
         ))
   {
+    if (CommBufferRange < sizeof (EFI_MM_COMMUNICATE_HEADER_V3)) {
+      return EFI_ACCESS_DENIED;
+    }
+
     CommBufferHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferAddr;
     Status             = SafeUint64Add (
                            CommBufferHeaderV3->MessageSize,
@@ -536,9 +540,21 @@ ValidateMmCommBufferAddr (
     if (EFI_ERROR (Status)) {
       return EFI_ACCESS_DENIED;
     }
+
+    if (BufferSize > CommBufferHeaderV3->BufferSize) {
+      return EFI_ACCESS_DENIED;
+    }
+
+    BufferSize = CommBufferHeaderV3->BufferSize;
   } else {
-    BufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
-                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+    Status = SafeUint64Add (
+               ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength,
+               OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+               &BufferSize
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_ACCESS_DENIED;
+    }
   }
 
   Status = SafeUint64Add (

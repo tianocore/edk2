@@ -55,6 +55,7 @@ typedef enum ArmObjectID {
   EArmObjDmc620PmuRegInfo,                                     ///< 25 - DMC620 PMU Reg Info
   EArmObjProcessorSpecificBlockInfo,                           ///< 26 - Processor Specific Block.
   EArmObjProcessorSpecificSubDataArchInfo,                     ///< 27 - Processor Specific Sub Data (ArchData)
+  EArmObjCoresightPmuInfo,                                     ///< 28 - Coresight PMU Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -872,5 +873,66 @@ typedef struct CmArmProcessorSpecificSubDataArchInfo {
   /// Value of ID_AA64ZFR0_EL1.
   UINT64    IdAA64Zfr0;
 } CM_ARM_PROCESSOR_SPECIFIC_SUB_DATA_ARCH_INFO;
+
+/** A structure that describes Coresight PMU information.
+
+    ID: EArmObjCoresightPmuInfo
+*/
+typedef struct CmArmCoresightPmuInfo {
+  /// Node Flags.
+  UINT8              Flags;
+
+  /// Node Type.
+  UINT16             Type;
+
+  /// Unique identifier for this node.
+  UINT32             Identifier;
+
+  /// Base address of Page 0 of the PMU.
+  UINT64             BaseAddress0;
+
+  ///
+  /// Base address of Page 1 of the PMU if the PMU
+  /// implements the dual-page extension otherwise 0.
+  ///
+  UINT64             BaseAddress1;
+
+  /// Overflow Interrupt.
+  UINT32             OverflowInterrupt;
+
+  /// Overflow Interrupt Flags.
+  UINT32             OverflowInterruptFlags;
+
+  /// Proc node token for processor affinity
+  CM_OBJECT_TOKEN    ProcNodeToken;
+
+  ///
+  /// Token pointing to the monitored device.
+  /// The Token is evaluated in regards to the node Type and might resolve
+  /// to a CM Object such as CPU cache, Smmu and etc.
+  ///
+  CM_OBJECT_TOKEN    TypeInstanceToken;
+
+  ///
+  /// This is valid when type is EFI_ACPI_APMT_NODE_TYPE_ACPI_DEVICE only.
+  /// Specify the associated acpi device's HID with this Coresight PMU
+  /// including NULL characther.
+  ///
+  CHAR8              AcpiDeviceHid[9];
+
+  ///
+  /// This is valid when type is EFI_ACPI_APMT_NODE_TYPE_ACPI_DEVICE only.
+  /// Specify the associated acpi device's UID with this Coresight PMU.
+  ///
+  UINT32             AcpiDeviceUid;
+
+  ///
+  /// This field is used for specifying the identity of the
+  /// implementer of this PMU.
+  /// This field must be set to 0 and ignored if the
+  /// PMIIDR or PMPIDR register is present in this PMU implementation.
+  ///
+  UINT32             ImplementationId;
+} CM_ARM_CORESIGHT_PMU_INFO;
 
 #pragma pack()

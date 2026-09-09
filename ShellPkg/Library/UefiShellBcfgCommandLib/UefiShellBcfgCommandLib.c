@@ -1550,159 +1550,216 @@ ShellCommandRunBcfg (
     } else {
       ASSERT (FALSE);
     }
+
+    goto Done;
+  }
+
+  //
+  // Read in if we are doing -OPT
+  //
+  if (ShellCommandLineGetFlag (Package, L"-opt")) {
+    CurrentOperation.OptData = ShellCommandLineGetValue (Package, L"-opt");
+    if (CurrentOperation.OptData == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellBcfgHiiHandle, L"bcfg", L"-opt");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+
+    CurrentOperation.Type = BcfgTypeOpt;
+  }
+
+  //
+  // small block to read the target of the operation
+  //
+  if (((ShellCommandLineGetCount (Package) < 3) && (CurrentOperation.Type != BcfgTypeOpt)) ||
+      ((ShellCommandLineGetCount (Package) < 2) && (CurrentOperation.Type == BcfgTypeOpt))
+      )
+  {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)ShellCommandLineGetRawValue (Package, 1), L"driver") == 0) {
+    CurrentOperation.Target = BcfgTargetDriverOrder;
+  } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)ShellCommandLineGetRawValue (Package, 1), L"boot") == 0) {
+    CurrentOperation.Target = BcfgTargetBootOrder;
   } else {
-    //
-    // Read in if we are doing -OPT
-    //
-    if (ShellCommandLineGetFlag (Package, L"-opt")) {
-      CurrentOperation.OptData = ShellCommandLineGetValue (Package, L"-opt");
-      if (CurrentOperation.OptData == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellBcfgHiiHandle, L"bcfg", L"-opt");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_DRIVER_BOOT), gShellBcfgHiiHandle, L"bcfg");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // Read in the boot or driver order environment variable (not needed for opt)
+  //
+  if ((ShellStatus == SHELL_SUCCESS) && (CurrentOperation.Target < BcfgTargetMax)) {
+    Length = 0;
+    Status = gRT->GetVariable (
+                    CurrentOperation.Target == BcfgTargetBootOrder ? (CHAR16 *)L"BootOrder" : (CHAR16 *)L"DriverOrder",
+                    (EFI_GUID *)&gEfiGlobalVariableGuid,
+                    NULL,
+                    &Length,
+                    CurrentOperation.Order
+                    );
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      CurrentOperation.Order = AllocateZeroPool (Length+(4*sizeof (CurrentOperation.Order[0])));
+      if (CurrentOperation.Order == NULL) {
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+      } else {
+        Status = gRT->GetVariable (
+                        CurrentOperation.Target == BcfgTargetBootOrder ? (CHAR16 *)L"BootOrder" : (CHAR16 *)L"DriverOrder",
+                        (EFI_GUID *)&gEfiGlobalVariableGuid,
+                        NULL,
+                        &Length,
+                        CurrentOperation.Order
+                        );
+      }
+    }
+  }
+
+  Count = (UINT16)(Length / sizeof (CurrentOperation.Order[0]));
+
+  //
+  // large block to read the type of operation and verify parameter types for the info.
+  //
+  if ((ShellStatus == SHELL_SUCCESS) && (CurrentOperation.Target < BcfgTargetMax)) {
+    for (ParamNumber = 2; ParamNumber < ShellCommandLineGetCount (Package) && ShellStatus == SHELL_SUCCESS; ParamNumber++) {
+      CurrentParam = ShellCommandLineGetRawValue (Package, ParamNumber);
+      if (CurrentParam == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"NULL");
         ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
       }
 
-      CurrentOperation.Type = BcfgTypeOpt;
-    }
+      if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"dump") == 0) {
+        CurrentOperation.Type = BcfgTypeDump;
+        if (ShellCommandLineGetCount (Package) > 3) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+      } else if (ShellCommandLineGetFlag (Package, L"-v")) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"-v (without dump)");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"add") == 0) {
+        if ((ParamNumber + 3) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
 
-    //
-    // small block to read the target of the operation
-    //
-    if (((ShellCommandLineGetCount (Package) < 3) && (CurrentOperation.Type != BcfgTypeOpt)) ||
-        ((ShellCommandLineGetCount (Package) < 2) && (CurrentOperation.Type == BcfgTypeOpt))
-        )
-    {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)ShellCommandLineGetRawValue (Package, 1), L"driver") == 0) {
-      CurrentOperation.Target = BcfgTargetDriverOrder;
-    } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)ShellCommandLineGetRawValue (Package, 1), L"boot") == 0) {
-      CurrentOperation.Target = BcfgTargetBootOrder;
-    } else {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_DRIVER_BOOT), gShellBcfgHiiHandle, L"bcfg");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    }
-
-    //
-    // Read in the boot or driver order environment variable (not needed for opt)
-    //
-    if ((ShellStatus == SHELL_SUCCESS) && (CurrentOperation.Target < BcfgTargetMax)) {
-      Length = 0;
-      Status = gRT->GetVariable (
-                      CurrentOperation.Target == BcfgTargetBootOrder ? (CHAR16 *)L"BootOrder" : (CHAR16 *)L"DriverOrder",
-                      (EFI_GUID *)&gEfiGlobalVariableGuid,
-                      NULL,
-                      &Length,
-                      CurrentOperation.Order
-                      );
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        CurrentOperation.Order = AllocateZeroPool (Length+(4*sizeof (CurrentOperation.Order[0])));
-        if (CurrentOperation.Order == NULL) {
-          ShellStatus = SHELL_OUT_OF_RESOURCES;
+        CurrentOperation.Type = BcfgTypeAdd;
+        CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+        if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+          ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          Status = gRT->GetVariable (
-                          CurrentOperation.Target == BcfgTargetBootOrder ? (CHAR16 *)L"BootOrder" : (CHAR16 *)L"DriverOrder",
-                          (EFI_GUID *)&gEfiGlobalVariableGuid,
-                          NULL,
-                          &Length,
-                          CurrentOperation.Order
-                          );
+          Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+          CurrentOperation.Number1 = (UINT16)Intermediate;
+          ASSERT (CurrentOperation.FileName == NULL);
+          CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+          ASSERT (CurrentOperation.Description == NULL);
+          CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
         }
-      }
-    }
-
-    Count = (UINT16)(Length / sizeof (CurrentOperation.Order[0]));
-
-    //
-    // large block to read the type of operation and verify parameter types for the info.
-    //
-    if ((ShellStatus == SHELL_SUCCESS) && (CurrentOperation.Target < BcfgTargetMax)) {
-      for (ParamNumber = 2; ParamNumber < ShellCommandLineGetCount (Package) && ShellStatus == SHELL_SUCCESS; ParamNumber++) {
-        CurrentParam = ShellCommandLineGetRawValue (Package, ParamNumber);
-        if (CurrentParam == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"NULL");
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"addp") == 0) {
+        if ((ParamNumber + 3) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
           ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
         }
 
-        if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"dump") == 0) {
-          CurrentOperation.Type = BcfgTypeDump;
-          if (ShellCommandLineGetCount (Package) > 3) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
-        } else if (ShellCommandLineGetFlag (Package, L"-v")) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"-v (without dump)");
+        CurrentOperation.Type = BcfgTypeAddp;
+        CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+        if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
           ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"add") == 0) {
-          if ((ParamNumber + 3) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
+        } else {
+          Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+          CurrentOperation.Number1 = (UINT16)Intermediate;
+          ASSERT (CurrentOperation.FileName == NULL);
+          CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+          ASSERT (CurrentOperation.Description == NULL);
+          CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"addh") == 0) {
+        if ((ParamNumber + 3) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
 
-          CurrentOperation.Type = BcfgTypeAdd;
-          CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+        CurrentOperation.Type = BcfgTypeAddh;
+        CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+        if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+          CurrentOperation.Number1 = (UINT16)Intermediate;
+          CurrentParam             = ShellCommandLineGetRawValue (Package, ++ParamNumber);
           if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
             ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-            CurrentOperation.Number1 = (UINT16)Intermediate;
-            ASSERT (CurrentOperation.FileName == NULL);
-            CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+            Status                       = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+            CurrentOperation.HandleIndex = (UINT16)Intermediate;
             ASSERT (CurrentOperation.Description == NULL);
             CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
           }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"addp") == 0) {
-          if ((ParamNumber + 3) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"rm") == 0) {
+        if ((ParamNumber + 1) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+
+        CurrentOperation.Type = BcfgTypeRm;
+        CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+        if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+          CurrentOperation.Number1 = (UINT16)Intermediate;
+          if (CurrentOperation.Number1 >= Count) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"mv") == 0) {
+        if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
 
-          CurrentOperation.Type = BcfgTypeAddp;
-          CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-          if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+        CurrentOperation.Type = BcfgTypeMv;
+        CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+        if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+          CurrentOperation.Number1 = (UINT16)Intermediate;
+          if (CurrentOperation.Number1 >= Count) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-            CurrentOperation.Number1 = (UINT16)Intermediate;
-            ASSERT (CurrentOperation.FileName == NULL);
-            CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
-            ASSERT (CurrentOperation.Description == NULL);
-            CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
-          }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"addh") == 0) {
-          if ((ParamNumber + 3) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
-
-          CurrentOperation.Type = BcfgTypeAddh;
-          CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-          if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-            CurrentOperation.Number1 = (UINT16)Intermediate;
-            CurrentParam             = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+            CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
             if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
               ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
-              Status                       = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-              CurrentOperation.HandleIndex = (UINT16)Intermediate;
-              ASSERT (CurrentOperation.Description == NULL);
-              CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+              Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+              CurrentOperation.Number2 = (UINT16)Intermediate;
+            }
+
+            if (  (CurrentOperation.Number2 == CurrentOperation.Number1)
+               || (CurrentOperation.Number2 >= Count)
+                  )
+            {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+              ShellStatus = SHELL_INVALID_PARAMETER;
             }
           }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"rm") == 0) {
-          if ((ParamNumber + 1) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
-
-          CurrentOperation.Type = BcfgTypeRm;
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"mod") == 0) {
+        if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          CurrentOperation.Type = BcfgTypeMod;
           CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
           if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
             ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
@@ -1713,15 +1770,62 @@ ShellCommandRunBcfg (
             if (CurrentOperation.Number1 >= Count) {
               ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
               ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              ASSERT (CurrentOperation.Description == NULL);
+              CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
             }
           }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"mv") == 0) {
-          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"modf") == 0) {
+        if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          CurrentOperation.Type = BcfgTypeModf;
+          CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+          if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
             ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+            CurrentOperation.Number1 = (UINT16)Intermediate;
+            if (CurrentOperation.Number1 >= Count) {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              ASSERT (CurrentOperation.FileName == NULL);
+              CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+            }
           }
-
-          CurrentOperation.Type = BcfgTypeMv;
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"modp") == 0) {
+        if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          CurrentOperation.Type = BcfgTypeModp;
+          CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+          if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+            CurrentOperation.Number1 = (UINT16)Intermediate;
+            if (CurrentOperation.Number1 >= Count) {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              ASSERT (CurrentOperation.FileName == NULL);
+              CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+            }
+          }
+        }
+      } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"modh") == 0) {
+        if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          CurrentOperation.Type = BcfgTypeModh;
           CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
           if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
             ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
@@ -1738,182 +1842,80 @@ ShellCommandRunBcfg (
                 ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
-                Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-                CurrentOperation.Number2 = (UINT16)Intermediate;
-              }
-
-              if (  (CurrentOperation.Number2 == CurrentOperation.Number1)
-                 || (CurrentOperation.Number2 >= Count)
-                    )
-              {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
-                ShellStatus = SHELL_INVALID_PARAMETER;
+                Status                       = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+                CurrentOperation.HandleIndex = (UINT16)Intermediate;
               }
             }
           }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"mod") == 0) {
-          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            CurrentOperation.Type = BcfgTypeMod;
-            CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-            if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            } else {
-              Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-              CurrentOperation.Number1 = (UINT16)Intermediate;
-              if (CurrentOperation.Number1 >= Count) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              } else {
-                ASSERT (CurrentOperation.Description == NULL);
-                CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
-              }
-            }
-          }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"modf") == 0) {
-          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            CurrentOperation.Type = BcfgTypeModf;
-            CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-            if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            } else {
-              Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-              CurrentOperation.Number1 = (UINT16)Intermediate;
-              if (CurrentOperation.Number1 >= Count) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              } else {
-                ASSERT (CurrentOperation.FileName == NULL);
-                CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
-              }
-            }
-          }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"modp") == 0) {
-          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            CurrentOperation.Type = BcfgTypeModp;
-            CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-            if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            } else {
-              Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-              CurrentOperation.Number1 = (UINT16)Intermediate;
-              if (CurrentOperation.Number1 >= Count) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              } else {
-                ASSERT (CurrentOperation.FileName == NULL);
-                CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
-              }
-            }
-          }
-        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)CurrentParam, L"modh") == 0) {
-          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            CurrentOperation.Type = BcfgTypeModh;
-            CurrentParam          = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-            if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            } else {
-              Status                   = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-              CurrentOperation.Number1 = (UINT16)Intermediate;
-              if (CurrentOperation.Number1 >= Count) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              } else {
-                CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
-                if ((CurrentParam == NULL) || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
-                  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-                  ShellStatus = SHELL_INVALID_PARAMETER;
-                } else {
-                  Status                       = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
-                  CurrentOperation.HandleIndex = (UINT16)Intermediate;
-                }
-              }
-            }
-          }
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
-          ShellStatus = SHELL_INVALID_PARAMETER;
         }
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+        ShellStatus = SHELL_INVALID_PARAMETER;
       }
     }
+  }
 
-    if ((ShellStatus == SHELL_SUCCESS) && (CurrentOperation.Target < BcfgTargetMax) && (CurrentOperation.Type < BcfgTypeMax)) {
-      //
-      // we have all the info.  Do the work
-      //
-      switch (CurrentOperation.Type) {
-        case BcfgTypeDump:
-          ShellStatus = BcfgDisplayDump (
-                          CurrentOperation.Target == BcfgTargetBootOrder ? L"Boot" : L"Driver",
-                          Count,
-                          CurrentOperation.Order,
-                          ShellCommandLineGetFlag (Package, L"-v")
-                          );
-          break;
-        case BcfgTypeMv:
-          ShellStatus = BcfgMove (
-                          CurrentOperation.Target,
-                          CurrentOperation.Order,
-                          Count,
-                          CurrentOperation.Number1,
-                          CurrentOperation.Number2
-                          );
-          break;
-        case BcfgTypeRm:
-          ShellStatus = BcfgRemove (
-                          CurrentOperation.Target,
-                          CurrentOperation.Order,
-                          Count,
-                          CurrentOperation.Number1
-                          );
-          break;
-        case BcfgTypeAdd:
-        case BcfgTypeAddp:
-        case BcfgTypeAddh:
-          ShellStatus = BcfgAdd (
-                          CurrentOperation.Number1,
-                          CurrentOperation.FileName,
-                          CurrentOperation.Description == NULL ? L"" : CurrentOperation.Description,
-                          CurrentOperation.Order,
-                          Count,
-                          CurrentOperation.Target,
-                          (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddh),
-                          (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddp),
-                          CurrentOperation.HandleIndex
-                          );
-          break;
-        case BcfgTypeMod:
-        case BcfgTypeModf:
-        case BcfgTypeModp:
-        case BcfgTypeModh:
-          ShellStatus = BcfgMod (&CurrentOperation, Count);
-          break;
-        case BcfgTypeOpt:
-          ShellStatus = BcfgAddOpt (
-                          CurrentOperation.OptData,
-                          CurrentOperation.Order,
-                          Count,
-                          CurrentOperation.Target
-                          );
-          break;
-        default:
-          ASSERT (FALSE);
-      }
+  if ((ShellStatus == SHELL_SUCCESS) && (CurrentOperation.Target < BcfgTargetMax) && (CurrentOperation.Type < BcfgTypeMax)) {
+    //
+    // we have all the info.  Do the work
+    //
+    switch (CurrentOperation.Type) {
+      case BcfgTypeDump:
+        ShellStatus = BcfgDisplayDump (
+                        CurrentOperation.Target == BcfgTargetBootOrder ? L"Boot" : L"Driver",
+                        Count,
+                        CurrentOperation.Order,
+                        ShellCommandLineGetFlag (Package, L"-v")
+                        );
+        break;
+      case BcfgTypeMv:
+        ShellStatus = BcfgMove (
+                        CurrentOperation.Target,
+                        CurrentOperation.Order,
+                        Count,
+                        CurrentOperation.Number1,
+                        CurrentOperation.Number2
+                        );
+        break;
+      case BcfgTypeRm:
+        ShellStatus = BcfgRemove (
+                        CurrentOperation.Target,
+                        CurrentOperation.Order,
+                        Count,
+                        CurrentOperation.Number1
+                        );
+        break;
+      case BcfgTypeAdd:
+      case BcfgTypeAddp:
+      case BcfgTypeAddh:
+        ShellStatus = BcfgAdd (
+                        CurrentOperation.Number1,
+                        CurrentOperation.FileName,
+                        CurrentOperation.Description == NULL ? L"" : CurrentOperation.Description,
+                        CurrentOperation.Order,
+                        Count,
+                        CurrentOperation.Target,
+                        (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddh),
+                        (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddp),
+                        CurrentOperation.HandleIndex
+                        );
+        break;
+      case BcfgTypeMod:
+      case BcfgTypeModf:
+      case BcfgTypeModp:
+      case BcfgTypeModh:
+        ShellStatus = BcfgMod (&CurrentOperation, Count);
+        break;
+      case BcfgTypeOpt:
+        ShellStatus = BcfgAddOpt (
+                        CurrentOperation.OptData,
+                        CurrentOperation.Order,
+                        Count,
+                        CurrentOperation.Target
+                        );
+        break;
+      default:
+        ASSERT (FALSE);
     }
   }
 

@@ -15,6 +15,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MemEncryptSevLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+  CONSTRUCTOR                    = DxeMemEncryptSevLibConstructor
 
 #
 # The following information is for reference only and not required by the build
@@ -32,6 +33,7 @@
 [Sources]
   DxeMemEncryptSevLibInternal.c
   PeiDxeMemEncryptSevLibInternal.c
+  PeiDxeMemEncryptSevLibInternal.h
   X64/DxeSnpSystemRamValidate.c
   X64/MemEncryptSevLib.c
   X64/PeiDxeVirtualMemory.c
@@ -52,6 +54,6 @@
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
-  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
