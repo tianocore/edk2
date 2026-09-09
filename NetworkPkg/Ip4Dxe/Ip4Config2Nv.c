@@ -878,15 +878,16 @@ Ip4FormExtractConfig (
   }
 
   IfrFormNvData      = NULL;
-  ConfigRequest      = NULL;
+  ConfigRequestHdr   = NULL;
+  ConfigRequest      = Request;
   FormResult         = NULL;
   Size               = 0;
   AllocatedRequest   = FALSE;
-  ConfigRequest      = Request;
   Private            = IP4_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
   Ip4Config2Instance = IP4_CONFIG2_INSTANCE_FROM_FORM_CALLBACK (Private);
   BufferSize         = sizeof (IP4_CONFIG2_IFR_NVDATA);
   *Progress          = Request;
+  *Results           = NULL;
 
   //
   // Check Request data in <ConfigHdr>.
@@ -909,8 +910,13 @@ Ip4FormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
+    if (ConfigRequestHdr == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Failure;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Failure;
@@ -919,7 +925,6 @@ Ip4FormExtractConfig (
     AllocatedRequest = TRUE;
 
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
-    FreePool (ConfigRequestHdr);
   }
 
   //
@@ -934,21 +939,12 @@ Ip4FormExtractConfig (
                                 Progress
                                 );
 
-  FreePool (IfrFormNvData);
-
-  //
-  // Free the allocated config request string.
-  //
-  if (AllocatedRequest) {
-    FreePool (ConfigRequest);
-    ConfigRequest = NULL;
-  }
-
   if (EFI_ERROR (Status)) {
     goto Failure;
   }
 
   *Results = FormResult;
+  FormResult = NULL;
 
 Failure:
   //
@@ -958,6 +954,22 @@ Failure:
     *Progress = NULL;
   } else if (StrStr (Request, L"OFFSET") == NULL) {
     *Progress = Request + StrLen (Request);
+  }
+
+  if (ConfigRequestHdr != NULL) {
+    FreePool (ConfigRequestHdr);
+  }
+
+  if (AllocatedRequest && (ConfigRequest != NULL)) {
+    FreePool (ConfigRequest);
+  }
+
+  if (IfrFormNvData != NULL) {
+    FreePool (IfrFormNvData);
+  }
+
+  if (FormResult != NULL) {
+    FreePool (FormResult);
   }
 
   return Status;
@@ -1336,24 +1348,27 @@ Ip4Config2FormInit (
                       STRING_TOKEN (STR_IP4_CONFIG2_FORM_HELP),
                       NULL
                       );
-    UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP4_CONFIG2_FORM_HELP),
-      MenuString,
-      NULL
-      );
+    if (OldMenuString != NULL) {
+      UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_IP4_CONFIG2_FORM_HELP),
+        MenuString,
+        NULL
+        );
 
-    UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP4_DEVICE_FORM_HELP),
-      PortString,
-      NULL
-      );
+      UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_IP4_DEVICE_FORM_HELP),
+        PortString,
+        NULL
+        );
+
+      FreePool (OldMenuString);
+    }
 
     FreePool (MacString);
-    FreePool (OldMenuString);
 
     return EFI_SUCCESS;
   }
