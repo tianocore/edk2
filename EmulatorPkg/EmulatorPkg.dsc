@@ -479,11 +479,6 @@
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  #{
-  #  <LibraryClasses>
-  #    NULL|EmulatorPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
-  #}
-
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
