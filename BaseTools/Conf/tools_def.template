@@ -979,10 +979,12 @@ RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC_LOONGARCH64_CC_FLAGS)
 
 ####################################################################################
 #
-# ICX - This configuration uses Intel oneAPI ICX on Linux to produce
-#       firmware binaries without LTO.  llvm-ar and llvm-objcopy are obtained
-#       from PATH because current oneAPI installations may not ship them in
-#       ICX_BIN.
+# ICX - This configuration uses Intel oneAPI ICX on Linux.  X64/IA32 build
+#       with -flto (needed to keep size-constrained regions such as FSP within
+#       budget), so the objects are LLVM bitcode.  Archiving/objcopy therefore
+#       use llvm-ar/llvm-objcopy, taken from the oneAPI install itself
+#       (ICX_BIN/compiler/) rather than a separate system LLVM, so ICX depends
+#       only on the oneAPI toolchain.
 #
 ####################################################################################
 *_ICX_*_*_FAMILY                = GCC
@@ -1002,6 +1004,12 @@ RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC_LOONGARCH64_CC_FLAGS)
 *_ICX_*_GENFWHII_FLAGS          = --hiibinpackage
 
 DEFINE ICX_PREFIX               = ENV(ICX_BIN)
+# LLVM binutils (llvm-ar/llvm-objcopy) shipped alongside icx in the oneAPI
+# install, under bin/compiler/.  Use these rather than a separate system LLVM
+# on PATH so ICX depends only on the oneAPI toolchain.  They are required
+# because ICX builds with -flto emit LLVM bitcode objects that GNU ar/objcopy
+# cannot index.
+DEFINE ICX_LLVM_TOOL_PREFIX     = DEF(ICX_PREFIX)compiler/
 DEFINE ICX_IA32_TARGET          = -target i686-pc-linux-gnu
 DEFINE ICX_X64_TARGET           = -target x86_64-pc-linux-gnu
 DEFINE ICX_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-shift-negative-value -Wno-empty-body -Wno-varargs -Wno-unknown-warning-option -Wno-unaligned-access
@@ -1013,9 +1021,9 @@ DEFINE ICX_IA32_X64_DLINK_FLAGS = DEF(ICX_IA32_X64_DLINK_COMMON) -Wl,--entry,$(I
 ##################
 # ICX IA32 definitions
 ##################
-*_ICX_IA32_OBJCOPY_PATH         = llvm-objcopy
+*_ICX_IA32_OBJCOPY_PATH         = DEF(ICX_LLVM_TOOL_PREFIX)llvm-objcopy
 *_ICX_IA32_CC_PATH              = DEF(ICX_PREFIX)icx
-*_ICX_IA32_SLINK_PATH           = llvm-ar
+*_ICX_IA32_SLINK_PATH           = DEF(ICX_LLVM_TOOL_PREFIX)llvm-ar
 *_ICX_IA32_DLINK_PATH           = DEF(ICX_PREFIX)icx
 *_ICX_IA32_ASLDLINK_PATH        = DEF(ICX_PREFIX)icx
 *_ICX_IA32_ASM_PATH             = DEF(ICX_PREFIX)icx
@@ -1023,7 +1031,7 @@ DEFINE ICX_IA32_X64_DLINK_FLAGS = DEF(ICX_IA32_X64_DLINK_COMMON) -Wl,--entry,$(I
 *_ICX_IA32_VFRPP_PATH           = DEF(ICX_PREFIX)icx
 *_ICX_IA32_ASLCC_PATH           = DEF(ICX_PREFIX)icx
 *_ICX_IA32_ASLPP_PATH           = DEF(ICX_PREFIX)icx
-*_ICX_IA32_RC_PATH              = llvm-objcopy
+*_ICX_IA32_RC_PATH              = DEF(ICX_LLVM_TOOL_PREFIX)llvm-objcopy
 
 *_ICX_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_COMMON) DEF(ICX_IA32_TARGET) -fno-lto -malign-double
 *_ICX_IA32_ASLDLINK_FLAGS       = DEF(ICX_IA32_X64_ASLDLINK_FLAGS) DEF(ICX_IA32_TARGET) -Wl,-m,elf_i386 -no-pie
@@ -1046,9 +1054,9 @@ NOOPT_ICX_IA32_DLINK_FLAGS      = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_IA32_TAR
 ##################
 # ICX X64 definitions
 ##################
-*_ICX_X64_OBJCOPY_PATH          = llvm-objcopy
+*_ICX_X64_OBJCOPY_PATH          = DEF(ICX_LLVM_TOOL_PREFIX)llvm-objcopy
 *_ICX_X64_CC_PATH               = DEF(ICX_PREFIX)icx
-*_ICX_X64_SLINK_PATH            = llvm-ar
+*_ICX_X64_SLINK_PATH            = DEF(ICX_LLVM_TOOL_PREFIX)llvm-ar
 *_ICX_X64_DLINK_PATH            = DEF(ICX_PREFIX)icx
 *_ICX_X64_ASLDLINK_PATH         = DEF(ICX_PREFIX)icx
 *_ICX_X64_ASM_PATH              = DEF(ICX_PREFIX)icx
@@ -1056,7 +1064,7 @@ NOOPT_ICX_IA32_DLINK_FLAGS      = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_IA32_TAR
 *_ICX_X64_VFRPP_PATH            = DEF(ICX_PREFIX)icx
 *_ICX_X64_ASLCC_PATH            = DEF(ICX_PREFIX)icx
 *_ICX_X64_ASLPP_PATH            = DEF(ICX_PREFIX)icx
-*_ICX_X64_RC_PATH               = llvm-objcopy
+*_ICX_X64_RC_PATH               = DEF(ICX_LLVM_TOOL_PREFIX)llvm-objcopy
 
 *_ICX_X64_ASLCC_FLAGS           = DEF(GCC_ASLCC_COMMON) DEF(ICX_X64_TARGET) -fno-lto
 *_ICX_X64_ASLDLINK_FLAGS        = DEF(ICX_IA32_X64_ASLDLINK_FLAGS) DEF(ICX_X64_TARGET) -Wl,-m,elf_x86_64 -no-pie
