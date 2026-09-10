@@ -36,8 +36,9 @@
 #      - Add CLANGDWARF support for LoongArch64
 #4.00  - Remove VS2015 support
 #4.01  - Remove VS2017 support
+#4.02  - Add ICX support for Linux IA32 and X64 firmware builds
 #
-#!VERSION=4.01
+#!VERSION=4.02
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
@@ -174,6 +175,9 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Required to compile nasm source:
 #                               nasm compiler from
 #                               NASM -- http://www.nasm.us/
+#   ICX        -Linux-  Requires:
+#                             Intel oneAPI DPC++/C++ Compiler (icx).
+#                             Set ICX_BIN to the directory containing icx.
 #
 ####################################################################################
 ####################################################################################
@@ -972,6 +976,107 @@ RELEASE_GCC_AARCH64_DLINK_FLAGS = DEF(GCC_AARCH64_DLINK_FLAGS) -flto -Os -L$(WOR
 DEBUG_GCC_LOONGARCH64_CC_FLAGS         = DEF(GCC_LOONGARCH64_CC_FLAGS)
 NOOPT_GCC_LOONGARCH64_CC_FLAGS         = DEF(GCC_LOONGARCH64_CC_FLAGS) -O0
 RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC_LOONGARCH64_CC_FLAGS)
+
+####################################################################################
+#
+# ICX - This configuration uses Intel oneAPI ICX on Linux to produce
+#       firmware binaries without LTO.  llvm-ar and llvm-objcopy are obtained
+#       from PATH because current oneAPI installations may not ship them in
+#       ICX_BIN.
+#
+####################################################################################
+*_ICX_*_*_FAMILY                = GCC
+*_ICX_*_*_BUILDRULEFAMILY       = GCC
+*_ICX_*_MAKE_PATH               = make
+*_ICX_*_*_DLL                   = ENV(ICX_DLL)
+*_ICX_*_ASL_PATH                = DEF(UNIX_IASL_BIN)
+
+*_ICX_*_PP_FLAGS                = DEF(GCC_PP_FLAGS)
+*_ICX_*_ASLPP_FLAGS             = DEF(GCC_ASLPP_FLAGS)
+*_ICX_*_ASLCC_FLAGS             = DEF(GCC_ASLCC_COMMON)
+*_ICX_*_VFRPP_FLAGS             = DEF(GCC_VFRPP_FLAGS)
+*_ICX_*_APP_FLAGS               =
+*_ICX_*_ASL_FLAGS               = DEF(IASL_FLAGS)
+*_ICX_*_ASL_OUTFLAGS            = DEF(IASL_OUTFLAGS)
+*_ICX_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_ICX_*_GENFWHII_FLAGS          = --hiibinpackage
+
+DEFINE ICX_PREFIX               = ENV(ICX_BIN)
+DEFINE ICX_IA32_TARGET          = -target i686-pc-linux-gnu
+DEFINE ICX_X64_TARGET           = -target x86_64-pc-linux-gnu
+DEFINE ICX_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-shift-negative-value -Wno-empty-body -Wno-varargs -Wno-unknown-warning-option -Wno-unaligned-access
+DEFINE ICX_ALL_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) DEF(ICX_WARNING_OVERRIDES) -D__STDC_NO_ATOMICS__ -fno-asynchronous-unwind-tables -fno-omit-frame-pointer
+DEFINE ICX_IA32_X64_DLINK_COMMON = -nostdlib -Wl,-q,--gc-sections
+DEFINE ICX_IA32_X64_ASLDLINK_FLAGS = DEF(ICX_IA32_X64_DLINK_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
+DEFINE ICX_IA32_X64_DLINK_FLAGS = DEF(ICX_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive DEF(GCC_DLINK_WARNING_FLAGS) -fuse-ld=lld
+
+##################
+# ICX IA32 definitions
+##################
+*_ICX_IA32_OBJCOPY_PATH         = llvm-objcopy
+*_ICX_IA32_CC_PATH              = DEF(ICX_PREFIX)icx
+*_ICX_IA32_SLINK_PATH           = llvm-ar
+*_ICX_IA32_DLINK_PATH           = DEF(ICX_PREFIX)icx
+*_ICX_IA32_ASLDLINK_PATH        = DEF(ICX_PREFIX)icx
+*_ICX_IA32_ASM_PATH             = DEF(ICX_PREFIX)icx
+*_ICX_IA32_PP_PATH              = DEF(ICX_PREFIX)icx
+*_ICX_IA32_VFRPP_PATH           = DEF(ICX_PREFIX)icx
+*_ICX_IA32_ASLCC_PATH           = DEF(ICX_PREFIX)icx
+*_ICX_IA32_ASLPP_PATH           = DEF(ICX_PREFIX)icx
+*_ICX_IA32_RC_PATH              = llvm-objcopy
+
+*_ICX_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_COMMON) DEF(ICX_IA32_TARGET) -fno-lto -malign-double
+*_ICX_IA32_ASLDLINK_FLAGS       = DEF(ICX_IA32_X64_ASLDLINK_FLAGS) DEF(ICX_IA32_TARGET) -Wl,-m,elf_i386 -no-pie
+*_ICX_IA32_ASM_FLAGS            = DEF(GCC_ASM_FLAGS) DEF(ICX_IA32_TARGET) -march=i386
+*_ICX_IA32_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(ICX_IA32_TARGET)
+*_ICX_IA32_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(ICX_IA32_TARGET)
+*_ICX_IA32_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(ICX_IA32_TARGET)
+*_ICX_IA32_DLINK2_FLAGS         = DEF(GCC_IA32_DLINK2_FLAGS) -no-pie
+*_ICX_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
+*_ICX_IA32_OBJCOPY_FLAGS        =
+*_ICX_IA32_NASM_FLAGS           = -f elf32
+
+  DEBUG_ICX_IA32_CC_FLAGS       = DEF(ICX_ALL_CC_FLAGS) DEF(ICX_IA32_TARGET) -march=i586 -malign-double -D EFI32 -Oz -flto
+DEBUG_ICX_IA32_DLINK_FLAGS      = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_IA32_TARGET) -Wl,-m,elf_i386,--oformat=elf32-i386
+RELEASE_ICX_IA32_CC_FLAGS       = DEF(ICX_ALL_CC_FLAGS) DEF(ICX_IA32_TARGET) -march=i586 -malign-double -D EFI32 -Os
+RELEASE_ICX_IA32_DLINK_FLAGS    = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_IA32_TARGET) -Wl,-m,elf_i386,--oformat=elf32-i386
+  NOOPT_ICX_IA32_CC_FLAGS       = DEF(ICX_ALL_CC_FLAGS) DEF(ICX_IA32_TARGET) -march=i586 -malign-double -D EFI32 -O0
+NOOPT_ICX_IA32_DLINK_FLAGS      = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_IA32_TARGET) -Wl,-m,elf_i386,--oformat=elf32-i386 -O0
+
+##################
+# ICX X64 definitions
+##################
+*_ICX_X64_OBJCOPY_PATH          = llvm-objcopy
+*_ICX_X64_CC_PATH               = DEF(ICX_PREFIX)icx
+*_ICX_X64_SLINK_PATH            = llvm-ar
+*_ICX_X64_DLINK_PATH            = DEF(ICX_PREFIX)icx
+*_ICX_X64_ASLDLINK_PATH         = DEF(ICX_PREFIX)icx
+*_ICX_X64_ASM_PATH              = DEF(ICX_PREFIX)icx
+*_ICX_X64_PP_PATH               = DEF(ICX_PREFIX)icx
+*_ICX_X64_VFRPP_PATH            = DEF(ICX_PREFIX)icx
+*_ICX_X64_ASLCC_PATH            = DEF(ICX_PREFIX)icx
+*_ICX_X64_ASLPP_PATH            = DEF(ICX_PREFIX)icx
+*_ICX_X64_RC_PATH               = llvm-objcopy
+
+*_ICX_X64_ASLCC_FLAGS           = DEF(GCC_ASLCC_COMMON) DEF(ICX_X64_TARGET) -fno-lto
+*_ICX_X64_ASLDLINK_FLAGS        = DEF(ICX_IA32_X64_ASLDLINK_FLAGS) DEF(ICX_X64_TARGET) -Wl,-m,elf_x86_64 -no-pie
+*_ICX_X64_ASM_FLAGS             = DEF(GCC_ASM_FLAGS) DEF(ICX_X64_TARGET)
+*_ICX_X64_PP_FLAGS              = DEF(GCC_PP_FLAGS) DEF(ICX_X64_TARGET)
+*_ICX_X64_ASLPP_FLAGS           = DEF(GCC_ASLPP_FLAGS) DEF(ICX_X64_TARGET)
+*_ICX_X64_VFRPP_FLAGS           = DEF(GCC_VFRPP_FLAGS) DEF(ICX_X64_TARGET)
+*_ICX_X64_DLINK2_FLAGS          = DEF(GCC_X64_DLINK2_FLAGS)
+*_ICX_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
+*_ICX_X64_OBJCOPY_FLAGS         =
+*_ICX_X64_NASM_FLAGS            = -f elf64
+
+  DEBUG_ICX_X64_CC_FLAGS        = DEF(ICX_ALL_CC_FLAGS) DEF(ICX_X64_TARGET) "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fno-direct-access-external-data -Oz -flto
+DEBUG_ICX_X64_DLINK_FLAGS       = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_X64_TARGET) -Wl,-m,elf_x86_64,--oformat=elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+RELEASE_ICX_X64_CC_FLAGS        = DEF(ICX_ALL_CC_FLAGS) DEF(ICX_X64_TARGET) "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fno-direct-access-external-data -Os
+RELEASE_ICX_X64_DLINK_FLAGS     = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_X64_TARGET) -Wl,-m,elf_x86_64,--oformat=elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+  NOOPT_ICX_X64_CC_FLAGS        = DEF(ICX_ALL_CC_FLAGS) DEF(ICX_X64_TARGET) "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fno-direct-access-external-data -O0
+NOOPT_ICX_X64_DLINK_FLAGS       = DEF(ICX_IA32_X64_DLINK_FLAGS) DEF(ICX_X64_TARGET) -Wl,-m,elf_x86_64,--oformat=elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs -O0
+
+*_ICX_X64_DLINK_XIPFLAGS        =
 
 ####################################################################################
 #
