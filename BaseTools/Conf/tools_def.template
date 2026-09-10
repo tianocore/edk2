@@ -1005,7 +1005,7 @@ DEFINE ICX_PREFIX               = ENV(ICX_BIN)
 DEFINE ICX_IA32_TARGET          = -target i686-pc-linux-gnu
 DEFINE ICX_X64_TARGET           = -target x86_64-pc-linux-gnu
 DEFINE ICX_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-shift-negative-value -Wno-empty-body -Wno-varargs -Wno-unknown-warning-option -Wno-unaligned-access
-DEFINE ICX_ALL_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) DEF(ICX_WARNING_OVERRIDES) -D__STDC_NO_ATOMICS__ -fno-asynchronous-unwind-tables -fno-omit-frame-pointer
+DEFINE ICX_ALL_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) DEF(ICX_WARNING_OVERRIDES) -D__STDC_NO_ATOMICS__ -fno-stack-protector -mno-implicit-float -fno-asynchronous-unwind-tables -fno-omit-frame-pointer
 DEFINE ICX_IA32_X64_DLINK_COMMON = -nostdlib -Wl,-q,--gc-sections
 DEFINE ICX_IA32_X64_ASLDLINK_FLAGS = DEF(ICX_IA32_X64_DLINK_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE ICX_IA32_X64_DLINK_FLAGS = DEF(ICX_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive DEF(GCC_DLINK_WARNING_FLAGS) -fuse-ld=lld
