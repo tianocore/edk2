@@ -393,6 +393,16 @@
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask           | 0x1
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask             | 0x07
 
+  #
+  # Enable performance measure, but filter DB:DriverBinding support performance records
+  #
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask           | 0x9
+  #
+  # Because there are many drivers or physical device drivers, more memory is needed to
+  # store the BootRecord.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize           | 0x100000
+
   # Use MMIO for accessing Serial port registers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio                      | TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo                | {0xFF}
