@@ -51,8 +51,8 @@ typedef enum ArmObjectID {
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
-  EArmObjDmc620PmuSocketInfo,                                  ///< 24 - DMC620 Socket Info
-  EArmObjDmc620PmuRegInfo,                                     ///< 25 - DMC620 PMU Reg Info
+  EArmObjDmcPmuSocketInfo,                                     ///< 24 - DMC Socket Info
+  EArmObjDmcPmuRegInfo,                                        ///< 25 - DMC PMU Reg Info
   EArmObjProcessorSpecificBlockInfo,                           ///< 26 - Processor Specific Block.
   EArmObjProcessorSpecificSubDataArchInfo,                     ///< 27 - Processor Specific Sub Data (ArchData)
   EArmObjCoresightPmuInfo,                                     ///< 28 - Coresight PMU Info
@@ -695,34 +695,34 @@ typedef struct CmArmCmn600Info {
   CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
 } CM_ARM_CMN_600_INFO;
 
-/** A structure that describes the DMC620 PMU hardware
+/** A structure that describes the DMC PMU hardware
     registers and interrupt.
 
-    ID: EArmObjDmc620PmuRegInfo
+    ID: EArmObjDmcPmuRegInfo
 */
-typedef struct CmArmDmc620PmuRegInfo {
-  /// The Base address of PMU register space in the DMC620 device.
+typedef struct CmArmDmcPmuRegInfo {
+  /// The Base address of PMU register space in the DMC device.
   UINT64                       BaseAddress;
 
-  /// Length of the DMC620 PMU registers
+  /// Length of the DMC PMU registers
   UINT64                       Length;
 
-  /// The DMC620 PMU interrupt descriptor
+  /// The DMC PMU interrupt descriptor
   CM_ARM_EXTENDED_INTERRUPT    PmuIntr;
-} CM_ARM_DMC620_PMU_REG_INFO;
+} CM_ARM_DMC_PMU_REG_INFO;
 
-/** A structure that describes the DMC620 PMU hardware
+/** A structure that describes the DMC PMU hardware
     on a socket.
 
-    ID: EArmObjDmc620PmuSocketInfo
+    ID: EArmObjDmcPmuSocketInfo
 */
-typedef struct CmArmDmc620PmuSocketInfo {
+typedef struct CmArmDmcPmuSocketInfo {
   /// Number of devices on this socket
   UINT8              NumDevices;
 
-  /// Array of DMC620 PMU devices on this socket
-  CM_OBJECT_TOKEN    Dmc620PmuRegInfoToken;
-} CM_ARM_DMC620_INFO;
+  /// Array of DMC PMU devices on this socket
+  CM_OBJECT_TOKEN    DmcPmuRegInfoToken;
+} CM_ARM_DMC_INFO;
 
 /** A structure that describes the
     RMR node for the Platform.
