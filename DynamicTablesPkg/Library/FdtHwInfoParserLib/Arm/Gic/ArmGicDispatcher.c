@@ -1,7 +1,7 @@
 /** @file
   Arm Gic dispatcher.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -138,7 +138,7 @@ ArmGicDispatcher (
   }
 
   // Get the interrupt-controller node associated to the "cpus" node.
-  Status = FdtGetIntcParentNode (Fdt, CpusNode, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, CpusNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {
