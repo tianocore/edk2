@@ -27,6 +27,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
@@ -492,6 +493,13 @@ InitializeXenPlatform (
   InstallClearCacheCallback ();
   AmdSevInitialize ();
   MiscInitialization ();
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. If no fw_cfg
+  // selector is present, no HOB is produced and the memory protection PCDs
+  // are used as a fallback.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
 
   return EFI_SUCCESS;
 }

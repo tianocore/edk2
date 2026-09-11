@@ -1,0 +1,34 @@
+## @file
+#  Library that builds the DXE and MM memory protection settings HOBs based on a
+#  QEMU fw_cfg selector.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformMemoryProtectionLib
+  FILE_GUID                      = CF9DCDD2-341B-43C3-97D7-0348FD3F9371
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformMemoryProtectionLib
+
+[Sources]
+  PlatformMemoryProtectionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+  QemuFwCfgLib
+
+[Guids]
+  gDxeMemoryProtectionSettingsGuid              ## SOMETIMES_PRODUCES
+  gMmMemoryProtectionSettingsGuid               ## SOMETIMES_PRODUCES

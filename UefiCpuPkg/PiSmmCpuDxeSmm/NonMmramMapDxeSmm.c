@@ -341,7 +341,7 @@ UpdateUefiMemMapAttributes (
   //
   // [0, 4k] may be non-present.
   //
-  PreviousAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
+  PreviousAddress = gMmMps.NullPointerDetectionPolicy ? BASE_4KB : 0;
 
   //
   // NonMmram shall be non-executable after the SmmReadyToLock event occurs, regardless of whether

@@ -32,6 +32,7 @@
   FdtLib
   PcdLib
   PeiServicesLib
+  PlatformMemoryProtectionLib
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize

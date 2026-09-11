@@ -34,15 +34,10 @@
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/MpInitLib.h>
 #include <Library/TimerLib.h>
+#include <Library/DxeMemoryProtectionHobLib.h>
 
 #include <Guid/IdleLoopEvent.h>
 #include <Guid/VectorHandoffTable.h>
-
-#define HEAP_GUARD_NONSTOP_MODE       \
-        ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT4|BIT1|BIT0)) > BIT6)
-
-#define NULL_DETECTION_NONSTOP_MODE   \
-        ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT6|BIT0)) > BIT6)
 
 /**
   Flush CPU data cache. If the instruction cache is fully coherent
