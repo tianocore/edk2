@@ -158,3 +158,4 @@
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+  GCC:*_*_X64_CC_FLAGS = -mno-mmx -mno-sse
