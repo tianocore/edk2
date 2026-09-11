@@ -70,8 +70,15 @@
 
     ## options defined .pytool/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [""],
-        "DscPath": ""  # Don't support this test
+        "IgnoreInf": [
+        # Only built when REDFISH_ENABLE is TRUE
+        "EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf",
+        # Only built when REDFISH_ENABLE is TRUE
+        "EmulatorPkg/Library/RedfishPlatformCredentialLib/RedfishPlatformCredentialLib.inf",
+        # Only built when REDFISH_ENABLE is TRUE
+        "EmulatorPkg/Library/RedfishPlatformHostInterfaceLib/RedfishPlatformHostInterfaceLib.inf",
+        ],
+        "DscPath": "EmulatorPkg.dsc"
     },
 
     ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck

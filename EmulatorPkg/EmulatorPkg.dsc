@@ -396,7 +396,6 @@
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
       SerialPortLib|EmulatorPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf
-      EmuThunkLib|EmulatorPkg/Library/DxeEmuLib/DxeEmuLib.inf
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
@@ -539,6 +538,27 @@
 
 !endif
 
+EmulatorPkg/Library/DxeCoreTimerLib/DxeCoreTimerLib.inf
+EmulatorPkg/Library/DxeEmuLib/DxeEmuLib.inf
+EmulatorPkg/Library/DxeEmuPeCoffExtraActionLib/DxeEmuPeCoffExtraActionLib.inf
+EmulatorPkg/Library/DxeEmuSerialPortLib/DxeEmuSerialPortLib.inf
+EmulatorPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf
+EmulatorPkg/Library/DxeTimerLib/DxeTimerLib.inf
+EmulatorPkg/Library/GuardUefiMemoryAllocationLib/GuardUefiMemoryAllocationLib.inf
+EmulatorPkg/Library/KeyMapLibNull/KeyMapLibNull.inf
+EmulatorPkg/Library/PeiCoreServicesTablePointerLib/PeiCoreServicesTablePointerLib.inf
+EmulatorPkg/Library/PeiEmuPeCoffExtraActionLib/PeiEmuPeCoffExtraActionLib.inf
+EmulatorPkg/Library/PeiEmuPeCoffGetEntryPointLib/PeiEmuPeCoffGetEntryPointLib.inf
+EmulatorPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
+EmulatorPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+EmulatorPkg/Library/PeiServicesTablePointerLibMagicPage/PeiServicesTablePointerLibMagicPage.inf
+EmulatorPkg/Library/PeiTimerLib/PeiTimerLib.inf
+EmulatorPkg/Library/PlatformBmLib/PlatformBmLib.inf
+EmulatorPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
+EmulatorPkg/Library/SecPpiListLib/SecPpiListLib.inf
+EmulatorPkg/Library/SmbiosLib/SmbiosLib.inf
+EmulatorPkg/Library/ThunkPpiList/ThunkPpiList.inf
+EmulatorPkg/Library/ThunkProtocolList/ThunkProtocolList.inf
 
 !if $(REDFISH_ENABLE) == TRUE
   EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf
