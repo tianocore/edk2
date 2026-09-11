@@ -19,6 +19,7 @@
   DeviceTreeTableFactory/DeviceTreeTableFactory.c
   DynamicTableFactoryDxe.c
   SmbiosTableFactory/SmbiosTableFactory.c
+  HiiFormsFactory/HiiFormsFactory.c
   DynamicTableFactory.h
 
 [Packages]
@@ -39,6 +40,7 @@
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomACPIGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomHiiGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxSmbiosHandleMapEntries
 
 [Protocols]

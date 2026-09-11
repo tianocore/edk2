@@ -1,0 +1,30 @@
+## @file
+#  Dynamic HII Strings Library
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = HiiStringsLib
+  FILE_GUID      = 8C34C70F-DCE2-45B9-A399-7BEA995EC433
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = HiiStringsLib
+
+[Sources]
+  HiiStringGenerator.c
+  InternalHiiStringsLib.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
