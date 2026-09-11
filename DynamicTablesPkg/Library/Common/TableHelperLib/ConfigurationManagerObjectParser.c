@@ -1220,6 +1220,19 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjEinjInstructionsInfoParser[] = {
   { "Mask",            8,                                               "0x%llx", NULL },
 };
 
+/** A parser for CmArchCommonObjErstInstructionsInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErstInstructionsInfoParser[] = {
+  { "SerializationAction", 1,                                               "0x%x",   NULL },
+  { "Instruction",         1,                                               "0x%x",   NULL },
+  { "Flags",               1,                                               "0x%x",   NULL },
+  { "RegisterRegion",      sizeof (EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "Value",               8,                                               "0x%llx", NULL },
+  { "Mask",                8,                                               "0x%llx", NULL },
+};
+
 /** A parser for EArchCommonObjPlatformFwInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonPlatformFwInfoParser[] = {
@@ -1673,6 +1686,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiProtocolRedfishOverIpDataInfo,CmArchCommonMchiProtocolRedfishOverIpDataInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescUsbInfo,     CmArchCommonMchiNetworkDeviceDescUsbInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMchiNetworkDeviceDescPciInfo,     CmArchCommonMchiNetworkDeviceDescPciInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErstInstructionsInfo,             CmArchCommonObjErstInstructionsInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
