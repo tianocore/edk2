@@ -21,17 +21,17 @@
   PL031RealTimeClockLib.c
 
 [Packages]
-  MdePkg/MdePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  IoLib
-  UefiLib
   DebugLib
-  PcdLib
   DxeServicesTableLib
+  IoLib
+  PcdLib
   TimeBaseLib
+  UefiLib
   UefiRuntimeLib
 
 [Guids]
