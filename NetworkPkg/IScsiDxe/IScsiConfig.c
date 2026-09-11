@@ -3156,6 +3156,7 @@ IScsiFormRouteConfig (
   CHAR8                        *InitiatorName;
   UINT8                        *AttemptList;
   UINTN                        BufferSize;
+  UINTN                        IfrBufferSize;
   UINTN                        OffSet;
   UINTN                        Index;
   UINTN                        Index2;
@@ -3194,14 +3195,14 @@ IScsiFormRouteConfig (
   //
   // Convert <ConfigResp> to buffer data by helper function ConfigToBlock().
   //
-  BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
-  Status     = gHiiConfigRouting->ConfigToBlock (
-                                    gHiiConfigRouting,
-                                    Configuration,
-                                    (UINT8 *)IfrNvData,
-                                    &BufferSize,
-                                    Progress
-                                    );
+  IfrBufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
+  Status        = gHiiConfigRouting->ConfigToBlock (
+                                       gHiiConfigRouting,
+                                       Configuration,
+                                       (UINT8 *)IfrNvData,
+                                       &IfrBufferSize,
+                                       Progress
+                                       );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
