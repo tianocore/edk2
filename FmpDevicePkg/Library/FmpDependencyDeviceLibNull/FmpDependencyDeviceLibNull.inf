@@ -13,7 +13,7 @@
   FILE_GUID       = 05BE67B1-0748-4022-97E6-7C0D2F992AA6
   MODULE_TYPE     = DXE_DRIVER
   VERSION_STRING  = 1.0
-  LIBRARY_CLASS   = FmpDependencyDeviceLib|DXE_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS   = FmpDependencyDeviceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.

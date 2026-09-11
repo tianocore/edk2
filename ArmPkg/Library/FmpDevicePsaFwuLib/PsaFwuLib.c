@@ -324,7 +324,7 @@ FwuCommunicate (
   }
 
   FwuStatus = RespMsg->Header.ResponseStatus;
-  if (FwuStatus == PSA_MM_FWU_SUCCESS) {
+  if ((FwuStatus == PSA_MM_FWU_SUCCESS) || (FwuStatus == PSA_MM_FWU_RESUME)) {
     RespDataSize = GetMmFwuRespDataSize (Command);
     if ((RespDataSize > 0) && (RespData != NULL)) {
       *RespData = (VOID *)RespMsg + sizeof (PSA_MM_FWU_CMD_DATA);

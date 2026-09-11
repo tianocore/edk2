@@ -36,6 +36,8 @@
 ///
 #define VARNAME_FMPSTATE  L"FmpState"
 
+extern EFI_RUNTIME_SERVICES  *mVarRT;
+
 ///
 /// FMP Controller State structure that is used to store the state of
 /// a controller in one combined UEFI Variable.
@@ -76,6 +78,7 @@ typedef struct {
   @param[in,out] Private  Private context structure for the managed controller.
 **/
 VOID
+EFIAPI
 GenerateFmpVariableNames (
   IN OUT FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
@@ -92,9 +95,11 @@ GenerateFmpVariableNames (
   @return  Pointer to the allocated FMP Controller State.  Returns NULL
            if the variable does not exist or is a different size than expected.
 **/
-FMP_CONTROLLER_STATE *
+EFI_STATUS
+EFIAPI
 GetFmpControllerState (
-  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  OUT FMP_CONTROLLER_STATE             *FmpControllerState
   );
 
 /**
@@ -178,6 +183,7 @@ GetLastAttemptVersionFromFmpControllerState (
   @param[in] Version  The version of the firmware image in the firmware device.
 **/
 VOID
+EFIAPI
 SetVersionInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            Version
@@ -195,6 +201,7 @@ SetVersionInVariable (
                                      firmware image in the firmware device.
 **/
 VOID
+EFIAPI
 SetLowestSupportedVersionInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            LowestSupportedVersion
@@ -212,6 +219,7 @@ SetLowestSupportedVersionInVariable (
                                 capsule update.
 **/
 VOID
+EFIAPI
 SetLastAttemptStatusInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            LastAttemptStatus
@@ -229,6 +237,7 @@ SetLastAttemptStatusInVariable (
                                  recent FMP capsule update.
 **/
 VOID
+EFIAPI
 SetLastAttemptVersionInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            LastAttemptVersion
@@ -245,6 +254,7 @@ SetLastAttemptVersionInVariable (
   @retval  Other            One of the UEFI variables could not be locked.
 **/
 EFI_STATUS
+EFIAPI
 LockAllFmpVariables (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );

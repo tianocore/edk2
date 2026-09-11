@@ -13,6 +13,7 @@
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -38,10 +39,10 @@
 #include <Library/BmpSupportLib.h>
 
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/EsrtManagement.h>
-#include <Protocol/FirmwareManagement.h>
-#include <Protocol/FirmwareManagementProgress.h>
-#include <Protocol/DevicePath.h>
+
+#include "DxeCapsuleRuntime.h"
+
+typedef VOID *FMP_HANDLE_LIST;
 
 EFI_SYSTEM_RESOURCE_TABLE  *mEsrtTable = NULL;
 
@@ -50,7 +51,13 @@ EFI_EVENT  mDxeCapsuleLibEndOfDxeEvent = NULL;
 
 EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress = NULL;
 
-BOOLEAN  mDxeCapsuleLibIsExitBootService = FALSE;
+BOOLEAN                           mDxeCapsuleLibIsExitBootService = FALSE;
+RUNTIME_FIRMWARE_MANAGEMENT_INFO  *mRuntimeFmpList;
+UINTN                             mRuntimeFmpCount = 0;
+EFI_FIRMWARE_IMAGE_DESCRIPTOR     *mRuntimeImageInfoBuffer;
+VOID                              *mRuntimeCapsuleResultVariable;
+EFI_HANDLE                        *mRuntimeMatchedHandleBuffer;
+BOOLEAN                           *mRuntimeMatchedResetRequiredBuffer;
 
 /**
   Initialize capsule related variables.
@@ -113,6 +120,342 @@ EFIAPI
 UpdateImageProgress (
   IN UINTN  Completion
   );
+
+/**
+  Allocate memory for matched Handler Buffer.
+
+  @param[in]  NumberOfHandles        The number of Handles.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+STATIC
+VOID *
+EFIAPI
+AllocateMatchedHandleBuffer (
+  IN UINTN  NumberOfHandles
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService) {
+    return AllocateZeroPool (sizeof (EFI_HANDLE) * NumberOfHandles);
+  }
+
+  return mRuntimeMatchedHandleBuffer;
+}
+
+/**
+  Frees a buffer that was previously allocated with AllocateMatchedHandleBuffer().
+
+  @param[in]  MatchedHandleBuffer  Pointer to the buffer to free.
+
+**/
+STATIC
+VOID
+EFIAPI
+FreeMatchedHandleBuffer (
+  IN VOID  *MatchedHandleBuffer
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService && (MatchedHandleBuffer != NULL)) {
+    FreePool (MatchedHandleBuffer);
+    return;
+  }
+}
+
+/**
+  Allocate memory for matched reset required buffer.
+
+  @param[in]  NumberOfHandles        The number of Handles.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+STATIC
+VOID *
+EFIAPI
+AllocateMatchedResetRequiredBuffer (
+  IN UINTN  NumberOfHandles
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService) {
+    return AllocateZeroPool (sizeof (BOOLEAN) * NumberOfHandles);
+  }
+
+  return mRuntimeMatchedResetRequiredBuffer;
+}
+
+/**
+  Frees a buffer that was previously allocated with AllocateMathcedResetRequiredBuffer().
+
+  @param[in]  MatchedResetRequiredBuffer  Pointer to the buffer to free.
+
+**/
+STATIC
+VOID
+EFIAPI
+FreeMatchedResetRequiredBuffer (
+  IN VOID  *MatchedResetRequiredBuffer
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService && (MatchedResetRequiredBuffer != NULL)) {
+    FreePool (MatchedResetRequiredBuffer);
+    return;
+  }
+}
+
+/**
+  Allocate memory for ImageInfo buffer.
+
+  @param[in]  ImageInfoSize        Image info size.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+STATIC
+VOID *
+EFIAPI
+AllocateImageInfoBuffer (
+  IN UINTN  ImageInfoSize
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService) {
+    return AllocateZeroPool (ImageInfoSize);
+  }
+
+  return mRuntimeImageInfoBuffer;
+}
+
+/**
+  Frees a buffer that was previously allocated with AllocateImageInfoBuffer().
+
+  @param[in]  ImageInfoBuffer  Pointer to the buffer to free.
+
+**/
+STATIC
+VOID
+EFIAPI
+FreeImageInfoBuffer (
+  IN VOID  *ImageInfoBuffer
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService && (ImageInfoBuffer != NULL)) {
+    FreePool (ImageInfoBuffer);
+    return;
+  }
+}
+
+/**
+  Get FMP Handle list.
+
+  @param[out]    HandleListPtr   HandleList.
+  @param[out]    NumberOfHandles Number of Handles
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND          There is no FMP.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetFmpHandleList (
+  OUT FMP_HANDLE_LIST  *HandleListPtr,
+  OUT UINTN            *NumberOfHandles
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  *HandleBuffer;
+
+  if (mDxeCapsuleLibIsExitBootService) {
+    if (mRuntimeFmpCount > 0) {
+      *HandleListPtr   = (FMP_HANDLE_LIST)mRuntimeFmpList;
+      *NumberOfHandles = mRuntimeFmpCount;
+      return EFI_SUCCESS;
+    }
+
+    return EFI_NOT_FOUND;
+  }
+
+  *HandleListPtr   = NULL;
+  *NumberOfHandles = 0;
+
+  Status =  gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   &gEfiFirmwareManagementProtocolGuid,
+                   NULL,
+                   NumberOfHandles,
+                   &HandleBuffer
+                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *HandleListPtr = (FMP_HANDLE_LIST)HandleBuffer;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Put FMP list gotten via GetFmpHandleList().
+
+  @param[in]   HandleList     HandleList.
+
+**/
+STATIC
+VOID
+EFIAPI
+PutFmpHandleList (
+  IN FMP_HANDLE_LIST  HandleList
+  )
+{
+  if (mDxeCapsuleLibIsExitBootService) {
+    return;
+  }
+
+  if (HandleList != NULL) {
+    FreePool (HandleList);
+  }
+}
+
+/**
+  Get EFI_HANDLE from FMP_HANDLE_LIST by index.
+
+  @param[in]    HandleList       HandleList.
+  @param[in]    Idx              Index.
+
+  @retval       EFI_HANDLE in HandleList at Idx.
+
+**/
+STATIC
+EFI_HANDLE
+EFIAPI
+GetHandleByIdx (
+  IN FMP_HANDLE_LIST  HandleList,
+  IN UINTN            Idx
+  )
+{
+  EFI_HANDLE  Handle;
+
+  if (mDxeCapsuleLibIsExitBootService) {
+    Handle = ((RUNTIME_FIRMWARE_MANAGEMENT_INFO *)HandleList)[Idx].Handle;
+  } else {
+    Handle = ((EFI_HANDLE *)HandleList)[Idx];
+  }
+
+  return Handle;
+}
+
+/**
+  Get Firmware Management protocol associated with Handle.
+
+  @param[in]  Handle  Handle.
+
+**/
+STATIC
+EFI_FIRMWARE_MANAGEMENT_PROTOCOL *
+EFIAPI
+GetFmpByHandle (
+  IN EFI_HANDLE  Handle
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             Idx;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
+
+  if (!mDxeCapsuleLibIsExitBootService) {
+    Status = gBS->HandleProtocol (
+                    Handle,
+                    &gEfiFirmwareManagementProtocolGuid,
+                    (VOID **)&Fmp
+                    );
+    if (EFI_ERROR (Status)) {
+      return NULL;
+    }
+
+    return Fmp;
+  }
+
+  for (Idx = 0; Idx < mRuntimeFmpCount; Idx++) {
+    if (mRuntimeFmpList[Idx].Handle == Handle) {
+      return mRuntimeFmpList[Idx].Fmp;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Get Firmware Management Progress protocol associated with Handle.
+
+  @param[in]  Handle  Handle.
+
+**/
+STATIC
+EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL *
+EFIAPI
+GetFmpProgressByHandle (
+  IN EFI_HANDLE  Handle
+  )
+{
+  UINTN                                        Idx;
+  EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *FmpProgress;
+
+  if (!mDxeCapsuleLibIsExitBootService) {
+    FmpProgress = NULL;
+
+    gBS->HandleProtocol (
+           Handle,
+           &gEdkiiFirmwareManagementProgressProtocolGuid,
+           (VOID **)&FmpProgress
+           );
+
+    return FmpProgress;
+  }
+
+  for (Idx = 0; Idx < mRuntimeFmpCount; Idx++) {
+    if (mRuntimeFmpList[Idx].Handle == Handle) {
+      return mRuntimeFmpList[Idx].FmpProgress;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Get Device Path protocol associated with Handle.
+
+  @param[in]  Handle  Handle.
+
+**/
+STATIC
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+GetFmpDevicePathByHandle (
+  IN EFI_HANDLE  Handle
+  )
+{
+  UINTN                     Idx;
+  EFI_DEVICE_PATH_PROTOCOL  *FmpDevicePath;
+
+  if (!mDxeCapsuleLibIsExitBootService) {
+    FmpDevicePath = NULL;
+
+    gBS->HandleProtocol (
+           Handle,
+           &gEfiDevicePathProtocolGuid,
+           (VOID **)&FmpDevicePath
+           );
+
+    return FmpDevicePath;
+  }
+
+  for (Idx = 0; Idx < mRuntimeFmpCount; Idx++) {
+    if (mRuntimeFmpList[Idx].Handle == Handle) {
+      return mRuntimeFmpList[Idx].FmpDevicePath;
+    }
+  }
+
+  return NULL;
+}
 
 /**
   Return if this capsule is a capsule name capsule, based upon CapsuleHeader.
@@ -482,7 +825,7 @@ DumpFmpImageInfo (
   DEBUG ((DEBUG_VERBOSE, "  DescriptorCount    - 0x%x\n", DescriptorCount));
   DEBUG ((DEBUG_VERBOSE, "  DescriptorSize     - 0x%x\n", DescriptorSize));
   DEBUG ((DEBUG_VERBOSE, "  PackageVersion     - 0x%x\n", PackageVersion));
-  DEBUG ((DEBUG_VERBOSE, "  PackageVersionName - %s\n\n", PackageVersionName));
+  DEBUG ((DEBUG_VERBOSE, "  PackageVersionName - %s\n\n", (PackageVersionName != NULL) ? PackageVersionName : L"None"));
   CurrentImageInfo = ImageInfo;
   for (Index = 0; Index < DescriptorCount; Index++) {
     DEBUG ((DEBUG_VERBOSE, "  ImageDescriptor (%d)\n", Index));
@@ -567,8 +910,9 @@ DumpAllFmpInfo (
   )
 {
   EFI_STATUS                        Status;
-  EFI_HANDLE                        *HandleBuffer;
+  FMP_HANDLE_LIST                   HandleList;
   UINTN                             NumberOfHandles;
+  EFI_HANDLE                        Handle;
   EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
   UINTN                             Index;
   UINTN                             ImageInfoSize;
@@ -579,24 +923,15 @@ DumpAllFmpInfo (
   UINT32                            PackageVersion;
   CHAR16                            *PackageVersionName;
 
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiFirmwareManagementProtocolGuid,
-                  NULL,
-                  &NumberOfHandles,
-                  &HandleBuffer
-                  );
+  Status = GetFmpHandleList (&HandleList, &NumberOfHandles);
   if (EFI_ERROR (Status)) {
     return;
   }
 
   for (Index = 0; Index < NumberOfHandles; Index++) {
-    Status = gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiFirmwareManagementProtocolGuid,
-                    (VOID **)&Fmp
-                    );
-    if (EFI_ERROR (Status)) {
+    Handle = GetHandleByIdx (HandleList, Index);
+    Fmp    = GetFmpByHandle (Handle);
+    if (Fmp == NULL) {
       continue;
     }
 
@@ -615,7 +950,7 @@ DumpAllFmpInfo (
       continue;
     }
 
-    FmpImageInfoBuf = AllocateZeroPool (ImageInfoSize);
+    FmpImageInfoBuf = AllocateImageInfoBuffer (ImageInfoSize);
     if (FmpImageInfoBuf == NULL) {
       continue;
     }
@@ -632,7 +967,7 @@ DumpAllFmpInfo (
                                 &PackageVersionName         // PackageVersionName
                                 );
     if (EFI_ERROR (Status)) {
-      FreePool (FmpImageInfoBuf);
+      FreeImageInfoBuffer (FmpImageInfoBuf);
       continue;
     }
 
@@ -647,14 +982,14 @@ DumpAllFmpInfo (
       PackageVersionName           // PackageVersionName
       );
 
-    if (PackageVersionName != NULL) {
+    if ((PackageVersionName != NULL) && !mDxeCapsuleLibEndOfDxe) {
       FreePool (PackageVersionName);
     }
 
-    FreePool (FmpImageInfoBuf);
+    FreeImageInfoBuffer (FmpImageInfoBuf);
   }
 
-  FreePool (HandleBuffer);
+  PutFmpHandleList (HandleList);
 
   return;
 }
@@ -666,6 +1001,7 @@ DumpAllFmpInfo (
   @param[in]     UpdateHardwareInstance  The HardwareInstance to target with this update.
   @param[out]    NoHandles               The number of handles returned in HandleBuf.
   @param[out]    HandleBuf               A pointer to the buffer to return the requested array of handles.
+
   @param[out]    ResetRequiredBuf        A pointer to the buffer to return reset required flag for
                                          the requested array of handles.
 
@@ -675,7 +1011,9 @@ DumpAllFmpInfo (
   @retval EFI_NOT_FOUND          No handles match the search.
   @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the matching results.
 **/
+STATIC
 EFI_STATUS
+EFIAPI
 GetFmpHandleBufferByType (
   IN     EFI_GUID    *UpdateImageTypeId,
   IN     UINT64      UpdateHardwareInstance,
@@ -685,11 +1023,12 @@ GetFmpHandleBufferByType (
   )
 {
   EFI_STATUS                        Status;
-  EFI_HANDLE                        *HandleBuffer;
+  FMP_HANDLE_LIST                   HandleList;
   UINTN                             NumberOfHandles;
   EFI_HANDLE                        *MatchedHandleBuffer;
   BOOLEAN                           *MatchedResetRequiredBuffer;
   UINTN                             MatchedNumberOfHandles;
+  EFI_HANDLE                        Handle;
   EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
   UINTN                             Index;
   UINTN                             ImageInfoSize;
@@ -701,6 +1040,12 @@ GetFmpHandleBufferByType (
   CHAR16                            *PackageVersionName;
   UINTN                             Index2;
   EFI_FIRMWARE_IMAGE_DESCRIPTOR     *TempFmpImageInfo;
+
+  if (!FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime) &&
+      mDxeCapsuleLibIsExitBootService)
+  {
+    return EFI_NOT_FOUND;
+  }
 
   if (NoHandles != NULL) {
     *NoHandles = 0;
@@ -714,13 +1059,7 @@ GetFmpHandleBufferByType (
     *ResetRequiredBuf = NULL;
   }
 
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiFirmwareManagementProtocolGuid,
-                  NULL,
-                  &NumberOfHandles,
-                  &HandleBuffer
-                  );
+  Status = GetFmpHandleList (&HandleList, &NumberOfHandles);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -729,33 +1068,30 @@ GetFmpHandleBufferByType (
 
   MatchedHandleBuffer = NULL;
   if (HandleBuf != NULL) {
-    MatchedHandleBuffer = AllocateZeroPool (sizeof (EFI_HANDLE) * NumberOfHandles);
+    MatchedHandleBuffer = AllocateMatchedHandleBuffer (sizeof (EFI_HANDLE) * NumberOfHandles);
     if (MatchedHandleBuffer == NULL) {
-      FreePool (HandleBuffer);
+      PutFmpHandleList (HandleList);
       return EFI_OUT_OF_RESOURCES;
     }
   }
 
   MatchedResetRequiredBuffer = NULL;
   if (ResetRequiredBuf != NULL) {
-    MatchedResetRequiredBuffer = AllocateZeroPool (sizeof (BOOLEAN) * NumberOfHandles);
+    MatchedResetRequiredBuffer = AllocateMatchedResetRequiredBuffer (sizeof (BOOLEAN) * NumberOfHandles);
     if (MatchedResetRequiredBuffer == NULL) {
       if (MatchedHandleBuffer != NULL) {
-        FreePool (MatchedHandleBuffer);
+        FreeMatchedHandleBuffer (MatchedHandleBuffer);
       }
 
-      FreePool (HandleBuffer);
+      PutFmpHandleList (HandleList);
       return EFI_OUT_OF_RESOURCES;
     }
   }
 
   for (Index = 0; Index < NumberOfHandles; Index++) {
-    Status = gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiFirmwareManagementProtocolGuid,
-                    (VOID **)&Fmp
-                    );
-    if (EFI_ERROR (Status)) {
+    Handle = GetHandleByIdx (HandleList, Index);
+    Fmp    = GetFmpByHandle (Handle);
+    if (Fmp == NULL) {
       continue;
     }
 
@@ -774,7 +1110,7 @@ GetFmpHandleBufferByType (
       continue;
     }
 
-    FmpImageInfoBuf = AllocateZeroPool (ImageInfoSize);
+    FmpImageInfoBuf = AllocateImageInfoBuffer (ImageInfoSize);
     if (FmpImageInfoBuf == NULL) {
       continue;
     }
@@ -791,11 +1127,11 @@ GetFmpHandleBufferByType (
                                 &PackageVersionName         // PackageVersionName
                                 );
     if (EFI_ERROR (Status)) {
-      FreePool (FmpImageInfoBuf);
+      FreeImageInfoBuffer (FmpImageInfoBuf);
       continue;
     }
 
-    if (PackageVersionName != NULL) {
+    if ((PackageVersionName != NULL) && !mDxeCapsuleLibIsExitBootService) {
       FreePool (PackageVersionName);
     }
 
@@ -810,7 +1146,7 @@ GetFmpHandleBufferByType (
              (UpdateHardwareInstance == TempFmpImageInfo->HardwareInstance)))
         {
           if (MatchedHandleBuffer != NULL) {
-            MatchedHandleBuffer[MatchedNumberOfHandles] = HandleBuffer[Index];
+            MatchedHandleBuffer[MatchedNumberOfHandles] = Handle;
           }
 
           if (MatchedResetRequiredBuffer != NULL) {
@@ -828,10 +1164,10 @@ GetFmpHandleBufferByType (
       TempFmpImageInfo = (EFI_FIRMWARE_IMAGE_DESCRIPTOR *)((UINT8 *)TempFmpImageInfo + DescriptorSize);
     }
 
-    FreePool (FmpImageInfoBuf);
+    FreeImageInfoBuffer (FmpImageInfoBuf);
   }
 
-  FreePool (HandleBuffer);
+  PutFmpHandleList (HandleList);
 
   if (MatchedNumberOfHandles == 0) {
     return EFI_NOT_FOUND;
@@ -874,12 +1210,8 @@ GetFmpImageInfoDescriptorVer (
   UINT32                            PackageVersion;
   CHAR16                            *PackageVersionName;
 
-  Status = gBS->HandleProtocol (
-                  Handle,
-                  &gEfiFirmwareManagementProtocolGuid,
-                  (VOID **)&Fmp
-                  );
-  if (EFI_ERROR (Status)) {
+  Fmp = GetFmpByHandle (Handle);
+  if (Fmp == NULL) {
     return 0;
   }
 
@@ -898,7 +1230,7 @@ GetFmpImageInfoDescriptorVer (
     return 0;
   }
 
-  FmpImageInfoBuf = AllocateZeroPool (ImageInfoSize);
+  FmpImageInfoBuf = AllocateImageInfoBuffer (ImageInfoSize);
   if (FmpImageInfoBuf == NULL) {
     return 0;
   }
@@ -915,9 +1247,10 @@ GetFmpImageInfoDescriptorVer (
                               &PackageVersionName         // PackageVersionName
                               );
   if (EFI_ERROR (Status)) {
-    FreePool (FmpImageInfoBuf);
     return 0;
   }
+
+  FreeImageInfoBuffer (FmpImageInfoBuf);
 
   return FmpImageInfoDescriptorVer;
 }
@@ -925,7 +1258,7 @@ GetFmpImageInfoDescriptorVer (
 /**
   Set FMP image data.
 
-  @param[in]  Handle        A FMP handle.
+  @param[in]  Handle        Handle.
   @param[in]  ImageHeader   The payload image header.
   @param[in]  PayloadIndex  The index of the payload.
 
@@ -933,7 +1266,7 @@ GetFmpImageInfoDescriptorVer (
 **/
 EFI_STATUS
 SetFmpImageData (
-  IN EFI_HANDLE                                    Handle,
+  IN EFI_HANDLE                                    Handle   OPTIONAL,
   IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
   IN UINTN                                         PayloadIndex
   )
@@ -945,27 +1278,16 @@ SetFmpImageData (
   CHAR16                                         *AbortReason;
   EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  ProgressCallback;
 
-  Status = gBS->HandleProtocol (
-                  Handle,
-                  &gEfiFirmwareManagementProtocolGuid,
-                  (VOID **)&Fmp
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  Fmp = GetFmpByHandle (Handle);
+  if (Fmp == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // Lookup Firmware Management Progress Protocol before SetImage() is called
   // This is an optional protocol that may not be present on Handle.
   //
-  Status = gBS->HandleProtocol (
-                  Handle,
-                  &gEdkiiFirmwareManagementProgressProtocolGuid,
-                  (VOID **)&mFmpProgress
-                  );
-  if (EFI_ERROR (Status)) {
-    mFmpProgress = NULL;
-  }
+  mFmpProgress = GetFmpProgressByHandle (Handle);
 
   if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
     Image = (UINT8 *)(ImageHeader + 1);
@@ -1028,7 +1350,7 @@ SetFmpImageData (
   }
 
   DEBUG ((DEBUG_INFO, "Fmp->SetImage - %r\n", Status));
-  if (AbortReason != NULL) {
+  if ((AbortReason != NULL) && !mDxeCapsuleLibEndOfDxe) {
     DEBUG ((DEBUG_ERROR, "%s\n", AbortReason));
     FreePool (AbortReason);
   }
@@ -1133,20 +1455,20 @@ RecordFmpCapsuleStatus (
   IN CHAR16                                        *CapFileName   OPTIONAL
   )
 {
-  EFI_STATUS                 Status;
-  EFI_DEVICE_PATH_PROTOCOL   *FmpDevicePath;
-  UINT32                     FmpImageInfoDescriptorVer;
-  EFI_STATUS                 StatusEsrt;
-  ESRT_MANAGEMENT_PROTOCOL   *EsrtProtocol;
-  EFI_SYSTEM_RESOURCE_ENTRY  EsrtEntry;
+  EFI_STATUS                        Status;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
+  EFI_DEVICE_PATH_PROTOCOL          *FmpDevicePath;
+  EFI_STATUS                        StatusEsrt;
+  ESRT_MANAGEMENT_PROTOCOL          *EsrtProtocol;
+  EFI_SYSTEM_RESOURCE_ENTRY         EsrtEntry;
+  UINT32                            FmpImageInfoDescriptorVer;
 
   FmpDevicePath = NULL;
+  Fmp           = NULL;
+
   if (Handle != NULL) {
-    gBS->HandleProtocol (
-           Handle,
-           &gEfiDevicePathProtocolGuid,
-           (VOID **)&FmpDevicePath
-           );
+    FmpDevicePath = GetFmpDevicePathByHandle (Handle);
+    Fmp           = GetFmpByHandle (Handle);
   }
 
   RecordFmpCapsuleStatusVariable (
@@ -1158,6 +1480,17 @@ RecordFmpCapsuleStatus (
     CapFileName
     );
 
+  if ((mDxeCapsuleLibIsExitBootService) || (Fmp == NULL)) {
+    // According to the UEFI Specification, Section 23.4.1 (EFI_SYSTEM_RESOURCE_TABLE),
+    // the ESRT must reside in EfiBootServicesData.
+    //
+    // Therefore, there is no need to update the ESRT after ExitBootServices() for
+    // the Runtime FMP DXE driver, as the OS will return an error if it attempts a
+    // runtime capsule update.
+    //
+    return;
+  }
+
   //
   // Update corresponding ESRT entry LastAttemp Status
   //
@@ -1166,15 +1499,11 @@ RecordFmpCapsuleStatus (
     return;
   }
 
-  if (Handle == NULL) {
-    return;
-  }
-
   //
   // Update EsrtEntry For V1, V2 FMP instance.
   // V3 FMP ESRT cache will be synced up through SyncEsrtFmp interface
   //
-  FmpImageInfoDescriptorVer = GetFmpImageInfoDescriptorVer (Handle);
+  FmpImageInfoDescriptorVer = GetFmpImageInfoDescriptorVer (Fmp);
   if (FmpImageInfoDescriptorVer < EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION) {
     StatusEsrt = EsrtProtocol->GetEsrtEntry (&ImageHeader->UpdateImageTypeId, &EsrtEntry);
     if (!EFI_ERROR (StatusEsrt)) {
@@ -1364,11 +1693,11 @@ ProcessFmpCapsuleImage (
     }
 
     if (HandleBuffer != NULL) {
-      FreePool (HandleBuffer);
+      FreeMatchedHandleBuffer (HandleBuffer);
     }
 
     if (ResetRequiredBuffer != NULL) {
-      FreePool (ResetRequiredBuffer);
+      FreeMatchedResetRequiredBuffer (ResetRequiredBuffer);
     }
   }
 
@@ -1381,6 +1710,175 @@ ProcessFmpCapsuleImage (
   // The status of SetImage is recorded in capsule result variable.
   //
   return EFI_SUCCESS;
+}
+
+/**
+  Process Firmware management protocol data capsule at runtime.
+
+  This function assumes the caller validated the capsule by using
+  ValidateFmpCapsule(), so that all fields in EFI_CAPSULE_HEADER,
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER and
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER are correct.
+
+  This function need support nested FMP capsule.
+
+  @param[in]  CapsuleHeader         Points to a capsule header.
+  @param[in]  CapFileName           Capsule file name.
+  @param[out] ResetRequired         Indicates whether reset is required or not.
+
+  @retval EFI_SUCCESS           Process Capsule Image successfully.
+  @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
+  @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory.
+  @retval EFI_NOT_READY         No FMP protocol to handle this FMP capsule.
+**/
+EFI_STATUS
+ProcessRuntimeFmpCapsuleImage (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN CHAR16              *CapFileName   OPTIONAL,
+  OUT BOOLEAN            *ResetRequired OPTIONAL
+  )
+{
+  EFI_STATUS                                    Status;
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER        *FmpCapsuleHeader;
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader;
+  UINT64                                        *ItemOffsetList;
+  UINTN                                         Index;
+  EFI_HANDLE                                    *HandleBuffer;
+  BOOLEAN                                       *ResetRequiredBuffer;
+  UINTN                                         NumberOfHandles;
+  UINT64                                        UpdateHardwareInstance;
+  UINTN                                         Index2;
+  BOOLEAN                                       NotReady;
+  BOOLEAN                                       Abort;
+
+  if (!IsFmpCapsuleGuid (&CapsuleHeader->CapsuleGuid)) {
+    return ProcessRuntimeFmpCapsuleImage ((EFI_CAPSULE_HEADER *)((UINTN)CapsuleHeader + CapsuleHeader->HeaderSize), CapFileName, ResetRequired);
+  }
+
+  Status   = EFI_NOT_READY;
+  NotReady = FALSE;
+  Abort    = FALSE;
+
+  DumpFmpCapsule (CapsuleHeader);
+
+  FmpCapsuleHeader = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER *)((UINT8 *)CapsuleHeader + CapsuleHeader->HeaderSize);
+
+  if (FmpCapsuleHeader->Version > EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  /**
+   * At EFI Runtime, We couldn't use Image boot service.
+   * So, we couldn't support update Embedded Drivers at Runtime.
+   */
+  if (FmpCapsuleHeader->EmbeddedDriverCount > 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  ItemOffsetList = (UINT64 *)(FmpCapsuleHeader + 1);
+
+  //
+  // capsule in which driver count and payload count are both zero is not processed.
+  //
+  if (FmpCapsuleHeader->PayloadItemCount == 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // 1. Route payload to right FMP instance
+  //
+  DEBUG ((DEBUG_INFO, "FmpCapsule: route payload to right FMP instance ...\n"));
+
+  DumpAllFmpInfo ();
+
+  //
+  // Check all the payload entry in capsule payload list
+  //
+  for (Index = 0; Index < FmpCapsuleHeader->PayloadItemCount; Index++) {
+    ImageHeader = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *)((UINT8 *)FmpCapsuleHeader + ItemOffsetList[Index]);
+
+    UpdateHardwareInstance = 0;
+    ///
+    /// UpdateHardwareInstance field was added in Version 2
+    ///
+    if (ImageHeader->Version >= 2) {
+      UpdateHardwareInstance = ImageHeader->UpdateHardwareInstance;
+    }
+
+    Status = GetFmpHandleBufferByType (
+               &ImageHeader->UpdateImageTypeId,
+               UpdateHardwareInstance,
+               &NumberOfHandles,
+               &HandleBuffer,
+               &ResetRequiredBuffer
+               );
+    if (EFI_ERROR (Status) ||
+        (HandleBuffer == NULL) ||
+        (ResetRequiredBuffer == NULL))
+    {
+      NotReady = TRUE;
+      RecordFmpCapsuleStatus (
+        NULL,
+        CapsuleHeader,
+        EFI_NOT_READY,
+        Index,
+        ImageHeader,
+        CapFileName
+        );
+      continue;
+    }
+
+    for (Index2 = 0; Index2 < NumberOfHandles; Index2++) {
+      if (Abort) {
+        RecordFmpCapsuleStatus (
+          HandleBuffer[Index2],
+          CapsuleHeader,
+          EFI_ABORTED,
+          Index,
+          ImageHeader,
+          CapFileName
+          );
+        continue;
+      }
+
+      Status = SetFmpImageData (
+                 HandleBuffer[Index2],
+                 ImageHeader,
+                 Index
+                 );
+      if (Status != EFI_SUCCESS) {
+        Abort = TRUE;
+      } else {
+        if (ResetRequired != NULL) {
+          *ResetRequired |= ResetRequiredBuffer[Index2];
+        }
+      }
+
+      RecordFmpCapsuleStatus (
+        HandleBuffer[Index2],
+        CapsuleHeader,
+        Status,
+        Index,
+        ImageHeader,
+        CapFileName
+        );
+    }
+
+    if (HandleBuffer != NULL) {
+      FreeMatchedHandleBuffer (HandleBuffer);
+    }
+
+    if (ResetRequiredBuffer != NULL) {
+      FreeMatchedResetRequiredBuffer (ResetRequiredBuffer);
+    }
+  }
+
+  if (NotReady) {
+    return EFI_NOT_READY;
+  }
+
+  return Status;
 }
 
 /**
@@ -1576,7 +2074,9 @@ ProcessThisCapsuleImage (
   //
   // Display image in firmware update display capsule
   //
-  if (CompareGuid (&gWindowsUxCapsuleGuid, &CapsuleHeader->CapsuleGuid)) {
+  if (!mDxeCapsuleLibIsExitBootService &&
+      CompareGuid (&gWindowsUxCapsuleGuid, &CapsuleHeader->CapsuleGuid))
+  {
     DEBUG ((DEBUG_INFO, "ProcessCapsuleImage for WindowsUxCapsule ...\n"));
     Status = DisplayCapsuleImage (CapsuleHeader);
     RecordCapsuleStatusVariable (CapsuleHeader, Status);
@@ -1600,7 +2100,17 @@ ProcessThisCapsuleImage (
     // Process EFI FMP Capsule
     //
     DEBUG ((DEBUG_INFO, "ProcessFmpCapsuleImage ...\n"));
-    Status = ProcessFmpCapsuleImage (CapsuleHeader, CapFileName, ResetRequired);
+    if (FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime) &&
+        mDxeCapsuleLibIsExitBootService)
+    {
+      //
+      // Runtime capsule update doesn't pass the CapsuleName argument.
+      //
+      Status = ProcessRuntimeFmpCapsuleImage (CapsuleHeader, NULL, ResetRequired);
+    } else {
+      Status = ProcessFmpCapsuleImage (CapsuleHeader, CapFileName, ResetRequired);
+    }
+
     DEBUG ((DEBUG_INFO, "ProcessFmpCapsuleImage - %r\n", Status));
 
     return Status;
@@ -1682,8 +2192,8 @@ DxeCapsuleLibConstructor (
 /**
   The destructor function closes the End of DXE event.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
+  @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable   A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS   The destructor completed successfully.
 **/
