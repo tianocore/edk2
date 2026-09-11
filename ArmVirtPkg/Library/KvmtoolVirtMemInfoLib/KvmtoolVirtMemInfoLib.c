@@ -9,6 +9,7 @@
 
 #include <Base.h>
 #include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 
@@ -33,10 +34,21 @@ ArmVirtGetMemoryMap (
   OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   )
 {
+  EFI_STATUS                    Status;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
   UINTN                         Idx;
+  UINT64                        DevMapBit;
 
   ASSERT (VirtualMemoryMap != NULL);
+  if (VirtualMemoryMap == NULL) {
+    return;
+  }
+
+  *VirtualMemoryMap = NULL;
+  Status = ArmCcaGetMemoryProtectionAttribute (&DevMapBit);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
   VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR *)
                        AllocatePages (
@@ -63,7 +75,7 @@ ArmVirtGetMemoryMap (
 
   // Map the UART
   ASSERT (IS_ALIGNED (PcdGet64 (PcdSerialRegisterBase), EFI_PAGE_SIZE));
-  VirtualMemoryTable[++Idx].PhysicalBase = PcdGet64 (PcdSerialRegisterBase);
+  VirtualMemoryTable[++Idx].PhysicalBase = (PcdGet64 (PcdSerialRegisterBase) | DevMapBit);
   VirtualMemoryTable[Idx].VirtualBase    = PcdGet64 (PcdSerialRegisterBase);
   VirtualMemoryTable[Idx].Length         = EFI_PAGE_SIZE;
   VirtualMemoryTable[Idx].Attributes     = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;

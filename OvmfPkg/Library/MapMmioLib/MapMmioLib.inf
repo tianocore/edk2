@@ -18,11 +18,22 @@
   DESTRUCTOR                     = MapMmioLibDestructor
 
 [Sources]
+  ArchConfig.h
   MapMmioLib.c
+
+[Sources.X64, Sources.IA32, Sources.EBC, Sources.RISCV64, Sources.LOONGARCH64]
+  Common/ArchConfig.c
+
+[Sources.AARCH64]
+  AArch64/ArchConfig.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+
+[Packages.AARCH64]
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -30,6 +41,10 @@
   DxeServicesTableLib
   MemoryAllocationLib
   UefiBootServicesTableLib
+
+[LibraryClasses.AARCH64]
+  ArmCcaLib
+  ArmMmuLib
 
 [Guids]
   gEfiEventExitBootServicesGuid
