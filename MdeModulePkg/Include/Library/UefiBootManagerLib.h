@@ -611,6 +611,16 @@ typedef enum {
 } CONSOLE_TYPE;
 
 /**
+  This function will search every input/output device in current system,
+  and make every input/output device as potential console device.
+**/
+VOID
+EFIAPI
+EfiBootManagerConnectAllConsoles (
+  VOID
+  );
+
+/**
   This function will connect all the console devices base on the console
   device variable ConIn, ConOut and ErrOut.
 
