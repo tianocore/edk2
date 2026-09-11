@@ -726,10 +726,10 @@ KcsTransportSendCommand (
 
     // Print out the response payloads.
     if (*ResponseDataSize != 0) {
-      if (ExpectedResponseDataSize != *ResponseDataSize) {
+      if (ExpectedResponseDataSize < *ResponseDataSize) {
         DEBUG ((
           DEBUG_ERROR,
-          "Expected KCS response size : %d is not matched to returned size : %d.\n",
+          "Expected KCS response size : %d is less than returned size : %d.\n",
           ExpectedResponseDataSize,
           *ResponseDataSize
           ));
