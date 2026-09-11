@@ -101,8 +101,9 @@ TransferTdxHobList (
   while (!END_OF_HOB_LIST (Hob)) {
     switch (Hob.Header->HobType) {
       case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR:
+      case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2:
         ResourceType      = Hob.ResourceDescriptor->ResourceType;
-        ResourceAttribute = Hob.ResourceDescriptor->ResourceAttribute;
+        ResourceAttribute = GET_RESOURCE_HOB_ATTRIBUTE (Hob);
 
         if (ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
           BuildResourceDescriptorHobForUnacceptedMemory (Hob.ResourceDescriptor);

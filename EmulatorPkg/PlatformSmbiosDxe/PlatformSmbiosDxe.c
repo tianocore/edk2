@@ -54,8 +54,12 @@ CreatePlatformSmbiosMemoryRecords (
 
   // Generate Type16 records
   gSmbiosType19Template.MemoryArrayHandle = PhyscialMemoryArrayHandle;
-  HobPtr.Raw                              = GetHobList ();
-  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, HobPtr.Raw)) != NULL) {
+
+  for (HobPtr.Raw = GetHobList (); !END_OF_HOB_LIST (HobPtr); HobPtr.Raw = GET_NEXT_HOB (HobPtr)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (HobPtr)) {
+      continue;
+    }
+
     if (HobPtr.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
       gSmbiosType19Template.ExtendedStartingAddress = HobPtr.ResourceDescriptor->PhysicalStart;
       gSmbiosType19Template.ExtendedEndingAddress   =
@@ -64,8 +68,6 @@ CreatePlatformSmbiosMemoryRecords (
 
       SmbiosLibCreateEntry ((SMBIOS_STRUCTURE *)&gSmbiosType19Template, NULL);
     }
-
-    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
   }
 }
 
