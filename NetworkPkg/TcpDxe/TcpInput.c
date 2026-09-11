@@ -735,7 +735,10 @@ TcpInput (
   Tcb    = NULL;
 
   Head = (TCP_HEAD *)NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (Head != NULL);
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    goto DISCARD;
+  }
 
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
     DEBUG ((DEBUG_NET, "TcpInput: received a malformed packet\n"));
@@ -794,6 +797,9 @@ TcpInput (
   }
 
   Seg = TcpFormatNetbuf (Tcb, Nbuf);
+  if (Seg == NULL) {
+    goto DISCARD;
+  }
 
   //
   // RFC1122 recommended reaction to illegal option
@@ -1596,7 +1602,10 @@ TcpIcmpInput (
   }
 
   Head = (TCP_HEAD *)NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (Head != NULL);
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    goto CLEAN_EXIT;
+  }
 
   Tcb = TcpLocateTcb (
           Head->DstPort,
