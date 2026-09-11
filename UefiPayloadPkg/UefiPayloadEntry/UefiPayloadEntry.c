@@ -350,6 +350,7 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *NewGfxDeviceInfo;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE    *SmBiosTableHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE      *AcpiTableHob;
+  UINT64                            SmBiosEntryPoint;
 
   //
   // First find TOLUD
@@ -415,14 +416,15 @@ BuildHobFromBl (
   //
   // Create SmBios table Hob
   //
-  SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
-  ASSERT (SmBiosTableHob != NULL);
-  SmBiosTableHob->Header.Revision = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
-  SmBiosTableHob->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
-  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
-  Status = ParseSmbiosTable (SmBiosTableHob);
+  Status = ParseSmbiosTable (&SmBiosEntryPoint);
   if (!EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx\n", SmBiosTableHob->SmBiosEntryPoint));
+    DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx\n", SmBiosEntryPoint));
+    SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+    ASSERT (SmBiosTableHob != NULL);
+    SmBiosTableHob->Header.Revision  = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
+    SmBiosTableHob->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
+    SmBiosTableHob->SmBiosEntryPoint = SmBiosEntryPoint;
+    DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
   }
 
   //
