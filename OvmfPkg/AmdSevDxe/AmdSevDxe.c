@@ -119,7 +119,13 @@ AcceptAllMemory (
     CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Desc;
 
     Desc = &AllDescMap[Index];
-    if (Desc->GcdMemoryType != EfiGcdMemoryTypeUnaccepted) {
+    //
+    // Skip unaccepted memory regions reserved for future memory hot-add.
+    // These have no backing memory yet, so they must not be validated here;
+    // they are left as unaccepted for a UHP-aware OS to handle after hot-add.
+    //
+    if ((Desc->GcdMemoryType != EfiGcdMemoryTypeUnaccepted) ||
+        (Desc->Capabilities & EFI_MEMORY_UHP)) {
       continue;
     }
 

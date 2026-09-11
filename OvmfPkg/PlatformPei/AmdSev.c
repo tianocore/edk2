@@ -120,7 +120,7 @@ AmdSevSnpGetApicIds (
 STATIC
 VOID
 AmdSevSnpInitialize (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   EFI_PEI_HOB_POINTERS         Hob;
@@ -169,6 +169,19 @@ AmdSevSnpInitialize (
           );
       }
     }
+  }
+
+  //
+  // Describe the memory hotplug window as unaccepted memory and tag it with
+  // EFI_RESOURCE_ATTRIBUTE_UNACCEPTED_HOT_PLUG
+  //
+  if (PlatformInfoHob->HotPlugMemoryEnd > PlatformInfoHob->HotPlugMemoryStart) {
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_MEMORY_UNACCEPTED,
+      EFI_RESOURCE_ATTRIBUTE_UNACCEPTED_HOT_PLUG,
+      PlatformInfoHob->HotPlugMemoryStart,
+      PlatformInfoHob->HotPlugMemoryEnd - PlatformInfoHob->HotPlugMemoryStart
+      );
   }
 
   //
@@ -460,7 +473,7 @@ AmdSevInitialize (
   // is because the system RAM must be validated before it is made shared.
   // The AmdSevSnpInitialize() validates the system RAM.
   //
-  AmdSevSnpInitialize ();
+  AmdSevSnpInitialize (PlatformInfoHob);
 
   //
   // Set Memory Encryption Mask PCD
