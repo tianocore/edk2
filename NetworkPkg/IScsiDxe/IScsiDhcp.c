@@ -77,7 +77,7 @@ IScsiDhcpExtractRootPath (
       Fields[FieldIndex].Str = &TmpStr[Index];
     }
 
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
       Index++;
     }
 

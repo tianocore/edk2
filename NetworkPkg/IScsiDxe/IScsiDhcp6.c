@@ -37,7 +37,7 @@ IScsiDhcp6ExtractRootPath (
   ISCSI_ROOT_PATH_FIELD        Fields[RP_FIELD_IDX_MAX];
   ISCSI_ROOT_PATH_FIELD        *Field;
   UINT32                       FieldIndex;
-  UINT8                        Index;
+  UINT16                       Index;
   ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
   EFI_IP_ADDRESS               Ip;
   UINT8                        IpMode;
@@ -88,7 +88,7 @@ IScsiDhcp6ExtractRootPath (
   Fields[RP_FIELD_IDX_SERVERNAME].Str = &TmpStr[Index];
 
   if (!ConfigNvData->DnsMode) {
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER)) {
       Index++;
     }
 
@@ -98,7 +98,7 @@ IScsiDhcp6ExtractRootPath (
     TmpStr[Index] = '\0';
     Index        += 2;
   } else {
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
       Index++;
     }
 
@@ -119,7 +119,7 @@ IScsiDhcp6ExtractRootPath (
       Fields[FieldIndex].Str = &TmpStr[Index];
     }
 
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
+    while ((Index < Length) && (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER)) {
       Index++;
     }
 
