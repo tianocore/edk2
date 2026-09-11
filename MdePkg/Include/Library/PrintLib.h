@@ -70,7 +70,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
       - Print a %%.
     - c
       - The argument is a Unicode character.  ASCII characters can be printed
-        using this type too by making sure bits 8..15 of the argument are set to 0.
+        using this type too by making sure bits 7..15 of the argument are set to 0.
     - x
       - The argument is an unsigned hexadecimal number.  The characters used are 0..9 and
         A..F.  If the flag 'L' is not specified, then the argument is assumed
