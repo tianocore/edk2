@@ -188,14 +188,29 @@ TcpIoCreateSocket (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR (Status) || (*Interface == NULL)) {
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  if (*Interface == NULL) {
+    Status = EFI_DEVICE_ERROR;
     goto ON_ERROR;
   }
 
   if (TcpVersion == TCP_VERSION_4) {
     Tcp4 = TcpIo->Tcp.Tcp4;
+    if (Tcp4 == NULL) {
+      ASSERT (Tcp4 != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
+    }
   } else {
     Tcp6 = TcpIo->Tcp.Tcp6;
+    if (Tcp6 == NULL) {
+      ASSERT (Tcp6 != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
+    }
   }
 
   TcpIo->Image      = Image;
@@ -248,8 +263,6 @@ TcpIoCreateSocket (
       sizeof (EFI_IPv4_ADDRESS)
       );
 
-    ASSERT (Tcp4 != NULL);
-
     //
     // Configure the TCP4 protocol.
     //
@@ -287,7 +300,6 @@ TcpIoCreateSocket (
 
     IP6_COPY_ADDRESS (&AccessPoint6->RemoteAddress, &ConfigData->Tcp6IoConfigData.RemoteIp);
 
-    ASSERT (Tcp6 != NULL);
     //
     // Configure the TCP6 protocol.
     //
@@ -550,10 +562,18 @@ TcpIoConnect (
   Tcp6 = NULL;
 
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
-    Tcp4   = TcpIo->Tcp.Tcp4;
+    Tcp4 = TcpIo->Tcp.Tcp4;
+    if (Tcp4 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp4->Connect (Tcp4, &TcpIo->ConnToken.Tcp4Token);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
-    Tcp6   = TcpIo->Tcp.Tcp6;
+    Tcp6 = TcpIo->Tcp.Tcp6;
+    if (Tcp6 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp6->Connect (Tcp6, &TcpIo->ConnToken.Tcp6Token);
   } else {
     return EFI_UNSUPPORTED;
@@ -626,10 +646,18 @@ TcpIoAccept (
   Tcp6 = NULL;
 
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
-    Tcp4   = TcpIo->Tcp.Tcp4;
+    Tcp4 = TcpIo->Tcp.Tcp4;
+    if (Tcp4 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp4->Accept (Tcp4, &TcpIo->ListenToken.Tcp4Token);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
-    Tcp6   = TcpIo->Tcp.Tcp6;
+    Tcp6 = TcpIo->Tcp.Tcp6;
+    if (Tcp6 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp6->Accept (Tcp6, &TcpIo->ListenToken.Tcp6Token);
   } else {
     return EFI_UNSUPPORTED;
@@ -678,6 +706,9 @@ TcpIoAccept (
                     TcpIo->Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
+    if (!EFI_ERROR (Status) && (TcpIo->NewTcp.Tcp4 == NULL)) {
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
   return Status;
@@ -710,11 +741,19 @@ TcpIoReset (
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
     TcpIo->CloseToken.Tcp4Token.AbortOnClose = TRUE;
     Tcp4                                     = TcpIo->Tcp.Tcp4;
-    Status                                   = Tcp4->Close (Tcp4, &TcpIo->CloseToken.Tcp4Token);
+    if (Tcp4 == NULL) {
+      return;
+    }
+
+    Status = Tcp4->Close (Tcp4, &TcpIo->CloseToken.Tcp4Token);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
     TcpIo->CloseToken.Tcp6Token.AbortOnClose = TRUE;
     Tcp6                                     = TcpIo->Tcp.Tcp6;
-    Status                                   = Tcp6->Close (Tcp6, &TcpIo->CloseToken.Tcp6Token);
+    if (Tcp6 == NULL) {
+      return;
+    }
+
+    Status = Tcp6->Close (Tcp6, &TcpIo->CloseToken.Tcp6Token);
   } else {
     return;
   }
