@@ -2,7 +2,7 @@
 
 Platform Runtime Mechanism (PRM) introduces the capability of moving platform-specific code out of SMM and into a
 code module that executes within the OS context. Moving this firmware to the OS context provides better transparency
-and mitigates the negative system impact currently accompanied with SMM solutions. Futhermore, the PRM code is
+and mitigates the negative system impact currently accompanied with SMM solutions. Furthermore, the PRM code is
 packaged into modules with well-defined entry points, each representing a specific PRM functionality.
 
 For more details on PRM, refer to the [Platform Runtime Mechanism Specification on uefi.org](https://uefi.org/sites/default/files/resources/Platform%20Runtime%20Mechanism%20-%20with%20legal%20notice.pdf).
