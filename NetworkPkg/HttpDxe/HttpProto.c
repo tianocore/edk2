@@ -1094,7 +1094,7 @@ HttpConfigureTcp4 (
   Tcp4Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
-  Tcp4Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
+  Tcp4Option->ConnectionTimeout   = PcdGet32 (PcdHttpConnectionTimeout);
   Tcp4Option->DataRetries         = HTTP_DATA_RETRIES;
   Tcp4Option->FinTimeout          = HTTP_FIN_TIMEOUT;
   Tcp4Option->KeepAliveProbes     = HTTP_KEEP_ALIVE_PROBES;
@@ -1178,7 +1178,7 @@ HttpConfigureTcp6 (
   Tcp6Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
-  Tcp6Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
+  Tcp6Option->ConnectionTimeout   = PcdGet32 (PcdHttpConnectionTimeout);
   Tcp6Option->DataRetries         = HTTP_DATA_RETRIES;
   Tcp6Option->FinTimeout          = HTTP_FIN_TIMEOUT;
   Tcp6Option->KeepAliveProbes     = HTTP_KEEP_ALIVE_PROBES;
@@ -1296,7 +1296,7 @@ HttpConnectTcp4 (
     //
     // Start the timer, and wait Timeout seconds for connection.
     //
-    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_CONNECTION_TIMEOUT * TICKS_PER_SECOND);
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, PcdGet32 (PcdHttpConnectionTimeout) * TICKS_PER_SECOND);
     if (EFI_ERROR (Status)) {
       TlsCloseTxRxEvent (HttpInstance);
       return Status;
@@ -1393,7 +1393,7 @@ HttpConnectTcp6 (
     //
     // Start the timer, and wait Timeout seconds for connection.
     //
-    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_CONNECTION_TIMEOUT * TICKS_PER_SECOND);
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, PcdGet32 (PcdHttpConnectionTimeout) * TICKS_PER_SECOND);
     if (EFI_ERROR (Status)) {
       TlsCloseTxRxEvent (HttpInstance);
       return Status;

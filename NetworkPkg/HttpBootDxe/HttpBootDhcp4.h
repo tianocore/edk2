@@ -88,7 +88,6 @@ typedef enum {
   HttpOfferTypeMax
 } HTTP_BOOT_OFFER_TYPE;
 
-#define HTTP_BOOT_DHCP_RETRIES   4
 #define HTTP_BOOT_OFFER_MAX_NUM  16
 
 // The array index of the DHCP4 option tag interested
