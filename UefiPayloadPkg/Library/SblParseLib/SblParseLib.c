@@ -129,7 +129,7 @@ ParseSmbiosTable (
 
   TableInfo = (UNIVERSAL_PAYLOAD_SMBIOS_TABLE *)GetGuidHobDataFromSbl (&gUniversalPayloadSmbiosTableGuid);
   if (TableInfo == NULL) {
-    ASSERT (FALSE);
+    DEBUG ((DEBUG_INFO, "No SMBIOS table from bootloader\n"));
     return RETURN_NOT_FOUND;
   }
 

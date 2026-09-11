@@ -10,6 +10,7 @@
 
 #include <PiPei.h>
 
+#include <Library/AcpiTableWalkLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -110,8 +111,9 @@ HobConstructor (
   );
 
 /**
-  Find DXE core from FV and build DXE core HOBs.
+  Find DXE core from the payload FV and build DXE core HOBs.
 
+  @param[in]   PayloadFv             The payload FV that contains the DXE FV.
   @param[out]  DxeCoreEntryPoint     DXE core entry point
 
   @retval EFI_SUCCESS        If it completed successfully.
@@ -119,7 +121,8 @@ HobConstructor (
 **/
 EFI_STATUS
 LoadDxeCore (
-  OUT PHYSICAL_ADDRESS  *DxeCoreEntryPoint
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *PayloadFv,
+  OUT PHYSICAL_ADDRESS            *DxeCoreEntryPoint
   );
 
 /**

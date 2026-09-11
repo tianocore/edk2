@@ -1,0 +1,50 @@
+## @file
+#  Discover the GIC Distributor, Redistributor and CPU-interface bases
+#  from the ACPI MADT supplied by the bootloader and populate the
+#  ArmGic PCDs.
+#
+#  Plugged into ArmGicDxe as a NULL library so that the constructor
+#  runs before InterruptDxeInitialize() reads PcdGicDistributorBase,
+#  PcdGicRedistributorsBase and PcdGicInterruptInterfaceBase.
+#
+#  Copyright (c) 2026, Amazon.com, Inc. or its affiliates.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiGicPcdLib
+  FILE_GUID                      = 4E7CB4BF-DF23-4AA1-8B1F-5A47DA0EC1E6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = AcpiGicPcdLibConstructor
+
+[Sources]
+  AcpiGicPcdLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  AcpiTableWalkLib
+  ArmLib
+  BaseLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  PcdLib
+
+[Guids]
+  gUniversalPayloadAcpiTableGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+
+[Depex]
+  gEfiCpuArchProtocolGuid

@@ -42,7 +42,6 @@ ResetSystemLibConstructor (
 
   ASSERT (mAcpiBoardInfo.ResetRegAddress != 0);
   ASSERT (mAcpiBoardInfo.ResetValue != 0);
-  ASSERT (mAcpiBoardInfo.PmGpeEnBase != 0);
   ASSERT (mAcpiBoardInfo.PmEvtBase != 0);
   ASSERT (mAcpiBoardInfo.PmCtrlRegBase != 0);
 
@@ -103,7 +102,9 @@ ResetShutdown (
   //
   // GPE0_EN should be disabled to avoid any GPI waking up the system from S5
   //
-  IoWrite16 ((UINTN)mAcpiBoardInfo.PmGpeEnBase, 0);
+  if (mAcpiBoardInfo.PmGpeEnBase != 0) {
+    IoWrite16 ((UINTN)mAcpiBoardInfo.PmGpeEnBase, 0);
+  }
 
   //
   // Clear Power Button Status

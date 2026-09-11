@@ -1,0 +1,32 @@
+## @file
+#  MemoryAllocationLib whose page allocations are EfiReservedMemoryType.
+#
+#  Overrides UefiMemoryAllocationLib for ChainloadApp so that the
+#  translation-table pages ArmMmuLib allocates through AllocatePages()
+#  are Reserved and each allocation is recorded for ChainloadApp to
+#  publish as a boot-time reservation.  Pool allocations remain
+#  EfiBootServicesData.
+#
+#  Copyright (c) 2026, Amazon.com, Inc. or its affiliates. All Rights Reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ReservedUefiMemoryAllocationLib
+  FILE_GUID                      = 4e4b7c1d-6a34-4a02-9c8e-9c9e9d0e0aa1
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryAllocationLib|UEFI_APPLICATION
+
+[Sources]
+  ReservedUefiMemoryAllocationLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
