@@ -43,7 +43,38 @@ None
 
 #### edk2-stable202611: Changes with Removal
 
-None
+##### Breaking Change: MapMmioLib moved from OvmfPkg to UefiCpuPkg
+
+- **Status**: Removed
+- **Tracking Issue**: [tianocore/edk2#13130](https://github.com/tianocore/edk2/issues/13130)
+- **Pull Request**: [tianocore/edk2#12894](https://github.com/tianocore/edk2/pull/12894)
+- **Type**: Source-Level (Removal) - Library class relocation, DEC declaration move, header file removal, and INF path removal
+
+**What changed**: `MapMmioLib` was moved from `OvmfPkg` to `UefiCpuPkg` so it can be used by non-OVMF
+platforms. The library class declaration moved from `OvmfPkg/OvmfPkg.dec` to `UefiCpuPkg/UefiCpuPkg.dec`, and the
+header and library instance moved from `OvmfPkg` paths to equivalent `UefiCpuPkg` paths.
+
+**What is removed**: The `OvmfPkg` `MapMmioLib` declaration, public header, and library instance paths:
+`OvmfPkg/Include/Library/MapMmioLib.h` and `OvmfPkg/Library/MapMmioLib/MapMmioLib.inf`.
+
+**Why it changed**: `MapMmioLib` provides generic MMIO range mapping support and is needed by packages outside
+`OvmfPkg`. Moving it to `UefiCpuPkg` provides a package-neutral library class declaration and implementation that can
+be consumed by OVMF and non-OVMF platforms.
+
+**What replaces it**: The `UefiCpuPkg` declaration, header, and library instance:
+`UefiCpuPkg/Include/Library/MapMmioLib.h` and `UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf`.
+
+**How to migrate**: Modules that include `<Library/MapMmioLib.h>` must list `UefiCpuPkg/UefiCpuPkg.dec` in their
+INF `[Packages]` section instead of relying on `OvmfPkg/OvmfPkg.dec`. Platform DSC files that map `MapMmioLib` to
+`OvmfPkg/Library/MapMmioLib/MapMmioLib.inf` must update the mapping to:
+
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
+
+**Breaking conditions**: Affects platforms and out-of-tree modules that reference the removed `OvmfPkg` `MapMmioLib`
+DEC declaration, header path, or library instance path.
+
+**Earliest removal**: Already removed in this change. The old `OvmfPkg` paths were removed in the same PR with no
+compatibility window.
 
 #### edk2-stable202611: Changes without Removal
 
