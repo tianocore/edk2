@@ -1,0 +1,30 @@
+## @file
+#  Contains helper functions for working with CFR.
+#
+#  Copyright (c) 2023, 9elements GmbH.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CfrHelpersLib
+  FILE_GUID                      = 4165BB9B-54BF-40B7-AD56-D51D1D90FFB7
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CfrHelpersLib
+
+[Sources]
+  CfrHelpersLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+
+[Guids]
+  gEfiCfrSetupMenuFormGuid
