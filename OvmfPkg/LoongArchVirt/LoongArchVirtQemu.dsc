@@ -133,6 +133,7 @@
   PciCapPciIoLib                   | OvmfPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
   DxeHardwareInfoLib               | OvmfPkg/Library/HardwareInfoLib/DxeHardwareInfoLib.inf
   IoLib                            | MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  IoMmuLib                         | MdeModulePkg/Library/IoMmuLibNull/IoMmuLibNull.inf
   FdtSerialPortAddressLib          | OvmfPkg/Library/FdtSerialPortAddressLib/FdtSerialPortAddressLib.inf
   PlatformHookLib                  | OvmfPkg/LoongArchVirt/Library/Fdt16550SerialPortHookLib/Fdt16550SerialPortHookLib.inf
   SerialPortLib                    | OvmfPkg/LoongArchVirt/Library/EarlyFdtSerialPortLib16550/EarlyFdtSerialPortLib16550.inf
