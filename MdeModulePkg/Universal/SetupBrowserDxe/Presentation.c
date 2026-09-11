@@ -2063,6 +2063,31 @@ ProcessCallBackFunction (
     return EFI_SUCCESS;
   }
 
+  //
+  // When processing CHANGED for an action opcode (e.g., "Commit Changes and Exit"),
+  // sync ordered list values to Storage first. Action opcodes can trigger form submit;
+  // ordered lists use separate BufferValue that must be synced before the callback
+  // runs HiiGetBrowserData. Only run for action opcodes to avoid affecting menu
+  // navigation (GOTO/REFRESH).
+  //
+  if ((Action == EFI_BROWSER_ACTION_CHANGED) &&
+      (Question != NULL) &&
+      (Question->Operand == EFI_IFR_ACTION_OP))
+  {
+    Link = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, Link)) {
+      Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+      Link      = GetNextNode (&Form->StatementListHead, Link);
+
+      if ((Statement->Operand == EFI_IFR_ORDERED_LIST_OP) &&
+          (Statement->Storage != NULL) &&
+          (Statement->BufferValue != NULL))
+      {
+        SetQuestionValue (FormSet, Form, Statement, GetSetValueWithEditBuffer);
+      }
+    }
+  }
+
   Link = GetFirstNode (&Form->StatementListHead);
   while (!IsNull (&Form->StatementListHead, Link)) {
     Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
