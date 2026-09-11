@@ -1184,6 +1184,8 @@ HttpParseMessageBody (
     switch (Parser->State) {
       case BodyParserStateMax:
         return EFI_ABORTED;
+      case BodyParserComplete:
+        return EFI_SUCCESS;
 
       case BodyParserBodyIdentity:
         //
