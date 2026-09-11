@@ -42,6 +42,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   INF EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+  INF ArmVirtPkg/QemuPlatformDxe/QemuPlatformDxe.inf
   INF OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
   #

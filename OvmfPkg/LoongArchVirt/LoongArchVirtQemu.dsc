@@ -518,6 +518,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 !endif
 
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable             |FALSE
+
 [PcdsDynamicHii]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|3
 !if $(TPM2_CONFIG_ENABLE) == TRUE
