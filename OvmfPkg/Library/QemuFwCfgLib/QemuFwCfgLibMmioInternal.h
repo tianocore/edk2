@@ -17,6 +17,11 @@ typedef struct {
   UINTN    FwCfgDmaAddress;
 } QEMU_FW_CFG_RESOURCE;
 
+RETURN_STATUS
+InternalInitIoMmu (
+  VOID
+  );
+
 /**
   Reads firmware configuration bytes into a buffer
 
