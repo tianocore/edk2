@@ -509,6 +509,33 @@ BasePrintLibConvertValueToStringS (
 }
 
 /**
+  Helper to count the number of characters in a string that might either be
+  ASCII or UTF-16 Unicode.
+
+  @param[in]  String              The input string
+  @param[in]  BytesPerCharacter   The unit size in bytes of the encoding
+  @param[in]  MaxLength           The maximum length to return if the string
+                                  is not NUL terminated.
+
+  @return     The number of characters before the NUL terminator if one was
+              found, and MaxLength otherwise.
+**/
+STATIC
+UINTN
+CountCharacters (
+  CONST CHAR8  *String,
+  UINTN        BytesPerCharacter,
+  UINTN        MaxLength
+  )
+{
+  if (BytesPerCharacter == 2) {
+    return StrnLenS ((CONST CHAR16 *)String, MaxLength);
+  } else {
+    return AsciiStrnLenS (String, MaxLength);
+  }
+}
+
+/**
   Worker function that produces a Null-terminated string in an output buffer
   based on a Null-terminated format string and a VA_LIST argument list.
 
@@ -1155,22 +1182,7 @@ BasePrintLibSPrintMarker (
     if ((Flags & ARGUMENT_REVERSED) != 0) {
       BytesPerArgumentCharacter = -BytesPerArgumentCharacter;
     } else {
-      //
-      // Compute the number of characters in ArgumentString and store it in Count
-      // ArgumentString is either null-terminated, or it contains Precision characters
-      //
-      for (Count = 0;
-           (ArgumentString[Count * BytesPerArgumentCharacter] != '\0' ||
-            (BytesPerArgumentCharacter > 1 &&
-             ArgumentString[Count * BytesPerArgumentCharacter + 1] != '\0')) &&
-           (Count < Precision || ((Flags & PRECISION) == 0));
-           Count++)
-      {
-        ArgumentCharacter = ((ArgumentString[Count * BytesPerArgumentCharacter] & 0xff) | ((ArgumentString[Count * BytesPerArgumentCharacter + 1]) << 8)) & ArgumentMask;
-        if (ArgumentCharacter == 0) {
-          break;
-        }
-      }
+      Count = CountCharacters (ArgumentString, BytesPerArgumentCharacter, (Flags & PRECISION) != 0 ? Precision : MAX_UINTN);
     }
 
     if (Precision < Count) {
