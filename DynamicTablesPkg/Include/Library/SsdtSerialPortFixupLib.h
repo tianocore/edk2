@@ -63,3 +63,16 @@ ValidateSerialPortInfo (
   IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfoTable,
   IN        UINT32                           SerialPortCount
   );
+
+/** Validate the Serial Port Architecture Information.
+
+  @param [in]  SerialPortInfoTable    Table of CM_ARCH_COMMON_SERIAL_PORT_INFO.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+ArchValidateSerialPortInfo (
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo
+  );
