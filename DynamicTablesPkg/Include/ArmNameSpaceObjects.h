@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -47,12 +47,12 @@ typedef enum ArmObjectID {
   EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
   EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
-  EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
+  EArmObjCmnInfo,                                              ///< 20 - CMN Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
-  EArmObjDmc620PmuSocketInfo,                                  ///< 24 - DMC620 Socket Info
-  EArmObjDmc620PmuRegInfo,                                     ///< 25 - DMC620 PMU Reg Info
+  EArmObjDmcPmuSocketInfo,                                     ///< 24 - DMC Socket Info
+  EArmObjDmcPmuRegInfo,                                        ///< 25 - DMC PMU Reg Info
   EArmObjProcessorSpecificBlockInfo,                           ///< 26 - Processor Specific Block.
   EArmObjProcessorSpecificSubDataArchInfo,                     ///< 27 - Processor Specific Sub Data (ArchData)
   EArmObjCoresightPmuInfo,                                     ///< 28 - Coresight PMU Info
@@ -663,66 +663,77 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
-/** A structure that describes the CMN-600 hardware.
+/** CMN implementation types. */
+typedef enum ArmCmnType {
+  ArmCmnType600,
+  ArmCmnType650,
+  ArmCmnType700,
+  ArmCmnTypeS3,
+  ArmCmnTypeMax
+} ARM_CMN_TYPE;
 
-    ID: EArmObjCmn600Info
+/** A structure that describes CMN hardware.
+
+    ID: EArmObjCmnInfo
 */
-typedef struct CmArmCmn600Info {
+typedef struct CmArmCmnInfo {
   /// The PERIPHBASE address.
   /// Corresponds to the Configuration Node Region (CFGR) base address.
-  UINT64    PeriphBaseAddress;
+  UINT64                       PeriphBaseAddress;
 
   /// The PERIPHBASE address length.
   /// Corresponds to the CFGR base address length.
-  UINT64    PeriphBaseAddressLength;
+  UINT64                       PeriphBaseAddressLength;
 
   /// The ROOTNODEBASE address.
   /// Corresponds to the Root node (ROOT) base address.
-  UINT64    RootNodeBaseAddress;
+  /// Required only for CMN-600; must be zero for other CMN types.
+  UINT64                       RootNodeBaseAddress;
 
-  /// The Debug and Trace Logic Controller (DTC) count.
-  /// CMN-600 can have maximum 4 DTCs.
-  UINT8     DtcCount;
+  /// Number of Debug and Trace Logic Controller interrupts.
+  /// A maximum of four DTC interrupts can be described.
+  UINT8                        DtcCount;
 
-  /// DTC Interrupt list.
-  /// The first interrupt resource descriptor pertains to
-  /// DTC[0], the second to DTC[1] and so on.
-  /// DtcCount determines the number of DTC Interrupts that
-  /// are populated. If DTC count is 2 then DtcInterrupt[2]
-  /// and DtcInterrupt[3] are ignored.
-  /// Note: The size of CM_ARM_CMN_600_INFO structure remains
-  /// constant and does not vary with the DTC count.
+  /// DTC interrupt descriptors.
+  /// Entries must be ordered by increasing hardware-assigned DTC Logical ID.
+  /// DtcCount determines the number of valid entries.
   CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
-} CM_ARM_CMN_600_INFO;
 
-/** A structure that describes the DMC620 PMU hardware
+  /// CMN implementation type.
+  ARM_CMN_TYPE                 CmnType;
+
+  /// Length of the optional root-node region. Zero means no ROOT resource.
+  UINT64                       RootNodeBaseAddressLength;
+} CM_ARM_CMN_INFO;
+
+/** A structure that describes the DMC PMU hardware
     registers and interrupt.
 
-    ID: EArmObjDmc620PmuRegInfo
+    ID: EArmObjDmcPmuRegInfo
 */
-typedef struct CmArmDmc620PmuRegInfo {
-  /// The Base address of PMU register space in the DMC620 device.
+typedef struct CmArmDmcPmuRegInfo {
+  /// The Base address of PMU register space in the DMC device.
   UINT64                       BaseAddress;
 
-  /// Length of the DMC620 PMU registers
+  /// Length of the DMC PMU registers
   UINT64                       Length;
 
-  /// The DMC620 PMU interrupt descriptor
+  /// The DMC PMU interrupt descriptor
   CM_ARM_EXTENDED_INTERRUPT    PmuIntr;
-} CM_ARM_DMC620_PMU_REG_INFO;
+} CM_ARM_DMC_PMU_REG_INFO;
 
-/** A structure that describes the DMC620 PMU hardware
+/** A structure that describes the DMC PMU hardware
     on a socket.
 
-    ID: EArmObjDmc620PmuSocketInfo
+    ID: EArmObjDmcPmuSocketInfo
 */
-typedef struct CmArmDmc620PmuSocketInfo {
+typedef struct CmArmDmcPmuSocketInfo {
   /// Number of devices on this socket
   UINT8              NumDevices;
 
-  /// Array of DMC620 PMU devices on this socket
-  CM_OBJECT_TOKEN    Dmc620PmuRegInfoToken;
-} CM_ARM_DMC620_INFO;
+  /// Array of DMC PMU devices on this socket
+  CM_OBJECT_TOKEN    DmcPmuRegInfoToken;
+} CM_ARM_DMC_INFO;
 
 /** A structure that describes the
     RMR node for the Platform.
