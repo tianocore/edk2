@@ -193,28 +193,40 @@ struct _IP4_SERVICE {
   EFI_MANAGED_NETWORK_PROTOCOL       *Mnp;
 
   EFI_MANAGED_NETWORK_CONFIG_DATA    MnpConfigData;
-  EFI_SIMPLE_NETWORK_MODE            SnpMode;
 
-  EFI_EVENT                          Timer;
-  EFI_EVENT                          ReconfigCheckTimer;
-  EFI_EVENT                          ReconfigEvent;
+  //
+  // SnpMode is a cached copy of the SNP device configuration data (MAC address,
+  // media header size, hardware address size, interface type, etc.). This copy is
+  // obtained during service initialization via GetModeData.
+  //
+  // IMPORTANT: This cached data becomes STALE if MnpConfigure() is called, as
+  // MnpConfigure triggers SNP Start/Initialize which may finalize or alter mode
+  // fields not set before Start. Code that calls MnpConfigure must refetch the
+  // SNP mode data via GetModeData after reconfiguration to ensure values like
+  // MediaHeaderSize, CurrentAddress, and HwAddressSize remain valid.
+  //
+  EFI_SIMPLE_NETWORK_MODE    SnpMode;
 
-  BOOLEAN                            Reconfig;
+  EFI_EVENT                  Timer;
+  EFI_EVENT                  ReconfigCheckTimer;
+  EFI_EVENT                  ReconfigEvent;
+
+  BOOLEAN                    Reconfig;
 
   //
   // Underlying media present status.
   //
-  BOOLEAN                            MediaPresent;
+  BOOLEAN                    MediaPresent;
 
   //
   // IPv4 Configuration II Protocol instance
   //
-  IP4_CONFIG2_INSTANCE               Ip4Config2Instance;
+  IP4_CONFIG2_INSTANCE       Ip4Config2Instance;
 
-  CHAR16                             *MacString;
+  CHAR16                     *MacString;
 
-  UINT32                             MaxPacketSize;
-  UINT32                             OldMaxPacketSize; ///< The MTU before IPsec enable.
+  UINT32                     MaxPacketSize;
+  UINT32                     OldMaxPacketSize;         ///< The MTU before IPsec enable.
 };
 
 #define IP4_INSTANCE_FROM_PROTOCOL(Ip4) \

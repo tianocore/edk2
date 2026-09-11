@@ -153,16 +153,27 @@ struct _ARP_SERVICE_DATA {
   EFI_MANAGED_NETWORK_CONFIG_DATA         MnpConfigData;
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN    RxToken;
 
-  EFI_SIMPLE_NETWORK_MODE                 SnpMode;
+  //
+  // SnpMode is a cached copy of the SNP device configuration data (MAC address,
+  // media header size, hardware address size, interface type, etc.). This copy is
+  // obtained during service initialization via GetModeData.
+  //
+  // IMPORTANT: This cached data becomes STALE if MnpConfigure() is called, as
+  // MnpConfigure triggers SNP Start/Initialize which may finalize or alter mode
+  // fields not set before Start. Code that calls MnpConfigure must refetch the
+  // SNP mode data via GetModeData after reconfiguration to ensure values like
+  // MediaHeaderSize, CurrentAddress, and HwAddressSize remain valid.
+  //
+  EFI_SIMPLE_NETWORK_MODE    SnpMode;
 
-  UINTN                                   ChildrenNumber;
-  LIST_ENTRY                              ChildrenList;
+  UINTN                      ChildrenNumber;
+  LIST_ENTRY                 ChildrenList;
 
-  LIST_ENTRY                              PendingRequestTable;
-  LIST_ENTRY                              DeniedCacheTable;
-  LIST_ENTRY                              ResolvedCacheTable;
+  LIST_ENTRY                 PendingRequestTable;
+  LIST_ENTRY                 DeniedCacheTable;
+  LIST_ENTRY                 ResolvedCacheTable;
 
-  EFI_EVENT                               PeriodicTimer;
+  EFI_EVENT                  PeriodicTimer;
 };
 
 //
