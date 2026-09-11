@@ -379,7 +379,14 @@
   #
   ArmFfaMemMgmtLib|Include/Library/ArmFfaMemMgmtLib.h
 
+  ## @libraryclass  Provides an interface for an Arm Transfer List.
+  #
+  ArmTransferListLib|Include/Library/ArmTransferListLib.h
+
 [Guids]
+  ## Include/Guid/TransferListHob.h
+  gArmTransferListHobGuid = { 0xebe7bae8, 0xfe18, 0x43c5, { 0xbf, 0x3f, 0xf2, 0xb1, 0xaf, 0xb2, 0xdf, 0xb8 } }
+
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
   #
@@ -962,6 +969,9 @@
   gEfiIa32X64ErrorTypeMsCheckGuid    = { 0x48AB7F57, 0xDC34, 0x4f6c, { 0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 }}
 
 [Ppis]
+  ## Arm Transfer List PPI GUID
+  gArmTransferListPpiGuid = { 0x6d2e9da1, 0x9414, 0x41c3, {0x86, 0xbe, 0xf9, 0x16, 0x9f, 0xb4, 0x76, 0x38} }
+
   ## Include/Ppi/MasterBootMode.h
   gEfiPeiMasterBootModePpiGuid = { 0x7408d748, 0xfc8c, 0x4ee6, {0x92, 0x88, 0xc4, 0xbe, 0xc0, 0x92, 0xa4, 0x10 } }
 
