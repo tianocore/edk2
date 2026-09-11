@@ -62,6 +62,8 @@
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
 
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
@@ -88,6 +90,9 @@
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+
+[LibraryClasses.AARCH64.SEC, LibraryClasses.AARCH64.PEI_CORE, LibraryClasses.AARCH64.PEIM]
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
 
 [BuildOptions]
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
