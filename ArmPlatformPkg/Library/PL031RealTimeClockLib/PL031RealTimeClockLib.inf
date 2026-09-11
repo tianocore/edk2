@@ -27,6 +27,7 @@
 
 [LibraryClasses]
   DebugLib
+  DxeServicesLib
   DxeServicesTableLib
   IoLib
   PcdLib
