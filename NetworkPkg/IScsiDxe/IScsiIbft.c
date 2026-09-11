@@ -318,7 +318,10 @@ IScsiFillNICAndTargetSections (
     // Get Nic Info: VLAN tag, Mac address, PCI location.
     //
     NicInfo = IScsiGetNicInfoByIndex (Attempt->NicIndex);
-    ASSERT (NicInfo != NULL);
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      break;
+    }
 
     Nic->VLanTag = NicInfo->VlanId;
     CopyMem (Nic->Mac, &NicInfo->PermanentAddress, sizeof (Nic->Mac));
@@ -506,9 +509,15 @@ IScsiPublishIbft (
   //
   // Fill in the various section of the iSCSI Boot Firmware Table.
   //
-  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
+  if (Xsdt != NULL) {
     IScsiInitIbfTableHeader (Table, Xsdt->OemId, &Xsdt->OemTableId);
   } else {
+    if (Rsdt == NULL) {
+      ASSERT (Rsdt != NULL);
+      FreePool (Table);
+      return;
+    }
+
     IScsiInitIbfTableHeader (Table, Rsdt->OemId, &Rsdt->OemTableId);
   }
 
