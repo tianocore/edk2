@@ -171,6 +171,41 @@ edk2-platforms repository.
 
 **Companion PR**: None required; no edk2-platforms consumer was identified.
 
+##### Breaking Change: PL031RealTimeClockLib gains MapMmioLib dependency
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13131](https://github.com/tianocore/edk2/issues/13131)
+- **Pull Request**: [tianocore/edk2#12894](https://github.com/tianocore/edk2/pull/12894)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition (single expected instance)
+
+**What changed**: `ArmPlatformPkg` `PL031RealTimeClockLib` gained a required dependency on the `MapMmioLib` library
+class declared in `UefiCpuPkg`. Platforms that build `PL031RealTimeClockLib` must resolve `MapMmioLib` in their DSC
+or the build fails with an unresolved library class.
+
+**Library class dependency case**: Single expected instance. `UefiCpuPkg` provides the recommended instance at
+`UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf`, so migration is a DSC library class mapping.
+
+**Why it changed**: `PL031RealTimeClockLib` now uses `MapMmioMemory()` to add and configure the PL031 RTC MMIO range
+before allocating it for runtime use. This centralizes MMIO mapping behavior and lets the shared `MapMmioLib`
+implementation apply any required architecture-specific memory attribute configuration.
+
+**What replaces it**: Nothing is removed. `MapMmioLib` becomes an additional required dependency of
+`PL031RealTimeClockLib`.
+
+**How to migrate**: Platforms building `PL031RealTimeClockLib` must add a `MapMmioLib` mapping to their platform DSC
+`[LibraryClasses]` section. To use the in-tree implementation, add:
+
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
+
+> Note: A corresponding `edk2-platforms` pull request is expected to add this mapping for:
+>
+> - `Platform/Qemu/SbsaQemu/SbsaQemu.dsc`
+> - `Platform/ARM/VExpressPkg/ArmVExpress.dsc.inc`
+
+**Breaking conditions**: Affects platforms that build
+`ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf` and do not already provide a `MapMmioLib`
+mapping for `DXE_RUNTIME_DRIVER` modules.
+
 ### edk2-stable202611: Behavioral Breaking Changes
 
 None
