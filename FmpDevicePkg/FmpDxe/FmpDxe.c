@@ -1390,12 +1390,6 @@ SetTheImage (
   Progress (4);
 
   //
-  // Save LastAttemptStatus as error so that if SetImage never returns the error
-  // state is recorded.
-  //
-  SetLastAttemptStatusInVariable (Private, LastAttemptStatus);
-
-  //
   // Strip off all the headers so the device can process its firmware
   //
   Status = GetFmpPayloadHeaderSize (FmpHeader, FmpPayloadSize, &FmpHeaderSize);
@@ -1410,6 +1404,16 @@ SetTheImage (
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): SetTheImage() - GetAllHeaderSize failed.\n", mImageIdName));
     LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_GET_ALL_HEADER_SIZE;
     Status            = EFI_ABORTED;
+    goto cleanup;
+  }
+
+  //
+  // Record the attempted version and a failure status together.  Do not hand
+  // control to the device writer unless this reset-safe checkpoint is durable.
+  //
+  Status = SetUpdateInProgressInVariable (Private, IncomingFwVersion);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): SetTheImage() - Failed to persist update checkpoint. Status = %r\n", mImageIdName, Status));
     goto cleanup;
   }
 

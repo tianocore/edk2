@@ -20,9 +20,15 @@
 
 [LibraryClasses]
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
+  VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
 
 [Components]
   #
   # Build HOST_APPLICATION that tests the FmpDependencyLib
   #
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestsHost.inf
+  FmpDevicePkg/FmpDxe/VariableSupportUnitTestHost.inf {
+    <LibraryClasses>
+      UefiLib|SecurityPkg/Library/SecureBootVariableLib/UnitTest/MockUefiLib.inf
+      UefiRuntimeServicesTableLib|MdeModulePkg/Library/DxeResetSystemLib/UnitTest/MockUefiRuntimeServicesTableLib.inf
+  }
