@@ -56,6 +56,12 @@
   #
   DEFINE CAPSULE_SUPPORT              = FALSE
   DEFINE CAPSULE_MAIN_FW_GUID         =
+  #
+  # Path (relative to WORKSPACE) for PcdFmpDevicePkcs7CertBufferXdr DSC include.
+  # Default: Tianocore test cert. Override with build -D FMP_DEVICE_PKCS7_PCD_INC=<path>
+  # so platforms can point at a build-local generated file under Conf/ (or elsewhere).
+  #
+  DEFINE FMP_DEVICE_PKCS7_PCD_INC     = BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
 
   #
   # Crypto Support
@@ -998,7 +1004,7 @@
       #
       # See BaseTools/Source/Python/Pkcs7Sign/Readme.md for more details on such
       # PCDs and include files.
-      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+      !include $(FMP_DEVICE_PKCS7_PCD_INC)
     <LibraryClasses>
 !if $(BOOTLOADER) == "COREBOOT"
       FmpDeviceLib|UefiPayloadPkg/Library/FmpDeviceSmmLib/FmpDeviceSmmLib.inf
