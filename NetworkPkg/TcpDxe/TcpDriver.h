@@ -27,6 +27,7 @@ typedef struct _TCP_SERVICE_DATA {
   IP_IO                           *IpIo;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   LIST_ENTRY                      SocketList;
+  EFI_HANDLE                      Hash2ServiceHandle;
 } TCP_SERVICE_DATA;
 
 typedef struct _TCP_PROTO_DATA {
