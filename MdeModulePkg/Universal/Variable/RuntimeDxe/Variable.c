@@ -20,6 +20,7 @@ Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Copyright (c) 2022, ARM Limited. All rights reserved.<BR>
+Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -818,6 +819,7 @@ Done:
     Status = DoneStatus;
   }
 
+  DEBUG ((DEBUG_INFO, "[Variable]: Completed Reclaim process with Status = %r.\n", Status));
   return Status;
 }
 
