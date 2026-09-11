@@ -11,6 +11,7 @@
 
 #include <Base.h>
 #include <Pi/PiMmCis.h>
+#include <Library/ArmStandaloneMmCoreEntryPoint.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/HobLib.h>
@@ -55,11 +56,47 @@ StandaloneMmCpuInitialize (
   IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable
   )
 {
-  EFI_STATUS  Status;
-  EFI_HANDLE  DispatchHandle;
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      DispatchHandle;
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  EFI_MMRAM_DESCRIPTOR            *NsCommBuffer;
+  EFI_MMRAM_DESCRIPTOR            *SecureCommBuffer;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHob;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
+
+  //
+  // gEfiStandaloneMmNonSecureBufferGuid GuidHob and
+  // gEfiMmPeiMmramMemoryReservedGuid GuidHob are already verified in
+  // ArmStandlaoneMmCoreEntryPoint. Therefore, it's enough ASSERT().
+  //
+  GuidHob = GetFirstGuidHob (&gEfiStandaloneMmNonSecureBufferGuid);
+  ASSERT (GuidHob != NULL);
+  NsCommBuffer = GET_GUID_HOB_DATA (GuidHob);
+
+  GuidHob = GetFirstGuidHob (&gEfiMmPeiMmramMemoryReserveGuid);
+  ASSERT (GuidHob != NULL);
+  MmramRangesHob   = GET_GUID_HOB_DATA (GuidHob);
+  SecureCommBuffer = &MmramRangesHob->Descriptor[MMRAM_DESC_IDX_SECURE_SHARED_BUFFER];
+
+  mGuidedEventContextSize = sizeof (MISC_MM_COMMUNICATE_BUFFER);
+  mGuidedEventContextSize = MAX (NsCommBuffer->PhysicalSize, mGuidedEventContextSize);
+  mGuidedEventContextSize = MAX (SecureCommBuffer->PhysicalSize, mGuidedEventContextSize);
+
+  // Allocate memory to copy the communication buffer to the secure world.
+  Status = mMmst->MmAllocatePool (
+                    EfiRuntimeServicesData,
+                    mGuidedEventContextSize,
+                    (VOID **)&mGuidedEventContext
+                    );
+  if (EFI_ERROR (Status)) {
+    mGuidedEventContext = NULL;
+    DEBUG ((DEBUG_ERROR, "%a: Mem alloc failed\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (mGuidedEventContext, mGuidedEventContextSize);
 
   // publish the MM config protocol so the MM core can register its entry point
   Status = mMmst->MmInstallProtocolInterface (
@@ -69,7 +106,7 @@ StandaloneMmCpuInitialize (
                     &mMmConfig
                     );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorHandler;
   }
 
   // Install  entry point of this CPU driver to allow
@@ -82,7 +119,7 @@ StandaloneMmCpuInitialize (
                     &mPiMmCpuDriverEpProtocol
                     );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorHandler;
   }
 
   // register the root MMI handler
@@ -92,8 +129,12 @@ StandaloneMmCpuInitialize (
                     &DispatchHandle
                     );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorHandler;
   }
 
+  return EFI_SUCCESS;
+
+ErrorHandler:
+  mMmst->MmFreePool ((VOID *)mGuidedEventContext);
   return Status;
 }

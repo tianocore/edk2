@@ -55,6 +55,35 @@ STATIC EFI_EVENT  mSetVirtualAddressMapEvent;
 STATIC EFI_HANDLE  mMmCommunicateHandle;
 
 /**
+  Convert SmcMmRet value to EFI_STATUS.
+
+  @param[in] SmcMmRet              Mm return code
+
+  @retval EFI_SUCCESS
+  @retval Others                   Error status correspond to SmcMmRet
+
+**/
+STATIC
+EFI_STATUS
+SmcMmRetToEfiStatus (
+  IN UINTN  SmcMmRet
+  )
+{
+  switch ((UINT32)SmcMmRet) {
+    case ARM_SMC_MM_RET_SUCCESS:
+      return EFI_SUCCESS;
+    case ARM_SMC_MM_RET_INVALID_PARAMS:
+      return EFI_INVALID_PARAMETER;
+    case ARM_SMC_MM_RET_DENIED:
+      return EFI_ACCESS_DENIED;
+    case ARM_SMC_MM_RET_NO_MEMORY:
+      return EFI_OUT_OF_RESOURCES;
+    default:
+      return EFI_ACCESS_DENIED;
+  }
+}
+
+/**
   Send mm communicate request via FF-A.
 
   @retval EFI_SUCCESS
@@ -101,36 +130,7 @@ SendFfaMmCommunicate (
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (CommunicateArgs.Header.x1), 0x00, &CommunicateArgs);
   }
 
-  return Status;
-}
-
-/**
-  Convert SmcMmRet value to EFI_STATUS.
-
-  @param[in] SmcMmRet              Mm return code
-
-  @retval EFI_SUCCESS
-  @retval Others                   Error status correspond to SmcMmRet
-
-**/
-STATIC
-EFI_STATUS
-SmcMmRetToEfiStatus (
-  IN UINTN  SmcMmRet
-  )
-{
-  switch ((UINT32)SmcMmRet) {
-    case ARM_SMC_MM_RET_SUCCESS:
-      return EFI_SUCCESS;
-    case ARM_SMC_MM_RET_INVALID_PARAMS:
-      return EFI_INVALID_PARAMETER;
-    case ARM_SMC_MM_RET_DENIED:
-      return EFI_ACCESS_DENIED;
-    case ARM_SMC_MM_RET_NO_MEMORY:
-      return EFI_OUT_OF_RESOURCES;
-    default:
-      return EFI_ACCESS_DENIED;
-  }
+  return SmcMmRetToEfiStatus (CommunicateArgs.Arg1);
 }
 
 /**
