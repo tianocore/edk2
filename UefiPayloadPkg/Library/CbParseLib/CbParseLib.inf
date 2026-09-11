@@ -33,6 +33,7 @@
   BaseMemoryLib
   IoLib
   DebugLib
+  FdtLib
   PcdLib
   PrintLib
 

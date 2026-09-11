@@ -4,15 +4,9 @@
 **/
 
 #include <PiPei.h>
-#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
 #include <Library/HobLib.h>
-#include <Library/PcdLib.h>
 #include <Guid/MemoryAllocationHob.h>
-#include <Library/IoLib.h>
-#include <Library/CpuLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 #include <Guid/AcpiBoardInfoGuid.h>
@@ -36,8 +30,6 @@
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
                                        EFI_RESOURCE_ATTRIBUTE_TESTED      )
 
-extern VOID  *mHobList;
-
 /**
   Add a new HOB to the HOB List.
 
@@ -53,42 +45,6 @@ EFIAPI
 CreateHob (
   IN  UINT16  HobType,
   IN  UINT16  HobLength
-  );
-
-/**
-  Build a Handoff Information Table HOB
-
-  This function initialize a HOB region from EfiMemoryBegin to
-  EfiMemoryTop. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
-  be inside the HOB region.
-
-  @param[in] EfiMemoryBottom       Total memory start address
-  @param[in] EfiMemoryTop          Total memory end address.
-  @param[in] EfiFreeMemoryBottom   Free memory start address
-  @param[in] EfiFreeMemoryTop      Free memory end address.
-
-  @return   The pointer to the handoff HOB table.
-
-**/
-EFI_HOB_HANDOFF_INFO_TABLE *
-EFIAPI
-HobConstructor (
-  IN VOID  *EfiMemoryBottom,
-  IN VOID  *EfiMemoryTop,
-  IN VOID  *EfiFreeMemoryBottom,
-  IN VOID  *EfiFreeMemoryTop
-  );
-
-/**
-  Build ACPI board info HOB using infomation from ACPI table
-
-  @param  AcpiTableBase      ACPI table start address in memory
-
-  @retval  A pointer to ACPI board HOB ACPI_BOARD_INFO. Null if build HOB failure.
-**/
-ACPI_BOARD_INFO *
-BuildHobFromAcpi (
-  IN   UINT64  AcpiTableBase
   );
 
 /**
