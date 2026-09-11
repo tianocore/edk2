@@ -38,3 +38,10 @@
 [submodule "TcgTpmPkg/Library/TpmLib/TPM"]
 	path = TcgTpmPkg/Library/TpmLib/TPM
 	url = https://github.com/TrustedComputingGroup/TPM.git
+[submodule "BaseTools/Source/C/Lz4Compress/lz4"]
+	path = BaseTools/Source/C/Lz4Compress/lz4
+	url = https://github.com/lz4/lz4.git
+	ignore = untracked
+[submodule "MdeModulePkg/Library/Lz4CustomDecompressLib/lz4"]
+	path = MdeModulePkg/Library/Lz4CustomDecompressLib/lz4
+	url = https://github.com/lz4/lz4.git
