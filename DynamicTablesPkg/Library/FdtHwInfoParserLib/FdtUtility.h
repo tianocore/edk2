@@ -127,6 +127,50 @@ BOOLEAN
   IN  CONST VOID    *Context
   );
 
+/** Check whether a node has the input name.
+
+  @param [in]  Fdt          Pointer to a Flattened Device Tree.
+  @param [in]  Node         Offset of the node to check the name.
+  @param [in]  SearchName   Node name to search.
+                            This is a NULL terminated string.
+
+  @retval True    The node has the input name.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+FdtNodeHasName (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *SearchName
+  );
+
+/** Check whether a node has the input name.
+
+  Some node names follow a convention where
+  an Id is added at the end of the name. E.g.
+  "socketN", "clusterN", "coreN", "threadN".
+  If set to TRUE, check that:
+  - the node name starts with SearchName
+  - the chars after SearchName are numbers
+  - there is at least one number after SearchName
+
+  @param [in]  Fdt          Pointer to a Flattened Device Tree.
+  @param [in]  Node         Offset of the node to check the name.
+  @param [in]  SearchName   Node name to search.
+                            This is a NULL terminated string.
+
+  @retval True    The node has the input name.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+FdtNodeHasNameExt (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *SearchName
+  );
+
 /** Iterate through the list of strings in the Context,
     and check whether at least one string is matching the
     "compatible" property of the node.
@@ -164,6 +208,26 @@ FdtNodeHasProperty (
   IN  CONST VOID   *Fdt,
   IN        INT32  Node,
   IN  CONST VOID   *PropertyName
+  );
+
+/** Check whether a node is a CPU device node.
+
+  A CPU device node must have the "cpu" node name and a "device_type"
+  property equal to "cpu".
+
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to operate the check on.
+  @param [in]  Context   Unused.
+
+  @retval TRUE    The node is a CPU device node.
+  @retval FALSE   Otherwise, or error.
+**/
+BOOLEAN
+EFIAPI
+IsCpuDeviceNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  IN  CONST VOID   *Context
   );
 
 /** Get the next node in a branch having a matching name.
@@ -257,6 +321,36 @@ FdtGetNextPropNodeInBranch (
   IN            INT32  FdtBranch,
   IN      CONST CHAR8  *PropName,
   IN OUT        INT32  *Node
+  );
+
+/** Count the number of Device Tree nodes fulfilling a condition
+    in a Device Tree branch.
+
+  The condition to fulfill is checked by the NodeChecker function.
+  Context is passed to NodeChecker.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  FdtBranch        Only search in the sub-nodes of this branch.
+                                Write (-1) to search the whole tree.
+  @param [in]  NodeChecker      Function called to check the condition is
+                                fulfilled.
+  @param [in]  Context          Context for the NodeChecker.
+  @param [out] NodeCount        If success, contains the count of nodes
+                                fulfilling the condition.
+                                Can be 0.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+FdtCountCondNodeInBranch (
+  IN  CONST VOID               *Fdt,
+  IN        INT32              FdtBranch,
+  IN        NODE_CHECKER_FUNC  NodeChecker,
+  IN  CONST VOID               *Context,
+  OUT       UINT32             *NodeCount
   );
 
 /** Count the number of nodes in a branch with the input name.
