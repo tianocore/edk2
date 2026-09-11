@@ -36,6 +36,7 @@
   #
   # Generators (Common)
   #
+  DynamicTablesPkg/Library/Acpi/Common/AcpiBertLib/AcpiBertLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf
@@ -147,6 +148,7 @@
     <LibraryClasses>
       # Generators
       #   Common
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiBertLib/AcpiBertLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf

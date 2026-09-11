@@ -120,36 +120,37 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourceGenericHwInfo,            ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,        ///< 53 - Generic Hardware Error Source Info version 2
   EArchCommonObjEinjInstructionsInfo,              ///< 54 - Einj Instruction Info
-  EArchCommonObjPlatformFwInfo,                    ///< 54 - Platform Firmware Info
-  EArchCommonObjPhysicalMemoryArray,               ///< 55 - Physical Memory Array Info
-  EArchCommonObjMemoryDeviceInfo,                  ///< 56 - Memory Device Info
-  EArchCommonObjMemoryArrayMappedAddress,          ///< 57 - Memory Array Mapped Address Info
-  EArchCommonObjCoolingDeviceInfo,                 ///< 58 - Cooling Device Info
-  EArchCommonObjTemperatureProbeInfo,              ///< 59 - Temperature Probe Info
-  EArchCommonObjVoltageProbeInfo,                  ///< 60 - Voltage Probe Info
-  EArchCommonObjElectricalCurrentProbeInfo,        ///< 61 - Electrical Current Probe Info
-  EArchCommonObjSystemResetInfo,                   ///< 62 - System Reset Info
-  EArchCommonObjMemoryDeviceMappedAddress,         ///< 63 - Memory Device Mapped Address Info
-  EArchCommonObjMemoryChannelInfo,                 ///< 64 - Memory Channel Info
-  EArchCommonObjMemoryChannelDevice,               ///< 65 - Memory Channel Device Info
-  EArchCommonObjProcessorSpecificBlockInfo,        ///< 66 - Processor specific data Info
-  EArchCommonObjSystemInfo,                        ///< 67 - System Info
-  EArchCommonObjAdditionalInformation,             ///< 68 - Additional Information
-  EArchCommonObjAdditionalInformationEntry,        ///< 69 - Additional Information Entry
-  EArchCommonObjAdditionalInformationValue,        ///< 70 - Additional Information Value
-  EArchCommonObjSystemEnclosureInfo,               ///< 71 - System Enclosure Info
-  EArchCommonObjEnclosureElement,                  ///< 72 - System Enclosure Contained Element
-  EArchCommonObjBaseboardInfo,                     ///< 73 - Baseboard Info
-  EArchCommonObjBaseboardContainedObject,          ///< 74 - Baseboard Contained Object
-  EArchCommonObjMsctMaxPhysicalAddrInfo,           ///< 75 - MSCT Maximum physical address Info
-  EArchCommonObjMchiInfo,                          ///< 76 - Management Controller Host Interface Info.
-  EArchCommonObjMchiMctpDataInfo,                  ///< 77 - MCHI MCTP specific data Info.
-  EArchCommonObjMchiNetworkDataInfo,               ///< 78 - MCHI Network specific data Info.
-  EArchCommonObjMchiProtocolInfo,                  ///< 79 - Management Controller Host Interface Protocol Info.
-  EArchCommonObjMchiProtocolMctpDataInfo,          ///< 80 - MCHI MCTP Protocol Info.
-  EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 81 - Redfish Over Ip Protocol Info.
-  EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 82 - MCHI USB Network Device descriptor info
-  EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 83 - MCHI PCI/PCIe Network Device descriptor info
+  EArchCommonObjPlatformFwInfo,                    ///< 55 - Platform Firmware Info
+  EArchCommonObjPhysicalMemoryArray,               ///< 56 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,                  ///< 57 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,          ///< 58 - Memory Array Mapped Address Info
+  EArchCommonObjCoolingDeviceInfo,                 ///< 59 - Cooling Device Info
+  EArchCommonObjTemperatureProbeInfo,              ///< 60 - Temperature Probe Info
+  EArchCommonObjVoltageProbeInfo,                  ///< 61 - Voltage Probe Info
+  EArchCommonObjElectricalCurrentProbeInfo,        ///< 62 - Electrical Current Probe Info
+  EArchCommonObjSystemResetInfo,                   ///< 63 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,         ///< 64 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,                 ///< 65 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,               ///< 66 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,        ///< 67 - Processor specific data Info
+  EArchCommonObjSystemInfo,                        ///< 68 - System Info
+  EArchCommonObjAdditionalInformation,             ///< 69 - Additional Information
+  EArchCommonObjAdditionalInformationEntry,        ///< 70 - Additional Information Entry
+  EArchCommonObjAdditionalInformationValue,        ///< 71 - Additional Information Value
+  EArchCommonObjSystemEnclosureInfo,               ///< 72 - System Enclosure Info
+  EArchCommonObjEnclosureElement,                  ///< 73 - System Enclosure Contained Element
+  EArchCommonObjBaseboardInfo,                     ///< 74 - Baseboard Info
+  EArchCommonObjBaseboardContainedObject,          ///< 75 - Baseboard Contained Object
+  EArchCommonObjMsctMaxPhysicalAddrInfo,           ///< 76 - MSCT Maximum physical address Info
+  EArchCommonObjMchiInfo,                          ///< 77 - Management Controller Host Interface Info.
+  EArchCommonObjMchiMctpDataInfo,                  ///< 78 - MCHI MCTP specific data Info.
+  EArchCommonObjMchiNetworkDataInfo,               ///< 79 - MCHI Network specific data Info.
+  EArchCommonObjMchiProtocolInfo,                  ///< 80 - Management Controller Host Interface Protocol Info.
+  EArchCommonObjMchiProtocolMctpDataInfo,          ///< 81 - MCHI MCTP Protocol Info.
+  EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 82 - Redfish Over Ip Protocol Info.
+  EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 83 - MCHI USB Network Device descriptor info
+  EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 84 - MCHI PCI/PCIe Network Device descriptor info
+  EArchCommonObjBootErrorRegionInfo,               ///< 85 - Boot Error Region Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1371,6 +1372,20 @@ typedef struct {
   UINT64                                    Value;
   UINT64                                    Mask;
 } CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
+
+/** A structure that describes the Boot Error Region referenced by the BERT.
+
+  Cf. ACPI 6.6, s18.3.1.
+
+  ID: EArchCommonObjBootErrorRegionInfo
+*/
+typedef struct CmArchCommonBootErrorRegionInfo {
+  /// 64-bit physical address of the Boot Error Region.
+  UINT64    BootErrorRegion;
+
+  /// Length, in bytes, of the Boot Error Region.
+  UINT32    BootErrorRegionLength;
+} CM_ARCH_COMMON_BOOT_ERROR_REGION_INFO;
 
 /** A structure that describes BIOS Information.
 
