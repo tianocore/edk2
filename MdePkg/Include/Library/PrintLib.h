@@ -42,6 +42,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     - L, l
       - The number being printed is size UINT64.  Only valid for types X, x, and d.
         If this flag is not specified, then the number being printed is size int.
+      - The byte string being printed is encoded as UTF-8. Only valid for type a.
+        If this flag is not specified, then the byte string is treated as ASCII.
     - NOTE: All invalid flags are ignored.
 
   [width]:
