@@ -236,6 +236,10 @@ VECTOR_TABLE(ExceptionHandlersStart, EXCEPTION_VECTOR)
 
 ASM_PFX(CommonExceptionEntry):
 
+  // Follow AAPCS: push frame record
+  stp      x29, x30, [sp,#-0x10]!
+  mov      x29, sp
+
   EL1_OR_EL2(x1)
 1:mrs      x2, elr_el1   // Exception Link Register
   mrs      x3, spsr_el1  // Saved Processor Status Register 32bit
@@ -274,8 +278,9 @@ ASM_PFX(CommonExceptionEntry):
   stp      q30, q31, [x28, #0x1e0]
 
   // x0 still holds the exception type.
-  // Set x1 to point to the top of our struct on the Stack
-  mov      x1, sp
+
+  // Set x1 to point to the top of our struct on the Stack, skipping the frame record.
+  add      x1, sp, #0x10
 
 // CommonCExceptionHandler (
 //   IN     EFI_EXCEPTION_TYPE           ExceptionType,   R0
@@ -287,6 +292,9 @@ ASM_PFX(CommonExceptionEntry):
   // For now we spin in the handler if we received an abort of some kind.
   // We do not try to recover.
   bl       ASM_PFX(CommonCExceptionHandler) // Call exception handler
+
+  // Pop frame record; restore SP to saved register context.
+  add      sp, sp, #0x10
 
   // Pop as many GP regs as we can before entering the critical section below
   ldp      x2,  x3,  [sp, #0x10]
