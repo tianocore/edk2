@@ -536,6 +536,35 @@ CountCharacters (
 }
 
 /**
+  Helper to retrieve the next character from a string that might either be
+  ASCII or UTF-16 Unicode. Advances the by-ref pointer past the returned
+  character.
+
+  @param[in,out]  String              The input string pointer
+  @param[in]      BytesPerCharacter   The unit size in bytes of the encoding
+
+  @return         The next character in the string
+**/
+STATIC
+UINTN
+GetNextCharacter (
+  CONST CHAR8  **String,
+  INTN         BytesPerCharacter
+  )
+{
+  UINTN  Character;
+
+  Character = (*String)[0];
+  if ((BytesPerCharacter != 1) && (BytesPerCharacter != -1)) {
+    Character |= (UINTN)(*String)[1] << 8;
+  }
+
+  *String += BytesPerCharacter;
+
+  return Character;
+}
+
+/**
   Worker function that produces a Null-terminated string in an output buffer
   based on a Null-terminated format string and a VA_LIST argument list.
 
@@ -588,7 +617,6 @@ BasePrintLibSPrintMarker (
   GUID           *TmpGuid;
   TIME           *TmpTime;
   UINTN          Count;
-  UINTN          ArgumentMask;
   INTN           BytesPerArgumentCharacter;
   UINTN          ArgumentCharacter;
   BOOLEAN        Done;
@@ -1172,10 +1200,8 @@ BasePrintLibSPrintMarker (
     // Retrieve the ArgumentString attributes
     //
     if ((Flags & ARGUMENT_UNICODE) != 0) {
-      ArgumentMask              = 0xffff;
       BytesPerArgumentCharacter = 2;
     } else {
-      ArgumentMask              = 0xff;
       BytesPerArgumentCharacter = 1;
     }
 
@@ -1236,18 +1262,18 @@ BasePrintLibSPrintMarker (
     //
     // Copy the string into the output buffer performing the required type conversions
     //
-    while (Index < Count &&
-           (ArgumentString[0] != '\0' ||
-            (BytesPerArgumentCharacter > 1 && ArgumentString[1] != '\0')))
-    {
-      ArgumentCharacter = ((*ArgumentString & 0xff) | (((UINT8)*(ArgumentString + 1)) << 8)) & ArgumentMask;
+    while (Index < Count) {
+      ArgumentCharacter = GetNextCharacter (&ArgumentString, BytesPerArgumentCharacter);
+
+      if (ArgumentCharacter == 0) {
+        break;
+      }
 
       LengthToReturn += (1 * BytesPerOutputCharacter);
       if (((Flags & COUNT_ONLY_NO_PRINT) == 0) && (Buffer != NULL)) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ArgumentCharacter, BytesPerOutputCharacter);
       }
 
-      ArgumentString += BytesPerArgumentCharacter;
       Index++;
       if (Comma) {
         Digits++;
