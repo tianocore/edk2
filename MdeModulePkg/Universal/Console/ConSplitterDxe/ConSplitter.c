@@ -2583,6 +2583,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
   StdErrMapTableSize = StdErrMaxMode * sizeof (INT32);
   StdErrMapTable     = AllocateZeroPool (StdErrMapTableSize);
   if (StdErrMapTable == NULL) {
+    FreePool (ConOutMapTable);
     return EFI_OUT_OF_RESOURCES;
   }
 

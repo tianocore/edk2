@@ -1724,6 +1724,7 @@ ConstructConfigHdr (
   UINTN                     Index;
   UINT8                     *Buffer;
   CHAR16                    *Name;
+  CHAR16                    *NameBackup;
   CHAR8                     *AsciiName;
   UINTN                     NameSize;
   EFI_GUID                  *Guid;
@@ -1780,6 +1781,10 @@ ConstructConfigHdr (
   if (DriverHandle != NULL) {
     DevicePath = DevicePathFromHandle (DriverHandle);
     if (DevicePath == NULL) {
+      if (Name != NULL) {
+        FreePool (Name);
+      }
+
       return NULL;
     }
 
@@ -1796,6 +1801,10 @@ ConstructConfigHdr (
   MaxLen = 5 + sizeof (EFI_GUID) * 2 + 6 + NameLength * 4 + 6 + DevicePathSize * 2 + 1;
   String = AllocateZeroPool (MaxLen * sizeof (CHAR16));
   if (String == NULL) {
+    if (Name != NULL) {
+      FreePool (Name);
+    }
+
     return NULL;
   }
 
@@ -1829,15 +1838,16 @@ ConstructConfigHdr (
   String += StrLen (String);
 
   if (Name != NULL) {
+    NameBackup = Name;
     //
     // Append Name converted to <Char>NameLength
     //
-    for ( ; *Name != L'\0'; Name++) {
+    for ( ; *NameBackup != L'\0'; NameBackup++) {
       UnicodeValueToStringS (
         String,
         MaxLen * sizeof (CHAR16) - ((UINTN)String - (UINTN)ReturnString),
         PREFIX_ZERO | RADIX_HEX,
-        *Name,
+        *NameBackup,
         4
         );
       String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
@@ -1868,6 +1878,10 @@ ConstructConfigHdr (
   // Null terminate the Unicode string
   //
   *String = L'\0';
+
+  if (Name != NULL) {
+    FreePool (Name);
+  }
 
   //
   // Convert all hex digits in range [A-F] in the configuration header to [a-f]
