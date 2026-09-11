@@ -522,6 +522,8 @@ Ip4Route (
       return NULL;
     } else if (!AlwaysTryDestAddr) {
       return NULL;
+    } else {
+      return NULL;
     }
   }
 

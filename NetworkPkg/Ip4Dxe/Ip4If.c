@@ -1130,6 +1130,12 @@ Ip4SendFrame (
   // Found a pending ARP request, enqueue the frame then return
   //
   if (Entry != &Interface->ArpQues) {
+    if (ArpQue == NULL) {
+      ASSERT (ArpQue != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
+    }
+
     InsertTailList (&ArpQue->Frames, &Token->Link);
     return EFI_SUCCESS;
   }

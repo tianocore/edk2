@@ -259,7 +259,10 @@ Ip4Reassemble (
   //
   // Assemble shouldn't be NULL here
   //
-  ASSERT (Assemble != NULL);
+  if (Assemble == NULL) {
+    ASSERT (Assemble != NULL);
+    goto DROP;
+  }
 
   //
   // Find the point to insert the packet: before the first
@@ -849,9 +852,11 @@ Ip4AccpetFrame (
   IP4_HEAD     ZeroHead;
   UINT8        *Option;
   UINT32       OptionLen;
+  UINT8        NoOption;
 
-  IpSb   = (IP4_SERVICE *)Context;
-  Option = NULL;
+  IpSb     = (IP4_SERVICE *)Context;
+  Option   = NULL;
+  NoOption = 0;
 
   if (EFI_ERROR (IoStatus) || (IpSb->State == IP4_SERVICE_DESTROY)) {
     goto DROP;
@@ -862,10 +867,16 @@ Ip4AccpetFrame (
   }
 
   Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Head != NULL);
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    goto RESTART;
+  }
+
   OptionLen = (Head->HeadLen << 2) - IP4_MIN_HEADLEN;
   if (OptionLen > 0) {
     Option = (UINT8 *)(Head + 1);
+  } else {
+    Option = &NoOption;
   }
 
   //
@@ -916,7 +927,11 @@ Ip4AccpetFrame (
     }
 
     Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
-    ASSERT (Head != NULL);
+    if (Head == NULL) {
+      ASSERT (Head != NULL);
+      goto RESTART;
+    }
+
     Status = Ip4PreProcessPacket (
                IpSb,
                &Packet,
@@ -1306,7 +1321,10 @@ Ip4InstanceDeliverPacket (
         // may be not continuous before the data.
         //
         Head = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
-        ASSERT (Head != NULL);
+        if (Head == NULL) {
+          ASSERT (Head != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
 
         Dup->Ip.Ip4 = (IP4_HEAD *)Head;
 
