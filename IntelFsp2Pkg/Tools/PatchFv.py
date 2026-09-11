@@ -433,6 +433,7 @@ class Symbols:
 
         moduleEntryPoint = "__ModuleEntryPoint"
         reportLine = reportLines[0]
+        isLldMap = False
         if reportLine.strip().find("Archive member included") != -1:
             #GCC
             #                0x0000000000001d55                IoRead8
@@ -440,6 +441,14 @@ class Symbols:
             matchKeyGroupIndex = 2
             matchSymbolGroupIndex  = 1
             prefix = '_'
+        elif any(line.strip().startswith("VMA") for line in reportLines):
+            # LLVM LLD
+            #             129f             129f        0     1                 TempRamInitApi
+            isLldMap = True
+            patchMapFileMatchString = r"^\s*([0-9a-fA-F]+)\s+[0-9a-fA-F]+\s+[0-9a-fA-F]+\s+\d+\s+([_a-zA-Z0-9]+)\s*$"
+            matchKeyGroupIndex = 2
+            matchSymbolGroupIndex  = 1
+            prefix = ''
         else:
             #MSFT
             #0003:00000190       _gComBase                  00007a50     SerialPo
@@ -472,7 +481,7 @@ class Symbols:
                         continue
 
         if not moduleEntryPoint in modSymbols:
-            if matchSymbolGroupIndex == 2:
+            if matchSymbolGroupIndex == 2 or isLldMap:
                 if not '_ModuleEntryPoint' in modSymbols:
                     return 1
                 else:

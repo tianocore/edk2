@@ -17,6 +17,7 @@ include Makefiles/header.makefile
 
 export PYTHON_COMMAND
 export HOST_ARCH
+export ICX_BIN
 
 all: makerootdir subdirs
 	@echo Finished building BaseTools C Tools with HOST_ARCH=$(HOST_ARCH)
