@@ -54,6 +54,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_3_ARM_ERROR_SOURCE_TABLE_SIGNATURE,                                                       ParseAcpiAest },
   { EFI_ACPI_ARM_AGDI_TABLE_SIGNATURE,                                                                   ParseAcpiAgdi },
   { EFI_ACPI_6_4_ARM_PERFORMANCE_MONITORING_UNIT_TABLE_SIGNATURE,                                        ParseAcpiApmt },
+  { EFI_ACPI_6_6_BOOT_ERROR_RECORD_TABLE_SIGNATURE,                                                      ParseAcpiBert },
   { EFI_ACPI_6_2_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE,                                                 ParseAcpiBgrt },
   { EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_SIGNATURE,                                       ParseAcpiCcel },
   { EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           ParseAcpiDbg2 },
