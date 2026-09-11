@@ -772,13 +772,6 @@ MainCmdMv (
   FileList    = NULL;
   Response    = NULL;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   switch (ParamCount = ShellCommandLineGetCount (Package)) {
     case 0:
     case 1:

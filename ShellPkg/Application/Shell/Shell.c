@@ -2304,47 +2304,78 @@ DoHelpUpdate (
   IN OUT CHAR16  **CmdLine
   )
 {
+  EFI_STATUS  Status;
   CHAR16      *CurrentParameter;
   CHAR16      *Walker;
   CHAR16      *NewCommandLine;
-  EFI_STATUS  Status;
+  CHAR16      *CmdName;
+  UINTN       CmdNameSize;
   UINTN       NewCmdLineSize;
+  BOOLEAN     HasHelpFlag;
 
-  Status = EFI_SUCCESS;
+  if ((CmdLine == NULL) || (*CmdLine == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   CurrentParameter = AllocateZeroPool (StrSize (*CmdLine));
   if (CurrentParameter == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  Walker = *CmdLine;
-  while (Walker != NULL && *Walker != CHAR_NULL) {
-    if (!EFI_ERROR (GetNextParameter (&Walker, &CurrentParameter, StrSize (*CmdLine), TRUE))) {
-      if (StrStr (CurrentParameter, L"-?") == CurrentParameter) {
-        CurrentParameter[0] = L' ';
-        CurrentParameter[1] = L' ';
-        NewCmdLineSize      = StrSize (L"help ") + StrSize (*CmdLine);
-        NewCommandLine      = AllocateZeroPool (NewCmdLineSize);
-        if (NewCommandLine == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          break;
-        }
-
-        //
-        // We know the space is sufficient since we just calculated it.
-        //
-        StrnCpyS (NewCommandLine, NewCmdLineSize/sizeof (CHAR16), L"help ", 5);
-        StrnCatS (NewCommandLine, NewCmdLineSize/sizeof (CHAR16), *CmdLine, StrLen (*CmdLine));
-        SHELL_FREE_NON_NULL (*CmdLine);
-        *CmdLine = NewCommandLine;
-        break;
+  HasHelpFlag = FALSE;
+  Walker      = *CmdLine;
+  CmdName     = NULL;
+  CmdNameSize = 0;
+  while ((Walker != NULL) && (*Walker != CHAR_NULL) &&
+         (!EFI_ERROR (GetNextParameter (&Walker, &CurrentParameter, StrSize (*CmdLine), TRUE))))
+  {
+    if (StrStr (CurrentParameter, L"-?") == CurrentParameter) {
+      HasHelpFlag = TRUE;
+    } else if (CmdName == NULL) {
+      //
+      // A command line can start with "-? CmdName".
+      // In such case CmdName is the second parameter.
+      //
+      CmdNameSize = StrSize (CurrentParameter);
+      CmdName     = AllocateCopyPool (CmdNameSize, CurrentParameter);
+      if (CmdName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto exit_handler;
       }
     }
   }
 
-  SHELL_FREE_NON_NULL (CurrentParameter);
+  //
+  // Nothing to do.
+  //
+  if (!HasHelpFlag) {
+    Status = EFI_SUCCESS;
+    goto exit_handler;
+  }
 
-  return (Status);
+  //
+  // Allocate space for "help [CmdName]"
+  //
+  NewCmdLineSize = sizeof (L"help ") + CmdNameSize;
+  NewCommandLine = AllocateZeroPool (NewCmdLineSize);
+  if (NewCommandLine == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto exit_handler;
+  }
+
+  StrnCpyS (NewCommandLine, NewCmdLineSize/sizeof (CHAR16), L"help ", StrLen (L"help "));
+  if (CmdName != NULL) {
+    StrnCatS (NewCommandLine, NewCmdLineSize/sizeof (CHAR16), CmdName, CmdNameSize/sizeof (CHAR16));
+  }
+
+  FreePool (*CmdLine);
+  *CmdLine = NewCommandLine;
+  Status   = EFI_SUCCESS;
+
+exit_handler:
+  SHELL_FREE_NON_NULL (CurrentParameter);
+  SHELL_FREE_NON_NULL (CmdName);
+  return Status;
 }
 
 /**
