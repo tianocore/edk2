@@ -4,6 +4,7 @@
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (C) 2022 - 2026, Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -295,6 +296,58 @@ ValidateReservedBits (
   IN UINT8   *Ptr,
   IN UINT32  Length,
   IN VOID    *Context
+  );
+
+/**
+  This function checks whether a field holds a valid PNP ID.
+
+  A PNP ID is 7 bytes long, of the form "AAA####" where 'A' is
+  uppercase letter and '#' is hexadecimal number. 8th byte
+  should be NULL terminator.
+
+  @param [in] Id      Pointer to the start of the field data.
+
+  @retval TRUE        The field holds a valid PNP ID.
+  @retval FALSE       The field does not hold a valid PNP ID.
+**/
+BOOLEAN
+EFIAPI
+IsPnpId (
+  IN CONST CHAR8  *Id
+  );
+
+/**
+  This function checks whether a field holds a valid ACPI ID.
+
+  An ACPI ID is 8 bytes long, of the form "NNNN####" where
+  'N' is restricted to uppercase letters and decimal digits and
+  '#' is hexadecimal number.
+
+  @param [in] Id      Pointer to the start of the field data.
+
+  @retval TRUE        The field holds a valid ACPI ID.
+  @retval FALSE       The field does not hold a valid ACPI ID.
+**/
+BOOLEAN
+EFIAPI
+IsAcpiId (
+  IN CONST CHAR8  *Id
+  );
+
+/**
+  This function checks whether a field holds a valid hardware ID.
+
+  A hardware ID can be either PNP ID or ACPI ID.
+
+  @param [in] Id      Pointer to the start of the field data.
+
+  @retval TRUE        The field holds a valid hardware ID.
+  @retval FALSE       The field does not hold a valid hardware ID.
+**/
+BOOLEAN
+EFIAPI
+IsHardwareId (
+  IN CONST CHAR8  *Id
   );
 
 /**
