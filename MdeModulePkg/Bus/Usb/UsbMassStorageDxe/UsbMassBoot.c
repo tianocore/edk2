@@ -281,7 +281,7 @@ UsbBootExecCmdWithRetry (
                DataLen,
                Timeout
                );
-    if ((Status == EFI_SUCCESS) || (Status == EFI_NO_MEDIA)) {
+    if ((Status == EFI_SUCCESS) || (Status == EFI_NO_MEDIA) || (Status == EFI_DEVICE_ERROR)) {
       break;
     }
 
