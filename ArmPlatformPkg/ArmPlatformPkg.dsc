@@ -99,6 +99,9 @@
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
 
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
+
 [Components.common]
   ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
   ArmPlatformPkg/Drivers/PL061GpioDxe/PL061GpioDxe.inf
