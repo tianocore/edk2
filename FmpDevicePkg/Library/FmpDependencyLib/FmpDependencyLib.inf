@@ -1,5 +1,18 @@
 ## @file
-#  Provides Fmp Capsule Dependency Expression support.
+#  Provides FMP Capsule Dependency Expression support.
+#
+#  This library validates a dependency expression, extracts a dependency
+#  expression from a firmware image, and evaluates a dependency expression
+#  against the versions of other installed Firmware Management Protocol
+#  instances.
+#
+#  A dependency expression is a byte stream of opcodes, as defined by the
+#  FMP capsule dependency format in the UEFI Specification. EvaluateDependency()
+#  in this library walks this byte stream and, when it encounters a PUSH_GUID
+#  opcode, requires the caller to have supplied the matching FMP instance's
+#  ImageTypeId and Version in the FmpVersions array. If a PUSH_GUID opcode refers
+#  to an FMP instance that is not present in FmpVersions, the dependency expression
+#  evaluates to FALSE.
 #
 #  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 #
