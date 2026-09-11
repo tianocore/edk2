@@ -94,6 +94,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
   - MSCT  : The MSCT (Maximum System Characteristics Table) generator collates
             the Maximum System Characteristics information from the
             Configuration Manager and builds the MSCT table.
+  - SSDT BMU:
+            The SSDT BMU generator collates the BMU specific information
+            from the Configuration Manager and uses the Dynamic AML CodeGen
+            API's to build the SSDT BMU table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -138,6 +142,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdHmat,                          ///< HMAT Generator
   EStdAcpiTableIdApmt,                          ///< APMT Generator
   EStdAcpiTableIdMsct,                          ///< MSCT Generator
+  EStdAcpiTableIdSsdtBmu,                       ///< SSDT BMU Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
