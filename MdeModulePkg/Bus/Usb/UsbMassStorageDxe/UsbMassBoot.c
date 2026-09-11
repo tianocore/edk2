@@ -722,6 +722,17 @@ UsbBootDetectMedia (
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "UsbBootDetectMedia: UsbBootReadCapacity (%r)\n", Status));
     }
+
+    if (UsbMass->OpticalStorage && (Media->LastBlock == 0)) {
+      //
+      // A blank (unwritten) optical disc reports a zero capacity: there is no
+      // user data block that can be read.  Report the media as absent so that
+      // upper layers (e.g. PartitionDxe and the BDS boot option probe) skip it
+      // instead of repeatedly reading LBA 0 and getting "LBA out of range".
+      //
+      Media->MediaPresent = FALSE;
+      Status              = EFI_NO_MEDIA;
+    }
   }
 
   if (EFI_ERROR (Status) && (Status != EFI_NO_MEDIA)) {
