@@ -755,6 +755,153 @@ AsciiCharToUpper (
 }
 
 /**
+  Checks if an ASCII character is a space character as defined by the ISO C
+  isspace() function ('\t', '\n', '\v', '\f', '\r' or ' ').
+
+  @param  Chr   One ASCII character.
+
+  @retval TRUE  If the Chr is a space character.
+  @retval FALSE If the Chr is not a space character.
+
+**/
+BOOLEAN
+EFIAPI
+AsciiIsSpace (
+  IN      CHAR8  Chr
+  )
+{
+  return Chr == '\t' || Chr == '\n' || Chr == '\v' || Chr == '\f' || Chr == '\r' || Chr == ' ';
+}
+
+/**
+  Convert a Null-terminated ASCII string to a value of type UINTN.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base, which must be 0, 10, or 16.
+  Leading space characters (as defined by AsciiIsSpace()) are skipped. If
+  Base is 0, the radix is detected from the string prefix: "0x" or "0X"
+  selects 16, otherwise 10 is used.
+
+  This function is a thin wrapper around AsciiStrHexToUintnS() and
+  AsciiStrDecimalToUintnS(). See those functions for the exact parsing rules,
+  the EndPtr behavior, and the overflow behavior.
+
+  If String is NULL, then ASSERT().
+  If Base is not 0, 10, or 16, then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use: 0 to auto-detect, 10, or 16.
+
+  @retval Value translated from String.
+
+**/
+UINTN
+EFIAPI
+AsciiStrToUintn (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  )
+{
+  CONST CHAR8    *Str;
+  UINTN          Result;
+  RETURN_STATUS  Status;
+
+  ASSERT (String != NULL);
+  ASSERT ((Base == 0) || (Base == 10) || (Base == 16));
+
+  Str = String;
+  while (AsciiIsSpace (*Str)) {
+    Str++;
+  }
+
+  if (Base == 0) {
+    if ((Str[0] == '0') && ((Str[1] == 'x') || (Str[1] == 'X'))) {
+      Base = 16;
+    } else {
+      Base = 10;
+    }
+  }
+
+  if (Base == 16) {
+    Status = AsciiStrHexToUintnS (Str, EndPtr, &Result);
+  } else {
+    Status = AsciiStrDecimalToUintnS (Str, EndPtr, &Result);
+  }
+
+  if (Status == RETURN_INVALID_PARAMETER) {
+    Result = 0;
+  }
+
+  return Result;
+}
+
+/**
+  Convert a Null-terminated ASCII string to a value of type UINT64.
+
+  This function scans the contents of the ASCII string specified by String
+  as a number using the radix specified by Base, which must be 0, 10, or 16.
+  Leading space characters (as defined by AsciiIsSpace()) are skipped. If
+  Base is 0, the radix is detected from the string prefix: "0x" or "0X"
+  selects 16, otherwise 10 is used.
+
+  This function is a thin wrapper around AsciiStrHexToUint64S() and
+  AsciiStrDecimalToUint64S(). See those functions for the exact parsing
+  rules, the EndPtr behavior, and the overflow behavior.
+
+  If String is NULL, then ASSERT().
+  If Base is not 0, 10, or 16, then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  EndPtr          The pointer to the character that stopped the scan.
+  @param  Base            The radix to use: 0 to auto-detect, 10, or 16.
+
+  @retval Value translated from String.
+
+**/
+UINT64
+EFIAPI
+AsciiStrToUint64 (
+  IN      CONST CHAR8  *String,
+  OUT     CHAR8        **EndPtr   OPTIONAL,
+  IN      UINTN        Base
+  )
+{
+  CONST CHAR8    *Str;
+  UINT64         Result;
+  RETURN_STATUS  Status;
+
+  ASSERT (String != NULL);
+  ASSERT ((Base == 0) || (Base == 10) || (Base == 16));
+
+  Str = String;
+  while (AsciiIsSpace (*Str)) {
+    Str++;
+  }
+
+  if (Base == 0) {
+    if ((Str[0] == '0') && ((Str[1] == 'x') || (Str[1] == 'X'))) {
+      Base = 16;
+    } else {
+      Base = 10;
+    }
+  }
+
+  if (Base == 16) {
+    Status = AsciiStrHexToUint64S (Str, EndPtr, &Result);
+  } else {
+    Status = AsciiStrDecimalToUint64S (Str, EndPtr, &Result);
+  }
+
+  if (Status == RETURN_INVALID_PARAMETER) {
+    Result = 0;
+  }
+
+  return Result;
+}
+
+/**
   Convert a ASCII character to numerical value.
 
   This internal function only deal with Unicode character
@@ -969,6 +1116,54 @@ AsciiStrStr (
   }
 
   return NULL;
+}
+
+/**
+  Returns the last occurrence of a character in a Null-terminated
+  ASCII string.
+
+  This function scans the contents of the ASCII string specified by String
+  and returns the last occurrence of Character. If Character is not found
+  in String, then NULL is returned.
+
+  If String is NULL, then ASSERT().
+
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
+
+  @param  String          The pointer to a Null-terminated ASCII string.
+  @param  Character       The character to search for.
+
+  @retval NULL            If Character does not appear in String.
+  @retval others          The last occurrence of Character in String.
+                          If Character is the Null-terminator, the pointer
+                          to the Null-terminator of String is returned.
+
+**/
+CHAR8 *
+EFIAPI
+AsciiStrRChr (
+  IN      CONST CHAR8  *String,
+  IN      CHAR8        Character
+  )
+{
+  CONST CHAR8  *LastMatch;
+
+  //
+  // ASSERT String is less long than PcdMaximumAsciiStringLength
+  //
+  ASSERT (AsciiStrSize (String) != 0);
+
+  LastMatch = NULL;
+
+  do {
+    if (*String == Character) {
+      LastMatch = String;
+    }
+  } while (*String++ != '\0');
+
+  return (CHAR8 *)LastMatch;
 }
 
 /**
