@@ -3673,8 +3673,60 @@ TABLE_ITEM  IPMIDIBMCInterfaceTypeTable[] = {
 
 TABLE_ITEM  MCHostInterfaceTypeTable[] = {
   {
-    0x3F00,
-    L" MCTP Host Interface "
+    0x02,
+    L" KCS: Keyboard Controller Style "
+  },
+  {
+    0x03,
+    L" 8250 UART Register Compatible "
+  },
+  {
+    0x04,
+    L" 16450 UART Register Compatible "
+  },
+  {
+    0x05,
+    L" 16550/16550A UART Register Compatible "
+  },
+  {
+    0x06,
+    L" 16650/16650A UART Register Compatible "
+  },
+  {
+    0x07,
+    L" 16750/16750A UART Register Compatible "
+  },
+  {
+    0x08,
+    L" 16850/16850A UART Register Compatible "
+  },
+  {
+    0x09,
+    L" I2C/SMBus "
+  },
+  {
+    0x0A,
+    L" I3C "
+  },
+  {
+    0x0B,
+    L" PCIe VDM "
+  },
+  {
+    0x0C,
+    L" MMBI "
+  },
+  {
+    0x0D,
+    L" PCC "
+  },
+  {
+    0x0E,
+    L" UCIe "
+  },
+  {
+    0x0F,
+    L" USB "
   },
   {
     0x40,
