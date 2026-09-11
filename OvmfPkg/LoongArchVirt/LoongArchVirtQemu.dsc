@@ -254,6 +254,7 @@
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
+  HobPrintLib                      | MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib                           | MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -286,6 +287,7 @@
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   CpuExceptionHandlerLib           | UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   PerformanceLib                   | MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
+  HobPrintLib                      | MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf

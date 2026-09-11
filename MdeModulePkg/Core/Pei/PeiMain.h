@@ -45,6 +45,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/SafeIntLib.h>
+#include <Library/HobPrintLib.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/FirmwareFileSystem3.h>
 #include <Guid/AprioriFileName.h>
