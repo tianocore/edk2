@@ -1179,7 +1179,6 @@ ParseDnsResponse (
   Dns6RR = NULL;
 
   *Completed      = TRUE;
-  Status          = EFI_SUCCESS;
   RemainingLength = Length;
 
   //
@@ -1257,6 +1256,12 @@ ParseDnsResponse (
     }
 
     ASSERT (Item != NULL);
+    if (Item == NULL) {
+      *Completed = FALSE;
+      Status     = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns4TokenEntry = (DNS4_TOKEN_ENTRY *)(Item->Key);
   } else {
     if (!IsValidDnsResponse (
@@ -1273,6 +1278,12 @@ ParseDnsResponse (
     }
 
     ASSERT (Item != NULL);
+    if (Item == NULL) {
+      *Completed = FALSE;
+      Status     = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns6TokenEntry = (DNS6_TOKEN_ENTRY *)(Item->Key);
   }
 
@@ -1499,6 +1510,10 @@ ParseDnsResponse (
           // This is address entry, get Data.
           //
           ASSERT (Dns4TokenEntry != NULL);
+          if (Dns4TokenEntry == NULL) {
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
 
           if (AnswerSection->DataLength != 4) {
             Status = EFI_ABORTED;
@@ -1561,6 +1576,10 @@ ParseDnsResponse (
           // This is address entry, get Data.
           //
           ASSERT (Dns6TokenEntry != NULL);
+          if (Dns6TokenEntry == NULL) {
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
 
           if (AnswerSection->DataLength != 16) {
             Status = EFI_ABORTED;
