@@ -22,5 +22,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define NEW_FOLDER_NAME_ID                   0x3001
 #define KEY_VALUE_CREATE_FOLDER_AND_EXIT     0x3002
 #define KEY_VALUE_NO_CREATE_FOLDER_AND_EXIT  0x3003
+//
+// Reserved question id used by the synthetic "Up one level" entry. It must stay
+// below NEW_FILE_QUESTION_ID_BASE (0x5000) so the incrementing new-file/new-folder
+// and FILE_OPTION_OFFSET (0x8000) question ids can never collide with it.
+//
+#define KEY_VALUE_UP_ONE_LEVEL               0x4000
 
 #define LABEL_END  0xffff
