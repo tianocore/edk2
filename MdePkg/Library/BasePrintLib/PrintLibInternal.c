@@ -509,6 +509,133 @@ BasePrintLibConvertValueToStringS (
 }
 
 /**
+  Decide whether a character is in a given inclusive range
+
+  @param[in]  Char    The character
+  @param[in]  Lower   The lower inclusive bound of the range
+  @param[in]  Upper   The upper inclusive bound of the range
+
+  @return     Whether the character is covered by the range
+**/
+STATIC
+BOOLEAN
+CharInRange (
+  UINTN  Char,
+  UINTN  Lower,
+  UINTN  Upper
+  )
+{
+  return Char >= Lower && Char <= Upper;
+}
+
+/**
+  Helper to count the number of characters in a string that might either be
+  ASCII, UTF-8 Unicode or UTF-16 Unicode.
+
+  @param[in]  String              The input string
+  @param[in]  BytesPerCharacter   The unit size in bytes of the encoding
+  @param[in]  MaxLength           The maximum length to return if the string
+                                  is not NUL terminated.
+  @param[in]  ConvertUtf8         Whether to interpret 1-byte wide input as UTF-8
+
+  @return     The number of characters before the NUL terminator if one was
+              found, and MaxLength otherwise.
+**/
+STATIC
+UINTN
+CountCharacters (
+  CONST CHAR8  *String,
+  UINTN        BytesPerCharacter,
+  UINTN        MaxLength,
+  BOOLEAN      ConvertUtf8
+  )
+{
+  CHAR8  Char;
+  UINTN  Length;
+
+  if (BytesPerCharacter == 2) {
+    return StrnLenS ((CONST CHAR16 *)String, MaxLength);
+  } else if (ConvertUtf8) {
+    Length = 0;
+    while (Length < MaxLength) {
+      Char = *String++;
+      if (Char == '\0') {
+        break;
+      } else if (!CharInRange (Char, 0x80, 0xbf)) {
+        // Only count bytes that are not trailing bytes of a
+        // multibyte encoding of a single character
+        Length++;
+      }
+    }
+
+    return Length;
+  } else {
+    return AsciiStrnLenS (String, MaxLength);
+  }
+}
+
+/**
+  Helper to retrieve the next character from a string that might either be
+  ASCII or UTF-8 Unicode or UTF-16 Unicode. Advances the by-ref pointer past
+  the returned character.
+
+  @param[in,out]  String              The input string pointer
+  @param[in]      BytesPerCharacter   The unit size in bytes of the encoding
+  @param[in]      ConvertUtf8         Whether to interpret 1-byte wide input as UTF-8
+
+  @return         The next character in the string
+**/
+STATIC
+UINTN
+GetNextCharacter (
+  CONST CHAR8  **String,
+  INTN         BytesPerCharacter,
+  BOOLEAN      ConvertUtf8
+  )
+{
+  UINTN  Character;
+
+  Character = (*String)[0];
+  if ((BytesPerCharacter != 1) && (BytesPerCharacter != -1)) {
+    Character |= (UINTN)(*String)[1] << 8;
+  } else if (ConvertUtf8) {
+    //
+    // Disregard invalid continuation characters - they did not contribute
+    // to the count so they should not produce any output either.
+    //
+    while (CharInRange (Character, 0x80, 0xbf)) {
+      Character = (++*String)[0];
+      if (Character == 0) {
+        return 0;
+      }
+    }
+
+    if (CharInRange (Character, 0xc2, 0xdf) && CharInRange ((*String)[1], 0x80, 0xbf)) {
+      // valid 2-byte encoding
+      Character  = (Character & 0x1f) << 6;
+      Character |= (*String)[1] & 0x3f;
+      *String   += 1;
+    } else if (CharInRange (Character, 0xe0, 0xef) &&
+               CharInRange ((*String)[1], (Character == 0xe0) ? 0xa0 : 0x80, (Character == 0xed) ? 0x9f : 0xbf) &&
+               CharInRange ((*String)[2], 0x80, 0xbf))
+    {
+      // valid 3-byte encoding
+      Character  = (Character & 0xf) << 12;
+      Character |= ((*String)[1] & 0x3f) << 6;
+      Character |= (*String)[2] & 0x3f;
+      *String   += 2;
+    } else if (Character >= 0x80) {
+      // unsupported or invalid encoding
+      Character = (UINTN)'?';
+    }
+  }
+
+  *String += BytesPerCharacter;
+
+  return Character;
+}
+
+/**
   Worker function that produces a Null-terminated string in an output buffer
   based on a Null-terminated format string and a VA_LIST argument list.
 
@@ -561,7 +688,6 @@ BasePrintLibSPrintMarker (
   GUID           *TmpGuid;
   TIME           *TmpTime;
   UINTN          Count;
-  UINTN          ArgumentMask;
   INTN           BytesPerArgumentCharacter;
   UINTN          ArgumentCharacter;
   BOOLEAN        Done;
@@ -576,6 +702,7 @@ BasePrintLibSPrintMarker (
   UINT16         GuidData2;
   UINT16         GuidData3;
   UINTN          LengthToReturn;
+  BOOLEAN        ConvertUtf8;
 
   //
   // If you change this code be sure to match the 2 versions of this function.
@@ -688,13 +815,14 @@ BasePrintLibSPrintMarker (
     //
     // Set the default width to zero, and the default precision to 1
     //
-    Width     = 0;
-    Precision = 1;
-    Prefix    = 0;
-    Comma     = FALSE;
-    ZeroPad   = FALSE;
-    Count     = 0;
-    Digits    = 0;
+    Width       = 0;
+    Precision   = 1;
+    Prefix      = 0;
+    Comma       = FALSE;
+    ZeroPad     = FALSE;
+    Count       = 0;
+    Digits      = 0;
+    ConvertUtf8 = FALSE;
 
     switch (FormatCharacter) {
       case '%':
@@ -958,6 +1086,7 @@ BasePrintLibSPrintMarker (
               Precision = 0;
             }
 
+            ConvertUtf8 = (Flags & LONG_TYPE) && (BytesPerOutputCharacter == 2);
             break;
 
           case 'c':
@@ -1145,32 +1274,20 @@ BasePrintLibSPrintMarker (
     // Retrieve the ArgumentString attributes
     //
     if ((Flags & ARGUMENT_UNICODE) != 0) {
-      ArgumentMask              = 0xffff;
       BytesPerArgumentCharacter = 2;
     } else {
-      ArgumentMask              = 0xff;
       BytesPerArgumentCharacter = 1;
     }
 
     if ((Flags & ARGUMENT_REVERSED) != 0) {
       BytesPerArgumentCharacter = -BytesPerArgumentCharacter;
     } else {
-      //
-      // Compute the number of characters in ArgumentString and store it in Count
-      // ArgumentString is either null-terminated, or it contains Precision characters
-      //
-      for (Count = 0;
-           (ArgumentString[Count * BytesPerArgumentCharacter] != '\0' ||
-            (BytesPerArgumentCharacter > 1 &&
-             ArgumentString[Count * BytesPerArgumentCharacter + 1] != '\0')) &&
-           (Count < Precision || ((Flags & PRECISION) == 0));
-           Count++)
-      {
-        ArgumentCharacter = ((ArgumentString[Count * BytesPerArgumentCharacter] & 0xff) | ((ArgumentString[Count * BytesPerArgumentCharacter + 1]) << 8)) & ArgumentMask;
-        if (ArgumentCharacter == 0) {
-          break;
-        }
-      }
+      Count = CountCharacters (
+                ArgumentString,
+                BytesPerArgumentCharacter,
+                (Flags & PRECISION) != 0 ? Precision : MAX_UINTN,
+                ConvertUtf8
+                );
     }
 
     if (Precision < Count) {
@@ -1224,18 +1341,18 @@ BasePrintLibSPrintMarker (
     //
     // Copy the string into the output buffer performing the required type conversions
     //
-    while (Index < Count &&
-           (ArgumentString[0] != '\0' ||
-            (BytesPerArgumentCharacter > 1 && ArgumentString[1] != '\0')))
-    {
-      ArgumentCharacter = ((*ArgumentString & 0xff) | (((UINT8)*(ArgumentString + 1)) << 8)) & ArgumentMask;
+    while (Index < Count) {
+      ArgumentCharacter = GetNextCharacter (&ArgumentString, BytesPerArgumentCharacter, ConvertUtf8);
+
+      if (ArgumentCharacter == 0) {
+        break;
+      }
 
       LengthToReturn += (1 * BytesPerOutputCharacter);
       if (((Flags & COUNT_ONLY_NO_PRINT) == 0) && (Buffer != NULL)) {
         Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ArgumentCharacter, BytesPerOutputCharacter);
       }
 
-      ArgumentString += BytesPerArgumentCharacter;
       Index++;
       if (Comma) {
         Digits++;

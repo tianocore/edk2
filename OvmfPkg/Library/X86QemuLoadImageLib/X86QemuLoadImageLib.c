@@ -571,7 +571,7 @@ QemuLoadKernelImage (
     UnicodeSPrintAsciiFormat (
       KernelLoadedImage->LoadOptions,
       KernelLoadedImage->LoadOptionsSize,
-      "%a%a%a",
+      "%a%a%la",
       (Shim == FALSE)        ?  "" : "kernel ",
       (InitrdSize == 0)      ?  "" : "initrd=initrd ",
       (CommandLineSize == 0) ?  "" : CommandLine
