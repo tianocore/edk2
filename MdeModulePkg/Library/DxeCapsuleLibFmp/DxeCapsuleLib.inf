@@ -82,6 +82,7 @@
   gEfiBlockIoProtocolGuid                       ## CONSUMES
   gEfiDiskIoProtocolGuid                        ## CONSUMES
   gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
+  gCapsuleTransformationProtocolGuid            ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
