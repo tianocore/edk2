@@ -1287,7 +1287,7 @@ TcgScaleEventLog (
     return EFI_VOLUME_FULL;
   }
 
-  NewLaml = EventLogAreaStruct->Laml * 2;
+  NewLaml = MultU64x32 (EventLogAreaStruct->Laml, 2);
   if (NewLaml <= EventLogAreaStruct->Laml) {
     DEBUG ((DEBUG_ERROR, "%a: Laml overflow (0x%lx * 2)\n", __func__, EventLogAreaStruct->Laml));
     return EFI_OUT_OF_RESOURCES;
