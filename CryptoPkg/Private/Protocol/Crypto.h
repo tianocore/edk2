@@ -6771,6 +6771,9 @@ BOOLEAN
 /**
   Generates an SLH-DSA signature for a given message.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function creates an SLH-DSA signature using the private key stored in the
   SLH-DSA context. SLH-DSA signatures can include an optional context string for
   domain separation, allowing the same key to be used in different contexts
@@ -6796,8 +6799,8 @@ BOOLEAN
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature (29792 bytes for SLH-DSA-SHAKE-256s).
 
-  @retval TRUE   SLH-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  Invalid parameters or signature generation failed. This deprecated
+                 protocol callback always returns FALSE.
 
 **/
 typedef
