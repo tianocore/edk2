@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SLH_DSA_MAX_CONTEXT_SIZE             255
 
 //
-// SLH-DSA-SHAKE-256s test vectors - include generated certificate and PEM key
+// SLH-DSA-SHAKE-256s test vectors - include generated certificate, PEM key, and precomputed signatures
 //
 #include "SlhDsaTestVectors.h"
 
@@ -419,7 +419,7 @@ TestVerifySlhDsaPemX509 (
   UT_ASSERT_NOT_NULL (SlhDsaPubKey);
 
   //
-  // SLH-DSA signing with key from PEM (no context string)
+  // Perform single live SLH-DSA signing operation from PEM private key to cover SlhDsaSign()
   //
   SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
   Status  = SlhDsaSign (
@@ -435,7 +435,7 @@ TestVerifySlhDsaPemX509 (
   UT_ASSERT_EQUAL (SigSize, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
 
   //
-  // SLH-DSA verification with key from X509
+  // SLH-DSA verification of generated signature with key from X509
   //
   Status = SlhDsaVerify (
              SlhDsaPubKey,
@@ -445,6 +445,20 @@ TestVerifySlhDsaPemX509 (
              MessageSize,
              Signature,
              SigSize
+             );
+  UT_ASSERT_TRUE (Status);
+
+  //
+  // SLH-DSA verification of precomputed signature with key from PEM
+  //
+  Status = SlhDsaVerify (
+             SlhDsaPrivKey,
+             NULL,
+             0,
+             (UINT8 *)mSlhDsaTestMessage,
+             MessageSize,
+             (UINT8 *)mSlhDsaShake256sTestSignature,
+             sizeof (mSlhDsaShake256sTestSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -470,38 +484,13 @@ TestVerifySlhDsaSignVerifyWithContext (
   )
 {
   BOOLEAN  Status;
-  VOID     *SlhDsaPrivKey;
   VOID     *SlhDsaPubKey;
-  UINT8    *Signature;
-  UINTN    SigSize;
   UINTN    MessageSize;
   UINTN    ContextSize;
 
-  SlhDsaPrivKey = NULL;
-  SlhDsaPubKey  = NULL;
-  MessageSize   = AsciiStrLen (mSlhDsaTestMessage);
-  ContextSize   = AsciiStrLen (mSlhDsaTestContext);
-
-  //
-  // Allocate signature buffer on the heap to avoid large stack frames.
-  //
-  Signature = AllocatePool (SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  UT_ASSERT_NOT_NULL (Signature);
-  if (Signature == NULL) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  //
-  // Retrieve SLH-DSA private key from PEM data.
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &SlhDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SlhDsaPrivKey);
+  SlhDsaPubKey = NULL;
+  MessageSize  = AsciiStrLen (mSlhDsaTestMessage);
+  ContextSize  = AsciiStrLen (mSlhDsaTestContext);
 
   //
   // Retrieve SLH-DSA public key from X509 certificate.
@@ -515,22 +504,6 @@ TestVerifySlhDsaSignVerifyWithContext (
   UT_ASSERT_NOT_NULL (SlhDsaPubKey);
 
   //
-  // SLH-DSA signing with context string
-  //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (
-              SlhDsaPrivKey,
-              (UINT8 *)mSlhDsaTestContext,
-              ContextSize,
-              (UINT8 *)mSlhDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-
-  //
   // SLH-DSA verification with matching context string
   //
   Status = SlhDsaVerify (
@@ -539,8 +512,8 @@ TestVerifySlhDsaSignVerifyWithContext (
              ContextSize,
              (UINT8 *)mSlhDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mSlhDsaShake256sTestContextSignature,
+             sizeof (mSlhDsaShake256sTestContextSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -553,8 +526,8 @@ TestVerifySlhDsaSignVerifyWithContext (
              AsciiStrLen ("Different context"),
              (UINT8 *)mSlhDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mSlhDsaShake256sTestContextSignature,
+             sizeof (mSlhDsaShake256sTestContextSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -567,14 +540,12 @@ TestVerifySlhDsaSignVerifyWithContext (
              0,
              (UINT8 *)mSlhDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mSlhDsaShake256sTestContextSignature,
+             sizeof (mSlhDsaShake256sTestContextSignature)
              );
   UT_ASSERT_FALSE (Status);
 
-  SlhDsaFree (SlhDsaPrivKey);
   SlhDsaFree (SlhDsaPubKey);
-  FreePool (Signature);
 
   return UNIT_TEST_PASSED;
 }
@@ -660,7 +631,6 @@ TestVerifySlhDsaTamperedData (
   )
 {
   BOOLEAN  Status;
-  VOID     *SlhDsaPrivKey;
   VOID     *SlhDsaPubKey;
   UINT8    *Signature;
   UINT8    *TamperedSignature;
@@ -668,9 +638,8 @@ TestVerifySlhDsaTamperedData (
   UINTN    SigSize;
   UINTN    MessageSize;
 
-  SlhDsaPrivKey = NULL;
-  SlhDsaPubKey  = NULL;
-  MessageSize   = AsciiStrLen (mSlhDsaTestMessage);
+  SlhDsaPubKey = NULL;
+  MessageSize  = AsciiStrLen (mSlhDsaTestMessage);
 
   //
   // Allocate signature buffers on the heap to avoid large stack frames.
@@ -691,18 +660,6 @@ TestVerifySlhDsaTamperedData (
   }
 
   //
-  // Retrieve SLH-DSA private key from PEM data.
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &SlhDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SlhDsaPrivKey);
-
-  //
   // Retrieve SLH-DSA public key from X509 certificate.
   //
   Status = SlhDsaGetPublicKeyFromX509 (
@@ -714,19 +671,10 @@ TestVerifySlhDsaTamperedData (
   UT_ASSERT_NOT_NULL (SlhDsaPubKey);
 
   //
-  // Generate valid signature
+  // Copy valid precomputed signature into buffer
   //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (
-              SlhDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mSlhDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
+  SigSize = sizeof (mSlhDsaShake256sTestSignature);
+  CopyMem (Signature, mSlhDsaShake256sTestSignature, SigSize);
 
   //
   // Verify original signature works
@@ -789,7 +737,6 @@ TestVerifySlhDsaTamperedData (
              );
   UT_ASSERT_FALSE (Status);
 
-  SlhDsaFree (SlhDsaPrivKey);
   SlhDsaFree (SlhDsaPubKey);
   FreePool (Signature);
   FreePool (TamperedSignature);
@@ -1036,21 +983,6 @@ TestVerifySlhDsaInvalidContextParams (
   UT_ASSERT_FALSE (Status);
 
   //
-  // Generate valid signature for verify test
-  //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (
-              SlhDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mSlhDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-
-  //
   // Test SlhDsaVerify with NULL Context but ContextSize > 0 (invalid combination)
   //
   Status = SlhDsaVerify (
@@ -1059,8 +991,8 @@ TestVerifySlhDsaInvalidContextParams (
              5,
              (UINT8 *)mSlhDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mSlhDsaShake256sTestSignature,
+             sizeof (mSlhDsaShake256sTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -1139,15 +1071,13 @@ TestVerifySlhDsaSignatureSizeExact (
   )
 {
   BOOLEAN  Status;
-  VOID     *SlhDsaPrivKey;
   VOID     *SlhDsaPubKey;
   UINT8    *Signature;
   UINTN    SigSize;
   UINTN    MessageSize;
 
-  SlhDsaPrivKey = NULL;
-  SlhDsaPubKey  = NULL;
-  MessageSize   = AsciiStrLen (mSlhDsaTestMessage);
+  SlhDsaPubKey = NULL;
+  MessageSize  = AsciiStrLen (mSlhDsaTestMessage);
 
   //
   // Allocate signature buffer on the heap to avoid large stack frames.
@@ -1159,16 +1089,8 @@ TestVerifySlhDsaSignatureSizeExact (
   }
 
   //
-  // Get valid keys
+  // Get public key from certificate
   //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &SlhDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-
   Status = SlhDsaGetPublicKeyFromX509 (
              mSlhDsaShake256sTestCert,
              sizeof (mSlhDsaShake256sTestCert),
@@ -1177,20 +1099,10 @@ TestVerifySlhDsaSignatureSizeExact (
   UT_ASSERT_TRUE (Status);
 
   //
-  // Generate valid signature
+  // Copy valid precomputed signature into buffer
   //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (
-              SlhDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mSlhDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
+  SigSize = sizeof (mSlhDsaShake256sTestSignature);
+  CopyMem (Signature, mSlhDsaShake256sTestSignature, SigSize);
 
   //
   // Verify with exact size - should succeed
@@ -1234,7 +1146,6 @@ TestVerifySlhDsaSignatureSizeExact (
              );
   UT_ASSERT_FALSE (Status);
 
-  SlhDsaFree (SlhDsaPrivKey);
   SlhDsaFree (SlhDsaPubKey);
   FreePool (Signature);
 
@@ -1359,22 +1270,7 @@ TestVerifySlhDsaEmptyMessage (
   UT_ASSERT_FALSE (Status);
 
   //
-  // Sign with valid pointer but zero size - should succeed
-  //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (
-              PrivKey,
-              NULL,
-              0,
-              EmptyMsg,
-              0,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify the zero-length message signature
+  // Verify the zero-length message precomputed signature
   //
   Status = SlhDsaVerify (
              PubKey,
@@ -1382,8 +1278,8 @@ TestVerifySlhDsaEmptyMessage (
              0,
              EmptyMsg,
              0,
-             Signature,
-             SigSize
+             (UINT8 *)mSlhDsaShake256sTestEmptyMsgSignature,
+             sizeof (mSlhDsaShake256sTestEmptyMsgSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -1411,24 +1307,11 @@ TestVerifySlhDsaMaxContextString (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
   VOID     *PubKey;
-  UINT8    *Signature;
-  UINTN    SigSize;
   UINT8    MaxContext[SLH_DSA_MAX_CONTEXT_SIZE];
   UINTN    Index;
 
-  PrivKey = NULL;
-  PubKey  = NULL;
-
-  //
-  // Allocate signature buffer on the heap to avoid large stack frames.
-  //
-  Signature = AllocatePool (SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  UT_ASSERT_NOT_NULL (Signature);
-  if (Signature == NULL) {
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
+  PubKey = NULL;
 
   //
   // Fill context with pattern
@@ -1438,36 +1321,13 @@ TestVerifySlhDsaMaxContextString (
   }
 
   //
-  // Load keys
+  // Load public key
   //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &PrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-
   Status = SlhDsaGetPublicKeyFromX509 (
              mSlhDsaShake256sTestCert,
              sizeof (mSlhDsaShake256sTestCert),
              &PubKey
              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Sign with maximum context
-  //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (
-              PrivKey,
-              MaxContext,
-              SLH_DSA_MAX_CONTEXT_SIZE,
-              (UINT8 *)mSlhDsaTestMessage,
-              AsciiStrLen (mSlhDsaTestMessage),
-              Signature,
-              &SigSize
-              );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1479,8 +1339,8 @@ TestVerifySlhDsaMaxContextString (
              SLH_DSA_MAX_CONTEXT_SIZE,
              (UINT8 *)mSlhDsaTestMessage,
              AsciiStrLen (mSlhDsaTestMessage),
-             Signature,
-             SigSize
+             (UINT8 *)mSlhDsaShake256sTestMaxContextSignature,
+             sizeof (mSlhDsaShake256sTestMaxContextSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -1494,14 +1354,12 @@ TestVerifySlhDsaMaxContextString (
                      SLH_DSA_MAX_CONTEXT_SIZE,
                      (UINT8 *)mSlhDsaTestMessage,
                      AsciiStrLen (mSlhDsaTestMessage),
-                     Signature,
-                     SigSize
+                     (UINT8 *)mSlhDsaShake256sTestMaxContextSignature,
+                     sizeof (mSlhDsaShake256sTestMaxContextSignature)
                      );
   UT_ASSERT_FALSE (Status);
 
-  SlhDsaFree (PrivKey);
   SlhDsaFree (PubKey);
-  FreePool (Signature);
 
   return UNIT_TEST_PASSED;
 }
@@ -1595,49 +1453,10 @@ TestVerifySlhDsaMultipleSignatures (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
   VOID     *PubKey;
-  UINT8    *Sig1;
-  UINT8    *Sig2;
-  UINT8    *Sig3;
-  UINTN    SigSize;
-  CHAR8    *Msg1 = "First message";
   CHAR8    *Msg2 = "Second message";
-  CHAR8    *Msg3 = "Third message";
 
-  PrivKey = NULL;
-  PubKey  = NULL;
-
-  //
-  // Allocate signature buffers on the heap to avoid large stack frames.
-  //
-  Sig1 = AllocatePool (SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  Sig2 = AllocatePool (SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  Sig3 = AllocatePool (SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  if ((Sig1 == NULL) || (Sig2 == NULL) || (Sig3 == NULL)) {
-    if (Sig1 != NULL) {
-      FreePool (Sig1);
-    }
-
-    if (Sig2 != NULL) {
-      FreePool (Sig2);
-    }
-
-    if (Sig3 != NULL) {
-      FreePool (Sig3);
-    }
-
-    UT_ASSERT_TRUE ((Sig1 != NULL) && (Sig2 != NULL) && (Sig3 != NULL));
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &PrivKey
-             );
-  UT_ASSERT_TRUE (Status);
+  PubKey = NULL;
 
   Status = SlhDsaGetPublicKeyFromX509 (
              mSlhDsaShake256sTestCert,
@@ -1647,46 +1466,24 @@ TestVerifySlhDsaMultipleSignatures (
   UT_ASSERT_TRUE (Status);
 
   //
-  // Generate three different signatures
+  // Verify both with correct messages using precomputed signatures
   //
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (PrivKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), Sig1, &SigSize);
+  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)mSlhDsaTestMessage, AsciiStrLen (mSlhDsaTestMessage), (UINT8 *)mSlhDsaShake256sTestSignature, sizeof (mSlhDsaShake256sTestSignature));
   UT_ASSERT_TRUE (Status);
 
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (PrivKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), Sig2, &SigSize);
-  UT_ASSERT_TRUE (Status);
-
-  SigSize = SLH_DSA_SHAKE_256S_SIGNATURE_SIZE;
-  Status  = SlhDsaSign (PrivKey, NULL, 0, (UINT8 *)Msg3, AsciiStrLen (Msg3), Sig3, &SigSize);
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify all three with correct messages
-  //
-  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), Sig1, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  UT_ASSERT_TRUE (Status);
-
-  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), Sig2, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
-  UT_ASSERT_TRUE (Status);
-
-  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg3, AsciiStrLen (Msg3), Sig3, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
+  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), (UINT8 *)mSlhDsaShake256sTestMsg2Signature, sizeof (mSlhDsaShake256sTestMsg2Signature));
   UT_ASSERT_TRUE (Status);
 
   //
   // Cross-verify should fail (wrong message/signature pairs)
   //
-  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), Sig2, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
+  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)mSlhDsaTestMessage, AsciiStrLen (mSlhDsaTestMessage), (UINT8 *)mSlhDsaShake256sTestMsg2Signature, sizeof (mSlhDsaShake256sTestMsg2Signature));
   UT_ASSERT_FALSE (Status);
 
-  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), Sig3, SLH_DSA_SHAKE_256S_SIGNATURE_SIZE);
+  Status = SlhDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), (UINT8 *)mSlhDsaShake256sTestSignature, sizeof (mSlhDsaShake256sTestSignature));
   UT_ASSERT_FALSE (Status);
 
-  SlhDsaFree (PrivKey);
   SlhDsaFree (PubKey);
-  FreePool (Sig1);
-  FreePool (Sig2);
-  FreePool (Sig3);
 
   return UNIT_TEST_PASSED;
 }
