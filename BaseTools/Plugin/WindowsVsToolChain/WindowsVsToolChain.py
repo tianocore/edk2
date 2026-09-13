@@ -9,22 +9,24 @@
 # Copyright (c) Microsoft Corporation
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-import os
 import logging
-from edk2toolext.environment.plugintypes.uefi_build_plugin import IUefiBuildPlugin
+import os
+from typing import Optional
+
 import edk2toollib.windows.locate_tools as locate_tools
-from edk2toollib.windows.locate_tools import FindWithVsWhere
-from edk2toolext.environment import shell_environment
-from edk2toolext.environment import version_aggregator
+from edk2toolext.environment import shell_environment, version_aggregator
+from edk2toolext.environment.plugintypes.uefi_build_plugin import IUefiBuildPlugin
+from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toollib.utility_functions import GetHostInfo
+from edk2toollib.windows.locate_tools import FindWithVsWhere
 
 
 class WindowsVsToolChain(IUefiBuildPlugin):
 
-    def do_post_build(self, thebuilder):
+    def do_post_build(self, thebuilder: UefiBuilder) -> int:
         return 0
 
-    def do_pre_build(self, thebuilder):
+    def do_pre_build(self, thebuilder: UefiBuilder) -> int:
         self.Logger = logging.getLogger("WindowsVsToolChain")
         interesting_keys = ["ExtensionSdkDir", "INCLUDE", "LIB", "LIBPATH", "UniversalCRTSdkDir",
                             "UCRTVersion", "WindowsLibPath", "WindowsSdkBinPath", "WindowsSdkDir", "WindowsSdkVerBinPath",
@@ -65,7 +67,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                 "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
 
             # check to see if full path already configured
-            if shell_environment.GetEnvironment().get_shell_var("VS2019_PREFIX") != None:
+            if shell_environment.GetEnvironment().get_shell_var("VS2019_PREFIX") is not None:
                 self.Logger.info("VS2019_PREFIX is already set.")
 
             else:
@@ -129,12 +131,14 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                         HostType = "x86"
                     elif HostInfo.bit == "64":
                         HostType = "x64"
+                    elif HostInfo.arch == "ARM" and HostInfo.bit == "64":
+                        HostType = "arm64"
                 else:
                     raise NotImplementedError()
 
             # VS2022_HOST options are not exactly the same as QueryVcVariables. This translates.
             VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
+                "x86": "x86", "x64": "AMD64", "arm64": "arm64"}
 
             # check to see if full path already configured
             if shell_environment.GetEnvironment().get_shell_var("VS2022_PREFIX") is not None:
@@ -201,12 +205,14 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                         HostType = "x86"
                     elif HostInfo.bit == "64":
                         HostType = "x64"
+                    elif HostInfo.arch == "ARM" and HostInfo.bit == "64":
+                        HostType = "arm64"
                 else:
                     raise NotImplementedError()
 
             # VS2026_HOST options are not exactly the same as QueryVcVariables. This translates.
             VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
+                "x86": "x86", "x64": "AMD64", "arm64": "arm64"}
 
             # check to see if full path already configured
             if shell_environment.GetEnvironment().get_shell_var("VS2026_PREFIX") is not None:
@@ -409,7 +415,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
 
         return 0
 
-    def _get_vs_install_path(self, vs_version, varname):
+    def _get_vs_install_path(self, vs_version: str, varname: str) -> Optional[str]:
         # check if already specified
         path = None
         if varname is not None:
@@ -430,7 +436,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                     f"VsWhere successfully executed, but could not find VS instance for {vs_version}.")
         return path
 
-    def _get_vc_version(self, path, varname):
+    def _get_vc_version(self, path: str, varname: str) -> Optional[str]:
         # check if already specified
         vc_ver = shell_environment.GetEnvironment().get_shell_var(varname)
         if (path is None):
