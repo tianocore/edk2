@@ -267,7 +267,7 @@ IpiInterruptHandler (
     //
     do {
       ResumeVector = IoCsrRead32 (LOONGARCH_IOCSR_MBUF0);
-    } while (!ResumeVector);
+    } while (ResumeVector == 0);
 
     //
     // Get the resume vector if populated.
@@ -279,7 +279,8 @@ IpiInterruptHandler (
     //
     do {
       Parameter = IoCsrRead32 (LOONGARCH_IOCSR_MBUF3);
-    } while (!Parameter && --RereadCount);
+      --RereadCount;
+    } while ((Parameter == 0) && (RereadCount != 0));
 
     //
     // Get the parameter if populated.

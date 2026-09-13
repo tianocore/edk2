@@ -740,22 +740,18 @@ UpdateStackHob (
 
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
-    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
+    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name)) &&
+        (Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress != BaseAddress))
+    {
       //
-      // Build a new memory allocation HOB with old stack info with EfiConventionalMemory type
+      // Convert this memory allocation HOB with the old stack info to EfiConventionalMemory type
       // to be reclaimed by DXE core.
       //
-      BuildMemoryAllocationHob (
-        Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress,
-        Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength,
-        EfiConventionalMemory
-        );
-      //
-      // Update the BSP Stack Hob to reflect the new stack info.
-      //
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress = BaseAddress;
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength      = Length;
-      break;
+      ZeroMem (&(Hob.MemoryAllocationStack->AllocDescriptor.Name), sizeof (EFI_GUID));
+      Hob.MemoryAllocationStack->AllocDescriptor.MemoryType = EfiConventionalMemory;
+    } else if ((Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == BaseAddress) && (Hob.MemoryAllocation->AllocDescriptor.MemoryLength == Length)) {
+      // Find the memory allocation HOB for the new stack and mark it as the stack HOB.
+      CopyGuid (&(Hob.MemoryAllocation->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
     }
 
     Hob.Raw = GET_NEXT_HOB (Hob);

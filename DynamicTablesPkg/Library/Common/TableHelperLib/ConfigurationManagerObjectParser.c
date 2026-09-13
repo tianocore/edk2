@@ -419,16 +419,16 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInitiatorAffinityInfoParser[] = {
   { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
-/** A parser for EArmObjDmc620PmuSocketInfo.
+/** A parser for EArmObjDmcPmuSocketInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuSocketInfoParser[] = {
-  { "NumDevices",            1,                        "0x%x", NULL },
-  { "Dmc620PmuRegInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+STATIC CONST CM_OBJ_PARSER  CmArmDmcPmuSocketInfoParser[] = {
+  { "NumDevices",         1,                        "0x%x", NULL },
+  { "DmcPmuRegInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
-/** A parser for EArmObjDmc620PmuRegInfo.
+/** A parser for EArmObjDmcPmuRegInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmDmc620PmuRegInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArmDmcPmuRegInfoParser[] = {
   { "BaseAddress", 8,                                         "0x%llx", NULL },
   { "Length",      8,                                         "0x%llx", NULL },
   { "PmuIntr",     sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
@@ -488,25 +488,27 @@ STATIC CONST CM_OBJ_PARSER  CmArmCoresightPmuInfoParser[] = {
   { "ImplementationId",       sizeof (UINT32),          "0x%x",   NULL        },
 };
 
-/** A parser for EArmObjCmn600Info.
+/** A parser for EArmObjCmnInfo containing CMN information.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmCmn600InfoParser[] = {
-  { "PeriphBaseAddress",       8,                                         "0x%llx", NULL },
-  { "PeriphBaseAddressLength", 8,                                         "0x%llx", NULL },
-  { "RootNodeBaseAddress",     8,                                         "0x%llx", NULL },
-  { "DtcCount",                1,                                         "0x%x",   NULL },
-  { "DtcIntr[0]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
+  { "PeriphBaseAddress",         8,                                         "0x%llx", NULL },
+  { "PeriphBaseAddressLength",   8,                                         "0x%llx", NULL },
+  { "RootNodeBaseAddress",       8,                                         "0x%llx", NULL },
+  { "DtcCount",                  1,                                         "0x%x",   NULL },
+  { "DtcIntr[0]",                sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
     NULL, NULL, CmArchCommonGenericInterruptParser,
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
-  { "DtcIntr[1]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+  { "DtcIntr[1]",                sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
     NULL, NULL, CmArchCommonGenericInterruptParser,
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
-  { "DtcIntr[2]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+  { "DtcIntr[2]",                sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
     NULL, NULL, CmArchCommonGenericInterruptParser,
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
-  { "DtcIntr[3]",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+  { "DtcIntr[3]",                sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
     NULL, NULL, CmArchCommonGenericInterruptParser,
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "CmnType",                   sizeof (ARM_CMN_TYPE),                     "0x%x",   NULL },
+  { "RootNodeBaseAddressLength", 8,                                         "0x%llx", NULL },
 };
 
 /** A parser for the EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE structure.
@@ -1697,12 +1699,12 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicItsIdentifierArray,           CmArmGicItsIdentifierParser),
   CM_PARSER_ADD_OBJECT (EArmObjIdMappingArray,                  CmArmIdMappingParser),
   CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,              CmArchCommonGenericInterruptParser),
-  CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                      CmArmCmn600InfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjCmnInfo,                         CmArmCmnInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                             CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,           CmArmMemoryRangeDescriptorInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjEtInfo,                          CmArmEtInfo),
-  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuSocketInfo,             CmArmDmc620PmuSocketInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjDmc620PmuRegInfo,                CmArmDmc620PmuRegInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjDmcPmuSocketInfo,                CmArmDmcPmuSocketInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjDmcPmuRegInfo,                   CmArmDmcPmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificBlockInfo,      CmArmProcessorSpecificBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcessorSpecificSubDataArchInfo,CmArmProcessorSpecificSubDataArchInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCoresightPmuInfo,                CmArmCoresightPmuInfoParser),
