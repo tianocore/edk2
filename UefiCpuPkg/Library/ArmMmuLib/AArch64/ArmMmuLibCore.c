@@ -351,7 +351,8 @@ UpdateRegionMappingRecursive (
         // entry with the right attributes, don't bother splitting it up.
         //
         if (IsBlockEntry (*Entry, Level) &&
-            ((*Entry & TT_ATTRIBUTES_MASK & ~AttributeClearMask) == AttributeSetMask))
+            ((*Entry & (TT_ATTRIBUTES_MASK | CcaProtectionAttribute) &
+              ~AttributeClearMask) == AttributeSetMask))
         {
           continue;
         }
@@ -403,7 +404,7 @@ UpdateRegionMappingRecursive (
             Status = UpdateRegionMappingRecursive (
                        RegionStart & ~BlockMask,
                        (RegionStart | BlockMask) + 1,
-                       *Entry & TT_ATTRIBUTES_MASK,
+                       *Entry & (TT_ATTRIBUTES_MASK | CcaProtectionAttribute),
                        0,
                        TranslationTable,
                        Level + 1,
