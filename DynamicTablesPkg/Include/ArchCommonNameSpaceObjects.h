@@ -157,6 +157,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
   EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
   EArchCommonObjIpmiDeviceInfo,                    ///< 91 - IPMI Device Information
+  EArchCommonObjSystemPowerSupplyInfo,             ///< 92 - System Power Supply Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2321,5 +2322,55 @@ typedef struct CmArchCommonIpmiDeviceInfo {
   /// Interrupt number, or zero if unspecified.
   UINT8              InterruptNumber;
 } CM_ARCH_COMMON_IPMI_DEVICE_INFO;
+
+/** A structure that describes a system power supply.
+
+  SMBIOS Specification v3.9.0 Type 39
+
+  ID: EArchCommonObjSystemPowerSupplyInfo
+**/
+typedef struct CmArchCommonSystemPowerSupplyInfo {
+  /// CM Object Token uniquely identifying this power supply.
+  CM_OBJECT_TOKEN    PowerSupplyInfoToken;
+
+  /// Token identifying the input voltage probe, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    InputVoltageProbeToken;
+
+  /// Token identifying the associated cooling device, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    CoolingDeviceToken;
+
+  /// Token identifying the input current probe, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    InputCurrentProbeToken;
+
+  /// Redundant power-unit group, or zero if not redundant.
+  UINT8              PowerUnitGroup;
+
+  /// Physical location of the power supply.
+  CHAR8              Location[SMBIOS_MAX_STRING_SIZE];
+
+  /// Device name.
+  CHAR8              DeviceName[SMBIOS_MAX_STRING_SIZE];
+
+  /// Manufacturer name.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+
+  /// Serial number.
+  CHAR8              SerialNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Asset tag number.
+  CHAR8              AssetTagNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Model or part number.
+  CHAR8              ModelPartNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Revision level.
+  CHAR8              RevisionLevel[SMBIOS_MAX_STRING_SIZE];
+
+  /// Maximum sustained power output in watts, or 0x8000 if unknown.
+  UINT16             MaxPowerCapacity;
+
+  /// Power supply characteristics as defined by SMBIOS Type 39.
+  UINT16             PowerSupplyCharacteristics;
+} CM_ARCH_COMMON_SYSTEM_POWER_SUPPLY_INFO;
 
 #pragma pack()
