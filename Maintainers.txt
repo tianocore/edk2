@@ -343,6 +343,7 @@ R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Richard Lyu <richard.lyu@suse.com> [r1chard-lyu]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
