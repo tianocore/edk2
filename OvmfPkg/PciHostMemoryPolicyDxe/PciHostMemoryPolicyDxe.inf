@@ -1,0 +1,37 @@
+## @file
+#  Publishes EDKII_PCI_HOST_MEMORY_POLICY_PROTOCOL, identifying VirtIO-GPU
+#  hostmem prefetchable BARs so the generic PCI bus driver leaves them
+#  without a firmware-assigned UC cache attribute.
+#
+#  Copyright (c) 2026, Collabora Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciHostMemoryPolicyDxe
+  FILE_GUID                      = 6f2ab3f4-6a6b-4c46-8f5b-2b1f9f8b6a10
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PciHostMemoryPolicyDxeEntryPoint
+
+[Sources]
+  PciHostMemoryPolicyDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiPciIoProtocolGuid                  ## CONSUMES
+  gEdkiiPciHostMemoryPolicyProtocolGuid  ## PRODUCES
+
+[Depex]
+  TRUE

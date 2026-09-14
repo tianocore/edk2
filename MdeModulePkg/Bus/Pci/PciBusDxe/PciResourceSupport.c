@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PciBus.h"
+#include <Library/DxeServicesTableLib.h>
+#include <Protocol/PciHostMemoryPolicy.h>
 
 //
 // The default policy for the PCI bus driver is NOT to reserve I/O ranges for both ISA aliases and VGA aliases.
@@ -14,6 +16,82 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN  mReserveIsaAliases = FALSE;
 BOOLEAN  mReserveVgaAliases = FALSE;
 BOOLEAN  mPolicyDetermined  = FALSE;
+
+/**
+  Determine whether a prefetchable PCI memory BAR should be left without a
+  firmware-assigned cache attribute, based on an optional platform-supplied
+  protocol. If no such protocol is published, the legacy conservative
+  behavior (UC) is preserved.
+
+  @param PciIo     The EFI_PCI_IO_PROTOCOL instance for the PCI device that
+                    owns the BAR.
+  @param BarIndex  Index of the BAR being programmed.
+
+  @retval TRUE   The BAR should be left without a firmware cache attribute.
+  @retval FALSE  The BAR should receive the default UC policy.
+
+**/
+STATIC
+BOOLEAN
+IsHostBackedPrefetchableBar (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                BarIndex
+  )
+{
+  EFI_STATUS                             Status;
+  EDKII_PCI_HOST_MEMORY_POLICY_PROTOCOL  *PciHostMemoryPolicy;
+
+  Status = gBS->LocateProtocol (
+                  &gEdkiiPciHostMemoryPolicyProtocolGuid,
+                  NULL,
+                  (VOID **)&PciHostMemoryPolicy
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return PciHostMemoryPolicy->IsHostBackedPrefetchableBar (PciHostMemoryPolicy, PciIo, BarIndex);
+}
+
+/**
+  Determine whether a PCI BAR should receive the legacy conservative UC
+  cache attribute: it must be a memory BAR (not I/O, OpRom, or unknown), and
+  it must not have been identified by a platform driver as host-backed
+  memory that a firmware-assigned attribute would harm.
+
+  @param PciDev    The PCI device that owns the BAR.
+  @param PciIo     The EFI_PCI_IO_PROTOCOL instance for PciDev.
+  @param BarIndex  Index of the BAR being programmed.
+
+  @retval TRUE   The BAR should receive the default UC policy.
+  @retval FALSE  The BAR should be left without a firmware cache attribute,
+                 either because it is not a memory BAR or because a
+                 platform driver exempted it.
+
+**/
+STATIC
+BOOLEAN
+PciBarNeedsDefaultUcPolicy (
+  IN PCI_IO_DEVICE        *PciDev,
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                BarIndex
+  )
+{
+  switch (PciDev->PciBar[BarIndex].BarType) {
+    case PciBarTypeMem32:
+    case PciBarTypePMem32:
+    case PciBarTypeMem64:
+    case PciBarTypePMem64:
+      break;
+    default:
+      //
+      // Not a memory BAR; no firmware cache attribute applies.
+      //
+      return FALSE;
+  }
+
+  return !IsHostBackedPrefetchableBar (PciIo, BarIndex);
+}
 
 /**
   The function is used to skip VGA range.
@@ -1337,6 +1415,47 @@ ProgramBar (
 
     default:
       break;
+  }
+
+  //
+  // Preserve the legacy conservative UC policy for memory BARs, since they
+  // may be plain device registers where speculative or cached accesses are
+  // unsafe.
+  //
+  // The one exception is a BAR that a platform driver has identified, via
+  // EDKII_PCI_HOST_MEMORY_POLICY_PROTOCOL, as mapping host-backed memory
+  // (DRAM/VRAM) rather than ordinary device registers. For such a BAR,
+  // forcing a firmware-level UC MTRR harming performance: MTRRs are a
+  // legacy mechanism that, once set to UC by firmware, cannot be relaxed by
+  // the OS's own PAT-based mapping (the most restrictive of MTRR/PAT always
+  // wins). Leaving that BAR without a firmware-assigned attribute allows the
+  // OS to choose the appropriate cache policy itself.
+  //
+  if (PciBarNeedsDefaultUcPolicy (Node->PciDev, PciIo, Node->Bar)) {
+    EFI_STATUS                         Status;
+    EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+
+    Descriptor = NULL;
+    Status     = PciIo->GetBarAttributes (
+                           PciIo,
+                           Node->Bar,
+                           NULL,
+                           (VOID **)&Descriptor
+                           );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: failed to get BAR attributes - %r\n", __func__, Status));
+    } else {
+      Status = gDS->SetMemorySpaceAttributes (
+                      Descriptor->AddrRangeMin,
+                      Descriptor->AddrLen,
+                      EFI_MEMORY_UC
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "%a: failed to set BAR memory attributes - %r\n", __func__, Status));
+      }
+
+      FreePool (Descriptor);
+    }
   }
 }
 
