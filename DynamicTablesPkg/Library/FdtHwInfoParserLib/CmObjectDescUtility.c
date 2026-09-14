@@ -288,7 +288,8 @@ AddMultipleCmObj (
       (CmObjDesc == NULL)                   ||
       (CmObjDesc->Count == 0)               ||
       (CmObjDesc->Data == NULL)             ||
-      (CmObjDesc->Size == 0))
+      (CmObjDesc->Size == 0)                ||
+      ((CmObjDesc->Size % CmObjDesc->Count) != 0))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
