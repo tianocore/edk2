@@ -1412,6 +1412,18 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemBootInfoParser[] = {
   { "BootStatus",          sizeof (UINT8),           "0x%x", NULL },
 };
 
+/** A parser for EArchCommonObjOnboardDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonOnboardDeviceInfoParser[] = {
+  { "OnboardDeviceInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ReferenceDesignation",   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "DeviceType",             sizeof (UINT8),           "0x%x", NULL        },
+  { "DeviceTypeInstance",     sizeof (UINT8),           "0x%x", NULL        },
+  { "SegmentGroupNum",        sizeof (UINT16),          "0x%x", NULL        },
+  { "BusNum",                 sizeof (UINT8),           "0x%x", NULL        },
+  { "DevFuncNum",             sizeof (UINT8),           "0x%x", NULL        },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1740,6 +1752,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguageInfo,                 CmArchCommonBiosLanguageInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguage,                     CmArchCommonBiosLanguageParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemBootInfo,                   CmArchCommonSystemBootInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjOnboardDeviceInfo,                CmArchCommonOnboardDeviceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
