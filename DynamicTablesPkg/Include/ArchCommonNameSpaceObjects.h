@@ -111,8 +111,10 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryLatBwInfo,                   ///< 43 - Memory Latency Bandwidth Info
   EArchCommonObjMemoryCacheInfo,                   ///< 44 - Memory Cache Info
   EArchCommonObjSpcrInfo,                          ///< 45 - Serial Terminal and Interrupt Info
-  EArchCommonObjTpm2DeviceInfo,                    ///< 46 - TPM2 Device Info
-  EArchCommonObjMcfgPciConfigSpaceInfo,            ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjTpmDeviceInfo,                     ///< 46 - TPM Device Info
+  /// Deprecated alias for EArchCommonObjTpmDeviceInfo.
+  EArchCommonObjTpm2DeviceInfo         = EArchCommonObjTpmDeviceInfo,
+  EArchCommonObjMcfgPciConfigSpaceInfo = 47,       ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                   ///< 48 - PCI root port configuration Info
   EArchCommonObjErrSourcePciRootPortInfo,          ///< 49 - PCI Express AER Info for RootPort
   EArchCommonObjErrSourcePciDeviceInfo,            ///< 50 - PCI Express AER Info for Device (Endpoint)
@@ -868,17 +870,52 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
   UINT64    Lasa;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
-/** A structure that describes TPM2 device.
+/** A structure that describes a TPM device.
 
-  ID: EArchCommonObjTpm2DeviceInfo
+  The TPM2 device base address and size are used by the ACPI TPM2 generator.
+  The remaining fields describe the SMBIOS Type 43 TPM device.
+
+  Cf. SMBIOS Specification v3.9.0, Type 43.
+
+  ID: EArchCommonObjTpmDeviceInfo
 */
-typedef struct CmArchCommonTpm2DeviceInfo {
-  /** TPM2 Device's Base Address */
-  UINT64    Tpm2DeviceBaseAddress;
+typedef struct CmArchCommonTpmDeviceInfo {
+  /** TPM2 device base address. */
+  UINT64             Tpm2DeviceBaseAddress;
 
-  /** TPM2 Device' Size */
-  UINT64    Tpm2DeviceSize;
-} CM_ARCH_COMMON_TPM2_DEVICE_INFO;
+  /** TPM2 device size. */
+  UINT64             Tpm2DeviceSize;
+
+  /// CM Object Token uniquely identifying this TPM device.
+  CM_OBJECT_TOKEN    TpmDeviceInfoToken;
+
+  /// Four-character TCG Vendor ID.
+  UINT8              VendorId[4];
+
+  /// Major TPM specification version.
+  UINT8              MajorSpecVersion;
+
+  /// Minor TPM specification version.
+  UINT8              MinorSpecVersion;
+
+  /// First firmware version value.
+  UINT32             FirmwareVersion1;
+
+  /// Second firmware version value.
+  UINT32             FirmwareVersion2;
+
+  /// Descriptive information for the TPM device.
+  CHAR8              Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// TPM device characteristics.
+  UINT64             Characteristics;
+
+  /// OEM-defined value.
+  UINT32             OemDefined;
+} CM_ARCH_COMMON_TPM_DEVICE_INFO;
+
+/** Deprecated alias for CM_ARCH_COMMON_TPM_DEVICE_INFO. */
+typedef CM_ARCH_COMMON_TPM_DEVICE_INFO CM_ARCH_COMMON_TPM2_DEVICE_INFO;
 
 /** A structure that describes the
     SPMI (Service Processor Management Interface) Info.

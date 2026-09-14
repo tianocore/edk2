@@ -1148,11 +1148,20 @@ STATIC CONST CM_OBJ_PARSER  CmRiscVProcessorSpecificBlockInfoParser[] = {
   { "ImplId",   sizeof (UINT64), "0x%lx", NULL },
 };
 
-/** A Parser for EArchCommonObjTpm2DeviceInfo.
+/** A parser for EArchCommonObjTpmDeviceInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArchCommonObjTpm2DeviceInfoParser[] = {
-  { "Tpm2DeviceBaseAddress", sizeof (UINT64), "0x%lx", NULL },
-  { "Tpm2DeviceSize",        sizeof (UINT64), "0x%lx", NULL }
+STATIC CONST CM_OBJ_PARSER  CmArchCommonTpmDeviceInfoParser[] = {
+  { "Tpm2DeviceBaseAddress", sizeof (UINT64),          "0x%lx", NULL        },
+  { "Tpm2DeviceSize",        sizeof (UINT64),          "0x%lx", NULL        },
+  { "TpmDeviceInfoToken",    sizeof (CM_OBJECT_TOKEN), "0x%p",  NULL        },
+  { "VendorId",              sizeof (UINT8) * 4,       NULL,    HexDump     },
+  { "MajorSpecVersion",      sizeof (UINT8),           "0x%x",  NULL        },
+  { "MinorSpecVersion",      sizeof (UINT8),           "0x%x",  NULL        },
+  { "FirmwareVersion1",      sizeof (UINT32),          "0x%x",  NULL        },
+  { "FirmwareVersion2",      sizeof (UINT32),          "0x%x",  NULL        },
+  { "Description",           SMBIOS_MAX_STRING_SIZE,   NULL,    PrintString },
+  { "Characteristics",       sizeof (UINT64),          "0x%lx", NULL        },
+  { "OemDefined",            sizeof (UINT32),          "0x%x",  NULL        },
 };
 
 /** A parser for EArchCommonObjPciRootPortInfo
@@ -1749,7 +1758,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryLatBwInfo,                  CmArchCommonMemoryLatBwInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,                  CmArchCommonMemoryCacheInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                         CmArchCommonObjSpcrInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,                   CmArchCommonObjTpm2DeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpmDeviceInfo,                    CmArchCommonTpmDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,           CmArchCommonPciConfigSpaceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,                  CmArchCommonObjPciRootPortInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciRootPortInfo,         CmArchCommonObjErrSourcePciRootPortInfoParser),
