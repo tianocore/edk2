@@ -153,6 +153,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjBiosLanguageInfo,                  ///< 84 - BIOS Language Information
   EArchCommonObjBiosLanguage,                      ///< 85 - BIOS Language
   EArchCommonObjSystemBootInfo,                    ///< 86 - System Boot Information
+  EArchCommonObjOnboardDeviceInfo,                 ///< 87 - Onboard Device Extended Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2216,5 +2217,34 @@ typedef struct CmArchCommonSystemBootInfo {
   /// System boot status as defined by SMBIOS Type 32.
   UINT8              BootStatus;
 } CM_ARCH_COMMON_SYSTEM_BOOT_INFO;
+
+/** A structure that describes an onboard device.
+
+  SMBIOS Specification v3.9.0 Type 41
+
+  ID: EArchCommonObjOnboardDeviceInfo
+**/
+typedef struct CmArchCommonOnboardDeviceInfo {
+  /// CM Object Token uniquely identifying this onboard device.
+  CM_OBJECT_TOKEN    OnboardDeviceInfoToken;
+
+  /// Onboard device reference designation.
+  CHAR8              ReferenceDesignation[SMBIOS_MAX_STRING_SIZE];
+
+  /// Device status in bit 7 and device type in bits 6:0.
+  UINT8              DeviceType;
+
+  /// Instance number, unique within the onboard device type.
+  UINT8              DeviceTypeInstance;
+
+  /// PCI segment group number.
+  UINT16             SegmentGroupNum;
+
+  /// PCI bus number.
+  UINT8              BusNum;
+
+  /// PCI device number in bits 7:3 and function number in bits 2:0.
+  UINT8              DevFuncNum;
+} CM_ARCH_COMMON_ONBOARD_DEVICE_INFO;
 
 #pragma pack()
