@@ -1,0 +1,52 @@
+#/** @file
+#
+#  Component description file for ArmVirtGicPlatformDxe module
+#
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  Copyright (c) 2026, Google LLC. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = ArmVirtGicPlatformDxe
+  FILE_GUID                      = b8de02d5-3164-448f-879c-62f695d6cca8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmVirtGicPlatformDxeInitialize
+
+[Sources]
+  ArmVirtGicPlatformDxe.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  MapMmioLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+
+[Guids]
+  gArmVirtPlatformHasGicV2
+  gArmVirtPlatformHasGicV3
+
+[Depex]
+  gFdtClientProtocolGuid

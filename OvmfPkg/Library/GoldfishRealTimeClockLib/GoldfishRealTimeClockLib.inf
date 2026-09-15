@@ -1,0 +1,45 @@
+# /** @file
+#   Implement Goldfish RealTimeClock runtime services via RTC Lib.
+
+#   Copyright (C) 2007 Google, Inc.
+#   Copyright (C) 2017 Imagination Technologies Ltd.
+#   Copyright (C) 2026 ZTE Corporation.
+
+#   SPDX-License-Identifier: BSD-2-Clause-Patent
+# **/
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = GoldfishRealTimeClockLib
+  FILE_GUID                      = D065956E-D64E-46AB-A70F-C4E7015B77A9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+
+[Sources.common]
+  GoldfishRealTimeClockLib.c
+  GoldfishRealTimeClock.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  TimerLib
+  TimeBaseLib
+  UefiRuntimeLib
+  PcdLib
+  DxeServicesTableLib
+  BaseMemoryLib
+  HobLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+  gFdtHobGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdGoldfishRtcRegBase

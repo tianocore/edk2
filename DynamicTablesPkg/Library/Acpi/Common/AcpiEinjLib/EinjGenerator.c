@@ -101,7 +101,11 @@ PopulateEinjTable (
       return EFI_INVALID_PARAMETER;
     }
 
-    if ((Instructions->Mask >> Instructions->RegisterRegion.RegisterBitWidth) != 0) {
+    if ((Instructions->RegisterRegion.RegisterBitWidth > 64) ||
+        ((Instructions->RegisterRegion.RegisterBitWidth < 64) &&
+         ((Instructions->Mask >>
+           Instructions->RegisterRegion.RegisterBitWidth) != 0)))
+    {
       return EFI_INVALID_PARAMETER;
     }
 

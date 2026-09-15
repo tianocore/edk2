@@ -13,7 +13,7 @@
   FILE_GUID                      = E225C90F-6CB9-8AF3-095B-2668FC633A57
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NorFlashQemuLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = VirtNorFlashPlatformLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
 [Sources]
   FdtNorFlashQemuLib.c

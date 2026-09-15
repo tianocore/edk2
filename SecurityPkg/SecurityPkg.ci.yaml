@@ -61,7 +61,9 @@
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
         # For UEFI shell based apps
-        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "AcceptableDependencies-UEFI_APPLICATION":[
+            "ShellPkg/ShellPkg.dec"
+        ],
         "IgnoreInf": []
     },
     "DscCompleteCheck": {

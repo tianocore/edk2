@@ -2175,6 +2175,8 @@ EfiBootManagerBoot (
     // Report Status Code with the failure status to indicate that boot failure
     //
     BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED, Status);
+  } else {
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_BOOT_OPTION_COMPLETE));
   }
 
   PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32)OptionNumber);

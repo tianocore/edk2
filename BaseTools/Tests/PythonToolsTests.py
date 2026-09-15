@@ -20,6 +20,8 @@ def TheTestSuite():
     suites.append(CheckPythonSyntax.TheTestSuite())
     import CheckUnicodeSourceFiles
     suites.append(CheckUnicodeSourceFiles.TheTestSuite())
+    import MetaFileParserTests
+    suites.append(MetaFileParserTests.TheTestSuite())
     return unittest.TestSuite(suites)
 
 if __name__ == '__main__':

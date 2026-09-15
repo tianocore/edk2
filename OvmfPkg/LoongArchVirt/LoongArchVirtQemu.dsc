@@ -19,7 +19,7 @@
   DSC_SPECIFICATION              = 1.29
   OUTPUT_DIRECTORY               = Build/$(PLATFORM_NAME)
   SUPPORTED_ARCHITECTURES        = LOONGARCH64
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/LoongArchVirt/LoongArchVirtQemu.fdf
 
@@ -264,7 +264,7 @@
   ReportStatusCodeLib              | MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   OemHookStatusCodeLib             | MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib           | MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  PeiResourcePublicationLib        | MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
+  ResourcePublicationLib           | MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ExtractGuidedSectionLib          | MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   PcdLib                           | MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   QemuFwCfgS3Lib                   | OvmfPkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf

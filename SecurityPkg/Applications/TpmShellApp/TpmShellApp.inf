@@ -1,0 +1,46 @@
+## @file
+# TpmShellApp.inf
+#
+# UEFI shell application for testing TPM 2.0 Physical Presence Interface
+# operations, including querying and configuring PCR banks.
+#
+# Copyright (C) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = TpmShellApp
+  FILE_GUID                      = A3B2D4F1-7E6C-4A89-B5D0-3C1F8E2A9D07
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TpmShellAppEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  TpmShellApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseCryptLib
+  BaseMemoryLib
+  IntrinsicLib
+  ShellLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiTcg2ProtocolGuid                 ## CONSUMES

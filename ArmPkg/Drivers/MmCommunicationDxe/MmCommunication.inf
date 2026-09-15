@@ -39,6 +39,7 @@
   DxeServicesTableLib
   HobLib
   UefiDriverEntryPoint
+  SafeIntLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid              ## UNDEFINED # SmiHandlerRegister

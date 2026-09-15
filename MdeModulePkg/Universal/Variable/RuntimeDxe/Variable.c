@@ -3697,6 +3697,9 @@ GetHobVariableStore (
 /**
   Initializes variable store area for non-volatile and volatile variable.
 
+  On any failure, the caller must invoke VariableCommonUninitialize() to
+  release resources that may have been partially allocated.
+
   @retval EFI_SUCCESS           Function successfully executed.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
 
@@ -3726,7 +3729,6 @@ VariableCommonInitialize (
   //
   Status = InitNonVolatileVariableStore ();
   if (EFI_ERROR (Status)) {
-    FreePool (mVariableModuleGlobal);
     return Status;
   }
 
@@ -3752,11 +3754,6 @@ VariableCommonInitialize (
   //
   Status = GetHobVariableStore (VariableGuid);
   if (EFI_ERROR (Status)) {
-    if (mNvFvHeaderCache != NULL) {
-      FreePool (mNvFvHeaderCache);
-    }
-
-    FreePool (mVariableModuleGlobal);
     return Status;
   }
 
@@ -3771,15 +3768,6 @@ VariableCommonInitialize (
   mVariableModuleGlobal->ScratchBufferSize = ScratchSize;
   VolatileVariableStore                    = AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize) + ScratchSize);
   if (VolatileVariableStore == NULL) {
-    if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
-      FreePool ((VOID *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase);
-    }
-
-    if (mNvFvHeaderCache != NULL) {
-      FreePool (mNvFvHeaderCache);
-    }
-
-    FreePool (mVariableModuleGlobal);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -3799,6 +3787,47 @@ VariableCommonInitialize (
   VolatileVariableStore->Reserved1 = 0;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Uninitialize variable store area, freeing all resources allocated by
+  VariableCommonInitialize().
+
+**/
+VOID
+VariableCommonUninitialize (
+  VOID
+  )
+{
+  if (mVariableModuleGlobal != NULL) {
+    if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
+      FreePool ((VOID *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase);
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
+    }
+
+    if (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase != 0) {
+      FreePool ((VOID *)(UINTN)mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
+    }
+
+    FreePool (mVariableModuleGlobal);
+    mVariableModuleGlobal = NULL;
+  }
+
+  if (mNvFvHeaderCache != NULL) {
+    //
+    // In real NV mode, mNvVariableCache points into the same allocation as mNvFvHeaderCache.
+    //
+    ASSERT ((UINTN)mNvVariableCache == (UINTN)mNvFvHeaderCache + mNvFvHeaderCache->HeaderLength);
+    FreePool (mNvFvHeaderCache);
+    mNvFvHeaderCache = NULL;
+    mNvVariableCache = NULL;
+  } else if ((mNvVariableCache != NULL) && (PcdGet64 (PcdEmuVariableNvStoreReserved) == 0)) {
+    //
+    // In emulated NV mode without a pre-reserved store, mNvVariableCache is a dynamic allocation.
+    //
+    FreePool (mNvVariableCache);
+    mNvVariableCache = NULL;
+  }
 }
 
 /**

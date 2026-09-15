@@ -29,9 +29,9 @@ __memcpy (
 __attribute__ ((__alias__ ("__memcpy")))
 void *
 memcpy (
-  void          *dest,
-  const void    *src,
-  unsigned int  count
+  void        *dest,
+  const void  *src,
+  size_t      count
   );
 
 #else

@@ -1,0 +1,33 @@
+## @file
+# Google Test mocks for PeCoffLib
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockPeCoffLib
+  FILE_GUID                      = E79BBE2D-008E-4831-AACF-4656C4AE99F3
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeCoffLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MockPeCoffLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
