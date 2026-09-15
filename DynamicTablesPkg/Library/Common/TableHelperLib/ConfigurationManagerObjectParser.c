@@ -99,6 +99,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "PsdToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
   { "ProximityDomainToken",          sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
   { "ClockDomainToken",              sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "IAffId",                        sizeof (UINT16),          "0x%x",   NULL },
+  { "IrsToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicDInfo.
@@ -514,21 +516,25 @@ STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
 /** A parser for EArmObjGicIrsInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmGicIrsInfoParser[] = {
-  { "Token",           sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
-  { "GicVersion",      sizeof (UINT32),          "0x%x",   NULL },
-  { "GicIrsId",        sizeof (UINT32),          "0x%x",   NULL },
-  { "Flags",           sizeof (UINT32),          "0x%x",   NULL },
-  { "ConfigFrameBase", sizeof (UINT64),          "0x%llx", NULL },
-  { "SetLpiFrameBase", sizeof (UINT64),          "0x%llx", NULL },
+  { "Token",                sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "GicVersion",           sizeof (UINT32),          "0x%x",   NULL },
+  { "GicIrsId",             sizeof (UINT32),          "0x%x",   NULL },
+  { "Flags",                sizeof (UINT32),          "0x%x",   NULL },
+  { "ConfigFrameBase",      sizeof (UINT64),          "0x%llx", NULL },
+  { "SetLpiFrameBase",      sizeof (UINT64),          "0x%llx", NULL },
+  { "ProximityDomain",      sizeof (UINT32),          "0x%x",   NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicItsV5Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmGicItsV5InfoParser[] = {
-  { "Token",               sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
-  { "GicItsId",            sizeof (UINT32),          "0x%x",   NULL },
-  { "Flags",               sizeof (UINT32),          "0x%x",   NULL },
-  { "PhysicalBaseAddress", sizeof (UINT64),          "0x%llx", NULL },
+  { "Token",                sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "GicItsId",             sizeof (UINT32),          "0x%x",   NULL },
+  { "Flags",                sizeof (UINT32),          "0x%x",   NULL },
+  { "PhysicalBaseAddress",  sizeof (UINT64),          "0x%llx", NULL },
+  { "ProximityDomain",      sizeof (UINT32),          "0x%x",   NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicItsV5TranslateFrameInfo.
