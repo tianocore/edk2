@@ -34,6 +34,9 @@
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 
+  # Shared buffer size for building the PSA firmware update library.
+  gArmTokenSpaceGuid.PcdMmBufferSize|0x10000
+
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]

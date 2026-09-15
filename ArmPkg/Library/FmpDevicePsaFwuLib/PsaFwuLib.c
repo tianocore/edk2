@@ -57,6 +57,24 @@ PsaFwuVirtualAddressChangeEvent (
 }
 
 /**
+  Generate a switch case returning the fixed data size for an FWU command.
+
+  Assert at build time that the shared buffer can hold the parameter header
+  and fixed request or response data for the command.
+
+  @param Command   Firmware update command identifier.
+  @param DataType  Fixed request or response structure type.
+**/
+#define RETURN_FWU_DATA_SIZE(Command, DataType)                           \
+  case Command:                                                          \
+    STATIC_ASSERT (                                                      \
+      MM_SHARED_BUFFER_SIZE >=                                           \
+      (sizeof (PSA_MM_FWU_PARAMETER_HEADER) + sizeof (DataType)),          \
+      "MM shared buffer is too small for the fixed FWU message"           \
+      );                                                                 \
+    return sizeof (DataType)
+
+/**
  * Get firmware update function request fixed data size.
  *
  * @param [in]  Command         firmware update function id.
@@ -71,18 +89,12 @@ GetMmFwuReqDataSize (
   )
 {
   switch (Command) {
-    case PSA_MM_FWU_COMMAND_BEGIN_STAGING:
-      return sizeof (PSA_MM_FWU_BEGIN_STAGING_REQ);
-    case PSA_MM_FWU_COMMAND_OPEN:
-      return sizeof (PSA_MM_FWU_OPEN_REQ);
-    case PSA_MM_FWU_COMMAND_WRITE_STREAM:
-      return sizeof (PSA_MM_FWU_WRITE_STREAM_REQ);
-    case PSA_MM_FWU_COMMAND_READ_STREAM:
-      return sizeof (PSA_MM_FWU_READ_STREAM_REQ);
-    case PSA_MM_FWU_COMMAND_COMMIT:
-      return sizeof (PSA_MM_FWU_COMMIT_REQ);
-    case PSA_MM_FWU_COMMAND_ACCEPT_IMAGE:
-      return sizeof (PSA_MM_FWU_ACCEPT_IMAGE_REQ);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_BEGIN_STAGING, PSA_MM_FWU_BEGIN_STAGING_REQ);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_OPEN, PSA_MM_FWU_OPEN_REQ);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_WRITE_STREAM, PSA_MM_FWU_WRITE_STREAM_REQ);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_READ_STREAM, PSA_MM_FWU_READ_STREAM_REQ);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_COMMIT, PSA_MM_FWU_COMMIT_REQ);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_ACCEPT_IMAGE, PSA_MM_FWU_ACCEPT_IMAGE_REQ);
     default:
       return 0;
   }
@@ -103,14 +115,10 @@ GetMmFwuRespDataSize (
   )
 {
   switch (Command) {
-    case PSA_MM_FWU_COMMAND_DISCOVER:
-      return sizeof (PSA_MM_FWU_DISCOVER_RESP);
-    case PSA_MM_FWU_COMMAND_OPEN:
-      return sizeof (PSA_MM_FWU_OPEN_RESP);
-    case PSA_MM_FWU_COMMAND_READ_STREAM:
-      return sizeof (PSA_MM_FWU_READ_STREAM_RESP);
-    case PSA_MM_FWU_COMMAND_COMMIT:
-      return sizeof (PSA_MM_FWU_COMMIT_RESP);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_DISCOVER, PSA_MM_FWU_DISCOVER_RESP);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_OPEN, PSA_MM_FWU_OPEN_RESP);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_READ_STREAM, PSA_MM_FWU_READ_STREAM_RESP);
+    RETURN_FWU_DATA_SIZE (PSA_MM_FWU_COMMAND_COMMIT, PSA_MM_FWU_COMMIT_RESP);
     default:
       return 0;
   }
