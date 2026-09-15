@@ -19,7 +19,6 @@ Maintainers Wanted:
 
   - NetworkPkg
   - SecurityPkg
-  - ShellPkg
 
 Descriptions of section entries:
 
@@ -184,6 +183,7 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 BaseTools
 F: BaseTools/
@@ -400,6 +400,7 @@ F: MdeModulePkg/Include/*/*Var*.h
 F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: Universal Payload definitions
@@ -659,7 +660,7 @@ R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 ShellPkg
 F: ShellPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
-R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/

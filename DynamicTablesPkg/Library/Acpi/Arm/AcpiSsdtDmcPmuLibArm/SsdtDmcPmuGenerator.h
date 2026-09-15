@@ -10,7 +10,7 @@
     - Std or STD - Standard
 
   @par Reference(s):
-  - Arm CoreLink DMC-620 Coherent Mesh Network Technical Reference Manual r3p0
+  - Arm CoreLink DMC Coherent Mesh Network Technical Reference Manual r3p0
   - Generic ACPI for Arm Components 1.0 Platform Design Document
 **/
 
@@ -18,12 +18,12 @@
 
 /** PeriphBase maximum address length is 512 bytes (0x200)
 */
-#define DMC620_PERIPHBASE_MAX_ADDRESS_LENGTH  0x200
+#define DMC_PERIPHBASE_MAX_ADDRESS_LENGTH  0x200
 
-/** Mask covering the DMC620 Address space
+/** Mask covering the DMC Address space
 */
-#define DMC620_REGISTER_SPACE_MASK  0x1FFF
+#define DMC_REGISTER_SPACE_MASK  0x1FFF
 
-/** Offset of the PMU registers in the DMC620 register space
+/** Offset of the PMU registers in the DMC register space
 */
-#define DMC620_PMU_ADDRESS_OFFSET  0x0A00
+#define DMC_PMU_ADDRESS_OFFSET  0x0A00
