@@ -13,7 +13,7 @@
   FILE_GUID                      = 1D13D1F8-82DC-408D-9979-9E7D7CDFCD04
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ManageabilityTransportLib|PEIM DXE_DRIVER
+  LIBRARY_CLASS                  = ManageabilityTransportLib|PEIM DXE_DRIVER MM_STANDALONE
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 AARCH64

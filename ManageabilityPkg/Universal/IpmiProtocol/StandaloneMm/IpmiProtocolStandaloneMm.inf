@@ -1,0 +1,57 @@
+## @file
+# IPMI Protocol Standalone MM Driver.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = IpmiStandaloneMm
+  FILE_GUID                      = EDF71BB4-D08F-4107-AA98-CAC7682BD372
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StandaloneMmIpmiEntry
+
+#
+#  VALID_ARCHITECTURES           = X64 AARCH64
+#
+
+[Sources]
+  IpmiProtocol.c
+  ../Common/IpmiProtocolCommon.c
+  ../Common/IpmiProtocolCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  ManageabilityTransportHelperLib
+  ManageabilityTransportLib
+  MemoryAllocationLib
+  MmServicesTableLib
+  StandaloneMmDriverEntryPoint
+
+[Protocols]
+  gSmmIpmiProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
+
+[Guids]
+  gManageabilityProtocolIpmiGuid
+  gManageabilityTransportKcsGuid
+  gManageabilityTransportSmbusI2cGuid
+  gManageabilityTransportSerialGuid
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterLun
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderLun
+
+[Depex]
+  TRUE
