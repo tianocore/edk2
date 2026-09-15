@@ -53,5 +53,5 @@
                                        #language fr-FR  "N"
 #string SAVE_CHANGES                   #language en-US  "Changes have not saved. Save Changes and exit?"
                                        #language fr-FR  "Enregistrer les modifications et quitter?"
-#string ARE_YOU_SURE                   #language en-US  "Press 'Y' to save and exit, 'N' to discard and exit, 'ESC' to cancel."
-                                       #language fr-FR  "Pressez 'Y' pour sauvegarder et quitter, 'N' de se défaire et de sortie"
+#string ARE_YOU_SURE                   #language en-US  "Press 'Y(y)' to save and exit, 'N(n)' to discard and exit, 'ESC' to cancel."
+                                       #language fr-FR  "Pressez 'Y(y)' pour sauvegarder et quitter, 'N(n)' de se défaire et de sortie"
