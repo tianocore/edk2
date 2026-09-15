@@ -5,6 +5,7 @@
   Copyright (c) 2019 - 2024, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
   Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -811,18 +812,19 @@ typedef struct {
 
 #define EFI_ACPI_6_6_IMSIC_STRUCTURE_VERSION  1
 
-#define IMSIC_MIN_NUM_IDS            63
-#define IMSIC_MAX_NUM_IDS            2047
-#define IMSIC_MIN_NUM_GUEST_IDS      63
-#define IMSIC_MAX_NUM_GUEST_IDS      2047
-#define IMSIC_MIN_GUEST_INDEX_BITS   0
-#define IMSIC_MAX_GUEST_INDEX_BITS   7
-#define IMSIC_MIN_HART_INDEX_BITS    0
-#define IMSIC_MAX_HART_INDEX_BITS    15
-#define IMSIC_MIN_GROUP_INDEX_BITS   0
-#define IMSIC_MAX_GROUP_INDEX_BITS   7
-#define IMSIC_MIN_GROUP_INDEX_SHIFT  0
-#define IMSIC_MAX_GROUP_INDEX_SHIFT  55
+#define IMSIC_MIN_NUM_IDS                       63
+#define IMSIC_MAX_NUM_IDS                       2047
+#define IMSIC_MIN_NUM_GUEST_IDS                 63
+#define IMSIC_MAX_NUM_GUEST_IDS                 2047
+#define IMSIC_MIN_GUEST_INDEX_BITS              0
+#define IMSIC_MAX_GUEST_INDEX_BITS              7
+#define IMSIC_MIN_HART_INDEX_BITS               0
+#define IMSIC_MAX_HART_INDEX_BITS               15
+#define IMSIC_MIN_GROUP_INDEX_BITS              0
+#define IMSIC_MAX_GROUP_INDEX_BITS              7
+#define IMSIC_MIN_GROUP_INDEX_SHIFT             0
+#define IMSIC_MIN_GROUP_INDEX_SHIFT_WITH_APLIC  24
+#define IMSIC_MAX_GROUP_INDEX_SHIFT             55
 
 ///
 /// RISC-V APLIC
@@ -843,6 +845,8 @@ typedef struct {
 
 #define EFI_ACPI_6_6_APLIC_STRUCTURE_VERSION  1
 
+#define APLIC_MAX_EXT_INT_SOURCES  1023
+
 ///
 /// RISC-V PLIC
 ///
@@ -861,6 +865,8 @@ typedef struct {
 } EFI_ACPI_6_6_PLIC_STRUCTURE;
 
 #define EFI_ACPI_6_6_PLIC_STRUCTURE_VERSION  1
+
+#define PLIC_MAX_EXT_INT_SOURCES  1023
 
 ///
 /// Smart Battery Description Table (SBST)
