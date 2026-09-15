@@ -161,5 +161,14 @@ VirtNorFlashPlatformGetDevices (
   *NorFlashDescriptions = mNorFlashDevices;
   *Count                = Num;
 
+  if (Num == 0) {
+    // No Flash Device found, request the NOR Flash Driver to be unloaded.
+    DEBUG ((
+      DEBUG_INFO,
+      "No Flash Device found, request the NOR Flash Driver to be unloaded.\n"
+      ));
+    return EFI_REQUEST_UNLOAD_IMAGE;
+  }
+
   return EFI_SUCCESS;
 }
