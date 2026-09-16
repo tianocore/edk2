@@ -1087,6 +1087,14 @@ class DscParser(MetaFileParser):
                             File=self.MetaFile, Line=self._LineIndex + 1,
                             ExtraData=self._CurrentLine)
 
+        if DirectiveName in ['!ELSE', '!ENDIF'] and self._ValueList[1] != '':
+            Message = "Unexpected content after '%s'" % self._ValueList[0]
+            if DirectiveName == '!ELSE' and self._ValueList[1].split()[0].lower() == 'if':
+                Message += "; use '!elseif <expression>' for a conditional branch"
+            EdkLogger.error("Parser", FORMAT_INVALID, Message,
+                            File=self.MetaFile, Line=self._LineIndex + 1,
+                            ExtraData=self._CurrentLine)
+
         ItemType = self.DataType[DirectiveName]
         Scope = [[TAB_COMMON, TAB_COMMON, TAB_COMMON]]
         if ItemType == MODEL_META_DATA_INCLUDE:
