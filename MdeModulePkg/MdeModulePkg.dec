@@ -762,6 +762,14 @@
   ## Include/Protocol/CxlIo.h
   gEdkiiCxlIoProtocolGuid = { 0x8FAC60B2, 0xBBC1, 0x41DE, {0xA7, 0x97, 0x98, 0x75, 0xCD, 0xD3, 0xA8, 0xF8 } }
 
+  ## DXE protocol installed by SpiNorFlash4ByteModeDxe to signal EN4B/EX4B support.
+  # Include/Protocol/SpiNorFlash4ByteMode.h
+  gEfiSpiNorFlash4ByteModeProtocolGuid = {0x3f2cedb0, 0x7e91, 0x4270, {0x99, 0x58, 0x19, 0x7d, 0xed, 0xae, 0x79, 0xb8}}
+
+  ## SMM protocol installed by SpiNorFlash4ByteModeSmm to signal EN4B/EX4B support.
+  # Include/Protocol/SpiNorFlash4ByteMode.h
+  gEfiSpiNorFlash4ByteModeSmmProtocolGuid = {0x0ac75736, 0x4702, 0x47b3, {0x9d, 0x91, 0xeb, 0x96, 0x2f, 0x5d, 0xbf, 0x50}}
+
 [PcdsFeatureFlag]
   ## Indicates if the platform can support update capsule across a system reset.<BR><BR>
   #   TRUE  - Supports update capsule across a system reset.<BR>
