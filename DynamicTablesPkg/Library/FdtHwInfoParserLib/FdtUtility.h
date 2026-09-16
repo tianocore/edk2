@@ -1,7 +1,7 @@
 /** @file
   Flattened device tree utility.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -12,44 +12,7 @@
 
 #pragma once
 
-/** Get the offset of an address in a "reg" Device Tree property.
-
-  In a Device Tree, the "reg" property stores address/size couples.
-  They are stored on N 32-bits cells.
-  Based on the value of the #address-cells, the #size-cells and the
-  index in the "reg" property, compute the number of 32-bits cells
-  to skip.
-
-  @param [in]  Index        Index in the reg property.
-  @param [in]  AddrCells    Number of cells used to store an address.
-  @param [in]  SizeCells    Number of cells used to store the size of
-                            an address.
-
-  @retval  Number of 32-bits cells to skip to access the address.
-*/
-#define GET_DT_REG_ADDRESS_OFFSET(Index, AddrCells, SizeCells)  (           \
-          (Index) * ((AddrCells) + (SizeCells))                             \
-          )
-
-/** Get the offset of an address size in a "reg" Device Tree property.
-
-  In a Device Tree, the "reg" property stores address/size couples.
-  They are stored on N 32-bits cells.
-  Based on the value of the #address-cells, the #size-cells and the
-  index in the "reg" property, compute the number of 32-bits cells
-  to skip.
-
-  @param [in]  Index        Index in the reg property.
-  @param [in]  AddrCells    Number of cells used to store an address.
-  @param [in]  SizeCells    Number of cells used to store the size of
-                            an address.
-
-  @retval  Number of 32-bits cells to skip to access the address size.
-*/
-#define GET_DT_REG_SIZE_OFFSET(Index, AddrCells, SizeCells)  (              \
-          GET_DT_REG_ADDRESS_OFFSET ((Index), (AddrCells), (SizeCells)) +   \
-          (SizeCells)                                                       \
-          )
+#include <Library/FdtLib.h>
 
 /// Maximum string length for compatible names.
 #define COMPATIBLE_STR_LEN  (32U)
@@ -74,13 +37,15 @@
   This function DOES NOT SUPPORT extended SPI range and extended PPI range.
 
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt id.
 **/
 UINT32
 EFIAPI
 FdtGetInterruptId (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   );
 
 /** Get the ACPI interrupt flags of an interrupt described in a fdt.
@@ -88,15 +53,46 @@ FdtGetInterruptId (
   Data must describe a GIC interrupt. A GIC interrupt is on at least
   3 UINT32 cells.
 
+  PPI interrupt cpu mask on bits [15:8] are ignored.
+
   @param [in]  Data   Pointer to the first cell of an "interrupts" property.
+  @param [in]  Size   Number of cells used to encode an interrupt.
 
   @retval  The interrupt flags (for ACPI).
 **/
 UINT32
 EFIAPI
 FdtGetInterruptFlags (
-  UINT32 CONST  *Data
+  UINT32 CONST  *Data,
+  UINT32        Size
   );
+
+/** Parsed "interrupt-map" entry information.
+*/
+typedef struct {
+  /// Child unit-address cells. Points into the FDT blob unless masked.
+  CONST UINT32    *ChildAddress;
+  /// Number of child unit-address cells.
+  INT32           ChildAddressCells;
+  /// Child interrupt specifier cells. Points into the FDT blob unless masked.
+  CONST UINT32    *ChildInterrupt;
+  /// Number of child interrupt specifier cells.
+  INT32           ChildInterruptCells;
+  /// "interrupt-parent" phandle cell from the map entry.
+  CONST UINT32    *InterruptParent;
+  /// Parent unit-address cells. Points into the FDT blob.
+  CONST UINT32    *ParentAddress;
+  /// Number of parent unit-address cells.
+  INT32           ParentAddressCells;
+  /// Parent interrupt specifier cells. Points into the FDT blob.
+  CONST UINT32    *ParentInterrupt;
+  /// Number of parent interrupt specifier cells.
+  INT32           ParentInterruptCells;
+  /// Storage for masked child unit-address cells when ApplyIntMask is TRUE.
+  UINT32          MaskedChildAddress[FDT_MAX_NCELLS];
+  /// Storage for masked child interrupt cells when ApplyIntMask is TRUE.
+  UINT32          MaskedChildInterrupt[FDT_MAX_NCELLS];
+} INTERRUPT_MAP_ENTRY_INFO;
 
 /** A structure describing a compatibility string.
 */
@@ -337,26 +333,40 @@ FdtCountPropNodeInBranch (
   OUT       UINT32  *NodeCount
   );
 
-/** Get the interrupt-controller node handling the interrupts of
-    the input node.
+/** Get the interrupt domain parent node handling the interrupts of the input
+    node.
 
-  To do this, recursively search a node with either the "interrupt-controller"
-  or the "interrupt-parent" property in the parents of Node.
+  The interrupt domain parent must be one of the following:
+  - an interrupt-controller
+  - an interrupt nexus
 
-  Devicetree Specification, Release v0.3,
-  2.4.1 "Properties for Interrupt Generating Devices":
-    Because the hierarchy of the nodes in the interrupt tree
-    might not match the devicetree, the interrupt-parent
-    property is available to make the definition of an
-    interrupt parent explicit. The value is the phandle to the
-    interrupt parent. If this property is missing from a
-    device, its interrupt parent is assumed to be its devicetree
-    parent.
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to start the search.
+  @param [out] IntcNode  If success, contains the offset of the matching
+                         interrupt domain node.
 
-  @param [in]  Fdt              Pointer to a Flattened Device Tree.
-  @param [in]  Node             Offset of the node to start the search.
-  @param [out] IntcNode         If success, contains the offset of the
-                                interrupt-controller node.
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_NOT_FOUND           No interrupt domain node found.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetIntDomainNode (
+  IN  CONST VOID   *Fdt,
+  IN        INT32  Node,
+  OUT       INT32  *IntcNode
+  );
+
+/** Get the interrupt-controller parent node handling the interrupts of the
+    input node.
+
+  The interrupt domain parent must be an interrupt-controller.
+
+  @param [in]  Fdt       Pointer to a Flattened Device Tree.
+  @param [in]  Node      Offset of the node to start the search.
+  @param [out] IntcNode  If success, contains the offset of the matching
+                         interrupt-controller node.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_NOT_FOUND           No interrupt-controller node found.
@@ -365,33 +375,124 @@ FdtCountPropNodeInBranch (
 **/
 EFI_STATUS
 EFIAPI
-FdtGetIntcParentNode (
+FdtGetIntControllerNode (
   IN  CONST VOID   *Fdt,
   IN        INT32  Node,
   OUT       INT32  *IntcNode
   );
 
-/** Get the "interrupt-cells" property value of the node.
+/** Read up to two FDT cells as a UINT64 value.
 
-  The "interrupts" property requires to know the number of cells used
-  to encode an interrupt. This information is stored in the
-  interrupt-controller of the input Node.
-
-  @param [in]  Fdt          Pointer to a Flattened Device Tree (Fdt).
-  @param [in]  IntcNode     Offset of an interrupt-controller node.
-  @param [out] IntCells     If success, contains the "interrupt-cells"
-                            property of the IntcNode.
+  @param [in]  Data       Pointer to the first cell to read.
+  @param [in]  CellCount  Number of cells to read.
+  @param [out] Value      If success, contains the decoded value.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_UNSUPPORTED         Unsupported.
+  @retval EFI_UNSUPPORTED         Unsupported cell count.
+**/
+EFI_STATUS
+EFIAPI
+ReadFdtCells64 (
+  IN  CONST UINT32  *Data,
+  IN        INT32   CellCount,
+  OUT       UINT64  *Value
+  );
+
+/** Get the number of cells used to encode an interrupt for a specific Node.
+
+  @param [in]  Fdt                Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node               Offset of a node in the interrupt hierarchy.
+  @param [in]  SearchInHierarchy  If TRUE, search from the parent node
+                                  (i.e. get the parent #interrupt-cells).
+                                  If FALSE, simply read the property directly from
+                                  the input Node.
+  @param [out] IntCells           If success, contains the "#interrupt-cells"
+                                  property value relevant for Node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
 EFI_STATUS
 EFIAPI
 FdtGetInterruptCellsInfo (
-  IN  CONST VOID   *Fdt,
-  IN        INT32  IntcNode,
-  OUT       INT32  *InterruptCells
+  IN  CONST VOID     *Fdt,
+  IN        INT32    Node,
+  IN        BOOLEAN  SearchInHierarchy,
+  OUT       INT32    *IntCells
+  );
+
+/** Get one "interrupt-map" entry.
+
+  This helper parses the "interrupt-map" property of a nexus node and returns
+  the fully decoded entry identified by Index. The pointers stored in Entry
+  point inside the FDT blob, except the child-side fields when ApplyIntMask is
+  TRUE. In that case, the child-side fields point to masked copies stored in
+  Entry.
+
+  An "interrupt-map" is encoded as:
+  <
+    child-unit-address
+    child-interrupt-specifier
+    interrupt parent
+    parent-unit-address
+    parent-interrupt-specifier
+  >
+
+  @param [in]  Fdt        Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  NexusNode  Offset of the nexus node exposing "interrupt-map".
+  @param [in]  Index      Zero-based interrupt-map entry index.
+  @param [in]  ApplyIntMask  Whether to apply the "interrupt-map-mask" to the
+                             child-side fields.
+  @param [out] Entry      If success, contains the requested interrupt-map
+                          entry.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested entry was not found.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetInterruptMap (
+  IN  CONST VOID                      *Fdt,
+  IN        INT32                     NexusNode,
+  IN        UINT32                    Index,
+  IN        BOOLEAN                   ApplyIntMask,
+  OUT       INTERRUPT_MAP_ENTRY_INFO  *Entry
+  );
+
+/** Resolve an interrupt specifier for a node through interrupt nexus nodes.
+
+  If the interrupt parent domain of Node is already an interrupt-controller,
+  the requested interrupt specifier is returned directly from the node
+  "interrupts" property. Otherwise, the interrupt specifier is resolved
+  recursively through one or more parent nexus "interrupt-map" properties
+  until a final interrupt-controller is reached.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node            Node to get the interrupt from.
+  @param [in]  Index           Index of the interrupt to get.
+  @param [out] Interrupt       If success, contains the resolved interrupt
+                               specifier.
+  @param [out] InterruptCells  If success, contains the "#interrupt-cells"
+                               value of the final interrupt-controller.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested interrupt was not found.
+  @retval EFI_UNSUPPORTED         Unsupported interrupt-map format.
+**/
+EFI_STATUS
+EFIAPI
+FdtResolveInterrupt (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT CONST UINT32  **Interrupt,
+  OUT       INT32   *InterruptCells
   );
 
 /** Get the "#address-cells" and/or "#size-cells" property of the node.
@@ -454,6 +555,71 @@ FdtGetParentAddressInfo (
   IN        INT32 Node,
   OUT       INT32 *AddressCells, OPTIONAL
   OUT       INT32     *SizeCells       OPTIONAL
+  );
+
+/** Get an address/size pair from a node "reg" property.
+
+  The "reg" property stores addresses in the parent bus address space.
+  This helper reads the requested entry without applying parent bus "ranges"
+  translations.
+
+  The helper supports address and size fields up to 64 bits.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node owning the "reg" property.
+  @param [in]  Index            Index of the address/size pair to read.
+  @param [out] BaseAddress      If success, contains the raw base address.
+  @param [out] BaseAddressSize  If success, contains the size associated with
+                                the raw base address. This parameter is
+                                optional.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The requested "reg" entry was not found.
+  @retval EFI_UNSUPPORTED         Unsupported address or size encoding.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetReg (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT       UINT64  *BaseAddress,
+  OUT       UINT64  *BaseAddressSize OPTIONAL
+  );
+
+/** Get a translated address/size pair from a node "reg" property.
+
+  The "reg" property stores addresses in the parent bus address space.
+  This helper reads the requested entry and resolves parent bus "ranges"
+  mappings up to the root bus to return a CPU physical address.
+
+  The helper supports address and size fields up to 64 bits.
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node owning the "reg" property.
+  @param [in]  Index            Index of the address/size pair to read.
+  @param [out] BaseAddress      If success, contains the translated base
+                                address.
+  @param [out] BaseAddressSize  If success, contains the size associated with
+                                the translated base address. This parameter is
+                                optional.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No matching "ranges" entry found.
+  @retval EFI_UNSUPPORTED         Unsupported address or size encoding.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetTranslatedReg (
+  IN  CONST VOID    *Fdt,
+  IN        INT32   Node,
+  IN        UINT32  Index,
+  OUT       UINT64  *BaseAddress,
+  OUT       UINT64  *BaseAddressSize OPTIONAL
   );
 
 /** For relevant architectures, get the "#address-cells" and/or "#size-cells"

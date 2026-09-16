@@ -150,6 +150,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 81 - Redfish Over Ip Protocol Info.
   EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 82 - MCHI USB Network Device descriptor info
   EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 83 - MCHI PCI/PCIe Network Device descriptor info
+  EArchCommonObjBiosLanguageInfo,                  ///< 84 - BIOS Language Information
+  EArchCommonObjBiosLanguage,                      ///< 85 - BIOS Language
+  EArchCommonObjSystemBootInfo,                    ///< 86 - System Boot Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2168,5 +2171,50 @@ typedef struct CmArchCommonMchiNetworkDeviceDescPciInfo {
   ///
   CM_OBJECT_TOKEN    IpmiToken;
 } CM_ARCH_COMMON_MCHI_NETWORK_DEVICE_DESC_PCI_INFO;
+
+/** A structure that describes an installable firmware language.
+
+  SMBIOS Specification v3.9.0 Type 13
+
+  ID: EArchCommonObjBiosLanguage
+**/
+typedef struct CmArchCommonBiosLanguage {
+  /// Firmware language string in long or abbreviated SMBIOS format.
+  CHAR8    Language[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_BIOS_LANGUAGE;
+
+/** A structure that describes Firmware Language Information.
+
+  SMBIOS Specification v3.9.0 Type 13
+
+  ID: EArchCommonObjBiosLanguageInfo
+**/
+typedef struct CmArchCommonBiosLanguageInfo {
+  /// CM Object Token uniquely identifying this Firmware Language Information.
+  CM_OBJECT_TOKEN    BiosLanguageInfoToken;
+
+  /// Token referencing an array of installable firmware languages.
+  CM_OBJECT_TOKEN    LanguageListToken;
+
+  /// Firmware language format flags as defined by SMBIOS Type 13.
+  UINT8              Flags;
+
+  /// One-based index of the currently installed firmware language.
+  UINT8              CurrentLanguage;
+} CM_ARCH_COMMON_BIOS_LANGUAGE_INFO;
+
+/** A structure that describes System Boot Information.
+
+  SMBIOS Specification v3.9.0 Type 32
+
+  ID: EArchCommonObjSystemBootInfo
+**/
+typedef struct CmArchCommonSystemBootInfo {
+  /// CM Object Token uniquely identifying this System Boot Information.
+  CM_OBJECT_TOKEN    SystemBootInfoToken;
+
+  /// System boot status as defined by SMBIOS Type 32.
+  UINT8              BootStatus;
+} CM_ARCH_COMMON_SYSTEM_BOOT_INFO;
 
 #pragma pack()

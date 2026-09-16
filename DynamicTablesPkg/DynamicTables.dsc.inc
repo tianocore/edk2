@@ -60,6 +60,7 @@
   DynamicTablesPkg/Library/Smbios/SmbiosType3Lib/SmbiosType3Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType13Lib/SmbiosType13Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType16Lib/SmbiosType16Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType17Lib/SmbiosType17Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType19Lib/SmbiosType19Lib.inf
@@ -69,6 +70,7 @@
   DynamicTablesPkg/Library/Smbios/SmbiosType27Lib/SmbiosType27Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType28Lib/SmbiosType28Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType29Lib/SmbiosType29Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType32Lib/SmbiosType32Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType40Lib/SmbiosType40Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
@@ -136,7 +138,7 @@
   DynamicTablesPkg/Library/Acpi/Arm/AcpiApmtLibArm/AcpiApmtLibArm.inf
 
   # AML Fixup (Arm specific)
-  DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmn600LibArm/SsdtCmn600LibArm.inf
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmnLibArm/SsdtCmnLibArm.inf
 
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmcPmuLibArm/SsdtDmcPmuLibArm.inf
 
@@ -173,7 +175,7 @@
       #  Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
       #  Arm specific
-      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmn600LibArm/SsdtCmn600LibArm.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmnLibArm/SsdtCmnLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmcPmuLibArm/SsdtDmcPmuLibArm.inf
 
       # AML Codegen
@@ -187,6 +189,7 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType3Lib/SmbiosType3Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType13Lib/SmbiosType13Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType16Lib/SmbiosType16Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType17Lib/SmbiosType17Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType19Lib/SmbiosType19Lib.inf
@@ -196,6 +199,7 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType27Lib/SmbiosType27Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType28Lib/SmbiosType28Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType29Lib/SmbiosType29Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType32Lib/SmbiosType32Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType40Lib/SmbiosType40Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
