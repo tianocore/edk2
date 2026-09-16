@@ -29,13 +29,13 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
-  DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE SECURE_BOOT_ENABLE      = TRUE
   DEFINE DEBUG_TO_MEM            = FALSE
 
   #
   # Shell can be useful for debugging but should not be enabled for production
   #
-  DEFINE BUILD_SHELL             = TRUE
+  DEFINE BUILD_SHELL             = FALSE
 
   #
   # Device drivers
