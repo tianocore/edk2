@@ -111,10 +111,16 @@ DoAcceptPage:
     if (TdxStatus != TDX_EXIT_REASON_SUCCESS) {
       if ((TdxStatus & ~0xFFFFULL) == TDX_EXIT_REASON_PAGE_ALREADY_ACCEPTED) {
         //
-        // Already accepted
+        // The page is already accepted. A correct TDVF accept path never
+        // accepts the same GPA twice, so this status means the VMM removed a
+        // previously accepted private page and re-presented it as pending in
+        // an attempt to have TDVF re-accept (and thereby re-zero) live guest
+        // memory. Fail closed instead of silently treating it as success.
         //
         mNumberOfDuplicatedAcceptedPages++;
-        DEBUG ((DEBUG_WARN, "Page at Address (0x%llx) has already been accepted. - %d\n", Address, mNumberOfDuplicatedAcceptedPages));
+        DEBUG ((DEBUG_ERROR, "Page at Address (0x%llx) has already been accepted. - %d\n", Address, mNumberOfDuplicatedAcceptedPages));
+        Status = EFI_ACCESS_DENIED;
+        break;
       } else if ((TdxStatus & ~0xFFFFULL) == TDX_EXIT_REASON_PAGE_SIZE_MISMATCH) {
         //
         // GpaPageLevel is mismatch, fall back to a smaller GpaPageLevel if possible
