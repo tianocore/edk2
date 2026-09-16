@@ -693,6 +693,7 @@ R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskara
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
+R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 UefiCpuPkg: AMD related files
 F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
