@@ -124,6 +124,16 @@ TransferTdxHobList (
           );
         break;
       case EFI_HOB_TYPE_GUID_EXTENSION:
+        //
+        // Hob.Guid->Header.HobLength is a VMM-controlled UINT16. Reject any GUID
+        // extension HOB smaller than the fixed EFI_HOB_GUID_TYPE header so the
+        // data-length subtraction below cannot underflow.
+        //
+        if (Hob.Guid->Header.HobLength < sizeof (EFI_HOB_GUID_TYPE)) {
+          DEBUG ((DEBUG_ERROR, "TransferTdxHobList: GUID extension Hob length is too small, skipped\n"));
+          break;
+        }
+
         GuidedData = (VOID *)(&Hob.Guid->Name + 1);
         BuildGuidDataHob (&Hob.Guid->Name, GuidedData, Hob.Guid->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE));
         break;
