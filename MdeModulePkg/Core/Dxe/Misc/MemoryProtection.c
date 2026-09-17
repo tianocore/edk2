@@ -705,6 +705,11 @@ ActivateNxCompatibilityMode (
   VOID
   )
 {
+  if (!FeaturePcdGet (PcdAllowNxCompatibilityMode)) {
+    DEBUG ((DEBUG_WARN, "%a - NX compatibility mode is not allowed by platform policy, leaving memory protections intact.\n", __func__));
+    return;
+  }
+
   if (mIsNxCompatibilityModeActive) {
     return;
   }
