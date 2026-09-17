@@ -37,6 +37,10 @@
   ManageabilityPkg/Universal/IpmiBlobTransferDxe/IpmiBlobTransferDxe.inf
 !endif
 
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityStandaloneMmIpmiEnable == TRUE
+  ManageabilityPkg/Universal/IpmiProtocol/Smm/IpmiProtocolStandaloneMm.inf
+!endif
+
 !if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiSmbiosTransferEnable == TRUE
   ManageabilityPkg/Universal/IpmiSmbiosTransferDxe/IpmiSmbiosTransferDxe.inf
 !endif

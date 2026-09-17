@@ -1,29 +1,26 @@
 ## @file
-# IPMI Protocol SMM Driver.
+# IPMI Protocol Standalone MM Driver.
 #
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
-# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
-#
 [Defines]
-  INF_VERSION                         = 0x0001001d
-  BASE_NAME                           = IpmiSmm
-  FILE_GUID                           = CDD5D1DE-E3D3-4B1F-8689-DCC661561BB4
-  MODULE_TYPE                         = DXE_SMM_DRIVER
-  PI_SPECIFICATION_VERSION            = 0x0001000A
-  VERSION_STRING                      = 1.0
-  ENTRY_POINT                         = SmmIpmiEntry
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = IpmiStandaloneMm
+  FILE_GUID                      = EDF71BB4-D08F-4107-AA98-CAC7682BD372
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StandaloneMmIpmiEntry
+
+#
+#  VALID_ARCHITECTURES           = X64 AARCH64
+#
 
 [Sources]
+  IpmiProtocolStandaloneMm.c
   IpmiProtocolMmCommon.c
   IpmiProtocolMmCommon.h
-  IpmiProtocolTraditionalMm.c
   ../Common/IpmiProtocolCommon.c
   ../Common/IpmiProtocolCommon.h
 
@@ -37,8 +34,9 @@
   DebugLib
   ManageabilityTransportHelperLib
   ManageabilityTransportLib
+  MemoryAllocationLib
   MmServicesTableLib
-  UefiDriverEntryPoint
+  StandaloneMmDriverEntryPoint
 
 [Protocols]
   gSmmIpmiProtocolGuid               # PROTOCOL ALWAYS_PRODUCED
@@ -46,9 +44,11 @@
 [Guids]
   gManageabilityProtocolIpmiGuid
   gManageabilityTransportKcsGuid
+  gManageabilityTransportSmbusI2cGuid
+  gManageabilityTransportSerialGuid
 
 [FixedPcd]
-  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress   # Used as default KCS I/O base adddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress
