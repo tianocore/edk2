@@ -218,6 +218,7 @@ FixupIwbDeviceInfo (
 
   The table created by this function must be freed by FreeSimpleIwbDeviceTable.
 
+  @param [in]  Idx              Index to generate device name.
   @param [in]  IwbInfo          IWB device info to describe in the SSDT table.
   @param [out] Table            If success, pointer to the created SSDT table.
 
@@ -229,6 +230,7 @@ FixupIwbDeviceInfo (
 EFI_STATUS
 EFIAPI
 BuildIwbDeviceTable (
+  IN        UINT32                       Idx,
   IN  CONST CM_ARM_GIC_IWB_INFO          *IwbInfo,
   OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table
   )
@@ -241,10 +243,20 @@ BuildIwbDeviceTable (
   ASSERT (IwbInfo != NULL);
   ASSERT (Table != NULL);
 
+  if (Idx >= MAX_IWB_COUNT) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: IWB-DEVICE-FIXUP:"
+      "Device index to generate device name should be < %d\n",
+      MAX_IWB_COUNT
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
   IwbDevName[0] = 'I';
   IwbDevName[1] = 'W';
   IwbDevName[2] = 'B';
-  IwbDevName[3] = AsciiFromHex (IwbInfo->GicIwbId);
+  IwbDevName[3] = AsciiFromHex (Idx);
   IwbDevName[4] = '\0';
 
   // Parse the IWB Device Table Template.

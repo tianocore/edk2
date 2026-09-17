@@ -1268,6 +1268,13 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjEinjInstructionsInfoParser[] = {
   { "Mask",            8,                                               "0x%llx", NULL },
 };
 
+/** A parser for CmArchCommonBootErrorRegionInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBootErrorRegionInfoParser[] = {
+  { "BootErrorRegion",       8, "0x%llx", NULL },
+  { "BootErrorRegionLength", 4, "0x%x",   NULL },
+};
+
 /** A parser for EArchCommonObjPlatformFwInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonPlatformFwInfoParser[] = {
@@ -1416,6 +1423,18 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageParser[] = {
 STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemBootInfoParser[] = {
   { "SystemBootInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "BootStatus",          sizeof (UINT8),           "0x%x", NULL },
+};
+
+/** A parser for EArchCommonObjOnboardDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonOnboardDeviceInfoParser[] = {
+  { "OnboardDeviceInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ReferenceDesignation",   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "DeviceType",             sizeof (UINT8),           "0x%x", NULL        },
+  { "DeviceTypeInstance",     sizeof (UINT8),           "0x%x", NULL        },
+  { "SegmentGroupNum",        sizeof (UINT16),          "0x%x", NULL        },
+  { "BusNum",                 sizeof (UINT8),           "0x%x", NULL        },
+  { "DevFuncNum",             sizeof (UINT8),           "0x%x", NULL        },
 };
 
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
@@ -1746,6 +1765,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguageInfo,                 CmArchCommonBiosLanguageInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguage,                     CmArchCommonBiosLanguageParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemBootInfo,                   CmArchCommonSystemBootInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjOnboardDeviceInfo,                CmArchCommonOnboardDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBootErrorRegionInfo,              CmArchCommonBootErrorRegionInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

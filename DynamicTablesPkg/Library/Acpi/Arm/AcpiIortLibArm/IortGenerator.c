@@ -28,12 +28,6 @@
 
 #include "IortGenerator.h"
 
-/** According to GICv5 spec, maximum wires per IWB instance is 65,336.
-    Therefore, it's reasonable to set the maximum number of IWB instance
-    as 16.
-*/
-#define MAX_IWB_COUNT  (16)
-
 /** ARM standard IORT Generator
 
 Requirements:
@@ -2340,7 +2334,7 @@ AddIwbNodes (
     IwbNode->IwbIndex        = NodeList->GicIwbId;
 
     // Generate object name
-    AsciiSPrint (IwbDevPath, IWB_DEV_PATH_SIZE, "\\_SB_.IWB%x", IwbNode->IwbIndex);
+    AsciiSPrint (IwbDevPath, IWB_DEV_PATH_SIZE, "\\_SB_.IWB%X", Idx);
 
     // Copy the object name
     ObjectName = (CHAR8 *)((UINT8 *)IwbNode +
@@ -3270,6 +3264,7 @@ BuildIortTableEx (
       // The Iwb AML table list starts at index 1.
       TableIdx++;
       Status = BuildIwbDeviceTable (
+                 IwbIdx,
                  &IwbNodeList[IwbIdx],
                  &TableList[TableIdx]
                  );
