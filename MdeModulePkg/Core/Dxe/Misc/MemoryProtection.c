@@ -703,6 +703,11 @@ ActivateCompatibilityMode (
   VOID
   )
 {
+  if (!FeaturePcdGet (PcdAllowMemoryProtectionsCompatibilityMode)) {
+    DEBUG ((DEBUG_WARN, "%a - Memory protections compatibility mode is not allowed by platform policy, leaving memory protections intact.\n", __func__));
+    return;
+  }
+
   if (mIsCompatibilityModeActive) {
     return;
   }

@@ -1008,6 +1008,14 @@
   # See MdeModulePkg/Core/MemoryBins.md for more details.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|FALSE|BOOLEAN|0x00010080
 
+  ## Indicates if the platform should allow memory protections compatibility mode to be entered or not. This
+  #  defaults to TRUE, allowing compatibility mode, which is required to enable strict memory protections but still
+  #  boot bootloaders that will crash with memory protections enabled.
+  #   TRUE  - Memory protections compatibility mode is allowed.
+  #   FALSE - Memory protections compatibility mode is not allowed. EFI_APPLICATIONs without the NX_COMPAT flag
+  #           will still be loaded, but memory protections will not be disabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAllowMemoryProtectionsCompatibilityMode|TRUE|BOOLEAN|0x00010081
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 
