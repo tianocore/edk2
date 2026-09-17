@@ -4,6 +4,8 @@
 # Copyright (c) 2021-, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
+import copy
+
 from core.FMMTParser import *
 from core.FvHandler import *
 from utils.FvLayoutPrint import *
@@ -162,7 +164,8 @@ def ReplaceFfs(inputfile: str, Ffs_name: str, newffsfile: str, outputfile: str, 
                 FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     if FmmtParser.WholeFvTree.Findlist != []:
         for TargetFfs in FmmtParser.WholeFvTree.Findlist:
-            FfsMod = FvHandler(newFmmtParser.WholeFvTree.Child[0], TargetFfs)
+            NewFfs = copy.deepcopy(newFmmtParser.WholeFvTree.Child[0])
+            FfsMod = FvHandler(NewFfs, TargetFfs)
             Status = FfsMod.ReplaceFfs()
     else:
         logger.error('Target Ffs not found!!!')
