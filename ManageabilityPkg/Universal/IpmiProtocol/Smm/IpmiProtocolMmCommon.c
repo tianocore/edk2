@@ -1,22 +1,22 @@
 /** @file
-  This file provides IPMI SMM Protocol implementation.
+  This file provides the shared IPMI MM Protocol implementation.
 
   Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <PiDxe.h>
+#include <PiMm.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ManageabilityTransportLib.h>
 #include <Library/ManageabilityTransportIpmiLib.h>
 #include <Library/ManageabilityTransportHelperLib.h>
-#include <Library/SmmServicesTableLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 
 #include <Protocol/IpmiProtocol.h>
 
 #include "IpmiProtocolCommon.h"
+#include "IpmiProtocolMmCommon.h"
 
 MANAGEABILITY_TRANSPORT_TOKEN                 *mTransportToken = NULL;
 CHAR16                                        *mTransportName;
@@ -73,19 +73,14 @@ static IPMI_PROTOCOL  mIpmiProtocol = {
 };
 
 /**
-  The entry point of the Ipmi DXE driver.
-
-  @param[in] ImageHandle - Handle of this driver image
-  @param[in] SystemTable - Table containing standard EFI services
+  Initialize the IPMI protocol for either Traditional MM or Standalone MM.
 
   @retval EFI_SUCCESS    - IPMI Protocol is installed successfully.
   @retval Otherwise      - Other errors.
 **/
 EFI_STATUS
-EFIAPI
-SmmIpmiEntry (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+IpmiProtocolInitialize (
+  VOID
   )
 {
   EFI_STATUS                                 Status;
@@ -145,7 +140,7 @@ SmmIpmiEntry (
   }
 
   Handle = NULL;
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
                     &gSmmIpmiProtocolGuid,
                     EFI_NATIVE_INTERFACE,
