@@ -291,6 +291,15 @@ struct cb_range {
   UINT32    range_size;
 } __attribute__ ((packed));
 
+#define CB_TAG_CFR_ROOT  0x0047
+struct cb_cfr {
+  UINT32 tag;
+  UINT32 size;
+  UINT32 version;
+  UINT32 checksum;  /* Of the following data only; excludes these 4 fields */
+  /* CFR_FORM forms[] */
+};
+
 /* Helpful macros */
 
 #define MEM_RANGE_COUNT(_rec) \

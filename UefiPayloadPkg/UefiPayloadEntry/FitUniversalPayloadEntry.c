@@ -419,6 +419,7 @@ FitBuildHobs (
   OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
   )
 {
+  EFI_STATUS                     Status;
   UINT8                          *GuidHob;
   UINT32                         FdtSize;
   EFI_HOB_FIRMWARE_VOLUME        *FvHob;
@@ -467,6 +468,11 @@ FitBuildHobs (
       AcpiBoardInfo = BuildHobFromAcpi ((UINT64)AcpiTable->Rsdp);
       ASSERT (AcpiBoardInfo != NULL);
     }
+  }
+
+  Status = ParseMiscInfo ();
+  if (EFI_ERROR (Status) && (Status != RETURN_NOT_FOUND)) {
+    DEBUG ((DEBUG_WARN, "Failed to parse bootloader misc info: %r\n", Status));
   }
 
   //
