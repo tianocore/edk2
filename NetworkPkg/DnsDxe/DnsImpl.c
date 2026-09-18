@@ -1218,7 +1218,7 @@ ParseDnsResponse (
   //
   QueryName = (CHAR8 *)(RxString + sizeof (*DnsHeader));
 
-  QueryNameLen = (UINT32)AsciiStrLen (QueryName) + 1;
+  QueryNameLen = (UINT32)AsciiStrnLenS (QueryName, RemainingLength) + 1;
 
   //
   // Check whether the remaining packet length is available or not.
