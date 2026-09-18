@@ -1857,7 +1857,10 @@ HttpTcpReceiveHeader (
   CHAR8              *Buffer;
   NET_FRAGMENT       Fragment;
 
-  ASSERT (HttpInstance != NULL);
+  if (HttpInstance == NULL) {
+    ASSERT (HttpInstance != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
 
   EndofHeader   = HttpInstance->EndofHeader;
   HttpHeaders   = HttpInstance->HttpHeaders;
@@ -1869,10 +1872,22 @@ HttpTcpReceiveHeader (
   Fragment.Len  = 0;
   Fragment.Bulk = NULL;
 
+  if ((EndofHeader == NULL) || (HttpHeaders == NULL)) {
+    ASSERT (EndofHeader != NULL);
+    ASSERT (HttpHeaders != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
   if (HttpInstance->LocalAddressIsIPv6) {
-    ASSERT (Tcp6 != NULL);
+    if (Tcp6 == NULL) {
+      ASSERT (Tcp6 != NULL);
+      return EFI_INVALID_PARAMETER;
+    }
   } else {
-    ASSERT (Tcp4 != NULL);
+    if (Tcp4 == NULL) {
+      ASSERT (Tcp4 != NULL);
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   if (!HttpInstance->UseHttps) {
@@ -1884,12 +1899,21 @@ HttpTcpReceiveHeader (
 
   if (!HttpInstance->LocalAddressIsIPv6) {
     if (!HttpInstance->UseHttps) {
-      Rx4Token                                                 = &HttpInstance->Rx4Token;
+      Rx4Token = &HttpInstance->Rx4Token;
+      if (Rx4Token == NULL) {
+        ASSERT (Rx4Token != NULL);
+        return EFI_DEVICE_ERROR;
+      }
+
       Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer = AllocateZeroPool (DEF_BUF_LEN);
       if (Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         return Status;
       }
+    }
+
+    if (Rx4Token  == NULL) {
+      return EFI_INVALID_PARAMETER;
     }
 
     //
@@ -1984,7 +2008,12 @@ HttpTcpReceiveHeader (
     }
   } else {
     if (!HttpInstance->UseHttps) {
-      Rx6Token                                                 = &HttpInstance->Rx6Token;
+      Rx6Token = &HttpInstance->Rx6Token;
+      if (Rx6Token == NULL) {
+        ASSERT (Rx6Token != NULL);
+        return EFI_DEVICE_ERROR;
+      }
+
       Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer = AllocateZeroPool (DEF_BUF_LEN);
       if (Rx6Token->Packet.RxData->FragmentTable[0].FragmentBuffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
