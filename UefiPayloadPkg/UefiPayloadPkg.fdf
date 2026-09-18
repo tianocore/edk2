@@ -373,6 +373,7 @@ INF ShellPkg/Application/Shell/Shell.inf
 # Capsules
 #
 !if $(CAPSULE_SUPPORT) == TRUE
+INF  FILE_GUID = $(CAPSULE_MAIN_FW_GUID) FmpDevicePkg/FmpDxe/FmpDxe.inf
 INF MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
 !endif
 
