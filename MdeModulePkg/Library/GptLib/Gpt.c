@@ -198,10 +198,13 @@ PartitionValidGptTable (
   //
   // Ensure PartitionEntryLBA * BlockSize and
   // NumberOfPartitionEntries * SizeOfPartitionEntry don't overflow when they
-  // are later used to read and size the partition entry array.
+  // are later used to read and size the partition entry array. Both entry
+  // fields are UINT32, so the product is evaluated in 32-bit arithmetic and
+  // must be bounded by MAX_UINT32 to avoid truncation before it is widened
+  // to UINTN.
   //
   if ((PartHdr->PartitionEntryLBA > DivU64x32 (MAX_UINT64, BlockSize)) ||
-      (PartHdr->NumberOfPartitionEntries > DivU64x32 (MAX_UINTN, PartHdr->SizeOfPartitionEntry)))
+      (PartHdr->NumberOfPartitionEntries > DivU64x32 (MAX_UINT32, PartHdr->SizeOfPartitionEntry)))
   {
     FreePool (PartHdr);
     return FALSE;
