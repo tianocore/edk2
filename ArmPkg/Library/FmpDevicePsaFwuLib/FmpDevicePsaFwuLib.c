@@ -35,14 +35,12 @@
 
 STATIC UINT64                      mSupportFunction = 0;
 STATIC UINT32                      mFwuFlags        = 0;
-STATIC UINT32                      mVendorFlags     = 0;
 STATIC UINT64                      mMaxPayloadSize;
 STATIC EFI_EVENT                   mEfiVirtualAddressChangeEvent;
 STATIC EFI_EVENT                   mEfiReadyToBootEvent;
 STATIC PSA_MM_FWU_IMAGE_DIRECTORY  *mImageDirectory = NULL;
 STATIC PSA_MM_FWU_IMG_INFO_ENTRY   *mImageEntry     = NULL;
 STATIC UINTN                       mImageDirectorySize;
-STATIC BOOLEAN                     mOnRuntime      = FALSE;
 STATIC BOOLEAN                     mUpdateDisabled = FALSE;
 
 /**
@@ -60,7 +58,6 @@ FmpPsaVirtualAddressChangeEvent (
   IN VOID       *Context
   )
 {
-  mOnRuntime = TRUE;
   PsaFwuVirtualAddressChangeEvent (Event, Context);
   gRT->ConvertPointer (0x00, (VOID **)&mImageDirectory);
   gRT->ConvertPointer (0x00, (VOID **)&mImageEntry);
@@ -130,15 +127,14 @@ CheckFwuSupport (
   }
 
   mFwuFlags       = FwuInfo->Flags;
-  mVendorFlags    = FwuInfo->VendorSpecificFlags;
   mMaxPayloadSize = FwuInfo->MaxPayloadSize;
 
   DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: ServiceStatus: %d\n", FwuInfo->ServiceStatus));
   DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMajor: %d\n", FwuInfo->VersionMajor));
   DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMinor: %d\n", FwuInfo->VersionMinor));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: mFwuFlags: %d\n", FwuInfo->Flags));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: mVendorFlags: %d\n", FwuInfo->VendorSpecificFlags));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: mMaxPayloadSize: %d\n", FwuInfo->MaxPayloadSize));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: FwuFlags: %d\n", FwuInfo->Flags));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VendorFlags: %d\n", FwuInfo->VendorSpecificFlags));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: MaxPayloadSize: %d\n", FwuInfo->MaxPayloadSize));
 
   return EFI_SUCCESS;
 }
