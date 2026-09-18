@@ -1383,8 +1383,7 @@ FdtResolveInterrupt (
 
   InterruptData = FdtGetProp (Fdt, Node, "interrupts", &DataSize);
   if ((InterruptData == NULL) || (DataSize <= 0)) {
-    ASSERT (FALSE);
-    return EFI_ABORTED;
+    return EFI_NOT_FOUND;
   }
 
   EntryOffset = (UINTN)Index * (UINTN)IntCells;
