@@ -248,8 +248,13 @@ FileFindSection (
 }
 
 /**
-  Find DXE core from FV and build DXE core HOBs.
+  Find DXE core from the payload FV and build DXE core HOBs.
 
+  The caller resolves the payload FV location once, so that the FV this
+  function reads from is always the same one the entry point reserved
+  with BuildMemoryAllocationHob ().
+
+  @param[in]   PayloadFv             The payload FV that contains the DXE FV.
   @param[out]  DxeCoreEntryPoint     DXE core entry point
 
   @retval EFI_SUCCESS        If it completed successfully.
@@ -257,18 +262,16 @@ FileFindSection (
 **/
 EFI_STATUS
 LoadDxeCore (
-  OUT PHYSICAL_ADDRESS  *DxeCoreEntryPoint
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *PayloadFv,
+  OUT PHYSICAL_ADDRESS            *DxeCoreEntryPoint
   )
 {
   EFI_STATUS                  Status;
-  EFI_FIRMWARE_VOLUME_HEADER  *PayloadFv;
   EFI_FIRMWARE_VOLUME_HEADER  *DxeCoreFv;
   EFI_FFS_FILE_HEADER         *FileHeader;
   VOID                        *PeCoffImage;
   EFI_PHYSICAL_ADDRESS        ImageAddress;
   UINT64                      ImageSize;
-
-  PayloadFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdPayloadFdMemBase);
 
   //
   // DXE FV is inside Payload FV. Here find DXE FV from Payload FV
