@@ -989,6 +989,17 @@ ParseDtb (
           NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
           NodeType   = CheckNodeType (NodePtr->Name, Depth);
           if (!IsHobConstructed && (NodeType != ReservedMemory)) {
+            if (sizeof (UINTN) == sizeof (UINT32)) {
+              if (StartAddress >= (BASE_4GB - EFI_PAGE_SIZE)) {
+                DEBUG ((DEBUG_INFO, "Skipping memory outside the IA32 HOB address limit\n"));
+                continue;
+              }
+
+              if (NumberOfBytes > (BASE_4GB - EFI_PAGE_SIZE - StartAddress)) {
+                NumberOfBytes = BASE_4GB - EFI_PAGE_SIZE - StartAddress;
+              }
+            }
+
             if (NumberOfBytes > MinimalNeededSize) {
               MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
               FreeMemoryBottom = MemoryBottom;
@@ -1018,6 +1029,11 @@ ParseDtb (
         RootBridgeCount++;
       }
     }
+  }
+
+  if (!IsHobConstructed) {
+    DEBUG ((DEBUG_ERROR, "No addressable memory range is large enough for HOBs\n"));
+    return 0;
   }
 
   NumRsv = FdtGetNumberOfReserveMapEntries (Fdt);
