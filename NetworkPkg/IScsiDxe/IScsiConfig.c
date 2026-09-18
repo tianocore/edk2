@@ -1765,7 +1765,11 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
   //
   // Record the user configuration information in NVR.
   //
-  ASSERT (Attempt != NULL);
+  if (Attempt == NULL) {
+    ASSERT (Attempt != NULL);
+    return EFI_NOT_FOUND;
+  }
+
   UnicodeSPrint (mPrivate->PortString, (UINTN)ISCSI_NAME_IFR_MAX_SIZE, L"Attempt %d", Attempt->AttemptConfigIndex);
   return gRT->SetVariable (
                 mPrivate->PortString,
@@ -2825,6 +2829,11 @@ IScsiConfigProcessDefault (
       FreePool (AttemptConfigOrder);
     }
 
+    if (AttemptConfigData == NULL) {
+      ASSERT (AttemptConfigData != NULL);
+      return EFI_NOT_FOUND;
+    }
+
     //
     // Record the MAC info in Config Data.
     //
@@ -2835,7 +2844,6 @@ IScsiConfigProcessDefault (
       MacString
       );
 
-    ASSERT (AttemptConfigData != NULL);
     UnicodeStrToAsciiStrS (MacString, AttemptConfigData->MacString, sizeof (AttemptConfigData->MacString));
     AttemptConfigData->NicIndex = NicIndex;
     AttemptConfigData->Actived  = ISCSI_ACTIVE_ENABLED;
@@ -3053,8 +3061,14 @@ IScsiFormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gIScsiConfigGuid, mVendorStorageName, Private->DriverHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
+    if (ConfigRequestHdr == NULL) {
+      FreePool (IfrNvData);
+      FreePool (InitiatorName);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
       FreePool (IfrNvData);
       FreePool (InitiatorName);
