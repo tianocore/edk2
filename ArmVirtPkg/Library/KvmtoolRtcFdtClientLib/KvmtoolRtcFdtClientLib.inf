@@ -23,8 +23,8 @@
   ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
-  OvmfPkg/OvmfPkg.dec
   PcAtChipsetPkg/PcAtChipsetPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib

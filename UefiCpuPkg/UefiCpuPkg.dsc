@@ -101,6 +101,10 @@
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   RegisterCpuFeaturesLib|UefiCpuPkg/Library/RegisterCpuFeaturesLib/DxeRegisterCpuFeaturesLib.inf
   CpuCacheInfoLib|UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
@@ -122,6 +126,9 @@
 
 [LibraryClasses.LoongArch64]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+
+[LibraryClasses.AARCH64]
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
 
 #
 # Drivers/Libraries within this package
@@ -218,6 +225,8 @@
   UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdStandaloneMmCpuFeaturesLib.inf
   UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   UefiCpuPkg/Library/SmmRelocationLib/AmdSmmRelocationLib.inf
+
+  UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
 
 [Components.X64]
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuStandaloneMm.inf

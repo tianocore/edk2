@@ -43,7 +43,38 @@ None
 
 #### edk2-stable202611: Changes with Removal
 
-None
+##### Breaking Change: MapMmioLib moved from OvmfPkg to UefiCpuPkg
+
+- **Status**: Removed
+- **Tracking Issue**: [tianocore/edk2#13130](https://github.com/tianocore/edk2/issues/13130)
+- **Pull Request**: [tianocore/edk2#12894](https://github.com/tianocore/edk2/pull/12894)
+- **Type**: Source-Level (Removal) - Library class relocation, DEC declaration move, header file removal, and INF path removal
+
+**What changed**: `MapMmioLib` was moved from `OvmfPkg` to `UefiCpuPkg` so it can be used by non-OVMF
+platforms. The library class declaration moved from `OvmfPkg/OvmfPkg.dec` to `UefiCpuPkg/UefiCpuPkg.dec`, and the
+header and library instance moved from `OvmfPkg` paths to equivalent `UefiCpuPkg` paths.
+
+**What is removed**: The `OvmfPkg` `MapMmioLib` declaration, public header, and library instance paths:
+`OvmfPkg/Include/Library/MapMmioLib.h` and `OvmfPkg/Library/MapMmioLib/MapMmioLib.inf`.
+
+**Why it changed**: `MapMmioLib` provides generic MMIO range mapping support and is needed by packages outside
+`OvmfPkg`. Moving it to `UefiCpuPkg` provides a package-neutral library class declaration and implementation that can
+be consumed by OVMF and non-OVMF platforms.
+
+**What replaces it**: The `UefiCpuPkg` declaration, header, and library instance:
+`UefiCpuPkg/Include/Library/MapMmioLib.h` and `UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf`.
+
+**How to migrate**: Modules that include `<Library/MapMmioLib.h>` must list `UefiCpuPkg/UefiCpuPkg.dec` in their
+INF `[Packages]` section instead of relying on `OvmfPkg/OvmfPkg.dec`. Platform DSC files that map `MapMmioLib` to
+`OvmfPkg/Library/MapMmioLib/MapMmioLib.inf` must update the mapping to:
+
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
+
+**Breaking conditions**: Affects platforms and out-of-tree modules that reference the removed `OvmfPkg` `MapMmioLib`
+DEC declaration, header path, or library instance path.
+
+**Earliest removal**: Already removed in this change. The old `OvmfPkg` paths were removed in the same PR with no
+compatibility window.
 
 #### edk2-stable202611: Changes without Removal
 
@@ -139,6 +170,74 @@ CMN-600 generator library path. No consumer was found in the current
 edk2-platforms repository.
 
 **Companion PR**: None required; no edk2-platforms consumer was identified.
+
+##### Breaking Change: Add ArmCcaLib dependency to ArmMmuLib
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13024](https://github.com/tianocore/edk2/issues/13024)
+- **Pull Request**: [tianocore/edk2#12893](https://github.com/tianocore/edk2/pull/12893)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition (single expected instance)
+
+**What changed**: The AArch64 `ArmMmuLib` instances `ArmMmuBaseLib` and `ArmMmuPeiLib` gained a
+required dependency on the `ArmCcaLib` library class declared in `MdeModulePkg`. Platforms
+that use these `ArmMmuLib` instances must resolve `ArmCcaLib` in their DSC or the build
+fails with an unresolved library class.
+
+Library class dependency case: Single expected instance.
+Platforms that do not support Arm CCA should use the Null implementation provided at
+`MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf`.
+Platforms supporting Arm CCA should use the appropriate CCA-aware `ArmCcaLib` implementation.
+
+**Why it changed**: `ArmMmuLib` needs to determine the Arm CCA Realm protection attribute when
+creating or updating AArch64 translation-table entries. Using `ArmCcaLib` allows the MMU
+library to obtain the Realm execution state and protection attribute through a common
+abstraction while retaining unchanged behavior on platforms that do not support Arm CCA.
+
+**What replaces it**: Nothing is removed. `ArmCcaLib` becomes an additional required dependency
+of the affected `ArmMmuLib` instances.
+
+**How to migrate**: Platforms using `ArmMmuBaseLib` or `ArmMmuPeiLib` must add an `ArmCcaLib`
+mapping to their DSC.
+Platforms that do not support Arm CCA should add:
+   `ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf`
+
+Platforms supporting Arm CCA should instead map `ArmCcaLib` to the appropriate CCA-aware
+implementation.
+
+##### Breaking Change: PL031RealTimeClockLib gains MapMmioLib dependency
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13131](https://github.com/tianocore/edk2/issues/13131)
+- **Pull Request**: [tianocore/edk2#12894](https://github.com/tianocore/edk2/pull/12894)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition (single expected instance)
+
+**What changed**: `ArmPlatformPkg` `PL031RealTimeClockLib` gained a required dependency on the `MapMmioLib` library
+class declared in `UefiCpuPkg`. Platforms that build `PL031RealTimeClockLib` must resolve `MapMmioLib` in their DSC
+or the build fails with an unresolved library class.
+
+**Library class dependency case**: Single expected instance. `UefiCpuPkg` provides the recommended instance at
+`UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf`, so migration is a DSC library class mapping.
+
+**Why it changed**: `PL031RealTimeClockLib` now uses `MapMmioMemory()` to add and configure the PL031 RTC MMIO range
+before allocating it for runtime use. This centralizes MMIO mapping behavior and lets the shared `MapMmioLib`
+implementation apply any required architecture-specific memory attribute configuration.
+
+**What replaces it**: Nothing is removed. `MapMmioLib` becomes an additional required dependency of
+`PL031RealTimeClockLib`.
+
+**How to migrate**: Platforms building `PL031RealTimeClockLib` must add a `MapMmioLib` mapping to their platform DSC
+`[LibraryClasses]` section. To use the in-tree implementation, add:
+
+  MapMmioLib|UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
+
+> Note: A corresponding `edk2-platforms` pull request is expected to add this mapping for:
+>
+> - `Platform/Qemu/SbsaQemu/SbsaQemu.dsc`
+> - `Platform/ARM/VExpressPkg/ArmVExpress.dsc.inc`
+
+**Breaking conditions**: Affects platforms that build
+`ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf` and do not already provide a `MapMmioLib`
+mapping for `DXE_RUNTIME_DRIVER` modules.
 
 ### edk2-stable202611: Behavioral Breaking Changes
 
