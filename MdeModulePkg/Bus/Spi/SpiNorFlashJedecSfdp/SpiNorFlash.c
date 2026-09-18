@@ -70,7 +70,12 @@ FillWriteBuffer (
     if (AddressBytesSupported == SPI_ADDR_3BYTE_ONLY) {
       if (SfdpAddressBytes != 0) {
         // Check if the supported address length is already initiated.
-        if ((SfdpAddressBytes != SPI_ADDR_3BYTE_ONLY) && (SfdpAddressBytes != SPI_ADDR_3OR4BYTE)) {
+        // Accept SPI_ADDR_4BYTE_ONLY too, since it may have been set by
+        // EN4B resolution after SFDP init.
+        if ((SfdpAddressBytes != SPI_ADDR_3BYTE_ONLY) &&
+            (SfdpAddressBytes != SPI_ADDR_3OR4BYTE) &&
+            (SfdpAddressBytes != SPI_ADDR_4BYTE_ONLY))
+        {
           DEBUG ((DEBUG_ERROR, "%a: Unsupported Address Bytes: 0x%x, SFDP is: 0x%x\n", __func__, AddressBytesSupported, SfdpAddressBytes));
           ASSERT (FALSE);
         }
@@ -90,16 +95,44 @@ FillWriteBuffer (
     } else if (AddressBytesSupported == SPI_ADDR_3OR4BYTE) {
       if (SfdpAddressBytes != 0) {
         // Check if the supported address length is already initiated.
-        if (SfdpAddressBytes != SPI_ADDR_3OR4BYTE) {
+        // Accept resolved modes too - SPI_ADDR_3BYTE_ONLY or
+        // SPI_ADDR_4BYTE_ONLY may have been set by EN4B/EX4B resolution.
+        if ((SfdpAddressBytes != SPI_ADDR_3OR4BYTE) &&
+            (SfdpAddressBytes != SPI_ADDR_4BYTE_ONLY) &&
+            (SfdpAddressBytes != SPI_ADDR_3BYTE_ONLY))
+        {
           DEBUG ((DEBUG_ERROR, "%a: Unsupported Address Bytes: 0x%x, SFDP is: 0x%x\n", __func__, AddressBytesSupported, SfdpAddressBytes));
           ASSERT (FALSE);
         }
       }
 
-      if (Instance->Protocol.FlashSize <= SIZE_16MB) {
+      if (SfdpAddressBytes == SPI_ADDR_4BYTE_ONLY) {
+        // EN4B already sent at SFDP init; always use 4-byte addressing.
+        AddressSize = 4;
+      } else if (Instance->SpiNorFlash4ByteModeProtocol != NULL) {
+        // Resolve the address mode for *this* transaction from its actual
+        // target Address, instead of the whole-chip FlashSize. Re-evaluated
+        // on every call so a later low-address transaction on a large flash
+        // cannot inherit a 4-byte decision made for an earlier high-address
+        // one, and vice versa.
+        EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL  *FourByteModeProtocol;
+        UINT8                                  NewAddrMode;
+
+        FourByteModeProtocol = (EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL *)Instance->SpiNorFlash4ByteModeProtocol;
+        NewAddrMode          = SPI_ADDR_3BYTE_ONLY;
+        if (Address >= SIZE_16MB) {
+          FourByteModeProtocol->Enter4ByteMode (FourByteModeProtocol, Instance->SpiIo, &NewAddrMode);
+        } else {
+          FourByteModeProtocol->Exit4ByteMode (FourByteModeProtocol, Instance->SpiIo, &NewAddrMode);
+        }
+
+        AddressSize = (NewAddrMode == SPI_ADDR_4BYTE_ONLY) ? 4 : 3;
+      } else if ((SfdpAddressBytes == SPI_ADDR_3BYTE_ONLY) ||
+                 (Instance->Protocol.FlashSize <= SIZE_16MB))
+      {
         AddressSize = 3;
       } else {
-        // SPI part is > 16MB use 4-byte addressing.
+        // SPI_ADDR_3OR4BYTE with flash > 16 MB and no EN4B/EX4B hook: use 4-byte addressing.
         AddressSize = 4;
       }
     } else {
@@ -115,14 +148,6 @@ FillWriteBuffer (
       AddressSize
       );
     Index += AddressSize;
-  }
-
-  if (SfdpAddressBytes == SPI_ADDR_3OR4BYTE) {
-    //
-    // TODO:
-    // We may need to enter/exit 4-Byte mode if SPI flash
-    // device is currently operated in 3-Bytes mode.
-    //
   }
 
   // Fill DummyBytes
@@ -777,8 +802,11 @@ WriteStatus (
   if (!EFI_ERROR (Status)) {
     if (Instance->WriteEnableLatchRequired) {
       Status = SetWel (Instance);
-      DEBUG ((DEBUG_ERROR, "%a: set Write Enable Error.\n", __func__));
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: set Write Enable Error.\n", __func__));
+        ASSERT_EFI_ERROR (Status);
+      }
+
       // Check not WIP & WEL enabled
       Status = WaitWelNotWip (Instance, FixedPcdGet32 (PcdSpiNorFlashOperationDelayMicroseconds), FixedPcdGet32 (PcdSpiNorFlashFixedTimeoutRetryCount));
     }

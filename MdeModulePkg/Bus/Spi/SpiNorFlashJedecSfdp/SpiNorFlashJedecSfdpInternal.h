@@ -18,6 +18,25 @@
 
 #define SPI_NOR_FLASH_FROM_THIS(a)  CR (a, SPI_NOR_FLASH_INSTANCE, Protocol, SPI_NOR_FLASH_SIGNATURE)
 
+//
+// Minimal forward declaration for the optional EN4B/EX4B protocol (see
+// MdeModulePkg/Bus/Spi/SpiNorFlash4ByteMode). Avoids a hard dependency from
+// this driver to the 4-byte mode module.
+//
+typedef struct _EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL;
+struct _EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL {
+  EFI_STATUS (EFIAPI *Enter4ByteMode)(
+    IN  EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL  *This,
+    IN  EFI_SPI_IO_PROTOCOL                    *SpiIo,
+    OUT UINT8                                  *AddressMode
+    );
+  EFI_STATUS (EFIAPI *Exit4ByteMode)(
+    IN  EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL  *This,
+    IN  EFI_SPI_IO_PROTOCOL                    *SpiIo,
+    OUT UINT8                                  *AddressMode
+    );
+};
+
 typedef struct {
   LIST_ENTRY    NextFastReadCap;     ///< Link list to next Fast read capability
   UINT8         FastReadInstruction; ///< Fast read instruction.
@@ -116,6 +135,13 @@ typedef struct {
                                                              ///< map descriptors.
   SFDP_SECTOR_MAP_RECORD        *CurrentSectorMap;           ///< The current activated flash device
                                                              ///< sector map.
+  ///
+  /// Optional platform hook for Enter/Exit 4-Byte Address Mode (EN4B/EX4B).
+  /// Set by DXE/SMM entry code when gEfiSpiNorFlash4ByteMode[Smm]ProtocolGuid
+  /// is installed.  NULL means no 4-byte mode support on this platform.
+  /// Points at an EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL instance.
+  ///
+  VOID                          *SpiNorFlash4ByteModeProtocol;
 } SPI_NOR_FLASH_INSTANCE;
 
 /**
