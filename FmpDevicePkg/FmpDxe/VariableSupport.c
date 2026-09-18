@@ -726,6 +726,76 @@ SetLastAttemptVersionInVariable (
 }
 
 /**
+  Records a durable failure checkpoint immediately before device update starts.
+
+  @param[in] Private             Private context structure for the managed
+                                 controller.
+  @param[in] LastAttemptVersion  Version of the firmware update being attempted.
+
+  @retval EFI_SUCCESS  The checkpoint is durable.
+  @retval Other        The checkpoint could not be persisted.
+**/
+EFI_STATUS
+SetUpdateInProgressInVariable (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN UINT32                            LastAttemptVersion
+  )
+{
+  EFI_STATUS            Status;
+  FMP_CONTROLLER_STATE  *FmpControllerState;
+  UINTN                 Size;
+
+  FmpControllerState = NULL;
+  Size               = 0;
+  Status             = GetVariable2 (
+                         Private->FmpStateVariableName,
+                         &gEfiCallerIdGuid,
+                         (VOID **)&FmpControllerState,
+                         &Size
+                         );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to read update checkpoint. Status = %r\n", mImageIdName, Status));
+    return Status;
+  }
+
+  if ((FmpControllerState == NULL) || (Size != sizeof (*FmpControllerState))) {
+    if (FmpControllerState != NULL) {
+      FreePool (FmpControllerState);
+    }
+
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Update checkpoint has invalid size 0x%x\n", mImageIdName, Size));
+    return EFI_COMPROMISED_DATA;
+  }
+
+  if (FmpControllerState->LastAttemptVersionValid &&
+      FmpControllerState->LastAttemptStatusValid &&
+      (FmpControllerState->LastAttemptVersion == LastAttemptVersion) &&
+      (FmpControllerState->LastAttemptStatus == LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL))
+  {
+    FreePool (FmpControllerState);
+    return EFI_SUCCESS;
+  }
+
+  FmpControllerState->LastAttemptVersionValid = TRUE;
+  FmpControllerState->LastAttemptStatusValid  = TRUE;
+  FmpControllerState->LastAttemptVersion      = LastAttemptVersion;
+  FmpControllerState->LastAttemptStatus       = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+  Status                                      = gRT->SetVariable (
+                                                       Private->FmpStateVariableName,
+                                                       &gEfiCallerIdGuid,
+                                                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                                                       sizeof (*FmpControllerState),
+                                                       FmpControllerState
+                                                       );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to write update checkpoint. Status = %r\n", mImageIdName, Status));
+  }
+
+  FreePool (FmpControllerState);
+  return Status;
+}
+
+/**
   Attempts to lock a single UEFI Variable propagating the error state of the
   first lock attempt that fails.  Uses gEfiCallerIdGuid as the variable GUID.
 
