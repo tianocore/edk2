@@ -755,7 +755,7 @@ InitializeMpExceptionHandlers (
   // Enable non-stop mode for #PF triggered by Heap Guard or NULL Pointer
   // Detection.
   //
-  if (HEAP_GUARD_NONSTOP_MODE || NULL_DETECTION_NONSTOP_MODE) {
+  if (gDxeMps.HeapGuardPolicy.Fields.NonStopMode || gDxeMps.NullPointerDetectionPolicy.Fields.NonStopMode) {
     RegisterCpuInterruptHandler (EXCEPT_IA32_DEBUG, DebugExceptionHandler);
     RegisterCpuInterruptHandler (EXCEPT_IA32_PAGE_FAULT, PageFaultExceptionHandler);
   }

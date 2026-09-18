@@ -34,8 +34,8 @@ SmmInitPageTable (
   mPagingMode          = PagingPae;
 
   if (mSmmProfileEnabled ||
-      HEAP_GUARD_NONSTOP_MODE ||
-      NULL_DETECTION_NONSTOP_MODE)
+      gMmMps.HeapGuardPolicy.Fields.NonStopMode ||
+      gMmMps.NullDetectionNonStopMode)
   {
     //
     // Set own Page Fault entry instead of the default one, because SMM Profile
@@ -135,7 +135,7 @@ SmiPFHandler (
           );
       }
 
-      if (HEAP_GUARD_NONSTOP_MODE) {
+      if (gMmMps.HeapGuardPolicy.Fields.NonStopMode) {
         GuardPagePFHandler (SystemContext.SystemContextIa32->ExceptionData);
         goto Exit;
       }
@@ -164,7 +164,7 @@ SmiPFHandler (
     //
     // If NULL pointer was just accessed
     //
-    if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) &&
+    if (gMmMps.NullPointerDetectionPolicy &&
         (PFAddress < EFI_PAGE_SIZE))
     {
       DumpCpuContext (InterruptType, SystemContext);
@@ -173,7 +173,7 @@ SmiPFHandler (
         DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
         );
 
-      if (NULL_DETECTION_NONSTOP_MODE) {
+      if (gMmMps.NullDetectionNonStopMode) {
         GuardPagePFHandler (SystemContext.SystemContextIa32->ExceptionData);
         goto Exit;
       }

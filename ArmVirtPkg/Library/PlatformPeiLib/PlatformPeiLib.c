@@ -17,6 +17,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 #include <Library/FdtSerialPortAddressLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 
@@ -295,6 +296,13 @@ PlatformPeim (
   }
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. If no fw_cfg
+  // selector is present (or fw_cfg is not available on this platform), no HOB
+  // is produced and the memory protection PCDs are used as a fallback.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
 
   return EFI_SUCCESS;
 }
