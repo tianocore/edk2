@@ -1649,7 +1649,7 @@ HttpBootGetBootFile (
             // For EFI_TIMEOUT and EFI_DEVICE_ERROR errors, we may resume the operation.
             // We will not check if server sent Accept-Ranges header, because some back-ends
             // do not report this header, even when supporting it. Know example: CloudFlare CDN Cache.
-            Private->PartialTransferredSize = ReceivedSize;
+            Private->PartialTransferredSize += ReceivedSize;
             DEBUG (
               (
                DEBUG_WARN | DEBUG_INFO,
