@@ -52,6 +52,7 @@
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
   gUefiShellFileGuid
 
 [Protocols]
@@ -62,6 +63,7 @@
   gEfiSmmAccess2ProtocolGuid
   gEfiSerialIoProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
+  gEfiPciIoProtocolGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
@@ -73,3 +75,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape
+
+[FeaturePcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdConnectAllDevices
