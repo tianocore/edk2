@@ -1779,6 +1779,7 @@ ERROR_6:
   }
 
   HttpBootFreeCache (Cache);
+  Cache = NULL;
 
 ERROR_5:
   if (ResponseData != NULL) {

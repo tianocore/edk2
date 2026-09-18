@@ -134,7 +134,7 @@ typedef enum {
    sizeof (EFI_DHCP4_PACKET_OPTION) + (Opt)->Length - 1)
 
 #define GET_OPTION_BUFFER_LEN(Pkt) \
-  ((Pkt)->Length - sizeof (EFI_DHCP4_HEADER) - 4)
+  ((Pkt)->Length - sizeof (EFI_DHCP4_HEADER) - sizeof ((Pkt)->Dhcp4.Magik))
 
 #define GET_NEXT_BOOT_SVR_ENTRY(Ent) \
   (PXEBC_BOOT_SVR_ENTRY *) ((UINT8 *) Ent + sizeof (*(Ent)) + \
