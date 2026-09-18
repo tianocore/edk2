@@ -232,7 +232,6 @@ AmlCreateObjectNode (
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
 **/
 STATIC
 EFI_STATUS
@@ -248,9 +247,6 @@ AmlDeleteDataNode (
 
   if (DataNode->Buffer != NULL) {
     FreePool (DataNode->Buffer);
-  } else {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
   }
 
   FreePool (DataNode);
