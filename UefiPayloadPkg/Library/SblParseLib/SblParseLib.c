@@ -111,6 +111,25 @@ ParseMemoryInfo (
 }
 
 /**
+  Parse the boot mode from the coreboot table in memory.
+
+  @param  Mode                Pointer to the boot mode variable
+
+  @retval RETURN_SUCCESS      Successfully find out the boot mode
+  @retval RETURN_NOT_FOUND    Failed to find the boot information.
+  @retval RETURN_UNSUPPORTED  Feature is not supported by the bootloader.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseBootMode (
+  OUT EFI_BOOT_MODE  *Mode
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+/**
   Acquire SMBIOS table from slim bootloader.
 
   @param  SmbiosTable           Pointer to the SMBIOS table info.
