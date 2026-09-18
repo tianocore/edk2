@@ -57,6 +57,7 @@
   PcdLib
   DevicePathLib
   UefiBootServicesTableLib
+  DxeServicesTableLib
   MemoryAllocationLib
   ReportStatusCodeLib
   BaseMemoryLib
@@ -81,6 +82,7 @@
   gEfiIncompatiblePciDeviceSupportProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEdkiiPciHostMemoryPolicyProtocolGuid            ## SOMETIMES_CONSUMES
   gEdkiiDeviceSecurityProtocolGuid                ## SOMETIMES_CONSUMES
   gEdkiiDeviceIdentifierTypePciGuid               ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
