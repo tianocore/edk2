@@ -286,5 +286,8 @@ typedef struct {
   UINT16                     X87Ftw;
   UINT8                      Reserved9[2];
   UINT16                     X87Fcw;
+  UINT8                      Reserved10[1166];
+  UINT32                     VcpuId;
+  UINT32                     VcpuSiblingMask;
 } SEV_ES_SAVE_AREA;
 #pragma pack ()
