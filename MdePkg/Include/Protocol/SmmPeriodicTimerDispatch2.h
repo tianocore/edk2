@@ -35,7 +35,7 @@
 ///      The resulting SMI will occur every 64ms with the child called back on
 ///      every 47th SMI.
 ///      NOTE: the child driver should be aware that this will result in more
-///        SMIs occuring during system runtime which can negatively impact system
+///        SMIs occurring during system runtime which can negatively impact system
 ///        performance.
 ///
 typedef struct {
