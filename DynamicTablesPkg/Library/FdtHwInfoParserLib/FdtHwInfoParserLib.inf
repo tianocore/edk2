@@ -25,6 +25,14 @@
   FdtHwInfoParser.h
   FdtUtility.c
   FdtUtility.h
+  Topology/TopologyCacheParser.c
+  Topology/TopologyCacheParser.h
+  Topology/TopologyHierarchyParser.c
+  Topology/TopologyHierarchyParser.h
+  Topology/TopologyParser.c
+  Topology/TopologyParser.h
+  Topology/TopologyUtility.c
+  Topology/TopologyUtility.h
   Pci/PciConfigSpaceParser.c
   Pci/PciConfigSpaceParser.h
   Serial/SerialPortParser.c
@@ -76,3 +84,6 @@
   DebugLib
   FdtLib
   MemoryAllocationLib
+
+[LibraryClasses.AARCH64]
+  ArmSmcccSocIdLib
