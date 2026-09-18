@@ -55,6 +55,55 @@ ProcessLibraryConstructorList (
   );
 
 /**
+  Build HOBs from bootloader-specific data.
+**/
+STATIC
+VOID
+BuildBootloaderHobs (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HOB_HANDOFF_INFO_TABLE  *Phit;
+  FIRMWARE_INFO               FirmwareInfo;
+  SMMSTORE_INFO               SmmStoreInfo;
+
+  if (GetFirstGuidHob (&gEfiSmmStoreInfoHobGuid) == NULL) {
+    Status = ParseSmmStoreInfo (&SmmStoreInfo);
+    if (!EFI_ERROR (Status)) {
+      BuildGuidDataHob (
+        &gEfiSmmStoreInfoHobGuid,
+        &SmmStoreInfo,
+        sizeof (SmmStoreInfo)
+        );
+    }
+  }
+
+  if (GetFirstGuidHob (&gEfiFirmwareInfoHobGuid) == NULL) {
+    Status = ParseFirmwareInfo (&FirmwareInfo);
+    if (!EFI_ERROR (Status)) {
+      BuildGuidDataHob (
+        &gEfiFirmwareInfoHobGuid,
+        &FirmwareInfo,
+        sizeof (FirmwareInfo)
+        );
+    }
+  }
+
+  Status = ParseCapsules (BuildCvHob);
+  if (EFI_ERROR (Status) && (Status != RETURN_NOT_FOUND)) {
+    DEBUG ((DEBUG_WARN, "Failed to parse bootloader capsules: %r\n", Status));
+  }
+
+  if (GetFirstHob (EFI_HOB_TYPE_UEFI_CAPSULE) != NULL) {
+    Phit = GetFirstHob (EFI_HOB_TYPE_HANDOFF);
+    if (Phit != NULL) {
+      Phit->BootMode = BOOT_ON_FLASH_UPDATE;
+    }
+  }
+}
+
+/**
   Find the first substring.
   @param  String    Point to the string where to find the substring.
   @param  CharSet   Point to the string to be found.
@@ -225,19 +274,21 @@ BuildFitLoadablesFvHob (
   VOID                    *Fdt;
   UINT8                   *GuidHob;
   UNIVERSAL_PAYLOAD_BASE  *PayloadBase;
-  INT32                   ConfigNode;
-  INT32                   Config1Node;
   INT32                   ImageNode;
   INT32                   FvNode;
-  INT32                   Depth;
   CONST FDT_PROPERTY      *PropertyPtr;
   INT32                   TempLen;
   CONST CHAR8             *Fvname;
+  UINTN                   FvNameLength;
   UINT32                  DataOffset;
   UINT32                  DataSize;
+  UINT32                  FitDataOffset;
+  UINT32                  FitSize;
   UINT32                  *Data32;
+  UINTN                   FvBase;
 
-  Fdt = NULL;
+  Fdt    = NULL;
+  *DxeFv = NULL;
 
   GuidHob = GetFirstGuidHob (&gUniversalPayloadBaseGuid);
   if (GuidHob != NULL) {
@@ -252,17 +303,26 @@ BuildFitLoadablesFvHob (
 
   Status = FdtCheckHeader (Fdt);
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "FIT header at 0x%08x is invalid: %d\n", Fdt, Status));
     return EFI_UNSUPPORTED;
   }
 
-  ConfigNode = FdtSubnodeOffsetNameLen (Fdt, 0, "configurations", (INT32)AsciiStrLen ("configurations"));
-  if (ConfigNode <= 0) {
-    return EFI_NOT_FOUND;
+  PropertyPtr = FdtGetProperty (Fdt, 0, "size", &TempLen);
+  if ((PropertyPtr == NULL) || (TempLen != sizeof (UINT32))) {
+    DEBUG ((DEBUG_ERROR, "FIT root has no valid size property\n"));
+    return EFI_COMPROMISED_DATA;
   }
 
-  Config1Node = FdtSubnodeOffsetNameLen (Fdt, ConfigNode, "conf-1", (INT32)AsciiStrLen ("conf-1"));
-  if (Config1Node <= 0) {
-    return EFI_NOT_FOUND;
+  FitSize = Fdt32ToCpu (ReadUnaligned32 ((UINT32 *)PropertyPtr->Data));
+  if ((FitSize < FdtTotalSize (Fdt)) || (FitSize > SIZE_256MB)) {
+    DEBUG ((DEBUG_ERROR, "FIT size 0x%x is invalid for FDT size 0x%x\n", FitSize, FdtTotalSize (Fdt)));
+    return EFI_COMPROMISED_DATA;
+  }
+
+  FitDataOffset = ALIGN_VALUE (FdtTotalSize (Fdt), 4);
+  if ((FitDataOffset < FdtTotalSize (Fdt)) || (FitDataOffset > FitSize)) {
+    DEBUG ((DEBUG_ERROR, "FIT external-data base 0x%x is invalid\n", FitDataOffset));
+    return EFI_COMPROMISED_DATA;
   }
 
   ImageNode = FdtSubnodeOffsetNameLen (Fdt, 0, "images", (INT32)AsciiStrLen ("images"));
@@ -270,40 +330,81 @@ BuildFitLoadablesFvHob (
     return EFI_NOT_FOUND;
   }
 
-  FvNode = FdtSubnodeOffsetNameLen (Fdt, ImageNode, "tianocore", (INT32)AsciiStrLen ("tianocore"));
-  Depth  = FdtNodeDepth (Fdt, FvNode);
-  FvNode = FdtNextNode (Fdt, FvNode, &Depth);
-  Fvname = FdtGetName (Fdt, FvNode, &TempLen);
-  while ((AsciiStrCmp ((Fvname + AsciiStrLen (Fvname) - 2), "fv") == 0)) {
-    if (FvNode <= 0) {
-      return EFI_NOT_FOUND;
+  for (FvNode = FdtFirstSubnode (Fdt, ImageNode); FvNode >= 0; FvNode = FdtNextSubnode (Fdt, FvNode)) {
+    Fvname = FdtGetName (Fdt, FvNode, &TempLen);
+    if ((Fvname == NULL) || (TempLen <= 0)) {
+      return EFI_COMPROMISED_DATA;
+    }
+
+    FvNameLength = AsciiStrLen (Fvname);
+    if ((FvNameLength < 3) || (AsciiStrCmp (Fvname + FvNameLength - 3, "-fv") != 0)) {
+      continue;
     }
 
     PropertyPtr = FdtGetProperty (Fdt, FvNode, "data-offset", &TempLen);
-    Data32      = (UINT32 *)(PropertyPtr->Data);
-    DataOffset  = SwapBytes32 (*Data32);
+    if ((PropertyPtr == NULL) || (TempLen != sizeof (UINT32))) {
+      DEBUG ((DEBUG_ERROR, "FIT image %a has no valid data-offset\n", Fvname));
+      return EFI_COMPROMISED_DATA;
+    }
+
+    Data32     = (UINT32 *)(PropertyPtr->Data);
+    DataOffset = Fdt32ToCpu (ReadUnaligned32 (Data32));
 
     PropertyPtr = FdtGetProperty (Fdt, FvNode, "data-size", &TempLen);
-    Data32      = (UINT32 *)(PropertyPtr->Data);
-    DataSize    = SwapBytes32 (*Data32);
+    if ((PropertyPtr == NULL) || (TempLen != sizeof (UINT32))) {
+      DEBUG ((DEBUG_ERROR, "FIT image %a has no valid data-size\n", Fvname));
+      return EFI_COMPROMISED_DATA;
+    }
+
+    Data32   = (UINT32 *)(PropertyPtr->Data);
+    DataSize = Fdt32ToCpu (ReadUnaligned32 (Data32));
+    if ((DataOffset > FitSize - FitDataOffset) ||
+        (DataSize < sizeof (EFI_FIRMWARE_VOLUME_HEADER)) ||
+        (DataSize > FitSize - FitDataOffset - DataOffset))
+    {
+      DEBUG ((DEBUG_ERROR, "FIT image %a range 0x%x+0x%x exceeds FIT size 0x%x\n", Fvname, DataOffset, DataSize, FitSize));
+      return EFI_COMPROMISED_DATA;
+    }
+
+    if ((PayloadBase->Entry > MAX_UINTN) ||
+        (PayloadBase->Entry > MAX_UINTN - FitDataOffset) ||
+        (PayloadBase->Entry + FitDataOffset > MAX_UINTN - DataOffset) ||
+        (((PayloadBase->Entry + FitDataOffset + DataOffset) & 7) != 0))
+    {
+      return EFI_COMPROMISED_DATA;
+    }
+
+    FvBase = (UINTN)PayloadBase->Entry + FitDataOffset + DataOffset;
+    if ((((EFI_FIRMWARE_VOLUME_HEADER *)FvBase)->Signature != EFI_FVH_SIGNATURE) ||
+        (((EFI_FIRMWARE_VOLUME_HEADER *)FvBase)->FvLength != DataSize))
+    {
+      DEBUG ((DEBUG_ERROR, "FIT image %a at 0x%08x is not the declared FV\n", Fvname, FvBase));
+      return EFI_COMPROMISED_DATA;
+    }
 
     if (AsciiStrCmp (Fvname, "uefi-fv") == 0) {
-      *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)PayloadBase->Entry + (UINTN)DataOffset);
-      ASSERT ((*DxeFv)->FvLength == DataSize);
+      if (*DxeFv != NULL) {
+        DEBUG ((DEBUG_ERROR, "FIT contains multiple uefi-fv images\n"));
+        return EFI_COMPROMISED_DATA;
+      }
+
+      *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)FvBase;
     } else {
-      BuildFvHob (((UINTN)PayloadBase->Entry + (UINTN)DataOffset), DataSize);
+      BuildFvHob (FvBase, DataSize);
     }
 
     DEBUG ((
       DEBUG_INFO,
       "UPL Multiple fv[%a], Base=0x%08x, size=0x%08x\n",
       Fvname,
-      ((UINTN)PayloadBase->Entry + (UINTN)DataOffset),
+      FvBase,
       DataSize
       ));
-    Depth  = FdtNodeDepth (Fdt, FvNode);
-    FvNode = FdtNextNode (Fdt, FvNode, &Depth);
-    Fvname = FdtGetName (Fdt, FvNode, &TempLen);
+  }
+
+  if (*DxeFv == NULL) {
+    DEBUG ((DEBUG_ERROR, "FIT contains no uefi-fv image\n"));
+    return EFI_NOT_FOUND;
   }
 
   return EFI_SUCCESS;
@@ -419,6 +520,7 @@ FitBuildHobs (
   OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
   )
 {
+  EFI_STATUS                     Status;
   UINT8                          *GuidHob;
   UINT32                         FdtSize;
   EFI_HOB_FIRMWARE_VOLUME        *FvHob;
@@ -469,12 +571,19 @@ FitBuildHobs (
     }
   }
 
+  BuildBootloaderHobs ();
+
   //
   // Create an empty FvHob for the DXE FV that contains DXE core.
   //
   BuildFvHob ((EFI_PHYSICAL_ADDRESS)0, 0);
 
-  BuildFitLoadablesFvHob (DxeFv);
+  Status = BuildFitLoadablesFvHob (DxeFv);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to create FIT FV HOBs: %r\n", Status));
+    return Status;
+  }
+
   //
   // Update DXE FV information to first fv hob in the hob list, which
   // is the empty FvHob created before.
@@ -506,6 +615,11 @@ FitUplEntryPoint (
   VOID              *FdtBase;
  #endif
   VOID  *FdtBaseResvd;
+
+  Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (FixedPcdGetBool (PcdHandOffFdtEnable)) {
     mHobList = (VOID *)NULL;
@@ -543,6 +657,9 @@ FitUplEntryPoint (
 
   // Build HOB based on information from Bootloader
   Status = FitBuildHobs ((UINTN)FdtBaseResvd, &DxeFv);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   // Call constructor for all libraries again since hobs were built
   ProcessLibraryConstructorList ();

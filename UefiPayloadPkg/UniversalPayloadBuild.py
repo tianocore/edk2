@@ -251,7 +251,7 @@ def BuildUniversalPayload(Args):
         fit_image_info_header.SecfvPath     = SecFvOutputDir
         fit_image_info_header.NetworkfvPath = NetworkFvOutputDir
         fit_image_info_header.DataOffset    = 0x1000
-        fit_image_info_header.LoadAddr      = Args.LoadAddress
+        fit_image_info_header.LoadAddr      = Args.LoadAddress + fit_image_info_header.DataOffset
         fit_image_info_header.Project       = 'tianocore'
 
         TargetRebaseFile = fit_image_info_header.Binary.replace (pathlib.Path(fit_image_info_header.Binary).suffix, ".pecoff")
@@ -268,7 +268,7 @@ def BuildUniversalPayload(Args):
             ))
         RunCommand (
             "GenFw --rebase 0x{:02X} -o {} {} ".format (
-              fit_image_info_header.LoadAddr + fit_image_info_header.DataOffset,
+              fit_image_info_header.LoadAddr,
               TargetRebaseFile,
               TargetRebaseFile,
             ))
