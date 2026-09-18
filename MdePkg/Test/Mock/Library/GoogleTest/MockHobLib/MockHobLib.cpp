@@ -30,3 +30,4 @@ MOCK_FUNCTION_DEFINITION (MockHobLib, BuildBspStoreHob, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockHobLib, BuildMemoryAllocationHob, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockHobLib, GetNextMemoryAllocationGuidHob, 2, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockHobLib, TagMemoryAllocationHobWithGuid, 2, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockHobLib, BuildResourceDescriptor2Hob, 6, EFIAPI);
