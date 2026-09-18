@@ -763,7 +763,9 @@ InitializeMpExceptionHandlers (
   //
   // Setup stack switch for Stack Guard feature and separate AP GDTs.
   //
-  InitializeMpExceptionStackSwitchHandlers ();
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    InitializeMpExceptionStackSwitchHandlers ();
+  }
 }
 
 /**
