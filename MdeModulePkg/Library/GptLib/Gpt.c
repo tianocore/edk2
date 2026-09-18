@@ -137,6 +137,7 @@ PartitionSetCrc (
 
 **/
 BOOLEAN
+EFIAPI
 PartitionValidGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
   IN  EFI_DISK_IO_PROTOCOL        *DiskIo,
@@ -291,6 +292,7 @@ PartitionCheckGptEntryArrayCRC (
 
 **/
 BOOLEAN
+EFIAPI
 PartitionRestoreGptTable (
   IN  EFI_BLOCK_IO_PROTOCOL       *BlockIo,
   IN  EFI_DISK_IO_PROTOCOL        *DiskIo,
@@ -393,6 +395,7 @@ Done:
 
 **/
 VOID
+EFIAPI
 PartitionCheckGptEntry (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader,
   IN  EFI_PARTITION_ENTRY         *PartEntry,
