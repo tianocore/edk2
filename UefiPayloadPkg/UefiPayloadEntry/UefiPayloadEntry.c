@@ -37,8 +37,8 @@ EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
 **/
 EFI_STATUS
 MemInfoCallbackMmio (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
   EFI_PHYSICAL_ADDRESS         Base;
@@ -116,8 +116,8 @@ MemInfoCallbackMmio (
 **/
 EFI_STATUS
 FindToludCallback (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
   //
@@ -185,13 +185,13 @@ FindToludCallback (
 **/
 EFI_STATUS
 FindFreeMemForHobCallback (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
-  EFI_STATUS        Status;
-  MEMORY_MAP_ENTRY  MemoryMapEntrySplit;
-  UINTN             *HobMemBase = (UINTN *)Params;
+  EFI_STATUS           Status;
+  BL_MEMORY_MAP_ENTRY  MemoryMapEntrySplit;
+  UINTN                *HobMemBase = (UINTN *)Params;
 
   //
   // Found new base, nothing to do
@@ -284,8 +284,8 @@ FindFreeMemForHobCallback (
 **/
 EFI_STATUS
 MemInfoCallback (
-  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  IN VOID              *Params
+  IN BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID                 *Params
   )
 {
   EFI_PHYSICAL_ADDRESS         Base;
