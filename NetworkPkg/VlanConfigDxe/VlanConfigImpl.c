@@ -113,9 +113,18 @@ VlanExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gVlanConfigFormSetGuid, mVlanStorageName, PrivateData->DriverHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    if (ConfigRequestHdr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      ASSERT (ConfigRequest != NULL);
+      FreePool (ConfigRequestHdr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);
@@ -244,7 +253,11 @@ VlanCallback (
   // Get Browser data
   //
   Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
-  ASSERT (Configuration != NULL);
+  if (Configuration == NULL) {
+    ASSERT (Configuration != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   HiiGetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *)Configuration);
 
   VlanConfig = PrivateData->VlanConfig;
@@ -374,10 +387,16 @@ VlanUpdateForm (
   // Init OpCode Handle
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle == NULL) {
+    ASSERT (StartOpCodeHandle != NULL);
+    return;
+  }
 
   EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
+  if (EndOpCodeHandle == NULL) {
+    ASSERT (EndOpCodeHandle != NULL);
+    return;
+  }
 
   //
   // Create Hii Extend Label OpCode as the start opcode
@@ -431,7 +450,10 @@ VlanUpdateForm (
     *String = 0;
 
     StringId = HiiSetString (PrivateData->HiiHandle, 0, VlanStr, NULL);
-    ASSERT (StringId != 0);
+    if (StringId == 0) {
+      ASSERT (StringId != 0);
+      continue;
+    }
 
     HiiCreateCheckBoxOpCode (
       StartOpCodeHandle,
