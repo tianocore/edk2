@@ -1,0 +1,13 @@
+// /** @file
+// Logo DXE driver that loads the platform logo from a firmware volume file.
+//
+// Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Logo DXE driver that loads the platform logo from a firmware volume file"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Installs EDKII_PLATFORM_LOGO_PROTOCOL by loading a BMP from a FREEFORM FFS file. Set PcdOemLogoEnabled and PcdLogoFile to select the OEM logo."
