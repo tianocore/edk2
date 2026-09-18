@@ -138,6 +138,7 @@ SetBiosVersion (
 {
   CHAR16         *DefaultVersionString;
   CHAR16         *Version;
+  CHAR16         *PcdVersion;
   EFI_STRING_ID  TokenToUpdate;
 
   DefaultVersionString = HiiGetString (
@@ -159,10 +160,10 @@ SetBiosVersion (
               );
 
   if (((StrCmp (Version, DefaultVersionString) == 0) || (StrLen (Version) == 0))) {
-    Version = (CHAR16 *)FixedPcdGetPtr (PcdFirmwareVersionString);
-    if (StrLen (Version) > 0) {
+    PcdVersion = (CHAR16 *)FixedPcdGetPtr (PcdFirmwareVersionString);
+    if ((PcdVersion != NULL) && (StrLen (PcdVersion) > 0)) {
       TokenToUpdate = STRING_TOKEN (STR_MISC_BIOS_VERSION);
-      HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, Version, NULL);
+      HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, PcdVersion, NULL);
     }
   }
 }
