@@ -110,7 +110,10 @@ SockTcpDataToRcv (
   // Get the first socket receive buffer
   //
   RcvBufEntry = SockBufFirst (SockBuffer);
-  ASSERT (RcvBufEntry != NULL);
+  if (RcvBufEntry == NULL) {
+    ASSERT (RcvBufEntry != NULL);
+    return 0;
+  }
 
   TcpRsvData = (TCP_RSV_DATA *)RcvBufEntry->ProtoData;
 
