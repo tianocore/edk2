@@ -155,6 +155,7 @@ def main():
             parser.print_help()
     except Exception as e:
         print(e)
+        status = 1
 
     return status
 
