@@ -89,6 +89,15 @@ typedef struct {
   CHAR16                            *FileType;
   CHOOSE_HANDLER                    ChooseHandler;
   EFI_DEVICE_PATH_PROTOCOL          *RetDevicePath;
+
+  //
+  // Location currently displayed, used to synthesize an "Up one level" entry.
+  // When CurDirPath is NULL the volume (file system) list is being shown and no
+  // "Up" entry is offered.
+  //
+  EFI_HANDLE                        CurDeviceHandle;
+  EFI_FILE_HANDLE                   CurDirHandle;
+  CHAR16                            *CurDirPath;
 } FILE_EXPLORER_CALLBACK_DATA;
 
 #define FILE_EXPLORER_PRIVATE_FROM_THIS(a)  CR (a, FILE_EXPLORER_CALLBACK_DATA, FeConfigAccess, FILE_EXPLORER_CALLBACK_DATA_SIGNATURE)
