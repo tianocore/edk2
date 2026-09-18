@@ -731,60 +731,6 @@ MmConfigurationMmNotify (
 }
 
 /**
-  Migrate MemoryBaseAddress in memory allocation HOBs with BootServiceData
-  type and non-zero GUID name from Boot Service memory to MMRAM.
-
-  @param[in]  HobStart       Pointer to the start of the HOB list.
-
-**/
-VOID
-MigrateMemoryAllocationHobs (
-  IN VOID  *HobStart
-  )
-{
-  EFI_PEI_HOB_POINTERS       Hob;
-  EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob;
-  VOID                       *MemoryInMmram;
-
-  MemoryAllocationHob = NULL;
-  Hob.Raw             = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobStart);
-  while (Hob.Raw != NULL) {
-    MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
-    if (MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) {
-      if (!IsZeroGuid (&MemoryAllocationHob->AllocDescriptor.Name)) {
-        MemoryInMmram = AllocatePages (EFI_SIZE_TO_PAGES (MemoryAllocationHob->AllocDescriptor.MemoryLength));
-        if (MemoryInMmram != NULL) {
-          DEBUG ((
-            DEBUG_INFO,
-            "Migrate Memory Allocation Hob (%g) from %08x to %08p\n",
-            &MemoryAllocationHob->AllocDescriptor.Name,
-            MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress,
-            MemoryInMmram
-            ));
-          CopyMem (
-            MemoryInMmram,
-            (VOID *)(UINTN)MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress,
-            MemoryAllocationHob->AllocDescriptor.MemoryLength
-            );
-          MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)MemoryInMmram;
-          MemoryAllocationHob->AllocDescriptor.MemoryType        = EfiRuntimeServicesData;
-        }
-      } else {
-        DEBUG ((
-          DEBUG_ERROR,
-          "Error - Memory Allocation Hob [%08x, %08x] doesn't have a GUID name specified\n",
-          MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress,
-          MemoryAllocationHob->AllocDescriptor.MemoryLength
-          ));
-      }
-    }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
-  }
-}
-
-/**
   This function is responsible for validating the input HOB list and
   initializing a new HOB list in MMRAM based on the input HOB list.
 
@@ -855,8 +801,6 @@ InitializeMmHobList (
   DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
   Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
   ASSERT_EFI_ERROR (Status);
-
-  MigrateMemoryAllocationHobs (MmHobStart);
 
   return MmHobStart;
 }
