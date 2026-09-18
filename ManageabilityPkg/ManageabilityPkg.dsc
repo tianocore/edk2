@@ -27,6 +27,7 @@
   #
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiEnable              |TRUE
   gManageabilityPkgTokenSpaceGuid.PcdManageabilitySmmIpmiEnable              |TRUE
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityStandaloneMmIpmiEnable     |TRUE
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiEnable              |TRUE
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmEnable              |TRUE
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeMctpEnable              |TRUE
@@ -105,6 +106,12 @@
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
+
+[LibraryClasses.common.MM_STANDALONE]
+  ManageabilityTransportLib|ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf
+  MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
+  MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+  StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   S3BootScriptLib|MdePkg/Library/BaseS3BootScriptLibNull/BaseS3BootScriptLibNull.inf
