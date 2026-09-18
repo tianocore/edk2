@@ -97,6 +97,7 @@
   PcdLib
   ImagePropertiesRecordLib
   OrderedCollectionLib
+  HobPrintLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## PRODUCES             ## Event
