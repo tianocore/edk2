@@ -780,47 +780,94 @@ SetEventCompleteSvcArgs (
   if (CommProtocol == CommProtocolFfa) {
     FfaMsgInfo = CommData;
 
-    if (EFI_ERROR (Status)) {
-      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_ERROR;
-
+    /*
+     * Once StandaloneMm is entered via FFA_SEND_DIRECT_MSG/MSGv2, it must
+     * return via FFA_SEND_DIRECT_RESP/RESPv2.
+     *
+     * For ServiceTypeMmCommunication, protocol errors are returned through
+     * the communication buffer, so the handler itself should return
+     * EFI_SUCCESS (See the MmiMange()). There are, however, a few failure
+     * cases outside the handler, such as when no matching service handler
+     * is found. In such cases, FFA_SEND_DIRECT_RESP/RESPv2 can be
+     * constructed as follows:
+     *
+     *  - FFA_SEND_DIRECT_RESP:
+     *    x0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP
+     *    x1 = Source/Dest Partition Id.
+     *    x2 = 0x00
+     *    x3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE
+     *    x4 = ARM_SPM_MM_RET_*
+     *
+     *  - FFA_SEND_DIRECT_RESPv2:
+     *    x0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP
+     *    x1 = Source/Dest Partition Id.
+     *    x2 = 0x00 (SBZ)
+     *    x3 = 0x00 (SBZ)
+     *    x4 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE
+     *    x5 = ARM_SPM_MM_RET_*
+     *
+     * For ServiceTypeMisc, however, the response, including any protocol
+     * error code and arguments, is returned directly through FfaArgs.
+     * Therefore, the handler is responsible for constructing FfaArgs and
+     * should return EFI_SUCCESS.
+     *
+     * The SPMC does not forward requests for unknown services to StandaloneMm,
+     * and StandaloneMm is not initialized if any service handler fails to
+     * register. Therefore, a failure reported by a ServiceTypeMisc handler
+     * is unexpected.
+     *
+     * In such a case, there is no generic way to construct FfaArgs for
+     * FFA_SEND_DIRECT_RESP/RESPv2. Call CpuDeadLoop() rather than returning
+     * an invalid response.
+     */
+    if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
       /*
-       * StandaloneMm is secure instance. So set as 0x00.
+       * DirectMsgV1 is only used for ServiceTypeMmCommunication
        */
-      EventCompleteSvcArgs->Arg1 = 0x00;
-      EventCompleteSvcArgs->Arg2 = EfiStatusToFfaStatus (Status);
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
+      EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+      EventCompleteSvcArgs->Arg4 = EfiStatusToSpmMmStatus (Status);
     } else {
-      if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
-        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
-        EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
-      } else {
-        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
 
-        if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
-          EventCompleteSvcArgs->Arg4  = mMiscMmCommunicateBuffer->FfaArgs.Arg4;
-          EventCompleteSvcArgs->Arg5  = mMiscMmCommunicateBuffer->FfaArgs.Arg5;
-          EventCompleteSvcArgs->Arg6  = mMiscMmCommunicateBuffer->FfaArgs.Arg6;
-          EventCompleteSvcArgs->Arg7  = mMiscMmCommunicateBuffer->FfaArgs.Arg7;
-          EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->FfaArgs.Arg8;
-          EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->FfaArgs.Arg9;
-          EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->FfaArgs.Arg10;
-          EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->FfaArgs.Arg11;
-          EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->FfaArgs.Arg12;
-          EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->FfaArgs.Arg13;
-          EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->FfaArgs.Arg14;
-          EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->FfaArgs.Arg15;
-          EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->FfaArgs.Arg16;
-          EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->FfaArgs.Arg17;
+      if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
+        /*
+         * See above comment.
+         */
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Error: ServiceTypeMisc, Status: %r\n", Status));
+          ASSERT (0);
+          CpuDeadLoop ();
         }
-      }
 
-      /*
-       * Swap source & dest partition id.
-       */
-      EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
-                                     FfaMsgInfo->DestPartId,
-                                     FfaMsgInfo->SourcePartId
-                                     );
+        EventCompleteSvcArgs->Arg4  = mMiscMmCommunicateBuffer->FfaArgs.Arg4;
+        EventCompleteSvcArgs->Arg5  = mMiscMmCommunicateBuffer->FfaArgs.Arg5;
+        EventCompleteSvcArgs->Arg6  = mMiscMmCommunicateBuffer->FfaArgs.Arg6;
+        EventCompleteSvcArgs->Arg7  = mMiscMmCommunicateBuffer->FfaArgs.Arg7;
+        EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->FfaArgs.Arg8;
+        EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->FfaArgs.Arg9;
+        EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->FfaArgs.Arg10;
+        EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->FfaArgs.Arg11;
+        EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->FfaArgs.Arg12;
+        EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->FfaArgs.Arg13;
+        EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->FfaArgs.Arg14;
+        EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->FfaArgs.Arg15;
+        EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->FfaArgs.Arg16;
+        EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->FfaArgs.Arg17;
+      } else {
+        // ServiceTypeMmCommunication
+        EventCompleteSvcArgs->Arg4 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+        EventCompleteSvcArgs->Arg5 = EfiStatusToSpmMmStatus (Status);
+      }
     }
+
+    /*
+     * Swap source & dest partition id.
+     */
+    EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
+                                   FfaMsgInfo->DestPartId,
+                                   FfaMsgInfo->SourcePartId
+                                   );
   } else {
     EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
