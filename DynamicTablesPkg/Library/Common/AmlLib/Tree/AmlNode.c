@@ -65,9 +65,6 @@ AmlDeleteRootNode (
 
   if ((RootNode->SdtHeader != NULL)) {
     FreePool (RootNode->SdtHeader);
-  } else {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
   }
 
   FreePool (RootNode);
