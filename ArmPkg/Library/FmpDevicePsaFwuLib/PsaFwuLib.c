@@ -458,7 +458,7 @@ FwuDiscovery (
    *        |                                                 |
    *        |<------------------------------------------------|
    *                         fwu_status with
-   *                       (fwu discoery info)
+   *                       (fwu discovery info)
    *                    (See PSA-FWU spec 3.4.2.1)
    */
   Status = FwuCommunicate (
