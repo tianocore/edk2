@@ -81,6 +81,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApSipiResendIntervalInMicroSeconds  ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                   ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi            ## CONSUMES
