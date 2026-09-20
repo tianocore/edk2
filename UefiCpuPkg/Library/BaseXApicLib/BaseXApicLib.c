@@ -525,6 +525,37 @@ SendStartupIpiAllExcludingSelf (
 }
 
 /**
+  Send a Start-up IPI to a specified target processor.
+
+  This function returns after the IPI has been accepted by the target processor.
+
+  if StartupRoutine >= 1M, then ASSERT.
+  if StartupRoutine is not multiple of 4K, then ASSERT.
+
+  @param  ApicId          Specify the local APIC ID of the target processor.
+  @param  StartupRoutine  Points to a start-up routine which is below 1M physical
+                          address and 4K aligned.
+**/
+VOID
+EFIAPI
+SendStartupIpi (
+  IN UINT32  ApicId,
+  IN UINT32  StartupRoutine
+  )
+{
+  LOCAL_APIC_ICR_LOW  IcrLow;
+
+  ASSERT (StartupRoutine < 0x100000);
+  ASSERT ((StartupRoutine & 0xfff) == 0);
+
+  IcrLow.Uint32            = 0;
+  IcrLow.Bits.Vector       = (StartupRoutine >> 12);
+  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;
+  IcrLow.Bits.Level        = 1;
+  SendIpi (IcrLow.Uint32, ApicId);
+}
+
+/**
   Send an INIT-Start-up-Start-up IPI sequence to a specified target processor.
 
   This function returns after the IPI has been accepted by the target processor.
@@ -543,21 +574,12 @@ SendInitSipiSipi (
   IN UINT32  StartupRoutine
   )
 {
-  LOCAL_APIC_ICR_LOW  IcrLow;
-
-  ASSERT (StartupRoutine < 0x100000);
-  ASSERT ((StartupRoutine & 0xfff) == 0);
-
   SendInitIpi (ApicId);
   MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
-  IcrLow.Uint32            = 0;
-  IcrLow.Bits.Vector       = (StartupRoutine >> 12);
-  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;
-  IcrLow.Bits.Level        = 1;
-  SendIpi (IcrLow.Uint32, ApicId);
+  SendStartupIpi (ApicId, StartupRoutine);
   if (!StandardSignatureIsAuthenticAMD ()) {
     MicroSecondDelay (200);
-    SendIpi (IcrLow.Uint32, ApicId);
+    SendStartupIpi (ApicId, StartupRoutine);
   }
 }
 
