@@ -43,6 +43,7 @@
 #include "MpHandOff.h"
 
 #define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
+
 //
 // To trigger the start-up signal, BSP writes the specified
 // StartupSignalValue to the StartupSignalAddress of each processor.
@@ -754,6 +755,44 @@ CheckAllAPs (
 VOID
 CheckAndUpdateApsStatus (
   VOID
+  );
+
+/**
+  Calculate timeout value and return the current performance counter value.
+
+  @param[in]  TimeoutInMicroseconds   Timeout value in microseconds.
+  @param[out] CurrentTime             Returns the current value of the performance counter.
+
+  @return Expected time stamp counter for timeout.
+          If TimeoutInMicroseconds is 0, return value is also 0, which is recognized
+          as infinity.
+**/
+UINT64
+CalculateTimeout (
+  IN  UINTN   TimeoutInMicroseconds,
+  OUT UINT64  *CurrentTime
+  );
+
+/**
+  Checks whether timeout expires.
+
+  @param[in, out]  PreviousTime   On input, the value of the performance counter
+                                  when it was last read.
+                                  On output, the current value of the performance
+                                  counter
+  @param[in]       TotalTime      The total amount of elapsed time in performance
+                                  counter ticks.
+  @param[in]       Timeout        The number of performance counter ticks required
+                                  to reach a timeout condition.
+
+  @retval TRUE                    A timeout condition has been reached.
+  @retval FALSE                   A timeout condition has not been reached.
+**/
+BOOLEAN
+CheckTimeout (
+  IN OUT UINT64  *PreviousTime,
+  IN     UINT64  *TotalTime,
+  IN     UINT64  Timeout
   );
 
 /**

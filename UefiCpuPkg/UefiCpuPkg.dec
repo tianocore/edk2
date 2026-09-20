@@ -406,6 +406,14 @@
   #  The value is defined as below.<BR><BR>
   # @Prompt The specified AP target C-state for Mwait.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate|0|UINT8|0x00000007
+  ## Specifies the interval in microseconds after which the BSP resends the
+  #  Start-up IPI to an AP that has not yet started. A hypervisor can drop
+  #  the Start-up IPI of an INIT-SIPI-SIPI sequence, leaving the AP in
+  #  wait-for-SIPI. A Start-up IPI is ignored by an AP that has already
+  #  started, so the resend is harmless to an AP that is merely slow.
+  #  0 disables the resend.
+  # @Prompt Interval for the BSP to resend the Start-up IPI to an AP.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApSipiResendIntervalInMicroSeconds|10000|UINT32|0x60000023
 
   ## Specifies the 1st timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM.
   # @Prompt The 1st BSP/AP synchronization timeout value in SMM.
