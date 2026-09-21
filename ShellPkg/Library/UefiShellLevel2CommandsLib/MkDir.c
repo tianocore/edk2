@@ -34,15 +34,6 @@ MainCmdMkdir (
   SaveSplitChar  = CHAR_NULL;
 
   //
-
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  }
-
-  //
   // create a set of directories
   //
   if (ShellCommandLineGetRawValue (Package, 1) == NULL) {

@@ -56,13 +56,7 @@ MainCmdSet (
 
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
+  if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
     return SHELL_INVALID_PARAMETER;
   } else if ((ShellCommandLineGetRawValue (Package, 1) != NULL) && ShellCommandLineGetFlag (Package, L"-d")) {
