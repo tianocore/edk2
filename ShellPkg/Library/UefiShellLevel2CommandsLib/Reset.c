@@ -36,13 +36,7 @@ MainCmdReset (
 
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+  if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
     return SHELL_INVALID_PARAMETER;
   }

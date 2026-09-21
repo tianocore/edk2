@@ -122,6 +122,7 @@ SetupTPMResources (
   //
   // Empty TpmBaseSize indicates no TPM found.
   //
+  TpmBase     = 0;
   TpmBaseSize = 0;
 
   //

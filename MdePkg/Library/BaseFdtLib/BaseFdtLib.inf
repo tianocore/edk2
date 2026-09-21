@@ -25,7 +25,6 @@
 
 [Sources]
   FdtLib.c
-  LibFdtWrapper.c
   # header Wrapper files
   limits.h
   stdbool.h

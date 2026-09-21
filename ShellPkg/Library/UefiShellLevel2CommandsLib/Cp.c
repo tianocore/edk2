@@ -674,13 +674,6 @@ MainCmdCp (
   FileList    = NULL;
 
   //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
-  //
   // Initialize SilentMode and RecursiveMode
   //
   if (gEfiShellProtocol->BatchIsActive ()) {

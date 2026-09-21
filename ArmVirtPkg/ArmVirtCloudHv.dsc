@@ -88,6 +88,11 @@
   # Rsdp base address in Cloud Hypervisor
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x40200000
 
+  # Smbios base address in Cloud Hypervisor. Must match the aarch64 SMBIOS
+  # staging address used by cloud-hypervisor
+  # ABI between cloud-hypervisor and firmware.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCloudHvSmbiosBaseAddress|0x403F0000
+
   #
   # ARM PrimeCell
   #
@@ -139,6 +144,20 @@
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
 
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
+
+  # ArmVirtCloudHv is by construction the Cloud Hypervisor platform. On X64
+  # this PCD is discovered at runtime by OvmfPkg/PlatformPei probing the host
+  # bridge.  As there is no such probe on aarch64, define it statically.
+  # OvmfPkg/SmbiosPlatformDxe uses this bridge device id.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0x0D57
+
+  #
+  # SMBIOS entry point version. Follow ArmVirtQemu rather than the X64
+  # CloudHv platform: OvmfPkg/CloudHv/CloudHvX64.dsc pins 0x0208 for
+  # pre-2015 x86 guests. AArch64 does not have such a concern.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0300
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
 
 [PcdsDynamicHii]
   gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gOvmfVariableGuid|0x0|FALSE|NV,BS
@@ -192,6 +211,12 @@
   # PCI support
   #
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+
+  #
+  # SMBIOS Support
+  #
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # ACPI Support
