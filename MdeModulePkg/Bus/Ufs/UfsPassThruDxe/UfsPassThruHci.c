@@ -1549,27 +1549,35 @@ UfsExecScsiCmds (
     goto Exit1;
   }
 
-  //
-  // Insert the async SCSI cmd to the Async I/O list
-  //
   if (Event != NULL) {
+    //
+    // Insert the async SCSI cmd to the Async I/O list and start it as one
+    // step. ProcessAsyncTaskList() runs from a timer at TPL_NOTIFY and takes a
+    // cleared doorbell bit of a queued request as its completion. If it could
+    // run between the insertion and the doorbell write it would find the bit
+    // still clear, complete the request, unmap its buffers and free TransReq,
+    // and the doorbell would then be rung for buffers that are no longer
+    // mapped.
+    //
+    // TransReq belongs to ProcessAsyncTaskList() once the TPL is restored, so
+    // it is not touched after that.
+    //
     OldTpl                = gBS->RaiseTPL (TPL_NOTIFY);
     TransReq->CallerEvent = Event;
     InsertTailList (&Private->Queue, &TransReq->TransferList);
+    UfsStartExecCmd (Private, TransReq->Slot);
     gBS->RestoreTPL (OldTpl);
+
+    //
+    // Immediately return for async I/O.
+    //
+    return EFI_SUCCESS;
   }
 
   //
   // Start to execute the transfer request.
   //
   UfsStartExecCmd (Private, TransReq->Slot);
-
-  //
-  // Immediately return for async I/O.
-  //
-  if (Event != NULL) {
-    return EFI_SUCCESS;
-  }
 
   //
   // Wait for the completion of the transfer request.
