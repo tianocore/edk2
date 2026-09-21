@@ -2343,8 +2343,13 @@ ProcessAsyncTaskList (
 
       if ((Value & (BIT0 << TransReq->Slot)) != 0) {
         //
-        // Scsi cmd not finished yet.
+        // Scsi cmd not finished yet. A Timeout of zero means wait
+        // indefinitely, as it does for a blocking request.
         //
+        if (Packet->Timeout == 0) {
+          continue;
+        }
+
         if (TransReq->TimeoutRemain > UFS_HC_ASYNC_TIMER) {
           TransReq->TimeoutRemain -= UFS_HC_ASYNC_TIMER;
           continue;
