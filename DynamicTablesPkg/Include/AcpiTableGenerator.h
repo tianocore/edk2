@@ -94,6 +94,11 @@ The Dynamic Tables Framework implements the following ACPI table generators:
   - MSCT  : The MSCT (Maximum System Characteristics Table) generator collates
             the Maximum System Characteristics information from the
             Configuration Manager and builds the MSCT table.
+  - BERT  : The BERT generator collates the boot error region information from
+            the Configuration Manager and builds the BERT table.
+  - ERST  : The ERST generator collates the error record serialization
+            instructions from the Configuration Manager and builds the ERST
+            table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -138,6 +143,8 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdHmat,                          ///< HMAT Generator
   EStdAcpiTableIdApmt,                          ///< APMT Generator
   EStdAcpiTableIdMsct,                          ///< MSCT Generator
+  EStdAcpiTableIdBert,                          ///< BERT Generator
+  EStdAcpiTableIdErst,                          ///< ERST Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

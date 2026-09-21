@@ -1,6 +1,6 @@
 ## @file
-#  Produce the Capsule Update Policy Protocol using the services of the Capsule
-#  Update Policy Library.
+#  Produce the Capsule Update Policy Protocol (EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL) using
+#  the services of the Capsule Update Policy Library.
 #
 #  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 #
