@@ -830,23 +830,18 @@ UpdateStackHob (
 
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
-    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
+    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name)) &&
+        (Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress != BaseAddress))
+    {
       //
-      // Build a new memory allocation HOB with old stack info with EfiBootServicesData type. Need to
-      // avoid this region be reclaimed by DXE core as the IDT built in SEC might be on stack, and some
-      // PEIMs may also keep key information on stack
+      // Convert this stack HOB with the old stack info into a regular memory allocation HOB. We need to
+      // avoid this region being reclaimed by DXE core as the IDT built in SEC might be on the stack, and some
+      // PEIMs may also keep key information on the stack.
       //
-      BuildMemoryAllocationHob (
-        Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress,
-        Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength,
-        EfiBootServicesData
-        );
-      //
-      // Update the BSP Stack Hob to reflect the new stack info.
-      //
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress = BaseAddress;
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength      = Length;
-      break;
+      ZeroMem (&(Hob.MemoryAllocationStack->AllocDescriptor.Name), sizeof (EFI_GUID));
+    } else if ((Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == BaseAddress) && (Hob.MemoryAllocation->AllocDescriptor.MemoryLength == Length)) {
+      // Find the memory allocation HOB that matches the new stack location and mark it as the stack HOB.
+      CopyGuid (&(Hob.MemoryAllocation->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
     }
 
     Hob.Raw = GET_NEXT_HOB (Hob);

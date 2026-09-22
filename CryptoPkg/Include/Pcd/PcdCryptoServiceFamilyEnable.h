@@ -126,6 +126,8 @@ typedef struct {
       UINT8    AuthenticodeVerify         : 1;
       UINT8    ImageTimestampVerify       : 1;
       UINT8    Pkcs1v2Decrypt             : 1;
+      UINT8    Pkcs7Encrypt               : 1;
+      UINT8    Pkcs7Decrypt               : 1;
     } Services;
     UINT32    Family;
   } Pkcs;

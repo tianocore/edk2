@@ -88,10 +88,6 @@ SHELL_PARAM_ITEM  mIfConfig6CheckList[] = {
     TypeValue
   },
   {
-    L"-?",
-    TypeFlag
-  },
-  {
     NULL,
     TypeMax
   },
@@ -1800,7 +1796,7 @@ ShellCommandRunIfconfig6 (
   // To handle no option.
   //
   if (!ShellCommandLineGetFlag (ParamPackage, L"-r") && !ShellCommandLineGetFlag (ParamPackage, L"-s") &&
-      !ShellCommandLineGetFlag (ParamPackage, L"-?") && !ShellCommandLineGetFlag (ParamPackage, L"-l"))
+      !ShellCommandLineGetFlag (ParamPackage, L"-l"))
   {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_LACK_OPTION), gShellNetwork2HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
@@ -1812,10 +1808,7 @@ ShellCommandRunIfconfig6 (
   //
   if (((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-s"))) ||
       ((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-l")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))))
+      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))))
   {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_CONFLICT_OPTIONS), gShellNetwork2HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;

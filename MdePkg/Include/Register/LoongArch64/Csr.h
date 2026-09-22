@@ -69,12 +69,14 @@
 ///
 /// Page table property definitions
 ///
-#define PAGE_VALID_SHIFT   0
-#define PAGE_DIRTY_SHIFT   1
-#define PAGE_PLV_SHIFT     2  // 2~3, two bits
-#define CACHE_SHIFT        4  // 4~5, two bits
-#define PAGE_GLOBAL_SHIFT  6
-#define PAGE_HUGE_SHIFT    6  // HUGE is a PMD bit
+#define PAGE_VALID_SHIFT    0
+#define PAGE_DIRTY_SHIFT    1
+#define PAGE_PLV_SHIFT      2  // 2~3, two bits
+#define CACHE_SHIFT         4  // 4~5, two bits
+#define PAGE_GLOBAL_SHIFT   6
+#define PAGE_HUGE_SHIFT     6  // HUGE is a PMD bit
+#define PAGE_PRESENT_SHIFT  7
+#define PAGE_WRITE_SHIFT    8
 
 #define PAGE_HGLOBAL_SHIFT  12 // HGlobal is a PMD bit
 #define PAGE_PFN_SHIFT      12
@@ -91,6 +93,8 @@
 #define PAGE_PLV      ((UINTN)(3) << PAGE_PLV_SHIFT)
 #define PAGE_GLOBAL   ((UINTN)(1) << PAGE_GLOBAL_SHIFT)
 #define PAGE_HUGE     ((UINTN)(1) << PAGE_HUGE_SHIFT)
+#define PAGE_PRESENT  ((UINTN)(1) << PAGE_PRESENT_SHIFT)
+#define PAGE_WRITE    ((UINTN)(1) << PAGE_WRITE_SHIFT)
 #define PAGE_HGLOBAL  ((UINTN)(1) << PAGE_HGLOBAL_SHIFT)
 #define PAGE_NO_READ  ((UINTN)(1) << PAGE_NO_READ_SHIFT)
 #define PAGE_NO_EXEC  ((UINTN)(1) << PAGE_NO_EXEC_SHIFT)

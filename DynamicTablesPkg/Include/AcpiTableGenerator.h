@@ -60,18 +60,18 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT Serial generator collates the Serial port information
             from the Configuration Manager and patches the SSDT Serial Port
             template to build the SSDT Serial port table.
-  - SSDT CMN-600:
-            The SSDT CMN-600 generator collates the CMN-600 information
-            from the Configuration Manager and patches the SSDT CMN-600
-            template to build the SSDT CMN-600 table.
+  - SSDT CMN:
+            The SSDT CMN generator collates the CMN information
+            from the Configuration Manager and patches the SSDT CMN
+            template to build the SSDT CMN table.
   - SSDT Cpu-Topology:
             The SSDT Cpu-Topology generator collates the cpu and LPI
             information from the Configuration Manager and generates a
             SSDT table describing the CPU hierarchy.
-  - SSDT DMC-620 PMU:
-            The SSDT DMC620 PMU generator collates the PMU specific information
+  - SSDT DMC PMU:
+            The SSDT DMC PMU generator collates the PMU specific information
             from the Configuration Manager and uses the Dynamic AML CodeGen
-            API's to build the SSDT DMC620 PMU table.
+            API's to build the SSDT DMC PMU table.
   - SSDT Pci-Express:
             The SSDT Pci Express generator collates the Pci Express
             information from the Configuration Manager and generates a
@@ -91,6 +91,14 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             Configuration Manager and builds the HEST table.
   - EINJ  : The EINJ generator collates the required platform information from
             the Configuration Manager and builds the EINJ table.
+  - MSCT  : The MSCT (Maximum System Characteristics Table) generator collates
+            the Maximum System Characteristics information from the
+            Configuration Manager and builds the MSCT table.
+  - BERT  : The BERT generator collates the boot error region information from
+            the Configuration Manager and builds the BERT table.
+  - ERST  : The ERST generator collates the error record serialization
+            instructions from the Configuration Manager and builds the ERST
+            table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -115,7 +123,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdPptt,                          ///< PPTT Generator
   EStdAcpiTableIdSrat,                          ///< SRAT Generator
   EStdAcpiTableIdSsdtSerialPort,                ///< SSDT Serial-Port Generator
-  EStdAcpiTableIdSsdtCmn600,                    ///< SSDT Cmn-600 Generator
+  EStdAcpiTableIdSsdtCmn,                       ///< SSDT Cmn Generator
   EStdAcpiTableIdSsdtCpuTopology,               ///< SSDT Cpu Topology
   EStdAcpiTableIdSsdtPciExpress,                ///< SSDT Pci Express Generator
   EStdAcpiTableIdSsdtPlicAplic,                 ///< SSDT Plic/Aplic Generator
@@ -129,10 +137,14 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdCedt,                          ///< CEDT Generator
   EStdAcpiTableIdSlit,                          ///< SLIT Generator
   EStdAcpiTableIdRhct,                          ///< RHCT Generator
-  EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
+  EStdAcpiTableIdSsdtDmcPmu,                    ///< SSDT DMC PMU Generator
   EStdAcpiTableIdHest,                          ///< Hest Generator
   EStdAcpiTableIdEinj,                          ///< EINJ Generator
   EStdAcpiTableIdHmat,                          ///< HMAT Generator
+  EStdAcpiTableIdApmt,                          ///< APMT Generator
+  EStdAcpiTableIdMsct,                          ///< MSCT Generator
+  EStdAcpiTableIdBert,                          ///< BERT Generator
+  EStdAcpiTableIdErst,                          ///< ERST Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

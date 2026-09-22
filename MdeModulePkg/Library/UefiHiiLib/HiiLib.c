@@ -2927,7 +2927,6 @@ HiiGetBrowserData (
   //
   ResultsData = InternalHiiBrowserCallback (VariableGuid, VariableName, NULL);
   if (ResultsData == NULL) {
-    ASSERT (ResultsData != NULL);
     return FALSE;
   }
 

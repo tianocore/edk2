@@ -73,6 +73,7 @@
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
 
 [Depex]
   TRUE

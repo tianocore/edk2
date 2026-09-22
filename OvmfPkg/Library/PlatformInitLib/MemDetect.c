@@ -815,7 +815,7 @@ PlatformDynamicMmioWindow (
   UINT64  AddrSpace, MmioSpace;
 
   AddrSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
-  MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 3);
+  MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 2);
 
   if (PlatformInfoHob->PcdPciMmio64Override) {
     DEBUG ((DEBUG_INFO, "%a: using fwcfg override for mmio window\n", __func__));

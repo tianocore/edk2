@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -47,14 +47,19 @@ typedef enum ArmObjectID {
   EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
   EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
-  EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
+  EArmObjCmnInfo,                                              ///< 20 - CMN Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
-  EArmObjDmc620PmuSocketInfo,                                  ///< 24 - DMC620 Socket Info
-  EArmObjDmc620PmuRegInfo,                                     ///< 25 - DMC620 PMU Reg Info
+  EArmObjDmcPmuSocketInfo,                                     ///< 24 - DMC Socket Info
+  EArmObjDmcPmuRegInfo,                                        ///< 25 - DMC PMU Reg Info
   EArmObjProcessorSpecificBlockInfo,                           ///< 26 - Processor Specific Block.
   EArmObjProcessorSpecificSubDataArchInfo,                     ///< 27 - Processor Specific Sub Data (ArchData)
+  EArmObjCoresightPmuInfo,                                     ///< 28 - Coresight PMU Info
+  EArmObjGicIrsInfo,                                           ///< 29 - GIC IRS Info
+  EArmObjGicItsV5Info,                                         ///< 30 - GIC ITS v5 Info
+  EArmObjGicItsV5TranslateFrameInfo,                           ///< 31 - GIC ITS v5 Translate Frame Info
+  EArmObjGicIwbInfo,                                           ///< 34 - GIC IWB Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -205,6 +210,16 @@ typedef struct CmArmGicCInfo {
         CM_ARM_GICC_INFO.ClockDomain
   */
   CM_OBJECT_TOKEN    ClockDomainToken;
+
+  /** GICv5 Interrupt Controller processor affinity ID.
+      This must be 0 for pre-v5 GIC.
+  */
+  UINT16             IAffId;
+
+  /** The ID of the IRS that this processor is connected to.
+      This must be CM_NULL_TOKEN for pre-v5 GIC.
+  */
+  CM_OBJECT_TOKEN    IrsToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -621,7 +636,7 @@ typedef struct CmArmPmcgNode {
     ID: EArmObjGicItsIdentifierArray
 */
 typedef struct CmArmGicItsIdentifier {
-  /// The ITS Identifier
+  /// The ITS Identifier or ITS Translate Id (GicV5)
   UINT32    ItsId;
 } CM_ARM_ITS_IDENTIFIER;
 
@@ -662,66 +677,77 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
-/** A structure that describes the CMN-600 hardware.
+/** CMN implementation types. */
+typedef enum ArmCmnType {
+  ArmCmnType600,
+  ArmCmnType650,
+  ArmCmnType700,
+  ArmCmnTypeS3,
+  ArmCmnTypeMax
+} ARM_CMN_TYPE;
 
-    ID: EArmObjCmn600Info
+/** A structure that describes CMN hardware.
+
+    ID: EArmObjCmnInfo
 */
-typedef struct CmArmCmn600Info {
+typedef struct CmArmCmnInfo {
   /// The PERIPHBASE address.
   /// Corresponds to the Configuration Node Region (CFGR) base address.
-  UINT64    PeriphBaseAddress;
+  UINT64                       PeriphBaseAddress;
 
   /// The PERIPHBASE address length.
   /// Corresponds to the CFGR base address length.
-  UINT64    PeriphBaseAddressLength;
+  UINT64                       PeriphBaseAddressLength;
 
   /// The ROOTNODEBASE address.
   /// Corresponds to the Root node (ROOT) base address.
-  UINT64    RootNodeBaseAddress;
+  /// Required only for CMN-600; must be zero for other CMN types.
+  UINT64                       RootNodeBaseAddress;
 
-  /// The Debug and Trace Logic Controller (DTC) count.
-  /// CMN-600 can have maximum 4 DTCs.
-  UINT8     DtcCount;
+  /// Number of Debug and Trace Logic Controller interrupts.
+  /// A maximum of four DTC interrupts can be described.
+  UINT8                        DtcCount;
 
-  /// DTC Interrupt list.
-  /// The first interrupt resource descriptor pertains to
-  /// DTC[0], the second to DTC[1] and so on.
-  /// DtcCount determines the number of DTC Interrupts that
-  /// are populated. If DTC count is 2 then DtcInterrupt[2]
-  /// and DtcInterrupt[3] are ignored.
-  /// Note: The size of CM_ARM_CMN_600_INFO structure remains
-  /// constant and does not vary with the DTC count.
+  /// DTC interrupt descriptors.
+  /// Entries must be ordered by increasing hardware-assigned DTC Logical ID.
+  /// DtcCount determines the number of valid entries.
   CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
-} CM_ARM_CMN_600_INFO;
 
-/** A structure that describes the DMC620 PMU hardware
+  /// CMN implementation type.
+  ARM_CMN_TYPE                 CmnType;
+
+  /// Length of the optional root-node region. Zero means no ROOT resource.
+  UINT64                       RootNodeBaseAddressLength;
+} CM_ARM_CMN_INFO;
+
+/** A structure that describes the DMC PMU hardware
     registers and interrupt.
 
-    ID: EArmObjDmc620PmuRegInfo
+    ID: EArmObjDmcPmuRegInfo
 */
-typedef struct CmArmDmc620PmuRegInfo {
-  /// The Base address of PMU register space in the DMC620 device.
+typedef struct CmArmDmcPmuRegInfo {
+  /// The Base address of PMU register space in the DMC device.
   UINT64                       BaseAddress;
 
-  /// Length of the DMC620 PMU registers
+  /// Length of the DMC PMU registers
   UINT64                       Length;
 
-  /// The DMC620 PMU interrupt descriptor
+  /// The DMC PMU interrupt descriptor
   CM_ARM_EXTENDED_INTERRUPT    PmuIntr;
-} CM_ARM_DMC620_PMU_REG_INFO;
+} CM_ARM_DMC_PMU_REG_INFO;
 
-/** A structure that describes the DMC620 PMU hardware
+/** A structure that describes the DMC PMU hardware
     on a socket.
 
-    ID: EArmObjDmc620PmuSocketInfo
+    ID: EArmObjDmcPmuSocketInfo
 */
-typedef struct CmArmDmc620PmuSocketInfo {
+typedef struct CmArmDmcPmuSocketInfo {
   /// Number of devices on this socket
   UINT8              NumDevices;
 
-  /// Array of DMC620 PMU devices on this socket
-  CM_OBJECT_TOKEN    Dmc620PmuRegInfoToken;
-} CM_ARM_DMC620_INFO;
+  /// Array of DMC PMU devices on this socket
+  CM_OBJECT_TOKEN    DmcPmuRegInfoToken;
+} CM_ARM_DMC_INFO;
 
 /** A structure that describes the
     RMR node for the Platform.
@@ -872,5 +898,161 @@ typedef struct CmArmProcessorSpecificSubDataArchInfo {
   /// Value of ID_AA64ZFR0_EL1.
   UINT64    IdAA64Zfr0;
 } CM_ARM_PROCESSOR_SPECIFIC_SUB_DATA_ARCH_INFO;
+
+/** A structure that describes Coresight PMU information.
+
+    ID: EArmObjCoresightPmuInfo
+*/
+typedef struct CmArmCoresightPmuInfo {
+  /// Node Flags.
+  UINT8              Flags;
+
+  /// Node Type.
+  UINT16             Type;
+
+  /// Unique identifier for this node.
+  UINT32             Identifier;
+
+  /// Base address of Page 0 of the PMU.
+  UINT64             BaseAddress0;
+
+  ///
+  /// Base address of Page 1 of the PMU if the PMU
+  /// implements the dual-page extension otherwise 0.
+  ///
+  UINT64             BaseAddress1;
+
+  /// Overflow Interrupt.
+  UINT32             OverflowInterrupt;
+
+  /// Overflow Interrupt Flags.
+  UINT32             OverflowInterruptFlags;
+
+  /// Proc node token for processor affinity
+  CM_OBJECT_TOKEN    ProcNodeToken;
+
+  ///
+  /// Token pointing to the monitored device.
+  /// The Token is evaluated in regards to the node Type and might resolve
+  /// to a CM Object such as CPU cache, Smmu and etc.
+  ///
+  CM_OBJECT_TOKEN    TypeInstanceToken;
+
+  ///
+  /// This is valid when type is EFI_ACPI_APMT_NODE_TYPE_ACPI_DEVICE only.
+  /// Specify the associated acpi device's HID with this Coresight PMU
+  /// including NULL characther.
+  ///
+  CHAR8              AcpiDeviceHid[9];
+
+  ///
+  /// This is valid when type is EFI_ACPI_APMT_NODE_TYPE_ACPI_DEVICE only.
+  /// Specify the associated acpi device's UID with this Coresight PMU.
+  ///
+  UINT32             AcpiDeviceUid;
+
+  ///
+  /// This field is used for specifying the identity of the
+  /// implementer of this PMU.
+  /// This field must be set to 0 and ignored if the
+  /// PMIIDR or PMPIDR register is present in this PMU implementation.
+  ///
+  UINT32             ImplementationId;
+} CM_ARM_CORESIGHT_PMU_INFO;
+
+/** A structure that describes GIC interrupt Routing Service (IRS).
+
+    ID: EArmObjGicIrsInfo
+*/
+typedef struct CmArmGicIrsInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// GIC version.
+  UINT32             GicVersion;
+  /// The GIC IRS ID
+  UINT32             GicIrsId;
+  /// Flags
+  UINT32             Flags;
+  /// Base address of the IRS config frame
+  UINT64             ConfigFrameBase;
+  /// Base address of the IRS SET_LPI frame
+  UINT64             SetLpiFrameBase;
+  /// Proximity domain that this IRS belongs to
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_IRS_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+} CM_ARM_GIC_IRS_INFO;
+
+/** A structure that describes the
+    GICv5 Interrupt Translation Service information for the Platform.
+
+    ID: EArmObjGicItsV5Info
+*/
+typedef struct CmArmGicItsV5Info {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// The GIC ITSv5 ID
+  UINT32             GicItsId;
+  /// Flags
+  UINT32             Flags;
+  /// Base address of the ITS config frame
+  UINT64             PhysicalBaseAddress;
+
+  /** The proximity domain to which the logical processor belongs.
+      This field is used to populate the GIC ITS affinity structure
+      in the SRAT table.
+  */
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_ITSV5_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+} CM_ARM_GIC_ITSV5_INFO;
+
+/** A structure that describes the
+    frame information for GICv5 Interrupt Translation Service.
+
+    ID: EArmObjGicItsV5TranslateFrameInfo
+*/
+typedef struct CmArmGicItsV5TranslateFrameInfo {
+  /// Relevant ITSv5 Token
+  CM_OBJECT_TOKEN    ItsV5Token;
+  /// The GIC ITSv5 translate frame ID
+  UINT32             ItsTranslateId;
+  /// Base address of the ITS translate frame
+  UINT64             ItsTranslateFrameBase;
+} CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO;
+
+/** A structure that describes the
+    Interrupt Wire Bridge (IWB) information.
+
+    ID: EArmObjGicIwbInfo
+*/
+typedef struct CmArmGicIwbInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// The GIC IWB ID
+  UINT32             GicIwbId;
+  /// Linked ITSv5 ID Token
+  CM_OBJECT_TOKEN    ItsV5Token;
+  /// Base address of the IWB config frame
+  UINT64             ConfigFrameBase;
+  /// Device ID used to signal any interrupt to the connected ITS
+  UINT32             DeviceId;
+  /// Base GSIV for this IWB
+  UINT32             BaseGsiv;
+  /// Number of wires handled by this IWB
+  UINT32             NumWires;
+  /// Reference token for the ID mapping array
+  CM_OBJECT_TOKEN    IdMappingToken;
+  /// Unique identifier for this node.
+  UINT32             Identifier;
+} CM_ARM_GIC_IWB_INFO;
 
 #pragma pack()

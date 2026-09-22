@@ -291,7 +291,7 @@ AcpiLocateTableBySignature (
 /**
   This function updates the integer value of an AML Object.
 
-  @param  AcpiTableSdtProtocol    Pointer to ACPI SDT protocol.
+  @param  AcpiSdtProtocol         Pointer to ACPI SDT protocol.
   @param  TableHandle             Points to the table representing the starting point
                                   for the object path search.
   @param  AsciiObjectPath         Pointer to the ACPI path of the object being updated.
@@ -301,6 +301,19 @@ AcpiLocateTableBySignature (
   @return EFI_INVALID_PARAMETER   At least one of parameters is invalid or the data type
                                   of the ACPI object is not an integer value.
   @retval EFI_NOT_FOUND           The object is not found with the given path.
+  @retval EFI_UNSUPPORTED         The object uses ZeroOp/OneOp encoding and cannot be
+                                  safely updated to a value other than 0 or 1.
+
+  @attention  IMPORTANT LIMITATION:
+      If the original ASL code uses Name (XXX, 0) or Name (XXX, 1),
+      the iASL compiler optimizes it to 1-byte ZeroOp/OneOp encoding.
+      This function CANNOT safely update such objects to values other than 0 or 1,
+      because there is no space to expand to BytePrefix encoding (2 bytes).
+
+      WORKAROUND: In ASL source, use an initial value >= 2, e.g.:
+          Name (_STA, 0xF)    // Forces BytePrefix encoding, reserves 2 bytes
+      instead of:
+          Name (_STA, 0x0)    // Optimized to ZeroOp, only 1 byte!
 
 **/
 EFI_STATUS
@@ -357,8 +370,47 @@ AcpiAmlObjectUpdateInteger (
   ASSERT (Buffer != NULL);
 
   if ((Buffer[0] == AML_ZERO_OP) || (Buffer[0] == AML_ONE_OP)) {
-    Status = AcpiSdtProtocol->SetOption (DataHandle, 0, (VOID *)&Value, sizeof (UINT8));
-    ASSERT_EFI_ERROR (Status);
+    //
+    // ZeroOp (0x00) and OneOp (0x01) are optimized 1-byte encodings where
+    // the value is implicit in the opcode itself.
+    //
+    // Only values 0 and 1 can be updated safely because they can be represented
+    // using the same 1-byte encoding.
+    //
+    // Values >= 2 require BytePrefix encoding (opcode + data), which
+    // needs 2 bytes total. Since the ACPI table is byte-exact encoding with
+    // no reserved space, we CANNOT expand from 1 byte to 2 bytes.
+    //
+    // Attempting to do so (as the original code did) would silently
+    // corrupt the AML byte stream, causing subsequent ACPI name segments
+    // to be misinterpreted as data bytes, ultimately leading to kernel
+    // crashes when the OS parses the corrupted ACPI table.
+    //
+    if ((Value == 0) || (Value == 1)) {
+      UINT8  Opcode;
+
+      Opcode = (Value == 0) ? AML_ZERO_OP : AML_ONE_OP;
+      Status = AcpiSdtProtocol->SetOption (
+                                  DataHandle,
+                                  0,
+                                  &Opcode,
+                                  sizeof (UINT8)
+                                  );
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ACPI: ERROR: Cannot update object '%a' from ZeroOp/OneOp to 0x%lx\n"
+        "ACPI:        No space to expand to BytePrefix encoding.\n"
+        "ACPI:        FIX: In ASL source, use an initial value >= 2 to\n"
+        "ACPI:             force BytePrefix, e.g. Name (_STA, 0xF)\n",
+        AsciiObjectPath,
+        Value
+        ));
+      ASSERT (FALSE);
+      Status = EFI_UNSUPPORTED;
+      goto Exit;
+    }
   } else {
     //
     // Check the size of data object

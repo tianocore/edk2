@@ -43,6 +43,7 @@ import os
 import shutil
 import sys
 
+LoggedLibraryWarnings = set()
 def _IsFieldValueAnArray (Value):
     Value = Value.strip()
     if Value.startswith(TAB_GUID) and Value.endswith(')'):
@@ -767,15 +768,24 @@ class DscBuildData(PlatformBuildClassObject):
             # get module private library instance
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, None, ModuleId]
             for Record in RecordList:
-                LibraryClass = Record[0]
-                LibraryPath = PathClass(NormPath(Record[1], Macros), GlobalData.gWorkspace, Arch=self._Arch)
-                LineNo = Record[-1]
+                LibraryClass, LibraryInstance, Dummy, Dummy, Dummy, Dummy, RecordId, LineNo = Record
+                LibraryPath = PathClass(NormPath(LibraryInstance, Macros), GlobalData.gWorkspace, Arch=self._Arch)
 
                 # check the file validation
                 ErrorCode, ErrorInfo = LibraryPath.Validate('.inf')
                 if ErrorCode != 0:
                     EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
                                     ExtraData=ErrorInfo)
+
+                # Validate that the Library instance implements the specified Library Class
+                if not self._ValidateLibraryClass(LibraryClass, LibraryPath, self._Arch):
+                    # LineNo counts against the file the entry was written in, which
+                    # is not this DSC when the entry came from an !include.
+                    OriginFile = self._RawData.GetOriginFile(RecordId)
+                    if self._ShouldLogLibrary(OriginFile, LineNo):
+                        EdkLogger.warn("build",
+                                       f"{str(LibraryPath)} does not support LIBRARY_CLASS {LibraryClass}",
+                                       File=OriginFile, Line=LineNo)
 
                 if LibraryClass == '' or LibraryClass == 'NULL':
                     self._NullLibraryNumber += 1
@@ -867,18 +877,29 @@ class DscBuildData(PlatformBuildClassObject):
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, None, -1]
             Macros = self._Macros
             for Record in RecordList:
-                LibraryClass, LibraryInstance, Dummy, Arch, ModuleType, Dummy, Dummy, LineNo = Record
+                LibraryClass, LibraryInstance, Dummy, Arch, ModuleType, Dummy, RecordId, LineNo = Record
                 if LibraryClass == '' or LibraryClass == 'NULL':
                     self._NullLibraryNumber += 1
                     LibraryClass = 'NULL%d' % self._NullLibraryNumber
                     EdkLogger.verbose("Found forced library for arch=%s\n\t%s [%s]" % (Arch, LibraryInstance, LibraryClass))
                 LibraryClassSet.add(LibraryClass)
                 LibraryInstance = PathClass(NormPath(LibraryInstance, Macros), GlobalData.gWorkspace, Arch=self._Arch)
+
                 # check the file validation
                 ErrorCode, ErrorInfo = LibraryInstance.Validate('.inf')
                 if ErrorCode != 0:
                     EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
                                     ExtraData=ErrorInfo)
+
+                # Validate that the Library instance implements the specified Library Class
+                if not self._ValidateLibraryClass(LibraryClass, LibraryInstance, Arch):
+                    # LineNo counts against the file the entry was written in, which
+                    # is not this DSC when the entry came from an !include.
+                    OriginFile = self._RawData.GetOriginFile(RecordId)
+                    if self._ShouldLogLibrary(OriginFile, LineNo):
+                        EdkLogger.warn("build",
+                                       f"{str(LibraryInstance)} does not support LIBRARY_CLASS {LibraryClass}",
+                                       File=OriginFile, Line=LineNo)
 
                 if ModuleType != TAB_COMMON and ModuleType not in SUP_MODULE_LIST:
                     EdkLogger.error('build', OPTION_UNKNOWN, "Unknown module type [%s]" % ModuleType,
@@ -1138,6 +1159,37 @@ class DscBuildData(PlatformBuildClassObject):
                         field_assign[TokenSpaceGuid, Token] = []
             for item in delete_assign:
                 GlobalData.BuildOptionPcd.remove(item)
+
+    def _ValidateLibraryClass(self, LibraryClass: str, LibraryInstance: PathClass, Arch: str) -> bool:
+        #
+        # Forced library instances have no class to match against. They are spelled
+        # 'NULL' (or left empty) in the DSC and renamed to 'NULL<n>' while parsing, so
+        # both spellings can reach here depending on the caller.
+        #
+        if LibraryClass in ('', 'NULL'):
+            return True
+        if LibraryClass.startswith('NULL') and LibraryClass[4:].isdigit():
+            return True
+
+        ParsedLibraryInfo = self._Bdb[LibraryInstance, Arch, self._Target, self._Toolchain]
+
+        for LibraryClassObject in ParsedLibraryInfo.LibraryClass:
+            if LibraryClassObject.LibraryClass == LibraryClass:
+                return True
+        return False
+
+    def _ShouldLogLibrary(self, OriginFile, LineNo) -> bool:
+        if not GlobalData.gLogLibraryMismatch:
+            return False
+
+        # Key on the file as well as the line, otherwise entries that share a line
+        # number across different DSC files silently suppress each other.
+        Key = (str(OriginFile), LineNo)
+        if Key in LoggedLibraryWarnings:
+            return False
+
+        LoggedLibraryWarnings.add(Key)
+        return True
 
     @staticmethod
     def HandleFlexiblePcd(TokenSpaceGuidCName, TokenCName, PcdValue, PcdDatumType, GuidDict, FieldName=''):

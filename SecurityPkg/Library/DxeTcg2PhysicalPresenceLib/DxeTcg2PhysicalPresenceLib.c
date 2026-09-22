@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/Tcg2PhysicalPresenceData.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/Tcg2PhysicalPresencePromptLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 
 #define CONFIRM_BUFFER_SIZE  4096
@@ -252,50 +253,6 @@ Tcg2ExecutePhysicalPresence (
 }
 
 /**
-  Read the specified key for user confirmation.
-
-  @param[in]  CautionKey  If true,  F12 is used as confirm key;
-                          If false, F10 is used as confirm key.
-
-  @retval     TRUE        User confirmed the changes by input.
-  @retval     FALSE       User discarded the changes.
-**/
-BOOLEAN
-Tcg2ReadUserKey (
-  IN     BOOLEAN  CautionKey
-  )
-{
-  EFI_STATUS     Status;
-  EFI_INPUT_KEY  Key;
-  UINT16         InputKey;
-
-  InputKey = 0;
-  do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-    }
-  } while (InputKey == 0);
-
-  if (InputKey != SCAN_ESC) {
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-/**
   Fill Buffer With BootHashAlg.
 
   @param[in] Buffer               Buffer to be filled.
@@ -373,8 +330,7 @@ Tcg2UserConfirm (
   UINTN                             BufSize;
   BOOLEAN                           CautionKey;
   BOOLEAN                           NoPpiInfo;
-  UINT16                            Index;
-  CHAR16                            DstStr[81];
+  BOOLEAN                           Result;
   CHAR16                            TempBuffer[1024];
   CHAR16                            TempBuffer2[1024];
   EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
@@ -382,15 +338,23 @@ Tcg2UserConfirm (
   UINT32                            CurrentPCRBanks;
   EFI_STATUS                        Status;
 
+  TmpStr1     = NULL;
   TmpStr2     = NULL;
   CautionKey  = FALSE;
   NoPpiInfo   = FALSE;
   BufSize     = CONFIRM_BUFFER_SIZE;
   ConfirmText = AllocateZeroPool (BufSize);
-  ASSERT (ConfirmText != NULL);
+  if (ConfirmText == NULL) {
+    ASSERT (ConfirmText != NULL);
+    return FALSE;
+  }
 
   mTcg2PpStringPackHandle = HiiAddPackages (&gEfiTcg2PhysicalPresenceGuid, gImageHandle, DxeTcg2PhysicalPresenceLibStrings, NULL);
-  ASSERT (mTcg2PpStringPackHandle != NULL);
+  if (mTcg2PpStringPackHandle == NULL) {
+    ASSERT (mTcg2PpStringPackHandle != NULL);
+    FreePool (ConfirmText);
+    return FALSE;
+  }
 
   switch (TpmPpCommand) {
     case TCG2_PHYSICAL_PRESENCE_CLEAR:
@@ -401,13 +365,24 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_CLEAR));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CLEAR));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n\n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
 
       break;
 
@@ -417,17 +392,33 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_CLEAR));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_PPI_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_NOTE_CLEAR));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CLEAR));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n\n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
 
       break;
 
@@ -452,14 +443,29 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_SET_PCR_BANKS));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_SET_PCR_BANKS_1));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_SET_PCR_BANKS_2));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
@@ -467,12 +473,18 @@ Tcg2UserConfirm (
       Tcg2FillBufferWithBootHashAlg (TempBuffer2, sizeof (TempBuffer2), CurrentPCRBanks);
 
       TmpStr1 = AllocateZeroPool (BufSize);
-      ASSERT (TmpStr1 != NULL);
+      if (TmpStr1 == NULL) {
+        ASSERT (TmpStr1 != NULL);
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (TmpStr1, BufSize, L"Current PCRBanks is 0x%x. (%s)\nNew PCRBanks is 0x%x. (%s)\n", CurrentPCRBanks, TempBuffer2, TpmPpCommandParameter, TempBuffer);
 
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
 
       break;
 
@@ -481,16 +493,32 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_CHANGE_EPS));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CHANGE_EPS_1));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CHANGE_EPS_2));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
 
       break;
 
@@ -498,16 +526,28 @@ Tcg2UserConfirm (
       TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_ENABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
       break;
 
     case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
       TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_DISABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
       break;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
@@ -515,8 +555,14 @@ Tcg2UserConfirm (
       TmpStr2   = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PP_ENABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PPI_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
       break;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
@@ -524,8 +570,14 @@ Tcg2UserConfirm (
       TmpStr2   = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PP_DISABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PPI_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
+      TmpStr1 = NULL;
       break;
 
     default:
@@ -533,8 +585,8 @@ Tcg2UserConfirm (
   }
 
   if (TmpStr2 == NULL) {
-    FreePool (ConfirmText);
-    return FALSE;
+    Result = FALSE;
+    goto Cleanup;
   }
 
   if (TpmPpCommand < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN) {
@@ -544,11 +596,21 @@ Tcg2UserConfirm (
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_ACCEPT_KEY));
     }
 
+    if (TmpStr1 == NULL) {
+      Result = FALSE;
+      goto Cleanup;
+    }
+
     StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
     FreePool (TmpStr1);
 
     if (NoPpiInfo) {
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_NO_PPI_INFO));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
     }
@@ -561,11 +623,21 @@ Tcg2UserConfirm (
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_ACCEPT_KEY));
     }
 
+    if (TmpStr1 == NULL) {
+      Result = FALSE;
+      goto Cleanup;
+    }
+
     StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
     FreePool (TmpStr1);
 
     if (NoPpiInfo) {
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_NO_PPI_INFO));
+      if (TmpStr1 == NULL) {
+        Result = FALSE;
+        goto Cleanup;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
     }
@@ -573,25 +645,38 @@ Tcg2UserConfirm (
     TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_REJECT_KEY));
   }
 
+  if (TmpStr1 == NULL) {
+    Result = FALSE;
+    goto Cleanup;
+  }
+
   BufSize -= StrSize (ConfirmText);
   UnicodeSPrint (ConfirmText + StrLen (ConfirmText), BufSize, TmpStr1, TmpStr2);
 
-  DstStr[80] = L'\0';
-  for (Index = 0; Index < StrLen (ConfirmText); Index += 80) {
-    StrnCpyS (DstStr, sizeof (DstStr) / sizeof (CHAR16), ConfirmText + Index, sizeof (DstStr) / sizeof (CHAR16) - 1);
-    Print (DstStr);
+  Status = Tcg2IsPromptReady ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Tcg2IsPromptReady failed w/ Status: %r\n", Status));
+    Result = FALSE;
+  } else {
+    Result = Tcg2PromptForUserConfirmation (ConfirmText, CautionKey);
   }
 
-  FreePool (TmpStr1);
-  FreePool (TmpStr2);
-  FreePool (ConfirmText);
+Cleanup:
+  if (TmpStr1 != NULL) {
+    FreePool (TmpStr1);
+  }
+
+  if (TmpStr2 != NULL) {
+    FreePool (TmpStr2);
+  }
+
+  if (ConfirmText != NULL) {
+    FreePool (ConfirmText);
+  }
+
   HiiRemovePackages (mTcg2PpStringPackHandle);
 
-  if (Tcg2ReadUserKey (CautionKey)) {
-    return TRUE;
-  }
-
-  return FALSE;
+  return Result;
 }
 
 /**

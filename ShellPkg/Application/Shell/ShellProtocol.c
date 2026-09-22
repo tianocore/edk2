@@ -290,16 +290,8 @@ EfiShellGetMapFromDevicePath (
   }
 
   if (PathForReturn != NULL) {
-    while (!IsDevicePathEndType (*DevicePath)) {
+    while (!IsDevicePathEnd (*DevicePath)) {
       *DevicePath = NextDevicePathNode (*DevicePath);
-    }
-
-    //
-    // Do not call SetDevicePathEndNode() if the device path node is already the
-    // end of an entire device path.
-    //
-    if (!IsDevicePathEnd (*DevicePath)) {
-      SetDevicePathEndNode (*DevicePath);
     }
   }
 

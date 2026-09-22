@@ -1,0 +1,50 @@
+## @file
+#  DXE driver that validates TCG2 event log dynamic scaling before ReadyToBoot.
+#
+#  Checks an NV variable to determine whether to run. If enabled, exercises
+#  pre-ReadyToBoot log scaling and records results via a local protocol that
+#  TcgLogTestApp retrieves post-boot.
+#
+#  Copyright (c), Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = TcgLogTestDxe
+  FILE_GUID                      = B4D2F8A7-3E16-4C9B-A1F0-7D5E9B2C4A81
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcgLogTestDxeEntry
+
+[Sources]
+  TcgLogTestDxe.c
+  TcgLogTestCommon.c
+  TcgLogTestCommon.h
+  TcgLogTest.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiTcg2ProtocolGuid       ## CONSUMES
+  gTcgLogTestProtocolGuid    ## PRODUCES
+
+[Guids]
+  gTcg2EventLogScaledGuid    ## CONSUMES  ## Event
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiTcg2ProtocolGuid

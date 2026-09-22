@@ -897,6 +897,15 @@ FindVariableEx (
       MaxIndex = (VARIABLE_HEADER *)((UINT8 *)IndexTable->StartPtr + Offset);
       Valid    = GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
       if (Valid && (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS)) {
+        //
+        // Skip variables with deleted state (0x3C).
+        // When a variable is deleted, the state becomes 0x3C (VAR_IN_DELETED_TRANSITION & VAR_DELETED & VAR_ADDED).
+        // This check ensures only valid states (0x3F or 0x3E) are processed.
+        //
+        if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_DELETED & VAR_ADDED)) {
+          continue;
+        }
+
         if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
           InDeletedVariable = PtrTrack->CurrPtr;
         } else {

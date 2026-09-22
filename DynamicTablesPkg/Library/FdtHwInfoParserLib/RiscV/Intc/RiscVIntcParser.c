@@ -309,10 +309,10 @@ CpuNodeParser (
 
   CpuName = FdtGetName (Fdt, CpuNode, &PropSize);
   ProcUid = AsciiStrDecimalToUintn (&CpuName[4]);
-  if (AddressCells == 2) {
-    HartId = Fdt64ToCpu (*((UINT64 *)Prop));
-  } else {
-    HartId = Fdt32ToCpu (*((UINT32 *)Prop));
+  Status  = ReadFdtCells64 ((UINT32 *)Prop, AddressCells, &HartId);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
   }
 
   /*
@@ -482,7 +482,7 @@ STATIC
 CM_RISCV_RINTC_INFO *
 RiscVFindRintc (
   IN CM_OBJ_DESCRIPTOR  *NewRintcCmObjDesc,
-  IN UINTN              HartId
+  IN UINT64             HartId
   )
 {
   CM_RISCV_RINTC_INFO  *RintcInfo;
@@ -634,8 +634,9 @@ RiscVUpdateRintc (
   CONST INT32          *Data;
   UINT32               AddressCells;
   INT32                DataSize;
-  UINTN                HartId;
+  UINT64               HartId;
   INT32                CpusNode;
+  EFI_STATUS           Status;
 
   CpusNode     = FdtParentOffset (Fdt, CpuNode);
   AddressCells = FdtAddressCells (Fdt, CpusNode);
@@ -653,10 +654,10 @@ RiscVUpdateRintc (
     return EFI_ABORTED;
   }
 
-  if (AddressCells == 2) {
-    HartId = Fdt64ToCpu (*((UINT64 *)Data));
-  } else {
-    HartId = Fdt32ToCpu (*((UINT32 *)Data));
+  Status = ReadFdtCells64 (Data, AddressCells, &HartId);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
   }
 
   RintcInfo = RiscVFindRintc (NewRintcCmObjDesc, HartId);
@@ -995,7 +996,7 @@ UpdateRintcInfo (
   INT32                DataSize;
   INT32                IntcNode;
   INT32                Phandle;
-  UINTN                HartId;
+  UINT64               HartId;
   UINTN                NumImsicBase;
   INTN                 Limit;
   INTN                 Idx;
@@ -1053,10 +1054,10 @@ UpdateRintcInfo (
         return EFI_ABORTED;
       }
 
-      if (AddressCells == 2) {
-        HartId = Fdt64ToCpu (*((UINT64 *)Data));
-      } else {
-        HartId = Fdt32ToCpu (*((UINT32 *)Data));
+      Status = ReadFdtCells64 (Data, AddressCells, &HartId);
+      if (EFI_ERROR (Status)) {
+        ASSERT (FALSE);
+        return EFI_ABORTED;
       }
 
       RintcInfoBuffer = RiscVFindRintc (NewRintcCmObjDesc, HartId);

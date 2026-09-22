@@ -218,6 +218,7 @@ class AutoGenWorkerInProcess(mp.Process):
             GlobalData.gEnableGenfdsMultiThread = self.data_pipe.Get("EnableGenfdsMultiThread")
             GlobalData.gPlatformFinalPcds = self.data_pipe.Get("gPlatformFinalPcds")
             GlobalData.file_lock = self.file_lock
+            GlobalData.gLogLibraryMismatch = False
             CommandTarget = self.data_pipe.Get("CommandTarget")
             pcd_from_build_option = []
             for pcd_tuple in self.data_pipe.Get("BuildOptPcd"):

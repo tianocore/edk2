@@ -47,7 +47,98 @@ None
 
 #### edk2-stable202611: Changes without Removal
 
-None
+##### Breaking Change: Rename the DMC-620 PMU Dynamic Tables interfaces
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13070](https://github.com/tianocore/edk2/issues/13070)
+- **Pull Request**: [tianocore/edk2#12994](https://github.com/tianocore/edk2/pull/12994)
+- **Type**: Source-Level (Non-removal) - Public identifier, structure,
+  structure member, generator symbol, file, and library path rename
+
+**What changed**: The DMC-620 PMU Dynamic Tables interfaces and SSDT
+generator were renamed to use the DMC PMU terminology adopted by the
+ACPI for Arm Components 1.3 Platform Design Document. The
+table-generator ID, Configuration Manager object IDs and structures,
+structure member, generator symbol, source files and library path were
+renamed. The generated AML, `ARMHD620` hardware identifier and generator
+behaviour are unchanged.
+
+**Why it changed**: ACPI for Arm Components 1.3 updates the relevant
+section and interface terminology from “DMC620 Memory Controller” and
+“DMC620 PMU” to “DMC Memory Controller” and “DMC PMU”. The edk2
+interfaces are renamed to align with the terminology used by the latest
+specification.
+
+**What replaces it**:
+
+- `EStdAcpiTableIdSsdtDmc620Pmu` is replaced by
+  `EStdAcpiTableIdSsdtDmcPmu`.
+- `EArmObjDmc620PmuSocketInfo` is replaced by
+  `EArmObjDmcPmuSocketInfo`.
+- `EArmObjDmc620PmuRegInfo` is replaced by `EArmObjDmcPmuRegInfo`.
+- `CM_ARM_DMC620_PMU_REG_INFO` is replaced by
+  `CM_ARM_DMC_PMU_REG_INFO`.
+- `CM_ARM_DMC620_INFO` is replaced by `CM_ARM_DMC_INFO`.
+- `Dmc620PmuRegInfoToken` is replaced by `DmcPmuRegInfoToken`.
+- `SsdtDmc620PmuGenerator` is replaced by `SsdtDmcPmuGenerator`.
+- `AcpiSsdtDmc620PmuLibArm` is replaced by `AcpiSsdtDmcPmuLibArm`.
+
+**How to migrate**: Replace the DMC-620-specific identifiers, structure
+names, structure member, generator symbol, filenames and library path with
+the DMC PMU equivalents listed above. No platform-data or behavioural changes
+are required.
+
+**Breaking conditions**: This affects out-of-tree platforms that consume
+the DMC-620 PMU Configuration Manager interfaces or reference the old
+generator symbol, filenames or library path. No consumer was found in the
+current edk2 or edk2-platforms repositories.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
+
+##### Breaking Change: Generalize the CMN SSDT generator
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13060](https://github.com/tianocore/edk2/issues/13060)
+- **Pull Request**: [tianocore/edk2#13019](https://github.com/tianocore/edk2/pull/13019)
+- **Type**: Source-Level (Non-removal) - Public identifier rename,
+  structure layout change, and library path rename
+
+**What changed**: The CMN-600-specific Dynamic Tables interfaces and
+generator were generalized to support CMN-600, CMN-650, CMN-700 and
+CMN-S3. The Configuration Manager object, table-generator ID, structure,
+generator symbols and library paths now use generic CMN terminology.
+The generic CMN information structure also identifies the CMN
+implementation and describes the optional ROOT resource length.
+
+**Why it changed**: The existing generator names and interfaces implied
+that only CMN-600 was supported. Generalizing them allows one generator
+to describe multiple CMN implementations while retaining the existing
+CMN-600 table-generation behaviour.
+
+**What replaces it**:
+
+- `EStdAcpiTableIdSsdtCmn600` is replaced by
+  `EStdAcpiTableIdSsdtCmn`.
+- `EArmObjCmn600Info` is replaced by `EArmObjCmnInfo`.
+- `CM_ARM_CMN_600_INFO` is replaced by `CM_ARM_CMN_INFO`.
+- The `AcpiSsdtCmn600LibArm` generator is replaced by
+  `AcpiSsdtCmnLibArm`.
+
+**How to migrate**: Replace the CMN-600-specific identifiers, structure
+name, generator symbols and library paths with their generic CMN
+equivalents. Initialize `CmnType` to the appropriate `ARM_CMN_TYPE`.
+For an existing CMN-600 description, set `CmnType` to
+`ArmCmnType600` and `RootNodeBaseAddressLength` to the CMN-600 ROOT
+region length. For CMN implementations without a separate ROOT
+resource, set `RootNodeBaseAddress` and `RootNodeBaseAddressLength`
+to zero.
+
+**Breaking conditions**: This affects out-of-tree platforms that consume
+the CMN-600 Dynamic Tables Configuration Manager object or reference the
+CMN-600 generator library path. No consumer was found in the current
+edk2-platforms repository.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
 
 ### edk2-stable202611: Behavioral Breaking Changes
 
@@ -236,6 +327,40 @@ instance is provided in-tree (MdeModulePkg/Library/GptLib/GptLib.inf).
 [LibraryClasses] section:
 
   GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
+
+##### Breaking Change: New Tcg2PhysicalPresencePromptLib library class dependency
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#TBD](https://github.com/tianocore/edk2/issues/12832)
+- **Pull Request**: [tianocore/edk2#12820](https://github.com/tianocore/edk2/pull/12820)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition (platform-implemented)
+
+**What changed**: `SecurityPkg` `DxeTcg2PhysicalPresenceLib` gained a required dependency on the new
+`Tcg2PhysicalPresencePromptLib` library class declared in `SecurityPkg/SecurityPkg.dec`. Platforms
+that build `DxeTcg2PhysicalPresenceLib` must resolve `Tcg2PhysicalPresencePromptLib` in their DSC or
+the build fails with an unresolved library class.
+
+**Why it changed**: Previously, `DxeTcg2PhysicalPresenceLib` printed the Physical Presence confirmation prompt
+directly to the console, giving platforms no clean way to substitute a platform-specific user-interaction mechanism.
+Extracting the prompt behind a library class lets platforms provide their own prompt implementation without patching
+`DxeTcg2PhysicalPresenceLib` and keeps the TPM 2.0 Physical Presence flow decoupled from any specific UI.
+
+**What replaces it**: Nothing is removed. `DxeTcg2PhysicalPresenceLib` now calls into the
+`Tcg2PhysicalPresencePromptLib` interface, and `SecurityPkg` provides the console-based default instance for platforms
+that do not implement their own.
+
+**How to migrate**: Platforms building `DxeTcg2PhysicalPresenceLib` must add a `Tcg2PhysicalPresencePromptLib` mapping
+to their platform DSC `[LibraryClasses]` section. To keep the existing behavior, map to the in-tree console instance:
+
+  Tcg2PhysicalPresencePromptLib|SecurityPkg/Library/Tcg2PhysicalPresencePromptLib/Tcg2PhysicalPresencePromptLibConsole.inf
+
+Platforms that want a custom prompt UI can instead provide their own instance implementing the
+`Tcg2PhysicalPresencePromptLib` interface declared in
+`SecurityPkg/Include/Library/Tcg2PhysicalPresencePromptLib.h` and map the library class to that instance in their DSC.
+
+**Breaking conditions**: Affects platforms and out-of-tree modules that build `SecurityPkg`'s
+`DxeTcg2PhysicalPresenceLib` (`Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib/DxeTcg2PhysicalPresenceLib.inf`).
+Platforms that do not consume `DxeTcg2PhysicalPresenceLib` are unaffected.
 
 ### edk2-stable202608: Behavioral Breaking Changes
 
