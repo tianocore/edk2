@@ -2,6 +2,7 @@
   Logo DXE Driver, install Edkii Platform Logo protocol.
 
 Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,8 +12,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/HiiImageEx.h>
 #include <Protocol/PlatformLogo.h>
 #include <Protocol/HiiPackageList.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/BmpSupportLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DxeServicesLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 typedef struct {
   EFI_IMAGE_ID                             ImageId;
@@ -23,6 +29,8 @@ typedef struct {
 
 EFI_HII_IMAGE_EX_PROTOCOL  *mHiiImageEx;
 EFI_HII_HANDLE             mHiiHandle;
+STATIC CONST EFI_GUID      mZeroGuid = { 0 };
+
 LOGO_ENTRY                 mLogos[] = {
   {
     IMAGE_TOKEN (IMG_LOGO),
@@ -31,6 +39,77 @@ LOGO_ENTRY                 mLogos[] = {
     0
   }
 };
+
+/**
+  Load the OEM logo from a firmware volume.
+
+  @param[out]  Image  The decoded OEM logo image.
+
+  @retval EFI_SUCCESS            The OEM logo was loaded.
+  @retval EFI_INVALID_PARAMETER  Image is NULL.
+  @retval EFI_UNSUPPORTED        The logo dimensions exceed the limits of EFI_IMAGE_INPUT.
+  @retval Others                 The OEM logo could not be loaded.
+
+**/
+STATIC
+EFI_STATUS
+GetOemLogoFromFv (
+  OUT EFI_IMAGE_INPUT  *Image
+  )
+{
+  EFI_STATUS                     Status;
+  VOID                           *BmpData;
+  UINTN                          BmpDataSize;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *GopBlt;
+  UINTN                          GopBltSize;
+  UINTN                          Height;
+  UINTN                          Width;
+
+  if (Image == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BmpData     = NULL;
+  BmpDataSize = 0;
+  Status      = GetSectionFromAnyFv (
+                  PcdGetPtr (PcdOemLogoFileGuid),
+                  EFI_SECTION_RAW,
+                  0,
+                  &BmpData,
+                  &BmpDataSize
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  GopBlt     = NULL;
+  GopBltSize = 0;
+  Status     = TranslateBmpToGopBlt (
+                 BmpData,
+                 BmpDataSize,
+                 &GopBlt,
+                 &GopBltSize,
+                 &Height,
+                 &Width
+                 );
+  FreePool (BmpData);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((Width > MAX_UINT16) || (Height > MAX_UINT16)) {
+    FreePool (GopBlt);
+    return EFI_UNSUPPORTED;
+  }
+
+  Image->Flags  = 0;
+  Image->Width  = (UINT16)Width;
+  Image->Height = (UINT16)Height;
+  Image->Bitmap = GopBlt;
+
+  return EFI_SUCCESS;
+}
 
 /**
   Load a platform logo image and return its data and attributes.
@@ -57,6 +136,7 @@ GetImage (
   )
 {
   UINT32  Current;
+  EFI_STATUS  Status;
 
   if ((Instance == NULL) || (Image == NULL) ||
       (Attribute == NULL) || (OffsetX == NULL) || (OffsetY == NULL))
@@ -73,7 +153,32 @@ GetImage (
   *Attribute = mLogos[Current].Attribute;
   *OffsetX   = mLogos[Current].OffsetX;
   *OffsetY   = mLogos[Current].OffsetY;
-  return mHiiImageEx->GetImageEx (mHiiImageEx, mHiiHandle, mLogos[Current].ImageId, Image);
+
+  if (CompareMem (
+        PcdGetPtr (PcdOemLogoFileGuid),
+        &mZeroGuid,
+        sizeof (EFI_GUID)
+        ) != 0)
+  {
+    Status = GetOemLogoFromFv (Image);
+
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    DEBUG ((
+      DEBUG_WARN,
+      "Failed to load OEM logo from FV: %r. Using default logo.\n",
+      Status
+      ));
+  }
+
+  return mHiiImageEx->GetImageEx (
+                        mHiiImageEx,
+                        mHiiHandle,
+                        mLogos[Current].ImageId,
+                        Image
+                        );
 }
 
 EDKII_PLATFORM_LOGO_PROTOCOL  mPlatformLogo = {
