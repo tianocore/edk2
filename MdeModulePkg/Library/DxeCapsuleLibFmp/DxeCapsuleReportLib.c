@@ -7,7 +7,6 @@
 **/
 
 #include <PiDxe.h>
-#include <Protocol/FirmwareManagement.h>
 #include <Guid/CapsuleReport.h>
 #include <Guid/FmpCapsule.h>
 #include <Guid/CapsuleVendor.h>
@@ -23,11 +22,99 @@
 #include <Library/HobLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/DevicePathLib.h>
 #include <Library/CapsuleLib.h>
 #include <Library/VariablePolicyHelperLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
+
+#include "DxeCapsuleRuntime.h"
+
+/**
+  Get Fmp Device Path string.
+
+  @param[in]     FmpDevicePath       Points to the device path to be converted.
+
+  @retval DevicePath string if none, return NULL.
+
+**/
+STATIC
+CHAR16 *
+EFIAPI
+GetFmpDevicePathStr (
+  IN EFI_DEVICE_PATH_PROTOCOL  *FmpDevicePath
+  )
+{
+  UINTN  Idx;
+
+  if (!mDxeCapsuleLibIsExitBootService) {
+    return ConvertDevicePathToText (FmpDevicePath, FALSE, FALSE);
+  }
+
+  for (Idx = 0; Idx < mRuntimeFmpCount; Idx++) {
+    if (mRuntimeFmpList[Idx].FmpDevicePath == FmpDevicePath) {
+      return mRuntimeFmpList[Idx].DevicePathStr;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Put Fmp Device Path string gotten by GetFmpDevicePathStr().
+
+  @param[in]     FmpDevicePathStr   Device Path String
+
+**/
+STATIC
+VOID
+EFIAPI
+PutFmpDevicePathStr (
+  IN CHAR16  *FmpDevicePathStr
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService && (FmpDevicePathStr != NULL)) {
+    FreePool (FmpDevicePathStr);
+  }
+}
+
+/**
+  Allocate memory for Capsule Result Variable.
+
+  @param  CapsuleResultVariableSize  Capsule Result Variable Size.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+STATIC
+VOID *
+EFIAPI
+AllocateCapsuleResultVariable (
+  IN UINTN  CapsuleResultVariableSize
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService) {
+    return AllocateZeroPool (CapsuleResultVariableSize);
+  }
+
+  return mRuntimeCapsuleResultVariable;
+}
+
+/**
+  Frees a buffer that was previously allocated with AllocateCapsuleResultVariable().
+
+  @param  CapsuleResultVariable  Pointer to the buffer to free.
+
+**/
+STATIC
+VOID
+FreeCapsuleResultVariable (
+  IN VOID  *CapsuleResultVariable
+  )
+{
+  if (!mDxeCapsuleLibIsExitBootService) {
+    FreePool (CapsuleResultVariable);
+  }
+}
 
 /**
   This routine is called to clear CapsuleOnDisk Relocation Info variable.
@@ -255,7 +342,7 @@ RecordFmpCapsuleStatusVariable (
   CapFileNameSize = sizeof (CHAR16);
 
   if (FmpDevicePath != NULL) {
-    DevicePathStr = ConvertDevicePathToText (FmpDevicePath, FALSE, FALSE);
+    DevicePathStr = GetFmpDevicePathStr (FmpDevicePath);
   }
 
   if (DevicePathStr != NULL) {
@@ -273,7 +360,7 @@ RecordFmpCapsuleStatusVariable (
   //
   CapsuleResultVariableSize = sizeof (EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof (EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapFileNameSize + DevicePathStrSize;
 
-  CapsuleResultVariable = AllocateZeroPool (CapsuleResultVariableSize);
+  CapsuleResultVariable = AllocateCapsuleResultVariable (CapsuleResultVariableSize);
   if (CapsuleResultVariable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -292,13 +379,13 @@ RecordFmpCapsuleStatusVariable (
   CapsuleResultVariableFmp->UpdateImageIndex = ImageHeader->UpdateImageIndex;
   CopyGuid (&CapsuleResultVariableFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId);
 
-  if (CapFileName != NULL) {
+  if (!mDxeCapsuleLibIsExitBootService && (CapFileName != NULL)) {
     CopyMem ((UINT8 *)CapsuleResultVariableFmp + sizeof (EFI_CAPSULE_RESULT_VARIABLE_FMP), CapFileName, CapFileNameSize);
   }
 
   if (DevicePathStr != NULL) {
     CopyMem ((UINT8 *)CapsuleResultVariableFmp + sizeof (EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapFileNameSize, DevicePathStr, DevicePathStrSize);
-    FreePool (DevicePathStr);
+    PutFmpDevicePathStr (DevicePathStr);
     DevicePathStr = NULL;
   }
 
@@ -307,7 +394,7 @@ RecordFmpCapsuleStatusVariable (
     Status = WriteNewCapsuleResultVariable (CapsuleResultVariable, CapsuleResultVariableSize);
   }
 
-  FreePool (CapsuleResultVariable);
+  FreeCapsuleResultVariable (CapsuleResultVariable);
   return Status;
 }
 
