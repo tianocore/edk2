@@ -31,7 +31,7 @@ EFI_HII_IMAGE_EX_PROTOCOL  *mHiiImageEx;
 EFI_HII_HANDLE             mHiiHandle;
 STATIC CONST EFI_GUID      mZeroGuid = { 0 };
 
-LOGO_ENTRY                 mLogos[] = {
+LOGO_ENTRY  mLogos[] = {
   {
     IMAGE_TOKEN (IMG_LOGO),
     EdkiiPlatformLogoDisplayAttributeCenter,
@@ -135,11 +135,14 @@ GetImage (
   OUT INTN                                   *OffsetY
   )
 {
-  UINT32  Current;
+  UINT32      Current;
   EFI_STATUS  Status;
 
-  if ((Instance == NULL) || (Image == NULL) ||
-      (Attribute == NULL) || (OffsetX == NULL) || (OffsetY == NULL))
+  if ((Instance == NULL) ||
+      (Image == NULL) ||
+      (Attribute == NULL) ||
+      (OffsetX == NULL) ||
+      (OffsetY == NULL))
   {
     return EFI_INVALID_PARAMETER;
   }
@@ -150,6 +153,7 @@ GetImage (
   }
 
   (*Instance)++;
+
   *Attribute = mLogos[Current].Attribute;
   *OffsetX   = mLogos[Current].OffsetX;
   *OffsetY   = mLogos[Current].OffsetY;
