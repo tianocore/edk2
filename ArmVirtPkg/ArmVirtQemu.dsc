@@ -299,10 +299,22 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/Sec/Sec.inf
-  MdeModulePkg/Core/Pei/PeiMain.inf
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  }
+  MdeModulePkg/Core/Pei/PeiMain.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  }
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
-  ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
+  ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  }
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
 !if $(DEBUG_TO_MEM)
