@@ -68,6 +68,7 @@
 
 [LibraryClasses.common]
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLibCca.inf
+  CcProbeLib|MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
   ArmTransferListLib|MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
@@ -398,6 +399,7 @@
   #
   # PCI support
   #
+  OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
 
   #
