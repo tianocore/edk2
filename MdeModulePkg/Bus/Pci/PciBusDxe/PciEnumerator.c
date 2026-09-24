@@ -872,7 +872,7 @@ GetMaxResourceConsumerDevice (
   while (CurrentLink != NULL && CurrentLink != &ResPool->ChildList) {
     Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
 
-    if (!IsRejectiveDevice (Temp)) {
+    if (!IsRejectiveDevice (Temp) || Temp->Fixed) {
       CurrentLink = CurrentLink->ForwardLink;
       continue;
     }

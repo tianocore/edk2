@@ -28,6 +28,16 @@ typedef struct {
   BOOLEAN               Reserved;
   PCI_RESOURCE_USAGE    ResourceUsage;
   BOOLEAN               Virtual;
+  //
+  // TRUE if the resource occupies a fixed range [FixedBase, FixedLimit]:
+  // either a BAR described by an Enhanced Allocation entry, or a PCI-PCI
+  // bridge window that is pinned by such fixed resources below it. Fixed
+  // resources are not assigned by the allocator, and do not consume any of
+  // the resources allocated to their parent.
+  //
+  BOOLEAN               Fixed;
+  UINT64                FixedBase;
+  UINT64                FixedLimit;
 } PCI_RESOURCE_NODE;
 
 #define RESOURCE_NODE_FROM_LINK(a) \
