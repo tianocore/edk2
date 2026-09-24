@@ -147,6 +147,12 @@ struct _PCI_BAR {
 #define PCI_EA_WINDOW_PMEM  2
 #define PCI_EA_WINDOW_MAX   3
 
+//
+// Primary bus number assigned to a PCI-PCI bridge whose fixed bus numbers,
+// described by its Enhanced Allocation capability, could not be assigned.
+//
+#define PCI_EA_UNASSIGNED_PRIMARY_BUS  0xFF
+
 #define P2C_BAR_0  0
 #define P2C_MEM_1  1
 #define P2C_MEM_2  2
@@ -299,6 +305,13 @@ struct _PCI_IO_DEVICE {
   // if its Length is non-zero.
   //
   PCI_BAR                                      EaWindow[PCI_EA_WINDOW_MAX];
+  //
+  // Fixed secondary and subordinate bus numbers of a PCI-PCI bridge described
+  // by its Enhanced Allocation capability. Only valid if EaFixedSecondaryBus
+  // is non-zero.
+  //
+  UINT8                                        EaFixedSecondaryBus;
+  UINT8                                        EaFixedSubordinateBus;
 };
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
