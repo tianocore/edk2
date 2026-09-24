@@ -592,10 +592,14 @@ InitializePciHostBridge (
     HostBridge->ResAlloc.GetProposedResources = GetProposedResources;
     HostBridge->ResAlloc.PreprocessController = PreprocessController;
 
+    HostBridge->FixedRes.SubmitFixedResources = SubmitFixedResources;
+
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &HostBridge->Handle,
                     &gEfiPciHostBridgeResourceAllocationProtocolGuid,
                     &HostBridge->ResAlloc,
+                    &gEdkiiPciHostBridgeFixedResourceProtocolGuid,
+                    &HostBridge->FixedRes,
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
@@ -809,6 +813,119 @@ AllocateResource (
 }
 
 /**
+  Claim the fixed ranges that were submitted for a root bridge in GCD, so that
+  the subsequent allocation of the root bridge windows steers clear of them.
+
+  Failure to claim a range is not fatal: the platform may have reserved the
+  range already, e.g., because it was described as such by PciHostBridgeLib or
+  by an earlier driver.
+
+  @param RootBridge  The root bridge instance.
+**/
+STATIC
+VOID
+ClaimFixedResources (
+  IN  PCI_ROOT_BRIDGE_INSTANCE  *RootBridge
+  )
+{
+  PCI_FIXED_RES_NODE  *Node;
+  UINTN               Index;
+  UINT64              HostBase;
+  EFI_STATUS          Status;
+
+  for (Index = 0; Index < RootBridge->FixedResCount; Index++) {
+    Node = &RootBridge->FixedRes[Index];
+    if (Node->Claimed) {
+      continue;
+    }
+
+    HostBase = TO_HOST_ADDRESS (Node->DeviceBase, Node->Translation);
+    if (Node->Type == TypeIo) {
+      Status = gDS->AllocateIoSpace (
+                      EfiGcdAllocateAddress,
+                      EfiGcdIoTypeIo,
+                      0,
+                      Node->Length,
+                      &HostBase,
+                      gImageHandle,
+                      NULL
+                      );
+    } else {
+      Status = gDS->AllocateMemorySpace (
+                      EfiGcdAllocateAddress,
+                      EfiGcdMemoryTypeMemoryMappedIo,
+                      0,
+                      Node->Length,
+                      &HostBase,
+                      gImageHandle,
+                      NULL
+                      );
+    }
+
+    DEBUG ((
+      EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_INFO,
+      "  %s: Fixed Base/Length = %lx/%lx - %r%a\n",
+      mPciResourceTypeStr[Node->Type],
+      HostBase,
+      Node->Length,
+      Status,
+      EFI_ERROR (Status) ? " (assuming reserved by platform)" : ""
+      ));
+
+    Node->Claimed = !EFI_ERROR (Status);
+  }
+}
+
+/**
+  Release the fixed ranges of a root bridge that were claimed in GCD, and
+  forget about all submitted fixed ranges.
+
+  @param RootBridge  The root bridge instance.
+
+  @retval EFI_SUCCESS  All claimed ranges were released.
+  @retval other        A GCD error occurred while releasing a range.
+**/
+STATIC
+EFI_STATUS
+FreeFixedResources (
+  IN  PCI_ROOT_BRIDGE_INSTANCE  *RootBridge
+  )
+{
+  PCI_FIXED_RES_NODE  *Node;
+  UINTN               Index;
+  UINT64              HostBase;
+  EFI_STATUS          Status;
+  EFI_STATUS          ReturnStatus;
+
+  ReturnStatus = EFI_SUCCESS;
+  for (Index = 0; Index < RootBridge->FixedResCount; Index++) {
+    Node = &RootBridge->FixedRes[Index];
+    if (!Node->Claimed) {
+      continue;
+    }
+
+    HostBase = TO_HOST_ADDRESS (Node->DeviceBase, Node->Translation);
+    if (Node->Type == TypeIo) {
+      Status = gDS->FreeIoSpace (HostBase, Node->Length);
+    } else {
+      Status = gDS->FreeMemorySpace (HostBase, Node->Length);
+    }
+
+    if (EFI_ERROR (Status)) {
+      ReturnStatus = Status;
+    }
+  }
+
+  if (RootBridge->FixedRes != NULL) {
+    FreePool (RootBridge->FixedRes);
+  }
+
+  RootBridge->FixedRes      = NULL;
+  RootBridge->FixedResCount = 0;
+  return ReturnStatus;
+}
+
+/**
 
   Enter a certain phase of the PCI enumeration process.
 
@@ -867,6 +984,8 @@ NotifyPhase (
 
           RootBridge->ResourceSubmitted = FALSE;
         }
+
+        FreeFixedResources (RootBridge);
       }
 
       HostBridge->CanRestarted = TRUE;
@@ -909,6 +1028,19 @@ NotifyPhase (
       }
 
       DEBUG ((DEBUG_INFO, "PciHostBridge: NotifyPhase (AllocateResources)\n"));
+
+      //
+      // Claim the fixed ranges of all root bridges first, so that none of the
+      // root bridge windows allocated below will overlap with them.
+      //
+      for (Link = GetFirstNode (&HostBridge->RootBridges)
+           ; !IsNull (&HostBridge->RootBridges, Link)
+           ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+           )
+      {
+        ClaimFixedResources (ROOT_BRIDGE_FROM_LINK (Link));
+      }
+
       for (Link = GetFirstNode (&HostBridge->RootBridges)
            ; !IsNull (&HostBridge->RootBridges, Link)
            ; Link = GetNextNode (&HostBridge->RootBridges, Link)
@@ -1170,6 +1302,11 @@ NotifyPhase (
         }
 
         RootBridge->ResourceSubmitted = FALSE;
+
+        Status = FreeFixedResources (RootBridge);
+        if (EFI_ERROR (Status)) {
+          ReturnStatus = Status;
+        }
       }
 
       HostBridge->CanRestarted = TRUE;
@@ -1588,6 +1725,216 @@ SubmitResources (
   }
 
   return EFI_INVALID_PARAMETER;
+}
+
+/**
+  Check whether a device address range is covered by a root bridge aperture.
+
+  @param Aperture  The aperture.
+  @param Base      The device address of the start of the range.
+  @param Length    The size of the range.
+
+  @retval TRUE   The range is covered by the aperture.
+  @retval FALSE  The range is not covered by the aperture.
+**/
+STATIC
+BOOLEAN
+IsRangeInAperture (
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Aperture,
+  IN  UINT64                    Base,
+  IN  UINT64                    Length
+  )
+{
+  return (Aperture->Base <= Aperture->Limit) &&
+         (Base >= Aperture->Base) &&
+         (Base + Length - 1 <= Aperture->Limit);
+}
+
+/**
+  Submit the fixed I/O and memory ranges decoded by devices below the
+  specified PCI root bridge.
+
+  @param[in] This              The EDKII_PCI_HOST_BRIDGE_FIXED_RESOURCE_PROTOCOL
+                               instance.
+  @param[in] RootBridgeHandle  The PCI root bridge below which the fixed ranges
+                               are decoded.
+  @param[in] Configuration     A list of ACPI QWORD address space descriptors,
+                               terminated by an end tag descriptor.
+
+  @retval EFI_SUCCESS            The fixed ranges were accepted.
+  @retval EFI_INVALID_PARAMETER  RootBridgeHandle or Configuration is invalid.
+  @retval EFI_ACCESS_DENIED      Fixed ranges were already claimed for this root
+                                 bridge, and have not been released yet.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+SubmitFixedResources (
+  IN EDKII_PCI_HOST_BRIDGE_FIXED_RESOURCE_PROTOCOL  *This,
+  IN EFI_HANDLE                                     RootBridgeHandle,
+  IN VOID                                           *Configuration
+  )
+{
+  LIST_ENTRY                         *Link;
+  PCI_HOST_BRIDGE_INSTANCE           *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  PCI_FIXED_RES_NODE                 *FixedRes;
+  UINTN                              Count;
+  UINTN                              Index;
+  UINTN                              BufferSize;
+  VOID                               *ConfigBuffer;
+  BOOLEAN                            Prefetchable;
+
+  if (Configuration == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  HostBridge = PCI_HOST_BRIDGE_FROM_FIXED_RES (This);
+  RootBridge = NULL;
+  for (Link = GetFirstNode (&HostBridge->RootBridges)
+       ; !IsNull (&HostBridge->RootBridges, Link)
+       ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+       )
+  {
+    RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+    if (RootBridge->Handle == RootBridgeHandle) {
+      break;
+    }
+
+    RootBridge = NULL;
+  }
+
+  if (RootBridge == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < RootBridge->FixedResCount; Index++) {
+    if (RootBridge->FixedRes[Index].Claimed) {
+      return EFI_ACCESS_DENIED;
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "PciHostBridge: SubmitFixedResources for %s\n", RootBridge->DevicePathStr));
+
+  //
+  // Count and sanity check the descriptors
+  //
+  Count = 0;
+  for (Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
+       Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR;
+       Descriptor++)
+  {
+    if (((Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) &&
+         (Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_IO)) ||
+        (Descriptor->AddrLen == 0) ||
+        (Descriptor->AddrRangeMin + Descriptor->AddrLen - 1 < Descriptor->AddrRangeMin))
+    {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Count++;
+  }
+
+  if (Descriptor->Desc != ACPI_END_TAG_DESCRIPTOR) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FixedRes = NULL;
+  if (Count > 0) {
+    FixedRes = AllocateZeroPool (Count * sizeof (PCI_FIXED_RES_NODE));
+    if (FixedRes == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  //
+  // Match each range with the aperture that covers it. Prefetchable ranges
+  // may reside in a non-prefetchable aperture, but not the other way around.
+  //
+  for (Index = 0, Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
+       Index < Count;
+       Index++, Descriptor++)
+  {
+    FixedRes[Index].DeviceBase = Descriptor->AddrRangeMin;
+    FixedRes[Index].Length     = Descriptor->AddrLen;
+    FixedRes[Index].Type       = TypeMax;
+
+    if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_IO) {
+      if (IsRangeInAperture (&RootBridge->Io, Descriptor->AddrRangeMin, Descriptor->AddrLen)) {
+        FixedRes[Index].Type        = TypeIo;
+        FixedRes[Index].Translation = RootBridge->Io.Translation;
+      }
+    } else {
+      Prefetchable = (Descriptor->SpecificFlag &
+                      EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0;
+
+      if (Prefetchable &&
+          IsRangeInAperture (&RootBridge->PMem, Descriptor->AddrRangeMin, Descriptor->AddrLen))
+      {
+        FixedRes[Index].Type        = TypePMem32;
+        FixedRes[Index].Translation = RootBridge->PMem.Translation;
+      } else if (Prefetchable &&
+                 IsRangeInAperture (&RootBridge->PMemAbove4G, Descriptor->AddrRangeMin, Descriptor->AddrLen))
+      {
+        FixedRes[Index].Type        = TypePMem64;
+        FixedRes[Index].Translation = RootBridge->PMemAbove4G.Translation;
+      } else if (IsRangeInAperture (&RootBridge->Mem, Descriptor->AddrRangeMin, Descriptor->AddrLen)) {
+        FixedRes[Index].Type        = TypeMem32;
+        FixedRes[Index].Translation = RootBridge->Mem.Translation;
+      } else if (IsRangeInAperture (&RootBridge->MemAbove4G, Descriptor->AddrRangeMin, Descriptor->AddrLen)) {
+        FixedRes[Index].Type        = TypeMem64;
+        FixedRes[Index].Translation = RootBridge->MemAbove4G.Translation;
+      }
+    }
+
+    if (FixedRes[Index].Type == TypeMax) {
+      DEBUG ((
+        DEBUG_ERROR,
+        " %s: Fixed range %lx/%lx not covered by any aperture\n",
+        mAcpiAddressSpaceTypeStr[Descriptor->ResType],
+        Descriptor->AddrRangeMin,
+        Descriptor->AddrLen
+        ));
+      FreePool (FixedRes);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      " %s: Fixed Base/Length = %lx/%lx\n",
+      mPciResourceTypeStr[FixedRes[Index].Type],
+      FixedRes[Index].DeviceBase,
+      FixedRes[Index].Length
+      ));
+  }
+
+  //
+  // Make sure the buffer returned by Configuration () is large enough to
+  // describe the fixed ranges in addition to the allocated windows.
+  //
+  if (Count > RootBridge->FixedResCapacity) {
+    BufferSize = (TypeMax + Count) * sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) +
+                 sizeof (EFI_ACPI_END_TAG_DESCRIPTOR);
+    ConfigBuffer = AllocatePool (BufferSize);
+    if (ConfigBuffer == NULL) {
+      if (FixedRes != NULL) {
+        FreePool (FixedRes);
+      }
+
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    FreePool (RootBridge->ConfigBuffer);
+    RootBridge->ConfigBuffer     = ConfigBuffer;
+    RootBridge->FixedResCapacity = Count;
+  }
+
+  FreeFixedResources (RootBridge);
+  RootBridge->FixedRes      = FixedRes;
+  RootBridge->FixedResCount = Count;
+  return EFI_SUCCESS;
 }
 
 /**
