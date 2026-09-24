@@ -89,6 +89,16 @@ PlatformHookSerialPortInitialize (
       return Status;
     }
 
+    if ((GenericHeader->Revision >= 2) &&
+        (GenericHeader->Length >= UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO, InputHertz)) &&
+        (SerialPortInfo->InputHertz > 0))
+    {
+      Status = PcdSet32S (PcdSerialClockRate, SerialPortInfo->InputHertz);
+      if (RETURN_ERROR (Status)) {
+        return Status;
+      }
+    }
+
  #if FixedPcdGetBool (PcdUseUniversalPayloadSerialPort) == 1
 
     Status = PcdSet32S (PcdSerialBaudRate, SerialPortInfo->BaudRate);
