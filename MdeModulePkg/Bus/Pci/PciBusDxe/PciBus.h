@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
+#include <Protocol/PciHostBridgeFixedResource.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/LoadFile2.h>
 #include <Protocol/PciRootBridgeIo.h>
