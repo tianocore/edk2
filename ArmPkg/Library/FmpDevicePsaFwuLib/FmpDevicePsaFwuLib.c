@@ -33,17 +33,71 @@
 
 #define IS_FWU_FUNC_SUPPORTED(Id)  ((BOOLEAN)((mSupportFunction & (1ULL << Id)) != 0))
 
+/**
+  See the FwuStatusToEfiStatus() how EFI_STATUS is mapped to
+  PSA_MM_FWU_* return value.
+
+  Since the PSA_MM_FWU_SUCCESS (EFI_SUCCESS) and PSA_FWU_RESUME (EFI_TIMEOUT)
+  are not ERROR status, they're not included.
+
+**/
+#define FOR_EACH_ERR_STATUS(macro)              \
+        macro(NOT_FOUND, 0)                     \
+        macro(NOT_READY, 1)                     \
+        macro(OUT_OF_RESOURCES, 2)              \
+        macro(SECURITY_VIOLATION, 3)            \
+        macro(ACCESS_DENIED, 4)                 \
+        macro(UNSUPPORTED, 5)                   \
+        macro(DEVICE_ERROR, 6)                  \
+        macro(INVALID_PARAMETER, 7)             \
+
+#define MAP_ERR_TO_ATTEMPT_STATUS(StatusName, Offset)                           \
+        STATIC CONST UINT32 PSA_FWU_LAST_ATTEMPT_ERROR_STATUS_##StatusName =    \
+        (LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE + Offset);
+
+#define MAP_CASE(StatusName, Offset)    \
+        case EFI_##StatusName:          \
+                return PSA_FWU_LAST_ATTEMPT_ERROR_STATUS_##StatusName;
+
+FOR_EACH_ERR_STATUS (MAP_ERR_TO_ATTEMPT_STATUS)
+
 STATIC UINT64                      mSupportFunction = 0;
-STATIC UINT32                      mFwuFlags        = 0;
-STATIC UINT32                      mVendorFlags     = 0;
+STATIC UINT32                      mFwuFlags = 0;
 STATIC UINT64                      mMaxPayloadSize;
 STATIC EFI_EVENT                   mEfiVirtualAddressChangeEvent;
 STATIC EFI_EVENT                   mEfiReadyToBootEvent;
 STATIC PSA_MM_FWU_IMAGE_DIRECTORY  *mImageDirectory = NULL;
 STATIC PSA_MM_FWU_IMG_INFO_ENTRY   *mImageEntry     = NULL;
 STATIC UINTN                       mImageDirectorySize;
-STATIC BOOLEAN                     mOnRuntime      = FALSE;
 STATIC BOOLEAN                     mUpdateDisabled = FALSE;
+
+/**
+  Convert Error EFI_STATUS to PSA_FWU_LAST_ATTEMPT_ERROR_STATUS.
+
+  @param [in]   Status        EFI_STATUS correspondant to PSA_MM_FWU_RET.
+
+  @retval LastAttemptStatus   The LastAttemptStatus corresponding to Status
+                              (PSA_FWU_LAST_ATTEMPT_ERROR_STATUS_XXX).
+**/
+STATIC
+UINT32
+EFIAPI
+ErrStatusToAttemptStatus (
+  IN EFI_STATUS  Status
+  )
+{
+  switch (Status) {
+    FOR_EACH_ERR_STATUS (MAP_CASE)
+  }
+
+  /*
+   * For unknown status, return LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL
+   * which out of range from LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE
+   * to LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE so that
+   * FmpDxe driver logs that invalid LastAttemptStatus is returned.
+   */
+  return LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+}
 
 /**
  * Convert Image Directory's address on VirtualAddress Change Event.
@@ -60,7 +114,6 @@ FmpPsaVirtualAddressChangeEvent (
   IN VOID       *Context
   )
 {
-  mOnRuntime = TRUE;
   PsaFwuVirtualAddressChangeEvent (Event, Context);
   gRT->ConvertPointer (0x00, (VOID **)&mImageDirectory);
   gRT->ConvertPointer (0x00, (VOID **)&mImageEntry);
@@ -130,15 +183,14 @@ CheckFwuSupport (
   }
 
   mFwuFlags       = FwuInfo->Flags;
-  mVendorFlags    = FwuInfo->VendorSpecificFlags;
   mMaxPayloadSize = FwuInfo->MaxPayloadSize;
 
   DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: ServiceStatus: %d\n", FwuInfo->ServiceStatus));
   DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMajor: %d\n", FwuInfo->VersionMajor));
   DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMinor: %d\n", FwuInfo->VersionMinor));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: mFwuFlags: %d\n", FwuInfo->Flags));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: mVendorFlags: %d\n", FwuInfo->VendorSpecificFlags));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: mMaxPayloadSize: %d\n", FwuInfo->MaxPayloadSize));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: Flags: %d\n", FwuInfo->Flags));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VendorSpecificFlags: %d\n", FwuInfo->VendorSpecificFlags));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: MaxPayloadSize: %d\n", FwuInfo->MaxPayloadSize));
 
   return EFI_SUCCESS;
 }
@@ -785,8 +837,7 @@ FmpDeviceSetImageWithStatus (
   UINT32      CommitProgress;
   UINT32      CommitTotalWorks;
 
-  Updatable          = 0;
-  *LastAttemptStatus = LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE;
+  Updatable = 0;
 
   Status = FmpDeviceCheckImageWithStatus (Image, ImageSize, &Updatable, LastAttemptStatus);
   if (EFI_ERROR (Status)) {
@@ -880,7 +931,10 @@ FmpDeviceSetImageWithStatus (
    * NOTE:
    *     Next boot, This image accepted in Entry point.
    */
-  Status = FwuCommit (Handle, 1, 0, &CommitProgress, &CommitTotalWorks);
+  do {
+    Status = FwuCommit (Handle, 1, 0, &CommitProgress, &CommitTotalWorks);
+  } while (Status == EFI_TIMEOUT);
+
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
@@ -937,6 +991,8 @@ CancelUpdate:
     CancelStatus = FwuCancelStaging ();
     ASSERT (CancelStatus == EFI_SUCCESS);
   }
+
+  *LastAttemptStatus = ErrStatusToAttemptStatus (Status);
 
   return Status;
 }
@@ -1071,7 +1127,7 @@ FmpDeviceCheckImageWithStatus (
 
   if ((ImageSize > mImageEntry->ImgMaxSize) || (mUpdateDisabled)) {
     *ImageUpdatable    = IMAGE_UPDATABLE_INVALID;
-    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE;
+    *LastAttemptStatus = ErrStatusToAttemptStatus (EFI_INVALID_PARAMETER);
     DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Invalid Status.\n"));
     return EFI_INVALID_PARAMETER;
   }
