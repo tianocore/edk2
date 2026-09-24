@@ -156,6 +156,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjOnboardDeviceInfo,                 ///< 88 - Onboard Device Extended Information
   EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
   EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
+  EArchCommonObjIpmiDeviceInfo,                    ///< 91 - IPMI Device Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2288,5 +2289,37 @@ typedef struct CmArchCommonOnboardDeviceInfo {
   /// PCI device number in bits 7:3 and function number in bits 2:0.
   UINT8              DevFuncNum;
 } CM_ARCH_COMMON_ONBOARD_DEVICE_INFO;
+
+/** A structure that describes an IPMI device.
+
+  SMBIOS Specification v3.9.0 Type 38
+
+  ID: EArchCommonObjIpmiDeviceInfo
+**/
+typedef struct CmArchCommonIpmiDeviceInfo {
+  /// CM Object Token uniquely identifying this IPMI device.
+  CM_OBJECT_TOKEN    IpmiDeviceInfoToken;
+
+  /// BMC interface type.
+  UINT8              InterfaceType;
+
+  /// IPMI specification revision in BCD format.
+  UINT8              IpmiSpecificationRevision;
+
+  /// I2C target address of the BMC.
+  UINT8              I2cTargetAddress;
+
+  /// NV storage device bus ID, or 0xFF if no device exists.
+  UINT8              NvStorageDeviceAddress;
+
+  /// Memory-mapped or I/O base address of the BMC.
+  UINT64             BaseAddress;
+
+  /// Base-address modifier and interrupt information.
+  UINT8              BaseAddressModifierInterruptInfo;
+
+  /// Interrupt number, or zero if unspecified.
+  UINT8              InterruptNumber;
+} CM_ARCH_COMMON_IPMI_DEVICE_INFO;
 
 #pragma pack()
