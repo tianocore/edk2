@@ -27,7 +27,7 @@ typedef enum {
 typedef struct {
   BOOLEAN                Exists; // The device exposes this structure
   VIRTIO_1_0_BAR_TYPE    BarType;
-  UINT8                  Bar;
+  UINT8                  Bar;    // EFI_PCI_IO_PROTOCOL BAR index
   UINT32                 Offset; // Offset into BAR where structure starts
   UINT32                 Length; // Length of structure in BAR.
 } VIRTIO_1_0_CONFIG;

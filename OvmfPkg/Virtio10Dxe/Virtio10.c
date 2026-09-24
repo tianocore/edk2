@@ -123,6 +123,82 @@ Virtio10Transfer (
 }
 
 /**
+  Translate a BAR number as used by VirtIo PCI capabilities into a BAR index
+  as used by EFI_PCI_IO_PROTOCOL.
+
+  VirtIo PCI capabilities identify a BAR by its register number, i.e., by its
+  offset in config space (0x10 + 4 * Bar). The EFI_PCI_IO_PROTOCOL instance
+  produced by PciBusDxe numbers BARs sequentially instead, with each 64-bit
+  memory BAR occupying a single index even though it consumes two BAR
+  registers. So every 64-bit memory BAR that precedes the BAR in question
+  shifts its index down by one.
+
+  @param[in]  PciIo      The EFI_PCI_IO_PROTOCOL instance that represents the
+                         device.
+
+  @param[in]  VirtioBar  The BAR register number from a VirtIo PCI capability.
+
+  @param[out] BarIndex   On output, the corresponding EFI_PCI_IO_PROTOCOL BAR
+                         index.
+
+  @retval EFI_SUCCESS      BarIndex has been set.
+
+  @retval EFI_UNSUPPORTED  VirtioBar is out of range, or refers to the upper
+                           half of a 64-bit memory BAR.
+
+  @return                  Error codes from EFI_PCI_IO_PROTOCOL.Pci.Read().
+**/
+STATIC
+EFI_STATUS
+GetPciIoBarIndex (
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT8                VirtioBar,
+  OUT UINT8                *BarIndex
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      BarValue;
+  UINT8       Register;
+  UINT8       Index;
+
+  if (VirtioBar >= PCI_MAX_BAR) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Index = 0;
+  for (Register = 0; Register < VirtioBar; Register++, Index++) {
+    Status = PciIo->Pci.Read (
+                          PciIo,
+                          EfiPciIoWidthUint32,
+                          (UINT32)(PCI_BASE_ADDRESSREG_OFFSET +
+                                   Register * sizeof (UINT32)),
+                          1,
+                          &BarValue
+                          );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // The memory space indicator and type bits are read-only, so they can be
+    // inspected without sizing the BAR. A 64-bit memory BAR has type 10b.
+    //
+    if (((BarValue & BIT0) == 0) && ((BarValue & (BIT2 | BIT1)) == BIT2)) {
+      //
+      // Skip the register holding the upper half of this 64-bit BAR.
+      //
+      Register++;
+      if (Register == VirtioBar) {
+        return EFI_UNSUPPORTED;
+      }
+    }
+  }
+
+  *BarIndex = Index;
+  return EFI_SUCCESS;
+}
+
+/**
   Determine if a PCI BAR is IO or MMIO.
 
   @param[in]  PciIo     The EFI_PCI_IO_PROTOCOL instance that represents the
@@ -239,6 +315,7 @@ ParseCapabilities (
     UINT8              CapLen;
     VIRTIO_PCI_CAP     VirtIoCap;
     VIRTIO_1_0_CONFIG  *ParsedConfig;
+    UINT8              BarIndex;
 
     //
     // Big enough to accommodate a VIRTIO_PCI_CAP structure?
@@ -269,6 +346,14 @@ ParseCapabilities (
       goto UninitCapList;
     }
 
+    if (VirtIoCap.Bar >= PCI_MAX_BAR) {
+      //
+      // Reserved BAR value; the spec requires the driver to ignore the
+      // capability.
+      //
+      continue;
+    }
+
     switch (VirtIoCap.ConfigType) {
       case VIRTIO_PCI_CAP_COMMON_CFG:
         ParsedConfig = &Device->CommonConfig;
@@ -289,12 +374,17 @@ ParseCapabilities (
     //
     // Save the location of the register block into ParsedConfig.
     //
-    Status = GetBarType (Device->PciIo, VirtIoCap.Bar, &ParsedConfig->BarType);
+    Status = GetPciIoBarIndex (Device->PciIo, VirtIoCap.Bar, &BarIndex);
     if (EFI_ERROR (Status)) {
       goto UninitCapList;
     }
 
-    ParsedConfig->Bar    = VirtIoCap.Bar;
+    Status = GetBarType (Device->PciIo, BarIndex, &ParsedConfig->BarType);
+    if (EFI_ERROR (Status)) {
+      goto UninitCapList;
+    }
+
+    ParsedConfig->Bar    = BarIndex;
     ParsedConfig->Offset = VirtIoCap.Offset;
     ParsedConfig->Length = VirtIoCap.Length;
 
