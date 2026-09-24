@@ -2149,6 +2149,10 @@ PciParseBar (
   resource allocation logic is aware that it must not relocate it or degrade
   its type.
 
+  For PCI-PCI bridges, also record the fixed windows described by entries with
+  BEI 6, through which the bridge forwards transactions to its secondary side
+  regardless of the contents of its Base/Limit registers.
+
   This must be called after the BARs have been parsed with PciParseBar (), and
   before resource allocation takes place.
 
@@ -2182,6 +2186,10 @@ PciParseEnhancedAllocation (
   UINTN                BarIndex;
   PCI_BAR              *Bar;
   PCI_BAR_TYPE         BarType;
+  BOOLEAN              Supported;
+  UINTN                Window;
+
+  ZeroMem (PciIoDevice->EaWindow, sizeof (PciIoDevice->EaWindow));
 
   CapOffset = 0;
   Status    = LocateCapabilityRegBlock (
@@ -2242,11 +2250,13 @@ PciParseEnhancedAllocation (
     }
 
     Bei = (UINT8)PCI_EA_ENTRY_BEI (EntryHeader);
-    if (Bei > MaxBei) {
+    if ((Bei > MaxBei) &&
+        !((Bei == PCI_EA_BEI_BRIDGE) && IS_PCI_BRIDGE (&PciIoDevice->Pci)))
+    {
       //
-      // Only BAR equivalent entries are handled here. Entries describing
-      // resources behind a bridge, the expansion ROM or SR-IOV VF BARs are
-      // ignored.
+      // Only BAR equivalent entries, and fixed windows of PCI-PCI bridges are
+      // handled here. Entries describing the expansion ROM or SR-IOV VF BARs
+      // are ignored.
       //
       DEBUG ((DEBUG_INFO, "   EA: entry %d: BEI %d not handled, ignoring\n", EntryIndex, Bei));
       continue;
@@ -2261,10 +2271,17 @@ PciParseEnhancedAllocation (
       Property = (UINT8)PCI_EA_ENTRY_SECONDARY_PROPERTIES (EntryHeader);
     }
 
-    if ((Property != PCI_EA_PROP_MEM) &&
-        (Property != PCI_EA_PROP_MEM_PREFETCH) &&
-        (Property != PCI_EA_PROP_IO))
-    {
+    if (Bei == PCI_EA_BEI_BRIDGE) {
+      Supported = (Property == PCI_EA_PROP_BRIDGE_MEM) ||
+                  (Property == PCI_EA_PROP_BRIDGE_PREFETCH) ||
+                  (Property == PCI_EA_PROP_BRIDGE_IO);
+    } else {
+      Supported = (Property == PCI_EA_PROP_MEM) ||
+                  (Property == PCI_EA_PROP_MEM_PREFETCH) ||
+                  (Property == PCI_EA_PROP_IO);
+    }
+
+    if (!Supported) {
       DEBUG ((
         DEBUG_INFO,
         "   EA: entry %d: BEI %d has properties 0x%x, ignoring\n",
@@ -2313,6 +2330,58 @@ PciParseEnhancedAllocation (
 
     if (MaxOffset >= MAX_UINT64 - Base) {
       DEBUG ((DEBUG_WARN, "   EA: entry %d: BEI %d range overflows, ignoring\n", EntryIndex, Bei));
+      continue;
+    }
+
+    if (Bei == PCI_EA_BEI_BRIDGE) {
+      //
+      // A fixed window of a PCI-PCI bridge: the bridge forwards this range to
+      // its secondary side regardless of its Base/Limit registers. Record it,
+      // and make sure resources of this type are not degraded to a different
+      // type on account of the Base/Limit registers not being implemented.
+      //
+      switch (Property) {
+        case PCI_EA_PROP_BRIDGE_IO:
+          Window                = PCI_EA_WINDOW_IO;
+          BarType               = (Base + MaxOffset > MAX_UINT16) ? PciBarTypeIo32 : PciBarTypeIo16;
+          PciIoDevice->Decodes |= (BarType == PciBarTypeIo32) ?
+                                  EFI_BRIDGE_IO32_DECODE_SUPPORTED :
+                                  EFI_BRIDGE_IO16_DECODE_SUPPORTED;
+          break;
+        case PCI_EA_PROP_BRIDGE_PREFETCH:
+          Window                = PCI_EA_WINDOW_PMEM;
+          BarType               = (Base + MaxOffset > MAX_UINT32) ? PciBarTypePMem64 : PciBarTypePMem32;
+          PciIoDevice->Decodes |= EFI_BRIDGE_PMEM32_DECODE_SUPPORTED;
+          if (BarType == PciBarTypePMem64) {
+            PciIoDevice->Decodes |= EFI_BRIDGE_PMEM64_DECODE_SUPPORTED;
+          }
+
+          break;
+        case PCI_EA_PROP_BRIDGE_MEM:
+        default:
+          Window  = PCI_EA_WINDOW_MEM;
+          BarType = (Base + MaxOffset > MAX_UINT32) ? PciBarTypeMem64 : PciBarTypeMem32;
+          break;
+      }
+
+      if (PciIoDevice->EaWindow[Window].Length != 0) {
+        DEBUG ((DEBUG_WARN, "   EA: entry %d: duplicate bridge window, ignoring\n", EntryIndex));
+        continue;
+      }
+
+      PciIoDevice->EaWindow[Window].BaseAddress  = Base;
+      PciIoDevice->EaWindow[Window].Length       = MaxOffset + 1;
+      PciIoDevice->EaWindow[Window].BarType      = BarType;
+      PciIoDevice->EaWindow[Window].BarTypeFixed = TRUE;
+      PciIoDevice->EaWindow[Window].AddressFixed = TRUE;
+
+      DEBUG ((
+        DEBUG_INFO,
+        "   EA: Window: Type = %s; Base = 0x%lx;\tLength = 0x%lx (fixed)\n",
+        mBarTypeStr[MIN (BarType, PciBarTypeMaxType)],
+        Base,
+        MaxOffset + 1
+        ));
       continue;
     }
 
