@@ -50,6 +50,40 @@ PciPciDeviceInfoCollector (
   );
 
 /**
+  Searches a PCI device and it's children to find the optimum Max Payload Size
+  supported by the provided device and its children.
+
+  @param[in]  PciIoDevice       The PCI IO Device to find the optimal MPS for.
+  @param[out] MaxPayloadSize    The optimum MPS for the device and it's children.
+
+  @retval   EFI_SUCCESS         Optimum MPS was found.
+  @retval   EFI_UNSUPPORTED     MPS not supported by provided device or its children.
+
+**/
+EFI_STATUS
+PciGetMaxPayloadSize (
+  IN PCI_IO_DEVICE  *PciIoDevice,
+  OUT UINT8         *MaxPayloadSize
+  );
+
+/**
+  Sets the PCIe Max PayloadSize for the provided device and it's children.
+
+  @param[in]  PciIoDevice       The PCI IO Device to set the MPS for.
+  @param[out] MaxPayloadSize    The MPS to set.
+
+  @retval   EFI_SUCCESS         The MPS ws set for the device and it's children.
+  @retval   EFI_UNSUPPORTED     MPS not supported by provided device or its children.
+  @retval   Other               MPS could not be read or written.
+
+**/
+EFI_STATUS
+PciProgramMps (
+  IN PCI_IO_DEVICE  *PciIoDevice,
+  IN UINT8          MaxPayloadSize
+  );
+
+/**
   Search required device and create PCI device instance.
 
   @param Bridge     Parent bridge instance.
