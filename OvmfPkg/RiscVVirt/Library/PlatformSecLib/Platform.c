@@ -59,7 +59,7 @@ PopulateIoResources (
     Reg = (UINT64 *)FdtGetProp (FdtBase, Node, "reg", &LenP);
     if (Reg) {
       ASSERT (LenP == (2 * sizeof (UINT64)));
-      AddIoMemoryBaseSizeHob (SwapBytes64 (Reg[0]), SwapBytes64 (Reg[1]));
+      AddIoMemoryBaseSizeHob (SwapBytes64 (ReadUnaligned64 (&Reg[0])), SwapBytes64 (ReadUnaligned64 (&Reg[1])));
     }
 
     Node = FdtNodeOffsetByCompatible (FdtBase, Node, Compatible);
