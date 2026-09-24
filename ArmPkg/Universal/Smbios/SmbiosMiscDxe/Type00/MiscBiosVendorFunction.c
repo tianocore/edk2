@@ -159,7 +159,9 @@ SetBiosVersion (
               NULL
               );
 
-  if (((StrCmp (Version, DefaultVersionString) == 0) || (StrLen (Version) == 0))) {
+  if ((DefaultVersionString == NULL) || (Version == NULL) ||
+      (StrCmp (Version, DefaultVersionString) == 0) || (StrLen (Version) == 0))
+  {
     PcdVersion = (CHAR16 *)FixedPcdGetPtr (PcdFirmwareVersionString);
     if ((PcdVersion != NULL) && (StrLen (PcdVersion) > 0)) {
       TokenToUpdate = STRING_TOKEN (STR_MISC_BIOS_VERSION);
