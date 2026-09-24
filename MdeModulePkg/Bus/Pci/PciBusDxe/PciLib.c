@@ -1245,6 +1245,80 @@ PciAllocateBusNumber (
 }
 
 /**
+  Check whether the fixed bus numbers described by the Enhanced Allocation
+  capability of a PCI-PCI bridge, if any, can be assigned to it.
+
+  Bus numbers are assigned in ascending order, so the fixed bus numbers must
+  not have been assigned yet. They must also reside in a single bus number
+  range of the root bridge, and inside the fixed bus numbers of the nearest
+  upstream bridge that has them, if any.
+
+  @param  Bridge        Parent bridge device instance.
+  @param  PciDevice     PCI-PCI bridge device instance.
+  @param  SubBusNumber  Highest bus number assigned so far.
+
+  @retval TRUE   The bridge has no fixed bus numbers, or they can be assigned.
+  @retval FALSE  The bridge has fixed bus numbers that cannot be assigned.
+
+**/
+STATIC
+BOOLEAN
+PciCheckFixedBusNumbers (
+  IN PCI_IO_DEVICE  *Bridge,
+  IN PCI_IO_DEVICE  *PciDevice,
+  IN UINT8          SubBusNumber
+  )
+{
+  PCI_IO_DEVICE  *Parent;
+  UINT8          NextBusNumber;
+
+  if (PciDevice->EaFixedSecondaryBus == 0) {
+    return TRUE;
+  }
+
+  if (PciDevice->EaFixedSecondaryBus <= SubBusNumber) {
+    goto Unavailable;
+  }
+
+  if (EFI_ERROR (
+        PciAllocateBusNumber (
+          Bridge,
+          SubBusNumber,
+          (UINT8)(PciDevice->EaFixedSubordinateBus - SubBusNumber),
+          &NextBusNumber
+          )
+        ) ||
+      (NextBusNumber != PciDevice->EaFixedSubordinateBus))
+  {
+    goto Unavailable;
+  }
+
+  for (Parent = Bridge; Parent != NULL; Parent = Parent->Parent) {
+    if (Parent->EaFixedSecondaryBus != 0) {
+      if (PciDevice->EaFixedSubordinateBus > Parent->EaFixedSubordinateBus) {
+        goto Unavailable;
+      }
+
+      break;
+    }
+  }
+
+  return TRUE;
+
+Unavailable:
+  DEBUG ((
+    DEBUG_ERROR,
+    "PciBus: [%02x|%02x|%02x] fixed bus numbers %02x-%02x cannot be assigned, not scanning behind bridge\n",
+    PciDevice->BusNumber,
+    PciDevice->DeviceNumber,
+    PciDevice->FunctionNumber,
+    PciDevice->EaFixedSecondaryBus,
+    PciDevice->EaFixedSubordinateBus
+    ));
+  return FALSE;
+}
+
+/**
   Scan pci bus and assign bus number to the given PCI bus system.
 
   @param  Bridge           Bridge device instance.
@@ -1288,6 +1362,7 @@ PciScanBus (
   BOOLEAN                            BusPadding;
   UINT32                             TempReservedBusNum;
   BOOLEAN                            IsAriEnabled;
+  BOOLEAN                            FixedBuses;
 
   PciRootBridgeIo   = Bridge->PciRootBridgeIo;
   SecondBus         = 0;
@@ -1419,10 +1494,27 @@ PciScanBus (
         }
       }
 
-      if (IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci)) {
+      if (IS_PCI_BRIDGE (&Pci) && !PciCheckFixedBusNumbers (Bridge, PciDevice, *SubBusNumber)) {
+        //
+        // The bridge only forwards configuration transactions for its fixed bus
+        // numbers, so there is no point in assigning different ones. Its bus
+        // number registers are likely hardwired, and so the hierarchy behind it
+        // may remain visible on buses that are assigned to other bridges. Set
+        // the primary bus number to an invalid value, so that the bridge is
+        // recognized as unusable by PciPciDeviceInfoCollector ().
+        //
+        Register = PCI_EA_UNASSIGNED_PRIMARY_BUS;
+        Address  = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET);
+        PciRootBridgeIo->Pci.Write (PciRootBridgeIo, EfiPciWidthUint16, Address, 1, &Register);
+        Register = 0;
+        Address  = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
+        PciRootBridgeIo->Pci.Write (PciRootBridgeIo, EfiPciWidthUint8, Address, 1, &Register);
+      } else if (IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci)) {
         //
         // For PPB
         //
+        FixedBuses = (BOOLEAN)(IS_PCI_BRIDGE (&Pci) && (PciDevice->EaFixedSecondaryBus != 0));
+
         if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
           //
           // If Hot Plug is supported,
@@ -1473,9 +1565,18 @@ PciScanBus (
           }
         }
 
-        Status = PciAllocateBusNumber (Bridge, *SubBusNumber, 1, SubBusNumber);
-        if (EFI_ERROR (Status)) {
-          return Status;
+        if (FixedBuses) {
+          //
+          // The bus numbers are fixed by Enhanced Allocation, and have been
+          // checked by PciCheckFixedBusNumbers (). Padding does not apply.
+          //
+          BusPadding    = FALSE;
+          *SubBusNumber = PciDevice->EaFixedSecondaryBus;
+        } else {
+          Status = PciAllocateBusNumber (Bridge, *SubBusNumber, 1, SubBusNumber);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
         }
 
         SecondBus = *SubBusNumber;
@@ -1499,7 +1600,7 @@ PciScanBus (
           // Temporarily initialize SubBusNumber to maximum bus number to ensure the
           // PCI configuration transaction to go through any PPB
           //
-          Register = PciGetMaxBusNumber (Bridge);
+          Register = FixedBuses ? PciDevice->EaFixedSubordinateBus : PciGetMaxBusNumber (Bridge);
           Address  = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
           Status   = PciRootBridgeIo->Pci.Write (
                                             PciRootBridgeIo,
@@ -1529,6 +1630,24 @@ PciScanBus (
           if (EFI_ERROR (Status)) {
             return Status;
           }
+        }
+
+        if (FixedBuses) {
+          if (*SubBusNumber > PciDevice->EaFixedSubordinateBus) {
+            DEBUG ((
+              DEBUG_ERROR,
+              "PciBus: [%02x|%02x|%02x] buses %02x-%02x exceed the fixed bus numbers %02x-%02x, and are unreachable\n",
+              PciDevice->BusNumber,
+              PciDevice->DeviceNumber,
+              PciDevice->FunctionNumber,
+              SecondBus,
+              *SubBusNumber,
+              PciDevice->EaFixedSecondaryBus,
+              PciDevice->EaFixedSubordinateBus
+              ));
+          }
+
+          *SubBusNumber = MAX (*SubBusNumber, PciDevice->EaFixedSubordinateBus);
         }
 
         if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport) && BusPadding) {
@@ -1563,7 +1682,7 @@ PciScanBus (
                                         EfiPciWidthUint8,
                                         Address,
                                         1,
-                                        SubBusNumber
+                                        FixedBuses ? &PciDevice->EaFixedSubordinateBus : SubBusNumber
                                         );
       } else {
         //
