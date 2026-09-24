@@ -247,6 +247,7 @@ PciPciDeviceInfoCollector (
   UINT8                Device;
   UINT8                Func;
   UINT8                SecBus;
+  UINT8                PrimaryBus;
   PCI_IO_DEVICE        *PciIoDevice;
   EFI_PCI_IO_PROTOCOL  *PciIo;
 
@@ -324,6 +325,18 @@ PciPciDeviceInfoCollector (
           //
           if (SecBus <= StartBusNumber) {
             break;
+          }
+
+          //
+          // Don't scan behind a bridge whose fixed bus numbers could not be
+          // assigned by PciScanBus (), as they may overlap with the buses of
+          // other bridges.
+          //
+          if (PciIoDevice->EaFixedSecondaryBus != 0) {
+            Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET, 1, &PrimaryBus);
+            if (EFI_ERROR (Status) || (PrimaryBus != StartBusNumber)) {
+              break;
+            }
           }
 
           //
@@ -2159,6 +2172,9 @@ PciParseBar (
   BEI 6, through which the bridge forwards transactions to its secondary side
   regardless of the contents of its Base/Limit registers.
 
+  For PCI-PCI bridges, also record the fixed secondary and subordinate bus
+  numbers, if any, which must be assigned to the bridge during bus enumeration.
+
   This must be called after the BARs have been parsed with PciParseBar (), and
   before resource allocation takes place.
 
@@ -2196,7 +2212,9 @@ PciParseEnhancedAllocation (
   UINTN                Window;
 
   ZeroMem (PciIoDevice->EaWindow, sizeof (PciIoDevice->EaWindow));
-  PciIoDevice->EaCapabilityOffset = 0;
+  PciIoDevice->EaCapabilityOffset    = 0;
+  PciIoDevice->EaFixedSecondaryBus   = 0;
+  PciIoDevice->EaFixedSubordinateBus = 0;
 
   CapOffset = 0;
   Status    = LocateCapabilityRegBlock (
@@ -2223,6 +2241,27 @@ PciParseEnhancedAllocation (
     //
     EntryOffset += PCI_EA_CAP_TYPE1_EXTRA_DWORDS * sizeof (UINT32);
     MaxBei       = PCI_EA_BEI_BAR0 + PPB_BAR_1;
+
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, CapOffset + sizeof (UINT32), 1, &Dword);
+    if (PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword) != 0) {
+      if (PCI_EA_CAP_FIXED_SUBORDINATE_BUS (Dword) < PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "   EA: invalid fixed bus numbers %02x-%02x, ignoring\n",
+          PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword),
+          PCI_EA_CAP_FIXED_SUBORDINATE_BUS (Dword)
+          ));
+      } else {
+        PciIoDevice->EaFixedSecondaryBus   = (UINT8)PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword);
+        PciIoDevice->EaFixedSubordinateBus = (UINT8)PCI_EA_CAP_FIXED_SUBORDINATE_BUS (Dword);
+        DEBUG ((
+          DEBUG_INFO,
+          "   EA: fixed secondary bus %02x, subordinate bus %02x\n",
+          PciIoDevice->EaFixedSecondaryBus,
+          PciIoDevice->EaFixedSubordinateBus
+          ));
+      }
+    }
   } else {
     MaxBei = PCI_EA_BEI_BAR5;
   }
