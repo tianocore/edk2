@@ -166,6 +166,14 @@ SetBiosVersion (
       HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, PcdVersion, NULL);
     }
   }
+
+  if (DefaultVersionString != NULL) {
+    FreePool (DefaultVersionString);
+  }
+
+  if (Version != NULL) {
+    FreePool (Version);
+  }
 }
 
 /**
