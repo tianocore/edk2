@@ -7,13 +7,16 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <PiDxe.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Virtio.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/VirtioDevice.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciCapLib.h>
 #include <Library/PciCapPciIoLib.h>
@@ -260,6 +263,150 @@ GetBarType (
   return Status;
 }
 
+/**
+  Parse a VIRTIO_PCI_CAP_SHARED_MEMORY_CFG capability, and record the shared
+  memory region it describes.
+
+  Capabilities that are malformed, violate the VirtIo spec, or point outside a
+  memory BAR are skipped with a warning; they do not cause the device to be
+  rejected.
+
+  @param[in,out] Device     The VIRTIO_1_0_DEV structure that identifies the
+                            device. On successful output, the shared memory
+                            region may have been appended to ShmRegions.
+
+  @param[in]     PciDevice  The PCI_CAP_DEV used to access config space.
+
+  @param[in]     VendorCap  The vendor capability to parse.
+
+  @param[in]     CapLen     The length of the vendor capability, in bytes.
+
+  @retval EFI_SUCCESS  The capability was processed (recorded or skipped).
+
+  @return              Error codes from PciCapRead().
+**/
+STATIC
+EFI_STATUS
+ParseSharedMemoryCap (
+  IN OUT VIRTIO_1_0_DEV  *Device,
+  IN     PCI_CAP_DEV     *PciDevice,
+  IN     PCI_CAP         *VendorCap,
+  IN     UINT8           CapLen
+  )
+{
+  EFI_STATUS                         Status;
+  VIRTIO_PCI_CAP64                   VirtIoCap64;
+  UINT64                             Offset;
+  UINT64                             Length;
+  VOID                               *Resources;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  VIRTIO_1_0_SHM_REGION              *Region;
+  UINT8                              BarIndex;
+
+  if (CapLen < sizeof VirtIoCap64) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shared memory capability too short (%u bytes)\n",
+      __func__,
+      CapLen
+      ));
+    return EFI_SUCCESS;
+  }
+
+  Status = PciCapRead (PciDevice, VendorCap, 0, &VirtIoCap64, sizeof VirtIoCap64);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Offset = LShiftU64 (VirtIoCap64.OffsetHi, 32) | VirtIoCap64.Cap.Offset;
+  Length = LShiftU64 (VirtIoCap64.LengthHi, 32) | VirtIoCap64.Cap.Length;
+
+  if (Device->ShmRegionCount == VIRTIO_1_0_MAX_SHM_REGIONS) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: too many shared memory regions, ignoring\n",
+      __func__,
+      VirtIoCap64.Cap.Id
+      ));
+    return EFI_SUCCESS;
+  }
+
+  //
+  // The spec requires shared memory regions to be non-empty, and 4 KB aligned
+  // in both offset and length.
+  //
+  if ((Length == 0) ||
+      ((Offset & (VIRTIO_PCI_SHM_ALIGNMENT - 1)) != 0) ||
+      ((Length & (VIRTIO_PCI_SHM_ALIGNMENT - 1)) != 0))
+  {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: invalid offset 0x%Lx / length 0x%Lx\n",
+      __func__,
+      VirtIoCap64.Cap.Id,
+      Offset,
+      Length
+      ));
+    return EFI_SUCCESS;
+  }
+
+  Status = GetPciIoBarIndex (Device->PciIo, VirtIoCap64.Cap.Bar, &BarIndex);
+  if (!EFI_ERROR (Status)) {
+    Status = Device->PciIo->GetBarAttributes (
+                              Device->PciIo,
+                              BarIndex,
+                              NULL,
+                              &Resources
+                              );
+  }
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: BAR %u unusable: %r\n",
+      __func__,
+      VirtIoCap64.Cap.Id,
+      VirtIoCap64.Cap.Bar,
+      Status
+      ));
+    return EFI_SUCCESS;
+  }
+
+  //
+  // The spec requires shared memory regions to reside in a memory BAR, and
+  // the region must fit inside it. Note that AddrRangeMin is the host (CPU)
+  // address of the BAR, i.e., the address translation has been applied.
+  //
+  Descriptor = Resources;
+  if ((Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR) ||
+      (Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) ||
+      (Offset > Descriptor->AddrLen) ||
+      (Length > Descriptor->AddrLen - Offset))
+  {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: [0x%Lx, +0x%Lx) not within memory BAR %u\n",
+      __func__,
+      VirtIoCap64.Cap.Id,
+      Offset,
+      Length,
+      VirtIoCap64.Cap.Bar
+      ));
+    goto FreeResources;
+  }
+
+  Region              = &Device->ShmRegions[Device->ShmRegionCount++];
+  Region->Id          = VirtIoCap64.Cap.Id;
+  Region->Bar         = BarIndex;
+  Region->Offset      = Offset;
+  Region->Length      = Length;
+  Region->HostAddress = Descriptor->AddrRangeMin + Offset;
+  Region->Remapped    = FALSE;
+
+FreeResources:
+  FreePool (Resources);
+  return EFI_SUCCESS;
+}
+
 /*
   Traverse the PCI capabilities list of a virtio-1.0 device, and capture the
   locations of the interesting virtio-1.0 register blocks.
@@ -364,6 +511,13 @@ ParseCapabilities (
       case VIRTIO_PCI_CAP_DEVICE_CFG:
         ParsedConfig = &Device->SpecificConfig;
         break;
+      case VIRTIO_PCI_CAP_SHARED_MEMORY_CFG:
+        Status = ParseSharedMemoryCap (Device, PciDevice, VendorCap, CapLen);
+        if (EFI_ERROR (Status)) {
+          goto UninitCapList;
+        }
+
+        continue;
       default:
         //
         // Capability is not interesting.
@@ -454,6 +608,214 @@ UpdateAttributes (
     *Attributes |= (Config->BarType == Virtio10BarTypeMem) ?
                    EFI_PCI_IO_ATTRIBUTE_MEMORY :
                    EFI_PCI_IO_ATTRIBUTE_IO;
+  }
+}
+
+/**
+  Remap a virtio shared memory region with cacheable attributes.
+
+  Shared memory regions are not read sensitive, and so the VirtIo spec permits
+  them to be mapped with cacheable semantics. The PCI root bridge apertures are
+  added to the GCD memory space map as uncached MMIO without the EFI_MEMORY_WC
+  capability, so the capability is added before the attributes are updated.
+
+  Note that EFI_PCI_IO_PROTOCOL.SetBarAttributes() is not used here, as
+  PciBusDxe does not support modifying the WRITE_COMBINE or CACHED attributes
+  of BAR ranges.
+
+  Failure is not fatal: the region simply remains mapped uncached.
+
+  @param[in,out] Region  The shared memory region to remap. On successful
+                         output, Remapped is set to TRUE, and OrigAttributes
+                         and OrigCapabilities record the GCD state to restore.
+**/
+STATIC
+VOID
+RemapSharedMemoryRegion (
+  IN OUT VIRTIO_1_0_SHM_REGION  *Region
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
+  UINT64                           NewAttributes;
+
+  Status = gDS->GetMemorySpaceDescriptor (Region->HostAddress, &GcdDescriptor);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: no GCD descriptor for 0x%Lx: %r\n",
+      __func__,
+      Region->Id,
+      Region->HostAddress,
+      Status
+      ));
+    return;
+  }
+
+  //
+  // Only touch MMIO, and require the region to be covered by a single GCD
+  // descriptor so that the original state can be restored uniformly.
+  //
+  if ((GcdDescriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) ||
+      (Region->Length > GcdDescriptor.BaseAddress + GcdDescriptor.Length -
+       Region->HostAddress))
+  {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: [0x%Lx, +0x%Lx) not in a single MMIO GCD descriptor\n",
+      __func__,
+      Region->Id,
+      Region->HostAddress,
+      Region->Length
+      ));
+    return;
+  }
+
+  Region->OrigAttributes   = GcdDescriptor.Attributes;
+  Region->OrigCapabilities = GcdDescriptor.Capabilities;
+
+  if ((GcdDescriptor.Capabilities & EFI_MEMORY_WB) == 0) {
+    Status = gDS->SetMemorySpaceCapabilities (
+                    Region->HostAddress,
+                    Region->Length,
+                    GcdDescriptor.Capabilities | EFI_MEMORY_WB
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: shm region %u: failed to add WB capability: %r\n",
+        __func__,
+        Region->Id,
+        Status
+        ));
+      return;
+    }
+  }
+
+  //
+  // Replace the cacheability attribute only; retain permission attributes
+  // such as EFI_MEMORY_XP.
+  //
+  NewAttributes = (GcdDescriptor.Attributes & ~EFI_CACHE_ATTRIBUTE_MASK) |
+                  EFI_MEMORY_WB;
+  Status = gDS->SetMemorySpaceAttributes (
+                  Region->HostAddress,
+                  Region->Length,
+                  NewAttributes
+                  );
+  if (EFI_ERROR (Status)) {
+    //
+    // This may happen e.g. on x86 when no variable MTRR is available.
+    //
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: shm region %u: failed to set WB attribute: %r\n",
+      __func__,
+      Region->Id,
+      Status
+      ));
+    if ((Region->OrigCapabilities & EFI_MEMORY_WB) == 0) {
+      gDS->SetMemorySpaceCapabilities (
+             Region->HostAddress,
+             Region->Length,
+             Region->OrigCapabilities
+             );
+    }
+
+    return;
+  }
+
+  Region->Remapped = TRUE;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: shm region %u: BAR %u [0x%Lx, +0x%Lx) mapped WB\n",
+    __func__,
+    Region->Id,
+    Region->Bar,
+    Region->HostAddress,
+    Region->Length
+    ));
+}
+
+/**
+  Remap all shared memory regions of a virtio-1.0 device with cacheable
+  attributes.
+
+  @param[in,out] Device  The VIRTIO_1_0_DEV structure that identifies the
+                         device.
+**/
+STATIC
+VOID
+RemapSharedMemoryRegions (
+  IN OUT VIRTIO_1_0_DEV  *Device
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < Device->ShmRegionCount; Index++) {
+    RemapSharedMemoryRegion (&Device->ShmRegions[Index]);
+  }
+}
+
+/**
+  Restore the original GCD attributes and capabilities of all shared memory
+  regions of a virtio-1.0 device that were remapped by
+  RemapSharedMemoryRegions().
+
+  @param[in,out] Device  The VIRTIO_1_0_DEV structure that identifies the
+                         device.
+**/
+STATIC
+VOID
+UnmapSharedMemoryRegions (
+  IN OUT VIRTIO_1_0_DEV  *Device
+  )
+{
+  EFI_STATUS             Status;
+  UINTN                  Index;
+  VIRTIO_1_0_SHM_REGION  *Region;
+
+  for (Index = 0; Index < Device->ShmRegionCount; Index++) {
+    Region = &Device->ShmRegions[Index];
+    if (!Region->Remapped) {
+      continue;
+    }
+
+    Status = gDS->SetMemorySpaceAttributes (
+                    Region->HostAddress,
+                    Region->Length,
+                    Region->OrigAttributes
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: shm region %u: failed to restore attributes: %r\n",
+        __func__,
+        Region->Id,
+        Status
+        ));
+      continue;
+    }
+
+    if ((Region->OrigCapabilities & EFI_MEMORY_WC) == 0) {
+      Status = gDS->SetMemorySpaceCapabilities (
+                      Region->HostAddress,
+                      Region->Length,
+                      Region->OrigCapabilities
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: shm region %u: failed to restore capabilities: %r\n",
+          __func__,
+          Region->Id,
+          Status
+          ));
+      }
+    }
+
+    Region->Remapped = FALSE;
   }
 }
 
@@ -1209,6 +1571,13 @@ Virtio10BindingStart (
   UpdateAttributes (&Device->CommonConfig, &SetAttributes);
   UpdateAttributes (&Device->NotifyConfig, &SetAttributes);
   UpdateAttributes (&Device->SpecificConfig, &SetAttributes);
+  if (Device->ShmRegionCount > 0) {
+    //
+    // Shared memory regions always live in memory BARs.
+    //
+    SetAttributes |= EFI_PCI_IO_ATTRIBUTE_MEMORY;
+  }
+
   Status = Device->PciIo->Attributes (
                             Device->PciIo,
                             EfiPciIoAttributeOperationEnable,
@@ -1218,6 +1587,8 @@ Virtio10BindingStart (
   if (EFI_ERROR (Status)) {
     goto ClosePciIo;
   }
+
+  RemapSharedMemoryRegions (Device);
 
   Status = gBS->InstallProtocolInterface (
                   &DeviceHandle,
@@ -1232,6 +1603,8 @@ Virtio10BindingStart (
   return EFI_SUCCESS;
 
 RestorePciAttributes:
+  UnmapSharedMemoryRegions (Device);
+
   Device->PciIo->Attributes (
                    Device->PciIo,
                    EfiPciIoAttributeOperationSet,
@@ -1289,6 +1662,8 @@ Virtio10BindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  UnmapSharedMemoryRegions (Device);
 
   Device->PciIo->Attributes (
                    Device->PciIo,
