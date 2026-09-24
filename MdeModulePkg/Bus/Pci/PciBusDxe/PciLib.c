@@ -459,6 +459,139 @@ AdjustPciDeviceBarSize (
 }
 
 /**
+  Pass the fixed ranges decoded below a root bridge to the host bridge driver,
+  so that it can keep them clear of the root bridge windows it allocates.
+
+  The fixed ranges are the direct children of the root bridge resource nodes
+  that are marked as Fixed: these are fixed BARs of devices on the root bus,
+  and pinned windows of PCI-PCI bridges that cover fixed BARs further down.
+
+  If the host bridge driver does not implement the fixed resource protocol,
+  the platform is expected to have reserved these ranges itself.
+
+  @param RootBridgeDev  The root bridge device.
+  @param Nodes          The root bridge resource nodes.
+  @param NodeCount      The number of entries in Nodes.
+
+**/
+STATIC
+VOID
+SubmitFixedRootResources (
+  IN PCI_IO_DEVICE      *RootBridgeDev,
+  IN PCI_RESOURCE_NODE  **Nodes,
+  IN UINTN              NodeCount
+  )
+{
+  EDKII_PCI_HOST_BRIDGE_FIXED_RESOURCE_PROTOCOL  *FixedRes;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR              *Config;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR              *Descriptor;
+  EFI_ACPI_END_TAG_DESCRIPTOR                    *End;
+  PCI_RESOURCE_NODE                              *Node;
+  LIST_ENTRY                                     *Link;
+  EFI_STATUS                                     Status;
+  UINTN                                          Count;
+  UINTN                                          Index;
+
+  Count = 0;
+  for (Index = 0; Index < NodeCount; Index++) {
+    for (Link = GetFirstNode (&Nodes[Index]->ChildList);
+         !IsNull (&Nodes[Index]->ChildList, Link);
+         Link = GetNextNode (&Nodes[Index]->ChildList, Link))
+    {
+      Node = RESOURCE_NODE_FROM_LINK (Link);
+      if (Node->Fixed) {
+        Count++;
+      }
+    }
+  }
+
+  if (Count == 0) {
+    return;
+  }
+
+  Status = gBS->HandleProtocol (
+                  RootBridgeDev->PciRootBridgeIo->ParentHandle,
+                  &gEdkiiPciHostBridgeFixedResourceProtocolGuid,
+                  (VOID **)&FixedRes
+                  );
+  if (EFI_ERROR (Status)) {
+    FixedRes = NULL;
+  }
+
+  Config = AllocateZeroPool (
+             Count * sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) +
+             sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
+             );
+  if (Config == NULL) {
+    DEBUG ((DEBUG_ERROR, "PciBus: Failed to submit fixed resources - %r\n", EFI_OUT_OF_RESOURCES));
+    return;
+  }
+
+  Descriptor = Config;
+  for (Index = 0; Index < NodeCount; Index++) {
+    for (Link = GetFirstNode (&Nodes[Index]->ChildList);
+         !IsNull (&Nodes[Index]->ChildList, Link);
+         Link = GetNextNode (&Nodes[Index]->ChildList, Link))
+    {
+      Node = RESOURCE_NODE_FROM_LINK (Link);
+      if (!Node->Fixed) {
+        continue;
+      }
+
+      Descriptor->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+      Descriptor->Len          = (UINT16)(sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
+      Descriptor->AddrRangeMin = Node->FixedBase;
+      Descriptor->AddrRangeMax = Node->FixedLimit;
+      Descriptor->AddrLen      = Node->Length;
+
+      switch (Node->ResType) {
+        case PciBarTypeIo16:
+        case PciBarTypeIo32:
+          Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
+          break;
+
+        case PciBarTypePMem32:
+        case PciBarTypePMem64:
+          Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+        //
+        // fall through
+        //
+        default:
+          Descriptor->ResType              = ACPI_ADDRESS_SPACE_TYPE_MEM;
+          Descriptor->AddrSpaceGranularity = (Node->FixedLimit > MAX_UINT32) ? 64 : 32;
+          break;
+      }
+
+      DEBUG ((
+        (FixedRes != NULL) ? DEBUG_INFO : DEBUG_WARN,
+        "PciBus: Fixed %a range [0x%lx, 0x%lx]%a%a\n",
+        (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_IO) ? "I/O" : "MMIO",
+        Node->FixedBase,
+        Node->FixedLimit,
+        (Descriptor->SpecificFlag != 0) ? " (prefetchable)" : "",
+        (FixedRes != NULL) ? "" : " - must be reserved by the platform"
+        ));
+
+      Descriptor++;
+    }
+  }
+
+  End       = (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor;
+  End->Desc = ACPI_END_TAG_DESCRIPTOR;
+
+  if (FixedRes != NULL) {
+    Status = FixedRes->SubmitFixedResources (FixedRes, RootBridgeDev->Handle, Config);
+    DEBUG ((
+      EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_INFO,
+      "PciBus: HostBridge->SubmitFixedResources() - %r\n",
+      Status
+      ));
+  }
+
+  FreePool (Config);
+}
+
+/**
   Submits the I/O and memory resource requirements for the specified PCI Host Bridge.
 
   @param PciResAlloc  Point to protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
@@ -496,6 +629,7 @@ PciHostBridgeResourceAllocator (
   PCI_RESOURCE_NODE                              *PMem32Bridge;
   PCI_RESOURCE_NODE                              *Mem64Bridge;
   PCI_RESOURCE_NODE                              *PMem64Bridge;
+  PCI_RESOURCE_NODE                              *RootNodes[5];
   PCI_RESOURCE_NODE                              IoPool;
   PCI_RESOURCE_NODE                              Mem32Pool;
   PCI_RESOURCE_NODE                              PMem32Pool;
@@ -675,6 +809,15 @@ PciHostBridgeResourceAllocator (
         //
         DEBUG ((DEBUG_INFO, "PciBus: HostBridge->SubmitResources() - %r\n", Status));
         ASSERT_EFI_ERROR (Status);
+
+        if (!EFI_ERROR (Status)) {
+          RootNodes[0] = IoBridge;
+          RootNodes[1] = Mem32Bridge;
+          RootNodes[2] = PMem32Bridge;
+          RootNodes[3] = Mem64Bridge;
+          RootNodes[4] = PMem64Bridge;
+          SubmitFixedRootResources (RootBridgeDev, RootNodes, ARRAY_SIZE (RootNodes));
+        }
       }
 
       //
