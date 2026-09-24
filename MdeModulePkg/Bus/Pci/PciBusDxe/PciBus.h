@@ -139,6 +139,14 @@ struct _PCI_BAR {
 #define PPB_PMEM64_RANGE  5
 #define PPB_MEM64_RANGE   0xFF
 
+//
+// Indices into PCI_IO_DEVICE::EaWindow[]
+//
+#define PCI_EA_WINDOW_IO    0
+#define PCI_EA_WINDOW_MEM   1
+#define PCI_EA_WINDOW_PMEM  2
+#define PCI_EA_WINDOW_MAX   3
+
 #define P2C_BAR_0  0
 #define P2C_MEM_1  1
 #define P2C_MEM_2  2
@@ -285,6 +293,12 @@ struct _PCI_IO_DEVICE {
   UINT16                                       BridgeIoAlignment;
   UINT32                                       ResizableBarOffset;
   UINT32                                       ResizableBarNumber;
+  //
+  // Fixed windows of a PCI-PCI bridge described by Enhanced Allocation
+  // entries with BEI 6, indexed by PCI_EA_WINDOW_xxx. An entry is only valid
+  // if its Length is non-zero.
+  //
+  PCI_BAR                                      EaWindow[PCI_EA_WINDOW_MAX];
 };
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
