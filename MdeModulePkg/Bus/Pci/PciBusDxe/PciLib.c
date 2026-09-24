@@ -443,6 +443,8 @@ AdjustPciDeviceBarSize (
           Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
         }
 
+        PciParseEnhancedAllocation (PciIoDevice);
+
         Adjusted = TRUE;
         DEBUG_CODE (
           DumpPciBars (PciIoDevice);
