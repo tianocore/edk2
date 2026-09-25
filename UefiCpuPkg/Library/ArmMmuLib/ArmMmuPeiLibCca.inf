@@ -1,16 +1,20 @@
-#/** @file
+## @file
+#  Arm MMU PEI library instance with Arm CCA support.
 #
-#  Copyright (c) 2016 Linaro Ltd. All rights reserved.
+#  Provides PEI-phase memory management support for AArch64 platforms
+#  using Arm Confidential Compute Architecture.
+#
+#  Copyright (c) 2016 Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2026, ARM Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-#
-#**/
+##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 0x0001001E
   BASE_NAME                      = ArmMmuPeiLib
-  FILE_GUID                      = b50d8d53-1ad1-44ea-9e69-8c89d4a6d08b
+  FILE_GUID                      = f278f4b6-de53-4725-9ba4-0d24d030fa33
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmMmuLib|PEIM
@@ -18,7 +22,7 @@
 
 [Sources.AARCH64]
   ArmMmuLibInternal.h
-  AArch64/ArmMmuLibCcaNull.c
+  AArch64/ArmMmuLibCca.c
   AArch64/ArmMmuLibCore.c
   AArch64/ArmMmuPeiLibConstructor.c
   AArch64/ArmMmuLibReplaceEntry.S

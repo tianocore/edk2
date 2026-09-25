@@ -22,3 +22,15 @@ VOID(
   IN  UINT64  RegionStart,
   IN  BOOLEAN DisableMmu
   );
+
+EFI_STATUS
+UpdateRegionMapping (
+  IN  UINT64   RegionStart,
+  IN  UINT64   RegionLength,
+  IN  UINT64   AttributeSetMask,
+  IN  UINT64   AttributeClearMask,
+  IN  UINT64   *RootTable,
+  IN  BOOLEAN  TableIsLive,
+  IN  BOOLEAN  Lpa2Enabled,
+  IN  UINT64   CcaProtectionAttribute
+  );
