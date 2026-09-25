@@ -43,7 +43,32 @@ None
 
 #### edk2-stable202611: Changes with Removal
 
-None
+##### Breaking Change: Remove MSVC AArch64 Support
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13176](https://github.com/tianocore/edk2/issues/13176)
+- **Deprecation Issue**: N/A (no deprecation possible)
+- **Removal Issue**: [tianocore/edk2#13177](https://github.com/tianocore/edk2/issues/13177)
+- **Pull Request**: TBA
+- **Type**: Build-System (Removal) - BaseTools Change
+
+**What changed**: [TianoCore RFC0004](https://github.com/tianocore/tianocore-wiki.github.io/blob/main/rfc/text/0004-drop-msvc-aarch64-support.md)
+approved removal of the MSVC AARCH64 toolchain.
+
+**What is removed**: The BaseTools MSVC AARCH64 tool definitions and any MSVC AARCH64 specific code.
+
+**Why it changed**: See the RFC for full details.
+
+**What replaces it**: CLANGPDB AARCH64 is the recommended migration toolchain as it has a superset of the capabilities
+of MSVC AARCH64, most importantly edk2 supports building platforms with it. See the RFC for full details.
+
+**How to migrate**: Stop using MSVC AARCH64 and use CLANGPDB AARCH64 instead.
+
+**Breaking conditions**: Affects anyone building with MSVC AARCH64 today. This is only believed to be EFI_APPLICATION
+developments (and even those are a subset) as significant downstream changes are required for platforms to build with
+the toolchain.
+
+**Earliest removal**: edk2-stable202702
 
 #### edk2-stable202611: Changes without Removal
 
