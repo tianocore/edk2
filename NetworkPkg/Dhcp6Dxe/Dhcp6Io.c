@@ -2808,8 +2808,10 @@ Dhcp6HandleStateful (
 {
   EFI_STATUS      Status;
   EFI_DHCP6_DUID  *ClientId;
+  EFI_DHCP6_DUID  *ServerId;
   DHCP6_SERVICE   *Service;
   UINT8           *Option;
+  UINT16          ServerIdLen;
 
   Service  = Instance->Service;
   ClientId = Service->ClientId;
@@ -2854,6 +2856,22 @@ Dhcp6HandleStateful (
 
   if (Option == NULL) {
     goto ON_CONTINUE;
+  }
+
+  //
+  // Per RFC 8415 Section 11.1, the DUID length excludes the 2-byte type
+  // code and MUST be between 1 and 128 octets.  Therefore, the full DUID
+  // length in ServerId option (RFC 8415 Section 21.3) MUST be 3..130 bytes.
+  // Reject out-of-range values before any downstream processing.
+  //
+  ServerId    = (EFI_DHCP6_DUID *)(Option + 2);
+  ServerIdLen = NTOHS (ServerId->Length);
+  if ((ServerIdLen < (sizeof (UINT16) + 1)) ||
+      (ServerIdLen > (sizeof (UINT16) + 128)))
+  {
+    DEBUG ((DEBUG_ERROR, "Invalid ServerId->Length = %d\n", ServerIdLen));
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
   }
 
   switch (Instance->IaCb.Ia->State) {
@@ -2918,11 +2936,13 @@ Dhcp6HandleStateless (
   IN EFI_DHCP6_PACKET  *Packet
   )
 {
-  EFI_STATUS     Status;
-  DHCP6_SERVICE  *Service;
-  DHCP6_INF_CB   *InfCb;
-  UINT8          *Option;
-  BOOLEAN        IsMatched;
+  EFI_STATUS      Status;
+  DHCP6_SERVICE   *Service;
+  DHCP6_INF_CB    *InfCb;
+  UINT8           *Option;
+  BOOLEAN         IsMatched;
+  EFI_DHCP6_DUID  *ServerId;
+  UINT16          ServerIdLen;
 
   Service   = Instance->Service;
   Status    = EFI_SUCCESS;
@@ -2958,6 +2978,22 @@ Dhcp6HandleStateless (
              );
 
   if (Option == NULL) {
+    goto ON_EXIT;
+  }
+
+  //
+  // Per RFC 8415 Section 11.1, the DUID length excludes the 2-byte type
+  // code and MUST be between 1 and 128 octets.  Therefore, the full DUID
+  // length in ServerId option (RFC 8415 Section 21.3) MUST be 3..130 bytes.
+  // Reject out-of-range values before any downstream processing.
+  //
+  ServerId    = (EFI_DHCP6_DUID *)(Option + 2);
+  ServerIdLen = NTOHS (ServerId->Length);
+  if ((ServerIdLen < (sizeof (UINT16) + 1)) ||
+      (ServerIdLen > (sizeof (UINT16) + 128)))
+  {
+    DEBUG ((DEBUG_ERROR, "Invalid ServerId->Length = %d\n", ServerIdLen));
+    Status = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }
 
