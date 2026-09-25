@@ -1,0 +1,70 @@
+## @file
+#  Logo DXE driver that loads the platform logo from a firmware volume file.
+#
+#  Installs EDKII_PLATFORM_LOGO_PROTOCOL by loading a BMP from a FREEFORM FFS
+#  file via GetSectionFromAnyFv(). No HII framework dependency.
+#
+#  Usage:
+#    1. Add this driver to the platform FDF:
+#         INF MdeModulePkg/Logo/LogoFvFileDxe.inf
+#
+#    2. Add a FILE FREEFORM block for the logo BMP in the platform FDF:
+#         FILE FREEFORM = <PcdLogoFile GUID> {
+#           SECTION RAW = <path/to/logo.bmp>
+#         }
+#
+#    3. Default logo: PcdLogoFile defaults to 7BB28B99-61BB-11D5-9A5D-0090273FC14D
+#         (FILE_GUID of MdeModulePkg/Logo/Logo.inf, TianoCore logo).
+#
+#    4. Custom logo: override PcdLogoFile in the platform DSC with the GUID
+#         of the custom FREEFORM block.
+#
+#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LogoFvFileDxe
+  MODULE_UNI_FILE                = LogoFvFileDxe.uni
+  FILE_GUID                      = FFD4698A-6353-4BEE-BD4B-5CCF995D09A2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = LogoFvFileDxeInitialize
+
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  LogoFvFile.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BmpSupportLib
+  DebugLib
+  DxeServicesLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLogoFile   ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  LogoFvFileDxeExtra.uni
+
