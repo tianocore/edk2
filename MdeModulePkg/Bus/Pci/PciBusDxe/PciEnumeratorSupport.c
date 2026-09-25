@@ -353,6 +353,157 @@ PciPciDeviceInfoCollector (
 }
 
 /**
+  Searches a PCI device and it's children to find the optimum Max Payload Size
+  supported by the provided device and its children.
+
+  @param[in]  PciIoDevice       The PCI IO Device to find the optimal MPS for.
+  @param[out] MaxPayloadSize    The optimum MPS for the device and it's children.
+
+  @retval   EFI_SUCCESS         Optimum MPS was found.
+  @retval   EFI_UNSUPPORTED     MPS not supported by provided device or its children.
+
+**/
+EFI_STATUS
+PciGetMaxPayloadSize (
+  IN PCI_IO_DEVICE  *PciIoDevice,
+  OUT UINT8         *MaxPayloadSize
+  )
+{
+  LIST_ENTRY     *CurrentLink;
+  UINT8          ChildMps;
+  PCI_IO_DEVICE  *Child;
+  EFI_STATUS     Status;
+
+  //
+  // Skip the root bridge.
+  //
+
+  if (PciIoDevice->Parent != NULL) {
+    if (!PciIoDevice->IsPciExp) {
+      return EFI_UNSUPPORTED;
+    }
+
+    *MaxPayloadSize = PciIoDevice->MaxPayloadSize;
+  } else {
+    *MaxPayloadSize = MAX_UINT8;
+  }
+
+  //
+  // Recurse into each child to find the max payload size supported.
+  //
+  CurrentLink = PciIoDevice->ChildList.ForwardLink;
+  while (CurrentLink != NULL && CurrentLink != &PciIoDevice->ChildList) {
+    Child  = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    Status = PciGetMaxPayloadSize (Child, &ChildMps);
+    if (!EFI_ERROR (Status) && (ChildMps < *MaxPayloadSize)) {
+      *MaxPayloadSize = ChildMps;
+    }
+
+    CurrentLink = CurrentLink->ForwardLink;
+  }
+
+  if (*MaxPayloadSize == MAX_UINT8) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Sets the PCIe Max PayloadSize for the provided device and it's children.
+
+  @param[in]  PciIoDevice       The PCI IO Device to set the MPS for.
+  @param[in]  MaxPayloadSize    The MPS to set.
+
+  @retval   EFI_SUCCESS         The MPS was set for the device and it's children.
+  @retval   EFI_UNSUPPORTED     MPS not supported by provided device or its children.
+  @retval   Other               MPS could not be read or written.
+
+**/
+EFI_STATUS
+PciProgramMps (
+  IN PCI_IO_DEVICE  *PciIoDevice,
+  IN UINT8          MaxPayloadSize
+  )
+{
+  LIST_ENTRY                   *CurrentLink;
+  PCI_IO_DEVICE                *Child;
+  EFI_STATUS                   Status;
+  PCI_REG_PCIE_DEVICE_CONTROL  DeviceControl;
+
+  //
+  // Skip the root bridge.
+  //
+
+  if (PciIoDevice->Parent != NULL) {
+    if (!PciIoDevice->IsPciExp) {
+      return EFI_UNSUPPORTED;
+    }
+
+    Status = PciIoDevice->PciIo.Pci.Read (
+                                      &PciIoDevice->PciIo,
+                                      EfiPciIoWidthUint16,
+                                      PciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CONTROL,
+                                      1,
+                                      &DeviceControl.Uint16
+                                      );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to read MPS for device %02x %02x %02x. %r\n",
+        __func__,
+        PciIoDevice->BusNumber,
+        PciIoDevice->DeviceNumber,
+        PciIoDevice->FunctionNumber,
+        Status
+        ));
+    } else if (DeviceControl.Bits.MaxPayloadSize != MaxPayloadSize) {
+      DeviceControl.Bits.MaxPayloadSize = MaxPayloadSize;
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: %02x %02x %02x Setting MPS: %x\n",
+        __func__,
+        PciIoDevice->BusNumber,
+        PciIoDevice->DeviceNumber,
+        PciIoDevice->FunctionNumber,
+        MaxPayloadSize
+        ));
+
+      Status = PciIoDevice->PciIo.Pci.Write (
+                                        &PciIoDevice->PciIo,
+                                        EfiPciIoWidthUint16,
+                                        PciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CONTROL,
+                                        1,
+                                        &DeviceControl.Uint16
+                                        );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Failed to set MPS for device %02x %02x %02x. %r\n",
+          __func__,
+          PciIoDevice->BusNumber,
+          PciIoDevice->DeviceNumber,
+          PciIoDevice->FunctionNumber,
+          Status
+          ));
+      }
+    }
+  }
+
+  //
+  // Recurse into each child to set the max payload size.
+  //
+  CurrentLink = PciIoDevice->ChildList.ForwardLink;
+  while (CurrentLink != NULL && CurrentLink != &PciIoDevice->ChildList) {
+    Child = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    PciProgramMps (Child, MaxPayloadSize);
+    CurrentLink = CurrentLink->ForwardLink;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Search required device and create PCI device instance.
 
   @param Bridge     Parent bridge instance.
@@ -2635,6 +2786,21 @@ CreatePciIoDevice (
       PciIoDevice->ResizableBarNumber = ResizableBarControl.Bits.ResizableBarNumber;
       PciProgramResizableBar (PciIoDevice, PciResizableBarMax);
     }
+  }
+
+  // Capture the maximum payload size supported for the device.
+  if (PcdGetBool (PcdPcieInitializeMps) && PciIoDevice->IsPciExp) {
+    PCI_REG_PCIE_DEVICE_CAPABILITY  DeviceCapabilities;
+    Status = PciIoDevice->PciIo.Pci.Read (
+                                      &PciIoDevice->PciIo,
+                                      EfiPciIoWidthUint32,
+                                      PciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES,
+                                      1,
+                                      &DeviceCapabilities.Uint32
+                                      );
+
+    ASSERT (!EFI_ERROR (Status));
+    PciIoDevice->MaxPayloadSize = (UINT8)DeviceCapabilities.Bits.MaxPayloadSize;
   }
 
   //
