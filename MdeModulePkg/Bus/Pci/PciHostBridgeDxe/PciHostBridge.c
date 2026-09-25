@@ -307,6 +307,30 @@ IntersectMemoryDescriptor (
     return Status;
   }
 
+  if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
+    //
+    // The descriptor is already a MMIO region, but it doesn't have the
+    // required capabilities. Add the missing capabilities.
+    //
+    Status = gDS->SetMemorySpaceCapabilities (
+                    IntersectionBase,
+                    IntersectionEnd - IntersectionBase,
+                    Descriptor->Capabilities | Capabilities
+                    );
+
+    DEBUG ((
+      EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
+      "%a: %a: set capabilities [%Lx, %Lx) to %Lx: %r\n",
+      gEfiCallerBaseName,
+      __func__,
+      IntersectionBase,
+      IntersectionEnd,
+      Descriptor->Capabilities | Capabilities,
+      Status
+      ));
+    return Status;
+  }
+
   DEBUG ((
     DEBUG_ERROR,
     "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
@@ -545,16 +569,16 @@ InitializePciHostBridge (
         Status = AddMemoryMappedIoSpace (
                    HostAddress,
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                   EFI_MEMORY_UC
+                   EFI_MEMORY_UC | EFI_MEMORY_XP
                    );
         ASSERT_EFI_ERROR (Status);
         Status = gDS->SetMemorySpaceAttributes (
                         HostAddress,
                         MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                        EFI_MEMORY_UC
+                        EFI_MEMORY_UC | EFI_MEMORY_XP
                         );
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
+          DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC | EFI_MEMORY_XP to MMIO aperture - %r.\n", Status));
         }
 
         if (ResourceAssigned) {
