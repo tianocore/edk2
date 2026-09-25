@@ -933,8 +933,8 @@ BuildAdmaDescTable (
 {
   EFI_PHYSICAL_ADDRESS  Data;
   UINT64                DataLen;
-  UINT64                Entries;
-  UINT64                Index;
+  UINTN                 Entries;
+  UINTN                 Index;
   UINT64                Remaining;
   UINT32                Address;
 
@@ -955,9 +955,9 @@ BuildAdmaDescTable (
     DEBUG ((DEBUG_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
   }
 
-  Entries = DivU64x32 ((DataLen + ADMA_MAX_DATA_PER_LINE - 1), ADMA_MAX_DATA_PER_LINE);
+  Entries = (UINTN)DivU64x32 ((DataLen + ADMA_MAX_DATA_PER_LINE - 1), ADMA_MAX_DATA_PER_LINE);
 
-  Trb->AdmaDescSize = (UINTN)MultU64x32 (Entries, sizeof (EMMC_HC_ADMA_DESC_LINE));
+  Trb->AdmaDescSize = Entries * sizeof (EMMC_HC_ADMA_DESC_LINE);
   Trb->AdmaDesc     = EmmcPeimAllocateMem (Trb->Slot->Private->Pool, Trb->AdmaDescSize);
   if (Trb->AdmaDesc == NULL) {
     return EFI_OUT_OF_RESOURCES;
