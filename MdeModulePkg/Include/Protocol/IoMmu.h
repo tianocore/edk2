@@ -26,7 +26,7 @@ typedef struct _EDKII_IOMMU_PROTOCOL EDKII_IOMMU_PROTOCOL;
 //          All future revisions must be backwards compatible.
 //          If a future version is not back wards compatible it is not the same GUID.
 //
-#define EDKII_IOMMU_PROTOCOL_REVISION  0x00010000
+#define EDKII_IOMMU_PROTOCOL_REVISION  0x00010001
 
 //
 // IOMMU Access for SetAttribute
@@ -128,6 +128,39 @@ EFI_STATUS
 (EFIAPI *EDKII_IOMMU_SET_ATTRIBUTE)(
   IN EDKII_IOMMU_PROTOCOL  *This,
   IN EFI_HANDLE            DeviceHandle,
+  IN VOID                  *Mapping,
+  IN UINT64                IoMmuAccess
+  );
+
+/**
+  Set IOMMU attributes for a DMA mapping when the caller cannot supply an
+  EFI_HANDLE for the device (for example, a firmware-internal MMIO/DMA
+  agent that has no UEFI device handle and is not described in the IORT).
+
+  The caller is responsible for providing the IOMMU base address that owns
+  the device and the DMA identifier the device emits, which would normally
+  be resolved by the IOMMU implementation via the IORT from a DeviceHandle.
+
+  @param [in]  This          Pointer to the IOMMU protocol instance.
+  @param [in]  IommuBase     Base MMIO address of the IOMMU that owns DmaId.
+  @param [in]  DmaId         DMA identifier emitted by the calling DMA agent
+                             (e.g. StreamID on Arm SMMU, RequesterID on VT-d).
+  @param [in]  Mapping       The mapping returned from Map().
+  @param [in]  IoMmuAccess   The IOMMU access attributes (R/W bits).
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval EFI_NOT_FOUND          No IOMMU is configured at IommuBase.
+  @retval EFI_UNSUPPORTED        The IOMMU does not support this entry point.
+  @retval EFI_OUT_OF_RESOURCES   Out of resources.
+  @retval EFI_DEVICE_ERROR       The IOMMU device reported an error.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_IOMMU_SET_ATTRIBUTE_BY_ID)(
+  IN EDKII_IOMMU_PROTOCOL  *This,
+  IN UINT64                IommuBase,
+  IN UINT32                DmaId,
   IN VOID                  *Mapping,
   IN UINT64                IoMmuAccess
   );
@@ -235,12 +268,17 @@ EFI_STATUS
 /// IOMMU Protocol structure.
 ///
 struct _EDKII_IOMMU_PROTOCOL {
-  UINT64                         Revision;
-  EDKII_IOMMU_SET_ATTRIBUTE      SetAttribute;
-  EDKII_IOMMU_MAP                Map;
-  EDKII_IOMMU_UNMAP              Unmap;
-  EDKII_IOMMU_ALLOCATE_BUFFER    AllocateBuffer;
-  EDKII_IOMMU_FREE_BUFFER        FreeBuffer;
+  UINT64                             Revision;
+  EDKII_IOMMU_SET_ATTRIBUTE          SetAttribute;
+  EDKII_IOMMU_MAP                    Map;
+  EDKII_IOMMU_UNMAP                  Unmap;
+  EDKII_IOMMU_ALLOCATE_BUFFER        AllocateBuffer;
+  EDKII_IOMMU_FREE_BUFFER            FreeBuffer;
+  ///
+  /// Optional. Set IOMMU attributes for callers that do not have an
+  /// EFI_HANDLE for the DMA agent.
+  ///
+  EDKII_IOMMU_SET_ATTRIBUTE_BY_ID    SetAttributeById;
 };
 
 ///
