@@ -83,16 +83,17 @@ CodeSeg64:
             DB      0                   ; BaseHigh
 GDT_SIZE equ $ - NullSeg
 
-ASM_PFX(gcSmmInitGdtr):
-    DW      GDT_SIZE - 1
-    DD      NullSeg
-
 
     SECTION .text
 
 global ASM_PFX(SmmStartup)
 
 BITS 16
+;
+; Run the entire 16-bit transition at SMBASE + 0x8000. Jumping to the
+; image with a high EIP in 16-bit mode is unsafe across QEMU page boundaries.
+;
+ASM_PFX(gcSmmInitTemplate):
 ASM_PFX(SmmStartup):
     mov     eax, 0x80000001             ; read capability
     cpuid
@@ -102,7 +103,7 @@ ASM_PFX(SmmStartup):
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
-o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
+o32 lgdt    [cs:ASM_PFX(gcSmmInitGdtr) - ASM_PFX(gcSmmInitTemplate) + 0x8000]
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr4):
     mov     cr4, eax
@@ -116,6 +117,12 @@ ASM_PFX(gPatchSmmInitCr0):
     mov     cr0, eax
     jmp     PROTECT_MODE_CS : dword @32bit
 
+ASM_PFX(gcSmmInitGdtr):
+    DW      GDT_SIZE - 1
+    DQ      NullSeg                     ; GDT base relocated with the image before copying
+
+ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
+
 BITS 32
 @32bit:
     mov     ds, edi
@@ -128,14 +135,6 @@ ASM_PFX(gPatchSmmInitStack):
     call    ASM_PFX(SmmInitHandler)
     StuffRsb32
     rsm
-
-BITS 16
-ASM_PFX(gcSmmInitTemplate):
-    mov ebp, ASM_PFX(SmmStartup)
-    sub ebp, 0x30000
-    jmp ebp
-
-ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
 
 BITS 32
 global ASM_PFX(SmmRelocationSemaphoreComplete)
