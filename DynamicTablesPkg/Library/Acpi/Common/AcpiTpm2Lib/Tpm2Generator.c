@@ -61,8 +61,8 @@ GET_OBJECT_LIST (
 
 GET_OBJECT_LIST (
   EObjNameSpaceArchCommon,
-  EArchCommonObjTpm2DeviceInfo,
-  CM_ARCH_COMMON_TPM2_DEVICE_INFO
+  EArchCommonObjTpmDeviceInfo,
+  CM_ARCH_COMMON_TPM_DEVICE_INFO
   );
 
 /**
@@ -238,7 +238,7 @@ BuildTpm2TableEx (
 {
   EFI_STATUS                          Status;
   CM_ARCH_COMMON_TPM2_INTERFACE_INFO  *TpmInfo;
-  CM_ARCH_COMMON_TPM2_DEVICE_INFO     *TpmDevInfo;
+  CM_ARCH_COMMON_TPM_DEVICE_INFO      *TpmDevInfo;
   UINT32                              TableSize;
   UINT32                              MaxParameterSize;
   EFI_ACPI_DESCRIPTION_HEADER         **TableList;
@@ -365,7 +365,7 @@ BuildTpm2TableEx (
 
   // Generate TPM2 device SSDT table.
   if (FixedPcdGetBool (PcdGenTpm2DeviceTable)) {
-    Status = GetEArchCommonObjTpm2DeviceInfo (
+    Status = GetEArchCommonObjTpmDeviceInfo (
                CfgMgrProtocol,
                CM_NULL_TOKEN,
                &TpmDevInfo,
@@ -377,6 +377,18 @@ BuildTpm2TableEx (
         "%a: Failed to get TPM2 Device CM Object %r\n",
         __func__,
         Status
+        ));
+      goto ErrorHandler;
+    }
+
+    if (TpmDevInfo->MajorSpecVersion != 2) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: TPM specification version %u.%u is not supported by the TPM2 device SSDT\n",
+        __func__,
+        TpmDevInfo->MajorSpecVersion,
+        TpmDevInfo->MinorSpecVersion
         ));
       goto ErrorHandler;
     }
