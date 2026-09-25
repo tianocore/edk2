@@ -4510,6 +4510,8 @@ ReGetDefault:
           } else {
             CopyMem (Question->BufferValue, StrValue, Question->StorageWidth);
           }
+
+          FreePool (StrValue);
         }
 
         return EFI_SUCCESS;

@@ -32,6 +32,7 @@
   Parsers/Aest/AestParser.c
   Parsers/Agdi/AgdiParser.c
   Parsers/Apmt/ApmtParser.c
+  Parsers/Bert/BertParser.c
   Parsers/Bgrt/BgrtParser.c
   Parsers/Ccel/CcelParser.c
   Parsers/Dbg2/Dbg2Parser.c
