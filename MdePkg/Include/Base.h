@@ -732,6 +732,22 @@ typedef UINTN *BASE_LIST;
 #define _BASE_INT_SIZE_OF(TYPE)  ((sizeof (TYPE) + sizeof (UINTN) - 1) / sizeof (UINTN))
 
 /**
+  Macro that performs integer division of Dividend by Divisor, rounding up to the
+  nearest integer.
+
+  This macro is intended for positive integer operands.
+
+  @param  X   The Dividend number
+  @param  Y   The Divisor number
+
+  @return The Quotient, rounded up to the nearest integer
+
+**/
+#ifndef BASE_DIV_ROUND_UP
+#define BASE_DIV_ROUND_UP(X, Y)  (((X) + (Y) - 1) / (Y))
+#endif
+
+/**
   Returns an argument of a specified type from a variable argument list and updates
   the pointer to the variable argument list to point to the next argument.
 
