@@ -598,6 +598,12 @@
   #  If developer need implement such functionality, they should use BasePeCoffLib.
   gEfiLoadPeImageProtocolGuid    = { 0x5CB5C776, 0x60D5, 0x45EE, { 0x88, 0x3C, 0x45, 0x27, 0x08, 0xCD, 0x74, 0x3F }}
 
+  ## This protocol allows a platform to indicate that a prefetchable PCI
+  #  memory BAR maps host-backed memory and should be left without a
+  #  firmware-assigned cache attribute, instead of the default UC policy.
+  #  Include/Protocol/PciHostMemoryPolicy.h
+  gEdkiiPciHostMemoryPolicyProtocolGuid = { 0x8e3c4a2f, 0x6b1d, 0x4f7a, { 0x9e, 0x2b, 0x1a, 0x5c, 0x7d, 0x3e, 0x8f, 0x60 }}
+
   ## Print protocols define basic print functions to print the format unicode and ascii string.
   # Include/Protocol/Print2.h
   gEfiPrint2ProtocolGuid          = { 0xf05976ef, 0x83f1, 0x4f3d, { 0x86, 0x19, 0xf7, 0x59, 0x5d, 0x41, 0xe5, 0x38 } }
