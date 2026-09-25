@@ -1089,7 +1089,11 @@ IsValidDnsResponse (
       continue;
     } else {
       TxString = NetbufGetByte (Packet, 0, NULL);
-      ASSERT (TxString != NULL);
+      if (TxString == NULL) {
+        ASSERT (TxString != NULL);
+        continue;
+      }
+
       DnsHeader    = (DNS_HEADER *)TxString;
       QueryName    = (CHAR8 *)(TxString + sizeof (*DnsHeader));
       QuerySection = (DNS_QUERY_SECTION *)(QueryName + AsciiStrLen (QueryName) + 1);
@@ -1256,7 +1260,13 @@ ParseDnsResponse (
       goto ON_EXIT;
     }
 
-    ASSERT (Item != NULL);
+    if ((Item == NULL) || (Item->Key == NULL)) {
+      ASSERT ((Item != NULL) && (Item->Key != NULL));
+      *Completed = FALSE;
+      Status     = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns4TokenEntry = (DNS4_TOKEN_ENTRY *)(Item->Key);
   } else {
     if (!IsValidDnsResponse (
@@ -1272,7 +1282,13 @@ ParseDnsResponse (
       goto ON_EXIT;
     }
 
-    ASSERT (Item != NULL);
+    if ((Item == NULL) || (Item->Key == NULL)) {
+      ASSERT ((Item != NULL) && (Item->Key != NULL));
+      *Completed = FALSE;
+      Status     = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns6TokenEntry = (DNS6_TOKEN_ENTRY *)(Item->Key);
   }
 
@@ -1298,7 +1314,11 @@ ParseDnsResponse (
   // Do some buffer allocations.
   //
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    ASSERT (Dns4TokenEntry != NULL);
+    if (Dns4TokenEntry == NULL) {
+      ASSERT (Dns4TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns4TokenEntry->GeneralLookUp) {
       //
@@ -1337,7 +1357,11 @@ ParseDnsResponse (
       }
     }
   } else {
-    ASSERT (Dns6TokenEntry != NULL);
+    if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns6TokenEntry->GeneralLookUp) {
       //
@@ -1432,7 +1456,19 @@ ParseDnsResponse (
     //
     // Check whether it's the GeneralLookUp querying.
     //
-    if ((Instance->Service->IpVersion == IP_VERSION_4) && Dns4TokenEntry->GeneralLookUp) {
+    if (Instance->Service->IpVersion == IP_VERSION_4) {
+      if (Dns4TokenEntry == NULL) {
+        ASSERT (Dns4TokenEntry != NULL);
+        Status = EFI_ABORTED;
+        goto ON_EXIT;
+      }
+    } else if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
+    if ((Instance->Service->IpVersion == IP_VERSION_4) && (Dns4TokenEntry != NULL) && Dns4TokenEntry->GeneralLookUp) {
       Dns4RR     = Dns4TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
 
@@ -1460,7 +1496,7 @@ ParseDnsResponse (
 
       RRCount++;
       Status = EFI_SUCCESS;
-    } else if ((Instance->Service->IpVersion == IP_VERSION_6) && Dns6TokenEntry->GeneralLookUp) {
+    } else if ((Instance->Service->IpVersion == IP_VERSION_6) && (Dns6TokenEntry != NULL) && Dns6TokenEntry->GeneralLookUp) {
       Dns6RR     = Dns6TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
 
@@ -1498,7 +1534,11 @@ ParseDnsResponse (
           //
           // This is address entry, get Data.
           //
-          ASSERT (Dns4TokenEntry != NULL);
+          if (Dns4TokenEntry == NULL) {
+            ASSERT (Dns4TokenEntry != NULL);
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
 
           if (AnswerSection->DataLength != 4) {
             Status = EFI_ABORTED;
@@ -1560,7 +1600,11 @@ ParseDnsResponse (
           //
           // This is address entry, get Data.
           //
-          ASSERT (Dns6TokenEntry != NULL);
+          if (Dns6TokenEntry == NULL) {
+            ASSERT (Dns6TokenEntry != NULL);
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
 
           if (AnswerSection->DataLength != 16) {
             Status = EFI_ABORTED;
@@ -1639,7 +1683,11 @@ ParseDnsResponse (
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    ASSERT (Dns4TokenEntry != NULL);
+    if (Dns4TokenEntry == NULL) {
+      ASSERT (Dns4TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns4TokenEntry->GeneralLookUp) {
       Dns4TokenEntry->Token->RspData.GLookupData->RRCount = RRCount;
@@ -1652,7 +1700,11 @@ ParseDnsResponse (
       }
     }
   } else {
-    ASSERT (Dns6TokenEntry != NULL);
+    if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns6TokenEntry->GeneralLookUp) {
       Dns6TokenEntry->Token->RspData.GLookupData->RRCount = RRCount;
@@ -1675,7 +1727,12 @@ ON_COMPLETE:
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    ASSERT (Dns4TokenEntry != NULL);
+    if (Dns4TokenEntry == NULL) {
+      ASSERT (Dns4TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, Dns4TokenEntry);
     Dns4TokenEntry->Token->Status = Status;
     if (Dns4TokenEntry->Token->Event != NULL) {
@@ -1683,7 +1740,12 @@ ON_COMPLETE:
       DispatchDpc ();
     }
   } else {
-    ASSERT (Dns6TokenEntry != NULL);
+    if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, Dns6TokenEntry);
     Dns6TokenEntry->Token->Status = Status;
     if (Dns6TokenEntry->Token->Event != NULL) {
