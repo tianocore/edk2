@@ -196,6 +196,11 @@ typedef struct {
   /// Private storage for implementation specific data.
   ///
   UINT64                      Context;
+  ///
+  /// Set by PeCoffLoaderGetImageInfo() to TRUE if the image has the IMAGE_DLLCHARACTERISTICS_NX_COMPAT
+  /// flag set.
+  ///
+  BOOLEAN                     SupportsNx;
 } PE_COFF_LOADER_IMAGE_CONTEXT;
 
 /**
