@@ -246,6 +246,7 @@ PciPciDeviceInfoCollector (
   UINT8                Device;
   UINT8                Func;
   UINT8                SecBus;
+  UINT8                PrimaryBus;
   PCI_IO_DEVICE        *PciIoDevice;
   EFI_PCI_IO_PROTOCOL  *PciIo;
 
@@ -323,6 +324,18 @@ PciPciDeviceInfoCollector (
           //
           if (SecBus <= StartBusNumber) {
             break;
+          }
+
+          //
+          // Don't scan behind a bridge whose fixed bus numbers could not be
+          // assigned by PciScanBus (), as they may overlap with the buses of
+          // other bridges.
+          //
+          if (PciIoDevice->EaFixedSecondaryBus != 0) {
+            Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET, 1, &PrimaryBus);
+            if (EFI_ERROR (Status) || (PrimaryBus != StartBusNumber)) {
+              break;
+            }
           }
 
           //
@@ -651,6 +664,8 @@ GatherDeviceInfo (
     Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
   }
 
+  PciParseEnhancedAllocation (PciIoDevice);
+
   //
   // Parse the SR-IOV VF bars
   //
@@ -730,6 +745,8 @@ GatherPpbInfo (
     //
     PciParseBar (PciIoDevice, 0x14, PPB_BAR_1);
   }
+
+  PciParseEnhancedAllocation (PciIoDevice);
 
   PciIo = &PciIoDevice->PciIo;
 
@@ -1562,6 +1579,14 @@ UpdatePciInfo (
         continue;
       }
 
+      if (PciIoDevice->PciBar[BarIndex].AddressFixed) {
+        //
+        // Enhanced Allocation BARs decode a range that is fixed by hardware,
+        // so their type, size and alignment cannot be overridden.
+        //
+        continue;
+      }
+
       SetFlag = FALSE;
       switch (Ptr->ResType) {
         case ACPI_ADDRESS_SPACE_TYPE_MEM:
@@ -1958,6 +1983,7 @@ PciParseBar (
   }
 
   PciIoDevice->PciBar[BarIndex].BarTypeFixed = FALSE;
+  PciIoDevice->PciBar[BarIndex].AddressFixed = FALSE;
   PciIoDevice->PciBar[BarIndex].Offset       = (UINT8)Offset;
   if ((Value & 0x01) != 0) {
     //
@@ -2123,6 +2149,346 @@ PciParseBar (
   // Increment number of bar
   //
   return Offset + 4;
+}
+
+/**
+  Parse the Enhanced Allocation (EA) capability of a PCI function, if present,
+  and record the fixed BARs it describes in the PCI device instance.
+
+  BARs described by an enabled EA entry decode a range that is fixed by the
+  hardware, and the corresponding BAR registers in the configuration header
+  are hardwired to zero, so they are not discovered by PciParseBar (). Record
+  the base, size and type of each such BAR, and mark it as fixed, so that the
+  resource allocation logic is aware that it must not relocate it or degrade
+  its type.
+
+  For PCI-PCI bridges, also record the fixed windows described by entries with
+  BEI 6, through which the bridge forwards transactions to its secondary side
+  regardless of the contents of its Base/Limit registers.
+
+  For PCI-PCI bridges, also record the fixed secondary and subordinate bus
+  numbers, if any, which must be assigned to the bridge during bus enumeration.
+
+  This must be called after the BARs have been parsed with PciParseBar (), and
+  before resource allocation takes place.
+
+  @param PciIoDevice  Pci device instance.
+
+**/
+VOID
+PciParseEnhancedAllocation (
+  IN PCI_IO_DEVICE  *PciIoDevice
+  )
+{
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINT8                CapOffset;
+  UINT32               CapHeader;
+  UINTN                NumEntries;
+  UINTN                EntryIndex;
+  UINT32               EntryOffset;
+  UINT32               NextEntryOffset;
+  UINT32               FieldOffset;
+  UINT32               EntryDwords;
+  UINT32               EntryHeader;
+  UINT32               BaseLow;
+  UINT32               MaxOffsetLow;
+  UINT32               Dword;
+  UINT64               Base;
+  UINT64               MaxOffset;
+  UINT8                Bei;
+  UINT8                Property;
+  UINTN                MaxBei;
+  UINTN                BarIndex;
+  PCI_BAR              *Bar;
+  PCI_BAR_TYPE         BarType;
+  BOOLEAN              Supported;
+  UINTN                Window;
+
+  ZeroMem (PciIoDevice->EaWindow, sizeof (PciIoDevice->EaWindow));
+  PciIoDevice->EaFixedSecondaryBus   = 0;
+  PciIoDevice->EaFixedSubordinateBus = 0;
+
+  CapOffset = 0;
+  Status    = LocateCapabilityRegBlock (
+                PciIoDevice,
+                EFI_PCI_CAPABILITY_ID_EA,
+                &CapOffset,
+                NULL
+                );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  PciIo = &PciIoDevice->PciIo;
+  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, CapOffset, 1, &CapHeader);
+  NumEntries = PCI_EA_CAP_NUM_ENTRIES (CapHeader);
+
+  EntryOffset = CapOffset + sizeof (UINT32);
+  if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
+    //
+    // Type 1 functions have an additional DWORD describing the fixed bus
+    // numbers, and only implement BAR0 and BAR1.
+    //
+    EntryOffset += PCI_EA_CAP_TYPE1_EXTRA_DWORDS * sizeof (UINT32);
+    MaxBei       = PCI_EA_BEI_BAR0 + PPB_BAR_1;
+
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, CapOffset + sizeof (UINT32), 1, &Dword);
+    if (PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword) != 0) {
+      if (PCI_EA_CAP_FIXED_SUBORDINATE_BUS (Dword) < PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "   EA: invalid fixed bus numbers %02x-%02x, ignoring\n",
+          PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword),
+          PCI_EA_CAP_FIXED_SUBORDINATE_BUS (Dword)
+          ));
+      } else {
+        PciIoDevice->EaFixedSecondaryBus   = (UINT8)PCI_EA_CAP_FIXED_SECONDARY_BUS (Dword);
+        PciIoDevice->EaFixedSubordinateBus = (UINT8)PCI_EA_CAP_FIXED_SUBORDINATE_BUS (Dword);
+        DEBUG ((
+          DEBUG_INFO,
+          "   EA: fixed secondary bus %02x, subordinate bus %02x\n",
+          PciIoDevice->EaFixedSecondaryBus,
+          PciIoDevice->EaFixedSubordinateBus
+          ));
+      }
+    }
+  } else {
+    MaxBei = PCI_EA_BEI_BAR5;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "   EA: CapOffset = 0x%x; NumEntries = %d\n",
+    CapOffset,
+    NumEntries
+    ));
+
+  for (EntryIndex = 0; EntryIndex < NumEntries; EntryIndex++, EntryOffset = NextEntryOffset) {
+    //
+    // The EA capability must reside in the PCI compatible configuration space.
+    //
+    if (EntryOffset + sizeof (UINT32) > PCI_MAX_CONFIG_OFFSET) {
+      break;
+    }
+
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, EntryOffset, 1, &EntryHeader);
+
+    //
+    // Entry Size is the number of DWORDs following the entry header.
+    //
+    EntryDwords     = PCI_EA_ENTRY_SIZE (EntryHeader);
+    NextEntryOffset = EntryOffset + 4U * (1 + EntryDwords);
+    if (NextEntryOffset > PCI_MAX_CONFIG_OFFSET) {
+      DEBUG ((DEBUG_WARN, "   EA: entry %d exceeds config space, ignoring\n", EntryIndex));
+      break;
+    }
+
+    if ((EntryHeader & PCI_EA_ENTRY_ENABLE) == 0) {
+      continue;
+    }
+
+    Bei = (UINT8)PCI_EA_ENTRY_BEI (EntryHeader);
+    if ((Bei > MaxBei) &&
+        !((Bei == PCI_EA_BEI_BRIDGE) && IS_PCI_BRIDGE (&PciIoDevice->Pci)))
+    {
+      //
+      // Only BAR equivalent entries, and fixed windows of PCI-PCI bridges are
+      // handled here. Entries describing the expansion ROM or SR-IOV VF BARs
+      // are ignored.
+      //
+      DEBUG ((DEBUG_INFO, "   EA: entry %d: BEI %d not handled, ignoring\n", EntryIndex, Bei));
+      continue;
+    }
+
+    //
+    // If the Primary Properties value is in the reserved range, the Secondary
+    // Properties value should be used instead.
+    //
+    Property = (UINT8)PCI_EA_ENTRY_PRIMARY_PROPERTIES (EntryHeader);
+    if ((Property > PCI_EA_PROP_BRIDGE_IO) && (Property < PCI_EA_PROP_MEM_RESERVED)) {
+      Property = (UINT8)PCI_EA_ENTRY_SECONDARY_PROPERTIES (EntryHeader);
+    }
+
+    if (Bei == PCI_EA_BEI_BRIDGE) {
+      Supported = (Property == PCI_EA_PROP_BRIDGE_MEM) ||
+                  (Property == PCI_EA_PROP_BRIDGE_PREFETCH) ||
+                  (Property == PCI_EA_PROP_BRIDGE_IO);
+    } else {
+      Supported = (Property == PCI_EA_PROP_MEM) ||
+                  (Property == PCI_EA_PROP_MEM_PREFETCH) ||
+                  (Property == PCI_EA_PROP_IO);
+    }
+
+    if (!Supported) {
+      DEBUG ((
+        DEBUG_INFO,
+        "   EA: entry %d: BEI %d has properties 0x%x, ignoring\n",
+        EntryIndex,
+        Bei,
+        Property
+        ));
+      continue;
+    }
+
+    //
+    // Read the Base and MaxOffset fields, and their upper halves if present.
+    //
+    if (EntryDwords < 2) {
+      DEBUG ((DEBUG_WARN, "   EA: entry %d: size %d too small, ignoring\n", EntryIndex, EntryDwords));
+      continue;
+    }
+
+    FieldOffset = EntryOffset + sizeof (UINT32);
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, FieldOffset, 1, &BaseLow);
+    FieldOffset += sizeof (UINT32);
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, FieldOffset, 1, &MaxOffsetLow);
+
+    if (EntryDwords < 2U +
+        (((BaseLow & PCI_EA_FIELD_64BIT) != 0) ? 1 : 0) +
+        (((MaxOffsetLow & PCI_EA_FIELD_64BIT) != 0) ? 1 : 0))
+    {
+      DEBUG ((DEBUG_WARN, "   EA: entry %d: size %d too small, ignoring\n", EntryIndex, EntryDwords));
+      continue;
+    }
+
+    Base      = BaseLow & PCI_EA_FIELD_MASK;
+    MaxOffset = (MaxOffsetLow & PCI_EA_FIELD_MASK) | ~PCI_EA_FIELD_MASK;
+
+    if ((BaseLow & PCI_EA_FIELD_64BIT) != 0) {
+      FieldOffset += sizeof (UINT32);
+      PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, FieldOffset, 1, &Dword);
+      Base |= LShiftU64 (Dword, 32);
+    }
+
+    if ((MaxOffsetLow & PCI_EA_FIELD_64BIT) != 0) {
+      FieldOffset += sizeof (UINT32);
+      PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, FieldOffset, 1, &Dword);
+      MaxOffset |= LShiftU64 (Dword, 32);
+    }
+
+    if (MaxOffset >= MAX_UINT64 - Base) {
+      DEBUG ((DEBUG_WARN, "   EA: entry %d: BEI %d range overflows, ignoring\n", EntryIndex, Bei));
+      continue;
+    }
+
+    if (Bei == PCI_EA_BEI_BRIDGE) {
+      //
+      // A fixed window of a PCI-PCI bridge: the bridge forwards this range to
+      // its secondary side regardless of its Base/Limit registers. Record it,
+      // and make sure resources of this type are not degraded to a different
+      // type on account of the Base/Limit registers not being implemented.
+      //
+      switch (Property) {
+        case PCI_EA_PROP_BRIDGE_IO:
+          Window                = PCI_EA_WINDOW_IO;
+          BarType               = (Base + MaxOffset > MAX_UINT16) ? PciBarTypeIo32 : PciBarTypeIo16;
+          PciIoDevice->Decodes |= (BarType == PciBarTypeIo32) ?
+                                  EFI_BRIDGE_IO32_DECODE_SUPPORTED :
+                                  EFI_BRIDGE_IO16_DECODE_SUPPORTED;
+          break;
+        case PCI_EA_PROP_BRIDGE_PREFETCH:
+          Window                = PCI_EA_WINDOW_PMEM;
+          BarType               = (Base + MaxOffset > MAX_UINT32) ? PciBarTypePMem64 : PciBarTypePMem32;
+          PciIoDevice->Decodes |= EFI_BRIDGE_PMEM32_DECODE_SUPPORTED;
+          if (BarType == PciBarTypePMem64) {
+            PciIoDevice->Decodes |= EFI_BRIDGE_PMEM64_DECODE_SUPPORTED;
+          }
+
+          break;
+        case PCI_EA_PROP_BRIDGE_MEM:
+        default:
+          Window  = PCI_EA_WINDOW_MEM;
+          BarType = (Base + MaxOffset > MAX_UINT32) ? PciBarTypeMem64 : PciBarTypeMem32;
+          break;
+      }
+
+      if (PciIoDevice->EaWindow[Window].Length != 0) {
+        DEBUG ((DEBUG_WARN, "   EA: entry %d: duplicate bridge window, ignoring\n", EntryIndex));
+        continue;
+      }
+
+      PciIoDevice->EaWindow[Window].BaseAddress  = Base;
+      PciIoDevice->EaWindow[Window].Length       = MaxOffset + 1;
+      PciIoDevice->EaWindow[Window].BarType      = BarType;
+      PciIoDevice->EaWindow[Window].BarTypeFixed = TRUE;
+      PciIoDevice->EaWindow[Window].AddressFixed = TRUE;
+
+      DEBUG ((
+        DEBUG_INFO,
+        "   EA: Window: Type = %s; Base = 0x%lx;\tLength = 0x%lx (fixed)\n",
+        mBarTypeStr[MIN (BarType, PciBarTypeMaxType)],
+        Base,
+        MaxOffset + 1
+        ));
+      continue;
+    }
+
+    switch (Property) {
+      case PCI_EA_PROP_IO:
+        BarType = (Base + MaxOffset > MAX_UINT16) ? PciBarTypeIo32 : PciBarTypeIo16;
+        break;
+      case PCI_EA_PROP_MEM_PREFETCH:
+        BarType = (Base + MaxOffset > MAX_UINT32) ? PciBarTypePMem64 : PciBarTypePMem32;
+        break;
+      case PCI_EA_PROP_MEM:
+      default:
+        BarType = (Base + MaxOffset > MAX_UINT32) ? PciBarTypeMem64 : PciBarTypeMem32;
+        break;
+    }
+
+    //
+    // The PciBar[] array is indexed by BAR sequence number rather than by BAR
+    // register, as 64-bit BARs occupy two registers. So locate the entry that
+    // corresponds with the BAR register that the BEI refers to.
+    //
+    Bar = NULL;
+    for (BarIndex = 0; BarIndex <= MaxBei; BarIndex++) {
+      if (PciIoDevice->PciBar[BarIndex].Offset == PCI_BASE_ADDRESSREG_OFFSET + Bei * sizeof (UINT32)) {
+        Bar = &PciIoDevice->PciBar[BarIndex];
+        break;
+      }
+    }
+
+    if (Bar == NULL) {
+      DEBUG ((
+        DEBUG_WARN,
+        "   EA: entry %d: BEI %d overlaps with a 64-bit BAR, ignoring\n",
+        EntryIndex,
+        Bei
+        ));
+      continue;
+    }
+
+    if (!Bar->AddressFixed && (Bar->BarType != PciBarTypeUnknown)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "   EA: entry %d: BAR register for BEI %d is not hardwired to 0\n",
+        EntryIndex,
+        Bei
+        ));
+    }
+
+    Bar->BaseAddress = Base;
+    Bar->Length      = MaxOffset + 1;
+    //
+    // The address is fixed, so the alignment is merely informational: use the
+    // natural alignment of the base address.
+    //
+    Bar->Alignment    = (Base == 0) ? 0 : (LShiftU64 (1, LowBitSet64 (Base)) - 1);
+    Bar->BarType      = BarType;
+    Bar->BarTypeFixed = TRUE;
+    Bar->AddressFixed = TRUE;
+
+    DEBUG ((
+      DEBUG_INFO,
+      "   EA: BAR[%d]: Type = %s; Base = 0x%lx;\tLength = 0x%lx (fixed)\n",
+      BarIndex,
+      mBarTypeStr[MIN (BarType, PciBarTypeMaxType)],
+      Base,
+      Bar->Length
+      ));
+  }
 }
 
 /**

@@ -762,6 +762,9 @@
   ## Include/Protocol/CxlIo.h
   gEdkiiCxlIoProtocolGuid = { 0x8FAC60B2, 0xBBC1, 0x41DE, {0xA7, 0x97, 0x98, 0x75, 0xCD, 0xD3, 0xA8, 0xF8 } }
 
+  ## Include/Protocol/PciHostBridgeFixedResource.h
+  gEdkiiPciHostBridgeFixedResourceProtocolGuid = { 0xbb465aea, 0x5165, 0x4fdf, { 0xb4, 0xb0, 0xfd, 0x3a, 0x1d, 0x4c, 0xc6, 0xd8 } }
+
 [PcdsFeatureFlag]
   ## Indicates if the platform can support update capsule across a system reset.<BR><BR>
   #   TRUE  - Supports update capsule across a system reset.<BR>
