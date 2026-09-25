@@ -327,6 +327,7 @@ PageTableLibMapInLevel (
   UINT64              RegionLength;
   UINT64              SubLength;
   UINT64              SubOffset;
+  UINT64              SubOffsetStep;
   UINT64              RegionMask;
   UINT64              RegionStart;
   IA32_MAP_ATTRIBUTE  AllOneMask;
@@ -390,8 +391,16 @@ PageTableLibMapInLevel (
       if (RETURN_ERROR (Status)) {
         return Status;
       }
-    } else {
+    }
+
+    //
+    // A present parent leaf is split into child leaf entries to preserve the existing mapping.
+    // A non-present parent is split into child leaf entries only when Level can be a leaf.
+    //
+    if ((ParentPagingEntry->Pce.Present == 1) || (Level <= MaxLeafLevel)) {
       PageTableLibSetPle (Level, &OneOfPagingEntry, 0, &PleBAttribute, &AllOneMask);
+    } else {
+      PageTableLibSetPnle (&OneOfPagingEntry.Pnle, &PleBAttribute, &AllOneMask);
     }
 
     //
@@ -426,14 +435,14 @@ PageTableLibMapInLevel (
       PagingEntry = (IA32_PAGING_ENTRY *)((UINTN)Buffer + *BufferSize);
       ZeroMem (PagingEntry, SIZE_4KB);
 
-      if (ParentPagingEntry->Pce.Present) {
-        //
-        // Create 512 child-level entries that map to 2M/4K.
-        //
-        for (SubOffset = 0, Index = 0; Index < 512; Index++) {
-          PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
-          SubOffset                += RegionLength;
-        }
+      //
+      // Create 512 child-level entries from OneOfPagingEntry.
+      // Only leaf entries map physical memory, so only they need the per-entry address offset.
+      //
+      SubOffsetStep = IsPle (&OneOfPagingEntry, Level) ? RegionLength : 0;
+      for (SubOffset = 0, Index = 0; Index < 512; Index++) {
+        PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
+        SubOffset                += SubOffsetStep;
       }
 
       //
@@ -519,10 +528,6 @@ PageTableLibMapInLevel (
         // e.g.: Set PDE[0-255].ReadWrite = 0
         //
         for (Index = 0; Index < 512; Index++) {
-          if (PagingEntry[Index].Pce.Present == 0) {
-            continue;
-          }
-
           if (IsPle (&PagingEntry[Index], Level)) {
             PageTableLibSetPle (Level, &PagingEntry[Index], 0, &ChildAttribute, &ChildMask);
           } else {
