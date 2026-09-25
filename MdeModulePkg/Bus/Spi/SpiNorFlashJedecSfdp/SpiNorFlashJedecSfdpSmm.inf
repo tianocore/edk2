@@ -48,6 +48,7 @@
 
 [Protocols]
   gEfiSpiSmmNorFlashProtocolGuid ## PROCUDES
+  gEfiSpiNorFlash4ByteModeSmmProtocolGuid ## SOMETIMES_CONSUMES
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationRetryCount

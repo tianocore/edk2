@@ -61,12 +61,34 @@ CreateSpiNorFlashSfdpInstance (
     DEBUG ((DEBUG_ERROR, "%a: Fail to locate SPI I/O protocol\n", __func__));
     FreePool (Instance);
   } else {
+    // Cache the EN4B/EX4B protocol pointer if available (optional).
+    gBS->LocateProtocol (
+           &gEfiSpiNorFlash4ByteModeProtocolGuid,
+           NULL,
+           &Instance->SpiNorFlash4ByteModeProtocol
+           );
     Status = InitialSpiNorFlashSfdpInstance (Instance);
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: Fail to initial SPI_NOR_FLASH_INSTANCE.\n", __func__));
       FreePool (Instance);
     } else {
+      // Resolve SPI_ADDR_3OR4BYTE to a definitive mode after SFDP init so all
+      // data operations use a confirmed address width from the very first call.
+      if ((Instance->SfdpBasicFlash != NULL) &&
+          (Instance->SfdpBasicFlash->AddressBytes == SPI_ADDR_3OR4BYTE) &&
+          (Instance->SpiNorFlash4ByteModeProtocol != NULL))
+      {
+        EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL  *FourByteModeProtocol;
+        UINT8                                  NewAddrMode;
+
+        FourByteModeProtocol = (EFI_SPI_NOR_FLASH_4BYTE_MODE_PROTOCOL *)Instance->SpiNorFlash4ByteModeProtocol;
+        NewAddrMode          = SPI_ADDR_3BYTE_ONLY;
+        FourByteModeProtocol->Enter4ByteMode (FourByteModeProtocol, Instance->SpiIo, &NewAddrMode);
+        Instance->SfdpBasicFlash->AddressBytes = (UINT32)NewAddrMode;
+        DEBUG ((DEBUG_INFO, "%a: post-init EN4B resolved AddressBytes to 0x%x\n", __func__, NewAddrMode));
+      }
+
       // Install SPI NOR Flash Protocol.
       Status = gBS->InstallProtocolInterface (
                       &Instance->Handle,
