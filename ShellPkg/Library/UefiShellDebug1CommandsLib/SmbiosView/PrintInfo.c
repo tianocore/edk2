@@ -1285,15 +1285,24 @@ SmbiosPrintStructure (
     {
       MC_HOST_INTERFACE_PROTOCOL_RECORD  *MCHostInterfaceProtocolRecord;
       UINT8                              *RecordsPointer;
+      UINT8                              *RecordsEnd;
       UINT8                              MCHostInterfaceProtocolNumber;
       UINT8                              ProtocolTypeDataLen;
+      UINT8                              InterfaceTypeSpecificDataLength;
+      UINTN                              RecordLength;
 
       DisplayMCHostInterfaceType (Struct->Type42->InterfaceType, Option);
       if (AE_SMBIOS_VERSION (0x3, 0x2)) {
         UINT32  DataValue = 0;
         PRINT_STRUCT_VALUE_H (Struct, Type42, InterfaceTypeSpecificDataLength);
-        if (Struct->Type42->InterfaceTypeSpecificDataLength < 4) {
+        InterfaceTypeSpecificDataLength = Struct->Type42->InterfaceTypeSpecificDataLength;
+        if (InterfaceTypeSpecificDataLength < 4) {
           ShellPrintDefaultEx (L"WARNING: InterfaceTypeSpecificDataLength should be >= 4.\n");
+        }
+
+        if (Struct->Hdr->Length < OFFSET_OF (SMBIOS_TABLE_TYPE42, InterfaceTypeSpecificData) + InterfaceTypeSpecificDataLength + 1) {
+          ShellPrintDefaultEx (L"WARNING: Type 42 structure length is too small for InterfaceTypeSpecificData and protocol count.\n");
+          break;
         }
 
         ShellPrintDefaultEx (L"InterfaceTypeSpecificData\n");
@@ -1302,13 +1311,14 @@ SmbiosPrintStructure (
           case MCHostInterfaceTypeOemDefined:
             // The first four bytes are the vendor ID (MSB first), as assigned by the Internet Assigned Numbers Authority (IANA) as "Enterprise Number".
             // See https://www.iana.org/assignments/enterprise-numbers.txt
-            ShellPrintDefaultEx (L"Vendor ID (IANA Enterprise Number): %d", (UINT32)*(Struct->Type42->InterfaceTypeSpecificData));
+            DataValue = ReadUnaligned32 ((UINT32 *)(UINTN)Struct->Type42->InterfaceTypeSpecificData);
+            ShellPrintDefaultEx (L"Vendor ID (IANA Enterprise Number): %d\n", DataValue);
             break;
 
           // As defined in MCTP Host Interface Specification, DSP0256
           case MCHostInterfaceTypeMMBI:
             // For MCTP interface type of MMBI; this defines the pointer to the MMBI capability descriptor, as defined in DSP0282, Section 7.1
-            DataValue = *(UINT32 *)Struct->Type42->InterfaceTypeSpecificData;
+            DataValue = ReadUnaligned32 ((UINT32 *)(UINTN)Struct->Type42->InterfaceTypeSpecificData);
             ShellPrintDefaultEx (L"Pointer to MMBI capability descriptor: 0x%x\n", DataValue);
             break;
 
@@ -1317,24 +1327,36 @@ SmbiosPrintStructure (
           case MCHostInterfaceTypeKCS:
             // switch case fall through
             // For MCTP interface type of I2C, I3C, KCS; this value is reserved and must be 0
-            DataValue = *(UINT32 *)Struct->Type42->InterfaceTypeSpecificData;
+            DataValue = ReadUnaligned32 ((UINT32 *)(UINTN)Struct->Type42->InterfaceTypeSpecificData);
             ShellPrintDefaultEx (L"For Interface type I2C, I3C or KCS, InterfaceTypeSpecificData is reserved and must be 0.\n");
             ShellPrintDefaultEx (L"Actual value is : 0x%x\n", DataValue);
             break;
 
           default:
             // The decoding is not defined for these values in SMBIOS 3.8.0. The value is dumped
-            PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, Struct->Type42->InterfaceTypeSpecificDataLength);
+            PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, InterfaceTypeSpecificDataLength);
             break;
         }
 
-        RecordsPointer                = (UINT8 *)(&Struct->Type42->InterfaceTypeSpecificData[0] + Struct->Type42->InterfaceTypeSpecificDataLength);
+        RecordsPointer                = (UINT8 *)(&Struct->Type42->InterfaceTypeSpecificData[0] + InterfaceTypeSpecificDataLength);
+        RecordsEnd                    = (UINT8 *)Struct->Raw + Struct->Hdr->Length;
         MCHostInterfaceProtocolNumber = *RecordsPointer;
         ShellPrintDefaultEx (L"MCHostInterfaceProtocol Number: %d\n", MCHostInterfaceProtocolNumber);
         MCHostInterfaceProtocolRecord = (MC_HOST_INTERFACE_PROTOCOL_RECORD *)(RecordsPointer + 1);
 
         for (Index = 0; Index < MCHostInterfaceProtocolNumber; Index++) {
+          if ((UINT8 *)MCHostInterfaceProtocolRecord + OFFSET_OF (MC_HOST_INTERFACE_PROTOCOL_RECORD, ProtocolTypeData) > RecordsEnd) {
+            ShellPrintDefaultEx (L"WARNING: Type 42 protocol record #%d header is outside the structure length.\n", Index);
+            break;
+          }
+
           ProtocolTypeDataLen = MCHostInterfaceProtocolRecord->ProtocolTypeDataLen;
+          RecordLength        = OFFSET_OF (MC_HOST_INTERFACE_PROTOCOL_RECORD, ProtocolTypeData) + ProtocolTypeDataLen;
+          if ((UINT8 *)MCHostInterfaceProtocolRecord + RecordLength > RecordsEnd) {
+            ShellPrintDefaultEx (L"WARNING: Type 42 protocol record #%d data is outside the structure length.\n", Index);
+            break;
+          }
+
           ShellPrintDefaultEx (L"#%d MCHostInterfaceProtocolType: ", Index);
           switch (MCHostInterfaceProtocolRecord->ProtocolType) {
             case MCHostInterfaceProtocolTypeIPMI:
@@ -1359,7 +1381,7 @@ SmbiosPrintStructure (
           }
 
           PRINT_SMBIOS_BIT_FIELD (Struct, MCHostInterfaceProtocolRecord->ProtocolTypeData, ProtocolTypeData, ProtocolTypeDataLen);
-          MCHostInterfaceProtocolRecord = (MC_HOST_INTERFACE_PROTOCOL_RECORD *)((UINT8 *)MCHostInterfaceProtocolRecord + ProtocolTypeDataLen);
+          MCHostInterfaceProtocolRecord = (MC_HOST_INTERFACE_PROTOCOL_RECORD *)((UINT8 *)MCHostInterfaceProtocolRecord + RecordLength);
         }
       }
 
