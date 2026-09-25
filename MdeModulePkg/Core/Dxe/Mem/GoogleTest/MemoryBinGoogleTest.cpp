@@ -552,11 +552,11 @@ TEST_F (BaseMemoryBinLibTest, ZeroesAllPagesWhenHobIsCorrupted) {
 // Test: GetMemoryTypeInformationResourceHob returns NOT_FOUND when no resource HOB exists
 //
 TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobReturnsNotFoundWhenNoResourceHob) {
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  UINT8                        HobListBuffer[sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + sizeof (EFI_HOB_GENERIC_HEADER)];
-  EFI_HOB_HANDOFF_INFO_TABLE   *HandoffHob;
-  EFI_HOB_GENERIC_HEADER       *EndOfHobList;
-  VOID                         *HobStart;
+  VOID                        *ResourceHob;
+  UINT8                       HobListBuffer[sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + sizeof (EFI_HOB_GENERIC_HEADER)];
+  EFI_HOB_HANDOFF_INFO_TABLE  *HandoffHob;
+  EFI_HOB_GENERIC_HEADER      *EndOfHobList;
+  VOID                        *HobStart;
 
   ZeroMem (HobListBuffer, sizeof (HobListBuffer));
 
@@ -576,16 +576,22 @@ TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobReturnsNotFound
 }
 
 //
-// Test: GetMemoryTypeInformationResourceHob finds matching resource HOB
+// Test: GetMemoryTypeInformationResourceHob finds matching Resource Descriptor2 HOB
 //
-TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobFindsMatchingHob) {
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  UINT8                        HobListBuffer[sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + 3 *sizeof (EFI_HOB_RESOURCE_DESCRIPTOR) + sizeof (EFI_HOB_GENERIC_HEADER)];
-  EFI_HOB_HANDOFF_INFO_TABLE   *HandoffHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceDescriptor;
-  EFI_HOB_GENERIC_HEADER       *EndOfHobList;
-  VOID                         *HobStart;
-  EFI_GUID                     OtherGuid = { 0x12345678, 0x1234, 0x1234, { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 }
+TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobFindsMatchingResourceDescriptor2Hob) {
+  EFI_PEI_HOB_POINTERS  ResourceHob;
+  UINT8                 HobListBuffer[
+                                      sizeof (EFI_HOB_HANDOFF_INFO_TABLE) +
+                                      2 * sizeof (EFI_HOB_RESOURCE_DESCRIPTOR) +
+                                      sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2) +
+                                      sizeof (EFI_HOB_GENERIC_HEADER)
+  ];
+  EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceDescriptor;
+  EFI_HOB_RESOURCE_DESCRIPTOR2  *ResourceDescriptor2;
+  EFI_HOB_GENERIC_HEADER        *EndOfHobList;
+  VOID                          *HobStart;
+  EFI_GUID                      OtherGuid = { 0x12345678, 0x1234, 0x1234, { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 }
   };
 
   ZeroMem (HobListBuffer, sizeof (HobListBuffer));
@@ -602,16 +608,16 @@ TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobFindsMatchingHo
   ResourceDescriptor->PhysicalStart  = 0x100000;
   ResourceDescriptor->ResourceLength = 0x50000;
 
-  ResourceDescriptor                   = (EFI_HOB_RESOURCE_DESCRIPTOR *)(ResourceDescriptor + 1);
-  ResourceDescriptor->Header.HobType   = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR;
-  ResourceDescriptor->Header.HobLength = sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
-  ResourceDescriptor->ResourceType     = EFI_RESOURCE_SYSTEM_MEMORY;
-  CopyGuid (&ResourceDescriptor->Owner, &gEfiMemoryTypeInformationGuid);
-  ResourceDescriptor->PhysicalStart     = 0x200000;
-  ResourceDescriptor->ResourceLength    = 0x75000;
-  ResourceDescriptor->ResourceAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED;
+  ResourceDescriptor2                   = (EFI_HOB_RESOURCE_DESCRIPTOR2 *)(ResourceDescriptor + 1);
+  ResourceDescriptor2->Header.HobType   = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2;
+  ResourceDescriptor2->Header.HobLength = sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2);
+  ResourceDescriptor2->ResourceType     = EFI_RESOURCE_SYSTEM_MEMORY;
+  CopyGuid (&ResourceDescriptor2->Owner, &gEfiMemoryTypeInformationGuid);
+  ResourceDescriptor2->PhysicalStart        = 0x200000;
+  ResourceDescriptor2->ResourceLength       = 0x75000;
+  ResourceDescriptor2->ResourceCapabilities = EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED;
 
-  ResourceDescriptor                   = (EFI_HOB_RESOURCE_DESCRIPTOR *)(ResourceDescriptor + 1);
+  ResourceDescriptor                   = (EFI_HOB_RESOURCE_DESCRIPTOR *)(ResourceDescriptor2 + 1);
   ResourceDescriptor->Header.HobType   = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR;
   ResourceDescriptor->Header.HobLength = sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
   ResourceDescriptor->ResourceType     = EFI_RESOURCE_SYSTEM_MEMORY;
@@ -625,17 +631,18 @@ TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobFindsMatchingHo
 
   HobStart = (VOID *)HobListBuffer;
 
-  ResourceHob = GetMemoryTypeInformationResourceHob (&HobStart, gMemoryTypeInformation);
+  ResourceHob.Raw = (UINT8 *)GetMemoryTypeInformationResourceHob (&HobStart, gMemoryTypeInformation);
 
-  ASSERT_EQ (ResourceHob->PhysicalStart, (EFI_PHYSICAL_ADDRESS)0x200000);
-  ASSERT_EQ (ResourceHob->ResourceLength, (UINT64)0x75000);
+  ASSERT_EQ (GET_HOB_TYPE (ResourceHob), EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2);
+  ASSERT_EQ (GET_RESOURCE_HOB_PHYSICAL_START (ResourceHob), (EFI_PHYSICAL_ADDRESS)0x200000);
+  ASSERT_EQ (GET_RESOURCE_HOB_RESOURCE_LENGTH (ResourceHob), (UINT64)0x75000);
 }
 
 //
 // Test: GetMemoryTypeInformationResourceHob Fails When Multiple Matching HOBs Exist
 //
 TEST_F (BaseMemoryBinLibTest, GetMemoryTypeInformationResourceHobFailsWithMultipleMatchingHobs) {
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
+  VOID                         *ResourceHob;
   UINT8                        HobListBuffer[sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + 2 * sizeof (EFI_HOB_RESOURCE_DESCRIPTOR) + sizeof (EFI_HOB_GENERIC_HEADER)];
   EFI_HOB_HANDOFF_INFO_TABLE   *HandoffHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *FirstMatchingResource;

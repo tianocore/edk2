@@ -205,10 +205,11 @@ CleanAndError:
   @param MemoryTypeInformation            The memory type information array to be used to determine
                                           the size of the memory bins.
 
-  @return Non-NULL                        The pointer to the singular MemoryTypeInformation Resource Descriptor HOB.
+  @return Non-NULL                        The pointer to the singular MemoryTypeInformation Resource Descriptor HOB
+                                          (v1 or v2).
   @return NULL                            No valid MemoryTypeInformation Resource Descriptor HOB found.
 **/
-EFI_HOB_RESOURCE_DESCRIPTOR *
+VOID *
 EFIAPI
 GetMemoryTypeInformationResourceHob (
   IN  VOID                        **HobStart,
@@ -217,43 +218,43 @@ GetMemoryTypeInformationResourceHob (
 {
   UINTN                        Count;
   EFI_PEI_HOB_POINTERS         Hob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
+  EFI_PEI_HOB_POINTERS         MemoryTypeInformationResourceHob;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceHobAttribute;
   EFI_PHYSICAL_ADDRESS         BinTop;
 
-  ASSERT (HobStart != NULL);
-  ASSERT (MemoryTypeInformation != NULL);
   if ((HobStart == NULL) || (MemoryTypeInformation == NULL)) {
+    ASSERT (HobStart != NULL);
+    ASSERT (MemoryTypeInformation != NULL);
     return NULL;
   }
 
   //
   // See if a Memory Type Information HOB is available
   //
-  MemoryTypeInformationResourceHob = NULL;
-  Count                            = 0;
+  MemoryTypeInformationResourceHob.Raw = NULL;
+  Count                                = 0;
   for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       continue;
     }
 
-    ResourceHob = Hob.ResourceDescriptor;
-    if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
+    ResourceHobAttribute = GET_RESOURCE_HOB_ATTRIBUTE (Hob);
+    if (!CompareGuid (GET_RESOURCE_HOB_OWNER (Hob), &gEfiMemoryTypeInformationGuid)) {
       continue;
     }
 
     Count++;
-    if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+    if (GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) != EFI_RESOURCE_SYSTEM_MEMORY) {
       continue;
     }
 
-    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+    if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
       continue;
     }
 
-    BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
-    if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop, MemoryTypeInformation)) {
-      MemoryTypeInformationResourceHob = ResourceHob;
+    BinTop = GET_RESOURCE_HOB_PHYSICAL_START (Hob) + GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
+    if (GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob) >= CalculateTotalMemoryBinSizeNeeded (&BinTop, MemoryTypeInformation)) {
+      MemoryTypeInformationResourceHob.Raw = Hob.Raw;
     }
   }
 
@@ -261,7 +262,7 @@ GetMemoryTypeInformationResourceHob (
     return NULL;
   }
 
-  return MemoryTypeInformationResourceHob;
+  return MemoryTypeInformationResourceHob.Raw;
 }
 
 /**

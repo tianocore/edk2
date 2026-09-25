@@ -172,15 +172,19 @@ PostFspmHobProcess (
   // Parse the hob list from fsp
   // Report all the resource hob except the memory between 1M and 4G
   //
-  Hob.Raw = (UINT8 *)(UINTN)FspHobList;
+
   DEBUG ((DEBUG_INFO, "FspHobList - 0x%x\n", FspHobList));
 
-  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw)) != NULL) {
+  for (Hob.Raw = (UINT8 *)(UINTN)FspHobList; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      continue;
+    }
+
     DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
     if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
         (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED))
     {
-      DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
+      DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", GET_RESOURCE_HOB_ATTRIBUTE (Hob)));
       DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%x\n", Hob.ResourceDescriptor->PhysicalStart));
       DEBUG ((DEBUG_INFO, "ResourceLength: 0x%x\n", Hob.ResourceDescriptor->ResourceLength));
       DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
@@ -191,7 +195,6 @@ PostFspmHobProcess (
        && (Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength <= BASE_4GB))
     {
       LowMemorySize += Hob.ResourceDescriptor->ResourceLength;
-      Hob.Raw        = GET_NEXT_HOB (Hob);
       continue;
     }
 
@@ -211,12 +214,10 @@ PostFspmHobProcess (
     //
     BuildResourceDescriptorHob (
       Hob.ResourceDescriptor->ResourceType,
-      Hob.ResourceDescriptor->ResourceAttribute,
+      GET_RESOURCE_HOB_ATTRIBUTE (Hob),
       Hob.ResourceDescriptor->PhysicalStart,
       Hob.ResourceDescriptor->ResourceLength
       );
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
   if (!FoundFspMemHob) {

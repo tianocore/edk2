@@ -40,7 +40,7 @@ FspGetResourceDescriptorByOwner (
   // Collect memory ranges
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) && \
           (CompareGuid (&Hob.ResourceDescriptor->Owner, OwnerGuid)))
       {
@@ -71,6 +71,9 @@ FspGetSystemMemorySize (
   EFI_BOOT_MODE                BootMode;
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
   EFI_PEI_HOB_POINTERS         Hob;
+  EFI_RESOURCE_TYPE            ResourceType;
+  EFI_PHYSICAL_ADDRESS         ResourceStart;
+  UINT64                       ResourceLength;
 
   ResourceAttribute = (
                        EFI_RESOURCE_ATTRIBUTE_PRESENT |
@@ -99,20 +102,30 @@ FspGetSystemMemorySize (
   // Collect memory ranges
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
-          ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) &&
-           (Hob.ResourceDescriptor->ResourceAttribute == ResourceAttribute)))
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) {
+        ResourceType   = Hob.ResourceDescriptor2->ResourceType;
+        ResourceStart  = Hob.ResourceDescriptor2->PhysicalStart;
+        ResourceLength = Hob.ResourceDescriptor2->ResourceLength;
+      } else {
+        ResourceType   = Hob.ResourceDescriptor->ResourceType;
+        ResourceStart  = Hob.ResourceDescriptor->PhysicalStart;
+        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+      }
+
+      if ((ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
+          ((ResourceType == EFI_RESOURCE_MEMORY_RESERVED) &&
+           (GET_RESOURCE_HOB_ATTRIBUTE (Hob) == ResourceAttribute)))
       {
         //
         // Need memory above 1MB to be collected here
         //
-        if ((Hob.ResourceDescriptor->PhysicalStart >= BASE_1MB) &&
-            (Hob.ResourceDescriptor->PhysicalStart < (EFI_PHYSICAL_ADDRESS)BASE_4GB))
+        if ((ResourceStart >= BASE_1MB) &&
+            (ResourceStart < (EFI_PHYSICAL_ADDRESS)BASE_4GB))
         {
-          *LowMemoryLength += (UINT64)(Hob.ResourceDescriptor->ResourceLength);
-        } else if (Hob.ResourceDescriptor->PhysicalStart >= (EFI_PHYSICAL_ADDRESS)BASE_4GB) {
-          *HighMemoryLength += (UINT64)(Hob.ResourceDescriptor->ResourceLength);
+          *LowMemoryLength += (UINT64)(ResourceLength);
+        } else if (ResourceStart >= (EFI_PHYSICAL_ADDRESS)BASE_4GB) {
+          *HighMemoryLength += (UINT64)(ResourceLength);
         }
       }
     }
