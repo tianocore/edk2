@@ -7,6 +7,8 @@
 
 all: subdirs
 
+export ICX_BIN
+
 LANGUAGES = C Python
 
 SOURCE_SUBDIRS := $(patsubst %,Source/%,$(sort $(LANGUAGES)))
