@@ -172,7 +172,7 @@ AmlSetFixedArgument (
   )
 {
   if (IS_AML_OBJECT_NODE (ObjectNode)                                     &&
-      (Index <= (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (ObjectNode))  &&
+      (Index < (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (ObjectNode))   &&
       ((NewNode == NULL)                                                  ||
        ((IS_AML_OBJECT_NODE (NewNode) || IS_AML_DATA_NODE (NewNode))      &&
         AML_NODE_IS_DETACHED (NewNode))))
