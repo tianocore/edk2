@@ -2372,6 +2372,17 @@
   # @Prompt PCI CRS timeout in seconds.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds|0|UINT32|0x1000002B
 
+  ## GUID of the firmware volume file containing the OEM logo image.
+  #
+  #  Platforms may override the default value with the GUID assigned to
+  #  the packaged OEM logo file. A zero GUID disables OEM logo loading.
+  #  When configured, LogoDxe attempts to load the OEM logo before
+  #  falling back to the built-in logo.
+  #
+  #
+  # @Prompt OEM Logo FFS File GUID.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdOemLogoFileGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x1000002C
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
