@@ -22,6 +22,8 @@
 
 #include <Protocol/IncompatiblePciDeviceSupport.h>
 
+#include "FixedBars.h"
+
 //
 // The protocol interface this driver produces.
 //
@@ -165,6 +167,57 @@ STATIC CONST EFI_ACPI_END_TAG_DESCRIPTOR  mEndDesc = {
 
   @retval EFI_SUCCESS   The function always returns EFI_SUCCESS.
 **/
+/**
+  This function copies Buffer into Configuration, then appends the
+  confidential-VM option ROM descriptor if applicable, and finally
+  appends the terminating End Tag.
+
+  @param[in]  Buffer        Descriptor bytes.
+  @param[in]  BufferSize    Size in bytes of Buffer.
+  @param[out] Configuration As in CheckDevice().
+
+  @retval EFI_SUCCESS           Configuration built and returned.
+  @retval EFI_OUT_OF_RESOURCES  Memory allocation failure.
+**/
+STATIC
+EFI_STATUS
+BuildConfiguration (
+  IN  CONST VOID  *Buffer,
+  IN  UINTN       BufferSize,
+  OUT VOID        **Configuration
+  )
+{
+  UINTN  Length;
+  UINT8  *Ptr;
+
+  Length = BufferSize + sizeof mEndDesc;
+
+  //
+  // In Td guest OptionRom is not allowed.
+  //
+  if (CcProbe ()) {
+    Length += sizeof mOptionRomConfiguration;
+  }
+
+  *Configuration = AllocateZeroPool (Length);
+  if (*Configuration == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Ptr = (UINT8 *)(UINTN)*Configuration;
+  CopyMem (Ptr, Buffer, BufferSize);
+  Length = BufferSize;
+
+  if (CcProbe ()) {
+    CopyMem (Ptr + Length, &mOptionRomConfiguration, sizeof mOptionRomConfiguration);
+    Length += sizeof mOptionRomConfiguration;
+  }
+
+  CopyMem (Ptr + Length, &mEndDesc, sizeof mEndDesc);
+
+  return EFI_SUCCESS;
+}
+
 STATIC
 EFI_STATUS
 EFIAPI
@@ -178,8 +231,25 @@ CheckDevice (
   OUT VOID                                          **Configuration
   )
 {
-  UINTN  Length;
-  UINT8  *Ptr;
+  EFI_STATUS  Status;
+  VOID        *FixedBarsDescs;
+  UINTN       FixedBarsDescsSize;
+
+  //
+  // Dispatch hook: if this device has an entry in the "etc/fixed-bars"
+  // fw_cfg blob, use that instead of the hardcoded 64-bit-MMIO-preference
+  // descriptor below.
+  //
+  Status = FixedBarsCheckDevice (VendorId, DeviceId, &FixedBarsDescs, &FixedBarsDescsSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (FixedBarsDescs != NULL) {
+    Status = BuildConfiguration (FixedBarsDescs, FixedBarsDescsSize, Configuration);
+    FreePool (FixedBarsDescs);
+    return Status;
+  }
 
   //
   // Unlike the general description of this protocol member suggests, there is
@@ -200,18 +270,8 @@ CheckDevice (
   // the edk2 PCI Bus UEFI_DRIVER actually handles error codes; see the
   // UpdatePciInfo() function.
   //
-  Length = sizeof mMmio64Configuration + sizeof mEndDesc;
-
-  //
-  // In Td guest OptionRom is not allowed.
-  //
-  if (CcProbe ()) {
-    Length += sizeof mOptionRomConfiguration;
-  }
-
-  *Configuration = AllocateZeroPool (Length);
-
-  if (*Configuration == NULL) {
+  Status = BuildConfiguration (&mMmio64Configuration, sizeof mMmio64Configuration, Configuration);
+  if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_WARN,
       "%a: 64-bit MMIO BARs may be degraded for PCI 0x%04x:0x%04x (rev %d)\n",
@@ -220,21 +280,9 @@ CheckDevice (
       (UINT32)DeviceId,
       (UINT8)RevisionId
       ));
-    return EFI_OUT_OF_RESOURCES;
   }
 
-  Ptr = (UINT8 *)(UINTN)*Configuration;
-  CopyMem (Ptr, &mMmio64Configuration, sizeof mMmio64Configuration);
-  Length = sizeof mMmio64Configuration;
-
-  if (CcProbe ()) {
-    CopyMem (Ptr + Length, &mOptionRomConfiguration, sizeof mOptionRomConfiguration);
-    Length += sizeof mOptionRomConfiguration;
-  }
-
-  CopyMem (Ptr + Length, &mEndDesc, sizeof mEndDesc);
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -257,12 +305,18 @@ DriverInitialize (
   )
 {
   EFI_STATUS  Status;
+  BOOLEAN     HasFixedBarsDevices;
+
+  Status = FixedBarsInit (&HasFixedBarsDevices);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
-  // If there is no 64-bit PCI MMIO aperture, then 64-bit MMIO BARs have to be
-  // allocated under 4 GB unconditionally.
+  // If there is no 64-bit PCI MMIO aperture and no fixed-bars devices to
+  // place, do not install the protocol.
   //
-  if (PcdGet64 (PcdPciMmio64Size) == 0) {
+  if ((PcdGet64 (PcdPciMmio64Size) == 0) && !HasFixedBarsDevices) {
     return EFI_UNSUPPORTED;
   }
 

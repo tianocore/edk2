@@ -1638,6 +1638,18 @@ UpdatePciInfo (
         if (Ptr->AddrLen != 0) {
           PciIoDevice->PciBar[BarIndex].Length = Ptr->AddrLen;
         }
+
+        //
+        // When both _MIF (BIT2) and _MAF (BIT3) are set in GenFlag the
+        // descriptor carries a fixed base address in AddrRangeMin.
+        //
+        if ((Ptr->GenFlag & (BIT2 | BIT3)) == (BIT2 | BIT3)) {
+          PciIoDevice->PciBar[BarIndex].HasFixedBaseAddress = TRUE;
+          PciIoDevice->PciBar[BarIndex].FixedBaseAddress    = Ptr->AddrRangeMin;
+          DEBUG ((DEBUG_INFO,
+                  "PciBus: UpdatePciInfo BAR[%u] fixed address=0x%016Lx\n",
+                  (UINT32)BarIndex, Ptr->AddrRangeMin));
+        }
       }
     }
 
