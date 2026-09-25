@@ -20,10 +20,17 @@
 
 #define GET_BOOTLOADER_PARAMETER()  PcdGet64 (PcdBootloaderParameter)
 
+typedef struct {
+  UINT64    Base;
+  UINT64    Size;
+  UINT32    Type;
+  UINT8     Flag;
+} BL_MEMORY_MAP_ENTRY;
+
 typedef RETURN_STATUS \
 (*BL_MEM_INFO_CALLBACK) (
-  MEMORY_MAP_ENTRY  *MemoryMapEntry,
-  VOID              *Param
+  BL_MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  VOID                 *Param
   );
 
 typedef VOID \
