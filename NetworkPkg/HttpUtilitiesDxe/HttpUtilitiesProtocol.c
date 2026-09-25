@@ -45,6 +45,11 @@ EFI_HTTP_UTILITIES_PROTOCOL  mHttpUtilitiesProtocol = {
   @retval EFI_OUT_OF_RESOURCES    Could not allocate memory for NewMessage.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
+                                  NewMessageSize is NULL.
+                                  NewMessage is NULL.
+                                  DeleteCount is not zero and DeleteList is NULL.
+                                  AppendCount is not zero and AppendList is NULL.
+                                  An entry in AppendList is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -72,6 +77,13 @@ HttpUtilitiesBuild (
   UINTN            StrLength;
   UINT8            *NewMessagePtr;
 
+  if ((This == NULL) || (NewMessageSize == NULL) || (NewMessage == NULL) ||
+      ((DeleteCount != 0) && (DeleteList == NULL)) ||
+      ((AppendCount != 0) && (AppendList == NULL)))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
   SeedHeaderFields = NULL;
   SeedFieldCount   = 0;
   TempHeaderFields = NULL;
@@ -85,10 +97,6 @@ HttpUtilitiesBuild (
   *NewMessageSize = 0;
   Status          = EFI_SUCCESS;
 
-  if (This == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   if (SeedMessage != NULL) {
     Status = This->Parse (
                      This,
@@ -100,12 +108,24 @@ HttpUtilitiesBuild (
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
+
+    if ((SeedFieldCount != 0) && (SeedHeaderFields == NULL)) {
+      ASSERT (SeedHeaderFields != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
   }
 
   //
   // Handle DeleteList
   //
   if ((SeedFieldCount != 0) && (DeleteCount != 0)) {
+    if (SeedHeaderFields == NULL) {
+      ASSERT (SeedHeaderFields != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
+
     TempHeaderFields = AllocateZeroPool (SeedFieldCount * sizeof (EFI_HTTP_HEADER));
     if (TempHeaderFields == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -144,6 +164,12 @@ HttpUtilitiesBuild (
   }
 
   for (Index = 0; Index < TempFieldCount; Index++) {
+    if (TempHeaderFields == NULL) {
+      ASSERT (TempHeaderFields != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
+
     Status = HttpSetFieldNameAndValue (
                &NewHeaderFields[Index],
                TempHeaderFields[Index].FieldName,
@@ -157,6 +183,12 @@ HttpUtilitiesBuild (
   NewFieldCount = TempFieldCount;
 
   for (Index = 0; Index < AppendCount; Index++) {
+    if (AppendList[Index] == NULL) {
+      ASSERT (AppendList[Index] != NULL);
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
     HttpHeader = HttpFindHeader (NewFieldCount, NewHeaderFields, AppendList[Index]->FieldName);
     if (HttpHeader != NULL) {
       Status = HttpSetFieldNameAndValue (
@@ -241,6 +273,10 @@ HttpUtilitiesBuild (
   // Free allocated buffer
   //
 ON_EXIT:
+  if (TempHeaderFields == SeedHeaderFields) {
+    TempHeaderFields = NULL;
+  }
+
   if (SeedHeaderFields != NULL) {
     HttpFreeHeaderFields (SeedHeaderFields, SeedFieldCount);
   }
