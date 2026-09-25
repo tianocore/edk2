@@ -1463,6 +1463,25 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonIpmiDeviceInfoParser[] = {
   { "InterruptNumber",                  sizeof (UINT8),           "0x%x",  NULL },
 };
 
+/** A parser for EArchCommonObjSystemPowerSupplyInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemPowerSupplyInfoParser[] = {
+  { "PowerSupplyInfoToken",       sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "InputVoltageProbeToken",     sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "CoolingDeviceToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "InputCurrentProbeToken",     sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "PowerUnitGroup",             sizeof (UINT8),           "0x%x", NULL        },
+  { "Location",                   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "DeviceName",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "Manufacturer",               SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SerialNumber",               SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "AssetTagNumber",             SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "ModelPartNumber",            SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "RevisionLevel",              SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "MaxPowerCapacity",           sizeof (UINT16),          "0x%x", NULL        },
+  { "PowerSupplyCharacteristics", sizeof (UINT16),          "0x%x", NULL        },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1795,6 +1814,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjBootErrorRegionInfo,              CmArchCommonBootErrorRegionInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErstInstructionsInfo,             CmArchCommonObjErstInstructionsInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjIpmiDeviceInfo,                   CmArchCommonIpmiDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemPowerSupplyInfo,            CmArchCommonSystemPowerSupplyInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
