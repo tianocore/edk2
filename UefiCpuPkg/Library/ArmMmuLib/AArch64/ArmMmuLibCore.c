@@ -103,8 +103,6 @@ ArmMemoryAttributeToPageAttribute (
 // T0SZ can be below MIN_T0SZ when LPA2 is in use, meaning the page table starts at level -1
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
-#define MAX_VA_BITS_48  48
-#define MAX_VA_BITS     52
 
 STATIC
 VOID
@@ -743,7 +741,7 @@ ArmConfigureMmu (
   // use of 4 KB pages.
   //
   if (ArmHas52BitTgran4 ()) {
-    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_LPA2);
   } else {
     MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
   }
@@ -1021,7 +1019,7 @@ ArmCcaSetMemoryProtectionAttribute (
   }
 
   if (ArmHas52BitTgran4 ()) {
-    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_LPA2);
   } else {
     MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
   }

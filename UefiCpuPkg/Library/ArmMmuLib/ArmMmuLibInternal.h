@@ -9,6 +9,10 @@
 
 #pragma once
 
+// Maximum VA bit definitions.
+#define MAX_VA_BITS_48    48
+#define MAX_VA_BITS_LPA2  52
+
 typedef
 VOID(
  EFIAPI  *ARM_REPLACE_LIVE_TRANSLATION_ENTRY
