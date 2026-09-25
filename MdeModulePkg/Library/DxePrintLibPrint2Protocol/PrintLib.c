@@ -2013,6 +2013,13 @@ InternalPrintLibSPrintMarker (
     {
       ArgumentCharacter = ((*ArgumentString & 0xff) | (((UINT8)*(ArgumentString + 1)) << 8)) & ArgumentMask;
 
+      // UCS-2 characters outside of the Latin-1 range cannot be converted to ASCII/Latin-1
+      // directly and simply truncating them may inject NUL bytes or other control characters
+      // or field delimiters into the output string inadvertently.
+      if ((BytesPerOutputCharacter < 2) && (ArgumentCharacter > MAX_UINT8)) {
+        ArgumentCharacter = (UINTN)L'?';
+      }
+
       LengthToReturn += (1 * BytesPerOutputCharacter);
       if (((Flags & COUNT_ONLY_NO_PRINT) == 0) && (Buffer != NULL)) {
         Buffer = InternalPrintLibFillBuffer (Buffer, EndBuffer, 1, ArgumentCharacter, BytesPerOutputCharacter);
