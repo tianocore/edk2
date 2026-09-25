@@ -18,6 +18,8 @@
   Include
 
 [LibraryClasses]
+  ##  @libraryclass  Locate ACPI tables by signature via a bootloader-supplied RSDP.
+  AcpiTableWalkLib|Include/Library/AcpiTableWalkLib.h
   PayloadEntryHelperLib|Include/Library/PayloadEntryHelperLib.h
 
 [Guids]
@@ -38,6 +40,7 @@
   gUefiAcpiBoardInfoGuid   = {0xad3d31b, 0xb3d8, 0x4506, {0xae, 0x71, 0x2e, 0xf1, 0x10, 0x6, 0xd9, 0xf}}
   gUefiSerialPortInfoGuid  = { 0x6c6872fe, 0x56a9, 0x4403, { 0xbb, 0x98, 0x95, 0x8d, 0x62, 0xde, 0x87, 0xf1 } }
   gLoaderMemoryMapInfoGuid = { 0xa1ff7424, 0x7a1a, 0x478e, { 0xa9, 0xe4, 0x92, 0xf3, 0x57, 0xd1, 0x28, 0x32 } }
+  gLoaderBootTimeReservationGuid = { 0x058e371c, 0x3486, 0x46b1, { 0xac, 0xf6, 0x2a, 0x3f, 0x26, 0x9c, 0xe2, 0x69 } }
   gEdkiiPayloadCommandLineGuid = {0xb5aeb34f, 0x3047, 0x4955, {0xb8, 0x80, 0xad, 0xd3, 0x6d, 0x86, 0xdc, 0x0f}}
 
   # SMM variable support
@@ -116,3 +119,23 @@ gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|TRUE|BOOLEAN|0x00
 
 ## Indicates whether allows PCI Root Bridge to allocate DMA memory resource above 4G
 gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE|BOOLEAN|0x0000002E
+
+[PcdsFeatureFlag]
+## Publish the MCFG ECAM window as EFI_RESOURCE_MEMORY_RESERVED rather
+#  than EFI_RESOURCE_MEMORY_MAPPED_IO, so that it appears in the UEFI
+#  memory map as a Reserved entry.
+#
+#  Linux only uses MMCONFIG for extended PCIe configuration space if the
+#  window passes its is_mmconf_reserved() check, which requires the range
+#  to be covered by a Reserved entry in the firmware-provided memory map.
+#  A plain MMIO resource does not qualify: CoreGetMemoryMap() reports an
+#  MMIO range only when it also carries EFI_MEMORY_RUNTIME, which the ECAM
+#  window does not. The window is still device memory, so it is published
+#  advertising UNCACHEABLE only, and a consumer that builds page tables
+#  from these HOBs must not map configuration space write-back.
+#
+#  Declared as a feature flag rather than alongside the package's other
+#  boolean knobs in [PcdsFixedAtBuild, PcdsPatchableInModule] so that the
+#  publication code is eliminated outright on platforms that leave it off.
+# @Prompt Publish the MCFG ECAM window as Reserved memory.
+gUefiPayloadPkgTokenSpaceGuid.PcdPublishMcfgAsReservedMemory|FALSE|BOOLEAN|0x0000002F

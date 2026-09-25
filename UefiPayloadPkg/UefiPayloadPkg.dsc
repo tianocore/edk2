@@ -45,6 +45,7 @@
   DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
   DEFINE BOOTSPLASH_IMAGE             = FALSE
   DEFINE NVME_ENABLE                  = TRUE
+  DEFINE VIRTIO_ENABLE                = FALSE
   DEFINE LOCKBOX_SUPPORT              = FALSE
   DEFINE LOAD_OPTION_ROMS             = FALSE
 
@@ -71,6 +72,17 @@
   #
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
   DEFINE UNIVERSAL_PAYLOAD_FORMAT     = ELF
+
+  #
+  # Enable defaults suited to the ChainloadApp frontend:
+  # MCFG published as reserved memory, endpoint PCI BARs left at zero
+  # by the outer firmware programmed before PciBusDxe runs, full
+  # INIT-SIPI-SIPI for the first AP wakeup, a larger UEFI region, and
+  # on AArch64 the HOB-driven SerialPortLib plus MADT-derived GIC
+  # bases.  Left FALSE so that coreboot/Slim Bootloader users are
+  # unaffected.
+  #
+  DEFINE CHAINLOAD_DEFAULTS           = FALSE
 
   #
   # NULL:    NullMemoryTestDxe
@@ -192,8 +204,10 @@
 
 [BuildOptions.AARCH64]
   GCC:*_*_*_CC_FLAGS         = -mstrict-align
+!if $(CHAINLOAD_DEFAULTS) == FALSE
   GCC:*_GCC_*_CC_FLAGS         = -mcmodel=tiny
   GCC:*_CLANGDWARF_*_CC_FLAGS  = -mcmodel=tiny
+!endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
@@ -407,6 +421,7 @@
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
 !endif
   UefiCpuBaseArchSupportLib|UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
+  AcpiTableWalkLib|UefiPayloadPkg/Library/AcpiTableWalkLib/AcpiTableWalkLib.inf
 
 [LibraryClasses.X64]
   #
@@ -424,7 +439,27 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
 
+!if $(VIRTIO_ENABLE) == TRUE
+  #
+  # Virtio driver dependencies
+  #
+  PciCapLib|OvmfPkg/Library/BasePciCapLib/BasePciCapLib.inf
+  PciCapPciIoLib|OvmfPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
+  OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+!endif
+
 [LibraryClasses.AARCH64]
+  #
+  # BaseIoLibIntrinsic.inf uses plain C volatile pointer dereferences for
+  # MmioRead*/MmioWrite*, which the compiler may fuse with adjacent pointer
+  # arithmetic into post-indexed AArch64 loads/stores. Post-indexed accesses
+  # produce a stage-2 data abort with ESR_EL2.ISV=0, so KVM cannot decode the
+  # access as MMIO and returns KVM_EXIT_ARM_NISV instead of KVM_EXIT_MMIO.
+  # Use the ArmVirt variant, which emits plain register-offset accesses in
+  # hand-written assembly, matching what ArmVirtPkg does.
+  #
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
@@ -436,7 +471,19 @@
   ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  #
+  # ChainloadApp emits a gUniversalPayloadSerialPortInfoGuid HOB from
+  # the ACPI SPCR, so use the HOB-driven 16550 SerialPortLib.  The
+  # PL011 instance below is fixed to PcdSerialRegisterBase, which is
+  # only correct on QEMU virt.  DXE-phase modules use the DxeHobLib-
+  # backed instance; SEC (below) uses the PayloadEntryHobLib-backed
+  # one.
+  #
+  SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/DxeBaseSerialPortLibHob.inf
+!else
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
+!endif
 
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
@@ -473,6 +520,11 @@
   ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+
+[LibraryClasses.AARCH64.SEC]
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/BaseSerialPortLibHob.inf
+!endif
 
 [LibraryClasses.common.SEC]
   HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
@@ -593,6 +645,10 @@
   ## Whether capsules are allowed to persist across reset.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|$(CAPSULE_SUPPORT)
 
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  gUefiPayloadPkgTokenSpaceGuid.PcdPublishMcfgAsReservedMemory|TRUE
+!endif
+
 [PcdsFeatureFlag.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
@@ -668,6 +724,14 @@
 
   ## Whether allows PCI RB to allocate DMA memory above 4GB
   gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  # Note: gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize is a
+  # different PCD with the same name; UefiPayloadEntry consumes only the
+  # gUefiPayloadPkgTokenSpaceGuid one below.
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x10000000
+  # Only consumed by UefiCpuPkg MpInitLib on IA32/X64; harmless on AArch64.
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
+!endif
 
 [PcdsFixedAtBuild.AARCH64]
   # System Memory Base -- fixed at 0x4000_0000
@@ -680,9 +744,11 @@
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
 
   # ARM General Interrupt Controller
+!if $(CHAINLOAD_DEFAULTS) == FALSE
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x8000000
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x80a0000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x8080000
+!endif
 
   # Enable NX memory protection for all non-code regions, including OEM and OS
   # reserved ones, with the exception of LoaderData regions, of which OS loaders
@@ -851,6 +917,19 @@
 
 [PcdsDynamicExDefault.AARCH64]
 
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  #
+  # ChainloadApp hands over ACPI tables from the outer firmware.
+  # AcpiGicPcdLib parses the MADT for the GICD/GICR/GICC bases and
+  # overrides these before ArmGicDxe reads them.  QEMU-virt
+  # defaults are kept as the fallback for a bootloader that does
+  # not supply a MADT.
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x8000000
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x80a0000
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x8080000
+!endif
+
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase     | 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64   | 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64   | 0
@@ -861,8 +940,8 @@
   # Timer IRQs
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30
-  # Not used in QEMU platform
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0
+  # QEMU virt: EL1 virtual timer PPI 27
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
   gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
 
@@ -1216,6 +1295,17 @@
   !error "Invalid TIMER_SUPPORT"
 !endif
 
+!if $(VIRTIO_ENABLE) == TRUE
+  #
+  # Virtio bus and class drivers
+  #
+  OvmfPkg/Virtio10Dxe/Virtio10.inf
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+!endif
+
 [Components.AARCH64]
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
@@ -1224,7 +1314,14 @@
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
+!if $(CHAINLOAD_DEFAULTS) == TRUE
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
+    <LibraryClasses>
+      NULL|UefiPayloadPkg/Library/AcpiGicPcdLib/AcpiGicPcdLib.inf
+  }
+!else
   ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
+!endif
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
     <LibraryClasses>
@@ -1339,3 +1436,30 @@
   }
 
 !endif
+
+#
+# ChainloadApp: UEFI-hosted payload launcher.  Always compiled so CI
+# covers it; without a generated EmbeddedPayload.h it links against
+# the in-tree stub and refuses to hand off at run time.  See
+# BuildChainloadEmbedded.sh for the two-stage embedded build.
+#
+[Components.X64, Components.AARCH64]
+  UefiPayloadPkg/ChainloadApp/ChainloadApp.inf {
+    <LibraryClasses>
+      #
+      # ChainloadApp runs under the outer firmware and must not pull
+      # in the payload's HOB-driven SerialPortLib (no HOB list yet).
+      # Route DEBUG() through the outer firmware's ConOut instead.
+      #
+      DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+      #
+      # ArmMmuLib allocates translation-table pages via
+      # MemoryAllocationLib::AllocatePages().  Redirect those to
+      # EfiReservedMemoryType so they stay isolated in the outer
+      # memory-map snapshot and cannot be selected as HOB memory,
+      # and record each one so ChainloadApp can hand the payload an
+      # explicit boot-time reservation list to publish as
+      # EfiBootServicesData.
+      #
+      MemoryAllocationLib|UefiPayloadPkg/ChainloadApp/ReservedUefiMemoryAllocationLib.inf
+  }

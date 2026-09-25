@@ -1,0 +1,77 @@
+## @file
+#  Chainload Application
+#
+#  Embeds a UniversalPayload binary and chainloads into it.
+#  The payload must be generated first using GenPayloadHdr.py to create
+#  EmbeddedPayload.h in the build directory before building this application.
+#
+#  Copyright (c) 2026, Amazon.com, Inc. or its affiliates. All Rights Reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ChainloadApp
+  FILE_GUID                      = 13DCF199-C146-4467-9353-0A601AA148FB
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ChainloadEntry
+
+#
+# VALID_ARCHITECTURES           = X64 AARCH64
+#
+
+[Sources]
+  ChainloadApp.c
+  EmbeddedPayloadStub.h
+  PciBarFixup.c
+
+[Sources.X64]
+  X64/PayloadEntry.nasm
+
+[Sources.AARCH64]
+  AArch64/PayloadEntry.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[Packages.AARCH64]
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  UefiLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  BaseLib
+  DebugLib
+  PcdLib
+  CacheMaintenanceLib
+  PeCoffGetEntryPointLib
+  PeCoffLib
+  AcpiTableWalkLib
+
+[LibraryClasses.AARCH64]
+  ArmLib
+  ArmMmuLib
+
+[Guids]
+  gEfiAcpiTableGuid
+  gEfiAcpi10TableGuid
+  gEfiSmbiosTableGuid
+  gEfiSmbios3TableGuid
+  gUniversalPayloadExtraDataGuid
+  gLoaderMemoryMapInfoGuid
+  gLoaderBootTimeReservationGuid
+  gUefiSerialPortInfoGuid
+  gUniversalPayloadSerialPortInfoGuid
+  gUniversalPayloadSmbiosTableGuid
+  gUniversalPayloadAcpiTableGuid
+
+[Pcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
