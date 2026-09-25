@@ -60,6 +60,7 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   PcdLib
+  PlatformMemoryProtectionLib
   ResourcePublicationLib
 
 [Pcd]

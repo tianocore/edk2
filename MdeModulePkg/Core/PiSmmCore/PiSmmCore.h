@@ -54,6 +54,7 @@
 #include <Library/HobLib.h>
 #include <Library/SmmMemLib.h>
 #include <Library/SafeIntLib.h>
+#include <Library/MmMemoryProtectionHobLib.h>
 
 #include "PiSmmCorePrivateData.h"
 #include "HeapGuard.h"

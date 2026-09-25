@@ -39,6 +39,7 @@
   PcdLib
   PeiServicesLib
   QemuFwCfgSimpleParserLib
+  PlatformMemoryProtectionLib
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize
