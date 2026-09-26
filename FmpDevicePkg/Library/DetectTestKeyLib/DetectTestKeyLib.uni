@@ -1,0 +1,12 @@
+// /** @file
+// Detects if PcdFmpDevicePkcs7CertBufferXdr contains a test key.
+//
+// Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Detects if PcdFmpDevicePkcs7CertBufferXdr contains a test key."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Detects if PcdFmpDevicePkcs7CertBufferXdr contains a test key."
