@@ -1336,6 +1336,10 @@ CoDCheckCapsuleOnDiskFlag (
   UINT64      OsIndication;
   UINTN       DataSize;
 
+  if (!PcdGetBool (PcdCapsuleOnDiskSupport)) {
+    return FALSE;
+  }
+
   //
   // Check File Capsule Delivery Supported Flag in OsIndication variable
   //
