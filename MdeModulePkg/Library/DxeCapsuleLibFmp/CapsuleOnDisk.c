@@ -1163,7 +1163,8 @@ EXIT:
 
 **/
 EFI_STATUS
-GetAllCapsuleOnDisk (
+EFIAPI
+CoDGetAll (
   IN  UINTN       MaxRetry,
   OUT IMAGE_INFO  **CapsulePtr,
   OUT UINTN       *CapsuleNum,
@@ -1203,7 +1204,7 @@ GetAllCapsuleOnDisk (
                       0
                       );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk fail to open RootDir!\n"));
+    DEBUG ((DEBUG_ERROR, "CoDGetAll fail to open RootDir!\n"));
     RootDir->Close (RootDir);
     return Status;
   }
@@ -1437,21 +1438,22 @@ CoDClearCapsuleRelocationInfo (
 }
 
 /**
-  Free resources allocated by GetAllCapsuleOnDisk.
+  Free resources allocated by CoDGetAll.
 
   @param[in]  ImageInfo  An array of data and information of files
   @param[in]  Count      Length of the array.
 
 **/
 VOID
-FreeImageInfos (
+EFIAPI
+CoDFreeImages (
   IN IMAGE_INFO  *ImageInfo,
   IN UINTN       Count
   )
 {
   UINTN  Index;
 
-  if (Count == 0) {
+  if ((ImageInfo == NULL) || (Count == 0)) {
     return;
   }
 
@@ -1520,9 +1522,9 @@ RelocateCapsuleToDisk (
   //
   // 1. Load all Capsule On Disks in to memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "RelocateCapsule: CoDGetAll Status - %r\n", Status));
     return EFI_NOT_FOUND;
   }
 
@@ -1759,7 +1761,7 @@ EXIT:
     FreePool (CapsuleDataBuf);
   }
 
-  FreeImageInfos (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+  CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
 
   if (TempCodFile != NULL) {
     if (EFI_ERROR (Status)) {
@@ -1817,9 +1819,9 @@ RelocateCapsuleToRam (
   //
   // 1. Load all Capsule On Disks into memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "CoDGetAll Status - %r\n", Status));
     return EFI_NOT_FOUND;
   }
 
@@ -1829,7 +1831,7 @@ RelocateCapsuleToRam (
   CapsuleBuffer = AllocateZeroPool ((CapsuleOnDiskNum + 1) * sizeof (VOID *));
   if (CapsuleBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for capsules.\n"));
-    FreeImageInfos (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1837,7 +1839,7 @@ RelocateCapsuleToRam (
   if (CapsuleSize == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for capsules.\n"));
     FreePool (CapsuleBuffer);
-    FreeImageInfos (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1860,7 +1862,7 @@ RelocateCapsuleToRam (
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for name capsule.\n"));
     FreePool (CapsuleBuffer);
     FreePool (CapsuleSize);
-    FreeImageInfos (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1890,7 +1892,8 @@ BuildGather:
     if (FileNameCapsule != NULL) {
       FreePool (FileNameCapsule);
     }
-    FreeImageInfos (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
 
     return EFI_OUT_OF_RESOURCES;
   }
