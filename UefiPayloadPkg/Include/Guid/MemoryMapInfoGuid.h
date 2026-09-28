@@ -15,6 +15,17 @@
 ///
 extern EFI_GUID  gLoaderMemoryMapInfoGuid;
 
+///
+/// MEMORY_MAP_ENTRY.Flag bits.
+///
+/// A bootloader that already knows a range is device MMIO can say so
+/// explicitly rather than leaving UefiPayloadEntry to classify the range by
+/// the below/above mTopOfLowerUsableDram heuristic.  The bit is additive: a
+/// payload that predates it simply falls back to the heuristic, and a
+/// bootloader that does not set it behaves exactly as before.
+///
+#define MEM_MAP_FLAG_MMIO  BIT0
+
 #pragma pack(1)
 typedef struct {
   UINT64    Base;

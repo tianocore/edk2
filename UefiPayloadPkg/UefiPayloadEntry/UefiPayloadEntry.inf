@@ -47,6 +47,7 @@
   UefiPayloadPkg/UefiPayloadPkg.dec
 
 [LibraryClasses]
+  AcpiTableWalkLib
   BaseMemoryLib
   DebugLib
   BaseLib
@@ -61,6 +62,10 @@
   UefiCpuBaseArchSupportLib
   MemoryAllocationLib
 
+[LibraryClasses.AARCH64]
+  ArmMmuLib
+  ArmLib
+
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiFirmwareFileSystem2Guid
@@ -70,15 +75,19 @@
   gUniversalPayloadSmbiosTableGuid
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadSerialPortInfoGuid
+  gUniversalPayloadExtraDataGuid
+  gLoaderBootTimeReservationGuid
   gEfiFirmwareInfoHobGuid
   gEfiSmmStoreInfoHobGuid
+
+[FeaturePcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPublishMcfgAsReservedMemory  ## CONSUMES
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
 
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
-
 
 [Pcd.IA32,Pcd.X64,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES

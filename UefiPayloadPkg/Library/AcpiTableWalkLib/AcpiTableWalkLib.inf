@@ -1,0 +1,29 @@
+## @file
+#  Locate ACPI tables by signature via a bootloader-supplied RSDP.
+#
+#  Copyright (c) 2026, Amazon.com, Inc. or its affiliates.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiTableWalkLib
+  FILE_GUID                      = 25DAFD0A-4FB0-497F-A069-2F7E0DE6819E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AcpiTableWalkLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 RISCV64
+#
+
+[Sources]
+  AcpiTableWalkLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
