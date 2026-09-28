@@ -120,39 +120,43 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourceGenericHwInfo,            ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,        ///< 53 - Generic Hardware Error Source Info version 2
   EArchCommonObjEinjInstructionsInfo,              ///< 54 - Einj Instruction Info
-  EArchCommonObjPlatformFwInfo,                    ///< 54 - Platform Firmware Info
-  EArchCommonObjPhysicalMemoryArray,               ///< 55 - Physical Memory Array Info
-  EArchCommonObjMemoryDeviceInfo,                  ///< 56 - Memory Device Info
-  EArchCommonObjMemoryArrayMappedAddress,          ///< 57 - Memory Array Mapped Address Info
-  EArchCommonObjCoolingDeviceInfo,                 ///< 58 - Cooling Device Info
-  EArchCommonObjTemperatureProbeInfo,              ///< 59 - Temperature Probe Info
-  EArchCommonObjVoltageProbeInfo,                  ///< 60 - Voltage Probe Info
-  EArchCommonObjElectricalCurrentProbeInfo,        ///< 61 - Electrical Current Probe Info
-  EArchCommonObjSystemResetInfo,                   ///< 62 - System Reset Info
-  EArchCommonObjMemoryDeviceMappedAddress,         ///< 63 - Memory Device Mapped Address Info
-  EArchCommonObjMemoryChannelInfo,                 ///< 64 - Memory Channel Info
-  EArchCommonObjMemoryChannelDevice,               ///< 65 - Memory Channel Device Info
-  EArchCommonObjProcessorSpecificBlockInfo,        ///< 66 - Processor specific data Info
-  EArchCommonObjSystemInfo,                        ///< 67 - System Info
-  EArchCommonObjAdditionalInformation,             ///< 68 - Additional Information
-  EArchCommonObjAdditionalInformationEntry,        ///< 69 - Additional Information Entry
-  EArchCommonObjAdditionalInformationValue,        ///< 70 - Additional Information Value
-  EArchCommonObjSystemEnclosureInfo,               ///< 71 - System Enclosure Info
-  EArchCommonObjEnclosureElement,                  ///< 72 - System Enclosure Contained Element
-  EArchCommonObjBaseboardInfo,                     ///< 73 - Baseboard Info
-  EArchCommonObjBaseboardContainedObject,          ///< 74 - Baseboard Contained Object
-  EArchCommonObjMsctMaxPhysicalAddrInfo,           ///< 75 - MSCT Maximum physical address Info
-  EArchCommonObjMchiInfo,                          ///< 76 - Management Controller Host Interface Info.
-  EArchCommonObjMchiMctpDataInfo,                  ///< 77 - MCHI MCTP specific data Info.
-  EArchCommonObjMchiNetworkDataInfo,               ///< 78 - MCHI Network specific data Info.
-  EArchCommonObjMchiProtocolInfo,                  ///< 79 - Management Controller Host Interface Protocol Info.
-  EArchCommonObjMchiProtocolMctpDataInfo,          ///< 80 - MCHI MCTP Protocol Info.
-  EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 81 - Redfish Over Ip Protocol Info.
-  EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 82 - MCHI USB Network Device descriptor info
-  EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 83 - MCHI PCI/PCIe Network Device descriptor info
-  EArchCommonObjBiosLanguageInfo,                  ///< 84 - BIOS Language Information
-  EArchCommonObjBiosLanguage,                      ///< 85 - BIOS Language
-  EArchCommonObjSystemBootInfo,                    ///< 86 - System Boot Information
+  EArchCommonObjPlatformFwInfo,                    ///< 55 - Platform Firmware Info
+  EArchCommonObjPhysicalMemoryArray,               ///< 56 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,                  ///< 57 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,          ///< 58 - Memory Array Mapped Address Info
+  EArchCommonObjCoolingDeviceInfo,                 ///< 59 - Cooling Device Info
+  EArchCommonObjTemperatureProbeInfo,              ///< 60 - Temperature Probe Info
+  EArchCommonObjVoltageProbeInfo,                  ///< 61 - Voltage Probe Info
+  EArchCommonObjElectricalCurrentProbeInfo,        ///< 62 - Electrical Current Probe Info
+  EArchCommonObjSystemResetInfo,                   ///< 63 - System Reset Info
+  EArchCommonObjMemoryDeviceMappedAddress,         ///< 64 - Memory Device Mapped Address Info
+  EArchCommonObjMemoryChannelInfo,                 ///< 65 - Memory Channel Info
+  EArchCommonObjMemoryChannelDevice,               ///< 66 - Memory Channel Device Info
+  EArchCommonObjProcessorSpecificBlockInfo,        ///< 67 - Processor specific data Info
+  EArchCommonObjSystemInfo,                        ///< 68 - System Info
+  EArchCommonObjAdditionalInformation,             ///< 69 - Additional Information
+  EArchCommonObjAdditionalInformationEntry,        ///< 70 - Additional Information Entry
+  EArchCommonObjAdditionalInformationValue,        ///< 71 - Additional Information Value
+  EArchCommonObjSystemEnclosureInfo,               ///< 72 - System Enclosure Info
+  EArchCommonObjEnclosureElement,                  ///< 73 - System Enclosure Contained Element
+  EArchCommonObjBaseboardInfo,                     ///< 74 - Baseboard Info
+  EArchCommonObjBaseboardContainedObject,          ///< 75 - Baseboard Contained Object
+  EArchCommonObjMsctMaxPhysicalAddrInfo,           ///< 76 - MSCT Maximum physical address Info
+  EArchCommonObjMchiInfo,                          ///< 77 - Management Controller Host Interface Info.
+  EArchCommonObjMchiMctpDataInfo,                  ///< 78 - MCHI MCTP specific data Info.
+  EArchCommonObjMchiNetworkDataInfo,               ///< 79 - MCHI Network specific data Info.
+  EArchCommonObjMchiProtocolInfo,                  ///< 80 - Management Controller Host Interface Protocol Info.
+  EArchCommonObjMchiProtocolMctpDataInfo,          ///< 81 - MCHI MCTP Protocol Info.
+  EArchCommonObjMchiProtocolRedfishOverIpDataInfo, ///< 82 - Redfish Over Ip Protocol Info.
+  EArchCommonObjMchiNetworkDeviceDescUsbInfo,      ///< 83 - MCHI USB Network Device descriptor info
+  EArchCommonObjMchiNetworkDeviceDescPciInfo,      ///< 84 - MCHI PCI/PCIe Network Device descriptor info
+  EArchCommonObjBiosLanguageInfo,                  ///< 85 - BIOS Language Information
+  EArchCommonObjBiosLanguage,                      ///< 86 - BIOS Language
+  EArchCommonObjSystemBootInfo,                    ///< 87 - System Boot Information
+  EArchCommonObjOnboardDeviceInfo,                 ///< 88 - Onboard Device Extended Information
+  EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
+  EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
+  EArchCommonObjIpmiDeviceInfo,                    ///< 91 - IPMI Device Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1375,6 +1379,46 @@ typedef struct {
   UINT64                                    Mask;
 } CM_ARCH_COMMON_EINJ_INSTRUCTIONS_INFO;
 
+/** A structure that describes the Boot Error Region referenced by the BERT.
+
+  Cf. ACPI 6.6, s18.3.1.
+
+  ID: EArchCommonObjBootErrorRegionInfo
+*/
+typedef struct CmArchCommonBootErrorRegionInfo {
+  /// 64-bit physical address of the Boot Error Region.
+  UINT64    BootErrorRegion;
+
+  /// Length, in bytes, of the Boot Error Region.
+  UINT32    BootErrorRegionLength;
+} CM_ARCH_COMMON_BOOT_ERROR_REGION_INFO;
+
+/** A structure that describes an ERST Serialization Instruction Entry.
+
+  Cf. ACPI 6.6, s18.5.1.2.
+
+  ID: EArchCommonObjErstInstructionsInfo
+*/
+typedef struct CmArchCommonErstInstructionsInfo {
+  /// Serialization action to which this instruction belongs.
+  UINT8                                     SerializationAction;
+
+  /// Serialization instruction to execute.
+  UINT8                                     Instruction;
+
+  /// Flags that qualify the serialization instruction.
+  UINT8                                     Flags;
+
+  /// Register region used by the serialization instruction.
+  EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE    RegisterRegion;
+
+  /// Value used by instructions that consume an immediate value.
+  UINT64                                    Value;
+
+  /// Mask selecting the relevant bits within the register region.
+  UINT64                                    Mask;
+} CM_ARCH_COMMON_ERST_INSTRUCTIONS_INFO;
+
 /** A structure that describes BIOS Information.
 
   SMBIOS Specification v3.9.0 Type 0
@@ -2216,5 +2260,66 @@ typedef struct CmArchCommonSystemBootInfo {
   /// System boot status as defined by SMBIOS Type 32.
   UINT8              BootStatus;
 } CM_ARCH_COMMON_SYSTEM_BOOT_INFO;
+
+/** A structure that describes an onboard device.
+
+  SMBIOS Specification v3.9.0 Type 41
+
+  ID: EArchCommonObjOnboardDeviceInfo
+**/
+typedef struct CmArchCommonOnboardDeviceInfo {
+  /// CM Object Token uniquely identifying this onboard device.
+  CM_OBJECT_TOKEN    OnboardDeviceInfoToken;
+
+  /// Onboard device reference designation.
+  CHAR8              ReferenceDesignation[SMBIOS_MAX_STRING_SIZE];
+
+  /// Device status in bit 7 and device type in bits 6:0.
+  UINT8              DeviceType;
+
+  /// Instance number, unique within the onboard device type.
+  UINT8              DeviceTypeInstance;
+
+  /// PCI segment group number.
+  UINT16             SegmentGroupNum;
+
+  /// PCI bus number.
+  UINT8              BusNum;
+
+  /// PCI device number in bits 7:3 and function number in bits 2:0.
+  UINT8              DevFuncNum;
+} CM_ARCH_COMMON_ONBOARD_DEVICE_INFO;
+
+/** A structure that describes an IPMI device.
+
+  SMBIOS Specification v3.9.0 Type 38
+
+  ID: EArchCommonObjIpmiDeviceInfo
+**/
+typedef struct CmArchCommonIpmiDeviceInfo {
+  /// CM Object Token uniquely identifying this IPMI device.
+  CM_OBJECT_TOKEN    IpmiDeviceInfoToken;
+
+  /// BMC interface type.
+  UINT8              InterfaceType;
+
+  /// IPMI specification revision in BCD format.
+  UINT8              IpmiSpecificationRevision;
+
+  /// I2C target address of the BMC.
+  UINT8              I2cTargetAddress;
+
+  /// NV storage device bus ID, or 0xFF if no device exists.
+  UINT8              NvStorageDeviceAddress;
+
+  /// Memory-mapped or I/O base address of the BMC.
+  UINT64             BaseAddress;
+
+  /// Base-address modifier and interrupt information.
+  UINT8              BaseAddressModifierInterruptInfo;
+
+  /// Interrupt number, or zero if unspecified.
+  UINT8              InterruptNumber;
+} CM_ARCH_COMMON_IPMI_DEVICE_INFO;
 
 #pragma pack()
