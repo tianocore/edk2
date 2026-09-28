@@ -82,6 +82,8 @@
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmFfaMemMgmtLib|MdePkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
@@ -152,6 +154,7 @@
 
 [Components.AARCH64]
   StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
+  StandaloneMmPkg/Library/MmUnblockMemoryLibArm/MmUnblockMemoryLibArm.inf
 
 [Components.X64]
   StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
