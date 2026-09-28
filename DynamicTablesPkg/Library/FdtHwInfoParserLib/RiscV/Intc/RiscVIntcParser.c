@@ -970,7 +970,9 @@ PlicAplicInfoParser (
 
   Parse RINTC information using IMSIC.
 
-  @param [in]      FdtParserHandle     A handle to the parser instance.
+  @param [in]      Fdt             Pointer to device tree.
+  @param [in]      ImsicNode       IMSIC node.
+  @param [in]      GuestIndexBits  Guest interrupt file index width.
   @param [in, out] NewRintcCmObjDesc   Pointer to array of RINTC CM objects.
 
   @retval EFI_SUCCESS                  The function completed successfully.
@@ -985,6 +987,7 @@ EFIAPI
 UpdateRintcInfo (
   IN  CONST VOID               *Fdt,
   IN  CONST INT32              ImsicNode,
+  IN  CONST UINT8              GuestIndexBits,
   IN  OUT   CM_OBJ_DESCRIPTOR  *NewRintcCmObjDesc
   )
 {
@@ -994,9 +997,8 @@ UpdateRintcInfo (
   CONST INT32          *Data;
   UINT64               ImsicBaseAddr;
   UINT64               ImsicBaseLen;
-  UINT64               ImsicCpuBaseAddr;
-  UINT64               ImsicCpuBaseLen;
   EFI_STATUS           Status;
+  UINT32               PagesPerHart;
   INT32                NumPhandle;
   INT32                Len;
   INT32                AddressCells;
@@ -1011,6 +1013,8 @@ UpdateRintcInfo (
   INTN                 Idx;
   INTN                 Idx1;
   INTN                 Idx2;
+
+  PagesPerHart = 1U << GuestIndexBits;
 
   IntExtProp = (UINT32 *)FdtGetProp (Fdt, ImsicNode, "interrupts-extended", &Len);
   if ((IntExtProp == 0) || ((Len / sizeof (UINT32)) % 2 != 0)) {
@@ -1037,9 +1041,9 @@ UpdateRintcInfo (
   for (Idx = 0; Idx < NumImsicBase; Idx++) {
     ImsicBaseAddr = Fdt64ToCpu (ImsicRegProp[Idx * 2]);
     ImsicBaseLen  = Fdt64ToCpu (ImsicRegProp[Idx * 2 + 1]);
-    // Calculate the limit of number of cpu nodes this imsic can handle
+    // Each hart occupies its supervisor file followed by its guest files.
     Limit = ImsicBaseLen /  IMSIC_MMIO_PAGE_SZ;
-    for (Idx1 = 0; Idx1 < Limit && Idx2 < NumPhandle; Idx1++, Idx2++) {
+    for (Idx1 = 0; Idx1 < Limit && Idx2 < NumPhandle; Idx1 += PagesPerHart, Idx2++) {
       Phandle      = Fdt32ToCpu (IntExtProp[Idx2 * 2]);
       IntcNode     = FdtNodeOffsetByPhandle (Fdt, Phandle);
       CpuNode      = FdtParentOffset (Fdt, IntcNode);
@@ -1074,10 +1078,11 @@ UpdateRintcInfo (
         return EFI_NOT_FOUND;
       }
 
-      ImsicCpuBaseAddr                  = ImsicBaseAddr + Idx1 * IMSIC_MMIO_PAGE_SZ;
-      ImsicCpuBaseLen                   = IMSIC_MMIO_PAGE_SZ;
-      RintcInfoBuffer->ImsicBaseAddress = ImsicCpuBaseAddr;
-      RintcInfoBuffer->ImsicSize        = ImsicCpuBaseLen;
+      RintcInfoBuffer->ImsicBaseAddress = ImsicBaseAddr + Idx1 * IMSIC_MMIO_PAGE_SZ;
+      RintcInfoBuffer->ImsicSize        = MIN (
+                                            PagesPerHart * IMSIC_MMIO_PAGE_SZ,
+                                            ImsicBaseLen - Idx1 * IMSIC_MMIO_PAGE_SZ
+                                            );
     }
   }
 
@@ -1108,6 +1113,7 @@ ImsicGetInfo (
 {
   CONST UINT32  *IntExtProp;
   CONST UINT64  *Prop;
+  UINT32        GuestIndexBits;
   INT32         Len;
   INT32         NumPhandle;
 
@@ -1153,7 +1159,12 @@ ImsicGetInfo (
   if (Prop == 0) {
     ImsicInfo->GuestIndexBits = 0;
   } else {
-    ImsicInfo->GuestIndexBits = Fdt32ToCpu (*(const UINT32 *)Prop);
+    GuestIndexBits = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if (GuestIndexBits > IMSIC_MAX_GUEST_INDEX_BITS) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    ImsicInfo->GuestIndexBits = GuestIndexBits;
   }
 
   Prop = FdtGetProp (Fdt, ImsicNode, "riscv,hart-index-bits", &Len);
@@ -1252,7 +1263,7 @@ ImsicInfoParser (
       return Status;
     }
 
-    Status = UpdateRintcInfo (Fdt, ImsicNode, NewRintcCmObjDesc);
+    Status = UpdateRintcInfo (Fdt, ImsicNode, ImsicInfo.GuestIndexBits, NewRintcCmObjDesc);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
