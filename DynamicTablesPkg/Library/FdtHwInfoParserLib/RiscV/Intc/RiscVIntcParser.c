@@ -559,7 +559,8 @@ IsImsicNode (
   need only S-mode APLIC.
 
   @param [in]  Fdt             Pointer to device tree.
-  @param [in]  AplicNode       Node with APLIC compatible property.
+  @param [in]  ExtIntcNode     Node with APLIC compatible property.
+  @param [out] MsiParentNode   IMSIC node for MSI mode; unchanged for direct mode.
 
   @retval TRUE                 The AplicNode is S-mode APLIC
   @retval FALSE                The AplicNode is not S-mode APLIC
@@ -567,8 +568,9 @@ IsImsicNode (
 STATIC
 BOOLEAN
 IsAplicNode (
-  IN VOID   *Fdt,
-  IN INT32  ExtIntcNode
+  IN VOID    *Fdt,
+  IN INT32   ExtIntcNode,
+  OUT INT32  *MsiParentNode
   )
 {
   INT32  *IrqProp;
@@ -593,17 +595,11 @@ IsAplicNode (
   }
 
   ImsicNode = FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*MsiProp));
-  if (ImsicNode < 0) {
+  if ((ImsicNode < 0) || !IsImsicNode (Fdt, ImsicNode)) {
     return FALSE;
   }
 
-  IrqProp = (INT32 *)FdtGetProp (Fdt, ImsicNode, "interrupts-extended", &Len);
-  if ((!IrqProp) || (Len < 4) ||
-      (Fdt32ToCpu (IrqProp[1]) != IRQ_S_EXT))
-  {
-    return FALSE;
-  }
-
+  *MsiParentNode = ImsicNode;
   return TRUE;
 }
 
@@ -879,6 +875,7 @@ PlicAplicInfoParser (
   UINT32                  Id;
   UINT32                  GsiBase;
   INT32                   Len;
+  INT32                   MsiParentNode;
   INT32                   Prev;
   INT32                   ExtIntcNode;
   VOID                    *Fdt;
@@ -895,10 +892,21 @@ PlicAplicInfoParser (
   for (Prev = 0; ; Prev = ExtIntcNode) {
     ExtIntcNode = FdtNextNode (Fdt, Prev, NULL);
     if (ExtIntcNode < 0) {
-      return EFI_SUCCESS;
+      return (Id == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
     }
 
-    if (!(IsPlicNode (Fdt, ExtIntcNode) || IsAplicNode (Fdt, ExtIntcNode))) {
+    MsiParentNode = -1;
+    if (!(IsPlicNode (Fdt, ExtIntcNode) ||
+          IsAplicNode (Fdt, ExtIntcNode, &MsiParentNode)))
+    {
+      continue;
+    }
+
+    if (!FdtNodeIsEnabled (Fdt, ExtIntcNode)) {
+      continue;
+    }
+
+    if ((MsiParentNode >= 0) && !FdtNodeIsEnabled (Fdt, MsiParentNode)) {
       continue;
     }
 
@@ -1231,6 +1239,10 @@ ImsicInfoParser (
     }
 
     if (IsImsicNode (Fdt, ImsicNode) == FALSE) {
+      continue;
+    }
+
+    if (!FdtNodeIsEnabled (Fdt, ImsicNode)) {
       continue;
     }
 

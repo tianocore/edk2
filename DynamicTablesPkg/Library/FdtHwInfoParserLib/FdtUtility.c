@@ -131,6 +131,35 @@ FdtNodeIsCompatible (
   return FALSE;
 }
 
+/** Check whether a device tree node is enabled.
+
+  @param [in] Fdt   Pointer to device tree.
+  @param [in] Node  Device tree node.
+
+  @retval TRUE   Status is absent, "okay" or "ok".
+  @retval FALSE  The node is not available.
+**/
+BOOLEAN
+EFIAPI
+FdtNodeIsEnabled (
+  IN CONST VOID  *Fdt,
+  IN INT32       Node
+  )
+{
+  CONST CHAR8  *Status;
+  INT32        Len;
+
+  Status = FdtGetProp (Fdt, Node, "status", &Len);
+  if (Status == NULL) {
+    return Len == -FDT_ERR_NOTFOUND;
+  }
+
+  return ((Len >= sizeof ("okay")) &&
+          (CompareMem (Status, "okay", sizeof ("okay")) == 0)) ||
+         ((Len >= sizeof ("ok")) &&
+          (CompareMem (Status, "ok", sizeof ("ok")) == 0));
+}
+
 /** Check whether a node has a property.
 
   @param [in]  Fdt          Pointer to a Flattened Device Tree.
