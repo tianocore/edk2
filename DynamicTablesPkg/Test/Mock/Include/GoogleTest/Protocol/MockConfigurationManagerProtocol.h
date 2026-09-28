@@ -2,6 +2,7 @@
   This file declares a mock of Configuration Manager Protocol.
 
   Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -36,6 +37,15 @@ struct MockConfigurationManagerProtocol {
      IN  CONST CM_OBJECT_ID                         CmObjectId,
      IN  CONST CM_OBJECT_TOKEN                      Token,
      IN  OUT   CM_OBJ_DESCRIPTOR                   *CmObject)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    SetObject,
+    (IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *This,
+     IN  CONST CM_OBJECT_ID                         CmObjectId,
+     IN  CONST CM_OBJECT_TOKEN                      Token,
+     IN        CM_OBJ_DESCRIPTOR                   *CmObject)
     );
 };
 
