@@ -988,6 +988,7 @@ UpdateRintcInfo (
   UINT64               ImsicBaseLen;
   UINT64               ImsicCpuBaseAddr;
   UINT64               ImsicCpuBaseLen;
+  EFI_STATUS           Status;
   INT32                NumPhandle;
   INT32                Len;
   INT32                AddressCells;
