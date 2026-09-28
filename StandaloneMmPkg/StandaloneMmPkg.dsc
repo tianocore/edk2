@@ -155,6 +155,7 @@
 [Components.AARCH64]
   StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
   StandaloneMmPkg/Library/MmUnblockMemoryLibArm/MmUnblockMemoryLibArm.inf
+  StandaloneMmPkg/Drivers/MmUnblockMemArm/MmUnblockMemArm.inf
 
 [Components.X64]
   StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
