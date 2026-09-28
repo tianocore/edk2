@@ -1,0 +1,31 @@
+## @file
+#  ERST Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001E
+  BASE_NAME      = AcpiErstLib
+  FILE_GUID      = 4802CF9B-BF2E-4F56-957B-4ADA89A2C3C6
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiErstLibConstructor
+  DESTRUCTOR     = AcpiErstLibDestructor
+
+[Sources]
+  ErstGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib

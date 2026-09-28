@@ -63,9 +63,9 @@ ASM_PFX(SecTemporaryRamSupport):
   ; ZeroMem (TemporaryMemoryBase /* rcx */, CopySize /* rdx */);
   mov     rcx, rdx
   mov     rdx, r9
-  sub     rsp, 0x28     ; Allocate register spill area & 16-byte align stack
+  sub     rsp, 0x20     ; Allocate register spill area & 16-byte align stack
   call    ZeroMem
-  add     rsp, 0x28
+  add     rsp, 0x20
 
   ; This data comes off the NEW stack
   pop     rbp

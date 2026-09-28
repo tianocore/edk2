@@ -65,9 +65,6 @@ AmlDeleteRootNode (
 
   if ((RootNode->SdtHeader != NULL)) {
     FreePool (RootNode->SdtHeader);
-  } else {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
   }
 
   FreePool (RootNode);
@@ -167,6 +164,7 @@ AmlDeleteObjectNode (
   @param  [in]  AmlByteEncoding   Byte encoding entry.
   @param  [in]  PkgLength         PkgLength of the node if the AmlByteEncoding
                                   has the PkgLen attribute.
+                                  Must be less than 2^28.
                                   0 otherwise.
   @param  [out] NewObjectNodePtr  If success, contains the created
                                   AML_OBJECT_NODE.
@@ -187,7 +185,8 @@ AmlCreateObjectNode (
   EFI_STATUS       Status;
   AML_OBJECT_NODE  *ObjectNode;
 
-  if ((AmlByteEncoding == NULL)  ||
+  if ((AmlByteEncoding == NULL) ||
+      (PkgLength >= (1U << 28)) ||
       (NewObjectNodePtr == NULL))
   {
     ASSERT (0);
@@ -230,7 +229,6 @@ AmlCreateObjectNode (
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
 **/
 STATIC
 EFI_STATUS
@@ -246,9 +244,6 @@ AmlDeleteDataNode (
 
   if (DataNode->Buffer != NULL) {
     FreePool (DataNode->Buffer);
-  } else {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
   }
 
   FreePool (DataNode);

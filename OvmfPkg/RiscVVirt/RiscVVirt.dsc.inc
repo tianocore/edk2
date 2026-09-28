@@ -309,6 +309,11 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
 
+  #
+  # Goldifish Rtc
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdGoldfishRtcRegBase|0x101000
+
 [Components.common]
   #
   # Ramdisk support

@@ -4,8 +4,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <IndustryStandard/CloudHv.h> // CLOUDHV_SMBIOS_ADDRESS
 #include <IndustryStandard/SmBios.h>  // SMBIOS_TABLE_3_0_ENTRY_POINT
+#include <Library/PcdLib.h>
 
 /**
   Locates and extracts Cloud Hypervisor SMBIOS data
@@ -18,7 +18,7 @@ GetCloudHvSmbiosTables (
   VOID
   )
 {
-  SMBIOS_TABLE_3_0_ENTRY_POINT  *CloudHvTables = (VOID *)CLOUDHV_SMBIOS_ADDRESS;
+  SMBIOS_TABLE_3_0_ENTRY_POINT  *CloudHvTables = (VOID *)(UINTN)PcdGet64 (PcdCloudHvSmbiosBaseAddress);
 
   if ((CloudHvTables->AnchorString[0] == '_') &&
       (CloudHvTables->AnchorString[1] == 'S') &&

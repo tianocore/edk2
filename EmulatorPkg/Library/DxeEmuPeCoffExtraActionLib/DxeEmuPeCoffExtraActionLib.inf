@@ -15,7 +15,7 @@
   FILE_GUID                      = 68FCD487-D230-6846-95B1-5E1F2EF942C4
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PeCoffExtraActionLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS                  = PeCoffExtraActionLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
   CONSTRUCTOR                    = DxeEmuPeCoffLibExtraActionConstructor
 

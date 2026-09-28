@@ -19,6 +19,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmCommunication3.h>
@@ -209,6 +210,7 @@ MmCommunicationCommon (
   EFI_MM_COMMUNICATE_HEADER     *CommunicateHeader;
   EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
   UINTN                         BufferSize;
+  UINTN                         InputBufferSize;
   UINTN                         *MessageSize;
   UINTN                         HeaderSize;
   EFI_STATUS                    Status;
@@ -239,14 +241,29 @@ MmCommunicationCommon (
     BufferSize          = CommunicateHeaderV3->BufferSize;
     MessageSize         = &CommunicateHeaderV3->MessageSize;
     HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+
+    if (BufferSize < HeaderSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (BufferSize - HeaderSize < *MessageSize) {
+      return EFI_INVALID_PARAMETER;
+    }
   } else {
-    BufferSize = CommunicateHeader->MessageLength +
-                 sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
+    Status = SafeUintnAdd (
+               CommunicateHeader->MessageLength,
+               OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+               &BufferSize
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     MessageSize = &CommunicateHeader->MessageLength;
-    HeaderSize  = sizeof (CommunicateHeader->HeaderGuid) +
-                  sizeof (CommunicateHeader->MessageLength);
+    HeaderSize  = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   }
+
+  InputBufferSize = BufferSize;
 
   // If CommSize is not omitted, perform size inspection before proceeding.
   if (CommSize != NULL) {
@@ -265,6 +282,8 @@ MmCommunicationCommon (
     if (*CommSize < BufferSize) {
       Status = EFI_INVALID_PARAMETER;
     }
+
+    InputBufferSize = *CommSize;
   }
 
   //
@@ -293,7 +312,6 @@ MmCommunicationCommon (
   }
 
   if (!EFI_ERROR (Status)) {
-    ZeroMem (CommBufferVirtual, BufferSize);
     // On successful return, the size of data being returned is inferred from
     // MessageLength + Header.
     CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
@@ -316,12 +334,17 @@ MmCommunicationCommon (
       CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateHeader;
       BufferSize          = CommunicateHeaderV3->BufferSize;
     } else {
-      BufferSize = CommunicateHeader->MessageLength +
-                   sizeof (CommunicateHeader->HeaderGuid) +
-                   sizeof (CommunicateHeader->MessageLength);
+      Status = SafeUintnAdd (
+                 CommunicateHeader->MessageLength,
+                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+                 &BufferSize
+                 );
+      if (EFI_ERROR (Status)) {
+        return EFI_INVALID_PARAMETER;
+      }
     }
 
-    if (BufferSize > mNsCommBuffMemRegion.Length) {
+    if (BufferSize > InputBufferSize) {
       // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
       Status = EFI_BAD_BUFFER_SIZE;
       DEBUG ((
@@ -329,7 +352,7 @@ MmCommunicationCommon (
         "%a Returned buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
         __func__,
         BufferSize,
-        (UINTN)mNsCommBuffMemRegion.Length
+        InputBufferSize
         ));
     } else {
       CopyMem (

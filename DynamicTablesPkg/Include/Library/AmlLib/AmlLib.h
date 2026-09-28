@@ -1,7 +1,7 @@
 /** @file
   AML Lib.
 
-  Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (C) 2023 - 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -130,6 +130,29 @@ typedef union {
   UINT64    Integer;
   VOID      *Buffer;
 } AML_METHOD_PARAM_DATA;
+
+/** AML Field access types. */
+typedef enum {
+  AmlFieldAccessAny    = 0,
+  AmlFieldAccessByte   = 1,
+  AmlFieldAccessWord   = 2,
+  AmlFieldAccessDWord  = 3,
+  AmlFieldAccessQWord  = 4,
+  AmlFieldAccessBuffer = 5
+} AML_FIELD_ACCESS_TYPE;
+
+/** AML Field lock rules. */
+typedef enum {
+  AmlFieldNoLock = 0,
+  AmlFieldLock   = 1
+} AML_FIELD_LOCK_RULE;
+
+/** AML Field update rules. */
+typedef enum {
+  AmlFieldUpdatePreserve     = 0,
+  AmlFieldUpdateWriteAsOnes  = 1,
+  AmlFieldUpdateWriteAsZeros = 2
+} AML_FIELD_UPDATE_RULE;
 
 /** structure to hold AML method parameter types
   Type  -   Type of parameter
@@ -1363,6 +1386,306 @@ AmlAddPrtEntry (
   IN        AML_OBJECT_NODE_HANDLE  PrtNameNode
   );
 
+/** AML code generation for an OperationRegion object node.
+
+  AmlCodeGenOperationRegion (
+    "REG0",
+    RegionSpace,
+    RegionOffset,
+    RegionLength,
+    ParentNode,
+    NewObjectNode
+    );
+
+  generates an OperationRegion equivalent to:
+
+    OperationRegion (
+      REG0,
+      RegionSpace,
+      RegionOffset,
+      RegionLength
+      )
+
+  where RegionSpace, RegionOffset, and RegionLength represent the values
+  supplied to the function.
+
+  @ingroup CodeGenApis
+
+  @param [in]  RegionName     Name of the OperationRegion.
+                              Must be a NULL-terminated ASL NameString.
+                              The input string is copied.
+  @param [in]  RegionSpace    Address space containing the region.
+  @param [in]  RegionOffset   Integer value used as the region offset.
+                              For SystemMemory, this is normally the physical
+                              base address of the region.
+  @param [in]  RegionLength   Integer length of the region in bytes.
+  @param [in]  ParentNode     Optional parent node to which the OperationRegion
+                              is appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              OperationRegion node.
+
+  @retval EFI_SUCCESS            The OperationRegion was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenOperationRegion (
+  IN  CONST CHAR8                   *RegionName,
+  IN        UINT8                   RegionSpace,
+  IN        UINT64                  RegionOffset,
+  IN        UINT64                  RegionLength,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for an empty Field object node.
+
+  AmlCodeGenField (
+    "REG0",
+    AmlFieldAccessDWord,
+    AmlFieldNoLock,
+    AmlFieldUpdatePreserve,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    Field (REG0, DWordAcc, NoLock, Preserve)
+    {
+    }
+
+  Field elements can subsequently be appended to the returned Field node.
+
+  @ingroup CodeGenApis
+
+  @param [in]  RegionName     Name of the associated OperationRegion.
+                              Must be a NULL-terminated ASL NameString.
+                              The input string is copied.
+  @param [in]  AccessType     Access width used for the Field.
+  @param [in]  LockRule       Field locking rule.
+  @param [in]  UpdateRule     Field update rule.
+  @param [in]  ParentNode     Optional parent node to which the Field is
+                              appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              Field node.
+
+  @retval EFI_SUCCESS            The Field was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenField (
+  IN  CONST CHAR8                   *RegionName,
+  IN        AML_FIELD_ACCESS_TYPE   AccessType,
+  IN        AML_FIELD_LOCK_RULE     LockRule,
+  IN        AML_FIELD_UPDATE_RULE   UpdateRule,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for a ReservedField element (ASL: Offset ()).
+
+  AmlCodeGenFieldElemReserved (64, ParentNode, NewObjectNode);
+
+  is equivalent to the following ASL code when the current Field position
+  is zero:
+
+    Offset (0x08),
+
+  Adds an unnamed reserved range of ReservedBitLength bits to a Field
+  list.
+
+  A ReservedField can be used to implement an ASL Offset() declaration.
+  The caller is responsible for calculating the number of bits between
+  the current Field position and the requested byte offset.
+
+  @ingroup CodeGenApis
+
+  @param [in]  ReservedBitLength  Number of bits in the reserved range.
+  @param [in]  ParentNode         Field node to which the ReservedField is
+                                  appended.
+  @param [out] NewObjectNode      Optional pointer that receives the created
+                                  ReservedField node.
+
+  @retval EFI_SUCCESS            The ReservedField was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenFieldElemReserved (
+  IN  UINT32                  ReservedBitLength,
+  IN  AML_OBJECT_NODE_HANDLE  ParentNode,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for a NamedField element.
+
+  AmlCodeGenFieldElemNamed (
+    "FLD0",
+    32,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to the following element in an ASL Field declaration:
+
+    FLD0, 32
+
+  @ingroup CodeGenApis
+
+  @param [in]  FieldName      Name of the field element. This must be a valid
+                              ASL NameSeg containing at most four characters.
+                              The input string is copied.
+  @param [in]  FieldBitLength Length of the field element in bits.
+  @param [in]  ParentNode     Field node to which the NamedField is appended.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              NamedField node.
+
+  @retval EFI_SUCCESS            The NamedField was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenFieldElemNamed (
+  IN  CONST CHAR8                   *FieldName,
+  IN        UINT32                  FieldBitLength,
+  IN        AML_OBJECT_NODE_HANDLE  ParentNode,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for a Store operation with a typed source and a
+    named target.
+
+  AML_METHOD_PARAM  Source;
+
+  Source.Type         = AmlMethodParamTypeInteger;
+  Source.Data.Integer = 1;
+  Source.DataSize     = 0;
+
+  AmlCodeGenStoreToName (
+    Source,
+    "FLD0",
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    Store (One, FLD0)
+
+  Integer, method argument, and local variable sources are supported.
+
+  @ingroup CodeGenApis
+
+  @param [in]  Source         Source operand to store.
+  @param [in]  TargetName     NameString identifying the target object.
+                              The input string is copied.
+  @param [in]  ParentNode     Optional parent executable statement node.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              Store node.
+
+  @retval EFI_SUCCESS            The Store object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenStoreToName (
+  IN  AML_METHOD_PARAM        Source,
+  IN  CONST CHAR8             *TargetName,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for an If object.
+
+  Creates an If object using PredicateNode as its predicate. Additional
+  executable statements can subsequently be appended to the returned node.
+
+  AmlCodeGenIf (
+    PredicateNode,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    If (Predicate)
+    {
+    }
+
+  The function takes ownership of PredicateNode.
+
+  @ingroup CodeGenApis
+
+  @param [in]  PredicateNode  AML node representing the If predicate.
+                              The node is deleted if an error occurs.
+  @param [in]  ParentNode     Optional parent executable statement node.
+  @param [out] NewObjectNode  Optional pointer that receives the created
+                              If node.
+
+  @retval EFI_SUCCESS            The If object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenIf (
+  IN  AML_NODE_HANDLE         PredicateNode,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
+/** AML code generation for a logical equality expression.
+
+  AML_METHOD_PARAM  LeftOperand  = { 0 };
+  AML_METHOD_PARAM  RightOperand = { 0 };
+
+  LeftOperand.Type     = AmlMethodParamTypeArg;
+  LeftOperand.Data.Arg = 0;
+
+  RightOperand.Type         = AmlMethodParamTypeInteger;
+  RightOperand.Data.Integer = 1;
+
+  AmlCodeGenEqual (
+    LeftOperand,
+    RightOperand,
+    ParentNode,
+    NewObjectNode
+    );
+
+  is equivalent to:
+
+    LEqual (Arg0, One)
+
+  Integer, method argument, and local variable operands are supported.
+
+  @ingroup CodeGenApis
+
+  @param [in]  LeftOperand    Left operand of the equality expression.
+  @param [in]  RightOperand   Right operand of the equality expression.
+  @param [in]  ParentNode     Optional parent node.
+  @param [out] NewObjectNode  On success, receives the created equality node.
+
+  @retval EFI_SUCCESS            The equality expression was created
+                                  successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenEqual (
+  IN  AML_METHOD_PARAM        LeftOperand,
+  IN  AML_METHOD_PARAM        RightOperand,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
@@ -1459,6 +1782,8 @@ AmlCodeGenScope (
 
   The ASL parameters "ReturnType" and "ParameterTypes" are not asked
   in this function. They are optional parameters in ASL.
+
+  @ingroup CodeGenApis
 
   @param [in]  NameString     The new Method's name.
                               Must be a NULL-terminated ASL NameString
@@ -1557,6 +1882,8 @@ AmlCodeGenMethodRetNameString (
   The ASL parameters "ReturnType" and "ParameterTypes" are not asked
   in this function. They are optional parameters in ASL.
 
+  @ingroup CodeGenApis
+
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
                                     e.g.: "MET0", "_SB.MET0", etc.
@@ -1603,6 +1930,8 @@ AmlCodeGenMethodRetInteger (
 
   To return an empty buffer, call the function with
   (ReturnedBuffer=NULL, ReturnedBufferSize=0).
+
+  @ingroup CodeGenApis
 
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
@@ -1655,6 +1984,8 @@ AmlCodeGenMethodRetBuffer (
 
   The ASL parameters "ReturnType" and "ParameterTypes" are not asked
   in this function. They are optional parameters in ASL.
+
+  @ingroup CodeGenApis
 
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
@@ -1922,6 +2253,7 @@ AmlCreateCpcNode (
 
 /** AML code generation to add a NameString to the package in a named node.
 
+  @ingroup CodeGenApis
 
   @param [in]  NameString     NameString to add
   @param [in]  NamedNode      Node to add the string to the included package.
@@ -2018,6 +2350,8 @@ AmlAddIntegerToNamedPackage (
       MET3 (Arg0, 0x0100)
     }
 
+  @ingroup CodeGenApis
+
   @param [in]  MethodNameString  The method name to be called or invoked.
   @param [in]  NumArgs           Number of arguments to be passed,
                                  0 to 7 are permissible values.
@@ -2087,6 +2421,8 @@ AmlCreatePsdNode (
 
   Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States)
 
+  @ingroup CodeGenApis
+
   @param [in]  CstNameString  The new CST 's object name.
                               Must be a NULL-terminated ASL NameString
                               e.g.: "_CST", "DEV0.CSTP", etc.
@@ -2119,6 +2455,8 @@ AmlCreateCstNode (
   }
 
   Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States).
+
+  @ingroup CodeGenApis
 
   @param [in]  CstInfo                    CstInfo object
   @param [in]  CstNode                    Cst node created with the function
@@ -2275,6 +2613,8 @@ AmlCreatePssNode (
      and initially contain a "ResourceTemplate ()".
    - returned through the NewRdNode parameter.
 
+  @ingroup CodeGenApis
+
   @param  [in]  IsEdgeTriggered The interrupt is edge triggered or
                                 level triggered.
   @param  [in]  IsActiveLow     The interrupt is active-high or active-low.
@@ -2317,6 +2657,8 @@ AmlCodeGenRdIrq (
      In such case NameOpNode must be defined by a the "Name ()" ASL statement
      and initially contain a "ResourceTemplate ()".
    - returned through the NewRdNode parameter.
+
+  @ingroup CodeGenApis
 
   @param [in]  InitialBaudRate           Initial baud rate.
   @param [in]  BitsPerByte               Number of bits per byte.
@@ -2378,6 +2720,35 @@ AmlCodeGenRdUartSerialBusV2 (
   OUT AML_DATA_NODE_HANDLE    *NewRdNode OPTIONAL
   );
 
+/** AML code generation for a Notify object.
+
+  Generates one of:
+
+    Notify (NameString, Value)
+    Notify (Local, Value)
+    Notify (Arg, Value)
+
+  @ingroup CodeGenApis
+
+  @param [in]  NotifyObjectParam  Object to be notified.
+  @param [in]  NotifyValue        Notification value.
+  @param [in]  ParentNode         Optional parent executable statement node.
+  @param [out] NewObjectNode      Optional pointer that receives the created
+                                  Notify node.
+
+  @retval EFI_SUCCESS            The Notify object was created successfully.
+  @retval EFI_INVALID_PARAMETER  An input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenNotify (
+  IN  AML_METHOD_PARAM        NotifyObjectParam,
+  IN  UINT8                   NotifyValue,
+  IN  AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
+  );
+
 /** AML code generation to create a method with Notify call.
 
   Example 1:
@@ -2414,6 +2785,8 @@ AmlCodeGenRdUartSerialBusV2 (
   processor, or thermal zone object.
   It assumes that NameString, Local, and Arg objects reference valid device,
   processor, or thermal zone objects.
+
+  @ingroup CodeGenApis
 
   @param [in]  MethodNameString     The new Method's name.
                                     Must be a NULL-terminated ASL NameString
@@ -2489,6 +2862,8 @@ AmlCodeGenMethodNotifyList (
     {
       Return (MET3 (Arg0, 0x0100) )
     }
+
+  @ingroup CodeGenApis
 
   @param [in] MethodNameString  The method name to be returned.
   @param [in] NumArgs           Number of arguments to be passed,

@@ -883,13 +883,6 @@ MainCmdLs (
   Count              = 0;
   ListUnfiltered     = FALSE;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");
     return SHELL_INVALID_PARAMETER;

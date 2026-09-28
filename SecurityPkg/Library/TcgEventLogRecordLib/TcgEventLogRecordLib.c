@@ -106,7 +106,7 @@ MeasureFirmwareBlob (
   {
     if (Description != NULL) {
       AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "%a", Description);
-    } else {
+    } else if (FvName != NULL) {
       AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "Fv(%g)", FvName);
     }
 
