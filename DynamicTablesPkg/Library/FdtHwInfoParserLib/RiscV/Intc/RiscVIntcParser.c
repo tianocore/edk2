@@ -1114,7 +1114,7 @@ ImsicGetInfo (
 {
   CONST UINT32  *IntExtProp;
   CONST UINT64  *Prop;
-  UINT32        GuestIndexBits;
+  UINT32        Value;
   INT32         Len;
   INT32         NumPhandle;
 
@@ -1149,23 +1149,45 @@ ImsicGetInfo (
   }
 
   ImsicInfo->NumIds = Fdt32ToCpu (*(const UINT32 *)Prop);
-  Prop              = FdtGetProp (Fdt, ImsicNode, "riscv,num-guest-ids", &Len);
-  if (Prop == 0) {
-    ImsicInfo->NumGuestIds = ImsicInfo->NumIds;
-  } else {
-    ImsicInfo->NumGuestIds = Fdt32ToCpu (*(const UINT32 *)Prop);
-  }
 
   Prop = FdtGetProp (Fdt, ImsicNode, "riscv,guest-index-bits", &Len);
   if (Prop == 0) {
     ImsicInfo->GuestIndexBits = 0;
   } else {
-    GuestIndexBits = Fdt32ToCpu (*(const UINT32 *)Prop);
-    if (GuestIndexBits > IMSIC_MAX_GUEST_INDEX_BITS) {
+    if (Len != sizeof (UINT32)) {
       return EFI_INVALID_PARAMETER;
     }
 
-    ImsicInfo->GuestIndexBits = GuestIndexBits;
+    Value = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if (Value > IMSIC_MAX_GUEST_INDEX_BITS) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    ImsicInfo->GuestIndexBits = Value;
+  }
+
+  if (ImsicInfo->GuestIndexBits == 0) {
+    // ACPI requires zero guest interrupt identities when no guest files exist.
+    ImsicInfo->NumGuestIds = 0;
+  } else {
+    Prop = FdtGetProp (Fdt, ImsicNode, "riscv,num-guest-ids", &Len);
+    if (Prop == 0) {
+      ImsicInfo->NumGuestIds = ImsicInfo->NumIds;
+    } else {
+      if (Len != sizeof (UINT32)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Value = Fdt32ToCpu (*(const UINT32 *)Prop);
+      if ((Value < IMSIC_MIN_NUM_GUEST_IDS) ||
+          (Value > IMSIC_MAX_NUM_GUEST_IDS) ||
+          (((Value + 1) % 64) != 0))
+      {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      ImsicInfo->NumGuestIds = Value;
+    }
   }
 
   Prop = FdtGetProp (Fdt, ImsicNode, "riscv,hart-index-bits", &Len);
