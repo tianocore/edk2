@@ -198,3 +198,57 @@ SetElapsedTime (
   IN     UINT16         *Elapsed,
   IN     DHCP_PROTOCOL  *Instance
   );
+
+/**
+  Binary search the DhcpOptionFormats array to find the format
+  information about a specific option.
+
+  @param[in]  Tag                    The option's tag.
+
+  @return The point to the option's format, NULL if not found.
+
+**/
+DHCP_OPTION_FORMAT *
+DhcpFindOptionFormat (
+  IN UINT8  Tag
+  );
+
+/**
+  Validate whether a single DHCP option is valid according to its format.
+
+  @param[in]  Format                 The option's format
+  @param[in]  OptValue               The value of the option
+  @param[in]  Len                    The length of the option value
+
+  @retval TRUE     The option is valid.
+  @retval FALSE    Otherwise.
+
+**/
+BOOLEAN
+DhcpOptionIsValid (
+  IN DHCP_OPTION_FORMAT  *Format,
+  IN UINT8               *OptValue,
+  IN INTN                Len
+  );
+
+/**
+  Remove malformed non-Alert options from the private packet copy.
+
+  Some DHCP servers send optional options with a format that does not
+  strictly comply with RFC standards. Alert options consumed by the
+  DHCP state machine must remain strictly validated, but malformed
+  non-Alert options can be safely removed from the private packet copy
+  before strict validation.
+
+  RFC 3396 allows an option to be split across several same-tag
+  instances. The merged length is used for validation; if the merged
+  value fails, all instances of that tag are removed.
+
+  @param[in, out] Packet  The DHCP packet to sanitize.
+
+**/
+VOID
+EFIAPI
+DhcpRemoveMalformedNonAlertOptions (
+  IN OUT EFI_DHCP4_PACKET  *Packet
+  );
