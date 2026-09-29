@@ -28,6 +28,13 @@ typedef struct {
   BOOLEAN               Reserved;
   PCI_RESOURCE_USAGE    ResourceUsage;
   BOOLEAN               Virtual;
+
+  //
+  // TRUE if this bridge's aggregate window must be placed at
+  // FixedBase, because it has at least one fixed descendant.
+  //
+  BOOLEAN               Fixed;
+  UINT64                FixedBase;
 } PCI_RESOURCE_NODE;
 
 #define RESOURCE_NODE_FROM_LINK(a) \

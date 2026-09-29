@@ -96,6 +96,8 @@ struct _PCI_BAR {
   UINT64          Alignment;
   PCI_BAR_TYPE    BarType;
   BOOLEAN         BarTypeFixed;
+  UINT64          FixedBaseAddress;
+  BOOLEAN         HasFixedBaseAddress;
   UINT16          Offset;
 };
 
