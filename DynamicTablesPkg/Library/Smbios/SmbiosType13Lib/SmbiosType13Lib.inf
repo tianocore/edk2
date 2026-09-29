@@ -1,0 +1,35 @@
+## @file
+#  SMBIOS Type 13 Firmware Language Information Table Generator.
+#
+#  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x0001001B
+  BASE_NAME       = SmbiosType13LibArm
+  FILE_GUID       = 7745162b-8f93-49c1-97d8-6fca23e06d3e
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = NULL|DXE_DRIVER
+  CONSTRUCTOR     = SmbiosType13LibConstructor
+  DESTRUCTOR      = SmbiosType13LibDestructor
+
+[Sources]
+  SmbiosType13Generator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+  gEdkiiDynamicTableFactoryProtocolGuid

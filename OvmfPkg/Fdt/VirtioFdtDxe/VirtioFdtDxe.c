@@ -86,7 +86,7 @@ InitializeVirtioFdtDxe (
     //
     // Create a unique device path for this transport on the fly
     //
-    RegBase    = SwapBytes64 (*Reg);
+    RegBase    = SwapBytes64 (ReadUnaligned64 (Reg));
     DevicePath = (VIRTIO_TRANSPORT_DEVICE_PATH *)CreateDeviceNode (
                                                    HARDWARE_DEVICE_PATH,
                                                    HW_VENDOR_DP,
