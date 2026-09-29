@@ -913,6 +913,73 @@ ON_EXIT:
 }
 
 /**
+  Remove malformed non-Alert options from the private packet copy.
+
+  Some DHCP servers send optional options with a format that does not
+  strictly comply with RFC standards. Alert options consumed by the
+  DHCP state machine must remain strictly validated, but malformed
+  non-Alert options can be safely removed from the private packet copy
+  before strict validation. This prevents downstream consumers (PXE,
+  HTTP Boot) from reading malformed data.
+
+  @param[in, out] Packet  The DHCP packet to sanitize.
+**/
+STATIC
+VOID
+DhcpRemoveMalformedNonAlertOptions (
+  IN OUT EFI_DHCP4_PACKET  *Packet
+  )
+{
+  UINT8               *Cur;
+  UINT8               *End;
+  UINT8               Tag;
+  UINT8               Len;
+  DHCP_OPTION_FORMAT  *Format;
+
+  Cur = Packet->Dhcp4.Option;
+  End = (UINT8 *)Packet + Packet->Length;
+
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    Format = DhcpFindOptionFormat (Tag);
+
+    if ((Format != NULL) && !Format->Alert &&
+        !DhcpOptionIsValid (Format, Cur, Len))
+    {
+      //
+      // Remove this malformed option by shifting the remaining bytes left.
+      //
+      CopyMem (Cur - 2, Cur + Len, (UINTN)(End - (Cur + Len)));
+      Packet->Length -= (UINT32)(Len + 2);
+      End            -= (Len + 2);
+      Cur            -= 2;
+      continue;
+    }
+
+    Cur += Len;
+  }
+}
+
+/**
   Handle the received DHCP packets. This function drives the DHCP
   state machine.
 
@@ -995,6 +1062,13 @@ DhcpInput (
   //
   // Validate the options and retrieve the interested options
   //
+  //
+  // Remove malformed non-Alert options from the private copy before
+  // strict validation, so downstream consumers do not read malformed
+  // data. Alert options and public APIs remain strictly validated.
+  //
+  DhcpRemoveMalformedNonAlertOptions (Packet);
+
   Para = NULL;
   if ((Packet->Length > sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)) &&
       (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC) &&
