@@ -544,7 +544,7 @@ IsImsicNode (
   }
 
   IrqProp = (INT32 *)FdtGetProp (Fdt, Node, "interrupts-extended", &Len);
-  if (!IrqProp || (Len < 4) ||
+  if (!IrqProp || (Len < 2 * sizeof (*IrqProp)) ||
       (Fdt32ToCpu (IrqProp[1]) != IRQ_S_EXT))
   {
     return FALSE;
@@ -583,7 +583,7 @@ IsAplicNode (
   }
 
   IrqProp = (INT32 *)FdtGetProp (Fdt, ExtIntcNode, "interrupts-extended", &Len);
-  if ((IrqProp > 0) && (Len >= 4) &&
+  if ((IrqProp != NULL) && (Len >= 2 * sizeof (*IrqProp)) &&
       (Fdt32ToCpu (IrqProp[1]) == IRQ_S_EXT))
   {
     return TRUE;
