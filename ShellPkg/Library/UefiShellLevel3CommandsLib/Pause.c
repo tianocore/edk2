@@ -31,13 +31,7 @@ MainCmdPause (
   ShellStatus = SHELL_SUCCESS;
   Resp        = NULL;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+  if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"pause");
     return SHELL_INVALID_PARAMETER;
   }

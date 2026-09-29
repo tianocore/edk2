@@ -61,6 +61,7 @@ CONST UINT64        gApStackSize = AP_STACK_SIZE;
 VOID                *gTtbr0;
 UINTN               gTcr;
 UINTN               gMair;
+UINTN               gHcr;
 
 STATIC
 BOOLEAN
@@ -1358,6 +1359,9 @@ MpServicesInitialize (
   gTcr   = ArmGetTCR ();
   gMair  = ArmGetMAIR ();
   gTtbr0 = ArmGetTTBR0BaseAddress ();
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    gHcr = ArmReadHcr ();
+  }
 
   //
   // The global pointer variables as well as the gProcessorIDs array contents
@@ -1365,6 +1369,7 @@ MpServicesInitialize (
   //
   WriteBackDataCacheRange (&gProcessorIDs, sizeof (UINT64 *));
   WriteBackDataCacheRange (&gApStacksBase, sizeof (UINT64 *));
+  WriteBackDataCacheRange (&gHcr, sizeof (gHcr));
 
   WriteBackDataCacheRange (
     gProcessorIDs,
