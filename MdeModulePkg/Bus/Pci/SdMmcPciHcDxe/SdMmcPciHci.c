@@ -1475,8 +1475,8 @@ BuildAdmaDescTable (
 {
   EFI_PHYSICAL_ADDRESS  Data;
   UINT64                DataLen;
-  UINT64                Entries;
-  UINT64                Index;
+  UINTN                 Entries;
+  UINTN                 Index;
   UINT64                Remaining;
   UINT64                Address;
   UINTN                 TableSize;
@@ -1539,8 +1539,8 @@ BuildAdmaDescTable (
     AdmaMaxDataPerLine = ADMA_MAX_DATA_PER_LINE_26B;
   }
 
-  Entries        = DivU64x32 ((DataLen + AdmaMaxDataPerLine - 1), AdmaMaxDataPerLine);
-  TableSize      = (UINTN)MultU64x32 (Entries, DescSize);
+  Entries        = (UINTN)DivU64x32 ((DataLen + AdmaMaxDataPerLine - 1), AdmaMaxDataPerLine);
+  TableSize      = Entries * DescSize;
   Trb->AdmaPages = (UINT32)EFI_SIZE_TO_PAGES (TableSize);
   Status         = PciIo->AllocateBuffer (
                             PciIo,
