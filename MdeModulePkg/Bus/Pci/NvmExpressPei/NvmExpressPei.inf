@@ -43,6 +43,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  BaseLib
   DebugLib
   DevicePathLib
   PeiServicesLib
