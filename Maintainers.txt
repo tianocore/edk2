@@ -291,6 +291,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
+R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules

@@ -1,16 +1,20 @@
-#/** @file
+## @file
+#  Arm MMU library implementation for Arm CCA.
 #
-#  Copyright (c) 2016 Linaro Ltd. All rights reserved.
+#  Provides the BASE instance of ArmMmuLib with Arm Confidential
+#  Compute Architecture support.
+#
+#  Copyright (c) 2016 Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2026, ARM Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-#
-#**/
+##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 0x0001001E
   BASE_NAME                      = ArmMmuBaseLib
-  FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
+  FILE_GUID                      = 3da6e3dd-72ec-43d4-ab2a-19d75d5a8f8a
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmMmuLib
@@ -18,15 +22,17 @@
 
 [Sources.AARCH64]
   ArmMmuLibInternal.h
-  AArch64/ArmMmuLibCcaNull.c
+  AArch64/ArmMmuLibCca.c
   AArch64/ArmMmuLibCore.c
   AArch64/ArmMmuLibReplaceEntry.S
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
+  ArmCcaLib
   ArmLib
   CacheMaintenanceLib
   HobLib
