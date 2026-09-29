@@ -152,6 +152,6 @@ typedef struct TransferListEventLog {
   UINT32    Flags;
 
   /// TPM event log as much as
-  /// TRNASFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
+  /// TRANSFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
   UINT8     EventLog[];
 } TRANSFER_LIST_EVENTLOG;

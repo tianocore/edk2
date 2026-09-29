@@ -20,6 +20,8 @@ GCC_ASM_IMPORT (gApStackSize)
 GCC_ASM_IMPORT (gTcr)
 GCC_ASM_IMPORT (gTtbr0)
 GCC_ASM_IMPORT (gMair)
+GCC_ASM_IMPORT (gHcr)
+GCC_ASM_IMPORT (ArmWriteHcr)
 GCC_ASM_IMPORT (ArmEnableVFP)
 
 GCC_ASM_EXPORT (ApEntryPoint)
@@ -30,6 +32,15 @@ GCC_ASM_EXPORT (ApEntryPoint)
 //   VOID
 //   );
 ASM_PFX(ApEntryPoint):
+  // Restore HCR_EL2 when running at EL2
+  EL1_OR_EL2(x1)
+1:
+  b     3f
+2:
+  LDR_LIT(x0, gHcr)
+  bl ArmWriteHcr
+
+3:
   // Configure the MMU and caches
   LDR_LIT(x0, gTcr)
   bl ArmSetTCR
