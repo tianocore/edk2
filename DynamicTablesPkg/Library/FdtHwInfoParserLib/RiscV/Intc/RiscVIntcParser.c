@@ -888,6 +888,7 @@ PlicAplicInfoParser (
   Fdt     = FdtParserHandle->Fdt;
   GsiBase = 0;
   Id      = 0;
+  ZeroMem (&PlicAplicCommonInfo, sizeof (PlicAplicCommonInfo));
 
   for (Prev = 0; ; Prev = ExtIntcNode) {
     ExtIntcNode = FdtNextNode (Fdt, Prev, NULL);
