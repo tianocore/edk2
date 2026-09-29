@@ -189,12 +189,24 @@ SerialPortNodeParser (
       }
 
       AccessSize = Fdt32ToCpu (*(UINT32 *)Data);
-      if (AccessSize > EFI_ACPI_6_3_QWORD) {
-        ASSERT (0);
-        return EFI_INVALID_PARAMETER;
+      // Convert the DT byte width to the ACPI GAS access-size encoding.
+      switch (AccessSize) {
+        case 1:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_BYTE;
+          break;
+        case 2:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_WORD;
+          break;
+        case 4:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_DWORD;
+          break;
+        case 8:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_QWORD;
+          break;
+        default:
+          ASSERT (0);
+          return EFI_INVALID_PARAMETER;
       }
-
-      SerialPortInfo->AccessSize = AccessSize;
     } else {
       // 8250/16550 defaults to byte access.
       SerialPortInfo->AccessSize = EFI_ACPI_6_3_BYTE;
