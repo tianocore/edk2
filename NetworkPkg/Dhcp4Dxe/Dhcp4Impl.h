@@ -198,3 +198,35 @@ SetElapsedTime (
   IN     UINT16         *Elapsed,
   IN     DHCP_PROTOCOL  *Instance
   );
+
+/**
+  Binary search the DhcpOptionFormats array to find the format
+  information about a specific option.
+
+  @param[in]  Tag                    The option's tag.
+
+  @return The point to the option's format, NULL if not found.
+
+**/
+DHCP_OPTION_FORMAT *
+DhcpFindOptionFormat (
+  IN UINT8  Tag
+  );
+
+/**
+  Validate whether a single DHCP option is valid according to its format.
+
+  @param[in]  Format                 The option's format
+  @param[in]  OptValue               The value of the option
+  @param[in]  Len                    The length of the option value
+
+  @retval TRUE     The option is valid.
+  @retval FALSE    Otherwise.
+
+**/
+BOOLEAN
+DhcpOptionIsValid (
+  IN DHCP_OPTION_FORMAT  *Format,
+  IN UINT8               *OptValue,
+  IN INTN                Len
+  );
