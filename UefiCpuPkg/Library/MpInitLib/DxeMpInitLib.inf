@@ -61,6 +61,7 @@
   PcdLib
   SynchronizationLib
   UefiBootServicesTableLib
+  DxeMemoryProtectionHobLib
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   AmdSvsmLib
@@ -86,7 +87,6 @@
   gProcessorResourceHobGuid                     ## SOMETIMES_CONSUMES  ## HOB
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber            ## CONSUMES

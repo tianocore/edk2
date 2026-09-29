@@ -14,6 +14,7 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CcExitLib.h>
+#include <Library/DxeMemoryProtectionHobLib.h>
 #include <Register/Amd/SevSnpMsr.h>
 #include <Register/Amd/Ghcb.h>
 
@@ -553,7 +554,7 @@ InitMpGlobalData (
     return;
   }
 
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (gDxeMps.CpuStackGuard) {
     //
     // One extra page at the bottom of the stack is needed for Guard page.
     //

@@ -30,6 +30,7 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PlatformHookLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Ppi/MasterBootMode.h>
 #include <Register/LoongArch64/Cpucfg.h>
@@ -537,6 +538,13 @@ InitializePlatform (
 
   AddFdtHob ();
   SetupTPMResources ((VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress));
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. If no fw_cfg
+  // selector is present, no HOB is produced and the memory protection PCDs
+  // are used as a fallback.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
+
   //
   // Initialization MMU
   //

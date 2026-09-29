@@ -29,6 +29,7 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PlatformInitLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
@@ -572,6 +573,13 @@ InitializePlatform (
 {
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
   BuildPlatformInfoHob ();
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. If no fw_cfg
+  // selector is present, no HOB is produced and the memory protection PCDs
+  // are used as a fallback.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
 
   //
   // Initialize Local APIC Timer hardware and disable Local APIC Timer

@@ -11,6 +11,7 @@
 #include "CpuMp.h"
 #include <Guid/IdleLoopEvent.h>
 #include <Library/CpuMmuLib.h>
+#include <Library/DxeMemoryProtectionHobLib.h>
 #include <Library/TimerLib.h>
 #include <Register/LoongArch64/Csr.h>
 
@@ -495,7 +496,7 @@ InitializeCpu (
   // the first page read-protected after the CPU architectural protocol is
   // installed, matching the generic DXE NULL pointer protection semantics.
   //
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0) {
+  if (gDxeMps.NullPointerDetectionPolicy.Fields.UefiNullDetection) {
     Status = CpuSetMemoryAttributes (&gCpu, 0, EFI_PAGE_SIZE, EFI_MEMORY_RP);
     ASSERT_EFI_ERROR (Status);
   }

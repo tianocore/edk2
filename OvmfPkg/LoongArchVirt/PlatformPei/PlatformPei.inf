@@ -54,6 +54,7 @@
   PeiServicesLib
   PlatformHookLib
   ResourcePublicationLib
+  PlatformMemoryProtectionLib
   QemuFwCfgLib
 
 [Pcd]

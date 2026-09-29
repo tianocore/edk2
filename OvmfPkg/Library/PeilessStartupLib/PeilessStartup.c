@@ -20,6 +20,7 @@
 #include <Library/PrePiLib.h>
 #include <Library/PeilessStartupLib.h>
 #include <Library/PlatformInitLib.h>
+#include <Library/PlatformMemoryProtectionLib.h>
 #include <Library/TdxHelperLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <ConfidentialComputingGuestAttr.h>
@@ -121,6 +122,13 @@ InitializePlatform (
   }
 
   PlatformMiscInitialization (PlatformInfoHob);
+
+  //
+  // Build the DXE memory protection settings HOB from fw_cfg. If no fw_cfg
+  // selector is present, no HOB is produced and the memory protection PCDs
+  // are used as a fallback.
+  //
+  PlatformBuildMemoryProtectionSettingsHob ();
 
   return EFI_SUCCESS;
 }
