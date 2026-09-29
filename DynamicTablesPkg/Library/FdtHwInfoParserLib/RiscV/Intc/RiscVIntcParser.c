@@ -627,8 +627,8 @@ RiscVUpdateRintc (
   )
 {
   CM_RISCV_RINTC_INFO  *RintcInfo;
-  CONST INT32          *Data;
-  UINT32               AddressCells;
+  CONST UINT32         *Data;
+  INT32                AddressCells;
   INT32                DataSize;
   UINT64               HartId;
   INT32                CpusNode;
@@ -995,7 +995,7 @@ UpdateRintcInfo (
   CM_RISCV_RINTC_INFO  *RintcInfoBuffer;
   CONST UINT32         *IntExtProp;
   CONST UINT64         *ImsicRegProp;
-  CONST INT32          *Data;
+  CONST UINT32         *Data;
   UINT64               ImsicBaseAddr;
   UINT64               ImsicBaseLen;
   EFI_STATUS           Status;
