@@ -37,6 +37,14 @@ STATIC UINTN  mGicDistributorBase;
 STATIC UINTN                       mGicNumInterrupts;
 STATIC HARDWARE_INTERRUPT_HANDLER  *mRegisteredInterruptHandlers;
 
+/**
+  Check whether an interrupt source is supported by the GIC.
+
+  @param[in] Source  Interrupt source to check.
+
+  @retval TRUE   Source is within the supported interrupt range.
+  @retval FALSE  Source is outside the supported interrupt range.
+**/
 STATIC
 BOOLEAN
 EFIAPI
@@ -291,6 +299,20 @@ GicV2IrqInterruptHandler (
   }
 }
 
+/**
+  Register or unregister a handler for a GICv2 interrupt source.
+
+  Validate Source before indexing the registered interrupt handler array.
+
+  @param[in] This     Instance pointer for this protocol.
+  @param[in] Source   Hardware source of the interrupt.
+  @param[in] Handler  Interrupt handler to register. NULL unregisters the handler.
+
+  @retval EFI_SUCCESS            The handler was registered or unregistered.
+  @retval EFI_UNSUPPORTED        Source is not a supported interrupt source.
+  @retval EFI_INVALID_PARAMETER  Handler is NULL and no handler is registered.
+  @retval EFI_ALREADY_STARTED    A handler is already registered for Source.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -300,6 +322,10 @@ GicV2RegisterInterruptSource (
   IN HARDWARE_INTERRUPT_HANDLER       Handler
   )
 {
+  if (!GicIsValidSource (Source)) {
+    return EFI_UNSUPPORTED;
+  }
+
   return GicCommonRegisterInterruptSource (
            This,
            Source,
