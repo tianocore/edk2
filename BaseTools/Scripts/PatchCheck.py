@@ -367,6 +367,7 @@ class GitDiffCheck:
         self.lines = diff.splitlines(True)
         self.count = len(self.lines)
         self.line_num = 0
+        self.file_line_num = None
         self.state = START
         self.new_bin = []
         while self.line_num < self.count and self.format_ok:
@@ -444,8 +445,13 @@ class GitDiffCheck:
             self.line_num += 1
         elif self.state == PRE_PATCH:
             if line.startswith('@@ '):
-                self.state = PATCH
-                self.binary = False
+                match = self.hunk_re.match(line)
+                if match is None:
+                    self.format_error("couldn't parse diff hunk marker")
+                else:
+                    self.file_line_num = int(match.group(1))
+                    self.state = PATCH
+                    self.binary = False
             elif line.startswith('GIT binary patch') or \
                  line.startswith('Binary files'):
                 self.state = PATCH
@@ -473,12 +479,15 @@ class GitDiffCheck:
                 pass
             elif line.startswith('+'):
                 self.check_added_line(line[1:])
+                self.file_line_num += 1
             elif line.startswith('\r\n'):
                 pass
             elif line.startswith(r'\ No newline '):
                 pass
             elif not line.startswith(' '):
                 self.format_error("unexpected patch line")
+            else:
+                self.file_line_num += 1
             self.line_num += 1
 
     pre_patch_prefixes = (
@@ -503,11 +512,13 @@ class GitDiffCheck:
                    ''',
                    re.VERBOSE)
 
+    hunk_re = re.compile(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@')
+
     def added_line_error(self, msg, line):
         lines = [ msg ]
         if self.filename is not None:
             lines.append('File: ' + self.filename)
-        lines.append('Line ' + str(self.line_num) + ': ' + line)
+        lines.append('Line ' + str(self.file_line_num) + ': ' + line)
 
         self.error(*lines)
 

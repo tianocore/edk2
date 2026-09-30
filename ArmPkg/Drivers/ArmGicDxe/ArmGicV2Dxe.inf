@@ -18,7 +18,6 @@
 
 [Sources.common]
   ArmGicCommonDxe.c
-  ArmGicDxe.c
   ArmGicDxe.h
   GicV2/ArmGicV2Dxe.c
 

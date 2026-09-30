@@ -1,7 +1,7 @@
 /** @file
   Arm Gic cpu parser.
 
-  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -149,16 +149,26 @@ CpuNodeParser (
 /** Parse a "cpus" node and its children "cpu" nodes.
 
   Create as many CM_ARM_GICC_INFO structures as "cpu" nodes.
+  The caller owns the returned CpuNodeOffsetMap and must free it
+  using FreePool().
 
   @param [in]  Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]  CpusNode         Offset of a cpus node.
   @param [in]  GicVersion       Version of the GIC.
   @param [out] NewGicCmObjDesc  If success, CM_OBJ_DESCRIPTOR containing
                                 all the created CM_ARM_GICC_INFO.
+  @param [out] CpuNodeOffsetMap If success, an array mapping each GICC index
+                                to the corresponding CPU DT node offset.
+                                The caller owns the returned array and must
+                                free it using FreePool().
+  @param [out] CpuCount         If success, number of CPU device nodes
+                                parsed below CpusNode.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No CPU device node was found.
+  @retval EFI_OUT_OF_RESOURCES    Memory allocation failed.
   @retval EFI_UNSUPPORTED         Unsupported.
 **/
 STATIC
@@ -169,6 +179,7 @@ CpusNodeParser (
   IN        INT32              CpusNode,
   IN        UINT32             GicVersion,
   OUT       CM_OBJ_DESCRIPTOR  **NewGicCmObjDesc,
+  OUT       INT32              **CpuNodeOffsetMap,
   OUT       UINTN              *CpuCount
   )
 {
@@ -179,12 +190,18 @@ CpusNodeParser (
 
   UINT32            Index;
   CM_ARM_GICC_INFO  *GicCInfoBuffer;
+  INT32             *LocalCpuNodeOffsetMap;
   UINT32            GicCInfoBufferSize;
 
-  if (NewGicCmObjDesc == NULL) {
+  if ((NewGicCmObjDesc == NULL) ||
+      (CpuNodeOffsetMap == NULL) ||
+      (CpuCount == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *CpuNodeOffsetMap = NULL;
 
   AddressCells = FdtAddressCells (Fdt, CpusNode);
   if (AddressCells < 0) {
@@ -192,8 +209,8 @@ CpusNodeParser (
     return EFI_ABORTED;
   }
 
-  // Count the number of "cpu" nodes under the "cpus" node.
-  Status = FdtCountNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNodeCount);
+  // Count the number of CPU device nodes under the "cpus" node.
+  Status = FdtCountCondNodeInBranch (Fdt, CpusNode, IsCpuDeviceNode, NULL, &CpuNodeCount);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -214,17 +231,17 @@ CpusNodeParser (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CpuNode = CpusNode;
-  for (Index = 0; Index < CpuNodeCount; Index++) {
-    Status = FdtGetNextNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNode);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      if (Status == EFI_NOT_FOUND) {
-        // Should have found the node.
-        Status = EFI_ABORTED;
-      }
+  LocalCpuNodeOffsetMap = AllocateZeroPool (CpuNodeCount * sizeof (*LocalCpuNodeOffsetMap));
+  if (LocalCpuNodeOffsetMap == NULL) {
+    FreePool (GicCInfoBuffer);
+    ASSERT (FALSE);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
-      goto exit_handler;
+  Index = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    if (!IsCpuDeviceNode (Fdt, CpuNode, NULL)) {
+      continue;
     }
 
     // Parse the "cpu" node.
@@ -245,7 +262,16 @@ CpusNodeParser (
       ASSERT (0);
       goto exit_handler;
     }
-  } // for
+
+    LocalCpuNodeOffsetMap[Index] = CpuNode;
+    Index++;
+  }
+
+  if (Index != CpuNodeCount) {
+    ASSERT (FALSE);
+    Status = EFI_ABORTED;
+    goto exit_handler;
+  }
 
   Status = CreateCmObjDesc (
              CREATE_CM_ARM_OBJECT_ID (EArmObjGicCInfo),
@@ -255,8 +281,16 @@ CpusNodeParser (
              NewGicCmObjDesc
              );
   ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
+    *CpuNodeOffsetMap     = LocalCpuNodeOffsetMap;
+    LocalCpuNodeOffsetMap = NULL;
+  }
 
 exit_handler:
+  if (LocalCpuNodeOffsetMap != NULL) {
+    FreePool (LocalCpuNodeOffsetMap);
+  }
+
   FreePool (GicCInfoBuffer);
   return Status;
 }
@@ -289,52 +323,49 @@ GicCIntcNodeParser (
   )
 {
   EFI_STATUS        Status;
-  INT32             IntCells;
   CM_ARM_GICC_INFO  *GicCInfo;
 
-  CONST UINT8  *Data;
-  INT32        DataSize;
-  UINT32       MaintenanceInterrupt;
-  UINT32       Flags;
+  CONST UINT32  *DecodedInterruptData;
+  INT32         DecodedInterruptCells;
+  UINT32        MaintenanceInterrupt;
+  UINT32        Flags;
 
   if (GicCCmObjDesc == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, &IntCells);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
   // Get the GSIV maintenance interrupt.
   // According to the DT bindings, this could be the:
   // "Interrupt source of the parent interrupt controller on secondary GICs"
   // but it is assumed that only one Gic is available.
-  Data = FdtGetProp (Fdt, GicIntcNode, "interrupts", &DataSize);
-  if ((Data != NULL) && (DataSize == (IntCells * sizeof (UINT32)))) {
-    MaintenanceInterrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
-    Flags                = DT_IRQ_IS_EDGE_TRIGGERED (
-                             Fdt32ToCpu (((UINT32 *)Data)[IRQ_FLAGS_OFFSET])
-                             ) ?
-                           EFI_ACPI_6_3_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS :
-                           0;
-    for (GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data; CpuCount--; GicCInfo++) {
-      GicCInfo->VGICMaintenanceInterrupt = MaintenanceInterrupt;
-      GicCInfo->Flags                   |= Flags;
-    }
-
-    return Status;
-  } else if (DataSize < 0) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             GicIntcNode,
+             0,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (Status == EFI_NOT_FOUND) {
     // This property is optional and was not found. Just return.
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
     return Status;
   }
 
-  // The property exists and its size doesn't match for one interrupt.
-  ASSERT (0);
-  return EFI_ABORTED;
+  MaintenanceInterrupt = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+  Flags                = DT_IRQ_IS_EDGE_TRIGGERED (
+                           Fdt32ToCpu (DecodedInterruptData[IRQ_FLAGS_OFFSET])
+                           ) ?
+                         EFI_ACPI_6_3_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS :
+                         0;
+  for (GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data; CpuCount--; GicCInfo++) {
+    GicCInfo->VGICMaintenanceInterrupt = MaintenanceInterrupt;
+    GicCInfo->Flags                   |= Flags;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /** Parse a Gic compatible interrupt-controller node,
@@ -369,10 +400,10 @@ GicCv2IntcNodeParser (
   CM_ARM_GICC_INFO  *GicCInfo;
   INT32             AddressCells;
   INT32             SizeCells;
-
-  CONST UINT8  *GicCValue;
-  CONST UINT8  *GicVValue;
-  CONST UINT8  *GicHValue;
+  UINT64            GicCValue;
+  UINT64            GicVValue;
+  UINT64            GicHValue;
+  UINT64            RegionSize;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -385,8 +416,9 @@ GicCv2IntcNodeParser (
   }
 
   GicCInfo  = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
-  GicVValue = NULL;
-  GicHValue = NULL;
+  GicCValue = 0;
+  GicVValue = 0;
+  GicHValue = 0;
 
   // Get the #address-cells and #size-cells property values.
   Status = FdtGetParentAddressInfo (
@@ -428,22 +460,34 @@ GicCv2IntcNodeParser (
     case 4:
     {
       // GicV is at index 3 in the reg property. GicV is optional.
-      GicVValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (3, AddressCells, SizeCells));
+      Status = FdtGetTranslatedReg (Fdt, Gicv2IntcNode, 3, &GicVValue, &RegionSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 3:
     {
       // GicH is at index 2 in the reg property. GicH is optional.
-      GicHValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (2, AddressCells, SizeCells));
+      Status = FdtGetTranslatedReg (Fdt, Gicv2IntcNode, 2, &GicHValue, &RegionSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 2:
     {
       // GicC is at index 1 in the reg property. GicC is mandatory.
-      GicCValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells));
+      Status = FdtGetTranslatedReg (Fdt, Gicv2IntcNode, 1, &GicCValue, &RegionSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       break;
     }
     default:
@@ -456,19 +500,9 @@ GicCv2IntcNodeParser (
 
   // Patch the relevant fields of the CM_ARM_GICC_INFO objects.
   for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-    if (AddressCells == 2) {
-      GicCInfo[Index].PhysicalBaseAddress = Fdt64ToCpu (*(UINT64 *)GicCValue);
-      GicCInfo[Index].GICH                = (GicHValue == NULL) ? 0 :
-                                            Fdt64ToCpu (*(UINT64 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt64ToCpu (*(UINT64 *)GicVValue);
-    } else {
-      GicCInfo[Index].PhysicalBaseAddress = Fdt32ToCpu (*(UINT32 *)GicCValue);
-      GicCInfo[Index].GICH                = (GicHValue == NULL) ? 0 :
-                                            Fdt32ToCpu (*(UINT32 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt32ToCpu (*(UINT32 *)GicVValue);
-    }
+    GicCInfo[Index].PhysicalBaseAddress = GicCValue;
+    GicCInfo[Index].GICH                = GicHValue;
+    GicCInfo[Index].GICV                = GicVValue;
   } // for
 
   return EFI_SUCCESS;
@@ -507,10 +541,10 @@ GicCv3IntcNodeParser (
   INT32             AddressCells;
   INT32             SizeCells;
   UINT32            AdditionalRedistReg;
-
-  CONST UINT8  *GicCValue;
-  CONST UINT8  *GicVValue;
-  CONST UINT8  *GicHValue;
+  UINT64            GicCValue;
+  UINT64            GicVValue;
+  UINT64            GicHValue;
+  UINT64            RegionSize;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -523,9 +557,9 @@ GicCv3IntcNodeParser (
   }
 
   GicCInfo  = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
-  GicCValue = NULL;
-  GicVValue = NULL;
-  GicHValue = NULL;
+  GicCValue = 0;
+  GicVValue = 0;
+  GicHValue = 0;
 
   // Get the #address-cells and #size-cells property values.
   Status = FdtGetParentAddressInfo (
@@ -594,35 +628,53 @@ GicCv3IntcNodeParser (
     case 5:
     {
       // GicV is at index 4 in the reg property. GicV is optional.
-      GicVValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (
-                            4 + AdditionalRedistReg,
-                            AddressCells,
-                            SizeCells
-                            ));
+      Status = FdtGetTranslatedReg (
+                 Fdt,
+                 Gicv3IntcNode,
+                 4 + AdditionalRedistReg,
+                 &GicVValue,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 4:
     {
       // GicH is at index 3 in the reg property. GicH is optional.
-      GicHValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (
-                            3 + AdditionalRedistReg,
-                            AddressCells,
-                            SizeCells
-                            ));
+      Status = FdtGetTranslatedReg (
+                 Fdt,
+                 Gicv3IntcNode,
+                 3 + AdditionalRedistReg,
+                 &GicHValue,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through.
     }
     case 3:
     {
       // GicC is at index 2 in the reg property. GicC is optional.
       // Even though GicC is optional, it is made mandatory in this parser.
-      GicCValue = Data + (sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (
-                            2 + AdditionalRedistReg,
-                            AddressCells,
-                            SizeCells
-                            ));
+      Status = FdtGetTranslatedReg (
+                 Fdt,
+                 Gicv3IntcNode,
+                 2 + AdditionalRedistReg,
+                 &GicCValue,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       // fall-through
     }
     case 2:
@@ -640,28 +692,12 @@ GicCv3IntcNodeParser (
   }
 
   // Patch the relevant fields of the CM_ARM_GICC_INFO objects.
-  if (AddressCells == 2) {
-    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
-      GicCInfo[Index].GICRBaseAddress     = 0;
-      GicCInfo[Index].PhysicalBaseAddress = (GicCValue == NULL) ? 0 :
-                                            Fdt64ToCpu (*(UINT64 *)GicCValue);
-      GicCInfo[Index].GICH = (GicHValue == NULL) ? 0 :
-                             Fdt64ToCpu (*(UINT64 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt64ToCpu (*(UINT64 *)GicVValue);
-    }
-  } else {
-    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
-      GicCInfo[Index].GICRBaseAddress     = 0;
-      GicCInfo[Index].PhysicalBaseAddress = (GicCValue == NULL) ? 0 :
-                                            Fdt32ToCpu (*(UINT32 *)GicCValue);
-      GicCInfo[Index].GICH = (GicHValue == NULL) ? 0 :
-                             Fdt32ToCpu (*(UINT32 *)GicHValue);
-      GicCInfo[Index].GICV = (GicVValue == NULL) ? 0 :
-                             Fdt32ToCpu (*(UINT32 *)GicVValue);
-    }
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
+    GicCInfo[Index].GICRBaseAddress     = 0;
+    GicCInfo[Index].PhysicalBaseAddress = GicCValue;
+    GicCInfo[Index].GICH                = GicHValue;
+    GicCInfo[Index].GICV                = GicVValue;
   }
 
   return EFI_SUCCESS;
@@ -692,14 +728,13 @@ GicCPmuNodeParser (
   )
 {
   EFI_STATUS        Status;
-  INT32             IntCells;
   INT32             PmuNode;
   UINT32            PmuNodeCount;
   UINT32            PmuIrq;
   UINT32            Index;
   CM_ARM_GICC_INFO  *GicCInfo;
-  CONST UINT8       *Data;
-  INT32             DataSize;
+  CONST UINT32      *DecodedInterruptData;
+  INT32             DecodedInterruptCells;
 
   if (GicCCmObjDesc == NULL) {
     ASSERT (GicCCmObjDesc != NULL);
@@ -739,44 +774,88 @@ GicCPmuNodeParser (
     }
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, &IntCells);
+  //
+  // There must be either:
+  // - 1 interrupt per core
+  // - 1 common interrupt
+  //
+
+  Status = FdtResolveInterrupt (
+             Fdt,
+             PmuNode,
+             0,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
 
-  Data = FdtGetProp (Fdt, PmuNode, "interrupts", &DataSize);
-  if ((Data == NULL) || ((DataSize != (GicCCmObjDesc->Count * IntCells * sizeof (UINT32))) && (DataSize != (IntCells * sizeof (UINT32))))) {
-    // If error, not 1 interrupt or not 1 interrupt per core.
-    ASSERT (Data != NULL);
-    ASSERT (DataSize == (IntCells * sizeof (UINT32)) || DataSize == (GicCCmObjDesc->Count * IntCells * sizeof (UINT32)));
-    return EFI_ABORTED;
-  }
+  PmuIrq = FdtGetInterruptId ((CONST UINT32 *)DecodedInterruptData, DecodedInterruptCells);
 
-  if (DataSize == (IntCells * sizeof (UINT32))) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             PmuNode,
+             1,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (Status == EFI_NOT_FOUND) {
     // One shared PMU IRQ
-    PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data);
+    Status = FdtResolveInterrupt (
+               Fdt,
+               PmuNode,
+               0,
+               &DecodedInterruptData,
+               &DecodedInterruptCells
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
+    //
     // Only supports PPI 23 for now.
     // According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23. A non BSA
     // compliant system may assign a different IRQ for the PMU, however this
     // is not implemented for now.
+    //
     if (PmuIrq != BSA_PMU_IRQ) {
       ASSERT (PmuIrq == BSA_PMU_IRQ);
       return EFI_ABORTED;
     }
 
+    //
+    // One common interrupt.
+    //
     for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
       GicCInfo[Index].PerformanceInterruptGsiv = PmuIrq;
     }
-  } else {
-    // One PMU IRQ per core
-    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)Data);
 
-      Data += IntCells * sizeof (UINT32);
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // One PMU IRQ per core.
+  //
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    Status = FdtResolveInterrupt (
+               Fdt,
+               PmuNode,
+               Index,
+               &DecodedInterruptData,
+               &DecodedInterruptCells
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return EFI_ABORTED;
     }
+
+    GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)DecodedInterruptData, DecodedInterruptCells);
   }
 
   return EFI_SUCCESS;
@@ -835,20 +914,25 @@ ArmGicCInfoParser (
   INT32              IntcNode;
   UINT32             GicVersion;
   CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
+  CM_OBJECT_TOKEN    *CpuTokenTable;
+  INT32              *CpuNodeOffsetMap;
   VOID               *Fdt;
   UINTN              CpuCount;
+  UINT32             Index;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Fdt          = FdtParserHandle->Fdt;
-  NewCmObjDesc = NULL;
+  Fdt              = FdtParserHandle->Fdt;
+  NewCmObjDesc     = NULL;
+  CpuTokenTable    = NULL;
+  CpuNodeOffsetMap = NULL;
 
   // The FdtBranch points to the Cpus Node.
   // Get the interrupt-controller node associated to the "cpus" node.
-  Status = FdtGetIntcParentNode (Fdt, FdtBranch, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, FdtBranch, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {
@@ -867,7 +951,14 @@ ArmGicCInfoParser (
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
   // and create a CM_OBJ_DESCRIPTOR.
-  Status = CpusNodeParser (Fdt, FdtBranch, GicVersion, &NewCmObjDesc, &CpuCount);
+  Status = CpusNodeParser (
+             Fdt,
+             FdtBranch,
+             GicVersion,
+             &NewCmObjDesc,
+             &CpuNodeOffsetMap,
+             &CpuCount
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -912,14 +1003,34 @@ ArmGicCInfoParser (
     goto exit_handler;
   }
 
+  CpuTokenTable = AllocateZeroPool (sizeof (*CpuTokenTable) * CpuCount);
+  if (CpuTokenTable == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    ASSERT (FALSE);
+    goto exit_handler;
+  }
+
+  for (Index = 0; Index < CpuCount; Index++) {
+    ASSERT (((CpuNodeOffsetMap[Index]) & ~CM_ABSTRACT_TOKEN_ID_MASK) == 0);
+    CpuTokenTable[Index] = (CM_OBJECT_TOKEN)CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceFdtHwInfo, EFdtHwInfoGicCObject, (UINT32)CpuNodeOffsetMap[Index]);
+  }
+
   // Add all the CmObjs to the Configuration Manager.
-  Status = AddMultipleCmObj (FdtParserHandle, NewCmObjDesc, 0, NULL);
+  Status = AddMultipleCmObjWithToken (FdtParserHandle, NewCmObjDesc, CpuTokenTable);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
   }
 
 exit_handler:
+  if (CpuTokenTable != NULL) {
+    FreePool (CpuTokenTable);
+  }
+
+  if (CpuNodeOffsetMap != NULL) {
+    FreePool (CpuNodeOffsetMap);
+  }
+
   FreeCmObjDesc (NewCmObjDesc);
   return Status;
 }

@@ -1,0 +1,4 @@
+{
+  "scope": "fsptools",
+  "flags": ["set_path", "set_pypath"]
+}
