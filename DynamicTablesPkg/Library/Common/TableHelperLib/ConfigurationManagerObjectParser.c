@@ -1148,11 +1148,20 @@ STATIC CONST CM_OBJ_PARSER  CmRiscVProcessorSpecificBlockInfoParser[] = {
   { "ImplId",   sizeof (UINT64), "0x%lx", NULL },
 };
 
-/** A Parser for EArchCommonObjTpm2DeviceInfo.
+/** A parser for EArchCommonObjTpmDeviceInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArchCommonObjTpm2DeviceInfoParser[] = {
-  { "Tpm2DeviceBaseAddress", sizeof (UINT64), "0x%lx", NULL },
-  { "Tpm2DeviceSize",        sizeof (UINT64), "0x%lx", NULL }
+STATIC CONST CM_OBJ_PARSER  CmArchCommonTpmDeviceInfoParser[] = {
+  { "Tpm2DeviceBaseAddress", sizeof (UINT64),          "0x%lx", NULL        },
+  { "Tpm2DeviceSize",        sizeof (UINT64),          "0x%lx", NULL        },
+  { "TpmDeviceInfoToken",    sizeof (CM_OBJECT_TOKEN), "0x%p",  NULL        },
+  { "VendorId",              sizeof (UINT8) * 4,       NULL,    HexDump     },
+  { "MajorSpecVersion",      sizeof (UINT8),           "0x%x",  NULL        },
+  { "MinorSpecVersion",      sizeof (UINT8),           "0x%x",  NULL        },
+  { "FirmwareVersion1",      sizeof (UINT32),          "0x%x",  NULL        },
+  { "FirmwareVersion2",      sizeof (UINT32),          "0x%x",  NULL        },
+  { "Description",           SMBIOS_MAX_STRING_SIZE,   NULL,    PrintString },
+  { "Characteristics",       sizeof (UINT64),          "0x%lx", NULL        },
+  { "OemDefined",            sizeof (UINT32),          "0x%x",  NULL        },
 };
 
 /** A parser for EArchCommonObjPciRootPortInfo
@@ -1266,6 +1275,26 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjEinjInstructionsInfoParser[] = {
     ARRAY_SIZE (AcpiGenericAddressParser) },
   { "Value",           8,                                               "0x%llx", NULL },
   { "Mask",            8,                                               "0x%llx", NULL },
+};
+
+/** A parser for CmArchCommonBootErrorRegionInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonBootErrorRegionInfoParser[] = {
+  { "BootErrorRegion",       8, "0x%llx", NULL },
+  { "BootErrorRegionLength", 4, "0x%x",   NULL },
+};
+
+/** A parser for CmArchCommonObjErstInstructionsInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErstInstructionsInfoParser[] = {
+  { "SerializationAction", 1,                                               "0x%x",   NULL },
+  { "Instruction",         1,                                               "0x%x",   NULL },
+  { "Flags",               1,                                               "0x%x",   NULL },
+  { "RegisterRegion",      sizeof (EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "Value",               8,                                               "0x%llx", NULL },
+  { "Mask",                8,                                               "0x%llx", NULL },
 };
 
 /** A parser for EArchCommonObjPlatformFwInfo.
@@ -1416,6 +1445,31 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageParser[] = {
 STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemBootInfoParser[] = {
   { "SystemBootInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "BootStatus",          sizeof (UINT8),           "0x%x", NULL },
+};
+
+/** A parser for EArchCommonObjOnboardDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonOnboardDeviceInfoParser[] = {
+  { "OnboardDeviceInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ReferenceDesignation",   SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "DeviceType",             sizeof (UINT8),           "0x%x", NULL        },
+  { "DeviceTypeInstance",     sizeof (UINT8),           "0x%x", NULL        },
+  { "SegmentGroupNum",        sizeof (UINT16),          "0x%x", NULL        },
+  { "BusNum",                 sizeof (UINT8),           "0x%x", NULL        },
+  { "DevFuncNum",             sizeof (UINT8),           "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjIpmiDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonIpmiDeviceInfoParser[] = {
+  { "IpmiDeviceInfoToken",              sizeof (CM_OBJECT_TOKEN), "0x%p",  NULL },
+  { "InterfaceType",                    sizeof (UINT8),           "0x%x",  NULL },
+  { "IpmiSpecificationRevision",        sizeof (UINT8),           "0x%x",  NULL },
+  { "I2cTargetAddress",                 sizeof (UINT8),           "0x%x",  NULL },
+  { "NvStorageDeviceAddress",           sizeof (UINT8),           "0x%x",  NULL },
+  { "BaseAddress",                      sizeof (UINT64),          "0x%lx", NULL },
+  { "BaseAddressModifierInterruptInfo", sizeof (UINT8),           "0x%x",  NULL },
+  { "InterruptNumber",                  sizeof (UINT8),           "0x%x",  NULL },
 };
 
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
@@ -1704,7 +1758,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryLatBwInfo,                  CmArchCommonMemoryLatBwInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,                  CmArchCommonMemoryCacheInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                         CmArchCommonObjSpcrInfoParser),
-  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,                   CmArchCommonObjTpm2DeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpmDeviceInfo,                    CmArchCommonTpmDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,           CmArchCommonPciConfigSpaceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,                  CmArchCommonObjPciRootPortInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciRootPortInfo,         CmArchCommonObjErrSourcePciRootPortInfoParser),
@@ -1746,6 +1800,10 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguageInfo,                 CmArchCommonBiosLanguageInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBiosLanguage,                     CmArchCommonBiosLanguageParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemBootInfo,                   CmArchCommonSystemBootInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjOnboardDeviceInfo,                CmArchCommonOnboardDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjBootErrorRegionInfo,              CmArchCommonBootErrorRegionInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErstInstructionsInfo,             CmArchCommonObjErstInstructionsInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjIpmiDeviceInfo,                   CmArchCommonIpmiDeviceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

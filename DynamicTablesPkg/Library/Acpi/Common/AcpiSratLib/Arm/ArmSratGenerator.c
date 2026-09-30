@@ -325,10 +325,12 @@ AddGICItsAffinity (
       ProximityDomain      = GicItsInfo->ProximityDomain;
       ProximityDomainToken = GicItsInfo->ProximityDomainToken;
       GicItsAff->ItsId     = GicItsInfo->GicItsId;
+      GicItsInfo++;
     } else {
       ProximityDomain      = GicItsV5Info->ProximityDomain;
       ProximityDomainToken = GicItsV5Info->ProximityDomainToken;
       GicItsAff->ItsId     = GicItsV5Info->GicItsId;
+      GicItsV5Info++;
     }
 
     Status = GetProximityDomainId (
@@ -344,7 +346,6 @@ AddGICItsAffinity (
 
     // Next
     GicItsAff++;
-    GicItsInfo++;
   }// while
 }
 
