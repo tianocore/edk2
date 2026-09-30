@@ -38,6 +38,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  BaseLib
   IoLib
   TimerLib
   BaseMemoryLib
