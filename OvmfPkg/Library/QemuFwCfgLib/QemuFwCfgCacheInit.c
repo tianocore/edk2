@@ -9,6 +9,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/SafeIntLib.h>
 #include "QemuFwCfgLibInternal.h"
 #include <Library/TdxHelperLib.h>
 #include <Library/PrintLib.h>
@@ -169,6 +170,7 @@ CacheFwCfgInfoWithOptionalMeasurment (
   FW_CFG_CACHED_ITEM  *CachedItem;
   UINT8               *ItemData;
   UINT32              FwCfgItemHobSize;
+  EFI_STATUS          Status;
 
   Count = CACHE_FW_CFG_COUNT;
 
@@ -178,7 +180,22 @@ CacheFwCfgInfoWithOptionalMeasurment (
     }
 
     FwCfginfoHobData = NULL;
-    FwCfgItemHobSize = sizeof (FW_CFG_CACHED_ITEM) + CacheFwCfgList[Index].FwCfgSize;
+
+    //
+    // FwCfgSize originates from the untrusted VMM fw_cfg interface. Reject a
+    // total length that overflows UINT32; BuildGuidHob() rejects lengths above
+    // the maximum GUID HOB payload.
+    //
+    Status = SafeUint32Add (
+               (UINT32)sizeof (FW_CFG_CACHED_ITEM),
+               CacheFwCfgList[Index].FwCfgSize,
+               &FwCfgItemHobSize
+               );
+    if (RETURN_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: FwCfgSize(0x%x) too large\n", __func__, CacheFwCfgList[Index].FwCfgSize));
+      return EFI_INVALID_PARAMETER;
+    }
+
     FwCfginfoHobData = BuildGuidHob (&gOvmfFwCfgInfoHobGuid, FwCfgItemHobSize);
     if (FwCfginfoHobData == NULL) {
       DEBUG ((DEBUG_ERROR, "%a: BuildGuidHob Failed with FwCfgItemHobSize(0x%x)\n", __func__, FwCfgItemHobSize));
@@ -208,7 +225,6 @@ CacheFwCfgInfoWithOptionalMeasurment (
 
     if (TdIsEnabled ()) {
       FW_CFG_EVENT  FwCfgEvent;
-      EFI_STATUS    Status;
 
       ZeroMem (&FwCfgEvent, sizeof (FW_CFG_EVENT));
       CopyMem (&FwCfgEvent.FwCfg, EV_POSTCODE_INFO_QEMU_FW_CFG_DATA, sizeof (EV_POSTCODE_INFO_QEMU_FW_CFG_DATA));
