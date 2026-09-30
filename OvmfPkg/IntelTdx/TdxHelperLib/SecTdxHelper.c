@@ -85,6 +85,14 @@ BspAcceptMemoryResourceRange (
   UINT64      Length3;
   UINT64      Pages;
 
+  //
+  // PhysicalAddress and PhysicalEnd derive from VMM-controlled resource
+  // descriptors. Reject a wrapped range before computing the length.
+  //
+  if (PhysicalEnd < PhysicalAddress) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   AcceptPageSize = FixedPcdGet32 (PcdTdxAcceptPageSize);
   TotalLength    = PhysicalEnd - PhysicalAddress;
   StartAddress1  = 0;
@@ -283,6 +291,14 @@ MpAcceptMemoryResourceRange (
   UINT64      Length;
   EFI_STATUS  Status;
 
+  //
+  // PhysicalStart and PhysicalEnd derive from VMM-controlled resource
+  // descriptors. Reject a wrapped range before computing the length.
+  //
+  if (PhysicalEnd < PhysicalStart) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Length = PhysicalEnd - PhysicalStart;
 
   DEBUG ((DEBUG_INFO, "MpAccept : 0x%llx - 0x%llx (0x%llx)\n", PhysicalStart, PhysicalEnd, Length));
@@ -382,7 +398,19 @@ AcceptMemoryForAPsStack (
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
         ResourceLength = Hob.ResourceDescriptor->ResourceLength;
         PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
-        PhysicalEnd    = PhysicalStart + ResourceLength;
+        //
+        // ResourceLength and PhysicalStart are VMM-controlled. Fence against a
+        // speculative bound-check bypass and reject a range that wraps around
+        // the address space before it is used to accept memory.
+        //
+        if (PhysicalStart + ResourceLength < PhysicalStart) {
+          DEBUG ((DEBUG_ERROR, "AcceptMemoryForAPsStack: resource descriptor overflow, skipped\n"));
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
+
+        AsmLfence ();
+        PhysicalEnd = PhysicalStart + ResourceLength;
 
         DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
         DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", PhysicalStart));
@@ -457,7 +485,19 @@ AcceptMemory (
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
         PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
-        PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        //
+        // PhysicalStart and ResourceLength are VMM-controlled. Fence against a
+        // speculative bound-check bypass and reject a range that wraps around
+        // the address space.
+        //
+        if (PhysicalStart + Hob.ResourceDescriptor->ResourceLength < PhysicalStart) {
+          DEBUG ((DEBUG_ERROR, "AcceptMemory: resource descriptor overflow, skipped\n"));
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
+
+        AsmLfence ();
+        PhysicalEnd = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
 
         if (PhysicalEnd <= PhysicalAddressStart) {
           // this memory region has been accepted. Skipped it.
