@@ -291,6 +291,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
+R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
@@ -341,8 +342,11 @@ F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
 R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 
 MdeModulePkg: Disk modules
+F: MdeModulePkg/Include/Library/GptLib.h
+F: MdeModulePkg/Library/GptLib/
 F: MdeModulePkg/Universal/Disk/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Richard Lyu <richard.lyu@suse.com> [r1chard-lyu]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/

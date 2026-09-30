@@ -42,7 +42,7 @@
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
-
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLibCca.inf
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/KvmtoolVirtMemInfoLib/KvmtoolVirtMemInfoLib.inf
 
@@ -73,8 +73,8 @@
 
   ArmCcaBootSyncCryptoLib|ArmVirtPkg/Library/ArmCcaBootSyncCryptoLib/ArmCcaBootSyncCryptoLib.inf
 
-  ArmCcaLib|ArmVirtPkg/Library/ArmCcaLib/ArmCcaLib.inf
-  ArmCcaRsiLib|ArmVirtPkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
 
 [LibraryClasses.common.SEC]
   ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
