@@ -332,7 +332,7 @@
   QemuFwCfgLib                     | OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   AcpiPlatformLib                  | OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
-  MapMmioLib                       | OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
+  MapMmioLib                       | UefiCpuPkg/Library/MapMmioLib/MapMmioLib.inf
   MpInitLib                        | UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
@@ -524,6 +524,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
 !endif
 
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable             |FALSE
+
 [PcdsDynamicHii]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|3
 !if $(TPM2_CONFIG_ENABLE) == TRUE
@@ -651,6 +654,7 @@
   #
   # Platform Driver
   #
+  OvmfPkg/IoMmuAbsentDxe/IoMmuAbsentDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioRngDxe/VirtioRng.inf

@@ -103,6 +103,9 @@
 !endif
 
   ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+  BlobVerifierLib|ArmVirtPkg/Library/BlobVerifierLibArmCca/BlobVerifierLibArmCca.inf
 
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
@@ -118,6 +121,9 @@
 
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLibCca.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+
+[LibraryClasses.AARCH64.SEC, LibraryClasses.AARCH64.PEI_CORE, LibraryClasses.AARCH64.PEIM]
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
@@ -229,6 +235,9 @@
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
 
@@ -300,10 +309,22 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/Sec/Sec.inf
-  MdeModulePkg/Core/Pei/PeiMain.inf
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  }
+  MdeModulePkg/Core/Pei/PeiMain.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  }
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
-  ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
+  ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf {
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  }
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
 !if $(DEBUG_TO_MEM)
@@ -358,6 +379,7 @@
   #
   # Platform Driver
   #
+  ArmVirtPkg/QemuPlatformDxe/QemuPlatformDxe.inf
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0
@@ -367,7 +389,7 @@
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+      NULL|ArmVirtPkg/Library/BlobVerifierLibArmCca/BlobVerifierLibArmCca.inf
   }
 
   #
@@ -439,3 +461,13 @@
     <LibraryClasses>
       NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
+
+  #
+  # Realm Aperture Management
+  #
+  ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf

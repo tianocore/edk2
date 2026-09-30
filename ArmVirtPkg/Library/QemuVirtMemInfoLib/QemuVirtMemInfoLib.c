@@ -10,6 +10,7 @@
 #include <Uefi.h>
 #include <Pi/PiMultiPhase.h>
 #include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -191,6 +192,8 @@ ArmVirtGetMemoryMap (
   RETURN_STATUS                 RetStatus;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
   VOID                          *MemorySizeHob;
+  EFI_STATUS                    Status;
+  UINT64                        DevMapBit;
   UINTN                         Idx;
   VOID                          *DeviceTreeBase;
   UINT64                        MappingBase;
@@ -202,6 +205,11 @@ ArmVirtGetMemoryMap (
   ASSERT (VirtualMemoryMap != NULL);
 
   Idx = 0;
+
+  Status = ArmCcaGetMemoryProtectionAttribute (&DevMapBit);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
   MemorySizeHob = GetFirstGuidHob (&gArmVirtSystemMemorySizeGuid);
   ASSERT (MemorySizeHob != NULL);
@@ -267,7 +275,7 @@ ArmVirtGetMemoryMap (
   MappingSize = EFI_PAGES_TO_SIZE (
                   EFI_SIZE_TO_PAGES (UartBase - MappingBase + EFI_PAGE_SIZE)
                   );
-  VirtualMemoryTable[Idx].PhysicalBase = MappingBase;
+  VirtualMemoryTable[Idx].PhysicalBase = (MappingBase | DevMapBit);
   VirtualMemoryTable[Idx].VirtualBase  = MappingBase;
   VirtualMemoryTable[Idx].Length       = MappingSize;
   VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
@@ -279,7 +287,7 @@ ArmVirtGetMemoryMap (
   MappingSize = EFI_PAGES_TO_SIZE (
                   EFI_SIZE_TO_PAGES (FwCfgBase - MappingBase + FwCfgSize)
                   );
-  VirtualMemoryTable[Idx].PhysicalBase = MappingBase;
+  VirtualMemoryTable[Idx].PhysicalBase = (MappingBase | DevMapBit);
   VirtualMemoryTable[Idx].VirtualBase  = MappingBase;
   VirtualMemoryTable[Idx].Length       = MappingSize;
   VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
