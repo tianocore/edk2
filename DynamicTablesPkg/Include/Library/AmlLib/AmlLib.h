@@ -1166,8 +1166,10 @@ AmlCodeGenRdIo (
 
   @param[in]  TableSignature       4-character ACPI signature.
                                    Must be 'DSDT' or 'SSDT'.
-  @param[in]  OemId                6-character string OEM identifier.
-  @param[in]  OemTableId           8-character string OEM table identifier.
+  @param[in]  OemId                OEM identifier, up to 6 characters.
+                                   Shorter values are padded with spaces.
+  @param[in]  OemTableId           OEM table identifier, up to 8 characters.
+                                   Shorter values are padded with spaces.
   @param[in]  OemRevision          OEM revision number.
   @param[out] DefinitionBlockTerm  The ASL Term handle representing a
                                    Definition Block.
