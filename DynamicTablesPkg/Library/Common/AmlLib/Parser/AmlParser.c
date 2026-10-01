@@ -182,7 +182,7 @@ AmlParseUIntX (
     return Status;
   }
 
-  AMLDBG_DUMP_RAW (AmlStreamGetCurrPos (FStream), UIntXSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, AmlStreamGetCurrPos (FStream), UIntXSize, "");
 
   // Move stream forward by the size of UIntX.
   Status = AmlStreamProgress (FStream, UIntXSize);
@@ -269,7 +269,7 @@ AmlParseNameString (
     return Status;
   }
 
-  AMLDBG_DUMP_RAW (AmlStreamGetCurrPos (FStream), StrSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, AmlStreamGetCurrPos (FStream), StrSize, "");
 
   // Move the stream forward by StrSize.
   Status = AmlStreamProgress (FStream, StrSize);
@@ -340,7 +340,7 @@ AmlParseString (
     StrSize++;
   } while (Byte != '\0');
 
-  AMLDBG_DUMP_RAW (Buffer, StrSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, Buffer, StrSize, "");
 
   Status = AmlCreateDataNode (
              AmlTypeToNodeDataType (ExpectedFormat),
@@ -449,7 +449,7 @@ AmlParseObject (
   }
 
   // Print the opcode.
-  AMLDBG_DUMP_RAW (Buffer, OpCodeSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, Buffer, OpCodeSize, "");
 
   if (!IS_END_OF_STREAM (FStream)) {
     // 3. Parse the PkgLength field, if present.
@@ -462,7 +462,7 @@ AmlParseObject (
       }
 
       // Print the package length.
-      AMLDBG_DUMP_RAW (Buffer, PkgOffset);
+      DUMP_HEX (DEBUG_VERBOSE, 0, Buffer, PkgOffset, "");
 
       // Adjust the size of the stream if it is valid  package length.
       FreeSpace = AmlStreamGetFreeSpace (FStream);
@@ -568,7 +568,7 @@ AmlParseFieldPkgLen (
     return Status;
   }
 
-  AMLDBG_DUMP_RAW (Buffer, PkgOffset);
+  DUMP_HEX (DEBUG_VERBOSE, 0, Buffer, PkgOffset, "");
 
   Status = AmlStreamProgress (FStream, PkgOffset);
   if (EFI_ERROR (Status)) {
@@ -858,7 +858,7 @@ AmlParseByteList (
       return Status;
     }
 
-    AMLDBG_DUMP_RAW (Buffer, BufferSize);
+    DUMP_HEX (DEBUG_VERBOSE, 0, Buffer, BufferSize, "");
 
     // Move the stream forward as we have consumed the Buffer.
     Status = AmlStreamProgress (FStream, BufferSize);

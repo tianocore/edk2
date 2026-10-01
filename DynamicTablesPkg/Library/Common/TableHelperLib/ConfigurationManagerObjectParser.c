@@ -2417,11 +2417,7 @@ HexDump (
   IN UINT32       Length
   )
 {
-  UINT32  Index;
-
-  for (Index = 0; Index < Length; Index++) {
-    DEBUG ((DEBUG_INFO, "0x%02x ", *Ptr++));
-  }
+  DUMP_HEX (DEBUG_INFO, 0, Ptr, Length, "");
 }
 
 /** Print fields of the objects.
