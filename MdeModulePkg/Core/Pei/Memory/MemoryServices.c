@@ -813,9 +813,9 @@ PeiAllocatePages (
     }
   }
 
-  if (!PrivateData->PeiMemoryInstalled && !PrivateData->SwitchStackSignal && PrivateData->PreMemoryPagesFreed) {
+  if (!PrivateData->PeiMemoryInstalled && !PrivateData->SwitchStackSignal && PrivateData->TemporaryMemoryPagesFreed) {
     //
-    // Reuse temporary-memory pages before consuming the limited free-memory top.
+    // Reuse Temporary Memory pages before consuming the limited free-memory top.
     //
     Status = FindFreeMemoryFromMemoryAllocationHob (
                (CONST EFI_PEI_SERVICES **)PeiServices,
@@ -874,7 +874,7 @@ PeiAllocatePages (
         // The padding HOB is reusable, so set the hint to search free HOBs
         // first on later allocations.
         //
-        PrivateData->PreMemoryPagesFreed = TRUE;
+        PrivateData->TemporaryMemoryPagesFreed = TRUE;
       }
     }
 
@@ -1083,7 +1083,7 @@ PeiFreePages (
       // The freed range is reusable; set the hint so later Temporary Memory
       // allocations search free HOBs before consuming the free-memory top.
       //
-      PrivateData->PreMemoryPagesFreed = TRUE;
+      PrivateData->TemporaryMemoryPagesFreed = TRUE;
     }
 
     return EFI_SUCCESS;

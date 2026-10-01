@@ -355,11 +355,11 @@ struct _PEI_CORE_INSTANCE {
   EFI_MEMORY_TYPE_STATISTICS        *MemoryTypeStatistics;
 
   //
-  // FALSE from the start of pre-memory PEI. TRUE once reusable pages have
-  // been represented by a free memory HOB after PeiFreePages() or padding-
+  // FALSE initially while PEI uses Temporary Memory. TRUE once reusable pages
+  // have been represented by a free memory HOB after PeiFreePages() or padding-
   // region creation; remains TRUE after the HOB is consumed.
   //
-  BOOLEAN                           PreMemoryPagesFreed;
+  BOOLEAN                           TemporaryMemoryPagesFreed;
 };
 
 ///
