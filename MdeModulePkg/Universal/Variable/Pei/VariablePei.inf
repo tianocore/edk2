@@ -26,6 +26,10 @@
 [Sources]
   Variable.c
   Variable.h
+  VariableCommon.c
+  VariableCommon.h
+  VariableCacheHobs.c
+  VariableCacheHobs.h
 
 [Packages]
   MdePkg/MdePkg.dec

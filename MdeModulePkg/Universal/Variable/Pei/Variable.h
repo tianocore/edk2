@@ -1,6 +1,5 @@
 /** @file
-  The internal header file includes the common header files, defines
-  internal structure and functions used by PeiVariable module.
+  PEI read-only variable service declarations.
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -35,18 +34,6 @@ typedef enum {
   VariableStoreTypeNv,
   VariableStoreTypeMax
 } VARIABLE_STORE_TYPE;
-
-typedef struct {
-  VARIABLE_STORE_HEADER                   *VariableStoreHeader;
-  VARIABLE_INDEX_TABLE                    *IndexTable;
-  //
-  // If it is not NULL, it means there may be an inconsecutive variable whose
-  // partial content is still in NV storage, but another partial content is backed up
-  // in spare block.
-  //
-  FAULT_TOLERANT_WRITE_LAST_WRITE_DATA    *FtwLastWriteData;
-  BOOLEAN                                 AuthFlag;
-} VARIABLE_STORE_INFO;
 
 //
 // Functions
