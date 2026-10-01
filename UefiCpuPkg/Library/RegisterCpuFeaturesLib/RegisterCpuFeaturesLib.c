@@ -21,15 +21,7 @@ DumpCpuFeatureMask (
   IN UINT32  BitMaskSize
   )
 {
-  UINTN  Index;
-  UINT8  *Data8;
-
-  Data8 = (UINT8 *)FeatureMask;
-  for (Index = 0; Index < BitMaskSize; Index++) {
-    DEBUG ((DEBUG_INFO, " %02x ", *Data8++));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, FeatureMask, BitMaskSize, "");
 }
 
 /**
