@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Guid/TcgEventHob.h>
 #include <Guid/MeasuredFvHob.h>
+#include <Guid/FirmwareVolumeMeasurementExcludedHob.h>
 #include <Guid/TpmInstance.h>
 #include <Guid/MigratedFvInfo.h>
 
@@ -41,6 +42,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/ResetSystemLib.h>
 #include <Library/PrintLib.h>
+
+//
+// HobLength is UINT16 and HOBs are 8-byte aligned, making 0xFFF8 the largest
+// valid HOB length. Subtract the GUID HOB header to get the maximum data size
+// accepted by BuildGuidHob().
+//
+#define MAX_EXCLUDED_FV_HOB_DATA_SIZE  (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE))
 
 typedef struct {
   EFI_GUID                     *EventGuid;
@@ -213,9 +221,18 @@ EndofPeiSignalNotifyCallBack (
   IN VOID                       *Ppi
   )
 {
-  MEASURED_HOB_DATA  *MeasuredHobData;
+  MEASURED_HOB_DATA                                      *MeasuredHobData;
+  EDKII_FIRMWARE_VOLUME_MEASUREMENT_EXCLUDED_HOB_DATA    *ExcludedHobData;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI  *MeasurementExcludedFvPpi;
+  UINT32                                                 Instance;
+  UINT32                                                 Count;
+  UINT32                                                 HobIndex;
+  UINTN                                                  ExcludedHobDataSize;
+  EFI_STATUS                                             Status;
 
-  MeasuredHobData = NULL;
+  MeasuredHobData          = NULL;
+  ExcludedHobData          = NULL;
+  MeasurementExcludedFvPpi = NULL;
 
   PERF_CALLBACK_BEGIN (&gEfiEndOfPeiSignalPpiGuid);
 
@@ -243,6 +260,94 @@ EndofPeiSignalNotifyCallBack (
     //
     CopyMem (&MeasuredHobData->MeasuredFvBuf[mMeasuredBaseFvIndex], mMeasuredChildFvInfo, sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredChildFvIndex));
   }
+
+  //
+  // Create a GUID HOB to save all excluded FVs for DXE
+  //
+
+  //
+  // Get count
+  //
+  Count               = 0;
+  ExcludedHobDataSize = sizeof (EDKII_FIRMWARE_VOLUME_MEASUREMENT_EXCLUDED_HOB_DATA);
+  for (Instance = 0; ; Instance++) {
+    Status = PeiServicesLocatePpi (
+               &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid,
+               Instance,
+               NULL,
+               (VOID **)&MeasurementExcludedFvPpi
+               );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    //
+    // Ensure the entries fit in the data portion of a single GUID HOB.
+    //
+    if (MeasurementExcludedFvPpi->Count >
+        ((MAX_EXCLUDED_FV_HOB_DATA_SIZE - ExcludedHobDataSize) /
+         sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_FV)))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ExcludedFvPpi entries exceed the maximum GUID HOB data size of 0x%x bytes\n",
+        MAX_EXCLUDED_FV_HOB_DATA_SIZE
+        ));
+      Count = 0;
+      break;
+    }
+
+    Count               += MeasurementExcludedFvPpi->Count;
+    ExcludedHobDataSize += sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_FV) * MeasurementExcludedFvPpi->Count;
+  }
+
+  // Check if there are any excluded FVs
+  if (Count > 0) {
+    DEBUG ((DEBUG_INFO, "Found %u FVs excluded.  Publishing hob.\n", Count));
+    ExcludedHobData = BuildGuidHob (
+                        &gEdkiiFirmwareVolumeMeasurementExcludedHobGuid,
+                        ExcludedHobDataSize
+                        );
+
+    // Check the allocation before writing data
+    if (ExcludedHobData == NULL) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "Failed to allocate 0x%x bytes of memory for FirmwareVolumeMeasurementExcludedHob.  Excluded FVs will not be shared with Dxe Phase.\n",
+        ExcludedHobDataSize
+        ));
+    } else {
+      ExcludedHobData->NumberOfEntries = 0;
+      //
+      // Copy FV info to hob data
+      //
+      HobIndex = 0;
+      for (Instance = 0; ; Instance++) {
+        Status = PeiServicesLocatePpi (
+                   &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid,
+                   Instance,
+                   NULL,
+                   (VOID **)&MeasurementExcludedFvPpi
+                   );
+        if (EFI_ERROR (Status)) {
+          break;
+        }
+
+        if (MeasurementExcludedFvPpi->Count == 0) {
+          DEBUG ((DEBUG_ERROR, "ExcludedFvPpi has invalid count %u\n", MeasurementExcludedFvPpi->Count));
+          ASSERT (MeasurementExcludedFvPpi->Count > 0);
+        } else if (MeasurementExcludedFvPpi->Count > Count - HobIndex) {
+          DEBUG ((DEBUG_ERROR, "ExcludedFvPpi count 0x%x exceeds remaining HOB capacity 0x%x\n", MeasurementExcludedFvPpi->Count, Count - HobIndex));
+          ASSERT (MeasurementExcludedFvPpi->Count <= Count - HobIndex);
+        } else {
+          CopyMem (&ExcludedHobData->ExcludedFvs[HobIndex], &MeasurementExcludedFvPpi->Fv[0], sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_FV) * MeasurementExcludedFvPpi->Count);
+          HobIndex += MeasurementExcludedFvPpi->Count;
+        }
+      }
+
+      ExcludedHobData->NumberOfEntries = HobIndex;
+    }
+  }  // Done with Excluded Fv Hob
 
   PERF_CALLBACK_END (&gEfiEndOfPeiSignalPpiGuid);
 
