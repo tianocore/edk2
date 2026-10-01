@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <Protocol/DevicePath.h> // [CODE_FIRST] 13226
+ // [CODE_FIRST] 13226
 ///
 /// Global ID for the SPI Configuration Protocol
 ///
