@@ -165,27 +165,6 @@ MeasurePeImageAndExtend (
 
 /**
 
-  This function dumps raw data.
-
-  @param  Data  raw data
-  @param  Size  raw data size
-
-**/
-VOID
-InternalDumpData (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < Size; Index++) {
-    DEBUG ((DEBUG_SECURITY, "%02x", (UINTN)Data[Index]));
-  }
-}
-
-/**
-
   This function initialize TCG_PCR_EVENT2_HDR for EV_NO_ACTION Event Type other than EFI Specification ID event
   The behavior is defined by TCG PC Client PFP Spec. Section 9.3.4 EV_NO_ACTION Event Types
 
@@ -258,41 +237,6 @@ InitNoActionEvent (
   // Set Event Size
   //
   WriteUnaligned32 ((UINT32 *)DigestBuffer, EventSize);
-}
-
-/**
-
-  This function dumps raw data in columns.
-
-  @param  Data  raw data
-  @param  Size  raw data size
-
-**/
-VOID
-InternalDumpHex (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-  UINTN  Count;
-  UINTN  Left;
-
-  #define COLUME_SIZE  (16 * 2)
-
-  Count = Size / COLUME_SIZE;
-  Left  = Size % COLUME_SIZE;
-  for (Index = 0; Index < Count; Index++) {
-    DEBUG ((DEBUG_SECURITY, "%04x: ", Index * COLUME_SIZE));
-    InternalDumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
-    DEBUG ((DEBUG_SECURITY, "\n"));
-  }
-
-  if (Left != 0) {
-    DEBUG ((DEBUG_SECURITY, "%04x: ", Index * COLUME_SIZE));
-    InternalDumpData (Data + Index * COLUME_SIZE, Left);
-    DEBUG ((DEBUG_SECURITY, "\n"));
-  }
 }
 
 /**
@@ -449,19 +393,12 @@ DumpEvent (
   IN TCG_PCR_EVENT_HDR  *EventHdr
   )
 {
-  UINTN  Index;
-
   DEBUG ((DEBUG_SECURITY, "  Event:\n"));
   DEBUG ((DEBUG_SECURITY, "    PCRIndex  - %d\n", EventHdr->PCRIndex));
   DEBUG ((DEBUG_SECURITY, "    EventType - 0x%08x\n", EventHdr->EventType));
-  DEBUG ((DEBUG_SECURITY, "    Digest    - "));
-  for (Index = 0; Index < sizeof (TCG_DIGEST); Index++) {
-    DEBUG ((DEBUG_SECURITY, "%02x ", EventHdr->Digest.digest[Index]));
-  }
-
-  DEBUG ((DEBUG_SECURITY, "\n"));
+  DUMP_HEX (DEBUG_SECURITY, 0, EventHdr->Digest.digest, sizeof (TCG_DIGEST), "    Digest    - ");
   DEBUG ((DEBUG_SECURITY, "    EventSize - 0x%08x\n", EventHdr->EventSize));
-  InternalDumpHex ((UINT8 *)(EventHdr + 1), EventHdr->EventSize);
+  DUMP_HEX (DEBUG_SECURITY, 0, (UINT8 *)(EventHdr + 1), EventHdr->EventSize, "");
 }
 
 /**
@@ -504,12 +441,7 @@ DumpTcgEfiSpecIdEventStruct (
   VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
   DEBUG ((DEBUG_SECURITY, "    VendorInfoSize     - 0x%02x\n", *VendorInfoSize));
   VendorInfo = VendorInfoSize + 1;
-  DEBUG ((DEBUG_SECURITY, "    VendorInfo         - "));
-  for (Index = 0; Index < *VendorInfoSize; Index++) {
-    DEBUG ((DEBUG_SECURITY, "%02x ", VendorInfo[Index]));
-  }
-
-  DEBUG ((DEBUG_SECURITY, "\n"));
+  DUMP_HEX (DEBUG_SECURITY, 0, VendorInfo, *VendorInfoSize, "    VendorInfo         - ");
 }
 
 /**
@@ -543,7 +475,6 @@ DumpEvent2 (
   IN TCG_PCR_EVENT2  *TcgPcrEvent2
   )
 {
-  UINTN          Index;
   UINT32         DigestIndex;
   UINT32         DigestCount;
   TPMI_ALG_HASH  HashAlgo;
@@ -563,13 +494,8 @@ DumpEvent2 (
   DigestBuffer = (UINT8 *)&TcgPcrEvent2->Digest.digests[0].digest;
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
     DEBUG ((DEBUG_SECURITY, "      HashAlgo : 0x%04x\n", HashAlgo));
-    DEBUG ((DEBUG_SECURITY, "      Digest(%d): ", DigestIndex));
     DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
-    for (Index = 0; Index < DigestSize; Index++) {
-      DEBUG ((DEBUG_SECURITY, "%02x ", DigestBuffer[Index]));
-    }
-
-    DEBUG ((DEBUG_SECURITY, "\n"));
+    DUMP_HEX (DEBUG_SECURITY, 0, DigestBuffer, DigestSize, "      Digest(%d): ", DigestIndex);
     //
     // Prepare next
     //
@@ -583,7 +509,7 @@ DumpEvent2 (
   CopyMem (&EventSize, DigestBuffer, sizeof (TcgPcrEvent2->EventSize));
   DEBUG ((DEBUG_SECURITY, "    EventSize - 0x%08x\n", EventSize));
   EventBuffer = DigestBuffer + sizeof (TcgPcrEvent2->EventSize);
-  InternalDumpHex (EventBuffer, EventSize);
+  DUMP_HEX (DEBUG_SECURITY, 0, EventBuffer, EventSize, "");
 }
 
 /**
