@@ -43,7 +43,55 @@ None
 
 #### edk2-stable202611: Changes with Removal
 
-None
+##### Breaking Change: Move ArmTransferListLib from ArmPkg to MdePkg
+
+- **Status**: Removed
+- **Tracking Issue**: [tianocore/edk2#13199](https://github.com/tianocore/edk2/issues/13199)
+- **Pull Request**: [tianocore/edk2#12346](https://github.com/tianocore/edk2/pull/12346)
+- **Deprecation Issue**: N/A
+- **Removal Issue**: N/A
+- **Type**: Source-Level (Removal) - Library and header path relocation
+
+**What changed**: `ArmTransferListLib` and its associated public Transfer
+List interfaces moved from `ArmPkg` to `MdePkg`.
+
+**Why it changed**: Transfer Lists provide a generic firmware handoff
+mechanism and are not specific to `ArmPkg`. Moving these interfaces to
+`MdePkg` makes them available from a common package location.
+
+**What was removed**: The `ArmPkg` implementation of
+`ArmTransferListLib`, its library class declaration, and the associated
+public Transfer List headers were removed from `ArmPkg`.
+
+**What replaces it**: The library implementation, library class declaration,
+and public headers are now provided by `MdePkg`.
+
+**How to migrate**: Replace this library mapping:
+
+```text
+ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+```
+
+with:
+
+```text
+ArmTransferListLib|MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+```
+
+Modules that consume the public Transfer List interfaces must add
+`MdePkg/MdePkg.dec` to their package dependencies. The existing
+`<Library/ArmTransferListLib.h>` and
+`<IndustryStandard/ArmTransferList.h>` include forms remain unchanged.
+
+**Breaking conditions**: Out-of-tree platforms or modules that directly
+reference the removed `ArmPkg` library, package declaration, or header paths
+will fail to build until they use the corresponding `MdePkg` interfaces.
+
+**Earliest removal**: The old `ArmPkg` paths are removed by this change in
+the `edk2-stable202611` development cycle.
+
+**Companion PR**:
+[tianocore/edk2-platforms#1010](https://github.com/tianocore/edk2-platforms/pull/1010)
 
 #### edk2-stable202611: Changes without Removal
 
