@@ -75,9 +75,11 @@
   DynamicTablesPkg/Library/Smbios/SmbiosType32Lib/SmbiosType32Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType38Lib/SmbiosType38Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType39Lib/SmbiosType39Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType40Lib/SmbiosType40Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType41Lib/SmbiosType41Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
 
   # AML Fixup (Common)
@@ -210,9 +212,11 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType32Lib/SmbiosType32Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType37Lib/SmbiosType37Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType38Lib/SmbiosType38Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType39Lib/SmbiosType39Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType40Lib/SmbiosType40Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType41Lib/SmbiosType41Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
   }
 

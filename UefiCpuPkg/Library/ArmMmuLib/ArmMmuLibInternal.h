@@ -23,6 +23,27 @@ VOID(
   IN  BOOLEAN DisableMmu
   );
 
+/**
+  Update the translation table mappings for a memory region.
+
+  @param[in]  RegionStart             Base address of the memory region.
+  @param[in]  RegionLength            Size of the memory region in bytes.
+  @param[in]  AttributeSetMask        Descriptor attributes to set.
+  @param[in]  AttributeClearMask      Mask of existing descriptor bits to
+                                      preserve.
+  @param[in]  RootTable               Root translation table to update.
+  @param[in]  TableIsLive             TRUE if updates are applied to active
+                                      translation tables using break-before-make
+                                      handling where required.
+  @param[in]  Lpa2Enabled             TRUE if FEAT_LPA2 descriptor format is in
+                                      use.
+  @param[in]  CcaProtectionAttribute  CCA protection attribute bits to preserve.
+
+  @retval EFI_SUCCESS            The region mapping was updated.
+  @retval EFI_INVALID_PARAMETER  RegionStart or RegionLength is not page
+                                 aligned.
+  @retval EFI_OUT_OF_RESOURCES   A page table allocation failed.
+**/
 EFI_STATUS
 UpdateRegionMapping (
   IN  UINT64   RegionStart,
