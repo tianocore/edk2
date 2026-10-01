@@ -22,7 +22,7 @@
 
 **/
 EFI_STATUS
-ShellConnectDevicePath (
+ConnectDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePathToConnect
   )
 {
@@ -334,7 +334,7 @@ ShellConnectFromDevPaths (
       //
       // connect the entire device path
       //
-      Status = ShellConnectDevicePath (Instance);
+      Status = ConnectDevicePath (Instance);
       if (!EFI_ERROR (Status)) {
         AtLeastOneConnected = TRUE;
       }
