@@ -353,6 +353,13 @@ struct _PEI_CORE_INSTANCE {
   // This is used for the memory bin feature, if enabled, to track bin locations.
   //
   EFI_MEMORY_TYPE_STATISTICS        *MemoryTypeStatistics;
+
+  //
+  // FALSE from the start of pre-memory PEI. TRUE once reusable pages have
+  // been represented by a free memory HOB after PeiFreePages() or padding-
+  // region creation; remains TRUE after the HOB is consumed.
+  //
+  BOOLEAN                           PreMemoryPagesFreed;
 };
 
 ///

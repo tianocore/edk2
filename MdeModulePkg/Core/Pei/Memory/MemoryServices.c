@@ -654,7 +654,9 @@ FindFreeMemoryFromMemoryAllocationHob (
   EFI_PEI_HOB_POINTERS       Hob;
   EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob;
   UINT64                     Bytes;
+  UINT64                     BestFitMemoryLength;
   EFI_PHYSICAL_ADDRESS       BaseAddress;
+  EFI_PHYSICAL_ADDRESS       CandidateAddress;
 
   Bytes = LShiftU64 (Pages, EFI_PAGE_SHIFT);
 
@@ -666,21 +668,23 @@ FindFreeMemoryFromMemoryAllocationHob (
         (Hob.MemoryAllocation->AllocDescriptor.MemoryLength >= Bytes))
     {
       //
-      // Found one memory allocation HOB with big enough free memory.
+      // Check whether this is the smallest suitable free range.
       //
-      MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
-      BaseAddress         = MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress +
-                            MemoryAllocationHob->AllocDescriptor.MemoryLength - Bytes;
+      CandidateAddress = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress +
+                         Hob.MemoryAllocation->AllocDescriptor.MemoryLength - Bytes;
       //
       // Make sure the granularity could be satisfied.
       //
-      BaseAddress &= ~((EFI_PHYSICAL_ADDRESS)Granularity - 1);
-      if (BaseAddress >= MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress) {
-        break;
+      CandidateAddress &= ~((EFI_PHYSICAL_ADDRESS)Granularity - 1);
+      if (CandidateAddress >= Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress) {
+        if ((MemoryAllocationHob == NULL) ||
+            (Hob.MemoryAllocation->AllocDescriptor.MemoryLength < BestFitMemoryLength))
+        {
+          MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
+          BaseAddress         = CandidateAddress;
+          BestFitMemoryLength = MemoryAllocationHob->AllocDescriptor.MemoryLength;
+        }
       }
-
-      BaseAddress         = 0;
-      MemoryAllocationHob = NULL;
     }
 
     //
@@ -809,6 +813,22 @@ PeiAllocatePages (
     }
   }
 
+  if (!PrivateData->PeiMemoryInstalled && !PrivateData->SwitchStackSignal && PrivateData->PreMemoryPagesFreed) {
+    //
+    // Reuse temporary-memory pages before consuming the limited free-memory top.
+    //
+    Status = FindFreeMemoryFromMemoryAllocationHob (
+               (CONST EFI_PEI_SERVICES **)PeiServices,
+               MemoryType,
+               ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (Granularity)),
+               Granularity,
+               Memory
+               );
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
   //
   // We will attempt up to two times here.
   // If we don't have memory bins, we will only attempt to allocate from the PHIT.
@@ -849,6 +869,13 @@ PeiAllocatePages (
         Padding & ~(UINTN)EFI_PAGE_MASK,
         EfiConventionalMemory
         );
+      if (!PrivateData->PeiMemoryInstalled) {
+        //
+        // The padding HOB is reusable, so set the hint to search free HOBs
+        // first on later allocations.
+        //
+        PrivateData->PreMemoryPagesFreed = TRUE;
+      }
     }
 
     //
@@ -1051,6 +1078,14 @@ PeiFreePages (
   if (MemoryAllocationHob != NULL) {
     UpdateOrSplitMemoryAllocationHob (PeiServices, MemoryAllocationHob, Memory, Bytes, EfiConventionalMemory);
     FreeMemoryAllocationHob (PrivateData, MemoryAllocationHob);
+    if (!PrivateData->PeiMemoryInstalled) {
+      //
+      // The freed range is reusable; set the hint so later Temporary Memory
+      // allocations search free HOBs before consuming the free-memory top.
+      //
+      PrivateData->PreMemoryPagesFreed = TRUE;
+    }
+
     return EFI_SUCCESS;
   } else {
     return EFI_NOT_FOUND;
