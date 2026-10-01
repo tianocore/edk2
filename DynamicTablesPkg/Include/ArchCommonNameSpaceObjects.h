@@ -111,8 +111,10 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryLatBwInfo,                   ///< 43 - Memory Latency Bandwidth Info
   EArchCommonObjMemoryCacheInfo,                   ///< 44 - Memory Cache Info
   EArchCommonObjSpcrInfo,                          ///< 45 - Serial Terminal and Interrupt Info
-  EArchCommonObjTpm2DeviceInfo,                    ///< 46 - TPM2 Device Info
-  EArchCommonObjMcfgPciConfigSpaceInfo,            ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjTpmDeviceInfo,                     ///< 46 - TPM Device Info
+  /// Deprecated alias for EArchCommonObjTpmDeviceInfo.
+  EArchCommonObjTpm2DeviceInfo         = EArchCommonObjTpmDeviceInfo,
+  EArchCommonObjMcfgPciConfigSpaceInfo = 47,       ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                   ///< 48 - PCI root port configuration Info
   EArchCommonObjErrSourcePciRootPortInfo,          ///< 49 - PCI Express AER Info for RootPort
   EArchCommonObjErrSourcePciDeviceInfo,            ///< 50 - PCI Express AER Info for Device (Endpoint)
@@ -156,6 +158,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjOnboardDeviceInfo,                 ///< 88 - Onboard Device Extended Information
   EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
   EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
+  EArchCommonObjIpmiDeviceInfo,                    ///< 91 - IPMI Device Information
+  EArchCommonObjSystemPowerSupplyInfo,             ///< 92 - System Power Supply Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -867,17 +871,52 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
   UINT64    Lasa;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
-/** A structure that describes TPM2 device.
+/** A structure that describes a TPM device.
 
-  ID: EArchCommonObjTpm2DeviceInfo
+  The TPM2 device base address and size are used by the ACPI TPM2 generator.
+  The remaining fields describe the SMBIOS Type 43 TPM device.
+
+  Cf. SMBIOS Specification v3.9.0, Type 43.
+
+  ID: EArchCommonObjTpmDeviceInfo
 */
-typedef struct CmArchCommonTpm2DeviceInfo {
-  /** TPM2 Device's Base Address */
-  UINT64    Tpm2DeviceBaseAddress;
+typedef struct CmArchCommonTpmDeviceInfo {
+  /** TPM2 device base address. */
+  UINT64             Tpm2DeviceBaseAddress;
 
-  /** TPM2 Device' Size */
-  UINT64    Tpm2DeviceSize;
-} CM_ARCH_COMMON_TPM2_DEVICE_INFO;
+  /** TPM2 device size. */
+  UINT64             Tpm2DeviceSize;
+
+  /// CM Object Token uniquely identifying this TPM device.
+  CM_OBJECT_TOKEN    TpmDeviceInfoToken;
+
+  /// Four-character TCG Vendor ID.
+  UINT8              VendorId[4];
+
+  /// Major TPM specification version.
+  UINT8              MajorSpecVersion;
+
+  /// Minor TPM specification version.
+  UINT8              MinorSpecVersion;
+
+  /// First firmware version value.
+  UINT32             FirmwareVersion1;
+
+  /// Second firmware version value.
+  UINT32             FirmwareVersion2;
+
+  /// Descriptive information for the TPM device.
+  CHAR8              Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// TPM device characteristics.
+  UINT64             Characteristics;
+
+  /// OEM-defined value.
+  UINT32             OemDefined;
+} CM_ARCH_COMMON_TPM_DEVICE_INFO;
+
+/** Deprecated alias for CM_ARCH_COMMON_TPM_DEVICE_INFO. */
+typedef CM_ARCH_COMMON_TPM_DEVICE_INFO CM_ARCH_COMMON_TPM2_DEVICE_INFO;
 
 /** A structure that describes the
     SPMI (Service Processor Management Interface) Info.
@@ -2288,5 +2327,87 @@ typedef struct CmArchCommonOnboardDeviceInfo {
   /// PCI device number in bits 7:3 and function number in bits 2:0.
   UINT8              DevFuncNum;
 } CM_ARCH_COMMON_ONBOARD_DEVICE_INFO;
+
+/** A structure that describes an IPMI device.
+
+  SMBIOS Specification v3.9.0 Type 38
+
+  ID: EArchCommonObjIpmiDeviceInfo
+**/
+typedef struct CmArchCommonIpmiDeviceInfo {
+  /// CM Object Token uniquely identifying this IPMI device.
+  CM_OBJECT_TOKEN    IpmiDeviceInfoToken;
+
+  /// BMC interface type.
+  UINT8              InterfaceType;
+
+  /// IPMI specification revision in BCD format.
+  UINT8              IpmiSpecificationRevision;
+
+  /// I2C target address of the BMC.
+  UINT8              I2cTargetAddress;
+
+  /// NV storage device bus ID, or 0xFF if no device exists.
+  UINT8              NvStorageDeviceAddress;
+
+  /// Memory-mapped or I/O base address of the BMC.
+  UINT64             BaseAddress;
+
+  /// Base-address modifier and interrupt information.
+  UINT8              BaseAddressModifierInterruptInfo;
+
+  /// Interrupt number, or zero if unspecified.
+  UINT8              InterruptNumber;
+} CM_ARCH_COMMON_IPMI_DEVICE_INFO;
+
+/** A structure that describes a system power supply.
+
+  SMBIOS Specification v3.9.0 Type 39
+
+  ID: EArchCommonObjSystemPowerSupplyInfo
+**/
+typedef struct CmArchCommonSystemPowerSupplyInfo {
+  /// CM Object Token uniquely identifying this power supply.
+  CM_OBJECT_TOKEN    PowerSupplyInfoToken;
+
+  /// Token identifying the input voltage probe, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    InputVoltageProbeToken;
+
+  /// Token identifying the associated cooling device, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    CoolingDeviceToken;
+
+  /// Token identifying the input current probe, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    InputCurrentProbeToken;
+
+  /// Redundant power-unit group, or zero if not redundant.
+  UINT8              PowerUnitGroup;
+
+  /// Physical location of the power supply.
+  CHAR8              Location[SMBIOS_MAX_STRING_SIZE];
+
+  /// Device name.
+  CHAR8              DeviceName[SMBIOS_MAX_STRING_SIZE];
+
+  /// Manufacturer name.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+
+  /// Serial number.
+  CHAR8              SerialNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Asset tag number.
+  CHAR8              AssetTagNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Model or part number.
+  CHAR8              ModelPartNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Revision level.
+  CHAR8              RevisionLevel[SMBIOS_MAX_STRING_SIZE];
+
+  /// Maximum sustained power output in watts, or 0x8000 if unknown.
+  UINT16             MaxPowerCapacity;
+
+  /// Power supply characteristics as defined by SMBIOS Type 39.
+  UINT16             PowerSupplyCharacteristics;
+} CM_ARCH_COMMON_SYSTEM_POWER_SUPPLY_INFO;
 
 #pragma pack()

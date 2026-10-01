@@ -291,6 +291,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
+R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
@@ -341,8 +342,11 @@ F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
 R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 
 MdeModulePkg: Disk modules
+F: MdeModulePkg/Include/Library/GptLib.h
+F: MdeModulePkg/Library/GptLib/
 F: MdeModulePkg/Universal/Disk/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Richard Lyu <richard.lyu@suse.com> [r1chard-lyu]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
@@ -661,6 +665,10 @@ ShellPkg
 F: ShellPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
 M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+R: Andrew Fish <afish@apple.com> [ajfish]
+R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
+R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+R: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/
