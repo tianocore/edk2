@@ -55,7 +55,7 @@
   IoLibNoIo.c
 
 [Sources.LOONGARCH64]
-  IoLibNoIo.c
+  IoLibPortMmio.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -64,4 +64,11 @@
   DebugLib
   BaseLib
   RegisterFilterLib
+
+[LibraryClasses.LOONGARCH64]
+  PcdLib
+
+
+[Pcd.LOONGARCH64]
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
 
