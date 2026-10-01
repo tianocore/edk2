@@ -8,58 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "VarCheckHii.h"
 #include "VarCheckHiiLibCommon.h"
-EFI_HANDLE                                 mEfiVariableCheckHiiHandle = NULL;
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  mVarCheckHiiHex[]          = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-/**
-  Dump some hexadecimal data.
-  @param[in] Indent     How many spaces to indent the output.
-  @param[in] Offset     The offset of the dump.
-  @param[in] DataSize   The size in bytes of UserData.
-  @param[in] UserData   The data to dump.
-**/
-VOID
-VarCheckHiiInternalDumpHex (
-  IN UINTN  Indent,
-  IN UINTN  Offset,
-  IN UINTN  DataSize,
-  IN VOID   *UserData
-  )
-{
-  UINT8  *Data;
-
-  CHAR8  Val[50];
-
-  CHAR8  Str[20];
-
-  UINT8  TempByte;
-  UINTN  Size;
-  UINTN  Index;
-
-  Data = UserData;
-  while (DataSize != 0) {
-    Size = 16;
-    if (Size > DataSize) {
-      Size = DataSize;
-    }
-
-    for (Index = 0; Index < Size; Index += 1) {
-      TempByte           = Data[Index];
-      Val[Index * 3 + 0] = mVarCheckHiiHex[TempByte >> 4];
-      Val[Index * 3 + 1] = mVarCheckHiiHex[TempByte & 0xF];
-      Val[Index * 3 + 2] = (CHAR8)((Index == 7) ? '-' : ' ');
-      Str[Index]         = (CHAR8)((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
-    }
-
-    Val[Index * 3] = 0;
-    Str[Index]     = 0;
-    DEBUG ((DEBUG_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
-
-    Data     += Size;
-    Offset   += Size;
-    DataSize -= Size;
-  }
-}
+EFI_HANDLE  mEfiVariableCheckHiiHandle = NULL;
 
 /**
   Var Check Hii Question.
@@ -148,7 +97,7 @@ VarCheckHiiQuestion (
         //
         DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: OneOf mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (
-          VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+          DUMP_HEX (DEBUG_INFO, 0, HiiQuestion, HiiQuestion->Length, "  ");
           );
         return FALSE;
       }
@@ -159,7 +108,7 @@ VarCheckHiiQuestion (
       if ((OneData != 0) && (OneData != 1)) {
         DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: CheckBox mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (
-          VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+          DUMP_HEX (DEBUG_INFO, 0, HiiQuestion, HiiQuestion->Length, "  ");
           );
         return FALSE;
       }
@@ -191,7 +140,7 @@ VarCheckHiiQuestion (
       if ((OneData < Minimum) || (OneData > Maximum)) {
         DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: Numeric mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (
-          VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+          DUMP_HEX (DEBUG_INFO, 0, HiiQuestion, HiiQuestion->Length, "  ");
           );
         return FALSE;
       }
@@ -235,10 +184,10 @@ VarCheckHiiQuestion (
           //
           DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: OrderedList mismatch\n"));
           DEBUG_CODE (
-            VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->StorageWidth * MaxContainers, (UINT8 *)Data + HiiQuestion->VarOffset);
+            DUMP_HEX (DEBUG_INFO, 0, (UINT8 *)Data + HiiQuestion->VarOffset, HiiQuestion->StorageWidth * MaxContainers, "  ");
             );
           DEBUG_CODE (
-            VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+            DUMP_HEX (DEBUG_INFO, 0, HiiQuestion, HiiQuestion->Length, "  ");
             );
           return FALSE;
         }

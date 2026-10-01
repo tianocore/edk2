@@ -17,60 +17,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 // #define DUMP_VAR_CHECK_PCD
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  mVarCheckPcdHex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-/**
-  Dump some hexadecimal data.
-
-  @param[in] Indent     How many spaces to indent the output.
-  @param[in] Offset     The offset of the dump.
-  @param[in] DataSize   The size in bytes of UserData.
-  @param[in] UserData   The data to dump.
-
-**/
-VOID
-VarCheckPcdInternalDumpHex (
-  IN UINTN  Indent,
-  IN UINTN  Offset,
-  IN UINTN  DataSize,
-  IN VOID   *UserData
-  )
-{
-  UINT8  *Data;
-
-  CHAR8  Val[50];
-
-  CHAR8  Str[20];
-
-  UINT8  TempByte;
-  UINTN  Size;
-  UINTN  Index;
-
-  Data = UserData;
-  while (DataSize != 0) {
-    Size = 16;
-    if (Size > DataSize) {
-      Size = DataSize;
-    }
-
-    for (Index = 0; Index < Size; Index += 1) {
-      TempByte           = Data[Index];
-      Val[Index * 3 + 0] = mVarCheckPcdHex[TempByte >> 4];
-      Val[Index * 3 + 1] = mVarCheckPcdHex[TempByte & 0xF];
-      Val[Index * 3 + 2] = (CHAR8)((Index == 7) ? '-' : ' ');
-      Str[Index]         = (CHAR8)((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
-    }
-
-    Val[Index * 3] = 0;
-    Str[Index]     = 0;
-    DEBUG ((DEBUG_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
-
-    Data     += Size;
-    Offset   += Size;
-    DataSize -= Size;
-  }
-}
-
 /**
   Var Check Pcd ValidData.
 
@@ -120,7 +66,7 @@ VarCheckPcdValidData (
         //
         DEBUG ((DEBUG_INFO, "VarCheckPcdValidData fail: ValidList mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (
-          VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *)PcdValidData);
+          DUMP_HEX (DEBUG_INFO, 0, PcdValidData, PcdValidData->Length, "  ");
           );
         return FALSE;
       }
@@ -144,7 +90,7 @@ VarCheckPcdValidData (
 
       DEBUG ((DEBUG_INFO, "VarCheckPcdValidData fail: ValidRange mismatch (0x%lx)\n", OneData));
       DEBUG_CODE (
-        VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *)PcdValidData);
+        DUMP_HEX (DEBUG_INFO, 0, PcdValidData, PcdValidData->Length, "  ");
         );
       return FALSE;
       break;
