@@ -1037,7 +1037,6 @@ IdentifyUsbNicBmcChannel (
   IN EFI_DEVICE_PATH_PROTOCOL  *UsbDevicePath
   )
 {
-  UINTN                            Index;
   EFI_STATUS                       Status;
   EFI_SIMPLE_NETWORK_PROTOCOL      *Snp;
   EFI_USB_IO_PROTOCOL              *UsbIo;
@@ -1081,12 +1080,7 @@ IdentifyUsbNicBmcChannel (
     (VOID *)&Snp->Mode->CurrentAddress,
     BmcUsbNic->MacAddressSize
     );
-  DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    MAC address (in size %d) for this SNP instance:\n", BmcUsbNic->MacAddressSize));
-  for (Index = 0; Index < BmcUsbNic->MacAddressSize; Index++) {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "%02x ", *(BmcUsbNic->MacAddress + Index)));
-  }
-
-  DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "\n"));
+  DUMP_HEX (DEBUG_REDFISH_HOST_INTERFACE, 0, BmcUsbNic->MacAddress, BmcUsbNic->MacAddressSize, "    MAC address (in size %d) for this SNP instance: ", BmcUsbNic->MacAddressSize);
   BmcUsbNic->ThisSnp   = Snp;
   BmcUsbNic->ThisUsbIo = UsbIo;
 
