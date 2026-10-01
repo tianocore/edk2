@@ -225,14 +225,7 @@ TdxDecodeInstruction (
   IN UINT32  Length
   )
 {
-  UINTN  i;
-
-  DEBUG ((DEBUG_INFO, "TDX: #TD[EPT] instruction (%p):", Rip));
-  for (i = 0; i < MIN (15, Length); i++) {
-    DEBUG ((DEBUG_INFO, "%02x ", Rip[i]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, Rip, MIN (15, Length), "TDX: #TD[EPT] instruction (%p): ", Rip);
 }
 
 #define TDX_DECODER_BUG_ON(x)               \
