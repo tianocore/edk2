@@ -18,6 +18,9 @@
 - [ ] Includes tests?
   - **Tests** - Does this PR include any explicit test code?
   - Examples: Unit tests or integration tests.
+- [ ] Code first?
+  - **Code-first** - Does this PR have an impact to industry standards?
+  - Example: UEFI/PI or ACPI specification changes.
 
 ## How This Was Tested
 

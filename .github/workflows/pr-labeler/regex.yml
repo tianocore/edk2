@@ -14,3 +14,5 @@ impact:security:
 
 impact:testing:
   - '\s*-\s*\[\s*[x|X]\s*\] Includes tests\?'
+impact:Code-first:
+  - '\s*-\s*\[\s*[x|X]\s*\] Code first\?'
