@@ -474,6 +474,7 @@ BuildSmbiosType7TableEx (
   CmObjectList       = NULL;
   SocketCmObjectList = NULL;
   SocketNodeList     = NULL;
+  ObjIndex           = 0;
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
@@ -573,8 +574,6 @@ BuildSmbiosType7TableEx (
       SocketCount++;
     }
   }
-
-  ObjIndex = 0;
 
   for (Index = 0; Index < CacheStructCount; Index++) {
     CacheNode = &CacheStructList[Index];
