@@ -303,12 +303,7 @@ DumpTcgEfiSpecIdEvent (
   DEBUG ((DEBUG_INFO, "    PCRIndex  - %d\n", TcgPcrEvent->PCRIndex));
   DEBUG ((DEBUG_INFO, "    EventType - 0x%08x\n", TcgPcrEvent->EventType));
 
-  DEBUG ((DEBUG_INFO, "    Digest: "));
-  for (Idx = 0; Idx < TPM_SHA1_160_HASH_LEN; Idx++) {
-    DEBUG ((DEBUG_INFO, "%02x ", TcgPcrEvent->Digest.digest[Idx]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, TcgPcrEvent->Digest.digest, TPM_SHA1_160_HASH_LEN, "    Digest: ");
 
   DEBUG ((DEBUG_INFO, "     Signature          - '"));
   for (Idx = 0; Idx < sizeof (TcgEfiSpecIdEventStruct->signature); Idx++) {
@@ -334,12 +329,7 @@ DumpTcgEfiSpecIdEvent (
   VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
   DEBUG ((DEBUG_INFO, "    VendorInfoSize     - 0x%02x\n", *VendorInfoSize));
   VendorInfo = VendorInfoSize + 1;
-  DEBUG ((DEBUG_INFO, "    VendorInfo         - "));
-  for (Idx = 0; Idx < *VendorInfoSize; Idx++) {
-    DEBUG ((DEBUG_INFO, "%02x ", VendorInfo[Idx]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, VendorInfo, *VendorInfoSize, "    VendorInfo         - ");
 }
 
 /**
@@ -356,7 +346,6 @@ DumpEvent (
   )
 {
   EFI_STATUS                   Status;
-  UINTN                        Idx;
   UINT32                       DigestIdx;
   UINT32                       DigestCount;
   TPMI_ALG_HASH                HashAlgo;
@@ -390,12 +379,7 @@ DumpEvent (
       DigestSize = HashInfo->HashSize;
     }
 
-    DEBUG ((DEBUG_INFO, "      Digest(%d): ", DigestIdx));
-    for (Idx = 0; Idx < DigestSize; Idx++) {
-      DEBUG ((DEBUG_INFO, "%02x ", DigestBuffer[Idx]));
-    }
-
-    DEBUG ((DEBUG_INFO, "\n"));
+    DUMP_HEX (DEBUG_INFO, 0, DigestBuffer, DigestSize, "      Digest(%d): ", DigestIdx);
 
     //
     // Prepare next
