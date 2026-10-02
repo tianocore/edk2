@@ -88,6 +88,9 @@ FillWriteBuffer (
 
       AddressSize = 4;
     } else if (AddressBytesSupported == SPI_ADDR_3OR4BYTE) {
+      UINT32      FlashSizeInBytes;
+      EFI_STATUS  AddressModeStatus;
+
       if (SfdpAddressBytes != 0) {
         // Check if the supported address length is already initiated.
         if (SfdpAddressBytes != SPI_ADDR_3OR4BYTE) {
@@ -96,12 +99,24 @@ FillWriteBuffer (
         }
       }
 
-      if (Instance->Protocol.FlashSize <= SIZE_16MB) {
-        AddressSize = 3;
+      // The device defaults to 3-byte addressing and must be switched per
+      // transaction once the target address crosses the 16MB
+      // (3-byte addressable) boundary. Enter4Byte/Exit4Byte no-op when the
+      // device is already in the requested mode (see CurrentAddressBytes).
+      FlashSizeInBytes = SfdpGetFlashSize (Instance);
+      DEBUG ((DEBUG_VERBOSE, "%a: Flash size=0x%x, target address=0x%x\n", __func__, FlashSizeInBytes, Address));
+
+      if (Address >= SIZE_16MB) {
+        AddressModeStatus = Instance->Protocol.Enter4Byte (&Instance->Protocol);
       } else {
-        // SPI part is > 16MB use 4-byte addressing.
-        AddressSize = 4;
+        AddressModeStatus = Instance->Protocol.Exit4Byte (&Instance->Protocol);
       }
+
+      if (EFI_ERROR (AddressModeStatus)) {
+        DEBUG ((DEBUG_ERROR, "%a: Failed to switch address mode: %r\n", __func__, AddressModeStatus));
+      }
+
+      AddressSize = (Instance->CurrentAddressBytes == 4) ? 4 : 3;
     } else {
       DEBUG ((DEBUG_ERROR, "%a: Invalid Address Bytes\n", __func__));
       ASSERT (FALSE);
@@ -115,14 +130,6 @@ FillWriteBuffer (
       AddressSize
       );
     Index += AddressSize;
-  }
-
-  if (SfdpAddressBytes == SPI_ADDR_3OR4BYTE) {
-    //
-    // TODO:
-    // We may need to enter/exit 4-Byte mode if SPI flash
-    // device is currently operated in 3-Bytes mode.
-    //
   }
 
   // Fill DummyBytes
