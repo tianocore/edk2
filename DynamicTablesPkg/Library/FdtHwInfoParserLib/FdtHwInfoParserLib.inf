@@ -18,6 +18,7 @@
   DESTRUCTOR     = RiscVExtIntcDataDestructor
 
 [Sources]
+  ArchUtility.h
   CmObjectDescUtility.c
   CmObjectDescUtility.h
   FdtHwInfoParserInclude.h
@@ -25,12 +26,21 @@
   FdtHwInfoParser.h
   FdtUtility.c
   FdtUtility.h
+  Topology/TopologyCacheParser.c
+  Topology/TopologyCacheParser.h
+  Topology/TopologyHierarchyParser.c
+  Topology/TopologyHierarchyParser.h
+  Topology/TopologyParser.c
+  Topology/TopologyParser.h
+  Topology/TopologyUtility.c
+  Topology/TopologyUtility.h
   Pci/PciConfigSpaceParser.c
   Pci/PciConfigSpaceParser.h
   Serial/SerialPortParser.c
   Serial/SerialPortParser.h
 
 [Sources.AARCH64]
+  Arm/ArmArchUtility.c
   Arm/ArmFdtInterrupt.c
   Arm/ArmFdtHwInfoParser.c
   Arm/BootArch/ArmBootArchParser.c
@@ -54,6 +64,7 @@
   Arm/Iort/SmmuV3Parser.c
 
 [Sources.RISCV64]
+  ArchUtility.c
   RiscV/RiscVFdtInterrupt.c
   RiscV/RiscVFdtHwInfoParser.c
   RiscV/Intc/RiscVIntcParser.c
@@ -76,3 +87,6 @@
   DebugLib
   FdtLib
   MemoryAllocationLib
+
+[LibraryClasses.AARCH64]
+  ArmSmcccSocIdLib

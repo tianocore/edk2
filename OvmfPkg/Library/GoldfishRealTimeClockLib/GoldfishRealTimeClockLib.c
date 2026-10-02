@@ -242,7 +242,7 @@ GetGoldfishRtcBase (
     return EFI_LOAD_ERROR;
   }
 
-  *BaseAddress = (UINTN)Fdt64ToCpu (*(UINT64 *)Data);
+  *BaseAddress = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data));
   return EFI_SUCCESS;
 }
 

@@ -63,13 +63,15 @@
             "8002", "aligned (",
             "4002", "_ReturnAddress",
             "8005", "__security_cookie",
-            "8006", "__stack_chk_fail"
+            "8006", "__stack_chk_fail",
+            "8002", "size_t"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Include/Guid/Cper.h",
             "Include/IndustryStandard/Acpi64.h",
             "Include/IndustryStandard/Acpi65.h",
+            "Include/IndustryStandard/Acpi67.h",
             "Include/IndustryStandard/Tpm12.h",
             "Include/IndustryStandard/Tpm20.h",
             "Include/IndustryStandard/IoRemappingTable.h",
