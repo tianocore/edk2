@@ -852,6 +852,10 @@ GetCurrentSectorMapConfiguration (
                                 0,
                                 NULL
                                 );
+    if (TransactionBufferLength == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Status = Instance->SpiIo->Transaction (
                                 Instance->SpiIo,
                                 SPI_TRANSACTION_WRITE_THEN_READ,
@@ -1216,6 +1220,149 @@ SfdpGetFlashSize (
 }
 
 /**
+  Default Enter4Byte implementation: switch to 4-byte address mode
+  (issue write enable 06h, then EN4B 0xB7). This covers both the
+  "preceding write enable not required" and "write enable then B7h"
+  methods described by DWORD 16 bits 31:24, since the extra write-enable is
+  harmless when not required.
+
+  @param[in]  This    Pointer to an EDKII_SPI_NOR_FLASH_PROTOCOL_EX data structure.
+
+  @retval EFI_SUCCESS   Device is in 4-byte address mode.
+  @retval Other         SPI transaction failed.
+**/
+EFI_STATUS
+EFIAPI
+SfdpEnter4ByteAddressMode (
+  IN CONST EDKII_SPI_NOR_FLASH_PROTOCOL_EX  *This
+  )
+{
+  EFI_STATUS              Status;
+  UINT32                  TransactionBufferLength;
+  SPI_NOR_FLASH_INSTANCE  *Instance;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = SPI_NOR_FLASH_FROM_THIS_EX (This);
+
+  if (Instance->CurrentAddressBytes == 4) {
+    return EFI_SUCCESS;
+  }
+
+  Status = SetWel (Instance);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Write enable before EN4B failed: %r\n", __func__, Status));
+    return Status;
+  }
+
+  TransactionBufferLength = FillWriteBuffer (
+                              Instance,
+                              SPI_FLASH_EN4B,
+                              0,
+                              SPI_ADDR_3BYTE_ONLY,
+                              FALSE,
+                              0,
+                              0,
+                              NULL
+                              );
+  if (TransactionBufferLength == 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = Instance->SpiIo->Transaction (
+                              Instance->SpiIo,
+                              SPI_TRANSACTION_WRITE_ONLY,
+                              FALSE,
+                              0,
+                              1,
+                              8,
+                              TransactionBufferLength,
+                              Instance->SpiTransactionWriteBuffer,
+                              0,
+                              NULL
+                              );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: EN4B transaction failed: %r\n", __func__, Status));
+    return Status;
+  }
+
+  Instance->CurrentAddressBytes = 4;
+  return EFI_SUCCESS;
+}
+
+/**
+  Default Exit4Byte implementation: switch to 3-byte address mode
+  (issue write enable 06h, then EX4B 0xE9).
+
+  @param[in]  This    Pointer to an EDKII_SPI_NOR_FLASH_PROTOCOL_EX data structure.
+
+  @retval EFI_SUCCESS   Device is in 3-byte address mode.
+  @retval Other         SPI transaction failed.
+**/
+EFI_STATUS
+EFIAPI
+SfdpExit4ByteAddressMode (
+  IN CONST EDKII_SPI_NOR_FLASH_PROTOCOL_EX  *This
+  )
+{
+  EFI_STATUS              Status;
+  UINT32                  TransactionBufferLength;
+  SPI_NOR_FLASH_INSTANCE  *Instance;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = SPI_NOR_FLASH_FROM_THIS_EX (This);
+
+  if (Instance->CurrentAddressBytes == 3) {
+    return EFI_SUCCESS;
+  }
+
+  Status = SetWel (Instance);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Write enable before EX4B failed: %r\n", __func__, Status));
+    return Status;
+  }
+
+  TransactionBufferLength = FillWriteBuffer (
+                              Instance,
+                              SPI_FLASH_EX4B,
+                              0,
+                              SPI_ADDR_3BYTE_ONLY,
+                              FALSE,
+                              0,
+                              0,
+                              NULL
+                              );
+  if (TransactionBufferLength == 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = Instance->SpiIo->Transaction (
+                              Instance->SpiIo,
+                              SPI_TRANSACTION_WRITE_ONLY,
+                              FALSE,
+                              0,
+                              1,
+                              8,
+                              TransactionBufferLength,
+                              Instance->SpiTransactionWriteBuffer,
+                              0,
+                              NULL
+                              );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: EX4B transaction failed: %r\n", __func__, Status));
+    return Status;
+  }
+
+  Instance->CurrentAddressBytes = 3;
+  return EFI_SUCCESS;
+}
+
+/**
   Read SFDP Header
 
   This routine reads the JEDEC SPI Flash Discoverable Parameter header from the
@@ -1251,6 +1398,10 @@ ReadSfdpHeader (
                               0,
                               NULL
                               );
+  if (TransactionBufferLength == 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
   Status = Instance->SpiIo->Transaction (
                               Instance->SpiIo,
                               SPI_TRANSACTION_WRITE_THEN_READ,
@@ -1418,6 +1569,10 @@ ReadSfdpParameterHeader (
                                   0,
                                   NULL
                                   );
+      if (TransactionBufferLength == 0) {
+        return EFI_DEVICE_ERROR;
+      }
+
       Status = Instance->SpiIo->Transaction (
                                   Instance->SpiIo,
                                   SPI_TRANSACTION_WRITE_THEN_READ,
@@ -1534,6 +1689,10 @@ SpiReadSfdpPtp (
                                   0,
                                   NULL
                                   );
+      if (TransactionBufferLength == 0) {
+        return EFI_DEVICE_ERROR;
+      }
+
       Status = Instance->SpiIo->Transaction (
                                   Instance->SpiIo,
                                   SPI_TRANSACTION_WRITE_THEN_READ,
@@ -1741,16 +1900,19 @@ InitialSpiNorFlashSfdpInstance (
   Instance->SpiTransactionWriteBuffer =
     AllocatePool (Instance->SpiIo->MaximumTransferBytes + 10);
 
-  Protocol                = &Instance->Protocol;
-  Protocol->SpiPeripheral = Instance->SpiIo->SpiPeripheral;
-  Protocol->GetFlashid    = GetFlashId;
-  Protocol->ReadData      = ReadData;      // Fast Read transfer
-  Protocol->LfReadData    = LfReadData;    // Normal Read transfer
-  Protocol->ReadStatus    = ReadStatus;
-  Protocol->WriteStatus   = WriteStatus;
-  Protocol->WriteData     = WriteData;
-  Protocol->Erase         = Erase;
-  Status                  = Protocol->GetFlashid (Protocol, (UINT8 *)&Protocol->Deviceid);
+  Protocol                        = &Instance->Protocol;
+  Protocol->SpiPeripheral         = Instance->SpiIo->SpiPeripheral;
+  Protocol->GetFlashid            = GetFlashId;
+  Protocol->ReadData              = ReadData;   // Fast Read transfer
+  Protocol->LfReadData            = LfReadData; // Normal Read transfer
+  Protocol->ReadStatus            = ReadStatus;
+  Protocol->WriteStatus           = WriteStatus;
+  Protocol->WriteData             = WriteData;
+  Protocol->Erase                 = Erase;
+  Instance->ProtocolEx.Version    = EDKII_SPI_NOR_FLASH_PROTOCOL_EX_VERSION;
+  Instance->ProtocolEx.Enter4Byte = SfdpEnter4ByteAddressMode;
+  Instance->ProtocolEx.Exit4Byte  = SfdpExit4ByteAddressMode;
+  Status                          = Protocol->GetFlashid (Protocol, (UINT8 *)&Protocol->Deviceid);
   ASSERT_EFI_ERROR (Status);
   DEBUG ((
     DEBUG_VERBOSE,
