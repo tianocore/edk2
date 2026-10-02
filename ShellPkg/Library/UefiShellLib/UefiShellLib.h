@@ -3,14 +3,12 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright 2026 Insyde Software Corp. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #pragma once
 
-#include <PiDxe.h>
 #include <Uefi.h>
 
 #include <Guid/FileInfo.h>
@@ -22,12 +20,8 @@
 #include <Protocol/Shell.h>
 #include <Protocol/ShellParameters.h>
 #include <Protocol/UnicodeCollation.h>
-#include <Protocol/DevicePathFromText.h>
-#include <Protocol/DevicePathToText.h>
 
-#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -39,7 +33,6 @@
 #include <Library/UefiLib.h>
 #include <Library/HiiLib.h>
 #include <Library/ShellLib.h>
-
 
 typedef struct  {
   EFI_SHELL_GET_FILE_INFO        GetFileInfo;
