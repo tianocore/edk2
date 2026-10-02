@@ -419,13 +419,13 @@ ShellLibConstructorWorker (
 
   Status = gBS->LocateProtocol(&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&mDpft);
   if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR, "DevicePathFromText Protocol Error (%r)\n", Status));
+    DEBUG((DEBUG_ERROR, "DevicePathFromText Protocol Error (%r)\n", Status));
     return Status;
   }
 
   Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&mDptt);
   if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR, "DevicePathToText Protocol Error (%r)\n", Status));
+    DEBUG((DEBUG_ERROR, "DevicePathToText Protocol Error (%r)\n", Status));
     return Status;
   }
 
@@ -5435,7 +5435,7 @@ ShellConnectDevicePath (
     // We convert back to the text representation of the device Path
 
     DevicePathTxt = mDptt->ConvertDevicePathToText (DevicePath, TRUE, TRUE);
-    DEBUG ((EFI_D_ERROR,"[Shell] %a() - DevicePath = %s\n", __FUNCTION__, DevicePathTxt));
+    DEBUG ((DEBUG_ERROR,"[Shell] %a() - DevicePath = %s\n", __func__, DevicePathTxt));
     SHELL_FREE_NON_NULL(DevicePathTxt);
   DEBUG_CODE_END ();
 
