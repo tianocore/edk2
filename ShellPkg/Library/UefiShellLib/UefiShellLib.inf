@@ -3,6 +3,7 @@
 #
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright 2026 Insyde Software Corp. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,6 +35,7 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
+  DxeServicesTableLib
   MemoryAllocationLib
   DevicePathLib
   BaseLib
@@ -56,9 +58,17 @@
   gEfiShellEnvironment2Guid                     ## SOMETIMES_CONSUMES
   gEfiShellInterfaceGuid                        ## SOMETIMES_CONSUMES
 
+  gEfiDevicePathFromTextProtocolGuid            # ALWAYS_CONSUMED
+  gEfiDevicePathToTextProtocolGuid              # ALWAYS_CONSUMED
+
+  gEfiBlockIoProtocolGuid
+
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
   gEfiShellEnvironment2ExtGuid                  ## SOMETIMES_CONSUMES ## GUID
+
+  gEfiGlobalVariableGuid                        # ALWAYS_CONSUMED
+
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize     ## CONSUMES

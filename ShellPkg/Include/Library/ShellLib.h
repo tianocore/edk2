@@ -3,6 +3,7 @@
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright 2018 Dell Technologies.<BR>
+  Copyright 2026 Insyde Software Corp. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1447,4 +1448,554 @@ BOOLEAN
 EFIAPI
 IsDotOrDotDot (
   CONST CHAR16  *Name
+  );
+BOOLEAN
+ShellIsWhitespace(
+  IN CHAR16 Ch
+  );
+
+CHAR16 *
+ShellStrChr(
+  IN CONST CHAR16 *Src,
+  IN CHAR16       Ch
+  );
+
+CHAR16 *
+ShellStrDup(
+  IN CONST CHAR16 *Src
+  );
+
+CHAR16 *
+ShellStrnDup(
+  IN CONST CHAR16 *Src,
+  IN UINTN        SrcLen
+  );
+
+CHAR16 *
+ShellStrCat(
+  IN CHAR16       *Dest,
+  IN CONST CHAR16 *Src
+  );
+
+CHAR16 *
+ShellStrnCat(
+  IN CHAR16       *Dest,
+  IN CONST CHAR16 *Src,
+  IN UINTN SrcLen
+  );
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %
+// %                             SHELL PROTOCOL HELPERS
+// %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+EFI_STATUS
+EFIAPI
+ShellSetCurrentDir (
+  IN CONST CHAR16       *FileSystem OPTIONAL,
+  IN CONST CHAR16       *Dir
+  );
+
+/**
+  Returns the page break mode.
+
+  @retval           TRUE                Page break mode is enabled.
+  @retval           FALSE               Page break mode is disabled.
+**/
+BOOLEAN
+ShellGetPageBreakMode(VOID);
+
+/**
+  Function to convert character or string to upper case/lower case.
+
+  @param[in] String
+
+  @retval EFI_SUCCESS             The conversion was successful.
+  @retval EFI_INVALID_PARAMETER   String contained an invalid character.
+**/
+EFI_STATUS
+EFIAPI
+ShellStrToUpper (
+  IN OUT CHAR16 *String
+  );
+
+EFI_STATUS
+EFIAPI
+ShellStrToLower (
+  IN OUT CHAR16 *String
+  );
+
+CHAR16
+EFIAPI
+ShellCharToUpper (
+  IN CHAR16 Char
+  );
+
+/**
+  Convert a Unicode character to lower case only if it maps to a valid small-
+  case ASCII character.
+
+  This internal function only deal with Unicode character which maps to a valid
+  upper-case ASCII character, i.e. L'A' to L'Z'. For other Unicode characters,
+  the input character is returned directly.
+
+  @param  Char  The character to convert.
+
+  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
+  @retval Unchanged        Otherwise.
+**/
+CHAR16
+EFIAPI
+ShellCharToLower (
+  IN CHAR16 Char
+  );
+
+/**
+  Convert a string representation of a guid to a Guid value.
+
+  @param[in] StringGuid    The pointer to the string of a guid.
+  @param[in, out] Guid     The pointer to the GUID structure to populate.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_SUCCESS             The conversion was successful.
+**/
+EFI_STATUS
+EFIAPI
+ShellConvertStringToGuid (
+  IN     CONST CHAR16 *StringGuid,
+  IN OUT EFI_GUID     *Guid
+  );
+
+/**
+  Convert a Unicode character to numerical value.
+
+  This internal function only deal with Unicode character
+  which maps to a valid hexadecimal ASII character, i.e.
+  L'0' to L'9', L'a' to L'f' or L'A' to L'F'. For other
+  Unicode character, the value returned does not make sense.
+
+  @param  Char  The character to convert.
+
+  @return The numerical value converted.
+**/
+UINTN
+EFIAPI
+ShellHexCharToUintn (
+  IN CHAR16 Char
+  );
+
+EFI_STATUS
+EFIAPI
+ShellGetDeviceName (
+  IN EFI_HANDLE                  DeviceHandle,
+  IN EFI_SHELL_DEVICE_NAME_FLAGS Flags,
+  IN CONST CHAR8                 *Language,
+  OUT CHAR16                     **BestDeviceName
+  );
+
+CHAR16 *
+EFIAPI
+ShellGetFilePathFromDevicePath (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *Path
+  );
+
+CONST EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ShellGetDevicePathFromMap (
+  IN CONST CHAR16 *Mapping
+  );
+
+CONST CHAR16 *
+EFIAPI
+ShellGetMapFromDevicePath (
+  IN OUT EFI_DEVICE_PATH_PROTOCOL **DevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+ShellSetMap (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
+  IN CONST CHAR16                   *Mapping
+  );
+
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ShellGetDevicePathFromFilePath (
+  IN CONST CHAR16 *FilePath
+  );
+
+/**
+  Converts a ";" delimited DevicePath string into DevicePath instances
+
+  @param  DevicePathsString     String with ";" delimited DevicePaths
+  @param  DevicePaths           DevicePath instances
+
+  @retval EFI_SUCCESS           String converted into DevicePath instances
+
+**/
+EFI_STATUS
+ShellStringToDevicePathInstances (
+  IN  CONST CHAR16    *DevicePathsString,
+  OUT EFI_DEVICE_PATH **DevicePaths
+  );
+
+EFI_STATUS
+EFIAPI
+ShellConnectDevicePath (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  OUT EFI_HANDLE                  *Handle,
+  OUT EFI_DEVICE_PATH_PROTOCOL    **RemainingDevicePath,
+  IN  BOOLEAN                     ConnectChildHandle,
+  IN  BOOLEAN                     DispatchPossibleChild
+  );
+
+/*
+  Get a UEFI variable value and attributes. Value is placed in allocated memory
+  which must be freed by the caller.
+*/
+EFI_STATUS
+EFIAPI
+ShellGetVariable2(
+  IN  CONST CHAR16   *Name,
+  IN  CONST EFI_GUID *Guid,
+  OUT UINT32         *Attributes,
+  OUT VOID           **Value,
+  OUT UINTN          *Size OPTIONAL
+  );
+
+/*
+  Set a UEFI variable value.
+*/
+EFI_STATUS
+EFIAPI
+ShellSetVariable (
+  IN CONST CHAR16   *Name,
+  IN CONST EFI_GUID *Guid,
+  IN UINT32         Attribs,
+  IN CONST VOID     *Data,
+  IN UINTN          Size
+  );
+
+/*
+  Delete a UEFI variable.
+*/
+EFI_STATUS
+ShellDeleteVariable(
+  IN CONST CHAR16 *Name,
+  IN CONST EFI_GUID *Guid
+  );
+
+/*
+  Set the value of a standard UEFI variable.
+*/
+EFI_STATUS
+EFIAPI
+ShellSetGlobalVariable (
+  IN CONST CHAR16 *Name,
+  IN UINT32       Attribs,
+  IN CONST VOID   *Data,
+  IN UINTN Size
+  );
+
+EFI_STATUS
+EFIAPI
+ShellStripQuotes (
+  IN  CONST CHAR16  *OriginalString,
+  OUT CHAR16        **CleanString
+  );
+
+BOOLEAN
+EFIAPI
+ShellGetArgs (
+  OUT UINTN         *Argc,
+  OUT CONST CHAR16  ***Argv
+  );
+
+BOOLEAN
+ShellGetVersion (
+  OUT UINT32        *MajorVersion,
+  OUT UINT32        *MinorVersion
+  );
+
+BOOLEAN
+EFIAPI
+ShellBatchIsActive (VOID);
+
+EFI_STATUS
+EFIAPI
+ShellFindFilesInDir (
+  IN  SHELL_FILE_HANDLE   FileDirHandle,
+  OUT EFI_SHELL_FILE_INFO **FileList
+  );
+
+EFI_STATUS
+EFIAPI
+ShellFreeFileList (
+  IN EFI_SHELL_FILE_INFO **FileList
+  );
+
+CONST CHAR16 *
+EFIAPI
+ShellGetAlias (
+  IN  CONST CHAR16  *Alias,
+  OUT BOOLEAN       *Volatile OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+ShellSetAlias (
+  IN CONST CHAR16 *Command,
+  IN CONST CHAR16 *Alias,
+  IN BOOLEAN      Replace,
+  IN BOOLEAN      Volatile
+  );
+
+EFI_STATUS
+ShellGetGuidName (
+  IN CONST EFI_GUID *Guid,
+  OUT CONST CHAR16  **GuidName
+  );
+
+EFI_STATUS
+ShellGetGuidFromName(
+  IN CONST CHAR16 *GuidName,
+  OUT EFI_GUID    *Guid
+  );
+
+EFI_STATUS
+ShellRegisterGuidName (
+  IN CONST EFI_GUID *Guid,
+  IN CONST CHAR16   *GuidName
+  );
+
+CONST EFI_SHELL_PROTOCOL *
+ShellGetProtocol (VOID);
+
+CONST EFI_SHELL_PARAMETERS_PROTOCOL *
+ShellGetParameters (VOID);
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %
+// %                         SHELL COMMAND-LINE HELPERS
+// %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/**
+ Check for the standard command-line options.
+
+ @param[in]         Arg                  Argument index.
+ @param[in]         Argv                Ptr to array of null-terminated
+                                        arguments.
+ @param[out]        HelpMode            Ptr to returned boolean that indicates
+                                        whether help mode was indicated.
+ @param[out]        VerboseMode         Ptr to returned boolean that indicates
+                                        whether verbose mode was indicated.
+ @param[out]        SfoMode             Ptr to returned boolean that indicates
+                                        whether SFO mode was indicated.
+
+ @retval            TRUE                Standard option was found.
+ @retval            FALSE               Standard option was not found.
+**/
+BOOLEAN
+ShellCheckStdArgs(
+  IN  UINTN         Arg,
+  IN  CONST CHAR16  **Argv,
+  OUT BOOLEAN       *HelpMode OPTIONAL,
+  OUT BOOLEAN       *VerboseMode OPTIONAL,
+  OUT BOOLEAN       *SfoMode OPTIONAL
+  );
+
+  /*
+ Increment the argument index and return the next argument. If there are no
+ more arguments, generate an error.
+
+ @param[in,out]     Arg                 Ptr to argument index.
+ @param[in]         Argc                Unsigned integer that specifies the
+                                        total number of arguments.
+ @param[in]         Argv                Ptr to array of null-terminated
+                                        arguments.
+ @param[in]         ArgName             Ptr to null-terminated string that
+                                        specifies the argument name. Used in
+                                        error messages.
+ @param[out]        ExpectedArg         Ptr to returned ptr to null-terminated
+                                        argument string.
+
+ @retval            FALSE               No more arguments on the line.
+ @retval            TRUE                Argument found and returned.
+*/
+BOOLEAN
+ShellExpectArg (
+  IN OUT UINTN        *Arg,
+  IN     UINTN        Argc,
+  IN     CONST CHAR16 **Argv,
+  IN     CONST CHAR8  *ArgName,
+  OUT    CONST CHAR16 **ExpectedArg
+  );
+
+/*
+ Increment the argument index and return the next argument. If there are no
+ more arguments, generate an error.
+
+ @param[in,out]     Arg                 Ptr to argument index.
+ @param[in]         Argc                Unsigned integer that specifies the
+                                        total number of arguments.
+ @param[in]         Argv                Ptr to array of null-terminated
+                                        arguments.
+ @param[in]         ArgName             Ptr to null-terminated string that
+                                        specifies the argument name. Used in
+                                        error messages.
+ @param[out]        ExpectedGuid        Ptr to returned GUID.
+
+ @retval            FALSE               No more arguments on the line.
+ @retval            TRUE                Argument found and returned.
+*/
+BOOLEAN
+ShellExpectGuid (
+  IN OUT UINTN         *Arg,
+  IN     UINTN         Argc,
+  IN OUT CONST CHAR16  **Argv,
+  IN     CONST CHAR8   *ArgName,
+  OUT    EFI_GUID      *ExpectedGuid
+  );
+
+/*
+ Increment the argument index and return the next argument. If there are no
+ more arguments, generate an error.
+
+ @param[in,out]     Arg                 Ptr to argument index.
+ @param[in]         Argc                Unsigned integer that specifies the
+                                        total number of arguments.
+ @param[in]         Argv                Ptr to array of null-terminated
+                                        arguments.
+ @param[in]         ArgName             Ptr to null-terminated string that
+                                        specifies the argument name. Used in
+                                        error messages.
+ @param[out]        ExpectedUint        Ptr to returned unsigned integer.
+
+ @retval            FALSE               No more arguments on the line.
+ @retval            TRUE                Argument found and returned.
+*/
+BOOLEAN
+ShellExpectUint (
+  IN OUT UINTN        *Arg,
+  IN     UINTN        Argc,
+  IN OUT CONST CHAR16 **Argv,
+  IN     CONST CHAR8  *ArgName,
+  OUT    UINT64       *ExpectedUint
+  );
+
+/*
+ Increment the argument index and return the next argument. If there are no
+ more arguments, generate an error.
+
+ @param[in,out]     Arg                 Ptr to argument index.
+ @param[in]         Argc                Unsigned integer that specifies the
+                                        total number of arguments.
+ @param[in]         Argv                Ptr to array of null-terminated
+                                        arguments.
+ @param[in]         ArgName             Ptr to null-terminated string that
+                                        specifies the argument name. Used in
+                                        error messages.
+ @param[out]        ExpectedUint        Ptr to returned unsigned integer.
+
+ @retval            FALSE               No more arguments on the line.
+ @retval            TRUE                Argument found and returned.
+*/
+BOOLEAN
+ShellExpectHexUint (
+  IN OUT UINTN        *Arg,
+  IN     UINTN        Argc,
+  IN OUT CONST CHAR16 **Argv,
+  IN     CONST CHAR8  *ArgName,
+  OUT    UINT64       *ExpectedUint
+  );
+
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %
+// %                              SHELL ERROR HELPERS
+// %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/*
+ Display an error message, prefixed by the current error command name (if set)
+ and the phrase 'error:'.
+
+ @param[in]             Format          Ptr to null-terminated format string.
+ @param[in]             ...             Zero or more variable arguments.
+
+ @retval                FALSE
+*/
+BOOLEAN
+ShellError (
+  IN CONST CHAR8 *Fmt,
+  ...
+  );
+
+/*
+ Set the shell command name to use as a prefix for error messages.
+
+ @param[in]             ErrorCmd        Ptr to null-terminated string that specifies the error command name.
+
+*/
+VOID
+ShellSetErrorCmd (
+  IN CONST CHAR16 *Cmd
+  );
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %
+// %                              SHELL FILE HELPERS
+// %
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+EFI_STATUS
+EFIAPI
+ShellOpenFileByName2(
+  IN  CONST CHAR16      *FileName,
+  OUT SHELL_FILE_HANDLE *FileHandle,
+  IN  UINT64            OpenMode
+  );
+
+EFI_STATUS
+EFIAPI
+ShellCreateFile(
+  IN  CONST CHAR16      *FileName,
+  IN  UINT64            Attributes,
+  OUT SHELL_FILE_HANDLE *FileHandle
+  );
+
+/**
+  Function printing hex output to the console.
+
+  @param[in] Indent       Number of spaces to indent.
+  @param[in] Offset       Offset to start with.
+  @param[in] DataSize     Length of data.
+  @param[in] UserData     Pointer to some data.
+**/
+VOID
+ShellDumpHex (
+  IN UINTN Indent,
+  IN UINTN Offset,
+  IN UINTN DataSize,
+  IN VOID  *UserData
+  );
+
+/**
+  Dump HEX data into buffer.
+
+  @param[in] Buffer     HEX data to be dumped in Buffer.
+  @param[in] Indent     How many spaces to indent the output.
+  @param[in] Offset     The offset of the printing.
+  @param[in] DataSize   The size in bytes of UserData.
+  @param[in] UserData   The data to print out.
+**/
+CHAR16*
+ShellCatSDumpHex (
+  IN CHAR16 *Buffer,
+  IN UINTN  Indent,
+  IN UINTN  Offset,
+  IN UINTN  DataSize,
+  IN VOID   *UserData
   );
