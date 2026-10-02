@@ -47,7 +47,8 @@
   SpiNorFlash.h
 
 [Protocols]
-  gEfiSpiSmmNorFlashProtocolGuid ## PROCUDES
+  gEfiSpiSmmNorFlashProtocolGuid ## PRODUCES
+  gEfiSpiSmmNorFlashProtocolExGuid ## PRODUCES
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationRetryCount
