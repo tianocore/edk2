@@ -47,7 +47,7 @@ EFI_STATUS
   );
 
 /**
-  Saves the WiFi connection status recieved by the WiFiConnectionManager when
+  Saves the WiFi connection status received by the WiFiConnectionManager when
   in a KVM OR One Click Recovery WLAN recovery flow. Input as
   EFI_80211_CONNECT_NETWORK_RESULT_CODE then converted and stored as EFI_STATUS type.
 
