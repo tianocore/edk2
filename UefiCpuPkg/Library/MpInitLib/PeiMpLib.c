@@ -202,10 +202,10 @@ GetWakeupBuffer (
   // Collect memory ranges
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       if ((Hob.ResourceDescriptor->PhysicalStart < BASE_1MB) &&
           (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-          ((Hob.ResourceDescriptor->ResourceAttribute &
+          ((GET_RESOURCE_HOB_ATTRIBUTE (Hob) &
             (EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
              EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
              EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED

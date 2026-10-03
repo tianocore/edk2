@@ -7,6 +7,7 @@
 **/
 
 #include <PiPei.h>
+#include <Uefi.h>
 
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmPlatformLib.h>
@@ -98,9 +99,12 @@ MemoryPeim (
   //
   // Check if the resource for the main system memory has been declared
   //
-  Found       = FALSE;
-  NextHob.Raw = GetHobList ();
-  while ((NextHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, NextHob.Raw)) != NULL) {
+  Found = FALSE;
+  for (NextHob.Raw = GetHobList (); !END_OF_HOB_LIST (NextHob); NextHob.Raw = GET_NEXT_HOB (NextHob)) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (NextHob)) {
+      continue;
+    }
+
     if ((NextHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
         (SystemMemoryBase >= NextHob.ResourceDescriptor->PhysicalStart) &&
         (NextHob.ResourceDescriptor->PhysicalStart + NextHob.ResourceDescriptor->ResourceLength <= SystemMemoryTop))
@@ -108,8 +112,6 @@ MemoryPeim (
       Found = TRUE;
       break;
     }
-
-    NextHob.Raw = GET_NEXT_HOB (NextHob);
   }
 
   if (!Found) {
@@ -135,13 +137,16 @@ MemoryPeim (
     Found = FALSE;
 
     // Search for System Memory Hob that contains the firmware
-    NextHob.Raw = GetHobList ();
-    while ((NextHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, NextHob.Raw)) != NULL) {
+    for (NextHob.Raw = GetHobList (); !END_OF_HOB_LIST (NextHob); NextHob.Raw = GET_NEXT_HOB (NextHob)) {
+      if (!IS_RESOURCE_DESCRIPTOR_HOB (NextHob)) {
+        continue;
+      }
+
       if ((NextHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
           (PcdGet64 (PcdFdBaseAddress) >= NextHob.ResourceDescriptor->PhysicalStart) &&
           (FdTop <= NextHob.ResourceDescriptor->PhysicalStart + NextHob.ResourceDescriptor->ResourceLength))
       {
-        ResourceAttributes = NextHob.ResourceDescriptor->ResourceAttribute;
+        ResourceAttributes = GET_RESOURCE_HOB_ATTRIBUTE (NextHob);
         ResourceLength     = NextHob.ResourceDescriptor->ResourceLength;
         ResourceTop        = NextHob.ResourceDescriptor->PhysicalStart + ResourceLength;
 
@@ -193,8 +198,6 @@ MemoryPeim (
         Found = TRUE;
         break;
       }
-
-      NextHob.Raw = GET_NEXT_HOB (NextHob);
     }
 
     ASSERT (Found);

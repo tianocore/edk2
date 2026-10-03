@@ -2245,11 +2245,10 @@ CoreInitializeMemoryServices (
   )
 {
   EFI_PEI_HOB_POINTERS         Hob;
+  EFI_PEI_HOB_POINTERS         PhitResourceHob;
+  EFI_PEI_HOB_POINTERS         MemoryTypeInformationResourceHob;
   BOOLEAN                      Found;
   EFI_HOB_HANDOFF_INFO_TABLE   *PhitHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *PhitResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
   EFI_PHYSICAL_ADDRESS         BaseAddress;
   UINT64                       Length;
   UINT64                       Attributes;
@@ -2259,7 +2258,10 @@ CoreInitializeMemoryServices (
   EFI_PHYSICAL_ADDRESS         HighAddress;
   UINT32                       ReservedCodePageNumber;
   UINT64                       MinimalMemorySizeNeeded;
+  EFI_PHYSICAL_ADDRESS         ResourcePhysicalStart;
+  UINT64                       ResourceLength;
   EFI_PHYSICAL_ADDRESS         ResourceHobMemoryTop;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceHobAttribute;
   EFI_STATUS                   Status;
 
   //
@@ -2277,11 +2279,10 @@ CoreInitializeMemoryServices (
   //
   // Initialize Local Variables
   //
-  PhitResourceHob = NULL;
-  ResourceHob     = NULL;
-  BaseAddress     = 0;
-  Length          = 0;
-  Attributes      = 0;
+  PhitResourceHob.Raw = NULL;
+  BaseAddress         = 0;
+  Length              = 0;
+  Attributes          = 0;
 
   //
   // Cache the PHIT HOB for later use
@@ -2302,16 +2303,16 @@ CoreInitializeMemoryServices (
   //
   // See if a Memory Type Information HOB is available
   //
-  MemoryTypeInformationResourceHob = NULL;
-  Status                           = PopulateMemoryTypeInformation (gMemoryTypeInformation);
+  MemoryTypeInformationResourceHob.Raw = NULL;
+  Status                               = PopulateMemoryTypeInformation (gMemoryTypeInformation);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "No Memory Type Information HOB found, S4 resume will likely fail\n"));
   }
 
-  MemoryTypeInformationResourceHob = GetMemoryTypeInformationResourceHob (
-                                       HobStart,
-                                       gMemoryTypeInformation
-                                       );
+  MemoryTypeInformationResourceHob.Raw = GetMemoryTypeInformationResourceHob (
+                                           HobStart,
+                                           gMemoryTypeInformation
+                                           );
 
   //
   // Include the total memory bin size needed to make sure memory bin could be allocated successfully.
@@ -2326,37 +2327,39 @@ CoreInitializeMemoryServices (
     //
     // Skip all HOBs except Resource Descriptor HOBs
     //
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       continue;
     }
 
     //
     // Skip Resource Descriptor HOBs that do not describe tested system memory
     //
-    ResourceHob = Hob.ResourceDescriptor;
-    if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+    ResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+    ResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
+    ResourceHobAttribute  = GET_RESOURCE_HOB_ATTRIBUTE (Hob);
+    if (GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) != EFI_RESOURCE_SYSTEM_MEMORY) {
       continue;
     }
 
-    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+    if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
       continue;
     }
 
     //
     // Skip Resource Descriptor HOBs that do not contain the PHIT range EfiFreeMemoryBottom..EfiFreeMemoryTop
     //
-    if (PhitHob->EfiFreeMemoryBottom < ResourceHob->PhysicalStart) {
+    if (PhitHob->EfiFreeMemoryBottom < ResourcePhysicalStart) {
       continue;
     }
 
     //
     // Check for potential overflow before addition
     //
-    if (ResourceHob->PhysicalStart > MAX_UINT64 - ResourceHob->ResourceLength) {
+    if (ResourcePhysicalStart > MAX_UINT64 - ResourceLength) {
       ASSERT (FALSE);
       ResourceHobMemoryTop = MAX_UINT64;
     } else {
-      ResourceHobMemoryTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+      ResourceHobMemoryTop = ResourcePhysicalStart + ResourceLength;
     }
 
     if (PhitHob->EfiFreeMemoryTop > ResourceHobMemoryTop) {
@@ -2366,22 +2369,22 @@ CoreInitializeMemoryServices (
     //
     // Cache the resource descriptor HOB for the memory region described by the PHIT HOB
     //
-    PhitResourceHob = ResourceHob;
-    Found           = TRUE;
+    PhitResourceHob.Raw = Hob.Raw;
+    Found               = TRUE;
 
     //
     // If a Memory Type Information Resource HOB was found and is the same
     // Resource HOB that describes the PHIT HOB, then ignore the Memory Type
     // Information Resource HOB.
     //
-    if (MemoryTypeInformationResourceHob == PhitResourceHob) {
-      MemoryTypeInformationResourceHob = NULL;
+    if (MemoryTypeInformationResourceHob.Raw == PhitResourceHob.Raw) {
+      MemoryTypeInformationResourceHob.Raw = NULL;
     }
 
     //
     // Compute range between PHIT EfiMemoryTop and the end of the Resource Descriptor HOB
     //
-    Attributes  = PhitResourceHob->ResourceAttribute;
+    Attributes  = ResourceHobAttribute;
     BaseAddress = PageAlignAddress (PhitHob->EfiMemoryTop);
 
     if (BaseAddress > ResourceHobMemoryTop) {
@@ -2404,7 +2407,7 @@ CoreInitializeMemoryServices (
         // If that range is not large enough to intialize the DXE Core, then
         // Compute range between the start of the Resource Descriptor HOB and the start of the HOB List
         //
-        BaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
+        BaseAddress = PageAlignAddress (ResourcePhysicalStart);
         Length      = PageAlignLength ((UINT64)((UINTN)*HobStart - BaseAddress));
         FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
       }
@@ -2436,44 +2439,46 @@ CoreInitializeMemoryServices (
       //
       // Skip the Resource Descriptor HOB that contains the PHIT
       //
-      if (Hob.ResourceDescriptor == PhitResourceHob) {
+      if (Hob.Raw == PhitResourceHob.Raw) {
         continue;
       }
 
       //
       // Skip the Resource Descriptor HOB that contains Memory Type Information bins
       //
-      if (Hob.ResourceDescriptor == MemoryTypeInformationResourceHob) {
+      if (Hob.Raw == MemoryTypeInformationResourceHob.Raw) {
         continue;
       }
 
       //
       // Skip all HOBs except Resource Descriptor HOBs
       //
-      if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
         continue;
       }
 
       //
       // Skip Resource Descriptor HOBs that do not describe tested system memory below MAX_ALLOC_ADDRESS
       //
-      ResourceHob = Hob.ResourceDescriptor;
-      if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+      ResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+      ResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
+      ResourceHobAttribute  = GET_RESOURCE_HOB_ATTRIBUTE (Hob);
+      if (GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) != EFI_RESOURCE_SYSTEM_MEMORY) {
         continue;
       }
 
-      if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+      if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
         continue;
       }
 
       //
       // Check for potential overflow before addition
       //
-      if (ResourceHob->PhysicalStart > MAX_UINT64 - ResourceHob->ResourceLength) {
+      if (ResourcePhysicalStart > MAX_UINT64 - ResourceLength) {
         ASSERT (FALSE);
         ResourceHobMemoryTop = MAX_UINT64;
       } else {
-        ResourceHobMemoryTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
+        ResourceHobMemoryTop = ResourcePhysicalStart + ResourceLength;
       }
 
       if (ResourceHobMemoryTop > (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS) {
@@ -2483,14 +2488,14 @@ CoreInitializeMemoryServices (
       //
       // Skip Resource Descriptor HOBs that are below a previously found Resource Descriptor HOB
       //
-      if ((HighAddress != (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS) && (ResourceHob->PhysicalStart <= HighAddress)) {
+      if ((HighAddress != (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS) && (ResourcePhysicalStart <= HighAddress)) {
         continue;
       }
 
       //
       // Skip Resource Descriptor HOBs that are not large enough to initilize the DXE Core
       //
-      TestedMemoryBaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
+      TestedMemoryBaseAddress = PageAlignAddress (ResourcePhysicalStart);
       TestedMemoryLength      = PageAlignLength (ResourceHobMemoryTop - TestedMemoryBaseAddress);
       FindLargestFreeRegion (&TestedMemoryBaseAddress, &TestedMemoryLength, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
       if (TestedMemoryLength < MinimalMemorySizeNeeded) {
@@ -2502,8 +2507,8 @@ CoreInitializeMemoryServices (
       //
       BaseAddress = TestedMemoryBaseAddress;
       Length      = TestedMemoryLength;
-      Attributes  = ResourceHob->ResourceAttribute;
-      HighAddress = ResourceHob->PhysicalStart;
+      Attributes  = ResourceHobAttribute;
+      HighAddress = ResourcePhysicalStart;
     }
   }
 
@@ -2524,15 +2529,15 @@ CoreInitializeMemoryServices (
     Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeSystemMemory, Attributes);
   }
 
-  if (MemoryTypeInformationResourceHob != NULL) {
+  if (MemoryTypeInformationResourceHob.Raw != NULL) {
     //
     // If a Memory Type Information Resource HOB was found, then use the address
     // range of the  Memory Type Information Resource HOB as the preferred
     // address range for the Memory Type Information bins.
     //
     CoreSetMemoryTypeInformationRange (
-      MemoryTypeInformationResourceHob->PhysicalStart,
-      MemoryTypeInformationResourceHob->ResourceLength,
+      GET_RESOURCE_HOB_PHYSICAL_START (MemoryTypeInformationResourceHob),
+      GET_RESOURCE_HOB_RESOURCE_LENGTH (MemoryTypeInformationResourceHob),
       gMemoryTypeInformation,
       &mMemoryTypeInformationInitialized,
       mMemoryTypeStatistics,
@@ -2582,7 +2587,9 @@ CoreInitializeGcdServices (
   EFI_HOB_HANDOFF_INFO_TABLE       *PhitHob;
   UINT8                            SizeOfMemorySpace;
   UINT8                            SizeOfIoSpace;
-  EFI_HOB_RESOURCE_DESCRIPTOR      *ResourceHob;
+  EFI_RESOURCE_TYPE                ResourceType;
+  EFI_PHYSICAL_ADDRESS             ResourcePhysicalStart;
+  UINT64                           ResourceLength;
   EFI_PHYSICAL_ADDRESS             BaseAddress;
   UINT64                           Length;
   EFI_STATUS                       Status;
@@ -2598,6 +2605,7 @@ CoreInitializeGcdServices (
   UINT64                           Capabilities;
   EFI_HOB_CPU                      *CpuHob;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMapHobList;
+  EFI_RESOURCE_ATTRIBUTE_TYPE      ResourceHobAttribute;
 
   //
   // Cache the PHIT HOB for later use
@@ -2653,34 +2661,47 @@ CoreInitializeGcdServices (
     GcdMemoryType = EfiGcdMemoryTypeNonExistent;
     GcdIoType     = EfiGcdIoTypeNonExistent;
 
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      ResourceHob = Hob.ResourceDescriptor;
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        ResourceType          = Hob.ResourceDescriptor->ResourceType;
+        ResourceHobAttribute  = Hob.ResourceDescriptor->ResourceAttribute;
+        ResourcePhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
+        ResourceLength        = Hob.ResourceDescriptor->ResourceLength;
+      } else if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) {
+        ResourceType          = Hob.ResourceDescriptor2->ResourceType;
+        ResourceHobAttribute  = Hob.ResourceDescriptor2->ResourceCapabilities;
+        ResourcePhysicalStart = Hob.ResourceDescriptor2->PhysicalStart;
+        ResourceLength        = Hob.ResourceDescriptor2->ResourceLength;
+      } else {
+        ASSERT (FALSE);
+        continue;
+      }
 
-      switch (ResourceHob->ResourceType) {
+      switch (ResourceType) {
         case EFI_RESOURCE_SYSTEM_MEMORY:
-          if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES) {
-            if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) == EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) {
+          if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES) {
+            if ((ResourceHobAttribute & EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) == EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) {
               GcdMemoryType = EfiGcdMemoryTypeMoreReliable;
             } else {
               GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
             }
           }
 
-          if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == INITIALIZED_MEMORY_ATTRIBUTES) {
+          if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) == INITIALIZED_MEMORY_ATTRIBUTES) {
             GcdMemoryType = EfiGcdMemoryTypeReserved;
           }
 
-          if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == PRESENT_MEMORY_ATTRIBUTES) {
+          if ((ResourceHobAttribute & MEMORY_ATTRIBUTE_MASK) == PRESENT_MEMORY_ATTRIBUTES) {
             GcdMemoryType = EfiGcdMemoryTypeReserved;
           }
 
           // Mark special purpose memory as system memory, if it was system memory in the HOB
           // However, if this is also marked as persistent, let persistent take precedence
-          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) {
+          if ((ResourceHobAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) {
             GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
           }
 
-          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
+          if ((ResourceHobAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
             GcdMemoryType = EfiGcdMemoryTypePersistent;
           }
 
@@ -2708,20 +2729,20 @@ CoreInitializeGcdServices (
         //
         // Validate the Resource HOB Attributes
         //
-        CoreValidateResourceDescriptorHobAttributes (ResourceHob->ResourceAttribute);
+        CoreValidateResourceDescriptorHobAttributes (ResourceHobAttribute);
 
         //
         // Convert the Resource HOB Attributes to an EFI Memory Capabilities mask
         //
         Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (
                          GcdMemoryType,
-                         ResourceHob->ResourceAttribute
+                         ResourceHobAttribute
                          );
 
         Status = CoreInternalAddMemorySpace (
                    GcdMemoryType,
-                   ResourceHob->PhysicalStart,
-                   ResourceHob->ResourceLength,
+                   ResourcePhysicalStart,
+                   ResourceLength,
                    Capabilities
                    );
       }
@@ -2729,8 +2750,8 @@ CoreInitializeGcdServices (
       if (GcdIoType != EfiGcdIoTypeNonExistent) {
         Status = CoreAddIoSpace (
                    GcdIoType,
-                   ResourceHob->PhysicalStart,
-                   ResourceHob->ResourceLength
+                   ResourcePhysicalStart,
+                   ResourceLength
                    );
       }
     }

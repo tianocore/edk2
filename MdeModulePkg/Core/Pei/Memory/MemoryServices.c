@@ -23,18 +23,18 @@ InitializeMemoryTypeInformationBins (
   IN VOID            **HobList
   )
 {
-  EFI_PHYSICAL_ADDRESS         BaseBinAddress;
-  EFI_PHYSICAL_ADDRESS         EndBinAddress;
-  EFI_PEI_HOB_POINTERS         Hob;
-  UINTN                        Index;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
+  EFI_PHYSICAL_ADDRESS  BaseBinAddress;
+  EFI_PHYSICAL_ADDRESS  EndBinAddress;
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PEI_HOB_POINTERS  MemoryTypeInformationResourceHob;
+  UINTN                 Index;
 
   BaseBinAddress = 0;
   EndBinAddress  = 0;
 
-  MemoryTypeInformationResourceHob = GetMemoryTypeInformationResourceHob (HobList, PrivateData->MemoryTypeInformation);
+  MemoryTypeInformationResourceHob.Raw = GetMemoryTypeInformationResourceHob (HobList, PrivateData->MemoryTypeInformation);
 
-  if (MemoryTypeInformationResourceHob != NULL) {
+  if (MemoryTypeInformationResourceHob.Raw != NULL) {
     //
     // If a Memory Type Information Resource HOB was found, then use the address
     // range of the  Memory Type Information Resource HOB as the preferred
@@ -43,8 +43,8 @@ InitializeMemoryTypeInformationBins (
     // the API needs something passed in.
     //
     CoreSetMemoryTypeInformationRange (
-      MemoryTypeInformationResourceHob->PhysicalStart,
-      MemoryTypeInformationResourceHob->ResourceLength,
+      GET_RESOURCE_HOB_PHYSICAL_START (MemoryTypeInformationResourceHob),
+      GET_RESOURCE_HOB_RESOURCE_LENGTH (MemoryTypeInformationResourceHob),
       PrivateData->MemoryTypeInformation,
       &PrivateData->MemoryTypeInformationInitialized,
       PrivateData->MemoryTypeStatistics,

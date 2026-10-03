@@ -607,8 +607,8 @@ DiscoverPeimsAndOrderWithApriori (
 **/
 BOOLEAN
 PeiLoadFixAddressIsMemoryRangeAvailable (
-  IN PEI_CORE_INSTANCE            *PrivateData,
-  IN EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob
+  IN PEI_CORE_INSTANCE     *PrivateData,
+  IN EFI_PEI_HOB_POINTERS  ResourceHob
   )
 {
   EFI_HOB_MEMORY_ALLOCATION  *MemoryHob;
@@ -616,7 +616,7 @@ PeiLoadFixAddressIsMemoryRangeAvailable (
   EFI_PEI_HOB_POINTERS       Hob;
 
   IsAvailable = TRUE;
-  if ((PrivateData == NULL) || (ResourceHob == NULL)) {
+  if ((PrivateData == NULL) || (ResourceHob.Raw == NULL)) {
     return FALSE;
   }
 
@@ -629,8 +629,9 @@ PeiLoadFixAddressIsMemoryRangeAvailable (
     //
     if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
       MemoryHob = Hob.MemoryAllocation;
-      if ((MemoryHob->AllocDescriptor.MemoryBaseAddress == ResourceHob->PhysicalStart) &&
-          (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength == ResourceHob->PhysicalStart + ResourceHob->ResourceLength))
+      if ((MemoryHob->AllocDescriptor.MemoryBaseAddress == GET_RESOURCE_HOB_PHYSICAL_START (ResourceHob)) &&
+          (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength ==
+           GET_RESOURCE_HOB_PHYSICAL_START (ResourceHob) + GET_RESOURCE_HOB_RESOURCE_LENGTH (ResourceHob)))
       {
         IsAvailable = FALSE;
         break;
@@ -639,6 +640,43 @@ PeiLoadFixAddressIsMemoryRangeAvailable (
   }
 
   return IsAvailable;
+}
+
+/**
+  Builds a Resource Descriptor HOB that matches the version of an existing HOB.
+
+  @param ResourceHob        The Resource Descriptor HOB whose version and
+                            Descriptor2-specific fields should be preserved.
+  @param ResourceAttribute  The resource attributes or capabilities.
+  @param PhysicalStart      The physical start address of the resource.
+  @param ResourceLength     The resource length in bytes.
+**/
+STATIC
+VOID
+BuildResourceDescriptorHobFromHob (
+  IN EFI_PEI_HOB_POINTERS         ResourceHob,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       ResourceLength
+  )
+{
+  if (GET_HOB_TYPE (ResourceHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) {
+    BuildResourceDescriptor2Hob (
+      GET_RESOURCE_HOB_RESOURCE_TYPE (ResourceHob),
+      ResourceAttribute,
+      PhysicalStart,
+      ResourceLength,
+      ResourceHob.ResourceDescriptor2->ResourceMemoryAttributes,
+      GET_RESOURCE_HOB_OWNER (ResourceHob)
+      );
+  } else {
+    BuildResourceDescriptorHob (
+      GET_RESOURCE_HOB_RESOURCE_TYPE (ResourceHob),
+      ResourceAttribute,
+      PhysicalStart,
+      ResourceLength
+      );
+  }
 }
 
 /**
@@ -657,30 +695,28 @@ PeiLoadFixAddressHook (
   IN PEI_CORE_INSTANCE  *PrivateData
   )
 {
-  EFI_PHYSICAL_ADDRESS         TopLoadingAddress;
-  UINT64                       PeiMemorySize;
-  UINT64                       TotalReservedMemorySize;
-  UINT64                       MemoryRangeEnd;
-  EFI_PHYSICAL_ADDRESS         HighAddress;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *NextResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *CurrentResourceHob;
-  EFI_PEI_HOB_POINTERS         CurrentHob;
-  EFI_PEI_HOB_POINTERS         Hob;
-  EFI_PEI_HOB_POINTERS         NextHob;
-  EFI_HOB_MEMORY_ALLOCATION    *MemoryHob;
+  EFI_PHYSICAL_ADDRESS       TopLoadingAddress;
+  UINT64                     PeiMemorySize;
+  UINT64                     TotalReservedMemorySize;
+  UINT64                     MemoryRangeEnd;
+  EFI_PHYSICAL_ADDRESS       HighAddress;
+  EFI_PHYSICAL_ADDRESS       ResourcePhysicalStart;
+  UINT64                     ResourceLength;
+  EFI_PHYSICAL_ADDRESS       NextResourcePhysicalStart;
+  UINT64                     NextResourceLength;
+  EFI_PEI_HOB_POINTERS       CurrentResourceHob;
+  EFI_PEI_HOB_POINTERS       Hob;
+  EFI_PEI_HOB_POINTERS       NextHob;
+  EFI_HOB_MEMORY_ALLOCATION  *MemoryHob;
 
   //
   // Initialize Local Variables
   //
-  CurrentResourceHob = NULL;
-  ResourceHob        = NULL;
-  NextResourceHob    = NULL;
-  HighAddress        = 0;
-  TopLoadingAddress  = 0;
-  MemoryRangeEnd     = 0;
-  CurrentHob.Raw     = PrivateData->HobList.Raw;
-  PeiMemorySize      = PrivateData->PhysicalMemoryLength;
+  CurrentResourceHob.Raw = NULL;
+  HighAddress            = 0;
+  TopLoadingAddress      = 0;
+  MemoryRangeEnd         = 0;
+  PeiMemorySize          = PrivateData->PhysicalMemoryLength;
   //
   // The top reserved memory include 3 parts: the topest range is for DXE core initialization with the size  MINIMUM_INITIAL_MEMORY_SIZE
   // then RuntimeCodePage range and Boot time code range.
@@ -703,13 +739,14 @@ PeiLoadFixAddressHook (
     //
     // See if this is a resource descriptor HOB
     //
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      ResourceHob = Hob.ResourceDescriptor;
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      ResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+      ResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
       //
       // If range described in this HOB is not system memory or higher than MAX_ADDRESS, ignored.
       //
-      if ((ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) ||
-          (ResourceHob->PhysicalStart + ResourceHob->ResourceLength > MAX_ADDRESS))
+      if ((GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) != EFI_RESOURCE_SYSTEM_MEMORY) ||
+          (ResourcePhysicalStart + ResourceLength > MAX_ADDRESS))
       {
         continue;
       }
@@ -722,32 +759,38 @@ PeiLoadFixAddressHook (
         //
         // See if this is a resource descriptor HOB
         //
-        if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-          NextResourceHob = NextHob.ResourceDescriptor;
+        if (IS_RESOURCE_DESCRIPTOR_HOB (NextHob)) {
+          NextResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (NextHob);
+          NextResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (NextHob);
           //
           // test if range described in this NextResourceHob is system memory and have the same attribute.
           // Note: Here is a assumption that system memory should always be healthy even without test.
           //
-          if ((NextResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-              (((NextResourceHob->ResourceAttribute^ResourceHob->ResourceAttribute) & (~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0))
+          if ((GET_RESOURCE_HOB_RESOURCE_TYPE (NextHob) == EFI_RESOURCE_SYSTEM_MEMORY) &&
+              (((GET_RESOURCE_HOB_ATTRIBUTE (NextHob)^GET_RESOURCE_HOB_ATTRIBUTE (Hob)) & (~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0))
           {
             //
             // See if the memory range described in ResourceHob and NextResourceHob is adjacent
             //
-            if (((ResourceHob->PhysicalStart <= NextResourceHob->PhysicalStart) &&
-                 (ResourceHob->PhysicalStart + ResourceHob->ResourceLength >= NextResourceHob->PhysicalStart)) ||
-                ((ResourceHob->PhysicalStart >= NextResourceHob->PhysicalStart) &&
-                 (ResourceHob->PhysicalStart <= NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength)))
+            if (((ResourcePhysicalStart <= NextResourcePhysicalStart) &&
+                 (ResourcePhysicalStart + ResourceLength >= NextResourcePhysicalStart)) ||
+                ((ResourcePhysicalStart >= NextResourcePhysicalStart) &&
+                 (ResourcePhysicalStart <= NextResourcePhysicalStart + NextResourceLength)))
             {
-              MemoryRangeEnd = ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength) > (NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength)) ?
-                               (ResourceHob->PhysicalStart + ResourceHob->ResourceLength) : (NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength);
+              MemoryRangeEnd        = MAX (ResourcePhysicalStart + ResourceLength, NextResourcePhysicalStart + NextResourceLength);
+              ResourcePhysicalStart = MIN (ResourcePhysicalStart, NextResourcePhysicalStart);
+              ResourceLength        = MemoryRangeEnd - ResourcePhysicalStart;
 
-              ResourceHob->PhysicalStart = (ResourceHob->PhysicalStart < NextResourceHob->PhysicalStart) ?
-                                           ResourceHob->PhysicalStart : NextResourceHob->PhysicalStart;
+              if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) {
+                Hob.ResourceDescriptor2->PhysicalStart        = ResourcePhysicalStart;
+                Hob.ResourceDescriptor2->ResourceLength       = ResourceLength;
+                Hob.ResourceDescriptor2->ResourceCapabilities = GET_RESOURCE_HOB_ATTRIBUTE (Hob) & (~EFI_RESOURCE_ATTRIBUTE_TESTED);
+              } else {
+                Hob.ResourceDescriptor->PhysicalStart     = ResourcePhysicalStart;
+                Hob.ResourceDescriptor->ResourceLength    = ResourceLength;
+                Hob.ResourceDescriptor->ResourceAttribute = GET_RESOURCE_HOB_ATTRIBUTE (Hob) & (~EFI_RESOURCE_ATTRIBUTE_TESTED);
+              }
 
-              ResourceHob->ResourceLength = (MemoryRangeEnd - ResourceHob->PhysicalStart);
-
-              ResourceHob->ResourceAttribute = ResourceHob->ResourceAttribute & (~EFI_RESOURCE_ATTRIBUTE_TESTED);
               //
               // Delete the NextResourceHob by marking it as unused.
               //
@@ -773,44 +816,53 @@ PeiLoadFixAddressHook (
         //
         // See if this is a resource descriptor HOB
         //
-        if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-          NextResourceHob = NextHob.ResourceDescriptor;
+        if (IS_RESOURCE_DESCRIPTOR_HOB (NextHob)) {
+          NextResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (NextHob);
+          NextResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (NextHob);
           //
           // If range described in this HOB is not system memory or higher than MAX_ADDRESS, ignored.
           //
-          if ((NextResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) || (NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength > MAX_ADDRESS)) {
+          if ((GET_RESOURCE_HOB_RESOURCE_TYPE (NextHob) != EFI_RESOURCE_SYSTEM_MEMORY) ||
+              (NextResourcePhysicalStart + NextResourceLength > MAX_ADDRESS))
+          {
             continue;
           }
 
           //
           // If the range describe in memory allocation HOB belongs to the memory range described by the resource HOB
           //
-          if ((MemoryHob->AllocDescriptor.MemoryBaseAddress >= NextResourceHob->PhysicalStart) &&
-              (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength <= NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength))
+          if ((MemoryHob->AllocDescriptor.MemoryBaseAddress >= NextResourcePhysicalStart) &&
+              (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength <= NextResourcePhysicalStart + NextResourceLength))
           {
             //
             // Build separate resource HOB for this allocated range
             //
-            if (MemoryHob->AllocDescriptor.MemoryBaseAddress > NextResourceHob->PhysicalStart) {
-              BuildResourceDescriptorHob (
-                EFI_RESOURCE_SYSTEM_MEMORY,
-                NextResourceHob->ResourceAttribute,
-                NextResourceHob->PhysicalStart,
-                (MemoryHob->AllocDescriptor.MemoryBaseAddress - NextResourceHob->PhysicalStart)
+            if (MemoryHob->AllocDescriptor.MemoryBaseAddress > NextResourcePhysicalStart) {
+              BuildResourceDescriptorHobFromHob (
+                NextHob,
+                GET_RESOURCE_HOB_ATTRIBUTE (NextHob),
+                NextResourcePhysicalStart,
+                MemoryHob->AllocDescriptor.MemoryBaseAddress - NextResourcePhysicalStart
                 );
             }
 
-            if (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength < NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength) {
-              BuildResourceDescriptorHob (
-                EFI_RESOURCE_SYSTEM_MEMORY,
-                NextResourceHob->ResourceAttribute,
+            if (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength < NextResourcePhysicalStart + NextResourceLength) {
+              BuildResourceDescriptorHobFromHob (
+                NextHob,
+                GET_RESOURCE_HOB_ATTRIBUTE (NextHob),
                 MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength,
-                (NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength -(MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength))
+                NextResourcePhysicalStart + NextResourceLength - (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength)
                 );
             }
 
-            NextResourceHob->PhysicalStart  = MemoryHob->AllocDescriptor.MemoryBaseAddress;
-            NextResourceHob->ResourceLength = MemoryHob->AllocDescriptor.MemoryLength;
+            if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) {
+              NextHob.ResourceDescriptor2->PhysicalStart  = MemoryHob->AllocDescriptor.MemoryBaseAddress;
+              NextHob.ResourceDescriptor2->ResourceLength = MemoryHob->AllocDescriptor.MemoryLength;
+            } else {
+              NextHob.ResourceDescriptor->PhysicalStart  = MemoryHob->AllocDescriptor.MemoryBaseAddress;
+              NextHob.ResourceDescriptor->ResourceLength = MemoryHob->AllocDescriptor.MemoryLength;
+            }
+
             break;
           }
         }
@@ -842,30 +894,30 @@ PeiLoadFixAddressHook (
       //
       // See if this is a resource descriptor HOB
       //
-      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-        ResourceHob = Hob.ResourceDescriptor;
+      if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+        ResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+        ResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
         //
         // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
         //
-        if ((ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-            (ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS))
+        if ((GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) == EFI_RESOURCE_SYSTEM_MEMORY) &&
+            (ResourcePhysicalStart + ResourceLength <= MAX_ADDRESS))
         {
           //
           // See if Top address specified by user is valid.
           //
-          if ((ResourceHob->PhysicalStart + TotalReservedMemorySize < TopLoadingAddress) &&
-              ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength - MINIMUM_INITIAL_MEMORY_SIZE) >= TopLoadingAddress) &&
-              PeiLoadFixAddressIsMemoryRangeAvailable (PrivateData, ResourceHob))
+          if ((ResourcePhysicalStart + TotalReservedMemorySize < TopLoadingAddress) &&
+              ((ResourcePhysicalStart + ResourceLength - MINIMUM_INITIAL_MEMORY_SIZE) >= TopLoadingAddress) &&
+              PeiLoadFixAddressIsMemoryRangeAvailable (PrivateData, Hob))
           {
-            CurrentResourceHob = ResourceHob;
-            CurrentHob         = Hob;
+            CurrentResourceHob = Hob;
             break;
           }
         }
       }
     }
 
-    if (CurrentResourceHob != NULL) {
+    if (CurrentResourceHob.Raw != NULL) {
       DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO:Top Address 0x%lx is valid \n", TopLoadingAddress));
       TopLoadingAddress += MINIMUM_INITIAL_MEMORY_SIZE;
     } else {
@@ -878,23 +930,24 @@ PeiLoadFixAddressHook (
         //
         // See if this is a resource descriptor HOB
         //
-        if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-          ResourceHob = Hob.ResourceDescriptor;
+        if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+          ResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+          ResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
           //
           // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
           //
-          if ((ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-              (ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS))
+          if ((GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) == EFI_RESOURCE_SYSTEM_MEMORY) &&
+              (ResourcePhysicalStart + ResourceLength <= MAX_ADDRESS))
           {
             //
             // See if Top address specified by user is valid.
             //
-            if ((ResourceHob->ResourceLength > TotalReservedMemorySize) && PeiLoadFixAddressIsMemoryRangeAvailable (PrivateData, ResourceHob)) {
+            if ((ResourceLength > TotalReservedMemorySize) && PeiLoadFixAddressIsMemoryRangeAvailable (PrivateData, Hob)) {
               DEBUG ((
                 DEBUG_INFO,
                 "(0x%lx, 0x%lx)\n",
-                (ResourceHob->PhysicalStart + TotalReservedMemorySize -MINIMUM_INITIAL_MEMORY_SIZE),
-                (ResourceHob->PhysicalStart + ResourceHob->ResourceLength -MINIMUM_INITIAL_MEMORY_SIZE)
+                (ResourcePhysicalStart + TotalReservedMemorySize - MINIMUM_INITIAL_MEMORY_SIZE),
+                (ResourcePhysicalStart + ResourceLength - MINIMUM_INITIAL_MEMORY_SIZE)
                 ));
             }
           }
@@ -919,28 +972,28 @@ PeiLoadFixAddressHook (
       //
       // See if this is a resource descriptor HOB
       //
-      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-        ResourceHob = Hob.ResourceDescriptor;
+      if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+        ResourcePhysicalStart = GET_RESOURCE_HOB_PHYSICAL_START (Hob);
+        ResourceLength        = GET_RESOURCE_HOB_RESOURCE_LENGTH (Hob);
         //
         // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
         //
-        if ((ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-            (ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS) &&
-            (ResourceHob->ResourceLength > TotalReservedMemorySize) && PeiLoadFixAddressIsMemoryRangeAvailable (PrivateData, ResourceHob))
+        if ((GET_RESOURCE_HOB_RESOURCE_TYPE (Hob) == EFI_RESOURCE_SYSTEM_MEMORY) &&
+            (ResourcePhysicalStart + ResourceLength <= MAX_ADDRESS) &&
+            (ResourceLength > TotalReservedMemorySize) && PeiLoadFixAddressIsMemoryRangeAvailable (PrivateData, Hob))
         {
           //
           // See if this is the highest largest system memory region below MaxAddress
           //
-          if (ResourceHob->PhysicalStart > HighAddress) {
-            CurrentResourceHob = ResourceHob;
-            CurrentHob         = Hob;
-            HighAddress        = CurrentResourceHob->PhysicalStart;
+          if (ResourcePhysicalStart > HighAddress) {
+            CurrentResourceHob = Hob;
+            HighAddress        = ResourcePhysicalStart;
           }
         }
       }
     }
 
-    if (CurrentResourceHob == NULL) {
+    if (CurrentResourceHob.Raw == NULL) {
       DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED ERROR:The System Memory is too small\n"));
       //
       // Assert here
@@ -948,16 +1001,16 @@ PeiLoadFixAddressHook (
       ASSERT (FALSE);
       return;
     } else {
-      TopLoadingAddress = CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength;
+      TopLoadingAddress = GET_RESOURCE_HOB_PHYSICAL_START (CurrentResourceHob) + GET_RESOURCE_HOB_RESOURCE_LENGTH (CurrentResourceHob);
     }
   }
 
-  if (CurrentResourceHob != NULL) {
+  if (CurrentResourceHob.Raw != NULL) {
     //
     // rebuild resource HOB for PEI memory and reserved memory
     //
-    BuildResourceDescriptorHob (
-      EFI_RESOURCE_SYSTEM_MEMORY,
+    BuildResourceDescriptorHobFromHob (
+      CurrentResourceHob,
       (
        EFI_RESOURCE_ATTRIBUTE_PRESENT |
        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -973,9 +1026,9 @@ PeiLoadFixAddressHook (
     //
     // rebuild resource for the remain memory if necessary
     //
-    if (CurrentResourceHob->PhysicalStart < TopLoadingAddress - TotalReservedMemorySize) {
-      BuildResourceDescriptorHob (
-        EFI_RESOURCE_SYSTEM_MEMORY,
+    if (GET_RESOURCE_HOB_PHYSICAL_START (CurrentResourceHob) < TopLoadingAddress - TotalReservedMemorySize) {
+      BuildResourceDescriptorHobFromHob (
+        CurrentResourceHob,
         (
          EFI_RESOURCE_ATTRIBUTE_PRESENT |
          EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -984,14 +1037,14 @@ PeiLoadFixAddressHook (
          EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
          EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
         ),
-        CurrentResourceHob->PhysicalStart,
-        (TopLoadingAddress - TotalReservedMemorySize - CurrentResourceHob->PhysicalStart)
+        GET_RESOURCE_HOB_PHYSICAL_START (CurrentResourceHob),
+        TopLoadingAddress - TotalReservedMemorySize - GET_RESOURCE_HOB_PHYSICAL_START (CurrentResourceHob)
         );
     }
 
-    if (CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength  > TopLoadingAddress ) {
-      BuildResourceDescriptorHob (
-        EFI_RESOURCE_SYSTEM_MEMORY,
+    if (GET_RESOURCE_HOB_PHYSICAL_START (CurrentResourceHob) + GET_RESOURCE_HOB_RESOURCE_LENGTH (CurrentResourceHob) > TopLoadingAddress) {
+      BuildResourceDescriptorHobFromHob (
+        CurrentResourceHob,
         (
          EFI_RESOURCE_ATTRIBUTE_PRESENT |
          EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -1001,14 +1054,14 @@ PeiLoadFixAddressHook (
          EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
         ),
         TopLoadingAddress,
-        (CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength  - TopLoadingAddress)
+        GET_RESOURCE_HOB_PHYSICAL_START (CurrentResourceHob) + GET_RESOURCE_HOB_RESOURCE_LENGTH (CurrentResourceHob) - TopLoadingAddress
         );
     }
 
     //
     // Delete CurrentHob by marking it as unused since the memory range described by is rebuilt.
     //
-    GET_HOB_TYPE (CurrentHob) = EFI_HOB_TYPE_UNUSED;
+    GET_HOB_TYPE (CurrentResourceHob) = EFI_HOB_TYPE_UNUSED;
   }
 
   //
