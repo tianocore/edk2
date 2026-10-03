@@ -48,6 +48,18 @@ typedef struct {
 } MAP_INFO;
 #define MAP_INFO_FROM_LINK(a)  CR (a, MAP_INFO, Link, MAP_INFO_SIGNATURE)
 
+//
+// A fixed I/O or MMIO range decoded by a device below a root bridge, as
+// submitted via EDKII_PCI_HOST_BRIDGE_FIXED_RESOURCE_PROTOCOL.
+//
+typedef struct {
+  PCI_RESOURCE_TYPE    Type;         // TypeIo, TypeMem32/64 or TypePMem32/64
+  UINT64               DeviceBase;
+  UINT64               Length;
+  UINT64               Translation;  // of the aperture covering the range
+  BOOLEAN              Claimed;      // allocated in GCD by this driver
+} PCI_FIXED_RES_NODE;
+
 #define PCI_ROOT_BRIDGE_SIGNATURE  SIGNATURE_32 ('_', 'p', 'r', 'b')
 
 typedef struct {
@@ -73,6 +85,10 @@ typedef struct {
 
   BOOLEAN                            ResourceSubmitted;
   LIST_ENTRY                         Maps;
+
+  PCI_FIXED_RES_NODE                 *FixedRes;
+  UINTN                              FixedResCount;
+  UINTN                              FixedResCapacity; // of ConfigBuffer
 } PCI_ROOT_BRIDGE_INSTANCE;
 
 #define ROOT_BRIDGE_FROM_THIS(a)  CR (a, PCI_ROOT_BRIDGE_INSTANCE, RootBridgeIo, PCI_ROOT_BRIDGE_SIGNATURE)
