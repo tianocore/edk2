@@ -1950,6 +1950,7 @@ EfiBootManagerBoot (
   UINTN                      FileSize;
   EFI_BOOT_LOGO_PROTOCOL     *BootLogo;
   EFI_EVENT                  LegacyBootEvent;
+  UINTN                      ReportStatusCodeData[2];
 
   if (BootOption == NULL) {
     return;
@@ -2047,7 +2048,19 @@ EfiBootManagerBoot (
     if (FileBuffer != NULL) {
       RamDiskDevicePath = BmGetRamDiskDevicePath (FilePath);
 
-      REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
+      ReportStatusCodeData[0] = (FilePath != NULL) ? (UINTN)FilePath : (UINTN)(BootOption->FilePath);
+      ReportStatusCodeData[1] = OptionNumber;
+
+      REPORT_STATUS_CODE_EX (
+        EFI_PROGRESS_CODE,
+        PcdGet32 (PcdProgressCodeOsLoaderLoad),
+        0,
+        NULL,
+        NULL,
+        ReportStatusCodeData,
+        sizeof (ReportStatusCodeData)
+        );
+
       Status = gBS->LoadImage (
                       TRUE,
                       gImageHandle,
