@@ -231,6 +231,8 @@ PlatformBootManagerBeforeConsole (
   EFI_INPUT_KEY                 CustomKey;
   EFI_INPUT_KEY                 Down;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
+  EDKII_PLATFORM_LOGO_PROTOCOL  *PlatformLogo;
+  BOOLEAN                       ConsoleInitialized;
 
   //
   // Register ENTER as CONTINUE key
@@ -267,8 +269,18 @@ PlatformBootManagerBeforeConsole (
   //
   // Process update capsules that don't contain embedded drivers.
   //
+  ConsoleInitialized = FALSE;
   if (GetBootModeHob () == BOOT_ON_FLASH_UPDATE) {
     // TODO: when enabling capsule support for laptops, add a battery check here
+    PlatformConsoleInit ();
+    ConsoleInitialized = TRUE;
+
+    Status = gBS->LocateProtocol (&gEdkiiPlatformLogoProtocolGuid, NULL, (VOID **)&PlatformLogo);
+    if (!EFI_ERROR (Status) && (gST != NULL) && (gST->ConOut != NULL)) {
+      gST->ConOut->ClearScreen (gST->ConOut);
+      BootLogoEnableLogo ();
+    }
+
     Status = ProcessCapsules ();
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a(): ProcessCapsule() failed with: %r\n", __func__, Status));
@@ -286,7 +298,9 @@ PlatformBootManagerBeforeConsole (
   //
   EfiBootManagerDispatchDeferredImages ();
 
-  PlatformConsoleInit ();
+  if (!ConsoleInitialized) {
+    PlatformConsoleInit ();
+  }
 }
 
 /**
