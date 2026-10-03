@@ -178,7 +178,26 @@ CacheFwCfgInfoWithOptionalMeasurment (
     }
 
     FwCfginfoHobData = NULL;
+
+    //
+    // FwCfgSize originates from the untrusted VMM fw_cfg interface. Guard
+    // against a UINT32 overflow of the HOB size and against exceeding the
+    // maximum GUID HOB payload before allocating: BuildGuidHob() truncates the
+    // length to a UINT16 HobLength in RELEASE builds, and QemuFwCfgReadBytes()
+    // below would then write FwCfgSize bytes past the truncated allocation.
+    //
+    if (CacheFwCfgList[Index].FwCfgSize > (MAX_UINT32 - sizeof (FW_CFG_CACHED_ITEM))) {
+      DEBUG ((DEBUG_ERROR, "%a: FwCfgSize(0x%x) too large\n", __func__, CacheFwCfgList[Index].FwCfgSize));
+      return EFI_INVALID_PARAMETER;
+    }
+
     FwCfgItemHobSize = sizeof (FW_CFG_CACHED_ITEM) + CacheFwCfgList[Index].FwCfgSize;
+
+    if (FwCfgItemHobSize > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE))) {
+      DEBUG ((DEBUG_ERROR, "%a: FwCfgItemHobSize(0x%x) exceeds max GUID HOB payload\n", __func__, FwCfgItemHobSize));
+      return EFI_INVALID_PARAMETER;
+    }
+
     FwCfginfoHobData = BuildGuidHob (&gOvmfFwCfgInfoHobGuid, FwCfgItemHobSize);
     if (FwCfginfoHobData == NULL) {
       DEBUG ((DEBUG_ERROR, "%a: BuildGuidHob Failed with FwCfgItemHobSize(0x%x)\n", __func__, FwCfgItemHobSize));
