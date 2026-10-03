@@ -52,6 +52,9 @@ typedef struct {
   UINT32    GopWidth;
   UINT32    GopHeight;
   UINT32    GopModeNumber;
+  UINTN     GlyphWidth;
+  UINTN     GlyphHeight;
+  UINTN     TextScale;
 } GRAPHICS_CONSOLE_MODE_DATA;
 
 typedef struct {
@@ -527,7 +530,8 @@ EFI_STATUS
 DrawUnicodeWeightAtCursorN (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN  CHAR16                           *UnicodeWeight,
-  IN  UINTN                            Count
+  IN  UINTN                            Count,
+  IN  UINTN                            CellCount
   );
 
 /**
