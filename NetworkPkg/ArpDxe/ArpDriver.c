@@ -133,6 +133,11 @@ ArpCreateService (
     goto ERROR_EXIT;
   }
 
+  Status = ArpService->Mnp->GetModeData (ArpService->Mnp, NULL, &ArpService->SnpMode);
+  if ((Status != EFI_NOT_STARTED) && EFI_ERROR (Status)) {
+    goto ERROR_EXIT;
+  }
+
   //
   // Create the event used in the RxToken.
   //
