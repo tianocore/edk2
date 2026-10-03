@@ -640,6 +640,12 @@ CoreLoadPeImage (
       return EFI_UNSUPPORTED;
   }
 
+  // If the image doesn't have the NXCOMPAT flag and is an EFI_APPLICATION subsystem, it could be a boot
+  // loader or 3rd party binary which isn't NX aware and may be incompatible with all memory protections.
+  if (!(Image->ImageContext.SupportsNx) && (Image->ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION)) {
+    ActivateCompatibilityMode ();
+  }
+
   //
   // Allocate memory of the correct memory type aligned on the required image boundary
   //
