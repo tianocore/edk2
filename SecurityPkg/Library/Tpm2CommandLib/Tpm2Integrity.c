@@ -140,21 +140,15 @@ Tpm2PcrExtend (
       DigestSize
       );
 
-    DEBUG_CODE_BEGIN ();
-    UINTN  Index2;
-    DEBUG ((
+    DUMP_HEX (
       DEBUG_VERBOSE,
+      0,
+      Buffer,
+      DigestSize,
       "Tpm2PcrExtend - Hash = 0x%04x, Pcr[%02d], digest = ",
       Digests->digests[Index].hashAlg,
       (UINT8)PcrHandle
-      ));
-
-    for (Index2 = 0; Index2 < DigestSize; Index2++) {
-      DEBUG ((DEBUG_VERBOSE, "%02x ", Buffer[Index2]));
-    }
-
-    DEBUG ((DEBUG_VERBOSE, "\n"));
-    DEBUG_CODE_END ();
+      );
 
     Buffer += DigestSize;
   }
@@ -758,7 +752,6 @@ Tpm2PcrReadForActiveBank (
   UINT32              ActivePcrBanks;
   UINT32              TcgRegistryHashAlg;
   UINTN               Index;
-  UINTN               Index2;
 
   PcrIndex = (UINT8)PcrHandle;
 
@@ -869,18 +862,15 @@ Tpm2PcrReadForActiveBank (
 
   if (DebugPrintLevelEnabled (DEBUG_SECURITY)) {
     for (Index = 0; Index < PcrValues.count; Index++) {
-      DEBUG ((
+      DUMP_HEX (
         DEBUG_SECURITY,
+        0,
+        PcrValues.digests[Index].buffer,
+        PcrValues.digests[Index].size,
         "ReadPcr - HashAlg = 0x%04x, Pcr[%02d], digest = ",
         PcrSelectionOut.pcrSelections[Index].hash,
         PcrIndex
-        ));
-
-      for (Index2 = 0; Index2 < PcrValues.digests[Index].size; Index2++) {
-        DEBUG ((DEBUG_SECURITY, "%02x ", PcrValues.digests[Index].buffer[Index2]));
-      }
-
-      DEBUG ((DEBUG_SECURITY, "\n"));
+        );
     }
   }
 

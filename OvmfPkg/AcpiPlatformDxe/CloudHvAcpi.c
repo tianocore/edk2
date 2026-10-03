@@ -58,11 +58,7 @@ InstallCloudHvTablesTdx (
         return Status;
       }
 
-      for (UINTN i = 0; i < CurrentTable->Length; i++) {
-        DEBUG ((DEBUG_INFO, " %x", *((UINT8 *)CurrentTable + i)));
-      }
-
-      DEBUG ((DEBUG_INFO, "\n"));
+      DUMP_HEX (DEBUG_INFO, 0, CurrentTable, CurrentTable->Length, "");
     }
 
     Hob.Raw  = GET_NEXT_HOB (Hob.Raw);

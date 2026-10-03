@@ -196,15 +196,7 @@ IpmiSmbiosTransferSendTables (
   DEBUG ((SMBIOS_TRANSFER_DEBUG, "%a: SMBIOS BINARY DATA OUTPUT\n", __func__));
   DEBUG ((SMBIOS_TRANSFER_DEBUG, "%a: Table Address: 0x%x\n", __func__, Smbios30Table->TableAddress));
   DEBUG ((SMBIOS_TRANSFER_DEBUG, "%a: Table Length: %d\n", __func__, Smbios30Table->TableMaximumSize));
-  for (Index = 0; Index < SendDataSize; Index++) {
-    if (((Index % BLOB_MAX_DATA_PER_PACKET) / 2) == 0) {
-      DEBUG ((SMBIOS_TRANSFER_DEBUG, "\n%04x: ", Index));
-    }
-
-    DEBUG ((SMBIOS_TRANSFER_DEBUG, "%02x ", *(SendData + Index)));
-  }
-
-  DEBUG ((SMBIOS_TRANSFER_DEBUG, "\n"));
+  DUMP_HEX (SMBIOS_TRANSFER_DEBUG, 0, SendData, SendDataSize, "");
   DEBUG_CODE_END ();
 
   Status = IpmiBlobTransfer->BlobOpen ((CHAR8 *)PcdGetPtr (PcdBmcSmbiosBlobTransferId), BLOB_TRANSFER_STAT_OPEN_W, &SessionId);
