@@ -52,6 +52,14 @@ ReadNvmeControllerCapabilities (
     return Status;
   }
 
+  if (Data == MAX_UINT64) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ReadNvmeControllerCapabilities: device returned all-ones -- not responding\n"
+      ));
+    return EFI_DEVICE_ERROR;
+  }
+
   WriteUnaligned64 ((UINT64 *)Cap, Data);
   return EFI_SUCCESS;
 }
@@ -88,6 +96,14 @@ ReadNvmeControllerConfiguration (
 
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (Data == MAX_UINT32) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ReadNvmeControllerConfiguration: device returned all-ones -- not responding\n"
+      ));
+    return EFI_DEVICE_ERROR;
   }
 
   WriteUnaligned32 ((UINT32 *)Cc, Data);
@@ -172,6 +188,11 @@ ReadNvmeControllerStatus (
 
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (Data == MAX_UINT32) {
+    DEBUG ((DEBUG_ERROR, "ReadNvmeControllerStatus: device returned all-ones -- not responding\n"));
+    return EFI_DEVICE_ERROR;
   }
 
   WriteUnaligned32 ((UINT32 *)Csts, Data);
@@ -775,7 +796,15 @@ NvmeControllerInit (
   //
   // Currently the driver only supports 4k page size.
   //
-  ASSERT ((Private->Cap.Mpsmin + 12) <= EFI_PAGE_SHIFT);
+  if ((Private->Cap.Mpsmin + 12) > EFI_PAGE_SHIFT) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "NvmeControllerInit: controller requires minimum page size 2^%d, driver supports 2^%d\n",
+      Private->Cap.Mpsmin + 12,
+      EFI_PAGE_SHIFT
+      ));
+    return EFI_UNSUPPORTED;
+  }
 
   Private->Cid[0]        = 0;
   Private->Cid[1]        = 0;
