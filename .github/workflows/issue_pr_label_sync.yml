@@ -1,0 +1,27 @@
+name: Sync Labels from Issue to PR
+
+on:
+  pull_request:
+    types:
+      - edited
+      - opened
+      - reopened
+      - synchronize
+
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # Required to add labels to the PR
+      issues: read        # Required to read labels from the linked issue
+
+    steps:
+      - name: Copy Labels from Linked Issue
+        uses: michalvankodev/copy-issue-labels@v1.3.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: Exclude specific triage or internal management labels
+          labels-to-include: |
+            code-first
