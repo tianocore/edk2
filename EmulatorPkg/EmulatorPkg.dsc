@@ -115,6 +115,7 @@
   #
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
+  IoMmuLib|MdeModulePkg/Library/IoMmuLibNull/IoMmuLibNull.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
