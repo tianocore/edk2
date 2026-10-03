@@ -37,8 +37,12 @@ ASM_PFX(TriggerSmi):
     jne     @Return                     ; SMM modified rax, return now
     push    rcx                         ; save rcx to stack
     mov     rcx, 10000
-    rep     pause                       ; add a small delay
+@Pause:
+    pause                               ; add a small delay
+    loop    @Pause
     pop     rcx                         ; restore rcx
+    cmp     rax, rcx                    ; Check for a response during the delay
+    jne     @Return
     cmp     r8, 0
     je      @Return
     dec     r8
