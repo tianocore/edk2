@@ -1,0 +1,14 @@
+// /**
+//   Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+//   SPDX-License-Identifier: BSD-3-Clause-Clear
+//   @file
+//   Lz4CustomDecompressLib produces LZ4 custom decompression algorithm.
+//   It is based on the LZ4 library by Yann Collet.
+//   LZ4 is released under the BSD 2-Clause License.
+//   It is available at https://github.com/lz4/lz4
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Lz4CustomDecompressLib produces LZ4 custom decompression algorithm"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It is based on the LZ4 library by Yann Collet. LZ4 is released under the BSD 2-Clause License. It is available at https://github.com/lz4/lz4 ."

@@ -30,6 +30,7 @@
         "IgnoreFiles": [
             "Library/LzmaCustomDecompressLib",
             "Library/BrotliCustomDecompressLib",
+            "Library/Lz4CustomDecompressLib",
             "Universal/RegularExpressionDxe"
         ]
     },

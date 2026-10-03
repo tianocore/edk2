@@ -20,6 +20,7 @@ APPLICATIONS = \
   GenFv \
   GenFw \
   GenSec \
+  Lz4Compress \
   LzmaCompress \
   TianoCompress \
   VolInfo \
