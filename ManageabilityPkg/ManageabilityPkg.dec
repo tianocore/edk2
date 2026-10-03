@@ -11,6 +11,7 @@
 # Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
 # Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -112,6 +113,7 @@
 [PcdsFeatureFlag]
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiEnable|FALSE|BOOLEAN|0x10000001
   gManageabilityPkgTokenSpaceGuid.PcdManageabilitySmmIpmiEnable|FALSE|BOOLEAN|0x10000002
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityStandaloneMmIpmiEnable|FALSE|BOOLEAN|0x1000000F
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiEnable|FALSE|BOOLEAN|0x10000003
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmEnable|FALSE|BOOLEAN|0x10000004
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeMctpEnable|FALSE|BOOLEAN|0x10000005
