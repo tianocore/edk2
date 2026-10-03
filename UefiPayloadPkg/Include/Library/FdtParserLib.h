@@ -27,7 +27,7 @@ ParseDtb (
   @retval HobList   The base address of Hoblist.
 
 **/
-UINT64
+UINTN
 EFIAPI
 FdtNodeParser (
   IN VOID  *FdtBase
