@@ -75,10 +75,13 @@ ConstructFwHobList (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
   UINT64                ResourceLength;
   EFI_PHYSICAL_ADDRESS  LowMemoryStart;
   UINT64                LowMemoryLength;
+  EFI_PHYSICAL_ADDRESS  FwRegionStart;
+  EFI_PHYSICAL_ADDRESS  FwRegionEnd;
 
   ASSERT (VmmHobList != NULL);
 
@@ -88,17 +91,50 @@ ConstructFwHobList (
   LowMemoryStart  = 0;
 
   //
+  // Reserve MEMFD for SEC state and the DXE firmware volumes. A VMM resource
+  // may span MEMFD and ordinary RAM; only the part after MEMFD is usable as
+  // the firmware HOB list heap.
+  //
+  FwRegionStart = (EFI_PHYSICAL_ADDRESS)FixedPcdGet32 (PcdOvmfSecPageTablesBase);
+  FwRegionEnd   = (EFI_PHYSICAL_ADDRESS)FixedPcdGet32 (PcdOvmfDxeNonCcFvBase) +
+                  (EFI_PHYSICAL_ADDRESS)FixedPcdGet32 (PcdOvmfDxeNonCcFvSize);
+
+  //
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
         ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+        PhysicalEnd    = PhysicalStart + ResourceLength;
+
+        //
+        // PhysicalStart and ResourceLength are VMM-controlled. Reject a range
+        // that wraps around the address space before it is used.
+        //
+        if (PhysicalEnd < PhysicalStart) {
+          DEBUG ((DEBUG_ERROR, "FwHobList: resource descriptor overflow, skipped\n"));
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
+
+        //
+        // Exclude MEMFD without discarding an otherwise usable RAM region.
+        //
+        if ((PhysicalStart < FwRegionEnd) && (PhysicalEnd > FwRegionStart)) {
+          if (PhysicalStart < FwRegionStart) {
+            PhysicalEnd = MIN (PhysicalEnd, FwRegionStart);
+          } else {
+            PhysicalStart = MIN (PhysicalEnd, FwRegionEnd);
+          }
+
+          ResourceLength = PhysicalEnd - PhysicalStart;
+        }
 
         if (PhysicalEnd <= BASE_4GB) {
           if (ResourceLength > LowMemoryLength) {
-            LowMemoryStart  = Hob.ResourceDescriptor->PhysicalStart;
+            LowMemoryStart  = PhysicalStart;
             LowMemoryLength = ResourceLength;
           }
         } else {

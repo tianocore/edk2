@@ -552,6 +552,59 @@ IsInValidList (
 }
 
 /**
+  Check whether a VMM unaccepted-memory resource overlaps metadata-initialized
+  TDVF regions or wraps the physical address space. Other MEMFD memory is allowed.
+
+  @param[in] Resource  The unaccepted-memory resource descriptor.
+
+  @retval TRUE   The resource wraps or overlaps an initialized TDVF region.
+  @retval FALSE  The resource does not overlap an initialized TDVF region.
+
+**/
+STATIC
+BOOLEAN
+UnacceptedMemoryOverlapsFirmware (
+  IN CONST EFI_HOB_RESOURCE_DESCRIPTOR  *Resource
+  )
+{
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  ProtectedStart[] = {
+    FixedPcdGet32 (PcdOvmfSecPageTablesBase),
+    FixedPcdGet32 (PcdOvmfSecGhcbBase),
+    FixedPcdGet32 (PcdOvmfWorkAreaBase),
+    FixedPcdGet32 (PcdOvmfSecPeiTempRamBase),
+    FixedPcdGet32 (PcdBfvBase),
+    FixedPcdGet32 (PcdCfvBase)
+  };
+  UINT64                ProtectedSize[] = {
+    FixedPcdGet32 (PcdOvmfSecPageTablesSize),
+    FixedPcdGet32 (PcdOvmfSecGhcbSize),
+    FixedPcdGet32 (PcdOvmfWorkAreaSize) + (UINT64)FixedPcdGet32 (PcdOvmfSecGhcbBackupSize),
+    FixedPcdGet32 (PcdOvmfSecPeiTempRamSize),
+    FixedPcdGet32 (PcdBfvRawDataSize),
+    FixedPcdGet32 (PcdCfvRawDataSize)
+  };
+  UINTN                 Index;
+
+  PhysicalStart = Resource->PhysicalStart;
+  if (Resource->ResourceLength > MAX_UINT64 - PhysicalStart) {
+    return TRUE;
+  }
+
+  PhysicalEnd = PhysicalStart + Resource->ResourceLength;
+  for (Index = 0; Index < ARRAY_SIZE (ProtectedStart); Index++) {
+    if ((PhysicalStart < ProtectedStart[Index] + ProtectedSize[Index]) &&
+        (PhysicalEnd > ProtectedStart[Index]))
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Check the integrity of VMM Hob List.
 
   @param[in] VmmHobList   A pointer to Hob List
@@ -677,6 +730,14 @@ ValidateHobList (
         {
           DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceAttribute type. Type: 0x%08x\n", Hob.ResourceDescriptor->ResourceAttribute));
           return FALSE;
+        }
+
+        if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
+          if (UnacceptedMemoryOverlapsFirmware (Hob.ResourceDescriptor)) {
+            DEBUG ((DEBUG_ERROR, "HOB: invalid unaccepted memory range 0x%llx + 0x%llx\n",
+                    Hob.ResourceDescriptor->PhysicalStart, Hob.ResourceDescriptor->ResourceLength));
+            return FALSE;
+          }
         }
 
         break;
