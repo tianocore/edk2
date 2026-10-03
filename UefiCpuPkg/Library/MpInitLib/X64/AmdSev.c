@@ -128,6 +128,7 @@ SevSnpCreateSaveArea (
   IA32_CR4          ResetCr4;
   UINTN             StartIp;
   UINT8             SipiVector;
+  MSR_SEV_STATUS_REGISTER  Msr;
 
   //
   // When running under an SVSM, a Calling Area page is also needed and is
@@ -253,8 +254,24 @@ SevSnpCreateSaveArea (
   //   SEV_FEATURES - equivalent to the SEV_STATUS MSR right shifted 2 bits
   //
   SaveArea->Vmpl        = AmdSvsmSnpGetVmpl ();
-  SaveArea->SevFeatures = AsmReadMsr64 (MSR_SEV_STATUS) >> 2;
+  Msr.Uint64            = AsmReadMsr64 (MSR_SEV_STATUS);
+  SaveArea->SevFeatures = Msr.Uint64 >> 2;
 
+
+  //
+  // Set the ESMTP specific fields for the save area:
+  //   VCPU_ID - a value that uniquely identifies a vCPU within the guest,
+  //            chosen by the guest itself. This implementation uses the
+  //            APIC ID.
+  //   VCPU_SIBLING_MASK - guest policy that decides which vCPUs may run as
+  //            co-resident SMT siblings. The sibling mask being fully set
+  //            places every vCPU of the same guest in a single group so that
+  //            any two of them may be co-resident.
+  //
+  if (Msr.Bits.EnhSmtProtection) {
+    SaveArea->VcpuId          = ApicId;
+    SaveArea->VcpuSiblingMask = MAX_UINT32;
+  }
   SevSnpPerformApAction (SaveArea, ApicId, SVM_VMGEXIT_SNP_AP_CREATE);
 }
 
