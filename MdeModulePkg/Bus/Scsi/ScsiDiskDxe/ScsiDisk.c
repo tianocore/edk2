@@ -4426,7 +4426,7 @@ ScsiDiskFuaMode (
   UINT8       HostAdapterStatus;
   UINT8       TargetStatus;
   UINT8       SenseDataLength;
-  UINT8       Buffer[CACHE_MODE_PAGE_LEN];
+  UINT8       *Buffer;
   UINT32      BufferLength;
   EFI_STATUS  ReturnStatus;
   BOOLEAN     DpoFua;
@@ -4436,6 +4436,12 @@ ScsiDiskFuaMode (
   BufferLength    = CACHE_MODE_PAGE_LEN;
   DpoFua          = TRUE;
   WriteCaching    = TRUE;
+  Buffer          = AllocateAlignedBuffer (ScsiDiskDevice, BufferLength);
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Buffer, BufferLength);
   //
   // Execute Mode Sense Command here to get the support of FUA
   // through Mode page. FUA support locates in Mode parameter
@@ -4459,6 +4465,7 @@ ScsiDiskFuaMode (
     //
     // Mode Sense Command fails
     //
+    FreeAlignedBuffer (Buffer, CACHE_MODE_PAGE_LEN);
     return EFI_DEVICE_ERROR;
   }
 
@@ -4470,6 +4477,7 @@ ScsiDiskFuaMode (
     //
     // Return page is not right
     //
+    FreeAlignedBuffer (Buffer, CACHE_MODE_PAGE_LEN);
     return EFI_DEVICE_ERROR;
   }
 
@@ -4496,6 +4504,7 @@ ScsiDiskFuaMode (
   }
 
   ScsiDiskDevice->FuaMode = DpoFua || WriteCaching;
+  FreeAlignedBuffer (Buffer, CACHE_MODE_PAGE_LEN);
 
   return EFI_SUCCESS;
 }
