@@ -2,9 +2,8 @@
 #  The default logo bitmap picture shown on setup screen.
 #
 #  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
-#
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
 #
 ##
 
@@ -38,15 +37,23 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
+  BmpSupportLib
+  DebugLib
+  DxeServicesLib
+  MemoryAllocationLib
+  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  DebugLib
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid        ## CONSUMES
   gEfiHiiImageExProtocolGuid         ## CONSUMES
   gEfiHiiPackageListProtocolGuid     ## PRODUCES CONSUMES
   gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdOemLogoFileGuid    ## CONSUMES
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND
