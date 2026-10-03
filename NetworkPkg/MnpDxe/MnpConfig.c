@@ -214,7 +214,7 @@ MnpFreeNbuf (
 EFI_STATUS
 MnpAddFreeTxBuf (
   IN OUT MNP_DEVICE_DATA  *MnpDeviceData,
-  IN     UINTN            Count
+  IN     UINT32           Count
   )
 {
   EFI_STATUS       Status;

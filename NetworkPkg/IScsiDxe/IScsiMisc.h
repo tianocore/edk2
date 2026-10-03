@@ -255,7 +255,7 @@ IScsiRemoveNic (
 **/
 EFI_STATUS
 IScsiCreateAttempts (
-  IN UINTN  AttemptNum
+  IN UINT8  AttemptNum
   );
 
 /**
