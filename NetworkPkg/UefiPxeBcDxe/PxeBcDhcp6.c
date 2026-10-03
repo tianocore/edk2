@@ -545,12 +545,18 @@ PxeBcExtractBootFileUrl (
     //
     while (*BootFileNamePtr != '\0') {
       if (*BootFileNamePtr == '%') {
-        TmpChar               = *(BootFileNamePtr+ 3);
-        *(BootFileNamePtr+ 3) = '\0';
-        *BootFileName         = (UINT8)AsciiStrHexToUintn ((CHAR8 *)(BootFileNamePtr + 1));
-        BootFileName++;
-        *(BootFileNamePtr+ 3) = TmpChar;
-        BootFileNamePtr      += 3;
+        if ((*(BootFileNamePtr + 1) == '\0') || (*(BootFileNamePtr + 2) == '\0')) {
+          *BootFileName = *BootFileNamePtr;
+          BootFileName++;
+          BootFileNamePtr++;
+        } else {
+          TmpChar               = *(BootFileNamePtr + 3);
+          *(BootFileNamePtr+ 3) = '\0';
+          *BootFileName         = (UINT8)AsciiStrHexToUintn ((CHAR8 *)(BootFileNamePtr + 1));
+          BootFileName++;
+          *(BootFileNamePtr+ 3) = TmpChar;
+          BootFileNamePtr      += 3;
+        }
       } else {
         *BootFileName = *BootFileNamePtr;
         BootFileName++;
