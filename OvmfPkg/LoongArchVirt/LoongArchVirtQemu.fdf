@@ -112,6 +112,7 @@ INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 #
 # Platform Driver
 #
+INF  OvmfPkg/IoMmuAbsentDxe/IoMmuAbsentDxe.inf
 INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
