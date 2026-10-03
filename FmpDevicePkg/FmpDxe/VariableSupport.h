@@ -235,6 +235,22 @@ SetLastAttemptVersionInVariable (
   );
 
 /**
+  Records a durable failure checkpoint immediately before device update starts.
+
+  @param[in] Private             Private context structure for the managed
+                                 controller.
+  @param[in] LastAttemptVersion  Version of the firmware update being attempted.
+
+  @retval EFI_SUCCESS  The checkpoint is durable.
+  @retval Other        The checkpoint could not be persisted.
+**/
+EFI_STATUS
+SetUpdateInProgressInVariable (
+  IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
+  IN UINT32                            LastAttemptVersion
+  );
+
+/**
   Locks all the UEFI Variables that use gEfiCallerIdGuid of the currently
   executing module.
 
