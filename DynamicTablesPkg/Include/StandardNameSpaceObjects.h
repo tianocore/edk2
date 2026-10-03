@@ -13,6 +13,7 @@
 #pragma once
 
 #include <AcpiTableGenerator.h>
+#include <HiiFormsGenerator.h>
 #include <SmbiosTableGenerator.h>
 #include <AbstractToken.h>
 
@@ -69,6 +70,7 @@ typedef enum StdObjectID {
   EStdObjCfgMgrInfo = 0x00000000, ///< 0 - Configuration Manager Info
   EStdObjAcpiTableList,           ///< 1 - ACPI table Info List
   EStdObjSmbiosTableList,         ///< 2 - SMBIOS table Info List
+  EStdObjHiiFormsList,            ///< 3 - Hii Forms Info List
   EStdObjMax
 } ESTD_OBJECT_ID;
 
@@ -158,5 +160,17 @@ typedef struct CmStdObjSmbiosTableInfo {
   /// Optional pointer to the SMBIOS table data
   SMBIOS_STRUCTURE             *SmbiosTableData;
 } CM_STD_OBJ_SMBIOS_TABLE_INFO;
+
+/** A structure used to describe the HII Forms generators to be invoked.
+*/
+typedef struct CmStdObjHiiFormsInfo {
+  /// The Hii Form Generator ID
+  HII_FORMS_GENERATOR_ID    FormGeneratorId;
+
+  /// Form variant ID. Can be used to distinguish
+  /// between different form versions, and generate
+  /// forms accordingly
+  UINT32                    FormVariantId;
+} CM_STD_OBJ_HII_FORMS_INFO;
 
 #pragma pack()
