@@ -681,8 +681,11 @@ DhcpValidateOptions (
     }
 
     if (!DhcpOptionIsValid (Format, Option->Data, Option->Len)) {
-      Status = EFI_INVALID_PARAMETER;
-      goto ON_EXIT;
+      //
+      // Skip the malformatted option instead of rejecting the whole packet.
+      // This improves compatibility with non-standard DHCP servers.
+      //
+      continue;
     }
 
     //
