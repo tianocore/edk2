@@ -160,6 +160,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
   EArchCommonObjIpmiDeviceInfo,                    ///< 91 - IPMI Device Information
   EArchCommonObjSystemPowerSupplyInfo,             ///< 92 - System Power Supply Information
+  EArchCommonObjSystemSlotInfo,                    ///< 93 - System Slot Information
+  EArchCommonObjSystemSlotPeerInfo,                ///< 94 - System Slot Peer Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2409,5 +2411,88 @@ typedef struct CmArchCommonSystemPowerSupplyInfo {
   /// Power supply characteristics as defined by SMBIOS Type 39.
   UINT16             PowerSupplyCharacteristics;
 } CM_ARCH_COMMON_SYSTEM_POWER_SUPPLY_INFO;
+
+/** A structure that describes a peer device associated with a system slot.
+
+  SMBIOS Specification v3.9.0 Type 9
+
+  ID: EArchCommonObjSystemSlotPeerInfo
+**/
+typedef struct CmArchCommonSystemSlotPeerInfo {
+  /// PCI segment group number.
+  UINT16    SegmentGroupNum;
+
+  /// PCI bus number.
+  UINT8     BusNum;
+
+  /// PCI device number in bits 7:3 and function number in bits 2:0.
+  UINT8     DevFuncNum;
+
+  /// Electrical bus width of the peer device.
+  UINT8     DataBusWidth;
+} CM_ARCH_COMMON_SYSTEM_SLOT_PEER_INFO;
+
+/** A structure that describes a system slot.
+
+  SMBIOS Specification v3.9.0 Type 9
+
+  ID: EArchCommonObjSystemSlotInfo
+**/
+typedef struct CmArchCommonSystemSlotInfo {
+  /// CM Object Token uniquely identifying this system slot.
+  CM_OBJECT_TOKEN    SystemSlotInfoToken;
+
+  /// Token referencing an array of system-slot peer records.
+  /// CM_NULL_TOKEN indicates that no peer devices are supplied.
+  CM_OBJECT_TOKEN    PeerGroupListToken;
+
+  /// Slot designation string.
+  CHAR8              SlotDesignation[SMBIOS_MAX_STRING_SIZE];
+
+  /// Slot type.
+  UINT8              SlotType;
+
+  /// Maximum electrical width of the slot.
+  UINT8              SlotDataBusWidth;
+
+  /// Current slot usage.
+  UINT8              CurrentUsage;
+
+  /// Slot length.
+  UINT8              SlotLength;
+
+  /// Slot identifier.
+  UINT16             SlotId;
+
+  /// Slot Characteristics 1 bit field.
+  UINT8              SlotCharacteristics1;
+
+  /// Slot Characteristics 2 bit field.
+  UINT8              SlotCharacteristics2;
+
+  /// PCI segment group number for the base device.
+  UINT16             SegmentGroupNum;
+
+  /// PCI bus number for the base device.
+  UINT8              BusNum;
+
+  /// PCI device number in bits 7:3 and function number in bits 2:0.
+  UINT8              DevFuncNum;
+
+  /// Electrical bus width of the base device.
+  UINT8              DataBusWidth;
+
+  /// Slot-type-specific information.
+  UINT8              SlotInformation;
+
+  /// Physical width of the slot.
+  UINT8              SlotPhysicalWidth;
+
+  /// Slot pitch in 1/100 millimeter units, or zero if unknown.
+  UINT16             SlotPitch;
+
+  /// Slot height.
+  UINT8              SlotHeight;
+} CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
 
 #pragma pack()
