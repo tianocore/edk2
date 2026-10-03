@@ -291,6 +291,7 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 #define EFI_RESOURCE_ATTRIBUTE_ENCRYPTED        0x04000000
 #define EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE  0x08000000
 #define EFI_RESOURCE_ATTRIBUTE_HOT_PLUGGABLE    0x10000000
+#define EFI_RESOURCE_ATTRIBUTE_UNACCEPTED_HOT_PLUG    0x20000000
 //
 // Physical memory relative reliability attribute. This
 // memory provides higher reliability relative to other

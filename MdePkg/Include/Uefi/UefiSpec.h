@@ -115,6 +115,15 @@ typedef enum {
 #define EFI_MEMORY_HOT_PLUGGABLE  0x0000000000100000
 
 //
+// If this flag is set, unaccepted memory regions are capable of having memory
+// dynamically added or removed from the platform. This attribute serves as a
+// hint to the OS prior to ACPI subsystem initialization when unaccepted table
+// sizes are determined. This allows for unaccepted memory to be allocated and
+// accepted when it becomes available post ACPI hotplug.
+//
+#define EFI_MEMORY_UHP  0x0000000000200000ULL
+
+//
 // Runtime memory attribute
 //
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
