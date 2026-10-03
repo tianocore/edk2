@@ -9,6 +9,7 @@
 **/
 
 #include "CpuDxe.h"
+#include "CpuMp.h"
 
 //
 // Global Variables
@@ -380,5 +381,8 @@ InitializeCpu (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
+
+  InitializeMpSupport ();
+
   return Status;
 }
