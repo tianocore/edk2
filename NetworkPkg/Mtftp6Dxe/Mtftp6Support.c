@@ -515,7 +515,11 @@ Mtftp6SendRequest (
   // Copy the opcode, filename and mode into packet.
   //
   Packet = (EFI_MTFTP6_PACKET *)NetbufAllocSpace (Nbuf, BufferLength, FALSE);
-  ASSERT (Packet != NULL);
+  if (Packet == NULL) {
+    ASSERT (Packet != NULL);
+    NetbufFree (Nbuf);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Packet->OpCode = HTONS (Operation);
   BufferLength  -= sizeof (Packet->OpCode);
@@ -673,7 +677,10 @@ Mtftp6TransmitPacket (
   Instance->PacketToLive = Instance->IsMaster ? Instance->Timeout : (Instance->Timeout * 2);
 
   Temp = (UINT16 *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Temp != NULL);
+  if (Temp == NULL) {
+    ASSERT (Temp != NULL);
+    return EFI_DEVICE_ERROR;
+  }
 
   Value  = *Temp;
   OpCode = NTOHS (Value);
