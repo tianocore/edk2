@@ -1817,17 +1817,29 @@ class FdRegionReport(object):
                         # a sub-section of the FFS.
                         if getattr(Section, 'FvFileName', None) is None:
                             for FvSection in Section.SectionList:
-                                if FvSection.FvName in self.FvList:
+                                FvName = getattr(FvSection, 'FvName', None)
+                                if FvName is None:
+                                    FvName = getattr(FvSection, 'FvFileName', None)
+                                if FvName is None or FvName.upper() not in Wa.FdfProfile.FvDict:
                                     continue
-                                self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
-                                self.FvList.append(FvSection.FvName)
-                                self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
-                                self._DiscoverNestedFvList(FvSection.FvName, Wa)
+                                if FvName in self.FvList:
+                                    continue
+                                self._GuidsDb[Ffs.NameGuid.upper()] = FvName
+                                self.FvList.append(FvName)
+                                self.FvInfo[FvName] = ("Nested FV", 0, 0)
+                                self._GeneratedFvList.add(FvName.upper())
+                                self._DiscoverNestedFvList(FvName, Wa)
                         else:
-                            self._GuidsDb[Ffs.NameGuid.upper()] = Section.FvFileName
-                            self.FvList.append(Section.FvName)
-                            self.FvInfo[Section.FvName] = ("Nested FV", 0, 0)
-                            self._DiscoverNestedFvList(Section.FvName, Wa)
+                            FvName = getattr(Section, 'FvName', None)
+                            if FvName is None:
+                                FvName = getattr(Section, 'FvFileName', None)
+                            if FvName is not None and FvName.upper() in Wa.FdfProfile.FvDict:
+                                self._GuidsDb[Ffs.NameGuid.upper()] = FvName
+                                self.FvList.append(FvName)
+                                self.FvInfo[FvName] = ("Nested FV", 0, 0)
+                                self._GeneratedFvList.add(FvName.upper())
+                                self._DiscoverNestedFvList(FvName, Wa)
+
                     except AttributeError:
                         pass
 
@@ -1849,6 +1861,7 @@ class FdRegionReport(object):
         self.Size = FdRegion.Size
         self.FvList = []
         self.FvInfo = {}
+        self._GeneratedFvList = set()
         self._GuidsDb = {}
         self._FvDir = Wa.FvDir
         self._WorkspaceDir = Wa.WorkspaceDir
@@ -1868,6 +1881,8 @@ class FdRegionReport(object):
                 continue
             self.FvList.append(FvName)
             self.FvInfo[FvName] = ("Fd Region", self.BaseAddress, self.Size)
+            if FvName.upper() in Wa.FdfProfile.FvDict:
+                self._GeneratedFvList.add(FvName.upper())
             self._DiscoverNestedFvList(FvName, Wa)
 
         PlatformPcds = {}
@@ -1952,6 +1967,11 @@ class FdRegionReport(object):
         FileWrite(File, "Base Address:       0x%X" % BaseAddress)
 
         if self.Type == BINARY_FILE_TYPE_FV:
+            if FvName.upper() not in self._GeneratedFvList:
+                FileWrite(File, "Size:               0x%X (%.0fK)" % (Size, Size / 1024.0))
+                FileWrite(File, gSubSectionEnd)
+                return
+
             FvTotalSize = 0
             FvTakenSize = 0
             FvFreeSize  = 0
@@ -1960,7 +1980,8 @@ class FdRegionReport(object):
             else:
                 FileExt = FvName + ".Fv.txt"
 
-            if not os.path.isfile(FileExt):
+            FvReportFileName = FileExt
+            if not os.path.isfile(FvReportFileName):
                 FvReportFileName = mws.join(self._WorkspaceDir, FileExt)
                 if not os.path.isfile(FvReportFileName):
                     FvReportFileName = os.path.join(self._FvDir, FileExt)
