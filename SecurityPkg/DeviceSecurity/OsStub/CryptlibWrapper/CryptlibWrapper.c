@@ -372,39 +372,13 @@ libspdm_rsa_pkcs1_sign_with_nid (
   size_t         *sig_size
   )
 {
-  switch (hash_nid) {
-    case CRYPTO_NID_SHA256:
-      if (hash_size != SHA256_DIGEST_SIZE) {
-        return FALSE;
-      }
-
-      break;
-
-    case CRYPTO_NID_SHA384:
-      if (hash_size != SHA384_DIGEST_SIZE) {
-        return FALSE;
-      }
-
-      break;
-
-    case CRYPTO_NID_SHA512:
-      if (hash_size != SHA512_DIGEST_SIZE) {
-        return FALSE;
-      }
-
-      break;
-
-    default:
-      return FALSE;
-  }
-
-  return RsaPkcs1Sign (
-           rsa_context,
-           message_hash,
-           hash_size,
-           signature,
-           sig_size
-           );
+  (VOID)rsa_context;
+  (VOID)hash_nid;
+  (VOID)message_hash;
+  (VOID)hash_size;
+  (VOID)signature;
+  (VOID)sig_size;
+  return FALSE;
 }
 
 bool
@@ -802,14 +776,13 @@ libspdm_ecdsa_sign (
   size_t         *sig_size
   )
 {
-  return EcDsaSign (
-           ec_context,
-           hash_nid,
-           message_hash,
-           hash_size,
-           signature,
-           sig_size
-           );
+  (VOID)ec_context;
+  (VOID)hash_nid;
+  (VOID)message_hash;
+  (VOID)hash_size;
+  (VOID)signature;
+  (VOID)sig_size;
+  return FALSE;
 }
 
 bool
