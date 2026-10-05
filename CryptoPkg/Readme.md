@@ -191,7 +191,7 @@ also configured.
 | Pkcs.VerifyEKUsInPkcs7Signature |     N      |     N     |             |      C      |      C       |      C      |                 |
 | Pkcs.Pkcs7GetSigners            |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.Pkcs7FreeSigners           |     N      |     N     |             |      C      |      C       |      C      |        C        |
-| Pkcs.Pkcs7Sign                  |     N      |     N     |             |             |      C       |             |                 |
+| Pkcs.Pkcs7Sign                  |     Y      |     Y     |             |             |              |             |                 |
 | Pkcs.Pkcs7Encrypt               |     N      |     N     |             |             |      C       |      C      |                 |
 | Pkcs.Pkcs7Decrypt               |     N      |     N     |             |             |      C       |      C      |                 |
 | Pkcs.Pkcs7GetAttachedContent    |     N      |     N     |             |      C      |      C       |      C      |                 |
@@ -207,7 +207,7 @@ also configured.
 | Rsa.GetKey                      |     N      |     N     |             |             |      C       |             |                 |
 | Rsa.GenerateKey                 |     N      |     N     |             |             |      C       |             |                 |
 | Rsa.CheckKey                    |     N      |     N     |             |             |      C       |             |                 |
-| Rsa.Pkcs1Sign                   |     N      |     N     |             |             |      C       |             |                 |
+| Rsa.Pkcs1Sign                   |     Y      |     Y     |             |             |              |             |                 |
 | Rsa.Pkcs1Verify                 |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Sha1                            |     N      |     Y     |             |      C      |      C       |      C      |        C        |
 | Sha256                          |     N      |     N     |             |      C      |      C       |      C      |        C        |
@@ -227,9 +227,9 @@ also configured.
 | Tls                             |     N      |     N     |             |             |    C-Tls     |             |                 |
 | TlsSet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
 | TlsGet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
-| RsaPss.Sign                     |     N      |     N     |             |             |      C       |             |                 |
+| RsaPss.Sign                     |     Y      |     Y     |             |             |              |             |                 |
 | RsaPss.Verify                   |     N      |     N     |             |      C      |      C       |      C      |                 |
-| RsaPss.SignDigest               |     N      |     N     |             |             |      C       |             |                 |
+| RsaPss.SignDigest               |     Y      |     Y     |             |             |              |             |                 |
 | RsaPss.VerifyDigest             |     N      |     N     |             |      C      |      C       |      C      |                 |
 | ParallelHash                    |     N      |     N     |             |             |              |      C      |                 |
 | AeadAesGcm                      |     N      |     N     |             |             |      C       |             |                 |
