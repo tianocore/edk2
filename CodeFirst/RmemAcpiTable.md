@@ -98,12 +98,17 @@ header extension, and a packed array of fixed-size RMEM entries. <!-- [CODE_FIRS
 <!-- [CODE_FIRST] 13253 -->
 #### RMEM table layout <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Offset | Size | Field | Description | <!-- [CODE_FIRST] 13253 -->
-| ---: | ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | 36 | Header | Standard ACPI DESCRIPTION_HEADER | <!-- [CODE_FIRST] 13253 -->
-| 36 | 2 | Entry Count | Number of RMEM entries | <!-- [CODE_FIRST] 13253 -->
-| 38 | 2 | Entry Offset | Offset in bytes from the start of the table to the first entry | <!-- [CODE_FIRST] 13253 -->
-| Entry Offset | 48 * Entry Count | Entries | Packed array of RMEM Revision 1 entries | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Offset</th><th>Size</th><th>Field</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>36</td><td>Header</td><td>Standard ACPI DESCRIPTION_HEADER</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>36</td><td>2</td><td>Entry Count</td><td>Number of RMEM entries</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>38</td><td>2</td><td>Entry Offset</td><td>Offset in bytes from the start of the table to the first entry</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>Entry Offset</td><td>48 * Entry Count</td><td>Entries</td><td>Packed array of RMEM Revision 1 entries</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 For Revision 1: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
@@ -123,13 +128,18 @@ removed from the specification before acceptance. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 #### RMEM Revision 1 entry <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Offset | Size | Field | Description | <!-- [CODE_FIRST] 13253 -->
-| ---: | ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | 8 | Base | Physical address of the first byte of the range, or zero when Address Hidden is set | <!-- [CODE_FIRST] 13253 -->
-| 8 | 8 | Size | Length of the range in bytes | <!-- [CODE_FIRST] 13253 -->
-| 16 | 2 | Category | Purpose category | <!-- [CODE_FIRST] 13253 -->
-| 18 | 2 | Flags | Entry attributes | <!-- [CODE_FIRST] 13253 -->
-| 20 | 28 | Label | Null-terminated, zero-padded ASCII diagnostic label | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Offset</th><th>Size</th><th>Field</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>8</td><td>Base</td><td>Physical address of the first byte of the range, or zero when Address Hidden is set</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>8</td><td>8</td><td>Size</td><td>Length of the range in bytes</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>16</td><td>2</td><td>Category</td><td>Purpose category</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>18</td><td>2</td><td>Flags</td><td>Entry attributes</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>20</td><td>28</td><td>Label</td><td>Null-terminated, zero-padded ASCII diagnostic label</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 All multibyte integer fields use the byte ordering defined for ACPI tables. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
@@ -148,17 +158,22 @@ Consumers must not interpret the label as a stable identifier. <!-- [CODE_FIRST]
 <!-- [CODE_FIRST] 13253 -->
 #### Category values <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Value | Name | Description | <!-- [CODE_FIRST] 13253 -->
-| ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | Unknown | Invalid sentinel; must not appear in a valid entry | <!-- [CODE_FIRST] 13253 -->
-| 1 | Security | Isolated execution, security processors, or protected services | <!-- [CODE_FIRST] 13253 -->
-| 2 | Shared Memory | Memory shared between firmware execution environments or components | <!-- [CODE_FIRST] 13253 -->
-| 3 | Display Framebuffer | Pre-OS or persistent display framebuffer memory | <!-- [CODE_FIRST] 13253 -->
-| 4 | GPU Reserved | Memory reserved for graphics processing | <!-- [CODE_FIRST] 13253 -->
-| 5 | AI Accelerator Reserved | Memory reserved for AI accelerator processing | <!-- [CODE_FIRST] 13253 -->
-| 6 | Firmware Runtime | Firmware runtime data, services, or crash diagnostics | <!-- [CODE_FIRST] 13253 -->
-| 7 | Other | A valid reservation that does not fit another defined category | <!-- [CODE_FIRST] 13253 -->
-| 8-65535 | Reserved | Reserved for future use | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Value</th><th>Name</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>Unknown</td><td>Invalid sentinel; must not appear in a valid entry</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>1</td><td>Security</td><td>Isolated execution, security processors, or protected services</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>2</td><td>Shared Memory</td><td>Memory shared between firmware execution environments or components</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>3</td><td>Display Framebuffer</td><td>Pre-OS or persistent display framebuffer memory</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>4</td><td>GPU Reserved</td><td>Memory reserved for graphics processing</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>5</td><td>AI Accelerator Reserved</td><td>Memory reserved for AI accelerator processing</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>6</td><td>Firmware Runtime</td><td>Firmware runtime data, services, or crash diagnostics</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>7</td><td>Other</td><td>A valid reservation that does not fit another defined category</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>8-65535</td><td>Reserved</td><td>Reserved for future use</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Firmware must not publish an entry with the Unknown or Reserved category. <!-- [CODE_FIRST] 13253 -->
 A consumer that encounters an unsupported category must reject that entry or <!-- [CODE_FIRST] 13253 -->
@@ -170,10 +185,15 @@ new RMEM table revision or may be assigned through a maintained registry. <!-- [
 <!-- [CODE_FIRST] 13253 -->
 #### Flags <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Bit | Name | Description | <!-- [CODE_FIRST] 13253 -->
-| ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | Address Hidden | The physical address is intentionally redacted | <!-- [CODE_FIRST] 13253 -->
-| 1-15 | Reserved | Must be zero | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Bit</th><th>Name</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>Address Hidden</td><td>The physical address is intentionally redacted</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>1-15</td><td>Reserved</td><td>Must be zero</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 When Address Hidden is clear, `Base` contains the physical address of the first <!-- [CODE_FIRST] 13253 -->
 byte in the reservation. <!-- [CODE_FIRST] 13253 -->

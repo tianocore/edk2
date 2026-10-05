@@ -132,22 +132,32 @@ For Revision 1, `EntryOffset` is 40 and the total table length is <!-- [CODE_FIR
 The entry array therefore begins at an 8-byte-aligned offset from the table <!-- [CODE_FIRST] 13253 -->
 base. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Table offset | Size | Field | Description | <!-- [CODE_FIRST] 13253 -->
-| ---: | ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | 36 | `Header` | Standard ACPI description header | <!-- [CODE_FIRST] 13253 -->
-| 36 | 2 | `EntryCount` | Number of entries following the header | <!-- [CODE_FIRST] 13253 -->
-| 38 | 2 | `EntryOffset` | Byte offset from the table start to the first entry | <!-- [CODE_FIRST] 13253 -->
-| 40 | `48 * EntryCount` | `Entries` | Packed array of RMEM entries | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Table offset</th><th>Size</th><th>Field</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>36</td><td><code>Header</code></td><td>Standard ACPI description header</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>36</td><td>2</td><td><code>EntryCount</code></td><td>Number of entries following the header</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>38</td><td>2</td><td><code>EntryOffset</code></td><td>Byte offset from the table start to the first entry</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>40</td><td><code>48 * EntryCount</code></td><td><code>Entries</code></td><td>Packed array of RMEM entries</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Each entry has the following layout: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Entry offset | Size | Field | Description | <!-- [CODE_FIRST] 13253 -->
-| ---: | ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | 8 | `Base` | First physical byte of the reserved range | <!-- [CODE_FIRST] 13253 -->
-| 8 | 8 | `Size` | Range length in bytes | <!-- [CODE_FIRST] 13253 -->
-| 16 | 2 | `Category` | Numeric purpose category | <!-- [CODE_FIRST] 13253 -->
-| 18 | 2 | `Flags` | Entry attributes | <!-- [CODE_FIRST] 13253 -->
-| 20 | 28 | `Label` | Null-terminated, zero-padded ASCII label | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Entry offset</th><th>Size</th><th>Field</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>8</td><td><code>Base</code></td><td>First physical byte of the reserved range</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>8</td><td>8</td><td><code>Size</code></td><td>Range length in bytes</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>16</td><td>2</td><td><code>Category</code></td><td>Numeric purpose category</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>18</td><td>2</td><td><code>Flags</code></td><td>Entry attributes</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>20</td><td>28</td><td><code>Label</code></td><td>Null-terminated, zero-padded ASCII label</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 The authoritative structure definitions are in <!-- [CODE_FIRST] 13253 -->
 `MdeModulePkg/Include/Guid/ReservedMemoryReportingTable.h`. <!-- [CODE_FIRST] 13253 -->
@@ -156,16 +166,21 @@ The authoritative structure definitions are in <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Revision 1 defines the following wire values: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-| Value | Category | Intended use | <!-- [CODE_FIRST] 13253 -->
-| ---: | --- | --- | <!-- [CODE_FIRST] 13253 -->
-| 0 | Unknown | Invalid sentinel for missing or uninitialized values | <!-- [CODE_FIRST] 13253 -->
-| 1 | Security | Isolated execution, security processors, or protected services | <!-- [CODE_FIRST] 13253 -->
-| 2 | SharedMemory | Memory shared across firmware execution environments | <!-- [CODE_FIRST] 13253 -->
-| 3 | DisplayFramebuffer | Pre-OS or persistent display framebuffer memory | <!-- [CODE_FIRST] 13253 -->
-| 4 | GpuReserved | Memory reserved for graphics use | <!-- [CODE_FIRST] 13253 -->
-| 5 | AiAcceleratorReserved | Memory reserved for AI acceleration | <!-- [CODE_FIRST] 13253 -->
-| 6 | FirmwareRuntime | Runtime data, services, or crash diagnostics | <!-- [CODE_FIRST] 13253 -->
-| 7 | Other | A reservation that does not fit another category | <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Value</th><th>Category</th><th>Intended use</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>0</td><td>Unknown</td><td>Invalid sentinel for missing or uninitialized values</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>1</td><td>Security</td><td>Isolated execution, security processors, or protected services</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>2</td><td>SharedMemory</td><td>Memory shared across firmware execution environments</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>3</td><td>DisplayFramebuffer</td><td>Pre-OS or persistent display framebuffer memory</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>4</td><td>GpuReserved</td><td>Memory reserved for graphics use</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>5</td><td>AiAcceleratorReserved</td><td>Memory reserved for AI acceleration</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>6</td><td>FirmwareRuntime</td><td>Runtime data, services, or crash diagnostics</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>7</td><td>Other</td><td>A reservation that does not fit another category</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 `RmemCategoryMax` is an exclusive implementation bound and is not a valid wire <!-- [CODE_FIRST] 13253 -->
 value. Producers must provide a category greater than `RmemCategoryUnknown` and <!-- [CODE_FIRST] 13253 -->
