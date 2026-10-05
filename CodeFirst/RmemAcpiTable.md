@@ -66,6 +66,13 @@ existing firmware implementations and consumers is therefore a primary <!-- [COD
 requirement. A change to the serialized format should be made only when needed <!-- [CODE_FIRST] 13253 -->
 to resolve a material technical or specification issue. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
+The existing Project Mu <!-- [CODE_FIRST] 13253 -->
+[Reserved-Memory Reporting through ACPI](https://github.com/microsoft/mu_basecore/blob/587366f707e8a15d4b5bec9aaea759b558486705/MdeModulePkg/Universal/Acpi/RmemAcpiDxe/ReadMe.md) <!-- [CODE_FIRST] 13253 -->
+documentation describes the deployed Revision 1 behavior, validation policy, <!-- [CODE_FIRST] 13253 -->
+Windows retrieval tooling, and reference firmware integration. It is the <!-- [CODE_FIRST] 13253 -->
+compatibility reference for this proposal; the final ACPI specification is <!-- [CODE_FIRST] 13253 -->
+normative if the documents conflict. <!-- [CODE_FIRST] 13253 -->
+<!-- [CODE_FIRST] 13253 -->
 RMEM does not replace: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 - The UEFI memory map. <!-- [CODE_FIRST] 13253 -->
@@ -144,14 +151,14 @@ Consumers must not interpret the label as a stable identifier. <!-- [CODE_FIRST]
 <!-- [CODE_FIRST] 13253 -->
 #### Category values <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-- **0, Unknown:** Invalid sentinel; must not appear in a valid entry. <!-- [CODE_FIRST] 13253 -->
+- **0, Unknown:** Invalid sentinel for missing or uninitialized values; must not appear in a valid entry. <!-- [CODE_FIRST] 13253 -->
 - **1, Security:** Isolated execution, security processors, or protected services. <!-- [CODE_FIRST] 13253 -->
-- **2, Shared Memory:** Memory shared between firmware execution environments or components. <!-- [CODE_FIRST] 13253 -->
+- **2, Shared Memory:** Memory shared across firmware execution environments. <!-- [CODE_FIRST] 13253 -->
 - **3, Display Framebuffer:** Pre-OS or persistent display framebuffer memory. <!-- [CODE_FIRST] 13253 -->
-- **4, GPU Reserved:** Memory reserved for graphics processing. <!-- [CODE_FIRST] 13253 -->
-- **5, AI Accelerator Reserved:** Memory reserved for AI accelerator processing. <!-- [CODE_FIRST] 13253 -->
-- **6, Firmware Runtime:** Firmware runtime data, services, or crash diagnostics. <!-- [CODE_FIRST] 13253 -->
-- **7, Other:** A valid reservation that does not fit another defined category. <!-- [CODE_FIRST] 13253 -->
+- **4, GPU Reserved:** Memory reserved for graphics use. <!-- [CODE_FIRST] 13253 -->
+- **5, AI Accelerator Reserved:** Memory reserved for AI acceleration. <!-- [CODE_FIRST] 13253 -->
+- **6, Firmware Runtime:** Runtime data, services, or crash diagnostics. <!-- [CODE_FIRST] 13253 -->
+- **7, Other:** A reservation that does not fit another category. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Firmware must not publish an entry with the Unknown or an unsupported category. <!-- [CODE_FIRST] 13253 -->
 A consumer that encounters an unsupported category must reject that entry or <!-- [CODE_FIRST] 13253 -->
