@@ -55,30 +55,15 @@ Range discovery remains with platform and silicon modules. The common RMEM DXE <
 publisher owns validation, conflict handling, serialization, and ACPI table <!-- [CODE_FIRST] 13253 -->
 installation. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-```mermaid <!-- [CODE_FIRST] 13253 -->
-flowchart LR <!-- [CODE_FIRST] 13253 -->
-  PreDxeProducer["Pre-DXE Platform or Silicon Producer"] <!-- [CODE_FIRST] 13253 -->
-  DxeProducer["DXE Platform or Silicon Producer"] <!-- [CODE_FIRST] 13253 -->
-  Hob[("RMEM Record GUID HOBs")] <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  subgraph CommonDriver["Common RMEM DXE Driver"] <!-- [CODE_FIRST] 13253 -->
-    Publisher["RMEM ACPI Publisher"] <!-- [CODE_FIRST] 13253 -->
-  end <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  Table[("RMEM ACPI Table")] <!-- [CODE_FIRST] 13253 -->
-  Consumer["Operating-System Diagnostic Consumer"] <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  PreDxeProducer -->|"BuildGuidDataHob()"| Hob <!-- [CODE_FIRST] 13253 -->
-  Publisher -->|"GetFirstGuidHob() / GetNextGuidHob()"| Hob <!-- [CODE_FIRST] 13253 -->
-  Hob -->|"RMEM_HOB_RECORD data"| Publisher <!-- [CODE_FIRST] 13253 -->
-  DxeProducer -->|"AddReservedRange()"| Publisher <!-- [CODE_FIRST] 13253 -->
-  Publisher -->|"InstallAcpiTable()"| Table <!-- [CODE_FIRST] 13253 -->
-  Table --> Consumer <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  classDef rmem fill:#1e3a5f,stroke:#0f172a,color:#fff <!-- [CODE_FIRST] 13253 -->
-  class Hob,Publisher,Table rmem <!-- [CODE_FIRST] 13253 -->
-  style CommonDriver fill:#1e3a5f,stroke:#0f172a,stroke-width:3px,color:#fff <!-- [CODE_FIRST] 13253 -->
-``` <!-- [CODE_FIRST] 13253 -->
+<table> <!-- [CODE_FIRST] 13253 -->
+  <thead> <!-- [CODE_FIRST] 13253 -->
+    <tr><th>Phase</th><th>Producer</th><th>Transport</th><th>Common publisher</th><th>Output</th></tr> <!-- [CODE_FIRST] 13253 -->
+  </thead> <!-- [CODE_FIRST] 13253 -->
+  <tbody> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>Pre-DXE</td><td>Platform or silicon module</td><td><code>BuildGuidDataHob()</code> creates an <code>RMEM_HOB_RECORD</code></td><td><code>RmemAcpiDxe</code> imports and validates HOB records</td><td rowspan="2">RMEM ACPI table for operating-system diagnostic consumers</td></tr> <!-- [CODE_FIRST] 13253 -->
+    <tr><td>DXE</td><td>Platform or silicon module</td><td><code>AddReservedRange()</code> registers a range</td><td><code>RmemAcpiDxe</code> validates protocol registrations</td></tr> <!-- [CODE_FIRST] 13253 -->
+  </tbody> <!-- [CODE_FIRST] 13253 -->
+</table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 A platform may use the pre-DXE path, the DXE path, or both. Each reservation <!-- [CODE_FIRST] 13253 -->
 should have one owning producer and one transport path. <!-- [CODE_FIRST] 13253 -->
