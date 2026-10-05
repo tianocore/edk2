@@ -171,11 +171,10 @@ Consumers must not interpret the label as a stable identifier. <!-- [CODE_FIRST]
     <tr><td>5</td><td>AI Accelerator Reserved</td><td>Memory reserved for AI accelerator processing</td></tr> <!-- [CODE_FIRST] 13253 -->
     <tr><td>6</td><td>Firmware Runtime</td><td>Firmware runtime data, services, or crash diagnostics</td></tr> <!-- [CODE_FIRST] 13253 -->
     <tr><td>7</td><td>Other</td><td>A valid reservation that does not fit another defined category</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>8-65535</td><td>Reserved</td><td>Reserved for future use</td></tr> <!-- [CODE_FIRST] 13253 -->
   </tbody> <!-- [CODE_FIRST] 13253 -->
 </table> <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-Firmware must not publish an entry with the Unknown or Reserved category. <!-- [CODE_FIRST] 13253 -->
+Firmware must not publish an entry with the Unknown or an unsupported category. <!-- [CODE_FIRST] 13253 -->
 A consumer that encounters an unsupported category must reject that entry or <!-- [CODE_FIRST] 13253 -->
 the complete table according to its input-validation policy; it must not infer <!-- [CODE_FIRST] 13253 -->
 ownership or access policy from an unknown value. <!-- [CODE_FIRST] 13253 -->
