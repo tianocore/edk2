@@ -585,11 +585,19 @@ GicCv3IntcNodeParser (
 
   // The "#redistributor-regions" property is optional.
   Data = FdtGetProp (Fdt, Gicv3IntcNode, "#redistributor-regions", &DataSize);
-  if ((Data != NULL) && (DataSize == sizeof (UINT32))) {
-    ASSERT (Fdt32ToCpu (*(UINT32 *)Data) > 1);
-    AdditionalRedistReg = Fdt32ToCpu (*(UINT32 *)Data) - 1;
-  } else {
+  if (Data == NULL) {
     AdditionalRedistReg = 0;
+  } else if (DataSize != sizeof (UINT32)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  } else {
+    AdditionalRedistReg = Fdt32ToCpu (*(UINT32 *)Data);
+    if ((AdditionalRedistReg < 1) || (AdditionalRedistReg > 4096)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    AdditionalRedistReg--;
   }
 
   RegSize = (AddressCells + SizeCells) * sizeof (UINT32);
@@ -621,7 +629,13 @@ GicCv3IntcNodeParser (
     return EFI_ABORTED;
   }
 
-  RegCount = (DataSize / RegSize) - AdditionalRedistReg;
+  RegCount = DataSize / RegSize;
+  if (RegCount < (AdditionalRedistReg + 2)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  RegCount -= AdditionalRedistReg;
 
   // The GicD and GicR info is mandatory.
   switch (RegCount) {
