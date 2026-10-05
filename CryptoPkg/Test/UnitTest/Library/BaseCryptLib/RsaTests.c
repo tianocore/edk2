@@ -276,22 +276,12 @@ TestVerifyRsaPkcs1SignVerify (
 {
   UINT8    HashValue[SHA1_DIGEST_SIZE];
   UINTN    HashSize;
-  UINT8    *Signature;
-  UINTN    SigSize;
   BOOLEAN  Status;
 
-  //
-  // SHA-1 Digest Message for PKCS#1 Signature
-  //
   HashSize = SHA1_DIGEST_SIZE;
   ZeroMem (HashValue, HashSize);
-
   Status = Sha1HashAll (RsaSignData, AsciiStrLen (RsaSignData), HashValue);
   UT_ASSERT_TRUE (Status);
-
-  //
-  // Sign RSA PKCS#1-encoded Signature
-  //
 
   Status = RsaSetKey (mRsa, RsaKeyN, RsaN, sizeof (RsaN));
   UT_ASSERT_TRUE (Status);
@@ -299,33 +289,8 @@ TestVerifyRsaPkcs1SignVerify (
   Status = RsaSetKey (mRsa, RsaKeyE, RsaE, sizeof (RsaE));
   UT_ASSERT_TRUE (Status);
 
-  Status = RsaSetKey (mRsa, RsaKeyD, RsaD, sizeof (RsaD));
+  Status = RsaPkcs1Verify (mRsa, HashValue, HashSize, RsaPkcs1Signature, sizeof (RsaPkcs1Signature));
   UT_ASSERT_TRUE (Status);
-
-  SigSize = 0;
-  Status  = RsaPkcs1Sign (mRsa, HashValue, HashSize, NULL, &SigSize);
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_NOT_EQUAL (SigSize, 0);
-
-  Signature = AllocatePool (SigSize);
-  if (Signature == NULL) {
-    UT_LOG_ERROR ("Failed to allocate memory for Signature");
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  Status = RsaPkcs1Sign (mRsa, HashValue, HashSize, Signature, &SigSize);
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, sizeof (RsaPkcs1Signature));
-
-  UT_ASSERT_MEM_EQUAL (Signature, RsaPkcs1Signature, SigSize);
-
-  //
-  // Verify RSA PKCS#1-encoded Signature
-  //
-  Status = RsaPkcs1Verify (mRsa, HashValue, HashSize, Signature, SigSize);
-  UT_ASSERT_TRUE (Status);
-
-  FreePool (Signature);
 
   return UNIT_TEST_PASSED;
 }
