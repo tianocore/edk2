@@ -60,6 +60,8 @@
       PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   }
 
+  MdeModulePkg/Universal/Acpi/RmemAcpiDxe/UnitTest/RmemAcpiDxeUnitTestHost.inf  # [CODE_FIRST] 13253
+  # [CODE_FIRST] 13253
   MdeModulePkg/Bus/Pci/NvmExpressDxe/UnitTest/MediaSanitizeUnitTestHost.inf {
     <LibraryClasses>
       NvmExpressDxe|MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
