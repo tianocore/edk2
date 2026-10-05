@@ -55,15 +55,12 @@ Range discovery remains with platform and silicon modules. The common RMEM DXE <
 publisher owns validation, conflict handling, serialization, and ACPI table <!-- [CODE_FIRST] 13253 -->
 installation. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-<table> <!-- [CODE_FIRST] 13253 -->
-  <thead> <!-- [CODE_FIRST] 13253 -->
-    <tr><th>Phase</th><th>Producer</th><th>Transport</th><th>Common publisher</th><th>Output</th></tr> <!-- [CODE_FIRST] 13253 -->
-  </thead> <!-- [CODE_FIRST] 13253 -->
-  <tbody> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>Pre-DXE</td><td>Platform or silicon module</td><td><code>BuildGuidDataHob()</code> creates an <code>RMEM_HOB_RECORD</code></td><td><code>RmemAcpiDxe</code> imports and validates HOB records</td><td rowspan="2">RMEM ACPI table for operating-system diagnostic consumers</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>DXE</td><td>Platform or silicon module</td><td><code>AddReservedRange()</code> registers a range</td><td><code>RmemAcpiDxe</code> validates protocol registrations</td></tr> <!-- [CODE_FIRST] 13253 -->
-  </tbody> <!-- [CODE_FIRST] 13253 -->
-</table> <!-- [CODE_FIRST] 13253 -->
+- **Pre-DXE path:** A platform or silicon module uses `BuildGuidDataHob()` to <!-- [CODE_FIRST] 13253 -->
+  create an `RMEM_HOB_RECORD`; `RmemAcpiDxe` imports and validates the HOB. <!-- [CODE_FIRST] 13253 -->
+- **DXE path:** A platform or silicon module calls `AddReservedRange()`; <!-- [CODE_FIRST] 13253 -->
+  `RmemAcpiDxe` validates the protocol registration. <!-- [CODE_FIRST] 13253 -->
+- **Output:** The common publisher installs one RMEM ACPI table for <!-- [CODE_FIRST] 13253 -->
+  operating-system diagnostic consumers. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 A platform may use the pre-DXE path, the DXE path, or both. Each reservation <!-- [CODE_FIRST] 13253 -->
 should have one owning producer and one transport path. <!-- [CODE_FIRST] 13253 -->
@@ -104,45 +101,29 @@ The Revision 1 table contains a standard 36-byte ACPI description header, a <!--
 2-byte entry count, a 2-byte entry offset, and zero or more packed 48-byte <!-- [CODE_FIRST] 13253 -->
 entries. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-```text <!-- [CODE_FIRST] 13253 -->
-+----------------------+------------+-------------+----------+----------+----------+---------+----------+ <!-- [CODE_FIRST] 13253 -->
-| ACPI header          | EntryCount | EntryOffset | Base     | Size     | Category | Flags   | Label    | <!-- [CODE_FIRST] 13253 -->
-| 36 bytes             | 2 bytes    | 2 bytes     | 8 bytes  | 8 bytes  | 2 bytes  | 2 bytes | 28 bytes | <!-- [CODE_FIRST] 13253 -->
-+----------------------+------------+-------------+----------+----------+----------+---------+----------+ <!-- [CODE_FIRST] 13253 -->
-|<----------- table header: 40 bytes ----------->|<------------ each entry: 48 bytes ------------>| <!-- [CODE_FIRST] 13253 -->
-``` <!-- [CODE_FIRST] 13253 -->
+    +----------------------+------------+-------------+----------+----------+----------+---------+----------+ <!-- [CODE_FIRST] 13253 -->
+    | ACPI header          | EntryCount | EntryOffset | Base     | Size     | Category | Flags   | Label    | <!-- [CODE_FIRST] 13253 -->
+    | 36 bytes             | 2 bytes    | 2 bytes     | 8 bytes  | 8 bytes  | 2 bytes  | 2 bytes | 28 bytes | <!-- [CODE_FIRST] 13253 -->
+    +----------------------+------------+-------------+----------+----------+----------+---------+----------+ <!-- [CODE_FIRST] 13253 -->
+    |<----------- table header: 40 bytes ----------->|<------------ each entry: 48 bytes ------------>| <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 For Revision 1, `EntryOffset` is 40 and the total table length is <!-- [CODE_FIRST] 13253 -->
 `EntryOffset + (48 * EntryCount)` bytes. <!-- [CODE_FIRST] 13253 -->
 The entry array therefore begins at an 8-byte-aligned offset from the table <!-- [CODE_FIRST] 13253 -->
 base. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-<table> <!-- [CODE_FIRST] 13253 -->
-  <thead> <!-- [CODE_FIRST] 13253 -->
-    <tr><th>Table offset</th><th>Size</th><th>Field</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
-  </thead> <!-- [CODE_FIRST] 13253 -->
-  <tbody> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>0</td><td>36</td><td><code>Header</code></td><td>Standard ACPI description header</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>36</td><td>2</td><td><code>EntryCount</code></td><td>Number of entries following the header</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>38</td><td>2</td><td><code>EntryOffset</code></td><td>Byte offset from the table start to the first entry</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>40</td><td><code>48 * EntryCount</code></td><td><code>Entries</code></td><td>Packed array of RMEM entries</td></tr> <!-- [CODE_FIRST] 13253 -->
-  </tbody> <!-- [CODE_FIRST] 13253 -->
-</table> <!-- [CODE_FIRST] 13253 -->
+- **Table offset 0, size 36, `Header`:** Standard ACPI description header. <!-- [CODE_FIRST] 13253 -->
+- **Table offset 36, size 2, `EntryCount`:** Number of entries following the header. <!-- [CODE_FIRST] 13253 -->
+- **Table offset 38, size 2, `EntryOffset`:** Byte offset from the table start to the first entry. <!-- [CODE_FIRST] 13253 -->
+- **Table offset 40, size `48 * EntryCount`, `Entries`:** Packed array of RMEM entries. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Each entry has the following layout: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-<table> <!-- [CODE_FIRST] 13253 -->
-  <thead> <!-- [CODE_FIRST] 13253 -->
-    <tr><th>Entry offset</th><th>Size</th><th>Field</th><th>Description</th></tr> <!-- [CODE_FIRST] 13253 -->
-  </thead> <!-- [CODE_FIRST] 13253 -->
-  <tbody> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>0</td><td>8</td><td><code>Base</code></td><td>First physical byte of the reserved range</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>8</td><td>8</td><td><code>Size</code></td><td>Range length in bytes</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>16</td><td>2</td><td><code>Category</code></td><td>Numeric purpose category</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>18</td><td>2</td><td><code>Flags</code></td><td>Entry attributes</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>20</td><td>28</td><td><code>Label</code></td><td>Null-terminated, zero-padded ASCII label</td></tr> <!-- [CODE_FIRST] 13253 -->
-  </tbody> <!-- [CODE_FIRST] 13253 -->
-</table> <!-- [CODE_FIRST] 13253 -->
+- **Entry offset 0, size 8, `Base`:** First physical byte of the reserved range. <!-- [CODE_FIRST] 13253 -->
+- **Entry offset 8, size 8, `Size`:** Range length in bytes. <!-- [CODE_FIRST] 13253 -->
+- **Entry offset 16, size 2, `Category`:** Numeric purpose category. <!-- [CODE_FIRST] 13253 -->
+- **Entry offset 18, size 2, `Flags`:** Entry attributes. <!-- [CODE_FIRST] 13253 -->
+- **Entry offset 20, size 28, `Label`:** Null-terminated, zero-padded ASCII label. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 The authoritative structure definitions are in <!-- [CODE_FIRST] 13253 -->
 `MdeModulePkg/Include/Guid/ReservedMemoryReportingTable.h`. <!-- [CODE_FIRST] 13253 -->
@@ -151,21 +132,14 @@ The authoritative structure definitions are in <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Revision 1 defines the following wire values: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-<table> <!-- [CODE_FIRST] 13253 -->
-  <thead> <!-- [CODE_FIRST] 13253 -->
-    <tr><th>Value</th><th>Category</th><th>Intended use</th></tr> <!-- [CODE_FIRST] 13253 -->
-  </thead> <!-- [CODE_FIRST] 13253 -->
-  <tbody> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>0</td><td>Unknown</td><td>Invalid sentinel for missing or uninitialized values</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>1</td><td>Security</td><td>Isolated execution, security processors, or protected services</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>2</td><td>SharedMemory</td><td>Memory shared across firmware execution environments</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>3</td><td>DisplayFramebuffer</td><td>Pre-OS or persistent display framebuffer memory</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>4</td><td>GpuReserved</td><td>Memory reserved for graphics use</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>5</td><td>AiAcceleratorReserved</td><td>Memory reserved for AI acceleration</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>6</td><td>FirmwareRuntime</td><td>Runtime data, services, or crash diagnostics</td></tr> <!-- [CODE_FIRST] 13253 -->
-    <tr><td>7</td><td>Other</td><td>A reservation that does not fit another category</td></tr> <!-- [CODE_FIRST] 13253 -->
-  </tbody> <!-- [CODE_FIRST] 13253 -->
-</table> <!-- [CODE_FIRST] 13253 -->
+- **0, Unknown:** Invalid sentinel for missing or uninitialized values. <!-- [CODE_FIRST] 13253 -->
+- **1, Security:** Isolated execution, security processors, or protected services. <!-- [CODE_FIRST] 13253 -->
+- **2, SharedMemory:** Memory shared across firmware execution environments. <!-- [CODE_FIRST] 13253 -->
+- **3, DisplayFramebuffer:** Pre-OS or persistent display framebuffer memory. <!-- [CODE_FIRST] 13253 -->
+- **4, GpuReserved:** Memory reserved for graphics use. <!-- [CODE_FIRST] 13253 -->
+- **5, AiAcceleratorReserved:** Memory reserved for AI acceleration. <!-- [CODE_FIRST] 13253 -->
+- **6, FirmwareRuntime:** Runtime data, services, or crash diagnostics. <!-- [CODE_FIRST] 13253 -->
+- **7, Other:** A reservation that does not fit another category. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 `RmemCategoryMax` is an exclusive implementation bound and is not a valid wire <!-- [CODE_FIRST] 13253 -->
 value. Producers must provide a category greater than `RmemCategoryUnknown` and <!-- [CODE_FIRST] 13253 -->
@@ -231,370 +205,364 @@ Windows-reported physically installed memory minus the physical memory available
 to the operating system. The script reads only system accounting and table <!-- [CODE_FIRST] 13253 -->
 metadata and does not access the reported physical ranges. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-```powershell <!-- [CODE_FIRST] 13253 -->
-$ErrorActionPreference = "Stop" <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if (-not ("RmemComparison.NativeMethods" -as [type])) { <!-- [CODE_FIRST] 13253 -->
-  Add-Type -TypeDefinition @" <!-- [CODE_FIRST] 13253 -->
-using System; <!-- [CODE_FIRST] 13253 -->
-using System.Runtime.InteropServices; <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-namespace RmemComparison <!-- [CODE_FIRST] 13253 -->
-{ <!-- [CODE_FIRST] 13253 -->
-  [StructLayout(LayoutKind.Sequential)] <!-- [CODE_FIRST] 13253 -->
-  public struct MemoryStatusEx <!-- [CODE_FIRST] 13253 -->
-  { <!-- [CODE_FIRST] 13253 -->
-    public uint Length; <!-- [CODE_FIRST] 13253 -->
-    public uint MemoryLoad; <!-- [CODE_FIRST] 13253 -->
-    public ulong TotalPhysical; <!-- [CODE_FIRST] 13253 -->
-    public ulong AvailablePhysical; <!-- [CODE_FIRST] 13253 -->
-    public ulong TotalPageFile; <!-- [CODE_FIRST] 13253 -->
-    public ulong AvailablePageFile; <!-- [CODE_FIRST] 13253 -->
-    public ulong TotalVirtual; <!-- [CODE_FIRST] 13253 -->
-    public ulong AvailableVirtual; <!-- [CODE_FIRST] 13253 -->
-    public ulong AvailableExtendedVirtual; <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  public static class NativeMethods <!-- [CODE_FIRST] 13253 -->
-  { <!-- [CODE_FIRST] 13253 -->
-    [DllImport("kernel32.dll", SetLastError = true)] <!-- [CODE_FIRST] 13253 -->
-    [return: MarshalAs(UnmanagedType.Bool)] <!-- [CODE_FIRST] 13253 -->
-    public static extern bool GetPhysicallyInstalledSystemMemory( <!-- [CODE_FIRST] 13253 -->
-      out ulong totalMemoryKilobytes); <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-    [DllImport("kernel32.dll", SetLastError = true)] <!-- [CODE_FIRST] 13253 -->
-    [return: MarshalAs(UnmanagedType.Bool)] <!-- [CODE_FIRST] 13253 -->
-    public static extern bool GlobalMemoryStatusEx( <!-- [CODE_FIRST] 13253 -->
-      ref MemoryStatusEx buffer); <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-    [DllImport("kernel32.dll", SetLastError = true)] <!-- [CODE_FIRST] 13253 -->
-    public static extern uint GetSystemFirmwareTable( <!-- [CODE_FIRST] 13253 -->
-      uint providerSignature, <!-- [CODE_FIRST] 13253 -->
-      uint tableId, <!-- [CODE_FIRST] 13253 -->
-      IntPtr buffer, <!-- [CODE_FIRST] 13253 -->
-      uint bufferSize); <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-"@ <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-function ConvertTo-ProviderSignature { <!-- [CODE_FIRST] 13253 -->
-  param([Parameter(Mandatory)] [string]$Text) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  $bytes = [Text.Encoding]::ASCII.GetBytes($Text) <!-- [CODE_FIRST] 13253 -->
-  ([uint32]$bytes[0] -shl 24) -bor <!-- [CODE_FIRST] 13253 -->
-    ([uint32]$bytes[1] -shl 16) -bor <!-- [CODE_FIRST] 13253 -->
-    ([uint32]$bytes[2] -shl 8) -bor <!-- [CODE_FIRST] 13253 -->
-    [uint32]$bytes[3] <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-function ConvertTo-TableId { <!-- [CODE_FIRST] 13253 -->
-  param([Parameter(Mandatory)] [string]$Text) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  [BitConverter]::ToUInt32([Text.Encoding]::ASCII.GetBytes($Text), 0) <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-function Format-ByteCount { <!-- [CODE_FIRST] 13253 -->
-  param([Parameter(Mandatory)] [uint64]$Bytes) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  "{0:N3} MiB (0x{1:X})" -f ($Bytes / 1MB), $Bytes <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-function Resolve-RmemCategory { <!-- [CODE_FIRST] 13253 -->
-  param([Parameter(Mandatory)] [uint16]$Value) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  switch ($Value) { <!-- [CODE_FIRST] 13253 -->
-    1 { "Security" } <!-- [CODE_FIRST] 13253 -->
-    2 { "SharedMemory" } <!-- [CODE_FIRST] 13253 -->
-    3 { "DisplayFramebuffer" } <!-- [CODE_FIRST] 13253 -->
-    4 { "GpuReserved" } <!-- [CODE_FIRST] 13253 -->
-    5 { "AiAcceleratorReserved" } <!-- [CODE_FIRST] 13253 -->
-    6 { "FirmwareRuntime" } <!-- [CODE_FIRST] 13253 -->
-    7 { "Other" } <!-- [CODE_FIRST] 13253 -->
-    default { "Unknown ($Value)" } <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-function Add-UInt64Checked { <!-- [CODE_FIRST] 13253 -->
-  param( <!-- [CODE_FIRST] 13253 -->
-    [Parameter(Mandatory)] [uint64]$Left, <!-- [CODE_FIRST] 13253 -->
-    [Parameter(Mandatory)] [uint64]$Right, <!-- [CODE_FIRST] 13253 -->
-    [Parameter(Mandatory)] [string]$Description <!-- [CODE_FIRST] 13253 -->
-  ) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  if ($Left -gt ([uint64]::MaxValue - $Right)) { <!-- [CODE_FIRST] 13253 -->
-    throw "$Description overflows UInt64." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  $Left + $Right <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-[uint64]$installedKilobytes = 0 <!-- [CODE_FIRST] 13253 -->
-if (-not [RmemComparison.NativeMethods]::GetPhysicallyInstalledSystemMemory( <!-- [CODE_FIRST] 13253 -->
-    [ref]$installedKilobytes)) { <!-- [CODE_FIRST] 13253 -->
-  $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error() <!-- [CODE_FIRST] 13253 -->
-  throw "GetPhysicallyInstalledSystemMemory failed (Win32 error $errorCode)." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if ($installedKilobytes -gt ([uint64]::MaxValue / 1KB)) { <!-- [CODE_FIRST] 13253 -->
-  throw "The installed-memory byte count overflows UInt64." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$memoryStatus = [RmemComparison.MemoryStatusEx]::new() <!-- [CODE_FIRST] 13253 -->
-$memoryStatus.Length = [Runtime.InteropServices.Marshal]::SizeOf( <!-- [CODE_FIRST] 13253 -->
-  [type][RmemComparison.MemoryStatusEx]) <!-- [CODE_FIRST] 13253 -->
-if (-not [RmemComparison.NativeMethods]::GlobalMemoryStatusEx( <!-- [CODE_FIRST] 13253 -->
-    [ref]$memoryStatus)) { <!-- [CODE_FIRST] 13253 -->
-  $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error() <!-- [CODE_FIRST] 13253 -->
-  throw "GlobalMemoryStatusEx failed (Win32 error $errorCode)." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-[uint64]$installedBytes = $installedKilobytes * 1KB <!-- [CODE_FIRST] 13253 -->
-[uint64]$windowsBytes = $memoryStatus.TotalPhysical <!-- [CODE_FIRST] 13253 -->
-if ($installedBytes -lt $windowsBytes) { <!-- [CODE_FIRST] 13253 -->
-  throw "Windows reports more usable memory than physically installed memory." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-[uint64]$hardwareReservedBytes = $installedBytes - $windowsBytes <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$provider = ConvertTo-ProviderSignature "ACPI" <!-- [CODE_FIRST] 13253 -->
-$tableId = ConvertTo-TableId "RMEM" <!-- [CODE_FIRST] 13253 -->
-$size = [RmemComparison.NativeMethods]::GetSystemFirmwareTable( <!-- [CODE_FIRST] 13253 -->
-  $provider, $tableId, [IntPtr]::Zero, 0) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if ($size -eq 0) { <!-- [CODE_FIRST] 13253 -->
-  throw "The currently booted firmware does not expose an RMEM ACPI table." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if ($size -gt [int]::MaxValue) { <!-- [CODE_FIRST] 13253 -->
-  throw "The RMEM table is too large to retrieve safely." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$buffer = [Runtime.InteropServices.Marshal]::AllocHGlobal([int]$size) <!-- [CODE_FIRST] 13253 -->
-try { <!-- [CODE_FIRST] 13253 -->
-  $written = [RmemComparison.NativeMethods]::GetSystemFirmwareTable( <!-- [CODE_FIRST] 13253 -->
-    $provider, $tableId, $buffer, $size) <!-- [CODE_FIRST] 13253 -->
-  if ($written -eq 0) { <!-- [CODE_FIRST] 13253 -->
-    $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error() <!-- [CODE_FIRST] 13253 -->
-    throw "GetSystemFirmwareTable failed (Win32 error $errorCode)." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  if ($written -ne $size) { <!-- [CODE_FIRST] 13253 -->
-    throw "RMEM table size changed while reading: requested=$size written=$written." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  $table = [byte[]]::new($written) <!-- [CODE_FIRST] 13253 -->
-  [Runtime.InteropServices.Marshal]::Copy($buffer, $table, 0, [int]$written) <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-finally { <!-- [CODE_FIRST] 13253 -->
-  [Runtime.InteropServices.Marshal]::FreeHGlobal($buffer) <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$headerSize = 40 <!-- [CODE_FIRST] 13253 -->
-$entrySize = 48 <!-- [CODE_FIRST] 13253 -->
-if ($table.Length -lt $headerSize) { <!-- [CODE_FIRST] 13253 -->
-  throw "RMEM table is shorter than its $headerSize-byte Revision 1 header." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$signature = [Text.Encoding]::ASCII.GetString($table, 0, 4) <!-- [CODE_FIRST] 13253 -->
-$tableLength = [BitConverter]::ToUInt32($table, 4) <!-- [CODE_FIRST] 13253 -->
-$revision = $table[8] <!-- [CODE_FIRST] 13253 -->
-$entryCount = [BitConverter]::ToUInt16($table, 36) <!-- [CODE_FIRST] 13253 -->
-$entryOffset = [BitConverter]::ToUInt16($table, 38) <!-- [CODE_FIRST] 13253 -->
-$expectedLength = [uint64]$entryOffset + ([uint64]$entryCount * $entrySize) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if ($entryCount -gt 64) { <!-- [CODE_FIRST] 13253 -->
-  throw "RMEM entry count $entryCount exceeds the Revision 1 limit of 64." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if (($signature -ne "RMEM") -or <!-- [CODE_FIRST] 13253 -->
-    ($revision -ne 1) -or <!-- [CODE_FIRST] 13253 -->
-    ($entryOffset -ne $headerSize) -or <!-- [CODE_FIRST] 13253 -->
-    ($tableLength -ne $expectedLength) -or <!-- [CODE_FIRST] 13253 -->
-    ($tableLength -ne $table.Length)) { <!-- [CODE_FIRST] 13253 -->
-  throw "RMEM header is inconsistent: signature=$signature revision=$revision length=$tableLength entries=$entryCount entryOffset=$entryOffset." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$checksum = 0 <!-- [CODE_FIRST] 13253 -->
-foreach ($value in $table) { <!-- [CODE_FIRST] 13253 -->
-  $checksum = ($checksum + $value) -band 0xFF <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if ($checksum -ne 0) { <!-- [CODE_FIRST] 13253 -->
-  throw "RMEM checksum is invalid." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$entries = @(for ($index = 0; $index -lt $entryCount; $index++) { <!-- [CODE_FIRST] 13253 -->
-  $offset = $entryOffset + ($index * $entrySize) <!-- [CODE_FIRST] 13253 -->
-  [uint64]$base = [BitConverter]::ToUInt64($table, $offset) <!-- [CODE_FIRST] 13253 -->
-  [uint64]$rangeSize = [BitConverter]::ToUInt64($table, $offset + 8) <!-- [CODE_FIRST] 13253 -->
-  [uint16]$category = [BitConverter]::ToUInt16($table, $offset + 16) <!-- [CODE_FIRST] 13253 -->
-  [uint16]$flags = [BitConverter]::ToUInt16($table, $offset + 18) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  if (($category -lt 1) -or ($category -gt 7)) { <!-- [CODE_FIRST] 13253 -->
-    throw "RMEM entry $index contains unsupported category $category." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  if (($flags -band 0xFFFE) -ne 0) { <!-- [CODE_FIRST] 13253 -->
-    throw "RMEM entry $index contains unsupported flags 0x$($flags.ToString('X4'))." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  $addressHidden = ($flags -band 0x01) -ne 0 <!-- [CODE_FIRST] 13253 -->
-  if (($rangeSize -eq 0) -or <!-- [CODE_FIRST] 13253 -->
-      (($base % 0x1000) -ne 0) -or <!-- [CODE_FIRST] 13253 -->
-      (($rangeSize % 0x1000) -ne 0) -or <!-- [CODE_FIRST] 13253 -->
-      ($addressHidden -and ($base -ne 0)) -or <!-- [CODE_FIRST] 13253 -->
-      (-not $addressHidden -and <!-- [CODE_FIRST] 13253 -->
-       ($base -gt ([uint64]::MaxValue - ($rangeSize - 1))))) { <!-- [CODE_FIRST] 13253 -->
-    throw "RMEM entry $index contains an invalid physical range." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  $labelBytes = $table[($offset + 20)..($offset + 47)] <!-- [CODE_FIRST] 13253 -->
-  $terminator = [Array]::IndexOf($labelBytes, [byte]0) <!-- [CODE_FIRST] 13253 -->
-  if ($terminator -lt 0) { <!-- [CODE_FIRST] 13253 -->
-    throw "RMEM entry $index has no null-terminated label." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-  [pscustomobject]@{ <!-- [CODE_FIRST] 13253 -->
-    Index = $index <!-- [CODE_FIRST] 13253 -->
-    Base = $base <!-- [CODE_FIRST] 13253 -->
-    End = if ($addressHidden) { <!-- [CODE_FIRST] 13253 -->
-      [decimal]0 <!-- [CODE_FIRST] 13253 -->
-    } else { <!-- [CODE_FIRST] 13253 -->
-      [decimal]$base + [decimal]$rangeSize <!-- [CODE_FIRST] 13253 -->
+    $ErrorActionPreference = "Stop" <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if (-not ("RmemComparison.NativeMethods" -as [type])) { <!-- [CODE_FIRST] 13253 -->
+      Add-Type -TypeDefinition @" <!-- [CODE_FIRST] 13253 -->
+    using System; <!-- [CODE_FIRST] 13253 -->
+    using System.Runtime.InteropServices; <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    namespace RmemComparison <!-- [CODE_FIRST] 13253 -->
+    { <!-- [CODE_FIRST] 13253 -->
+      [StructLayout(LayoutKind.Sequential)] <!-- [CODE_FIRST] 13253 -->
+      public struct MemoryStatusEx <!-- [CODE_FIRST] 13253 -->
+      { <!-- [CODE_FIRST] 13253 -->
+        public uint Length; <!-- [CODE_FIRST] 13253 -->
+        public uint MemoryLoad; <!-- [CODE_FIRST] 13253 -->
+        public ulong TotalPhysical; <!-- [CODE_FIRST] 13253 -->
+        public ulong AvailablePhysical; <!-- [CODE_FIRST] 13253 -->
+        public ulong TotalPageFile; <!-- [CODE_FIRST] 13253 -->
+        public ulong AvailablePageFile; <!-- [CODE_FIRST] 13253 -->
+        public ulong TotalVirtual; <!-- [CODE_FIRST] 13253 -->
+        public ulong AvailableVirtual; <!-- [CODE_FIRST] 13253 -->
+        public ulong AvailableExtendedVirtual; <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      public static class NativeMethods <!-- [CODE_FIRST] 13253 -->
+      { <!-- [CODE_FIRST] 13253 -->
+        [DllImport("kernel32.dll", SetLastError = true)] <!-- [CODE_FIRST] 13253 -->
+        [return: MarshalAs(UnmanagedType.Bool)] <!-- [CODE_FIRST] 13253 -->
+        public static extern bool GetPhysicallyInstalledSystemMemory( <!-- [CODE_FIRST] 13253 -->
+          out ulong totalMemoryKilobytes); <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+        [DllImport("kernel32.dll", SetLastError = true)] <!-- [CODE_FIRST] 13253 -->
+        [return: MarshalAs(UnmanagedType.Bool)] <!-- [CODE_FIRST] 13253 -->
+        public static extern bool GlobalMemoryStatusEx( <!-- [CODE_FIRST] 13253 -->
+          ref MemoryStatusEx buffer); <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+        [DllImport("kernel32.dll", SetLastError = true)] <!-- [CODE_FIRST] 13253 -->
+        public static extern uint GetSystemFirmwareTable( <!-- [CODE_FIRST] 13253 -->
+          uint providerSignature, <!-- [CODE_FIRST] 13253 -->
+          uint tableId, <!-- [CODE_FIRST] 13253 -->
+          IntPtr buffer, <!-- [CODE_FIRST] 13253 -->
+          uint bufferSize); <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
     } <!-- [CODE_FIRST] 13253 -->
-    Size = $rangeSize <!-- [CODE_FIRST] 13253 -->
-    Category = Resolve-RmemCategory $category <!-- [CODE_FIRST] 13253 -->
-    Flags = $flags <!-- [CODE_FIRST] 13253 -->
-    AddressHidden = $addressHidden <!-- [CODE_FIRST] 13253 -->
-    Label = [Text.Encoding]::ASCII.GetString($labelBytes, 0, $terminator) <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-}) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-[uint64]$rawTotal = 0 <!-- [CODE_FIRST] 13253 -->
-[uint64]$visibleTotal = 0 <!-- [CODE_FIRST] 13253 -->
-[uint64]$hiddenTotal = 0 <!-- [CODE_FIRST] 13253 -->
-foreach ($entry in $entries) { <!-- [CODE_FIRST] 13253 -->
-  $rawTotal = Add-UInt64Checked $rawTotal $entry.Size "RMEM total" <!-- [CODE_FIRST] 13253 -->
-  if ($entry.AddressHidden) { <!-- [CODE_FIRST] 13253 -->
-    $hiddenTotal = Add-UInt64Checked ` <!-- [CODE_FIRST] 13253 -->
-      $hiddenTotal $entry.Size "RMEM hidden total" <!-- [CODE_FIRST] 13253 -->
-  } else { <!-- [CODE_FIRST] 13253 -->
-    $visibleTotal = Add-UInt64Checked ` <!-- [CODE_FIRST] 13253 -->
-      $visibleTotal $entry.Size "RMEM visible total" <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-$visibleEntries = @( <!-- [CODE_FIRST] 13253 -->
-  $entries | <!-- [CODE_FIRST] 13253 -->
-    Where-Object { -not $_.AddressHidden } | <!-- [CODE_FIRST] 13253 -->
-    Sort-Object Base <!-- [CODE_FIRST] 13253 -->
-) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-for ($index = 1; $index -lt $visibleEntries.Count; $index++) { <!-- [CODE_FIRST] 13253 -->
-  $previous = $visibleEntries[$index - 1] <!-- [CODE_FIRST] 13253 -->
-  $current = $visibleEntries[$index] <!-- [CODE_FIRST] 13253 -->
-  if ([decimal]$current.Base -lt $previous.End) { <!-- [CODE_FIRST] 13253 -->
-    throw "RMEM entries $($previous.Index) and $($current.Index) overlap." <!-- [CODE_FIRST] 13253 -->
-  } <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-[decimal]$difference = <!-- [CODE_FIRST] 13253 -->
-  [decimal]$rawTotal - [decimal]$hardwareReservedBytes <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-Write-Host "Windows memory accounting" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  Physically installed : $(Format-ByteCount $installedBytes)" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  OS-usable physical   : $(Format-ByteCount $windowsBytes)" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  Hardware reserved    : $(Format-ByteCount $hardwareReservedBytes)" <!-- [CODE_FIRST] 13253 -->
-Write-Host "" <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-Write-Host "RMEM accounting" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  Entries              : $entryCount" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  Visible entry total  : $(Format-ByteCount $visibleTotal)" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  Hidden entry total   : $(Format-ByteCount $hiddenTotal)" <!-- [CODE_FIRST] 13253 -->
-Write-Host "  RMEM total           : $(Format-ByteCount $rawTotal)" <!-- [CODE_FIRST] 13253 -->
-Write-Host ("  RMEM - Windows       : {0:N3} MiB" -f ($difference / 1MB)) <!-- [CODE_FIRST] 13253 -->
-Write-Host "" <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-if ($hiddenTotal -ne 0) { <!-- [CODE_FIRST] 13253 -->
-  Write-Warning "Hidden entries are included by size, but their overlap cannot be independently checked." <!-- [CODE_FIRST] 13253 -->
-} <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-Write-Warning "A nonzero RMEM - Windows difference may indicate missing RMEM coverage or a difference in reporting scope." <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-Write-Host "" <!-- [CODE_FIRST] 13253 -->
-Write-Host "RMEM totals by category" <!-- [CODE_FIRST] 13253 -->
-$entries | <!-- [CODE_FIRST] 13253 -->
-  Group-Object Category | <!-- [CODE_FIRST] 13253 -->
-  ForEach-Object { <!-- [CODE_FIRST] 13253 -->
-    [uint64]$categoryTotal = 0 <!-- [CODE_FIRST] 13253 -->
-    foreach ($entry in $_.Group) { <!-- [CODE_FIRST] 13253 -->
-      $categoryTotal = Add-UInt64Checked ` <!-- [CODE_FIRST] 13253 -->
-        $categoryTotal $entry.Size "RMEM category total" <!-- [CODE_FIRST] 13253 -->
+    "@ <!-- [CODE_FIRST] 13253 -->
     } <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-    [pscustomobject]@{ <!-- [CODE_FIRST] 13253 -->
-      Category = $_.Name <!-- [CODE_FIRST] 13253 -->
-      Entries = $_.Count <!-- [CODE_FIRST] 13253 -->
-      TotalMiB = [Math]::Round($categoryTotal / 1MB, 3) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    function ConvertTo-ProviderSignature { <!-- [CODE_FIRST] 13253 -->
+      param([Parameter(Mandatory)] [string]$Text) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      $bytes = [Text.Encoding]::ASCII.GetBytes($Text) <!-- [CODE_FIRST] 13253 -->
+      ([uint32]$bytes[0] -shl 24) -bor <!-- [CODE_FIRST] 13253 -->
+        ([uint32]$bytes[1] -shl 16) -bor <!-- [CODE_FIRST] 13253 -->
+        ([uint32]$bytes[2] -shl 8) -bor <!-- [CODE_FIRST] 13253 -->
+        [uint32]$bytes[3] <!-- [CODE_FIRST] 13253 -->
     } <!-- [CODE_FIRST] 13253 -->
-  } | <!-- [CODE_FIRST] 13253 -->
-  Format-Table -AutoSize <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-Write-Host "RMEM entries" <!-- [CODE_FIRST] 13253 -->
-$entries | <!-- [CODE_FIRST] 13253 -->
-  Select-Object Index, <!-- [CODE_FIRST] 13253 -->
-    @{Name = "Base"; Expression = { <!-- [CODE_FIRST] 13253 -->
-      if ($_.AddressHidden) { "<hidden>" } else { "0x{0:X16}" -f $_.Base } <!-- [CODE_FIRST] 13253 -->
-    }}, <!-- [CODE_FIRST] 13253 -->
-    @{Name = "SizeMiB"; Expression = { [Math]::Round($_.Size / 1MB, 3) }}, <!-- [CODE_FIRST] 13253 -->
-    Category, <!-- [CODE_FIRST] 13253 -->
-    @{Name = "Flags"; Expression = { "0x{0:X4}" -f $_.Flags }}, <!-- [CODE_FIRST] 13253 -->
-    Label | <!-- [CODE_FIRST] 13253 -->
-  Format-Table -AutoSize <!-- [CODE_FIRST] 13253 -->
-``` <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    function ConvertTo-TableId { <!-- [CODE_FIRST] 13253 -->
+      param([Parameter(Mandatory)] [string]$Text) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      [BitConverter]::ToUInt32([Text.Encoding]::ASCII.GetBytes($Text), 0) <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    function Format-ByteCount { <!-- [CODE_FIRST] 13253 -->
+      param([Parameter(Mandatory)] [uint64]$Bytes) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      "{0:N3} MiB (0x{1:X})" -f ($Bytes / 1MB), $Bytes <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    function Resolve-RmemCategory { <!-- [CODE_FIRST] 13253 -->
+      param([Parameter(Mandatory)] [uint16]$Value) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      switch ($Value) { <!-- [CODE_FIRST] 13253 -->
+        1 { "Security" } <!-- [CODE_FIRST] 13253 -->
+        2 { "SharedMemory" } <!-- [CODE_FIRST] 13253 -->
+        3 { "DisplayFramebuffer" } <!-- [CODE_FIRST] 13253 -->
+        4 { "GpuReserved" } <!-- [CODE_FIRST] 13253 -->
+        5 { "AiAcceleratorReserved" } <!-- [CODE_FIRST] 13253 -->
+        6 { "FirmwareRuntime" } <!-- [CODE_FIRST] 13253 -->
+        7 { "Other" } <!-- [CODE_FIRST] 13253 -->
+        default { "Unknown ($Value)" } <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    function Add-UInt64Checked { <!-- [CODE_FIRST] 13253 -->
+      param( <!-- [CODE_FIRST] 13253 -->
+        [Parameter(Mandatory)] [uint64]$Left, <!-- [CODE_FIRST] 13253 -->
+        [Parameter(Mandatory)] [uint64]$Right, <!-- [CODE_FIRST] 13253 -->
+        [Parameter(Mandatory)] [string]$Description <!-- [CODE_FIRST] 13253 -->
+      ) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      if ($Left -gt ([uint64]::MaxValue - $Right)) { <!-- [CODE_FIRST] 13253 -->
+        throw "$Description overflows UInt64." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      $Left + $Right <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    [uint64]$installedKilobytes = 0 <!-- [CODE_FIRST] 13253 -->
+    if (-not [RmemComparison.NativeMethods]::GetPhysicallyInstalledSystemMemory( <!-- [CODE_FIRST] 13253 -->
+        [ref]$installedKilobytes)) { <!-- [CODE_FIRST] 13253 -->
+      $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error() <!-- [CODE_FIRST] 13253 -->
+      throw "GetPhysicallyInstalledSystemMemory failed (Win32 error $errorCode)." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if ($installedKilobytes -gt ([uint64]::MaxValue / 1KB)) { <!-- [CODE_FIRST] 13253 -->
+      throw "The installed-memory byte count overflows UInt64." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $memoryStatus = [RmemComparison.MemoryStatusEx]::new() <!-- [CODE_FIRST] 13253 -->
+    $memoryStatus.Length = [Runtime.InteropServices.Marshal]::SizeOf( <!-- [CODE_FIRST] 13253 -->
+      [type][RmemComparison.MemoryStatusEx]) <!-- [CODE_FIRST] 13253 -->
+    if (-not [RmemComparison.NativeMethods]::GlobalMemoryStatusEx( <!-- [CODE_FIRST] 13253 -->
+        [ref]$memoryStatus)) { <!-- [CODE_FIRST] 13253 -->
+      $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error() <!-- [CODE_FIRST] 13253 -->
+      throw "GlobalMemoryStatusEx failed (Win32 error $errorCode)." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    [uint64]$installedBytes = $installedKilobytes * 1KB <!-- [CODE_FIRST] 13253 -->
+    [uint64]$windowsBytes = $memoryStatus.TotalPhysical <!-- [CODE_FIRST] 13253 -->
+    if ($installedBytes -lt $windowsBytes) { <!-- [CODE_FIRST] 13253 -->
+      throw "Windows reports more usable memory than physically installed memory." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    [uint64]$hardwareReservedBytes = $installedBytes - $windowsBytes <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $provider = ConvertTo-ProviderSignature "ACPI" <!-- [CODE_FIRST] 13253 -->
+    $tableId = ConvertTo-TableId "RMEM" <!-- [CODE_FIRST] 13253 -->
+    $size = [RmemComparison.NativeMethods]::GetSystemFirmwareTable( <!-- [CODE_FIRST] 13253 -->
+      $provider, $tableId, [IntPtr]::Zero, 0) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if ($size -eq 0) { <!-- [CODE_FIRST] 13253 -->
+      throw "The currently booted firmware does not expose an RMEM ACPI table." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if ($size -gt [int]::MaxValue) { <!-- [CODE_FIRST] 13253 -->
+      throw "The RMEM table is too large to retrieve safely." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $buffer = [Runtime.InteropServices.Marshal]::AllocHGlobal([int]$size) <!-- [CODE_FIRST] 13253 -->
+    try { <!-- [CODE_FIRST] 13253 -->
+      $written = [RmemComparison.NativeMethods]::GetSystemFirmwareTable( <!-- [CODE_FIRST] 13253 -->
+        $provider, $tableId, $buffer, $size) <!-- [CODE_FIRST] 13253 -->
+      if ($written -eq 0) { <!-- [CODE_FIRST] 13253 -->
+        $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error() <!-- [CODE_FIRST] 13253 -->
+        throw "GetSystemFirmwareTable failed (Win32 error $errorCode)." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      if ($written -ne $size) { <!-- [CODE_FIRST] 13253 -->
+        throw "RMEM table size changed while reading: requested=$size written=$written." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      $table = [byte[]]::new($written) <!-- [CODE_FIRST] 13253 -->
+      [Runtime.InteropServices.Marshal]::Copy($buffer, $table, 0, [int]$written) <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    finally { <!-- [CODE_FIRST] 13253 -->
+      [Runtime.InteropServices.Marshal]::FreeHGlobal($buffer) <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $headerSize = 40 <!-- [CODE_FIRST] 13253 -->
+    $entrySize = 48 <!-- [CODE_FIRST] 13253 -->
+    if ($table.Length -lt $headerSize) { <!-- [CODE_FIRST] 13253 -->
+      throw "RMEM table is shorter than its $headerSize-byte Revision 1 header." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $signature = [Text.Encoding]::ASCII.GetString($table, 0, 4) <!-- [CODE_FIRST] 13253 -->
+    $tableLength = [BitConverter]::ToUInt32($table, 4) <!-- [CODE_FIRST] 13253 -->
+    $revision = $table[8] <!-- [CODE_FIRST] 13253 -->
+    $entryCount = [BitConverter]::ToUInt16($table, 36) <!-- [CODE_FIRST] 13253 -->
+    $entryOffset = [BitConverter]::ToUInt16($table, 38) <!-- [CODE_FIRST] 13253 -->
+    $expectedLength = [uint64]$entryOffset + ([uint64]$entryCount * $entrySize) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if ($entryCount -gt 64) { <!-- [CODE_FIRST] 13253 -->
+      throw "RMEM entry count $entryCount exceeds the Revision 1 limit of 64." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if (($signature -ne "RMEM") -or <!-- [CODE_FIRST] 13253 -->
+        ($revision -ne 1) -or <!-- [CODE_FIRST] 13253 -->
+        ($entryOffset -ne $headerSize) -or <!-- [CODE_FIRST] 13253 -->
+        ($tableLength -ne $expectedLength) -or <!-- [CODE_FIRST] 13253 -->
+        ($tableLength -ne $table.Length)) { <!-- [CODE_FIRST] 13253 -->
+      throw "RMEM header is inconsistent: signature=$signature revision=$revision length=$tableLength entries=$entryCount entryOffset=$entryOffset." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $checksum = 0 <!-- [CODE_FIRST] 13253 -->
+    foreach ($value in $table) { <!-- [CODE_FIRST] 13253 -->
+      $checksum = ($checksum + $value) -band 0xFF <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if ($checksum -ne 0) { <!-- [CODE_FIRST] 13253 -->
+      throw "RMEM checksum is invalid." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $entries = @(for ($index = 0; $index -lt $entryCount; $index++) { <!-- [CODE_FIRST] 13253 -->
+      $offset = $entryOffset + ($index * $entrySize) <!-- [CODE_FIRST] 13253 -->
+      [uint64]$base = [BitConverter]::ToUInt64($table, $offset) <!-- [CODE_FIRST] 13253 -->
+      [uint64]$rangeSize = [BitConverter]::ToUInt64($table, $offset + 8) <!-- [CODE_FIRST] 13253 -->
+      [uint16]$category = [BitConverter]::ToUInt16($table, $offset + 16) <!-- [CODE_FIRST] 13253 -->
+      [uint16]$flags = [BitConverter]::ToUInt16($table, $offset + 18) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      if (($category -lt 1) -or ($category -gt 7)) { <!-- [CODE_FIRST] 13253 -->
+        throw "RMEM entry $index contains unsupported category $category." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      if (($flags -band 0xFFFE) -ne 0) { <!-- [CODE_FIRST] 13253 -->
+        throw "RMEM entry $index contains unsupported flags 0x$($flags.ToString('X4'))." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      $addressHidden = ($flags -band 0x01) -ne 0 <!-- [CODE_FIRST] 13253 -->
+      if (($rangeSize -eq 0) -or <!-- [CODE_FIRST] 13253 -->
+          (($base % 0x1000) -ne 0) -or <!-- [CODE_FIRST] 13253 -->
+          (($rangeSize % 0x1000) -ne 0) -or <!-- [CODE_FIRST] 13253 -->
+          ($addressHidden -and ($base -ne 0)) -or <!-- [CODE_FIRST] 13253 -->
+          (-not $addressHidden -and <!-- [CODE_FIRST] 13253 -->
+           ($base -gt ([uint64]::MaxValue - ($rangeSize - 1))))) { <!-- [CODE_FIRST] 13253 -->
+        throw "RMEM entry $index contains an invalid physical range." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      $labelBytes = $table[($offset + 20)..($offset + 47)] <!-- [CODE_FIRST] 13253 -->
+      $terminator = [Array]::IndexOf($labelBytes, [byte]0) <!-- [CODE_FIRST] 13253 -->
+      if ($terminator -lt 0) { <!-- [CODE_FIRST] 13253 -->
+        throw "RMEM entry $index has no null-terminated label." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+      [pscustomobject]@{ <!-- [CODE_FIRST] 13253 -->
+        Index = $index <!-- [CODE_FIRST] 13253 -->
+        Base = $base <!-- [CODE_FIRST] 13253 -->
+        End = if ($addressHidden) { <!-- [CODE_FIRST] 13253 -->
+          [decimal]0 <!-- [CODE_FIRST] 13253 -->
+        } else { <!-- [CODE_FIRST] 13253 -->
+          [decimal]$base + [decimal]$rangeSize <!-- [CODE_FIRST] 13253 -->
+        } <!-- [CODE_FIRST] 13253 -->
+        Size = $rangeSize <!-- [CODE_FIRST] 13253 -->
+        Category = Resolve-RmemCategory $category <!-- [CODE_FIRST] 13253 -->
+        Flags = $flags <!-- [CODE_FIRST] 13253 -->
+        AddressHidden = $addressHidden <!-- [CODE_FIRST] 13253 -->
+        Label = [Text.Encoding]::ASCII.GetString($labelBytes, 0, $terminator) <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    }) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    [uint64]$rawTotal = 0 <!-- [CODE_FIRST] 13253 -->
+    [uint64]$visibleTotal = 0 <!-- [CODE_FIRST] 13253 -->
+    [uint64]$hiddenTotal = 0 <!-- [CODE_FIRST] 13253 -->
+    foreach ($entry in $entries) { <!-- [CODE_FIRST] 13253 -->
+      $rawTotal = Add-UInt64Checked $rawTotal $entry.Size "RMEM total" <!-- [CODE_FIRST] 13253 -->
+      if ($entry.AddressHidden) { <!-- [CODE_FIRST] 13253 -->
+        $hiddenTotal = Add-UInt64Checked ` <!-- [CODE_FIRST] 13253 -->
+          $hiddenTotal $entry.Size "RMEM hidden total" <!-- [CODE_FIRST] 13253 -->
+      } else { <!-- [CODE_FIRST] 13253 -->
+        $visibleTotal = Add-UInt64Checked ` <!-- [CODE_FIRST] 13253 -->
+          $visibleTotal $entry.Size "RMEM visible total" <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    $visibleEntries = @( <!-- [CODE_FIRST] 13253 -->
+      $entries | <!-- [CODE_FIRST] 13253 -->
+        Where-Object { -not $_.AddressHidden } | <!-- [CODE_FIRST] 13253 -->
+        Sort-Object Base <!-- [CODE_FIRST] 13253 -->
+    ) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    for ($index = 1; $index -lt $visibleEntries.Count; $index++) { <!-- [CODE_FIRST] 13253 -->
+      $previous = $visibleEntries[$index - 1] <!-- [CODE_FIRST] 13253 -->
+      $current = $visibleEntries[$index] <!-- [CODE_FIRST] 13253 -->
+      if ([decimal]$current.Base -lt $previous.End) { <!-- [CODE_FIRST] 13253 -->
+        throw "RMEM entries $($previous.Index) and $($current.Index) overlap." <!-- [CODE_FIRST] 13253 -->
+      } <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    [decimal]$difference = <!-- [CODE_FIRST] 13253 -->
+      [decimal]$rawTotal - [decimal]$hardwareReservedBytes <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    Write-Host "Windows memory accounting" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  Physically installed : $(Format-ByteCount $installedBytes)" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  OS-usable physical   : $(Format-ByteCount $windowsBytes)" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  Hardware reserved    : $(Format-ByteCount $hardwareReservedBytes)" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "" <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    Write-Host "RMEM accounting" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  Entries              : $entryCount" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  Visible entry total  : $(Format-ByteCount $visibleTotal)" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  Hidden entry total   : $(Format-ByteCount $hiddenTotal)" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "  RMEM total           : $(Format-ByteCount $rawTotal)" <!-- [CODE_FIRST] 13253 -->
+    Write-Host ("  RMEM - Windows       : {0:N3} MiB" -f ($difference / 1MB)) <!-- [CODE_FIRST] 13253 -->
+    Write-Host "" <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    if ($hiddenTotal -ne 0) { <!-- [CODE_FIRST] 13253 -->
+      Write-Warning "Hidden entries are included by size, but their overlap cannot be independently checked." <!-- [CODE_FIRST] 13253 -->
+    } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    Write-Warning "A nonzero RMEM - Windows difference may indicate missing RMEM coverage or a difference in reporting scope." <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    Write-Host "" <!-- [CODE_FIRST] 13253 -->
+    Write-Host "RMEM totals by category" <!-- [CODE_FIRST] 13253 -->
+    $entries | <!-- [CODE_FIRST] 13253 -->
+      Group-Object Category | <!-- [CODE_FIRST] 13253 -->
+      ForEach-Object { <!-- [CODE_FIRST] 13253 -->
+        [uint64]$categoryTotal = 0 <!-- [CODE_FIRST] 13253 -->
+        foreach ($entry in $_.Group) { <!-- [CODE_FIRST] 13253 -->
+          $categoryTotal = Add-UInt64Checked ` <!-- [CODE_FIRST] 13253 -->
+            $categoryTotal $entry.Size "RMEM category total" <!-- [CODE_FIRST] 13253 -->
+        } <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+        [pscustomobject]@{ <!-- [CODE_FIRST] 13253 -->
+          Category = $_.Name <!-- [CODE_FIRST] 13253 -->
+          Entries = $_.Count <!-- [CODE_FIRST] 13253 -->
+          TotalMiB = [Math]::Round($categoryTotal / 1MB, 3) <!-- [CODE_FIRST] 13253 -->
+        } <!-- [CODE_FIRST] 13253 -->
+      } | <!-- [CODE_FIRST] 13253 -->
+      Format-Table -AutoSize <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    Write-Host "RMEM entries" <!-- [CODE_FIRST] 13253 -->
+    $entries | <!-- [CODE_FIRST] 13253 -->
+      Select-Object Index, <!-- [CODE_FIRST] 13253 -->
+        @{Name = "Base"; Expression = { <!-- [CODE_FIRST] 13253 -->
+          if ($_.AddressHidden) { "<hidden>" } else { "0x{0:X16}" -f $_.Base } <!-- [CODE_FIRST] 13253 -->
+        }}, <!-- [CODE_FIRST] 13253 -->
+        @{Name = "SizeMiB"; Expression = { [Math]::Round($_.Size / 1MB, 3) }}, <!-- [CODE_FIRST] 13253 -->
+        Category, <!-- [CODE_FIRST] 13253 -->
+        @{Name = "Flags"; Expression = { "0x{0:X4}" -f $_.Flags }}, <!-- [CODE_FIRST] 13253 -->
+        Label | <!-- [CODE_FIRST] 13253 -->
+      Format-Table -AutoSize <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 ### Expected PowerShell Output <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 The values below are illustrative. Actual addresses, sizes, categories, and <!-- [CODE_FIRST] 13253 -->
 labels depend on the platform firmware and boot configuration. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-```text <!-- [CODE_FIRST] 13253 -->
-Windows memory accounting <!-- [CODE_FIRST] 13253 -->
-  Physically installed : 8,192.000 MiB (0x200000000) <!-- [CODE_FIRST] 13253 -->
-  OS-usable physical   : 7,408.000 MiB (0x1CF000000) <!-- [CODE_FIRST] 13253 -->
-  Hardware reserved    : 784.000 MiB (0x31000000) <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-RMEM accounting <!-- [CODE_FIRST] 13253 -->
-  Entries              : 4 <!-- [CODE_FIRST] 13253 -->
-  Visible entry total  : 529.000 MiB (0x21100000) <!-- [CODE_FIRST] 13253 -->
-  Hidden entry total   : 255.000 MiB (0xFF00000) <!-- [CODE_FIRST] 13253 -->
-  RMEM total           : 784.000 MiB (0x31000000) <!-- [CODE_FIRST] 13253 -->
-  RMEM - Windows       : 0.000 MiB <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-RMEM totals by category <!-- [CODE_FIRST] 13253 -->
-Category        Entries TotalMiB <!-- [CODE_FIRST] 13253 -->
---------        ------- -------- <!-- [CODE_FIRST] 13253 -->
-GpuReserved           1      512 <!-- [CODE_FIRST] 13253 -->
-Security              1      255 <!-- [CODE_FIRST] 13253 -->
-SharedMemory          1        1 <!-- [CODE_FIRST] 13253 -->
-FirmwareRuntime       1       16 <!-- [CODE_FIRST] 13253 -->
-<!-- [CODE_FIRST] 13253 -->
-RMEM entries <!-- [CODE_FIRST] 13253 -->
-Index Base               SizeMiB Category        Flags Label <!-- [CODE_FIRST] 13253 -->
------ ----               ------- --------        ----- ----- <!-- [CODE_FIRST] 13253 -->
-  0 0x0000000010000000 512.000 GpuReserved     0x0000 iGPU Shared VRAM <!-- [CODE_FIRST] 13253 -->
-  1 <hidden>            255.000 Security        0x0001 Security Processor <!-- [CODE_FIRST] 13253 -->
-  2 0x000000003FF00000   1.000 SharedMemory    0x0000 MM Communication Buffer <!-- [CODE_FIRST] 13253 -->
-  3 0x0000000040000000  16.000 FirmwareRuntime 0x0000 Offline Crash Dump <!-- [CODE_FIRST] 13253 -->
-``` <!-- [CODE_FIRST] 13253 -->
+    Windows memory accounting <!-- [CODE_FIRST] 13253 -->
+      Physically installed : 8,192.000 MiB (0x200000000) <!-- [CODE_FIRST] 13253 -->
+      OS-usable physical   : 7,408.000 MiB (0x1CF000000) <!-- [CODE_FIRST] 13253 -->
+      Hardware reserved    : 784.000 MiB (0x31000000) <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    RMEM accounting <!-- [CODE_FIRST] 13253 -->
+      Entries              : 4 <!-- [CODE_FIRST] 13253 -->
+      Visible entry total  : 529.000 MiB (0x21100000) <!-- [CODE_FIRST] 13253 -->
+      Hidden entry total   : 255.000 MiB (0xFF00000) <!-- [CODE_FIRST] 13253 -->
+      RMEM total           : 784.000 MiB (0x31000000) <!-- [CODE_FIRST] 13253 -->
+      RMEM - Windows       : 0.000 MiB <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    RMEM totals by category <!-- [CODE_FIRST] 13253 -->
+    Category        Entries TotalMiB <!-- [CODE_FIRST] 13253 -->
+    --------        ------- -------- <!-- [CODE_FIRST] 13253 -->
+    GpuReserved           1      512 <!-- [CODE_FIRST] 13253 -->
+    Security              1      255 <!-- [CODE_FIRST] 13253 -->
+    SharedMemory          1        1 <!-- [CODE_FIRST] 13253 -->
+    FirmwareRuntime       1       16 <!-- [CODE_FIRST] 13253 -->
+    <!-- [CODE_FIRST] 13253 -->
+    RMEM entries <!-- [CODE_FIRST] 13253 -->
+    Index Base               SizeMiB Category        Flags Label <!-- [CODE_FIRST] 13253 -->
+    ----- ----               ------- --------        ----- ----- <!-- [CODE_FIRST] 13253 -->
+      0 0x0000000010000000 512.000 GpuReserved     0x0000 iGPU Shared VRAM <!-- [CODE_FIRST] 13253 -->
+      1 <hidden>            255.000 Security        0x0001 Security Processor <!-- [CODE_FIRST] 13253 -->
+      2 0x000000003FF00000   1.000 SharedMemory    0x0000 MM Communication Buffer <!-- [CODE_FIRST] 13253 -->
+      3 0x0000000040000000  16.000 FirmwareRuntime 0x0000 Offline Crash Dump <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 If the currently booted firmware does not publish RMEM, the script terminates <!-- [CODE_FIRST] 13253 -->
 with an error similar to: <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
-```text <!-- [CODE_FIRST] 13253 -->
-The currently booted firmware does not expose an RMEM ACPI table. <!-- [CODE_FIRST] 13253 -->
-``` <!-- [CODE_FIRST] 13253 -->
+    The currently booted firmware does not expose an RMEM ACPI table. <!-- [CODE_FIRST] 13253 -->
 <!-- [CODE_FIRST] 13253 -->
 Run the script from an ordinary PowerShell session after booting firmware that <!-- [CODE_FIRST] 13253 -->
 publishes RMEM. If the table is absent, the script reports that the current <!-- [CODE_FIRST] 13253 -->
