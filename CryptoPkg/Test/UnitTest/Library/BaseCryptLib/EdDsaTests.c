@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "TestBaseCryptLib.h"
+#include "VerifyTestSignatures.h"
 
 #define ED448_KEY_SIZE  57
 #define ED448_SIG_SIZE  114
@@ -387,7 +388,7 @@ TestVerifyEdDsaKeySetGet (
 }
 
 /**
-  Validate UEFI-OpenSSL EdDSA Signing and Verification.
+  Validate UEFI-OpenSSL EdDSA signature verification.
 
   @param[in]  Context  Unit test context.
 
@@ -401,122 +402,36 @@ TestVerifyEdDsaSignVerify (
   )
 {
   BOOLEAN  Status;
-  UINT8    Signature[ED448_SIG_SIZE];
-  UINTN    SigSize;
+  UINT8    TamperedSignature[ED448_SIG_SIZE];
+  UINT8    ModifiedMessage[100];
   UINTN    MessageSize;
 
   MessageSize = AsciiStrLen (mEdDsaTestMessage);
 
-  //
-  // Create context with private key for signing
-  //
   EdDsaContext1 = EdDsaNewByNid (CRYPTO_NID_ED448);
   UT_ASSERT_NOT_NULL (EdDsaContext1);
 
-  Status = EdDsaSetPrivKey (
-             EdDsaContext1,
-             (UINT8 *)mEd448TestPrivateKey,
-             ED448_KEY_SIZE
-             );
+  Status = EdDsaSetPubKey (EdDsaContext1, (UINT8 *)mEd448TestPublicKey, ED448_KEY_SIZE);
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Test EdDsaSign without context string
-  //
-  SigSize = sizeof (Signature);
-  Status  = EdDsaSign (
-              EdDsaContext1,
-              NULL,
-              0,
-              (UINT8 *)mEdDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
+  Status = EdDsaVerify (EdDsaContext1, NULL, 0, (UINT8 *)mEdDsaTestMessage, MessageSize, (UINT8 *)mEdDsaTestSignature, sizeof (mEdDsaTestSignature));
   UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, ED448_SIG_SIZE);
-
-  //
-  // Test EdDsaVerify with the same context
-  //
-  Status = EdDsaVerify (
-             EdDsaContext1,
-             NULL,
-             0,
-             (UINT8 *)mEdDsaTestMessage,
-             MessageSize,
-             Signature,
-             SigSize
-             );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Create separate context with public key for verification
-  //
-  EdDsaContext2 = EdDsaNewByNid (CRYPTO_NID_ED448);
-  UT_ASSERT_NOT_NULL (EdDsaContext2);
-
-  Status = EdDsaSetPubKey (
-             EdDsaContext2,
-             (UINT8 *)mEd448TestPublicKey,
-             ED448_KEY_SIZE
-             );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Test EdDsaVerify with separate public key context
-  //
-  Status = EdDsaVerify (
-             EdDsaContext2,
-             NULL,
-             0,
-             (UINT8 *)mEdDsaTestMessage,
-             MessageSize,
-             Signature,
-             SigSize
-             );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Test EdDsaVerify with modified message (should fail)
-  //
-  UINT8  ModifiedMessage[100];
 
   CopyMem (ModifiedMessage, mEdDsaTestMessage, MessageSize);
   ModifiedMessage[0] ^= 0xFF;
-
-  Status = EdDsaVerify (
-             EdDsaContext2,
-             NULL,
-             0,
-             ModifiedMessage,
-             MessageSize,
-             Signature,
-             SigSize
-             );
+  Status              = EdDsaVerify (EdDsaContext1, NULL, 0, ModifiedMessage, MessageSize, (UINT8 *)mEdDsaTestSignature, sizeof (mEdDsaTestSignature));
   UT_ASSERT_FALSE (Status);
 
-  //
-  // Test EdDsaVerify with modified signature (should fail)
-  //
-  Signature[0] ^= 0xFF;
-  Status        = EdDsaVerify (
-                    EdDsaContext2,
-                    NULL,
-                    0,
-                    (UINT8 *)mEdDsaTestMessage,
-                    MessageSize,
-                    Signature,
-                    SigSize
-                    );
+  CopyMem (TamperedSignature, mEdDsaTestSignature, sizeof (TamperedSignature));
+  TamperedSignature[0] ^= 0xFF;
+  Status                = EdDsaVerify (EdDsaContext1, NULL, 0, (UINT8 *)mEdDsaTestMessage, MessageSize, TamperedSignature, sizeof (TamperedSignature));
   UT_ASSERT_FALSE (Status);
-  Signature[0] ^= 0xFF;
 
   return UNIT_TEST_PASSED;
 }
 
 /**
-  Validate UEFI-OpenSSL EdDSA Signing and Verification with Context String.
+  Validate UEFI-OpenSSL EdDSA signature verification with a context string.
 
   @param[in]  Context  Unit test context.
 
@@ -530,62 +445,34 @@ TestVerifyEdDsaSignVerifyWithContext (
   )
 {
   BOOLEAN      Status;
-  UINT8        Signature[ED448_SIG_SIZE];
-  UINTN        SigSize;
   UINTN        MessageSize;
   CONST CHAR8  *ContextString = "test-context";
+  CONST CHAR8  *WrongContext  = "wrong-context";
   UINTN        ContextSize;
 
   MessageSize = AsciiStrLen (mEdDsaTestMessage);
   ContextSize = AsciiStrLen (ContextString);
 
-  //
-  // Create context with private key
-  //
   EdDsaContext1 = EdDsaNewByNid (CRYPTO_NID_ED448);
   UT_ASSERT_NOT_NULL (EdDsaContext1);
 
-  Status = EdDsaSetPrivKey (
+  Status = EdDsaSetPubKey (
              EdDsaContext1,
-             (UINT8 *)mEd448TestPrivateKey,
+             (UINT8 *)mEd448TestPublicKey,
              ED448_KEY_SIZE
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Test EdDsaSign with context string
-  //
-  SigSize = sizeof (Signature);
-  Status  = EdDsaSign (
-              EdDsaContext1,
-              (UINT8 *)ContextString,
-              ContextSize,
-              (UINT8 *)mEdDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, ED448_SIG_SIZE);
-
-  //
-  // Test EdDsaVerify with matching context string
-  //
   Status = EdDsaVerify (
              EdDsaContext1,
              (UINT8 *)ContextString,
              ContextSize,
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mEdDsaTestContextSignature,
+             sizeof (mEdDsaTestContextSignature)
              );
   UT_ASSERT_TRUE (Status);
-
-  //
-  // Test EdDsaVerify with different context string (should fail)
-  //
-  CONST CHAR8  *WrongContext = "wrong-context";
 
   Status = EdDsaVerify (
              EdDsaContext1,
@@ -593,22 +480,19 @@ TestVerifyEdDsaSignVerifyWithContext (
              AsciiStrLen (WrongContext),
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mEdDsaTestContextSignature,
+             sizeof (mEdDsaTestContextSignature)
              );
   UT_ASSERT_FALSE (Status);
 
-  //
-  // Test EdDsaVerify without context string (should fail)
-  //
   Status = EdDsaVerify (
              EdDsaContext1,
              NULL,
              0,
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mEdDsaTestContextSignature,
+             sizeof (mEdDsaTestContextSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -630,11 +514,7 @@ TestVerifyEdDsaErrorCases (
   )
 {
   BOOLEAN  Status;
-  UINT8    Signature[ED448_SIG_SIZE];
-  UINTN    SigSize;
   UINTN    MessageSize;
-  UINT8    TooSmallSig[10];
-  UINTN    TooSmallSigSize;
 
   MessageSize = AsciiStrLen (mEdDsaTestMessage);
 
@@ -644,72 +524,11 @@ TestVerifyEdDsaErrorCases (
   EdDsaContext1 = EdDsaNewByNid (CRYPTO_NID_ED448);
   UT_ASSERT_NOT_NULL (EdDsaContext1);
 
-  Status = EdDsaSetPrivKey (
+  Status = EdDsaSetPubKey (
              EdDsaContext1,
-             (UINT8 *)mEd448TestPrivateKey,
+             (UINT8 *)mEd448TestPublicKey,
              ED448_KEY_SIZE
              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Test EdDsaSign with NULL context
-  //
-  SigSize = sizeof (Signature);
-  Status  = EdDsaSign (
-              NULL,
-              NULL,
-              0,
-              (UINT8 *)mEdDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test EdDsaSign with NULL message
-  //
-  SigSize = sizeof (Signature);
-  Status  = EdDsaSign (
-              EdDsaContext1,
-              NULL,
-              0,
-              NULL,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test EdDsaSign with too small signature buffer
-  //
-  TooSmallSigSize = sizeof (TooSmallSig);
-  Status          = EdDsaSign (
-                      EdDsaContext1,
-                      NULL,
-                      0,
-                      (UINT8 *)mEdDsaTestMessage,
-                      MessageSize,
-                      TooSmallSig,
-                      &TooSmallSigSize
-                      );
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_EQUAL (TooSmallSigSize, ED448_SIG_SIZE);
-
-  //
-  // Generate valid signature for verification tests
-  //
-  SigSize = sizeof (Signature);
-  Status  = EdDsaSign (
-              EdDsaContext1,
-              NULL,
-              0,
-              (UINT8 *)mEdDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -721,8 +540,8 @@ TestVerifyEdDsaErrorCases (
              0,
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mEdDsaTestSignature,
+             sizeof (mEdDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -735,8 +554,8 @@ TestVerifyEdDsaErrorCases (
              0,
              NULL,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mEdDsaTestSignature,
+             sizeof (mEdDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -750,7 +569,7 @@ TestVerifyEdDsaErrorCases (
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
              NULL,
-             SigSize
+             sizeof (mEdDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -763,7 +582,7 @@ TestVerifyEdDsaErrorCases (
              0,
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
-             Signature,
+             (UINT8 *)mEdDsaTestSignature,
              32
              );
   UT_ASSERT_FALSE (Status);
@@ -777,7 +596,7 @@ TestVerifyEdDsaErrorCases (
              0,
              (UINT8 *)mEdDsaTestMessage,
              MessageSize,
-             Signature,
+             (UINT8 *)mEdDsaTestSignature,
              0
              );
   UT_ASSERT_FALSE (Status);
@@ -840,13 +659,9 @@ TestVerifyEdDsaPemX509 (
   BOOLEAN  Status;
   VOID     *EdDsaPrivKey;
   VOID     *EdDsaPubKey;
-  UINT8    Signature[ED448_SIG_SIZE];
-  UINTN    SigSize;
-  UINTN    MessageSize;
 
   EdDsaPrivKey = NULL;
   EdDsaPubKey  = NULL;
-  MessageSize  = AsciiStrLen (mEdDsaTestMessage);
 
   //
   // Retrieve EdDsa private key from PEM data.
@@ -871,33 +686,14 @@ TestVerifyEdDsaPemX509 (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_NOT_NULL (EdDsaPubKey);
 
-  //
-  // EdDSA signing with key from PEM
-  //
-  SigSize = sizeof (Signature);
-  Status  = EdDsaSign (
-              EdDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mEdDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, ED448_SIG_SIZE);
-
-  //
-  // EdDSA verification with key from X509
-  //
   Status = EdDsaVerify (
              EdDsaPubKey,
              NULL,
              0,
              (UINT8 *)mEdDsaTestMessage,
-             MessageSize,
-             Signature,
-             SigSize
+             AsciiStrLen (mEdDsaTestMessage),
+             (UINT8 *)mEdDsaTestSignature,
+             sizeof (mEdDsaTestSignature)
              );
   UT_ASSERT_TRUE (Status);
 
