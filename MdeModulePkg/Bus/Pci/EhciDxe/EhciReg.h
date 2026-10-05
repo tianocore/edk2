@@ -330,6 +330,23 @@ EhcRunHC (
   );
 
 /**
+  Turn off the periodic and asynchronous schedules and wait for the
+  controller to report both of them as disabled.
+
+  @param  Ehc          The EHCI device.
+  @param  Timeout      Time to wait before abort.
+
+  @retval EFI_SUCCESS  Both schedules are disabled.
+  @retval EFI_TIMEOUT  Failed to disable the schedules before Timeout.
+
+**/
+EFI_STATUS
+EhcQuiesceHC (
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
+  );
+
+/**
   Initialize the HC hardware.
   EHCI spec lists the five things to do to initialize the hardware:
   1. Program CTRLDSSEGMENT
