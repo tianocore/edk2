@@ -210,6 +210,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"
 
 [Components]
+  MdeModulePkg/Universal/Acpi/RmemAcpiDxe/RmemAcpiDxe.inf  # [CODE_FIRST] 13253
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
@@ -557,4 +558,3 @@
   }
 
 [BuildOptions]
-
