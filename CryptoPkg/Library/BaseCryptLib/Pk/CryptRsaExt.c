@@ -5,7 +5,6 @@
   1) RsaGetKey
   2) RsaGenerateKey
   3) RsaCheckKey
-  4) RsaPkcs1Sign
 
 Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -265,101 +264,4 @@ RsaCheckKey (
   }
 
   return TRUE;
-}
-
-/**
-  Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
-
-  This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
-  RSA PKCS#1.
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  If RsaContext is NULL, then return FALSE.
-  If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
-  If SigSize is large enough but Signature is NULL, then return FALSE.
-
-  @param[in]       RsaContext   Pointer to RSA context for signature generation.
-  @param[in]       MessageHash  Pointer to octet message hash to be signed.
-  @param[in]       HashSize     Size of the message hash in bytes.
-  @param[out]      Signature    Pointer to buffer to receive RSA PKCS1-v1_5 signature.
-  @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
-                                On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-
-**/
-BOOLEAN
-EFIAPI
-RsaPkcs1Sign (
-  IN      VOID         *RsaContext,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  )
-{
-  RSA    *Rsa;
-  UINTN  Size;
-  INT32  DigestType;
-
-  //
-  // Check input parameters.
-  //
-  if ((RsaContext == NULL) || (MessageHash == NULL)) {
-    return FALSE;
-  }
-
-  Rsa  = (RSA *)RsaContext;
-  Size = RSA_size (Rsa);
-
-  if (*SigSize < Size) {
-    *SigSize = Size;
-    return FALSE;
-  }
-
-  if (Signature == NULL) {
-    return FALSE;
-  }
-
-  //
-  // Determine the message digest algorithm according to digest size.
-  //   Only MD5, SHA-1, SHA-256, SHA-384 or SHA-512 algorithm is supported.
-  //
-  switch (HashSize) {
-    case MD5_DIGEST_SIZE:
-      DigestType = NID_md5;
-      break;
-
-    case SHA1_DIGEST_SIZE:
-      DigestType = NID_sha1;
-      break;
-
-    case SHA256_DIGEST_SIZE:
-      DigestType = NID_sha256;
-      break;
-
-    case SHA384_DIGEST_SIZE:
-      DigestType = NID_sha384;
-      break;
-
-    case SHA512_DIGEST_SIZE:
-      DigestType = NID_sha512;
-      break;
-
-    default:
-      return FALSE;
-  }
-
-  return (BOOLEAN)RSA_sign (
-                    DigestType,
-                    MessageHash,
-                    (UINT32)HashSize,
-                    Signature,
-                    (UINT32 *)SigSize,
-                    (RSA *)RsaContext
-                    );
 }

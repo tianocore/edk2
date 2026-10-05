@@ -198,54 +198,6 @@ MlDsaGeneratePubKey (
 }
 
 /**
-  Generates an ML-DSA signature for a given message.
-
-  This function creates an ML-DSA signature using the private key stored in the
-  ML-DSA context. ML-DSA signatures can include an optional context string for
-  domain separation, allowing the same key to be used in different contexts
-  without creating security vulnerabilities.
-
-  The context must contain a private key (set via MlDsaSetPrivKey()) before
-  calling this function.
-
-  If MlDsaContext is NULL, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If Signature is NULL, then return FALSE.
-  If SigSize is NULL, then return FALSE.
-  If SigSize buffer is too small, SigSize is updated with required size and return FALSE.
-  Context may be NULL if no context string is used (ContextSize must be 0).
-
-  @param[in]      MlDsaContext   Pointer to ML-DSA context containing the private key.
-  @param[in]      Context        Optional context string for domain separation.
-                                 May be NULL for default context.
-  @param[in]      ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
-  @param[in]      Message        Pointer to message data to be signed.
-  @param[in]      MessageSize    Size of message in bytes.
-  @param[out]     Signature      Pointer to buffer to receive the signature.
-  @param[in,out]  SigSize        On input, size of Signature buffer.
-                                 On output, actual size of signature (4627 bytes for ML-DSA-87).
-
-  @retval TRUE   ML-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-MlDsaSign (
-  IN      VOID         *MlDsaContext,
-  IN      UINT8        *Context,
-  IN      UINTN        ContextSize,
-  IN      CONST UINT8  *Message,
-  IN      UINTN        MessageSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
   Verifies the ML-DSA signature for a given message.
 
   This function verifies an ML-DSA signature against a message using the public key
