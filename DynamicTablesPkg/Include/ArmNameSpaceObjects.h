@@ -62,6 +62,9 @@ typedef enum ArmObjectID {
   EArmObjGicIwbInfo,                                           ///< 32 - GIC IWB Info
   EArmObjBmuRegInfo,                                           ///< 33 - BMU Reg Info
   EArmObjPl050Info,                                            ///< 34 - PL050 Info
+  EArmObjScmiDeviceInfo,                                       ///< 35 - SCMI Device Information
+  EArmObjScmiPccTransportInfo,                                 ///< 36 - SCMI PCC Transport Information
+  EArmObjScmiProtocolInfo,                                     ///< 37 - SCMI Protocol Information
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1087,5 +1090,64 @@ typedef struct CmArmBmuRegInfo {
   /// The BMU interrupt descriptor
   CM_ARM_EXTENDED_INTERRUPT    BmuIntr;
 } CM_ARM_BMU_REG_INFO;
+
+/** SCMI protocols described by an SCMI ACPI device.
+*/
+typedef enum ArmScmiProtocolType {
+  ArmScmiProtocolTypePcap,
+  ArmScmiProtocolTypeSystemTelemetry,
+  ArmScmiProtocolTypeMax
+} CM_ARM_SCMI_PROTOCOL_TYPE;
+
+/** A structure that describes an SCMI ACPI device.
+
+    ID: EArmObjScmiDeviceInfo
+*/
+typedef struct CmArmScmiDeviceInfo {
+  /// A unique token identifying this SCMI device.
+  CM_OBJECT_TOKEN    Token;
+
+  /// Token identifying the common agent-to-platform transport.
+  CM_OBJECT_TOKEN    CommonA2pTransportToken;
+
+  /// Token identifying the optional common platform-to-agent transport.
+  CM_OBJECT_TOKEN    CommonP2aTransportToken;
+
+  /// Token referencing an array of SCMI protocol information objects.
+  CM_OBJECT_TOKEN    ProtocolInfoToken;
+} CM_ARM_SCMI_DEVICE_INFO;
+
+/** A structure that describes an SCMI PCC transport.
+
+    ID: EArmObjScmiPccTransportInfo
+*/
+typedef struct CmArmScmiPccTransportInfo {
+  /// A unique token identifying this SCMI PCC transport.
+  CM_OBJECT_TOKEN    Token;
+
+  /// Object ID identifying the type of the referenced PCC subspace object.
+  UINT32             PccSubspaceObjectId;
+
+  /// Token identifying the referenced PCC subspace object.
+  CM_OBJECT_TOKEN    PccSubspaceToken;
+} CM_ARM_SCMI_PCC_TRANSPORT_INFO;
+
+/** A structure that describes an SCMI protocol.
+
+    ID: EArmObjScmiProtocolInfo
+*/
+typedef struct CmArmScmiProtocolInfo {
+  /// SCMI protocol type.
+  CM_ARM_SCMI_PROTOCOL_TYPE    ProtocolType;
+
+  /// Token identifying an optional exclusive agent-to-platform transport.
+  CM_OBJECT_TOKEN              ExclusiveA2pTransportToken;
+
+  /// Token identifying an optional exclusive platform-to-agent transport.
+  CM_OBJECT_TOKEN              ExclusiveP2aTransportToken;
+
+  /// Indicates whether the protocol supports notifications.
+  BOOLEAN                      NotificationsSupported;
+} CM_ARM_SCMI_PROTOCOL_INFO;
 
 #pragma pack()
