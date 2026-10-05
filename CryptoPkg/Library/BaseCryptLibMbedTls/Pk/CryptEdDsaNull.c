@@ -203,57 +203,6 @@ EdDsaGetPubKey (
 }
 
 /**
-  Generates an EdDSA signature for a given message.
-
-  This function creates an EdDSA signature using the private key stored in the
-  EdDSA context. EdDSA uses a 'pure' signature scheme where the entire message
-  is processed directly without pre-computing a hash digest.
-
-  For Ed448, an optional context string can be provided for domain separation.
-  This allows the same key to be used in different contexts without creating
-  security vulnerabilities.
-
-  The context must contain a private key (set via EdDsaSetPrivKey() or loaded
-  from PEM) before calling this function.
-
-  If EdDsaContext is NULL, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If MessageSize is 0 or exceeds INT_MAX, then return FALSE.
-  If Signature is NULL, then return FALSE.
-  If SigSize is NULL, then return FALSE.
-  For Ed448: Context may be NULL if no context string is used (ContextSize must be 0).
-
-  @param[in]      EdDsaContext    Pointer to EdDSA context containing the private key.
-  @param[in]      Context         Optional context string for Ed448 domain separation.
-                                  May be NULL for default context.
-  @param[in]      ContextSize     Size of context string in bytes. Set to 0 if Context is NULL.
-  @param[in]      Message         Pointer to message data to be signed.
-  @param[in]      MessageSize     Size of message in bytes.
-  @param[out]     Signature       Pointer to buffer to receive the signature.
-  @param[in,out]  SigSize         On input, size of Signature buffer.
-                                  On output, actual size of signature (114 bytes for Ed448).
-
-  @retval TRUE   EdDSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaSign (
-  IN      VOID         *EdDsaContext,
-  IN      CONST UINT8  *Context,
-  IN      UINTN        ContextSize,
-  IN      CONST UINT8  *Message,
-  IN      UINTN        MessageSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
   Verifies the EdDSA signature for a given message.
 
   This function verifies an EdDSA signature against a message using the public key
