@@ -9,8 +9,6 @@
 ##
 # Import Modules
 #
-import os
-import sys
 import unittest
 
 
@@ -20,6 +18,8 @@ def TheTestSuite():
     suites.append(CheckPythonSyntax.TheTestSuite())
     import CheckUnicodeSourceFiles
     suites.append(CheckUnicodeSourceFiles.TheTestSuite())
+    import TestMultipleWorkspace
+    suites.append(TestMultipleWorkspace.TheTestSuite())
     import MetaFileParserTests
     suites.append(MetaFileParserTests.TheTestSuite())
     return unittest.TestSuite(suites)
@@ -27,4 +27,3 @@ def TheTestSuite():
 if __name__ == '__main__':
     allTests = TheTestSuite()
     unittest.TextTestRunner().run(allTests)
-
