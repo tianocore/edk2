@@ -560,7 +560,10 @@ LibFileInfo (
                     );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Buffer = AllocatePool (BufferSize);
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return NULL;
+    }
   }
 
   Status = FHand->GetInfo (

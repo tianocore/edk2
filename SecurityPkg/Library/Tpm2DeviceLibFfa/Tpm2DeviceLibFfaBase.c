@@ -10,15 +10,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <IndustryStandard/ArmFfaSvc.h>
 #include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
-#include <IndustryStandard/ArmStdSmc.h>
-#include <IndustryStandard/Tpm20.h>
-#include <Library/TimerLib.h>
-
 #include "Tpm2DeviceLibFfa.h"
 
 UINT8  mCRBIdleByPass;
@@ -54,19 +47,15 @@ InternalTpm2DeviceLibFfaConstructor (
   mCRBIdleByPass = 0xFF;
 
   if (PcdGet64 (PcdTpmBaseAddress) == 0) {
-    Status = EFI_NO_MAPPING;
-    goto Exit;
+    return EFI_NO_MAPPING;
   }
 
   Status = ValidateTpmInterfaceType ();
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
   mCRBIdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
 
-  Status = EFI_SUCCESS;
-
-Exit:
-  return Status;
+  return EFI_SUCCESS;
 }

@@ -527,6 +527,10 @@ ValidateMmCommBufferAddr (
         &gEfiMmCommunicateHeaderV3Guid
         ))
   {
+    if (CommBufferRange < sizeof (EFI_MM_COMMUNICATE_HEADER_V3)) {
+      return EFI_ACCESS_DENIED;
+    }
+
     CommBufferHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferAddr;
     Status             = SafeUint64Add (
                            CommBufferHeaderV3->MessageSize,
@@ -536,9 +540,21 @@ ValidateMmCommBufferAddr (
     if (EFI_ERROR (Status)) {
       return EFI_ACCESS_DENIED;
     }
+
+    if (BufferSize > CommBufferHeaderV3->BufferSize) {
+      return EFI_ACCESS_DENIED;
+    }
+
+    BufferSize = CommBufferHeaderV3->BufferSize;
   } else {
-    BufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
-                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+    Status = SafeUint64Add (
+               ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength,
+               OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+               &BufferSize
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_ACCESS_DENIED;
+    }
   }
 
   Status = SafeUint64Add (
@@ -764,47 +780,99 @@ SetEventCompleteSvcArgs (
   if (CommProtocol == CommProtocolFfa) {
     FfaMsgInfo = CommData;
 
-    if (EFI_ERROR (Status)) {
-      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_ERROR;
-
+    /*
+     * Once StandaloneMm is entered via FFA_SEND_DIRECT_MSG/MSGv2, it must
+     * return via FFA_SEND_DIRECT_RESP/RESPv2.
+     *
+     * For ServiceTypeMmCommunication, protocol errors are returned through
+     * the communication buffer, so the handler itself should return
+     * EFI_SUCCESS (See the MmiMange()). There are, however, a few failure
+     * cases outside the handler, such as when no matching service handler
+     * is found. In such cases, FFA_SEND_DIRECT_RESP/RESPv2 can be
+     * constructed with ARM_SPM_MM_RET_* return code.
+     *
+     * For ServiceTypeMisc, however, the response, including any protocol
+     * error code and arguments, is returned directly through FfaArgs.
+     * Therefore, the handler is responsible for constructing FfaArgs and
+     * should return EFI_SUCCESS.
+     *
+     * The SPMC does not forward requests for unknown services to StandaloneMm,
+     * and StandaloneMm is not initialized if any service handler fails to
+     * register. Therefore, a failure reported by a ServiceTypeMisc handler
+     * is unexpected.
+     *
+     * In such a case, there is no generic way to construct FfaArgs for
+     * FFA_SEND_DIRECT_RESP/RESPv2. Call CpuDeadLoop() rather than returning
+     * an invalid response.
+     */
+    if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
       /*
-       * StandaloneMm is secure instance. So set as 0x00.
+       * DirectMsgV1 is only used for ServiceTypeMmCommunication:
+       *
+       *   - FFA_SEND_DIRECT_RESP:
+       *     x0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP
+       *     x1 = Source/Dest Partition Id.
+       *     x2 = 0x00
+       *     x3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE
+       *     x4 = ARM_SPM_MM_RET_*
        */
-      EventCompleteSvcArgs->Arg1 = 0x00;
-      EventCompleteSvcArgs->Arg2 = EfiStatusToFfaStatus (Status);
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
+      EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+      EventCompleteSvcArgs->Arg4 = EfiStatusToSpmMmStatus (Status);
     } else {
-      if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
-        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
-        EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
-      } else {
-        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
 
-        if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
-          EventCompleteSvcArgs->Arg4  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg0;
-          EventCompleteSvcArgs->Arg5  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg1;
-          EventCompleteSvcArgs->Arg6  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg2;
-          EventCompleteSvcArgs->Arg7  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg3;
-          EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg4;
-          EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg5;
-          EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg6;
-          EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg7;
-          EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg8;
-          EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg9;
-          EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg10;
-          EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg11;
-          EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg12;
-          EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg13;
+      if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
+        /*
+         * This case occurs when StandaloneMm receives a direct request but
+         * has no registered service handler matching the service GUID.
+         * It likely indicates a configuration mismatch: the SPMC expects
+         * StandaloneMm to support the service, but StandaloneMm does not.
+         */
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Error: ServiceTypeMisc, Status: %r\n", Status));
+          ASSERT (0);
+          CpuDeadLoop ();
         }
-      }
 
-      /*
-       * Swap source & dest partition id.
-       */
-      EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
-                                     FfaMsgInfo->DestPartId,
-                                     FfaMsgInfo->SourcePartId
-                                     );
+        EventCompleteSvcArgs->Arg4  = mMiscMmCommunicateBuffer->FfaArgs.Arg4;
+        EventCompleteSvcArgs->Arg5  = mMiscMmCommunicateBuffer->FfaArgs.Arg5;
+        EventCompleteSvcArgs->Arg6  = mMiscMmCommunicateBuffer->FfaArgs.Arg6;
+        EventCompleteSvcArgs->Arg7  = mMiscMmCommunicateBuffer->FfaArgs.Arg7;
+        EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->FfaArgs.Arg8;
+        EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->FfaArgs.Arg9;
+        EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->FfaArgs.Arg10;
+        EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->FfaArgs.Arg11;
+        EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->FfaArgs.Arg12;
+        EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->FfaArgs.Arg13;
+        EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->FfaArgs.Arg14;
+        EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->FfaArgs.Arg15;
+        EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->FfaArgs.Arg16;
+        EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->FfaArgs.Arg17;
+      } else {
+        /*
+         * ServiceTypeMmCommunication with DirectMsgV2:
+         *
+         *  - FFA_SEND_DIRECT_RESPv2:
+         *    x0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP
+         *    x1 = Source/Dest Partition Id.
+         *    x2 = 0x00 (SBZ)
+         *    x3 = 0x00 (SBZ)
+         *    x4 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE
+         *    x5 = ARM_SPM_MM_RET_*
+         */
+        EventCompleteSvcArgs->Arg4 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+        EventCompleteSvcArgs->Arg5 = EfiStatusToSpmMmStatus (Status);
+      }
     }
+
+    /*
+     * Swap source & dest partition id.
+     */
+    EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
+                                   FfaMsgInfo->DestPartId,
+                                   FfaMsgInfo->SourcePartId
+                                   );
   } else {
     EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
@@ -831,21 +899,9 @@ InitializeMiscMmCommunicateBuffer (
 {
   ZeroMem (Buffer, sizeof (MISC_MM_COMMUNICATE_BUFFER));
 
-  Buffer->MessageLength       = sizeof (DIRECT_MSG_ARGS);
-  Buffer->DirectMsgArgs.Arg0  = EventSvcArgs->Arg4;
-  Buffer->DirectMsgArgs.Arg1  = EventSvcArgs->Arg5;
-  Buffer->DirectMsgArgs.Arg2  = EventSvcArgs->Arg6;
-  Buffer->DirectMsgArgs.Arg3  = EventSvcArgs->Arg7;
-  Buffer->DirectMsgArgs.Arg4  = EventSvcArgs->Arg8;
-  Buffer->DirectMsgArgs.Arg5  = EventSvcArgs->Arg9;
-  Buffer->DirectMsgArgs.Arg6  = EventSvcArgs->Arg10;
-  Buffer->DirectMsgArgs.Arg7  = EventSvcArgs->Arg11;
-  Buffer->DirectMsgArgs.Arg8  = EventSvcArgs->Arg12;
-  Buffer->DirectMsgArgs.Arg9  = EventSvcArgs->Arg13;
-  Buffer->DirectMsgArgs.Arg10 = EventSvcArgs->Arg14;
-  Buffer->DirectMsgArgs.Arg11 = EventSvcArgs->Arg15;
-  Buffer->DirectMsgArgs.Arg12 = EventSvcArgs->Arg16;
-  Buffer->DirectMsgArgs.Arg13 = EventSvcArgs->Arg17;
+  Buffer->MessageLength = sizeof (DIRECT_MSG_ARGS);
+
+  CopyMem (&Buffer->FfaArgs, EventSvcArgs, sizeof (ARM_FFA_ARGS));
 
   CopyGuid (&Buffer->HeaderGuid, ServiceGuid);
 }

@@ -21,6 +21,27 @@
 #define UNIT_TEST_VERSION  "0.1"
 
 /**
+  Sample unit test the triggers an unexpected exception
+
+  @param[in]  Context    [Optional] An optional parameter that enables:
+                         1) test-case reuse with varied parameters and
+                         2) test-case re-entry for Target tests that need a
+                         reboot.  This parameter is a VOID* and it is the
+                         responsibility of the test author to ensure that the
+                         contents are well understood by all test cases that may
+                         consume it.
+
+  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
+                                        case was successful.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+GenerateUnexpectedException (
+  IN UNIT_TEST_CONTEXT  Context
+  );
+
+/**
   Unit-Test Test Suite Setup (before) function that enables ASSERT() macros.
 **/
 VOID
@@ -48,51 +69,6 @@ TestSuiteDisableAsserts (
   // Clear BIT0 (DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED)
   //
   PatchPcdSet8 (PcdDebugPropertyMask, PcdGet8 (PcdDebugPropertyMask) & (~BIT0));
-}
-
-UINTN
-DivideWithNoParameterChecking (
-  UINTN  Dividend,
-  UINTN  Divisor
-  )
-{
-  //
-  // Perform integer division with no check for divide by zero
-  //
-  return (Dividend / Divisor);
-}
-
-/**
-  Sample unit test the triggers an unexpected exception
-
-  @param[in]  Context    [Optional] An optional parameter that enables:
-                         1) test-case reuse with varied parameters and
-                         2) test-case re-entry for Target tests that need a
-                         reboot.  This parameter is a VOID* and it is the
-                         responsibility of the test author to ensure that the
-                         contents are well understood by all test cases that may
-                         consume it.
-
-  @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
-                                        case was successful.
-  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
-**/
-UNIT_TEST_STATUS
-EFIAPI
-GenerateUnexpectedException (
-  IN UNIT_TEST_CONTEXT  Context
-  )
-{
-  //
-  // Assertion that passes without generating an exception
-  //
-  UT_ASSERT_EQUAL (DivideWithNoParameterChecking (20, 1), (UINTN)20);
-  //
-  // Assertion that generates divide by zero exception before result evaluated
-  //
-  UT_ASSERT_EQUAL (DivideWithNoParameterChecking (20, 0), MAX_UINTN);
-
-  return UNIT_TEST_PASSED;
 }
 
 /**

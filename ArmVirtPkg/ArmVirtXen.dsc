@@ -68,22 +68,11 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
-
-  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
 
   ## Default Terminal Type
   ## 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
-
-  #
-  # Make VariableRuntimeDxe work at emulated non-volatile variable mode.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
 [PcdsPatchableInModule.common]
   # we need to provide a resolution for this PCD that supports PcdSet64()
@@ -103,20 +92,6 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress|0x0
 
 [PcdsDynamicDefault.common]
-
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
-  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
-
-  #
-  # ARM General Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
-
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
 ################################################################################
@@ -145,13 +120,6 @@
   #
   # Architectural Protocols
   #
-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-  }
-
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 
   #

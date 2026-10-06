@@ -63,6 +63,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
 
 [Depex]
   TRUE

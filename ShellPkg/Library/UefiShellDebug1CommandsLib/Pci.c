@@ -2451,6 +2451,556 @@ PciConfigSpaceDumpHex (
 }
 
 /**
+  Enumerate all PCI functions exposed by the discovered root bridge handles.
+
+  @param[in] HandleBuf    Buffer of handles exposing
+                          EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+  @param[in] HandleCount  Number of entries in HandleBuf.
+
+  @retval SHELL_SUCCESS            Enumeration completed successfully.
+  @retval SHELL_ABORTED            The user interrupted enumeration.
+  @retval SHELL_NOT_FOUND          A root bridge or bus range could not be read.
+**/
+STATIC
+SHELL_STATUS
+PciEnumerateAll (
+  IN EFI_HANDLE  *HandleBuf,
+  IN UINTN       HandleCount
+  )
+{
+  EFI_STATUS                         Status;
+  UINT16                             Bus;
+  UINT16                             Device;
+  UINT16                             Func;
+  UINT64                             Address;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    *IoDev;
+  PCI_DEVICE_INDEPENDENT_REGION      PciHeader;
+  UINTN                              ScreenCount;
+  UINTN                              TempColumn;
+  UINTN                              ScreenSize;
+  UINTN                              Index;
+  BOOLEAN                            PrintTitle;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptors;
+  UINT16                             MinBus;
+  UINT16                             MaxBus;
+  BOOLEAN                            IsEnd;
+
+  Status  = EFI_SUCCESS;
+  Address = 0;
+  IoDev   = NULL;
+
+  gST->ConOut->QueryMode (
+                 gST->ConOut,
+                 gST->ConOut->Mode->Mode,
+                 &TempColumn,
+                 &ScreenSize
+                 );
+
+  ScreenCount = 0;
+  ScreenSize -= 4;
+  if ((ScreenSize & 1) == 1) {
+    ScreenSize -= 1;
+  }
+
+  PrintTitle = TRUE;
+
+  //
+  // For each handle, which decides a segment and a bus number range,
+  // enumerate all devices on it.
+  //
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = PciGetProtocolAndResource (
+               HandleBuf[Index],
+               &IoDev,
+               &Descriptors
+               );
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"pci");
+      return SHELL_NOT_FOUND;
+    }
+
+    //
+    // No document say it's impossible for a RootBridgeIo protocol handle
+    // to have more than one address space descriptors, so find out every
+    // bus range and for each of them do device enumeration.
+    //
+    while (TRUE) {
+      Status = PciGetNextBusRange (&Descriptors, &MinBus, &MaxBus, &IsEnd);
+
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_BUS_RANGE_ERR), gShellDebug1HiiHandle, L"pci");
+        return SHELL_NOT_FOUND;
+      }
+
+      if (IsEnd) {
+        break;
+      }
+
+      for (Bus = MinBus; Bus <= MaxBus; Bus++) {
+        //
+        // For each devices, enumerate all functions it contains
+        //
+        for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
+          //
+          // For each function, read its configuration space and print summary
+          //
+          for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
+            if (ShellGetExecutionBreakFlag ()) {
+              return SHELL_ABORTED;
+            }
+
+            Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
+            IoDev->Pci.Read (
+                         IoDev,
+                         EfiPciWidthUint16,
+                         Address,
+                         1,
+                         &PciHeader.VendorId
+                         );
+
+            //
+            // If VendorId = 0xffff, there does not exist a device at this
+            // location. For each device, if there is any function on it,
+            // there must be 1 function at Function 0. So if Func = 0, there
+            // will be no more functions in the same device, so we can break
+            // loop to deal with the next device.
+            //
+            if ((PciHeader.VendorId == 0xffff) && (Func == 0)) {
+              break;
+            }
+
+            if (PciHeader.VendorId != 0xffff) {
+              if (PrintTitle) {
+                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_TITLE), gShellDebug1HiiHandle);
+                PrintTitle = FALSE;
+              }
+
+              IoDev->Pci.Read (
+                           IoDev,
+                           EfiPciWidthUint32,
+                           Address,
+                           sizeof (PciHeader) / sizeof (UINT32),
+                           &PciHeader
+                           );
+
+              ShellPrintHiiDefaultEx (
+                STRING_TOKEN (STR_PCI_LINE_P1),
+                gShellDebug1HiiHandle,
+                IoDev->SegmentNumber,
+                Bus,
+                Device,
+                Func
+                );
+
+              PciPrintClassCode (PciHeader.ClassCode, FALSE);
+              ShellPrintHiiDefaultEx (
+                STRING_TOKEN (STR_PCI_LINE_P2),
+                gShellDebug1HiiHandle,
+                PciHeader.VendorId,
+                PciHeader.DeviceId,
+                PciHeader.ClassCode[0]
+                );
+
+              ScreenCount += 2;
+              if ((ScreenCount >= ScreenSize) && (ScreenSize != 0)) {
+                //
+                // If ScreenSize == 0 we have the console redirected so don't
+                // block updates.
+                //
+                ScreenCount = 0;
+              }
+
+              //
+              // If this is not a multi-function device, we can leave the loop
+              // to deal with the next device.
+              //
+              if ((Func == 0) && ((PciHeader.HeaderType & HEADER_TYPE_MULTI_FUNCTION) == 0x00)) {
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      //
+      // If Descriptor is NULL, Configuration() returns EFI_UNSUPPRORED,
+      // we assume the bus range is 0~PCI_MAX_BUS. After enumerated all
+      // devices on all bus, we can leave loop.
+      //
+      if (Descriptors == NULL) {
+        break;
+      }
+    }
+  }
+
+  return SHELL_SUCCESS;
+}
+
+/**
+  Parse the three positional PCI BDF fields from the command line.
+
+  @param[in]  Package  Parsed command line package for the `pci` command.
+  @param[out] Bus      Parsed bus number.
+  @param[out] Device   Parsed device number.
+  @param[out] Func     Parsed function number.
+
+  @retval SHELL_SUCCESS            The BDF fields were parsed successfully.
+  @retval SHELL_INVALID_PARAMETER  One of the fields was not valid hexadecimal
+                                   input or exceeded the allowed PCI range.
+**/
+STATIC
+SHELL_STATUS
+ParsePciBdf (
+  IN  LIST_ENTRY  *Package,
+  OUT UINT16      *Bus,
+  OUT UINT16      *Device,
+  OUT UINT16      *Func
+  )
+{
+  CONST CHAR16  *Temp;
+  UINT64        RetVal[3];
+  UINTN         Index;
+
+  ASSERT (Package != NULL);
+  ASSERT (Bus != NULL);
+  ASSERT (Device != NULL);
+  ASSERT (Func != NULL);
+
+  *Bus    = 0;
+  *Device = 0;
+  *Func   = 0;
+
+  //
+  // The first Argument(except "-i") is assumed to be Bus number, second
+  // to be Device number, and third to be Func number.
+  //
+
+  for (Index = 0; Index < 3; Index++) {
+    Temp = ShellCommandLineGetRawValue (Package, Index + 1);
+    if (Temp == NULL) {
+      continue;
+    }
+
+    //
+    // Input converted to hexadecimal number.
+    //
+    if (EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal[Index], TRUE, TRUE))) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
+      return SHELL_INVALID_PARAMETER;
+    }
+
+    switch (Index) {
+      case 0:
+        *Bus = (UINT16)RetVal[Index];
+        if (*Bus > PCI_MAX_BUS) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
+          return SHELL_INVALID_PARAMETER;
+        }
+
+        break;
+      case 1:
+        *Device = (UINT16)RetVal[Index];
+        if (*Device > PCI_MAX_DEVICE) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
+          return SHELL_INVALID_PARAMETER;
+        }
+
+        break;
+      case 2:
+        *Func = (UINT16)RetVal[Index];
+        if (*Func > PCI_MAX_FUNC) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
+          return SHELL_INVALID_PARAMETER;
+        }
+
+        break;
+      default:
+        ASSERT (FALSE);
+        return SHELL_INVALID_PARAMETER;
+    }
+  }
+
+  return SHELL_SUCCESS;
+}
+
+/** Main function of the 'Pci' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdPci (
+  LIST_ENTRY  *Package
+  )
+{
+  UINT16                           Segment;
+  UINT16                           Bus;
+  UINT16                           Device;
+  UINT16                           Func;
+  UINT64                           Address;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *IoDev;
+  EFI_STATUS                       Status;
+  PCI_CONFIG_SPACE                 ConfigSpace;
+  BOOLEAN                          ExplainData;
+  UINTN                            SizeOfHeader;
+  UINTN                            HandleBufSize;
+  EFI_HANDLE                       *HandleBuf;
+  UINTN                            HandleCount;
+  SHELL_STATUS                     ShellStatus;
+  CONST CHAR16                     *Temp;
+  UINT64                           RetVal;
+  UINT16                           ExtendedCapability;
+  UINT8                            PcieCapabilityPtr;
+  UINT8                            *ExtendedConfigSpace;
+  UINTN                            ExtendedConfigSize;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+  Address     = 0;
+  IoDev       = NULL;
+  HandleBuf   = NULL;
+
+  if (ShellCommandLineGetCount (Package) == 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"pci");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellCommandLineGetCount (Package) > 4) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-ec") && (ShellCommandLineGetValue (Package, L"-ec") == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"pci", L"-ec");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-s") && (ShellCommandLineGetValue (Package, L"-s") == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"pci", L"-s");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // Get all instances of PciRootBridgeIo. Allocate space for 1 EFI_HANDLE and
+  // call LibLocateHandle(), if EFI_BUFFER_TOO_SMALL is returned, allocate enough
+  // space for handles and call it again.
+  //
+  HandleBufSize = sizeof (EFI_HANDLE);
+  HandleBuf     = (EFI_HANDLE *)AllocateZeroPool (HandleBufSize);
+  if (HandleBuf == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
+    return SHELL_OUT_OF_RESOURCES;
+  }
+
+  Status = gBS->LocateHandle (
+                  ByProtocol,
+                  &gEfiPciRootBridgeIoProtocolGuid,
+                  NULL,
+                  &HandleBufSize,
+                  HandleBuf
+                  );
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    HandleBuf = ReallocatePool (sizeof (EFI_HANDLE), HandleBufSize, HandleBuf);
+    if (HandleBuf == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
+      goto Done;
+    }
+
+    Status = gBS->LocateHandle (
+                    ByProtocol,
+                    &gEfiPciRootBridgeIoProtocolGuid,
+                    NULL,
+                    &HandleBufSize,
+                    HandleBuf
+                    );
+  }
+
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"pci");
+    ShellStatus = SHELL_NOT_FOUND;
+    goto Done;
+  }
+
+  HandleCount = HandleBufSize / sizeof (EFI_HANDLE);
+  //
+  // Argument Count == 1(no other argument): enumerate all pci functions
+  //
+  if (ShellCommandLineGetCount (Package) == 1) {
+    ShellStatus = PciEnumerateAll (HandleBuf, HandleCount);
+    goto Done;
+  }
+
+  ExplainData        = FALSE;
+  Segment            = 0;
+  ExtendedCapability = 0xFFFF;
+  if (ShellCommandLineGetFlag (Package, L"-i")) {
+    ExplainData = TRUE;
+  }
+
+  Temp = ShellCommandLineGetValue (Package, L"-s");
+  if (Temp != NULL) {
+    //
+    // Input converted to hexadecimal number.
+    //
+    if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+      Segment = (UINT16)RetVal;
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+  }
+
+  ShellStatus = ParsePciBdf (Package, &Bus, &Device, &Func);
+  if (ShellStatus != SHELL_SUCCESS) {
+    goto Done;
+  }
+
+  Temp = ShellCommandLineGetValue (Package, L"-ec");
+  if (Temp != NULL) {
+    //
+    // Input converted to hexadecimal number.
+    //
+    if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+      ExtendedCapability = (UINT16)RetVal;
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+  }
+
+  //
+  // Find the protocol interface who's in charge of current segment, and its
+  // bus range covers the current bus
+  //
+  Status = PciFindProtocolInterface (
+             HandleBuf,
+             HandleCount,
+             Segment,
+             Bus,
+             &IoDev
+             );
+
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_PCI_NO_FIND),
+      gShellDebug1HiiHandle,
+      L"pci",
+      Segment,
+      Bus
+      );
+    ShellStatus = SHELL_NOT_FOUND;
+    goto Done;
+  }
+
+  Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
+  Status  = IoDev->Pci.Read (
+                         IoDev,
+                         EfiPciWidthUint8,
+                         Address,
+                         sizeof (ConfigSpace),
+                         &ConfigSpace
+                         );
+
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_NO_CFG), gShellDebug1HiiHandle, L"pci");
+    ShellStatus = SHELL_ACCESS_DENIED;
+    goto Done;
+  }
+
+  mConfigSpace = &ConfigSpace;
+  ShellPrintHiiDefaultEx (
+    STRING_TOKEN (STR_PCI_INFO),
+    gShellDebug1HiiHandle,
+    Segment,
+    Bus,
+    Device,
+    Func,
+    Segment,
+    Bus,
+    Device,
+    Func
+    );
+
+  //
+  // Dump standard header of configuration space
+  //
+  SizeOfHeader = sizeof (ConfigSpace.Common) + sizeof (ConfigSpace.NonCommon);
+
+  DumpHex (2, 0, SizeOfHeader, &ConfigSpace);
+  ShellPrintDefaultEx (L"\r\n");
+
+  //
+  // Dump device dependent Part of configuration space
+  //
+  DumpHex (
+    2,
+    SizeOfHeader,
+    sizeof (ConfigSpace) - SizeOfHeader,
+    ConfigSpace.Data
+    );
+
+  ExtendedConfigSpace = NULL;
+  ExtendedConfigSize  = 0;
+  PcieCapabilityPtr   = LocatePciCapability (&ConfigSpace, EFI_PCI_CAPABILITY_ID_PCIEXP);
+  if (PcieCapabilityPtr != 0) {
+    ExtendedConfigSize  = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
+    ExtendedConfigSpace = AllocatePool (ExtendedConfigSize);
+    if (ExtendedConfigSpace != NULL) {
+      Status = IoDev->Pci.Read (
+                            IoDev,
+                            EfiPciWidthUint32,
+                            EFI_PCI_ADDRESS (Bus, Device, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET),
+                            ExtendedConfigSize / sizeof (UINT32),
+                            ExtendedConfigSpace
+                            );
+      if (EFI_ERROR (Status)) {
+        SHELL_FREE_NON_NULL (ExtendedConfigSpace);
+      }
+    }
+  }
+
+  if ((ExtendedConfigSpace != NULL) && !ShellGetExecutionBreakFlag ()) {
+    //
+    // Print the PciEx extend space in raw bytes ( 0xFF-0xFFF)
+    //
+    ShellPrintDefaultEx (L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
+
+    DumpHex (
+      2,
+      EFI_PCIE_CAPABILITY_BASE_OFFSET,
+      ExtendedConfigSize,
+      ExtendedConfigSpace
+      );
+  }
+
+  //
+  // If "-i" appears in command line, interpret data in configuration space
+  //
+  if (ExplainData) {
+    PciExplainPci (&ConfigSpace, Address, IoDev);
+    if ((ExtendedConfigSpace != NULL) && !ShellGetExecutionBreakFlag ()) {
+      PciExplainPciExpress (
+        (PCI_CAPABILITY_PCIEXP *)((UINT8 *)&ConfigSpace + PcieCapabilityPtr),
+        ExtendedConfigSpace,
+        ExtendedConfigSize,
+        ExtendedCapability
+        );
+    }
+  }
+
+Done:
+  if (HandleBuf != NULL) {
+    FreePool (HandleBuf);
+  }
+
+  return ShellStatus;
+}
+
+/**
   Function for 'pci' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -2463,44 +3013,13 @@ ShellCommandRunPci (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT16                             Segment;
-  UINT16                             Bus;
-  UINT16                             Device;
-  UINT16                             Func;
-  UINT64                             Address;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    *IoDev;
-  EFI_STATUS                         Status;
-  PCI_DEVICE_INDEPENDENT_REGION      PciHeader;
-  PCI_CONFIG_SPACE                   ConfigSpace;
-  UINTN                              ScreenCount;
-  UINTN                              TempColumn;
-  UINTN                              ScreenSize;
-  BOOLEAN                            ExplainData;
-  UINTN                              Index;
-  UINTN                              SizeOfHeader;
-  BOOLEAN                            PrintTitle;
-  UINTN                              HandleBufSize;
-  EFI_HANDLE                         *HandleBuf;
-  UINTN                              HandleCount;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptors;
-  UINT16                             MinBus;
-  UINT16                             MaxBus;
-  BOOLEAN                            IsEnd;
-  LIST_ENTRY                         *Package;
-  CHAR16                             *ProblemParam;
-  SHELL_STATUS                       ShellStatus;
-  CONST CHAR16                       *Temp;
-  UINT64                             RetVal;
-  UINT16                             ExtendedCapability;
-  UINT8                              PcieCapabilityPtr;
-  UINT8                              *ExtendedConfigSpace;
-  UINTN                              ExtendedConfigSize;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
-  Address     = 0;
-  IoDev       = NULL;
-  HandleBuf   = NULL;
   Package     = NULL;
 
   //
@@ -2524,463 +3043,13 @@ ShellCommandRunPci (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetCount (Package) == 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"pci");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
 
-    if (ShellCommandLineGetCount (Package) > 4) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    if (ShellCommandLineGetFlag (Package, L"-ec") && (ShellCommandLineGetValue (Package, L"-ec") == NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"pci", L"-ec");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    if (ShellCommandLineGetFlag (Package, L"-s") && (ShellCommandLineGetValue (Package, L"-s") == NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"pci", L"-s");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
-    //
-    // Get all instances of PciRootBridgeIo. Allocate space for 1 EFI_HANDLE and
-    // call LibLocateHandle(), if EFI_BUFFER_TOO_SMALL is returned, allocate enough
-    // space for handles and call it again.
-    //
-    HandleBufSize = sizeof (EFI_HANDLE);
-    HandleBuf     = (EFI_HANDLE *)AllocateZeroPool (HandleBufSize);
-    if (HandleBuf == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
-      ShellStatus = SHELL_OUT_OF_RESOURCES;
-      goto Done;
-    }
-
-    Status = gBS->LocateHandle (
-                    ByProtocol,
-                    &gEfiPciRootBridgeIoProtocolGuid,
-                    NULL,
-                    &HandleBufSize,
-                    HandleBuf
-                    );
-
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleBuf = ReallocatePool (sizeof (EFI_HANDLE), HandleBufSize, HandleBuf);
-      if (HandleBuf == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
-        ShellStatus = SHELL_OUT_OF_RESOURCES;
-        goto Done;
-      }
-
-      Status = gBS->LocateHandle (
-                      ByProtocol,
-                      &gEfiPciRootBridgeIoProtocolGuid,
-                      NULL,
-                      &HandleBufSize,
-                      HandleBuf
-                      );
-    }
-
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"pci");
-      ShellStatus = SHELL_NOT_FOUND;
-      goto Done;
-    }
-
-    HandleCount = HandleBufSize / sizeof (EFI_HANDLE);
-    //
-    // Argument Count == 1(no other argument): enumerate all pci functions
-    //
-    if (ShellCommandLineGetCount (Package) == 1) {
-      gST->ConOut->QueryMode (
-                     gST->ConOut,
-                     gST->ConOut->Mode->Mode,
-                     &TempColumn,
-                     &ScreenSize
-                     );
-
-      ScreenCount = 0;
-      ScreenSize -= 4;
-      if ((ScreenSize & 1) == 1) {
-        ScreenSize -= 1;
-      }
-
-      PrintTitle = TRUE;
-
-      //
-      // For each handle, which decides a segment and a bus number range,
-      // enumerate all devices on it.
-      //
-      for (Index = 0; Index < HandleCount; Index++) {
-        Status = PciGetProtocolAndResource (
-                   HandleBuf[Index],
-                   &IoDev,
-                   &Descriptors
-                   );
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"pci");
-          ShellStatus = SHELL_NOT_FOUND;
-          goto Done;
-        }
-
-        //
-        // No document say it's impossible for a RootBridgeIo protocol handle
-        // to have more than one address space descriptors, so find out every
-        // bus range and for each of them do device enumeration.
-        //
-        while (TRUE) {
-          Status = PciGetNextBusRange (&Descriptors, &MinBus, &MaxBus, &IsEnd);
-
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_BUS_RANGE_ERR), gShellDebug1HiiHandle, L"pci");
-            ShellStatus = SHELL_NOT_FOUND;
-            goto Done;
-          }
-
-          if (IsEnd) {
-            break;
-          }
-
-          for (Bus = MinBus; Bus <= MaxBus; Bus++) {
-            //
-            // For each devices, enumerate all functions it contains
-            //
-            for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
-              //
-              // For each function, read its configuration space and print summary
-              //
-              for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
-                if (ShellGetExecutionBreakFlag ()) {
-                  ShellStatus = SHELL_ABORTED;
-                  goto Done;
-                }
-
-                Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
-                IoDev->Pci.Read (
-                             IoDev,
-                             EfiPciWidthUint16,
-                             Address,
-                             1,
-                             &PciHeader.VendorId
-                             );
-
-                //
-                // If VendorId = 0xffff, there does not exist a device at this
-                // location. For each device, if there is any function on it,
-                // there must be 1 function at Function 0. So if Func = 0, there
-                // will be no more functions in the same device, so we can break
-                // loop to deal with the next device.
-                //
-                if ((PciHeader.VendorId == 0xffff) && (Func == 0)) {
-                  break;
-                }
-
-                if (PciHeader.VendorId != 0xffff) {
-                  if (PrintTitle) {
-                    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_TITLE), gShellDebug1HiiHandle);
-                    PrintTitle = FALSE;
-                  }
-
-                  IoDev->Pci.Read (
-                               IoDev,
-                               EfiPciWidthUint32,
-                               Address,
-                               sizeof (PciHeader) / sizeof (UINT32),
-                               &PciHeader
-                               );
-
-                  ShellPrintHiiDefaultEx (
-                    STRING_TOKEN (STR_PCI_LINE_P1),
-                    gShellDebug1HiiHandle,
-                    IoDev->SegmentNumber,
-                    Bus,
-                    Device,
-                    Func
-                    );
-
-                  PciPrintClassCode (PciHeader.ClassCode, FALSE);
-                  ShellPrintHiiDefaultEx (
-                    STRING_TOKEN (STR_PCI_LINE_P2),
-                    gShellDebug1HiiHandle,
-                    PciHeader.VendorId,
-                    PciHeader.DeviceId,
-                    PciHeader.ClassCode[0]
-                    );
-
-                  ScreenCount += 2;
-                  if ((ScreenCount >= ScreenSize) && (ScreenSize != 0)) {
-                    //
-                    // If ScreenSize == 0 we have the console redirected so don't
-                    //  block updates
-                    //
-                    ScreenCount = 0;
-                  }
-
-                  //
-                  // If this is not a multi-function device, we can leave the loop
-                  // to deal with the next device.
-                  //
-                  if ((Func == 0) && ((PciHeader.HeaderType & HEADER_TYPE_MULTI_FUNCTION) == 0x00)) {
-                    break;
-                  }
-                }
-              }
-            }
-          }
-
-          //
-          // If Descriptor is NULL, Configuration() returns EFI_UNSUPPRORED,
-          // we assume the bus range is 0~PCI_MAX_BUS. After enumerated all
-          // devices on all bus, we can leave loop.
-          //
-          if (Descriptors == NULL) {
-            break;
-          }
-        }
-      }
-
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-
-    ExplainData        = FALSE;
-    Segment            = 0;
-    Bus                = 0;
-    Device             = 0;
-    Func               = 0;
-    ExtendedCapability = 0xFFFF;
-    if (ShellCommandLineGetFlag (Package, L"-i")) {
-      ExplainData = TRUE;
-    }
-
-    Temp = ShellCommandLineGetValue (Package, L"-s");
-    if (Temp != NULL) {
-      //
-      // Input converted to hexadecimal number.
-      //
-      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-        Segment = (UINT16)RetVal;
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-    }
-
-    //
-    // The first Argument(except "-i") is assumed to be Bus number, second
-    // to be Device number, and third to be Func number.
-    //
-    Temp = ShellCommandLineGetRawValue (Package, 1);
-    if (Temp != NULL) {
-      //
-      // Input converted to hexadecimal number.
-      //
-      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-        Bus = (UINT16)RetVal;
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      if (Bus > PCI_MAX_BUS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-    }
-
-    Temp = ShellCommandLineGetRawValue (Package, 2);
-    if (Temp != NULL) {
-      //
-      // Input converted to hexadecimal number.
-      //
-      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-        Device = (UINT16)RetVal;
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      if (Device > PCI_MAX_DEVICE) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-    }
-
-    Temp = ShellCommandLineGetRawValue (Package, 3);
-    if (Temp != NULL) {
-      //
-      // Input converted to hexadecimal number.
-      //
-      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-        Func = (UINT16)RetVal;
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      if (Func > PCI_MAX_FUNC) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-    }
-
-    Temp = ShellCommandLineGetValue (Package, L"-ec");
-    if (Temp != NULL) {
-      //
-      // Input converted to hexadecimal number.
-      //
-      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-        ExtendedCapability = (UINT16)RetVal;
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-    }
-
-    //
-    // Find the protocol interface who's in charge of current segment, and its
-    // bus range covers the current bus
-    //
-    Status = PciFindProtocolInterface (
-               HandleBuf,
-               HandleCount,
-               Segment,
-               Bus,
-               &IoDev
-               );
-
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_PCI_NO_FIND),
-        gShellDebug1HiiHandle,
-        L"pci",
-        Segment,
-        Bus
-        );
-      ShellStatus = SHELL_NOT_FOUND;
-      goto Done;
-    }
-
-    Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
-    Status  = IoDev->Pci.Read (
-                           IoDev,
-                           EfiPciWidthUint8,
-                           Address,
-                           sizeof (ConfigSpace),
-                           &ConfigSpace
-                           );
-
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI_NO_CFG), gShellDebug1HiiHandle, L"pci");
-      ShellStatus = SHELL_ACCESS_DENIED;
-      goto Done;
-    }
-
-    mConfigSpace = &ConfigSpace;
-    ShellPrintHiiDefaultEx (
-      STRING_TOKEN (STR_PCI_INFO),
-      gShellDebug1HiiHandle,
-      Segment,
-      Bus,
-      Device,
-      Func,
-      Segment,
-      Bus,
-      Device,
-      Func
-      );
-
-    //
-    // Dump standard header of configuration space
-    //
-    SizeOfHeader = sizeof (ConfigSpace.Common) + sizeof (ConfigSpace.NonCommon);
-
-    DumpHex (2, 0, SizeOfHeader, &ConfigSpace);
-    ShellPrintDefaultEx (L"\r\n");
-
-    //
-    // Dump device dependent Part of configuration space
-    //
-    DumpHex (
-      2,
-      SizeOfHeader,
-      sizeof (ConfigSpace) - SizeOfHeader,
-      ConfigSpace.Data
-      );
-
-    ExtendedConfigSpace = NULL;
-    ExtendedConfigSize  = 0;
-    PcieCapabilityPtr   = LocatePciCapability (&ConfigSpace, EFI_PCI_CAPABILITY_ID_PCIEXP);
-    if (PcieCapabilityPtr != 0) {
-      ExtendedConfigSize  = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
-      ExtendedConfigSpace = AllocatePool (ExtendedConfigSize);
-      if (ExtendedConfigSpace != NULL) {
-        Status = IoDev->Pci.Read (
-                              IoDev,
-                              EfiPciWidthUint32,
-                              EFI_PCI_ADDRESS (Bus, Device, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET),
-                              ExtendedConfigSize / sizeof (UINT32),
-                              ExtendedConfigSpace
-                              );
-        if (EFI_ERROR (Status)) {
-          SHELL_FREE_NON_NULL (ExtendedConfigSpace);
-        }
-      }
-    }
-
-    if ((ExtendedConfigSpace != NULL) && !ShellGetExecutionBreakFlag ()) {
-      //
-      // Print the PciEx extend space in raw bytes ( 0xFF-0xFFF)
-      //
-      ShellPrintDefaultEx (L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
-
-      DumpHex (
-        2,
-        EFI_PCIE_CAPABILITY_BASE_OFFSET,
-        ExtendedConfigSize,
-        ExtendedConfigSpace
-        );
-    }
-
-    //
-    // If "-i" appears in command line, interpret data in configuration space
-    //
-    if (ExplainData) {
-      PciExplainPci (&ConfigSpace, Address, IoDev);
-      if ((ExtendedConfigSpace != NULL) && !ShellGetExecutionBreakFlag ()) {
-        PciExplainPciExpress (
-          (PCI_CAPABILITY_PCIEXP *)((UINT8 *)&ConfigSpace + PcieCapabilityPtr),
-          ExtendedConfigSpace,
-          ExtendedConfigSize,
-          ExtendedCapability
-          );
-      }
-    }
+    return ShellStatus;
   }
 
-Done:
-  if (HandleBuf != NULL) {
-    FreePool (HandleBuf);
-  }
+  ShellStatus = MainCmdPci (Package);
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
-
+  ShellCommandLineFreeVarList (Package);
   mConfigSpace = NULL;
   return ShellStatus;
 }

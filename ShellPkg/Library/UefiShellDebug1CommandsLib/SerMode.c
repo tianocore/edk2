@@ -239,17 +239,14 @@ ValidDataBits (
   return (DataBits == 4) || (DataBits == 7) || (DataBits == 8);
 }
 
-/**
-  Function for 'sermode' command.
+/** Main function of the 'SerMode' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunSerMode (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdSerMode (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS              Status;
@@ -263,8 +260,6 @@ ShellCommandRunSerMode (
   UINTN                   BaudRate;
   UINTN                   DataBits;
   EFI_SERIAL_IO_PROTOCOL  *SerialIo;
-  LIST_ENTRY              *Package;
-  CHAR16                  *ProblemParam;
   CONST CHAR16            *Temp;
   UINT64                  Intermediate;
 
@@ -274,6 +269,146 @@ ShellCommandRunSerMode (
   Handles     = NULL;
   NoHandles   = 0;
   Index       = 0;
+
+  if ((ShellCommandLineGetCount (Package) < 6) && (ShellCommandLineGetCount (Package) > 2)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"sermode");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetCount (Package) > 6) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"sermode");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Temp = ShellCommandLineGetRawValue (Package, 1);
+  if (Temp == NULL) {
+    return DisplaySettings (0, FALSE);
+  }
+
+  Status    = ShellConvertStringToUint64 (Temp, &Intermediate, TRUE, FALSE);
+  HandleIdx = (UINTN)Intermediate;
+  Temp      = ShellCommandLineGetRawValue (Package, 2);
+  if (Temp == NULL) {
+    return DisplaySettings (HandleIdx, TRUE);
+  }
+
+  Temp = ShellCommandLineGetRawValue (Package, 2);
+  if (Temp != NULL) {
+    BaudRate = ShellStrToUintn (Temp);
+  } else {
+    ASSERT (FALSE);
+    BaudRate = 0;
+  }
+
+  Temp = ShellCommandLineGetRawValue (Package, 3);
+  if ((Temp == NULL) || (StrLen (Temp) > 1)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else {
+    Status = GetParityType (Temp[0], &Parity);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+      return SHELL_INVALID_PARAMETER;
+    }
+  }
+
+  Temp = ShellCommandLineGetRawValue (Package, 4);
+  if (Temp != NULL) {
+    DataBits = ShellStrToUintn (Temp);
+  } else {
+    //
+    // make sure this is some number not in the list below.
+    //
+    DataBits = 0;
+  }
+
+  if (!ValidDataBits (DataBits)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Temp = ShellCommandLineGetRawValue (Package, 5);
+  if (Temp == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = GetStopBits (ShellStrToUintn (Temp), &StopBits);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSerialIoProtocolGuid, NULL, &NoHandles, &Handles);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < NoHandles; Index++) {
+    if (ConvertHandleIndexToHandle (HandleIdx) != Handles[Index]) {
+      continue;
+    }
+
+    Status = gBS->HandleProtocol (Handles[Index], &gEfiSerialIoProtocolGuid, (VOID **)&SerialIo);
+    if (!EFI_ERROR (Status)) {
+      Status = SerialIo->SetAttributes (
+                           SerialIo,
+                           (UINT64)BaudRate,
+                           SerialIo->Mode->ReceiveFifoDepth,
+                           SerialIo->Mode->Timeout,
+                           Parity,
+                           (UINT8)DataBits,
+                           StopBits
+                           );
+      if (EFI_ERROR (Status)) {
+        if (Status == EFI_INVALID_PARAMETER) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_UNSUPPORTED), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
+          ShellStatus = SHELL_UNSUPPORTED;
+        } else if (Status == EFI_DEVICE_ERROR) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_DEV_ERROR), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
+          ShellStatus = SHELL_ACCESS_DENIED;
+        } else {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_FAIL), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
+          ShellStatus = SHELL_ACCESS_DENIED;
+        }
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_HANDLE), gShellDebug1HiiHandle, ConvertHandleToHandleIndex (Handles[Index]));
+      }
+
+      break;
+    }
+  }
+
+  if ((ShellStatus == SHELL_SUCCESS) && (Index == NoHandles)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_BAD_HANDLE), gShellDebug1HiiHandle, L"sermode", HandleIdx);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  }
+
+  if (Handles != NULL) {
+    FreePool (Handles);
+  }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'sermode' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunSerMode (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  SHELL_STATUS  ShellStatus;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+
+  ShellStatus = SHELL_SUCCESS;
   Package     = NULL;
 
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
@@ -285,136 +420,13 @@ ShellCommandRunSerMode (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if ((ShellCommandLineGetCount (Package) < 6) && (ShellCommandLineGetCount (Package) > 2)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"sermode");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount (Package) > 6) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"sermode");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Temp = ShellCommandLineGetRawValue (Package, 1);
-      if (Temp != NULL) {
-        Status    = ShellConvertStringToUint64 (Temp, &Intermediate, TRUE, FALSE);
-        HandleIdx = (UINTN)Intermediate;
-        Temp      = ShellCommandLineGetRawValue (Package, 2);
-        if (Temp == NULL) {
-          ShellStatus = DisplaySettings (HandleIdx, TRUE);
-          goto Done;
-        }
-      } else {
-        ShellStatus = DisplaySettings (0, FALSE);
-        goto Done;
-      }
 
-      Temp = ShellCommandLineGetRawValue (Package, 2);
-      if (Temp != NULL) {
-        BaudRate = ShellStrToUintn (Temp);
-      } else {
-        ASSERT (FALSE);
-        BaudRate = 0;
-      }
-
-      Temp = ShellCommandLineGetRawValue (Package, 3);
-      if ((Temp == NULL) || (StrLen (Temp) > 1)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Status = GetParityType (Temp[0], &Parity);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
-        }
-      }
-
-      Temp = ShellCommandLineGetRawValue (Package, 4);
-      if (Temp != NULL) {
-        DataBits = ShellStrToUintn (Temp);
-      } else {
-        //
-        // make sure this is some number not in the list below.
-        //
-        DataBits = 0;
-      }
-
-      if (!ValidDataBits (DataBits)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      Temp = ShellCommandLineGetRawValue (Package, 5);
-      if (Temp == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      Status = GetStopBits (ShellStrToUintn (Temp), &StopBits);
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSerialIoProtocolGuid, NULL, &NoHandles, &Handles);
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      for (Index = 0; Index < NoHandles; Index++) {
-        if (ConvertHandleIndexToHandle (HandleIdx) != Handles[Index]) {
-          continue;
-        }
-
-        Status = gBS->HandleProtocol (Handles[Index], &gEfiSerialIoProtocolGuid, (VOID **)&SerialIo);
-        if (!EFI_ERROR (Status)) {
-          Status = SerialIo->SetAttributes (
-                               SerialIo,
-                               (UINT64)BaudRate,
-                               SerialIo->Mode->ReceiveFifoDepth,
-                               SerialIo->Mode->Timeout,
-                               Parity,
-                               (UINT8)DataBits,
-                               StopBits
-                               );
-          if (EFI_ERROR (Status)) {
-            if (Status == EFI_INVALID_PARAMETER) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_UNSUPPORTED), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
-              ShellStatus = SHELL_UNSUPPORTED;
-            } else if (Status == EFI_DEVICE_ERROR) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_DEV_ERROR), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
-              ShellStatus = SHELL_ACCESS_DENIED;
-            } else {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_FAIL), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
-              ShellStatus = SHELL_ACCESS_DENIED;
-            }
-          } else {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_HANDLE), gShellDebug1HiiHandle, ConvertHandleToHandleIndex (Handles[Index]));
-          }
-
-          break;
-        }
-      }
-    }
+    return ShellStatus;
   }
 
-  if ((ShellStatus == SHELL_SUCCESS) && (Index == NoHandles)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_BAD_HANDLE), gShellDebug1HiiHandle, L"sermode", HandleIdx);
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  }
+  ShellStatus = MainCmdSerMode (Package);
 
-Done:
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
-
-  if (Handles != NULL) {
-    FreePool (Handles);
-  }
+  ShellCommandLineFreeVarList (Package);
 
   return ShellStatus;
 }

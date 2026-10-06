@@ -19,7 +19,6 @@ Maintainers Wanted:
 
   - NetworkPkg
   - SecurityPkg
-  - ShellPkg
 
 Descriptions of section entries:
 
@@ -153,10 +152,12 @@ EDK II Contributed Files:
 Breaking Changes Documentation
 F: BREAKING-CHANGES.md
 R: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+R: Aaron Pop <aaronpop@microsoft.com> [apop5]
 
 VS Code PR Dashboard Notebook
 F: contrib/PullRequests.github-issues
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+M: Aaron Pop <aaronpop@microsoft.com> [apop5]
 
 EDK II Packages:
 ----------------
@@ -182,6 +183,7 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 BaseTools
 F: BaseTools/
@@ -223,6 +225,7 @@ F: EmulatorPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/platform-ports/emulator_pkg.html
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+M: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 S: Maintained
 
 EmulatorPkg: Redfish-related modules
@@ -288,6 +291,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
+R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
@@ -338,8 +342,11 @@ F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
 R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 
 MdeModulePkg: Disk modules
+F: MdeModulePkg/Include/Library/GptLib.h
+F: MdeModulePkg/Library/GptLib/
 F: MdeModulePkg/Universal/Disk/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Richard Lyu <richard.lyu@suse.com> [r1chard-lyu]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
@@ -397,6 +404,7 @@ F: MdeModulePkg/Include/*/*Var*.h
 F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: Universal Payload definitions
@@ -512,7 +520,7 @@ F: OvmfPkg/Library/PlatformBootManagerLibBhyve/
 F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bexcran]
-R: Corvin Köhne <corvink@freebsd.org> [corvink]
+R: Corvin Köhne <corvink@freebsd.org> [ckoehne]
 
 OvmfPkg: cloudhv-related modules
 F: OvmfPkg/CloudHv/
@@ -656,7 +664,11 @@ R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 ShellPkg
 F: ShellPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
-R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+R: Andrew Fish <afish@apple.com> [ajfish]
+R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
+R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+R: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/

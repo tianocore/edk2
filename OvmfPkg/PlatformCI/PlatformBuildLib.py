@@ -16,7 +16,7 @@ from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubm
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
-
+from pathlib import Path
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
@@ -209,6 +209,27 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -cpu IvyBridge,+rdrand"                                   # IvyBridge is the first CPU that supported
                                                                             # RDRAND, which is required for dynamic
                                                                             # stack cookies
+
+        path_to_os = self.env.GetValue("PATH_TO_OS")
+        if path_to_os is not None:
+            args += f" -m 8192"                                             # 8gb memory for OS
+            file_extension = Path(path_to_os).suffix.lower().replace('"', '')
+
+            storage_format = {
+                ".vhd": "raw",
+                ".qcow2": "qcow2",
+                ".iso": "iso",
+            }.get(file_extension, None)
+
+            if storage_format is None:
+                raise Exception(f"Unknown OS storage type: {path_to_os}")
+
+            if storage_format == "iso":
+                args += f" -cdrom \"{path_to_os}\""
+            else:
+                args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
+                args += " -device nvme,serial=nvme-1,drive=os_nvme,bootindex=0"
+
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
         # Provides Rng services to the Guest VM
         args += " -device virtio-rng-pci"

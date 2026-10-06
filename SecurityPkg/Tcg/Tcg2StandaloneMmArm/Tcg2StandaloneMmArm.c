@@ -18,11 +18,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiMm.h>
 #include <IndustryStandard/TcgPhysicalPresence.h>
 #include <Guid/TpmNvsMm.h>
+#include <Library/ArmFfaLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MmServicesTableLib.h>
 #include <Library/StandaloneMmMemLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+
+STATIC_ASSERT (sizeof (TCG_NVS) <= (sizeof (ARM_FFA_ARGS) - OFFSET_OF (ARM_FFA_ARGS, Arg4)), "TCG_NVS size is larger than direct message buffer size");
 
 /**
   This function checks if the required instance is a supported TPM 2.0 instance.
@@ -97,7 +100,7 @@ PhysicalPresenceCallback (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (*CommBufferSize < sizeof (TCG_NVS)) {
+  if (*CommBufferSize < sizeof (ARM_FFA_ARGS)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -107,7 +110,7 @@ PhysicalPresenceCallback (
   }
 
   // Enough complaints, now get to work...
-  LocalTcgNvs = (TCG_NVS *)CommBuffer;
+  LocalTcgNvs = (TCG_NVS *)((UINT8 *)CommBuffer + OFFSET_OF (ARM_FFA_ARGS, Arg4));
 
   if (LocalTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
     LocalTcgNvs->PhysicalPresence.ReturnCode = Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (

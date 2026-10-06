@@ -278,6 +278,11 @@ typedef struct CmX64LocalApicX2ApicInfo {
 
   /** Optional field: Reference Token for _STA info of this processor.
       i.e. a token referencing a CM_ARCH_COMMON_STA_INFO object.
+
+      Note:
+      This should not happen, but if CM_ARCH_COMMON_PROC_HIERARCHY_INFO
+      objects are used, CM_ARCH_COMMON_PROC_HIERARCHY_INFO.StaToken takes
+      precedence over this field.
    */
   CM_OBJECT_TOKEN    StaToken;
 } CM_X64_LOCAL_APIC_X2APIC_INFO;

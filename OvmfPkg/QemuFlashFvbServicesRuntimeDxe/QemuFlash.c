@@ -284,6 +284,14 @@ QemuFlashInitialize (
   if (!QemuFlashDetected ()) {
     ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));
     return EFI_WRITE_PROTECTED;
+  } else {
+    if (!FeaturePcdGet (PcdSmmSmramRequire) && FeaturePcdGet (PcdSecureBootSupported)) {
+      DEBUG ((DEBUG_ERROR, "ERROR: This VM configuration is not secure.\n"));
+      DEBUG ((DEBUG_ERROR, "When using secure boot and storing UEFI variables in pflash SMM mode\n"));
+      DEBUG ((DEBUG_ERROR, "must be used to prevent unauthorized updates of secure boot variables.\n"));
+      ASSERT (FeaturePcdGet (PcdSmmSmramRequire) || !FeaturePcdGet (PcdSecureBootSupported));
+      CpuDeadLoop ();
+    }
   }
 
   return EFI_SUCCESS;

@@ -180,7 +180,10 @@ ConfigureMemoryManagementUnit (
   //
   CsrWrite (LOONGARCH_CSR_PWCTL0, (UINT32)PageWalkCfg);
   if ((PageWalkCfg >> 32) != 0x0) {
-    CsrWrite (LOONGARCH_CSR_PWCTL1, (UINT32)(PageWalkCfg >> 32));
+    //
+    // Keep the value of high 8 bits unchanged.
+    //
+    CsrXChg (LOONGARCH_CSR_PWCTL1, (UINT32)(PageWalkCfg >> 32), ~(0xFF << 24));
   }
 
   //

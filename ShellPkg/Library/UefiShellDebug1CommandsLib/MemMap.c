@@ -327,6 +327,70 @@ ParseMemoryDescriptors (
   return SHELL_SUCCESS;
 }
 
+/** Main function of the 'MemMap' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdMemMap (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS             Status;
+  SHELL_STATUS           ShellStatus;
+  UINTN                  Size;
+  EFI_MEMORY_DESCRIPTOR  *Descriptors;
+  UINTN                  MapKey;
+  UINTN                  ItemSize;
+  UINT32                 Version;
+  BOOLEAN                Sfo;
+
+  Size        = 0;
+  Descriptors = NULL;
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  if (ShellCommandLineGetCount (Package) > 1) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"memmap");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = gBS->GetMemoryMap (&Size, Descriptors, &MapKey, &ItemSize, &Version);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Size       += SIZE_1KB;
+    Descriptors = AllocateZeroPool (Size);
+    if (Descriptors == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"memmap");
+      return SHELL_OUT_OF_RESOURCES;
+    }
+
+    Status = gBS->GetMemoryMap (&Size, Descriptors, &MapKey, &ItemSize, &Version);
+  }
+
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MEMMAP_GET_FAILED), gShellDebug1HiiHandle, L"memmap");
+    ShellStatus = SHELL_ACCESS_DENIED;
+  } else {
+    ASSERT (Version == EFI_MEMORY_DESCRIPTOR_VERSION);
+
+    Sfo = ShellCommandLineGetFlag (Package, L"-sfo");
+    if (!Sfo) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MEMMAP_LIST_HEAD), gShellDebug1HiiHandle);
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDebug1HiiHandle, L"memmap");
+    }
+
+    ParseMemoryDescriptors (Descriptors, Size, ItemSize, Sfo);
+  }
+
+  if (Descriptors != NULL) {
+    FreePool (Descriptors);
+  }
+
+  return ShellStatus;
+}
+
 /**
   Function for 'memmap' command.
 
@@ -340,19 +404,11 @@ ShellCommandRunMemMap (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS             Status;
-  LIST_ENTRY             *Package;
-  CHAR16                 *ProblemParam;
-  SHELL_STATUS           ShellStatus;
-  UINTN                  Size;
-  EFI_MEMORY_DESCRIPTOR  *Descriptors;
-  UINTN                  MapKey;
-  UINTN                  ItemSize;
-  UINT32                 Version;
-  BOOLEAN                Sfo;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
-  Size        = 0;
-  Descriptors = NULL;
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
 
@@ -377,47 +433,13 @@ ShellCommandRunMemMap (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetCount (Package) > 1) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"memmap");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Status = gBS->GetMemoryMap (&Size, Descriptors, &MapKey, &ItemSize, &Version);
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        Size       += SIZE_1KB;
-        Descriptors = AllocateZeroPool (Size);
-        if (Descriptors == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"memmap");
-          ShellCommandLineFreeVarList (Package);
-          return SHELL_OUT_OF_RESOURCES;
-        }
 
-        Status = gBS->GetMemoryMap (&Size, Descriptors, &MapKey, &ItemSize, &Version);
-      }
-
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MEMMAP_GET_FAILED), gShellDebug1HiiHandle, L"memmap");
-        ShellStatus = SHELL_ACCESS_DENIED;
-      } else {
-        ASSERT (Version == EFI_MEMORY_DESCRIPTOR_VERSION);
-
-        Sfo = ShellCommandLineGetFlag (Package, L"-sfo");
-        if (!Sfo) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MEMMAP_LIST_HEAD), gShellDebug1HiiHandle);
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDebug1HiiHandle, L"memmap");
-        }
-
-        ParseMemoryDescriptors (Descriptors, Size, ItemSize, Sfo);
-      }
-    }
-
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
 
-  if (Descriptors != NULL) {
-    FreePool (Descriptors);
-  }
+  ShellStatus = MainCmdMemMap (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

@@ -381,6 +381,10 @@ DumpResourceMap (
       }
 
       ChildResources = AllocatePool (sizeof (PCI_RESOURCE_NODE *) * ChildResourceCount);
+      if (ChildResources == NULL) {
+        return;
+      }
+
       ASSERT (ChildResources != NULL);
       ChildResourceCount = 0;
       for (Index = 0; Index < ResourceCount; Index++) {
@@ -523,7 +527,6 @@ PciHostBridgeResourceAllocator (
       // Get Root Bridge Device by handle
       //
       RootBridgeDev = GetRootBridgeByHandle (RootBridgeHandle);
-
       if (RootBridgeDev == NULL) {
         return EFI_NOT_FOUND;
       }
@@ -545,6 +548,9 @@ PciHostBridgeResourceAllocator (
                    PciBarTypeIo16,
                    PciResUsageTypical
                    );
+      if (IoBridge == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
 
       Mem32Bridge = CreateResourceNode (
                       RootBridgeDev,
@@ -554,6 +560,10 @@ PciHostBridgeResourceAllocator (
                       PciBarTypeMem32,
                       PciResUsageTypical
                       );
+      if (Mem32Bridge == NULL) {
+        FreePool (IoBridge);
+        return EFI_OUT_OF_RESOURCES;
+      }
 
       PMem32Bridge = CreateResourceNode (
                        RootBridgeDev,
@@ -563,6 +573,11 @@ PciHostBridgeResourceAllocator (
                        PciBarTypePMem32,
                        PciResUsageTypical
                        );
+      if (PMem32Bridge == NULL) {
+        FreePool (IoBridge);
+        FreePool (Mem32Bridge);
+        return EFI_OUT_OF_RESOURCES;
+      }
 
       Mem64Bridge = CreateResourceNode (
                       RootBridgeDev,
@@ -572,6 +587,12 @@ PciHostBridgeResourceAllocator (
                       PciBarTypeMem64,
                       PciResUsageTypical
                       );
+      if (Mem64Bridge == NULL) {
+        FreePool (IoBridge);
+        FreePool (Mem32Bridge);
+        FreePool (PMem32Bridge);
+        return EFI_OUT_OF_RESOURCES;
+      }
 
       PMem64Bridge = CreateResourceNode (
                        RootBridgeDev,
@@ -581,6 +602,13 @@ PciHostBridgeResourceAllocator (
                        PciBarTypePMem64,
                        PciResUsageTypical
                        );
+      if (PMem64Bridge == NULL) {
+        FreePool (IoBridge);
+        FreePool (Mem32Bridge);
+        FreePool (PMem32Bridge);
+        FreePool (Mem64Bridge);
+        return EFI_OUT_OF_RESOURCES;
+      }
 
       //
       // Get the max ROM size that the root bridge can process
@@ -667,10 +695,13 @@ PciHostBridgeResourceAllocator (
       }
     }
 
-    //
-    // End while, at least one Root Bridge should be found.
-    //
-    ASSERT (RootBridgeDev != NULL);
+    if (RootBridgeDev == NULL) {
+      //
+      // End while, at least one Root Bridge should be found.
+      //
+      ASSERT (RootBridgeDev != NULL);
+      return EFI_NOT_FOUND;
+    }
 
     //
     // Notify platform to start to program the resource
@@ -762,6 +793,10 @@ PciHostBridgeResourceAllocator (
             );
           FreePool (AcpiConfig);
         }
+      }
+
+      if (RootBridgeDev == NULL) {
+        return EFI_NOT_FOUND;
       }
 
       //

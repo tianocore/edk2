@@ -49,8 +49,8 @@
   ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf
   ManageabilityPkg/Library/ManageabilityTransportMctpLib/Dxe/DxeManageabilityTransportMctp.inf
   ManageabilityPkg/Library/ManageabilityTransportSerialLib/Dxe/DxeManageabilityTransportSerial.inf
-  ManageabilityPkg/Library/ManageabilityTransportSsifLib/Dxe/DxeManageabilityTransportSsif.inf
-  ManageabilityPkg/Library/ManageabilityTransportSsifLib/Pei/PeiManageabilityTransportSsif.inf
+  ManageabilityPkg/Library/ManageabilityTransportSsifLib/DxeManageabilityTransportSsif.inf
+  ManageabilityPkg/Library/ManageabilityTransportSsifLib/PeiManageabilityTransportSsif.inf
   ManageabilityPkg/Library/PlatformBmcReadyLibNull/PlatformBmcReadyLibNull.inf
   ManageabilityPkg/Library/PldmProtocolLibrary/Dxe/PldmProtocolLib.inf
 
@@ -71,7 +71,7 @@
   # Basic
   #
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   #

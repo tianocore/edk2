@@ -22,7 +22,6 @@
 // The current period of the timer interrupt
 //
 STATIC UINT64  mTimerPeriod = 0;
-STATIC UINT64  mTimerTicks  = 0;
 
 //
 // The handle onto which the Timer Architectural Protocol will be installed
@@ -200,7 +199,6 @@ TimerDriverSetTimerPeriod (
     //
     // Program the stable timer with the new count value
     //
-    mTimerTicks = TimerCount;
     SetPitCount (TimerCount);
 
     //

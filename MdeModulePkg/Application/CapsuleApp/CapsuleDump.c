@@ -993,7 +993,7 @@ DumpProvisionedCapsule (
       //
       // Display description and device path
       //
-      GetEfiSysPartitionFromBootOptionFilePath (BootNextOptionEntry.FilePath, &DevicePath, &Fs);
+      Status = GetEfiSysPartitionFromBootOptionFilePath (BootNextOptionEntry.FilePath, &DevicePath, &Fs);
       if (!EFI_ERROR (Status)) {
         Print (L"Capsules are provisioned on BootOption: %s\n", BootNextOptionEntry.Description);
         Print (L"    %s %s\n", ShellProtocol->GetMapFromDevicePath (&DevicePath), ConvertDevicePathToText (DevicePath, TRUE, TRUE));

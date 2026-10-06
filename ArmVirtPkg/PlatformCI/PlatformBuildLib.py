@@ -17,7 +17,7 @@ from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
 from edk2toollib.utility_functions import GetHostInfo
-
+from pathlib import Path
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
@@ -236,11 +236,33 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
         # Common Args
         args += CommonPlatform.FvQemuArg + Built_FV                         # path to fw
-        args += " -m 1024"                                                  # 1gb memory
         # turn off network
         args += " -net none"
         # Serial messages out
         args += " -serial stdio"
+
+        path_to_os = self.env.GetValue("PATH_TO_OS")
+        if path_to_os is not None:
+            args += f" -m 8192"                                      # 8gb memory for OS
+            file_extension = Path(path_to_os).suffix.lower().replace('"', '')
+
+            storage_format = {
+                ".vhd": "raw",
+                ".qcow2": "qcow2",
+                ".iso": "iso",
+            }.get(file_extension, None)
+
+            if storage_format is None:
+                raise Exception(f"Unknown OS storage type: {path_to_os}")
+
+            if storage_format == "iso":
+                args += f" -cdrom \"{path_to_os}\""
+            else:
+                args += f" -drive file=\"{path_to_os}\",format={storage_format},if=none,id=os_nvme"
+                args += " -device nvme,serial=nvme-1,drive=os_nvme,bootindex=0"
+        else:
+            args += " -m 1024"                                       # 1gb memory
+
         # Mount disk with startup.nsh
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
         # Provides Rng services to the Guest VM

@@ -27,6 +27,7 @@
 #include <Ppi/MmCoreFvLocationPpi.h>
 #include <Protocol/MmCommunication.h>
 #include <Library/MmPlatformHobProducerLib.h>
+#include <Library/SafeIntLib.h>
 
 /**
   Communicates with a registered handler.
