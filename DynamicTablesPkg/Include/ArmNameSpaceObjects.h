@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
+    - AEST       - Arm Error Source Table
     - Cm or CM   - Configuration Manager
     - Obj or OBJ - Object
     - Std or STD - Standard
@@ -65,6 +66,15 @@ typedef enum ArmObjectID {
   EArmObjScmiDeviceInfo,                                       ///< 35 - SCMI Device Information
   EArmObjScmiPccTransportInfo,                                 ///< 36 - SCMI PCC Transport Information
   EArmObjScmiProtocolInfo,                                     ///< 37 - SCMI Protocol Information
+  EArmObjAestProcessorNode,                                    ///< 38 - AEST processor node
+  EArmObjAestBitmapArray,                                      ///< 39 - AEST bitmap words
+  EArmObjAestInterruptArray,                                   ///< 40 - AEST interrupts
+  EArmObjAestMemoryNode,                                       ///< 41 - AEST memory controller node
+  EArmObjAestSmmuNode,                                         ///< 42 - AEST SMMU node
+  EArmObjAestVendorNode,                                       ///< 43 - AEST vendor-defined node
+  EArmObjAestGicNode,                                          ///< 44 - AEST GIC node
+  EArmObjAestPcieRootComplexNode,                              ///< 45 - AEST PCIe Root Complex node
+  EArmObjAestProxyNode,                                        ///< 46 - AEST proxy node
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1151,5 +1161,211 @@ typedef struct CmArmScmiProtocolInfo {
   /// Indicates whether the protocol supports notifications.
   BOOLEAN                      NotificationsSupported;
 } CM_ARM_SCMI_PROTOCOL_INFO;
+
+/** A structure that describes one AEST error-record bitmap word.
+
+    A token selects 1, 4, or 14 words according to GroupFormat.
+
+    ID: EArmObjAestBitmapArray
+*/
+typedef struct CmArmAestBitmapWord {
+  /// One 64-bit word in the selected bitmap.
+  UINT64    Word;
+} CM_ARM_AEST_BITMAP_WORD;
+
+/** A structure that describes AEST FHI or ERI interrupt entry.
+
+    A token selects an array of InterruptCount entries.
+
+    ID: EArmObjAestInterruptArray
+*/
+typedef struct CmArmAestInterrupt {
+  /// Fault Handling or Error Recovery interrupt type.
+  UINT8     Type;
+  /// AEST interrupt flags.
+  UINT8     Flags;
+  /// Interrupt GSIV; zero selects MSI.
+  UINT32    Gsiv;
+} CM_ARM_AEST_INTERRUPT;
+
+/** A structure that describes the interface shared by AEST nodes.
+
+    The three bitmap tokens select EArmObjAestBitmapArray lists.
+    Their lengths depend on GroupFormat.
+    ProcessorHierarchyToken selects EArchCommonObjProcHierarchyInfo.
+*/
+typedef struct CmArmAestInterface {
+  /// System-register, group-MMIO, or single-record-MMIO interface type.
+  UINT8              Type;
+  /// Error-record group format.
+  UINT8              GroupFormat;
+  /// Node interface flags.
+  UINT32             Flags;
+  /// Base address of the error-record group or single record.
+  UINT64             BaseAddress;
+  /// Zero-based index of this node's first error record.
+  UINT32             StartErrorRecordIndex;
+  /// Number of error records belonging to this node.
+  UINT32             NumberErrorRecords;
+  /// Token selecting the implemented-record bitmap words.
+  CM_OBJECT_TOKEN    ImplementedBitmapToken;
+  /// Token selecting the group-status bitmap words.
+  CM_OBJECT_TOKEN    GroupStatusBitmapToken;
+  /// Token selecting the addressing-mode bitmap words.
+  CM_OBJECT_TOKEN    AddressModeBitmapToken;
+  /// Token selecting a processor leaf or container for affinity.
+  CM_OBJECT_TOKEN    ProcessorHierarchyToken;
+  /// AEST device UID.
+  UINT32             ArmErrorNodeDeviceUid;
+  /// Base address of the group-status register set.
+  UINT64             GroupStatusRegistersBaseAddress;
+  /// Base address of the fault-injection register set.
+  UINT64             FaultInjectionRegistersBaseAddress;
+  /// Base address of the interrupt-configuration register set.
+  UINT64             InterruptConfigurationRegistersBaseAddress;
+} CM_ARM_AEST_INTERFACE;
+
+/** A structure that describes fields shared by AEST node CM objects.
+
+    Interface contains register access and affinity data.
+    InterruptArrayToken selects EArmObjAestInterruptArray when
+    InterruptCount is nonzero.
+*/
+typedef struct CmArmAestCommon {
+  /// Timestamp counter rate in hertz.
+  UINT64                   TimestampRate;
+  /// Signed timebase offset in nanoseconds.
+  INT64                    TimebaseOffset;
+  /// Error injection countdown rate in hertz.
+  UINT64                   ErrorInjectionCountdownRate;
+  /// Interface inputs embedded in the node.
+  CM_ARM_AEST_INTERFACE    Interface;
+  /// Number of entries in the interrupt array.
+  UINT32                   InterruptCount;
+  /// Token selecting the interrupt array.
+  CM_OBJECT_TOKEN          InterruptArrayToken;
+} CM_ARM_AEST_COMMON;
+
+/** A union that describes an AEST processor error resource.
+*/
+typedef union CmArmAestProcessorResource {
+  /// Token selecting cache information for a Cache resource.
+  CM_OBJECT_TOKEN    CacheToken;
+  /// TLB level for a TLB resource.
+  UINT32             TlbLevel;
+  /// Vendor-defined data for a Generic resource.
+  UINT32             GenericData;
+} CM_ARM_AEST_PROCESSOR_RESOURCE;
+
+/** A structure that describes an AEST processor error node.
+
+    Common is the first member. For a Cache resource, CacheToken selects
+    EArchCommonObjCacheInfo.
+
+    ID: EArmObjAestProcessorNode
+*/
+typedef struct CmArmAestProcessorNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON                Common;
+  /// Cache, TLB, or Generic resource type.
+  UINT8                             ResourceType;
+  /// Global and Shared processor node flags.
+  UINT8                             Flags;
+  /// Resource data selected by ResourceType.
+  CM_ARM_AEST_PROCESSOR_RESOURCE    Resource;
+} CM_ARM_AEST_PROCESSOR_NODE;
+
+/** A structure that describes an AEST memory controller error node.
+
+    ProximityDomainToken selects EArchCommonObjProximityDomainInfo.
+    CM_NULL_TOKEN means no SRAT proximity domain is referenced.
+
+    ID: EArmObjAestMemoryNode
+*/
+typedef struct CmArmAestMemoryNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON    Common;
+  /// Token selecting the SRAT proximity domain identifier owner.
+  CM_OBJECT_TOKEN       ProximityDomainToken;
+} CM_ARM_AEST_MEMORY_NODE;
+
+/** A structure that describes an AEST SMMU error node.
+
+    SmmuToken selects EArmObjSmmuV1SmmuV2 or EArmObjSmmuV3.
+    SubcomponentToken selects EArmObjRootComplex, EArmObjNamedComponent,
+    or the SMMU selected by SmmuToken.
+
+    ID: EArmObjAestSmmuNode
+*/
+typedef struct CmArmAestSmmuNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON    Common;
+  /// Owner of the IORT SMMU Identifier.
+  CM_OBJECT_TOKEN       SmmuToken;
+  /// Token selecting the IORT subcomponent Identifier owner.
+  CM_OBJECT_TOKEN       SubcomponentToken;
+} CM_ARM_AEST_SMMU_NODE;
+
+/** A structure that describes an AEST vendor-defined error node.
+
+    The platform CM supplies the vendor-defined payload.
+
+    ID: EArmObjAestVendorNode
+*/
+typedef struct CmArmAestVendorNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON    Common;
+  /// Eight-byte hardware ID as carried by AEST.
+  UINT8                 HardwareId[8];
+  /// Four-byte unique ID as carried by AEST.
+  UINT32                UniqueId;
+  /// Vendor-defined supplementary data.
+  UINT8                 VendorData[16];
+} CM_ARM_AEST_VENDOR_NODE;
+
+/** A structure that describes an AEST GIC error node.
+
+    InterfaceType selects GICC, GICD, GICR, or GITS.
+    InstanceToken selects EArmObjGicCInfo for GICC/GICR and
+    EArmObjGicItsInfo for GITS. GICD uses CM_NULL_TOKEN.
+
+    Cf. ACPI Specification 6.6, Section 5.2.12.15 an Arm MADT
+    must contain exactly one GICD structure. Its instance
+    identifier is emitted as zero to match the Arm MADT generator's GIC ID.
+
+    ID: EArmObjAestGicNode
+*/
+typedef struct CmArmAestGicNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON    Common;
+  /// GICC, GICD, GICR, or GITS interface type.
+  UINT32                InterfaceType;
+  /// Token selecting the GIC identifier owner.
+  CM_OBJECT_TOKEN       InstanceToken;
+} CM_ARM_AEST_GIC_NODE;
+
+/** A structure that describes an AEST PCIe Root Complex error node.
+
+    RootComplexToken selects EArmObjRootComplex object.
+
+    ID: EArmObjAestPcieRootComplexNode
+*/
+typedef struct CmArmAestPcieRootComplexNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON    Common;
+  /// Token selecting the IORT Root Complex.
+  CM_OBJECT_TOKEN       RootComplexToken;
+} CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE;
+
+/** A structure that describes an AEST proxy error node.
+
+    ID: EArmObjAestProxyNode
+*/
+typedef struct CmArmAestProxyNode {
+  /// Common fields shared by all AEST node types.
+  CM_ARM_AEST_COMMON    Common;
+  /// Address of the proxied error-record group's first record.
+  UINT64                NodeAddress;
+} CM_ARM_AEST_PROXY_NODE;
 
 #pragma pack()
