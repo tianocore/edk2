@@ -32,7 +32,7 @@ EFI_DRIVER_BINDING_PROTOCOL  gDiskIoDriverBinding = {
 // Template for DiskIo private data structure.
 // The pointer to BlockIo protocol interface is assigned dynamically.
 //
-DISK_IO_PRIVATE_DATA  gDiskIoPrivateDataTemplate = {
+STATIC CONST DISK_IO_PRIVATE_DATA  gDiskIoPrivateDataTemplate = {
   DISK_IO_PRIVATE_DATA_SIGNATURE,
   {
     EFI_DISK_IO_PROTOCOL_REVISION,
@@ -121,9 +121,10 @@ DiskIoDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  DISK_IO_PRIVATE_DATA  *Instance;
-  EFI_TPL               OldTpl;
+  EFI_STATUS             Status;
+  DISK_IO_PRIVATE_DATA   *Instance;
+  EFI_TPL                OldTpl;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
 
   Instance = NULL;
 
@@ -135,25 +136,13 @@ DiskIoDriverBindingStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
-                  (VOID **)&gDiskIoPrivateDataTemplate.BlockIo,
+                  (VOID **)&BlockIo,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
     goto ErrorExit1;
-  }
-
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiBlockIo2ProtocolGuid,
-                  (VOID **)&gDiskIoPrivateDataTemplate.BlockIo2,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (EFI_ERROR (Status)) {
-    gDiskIoPrivateDataTemplate.BlockIo2 = NULL;
   }
 
   //
@@ -164,6 +153,17 @@ DiskIoDriverBindingStart (
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
+
+  Instance->BlockIo = BlockIo;
+
+  gBS->OpenProtocol (
+         ControllerHandle,
+         &gEfiBlockIo2ProtocolGuid,
+         (VOID **)&Instance->BlockIo2,
+         This->DriverBindingHandle,
+         ControllerHandle,
+         EFI_OPEN_PROTOCOL_BY_DRIVER
+         );
 
   //
   // The BlockSize and IoAlign of BlockIo and BlockIo2 should equal.
@@ -217,6 +217,15 @@ ErrorExit:
     }
 
     if (Instance != NULL) {
+      if (Instance->BlockIo2 != NULL) {
+        gBS->CloseProtocol (
+               ControllerHandle,
+               &gEfiBlockIo2ProtocolGuid,
+               This->DriverBindingHandle,
+               ControllerHandle
+               );
+      }
+
       FreePool (Instance);
     }
 

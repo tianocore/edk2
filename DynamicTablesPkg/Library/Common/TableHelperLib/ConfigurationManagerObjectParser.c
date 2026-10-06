@@ -490,6 +490,16 @@ STATIC CONST CM_OBJ_PARSER  CmArmCoresightPmuInfoParser[] = {
   { "ImplementationId",       sizeof (UINT32),          "0x%x",   NULL        },
 };
 
+/** A parser for EArmObjBmuRegInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmBmuRegInfoParser[] = {
+  { "BaseAddress", 8,                                         "0x%llx", NULL },
+  { "Length",      8,                                         "0x%llx", NULL },
+  { "BmuIntr",     sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+};
+
 /** A parser for EArmObjCmnInfo containing CMN information.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
@@ -1863,6 +1873,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicItsV5Info,                    CmArmGicItsV5InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicItsV5TranslateFrameInfo,      CmArmGicItsV5TranslateFrameInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
