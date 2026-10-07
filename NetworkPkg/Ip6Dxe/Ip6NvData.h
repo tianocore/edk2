@@ -2,6 +2,7 @@
   NVData structure used by the IP6 configuration component.
 
   Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -41,6 +42,14 @@
 #define ADDRESS_STR_MIN_SIZE       2
 #define ADDRESS_STR_MAX_SIZE       255
 
+//
+// ADDRESS_STR_MAX_SIZE matches the VFR maxsize for the ManualAddress,
+// GatewayAddress and DnsAddress inputs, so a maximum-length string leaves no
+// room for the CHAR16 NUL terminator. ADDRESS_STR_STORAGE reserves space for
+// it in the corresponding storage buffers.
+//
+#define ADDRESS_STR_STORAGE  256
+
 ///
 /// IP6_CONFIG_IFR_NVDATA contains the IP6 configure
 /// parameters for that NIC.
@@ -52,8 +61,8 @@ typedef struct {
   UINT32    Policy;                                       ///< manual or automatic
   UINT32    DadTransmitCount;                             ///< dad transmits count
   CHAR16    InterfaceId[INTERFACE_ID_STR_STORAGE];        ///< alternative interface id
-  CHAR16    ManualAddress[ADDRESS_STR_MAX_SIZE];          ///< IP addresses
-  CHAR16    GatewayAddress[ADDRESS_STR_MAX_SIZE];         ///< Gateway address
-  CHAR16    DnsAddress[ADDRESS_STR_MAX_SIZE];             ///< DNS server address
+  CHAR16    ManualAddress[ADDRESS_STR_STORAGE];           ///< IP addresses
+  CHAR16    GatewayAddress[ADDRESS_STR_STORAGE];          ///< Gateway address
+  CHAR16    DnsAddress[ADDRESS_STR_STORAGE];              ///< DNS server address
 } IP6_CONFIG_IFR_NVDATA;
 #pragma pack()

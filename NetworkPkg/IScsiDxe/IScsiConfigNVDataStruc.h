@@ -2,6 +2,7 @@
   Define NVData structures used by the iSCSI configuration component.
 
 Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -144,6 +145,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ISCSI_TARGET_URI_MIN_SIZE  0
 #define ISCSI_TARGET_URI_MAX_SIZE  255
 
+//
+// ISCSI_TARGET_URI_MAX_SIZE matches the VFR maxsize for the TargetIp input,
+// so a maximum-length string leaves no room for the CHAR16 NUL terminator.
+// ISCSI_TARGET_URI_STORAGE reserves space for it in the TargetIp and
+// ISCSITargetIpAddress storage buffers.
+//
+#define ISCSI_TARGET_URI_STORAGE  256
+
 #pragma pack(1)
 
 //
@@ -155,7 +164,7 @@ typedef struct {
   CHAR16    ISCSIInitiatorNetmask[IP4_STR_MAX_SIZE];
   CHAR16    ISCSIInitiatorGateway[IP4_STR_MAX_SIZE];
   CHAR16    ISCSITargetName[ISCSI_NAME_MAX_SIZE];
-  CHAR16    ISCSITargetIpAddress[ISCSI_TARGET_URI_MAX_SIZE];
+  CHAR16    ISCSITargetIpAddress[ISCSI_TARGET_URI_STORAGE];
   CHAR16    ISCSILun[ISCSI_LUN_STR_MAX_LEN];
   CHAR16    ISCSIChapUsername[ISCSI_CHAP_NAME_STORAGE];
   CHAR16    ISCSIChapSecret[ISCSI_CHAP_SECRET_STORAGE];
@@ -180,7 +189,7 @@ typedef struct _ISCSI_CONFIG_IFR_NVDATA {
   CHAR16         Gateway[IP4_STR_MAX_SIZE];
 
   CHAR16         TargetName[ISCSI_NAME_MAX_SIZE];
-  CHAR16         TargetIp[ISCSI_TARGET_URI_MAX_SIZE];
+  CHAR16         TargetIp[ISCSI_TARGET_URI_STORAGE];
   UINT16         TargetPort;
   CHAR16         BootLun[ISCSI_LUN_STR_MAX_LEN];
 
