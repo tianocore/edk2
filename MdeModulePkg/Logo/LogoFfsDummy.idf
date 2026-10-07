@@ -1,0 +1,12 @@
+// /** @file
+// Dummy Platform Logo image definition file for FFS logo usecase.
+//
+//
+// Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#image IMG_LOGO LogoFfsDummy.bmp

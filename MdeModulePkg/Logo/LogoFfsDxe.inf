@@ -1,38 +1,30 @@
 ## @file
-#  Logo DXE Driver for FFS and HII-based embedded logo loading.
+#  Logo DXE Driver for FFS-based custom logo loading.
 #
 #  This driver installs the Edkii Platform Logo protocol configured to load
+#  logo from a firmware volume file specified by PcdLogoFileGuid. This variant
+#  excludes the embedded HII logo resources (Logo.bmp and Logo.idf) to reduce
+#  binary size when using FFS-based custom logos.
 #
 #  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-#
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
-  BASE_NAME                      = LogoDxe
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = LogoDxeFfs
   MODULE_UNI_FILE                = LogoDxe.uni
-  FILE_GUID                      = F74D20EE-37E7-48FC-97F7-9B1047749C69
+  FILE_GUID                      = 2C2D8E4A-6C5D-4B5A-9A5F-6F7E8D9C0B1A
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeLogo
-#
-#  This flag specifies whether HII resource section is generated into PE image.
-#
-  UEFI_HII_RESOURCE_SECTION      = TRUE
-
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64
-#
 
 [Sources]
-  Logo.bmp
   Logo.c
-  Logo.idf
+  LogoFfsDummy.idf
+  LogoFfsDummy.bmp
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -57,8 +49,7 @@
   gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
 
 [Depex]
-  gEfiHiiDatabaseProtocolGuid AND
-  gEfiHiiImageExProtocolGuid
+  TRUE
 
 [UserExtensions.TianoCore."ExtraFiles"]
   LogoDxeExtra.uni
