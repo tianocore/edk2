@@ -117,6 +117,7 @@ HMainCommandDisplayHelp (
                    );
     if (InfoString != NULL) {
       ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
+      FreePool (InfoString);
     } else {
       ASSERT (FALSE);
     }

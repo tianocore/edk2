@@ -108,7 +108,19 @@ ValidateDmcPmuInfo (
     }
 
     PmuIntr = &RegInfo->PmuIntr;
-    if ((PmuIntr->Flags & BIT0) != 0) {
+    if ((PmuIntr->Flags &
+         EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER_CONSUMER_MASK) == 0)
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SSDT-DMC: PMU Interrupt must be consumer.\n"
+        ));
+      goto error_handler;
+    }
+
+    if ((PmuIntr->Flags &
+         EFI_ACPI_EXTENDED_INTERRUPT_FLAG_MODE_MASK) != 0)
+    {
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: SSDT-DMC: PMU Interrupt must be Level Triggered.\n"
@@ -116,7 +128,9 @@ ValidateDmcPmuInfo (
       goto error_handler;
     }
 
-    if ((PmuIntr->Flags & BIT1) != 0) {
+    if ((PmuIntr->Flags &
+         EFI_ACPI_EXTENDED_INTERRUPT_FLAG_POLARITY_MASK) != 0)
+    {
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: SSDT-DMC: PMU Interrupt must be Active High.\n"
@@ -213,10 +227,14 @@ CreateDmcPmuCrs (
 
   Intr   = DmcPmuRegInfo->PmuIntr.Interrupt;
   Status = AmlCodeGenRdInterrupt (
-             TRUE,
-             FALSE,
-             FALSE,
-             FALSE,
+             ((DmcPmuRegInfo->PmuIntr.Flags &
+               EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER_CONSUMER_MASK) != 0),
+             ((DmcPmuRegInfo->PmuIntr.Flags &
+               EFI_ACPI_EXTENDED_INTERRUPT_FLAG_MODE_MASK) != 0),
+             ((DmcPmuRegInfo->PmuIntr.Flags &
+               EFI_ACPI_EXTENDED_INTERRUPT_FLAG_POLARITY_MASK) != 0),
+             ((DmcPmuRegInfo->PmuIntr.Flags &
+               EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARABLE_MASK) != 0),
              &Intr,
              1,
              CrsNode,
