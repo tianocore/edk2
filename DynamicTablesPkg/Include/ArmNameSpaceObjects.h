@@ -59,8 +59,8 @@ typedef enum ArmObjectID {
   EArmObjGicIrsInfo,                                           ///< 29 - GIC IRS Info
   EArmObjGicItsV5Info,                                         ///< 30 - GIC ITS v5 Info
   EArmObjGicItsV5TranslateFrameInfo,                           ///< 31 - GIC ITS v5 Translate Frame Info
-  EArmObjGicIwbInfo,                                           ///< 34 - GIC IWB Info
-  EArmObjBmuRegInfo,                                           ///< 35 - BMU Reg Info
+  EArmObjGicIwbInfo,                                           ///< 32 - GIC IWB Info
+  EArmObjBmuRegInfo,                                           ///< 33 - BMU Reg Info
   EArmObjMax
 } EARM_OBJECT_ID;
 

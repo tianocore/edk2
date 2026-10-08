@@ -78,6 +78,7 @@ _______________________________________________________________________________
       31 - MSCT
       32 - BERT
       33 - ERST
+      34 - SSDT BMU
 
     Standard SMBIOS Table IDs:
        0 - Reserved
