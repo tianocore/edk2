@@ -340,6 +340,16 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInterruptParser[] = {
   { "Flags",     4, "0x%x", NULL }
 };
 
+/** A parser for EArmObjPl050Info.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmPl050InfoParser[] = {
+  { "IsMouse",     sizeof (BOOLEAN),                   "0x%x",   NULL },
+  { "BaseAddress", sizeof (UINT64),                    "0x%llx", NULL },
+  { "Interrupt",   sizeof (CM_ARM_EXTENDED_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+};
+
 /** A parser for EArchCommonObjProcHierarchyInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
@@ -1874,6 +1884,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicItsV5TranslateFrameInfo,      CmArmGicItsV5TranslateFrameInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjPl050Info,                       CmArmPl050InfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 

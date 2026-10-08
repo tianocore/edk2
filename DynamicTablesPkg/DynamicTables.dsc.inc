@@ -148,6 +148,7 @@
 
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmcPmuLibArm/SsdtDmcPmuLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtBmuLibArm/SsdtBmuLibArm.inf
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtPl050LibArm/SsdtPl050LibArm.inf
 
   #
   # Dynamic Table Factory Dxe
@@ -187,6 +188,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmnLibArm/SsdtCmnLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmcPmuLibArm/SsdtDmcPmuLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtBmuLibArm/SsdtBmuLibArm.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtPl050LibArm/SsdtPl050LibArm.inf
 
       # AML Codegen
       #  Common
