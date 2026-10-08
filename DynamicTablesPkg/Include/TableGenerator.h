@@ -79,6 +79,7 @@ _______________________________________________________________________________
       32 - BERT
       33 - ERST
       34 - SSDT BMU
+      35 - SSDT PL050
 
     Standard SMBIOS Table IDs:
        0 - Reserved
