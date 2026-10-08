@@ -107,6 +107,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT BMU generator collates the BMU specific information
             from the Configuration Manager and uses the Dynamic AML CodeGen
             API's to build the SSDT BMU table.
+  - SSDT SCMI:
+            The SSDT SCMI generator collates the SCMI device, protocol, and
+            PCC transport information from the Configuration Manager and uses
+            the Dynamic AML CodeGen APIs to build the SSDT SCMI table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -155,6 +159,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdErst,                          ///< ERST Generator
   EStdAcpiTableIdSsdtBmu,                       ///< SSDT BMU Generator
   EStdAcpiTableIdSsdtPl050,                     ///< SSDT PL050 Generator
+  EStdAcpiTableIdSsdtScmi,                      ///< SSDT SCMI Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
