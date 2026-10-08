@@ -1188,6 +1188,72 @@ AmlCodeGenDefinitionBlock (
   OUT       AML_ROOT_NODE_HANDLE  *NewRootNode
   );
 
+/** AML code generation for a String object node.
+
+  The created node is not attached to an AML tree. The caller must either
+  attach it using AmlAttachNode() or delete it using AmlDeleteTree().
+
+  @ingroup CodeGenApis
+
+  @param [in]  String         Pointer to a NULL-terminated string.
+  @param [out] NewObjectNode  On success, contains the created String object
+                              node.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenString (
+  IN  CONST CHAR8                   *String,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode
+  );
+
+/** AML code generation for an Integer object node.
+
+  The created node is not attached to an AML tree. The caller must either
+  attach it using AmlAttachNode() or delete it using AmlDeleteTree().
+
+  @ingroup CodeGenApis
+
+  @param [in]  Integer        Integer value of the object node.
+  @param [out] NewObjectNode  On success, contains the created Integer object
+                              node.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenInteger (
+  IN  UINT64                  Integer,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode
+  );
+
+/** AML code generation for an empty Package object node.
+
+  Elements can be added to the package using AmlAttachNode().
+
+  The created node is not attached to an AML tree. The caller must either
+  attach it using AmlAttachNode() or delete it using AmlDeleteTree().
+
+  @ingroup CodeGenApis
+
+  @param [out] NewObjectNode  On success, contains the created Package object
+                              node.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenPackage (
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode
+  );
+
 /** AML code generation for a Name object node, containing a String.
 
   AmlCodeGenNameString ("_HID", "HID0000", ParentNode, NewObjectNode) is
