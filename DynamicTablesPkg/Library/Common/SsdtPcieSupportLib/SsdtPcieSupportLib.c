@@ -114,7 +114,7 @@ GeneratePciSlots (
     // _SUN object is not generated as we don't know which slot will be used.
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /** Add an _OSC template method to the PciNode.
