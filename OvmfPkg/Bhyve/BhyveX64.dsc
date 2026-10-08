@@ -762,7 +762,7 @@
 
   OvmfPkg/Bhyve/BhyveRfbDxe/BhyveRfbDxe.inf {
     <LibraryClasses>
-      BltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+      FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
 
