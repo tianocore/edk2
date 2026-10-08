@@ -55,6 +55,13 @@ GicIsValidSource (
   return Source < mGicNumInterrupts;
 }
 
+/**
+  Enable an interrupt in the GIC distributor.
+
+  @param[in] GicDistributorBase    Base address of the GIC distributor.
+  @param[in] GicRedistributorBase  Unused for GICv2.
+  @param[in] Source                Interrupt source, validated by the caller.
+**/
 STATIC
 VOID
 ArmGicEnableInterrupt (
@@ -77,6 +84,13 @@ ArmGicEnableInterrupt (
     );
 }
 
+/**
+  Disable an interrupt in the GIC distributor.
+
+  @param[in] GicDistributorBase    Base address of the GIC distributor.
+  @param[in] GicRedistributorBase  Unused for GICv2.
+  @param[in] Source                Interrupt source, validated by the caller.
+**/
 STATIC
 VOID
 ArmGicDisableInterrupt (
@@ -99,6 +113,16 @@ ArmGicDisableInterrupt (
     );
 }
 
+/**
+  Get the enable state of an interrupt in the GIC distributor.
+
+  @param[in] GicDistributorBase    Base address of the GIC distributor.
+  @param[in] GicRedistributorBase  Unused for GICv2.
+  @param[in] Source                Interrupt source, validated by the caller.
+
+  @retval TRUE   The interrupt is enabled.
+  @retval FALSE  The interrupt is disabled.
+**/
 STATIC
 BOOLEAN
 ArmGicIsInterruptEnabled (
@@ -140,7 +164,7 @@ GicV2EnableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -168,7 +192,7 @@ GicV2DisableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -198,7 +222,7 @@ GicV2GetInterruptSourceState (
   IN BOOLEAN                          *InterruptState
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -208,6 +232,14 @@ GicV2GetInterruptSourceState (
   return EFI_SUCCESS;
 }
 
+/**
+  Read the GICv2 interrupt acknowledge register.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+
+  @return The interrupt acknowledge register value, including the interrupt
+          ID and source CPU ID. A special interrupt ID may be returned.
+**/
 STATIC
 UINTN
 ArmGicV2AcknowledgeInterrupt (
@@ -218,6 +250,13 @@ ArmGicV2AcknowledgeInterrupt (
   return MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
 }
 
+/**
+  Signal completion of an interrupt to the GICv2 CPU interface.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+  @param[in] Source                     Interrupt acknowledge register value
+                                       for the interrupt being completed.
+**/
 STATIC
 VOID
 ArmGicV2EndOfInterrupt (
@@ -248,7 +287,7 @@ GicV2EndOfInterrupt (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -480,6 +519,11 @@ GicV2SetTriggerType (
   return EFI_SUCCESS;
 }
 
+/**
+  Enable interrupt forwarding from the GIC distributor.
+
+  @param[in] GicDistributorBase  Base address of the GIC distributor.
+**/
 STATIC
 VOID
 ArmGicEnableDistributor (
@@ -499,6 +543,11 @@ EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol = {
   GicV2SetTriggerType
 };
 
+/**
+  Enable the GICv2 CPU interface for the Non-Secure world.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+**/
 STATIC
 VOID
 ArmGicV2EnableInterruptInterface (
@@ -512,6 +561,11 @@ ArmGicV2EnableInterruptInterface (
   MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x1);
 }
 
+/**
+  Disable the GICv2 CPU interface and clear its priority mask.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+**/
 STATIC
 VOID
 ArmGicV2DisableInterruptInterface (
