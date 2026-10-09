@@ -278,17 +278,12 @@ class CommitMessageCheck:
             # subject line to 92 characters
             #
             maxlength = 92
-        elif lines[0].find(':') > 55:
-            #
-            # If we need to enumerate lots of packages, ensure to leave room for
-            # a very short description at the end (after the ':').
-            #
-            maxlength = lines[0].find(':') + 20
         else:
             #
-            # Otherwise, limit the length of subject line to 75 characters
+            # Keep the usual 75-character limit, but allow at least 40
+            # description characters after the package/component prefix.
             #
-            maxlength = 75
+            maxlength = max(75, lines[0].find(':') + 2 + 40)
 
         if len(lines[0].rstrip()) > maxlength:
             self.error(
