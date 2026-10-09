@@ -61,8 +61,24 @@ typedef struct {
   UFDT_MEMORY_REGION    CpuInterface;
 } UFDT_GIC_V2_INFO;
 
+/** GICv3 dispatcher struct.
+
+  Struct associated with gEdkiiUfdtGicV3InfoProtocolGuid
+
+  The CPU interface uses system registers and needs no MMIO region.
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON           Common;
+  /// GIC distributor register region.
+  UFDT_MEMORY_REGION    Distributor;
+  /// Contiguous GICv3 redistributor register region.
+  UFDT_MEMORY_REGION    Redistributors;
+} UFDT_GIC_V3_INFO;
+
 /// Prepared resource interfaces; their presence also satisfies consumer DEPEX.
 extern EFI_GUID  gEdkiiUfdtGicV2InfoProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtGicV3InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
@@ -74,6 +90,7 @@ extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
   class. These markers are valid only during boot services.
 **/
 extern EFI_GUID  gEdkiiUfdtGicV2AbsentProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtGicV3AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
 
 /** Fixed-clock dispatcher struct.
