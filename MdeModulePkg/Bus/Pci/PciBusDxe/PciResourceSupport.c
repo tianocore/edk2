@@ -83,7 +83,12 @@ SkipIsaAliasAperture (
 
 /**
   This function inserts a resource node into the resource list.
-  The resource list is sorted in descend order.
+  The resource list is sorted in descending order of alignment. Resource
+  nodes with the same alignment are sorted by the remainder of their
+  length modulo the alignment: nodes without a remainder come first,
+  followed by the others in descending order of the remainder. Resource
+  nodes that rank equal, such as BARs of the same size, keep their
+  insertion order.
 
   @param Bridge  PCI resource node for bridge.
   @param ResNode Resource node want to be inserted.
@@ -103,25 +108,25 @@ InsertResourceNode (
   ASSERT (Bridge  != NULL);
   ASSERT (ResNode != NULL);
 
-  InsertHeadList (&Bridge->ChildList, &ResNode->Link);
+  InsertTailList (&Bridge->ChildList, &ResNode->Link);
 
-  CurrentLink = Bridge->ChildList.ForwardLink->ForwardLink;
+  CurrentLink = ResNode->Link.BackLink;
   while (CurrentLink != &Bridge->ChildList) {
     Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
 
-    if (ResNode->Alignment > Temp->Alignment) {
+    if (Temp->Alignment > ResNode->Alignment) {
       break;
-    } else if (ResNode->Alignment == Temp->Alignment) {
+    } else if (Temp->Alignment == ResNode->Alignment) {
       ResNodeAlignRest = ResNode->Length & ResNode->Alignment;
       TempAlignRest    = Temp->Length & Temp->Alignment;
-      if ((ResNodeAlignRest == 0) || (ResNodeAlignRest >= TempAlignRest)) {
+      if ((TempAlignRest == 0) || ((ResNodeAlignRest != 0) && (TempAlignRest >= ResNodeAlignRest))) {
         break;
       }
     }
 
-    SwapListEntries (&ResNode->Link, CurrentLink);
+    SwapListEntries (CurrentLink, &ResNode->Link);
 
-    CurrentLink = ResNode->Link.ForwardLink;
+    CurrentLink = ResNode->Link.BackLink;
   }
 }
 
