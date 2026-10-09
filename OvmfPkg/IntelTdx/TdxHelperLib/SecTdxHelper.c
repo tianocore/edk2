@@ -355,6 +355,41 @@ MpAcceptMemoryResourceRange (
 }
 
 /**
+  Validate and fence a VMM-provided unaccepted-memory range before use.
+
+  @param[in]  Resource       The unaccepted-memory resource descriptor.
+  @param[out] PhysicalStart The validated start address.
+  @param[out] PhysicalEnd   The validated exclusive end address.
+
+  @retval TRUE   The range does not overflow.
+  @retval FALSE  The range overflows; output addresses are not modified.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+GetUnacceptedMemoryRange (
+  IN CONST EFI_HOB_RESOURCE_DESCRIPTOR  *Resource,
+  OUT EFI_PHYSICAL_ADDRESS             *PhysicalStart,
+  OUT EFI_PHYSICAL_ADDRESS             *PhysicalEnd
+  )
+{
+  EFI_PHYSICAL_ADDRESS  Start;
+  UINT64                Length;
+
+  Start  = Resource->PhysicalStart;
+  Length = Resource->ResourceLength;
+  if (Length > MAX_UINT64 - Start) {
+    return FALSE;
+  }
+
+  AsmLfence ();
+  *PhysicalStart = Start;
+  *PhysicalEnd   = Start + Length;
+
+  return TRUE;
+}
+
+/**
   BSP accept a small piece of memory which will be used as APs stack.
 
   @param[in] VmmHobList    The Hoblist pass the firmware
@@ -396,21 +431,13 @@ AcceptMemoryForAPsStack (
       DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
 
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
-        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
-        //
-        // ResourceLength and PhysicalStart are VMM-controlled. Fence against a
-        // speculative bound-check bypass and reject a range that wraps around
-        // the address space before it is used to accept memory.
-        //
-        if (PhysicalStart + ResourceLength < PhysicalStart) {
+        if (!GetUnacceptedMemoryRange (Hob.ResourceDescriptor, &PhysicalStart, &PhysicalEnd)) {
           DEBUG ((DEBUG_ERROR, "AcceptMemoryForAPsStack: resource descriptor overflow, skipped\n"));
           Hob.Raw = GET_NEXT_HOB (Hob);
           continue;
         }
 
-        AsmLfence ();
-        PhysicalEnd = PhysicalStart + ResourceLength;
+        ResourceLength = PhysicalEnd - PhysicalStart;
 
         DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
         DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", PhysicalStart));
@@ -420,12 +447,12 @@ AcceptMemoryForAPsStack (
         if (ResourceLength >= APsStackSize) {
           MemoryRegionFound = TRUE;
           if (ResourceLength > ACCEPT_CHUNK_SIZE) {
-            PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + APsStackSize;
+            PhysicalEnd = PhysicalStart + APsStackSize;
           }
         }
 
         Status = BspAcceptMemoryResourceRange (
-                   Hob.ResourceDescriptor->PhysicalStart,
+                   PhysicalStart,
                    PhysicalEnd
                    );
         if (EFI_ERROR (Status)) {
@@ -484,20 +511,11 @@ AcceptMemory (
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
-        //
-        // PhysicalStart and ResourceLength are VMM-controlled. Fence against a
-        // speculative bound-check bypass and reject a range that wraps around
-        // the address space.
-        //
-        if (PhysicalStart + Hob.ResourceDescriptor->ResourceLength < PhysicalStart) {
+        if (!GetUnacceptedMemoryRange (Hob.ResourceDescriptor, &PhysicalStart, &PhysicalEnd)) {
           DEBUG ((DEBUG_ERROR, "AcceptMemory: resource descriptor overflow, skipped\n"));
           Hob.Raw = GET_NEXT_HOB (Hob);
           continue;
         }
-
-        AsmLfence ();
-        PhysicalEnd = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
 
         if (PhysicalEnd <= PhysicalAddressStart) {
           // this memory region has been accepted. Skipped it.
