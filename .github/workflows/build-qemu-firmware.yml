@@ -1,0 +1,104 @@
+name: Build QEMU firmware
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.label }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: x86_64
+            arch: X64
+            dsc: OvmfPkg/OvmfPkgX64.dsc
+            output_dir: Build/OvmfX64/RELEASE_GCC/FV
+            artifact_name: qube-ovmf-x86_64
+          - label: AArch64
+            arch: AARCH64
+            dsc: ArmVirtPkg/ArmVirtQemu.dsc
+            output_dir: Build/ArmVirtQemu-AArch64/RELEASE_GCC/FV
+            artifact_name: qube-ovmf-aarch64
+
+    steps:
+      - name: Check out EDK II (including submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            acpica-tools \
+            binutils-aarch64-linux-gnu \
+            build-essential \
+            gcc-aarch64-linux-gnu \
+            nasm \
+            uuid-dev
+
+      - name: Install EDK II Python requirements
+        run: python -m pip install -r pip-requirements.txt
+
+      - name: Build BaseTools
+        run: make -C BaseTools -j"$(nproc)"
+
+      - name: Build firmware
+        env:
+          GCC_AARCH64_PREFIX: aarch64-linux-gnu-
+        run: |
+          set -euo pipefail
+          source ./edksetup.sh
+          build -a "${{ matrix.arch }}" \
+            -b RELEASE \
+            -t GCC \
+            -p "${{ matrix.dsc }}"
+
+          mkdir -p dist
+          output_dir="${{ matrix.output_dir }}"
+          if [[ "${{ matrix.arch }}" == "X64" ]]; then
+            cp "$output_dir/OVMF_CODE.fd" dist/
+            cp "$output_dir/OVMF_VARS.fd" dist/
+            cp "$output_dir/OVMF.fd" dist/
+          else
+            cp "$output_dir/QEMU_EFI.fd" dist/
+            cp "$output_dir/QEMU_VARS.fd" dist/
+          fi
+
+          sha256sum dist/*.fd > dist/SHA256SUMS
+          cat > dist/README.txt <<'EOF'
+          QubeVM QEMU firmware build
+
+          x86_64 artifacts: OVMF_CODE.fd (read-only flash code), OVMF_VARS.fd
+          (copy per VM for writable UEFI variables), and OVMF.fd (combined image).
+          Use OVMF_CODE.fd and a writable copy of OVMF_VARS.fd as separate pflash
+          drives for persistent variables.
+
+          AArch64 artifacts: QEMU_EFI.fd (firmware code) and QEMU_VARS.fd
+          (writable variable store). Use them as separate pflash drives with
+          qemu-system-aarch64 and a compatible virt machine.
+
+          The firmware embeds MdeModulePkg/Logo/Logo.bmp from this repository.
+          EOF
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
