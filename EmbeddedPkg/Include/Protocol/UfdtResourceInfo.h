@@ -59,6 +59,23 @@ typedef struct {
   UFDT_MEMORY_REGION    Registers;
 } UFDT_PL031_RTC_INFO;
 
+/** MC146818 RTC dispatcher struct.
+
+  Struct associated with gEdkiiUfdtMc146818RtcInfoProtocolGuid
+
+  Register addresses are CPU physical addresses.
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON             Common;
+  /// RTC index and data port address.
+  UFDT_MEMORY_REGION      Registers;
+  /// Byte-wide index port at the register-region base.
+  EFI_PHYSICAL_ADDRESS    IndexRegister;
+  /// Byte-wide data port at the register-region base plus one.
+  EFI_PHYSICAL_ADDRESS    TargetRegister;
+} UFDT_MC146818_RTC_INFO;
+
 /** Architectural timer dispatcher struct.
 
   Struct associated with gEdkiiUfdtTimerInfoProtocolGuid
@@ -117,6 +134,7 @@ extern EFI_GUID  gEdkiiUfdtGicV2InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV3InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtTimerInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtPl031RtcInfoProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtMc146818RtcInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
@@ -131,6 +149,7 @@ extern EFI_GUID  gEdkiiUfdtGicV2AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV3AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtTimerAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtPl031RtcAbsentProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtMc146818RtcAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
 
 /** Fixed-clock dispatcher struct.
