@@ -574,9 +574,9 @@ WifiMgrConfigEap (
     Status = gBS->LocateProtocol (&gEdkiiWiFiProfileSyncProtocolGuid, NULL, (VOID **)&WiFiProfileSyncProtocol);
     if (!EFI_ERROR (Status)) {
       //
-      // Max size of EapIdentity ::= sizeof (CHAR16) * sizeof (Profile->EapIdentity) ::= 2 * EAP_IDENTITY_SIZE
+      // Max size of EapIdentity ::= sizeof (Profile->EapIdentity) ::= EAP_IDENTITY_SIZE*2 bytes
       //
-      IdentitySize = sizeof (CHAR8) * (AsciiStrnLenS ((CHAR8 *)Profile->EapIdentity, sizeof (CHAR16) * sizeof (Profile->EapIdentity)) + 1);
+      IdentitySize = sizeof (CHAR8) * (AsciiStrnLenS ((CHAR8 *)Profile->EapIdentity, sizeof (Profile->EapIdentity)) + 1);
     } else {
       IdentitySize = sizeof (CHAR8) * (StrLen (Profile->EapIdentity) + 1);
     }
