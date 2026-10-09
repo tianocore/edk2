@@ -369,8 +369,8 @@ BOOLEAN
 EFIAPI
 GetUnacceptedMemoryRange (
   IN CONST EFI_HOB_RESOURCE_DESCRIPTOR  *Resource,
-  OUT EFI_PHYSICAL_ADDRESS             *PhysicalStart,
-  OUT EFI_PHYSICAL_ADDRESS             *PhysicalEnd
+  OUT EFI_PHYSICAL_ADDRESS              *PhysicalStart,
+  OUT EFI_PHYSICAL_ADDRESS              *PhysicalEnd
   )
 {
   EFI_PHYSICAL_ADDRESS  Start;
