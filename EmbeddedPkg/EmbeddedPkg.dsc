@@ -241,6 +241,11 @@
   }
 
 [Components.AARCH64]
+  # FDT discovery framework and resource parsers.
+  EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf {
+    <LibraryClasses>
+  }
+
   EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
@@ -248,3 +253,6 @@
 
 [Components.IA32, Components.X64]
   EmbeddedPkg/GdbStub/GdbStub.inf
+
+[Components.IA32, Components.X64, Components.RISCV64, Components.LOONGARCH64]
+  EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf
