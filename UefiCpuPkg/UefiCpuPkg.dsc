@@ -15,7 +15,7 @@
   PLATFORM_VERSION               = 0.90
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/UefiCpu
-  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -119,6 +119,10 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+
+[LibraryClasses.RISCV64]
+  RiscVSbiLib|MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
+  RiscVMmuLib|UefiCpuPkg/Library/BaseRiscVMmuLib/BaseRiscVMmuLib.inf
 
 [LibraryClasses.LoongArch64]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
