@@ -1264,6 +1264,16 @@
   # @ValidRange 0x80000001 | 1 - 255
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkPeriodicTimerInterval|16|UINT8|0x30001063
 
+  ## This PCD holds the background color of the firmware update progress bar.
+  #  Bit fields:
+  #    [31:24] - Reserved
+  #    [23:16] - Red
+  #    [15:8]  - Green
+  #    [7:0]   - Blue
+  #  The default value is 0x00808080 (grey).
+  # @Prompt Background color of the firmware update progress bar.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressBarBackgroundColor|0x00808080|UINT32|0x0000010B
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
