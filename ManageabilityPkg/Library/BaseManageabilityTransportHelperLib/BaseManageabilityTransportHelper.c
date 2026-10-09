@@ -403,54 +403,8 @@ HelperManageabilityPayLoadDebugPrint (
   IN  UINT32  PayloadSize
   )
 {
-  UINTN  Block;
-  UINTN  BlockSize;
-  UINTN  RowSize;
-  UINTN  RemainingBytes;
-  UINTN  BytesPrinted;
-
-  RemainingBytes = PayloadSize;
-  BlockSize      = 256;
-  RowSize        = 16;
-
-  for (Block = 0, BytesPrinted = 0; RemainingBytes > 0;) {
-    UINTN  BlockBase;
-    UINTN  Row;
-    UINTN  RowsToPrint;
-    UINTN  Column;
-
-    Block     = BytesPrinted / BlockSize;
-    BlockBase = Block * BlockSize;
-
-    if (BytesPrinted % BlockSize == 0) {
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "======== Manageability Payload %04xH - %04xH =========\n", BlockBase, BlockBase + MIN (RemainingBytes, BlockSize) - 1));
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "       "));
-      for (Column = 0; Column < RowSize; Column++) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", Column));
-      }
-
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n       -----------------------------------------------\n"));
-    }
-
-    if (RemainingBytes >= BlockSize) {
-      RowsToPrint = BlockSize / RowSize;
-    } else {
-      RowsToPrint = RemainingBytes / RowSize + 1;
-    }
-
-    for (Row = 0; Row < RowsToPrint; Row++) {
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "%04x | ", BlockBase + Row * RowSize));
-      for (Column = 0; Column < MIN (RemainingBytes, RowSize); Column++) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", *((UINT8 *)Payload + BlockBase + Row * RowSize + Column)));
-      }
-
-      RemainingBytes -= Column;
-      BytesPrinted   += Column;
-
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n"));
-    }
-
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n"));
+  if (PayloadSize > 0) {
+    DUMP_HEX (DEBUG_MANAGEABILITY_INFO, 0, Payload, PayloadSize, "Manageability Payload: ");
   }
 }
 

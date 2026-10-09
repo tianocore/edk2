@@ -154,20 +154,11 @@ IpmiBlobTransferSendIpmi (
 
   DEBUG_CODE_BEGIN ();
   DEBUG ((BLOB_TRANSFER_DEBUG, "%a: Inputs:\n", __func__));
-  DEBUG ((BLOB_TRANSFER_DEBUG, "%a: SendDataSize: %02x\nData: ", __func__, SendDataSize));
-  UINT8  i;
-
-  for (i = 0; i < SendDataSize; i++) {
-    DEBUG ((BLOB_TRANSFER_DEBUG, "%02x", *((UINT8 *)SendData + i)));
+  if (SendDataSize > 0) {
+    DUMP_HEX (BLOB_TRANSFER_DEBUG, 0, SendData, SendDataSize, "%a: SendDataSize: %02x\nData: ", __func__, SendDataSize);
   }
 
-  DEBUG ((BLOB_TRANSFER_DEBUG, "\n"));
-  DEBUG ((BLOB_TRANSFER_DEBUG, "%a: IpmiSendDataSize: %02x\nData: ", __func__, IpmiSendDataSize));
-  for (i = 0; i < IpmiSendDataSize; i++) {
-    DEBUG ((BLOB_TRANSFER_DEBUG, "%02x", *((UINT8 *)IpmiSendData + i)));
-  }
-
-  DEBUG ((BLOB_TRANSFER_DEBUG, "\n"));
+  DUMP_HEX (BLOB_TRANSFER_DEBUG, 0, IpmiSendData, IpmiSendDataSize, "%a: IpmiSendDataSize: %02x\nData: ", __func__, IpmiSendDataSize);
   DEBUG_CODE_END ();
 
   AllocatedResponseSize = PROTOCOL_RESPONSE_OVERHEAD + sizeof (Crc) + BLOB_MAX_DATA_PER_PACKET;
@@ -193,14 +184,7 @@ IpmiBlobTransferSendIpmi (
 
   DEBUG_CODE_BEGIN ();
   DEBUG ((BLOB_TRANSFER_DEBUG, "%a: IPMI Response:\n", __func__));
-  DEBUG ((BLOB_TRANSFER_DEBUG, "%a: ResponseDataSize: %02x\nData: ", __func__, IpmiResponseDataSize));
-  UINT8  i;
-
-  for (i = 0; i < IpmiResponseDataSize; i++) {
-    DEBUG ((BLOB_TRANSFER_DEBUG, "%02x", *(ModifiedResponseData + i)));
-  }
-
-  DEBUG ((BLOB_TRANSFER_DEBUG, "\n"));
+  DUMP_HEX (BLOB_TRANSFER_DEBUG, 0, ModifiedResponseData, IpmiResponseDataSize, "%a: ResponseDataSize: %02x\nData: ", __func__, IpmiResponseDataSize);
   DEBUG_CODE_END ();
 
   if (EFI_ERROR (Status)) {
