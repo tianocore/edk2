@@ -4,8 +4,6 @@
   Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-  @par Revision Reference:
-    - Universal Payload Specification 0.75 (https://universalpayload.github.io/documentation/)
 **/
 
 #pragma once
@@ -19,9 +17,10 @@ typedef struct {
   UINT8                               RegisterStride;
   UINT32                              BaudRate;
   EFI_PHYSICAL_ADDRESS                RegisterBase;
+  UINT32                              InputHertz;
 } UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO;
 #pragma pack()
 
-#define UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION  1
+#define UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION  2
 
 extern GUID  gUniversalPayloadSerialPortInfoGuid;
