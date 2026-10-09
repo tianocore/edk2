@@ -68,10 +68,11 @@ PopulateMemoryTypeInformation (
   @param MemoryTypeInformation            The memory type information array to be used to determine
                                           the size of the memory bins.
 
-  @return Non-NULL                        The pointer to the singular MemoryTypeInformation Resource Descriptor HOB.
+  @return Non-NULL                        The pointer to the singular MemoryTypeInformation Resource Descriptor HOB
+                                          (v1 or v2).
   @return NULL                            No valid MemoryTypeInformation Resource Descriptor HOB found.
 **/
-EFI_HOB_RESOURCE_DESCRIPTOR *
+VOID *
 EFIAPI
 GetMemoryTypeInformationResourceHob (
   IN  VOID                        **HobStart,
