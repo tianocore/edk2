@@ -83,6 +83,10 @@
   #
   QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
 
+  ##  @libraryclass  Reads platform-specific TPM Physical Presence configuration.
+  #
+  Tcg2PhysicalPresencePlatformLib|Include/Library/Tcg2PhysicalPresencePlatformLib.h
+
   ##  @libraryclass  S3 support for QEMU fw_cfg
   #
   QemuFwCfgS3Lib|Include/Library/QemuFwCfgS3Lib.h
