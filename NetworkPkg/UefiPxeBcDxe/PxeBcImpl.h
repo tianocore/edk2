@@ -66,7 +66,6 @@ typedef struct _PXEBC_VIRTUAL_NIC       PXEBC_VIRTUAL_NIC;
 #define PXEBC_DAD_ADDITIONAL_DELAY  30000000   // 3 seconds
 #define PXEBC_MTFTP_TIMEOUT         4
 #define PXEBC_MTFTP_RETRIES         6
-#define PXEBC_DHCP_RETRIES          4          // refers to mPxeDhcpTimeout, also by PXE2.1 spec.
 #define PXEBC_MENU_MAX_NUM          24
 #define PXEBC_OFFER_MAX_NUM         16
 

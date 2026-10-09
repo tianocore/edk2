@@ -104,6 +104,12 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize    ## SOMETIMES_CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport       ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp4DiscoverTimeout                    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp4DiscoverTryCount                    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitInitialRetransmissionTime    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionCount   ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionTime    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionDuration ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiPxeBcDxeExtra.uni
