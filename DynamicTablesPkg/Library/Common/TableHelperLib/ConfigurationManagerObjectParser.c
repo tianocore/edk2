@@ -1445,6 +1445,19 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonAdditionalInformationValueParser[] = {
   { "Value", SMBIOS_MAX_ADDITIONAL_INFORMATION_VALUE_SIZE, NULL,   HexDump },
 };
 
+/** A parser for EArchCommonObjOemStringsInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonOemStringsInfoParser[] = {
+  { "OemStringsInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "StringListToken",     sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjOemString.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonOemStringParser[] = {
+  { "String", SMBIOS_MAX_STRING_SIZE, NULL, PrintString },
+};
+
 /** A parser for EArchCommonObjBiosLanguageInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageInfoParser[] = {
@@ -1878,6 +1891,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemPowerSupplyInfo,            CmArchCommonSystemPowerSupplyInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemSlotInfo,                   CmArchCommonSystemSlotInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemSlotPeerInfo,               CmArchCommonSystemSlotPeerInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjOemStringsInfo,                   CmArchCommonOemStringsInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjOemString,                        CmArchCommonOemStringParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

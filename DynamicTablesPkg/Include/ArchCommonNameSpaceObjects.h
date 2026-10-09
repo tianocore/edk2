@@ -162,6 +162,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSystemPowerSupplyInfo,             ///< 92 - System Power Supply Information
   EArchCommonObjSystemSlotInfo,                    ///< 93 - System Slot Information
   EArchCommonObjSystemSlotPeerInfo,                ///< 94 - System Slot Peer Information
+  EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
+  EArchCommonObjOemString,                         ///< 96 - OEM String
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2255,6 +2257,31 @@ typedef struct CmArchCommonMchiNetworkDeviceDescPciInfo {
   ///
   CM_OBJECT_TOKEN    IpmiToken;
 } CM_ARCH_COMMON_MCHI_NETWORK_DEVICE_DESC_PCI_INFO;
+
+/** A structure that describes an OEM-defined string.
+
+  SMBIOS Specification v3.9.0 Type 11
+
+  ID: EArchCommonObjOemString
+**/
+typedef struct CmArchCommonOemString {
+  /// OEM-defined string.
+  CHAR8    String[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_OEM_STRING;
+
+/** A structure that describes OEM Strings Information.
+
+  SMBIOS Specification v3.9.0 Type 11
+
+  ID: EArchCommonObjOemStringsInfo
+**/
+typedef struct CmArchCommonOemStringsInfo {
+  /// CM Object Token uniquely identifying this OEM Strings Information.
+  CM_OBJECT_TOKEN    OemStringsInfoToken;
+
+  /// Token referencing an array of OEM-defined strings.
+  CM_OBJECT_TOKEN    StringListToken;
+} CM_ARCH_COMMON_OEM_STRINGS_INFO;
 
 /** A structure that describes an installable firmware language.
 
