@@ -1582,6 +1582,7 @@ EfiIp4Transmit (
   UINT8                  RawHdrLen;
   UINT32                 OptionsLength;
   UINT8                  *OptionsBuffer;
+  UINT8                  NoOptions;
   VOID                   *FirstFragment;
 
   if (This == NULL) {
@@ -1596,9 +1597,10 @@ EfiIp4Transmit (
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  IpSb   = IpInstance->Service;
-  IpIf   = IpInstance->Interface;
-  Config = &IpInstance->ConfigData;
+  IpSb      = IpInstance->Service;
+  IpIf      = IpInstance->Interface;
+  Config    = &IpInstance->ConfigData;
+  NoOptions = 0;
 
   if (Config->UseDefaultAddress && IP4_NO_MAPPING (IpInstance)) {
     Status = EFI_NO_MAPPING;
@@ -1705,6 +1707,16 @@ EfiIp4Transmit (
 
     OptionsLength = TxData->OptionsLength;
     OptionsBuffer = (UINT8 *)(TxData->OptionsBuffer);
+  }
+
+  if ((OptionsLength != 0) && (OptionsBuffer == NULL)) {
+    ASSERT (OptionsBuffer != NULL);
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
+  }
+
+  if (OptionsBuffer == NULL) {
+    OptionsBuffer = &NoOptions;
   }
 
   //
