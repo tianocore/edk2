@@ -502,6 +502,40 @@ UpdatePlatformMode (
 }
 
 /**
+  Check if Certificate can be accepted into Signature Database.
+
+  @param[in]      CertData                Certificate Data
+  @param[in]      CertLen                 Certificate Length
+
+  @return EFI_INVALID_PARAMETER           Invalid certificate.
+  @return EFI_SUCCESS                     Checks passed.
+
+**/
+EFI_STATUS
+CheckCertificate (
+  IN EFI_SIGNATURE_DATA  *CertData,
+  IN UINTN               CertLen
+  )
+{
+  VOID  *RsaContext;
+
+  RsaContext = NULL;
+
+  // sanity check
+  if (CertLen == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // rsa check
+  if (RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
+    RsaFree (RsaContext);
+    return EFI_SUCCESS;
+  }
+
+  return EFI_INVALID_PARAMETER;
+}
+
+/**
   Check input data form to make sure it is a valid EFI_SIGNATURE_LIST for PK/KEK/db/dbx/dbt variable.
 
   @param[in]  VariableName                Name of Variable to be check.
@@ -526,9 +560,9 @@ CheckSignatureListFormat (
   UINT32              Index;
   UINT32              SigCount;
   BOOLEAN             IsPk;
-  VOID                *RsaContext;
   EFI_SIGNATURE_DATA  *CertData;
   UINTN               CertLen;
+  EFI_STATUS          Status;
 
   if (DataSize == 0) {
     return EFI_SUCCESS;
@@ -551,7 +585,6 @@ CheckSignatureListFormat (
   SigCount    = 0;
   SigList     = (EFI_SIGNATURE_LIST *)Data;
   SigDataSize = DataSize;
-  RsaContext  = NULL;
 
   //
   // Walk through the input signature list and check the data format.
@@ -592,14 +625,12 @@ CheckSignatureListFormat (
       // Try to retrieve the RSA public key from the X.509 certificate.
       // If this operation fails, it's not a valid certificate.
       //
-      CertData   = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
-      CertLen    = SigList->SignatureSize - sizeof (EFI_GUID);
-      RsaContext = NULL;
-      if ((CertLen > 0) && !RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
-        return EFI_INVALID_PARAMETER;
+      CertData = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
+      CertLen  = SigList->SignatureSize - sizeof (EFI_GUID);
+      Status   = CheckCertificate (CertData, CertLen);
+      if (Status != EFI_SUCCESS) {
+        return Status;
       }
-
-      RsaFree (RsaContext);
     }
 
     if ((SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) % SigList->SignatureSize != 0) {
