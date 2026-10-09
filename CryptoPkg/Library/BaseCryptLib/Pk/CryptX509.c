@@ -2,6 +2,7 @@
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
 Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -216,6 +217,7 @@ X509ConstructCertificateStackV (
   X509   *X509Cert;
 
   STACK_OF (X509)  *CertStack;
+  STACK_OF (X509)  *NewCertStack;
   BOOLEAN  Status;
 
   //
@@ -225,19 +227,13 @@ X509ConstructCertificateStackV (
     return FALSE;
   }
 
-  Status = FALSE;
-
-  //
-  // Initialize X509 stack object.
-  //
-  CertStack = (STACK_OF (X509) *)(*X509Stack);
-  if (CertStack == NULL) {
-    CertStack = sk_X509_new_null ();
-    if (CertStack == NULL) {
-      return Status;
-    }
+  CertStack    = (STACK_OF (X509) *)(*X509Stack);
+  NewCertStack = sk_X509_new_null ();
+  if (NewCertStack == NULL) {
+    return FALSE;
   }
 
+  Status = TRUE;
   while (TRUE) {
     //
     // If Cert is NULL, then it is the end of the list.
@@ -249,6 +245,7 @@ X509ConstructCertificateStackV (
 
     CertSize = VA_ARG (Args, UINTN);
     if (CertSize == 0) {
+      Status = FALSE;
       break;
     }
 
@@ -272,16 +269,43 @@ X509ConstructCertificateStackV (
     //
     // Insert the new X509 object into X509 stack object.
     //
-    sk_X509_push (CertStack, X509Cert);
+    if (sk_X509_push (NewCertStack, X509Cert) == 0) {
+      X509_free (X509Cert);
+      Status = FALSE;
+      break;
+    }
   }
 
   if (!Status) {
-    sk_X509_pop_free (CertStack, X509_free);
-  } else {
-    *X509Stack = (UINT8 *)CertStack;
+    sk_X509_pop_free (NewCertStack, X509_free);
+    return FALSE;
   }
 
-  return Status;
+  if (CertStack == NULL) {
+    *X509Stack = (UINT8 *)NewCertStack;
+    return TRUE;
+  }
+
+  if (sk_X509_num (NewCertStack) == 0) {
+    sk_X509_free (NewCertStack);
+    return TRUE;
+  }
+
+  if (sk_X509_reserve (CertStack, sk_X509_num (NewCertStack)) == 0) {
+    sk_X509_pop_free (NewCertStack, X509_free);
+    return FALSE;
+  }
+
+  while ((X509Cert = sk_X509_shift (NewCertStack)) != NULL) {
+    if (sk_X509_push (CertStack, X509Cert) == 0) {
+      X509_free (X509Cert);
+      sk_X509_pop_free (NewCertStack, X509_free);
+      return FALSE;
+    }
+  }
+
+  sk_X509_free (NewCertStack);
+  return TRUE;
 }
 
 /**
