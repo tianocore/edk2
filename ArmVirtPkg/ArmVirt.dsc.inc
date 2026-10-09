@@ -531,18 +531,19 @@ DEFINE FD_SIZE_IN_MB    = 3
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
-  ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
   EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf {
     <LibraryClasses>
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
   }
   ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV2DepexLib.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
   }
   ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV3DepexLib.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV3DepexLib/UfdtGicV3DepexLib.inf
   }
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
     <LibraryClasses>

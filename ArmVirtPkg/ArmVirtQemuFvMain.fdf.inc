@@ -78,7 +78,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
   INF EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf
-  INF ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
