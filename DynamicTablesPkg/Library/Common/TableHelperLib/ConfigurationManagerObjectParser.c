@@ -340,6 +340,16 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInterruptParser[] = {
   { "Flags",     4, "0x%x", NULL }
 };
 
+/** A parser for EArmObjPl050Info.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmPl050InfoParser[] = {
+  { "IsMouse",     sizeof (BOOLEAN),                   "0x%x",   NULL },
+  { "BaseAddress", sizeof (UINT64),                    "0x%llx", NULL },
+  { "Interrupt",   sizeof (CM_ARM_EXTENDED_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+};
+
 /** A parser for EArchCommonObjProcHierarchyInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
@@ -1501,6 +1511,38 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemPowerSupplyInfoParser[] = {
   { "PowerSupplyCharacteristics", sizeof (UINT16),          "0x%x", NULL        },
 };
 
+/** A parser for EArchCommonObjSystemSlotInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemSlotInfoParser[] = {
+  { "SystemSlotInfoToken",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "PeerGroupListToken",   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "SlotDesignation",      SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+  { "SlotType",             sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotDataBusWidth",     sizeof (UINT8),           "0x%x", NULL        },
+  { "CurrentUsage",         sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotLength",           sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotId",               sizeof (UINT16),          "0x%x", NULL        },
+  { "SlotCharacteristics1", sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotCharacteristics2", sizeof (UINT8),           "0x%x", NULL        },
+  { "SegmentGroupNum",      sizeof (UINT16),          "0x%x", NULL        },
+  { "BusNum",               sizeof (UINT8),           "0x%x", NULL        },
+  { "DevFuncNum",           sizeof (UINT8),           "0x%x", NULL        },
+  { "DataBusWidth",         sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotInformation",      sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotPhysicalWidth",    sizeof (UINT8),           "0x%x", NULL        },
+  { "SlotPitch",            sizeof (UINT16),          "0x%x", NULL        },
+  { "SlotHeight",           sizeof (UINT8),           "0x%x", NULL        },
+};
+
+/** A parser for EArchCommonObjSystemSlotPeerInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemSlotPeerInfoParser[] = {
+  { "SegmentGroupNum", sizeof (UINT16), "0x%x", NULL },
+  { "BusNum",          sizeof (UINT8),  "0x%x", NULL },
+  { "DevFuncNum",      sizeof (UINT8),  "0x%x", NULL },
+  { "DataBusWidth",    sizeof (UINT8),  "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjMemoryDeviceMappedAddress.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceMappedAddressParser[] = {
@@ -1834,6 +1876,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjErstInstructionsInfo,             CmArchCommonObjErstInstructionsInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjIpmiDeviceInfo,                   CmArchCommonIpmiDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSystemPowerSupplyInfo,            CmArchCommonSystemPowerSupplyInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemSlotInfo,                   CmArchCommonSystemSlotInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSystemSlotPeerInfo,               CmArchCommonSystemSlotPeerInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -1874,6 +1918,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicItsV5TranslateFrameInfo,      CmArmGicItsV5TranslateFrameInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjPl050Info,                       CmArmPl050InfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
