@@ -33,6 +33,7 @@ InstallCloudHvTablesTdx (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_ACPI_DESCRIPTION_HEADER  *CurrentTable;
   EFI_ACPI_DESCRIPTION_HEADER  *DsdtTable;
+  UINTN                        TableDataSize;
 
   DsdtTable   = NULL;
   TableHandle = 0;
@@ -41,6 +42,34 @@ InstallCloudHvTablesTdx (
 
   while (Hob.Guid != NULL) {
     CurrentTable = (EFI_ACPI_DESCRIPTION_HEADER *)(&Hob.Guid->Name + 1);
+
+    //
+    // The ACPI table payload is provided by the untrusted VMM through the HOB.
+    // Validate that the table header fits within the HOB and that the
+    // self-described Length does not exceed the data actually carried by the
+    // HOB before it is passed to InstallAcpiTable(), otherwise a crafted Length
+    // would drive an out-of-bounds read of the table body.
+    //
+    if (Hob.Guid->Header.HobLength <= sizeof (EFI_HOB_GUID_TYPE)) {
+      DEBUG ((DEBUG_ERROR, "%a: ACPI HOB too small\n", __func__));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    TableDataSize = Hob.Guid->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE);
+    if ((TableDataSize < sizeof (EFI_ACPI_DESCRIPTION_HEADER)) ||
+        (CurrentTable->Length < sizeof (EFI_ACPI_DESCRIPTION_HEADER)) ||
+        (CurrentTable->Length > TableDataSize))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: invalid ACPI table length 0x%x (HOB data 0x%x)\n",
+        __func__,
+        CurrentTable->Length,
+        (UINT32)TableDataSize
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
     if (!AsciiStrnCmp ((CHAR8 *)&CurrentTable->Signature, "DSDT", 4)) {
       DsdtTable = CurrentTable;
     } else {
