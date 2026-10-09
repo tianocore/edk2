@@ -46,7 +46,23 @@ typedef struct {
   UINT64                  Length;
 } UFDT_MEMORY_REGION;
 
+/** GICv2 dispatcher struct.
+
+  Struct associated with gEdkiiUfdtGicV2InfoProtocolGuid
+
+  Only the distributor and CPU interface consumed by ArmGicDxe are listed.
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON           Common;
+  /// GIC distributor register region.
+  UFDT_MEMORY_REGION    Distributor;
+  /// GICv2 CPU interface register region.
+  UFDT_MEMORY_REGION    CpuInterface;
+} UFDT_GIC_V2_INFO;
+
 /// Prepared resource interfaces; their presence also satisfies consumer DEPEX.
+extern EFI_GUID  gEdkiiUfdtGicV2InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
@@ -57,6 +73,7 @@ extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
   failure. Another binding may have selected a device of the same generic
   class. These markers are valid only during boot services.
 **/
+extern EFI_GUID  gEdkiiUfdtGicV2AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
 
 /** Fixed-clock dispatcher struct.

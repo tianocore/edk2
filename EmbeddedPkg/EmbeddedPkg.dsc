@@ -45,6 +45,7 @@
 
 [LibraryClasses.common]
   UfdtDispatcherLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDispatcherLib/UfdtDispatcherLib.inf
+  UfdtDepexLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDepexLib/UfdtDepexLib.inf
 #  DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
@@ -125,6 +126,7 @@
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
 
 [LibraryClasses.AARCH64]
+  MapMmioLib|OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
@@ -193,6 +195,11 @@
   gEmbeddedTokenSpaceGuid.PcdTimerVector|7
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
 
+[PcdsDynamicDefault.AARCH64]
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0
+
 [BuildOptions]
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
   *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
@@ -203,6 +210,7 @@
 #
 ################################################################################
 [Components.common]
+  EmbeddedPkg/UfdtDispatcher/Library/UfdtDepexLib/UfdtDepexLib.inf
   EmbeddedPkg/UfdtDispatcher/Library/UfdtDispatcherLib/UfdtDispatcherLib.inf
   EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf
   EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf
@@ -245,8 +253,15 @@
   EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf {
     <LibraryClasses>
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
+  }
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
   }
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
 
   EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
