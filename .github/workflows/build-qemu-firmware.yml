@@ -69,7 +69,7 @@ jobs:
         env:
           GCC_AARCH64_PREFIX: aarch64-linux-gnu-
         run: |
-          set -euo pipefail
+          set -eo pipefail
           source ./edksetup.sh
           build -a "${{ matrix.arch }}" \
             -b RELEASE \
