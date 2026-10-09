@@ -207,6 +207,9 @@
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0
   gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|0
 
 [BuildOptions]
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
@@ -266,6 +269,7 @@
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtPl031BindingDriver/UfdtPl031BindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtMc146818RtcBindingDriver/UfdtMc146818RtcBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtWatchdogBindingDriver/UfdtWatchdogBindingDriver.inf
   }
   ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
@@ -282,11 +286,13 @@
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtMc146818RtcBindingDriver/UfdtMc146818RtcBindingDriver.inf
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtPl031BindingDriver/UfdtPl031BindingDriver.inf
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtWatchdogBindingDriver/UfdtWatchdogBindingDriver.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV3DepexLib/UfdtGicV3DepexLib.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtRtcDepexLib/UfdtRtcDepexLib.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtMc146818RtcDepexLib/UfdtMc146818RtcDepexLib.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtTimerDepexLib/UfdtTimerDepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtWatchdogDepexLib/UfdtWatchdogDepexLib.inf
 
   EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf

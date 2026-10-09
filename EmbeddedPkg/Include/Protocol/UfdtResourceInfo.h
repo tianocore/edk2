@@ -99,6 +99,23 @@ typedef struct {
   UINT32         HypervisorVirtualInterrupt;
 } UFDT_TIMER_INFO;
 
+/** SBSA generic watchdog dispatcher struct.
+
+  Struct associated with gEdkiiUfdtWatchdogInfoProtocolGuid
+
+  Interrupt is the architectural WS0 INTID.
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON           Common;
+  /// Watchdog control frame address.
+  UFDT_MEMORY_REGION    ControlFrame;
+  /// Watchdog refresh frame address.
+  UFDT_MEMORY_REGION    RefreshFrame;
+  /// Architectural INTID for the watchdog WS0 signal.
+  UINT32                Interrupt;
+} UFDT_WATCHDOG_INFO;
+
 /** GICv2 dispatcher struct.
 
   Struct associated with gEdkiiUfdtGicV2InfoProtocolGuid
@@ -135,6 +152,7 @@ extern EFI_GUID  gEdkiiUfdtGicV3InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtTimerInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtPl031RtcInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtMc146818RtcInfoProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtWatchdogInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
@@ -150,6 +168,7 @@ extern EFI_GUID  gEdkiiUfdtGicV3AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtTimerAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtPl031RtcAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtMc146818RtcAbsentProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtWatchdogAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
 
 /** Fixed-clock dispatcher struct.
