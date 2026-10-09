@@ -250,6 +250,7 @@ IScsiRemoveNic (
   @param[in]  AttemptNum          The number of Attempts will be created.
 
   @retval EFI_SUCCESS             The Attempts have been created successfully.
+  @retval EFI_INVALID_PARAMETER   AttemptNum exceeds the UINT8 storage limit.
   @retval Others                  Failed to create the Attempt.
 
 **/
