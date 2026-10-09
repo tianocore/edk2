@@ -53,6 +53,7 @@
 #define E820_DISABLED   6
 #define E820_PMEM       7
 #define E820_UNDEFINED  8
+#define E820_SOFT_RESERVED  0xefffffff
 
 /**
   Add a new HOB to the HOB List.
