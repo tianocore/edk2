@@ -74,6 +74,7 @@
   gEfiDecompressProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiPciHotPlugInitProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiPciHostBridgeResourceAllocationProtocolGuid ## TO_START
+  gEdkiiPciHostBridgeFixedResourceProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiPciPlatformProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiPciOverrideProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiPciEnumerationCompleteProtocolGuid          ## PRODUCES
