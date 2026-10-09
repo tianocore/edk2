@@ -2250,7 +2250,8 @@ CoreGetMemoryMap (
       MemoryMap->NumberOfPages = RShiftU64 ((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1), EFI_PAGE_SHIFT);
       MemoryMap->Attribute     = MergeGcdMapEntry.Attributes |
                                  (MergeGcdMapEntry.Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
-                                                                   EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
+                                                                   EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT |
+                                                                   EFI_MEMORY_WB | EFI_MEMORY_UHP));
       MemoryMap->Type = EfiUnacceptedMemoryType;
 
       //
