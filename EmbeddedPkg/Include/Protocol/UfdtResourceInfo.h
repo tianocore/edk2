@@ -46,6 +46,29 @@ typedef struct {
   UINT64                  Length;
 } UFDT_MEMORY_REGION;
 
+/** Architectural timer dispatcher struct.
+
+  Struct associated with gEdkiiUfdtTimerInfoProtocolGuid
+
+  Architectural INTIDs, not raw DT PPI numbers.
+  The first three interrupts are mandatory; absent optional interrupts are 0.
+  The architectural timer uses system registers and has no MMIO region.
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON    Common;
+  /// Secure physical timer INTID.
+  UINT32         SecurePhysicalInterrupt;
+  /// Non-secure physical timer INTID.
+  UINT32         NonSecurePhysicalInterrupt;
+  /// Virtual timer INTID.
+  UINT32         VirtualInterrupt;
+  /// Hypervisor physical timer INTID; zero when absent.
+  UINT32         HypervisorPhysicalInterrupt;
+  /// Hypervisor virtual timer INTID; zero when absent.
+  UINT32         HypervisorVirtualInterrupt;
+} UFDT_TIMER_INFO;
+
 /** GICv2 dispatcher struct.
 
   Struct associated with gEdkiiUfdtGicV2InfoProtocolGuid
@@ -79,6 +102,7 @@ typedef struct {
 /// Prepared resource interfaces; their presence also satisfies consumer DEPEX.
 extern EFI_GUID  gEdkiiUfdtGicV2InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV3InfoProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtTimerInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
@@ -91,6 +115,7 @@ extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 **/
 extern EFI_GUID  gEdkiiUfdtGicV2AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV3AbsentProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtTimerAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
 
 /** Fixed-clock dispatcher struct.

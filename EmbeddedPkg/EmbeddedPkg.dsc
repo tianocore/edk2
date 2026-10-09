@@ -199,6 +199,11 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0
 
 [BuildOptions]
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
@@ -255,6 +260,7 @@
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
   }
   ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
@@ -268,8 +274,10 @@
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
   EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
   EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV3DepexLib/UfdtGicV3DepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtTimerDepexLib/UfdtTimerDepexLib.inf
 
   EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
