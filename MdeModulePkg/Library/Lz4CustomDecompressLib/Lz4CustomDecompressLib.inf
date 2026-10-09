@@ -1,0 +1,53 @@
+
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#  @file
+#  Lz4CustomDecompressLib produces LZ4 custom decompression algorithm.
+#  It is based on the LZ4 library (https://github.com/lz4/lz4)
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Lz4DecompressLib
+  MODULE_UNI_FILE                = Lz4DecompressLib.uni
+  FILE_GUID                      = 35194661-7421-44ad-9636-e44885f092d2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = Lz4DecompressLibConstructor
+
+[Sources]
+  Lz4Decompress.c
+  Lz4UefiSupport.c
+  GuidedSectionExtraction.c
+  Lz4DecompressLibInternal.h
+  Lz4Format.h
+  UefiLz4Compat.h
+  limits.h
+  stddef.h
+  stdint.h
+  stdlib.h
+  lz4/lib/lz4.h
+  lz4/lib/lz4.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids]
+  gLz4CustomDecompressGuid  ## PRODUCES  ## UNDEFINED # GUID for the LZ4 guided section handler.
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  ExtractGuidedSectionLib
+
+[BuildOptions]
+  # Disable standard C library dependencies for UEFI environment.
+  # Force-include the UEFI compatibility shim so upstream lz4.c also sees the
+  # freestanding memory macro mappings.
+  GCC:*_*_*_CC_FLAGS = -include UefiLz4Compat.h -Wno-unused-function
+  CLANGPDB:*_*_*_CC_FLAGS = -include UefiLz4Compat.h -Wno-unused-function -U_MSC_VER
+  CLANGDWARF:*_*_*_CC_FLAGS = -include UefiLz4Compat.h -Wno-unused-function
+  MSFT:*_*_*_CC_FLAGS = /FIUefiLz4Compat.h

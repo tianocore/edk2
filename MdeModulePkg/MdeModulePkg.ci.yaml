@@ -30,6 +30,7 @@
         "IgnoreFiles": [
             "Library/LzmaCustomDecompressLib",
             "Library/BrotliCustomDecompressLib",
+            "Library/Lz4CustomDecompressLib",
             "Universal/RegularExpressionDxe"
         ]
     },
@@ -102,7 +103,8 @@
             "*.c", "*.asm", "*.h", "*.nasm", "*.s", "*.asl", "*.inf"
         ],
         "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
-            "Library/LzmaCustomDecompressLib/Sdk/DOC/*"
+            "Library/LzmaCustomDecompressLib/Sdk/DOC/*",
+            "Library/Lz4CustomDecompressLib/lz4/*"
         ],
         "ExtendWords": [           # words to extend to the dictionary for this package
             "LIGHTGRAY",
