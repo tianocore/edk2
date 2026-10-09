@@ -1,0 +1,25 @@
+## @file
+#  Functions to deal with an FMP payload in a transparent way.
+#
+#  Copyright (c) 2026, 3mdeb Sp. z o.o. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FmpPayloadLib
+  FILE_GUID                      = E06A8E16-B880-4CC1-BA30-1D8BC2C29256
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpPayloadLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+[Sources]
+  FmpPayloadLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+
+[LibraryClasses]
+  FmpPayloadHeaderLib
