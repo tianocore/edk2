@@ -19,9 +19,10 @@ else
 GCCVERSION := $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
 endif
 CLANG := $(findstring clang,$(shell $(CC) --version))
+ICX := $(findstring Intel(R) oneAPI DPC++/C++ Compiler,$(shell $(CC) --version))
 
 ifneq ("$(GCCVERSION)", "5")
-ifeq ($(CLANG),)
+ifeq ($(strip $(CLANG)$(ICX)),)
 ifneq ($(DARWIN),Darwin)
 # gcc 12 trips over device path handling
 CFLAGS += -Wno-error=stringop-overflow
