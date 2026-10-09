@@ -18,6 +18,7 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "8001", "FmpDeviceSmmLibUnitTestMain"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
