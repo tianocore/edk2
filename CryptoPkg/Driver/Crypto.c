@@ -2877,7 +2877,12 @@ CryptoServiceRsaPkcs1Sign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (Rsa.Services.Pkcs1Sign, RsaPkcs1Sign, (RsaContext, MessageHash, HashSize, Signature, SigSize), FALSE);
+  (VOID)RsaContext;
+  (VOID)MessageHash;
+  (VOID)HashSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**
@@ -4024,7 +4029,16 @@ CryptoServicePkcs7Sign (
   OUT  UINTN        *SignedDataSize
   )
 {
-  return CALL_BASECRYPTLIB (Pkcs.Services.Pkcs7Sign, Pkcs7Sign, (PrivateKey, PrivateKeySize, KeyPassword, InData, InDataSize, SignCert, OtherCerts, SignedData, SignedDataSize), FALSE);
+  (VOID)PrivateKey;
+  (VOID)PrivateKeySize;
+  (VOID)KeyPassword;
+  (VOID)InData;
+  (VOID)InDataSize;
+  (VOID)SignCert;
+  (VOID)OtherCerts;
+  (VOID)SignedData;
+  (VOID)SignedDataSize;
+  return FALSE;
 }
 
 /**
@@ -5883,7 +5897,14 @@ CryptoServiceRsaPssSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (RsaPss.Services.Sign, RsaPssSign, (RsaContext, Message, MsgSize, DigestLen, SaltLen, Signature, SigSize), FALSE);
+  (VOID)RsaContext;
+  (VOID)Message;
+  (VOID)MsgSize;
+  (VOID)DigestLen;
+  (VOID)SaltLen;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**
@@ -5945,7 +5966,12 @@ CryptoServiceRsaPssSignDigest (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (RsaPss.Services.SignDigest, RsaPssSignDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
+  (VOID)RsaContext;
+  (VOID)Digest;
+  (VOID)DigestSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**
@@ -7382,7 +7408,13 @@ CryptoServiceEcDsaSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (Ec.Services.DsaSign, EcDsaSign, (EcContext, HashNid, MessageHash, HashSize, Signature, SigSize), FALSE);
+  (VOID)EcContext;
+  (VOID)HashNid;
+  (VOID)MessageHash;
+  (VOID)HashSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**
@@ -7705,7 +7737,14 @@ CryptoServiceEdDsaSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (EdDsa.Services.Sign, EdDsaSign, (EdDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+  (VOID)EdDsaContext;
+  (VOID)Context;
+  (VOID)ContextSize;
+  (VOID)Message;
+  (VOID)MessageSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**
@@ -7969,7 +8008,14 @@ CryptoServiceMlDsaSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (MlDsa.Services.Sign, MlDsaSign, (MlDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+  (VOID)MlDsaContext;
+  (VOID)Context;
+  (VOID)ContextSize;
+  (VOID)Message;
+  (VOID)MessageSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**

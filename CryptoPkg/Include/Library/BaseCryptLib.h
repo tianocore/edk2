@@ -1794,43 +1794,6 @@ RsaCheckKey (
   );
 
 /**
-  Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
-
-  This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
-  RSA PKCS#1.
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  If RsaContext is NULL, then return FALSE.
-  If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then return FALSE.
-  If SigSize is large enough but Signature is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]      RsaContext   Pointer to RSA context for signature generation.
-  @param[in]      MessageHash  Pointer to octet message hash to be signed.
-  @param[in]      HashSize     Size of the message hash in bytes.
-  @param[out]     Signature    Pointer to buffer to receive RSA PKCS1-v1_5 signature.
-  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
-                               On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-RsaPkcs1Sign (
-  IN      VOID         *RsaContext,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  );
-
-/**
   Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
 
@@ -1857,50 +1820,6 @@ RsaPkcs1Verify (
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
-  );
-
-/**
-  Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
-
-  This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
-  RFC 8017.
-  Mask generation function is the same as the message digest algorithm.
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  If RsaContext is NULL, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If MsgSize is zero or > INT_MAX, then return FALSE.
-  If DigestLen is NOT 32, 48 or 64, return FALSE.
-  If SaltLen is not equal to DigestLen, then return FALSE.
-  If SigSize is large enough but Signature is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]      RsaContext   Pointer to RSA context for signature generation.
-  @param[in]      Message      Pointer to octet message to be signed.
-  @param[in]      MsgSize      Size of the message in bytes.
-  @param[in]      DigestLen    Length of the digest in bytes to be used for RSA signature operation.
-  @param[in]      SaltLen      Length of the salt in bytes to be used for PSS encoding.
-  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
-  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
-                               On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-RsaPssSign (
-  IN      VOID         *RsaContext,
-  IN      CONST UINT8  *Message,
-  IN      UINTN        MsgSize,
-  IN      UINT16       DigestLen,
-  IN      UINT16       SaltLen,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
   );
 
 /**
@@ -1931,45 +1850,6 @@ RsaPssVerify (
   IN  UINTN        SigSize,
   IN  UINT16       DigestLen,
   IN  UINT16       SaltLen
-  );
-
-/**
-  Carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme
-  over a precomputed message digest.
-
-  This function carries out the RSA-PSS signature generation with EMSA-PSS encoding scheme defined in
-  RFC 8017.
-  Mask generation function is the same as the message digest algorithm.
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  If RsaContext is NULL, then return FALSE.
-  If Digest is NULL, then return FALSE.
-  If DigestSize is not one of SHA-256, SHA-384 or SHA-512 digest sizes, then return FALSE.
-  If SigSize is large enough but Signature is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]      RsaContext   Pointer to RSA context for signature generation.
-  @param[in]      Digest       Pointer to the precomputed message digest.
-  @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
-  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
-  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
-                               On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-RsaPssSignDigest (
-  IN      VOID         *RsaContext,
-  IN      CONST UINT8  *Digest,
-  IN      UINTN        DigestSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
   );
 
 /**
@@ -2620,47 +2500,6 @@ Pkcs7GetCertificatesList (
   OUT UINTN        *ChainLength,
   OUT UINT8        **UnchainCerts,
   OUT UINTN        *UnchainLength
-  );
-
-/**
-  Creates a PKCS#7 signedData as described in "PKCS #7: Cryptographic Message
-  Syntax Standard, version 1.5". This interface is only intended to be used for
-  application to perform PKCS#7 functionality validation.
-
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  PrivateKey       Pointer to the PEM-formatted private key data for
-                               data signing.
-  @param[in]  PrivateKeySize   Size of the PEM private key data in bytes.
-  @param[in]  KeyPassword      NULL-terminated passphrase used for encrypted PEM
-                               key data.
-  @param[in]  InData           Pointer to the content to be signed.
-  @param[in]  InDataSize       Size of InData in bytes.
-  @param[in]  SignCert         Pointer to signer's DER-encoded certificate to sign with.
-  @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
-                               include in the PKCS#7 signedData (e.g. any intermediate
-                               CAs in the chain).
-  @param[out] SignedData       Pointer to output PKCS#7 signedData. It's caller's
-                               responsibility to free the buffer with FreePool().
-  @param[out] SignedDataSize   Size of SignedData in bytes.
-
-  @retval     TRUE             PKCS#7 data signing succeeded.
-  @retval     FALSE            PKCS#7 data signing failed.
-  @retval     FALSE            This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Pkcs7Sign (
-  IN   CONST UINT8  *PrivateKey,
-  IN   UINTN        PrivateKeySize,
-  IN   CONST UINT8  *KeyPassword,
-  IN   UINT8        *InData,
-  IN   UINTN        InDataSize,
-  IN   UINT8        *SignCert,
-  IN   UINT8        *OtherCerts      OPTIONAL,
-  OUT  UINT8        **SignedData,
-  OUT  UINTN        *SignedDataSize
   );
 
 /**
@@ -4768,46 +4607,6 @@ EcGetPublicKeyFromX509 (
   );
 
 /**
-  Carries out the EC-DSA signature.
-
-  This function carries out the EC-DSA signature.
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  If EcContext is NULL, then return FALSE.
-  If MessageHash is NULL, then return FALSE.
-  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
-  If SigSize is large enough but Signature is NULL, then return FALSE.
-
-  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
-  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
-  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
-
-  @param[in]       EcContext    Pointer to EC context for signature generation.
-  @param[in]       HashNid      hash NID
-  @param[in]       MessageHash  Pointer to octet message hash to be signed.
-  @param[in]       HashSize     Size of the message hash in bytes.
-  @param[out]      Signature    Pointer to buffer to receive EC-DSA signature.
-  @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
-                                On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated in EC-DSA.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-
-**/
-BOOLEAN
-EFIAPI
-EcDsaSign (
-  IN      VOID         *EcContext,
-  IN      UINTN        HashNid,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  );
-
-/**
   Verifies the EC-DSA signature.
 
   If EcContext is NULL, then return FALSE.
@@ -5001,55 +4800,6 @@ EdDsaGetPubKey (
   IN      VOID   *EdDsaContext,
   OUT     UINT8  *PublicKey,
   IN OUT  UINTN  *PublicKeySize
-  );
-
-/**
-  Generates an EdDSA signature for a given message.
-
-  This function creates an EdDSA signature using the private key stored in the
-  EdDSA context. EdDSA uses a 'pure' signature scheme where the entire message
-  is processed directly without pre-computing a hash digest.
-
-  For Ed448, an optional context string can be provided for domain separation.
-  This allows the same key to be used in different contexts without creating
-  security vulnerabilities.
-
-  The context must contain a private key (set via EdDsaSetPrivKey() or loaded
-  from PEM) before calling this function.
-
-  If EdDsaContext is NULL, then return FALSE.
-  If HashNid is invalid for the curve type, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If MessageSize is 0 or exceeds INT_MAX, then return FALSE.
-  If Signature is NULL, then return FALSE.
-  If SigSize is NULL, then return FALSE.
-  For Ed448: Context may be NULL if no context string is used (ContextSize must be 0).
-
-  @param[in]      EdDsaContext    Pointer to EdDSA context containing the private key.
-  @param[in]      HashNid         Hash algorithm NID (must match curve requirements).
-  @param[in]      Context         Optional context string for Ed448 domain separation.
-                                  May be NULL for default context.
-  @param[in]      ContextSize     Size of context string in bytes. Set to 0 if Context is NULL.
-  @param[in]      Message         Pointer to message data to be signed.
-  @param[in]      MessageSize     Size of message in bytes.
-  @param[out]     Signature       Pointer to buffer to receive the signature.
-  @param[in,out]  SigSize         On input, size of Signature buffer.
-                                  On output, actual size of signature (114 bytes for Ed448).
-
-  @retval TRUE   EdDSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaSign (
-  IN     VOID         *EdDsaContext,
-  IN     CONST UINT8  *Context,
-  IN     UINTN        ContextSize,
-  IN     CONST UINT8  *Message,
-  IN     UINTN        MessageSize,
-  OUT    UINT8        *Signature,
-  OUT    UINTN        *SigSize
   );
 
 /**
@@ -5311,50 +5061,6 @@ MlDsaGeneratePubKey (
   IN  VOID   *MlDsaContext,
   OUT UINT8  *PublicKey,
   IN  UINTN  PublicKeySize
-  );
-
-/**
-  Generates an ML-DSA signature for a given message.
-
-  This function creates an ML-DSA signature using the private key stored in the
-  ML-DSA context. ML-DSA signatures can include an optional context string for
-  domain separation, allowing the same key to be used in different contexts
-  without creating security vulnerabilities.
-
-  The context must contain a private key (set via MlDsaSetPrivKey()) before
-  calling this function.
-
-  If MlDsaContext is NULL, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If Signature is NULL, then return FALSE.
-  If SigSize is NULL, then return FALSE.
-  If SigSize buffer is too small, SigSize is updated with required size and return FALSE.
-  Context may be NULL if no context string is used (ContextSize must be 0).
-
-  @param[in]      MlDsaContext   Pointer to ML-DSA context containing the private key.
-  @param[in]      Context        Optional context string for domain separation.
-                                 May be NULL for default context.
-  @param[in]      ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
-  @param[in]      Message        Pointer to message data to be signed.
-  @param[in]      MessageSize    Size of message in bytes.
-  @param[out]     Signature      Pointer to buffer to receive the signature.
-  @param[in,out]  SigSize        On input, size of Signature buffer.
-                                 On output, actual size of signature (4627 bytes for ML-DSA-87).
-
-  @retval TRUE   ML-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-MlDsaSign (
-  IN      VOID         *MlDsaContext,
-  IN      UINT8        *Context,
-  IN      UINTN        ContextSize,
-  IN      CONST UINT8  *Message,
-  IN      UINTN        MessageSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
   );
 
 /**

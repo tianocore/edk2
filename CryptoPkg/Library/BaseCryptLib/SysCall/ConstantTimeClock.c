@@ -7,10 +7,8 @@
   of following APIs which need system time support:
   1)  RsaGenerateKey
   2)  RsaCheckKey
-  3)  RsaPkcs1Sign
-  4)  Pkcs7Sign
-  5)  DhGenerateParameter
-  6)  DhGenerateKey
+  3)  DhGenerateParameter
+  4)  DhGenerateKey
 
 Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
