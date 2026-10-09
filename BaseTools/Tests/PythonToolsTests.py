@@ -22,6 +22,8 @@ def TheTestSuite():
     suites.append(CheckUnicodeSourceFiles.TheTestSuite())
     import MetaFileParserTests
     suites.append(MetaFileParserTests.TheTestSuite())
+    import FMMTTests
+    suites.append(FMMTTests.TheTestSuite())
     return unittest.TestSuite(suites)
 
 if __name__ == '__main__':

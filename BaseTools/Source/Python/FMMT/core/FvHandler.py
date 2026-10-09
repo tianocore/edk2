@@ -145,6 +145,25 @@ def ModifyFvSystemGuid(TargetFv) -> None:
         else:
             TargetFv.Data.Data += struct2stream(item.Data.Header)+ item.Data.Data + item.Data.PadData
 
+def SetFvFreeSpace(TargetFv, NewFreeSpace: int) -> None:
+    FreeSpaceTree = (
+        TargetFv.Child[-1]
+        if TargetFv.Child[-1].type == FFS_FREE_SPACE
+        else None
+    )
+    if NewFreeSpace:
+        if FreeSpaceTree is None:
+            FreeSpaceTree = BIOSTREE('FREE_SPACE')
+            FreeSpaceTree.type = FFS_FREE_SPACE
+            FreeSpaceTree.Data = FreeSpaceNode(b'\xff' * NewFreeSpace)
+            TargetFv.insertChild(FreeSpaceTree)
+        else:
+            FreeSpaceTree.Data.Data = b'\xff' * NewFreeSpace
+            FreeSpaceTree.Data.Size = NewFreeSpace
+    elif FreeSpaceTree is not None:
+        TargetFv.Child.remove(FreeSpaceTree)
+    TargetFv.Data.Free_Space = NewFreeSpace
+
 class FvHandler:
     def __init__(self, NewFfs, TargetFfs=None) -> None:
         self.NewFfs = NewFfs
@@ -283,12 +302,10 @@ class FvHandler:
                         BlockSize = ParTree.Data.Header.BlockMap[0].Length
                         New_Add_Len = BlockSize - Needed_Space%BlockSize
                         if New_Add_Len % BlockSize:
-                            ParTree.Child[-1].Data.Data = b'\xff' * New_Add_Len
-                            ParTree.Data.Free_Space = New_Add_Len
+                            SetFvFreeSpace(ParTree, New_Add_Len)
                             Needed_Space += New_Add_Len
                         else:
-                            ParTree.Child.remove(ParTree.Child[-1])
-                            ParTree.Data.Free_Space = 0
+                            SetFvFreeSpace(ParTree, 0)
                         ParTree.Data.Size += Needed_Space
                         ParTree.Data.Header.FvLength = ParTree.Data.Size
                 ModifyFvSystemGuid(ParTree)
@@ -451,15 +468,14 @@ class FvHandler:
                     New_Add_Len = BlockSize - Needed_Space%BlockSize
                     Target_index = TargetFv.Child.index(self.TargetFfs)
                     if New_Add_Len % BlockSize:
-                        TargetFv.Child[-1].Data.Data = b'\xff' * New_Add_Len
-                        TargetFv.Data.Free_Space = New_Add_Len
+                        SetFvFreeSpace(TargetFv, New_Add_Len)
                         Needed_Space += New_Add_Len
                         TargetFv.insertChild(self.NewFfs, Target_index)
                         TargetFv.Child.remove(self.TargetFfs)
                     else:
+                        SetFvFreeSpace(TargetFv, 0)
                         TargetFv.Child.remove(self.TargetFfs)
-                        TargetFv.Data.Free_Space = 0
-                        TargetFv.insertChild(self.NewFfs)
+                        TargetFv.insertChild(self.NewFfs, Target_index)
                     # Encapsulate the Fv Data for update.
                     TargetFv.Data.Data = b''
                     for item in TargetFv.Child:
@@ -488,11 +504,7 @@ class FvHandler:
                 TargetFv.insertChild(self.NewFfs, Target_index)
             # If TargetFv do not have free space, create free space for Fv.
             else:
-                New_Free_Space_Tree = BIOSTREE('FREE_SPACE')
-                New_Free_Space_Tree.type = FFS_FREE_SPACE
-                New_Free_Space_Tree.Data = FfsNode(b'\xff' * New_Free_Space)
-                TargetFv.Data.Free_Space = New_Free_Space
-                TargetFv.insertChild(New_Free_Space)
+                SetFvFreeSpace(TargetFv, New_Free_Space)
                 Target_index = TargetFv.Child.index(self.TargetFfs)
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs, Target_index)
