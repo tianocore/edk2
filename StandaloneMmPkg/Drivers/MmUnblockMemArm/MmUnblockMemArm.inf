@@ -1,0 +1,43 @@
+## @file
+#  FF-A based memory unblock handler driver for ARM64
+#
+#  Copyright (c), Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MmUnblockMemArm
+  FILE_GUID                      = 96F38B61-0547-42C6-A999-9B5DC07306FD
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = MmUnblockMemArmInitialize
+
+[Sources]
+  MmUnblockMemArm.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  ArmFfaLib
+  ArmFfaMemMgmtLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemLib
+  MmServicesTableLib
+  StandaloneMmDriverEntryPoint
+
+[Protocols]
+  gEfiMmEndOfDxeProtocolGuid                             # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+  gMmUnblockRegionFfaGuid
+
+[Depex]
+  TRUE

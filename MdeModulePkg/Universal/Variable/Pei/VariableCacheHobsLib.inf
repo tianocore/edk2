@@ -1,0 +1,52 @@
+## @file
+#  Implements Variable Cache HOBs Library
+#
+#  Copyright (c), Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariableCacheHobsLib
+  FILE_GUID                      = A7FD8758-F8EF-4792-B209-DEB47A131B77
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = NULL
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = VariableCacheHobsLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  VariableCacheHobs.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  HobLib
+  DebugLib
+  SafeIntLib
+  VariableFlashInfoLib
+  MmUnblockMemoryLib
+
+[Guids]
+  ## CONSUMES             ## GUID # Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiAuthenticatedVariableGuid
+  ## SOMETIMES_CONSUMES   ## GUID # Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiVariableGuid
+  gEdkiiVariableRuntimeCacheInfoHobGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize            ## CONSUMES
