@@ -115,9 +115,11 @@ The EDK II open source project uses content from upstream projects as git submod
 that are covered by additional licenses.
 
 -  `BaseTools/Source/C/BrotliCompress/brotli <https://github.com/google/brotli/blob/666c3280cc11dc433c303d79a83d4ffbdd12cc8d/LICENSE>`__
+-  `BaseTools/Source/C/Lz4Compress/lz4 <https://github.com/lz4/lz4/blob/0774d05537f9762f838f7ab541b7765f1a729cb5/LICENSE>`__
 -  `CryptoPkg/Library/OpensslLib/openssl <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
 -  `CryptoPkg/Library/MbedTlsLib/mbedtls <https://github.com/Mbed-TLS/mbedtls/blob/8c89224991adff88d53cd380f42a2baa36f91454/LICENSE>`__
 -  `MdeModulePkg/Library/BrotliCustomDecompressLib/brotli <https://github.com/google/brotli/blob/666c3280cc11dc433c303d79a83d4ffbdd12cc8d/LICENSE>`__
+-  `MdeModulePkg/Library/Lz4CustomDecompressLib/lz4 <https://github.com/lz4/lz4/blob/0774d05537f9762f838f7ab541b7765f1a729cb5/LICENSE>`__
 -  `MdeModulePkg/Universal/RegularExpressionDxe/oniguruma <https://github.com/kkos/oniguruma/blob/abfc8ff81df4067f309032467785e06975678f0d/COPYING>`__
 -  `UnitTestFrameworkPkg/Library/CmockaLib/cmocka <https://github.com/tianocore/edk2-cmocka/blob/f5e2cd77c88d9f792562888d2b70c5a396bfbf7a/COPYING>`__
 -  `UnitTestFrameworkPkg/Library/GoogleTestLib/googletest <https://github.com/google/googletest/blob/86add13493e5c881d7e4ba77fb91c1f57752b3a4/LICENSE>`__
