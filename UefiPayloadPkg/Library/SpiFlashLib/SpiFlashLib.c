@@ -84,9 +84,9 @@ SpiConstructor (
     DEBUG ((DEBUG_ERROR, "SPI FLASH HOB is not expected. need check the hob or enhance SPI flash driver.\n"));
   }
 
-  SpiInstance->PchSpiBase = (UINT32)(UINTN)SpiFlashInfo->SpiAddress.Address;
+  SpiInstance->PchSpiBase = (UINTN)SpiFlashInfo->SpiAddress.Address;
   SpiInstance->Flags      = SpiFlashInfo->Flags;
-  DEBUG ((DEBUG_INFO, "PchSpiBase at 0x%x\n", SpiInstance->PchSpiBase));
+  DEBUG ((DEBUG_INFO, "PchSpiBase at 0x%Lx\n", (UINT64)SpiInstance->PchSpiBase));
 
   ScSpiBar0 = AcquireSpiBar0 (SpiInstance->PchSpiBase);
   DEBUG ((DEBUG_INFO, "ScSpiBar0 at 0x%08X\n", ScSpiBar0));
