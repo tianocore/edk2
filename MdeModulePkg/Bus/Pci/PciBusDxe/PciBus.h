@@ -279,6 +279,8 @@ struct _PCI_IO_DEVICE {
   UINT16                                       BridgeIoAlignment;
   UINT32                                       ResizableBarOffset;
   UINT32                                       ResizableBarNumber;
+  BOOLEAN                                      IgnoreROM;
+  UINT8                                        MaxPayloadSize;
 };
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
