@@ -1556,6 +1556,12 @@ RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -W
 *_*_*_LZMA_GUID          = EE4E5898-3914-4259-9D6E-DC7BD79403CF
 
 ##################
+# Lz4 tool definitions
+##################
+*_*_*_LZ4_PATH          = Lz4Compress
+*_*_*_LZ4_GUID          = D47B5624-5E79-4616-B3DC-5B60E7D0A929
+
+##################
 # LzmaF86Compress tool definitions with converter for x86 code.
 # It can improve the compression ratio if the input file is IA32 or X64 PE image.
 ##################
