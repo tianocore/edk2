@@ -1599,7 +1599,11 @@ Udp4Demultiplex (
   // Get the datagram header from the packet buffer.
   //
   Udp4Header = (EFI_UDP_HEADER *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Udp4Header != NULL);
+  if (Udp4Header == NULL) {
+    ASSERT (Udp4Header != NULL);
+    NetbufFree (Packet);
+    return;
+  }
 
   if (Udp4Header->Checksum != 0) {
     //
@@ -1714,7 +1718,11 @@ Udp4SendPortUnreach (
   // Allocate space for the IP4_ICMP_ERROR_HEAD.
   //
   IcmpErrHdr = (IP4_ICMP_ERROR_HEAD *)NetbufAllocSpace (Packet, Len, FALSE);
-  ASSERT (IcmpErrHdr != NULL);
+  if (IcmpErrHdr == NULL) {
+    ASSERT (IcmpErrHdr != NULL);
+    NetbufFree (Packet);
+    return;
+  }
 
   //
   // Set the required fields for the icmp port unreachable message.
@@ -1789,7 +1797,11 @@ Udp4IcmpHandler (
   }
 
   Udp4Header = (EFI_UDP_HEADER *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Udp4Header != NULL);
+  if (Udp4Header == NULL) {
+    ASSERT (Udp4Header != NULL);
+    NetbufFree (Packet);
+    return;
+  }
 
   CopyMem (&Udp4Session.SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
   CopyMem (&Udp4Session.DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
