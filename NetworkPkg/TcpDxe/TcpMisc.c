@@ -77,8 +77,17 @@ TcpInitTcbLocal (
   IN OUT TCP_CB  *Tcb
   )
 {
-  TCP_SEQNO   Isn;
-  EFI_STATUS  Status;
+  TCP_SEQNO           Isn;
+  EFI_STATUS          Status;
+  TCP_PROTO_DATA      *TcpProto;
+  EFI_HASH2_PROTOCOL  *Hash2Protocol;
+
+  //
+  // Use the Hash2 protocol owned by this connection's own TCP service, rather
+  // than an arbitrary Hash2 instance that could belong to a different, torn-down NIC.
+  //
+  TcpProto      = (TCP_PROTO_DATA *)Tcb->Sk->ProtoReserved;
+  Hash2Protocol = TcpProto->TcpService->Hash2Protocol;
 
   //
   // Compute the checksum of the fixed parts of pseudo header
@@ -92,6 +101,7 @@ TcpInitTcbLocal (
                      );
 
     Status = TcpGetIsn (
+               Hash2Protocol,
                Tcb->LocalEnd.Ip.v4.Addr,
                sizeof (IPv4_ADDRESS),
                Tcb->LocalEnd.Port,
@@ -109,6 +119,7 @@ TcpInitTcbLocal (
                      );
 
     Status = TcpGetIsn (
+               Hash2Protocol,
                Tcb->LocalEnd.Ip.v6.Addr,
                sizeof (IPv6_ADDRESS),
                Tcb->LocalEnd.Port,
@@ -586,6 +597,8 @@ TcpCloneTcb (
     secret data. For discussion of the selection of a specific hash algorithm and
     management of the secret key data."
 
+  @param[in]       Hash2Protocol  A pointer to the Hash2 protocol instance owned by the TCP
+                                  service this connection belongs to.
   @param[in]       LocalIp        A pointer to the local IP address of the TCP connection.
   @param[in]       LocalIpSize    The size, in bytes, of the LocalIp buffer.
   @param[in]       LocalPort      The local port number of the TCP connection.
@@ -603,20 +616,20 @@ TcpCloneTcb (
 **/
 EFI_STATUS
 TcpGetIsn (
-  IN UINT8       *LocalIp,
-  IN UINTN       LocalIpSize,
-  IN UINT16      LocalPort,
-  IN UINT8       *RemoteIp,
-  IN UINTN       RemoteIpSize,
-  IN UINT16      RemotePort,
-  OUT TCP_SEQNO  *Isn
+  IN EFI_HASH2_PROTOCOL  *Hash2Protocol,
+  IN UINT8               *LocalIp,
+  IN UINTN               LocalIpSize,
+  IN UINT16              LocalPort,
+  IN UINT8               *RemoteIp,
+  IN UINTN               RemoteIpSize,
+  IN UINT16              RemotePort,
+  OUT TCP_SEQNO          *Isn
   )
 {
-  EFI_STATUS          Status;
-  EFI_HASH2_PROTOCOL  *Hash2Protocol;
-  EFI_HASH2_OUTPUT    HashResult;
-  ISN_HASH_CTX        IsnHashCtx;
-  EFI_TIME            TimeStamp;
+  EFI_STATUS        Status;
+  EFI_HASH2_OUTPUT  HashResult;
+  ISN_HASH_CTX      IsnHashCtx;
+  EFI_TIME          TimeStamp;
 
   //
   // Check that the ISN pointer is valid
@@ -640,17 +653,11 @@ TcpGetIsn (
   }
 
   //
-  // Locate the Hash Protocol
+  // The Hash2 protocol is resolved from the owning TCP service's own Hash2 child,
+  // instead of an arbitrary Hash2 instance, so it is always valid for this service.
   //
-  Status = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_NET, "Failed to locate Hash Protocol: %r\n", Status));
-
-    //
-    // TcpCreateService(..) is expected to be called prior to this function
-    //
-    ASSERT_EFI_ERROR (Status);
-    return Status;
+  if (Hash2Protocol == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
