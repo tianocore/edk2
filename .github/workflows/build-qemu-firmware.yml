@@ -33,6 +33,7 @@ jobs:
       - name: Check out EDK II (including submodules)
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           submodules: recursive
 
       - name: Set up Python
@@ -57,6 +58,13 @@ jobs:
       - name: Build BaseTools
         run: make -C BaseTools -j"$(nproc)"
 
+      - name: Resolve EDK II source base date
+        run: |
+          git fetch --no-tags https://github.com/tianocore/edk2.git master
+          source_base_commit="$(git merge-base HEAD FETCH_HEAD)"
+          source_base_date="$(git show -s --format=%cs "$source_base_commit")"
+          echo "SOURCE_BASE_DATE=$source_base_date" >> "$GITHUB_ENV"
+
       - name: Build firmware
         env:
           GCC_AARCH64_PREFIX: aarch64-linux-gnu-
@@ -79,21 +87,8 @@ jobs:
             cp "$output_dir/QEMU_VARS.fd" dist/
           fi
 
-          sha256sum dist/*.fd > dist/SHA256SUMS
-          cat > dist/README.txt <<'EOF'
-          QubeVM QEMU firmware build
-
-          x86_64 artifacts: OVMF_CODE.fd (read-only flash code), OVMF_VARS.fd
-          (copy per VM for writable UEFI variables), and OVMF.fd (combined image).
-          Use OVMF_CODE.fd and a writable copy of OVMF_VARS.fd as separate pflash
-          drives for persistent variables.
-
-          AArch64 artifacts: QEMU_EFI.fd (firmware code) and QEMU_VARS.fd
-          (writable variable store). Use them as separate pflash drives with
-          qemu-system-aarch64 and a compatible virt machine.
-
-          The firmware embeds MdeModulePkg/Logo/Logo.bmp from this repository.
-          EOF
+          printf 'build_date: %s\nsource_base: %s\n' \
+            "$(date -u +%Y-%m-%d)" "$SOURCE_BASE_DATE" > dist/build-info.yml
 
       - name: Upload firmware artifacts
         uses: actions/upload-artifact@v4
