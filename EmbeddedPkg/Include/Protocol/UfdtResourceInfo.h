@@ -46,6 +46,19 @@ typedef struct {
   UINT64                  Length;
 } UFDT_MEMORY_REGION;
 
+/** PL031 RTC dispatcher struct.
+
+  Struct associated with gEdkiiUfdtPl031RtcInfoProtocolGuid
+
+  The complete PL031 register region.
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON           Common;
+  /// PL031 register address.
+  UFDT_MEMORY_REGION    Registers;
+} UFDT_PL031_RTC_INFO;
+
 /** Architectural timer dispatcher struct.
 
   Struct associated with gEdkiiUfdtTimerInfoProtocolGuid
@@ -103,6 +116,7 @@ typedef struct {
 extern EFI_GUID  gEdkiiUfdtGicV2InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV3InfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtTimerInfoProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtPl031RtcInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
@@ -116,6 +130,7 @@ extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV2AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtGicV3AbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtTimerAbsentProtocolGuid;
+extern EFI_GUID  gEdkiiUfdtPl031RtcAbsentProtocolGuid;
 extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
 
 /** Fixed-clock dispatcher struct.

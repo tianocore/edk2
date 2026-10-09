@@ -1,0 +1,40 @@
+## @file
+#  Register PL031 RTC configuration callbacks.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtPl031BindingDriver
+  FILE_GUID                      = e94c3173-1bb5-4abc-ac61-51080641253d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = UfdtPl031BindingDriverConstructor
+
+[Sources]
+  UfdtPl031BindingDriver.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UfdtDispatcherLib
+  PcdLib
+  MapMmioLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[Protocols]
+  gEdkiiUfdtGenericRtcProtocolGuid  ## SOMETIMES_PRODUCES ## CONSUMES
+  gEdkiiUfdtPl031RtcInfoProtocolGuid  ## SOMETIMES_PRODUCES
+  gEdkiiUfdtPl031RtcAbsentProtocolGuid  ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
