@@ -195,6 +195,9 @@
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
 
 [Guids]
+  ## Include/Guid/ReservedMemoryReportingHob.h                                                                # [CODE_FIRST] 13253
+  gEdkiiRmemRecordHobGuid        = { 0x089dcec6, 0x097b, 0x4dbf, { 0x8d, 0xb4, 0x68, 0x23, 0x61, 0xc8, 0x4a, 0x1e }} # [CODE_FIRST] 13253
+  # [CODE_FIRST] 13253
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
   gEfiMdeModulePkgTokenSpaceGuid       = { 0xA1AFF049, 0xFDEB, 0x442a, { 0xB3, 0x20, 0x13, 0xAB, 0x4C, 0xB7, 0x2B, 0xBC }}
@@ -604,6 +607,9 @@
   gEdkiiPeiMigrateTempRamPpiGuid            = { 0xc79dc53b, 0xafcd, 0x4a6a, { 0xad, 0x94, 0xa7, 0x6a, 0x3f, 0xa9, 0xe9, 0xc2 } }
 
 [Protocols]
+  ## Include/Protocol/ReservedMemoryReporting.h                                                                        # [CODE_FIRST] 13253
+  gEdkiiRmemRegistrationProtocolGuid = { 0x0cb661d3, 0x3c81, 0x4074, { 0xa6, 0xa8, 0xc9, 0x75, 0x9c, 0xc5, 0x12, 0x07 }} # [CODE_FIRST] 13253
+  # [CODE_FIRST] 13253
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
   #  This protocol is deprecated. Native EDKII module should NOT use this protocol to load/unload image.
