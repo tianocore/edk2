@@ -18,6 +18,7 @@
 
 [Includes]
   Include
+  Test/Mock/Include
 
 [LibraryClasses]
   ##  @libraryclass  Defines some routines that are used to register/manage/program

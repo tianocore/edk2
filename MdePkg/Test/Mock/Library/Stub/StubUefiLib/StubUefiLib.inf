@@ -1,0 +1,37 @@
+## @file
+# Mock instance of UEFI Library.
+#
+# The UEFI Library provides functions and macros that simplify the development of
+#  UEFI Drivers and UEFI Applications.  These functions and macros help manage EFI
+#  events, build simple locks utilizing EFI Task Priority Levels (TPLs), install
+#  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers,
+#  and print messages on the console output and standard error devices.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StubUefiLib
+  FILE_GUID                      = 2834A68A-7201-4931-B953-53EA5E45AA14
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiLib|HOST_APPLICATION
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  StubUefiLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+
+[LibraryClasses]
+  DebugLib
