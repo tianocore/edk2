@@ -525,6 +525,10 @@ FitUplEntryPoint (
   DEBUG ((DEBUG_INFO, "Start init Hobs...\n"));
  #if FixedPcdGetBool (PcdHandOffFdtEnable) == 1
   HobListPtr = UplInitHob ((VOID *)BootloaderParameter);
+  if (HobListPtr == 0) {
+    DEBUG ((DEBUG_ERROR, "Failed to initialize HOBs from FDT\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Found hob list node
