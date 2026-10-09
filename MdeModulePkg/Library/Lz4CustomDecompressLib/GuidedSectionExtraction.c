@@ -27,10 +27,10 @@
 STATIC
 EFI_STATUS
 Lz4GetSectionData (
-  IN  CONST VOID   *InputSection,
-  IN  BOOLEAN      Section2,
-  OUT CONST VOID   **SectionData,
-  OUT UINT32       *SectionDataSize
+  IN  CONST VOID  *InputSection,
+  IN  BOOLEAN     Section2,
+  OUT CONST VOID  **SectionData,
+  OUT UINT32      *SectionDataSize
   )
 {
   UINT32  SectionSize;
@@ -98,10 +98,10 @@ Lz4GuidedSectionGetInfo (
   OUT UINT16      *SectionAttribute
   )
 {
-  CONST VOID    *SectionData;
-  UINT32        SectionDataSize;
-  EFI_STATUS    Status;
-  BOOLEAN       Section2;
+  CONST VOID  *SectionData;
+  UINT32      SectionDataSize;
+  EFI_STATUS  Status;
+  BOOLEAN     Section2;
 
   ASSERT (InputSection != NULL);
   ASSERT (OutputBufferSize != NULL);
@@ -199,10 +199,10 @@ Lz4GuidedSectionExtraction (
   OUT       UINT32  *AuthenticationStatus
   )
 {
-  CONST VOID    *SectionData;
-  UINT32        SectionDataSize;
-  EFI_STATUS    Status;
-  BOOLEAN       Section2;
+  CONST VOID  *SectionData;
+  UINT32      SectionDataSize;
+  EFI_STATUS  Status;
+  BOOLEAN     Section2;
 
   ASSERT (OutputBuffer != NULL);
   ASSERT (InputSection != NULL);
