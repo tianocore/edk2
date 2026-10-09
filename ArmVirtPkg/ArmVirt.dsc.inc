@@ -536,6 +536,7 @@ DEFINE FD_SIZE_IN_MB    = 3
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
   }
   ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
@@ -547,7 +548,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   }
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtTimerDepexLib/UfdtTimerDepexLib.inf
   }
 
   #
