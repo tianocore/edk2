@@ -73,6 +73,8 @@ DEFINE FD_SIZE_IN_MB    = 3
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
+  UfdtDispatcherLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDispatcherLib/UfdtDispatcherLib.inf
+  UfdtDepexLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDepexLib/UfdtDepexLib.inf
   GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -530,6 +532,10 @@ DEFINE FD_SIZE_IN_MB    = 3
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
   ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
+  EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+  }
   ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV2DepexLib.inf
