@@ -400,6 +400,102 @@ FreeMemorySpaceMap:
 }
 
 /**
+  Allocate MMIO space in GCD, skipping already allocated platform ranges.
+
+  @param Base         Base address of the MMIO space.
+  @param Length       Length of the MMIO space.
+
+  @retval EFI_SUCCESS The unallocated MMIO space was allocated successfully.
+**/
+EFI_STATUS
+AllocateMemoryMappedIoSpace (
+  IN  UINT64  Base,
+  IN  UINT64  Length
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            Index;
+  UINT64                           IntersectionBase;
+  UINT64                           IntersectionEnd;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  EFI_PHYSICAL_ADDRESS             AllocationBase;
+
+  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: GetMemorySpaceMap(): %r\n",
+      gEfiCallerBaseName,
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    IntersectionBase = MAX (Base, MemorySpaceMap[Index].BaseAddress);
+    IntersectionEnd  = MIN (
+                         Base + Length,
+                         MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length
+                         );
+    if (IntersectionBase >= IntersectionEnd) {
+      continue;
+    }
+
+    if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: %a: desc [%Lx, %Lx) type %u conflicts with aperture [%Lx, %Lx)\n",
+        gEfiCallerBaseName,
+        __func__,
+        MemorySpaceMap[Index].BaseAddress,
+        MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length,
+        (UINT32)MemorySpaceMap[Index].GcdMemoryType,
+        Base,
+        Base + Length
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      goto FreeMemorySpaceMap;
+    }
+
+    if (MemorySpaceMap[Index].ImageHandle != NULL) {
+      continue;
+    }
+
+    AllocationBase = IntersectionBase;
+    Status         = gDS->AllocateMemorySpace (
+                            EfiGcdAllocateAddress,
+                            EfiGcdMemoryTypeMemoryMappedIo,
+                            0,
+                            IntersectionEnd - IntersectionBase,
+                            &AllocationBase,
+                            gImageHandle,
+                            NULL
+                            );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: %a: allocate [%Lx, %Lx): %r\n",
+        gEfiCallerBaseName,
+        __func__,
+        IntersectionBase,
+        IntersectionEnd,
+        Status
+        ));
+      goto FreeMemorySpaceMap;
+    }
+  }
+
+  Status = EFI_SUCCESS;
+
+FreeMemorySpaceMap:
+  FreePool (MemorySpaceMap);
+
+  return Status;
+}
+
+/**
   Event notification that is fired when IOMMU protocol is installed.
 
   @param  Event                 The Event that is being processed.
@@ -558,15 +654,10 @@ InitializePciHostBridge (
         }
 
         if (ResourceAssigned) {
-          Status = gDS->AllocateMemorySpace (
-                          EfiGcdAllocateAddress,
-                          EfiGcdMemoryTypeMemoryMappedIo,
-                          0,
-                          MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                          &HostAddress,
-                          gImageHandle,
-                          NULL
-                          );
+          Status = AllocateMemoryMappedIoSpace (
+                     HostAddress,
+                     MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1
+                     );
           ASSERT_EFI_ERROR (Status);
         }
       }
