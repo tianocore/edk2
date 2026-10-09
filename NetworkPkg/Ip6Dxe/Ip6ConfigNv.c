@@ -2082,11 +2082,23 @@ Ip6ConfigFormUnload (
 
   Ip6NvData = &Instance->Ip6NvData;
 
-  Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
-  Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
-  Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
+  //
+  // A zero count means the list head may not have been initialized yet
+  // (e.g. an error path in Ip6ConfigFormInit() before InitializeListHead()
+  // ran), so skip the free in that case to avoid walking a bogus list.
+  //
+  if (Ip6NvData->ManualAddressCount > 0) {
+    Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
+    Ip6NvData->ManualAddressCount = 0;
+  }
 
-  Ip6NvData->ManualAddressCount  = 0;
-  Ip6NvData->GatewayAddressCount = 0;
-  Ip6NvData->DnsAddressCount     = 0;
+  if (Ip6NvData->GatewayAddressCount > 0) {
+    Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
+    Ip6NvData->GatewayAddressCount = 0;
+  }
+
+  if (Ip6NvData->DnsAddressCount > 0) {
+    Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
+    Ip6NvData->DnsAddressCount = 0;
+  }
 }
