@@ -31,6 +31,7 @@
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
+  DEFINE CSM_ENABLE              = FALSE
   DEFINE QEMU_PV_VARS            = FALSE
   DEFINE STANDALONE_MM_ENABLE    = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
@@ -567,6 +568,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+!if $(CSM_ENABLE) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|TRUE
+!endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 !if $(SMM_REQUIRE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
@@ -685,6 +689,9 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
 !endif
 
+  # IRQs 5, 9, 10, 11 are level-triggered
+  gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0E20
+
   # Point to the MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0xdc, 0x5b, 0xc2, 0xee, 0xf2, 0x67, 0x95, 0x4d, 0xb1, 0xd5, 0xf8, 0x1b, 0x20, 0x39, 0xd1, 0x1d }
   #
@@ -695,7 +702,9 @@
   #
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
+!if $(CSM_ENABLE) == FALSE
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
+!endif
 
 ################################################################################
 #
@@ -722,7 +731,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0
+!if $(CSM_ENABLE) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x0
+!else
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
+!endif
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
@@ -919,7 +932,12 @@
       NULL|OvmfPkg/Library/MpInitLibDepLib/DxeMpInitLibUpDepLib.inf
   }
 
+!if $(CSM_ENABLE) == TRUE
+  OvmfPkg/8259InterruptControllerDxe/8259.inf
+  OvmfPkg/8254TimerDxe/8254Timer.inf
+!else
   OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!endif
   OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
   OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
@@ -939,6 +957,10 @@
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
       XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
+!if $(CSM_ENABLE) == TRUE
+      NULL|OvmfPkg/Csm/CsmSupportLib/CsmSupportLib.inf
+      NULL|OvmfPkg/Csm/LegacyBootManagerLib/LegacyBootManagerLib.inf
+!endif
   }
   MdeModulePkg/Logo/LogoDxe.inf
   MdeModulePkg/Application/UiApp/UiApp.inf {
@@ -946,6 +968,10 @@
       NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
+!if $(CSM_ENABLE) == TRUE
+      NULL|OvmfPkg/Csm/LegacyBootManagerLib/LegacyBootManagerLib.inf
+      NULL|OvmfPkg/Csm/LegacyBootMaintUiLib/LegacyBootMaintUiLib.inf
+!endif
   }
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
@@ -995,7 +1021,18 @@
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
 
+!if $(CSM_ENABLE) == TRUE
+  OvmfPkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
+  OvmfPkg/Csm/Csm16/Csm16.inf
+!endif
+
+!if $(CSM_ENABLE) == FALSE
   OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+!endif
   OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
   OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf

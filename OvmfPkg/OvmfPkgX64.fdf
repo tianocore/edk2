@@ -200,7 +200,12 @@ INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF  FILE_GUID = $(UP_CPU_DXE_GUID) UefiCpuPkg/CpuDxe/CpuDxe.inf
 
-INF  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!if $(CSM_ENABLE) == TRUE
+  INF  OvmfPkg/8259InterruptControllerDxe/8259.inf
+  INF  OvmfPkg/8254TimerDxe/8254Timer.inf
+!else
+  INF  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!endif
 INF  OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
 INF  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
 INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
@@ -304,7 +309,13 @@ INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
+!if $(CSM_ENABLE) == TRUE
+INF  OvmfPkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
+INF  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
+INF  RuleOverride=CSM OvmfPkg/Csm/Csm16/Csm16.inf
+!else
 INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+!endif
 INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf
@@ -506,6 +517,11 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     PE32      PE32                    |.efi
     UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.USER_DEFINED.CSM]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW BIN                |.bin
   }
 
 [Rule.Common.USER_DEFINED.RESET_VECTOR]
