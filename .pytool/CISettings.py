@@ -199,6 +199,10 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         rs.append(RequiredSubmodule(
             "BaseTools/Source/C/BrotliCompress/brotli", False))
         rs.append(RequiredSubmodule(
+            "MdeModulePkg/Library/Lz4CustomDecompressLib/lz4", False))
+        rs.append(RequiredSubmodule(
+            "BaseTools/Source/C/Lz4Compress/lz4", False))
+        rs.append(RequiredSubmodule(
             "RedfishPkg/Library/JsonLib/jansson", False))
         rs.append(RequiredSubmodule(
             "UnitTestFrameworkPkg/Library/SubhookLib/subhook", False))
