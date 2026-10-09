@@ -2223,6 +2223,287 @@ FindLargestFreeRegion (
 }
 
 /**
+  Print all Resource Descriptor HOBs and report overlapping ranges.
+
+  @param  HobStart  The start address of the HOB list.
+
+**/
+STATIC
+VOID
+ResourceHobVerification (
+  IN VOID  *HobStart
+  )
+{
+  DEBUG_CODE_BEGIN ();
+  EFI_PEI_HOB_POINTERS          Hob;
+  EFI_PEI_HOB_POINTERS          OtherHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR2  *ResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR2  *OtherResourceHob;
+  EFI_PHYSICAL_ADDRESS          ResourceEnd;
+  EFI_PHYSICAL_ADDRESS          OtherResourceEnd;
+  UINTN                         ResourceIndex;
+  UINTN                         OtherResourceIndex;
+  BOOLEAN                       ResourceIsIo;
+  BOOLEAN                       OtherResourceIsIo;
+  BOOLEAN                       ResourceIsMemory;
+  BOOLEAN                       OtherResourceIsMemory;
+
+  DEBUG ((DEBUG_INFO, "Resource Descriptor HOBs:\n"));
+  DEBUG ((
+    DEBUG_INFO,
+    "Index Ver Type       Range                             Capabilities     "
+    "MemoryAttr       Owner\n"
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "===== === ========== ================================= "
+    "================ ================= ====================================\n"
+    ));
+
+  //
+  // Print every v1 and v2 Resource Descriptor HOB in HOB-list order.
+  //
+  ResourceIndex = 0;
+  for (Hob.Raw = GetNextResourceHob (HobStart);
+       Hob.Raw != NULL;
+       Hob.Raw = GetNextResourceHob (GET_NEXT_HOB (Hob)))
+  {
+    //
+    // The fields through ResourceLength have the same layout in v1 and v2.
+    //
+    ResourceHob = Hob.ResourceDescriptor2;
+
+    //
+    // Calculate an inclusive end address without overflowing UINT64.
+    //
+    if (ResourceHob->ResourceLength == 0) {
+      ResourceEnd = ResourceHob->PhysicalStart;
+    } else if (ResourceHob->PhysicalStart > MAX_UINT64 - (ResourceHob->ResourceLength - 1)) {
+      ResourceEnd = MAX_UINT64;
+    } else {
+      ResourceEnd = ResourceHob->PhysicalStart + ResourceHob->ResourceLength - 1;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%5u  v%u 0x%08x %016lx-%016lx %016lx %016lx %g\n",
+      ResourceIndex,
+      (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) ? 2 : 1,
+      ResourceHob->ResourceType,
+      ResourceHob->PhysicalStart,
+      ResourceEnd,
+      ResourceHob->ResourceCapabilities,
+      (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) ? ResourceHob->ResourceMemoryAttributes : 0,
+      &ResourceHob->Owner
+      ));
+
+    ResourceIndex++;
+  }
+
+  //
+  // Compare every unique pair of Resource Descriptor HOBs.
+  //
+  ResourceIndex = 0;
+  for (Hob.Raw = GetNextResourceHob (HobStart);
+       Hob.Raw != NULL;
+       Hob.Raw = GetNextResourceHob (GET_NEXT_HOB (Hob)))
+  {
+    ResourceHob = Hob.ResourceDescriptor2;
+
+    //
+    // I/O resources and memory resources occupy separate address spaces.
+    //
+    ResourceIsIo = (BOOLEAN)(
+                             (ResourceHob->ResourceType == EFI_RESOURCE_IO) ||
+                             (ResourceHob->ResourceType == EFI_RESOURCE_IO_RESERVED)
+                             );
+    ResourceIsMemory = (BOOLEAN)(
+                                 (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
+                                 (ResourceHob->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO) ||
+                                 (ResourceHob->ResourceType == EFI_RESOURCE_FIRMWARE_DEVICE) ||
+                                 (ResourceHob->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO_PORT) ||
+                                 (ResourceHob->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) ||
+                                 (ResourceHob->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED)
+                                 );
+    //
+    // A Resource Descriptor HOB must describe a non-empty address range.
+    //
+    if (ResourceHob->ResourceLength == 0) {
+      DEBUG ((DEBUG_ERROR, "Resource Descriptor HOB %u has invalid zero length\n", ResourceIndex));
+      ASSERT (ResourceHob->ResourceLength != 0);
+      ResourceIndex++;
+      continue;
+    }
+
+    //
+    // Calculate an inclusive end address without overflowing UINT64.
+    //
+    if (ResourceHob->PhysicalStart > MAX_UINT64 - (ResourceHob->ResourceLength - 1)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "Resource Descriptor HOB %u has an invalid range that overflows the physical address space\n",
+        ResourceIndex
+        ));
+      ASSERT (FALSE);
+      ResourceIndex++;
+      continue;
+    }
+
+    ResourceEnd = ResourceHob->PhysicalStart + ResourceHob->ResourceLength - 1;
+
+    //
+    // Start after the current HOB so each pair is checked exactly once.
+    //
+    OtherResourceIndex = ResourceIndex + 1;
+    for (OtherHob.Raw = GetNextResourceHob (GET_NEXT_HOB (Hob));
+         OtherHob.Raw != NULL;
+         OtherHob.Raw = GetNextResourceHob (GET_NEXT_HOB (OtherHob)))
+    {
+      OtherResourceHob  = OtherHob.ResourceDescriptor2;
+      OtherResourceIsIo = (BOOLEAN)(
+                                    (OtherResourceHob->ResourceType == EFI_RESOURCE_IO) ||
+                                    (OtherResourceHob->ResourceType == EFI_RESOURCE_IO_RESERVED)
+                                    );
+      OtherResourceIsMemory = (BOOLEAN)(
+                                        (OtherResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
+                                        (OtherResourceHob->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO) ||
+                                        (OtherResourceHob->ResourceType == EFI_RESOURCE_FIRMWARE_DEVICE) ||
+                                        (OtherResourceHob->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO_PORT) ||
+                                        (OtherResourceHob->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) ||
+                                        (OtherResourceHob->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED)
+                                        );
+
+      //
+      // Only compare descriptors that occupy the same domain (I/O or Memory)
+      //
+      if (!((ResourceIsIo && OtherResourceIsIo) ||
+            (ResourceIsMemory && OtherResourceIsMemory)))
+      {
+        OtherResourceIndex++;
+        continue;
+      }
+
+      if (OtherResourceHob->ResourceLength == 0) {
+        OtherResourceIndex++;
+        continue;
+      }
+
+      if (OtherResourceHob->PhysicalStart > MAX_UINT64 - (OtherResourceHob->ResourceLength - 1)) {
+        OtherResourceIndex++;
+        continue;
+      }
+
+      OtherResourceEnd = OtherResourceHob->PhysicalStart + OtherResourceHob->ResourceLength - 1;
+
+      //
+      // Inclusive ranges overlap when each range starts before the other ends.
+      //
+      if ((ResourceHob->PhysicalStart <= OtherResourceEnd) &&
+          (OtherResourceHob->PhysicalStart <= ResourceEnd))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Resource Descriptor HOB overlap: %u (type 0x%x, %016lx-%016lx) and %u (type 0x%x, %016lx-%016lx)\n",
+          ResourceIndex,
+          ResourceHob->ResourceType,
+          ResourceHob->PhysicalStart,
+          ResourceEnd,
+          OtherResourceIndex,
+          OtherResourceHob->ResourceType,
+          OtherResourceHob->PhysicalStart,
+          OtherResourceEnd
+          ));
+      }
+
+      OtherResourceIndex++;
+    }
+
+    ResourceIndex++;
+  }
+
+  DEBUG_CODE_END ();
+}
+
+/**
+  Print the GCD memory space map with explicit entries for any gaps.
+
+**/
+STATIC
+VOID
+OutputMemoryMap (
+  VOID
+  )
+{
+  DEBUG_CODE_BEGIN ();
+  EFI_STATUS                       Status;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            Index;
+  EFI_PHYSICAL_ADDRESS             ExpectedAddress;
+  EFI_PHYSICAL_ADDRESS             DescriptorEnd;
+
+  Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "Unable to retrieve the GCD memory space map: %r\n", Status));
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "\nGCD Addressable Memory Space:\n"));
+  DEBUG ((DEBUG_INFO, "GCDMemType Range                             Capabilities     Attributes\n"));
+  DEBUG ((DEBUG_INFO, "========== ================================= ================ ================\n"));
+
+  ExpectedAddress = 0;
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    if (MemorySpaceMap[Index].Length == 0) {
+      DEBUG ((DEBUG_WARN, "GCD memory space descriptor %u has zero length\n", Index));
+      continue;
+    }
+
+    if (MemorySpaceMap[Index].BaseAddress > ExpectedAddress) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a  %016lx-%016lx %016lx %016lx\n",
+        mGcdMemoryTypeNames[EfiGcdMemoryTypeNonExistent],
+        ExpectedAddress,
+        MemorySpaceMap[Index].BaseAddress - 1,
+        0,
+        0
+        ));
+    } else if (MemorySpaceMap[Index].BaseAddress < ExpectedAddress) {
+      DEBUG ((DEBUG_WARN, "GCD memory space descriptor %u overlaps the preceding descriptor\n", Index));
+    }
+
+    if (MemorySpaceMap[Index].BaseAddress > MAX_UINT64 - (MemorySpaceMap[Index].Length - 1)) {
+      DescriptorEnd = MAX_UINT64;
+    } else {
+      DescriptorEnd = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - 1;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a  %016lx-%016lx %016lx %016lx\n",
+      mGcdMemoryTypeNames[MIN (MemorySpaceMap[Index].GcdMemoryType, EfiGcdMemoryTypeMaximum)],
+      MemorySpaceMap[Index].BaseAddress,
+      DescriptorEnd,
+      MemorySpaceMap[Index].Capabilities,
+      MemorySpaceMap[Index].Attributes
+      ));
+
+    if (DescriptorEnd == MAX_UINT64) {
+      break;
+    }
+
+    if (DescriptorEnd >= ExpectedAddress) {
+      ExpectedAddress = DescriptorEnd + 1;
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "\n"));
+  FreePool (MemorySpaceMap);
+  DEBUG_CODE_END ();
+}
+
+/**
   External function. Initializes memory services based on the memory
   descriptor HOBs.  This function is responsible for priming the memory
   map, so memory allocations and resource allocations can be made.
@@ -2916,6 +3197,9 @@ CoreInitializeGcdServices (
   }
 
   CoreFreePool (MemorySpaceMap);
+
+  ResourceHobVerification (*HobStart);
+  OutputMemoryMap ();
 
   return EFI_SUCCESS;
 }
