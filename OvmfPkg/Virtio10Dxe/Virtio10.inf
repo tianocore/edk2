@@ -23,8 +23,10 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
+  DxeServicesTableLib
   MemoryAllocationLib
   PciCapLib
   PciCapPciIoLib
