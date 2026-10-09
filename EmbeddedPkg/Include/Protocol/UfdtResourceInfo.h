@@ -47,6 +47,7 @@ typedef struct {
 } UFDT_MEMORY_REGION;
 
 /// Prepared resource interfaces; their presence also satisfies consumer DEPEX.
+extern EFI_GUID  gEdkiiUfdtClockInfoProtocolGuid;
 
 /** Absence markers for bindings with no selected device after discovery.
 
@@ -56,3 +57,15 @@ typedef struct {
   failure. Another binding may have selected a device of the same generic
   class. These markers are valid only during boot services.
 **/
+extern EFI_GUID  gEdkiiUfdtClockAbsentProtocolGuid;
+
+/** Fixed-clock dispatcher struct.
+
+  Struct associated with gEdkiiUfdtClockInfoProtocolGuid
+*/
+typedef struct {
+  /// Common Ufdt information
+  UFDT_COMMON    Common;
+  /// Fixed, nonzero output frequency in hertz.
+  UINT64         Frequency;
+} UFDT_CLOCK_INFO;
