@@ -175,6 +175,34 @@ EFI_STATUS
   IN UINT32                            BlockCount
   );
 
+/**
+  Switch the SPI NOR flash device to 4-byte address mode.
+
+  @param[in]  This    Pointer to an EFI_SPI_NOR_FLASH_PROTOCOL data structure.
+
+  @retval EFI_SUCCESS   Device is in 4-byte address mode.
+  @retval Other         Failed to switch address mode.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_SPI_NOR_FLASH_PROTOCOL_ENTER_4BYTE)(
+  IN CONST EFI_SPI_NOR_FLASH_PROTOCOL  *This
+  );
+
+/**
+  Switch the SPI NOR flash device to 3-byte address mode.
+
+  @param[in]  This    Pointer to an EFI_SPI_NOR_FLASH_PROTOCOL data structure.
+
+  @retval EFI_SUCCESS   Device is in 3-byte address mode.
+  @retval Other         Failed to switch address mode.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_SPI_NOR_FLASH_PROTOCOL_EXIT_4BYTE)(
+  IN CONST EFI_SPI_NOR_FLASH_PROTOCOL  *This
+  );
+
 ///
 /// The EFI_SPI_NOR_FLASH_PROTOCOL exists in the SPI peripheral layer.
 /// This protocol manipulates the SPI NOR flash parts using a common set of
@@ -248,6 +276,16 @@ struct _EFI_SPI_NOR_FLASH_PROTOCOL {
   /// Efficiently erases one or more 4KiB regions in the SPI flash.
   ///
   EFI_SPI_NOR_FLASH_PROTOCOL_ERASE           Erase;
+
+  ///
+  /// Switch to 4-byte address mode.
+  ///
+  EFI_SPI_NOR_FLASH_PROTOCOL_ENTER_4BYTE     Enter4Byte;
+
+  ///
+  /// Switch to 3-byte address mode.
+  ///
+  EFI_SPI_NOR_FLASH_PROTOCOL_EXIT_4BYTE      Exit4Byte;
 };
 
 extern EFI_GUID  gEfiSpiNorFlashProtocolGuid;
