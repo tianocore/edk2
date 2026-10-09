@@ -537,7 +537,9 @@ DEFINE FD_SIZE_IN_MB    = 3
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
-!if $(PLAT_KVMTOOL) == FALSE && $(PLAT_XEN) == FALSE
+!if $(PLAT_KVMTOOL) == TRUE
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtMc146818RtcBindingDriver/UfdtMc146818RtcBindingDriver.inf
+!elseif $(PLAT_XEN) == FALSE
       NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtPl031BindingDriver/UfdtPl031BindingDriver.inf
 !endif
   }
