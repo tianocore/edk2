@@ -49,6 +49,7 @@ TdxMeasurementBuildGuidHob (
   VOID                *EventHobData;
   UINT8               *Ptr;
   TPML_DIGEST_VALUES  *TdxDigest;
+  UINT32              DataLength;
 
   if (HashSize != SHA384_DIGEST_SIZE) {
     return EFI_INVALID_PARAMETER;
@@ -56,11 +57,24 @@ TdxMeasurementBuildGuidHob (
 
   #define TDX_DIGEST_VALUE_LEN  (sizeof (UINT32) + sizeof (TPMI_ALG_HASH) + SHA384_DIGEST_SIZE)
 
+  //
+  // EventSize is derived from the measured input and can be attacker-
+  // influenced. Reject a total length that would truncate to UINT32 before
+  // BuildGuidHob() can validate it.
+  //
+  if (EventSize >
+      (MAX_UINT32 - (sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) + TDX_DIGEST_VALUE_LEN + sizeof (UINT32))))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DataLength = sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) +
+               TDX_DIGEST_VALUE_LEN +
+               sizeof (UINT32) + EventSize;
+
   EventHobData = BuildGuidHob (
                    &gCcEventEntryHobGuid,
-                   sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) +
-                   TDX_DIGEST_VALUE_LEN +
-                   sizeof (UINT32) + EventSize
+                   DataLength
                    );
 
   if (EventHobData == NULL) {

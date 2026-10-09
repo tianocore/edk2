@@ -178,7 +178,19 @@ CacheFwCfgInfoWithOptionalMeasurment (
     }
 
     FwCfginfoHobData = NULL;
+
+    //
+    // FwCfgSize originates from the untrusted VMM fw_cfg interface. Guard
+    // against truncating the total length to UINT32 before BuildGuidHob()
+    // can validate it.
+    //
+    if (CacheFwCfgList[Index].FwCfgSize > (MAX_UINT32 - sizeof (FW_CFG_CACHED_ITEM))) {
+      DEBUG ((DEBUG_ERROR, "%a: FwCfgSize(0x%x) too large\n", __func__, CacheFwCfgList[Index].FwCfgSize));
+      return EFI_INVALID_PARAMETER;
+    }
+
     FwCfgItemHobSize = sizeof (FW_CFG_CACHED_ITEM) + CacheFwCfgList[Index].FwCfgSize;
+
     FwCfginfoHobData = BuildGuidHob (&gOvmfFwCfgInfoHobGuid, FwCfgItemHobSize);
     if (FwCfginfoHobData == NULL) {
       DEBUG ((DEBUG_ERROR, "%a: BuildGuidHob Failed with FwCfgItemHobSize(0x%x)\n", __func__, FwCfgItemHobSize));
