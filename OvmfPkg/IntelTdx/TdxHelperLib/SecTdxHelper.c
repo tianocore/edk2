@@ -85,6 +85,14 @@ BspAcceptMemoryResourceRange (
   UINT64      Length3;
   UINT64      Pages;
 
+  //
+  // PhysicalAddress and PhysicalEnd derive from VMM-controlled resource
+  // descriptors. Reject a wrapped range before computing the length.
+  //
+  if (PhysicalEnd < PhysicalAddress) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   AcceptPageSize = FixedPcdGet32 (PcdTdxAcceptPageSize);
   TotalLength    = PhysicalEnd - PhysicalAddress;
   StartAddress1  = 0;
@@ -283,6 +291,14 @@ MpAcceptMemoryResourceRange (
   UINT64      Length;
   EFI_STATUS  Status;
 
+  //
+  // PhysicalStart and PhysicalEnd derive from VMM-controlled resource
+  // descriptors. Reject a wrapped range before computing the length.
+  //
+  if (PhysicalEnd < PhysicalStart) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Length = PhysicalEnd - PhysicalStart;
 
   DEBUG ((DEBUG_INFO, "MpAccept : 0x%llx - 0x%llx (0x%llx)\n", PhysicalStart, PhysicalEnd, Length));
@@ -339,6 +355,41 @@ MpAcceptMemoryResourceRange (
 }
 
 /**
+  Validate and fence a VMM-provided unaccepted-memory range before use.
+
+  @param[in]  Resource       The unaccepted-memory resource descriptor.
+  @param[out] PhysicalStart The validated start address.
+  @param[out] PhysicalEnd   The validated exclusive end address.
+
+  @retval TRUE   The range does not overflow.
+  @retval FALSE  The range overflows; output addresses are not modified.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+GetUnacceptedMemoryRange (
+  IN CONST EFI_HOB_RESOURCE_DESCRIPTOR  *Resource,
+  OUT EFI_PHYSICAL_ADDRESS              *PhysicalStart,
+  OUT EFI_PHYSICAL_ADDRESS              *PhysicalEnd
+  )
+{
+  EFI_PHYSICAL_ADDRESS  Start;
+  UINT64                Length;
+
+  Start  = Resource->PhysicalStart;
+  Length = Resource->ResourceLength;
+  if (Length > MAX_UINT64 - Start) {
+    return FALSE;
+  }
+
+  AsmLfence ();
+  *PhysicalStart = Start;
+  *PhysicalEnd   = Start + Length;
+
+  return TRUE;
+}
+
+/**
   BSP accept a small piece of memory which will be used as APs stack.
 
   @param[in] VmmHobList    The Hoblist pass the firmware
@@ -380,9 +431,13 @@ AcceptMemoryForAPsStack (
       DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
 
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
-        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
-        PhysicalEnd    = PhysicalStart + ResourceLength;
+        if (!GetUnacceptedMemoryRange (Hob.ResourceDescriptor, &PhysicalStart, &PhysicalEnd)) {
+          DEBUG ((DEBUG_ERROR, "AcceptMemoryForAPsStack: resource descriptor overflow, skipped\n"));
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
+
+        ResourceLength = PhysicalEnd - PhysicalStart;
 
         DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
         DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", PhysicalStart));
@@ -392,12 +447,12 @@ AcceptMemoryForAPsStack (
         if (ResourceLength >= APsStackSize) {
           MemoryRegionFound = TRUE;
           if (ResourceLength > ACCEPT_CHUNK_SIZE) {
-            PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + APsStackSize;
+            PhysicalEnd = PhysicalStart + APsStackSize;
           }
         }
 
         Status = BspAcceptMemoryResourceRange (
-                   Hob.ResourceDescriptor->PhysicalStart,
+                   PhysicalStart,
                    PhysicalEnd
                    );
         if (EFI_ERROR (Status)) {
@@ -456,8 +511,11 @@ AcceptMemory (
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
-        PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        if (!GetUnacceptedMemoryRange (Hob.ResourceDescriptor, &PhysicalStart, &PhysicalEnd)) {
+          DEBUG ((DEBUG_ERROR, "AcceptMemory: resource descriptor overflow, skipped\n"));
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
 
         if (PhysicalEnd <= PhysicalAddressStart) {
           // this memory region has been accepted. Skipped it.
