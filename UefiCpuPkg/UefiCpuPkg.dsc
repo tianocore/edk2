@@ -123,6 +123,9 @@
 [LibraryClasses.LoongArch64]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
+[LibraryClasses.AARCH64]
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
+
 #
 # Drivers/Libraries within this package
 #
@@ -237,6 +240,7 @@
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLibCca.inf
   UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
+  UefiCpuPkg/SmmuDxe/SmmuDxe.inf
 
 [Components.LOONGARCH64]
   UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
