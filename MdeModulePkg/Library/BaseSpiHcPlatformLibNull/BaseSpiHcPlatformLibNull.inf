@@ -2,7 +2,7 @@
 #  NULL library for platform SPI Host controller, which should be provided
 #  by the OEM.
 #
-#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR> # [CODE_FIRST] 13226
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -18,10 +18,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
-[LibraryClasses]
-  DevicePathLib
-  UefiLib
 
 [Sources]
   BaseSpiHcPlatformLibNull.c

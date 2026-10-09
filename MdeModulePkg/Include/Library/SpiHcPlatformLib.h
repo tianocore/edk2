@@ -2,16 +2,16 @@
 
   Function declarations for SpiHcPlatformLib
 
-  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR> // [CODE_FIRST] 13226
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #pragma once
 
 #include <Uefi/UefiBaseType.h>
-#include <Protocol/SpiHc.h>
-#include <Protocol/SpiConfiguration.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/SpiConfiguration.h> // [CODE_FIRST] 13226
+#include <Protocol/SpiHc.h> // [CODE_FIRST] 13226
 #include <Library/DevicePathLib.h>
 
 /**
