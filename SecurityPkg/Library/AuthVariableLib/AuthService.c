@@ -518,8 +518,10 @@ CheckCertificate (
   )
 {
   VOID  *RsaContext;
+  VOID  *MlDsaContext;
 
-  RsaContext = NULL;
+  RsaContext   = NULL;
+  MlDsaContext = NULL;
 
   // sanity check
   if (CertLen == 0) {
@@ -529,6 +531,12 @@ CheckCertificate (
   // rsa check
   if (RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
     RsaFree (RsaContext);
+    return EFI_SUCCESS;
+  }
+
+  // ml-dsa check
+  if (MlDsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &MlDsaContext)) {
+    MlDsaFree (MlDsaContext);
     return EFI_SUCCESS;
   }
 
