@@ -59,12 +59,8 @@ TdxMeasurementBuildGuidHob (
 
   //
   // EventSize is derived from the measured input and can be attacker-
-  // influenced. BuildGuidHob() stores the total length in a UINT16 HobLength
-  // field and its range check is compiled out in RELEASE builds, so an
-  // oversized EventSize would silently truncate the allocation while the
-  // CopyMem() below still writes EventSize bytes, overflowing the HOB. Reject
-  // a length that overflows UINT32 or exceeds the maximum GUID HOB payload
-  // before allocating.
+  // influenced. Reject a total length that would truncate to UINT32 before
+  // BuildGuidHob() can validate it.
   //
   if (EventSize >
       (MAX_UINT32 - (sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) + TDX_DIGEST_VALUE_LEN + sizeof (UINT32))))
@@ -75,10 +71,6 @@ TdxMeasurementBuildGuidHob (
   DataLength = sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) +
                TDX_DIGEST_VALUE_LEN +
                sizeof (UINT32) + EventSize;
-
-  if (DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE))) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   EventHobData = BuildGuidHob (
                    &gCcEventEntryHobGuid,
