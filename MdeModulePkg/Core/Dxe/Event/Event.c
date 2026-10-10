@@ -497,11 +497,14 @@ CoreCreateEventInternal (
     }
 
     //
-    // The Event's NotifyFunction must be queued whenever the event is signaled
+    // Only group members need to be visited when a group is signaled.
+    // Ungrouped events are dispatched directly by CoreSignalEvent().
     //
     CoreAcquireEventLock ();
 
-    InsertHeadList (&gEventSignalQueue, &IEvent->SignalLink);
+    if (EventGroup != NULL) {
+      InsertHeadList (&gEventSignalQueue, &IEvent->SignalLink);
+    }
 
     CoreReleaseEventLock ();
   }
