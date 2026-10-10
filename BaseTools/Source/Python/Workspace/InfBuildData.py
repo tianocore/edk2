@@ -772,6 +772,15 @@ class InfBuildData(ModuleBuildClassObject):
             return RetVal
 
         RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
+
+        # If the module is not a library (no LIBRARY_CLASS in the [Defines] section) and the MODULE_TYPE is
+        # SEC, SMM_CORE, DXE_CORE, PEI_CORE, UEFI_DRIVER, UEFI_APPLICATION or HOST_APPLICATION a Depex section
+        # is not permitted.
+        if len(self.LibraryClass) == 0 and len(RecordList) != 0:
+            if self.ModuleType in [SUP_MODULE_SEC, SUP_MODULE_SMM_CORE, SUP_MODULE_DXE_CORE, SUP_MODULE_PEI_CORE, SUP_MODULE_UEFI_DRIVER, \
+                SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_HOST_APPLICATION]:
+                EdkLogger.warn(None, "[Depex] section is not permitted for [%s] module" % self.ModuleType, File=self.MetaFile)
+
         # PEIM and DXE drivers must have a valid [Depex] section
         if len(self.LibraryClass) == 0 and len(RecordList) == 0:
             if self.ModuleType == SUP_MODULE_DXE_DRIVER or self.ModuleType == SUP_MODULE_PEIM or self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER or \
