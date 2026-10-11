@@ -212,6 +212,7 @@ DynamicTablesPkg
 F: DynamicTablesPkg/
 M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
 M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+R: Varshit Pandya <varshit.pandya@arm.com> [vbpandya]
 
 EmbeddedPkg
 F: EmbeddedPkg/
