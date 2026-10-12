@@ -361,7 +361,7 @@ GroupCmObjNodes (
   CmObjDesc->Count    = (UINT32)Count;
   CmObjDesc->Data     = GroupedData;
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /** Finalise the dynamic repository.

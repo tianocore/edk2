@@ -17,6 +17,7 @@
 #include "CmObjectDescUtility.h"
 #include "Arm/Gic/ArmGicCParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmTraceExtensionsParser.h"
 
 /** List of "compatible" property values for CPU nodes.
 
@@ -52,6 +53,53 @@ CONST COMPATIBILITY_INFO  PmuCompatibleInfo = {
   ARRAY_SIZE (PmuCompatibleStr),
   PmuCompatibleStr
 };
+
+/** Parse TRBE nodes and attach the decoded interrupt to their CPUs.
+
+  This function modifies the input CM_ARM_GICC_INFO array to set:
+    - TrbeInterrupt
+
+  @param [in]      Fdt               Pointer to a Flattened Device Tree (Fdt).
+  @param [in, out] GicCCmObjDesc     The CM_ARM_GICC_INFO array to patch.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No TRBE node was found.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GicCTrbeNodeParser (
+  IN      CONST VOID               *Fdt,
+  IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
+  )
+{
+  EFI_STATUS        Status;
+  UINT32            Index;
+  UINT16            TrbeInterrupt;
+  CM_ARM_GICC_INFO  *GicCInfo;
+
+  if ((Fdt == NULL)             ||
+      (GicCCmObjDesc == NULL)   ||
+      (GicCCmObjDesc->Data == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ArmGetTrbeInterrupt (Fdt, &TrbeInterrupt);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    GicCInfo[Index].TrbeInterrupt = TrbeInterrupt;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /** Parse a "cpu" node.
 
@@ -585,11 +633,19 @@ GicCv3IntcNodeParser (
 
   // The "#redistributor-regions" property is optional.
   Data = FdtGetProp (Fdt, Gicv3IntcNode, "#redistributor-regions", &DataSize);
-  if ((Data != NULL) && (DataSize == sizeof (UINT32))) {
-    ASSERT (Fdt32ToCpu (*(UINT32 *)Data) > 1);
-    AdditionalRedistReg = Fdt32ToCpu (*(UINT32 *)Data) - 1;
-  } else {
+  if (Data == NULL) {
     AdditionalRedistReg = 0;
+  } else if (DataSize != sizeof (UINT32)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  } else {
+    AdditionalRedistReg = Fdt32ToCpu (*(UINT32 *)Data);
+    if ((AdditionalRedistReg < 1) || (AdditionalRedistReg > 4096)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    AdditionalRedistReg--;
   }
 
   RegSize = (AddressCells + SizeCells) * sizeof (UINT32);
@@ -621,7 +677,13 @@ GicCv3IntcNodeParser (
     return EFI_ABORTED;
   }
 
-  RegCount = (DataSize / RegSize) - AdditionalRedistReg;
+  RegCount = DataSize / RegSize;
+  if (RegCount < (AdditionalRedistReg + 2)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  RegCount -= AdditionalRedistReg;
 
   // The GicD and GicR info is mandatory.
   switch (RegCount) {
@@ -884,6 +946,8 @@ GicCPmuNodeParser (
     UINT32  ProximityDomain;                  // {default = 0}
     UINT32  ClockDomain;                      // {default = 0}
     UINT32  AffinityFlags;                    // {default = 0}
+    UINT16  TrbeInterrupt;                    // {default = 0}
+    CM_OBJECT_TOKEN EtToken;                  // {default = CM_NULL_TOKEN}
   } CM_ARM_GICC_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
@@ -998,6 +1062,28 @@ ArmGicCInfoParser (
 
   // Parse the Pmu Interrupt.
   Status = GicCPmuNodeParser (Fdt, IntcNode, NewCmObjDesc);
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  // Parse the per-CPU trace buffer extension interrupt.
+  Status = GicCTrbeNodeParser (
+             Fdt,
+             NewCmObjDesc
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  // Parse the per-CPU embedded trace extension information.
+  Status = ArmTraceAddEtInfo (
+             Fdt,
+             FdtParserHandle,
+             CpuNodeOffsetMap,
+             NewCmObjDesc
+             );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     ASSERT_EFI_ERROR (Status);
     goto exit_handler;

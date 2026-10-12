@@ -8190,6 +8190,9 @@ CryptoServiceSlhDsaGetPrivateKeyFromPem (
 /**
   Generates an SLH-DSA signature for a given message.
 
+  This callback is deprecated and retained only for protocol ABI compatibility.
+  It always returns FALSE.
+
   @param[in]      SlhDsaContext  Pointer to SLH-DSA context containing the private key.
   @param[in]      Context        Optional context string for domain separation.
                                  May be NULL for default context.
@@ -8200,8 +8203,7 @@ CryptoServiceSlhDsaGetPrivateKeyFromPem (
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature.
 
-  @retval TRUE   SLH-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  SLH-DSA signing is deprecated and unsupported.
 
 **/
 BOOLEAN
@@ -8216,7 +8218,14 @@ CryptoServiceSlhDsaSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (SlhDsa.Services.Sign, SlhDsaSign, (SlhDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+  (VOID)SlhDsaContext;
+  (VOID)Context;
+  (VOID)ContextSize;
+  (VOID)Message;
+  (VOID)MessageSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**

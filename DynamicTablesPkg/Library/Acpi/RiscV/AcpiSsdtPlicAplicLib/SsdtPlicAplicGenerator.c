@@ -207,6 +207,7 @@ BuildSsdtPlicAplicTable (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   Generator = (ACPI_TABLE_GENERATOR *)This;
+  PlicInfo  = NULL;
 
   Status = GetERiscVObjAplicInfo (
              CfgMgrProtocol,
@@ -217,7 +218,7 @@ BuildSsdtPlicAplicTable (
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     ASSERT (0);
     return Status;
-  } else if (Status == EFI_NOT_FOUND) {
+  } else if (AplicCount == 0) {
     Status = GetERiscVObjPlicInfo (
                CfgMgrProtocol,
                CM_NULL_TOKEN,
