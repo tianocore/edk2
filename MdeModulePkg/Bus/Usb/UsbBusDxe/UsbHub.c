@@ -1175,7 +1175,8 @@ UsbRootHubResetPort (
          && (Bus->Usb2Hc->MajorRevision >= 0x3)
          && (Bus->Devices[Index]->IsSSDev)
          && (Bus->Devices[Index]->Speed < EFI_USB_SPEED_SUPER)
-         && (Bus->Devices[Index]->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE))
+         && (  (Bus->Devices[Index]->DevDesc == NULL)
+            || (Bus->Devices[Index]->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE)))
       {
         DEBUG ((DEBUG_INFO, "Found the device matched, Index = %d, Port = %X, ParentIf = %X\n", Index, Port, RootIf));
         DEBUG ((DEBUG_INFO, "This is a USB 3 device and it need a longer waiting time for super speed.\n"));
