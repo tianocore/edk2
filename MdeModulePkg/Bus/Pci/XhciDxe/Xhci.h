@@ -107,6 +107,9 @@ typedef struct _USB_DEV_CONTEXT    USB_DEV_CONTEXT;
 #define USB_DESC_TYPE_HUB              0x29
 #define USB_DESC_TYPE_HUB_SUPER_SPEED  0x2a
 
+//XHCI 1.2 Spec section 6.2.3.6. Ep Context valid Interval Range is 0-18.
+#define USB_INVALID_EP_CONTEXT_INTERVAL 0xFF
+
 //
 // The RequestType in EFI_USB_DEVICE_REQUEST is composed of
 // three fields: One bit direction, 2 bit type, and 5 bit
