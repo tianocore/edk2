@@ -810,10 +810,6 @@
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
-  ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
 
   #
   # TPM2 support

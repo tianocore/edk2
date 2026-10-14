@@ -2,6 +2,7 @@
   Application for Hkdf Primitives Validation.
 
 Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -78,6 +79,98 @@ UINT8  mHkdfSha384Okm[64] = {
   0x7e, 0xb1, 0xaa, 0x02, 0xec, 0x04, 0xc3, 0x3f, 0x54, 0x6c,
   0xb2, 0xf3, 0xd1, 0x93, 0xe9, 0x30, 0xa9, 0xf8, 0x9e, 0xc9,
   0xce, 0x3a, 0x82, 0xb5
+};
+
+/**
+ * This Hkdf-Sha512 test vector uses the input parameters from RFC 5869
+ * Appendix A.1 'Test Case 1' with SHA512 as the hash function.
+ * https://www.rfc-editor.org/rfc/rfc5869.html#appendix-A.1
+ **/
+
+/* Input keying material (IKM)
+  IKM  = 0x0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b (22 octets)
+*/
+UINT8  mHkdfSha512Ikm[22] = {
+  0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+  0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+  0x0b, 0x0b
+};
+
+/* Salt
+  salt = 0x000102030405060708090a0b0c (13 octets)
+*/
+UINT8  mHkdfSha512Salt[13] = {
+  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+  0x0a, 0x0b, 0x0c,
+};
+
+/* Info
+  info = 0xf0f1f2f3f4f5f6f7f8f9 (10 octets)
+*/
+UINT8  mHkdfSha512Info[10] = {
+  0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9,
+};
+
+/* Pseudorandom Key (PRK) value can be obtained by running
+   the following command:
+
+  IKM=0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b
+  SALT=000102030405060708090a0b0c
+
+  printf "$IKM" | xxd -r -p | \
+  openssl mac \
+    -digest SHA512 \
+    -macopt hexkey:$SALT \
+    -in /dev/stdin \
+    HMAC | tr -d ' :\n' | tr 'A-F' 'a-f'
+
+Output:
+  665799823737ded04a88
+  e47e54a5890bb2c3d247
+  c7a4254a8e6135072359
+  0a26c36238127d8661b8
+  8cf80ef802d57e2f7ceb
+  cf1e00e083848be19929
+  c61b4237
+*/
+UINT8  mHkdfSha512Prk[64] = {
+  0x66, 0x57, 0x99, 0x82, 0x37, 0x37, 0xde, 0xd0, 0x4a, 0x88,
+  0xe4, 0x7e, 0x54, 0xa5, 0x89, 0x0b, 0xb2, 0xc3, 0xd2, 0x47,
+  0xc7, 0xa4, 0x25, 0x4a, 0x8e, 0x61, 0x35, 0x07, 0x23, 0x59,
+  0x0a, 0x26, 0xc3, 0x62, 0x38, 0x12, 0x7d, 0x86, 0x61, 0xb8,
+  0x8c, 0xf8, 0x0e, 0xf8, 0x02, 0xd5, 0x7e, 0x2f, 0x7c, 0xeb,
+  0xcf, 0x1e, 0x00, 0xe0, 0x83, 0x84, 0x8b, 0xe1, 0x99, 0x29,
+  0xc6, 0x1b, 0x42, 0x37,
+};
+
+/* Output keying material (OKM) value can be obtained by running
+   the following command:
+
+  IKM=0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b
+  SALT=000102030405060708090a0b0c
+  INFO=f0f1f2f3f4f5f6f7f8f9
+
+  openssl kdf \
+    -keylen 42 \
+    -kdfopt digest:SHA512 \
+    -kdfopt hexkey:$IKM \
+    -kdfopt hexsalt:$SALT \
+    -kdfopt hexinfo:$INFO \
+    HKDF | tr -d ' :\n' | tr 'A-F' 'a-f'
+
+Output:
+  832390086cda71fb4762
+  5bb5ceb168e4c8e26a1a
+  16ed34d9fc7fe92c1481
+  579338da362cb8d9f925
+  d7cb
+*/
+UINT8  mHkdfSha512Okm[42] = {
+  0x83, 0x23, 0x90, 0x08, 0x6c, 0xda, 0x71, 0xfb, 0x47, 0x62,
+  0x5b, 0xb5, 0xce, 0xb1, 0x68, 0xe4, 0xc8, 0xe2, 0x6a, 0x1a,
+  0x16, 0xed, 0x34, 0xd9, 0xfc, 0x7f, 0xe9, 0x2c, 0x14, 0x81,
+  0x57, 0x93, 0x38, 0xda, 0x36, 0x2c, 0xb8, 0xd9, 0xf9, 0x25,
+  0xd7, 0xcb,
 };
 
 UNIT_TEST_STATUS
@@ -191,12 +284,68 @@ TestVerifyHkdfSha384 (
   return UNIT_TEST_PASSED;
 }
 
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifyHkdfSha512 (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINT8    PrkOut[64];
+  UINT8    Out[42];
+  BOOLEAN  Status;
+
+  /* HKDF-SHA-512 digest Validation*/
+  ZeroMem (PrkOut, sizeof (PrkOut));
+  Status = HkdfSha512Extract (
+             mHkdfSha512Ikm,
+             sizeof (mHkdfSha512Ikm),
+             mHkdfSha512Salt,
+             sizeof (mHkdfSha512Salt),
+             PrkOut,
+             sizeof (PrkOut)
+             );
+  UT_ASSERT_TRUE (Status);
+
+  UT_ASSERT_MEM_EQUAL (PrkOut, mHkdfSha512Prk, sizeof (mHkdfSha512Prk));
+
+  ZeroMem (Out, sizeof (Out));
+  Status = HkdfSha512Expand (
+             mHkdfSha512Prk,
+             sizeof (mHkdfSha512Prk),
+             mHkdfSha512Info,
+             sizeof (mHkdfSha512Info),
+             Out,
+             sizeof (Out)
+             );
+  UT_ASSERT_TRUE (Status);
+
+  UT_ASSERT_MEM_EQUAL (Out, mHkdfSha512Okm, sizeof (mHkdfSha512Okm));
+
+  ZeroMem (Out, sizeof (Out));
+  Status = HkdfSha512ExtractAndExpand (
+             mHkdfSha512Ikm,
+             sizeof (mHkdfSha512Ikm),
+             mHkdfSha512Salt,
+             sizeof (mHkdfSha512Salt),
+             mHkdfSha512Info,
+             sizeof (mHkdfSha512Info),
+             Out,
+             sizeof (Out)
+             );
+  UT_ASSERT_TRUE (Status);
+
+  UT_ASSERT_MEM_EQUAL (Out, mHkdfSha512Okm, sizeof (mHkdfSha512Okm));
+
+  return UNIT_TEST_PASSED;
+}
+
 TEST_DESC  mHkdfTest[] = {
   //
   // -----Description--------------------------------------Class----------------------Function---------------------------------Pre---------------------Post---------Context
   //
   { "TestVerifyHkdfSha256()", "CryptoPkg.BaseCryptLib.Hkdf", TestVerifyHkdfSha256, NULL, NULL, NULL },
   { "TestVerifyHkdfSha384()", "CryptoPkg.BaseCryptLib.Hkdf", TestVerifyHkdfSha384, NULL, NULL, NULL },
+  { "TestVerifyHkdfSha512()", "CryptoPkg.BaseCryptLib.Hkdf", TestVerifyHkdfSha512, NULL, NULL, NULL },
 };
 
 UINTN  mHkdfTestNum = ARRAY_SIZE (mHkdfTest);
