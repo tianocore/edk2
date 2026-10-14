@@ -6,6 +6,8 @@
 
 **/
 #include "TestBaseCryptLib.h"
+#define BASE_CRYPT_LIB_VERIFY_TEST_SIGNATURES_DEFINE
+#include "VerifyTestSignatures.h"
 
 SUITE_DESC  mSuiteDesc[] = {
   //

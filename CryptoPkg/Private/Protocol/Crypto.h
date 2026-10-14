@@ -976,6 +976,9 @@ VOID
   Syntax Standard, version 1.5". This interface is only intended to be used for
   application to perform PKCS#7 functionality validation.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   If this interface is not supported, then return FALSE.
 
   @param[in]  PrivateKey       Pointer to the PEM-formatted private key data for
@@ -993,9 +996,7 @@ VOID
                                responsibility to free the buffer with FreePool().
   @param[out] SignedDataSize   Size of SignedData in bytes.
 
-  @retval     TRUE             PKCS#7 data signing succeeded.
-  @retval     FALSE            PKCS#7 data signing failed.
-  @retval     FALSE            This interface is not supported.
+  @retval     FALSE            This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -1644,6 +1645,9 @@ BOOLEAN
 /**
   Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
   If the Signature buffer is too small to hold the contents of signature, FALSE
@@ -1662,10 +1666,7 @@ BOOLEAN
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
                                On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -4505,6 +4506,9 @@ EFI_STATUS
 /**
   Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
   RFC 8017.
   Mask generation function is the same as the message digest algorithm.
@@ -4528,10 +4532,7 @@ EFI_STATUS
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
                                On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -4579,6 +4580,9 @@ BOOLEAN
 /**
   Carries out the RSA-PSS signature generation over a precomputed message digest.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   @param[in]      RsaContext   Pointer to RSA context for signature generation.
   @param[in]      Digest       Pointer to the precomputed message digest.
   @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
@@ -4586,10 +4590,7 @@ BOOLEAN
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
                                On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -5894,6 +5895,9 @@ BOOLEAN
 /**
   Carries out the EC-DSA signature.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function carries out the EC-DSA signature.
   If the Signature buffer is too small to hold the contents of signature, FALSE
   is returned and SigSize is set to the required buffer size to obtain the signature.
@@ -5915,9 +5919,7 @@ BOOLEAN
   @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
                                 On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in EC-DSA.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6179,6 +6181,9 @@ BOOLEAN
 /**
   Generates an EdDSA signature for a given message.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function creates an EdDSA signature using the private key stored in the
   EdDSA context. EdDSA uses a 'pure' signature scheme where the entire message
   is processed directly without pre-computing a hash digest.
@@ -6207,8 +6212,7 @@ BOOLEAN
   @param[in,out]  SigSize         On input, size of Signature buffer.
                                   On output, actual size of signature (114 bytes for Ed448).
 
-  @retval TRUE   EdDSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6477,6 +6481,9 @@ BOOLEAN
 /**
   Generates an ML-DSA signature for a given message.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function creates an ML-DSA signature using the private key stored in the
   ML-DSA context. ML-DSA signatures can include an optional context string for
   domain separation, allowing the same key to be used in different contexts
@@ -6502,8 +6509,7 @@ BOOLEAN
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature (4627 bytes for ML-DSA-87).
 
-  @retval TRUE   ML-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6799,8 +6805,7 @@ BOOLEAN
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature (29792 bytes for SLH-DSA-SHAKE-256s).
 
-  @retval FALSE  Invalid parameters or signature generation failed. This deprecated
-                 protocol callback always returns FALSE.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6907,6 +6912,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_PKCS7_VERIFY_EKU                       VerifyEKUsInPkcs7Signature;
   EDKII_CRYPTO_PKCS7_GET_SIGNERS                      Pkcs7GetSigners;
   EDKII_CRYPTO_PKCS7_FREE_SIGNERS                     Pkcs7FreeSigners;
+  /// PKCS7 Sign - deprecated and unsupported
   EDKII_CRYPTO_PKCS7_SIGN                             Pkcs7Sign;
   EDKII_CRYPTO_PKCS7_GET_ATTACHED_CONTENT             Pkcs7GetAttachedContent;
   EDKII_CRYPTO_PKCS7_GET_CERTIFICATES_LIST            Pkcs7GetCertificatesList;
@@ -6930,6 +6936,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_RSA_GET_KEY                            RsaGetKey;
   EDKII_CRYPTO_RSA_GENERATE_KEY                       RsaGenerateKey;
   EDKII_CRYPTO_RSA_CHECK_KEY                          RsaCheckKey;
+  /// RSA PKCS1 Sign - deprecated and unsupported
   EDKII_CRYPTO_RSA_PKCS1_SIGN                         RsaPkcs1Sign;
   EDKII_CRYPTO_RSA_PKCS1_VERIFY                       RsaPkcs1Verify;
   EDKII_CRYPTO_RSA_GET_PRIVATE_KEY_FROM_PEM           RsaGetPrivateKeyFromPem;
@@ -7044,6 +7051,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY               TlsGetHostPrivateKey;
   EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST           TlsGetCertRevocationList;
   /// RSA PSS
+  /// RSA PSS Sign - deprecated and unsupported
   EDKII_CRYPTO_RSA_PSS_SIGN                           RsaPssSign;
   EDKII_CRYPTO_RSA_PSS_VERIFY                         RsaPssVerify;
   /// Parallel hash
@@ -7125,6 +7133,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   /// Ec (Continued)
   EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_X509            EcGetPublicKeyFromX509;
   EDKII_CRYPTO_EC_GET_PRIVATE_KEY_FROM_PEM            EcGetPrivateKeyFromPem;
+  /// EC-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_EC_DSA_SIGN                            EcDsaSign;
   EDKII_CRYPTO_EC_DSA_VERIFY                          EcDsaVerify;
   /// X509 (Continued)
@@ -7169,6 +7178,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_EC_POINT_MUL2                          EcPointMul2;
   EDKII_CRYPTO_EC_POINTS_MUL                          EcPointsMul;
   /// RSA PSS (Continued)
+  /// RSA PSS Sign Digest - deprecated and unsupported
   EDKII_CRYPTO_RSA_PSS_SIGN_DIGEST                    RsaPssSignDigest;
   EDKII_CRYPTO_RSA_PSS_VERIFY_DIGEST                  RsaPssVerifyDigest;
   /// Ed-DSA
@@ -7180,6 +7190,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_ED_DSA_GET_PUB_KEY                     EdDsaGetPubKey;
   EDKII_CRYPTO_ED_DSA_GET_PUBLIC_KEY_FROM_X509        EdDsaGetPublicKeyFromX509;
   EDKII_CRYPTO_ED_DSA_GET_PRIVATE_KEY_FROM_PEM        EdDsaGetPrivateKeyFromPem;
+  /// Ed-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_ED_DSA_SIGN                            EdDsaSign;
   EDKII_CRYPTO_ED_DSA_VERIFY                          EdDsaVerify;
   /// ML-DSA
@@ -7191,6 +7202,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_ML_DSA_GET_PUB_KEY                     MlDsaGetPubKey;
   EDKII_CRYPTO_ML_DSA_GET_PUBLIC_KEY_FROM_X509        MlDsaGetPublicKeyFromX509;
   EDKII_CRYPTO_ML_DSA_GET_PRIVATE_KEY_FROM_PEM        MlDsaGetPrivateKeyFromPem;
+  /// ML-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_ML_DSA_SIGN                            MlDsaSign;
   EDKII_CRYPTO_ML_DSA_VERIFY                          MlDsaVerify;
   /// SLH-DSA
@@ -7202,6 +7214,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_SLH_DSA_GET_PUB_KEY                    SlhDsaGetPubKey;
   EDKII_CRYPTO_SLH_DSA_GET_PUBLIC_KEY_FROM_X509       SlhDsaGetPublicKeyFromX509;
   EDKII_CRYPTO_SLH_DSA_GET_PRIVATE_KEY_FROM_PEM       SlhDsaGetPrivateKeyFromPem;
+  /// SLH-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_SLH_DSA_SIGN                           SlhDsaSign;
   EDKII_CRYPTO_SLH_DSA_VERIFY                         SlhDsaVerify;
   /// Pkcs (Continued)

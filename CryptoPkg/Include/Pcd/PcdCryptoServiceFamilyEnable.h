@@ -120,7 +120,7 @@ typedef struct {
       UINT8    VerifyEKUsInPkcs7Signature : 1;
       UINT8    Pkcs7GetSigners            : 1;
       UINT8    Pkcs7FreeSigners           : 1;
-      UINT8    Pkcs7Sign                  : 1;
+      UINT8    Pkcs7Sign                  : 1;  // Deprecated
       UINT8    Pkcs7GetAttachedContent    : 1;
       UINT8    Pkcs7GetCertificatesList   : 1;
       UINT8    AuthenticodeVerify         : 1;
@@ -158,7 +158,7 @@ typedef struct {
       UINT8    GetKey               : 1;
       UINT8    GenerateKey          : 1;
       UINT8    CheckKey             : 1;
-      UINT8    Pkcs1Sign            : 1;
+      UINT8    Pkcs1Sign            : 1;  // Deprecated
       UINT8    Pkcs1Verify          : 1;
       UINT8    GetPrivateKeyFromPem : 1;
       UINT8    GetPublicKeyFromX509 : 1;
@@ -357,9 +357,9 @@ typedef struct {
   } TlsGet;
   union {
     struct {
-      UINT8    Sign         : 1;
+      UINT8    Sign         : 1;  // Deprecated
       UINT8    Verify       : 1;
-      UINT8    SignDigest   : 1;
+      UINT8    SignDigest   : 1;  // Deprecated
       UINT8    VerifyDigest : 1;
     } Services;
     UINT32    Family;
@@ -437,7 +437,7 @@ typedef struct {
       UINT8    DhComputeKey                  : 1;
       UINT8    GetPublicKeyFromX509          : 1;
       UINT8    GetPrivateKeyFromPem          : 1;
-      UINT8    DsaSign                       : 1;
+      UINT8    DsaSign                       : 1;  // Deprecated
       UINT8    DsaVerify                     : 1;
       UINT8    GroupInitGFp                  : 1;
       UINT8    GroupSetGenerator             : 1;
@@ -465,7 +465,7 @@ typedef struct {
       UINT8    GetPubKey            : 1;
       UINT8    GetPrivateKeyFromPem : 1;
       UINT8    GetPublicKeyFromX509 : 1;
-      UINT8    Sign                 : 1;
+      UINT8    Sign                 : 1;  // Deprecated
       UINT8    Verify               : 1;
     } Services;
     UINT32    Family;
@@ -480,7 +480,7 @@ typedef struct {
       UINT8    GetPubKey            : 1;
       UINT8    GetPublicKeyFromX509 : 1;
       UINT8    GetPrivateKeyFromPem : 1;
-      UINT8    Sign                 : 1;
+      UINT8    Sign                 : 1;  // Deprecated
       UINT8    Verify               : 1;
     } Services;
     UINT32    Family;
@@ -495,7 +495,7 @@ typedef struct {
       UINT8    GetPubKey            : 1;
       UINT8    GetPublicKeyFromX509 : 1;
       UINT8    GetPrivateKeyFromPem : 1;
-      UINT8    Sign                 : 1;
+      UINT8    Sign                 : 1;  // Deprecated
       UINT8    Verify               : 1;
     } Services;
     UINT32    Family;

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "TestBaseCryptLib.h"
+#include "VerifyTestSignatures.h"
 
 #define EC_CURVE_NUM_SUPPORTED  3
 UINTN  EcCurveList[EC_CURVE_NUM_SUPPORTED]   = { CRYPTO_NID_SECP256R1, CRYPTO_NID_SECP384R1, CRYPTO_NID_SECP521R1 };
@@ -362,6 +363,14 @@ TestVerifyEcDh (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Validate ECDSA signature verification.
+
+  @param[in]  Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED               The test case has completed successfully.
+  @retval UNIT_TEST_ERROR_TEST_FAILED    A test case assertion has failed.
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestVerifyEcKey (
@@ -371,10 +380,10 @@ TestVerifyEcKey (
   BOOLEAN  Status;
   VOID     *EcPrivKey;
   VOID     *EcPubKey;
-  UINT8    HashValue[SHA256_DIGEST_SIZE];
-  UINTN    HashSize;
-  UINT8    Signature[66 * 2];
-  UINTN    SigSize;
+  UINT8    MessageHash[SHA256_DIGEST_SIZE];
+
+  EcPrivKey = NULL;
+  EcPubKey  = NULL;
 
   //
   // Retrieve EC private key from PEM data.
@@ -397,34 +406,20 @@ TestVerifyEcKey (
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Verify EC-DSA
-  //
-  HashSize = sizeof (HashValue);
-  SigSize  = sizeof (Signature);
-  //
-  // EC-DSA Signing ...
-  //
-  Status = EcDsaSign (
-             EcPrivKey,
-             CRYPTO_NID_SHA256,
-             HashValue,
-             HashSize,
-             Signature,
-             &SigSize
+  Status = Sha256HashAll (
+             (UINT8 *)"Test message for ECDSA verification",
+             sizeof ("Test message for ECDSA verification") - 1,
+             MessageHash
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // EC-DSA Verification ...
-  //
   Status = EcDsaVerify (
              EcPubKey,
              CRYPTO_NID_SHA256,
-             HashValue,
-             HashSize,
-             Signature,
-             SigSize
+             MessageHash,
+             sizeof (MessageHash),
+             mEcDsaTestSignature,
+             sizeof (mEcDsaTestSignature)
              );
   UT_ASSERT_TRUE (Status);
 
