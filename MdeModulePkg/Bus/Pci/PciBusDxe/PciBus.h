@@ -104,6 +104,13 @@ struct _PCI_BAR {
   // is fixed and must not be reassigned.
   //
   BOOLEAN         AddressFixed;
+  //
+  // TRUE if the BAR register already holds BaseAddress, as for a BAR described
+  // by an Enhanced Allocation entry whose hardware decodes the fixed range
+  // itself. FALSE if BaseAddress comes from a platform supplied descriptor and
+  // must be written to the BAR register.
+  //
+  BOOLEAN         AddressProgrammed;
   UINT16          Offset;
 };
 

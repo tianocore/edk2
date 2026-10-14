@@ -2005,9 +2005,10 @@ PciParseBar (
     return Offset + 4;
   }
 
-  PciIoDevice->PciBar[BarIndex].BarTypeFixed = FALSE;
-  PciIoDevice->PciBar[BarIndex].AddressFixed = FALSE;
-  PciIoDevice->PciBar[BarIndex].Offset       = (UINT8)Offset;
+  PciIoDevice->PciBar[BarIndex].BarTypeFixed      = FALSE;
+  PciIoDevice->PciBar[BarIndex].AddressFixed      = FALSE;
+  PciIoDevice->PciBar[BarIndex].AddressProgrammed = FALSE;
+  PciIoDevice->PciBar[BarIndex].Offset            = (UINT8)Offset;
   if ((Value & 0x01) != 0) {
     //
     // Device I/Os
@@ -2501,10 +2502,11 @@ PciParseEnhancedAllocation (
     // The address is fixed, so the alignment is merely informational: use the
     // natural alignment of the base address.
     //
-    Bar->Alignment    = (Base == 0) ? 0 : (LShiftU64 (1, LowBitSet64 (Base)) - 1);
-    Bar->BarType      = BarType;
-    Bar->BarTypeFixed = TRUE;
-    Bar->AddressFixed = TRUE;
+    Bar->Alignment         = (Base == 0) ? 0 : (LShiftU64 (1, LowBitSet64 (Base)) - 1);
+    Bar->BarType           = BarType;
+    Bar->BarTypeFixed      = TRUE;
+    Bar->AddressFixed      = TRUE;
+    Bar->AddressProgrammed = TRUE;
 
     DEBUG ((
       DEBUG_INFO,
