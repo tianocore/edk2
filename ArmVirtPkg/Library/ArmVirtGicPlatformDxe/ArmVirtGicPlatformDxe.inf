@@ -24,8 +24,8 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  DxeServicesLib
   PcdLib
-  MapMmioLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
