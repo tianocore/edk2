@@ -1,5 +1,5 @@
 /** @file
-  Helper library to map mmio memory regions.
+  Helper functions to map MMIO memory regions.
 
   Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -7,15 +7,12 @@
 
 #include <Base.h>
 #include <Uefi.h>
-
+#include <Guid/DxeServices.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-STATIC EFI_EVENT  mExitBootServicesEvent;
-STATIC BOOLEAN    mAtRuntime = FALSE;
+#include <Library/UefiLib.h>
 
 /**
   Ensure a range is present in the GCD memory space map as MMIO.
@@ -31,10 +28,11 @@ STATIC BOOLEAN    mAtRuntime = FALSE;
   This function only ensures that MMIO GCD descriptors exist. It does not set
   memory space attributes.
 
-  @param[in] Base        The page-aligned base address of the MMIO range.
-  @param[in] Length      The page-aligned size of the MMIO range, in bytes.
-  @param[in] Attributes  The GCD memory space attributes required for the MMIO
-                         range.
+  @param[in] DxeServices  Pointer to the Dxe Services.
+  @param[in] Base         The page-aligned base address of the MMIO range.
+  @param[in] Length       The page-aligned size of the MMIO range, in bytes.
+  @param[in] Attributes   The GCD memory space attributes required for the MMIO
+                          range.
 
   @retval EFI_SUCCESS      The range is backed by compatible MMIO descriptors.
   @retval EFI_UNSUPPORTED  The range overlaps an existing non-MMIO descriptor,
@@ -46,9 +44,10 @@ STATIC BOOLEAN    mAtRuntime = FALSE;
 STATIC
 EFI_STATUS
 AddMmioMemorySpace (
-  IN  UINT64  Base,
-  IN  UINT64  Length,
-  IN  UINT64  Attributes
+  IN  EFI_DXE_SERVICES  *DxeServices,
+  IN  UINT64            Base,
+  IN  UINT64            Length,
+  IN  UINT64            Attributes
   )
 {
   EFI_STATUS                       Status;
@@ -59,7 +58,10 @@ AddMmioMemorySpace (
   UINT64                           IntersectionBase;
   UINT64                           IntersectionEnd;
 
-  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  Status = DxeServices->GetMemorySpaceMap (
+                          &NumberOfDescriptors,
+                          &MemorySpaceMap
+                          );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -85,12 +87,12 @@ AddMmioMemorySpace (
     }
 
     if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-      Status = gDS->AddMemorySpace (
-                      EfiGcdMemoryTypeMemoryMappedIo,
-                      IntersectionBase,
-                      IntersectionEnd - IntersectionBase,
-                      Attributes
-                      );
+      Status = DxeServices->AddMemorySpace (
+                              EfiGcdMemoryTypeMemoryMappedIo,
+                              IntersectionBase,
+                              IntersectionEnd - IntersectionBase,
+                              Attributes
+                              );
 
       DEBUG ((
         EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
@@ -136,6 +138,9 @@ AddMmioMemorySpace (
   are not rolled back. Callers are expected to treat failures from this function
   as fatal to the current boot path.
 
+  Note: This function is intended to be used only in DXE phase and must not be
+        used after ExitBootServices has been signalled.
+
   @param[in] Base        The base address of the requested MMIO range.
   @param[in] Length      The size of the requested MMIO range, in bytes.
   @param[in] Attributes  The GCD memory space attributes to apply to the MMIO
@@ -149,7 +154,7 @@ AddMmioMemorySpace (
                                  descriptor, or an MMIO descriptor without the
                                  requested attributes.
   @retval EFI_ABORTED            An existing GCD descriptor is malformed.
-  @retval EFI_ACCESS_DENIED      DXE Services are no longer available.
+  @retval EFI_ACCESS_DENIED      DXE Services are not available.
   @retval Others                 The GCD memory services returned an error.
 **/
 EFI_STATUS
@@ -162,11 +167,13 @@ MapMmioMemory (
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  RegionEnd;
+  EFI_DXE_SERVICES      *DxeServices;
 
-  if (mAtRuntime) {
-    //
-    // DXE Services are no longer available.
-    //
+  Status = EfiGetSystemConfigurationTable (
+             &gEfiDxeServicesTableGuid,
+             (VOID **)&DxeServices
+             );
+  if (EFI_ERROR (Status) || (DxeServices == NULL)) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -202,80 +209,10 @@ MapMmioMemory (
   // Calculate the total region size.
   Length = RegionEnd - Base;
 
-  Status = AddMmioMemorySpace (Base, Length, Attributes);
+  Status = AddMmioMemorySpace (DxeServices, Base, Length, Attributes);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  return gDS->SetMemorySpaceAttributes (Base, Length, Attributes);
-}
-
-/**
-  Notification function signaled when ExitBootServices() is called.
-
-  Record that DXE services are no longer available. MapMmioMemory() uses this
-  state to reject calls after ExitBootServices().
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  Pointer to the notification function's context.
-**/
-STATIC
-VOID
-EFIAPI
-MapMmioLibExitBootServicesNotify (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  mAtRuntime = TRUE;
-}
-
-/**
-  Library instance destructor.
-
-  Close the ExitBootServices event created by the constructor.
-
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
-  @param[in] SystemTable  A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS  The ExitBootServices event was closed.
-  @retval Others       Failed to close the ExitBootServices event.
-**/
-EFI_STATUS
-EFIAPI
-MapMmioLibDestructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  return gBS->CloseEvent (mExitBootServicesEvent);
-}
-
-/**
-  Library instance constructor.
-
-  Register for ExitBootServices() notification so MapMmioLib can detect when
-  DXE services are no longer available.
-
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
-  @param[in] SystemTable  A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS  The ExitBootServices event was registered.
-  @retval Others       Failed to register the ExitBootServices event.
-**/
-EFI_STATUS
-EFIAPI
-MapMmioLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  return gBS->CreateEventEx (
-                EVT_NOTIFY_SIGNAL,
-                TPL_CALLBACK,
-                MapMmioLibExitBootServicesNotify,
-                NULL,
-                &gEfiEventExitBootServicesGuid,
-                &mExitBootServicesEvent
-                );
+  return DxeServices->SetMemorySpaceAttributes (Base, Length, Attributes);
 }
