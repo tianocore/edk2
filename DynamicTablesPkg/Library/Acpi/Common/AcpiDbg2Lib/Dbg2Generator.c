@@ -171,6 +171,7 @@ FreeDbg2TableEx (
   }
 
   TableList = *Table;
+  Status    = EFI_SUCCESS;
 
   // Free the DBG2 table
   if (TableCount != 0) {
