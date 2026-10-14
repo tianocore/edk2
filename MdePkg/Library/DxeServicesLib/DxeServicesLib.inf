@@ -27,6 +27,7 @@
 
 [Sources]
   DxeServicesLib.c
+  MapMmioMemory.c
 
 [Sources.IA32, Sources.EBC, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
   Allocate.c
@@ -50,6 +51,7 @@
 
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## UNDEFINED
+  gEfiDxeServicesTableGuid                      ## SOMETIMES_CONSUMES
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMES
@@ -57,4 +59,3 @@
   gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
-
