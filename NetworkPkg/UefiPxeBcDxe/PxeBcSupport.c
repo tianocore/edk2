@@ -321,6 +321,7 @@ PxeBcIcmpErrorDpcHandle (
   // Copy ICMP error fragments into Mode->IcmpError in order. The maximum
   // buffer size is sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR); truncate any excess.
   //
+  ZeroMem (&Mode->IcmpError, sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
   for (Index = 0, IcmpError = (UINT8 *)&Mode->IcmpError, CopiedLen = 0;
        (Index < RxData->FragmentCount) &&
        (CopiedLen < sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
@@ -445,6 +446,7 @@ PxeBcIcmp6ErrorDpcHandle (
   // Copy ICMP error fragments into Mode->IcmpError in order. The maximum
   // buffer size is sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR); truncate any excess.
   //
+  ZeroMem (&Mode->IcmpError, sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
   for (Index = 0, Icmp6Error = (UINT8 *)&Mode->IcmpError, CopiedLen = 0;
        (Index < RxData->FragmentCount) &&
        (CopiedLen < sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
