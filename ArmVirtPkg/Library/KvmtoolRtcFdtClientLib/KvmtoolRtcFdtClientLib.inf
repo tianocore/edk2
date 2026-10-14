@@ -29,7 +29,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-  MapMmioLib
+  DxeServicesLib
   PcdLib
   UefiBootServicesTableLib
   DxeServicesTableLib
