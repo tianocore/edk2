@@ -328,7 +328,8 @@ AllocatePeiAccessiblePages (
   of any other type are treated as conflicts.
 
   After the range is backed by compatible MMIO descriptors, the requested GCD
-  memory space attributes are applied to the normalized full range.
+  memory space attributes are applied to the normalized full range, followed by
+  architecture-specific attribute configuration.
 
   If this function fails after adding new GCD MMIO descriptors, the descriptors
   are not rolled back. Callers are expected to treat failures from this function
