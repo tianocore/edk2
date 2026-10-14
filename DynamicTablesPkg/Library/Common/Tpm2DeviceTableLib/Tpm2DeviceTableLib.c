@@ -117,8 +117,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupTpm2DeviceCrs (
-  IN        AML_ROOT_NODE_HANDLE             RootNodeHandle,
-  IN  CONST CM_ARCH_COMMON_TPM2_DEVICE_INFO  *TpmDevInfo
+  IN        AML_ROOT_NODE_HANDLE            RootNodeHandle,
+  IN  CONST CM_ARCH_COMMON_TPM_DEVICE_INFO  *TpmDevInfo
   )
 {
   EFI_STATUS              Status;
@@ -181,10 +181,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupTpm2DeviceInfo (
-  IN            AML_ROOT_NODE_HANDLE             RootNodeHandle,
-  IN      CONST CM_ARCH_COMMON_TPM2_DEVICE_INFO  *TpmDevInfo,
-  IN      CONST CHAR8                            *Name,
-  IN      CONST UINT64                           Uid
+  IN            AML_ROOT_NODE_HANDLE            RootNodeHandle,
+  IN      CONST CM_ARCH_COMMON_TPM_DEVICE_INFO  *TpmDevInfo,
+  IN      CONST CHAR8                           *Name,
+  IN      CONST UINT64                          Uid
   )
 {
   EFI_STATUS  Status;
@@ -229,10 +229,10 @@ FixupTpm2DeviceInfo (
 EFI_STATUS
 EFIAPI
 BuildTpm2DeviceTable (
-  IN  CONST CM_ARCH_COMMON_TPM2_DEVICE_INFO  *TpmDevInfo,
-  IN  CONST CHAR8                            *Name,
-  IN  CONST UINT64                           Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER      **Table
+  IN  CONST CM_ARCH_COMMON_TPM_DEVICE_INFO  *TpmDevInfo,
+  IN  CONST CHAR8                           *Name,
+  IN  CONST UINT64                          Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER     **Table
   )
 {
   EFI_STATUS            Status;

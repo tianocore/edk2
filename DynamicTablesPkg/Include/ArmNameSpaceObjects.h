@@ -59,7 +59,9 @@ typedef enum ArmObjectID {
   EArmObjGicIrsInfo,                                           ///< 29 - GIC IRS Info
   EArmObjGicItsV5Info,                                         ///< 30 - GIC ITS v5 Info
   EArmObjGicItsV5TranslateFrameInfo,                           ///< 31 - GIC ITS v5 Translate Frame Info
-  EArmObjGicIwbInfo,                                           ///< 34 - GIC IWB Info
+  EArmObjGicIwbInfo,                                           ///< 32 - GIC IWB Info
+  EArmObjBmuRegInfo,                                           ///< 33 - BMU Reg Info
+  EArmObjPl050Info,                                            ///< 34 - PL050 Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -677,6 +679,21 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
+/** A structure that describes a PL050 keyboard or mouse interface.
+
+    ID: EArmObjPl050Info
+*/
+typedef struct CmArmPl050Info {
+  /// FALSE for a keyboard interface; TRUE for a mouse interface.
+  BOOLEAN                      IsMouse;
+
+  /// Controller MMIO base address.
+  UINT64                       BaseAddress;
+
+  /// AML Extended Interrupt descriptor information.
+  CM_ARM_EXTENDED_INTERRUPT    Interrupt;
+} CM_ARM_PL050_INFO;
+
 /** CMN implementation types. */
 typedef enum ArmCmnType {
   ArmCmnType600,
@@ -1054,5 +1071,21 @@ typedef struct CmArmGicIwbInfo {
   /// Unique identifier for this node.
   UINT32             Identifier;
 } CM_ARM_GIC_IWB_INFO;
+
+/** A structure that describes the BMU hardware
+    registers and interrupt.
+
+    ID: EArmObjBmuRegInfo
+*/
+typedef struct CmArmBmuRegInfo {
+  /// The Base address of BMU register space.
+  UINT64                       BaseAddress;
+
+  /// Length of the BMU registers
+  UINT64                       Length;
+
+  /// The BMU interrupt descriptor
+  CM_ARM_EXTENDED_INTERRUPT    BmuIntr;
+} CM_ARM_BMU_REG_INFO;
 
 #pragma pack()

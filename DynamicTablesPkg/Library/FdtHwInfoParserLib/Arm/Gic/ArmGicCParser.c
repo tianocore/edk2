@@ -17,6 +17,7 @@
 #include "CmObjectDescUtility.h"
 #include "Arm/Gic/ArmGicCParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmTraceExtensionsParser.h"
 
 /** List of "compatible" property values for CPU nodes.
 
@@ -52,6 +53,53 @@ CONST COMPATIBILITY_INFO  PmuCompatibleInfo = {
   ARRAY_SIZE (PmuCompatibleStr),
   PmuCompatibleStr
 };
+
+/** Parse TRBE nodes and attach the decoded interrupt to their CPUs.
+
+  This function modifies the input CM_ARM_GICC_INFO array to set:
+    - TrbeInterrupt
+
+  @param [in]      Fdt               Pointer to a Flattened Device Tree (Fdt).
+  @param [in, out] GicCCmObjDesc     The CM_ARM_GICC_INFO array to patch.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No TRBE node was found.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GicCTrbeNodeParser (
+  IN      CONST VOID               *Fdt,
+  IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
+  )
+{
+  EFI_STATUS        Status;
+  UINT32            Index;
+  UINT16            TrbeInterrupt;
+  CM_ARM_GICC_INFO  *GicCInfo;
+
+  if ((Fdt == NULL)             ||
+      (GicCCmObjDesc == NULL)   ||
+      (GicCCmObjDesc->Data == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ArmGetTrbeInterrupt (Fdt, &TrbeInterrupt);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    GicCInfo[Index].TrbeInterrupt = TrbeInterrupt;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /** Parse a "cpu" node.
 
@@ -149,16 +197,26 @@ CpuNodeParser (
 /** Parse a "cpus" node and its children "cpu" nodes.
 
   Create as many CM_ARM_GICC_INFO structures as "cpu" nodes.
+  The caller owns the returned CpuNodeOffsetMap and must free it
+  using FreePool().
 
   @param [in]  Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]  CpusNode         Offset of a cpus node.
   @param [in]  GicVersion       Version of the GIC.
   @param [out] NewGicCmObjDesc  If success, CM_OBJ_DESCRIPTOR containing
                                 all the created CM_ARM_GICC_INFO.
+  @param [out] CpuNodeOffsetMap If success, an array mapping each GICC index
+                                to the corresponding CPU DT node offset.
+                                The caller owns the returned array and must
+                                free it using FreePool().
+  @param [out] CpuCount         If success, number of CPU device nodes
+                                parsed below CpusNode.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No CPU device node was found.
+  @retval EFI_OUT_OF_RESOURCES    Memory allocation failed.
   @retval EFI_UNSUPPORTED         Unsupported.
 **/
 STATIC
@@ -169,6 +227,7 @@ CpusNodeParser (
   IN        INT32              CpusNode,
   IN        UINT32             GicVersion,
   OUT       CM_OBJ_DESCRIPTOR  **NewGicCmObjDesc,
+  OUT       INT32              **CpuNodeOffsetMap,
   OUT       UINTN              *CpuCount
   )
 {
@@ -179,12 +238,18 @@ CpusNodeParser (
 
   UINT32            Index;
   CM_ARM_GICC_INFO  *GicCInfoBuffer;
+  INT32             *LocalCpuNodeOffsetMap;
   UINT32            GicCInfoBufferSize;
 
-  if (NewGicCmObjDesc == NULL) {
+  if ((NewGicCmObjDesc == NULL) ||
+      (CpuNodeOffsetMap == NULL) ||
+      (CpuCount == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *CpuNodeOffsetMap = NULL;
 
   AddressCells = FdtAddressCells (Fdt, CpusNode);
   if (AddressCells < 0) {
@@ -192,8 +257,8 @@ CpusNodeParser (
     return EFI_ABORTED;
   }
 
-  // Count the number of "cpu" nodes under the "cpus" node.
-  Status = FdtCountNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNodeCount);
+  // Count the number of CPU device nodes under the "cpus" node.
+  Status = FdtCountCondNodeInBranch (Fdt, CpusNode, IsCpuDeviceNode, NULL, &CpuNodeCount);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -214,17 +279,17 @@ CpusNodeParser (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CpuNode = CpusNode;
-  for (Index = 0; Index < CpuNodeCount; Index++) {
-    Status = FdtGetNextNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNode);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      if (Status == EFI_NOT_FOUND) {
-        // Should have found the node.
-        Status = EFI_ABORTED;
-      }
+  LocalCpuNodeOffsetMap = AllocateZeroPool (CpuNodeCount * sizeof (*LocalCpuNodeOffsetMap));
+  if (LocalCpuNodeOffsetMap == NULL) {
+    FreePool (GicCInfoBuffer);
+    ASSERT (FALSE);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
-      goto exit_handler;
+  Index = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    if (!IsCpuDeviceNode (Fdt, CpuNode, NULL)) {
+      continue;
     }
 
     // Parse the "cpu" node.
@@ -245,7 +310,16 @@ CpusNodeParser (
       ASSERT (0);
       goto exit_handler;
     }
-  } // for
+
+    LocalCpuNodeOffsetMap[Index] = CpuNode;
+    Index++;
+  }
+
+  if (Index != CpuNodeCount) {
+    ASSERT (FALSE);
+    Status = EFI_ABORTED;
+    goto exit_handler;
+  }
 
   Status = CreateCmObjDesc (
              CREATE_CM_ARM_OBJECT_ID (EArmObjGicCInfo),
@@ -255,8 +329,16 @@ CpusNodeParser (
              NewGicCmObjDesc
              );
   ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
+    *CpuNodeOffsetMap     = LocalCpuNodeOffsetMap;
+    LocalCpuNodeOffsetMap = NULL;
+  }
 
 exit_handler:
+  if (LocalCpuNodeOffsetMap != NULL) {
+    FreePool (LocalCpuNodeOffsetMap);
+  }
+
   FreePool (GicCInfoBuffer);
   return Status;
 }
@@ -551,11 +633,19 @@ GicCv3IntcNodeParser (
 
   // The "#redistributor-regions" property is optional.
   Data = FdtGetProp (Fdt, Gicv3IntcNode, "#redistributor-regions", &DataSize);
-  if ((Data != NULL) && (DataSize == sizeof (UINT32))) {
-    ASSERT (Fdt32ToCpu (*(UINT32 *)Data) > 1);
-    AdditionalRedistReg = Fdt32ToCpu (*(UINT32 *)Data) - 1;
-  } else {
+  if (Data == NULL) {
     AdditionalRedistReg = 0;
+  } else if (DataSize != sizeof (UINT32)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  } else {
+    AdditionalRedistReg = Fdt32ToCpu (*(UINT32 *)Data);
+    if ((AdditionalRedistReg < 1) || (AdditionalRedistReg > 4096)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
+
+    AdditionalRedistReg--;
   }
 
   RegSize = (AddressCells + SizeCells) * sizeof (UINT32);
@@ -587,7 +677,13 @@ GicCv3IntcNodeParser (
     return EFI_ABORTED;
   }
 
-  RegCount = (DataSize / RegSize) - AdditionalRedistReg;
+  RegCount = DataSize / RegSize;
+  if (RegCount < (AdditionalRedistReg + 2)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  RegCount -= AdditionalRedistReg;
 
   // The GicD and GicR info is mandatory.
   switch (RegCount) {
@@ -850,6 +946,8 @@ GicCPmuNodeParser (
     UINT32  ProximityDomain;                  // {default = 0}
     UINT32  ClockDomain;                      // {default = 0}
     UINT32  AffinityFlags;                    // {default = 0}
+    UINT16  TrbeInterrupt;                    // {default = 0}
+    CM_OBJECT_TOKEN EtToken;                  // {default = CM_NULL_TOKEN}
   } CM_ARM_GICC_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
@@ -880,16 +978,21 @@ ArmGicCInfoParser (
   INT32              IntcNode;
   UINT32             GicVersion;
   CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
+  CM_OBJECT_TOKEN    *CpuTokenTable;
+  INT32              *CpuNodeOffsetMap;
   VOID               *Fdt;
   UINTN              CpuCount;
+  UINT32             Index;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Fdt          = FdtParserHandle->Fdt;
-  NewCmObjDesc = NULL;
+  Fdt              = FdtParserHandle->Fdt;
+  NewCmObjDesc     = NULL;
+  CpuTokenTable    = NULL;
+  CpuNodeOffsetMap = NULL;
 
   // The FdtBranch points to the Cpus Node.
   // Get the interrupt-controller node associated to the "cpus" node.
@@ -912,7 +1015,14 @@ ArmGicCInfoParser (
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
   // and create a CM_OBJ_DESCRIPTOR.
-  Status = CpusNodeParser (Fdt, FdtBranch, GicVersion, &NewCmObjDesc, &CpuCount);
+  Status = CpusNodeParser (
+             Fdt,
+             FdtBranch,
+             GicVersion,
+             &NewCmObjDesc,
+             &CpuNodeOffsetMap,
+             &CpuCount
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -957,14 +1067,56 @@ ArmGicCInfoParser (
     goto exit_handler;
   }
 
+  // Parse the per-CPU trace buffer extension interrupt.
+  Status = GicCTrbeNodeParser (
+             Fdt,
+             NewCmObjDesc
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  // Parse the per-CPU embedded trace extension information.
+  Status = ArmTraceAddEtInfo (
+             Fdt,
+             FdtParserHandle,
+             CpuNodeOffsetMap,
+             NewCmObjDesc
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  CpuTokenTable = AllocateZeroPool (sizeof (*CpuTokenTable) * CpuCount);
+  if (CpuTokenTable == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    ASSERT (FALSE);
+    goto exit_handler;
+  }
+
+  for (Index = 0; Index < CpuCount; Index++) {
+    ASSERT (((CpuNodeOffsetMap[Index]) & ~CM_ABSTRACT_TOKEN_ID_MASK) == 0);
+    CpuTokenTable[Index] = (CM_OBJECT_TOKEN)CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceFdtHwInfo, EFdtHwInfoGicCObject, (UINT32)CpuNodeOffsetMap[Index]);
+  }
+
   // Add all the CmObjs to the Configuration Manager.
-  Status = AddMultipleCmObj (FdtParserHandle, NewCmObjDesc, 0, NULL);
+  Status = AddMultipleCmObjWithToken (FdtParserHandle, NewCmObjDesc, CpuTokenTable);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
   }
 
 exit_handler:
+  if (CpuTokenTable != NULL) {
+    FreePool (CpuTokenTable);
+  }
+
+  if (CpuNodeOffsetMap != NULL) {
+    FreePool (CpuNodeOffsetMap);
+  }
+
   FreeCmObjDesc (NewCmObjDesc);
   return Status;
 }
