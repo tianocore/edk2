@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -414,7 +415,6 @@ AdjustPciDeviceBarSize (
   LIST_ENTRY     *CurrentLink;
   BOOLEAN        Adjusted;
   UINTN          Offset;
-  UINTN          BarIndex;
 
   Adjusted    = FALSE;
   CurrentLink = RootBridgeDev->ChildList.ForwardLink;
@@ -439,8 +439,8 @@ AdjustPciDeviceBarSize (
         //
         // Start to parse the bars
         //
-        for (Offset = 0x10, BarIndex = 0; Offset <= 0x24 && BarIndex < PCI_MAX_BAR; BarIndex++) {
-          Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
+        for (Offset = 0x10; Offset <= 0x24;) {
+          Offset = PciParseBar (PciIoDevice, Offset);
         }
 
         Adjusted = TRUE;
