@@ -32,6 +32,10 @@
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
+[LibraryClasses.AARCH64]
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+
 [Components]
   MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
