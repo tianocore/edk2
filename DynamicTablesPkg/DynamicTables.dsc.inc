@@ -91,6 +91,7 @@
   # AML Codegen (Common)
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtVirtioMmioDeviceLib/SsdtVirtioMmioDeviceLib.inf
 
   #
   # Dynamic Tables Manager Dxe
@@ -133,6 +134,7 @@
       #  Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtVirtioMmioDeviceLib/SsdtVirtioMmioDeviceLib.inf
       #  X64 specific
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
   }
@@ -197,6 +199,7 @@
       #  Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtVirtioMmioDeviceLib/SsdtVirtioMmioDeviceLib.inf
 
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType0Lib/SmbiosType0Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType1Lib/SmbiosType1Lib.inf
