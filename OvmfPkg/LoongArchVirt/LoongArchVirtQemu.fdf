@@ -210,7 +210,6 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
-INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 
 #
 # TPM support

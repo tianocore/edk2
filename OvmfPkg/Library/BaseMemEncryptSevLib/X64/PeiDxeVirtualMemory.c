@@ -730,11 +730,6 @@ SetMemoryEncDec (
   UINTN                           OrigLength;
   RETURN_STATUS                   Status;
 
-  //
-  // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
-  //
-  PageMapLevel4Entry = NULL;
-
   DEBUG ((
     DEBUG_PAGING,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
@@ -809,14 +804,14 @@ SetMemoryEncDec (
   OrigLength          = Length;
   OrigPhysicalAddress = PhysicalAddress;
 
-  while (Length != 0) {
-    //
-    // If Cr3BaseAddress is not specified then read the current CR3
-    //
-    if (Cr3BaseAddress == 0) {
-      Cr3BaseAddress = AsmReadCr3 ();
-    }
+  //
+  // If Cr3BaseAddress is not specified then read the current CR3
+  //
+  if (Cr3BaseAddress == 0) {
+    Cr3BaseAddress = AsmReadCr3 ();
+  }
 
+  while (Length != 0) {
     PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
     PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
     if (!PageMapLevel4Entry->Bits.Present) {
@@ -974,7 +969,7 @@ SetMemoryEncDec (
   // read-only.
   //
   if (IsWpEnabled) {
-    EnablePageTableProtection ((UINTN)PageMapLevel4Entry, TRUE);
+    EnablePageTableProtection ((UINTN)(Cr3BaseAddress & ~PgTableMask), TRUE);
   }
 
   //
