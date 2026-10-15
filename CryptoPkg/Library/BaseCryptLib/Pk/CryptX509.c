@@ -3,6 +3,7 @@
 
 Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1038,9 +1039,9 @@ EcGetPublicKeyFromX509 (
   OUT  VOID         **EcContext
   )
 {
-  BOOLEAN   Status;
-  EVP_PKEY  *Pkey;
-  X509      *X509Cert;
+  BOOLEAN     Status;
+  EC_CONTEXT  *EcCtx;
+  X509        *X509Cert;
 
   //
   // Check input parameters.
@@ -1049,16 +1050,22 @@ EcGetPublicKeyFromX509 (
     return FALSE;
   }
 
+  *EcContext = NULL;
+
   //
   // If CertSize is 0, return FALSE to be safe.
   //
   if (CertSize == 0) {
-    *EcContext = NULL;
     return FALSE;
   }
 
-  Pkey     = NULL;
   X509Cert = NULL;
+  Status   = FALSE;
+
+  EcCtx = OPENSSL_zalloc (sizeof (EC_CONTEXT));
+  if (EcCtx == NULL) {
+    return FALSE;
+  }
 
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
@@ -1074,17 +1081,19 @@ EcGetPublicKeyFromX509 (
   //
   // Retrieve and check EVP_PKEY data from X509 Certificate.
   //
-  Pkey = X509_get_pubkey (X509Cert);
-  if ((Pkey == NULL) || (EVP_PKEY_id (Pkey) != EVP_PKEY_EC)) {
+  EcCtx->EvpPkey = X509_get_pubkey (X509Cert);
+  if (EcCtx->EvpPkey == NULL) {
     goto _Exit;
   }
 
-  //
-  // Duplicate EC Context from the retrieved EVP_PKEY.
-  //
-  if ((*EcContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
-    Status = TRUE;
+  if (EVP_PKEY_id (EcCtx->EvpPkey) != EVP_PKEY_EC) {
+    EVP_PKEY_free (EcCtx->EvpPkey);
+    goto _Exit;
   }
+
+  Status     = TRUE;
+  *EcContext = EcCtx;
+  EcCtx      = NULL;
 
 _Exit:
   //
@@ -1094,8 +1103,8 @@ _Exit:
     X509_free (X509Cert);
   }
 
-  if (Pkey != NULL) {
-    EVP_PKEY_free (Pkey);
+  if (EcCtx != NULL) {
+    OPENSSL_free (EcCtx);
   }
 
   return Status;
