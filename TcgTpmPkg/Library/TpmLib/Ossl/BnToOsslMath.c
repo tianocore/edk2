@@ -174,6 +174,7 @@ BnMathLibraryCompatibilityCheck (
 
   // Convert the test data to an OpenSSL BIGNUM
   osslTemp = BigNumFromBin (test, sizeof (test));
+  GOTO_ERROR_UNLESS (osslTemp != NULL);
 
   // Make sure the values are consistent
   GOTO_ERROR_UNLESS (osslTemp->top == (int)tpmTemp->size);
