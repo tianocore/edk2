@@ -165,6 +165,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
   EArchCommonObjOemString,                         ///< 96 - OEM String
   EArchCommonObjPortConnectorInfo,                 ///< 97 - Port Connector Information
+  EArchCommonObjVirtioMmioDeviceInfo,              ///< 98 - Virtio MMIO Device Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2551,5 +2552,18 @@ typedef struct CmArchCommonSystemSlotInfo {
   /// Slot height.
   UINT8              SlotHeight;
 } CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
+
+/** A structure describing a Virtio MMIO device.
+
+  ID: EArchCommonObjVirtioMmioDeviceInfo
+**/
+typedef struct CmArchCommonVirtioMmioDeviceInfo {
+  /// Physical base address of the device registers.
+  UINT64                              BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                              BaseAddressLength;
+  /// Interrupt number and polarity/trigger flags.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
+} CM_ARCH_COMMON_VIRTIO_MMIO_DEVICE_INFO;
 
 #pragma pack()
