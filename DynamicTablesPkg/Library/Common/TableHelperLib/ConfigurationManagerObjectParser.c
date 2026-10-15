@@ -510,6 +510,32 @@ STATIC CONST CM_OBJ_PARSER  CmArmBmuRegInfoParser[] = {
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
+/** A parser for EArmObjScmiDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiDeviceInfoParser[] = {
+  { "Token",                   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CommonA2pTransportToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CommonP2aTransportToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "ProtocolInfoToken",       sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiPccTransportInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiPccTransportInfoParser[] = {
+  { "Token",               sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "PccSubspaceObjectId", sizeof (UINT32),          "0x%x", NULL },
+  { "PccSubspaceToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiProtocolInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiProtocolInfoParser[] = {
+  { "ProtocolType",               sizeof (CM_ARM_SCMI_PROTOCOL_TYPE), "0x%x", NULL },
+  { "ExclusiveA2pTransportToken", sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "ExclusiveP2aTransportToken", sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "NotificationsSupported",     sizeof (BOOLEAN),                   "0x%x", NULL },
+};
+
 /** A parser for EArmObjCmnInfo containing CMN information.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
@@ -1946,6 +1972,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPl050Info,                       CmArmPl050InfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiDeviceInfo,                  CmArmScmiDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiPccTransportInfo,            CmArmScmiPccTransportInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiProtocolInfo,                CmArmScmiProtocolInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
