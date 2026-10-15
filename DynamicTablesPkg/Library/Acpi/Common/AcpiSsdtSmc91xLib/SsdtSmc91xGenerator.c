@@ -325,11 +325,6 @@ BuildSsdtSmc91xTable (
   Status = AmlSerializeDefinitionBlock (RootNode, Table);
 
 Cleanup:
-  if (EFI_ERROR (Status) && (*Table != NULL)) {
-    FreePool (*Table);
-    *Table = NULL;
-  }
-
   CleanupStatus = AmlDeleteTree (RootNode);
   if (EFI_ERROR (CleanupStatus)) {
     DEBUG ((
@@ -338,6 +333,14 @@ Cleanup:
       " Status = %r\n",
       CleanupStatus
       ));
+    if (!EFI_ERROR (Status)) {
+      Status = CleanupStatus;
+    }
+  }
+
+  if (EFI_ERROR (Status) && (*Table != NULL)) {
+    FreePool (*Table);
+    *Table = NULL;
   }
 
   return Status;
