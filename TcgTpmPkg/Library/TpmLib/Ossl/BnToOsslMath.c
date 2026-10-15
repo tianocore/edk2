@@ -444,7 +444,10 @@ EcPointInitialized (
     }
 
     P = EcPointInit (E->G);
-    if (!EcPointSetAffineCoordinates (E->G, P, bnX, bnY, E->CTX)) {
+    if ((P != NULL) &&
+        !EcPointSetAffineCoordinates (E->G, P, bnX, bnY, E->CTX))
+    {
+      EcPointDeInit (P, FALSE);
       P = NULL;
     }
   }
