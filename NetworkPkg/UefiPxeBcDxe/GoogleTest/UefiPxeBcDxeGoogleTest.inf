@@ -20,6 +20,7 @@ VERSION_STRING = 1.0
 [Sources]
   UefiPxeBcDxeGoogleTest.cpp
   PxeBcDhcp6GoogleTest.cpp
+  PxeBcSupportGoogleTest.cpp
   PxeBcDhcp6GoogleTest.h
   ../PxeBcDhcp6.c
   ../PxeBcSupport.c
