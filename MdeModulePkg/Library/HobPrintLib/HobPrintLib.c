@@ -54,40 +54,6 @@ CHAR8  *mResource_Type_List[] = {
 };
 
 /**
-  Print the Hex value of a given range.
-
-  @param[in]  ErrorLevel     Error Level to print the Hex value.
-  @param[in]  DataStart      A pointer to the start of data to be printed.
-  @param[in]  DataSize       The length of the data to be printed.
-
-  @retval EFI_SUCCESS        If it completed successfully.
-**/
-EFI_STATUS
-PrintHex (
-  IN  UINT32  ErrorLevel,
-  IN  UINT8   *DataStart,
-  IN  UINT16  DataSize
-  )
-{
-  UINTN  Index1;
-  UINTN  Index2;
-  UINT8  *StartAddr;
-
-  StartAddr = DataStart;
-  for (Index1 = 0; Index1 * ROW_LIMITER < DataSize; Index1++) {
-    DEBUG ((ErrorLevel, "   0x%04p:", (DataStart - StartAddr)));
-    for (Index2 = 0; (Index2 < ROW_LIMITER) && (Index1 * ROW_LIMITER + Index2 < DataSize); Index2++) {
-      DEBUG ((ErrorLevel, " %02x", *DataStart));
-      DataStart++;
-    }
-
-    DEBUG ((ErrorLevel, "\n"));
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Print the Hex value of the Invalid HOB.
 
   @param[in]  HobStart       A pointer to the Invalid HOB.
@@ -102,7 +68,7 @@ PrintInvalidHob (
   )
 {
   DEBUG ((DEBUG_ERROR, "   Invalid HOB. Full hex dump in below:\n"));
-  PrintHex (DEBUG_ERROR, HobStart, HobLength);
+  DUMP_HEX (DEBUG_ERROR, 0, HobStart, HobLength, "");
   return RETURN_INVALID_PARAMETER;
 }
 
@@ -236,7 +202,7 @@ PrintGuidHob (
 
   DEBUG ((DEBUG_INFO, "   Name       = %g\n", &Hob.Guid->Name));
   DEBUG ((DEBUG_INFO, "   DataLength = 0x%x\n", DataLength));
-  PrintHex (DEBUG_VERBOSE, GET_GUID_HOB_DATA (Hob.Raw), DataLength);
+  DUMP_HEX (DEBUG_VERBOSE, 0, GET_GUID_HOB_DATA (Hob.Raw), DataLength, "");
   return EFI_SUCCESS;
 }
 
@@ -305,7 +271,7 @@ PrintMemoryPoolHob (
   AllocationSize = HobLength - sizeof (EFI_HOB_GENERIC_HEADER);
   DEBUG ((DEBUG_INFO, "   AllocationSize    = 0x%lx\n", AllocationSize));
 
-  PrintHex (DEBUG_VERBOSE, Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER), AllocationSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER), AllocationSize, "");
 
   return EFI_SUCCESS;
 }
@@ -460,7 +426,7 @@ PrintHobList (
         }
       } else {
         DEBUG ((DEBUG_INFO, "   Unknown Hob type, full hex dump in below:\n"));
-        PrintHex (DEBUG_INFO, Hob.Raw, Hob.Header->HobLength);
+        DUMP_HEX (DEBUG_INFO, 0, Hob.Raw, Hob.Header->HobLength, "");
       }
     }
 
