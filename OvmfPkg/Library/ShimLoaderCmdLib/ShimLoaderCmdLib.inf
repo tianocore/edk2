@@ -1,0 +1,31 @@
+[Defines]
+  INF_VERSION                    = 1.31
+  BASE_NAME                      = ShimLoaderCmdLib
+  FILE_GUID                      = A7B19C3E-902F-4D5F-81E3-83DE7FAAC74B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = ShimLoaderCmdLibConstructor
+
+[Sources]
+  ShimLoaderCmdLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiLib
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  ShellLib
+  ShellCommandLib
+
+[Guids]
+  gShimImageLoaderGuid
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                 ## CONSUMES
