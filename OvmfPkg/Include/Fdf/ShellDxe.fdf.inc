@@ -9,6 +9,7 @@
 !if $(BUILD_SHELL) == TRUE && $(SECURE_BOOT_ENABLE) == FALSE
 
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
+INF  ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 !if $(NETWORK_ENABLE) == TRUE
 INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF  ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf

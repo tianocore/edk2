@@ -164,6 +164,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSystemSlotPeerInfo,                ///< 94 - System Slot Peer Information
   EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
   EArchCommonObjOemString,                         ///< 96 - OEM String
+  EArchCommonObjPortConnectorInfo,                 ///< 97 - Port Connector Information
+  EArchCommonObjSmc91xInfo,                        ///< 98 - SMC91X Network Device Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2284,6 +2286,34 @@ typedef struct CmArchCommonOemStringsInfo {
   CM_OBJECT_TOKEN    StringListToken;
 } CM_ARCH_COMMON_OEM_STRINGS_INFO;
 
+/** A structure that describes Port Connector Information.
+
+  SMBIOS Specification v3.9.0 Type 8
+
+  ID: EArchCommonObjPortConnectorInfo
+**/
+typedef struct CmArchCommonPortConnectorInfo {
+  /// CM Object Token uniquely identifying this Port Connector Information.
+  CM_OBJECT_TOKEN    PortConnectorInfoToken;
+
+  /// Null-terminated internal reference designator encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              InternalReferenceDesignator[SMBIOS_MAX_STRING_SIZE];
+
+  /// Internal connector type defined by SMBIOS Specification v3.9.0, Table 42.
+  UINT8              InternalConnectorType;
+
+  /// Null-terminated external reference designator encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              ExternalReferenceDesignator[SMBIOS_MAX_STRING_SIZE];
+
+  /// External connector type defined by SMBIOS Specification v3.9.0, Table 42.
+  UINT8              ExternalConnectorType;
+
+  /// Port type defined by SMBIOS Specification v3.9.0, Table 43.
+  UINT8              PortType;
+} CM_ARCH_COMMON_PORT_CONNECTOR_INFO;
+
 /** A structure that describes an installable firmware language.
 
   SMBIOS Specification v3.9.0 Type 13
@@ -2522,5 +2552,18 @@ typedef struct CmArchCommonSystemSlotInfo {
   /// Slot height.
   UINT8              SlotHeight;
 } CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
+
+/** SMC91X network device resources.
+
+  ID: EArchCommonObjSmc91xInfo
+**/
+typedef struct CmArchCommonSmc91xInfo {
+  /// Physical base address of the device registers.
+  UINT64                              BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                              BaseAddressLength;
+  /// Interrupt number and polarity/trigger flags.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
+} CM_ARCH_COMMON_SMC91X_INFO;
 
 #pragma pack()
