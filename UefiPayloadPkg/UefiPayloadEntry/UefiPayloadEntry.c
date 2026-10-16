@@ -585,7 +585,7 @@ _ModuleEntryPoint (
     UniversalSerialPort->RegisterBase    = SerialPortInfo.BaseAddr;
     UniversalSerialPort->BaudRate        = SerialPortInfo.Baud;
     UniversalSerialPort->RegisterStride  = (UINT8)SerialPortInfo.RegWidth;
-    // Set PCD here (vs in PlatformHookLib.c) to avoid adding a new field to UniversalSerialPort struct
+    UniversalSerialPort->InputHertz      = SerialPortInfo.InputHertz;
     if (SerialPortInfo.InputHertz > 0) {
       Status = PcdSet32S (PcdSerialClockRate, SerialPortInfo.InputHertz);
       if (RETURN_ERROR (Status)) {

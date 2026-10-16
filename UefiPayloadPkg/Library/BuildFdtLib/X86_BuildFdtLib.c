@@ -416,6 +416,15 @@ BuildFdtForSerialLpss (
     Status = FdtSetProp (Fdt, TempNode, "reg-io-width", &Data32, sizeof (Data32));
     ASSERT_EFI_ERROR (Status);
 
+    if ((SerialPortInfo->Header.Revision >= 2) &&
+        (SerialPortInfo->Header.Length >= UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO, InputHertz)) &&
+        (SerialPortInfo->InputHertz > 0))
+    {
+      Data32 = CpuToFdt32 (SerialPortInfo->InputHertz);
+      Status = FdtSetProp (Fdt, TempNode, "clock-frequency", &Data32, sizeof (Data32));
+      ASSERT_EFI_ERROR (Status);
+    }
+
     Status = FdtSetProp (Fdt, TempNode, "compatible", "ns16550a", (UINT32)(AsciiStrLen ("ns16550a")+1));
     ASSERT_EFI_ERROR (Status);
 
