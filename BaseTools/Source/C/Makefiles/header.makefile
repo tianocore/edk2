@@ -123,12 +123,22 @@ AS ?= $(CLANG_BIN)clang
 AR ?= $(CLANG_BIN)llvm-ar
 LD ?= $(CLANG_BIN)llvm-ld
 else ifeq ($(origin CC),default)
+ifneq ($(strip $(ICX_BIN)),)
+CC = $(ICX_BIN)/icx
+CXX = $(ICX_BIN)/icpx
+AS = $(ICX_BIN)/icx
+AR = llvm-ar
+LD = ld.lld
+else
 CC = $(GCC_PREFIX)gcc
 CXX = $(GCC_PREFIX)g++
 AS = $(GCC_PREFIX)gcc
 AR = $(GCC_PREFIX)ar
 LD = $(GCC_PREFIX)ld
 endif
+endif
+CLANG := $(findstring clang,$(shell $(CC) --version))
+ICX := $(findstring Intel(R) oneAPI DPC++/C++ Compiler,$(shell $(CC) --version))
 LINKER ?= $(CC)
 ifeq ($(HOST_ARCH), IA32)
 ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/Ia32/
@@ -161,7 +171,7 @@ ifeq ($(DARWIN),Darwin)
 CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
 else
-ifneq ($(CLANG),)
+ifneq ($(strip $(CLANG)$(ICX)),)
 CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign \
@@ -173,7 +183,7 @@ CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -Wno-unused-result -nostdlib -g
 endif
 endif
-ifneq ($(CLANG),)
+ifneq ($(strip $(CLANG)$(ICX)),)
 LDFLAGS =
 CXXFLAGS = -Wno-deprecated-register -Wno-unused-result -std=c++14
 else
