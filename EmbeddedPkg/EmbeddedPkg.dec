@@ -77,6 +77,8 @@
   ## Boot-services controller identity for FDT Driver Binding adapters.
   gEdkiiUfdtNodeProtocolGuid = { 0x7d145912, 0xfeb1, 0x4b62, { 0xa1, 0xed, 0xef, 0x8a, 0x13, 0x46, 0x63, 0xba } }
 
+  ## NULL-interface generic class protocol: Include/Protocol/UfdtGenericIntC.h.
+  gEdkiiUfdtGenericIntCProtocolGuid = { 0x57a07068, 0x14e4, 0x4640, { 0x91, 0x26, 0xa1, 0x31, 0x69, 0x6b, 0xa3, 0x4f } }
   ## Prepared device resources; presence also satisfies consumer DEPEX.
   ## Structures are declared in Include/Protocol/UfdtResourceInfo.h.
   gEdkiiUfdtClockInfoProtocolGuid = { 0x649b84cc, 0x96b2, 0x5aff, { 0xb0, 0xed, 0xf8, 0x3c, 0x90, 0xef, 0xe2, 0x41 } }
