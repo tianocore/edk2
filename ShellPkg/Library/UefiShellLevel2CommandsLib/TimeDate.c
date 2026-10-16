@@ -332,13 +332,7 @@ MainCmdDate (
 
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"date");
     return SHELL_INVALID_PARAMETER;
   }
@@ -587,18 +581,12 @@ MainCmdTime (
 
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
   Status = GetCurrentTime (L"time", &TheTime);
   if (EFI_ERROR (Status)) {
     return (SHELL_DEVICE_ERROR);
   }
 
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
     return SHELL_INVALID_PARAMETER;
   }
@@ -905,15 +893,9 @@ MainCmdTimeZone (
 
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
   if (ShellCommandLineGetCount (Package) > 1) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"timezone");
     return SHELL_INVALID_PARAMETER;
-  } else if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
   } else if (ShellCommandLineGetFlag (Package, L"-s")) {
     if ((ShellCommandLineGetFlag (Package, L"-l")) || (ShellCommandLineGetFlag (Package, L"-f"))) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"timezone", L"-l or -f");

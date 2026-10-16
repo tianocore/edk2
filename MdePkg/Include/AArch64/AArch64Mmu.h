@@ -80,6 +80,11 @@
 // Valid for FEAT_LPA2 (52-bit output address)
 #define TT_UPPER_ADDRESS_MASK  (0x3 << 8)
 
+// Upper IPA address bits for FEAT_LPA2 (52-bit output address)
+// Bits[9:8] of translation table descriptors hold output address[51:50].
+#define TT_UPPER_IPA_BITS              (BIT51 | BIT50)
+#define TT_UPPER_IPA_TO_OUTADDR_SHIFT  (50 - 8)
+
 #define TT_PXN_MASK  BIT53
 #define TT_UXN_MASK  BIT54                              // EL1&0
 #define TT_XN_MASK   BIT54                              // EL2 / EL3

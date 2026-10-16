@@ -1023,7 +1023,13 @@ BmExpandPartitionDevicePath (
 
     Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
     if (EFI_ERROR (Status)) {
-      return NULL;
+      //
+      // No Block I/O handles found.  Set count to 0 and buffer to NULL and
+      // continue to allow search for Block I/O handles to be tried again after
+      // attempting a ConnectAll.
+      //
+      BlockIoHandleCount = 0;
+      BlockIoBuffer      = NULL;
     }
 
     //
@@ -2175,6 +2181,8 @@ EfiBootManagerBoot (
     // Report Status Code with the failure status to indicate that boot failure
     //
     BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED, Status);
+  } else {
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_BOOT_OPTION_COMPLETE));
   }
 
   PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32)OptionNumber);

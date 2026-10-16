@@ -546,6 +546,8 @@ SerialTransportSendCommand (
 {
   EFI_STATUS  Status;
 
+  Status = EFI_SUCCESS;
+
   if ((RequestData != NULL) && (RequestDataSize == 0)) {
     DEBUG ((DEBUG_ERROR, "%a: Mismatched values of RequestData and RequestDataSize\n", __func__));
     return EFI_INVALID_PARAMETER;
@@ -602,7 +604,7 @@ SerialTransportSendCommand (
     } else {
       DEBUG ((DEBUG_ERROR, "No response, can't determine Completion Code.\n"));
     }
-  } else {
+  } else if (ResponseDataSize != NULL) {
     *ResponseDataSize = 0;
   }
 
