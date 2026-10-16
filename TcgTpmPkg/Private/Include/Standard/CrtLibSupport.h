@@ -71,7 +71,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   // On EBC, sizeof(UINTN) is evaluated at runtime, so we cannot provide valid
   // preprocessor expressions for it.
   //
-  #error Unsupported target architecture - EBC's runtime sizeof(UINTN) conflicts with SIZE_MAX and UINTPTR_MAX preprocessor definitions
+  #error Unsupported target architecture - EBC runtime sizeof(UINTN) conflicts with SIZE_MAX and UINTPTR_MAX preprocessor definitions
 #else
   #error Unknown target architecture
 #endif
