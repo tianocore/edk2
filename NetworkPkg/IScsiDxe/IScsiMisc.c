@@ -2219,7 +2219,11 @@ IScsiGetConfigData (
     //
 
     NicInfo = IScsiGetNicInfoByIndex (mPrivate->CurrentNic);
-    ASSERT (NicInfo != NULL);
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      break;
+    }
+
     IScsiMacAddrToStr (&NicInfo->PermanentAddress, NicInfo->HwAddressSize, NicInfo->VlanId, MacString);
     UnicodeSPrint (
       mPrivate->PortString,
