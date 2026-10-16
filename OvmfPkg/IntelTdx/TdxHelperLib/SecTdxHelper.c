@@ -568,6 +568,7 @@ ValidateHobList (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 HobEnd;
   UINT32                EFI_BOOT_MODE_LIST[] = {
     BOOT_WITH_FULL_CONFIGURATION,
     BOOT_WITH_MINIMAL_CONFIGURATION,
@@ -600,18 +601,51 @@ ValidateHobList (
   }
 
   Hob.Raw = (UINT8 *)VmmHobList;
+  //
+  // The TD HOB is placed by the VMM in the fixed-size region described by
+  // PcdOvmfSecGhcbBase/PcdOvmfSecGhcbSize. Bound every access to this region so
+  // a malformed HobLength or a missing end-of-list marker cannot walk the
+  // parser past the region into adjacent memory.
+  //
+  HobEnd = (UINTN)VmmHobList + FixedPcdGet32 (PcdOvmfSecGhcbSize);
 
   //
   // Parse the HOB list until end of list or matching type is found.
   //
-  while (!END_OF_HOB_LIST (Hob)) {
+  while (TRUE) {
+    //
+    // The generic header must be fully inside the region before it is read.
+    //
+    if (((UINTN)Hob.Raw < (UINTN)VmmHobList) ||
+        ((UINTN)Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER) > HobEnd))
+    {
+      DEBUG ((DEBUG_ERROR, "HOB: Hob header is out of the TD HOB region\n"));
+      return FALSE;
+    }
+
+    if (END_OF_HOB_LIST (Hob)) {
+      break;
+    }
+
     if (Hob.Header->Reserved != (UINT32)0) {
       DEBUG ((DEBUG_ERROR, "HOB: Hob header Reserved filed should be zero\n"));
       return FALSE;
     }
 
     if (Hob.Header->HobLength == 0) {
-      DEBUG ((DEBUG_ERROR, "HOB: Hob header LEANGTH should not be zero\n"));
+      DEBUG ((DEBUG_ERROR, "HOB: Hob header LENGTH should not be zero\n"));
+      return FALSE;
+    }
+
+    //
+    // HobLength must be 8-byte aligned and the whole HOB must fit inside the
+    // region without wrapping around the address space.
+    //
+    if (((Hob.Header->HobLength & 0x7) != 0) ||
+        ((UINTN)Hob.Raw + Hob.Header->HobLength <= (UINTN)Hob.Raw) ||
+        ((UINTN)Hob.Raw + Hob.Header->HobLength > HobEnd))
+    {
+      DEBUG ((DEBUG_ERROR, "HOB: Hob length steps outside the TD HOB region\n"));
       return FALSE;
     }
 
@@ -681,8 +715,16 @@ ValidateHobList (
 
         break;
 
-      // EFI_HOB_GUID_TYPE is variable length data, so skip check
       case EFI_HOB_TYPE_GUID_EXTENSION:
+        //
+        // A GUID extension HOB carries variable-length data, but it must at
+        // least contain the fixed EFI_HOB_GUID_TYPE header and its Name GUID.
+        //
+        if (Hob.Header->HobLength < sizeof (EFI_HOB_GUID_TYPE)) {
+          DEBUG ((DEBUG_ERROR, "HOB: GUID extension Hob length is smaller than EFI_HOB_GUID_TYPE\n"));
+          return FALSE;
+        }
+
         break;
 
       case EFI_HOB_TYPE_FV:
@@ -853,14 +895,37 @@ TdxHelperMeasureTdHob (
   UINT8                 Digest[SHA384_DIGEST_SIZE];
   OVMF_WORK_AREA        *WorkArea;
   VOID                  *TdHob;
+  UINTN                 HobEnd;
 
   TdHob   = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
   Hob.Raw = (UINT8 *)TdHob;
+  HobEnd  = (UINTN)TdHob + FixedPcdGet32 (PcdOvmfSecGhcbSize);
 
   //
-  // Walk thru the TdHob list until end of list.
+  // Walk thru the TdHob list until end of list. The TD HOB is measured before
+  // it is validated, so bound the walk to the fixed TD HOB region to keep a
+  // malformed HobLength (or a missing end-of-list marker) from reading beyond
+  // the region and from letting the VMM control the measured size.
   //
-  while (!END_OF_HOB_LIST (Hob)) {
+  while (TRUE) {
+    if (((UINTN)Hob.Raw < (UINTN)TdHob) ||
+        ((UINTN)Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER) > HobEnd))
+    {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (END_OF_HOB_LIST (Hob)) {
+      break;
+    }
+
+    if ((Hob.Header->HobLength == 0) ||
+        ((Hob.Header->HobLength & 0x7) != 0) ||
+        ((UINTN)Hob.Raw + Hob.Header->HobLength <= (UINTN)Hob.Raw) ||
+        ((UINTN)Hob.Raw + Hob.Header->HobLength > HobEnd))
+    {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
