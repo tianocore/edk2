@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2026, ARM Limited. All rights reserved.
 //
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -8,6 +8,9 @@
 #include <AsmMacroLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
+  // Default to no TransferList unless the handoff registers match the spec.
+  msr   TPIDRRO_EL0, xzr
+
   // Check if register assignment at handoff matches spec
   MOV64 (x4, 0x14a0fb10b)
   // Check if x1 holds TransferList signature
@@ -17,8 +20,8 @@ ASM_FUNC(_ModuleEntryPoint)
   // Skip TransferList init if x2 is not equal to 0
   cbnz  x2, _SkipTransferList
 
-  // Set the TransferList Base Address from register x3
-  mov   x10, x3
+  // Set the TransferList Base Address from register x3 to TPIDRRO_EL0
+  msr   TPIDRRO_EL0, x3
 
 _SkipTransferList:
   // Do early platform specific actions
@@ -61,7 +64,8 @@ ASM_PFX(MainEntryPoint):
   MOV64 (x2, FixedPcdGet64(PcdFvBaseAddress))
   ldr   x0, [x2, #8]
   // Pass the TransferList Base Address
-  mov   x1, x10
+  mrs   x1, TPIDRRO_EL0
+
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x3, =ASM_PFX(CEntryPoint)
