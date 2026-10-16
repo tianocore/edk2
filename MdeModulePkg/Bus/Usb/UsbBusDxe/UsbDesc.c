@@ -756,32 +756,34 @@ UsbGetDevBosDesc (
              Buf,
              sizeof (EFI_USB_BOS_DESCRIPTOR)
              );
-  if (!EFI_ERROR (Status)) {
-    TotalLength = ((EFI_USB_BOS_DESCRIPTOR *)Buf)->TotalLength;
+  if (EFI_ERROR (Status)) {
     gBS->FreePool (Buf);
-    Buf = NULL;
-    Buf = AllocateZeroPool (TotalLength);
-    if (Buf == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Status = UsbCtrlGetDesc (
-               UsbDev,
-               USB_DESC_TYPE_BOS,
-               0,
-               0,
-               Buf,
-               TotalLength
-               );
-
-    if (EFI_ERROR (Status)) {
-      gBS->FreePool (Buf);
-      Buf = NULL;
-    }
-
-    UsbDev->DevDesc->BosDesc = (EFI_USB_BOS_DESCRIPTOR *)Buf;
+    return Status;
   }
 
+  TotalLength = ((EFI_USB_BOS_DESCRIPTOR *)Buf)->TotalLength;
+  gBS->FreePool (Buf);
+  Buf = NULL;
+  Buf = AllocateZeroPool (TotalLength);
+  if (Buf == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = UsbCtrlGetDesc (
+             UsbDev,
+             USB_DESC_TYPE_BOS,
+             0,
+             0,
+             Buf,
+             TotalLength
+             );
+
+  if (EFI_ERROR (Status)) {
+    gBS->FreePool (Buf);
+    Buf = NULL;
+  }
+
+  UsbDev->DevDesc->BosDesc = (EFI_USB_BOS_DESCRIPTOR *)Buf;
   return Status;
 }
 
