@@ -14,6 +14,8 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CpuPageTableLib.h>
+
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
 #include <Library/CpuLib.h>
@@ -324,6 +326,58 @@ FindFfsFileAndSection (
   }
 }
 
+VOID
+MapPeiFvReadOnly (
+  UINT64  Base,
+  UINT64  Size
+  )
+{
+  PHYSICAL_ADDRESS    Cr3;
+  IA32_CR0            Cr0;
+  IA32_CR4            Cr4;
+  PAGING_MODE         PagingMode;
+  UINTN               BufferSize;
+  IA32_MAP_ATTRIBUTE  MapAttr;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  RETURN_STATUS       Status;
+
+  // enable write protection page faults
+  Cr0.UintN   = AsmReadCr0 ();
+  Cr0.Bits.WP = 1;
+  AsmWriteCr0 (Cr0.UintN);
+
+  // check paging mode
+  Cr4.UintN  = AsmReadCr4 ();
+  PagingMode = Cr4.Bits.LA57 ? Paging5Level : Paging4Level;
+
+  // clear write bit in page tables
+  Cr3                    = AsmReadCr3 ();
+  BufferSize             = 0;
+  MapAttr.Uint64         = 0;
+  MapMask.Uint64         = 0;
+  MapAttr.Bits.ReadWrite = 0;
+  MapMask.Bits.ReadWrite = 1;
+
+  DEBUG ((DEBUG_INFO, "Mapping PeiFv [%lx -> %lx] read/only\n", Base, Base + Size));
+  Status = PageTableMap (
+             (UINTN *)&Cr3,
+             PagingMode,
+             NULL,
+             &BufferSize,
+             Base,
+             Size,
+             &MapAttr,
+             &MapMask,
+             NULL
+             );
+  if (RETURN_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Mapping failed: %r\n", Status));
+    return;
+  }
+
+  CpuFlushTlb ();
+}
+
 /**
   Locates the compressed main firmware volume and decompresses it.
 
@@ -428,6 +482,7 @@ DecompressMemFvs (
 
   PeiMemFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdOvmfPeiMemFvBase);
   CopyMem (PeiMemFv, (VOID *)(FvSection + 1), PcdGet32 (PcdOvmfPeiMemFvSize));
+  MapPeiFvReadOnly (PcdGet32 (PcdOvmfPeiMemFvBase), PcdGet32 (PcdOvmfPeiMemFvSize));
 
   if (PeiMemFv->Signature != EFI_FVH_SIGNATURE) {
     DEBUG ((DEBUG_ERROR, "Extracted FV at %p does not have FV header signature\n", PeiMemFv));
