@@ -1,0 +1,38 @@
+## @file
+#  OVMF-specific IoMmuLib instance that switches behavior based on protocol policy.
+#
+#  Copyright (c) Microsoft Corporation.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001E
+  BASE_NAME                      = OvmfIoMmuLib
+  FILE_GUID                      = 822fcb30-ebeb-4b30-8b91-663447304e80
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IoMmuLib
+  CONSTRUCTOR                    = IoMmuLibInit
+
+[Sources]
+  IoMmuLib.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid             ## SOMETIMES_CONSUMES
+  gIoMmuAbsentProtocolGuid            ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEdkiiIoMmuProtocolGuid OR
+  gIoMmuAbsentProtocolGuid
