@@ -889,7 +889,19 @@ GetNextMemoryAllocationGuidHob (
   IN CONST VOID      *HobStart
   )
 {
-  ASSERT (FALSE);
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (Guid != NULL);
+  ASSERT (HobStart != NULL);
+
+  for (Hob.Raw = (UINT8 *)HobStart; (Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL;
+       Hob.Raw = GET_NEXT_HOB (Hob))
+  {
+    if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, Guid)) {
+      return Hob.Raw;
+    }
+  }
+
   return NULL;
 }
 
@@ -914,6 +926,18 @@ TagMemoryAllocationHobWithGuid (
   IN CONST EFI_GUID        *Guid
   )
 {
-  ASSERT (FALSE);
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (Guid != NULL);
+
+  for (Hob.Raw = GetHobList (); (Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL;
+       Hob.Raw = GET_NEXT_HOB (Hob))
+  {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == BaseAddress) {
+      CopyGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, Guid);
+      return Hob.Raw;
+    }
+  }
+
   return NULL;
 }

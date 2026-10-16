@@ -145,3 +145,173 @@ PeiGetNextVariableName (
   IN OUT CHAR16                              *VariableName,
   IN OUT EFI_GUID                            *VariableGuid
   );
+
+/**
+
+  Gets the pointer to the first variable header in given variable store area.
+
+  @param VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return Pointer to the first variable header.
+
+**/
+VARIABLE_HEADER *
+GetStartPointer (
+  IN VARIABLE_STORE_HEADER  *VarStoreHeader
+  );
+
+/**
+
+  Gets the pointer to the end of the variable storage area.
+
+  This function gets pointer to the end of the variable storage
+  area, according to the input variable store header.
+
+  @param VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return Pointer to the end of the variable storage area.
+
+**/
+VARIABLE_HEADER *
+GetEndPointer (
+  IN VARIABLE_STORE_HEADER  *VarStoreHeader
+  );
+
+/**
+  This code gets the size of data of variable.
+
+  @param  Variable  Pointer to the Variable Header.
+  @param  AuthFlag  Authenticated variable flag.
+
+  @return Size of variable in bytes in type UINTN.
+
+**/
+UINTN
+DataSizeOfVariable (
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFlag
+  );
+
+/**
+  This code gets the pointer to the variable name.
+
+  @param   Variable  Pointer to the Variable Header.
+  @param   AuthFlag  Authenticated variable flag.
+
+  @return  A CHAR16* pointer to Variable Name.
+
+**/
+CHAR16 *
+GetVariableNamePtr (
+  IN VARIABLE_HEADER  *Variable,
+  IN BOOLEAN          AuthFlag
+  );
+
+/**
+  This code gets the pointer to the variable data.
+
+  @param   Variable         Pointer to the Variable Header.
+  @param   VariableHeader   Pointer to the Variable Header that has consecutive content.
+  @param   AuthFlag         Authenticated variable flag.
+
+  @return  A UINT8* pointer to Variable Data.
+
+**/
+UINT8 *
+GetVariableDataPtr (
+  IN  VARIABLE_HEADER  *Variable,
+  IN  VARIABLE_HEADER  *VariableHeader,
+  IN  BOOLEAN          AuthFlag
+  );
+
+/**
+  This code gets the pointer to the next variable header.
+
+  @param  StoreInfo         Pointer to variable store info structure.
+  @param  Variable          Pointer to the Variable Header.
+  @param  VariableHeader    Pointer to the Variable Header that has consecutive content.
+
+  @return  A VARIABLE_HEADER* pointer to next variable header.
+
+**/
+VARIABLE_HEADER *
+GetNextVariablePtr (
+  IN  VARIABLE_STORE_INFO  *StoreInfo,
+  IN  VARIABLE_HEADER      *Variable,
+  IN  VARIABLE_HEADER      *VariableHeader
+  );
+
+/**
+  This code gets the size of name of variable.
+
+  @param  Variable  Pointer to the Variable Header.
+  @param  AuthFlag  Authenticated variable flag.
+
+  @return Size of variable in bytes in type UINTN.
+
+**/
+UINTN
+NameSizeOfVariable (
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFlag
+  );
+
+/**
+  This code gets the size of variable header.
+
+  @param AuthFlag   Authenticated variable flag.
+
+  @return Size of variable header in bytes in type UINTN.
+
+**/
+UINTN
+GetVariableHeaderSize (
+  IN  BOOLEAN  AuthFlag
+  );
+
+/**
+  This code gets the size of name of variable.
+
+  @param  Variable  Pointer to the Variable Header.
+  @param  AuthFlag  Authenticated variable flag.
+
+  @return Size of variable in bytes in type UINTN.
+
+**/
+UINTN
+NameSizeOfVariable (
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFlag
+  );
+
+/**
+  Get HOB variable store.
+
+  @param[out] StoreInfo             Return the store info.
+  @param[out] VariableStoreHeader   Return variable store header.
+
+**/
+VOID
+GetHobVariableStore (
+  OUT VARIABLE_STORE_INFO    *StoreInfo,
+  OUT VARIABLE_STORE_HEADER  **VariableStoreHeader
+  );
+
+/**
+  Build the variable runtime cache info HOB from a buffer.
+
+  @param  Buffer  Pointer to the buffer containing the cache info. This parameter is optional and can be NULL.
+  @param  Pages   Pointer to the number of pages in the buffer. On input, it specifies the number of pages
+                  allocated for the buffer. On output, it returns the actual number of pages needed by the cache info.
+
+  @retval EFI_SUCCESS           The HOB was built successfully.
+  @retval EFI_INVALID_PARAMETER One or more of the input parameters are NULL or invalid.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer provided is too small to hold the cache info.
+  @retval EFI_DEVICE_ERROR      The HOB could not be built due to a device error.
+**/
+EFI_STATUS
+EFIAPI
+BuildVariableRuntimeCacheInfoHobFromBuffer (
+  IN       VOID   *Buffer OPTIONAL,
+  IN OUT   UINTN  *Pages
+  );
