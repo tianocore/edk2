@@ -58,9 +58,11 @@
   BaseLib
   SecurityManagementLib
   HobLib
+  GptLib
 
 [Guids]
-  gMeasuredFvHobGuid                    ## SOMETIMES_CONSUMES ## HOB
+  gMeasuredFvHobGuid                               ## SOMETIMES_CONSUMES ## HOB
+  gEdkiiFirmwareVolumeMeasurementExcludedHobGuid   ## SOMETIMES_CONSUMES ## HOB
 
 [Protocols]
   gEfiTcg2ProtocolGuid                  ## SOMETIMES_CONSUMES

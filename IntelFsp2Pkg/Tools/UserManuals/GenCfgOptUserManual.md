@@ -1,16 +1,21 @@
-#Name
+# Name
+
+<!-- markdownlint-disable MD024 -->
+
 **GenCfgOpt.py** The python script that generates UPD text (**.txt**) files for
 the compiler, header files for the UPD regions, and generates a Boot Settings
 File (**BSF**), all from an EDK II Platform Description (**DSC**) file.
 
-#Synopsis
-```
+## Synopsis
+
+```text
 GenCfgOpt UPDTXT PlatformDscFile BuildFvDir [TxtOutFile] [-D Macros]
 GenCfgOpt HEADER PlatformDscFile BuildFvDir [InputHFile] [-D Macros]
 GenCfgOpt GENBSF PlatformDscFile BuildFvDir BsfOutFile [-D Macros]
 ```
 
-#Description
+## Description
+
 **GenCfgOpt.py** is a script that generates configuration options from an
 **EDK II Platform Description (DSC)** file. It has three functions.
 
@@ -28,6 +33,7 @@ the **'build'** command; the **GENBSF** use case may be done at any time.
 The following sections explain the three use cases.
 
 ## 1. GenCfgOpt.py UPDTXT
+
 The **UPDTXT** option creates a text file with all the UPD entries, offsets,
 size in bytes, and values. **GenCfgOpt** reads this information from the
 **[PcdsDynamicVpd.Upd]** section of the project's DSC file. The DSC file allows
@@ -36,7 +42,7 @@ introducing gaps between entries. **GenCfgOpt** fills in these gaps with UPD
 entries that have the generic names **UnusedUpdSpaceN** where N begins with 0
 and increments. The command signature for **UPDTXT** is:
 
-```
+```text
 GenCfgOpt UPDTXT PlatformDscFile BuildFvDir [TxtOutFile] [-D Macros]
 ```
 
@@ -52,13 +58,16 @@ must follow the form ```?D <MACRO_NAME>=<VALUE>```.
 will only re-create it if the DSC was modified after it was created.
 
 ## 2. GenCfgOpt.py HEADER
+
 The **HEADER** option creates header files in the build folder. Both header
 files define the ```_UPD_DATA_REGION``` data structures in FspUpd.h, FsptUpd.h,
 FspmUpd.h and FspsUpd.h. In these header files any undefined elements of
 structures will be added as **ReservedUpdSpaceN** beginning with N=0. The
 command signature for **HEADER** is
 
-```GenCfgOpt HEADER PlatformDscFile BuildFvDir [InputHFile] [-D Macros]```
+```text
+GenCfgOpt HEADER PlatformDscFile BuildFvDir [InputHFile] [-D Macros]
+```
 
 **PlatformDscFile** and **BuildFvDir** are described in the previous section.
 The optional **InputHFile** is a header file that may contain data definitions
@@ -72,29 +81,36 @@ the DSC file. The special commands begin with ```!HDR```, for header. The
 following table summarizes the two command options.
 
 ### HEADER
+
 Use the **HEADER** command to hide specific variables in the public header file.
 In your project DSC file, use ```!HDR HEADER:{OFF}``` at the beginning of the
 section you wish to hide and ```!HDR HEADER:{ON}``` at the end.
 
 ### STRUCT
+
 The **STRUCT** command allows you to specify a specific data type for a
 variable. You can specify a pointer to a data struct, for example. You define
 the data structure in the **InputHFile** between
 ```!EXPORT EXTERNAL_BOOTLOADER_STRUCT_BEGIN``` and
 ```!EXPORT EXTERNAL_BOOTLOADER_STRUCT_END```.
 
-#####Example:
-```!HDR STRUCT:{MY_DATA_STRUCT*}```
+#### Example
+
+```text
+!HDR STRUCT:{MY_DATA_STRUCT*}
+```
 
 You then define ```MY_DATA_STRUCT``` in **InputHFile**.
 
 ### EMBED
+
 The **EMBED** command allows you to put one or more UPD data into a specify data
 structure. You can utilize it as a group of UPD for example. You must specify a
 start and an end for the specify data structure.
 
-#####Example:
-```
+#### Example
+
+```text
   !HDR EMBED:{MY_DATA_STRUCT:MyDataStructure:START}
   gTokenSpaceGuid.Upd1  | 0x0020 | 0x01 | 0x00
   gTokenSpaceGuid.Upd2  | 0x0021 | 0x01 | 0x00
@@ -102,8 +118,9 @@ start and an end for the specify data structure.
   gTokenSpaceGuid.UpdN  | 0x0022 | 0x01 | 0x00
 ```
 
-#####Result:
-```
+##### Result
+
+```text
   typedef struct {
     /** Offset 0x0020
     **/
@@ -126,6 +143,7 @@ start and an end for the specify data structure.
 ```
 
 ## 3. GenCfgOpt .py GENBSF
+
 The **GENBSF** option generates a BSF from the UPD entries in a package's DSC
 file. It does this by parsing special commands found in the comments of the DSC
 file. They roughly match the keywords that define the different sections of the
@@ -141,20 +159,25 @@ relative path to where the BSF should be stored.
 Every BSF command in the DSC file begins with **!BSF** or **@Bsf**. The
 following table summarizes the options that come after **!BSF** or **@Bsf**:
 
-# BSF Commands Description
-###PAGES
+## BSF Commands Description
+
+### PAGES
+
 **PAGES** maps abbreviations to friendly-text descriptions of the pages in a BSF.
 
-#####Example:
+#### Example
+
 ```!BSF PAGES:{PG1:?Page 1?, PG2:?Page 2?}``` or
 
 ```@Bsf PAGES:{PG1:?Page 1?, PG2:?Page 2?}```
 
-###PAGE
+### PAGE
+
 This marks the beginning of a page. Use the abbreviation specified in **PAGES**
 command.
 
-#####Example:
+#### Example
+
 ```!BSF PAGE:{PG1}``` or
 
 ```@Bsf PAGE:{PG1}```
@@ -162,32 +185,38 @@ command.
 All the entries that come after this command are assumed to be on that page,
 until the next **PAGE** command
 
-###FIND
+### FIND
+
 FIND maps to the BSF **Find** command. It will be placed in the **StructDef**
 region of the BSF and should come at the beginning of the UPD sections of the
 DSC, immediately before the signatures that mark the beginning of these
 sections. The content should be the plain-text equivalent of the signature. The
 signature is usually 8 characters.
 
-#####Example:
+#### Example
+
 ```!BSF FIND:{PROJSIG1}``` or
 
 ```@Bsf FIND:{PROJSIG1}```
 
-###BLOCK
+### BLOCK
+
 The BLOCK command maps to the **BeginInfoBlock** section of the BSF. There are
 two elements: a version number and a plain-text description.
 
-#####Example:
+#### Example
+
 ```!BSF BLOCK:{NAME:"My platform name", VER:"0.1"}``` or
 
 ```@Bsf BLOCK:{NAME:"My platform name", VER:"0.1"}```
 
-###NAME
+### NAME
+
 **NAME** gives a plain-text for a variable. This is the text label that will
 appear next to the control in **BCT**.
 
-#####Example:
+#### Example
+
 ```!BSF NAME:{Variable 0}``` or
 
 ```@Bsf NAME:{Variable 0}```
@@ -195,20 +224,23 @@ appear next to the control in **BCT**.
 If the **!BSF NAME**  or **@Bsf NAME** command does not appear before an entry
 in the UPD region of the DSC file, then that entry will not appear in the BSF.
 
-###TYPE
+### TYPE
+
 The **TYPE** command is used either by itself or with the **NAME** command. It
 is usually used by itself when defining an **EditNum** field for the BSF. You
 specify the type of data in the second parameter and the range of valid values
 in the third.
 
-#####Example:
+#### Example
+
 ```!BSF TYPE:{EditNum, HEX, (0x00,0xFF)}``` or
 
 ```@Bsf TYPE:{EditNum, HEX, (0x00,0xFF)}```
 
 **TYPE** appears on the same line as the **NAME** command when using a combo-box.
 
-#####Example:
+#### Example
+
 ```!BSF NAME:{Variable 1} TYPE:{Combo}``` or
 ```@Bsf NAME:{Variable 1} TYPE:{Combo}```
 
@@ -216,20 +248,24 @@ There is a special **None** type that puts the variable in the **StructDef**
 region of the BSF, but doesn't put it in any **Page** section. This makes the
 variable visible to BCT, but not to the end user.
 
-###HELP
+### HELP
+
 The **HELP** command defines what will appear in the help text for each control
 in BCT.
 
-#####Example:
+#### Example
+
 ```!BSF HELP:{Enable/disable LAN controller.}``` or
 
 ```@Bsf HELP:{Enable/disable LAN controller.}```
 
-###OPTION
+### OPTION
+
 The **OPTION** command allows you to custom-define combo boxes and map integer
 or hex values to friendly-text options.
 
-#####Example:
+#### Example
+
 ```!BSF OPTION:{0:IDE, 1:AHCI, 2:RAID}```
 
 ```!BSF OPTION:{0x00:0 MB, 0x01:32 MB, 0x02:64 MB}```
@@ -240,25 +276,29 @@ or
 
 ```@Bsf OPTION:{0x00:0 MB, 0x01:32 MB, 0x02:64 MB}```
 
-###FIELD
+### FIELD
+
 The **FIELD** command can be used to define a section of a consolidated PCD
 such that the PCD will be displayed in several fields via BCT interface instead
 of one long entry.
 
-#####Example:
+#### Example
+
 ```!BSF FIELD:{PcdDRAMSpeed:1}``` or
 
 ```@Bsf FIELD:{PcdDRAMSpeed:1}```
 
-###ORDER
+### ORDER
+
 The **ORDER** command can be used to adjust the display order for the BSF items.
 By default the order value for a BSF item is assigned to be the UPD item
-```(Offset * 256)```. It can be overridden by declaring **ORDER** command using
+```(Offset *256)```. It can be overridden by declaring **ORDER** command using
 format ORDER: ```{HexMajor.HexMinor}```. In this case the order value will be
 ```(HexMajor*256+HexMinor)```. The item order value will be used as the sort key
 during the BSF item display.
 
-#####Example:
+#### Example
+
 ```!BSF ORDER:{0x0040.01}``` or
 
 ```@Bsf ORDER:{0x0040.01}```
@@ -293,11 +333,14 @@ same line following the **!BSF** or **@Bsf** keyword or they may appear on
 separate lines to improve readability.
 
 There are four alternative ways to replace current BSF commands.
+
 ### 1. ```# @Prompt```
+
 An alternative way replacing **NAME** gives a plain-text for a
 variable. This is the text label that will appear next to the control in BCT.
 
-#####Example:
+#### Example
+
 ```# @Prompt Variable 0```
 
 The above example can replace the two methods as below.
@@ -310,10 +353,12 @@ If the ```# @Prompt``` command does not appear before an entry in the UPD region
 of the DSC file, then that entry will not appear in the BSF.
 
 ### 2. ```##```
+
 An alternative way replacing **HELP** command defines what will appear in the
 help text for each control in BCT.
 
-#####Example:
+#### Example
+
 ```## Enable/disable LAN controller.```
 
 The above example can replace the two methods as below.
@@ -323,13 +368,15 @@ The above example can replace the two methods as below.
 ```@Bsf HELP:{Enable/disable LAN controller.}```
 
 ### 3. ```# @ValidList```
+
 An alternative way replacing **OPTION** command allows you to custom-define
 combo boxes and map integer or hex values to friendly-text options.
 
-#####Example:
+#### Example
+
 ``` # @ValidList 0x80000003 | 0, 1, 2 | IDE, AHCI, RAID
                    Error Code | Options | Descriptions
-```
+```text
 
 The above example can replace the two methods as below.
 
@@ -338,16 +385,17 @@ The above example can replace the two methods as below.
 ```@Bsf OPTION:{0:IDE, 1:AHCI, 2:RAID}```
 
 ### 4. ```# @ValidRange```
+
 An alternative way replace **EditNum** field for the BSF.
 
-#####Example:
+#### Example
+
 ```# @ValidRange 0x80000001 | 0x0 ? 0xFF
                     Error Code | Range
-```
+```text
 
 The above example can replace the two methods as below.
 
 ```!BSF TYPE:{EditNum, HEX, (0x00,0xFF)}``` or
 
 ```@Bsf TYPE:{EditNum, HEX, (0x00,0xFF)}```
-

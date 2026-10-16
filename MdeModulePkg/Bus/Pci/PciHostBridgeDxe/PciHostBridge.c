@@ -667,7 +667,10 @@ ResourceConflict (
                 RootBridgeCount * (TypeMax * sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)) +
                 sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
                 );
-  ASSERT (Resources != NULL);
+  if (Resources == NULL) {
+    ASSERT (Resources != NULL);
+    return;
+  }
 
   for (Link = GetFirstNode (&HostBridge->RootBridges), Descriptor = Resources
        ; !IsNull (&HostBridge->RootBridges, Link)

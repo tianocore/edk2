@@ -676,6 +676,9 @@ XhcPeiCheckUrbResult (
     //
     PhyAddr = (EFI_PHYSICAL_ADDRESS)(EvtTrb->TRBPtrLo | LShiftU64 ((UINT64)EvtTrb->TRBPtrHi, 32));
     TRBPtr  = (TRB_TEMPLATE *)(UINTN)UsbHcGetHostAddrForPciAddr (Xhc->MemPool, (VOID *)(UINTN)PhyAddr, sizeof (TRB_TEMPLATE), FALSE);
+    if (TRBPtr == NULL) {
+      return FALSE;
+    }
 
     //
     // Update the status of Urb according to the finished event regardless of whether
@@ -1120,7 +1123,11 @@ XhcPeiInitializeDeviceSlot (
   // 1) Allocate an Input Context data structure (6.2.5) and initialize all fields to '0'.
   //
   InputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (INPUT_CONTEXT));
-  ASSERT (InputContext != NULL);
+  if (InputContext == NULL) {
+    ASSERT (InputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)InputContext & 0x3F) == 0);
   ZeroMem (InputContext, sizeof (INPUT_CONTEXT));
 
@@ -1223,7 +1230,11 @@ XhcPeiInitializeDeviceSlot (
   // 6) Allocate the Output Device Context data structure (6.2.1) and initialize it to '0'.
   //
   OutputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (DEVICE_CONTEXT));
-  ASSERT (OutputContext != NULL);
+  if (OutputContext == NULL) {
+    ASSERT (OutputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)OutputContext & 0x3F) == 0);
   ZeroMem (OutputContext, sizeof (DEVICE_CONTEXT));
 
@@ -1335,7 +1346,11 @@ XhcPeiInitializeDeviceSlot64 (
   // 1) Allocate an Input Context data structure (6.2.5) and initialize all fields to '0'.
   //
   InputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (INPUT_CONTEXT_64));
-  ASSERT (InputContext != NULL);
+  if (InputContext == NULL) {
+    ASSERT (InputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)InputContext & 0x3F) == 0);
   ZeroMem (InputContext, sizeof (INPUT_CONTEXT_64));
 
@@ -1438,7 +1453,11 @@ XhcPeiInitializeDeviceSlot64 (
   // 6) Allocate the Output Device Context data structure (6.2.1) and initialize it to '0'.
   //
   OutputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (DEVICE_CONTEXT_64));
-  ASSERT (OutputContext != NULL);
+  if (OutputContext == NULL) {
+    ASSERT (OutputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)OutputContext & 0x3F) == 0);
   ZeroMem (OutputContext, sizeof (DEVICE_CONTEXT_64));
 
@@ -2682,7 +2701,11 @@ XhcPeiCreateEventRing (
 
   Size = sizeof (TRB_TEMPLATE) * EVENT_RING_TRB_NUMBER;
   Buf  = UsbHcAllocateMem (Xhc->MemPool, Size);
-  ASSERT (Buf != NULL);
+  if (Buf == NULL ) {
+    ASSERT (Buf != NULL);
+    return;
+  }
+
   ASSERT (((UINTN)Buf & 0x3F) == 0);
   ZeroMem (Buf, Size);
 
@@ -2701,7 +2724,11 @@ XhcPeiCreateEventRing (
 
   Size = sizeof (EVENT_RING_SEG_TABLE_ENTRY) * ERST_NUMBER;
   Buf  = UsbHcAllocateMem (Xhc->MemPool, Size);
-  ASSERT (Buf != NULL);
+  if (Buf == NULL) {
+    ASSERT (Buf != NULL);
+    return;
+  }
+
   ASSERT (((UINTN)Buf & 0x3F) == 0);
   ZeroMem (Buf, Size);
 
@@ -2918,7 +2945,10 @@ XhcPeiInitSched (
   //
   Size  = (Xhc->MaxSlotsEn + 1) * sizeof (UINT64);
   Dcbaa = UsbHcAllocateMem (Xhc->MemPool, Size);
-  ASSERT (Dcbaa != NULL);
+  if (Dcbaa == NULL) {
+    ASSERT (Dcbaa != NULL);
+    return;
+  }
 
   //
   // A Scratchpad Buffer is a PAGESIZE block of system memory located on a PAGESIZE boundary.

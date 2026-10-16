@@ -1,0 +1,46 @@
+## @file
+#  UEFI Shell application that validates TCG2 event log dynamic scaling
+#  after ReadyToBoot using the UnitTest framework.
+#
+#  Copyright (c), Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = TcgLogTestApp
+  FILE_GUID                      = 1F3A9C52-6E8B-4D07-B2A3-8C4E7F1D5E90
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcgLogTestAppEntry
+
+[Sources]
+  TcgLogTestApp.c
+  TcgLogTestCommon.c
+  TcgLogTestCommon.h
+  TcgLogTest.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UnitTestLib
+
+[Protocols]
+  gEfiTcg2ProtocolGuid            ## CONSUMES
+  gTcgLogTestProtocolGuid         ## CONSUMES
+  gEfiTcg2FinalEventsTableGuid    ## CONSUMES  ## SystemTable
+
+[Guids]
+  gTcg2EventLogScaledGuid         ## CONSUMES  ## Event

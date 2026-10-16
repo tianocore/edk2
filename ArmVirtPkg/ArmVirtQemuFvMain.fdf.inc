@@ -76,6 +76,8 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
+  INF ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
+  INF ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   INF OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
@@ -107,6 +109,7 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
   INF OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+  INF OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 

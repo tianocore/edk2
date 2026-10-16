@@ -1,0 +1,25 @@
+## @file
+#  Arm SMCCC SoC ID library.
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = ArmSmcccSocIdLib
+  FILE_GUID      = 06525cc6-5a4d-4465-be65-186e2e587b1d
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = ArmSmcccSocIdLib
+
+[Sources]
+  ArmSmcccSocIdLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmSmcLib

@@ -59,11 +59,11 @@
 %define GHCB_BASE                     (FixedPcdGet32 (PcdOvmfSecGhcbBase))
 %define GHCB_SIZE                     (FixedPcdGet32 (PcdOvmfSecGhcbSize))
 %define SEV_ES_WORK_AREA              (FixedPcdGet32 (PcdSevEsWorkAreaBase))
-%define SEV_ES_WORK_AREA_SIZE         25
-%define SEV_ES_WORK_AREA_STATUS_MSR   (FixedPcdGet32 (PcdSevEsWorkAreaBase))
-%define SEV_ES_WORK_AREA_RDRAND       (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
-%define SEV_ES_WORK_AREA_ENC_MASK     (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
-%define SEV_ES_WORK_AREA_FLAGS        (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 24)
+%define SEV_ES_WORK_AREA_SIZE         41
+%define SEV_ES_WORK_AREA_STATUS_MSR   (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
+%define SEV_ES_WORK_AREA_RDRAND       (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 24)
+%define SEV_ES_WORK_AREA_ENC_MASK     (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 32)
+%define SEV_ES_WORK_AREA_FLAGS        (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 40)
 %define SEV_ES_WORK_AREA_FLAG_VC      0x01
 %define SEV_ES_WORK_AREA_FLAG_CSFW_NO 0x02
 %define SEV_ES_VC_TOP_OF_STACK        (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
@@ -137,6 +137,9 @@
 
   %define OVMF_PAGE_TABLE_BASE      FixedPcdGet32 (PcdOvmfSecPageTablesBase)
   %define OVMF_PAGE_TABLE_SIZE      FixedPcdGet32 (PcdOvmfSecPageTablesSize)
+
+  %define TDX_EARLY_DEBUG_LOG_BASE  FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase)
+  %define TDX_EARLY_DEBUG_LOG_SIZE  FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize)
 
   %define TDX_WORK_AREA_PGTBL_READY (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
   %define TDX_WORK_AREA_GPAW        (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 8)

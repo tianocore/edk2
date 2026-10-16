@@ -9,7 +9,7 @@ on the TianoCore wiki.
 
 ## Basic Status
 
-| Package              | Windows VS2022 (IA32/X64)| Ubuntu GCC (IA32/X64/AARCH64) | Known Issues |
+| Package              | Windows VS2026 (IA32/X64)| Ubuntu GCC (IA32/X64/AARCH64) | Known Issues |
 | :----                | :-----                   | :----                             | :---         |
 | ArmPkg               |                    | :heavy_check_mark: |
 | ArmPlatformPkg       |                    | :heavy_check_mark: |

@@ -42,8 +42,15 @@
  *      MBEDTLS_PADLOCK_C
  *
  * Comment to disable the use of assembly code.
+ *
+ * \note Disabled for the UEFI/firmware environment. The architecture-specific
+ *       inline assembly (e.g. the AArch64 constant-time / unaligned-access
+ *       helpers in library/constant_time.c) is not compatible with the EDK2
+ *       freestanding GCC + LTO toolchain and fails to build. All assembly
+ *       paths have portable C fallbacks, so disabling this keeps the library
+ *       correct across every supported architecture.
  */
-#define MBEDTLS_HAVE_ASM
+// #define MBEDTLS_HAVE_ASM
 
 /**
  * \def MBEDTLS_NO_UDBL_DIVISION
@@ -2350,8 +2357,12 @@
  * armclang <= 6.9
  *
  * This module adds support for the AES Armv8-A Cryptographic Extensions on Armv8 systems.
+ *
+ * \note Disabled for the UEFI/firmware environment: AESCE runtime detection
+ *       relies on OS support (Linux getauxval / <sys/auxv.h>), which is not
+ *       available in a freestanding firmware build.
  */
-#define MBEDTLS_AESCE_C
+// #define MBEDTLS_AESCE_C
 
 /**
  * \def MBEDTLS_AES_C

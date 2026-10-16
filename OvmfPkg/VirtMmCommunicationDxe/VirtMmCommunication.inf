@@ -19,7 +19,6 @@
   VirtMmCommunication.c
 
 [Sources.X64]
-#  QemuX64.c
   QemuHwInfo.c
   QemuMmio.c
   Svsm.c

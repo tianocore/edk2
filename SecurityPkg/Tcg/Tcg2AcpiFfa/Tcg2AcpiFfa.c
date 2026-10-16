@@ -66,39 +66,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define MAX_PRS_INT_BUF_SIZE  (15*4)
 
-#pragma pack(1)
-
-typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER                               Header;
-  // Flags field is replaced in version 4 and above
-  //    BIT0~15:  PlatformClass      This field is only valid for version 4 and above
-  //    BIT16~31: Reserved
-  UINT32                                                    Flags;
-  UINT64                                                    AddressOfControlArea;
-  UINT32                                                    StartMethod;
-  EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_FFA    FfaParameters;
-  UINT32                                                    Laml; // Optional
-  UINT64                                                    Lasa; // Optional
-} EFI_TPM2_ACPI_TABLE_V5;
-
-#pragma pack()
-
-EFI_TPM2_ACPI_TABLE_V5  mTpm2AcpiTemplate = {
-  {
-    EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,
-    sizeof (mTpm2AcpiTemplate),
-    EFI_TPM2_ACPI_TABLE_REVISION,
-    //
-    // Compiler initializes the remaining bytes to 0
-    // These fields should be filled in in production
-    //
-  },
-  0, // BIT0~15:  PlatformClass
-     // BIT16~31: Reserved
-  0,                                    // Control Area
-  EFI_TPM2_ACPI_TABLE_START_METHOD_TIS, // StartMethod
-};
-
 /**
   Patch version string of Physical Presence interface supported by platform. The initial string tag in TPM
 ACPI table is "$PV".
@@ -334,15 +301,19 @@ PublishTpm2 (
   VOID
   )
 {
-  EFI_STATUS                  Status;
-  EFI_ACPI_TABLE_PROTOCOL     *AcpiTable;
-  UINTN                       TableKey;
-  UINT64                      OemTableId;
-  EFI_TPM2_ACPI_CONTROL_AREA  *ControlArea;
-  TPM2_PTP_INTERFACE_TYPE     InterfaceType;
-  UINT64                      PartitionId;
+  EFI_STATUS                    Status;
+  EFI_ACPI_TABLE_PROTOCOL       *AcpiTable;
+  UINTN                         TableKey;
+  UINT64                        OemTableId;
+  EFI_TPM2_ACPI_CONTROL_AREA    *ControlArea;
+  TPM2_PTP_INTERFACE_TYPE       InterfaceType;
+  EFI_TPM2_ACPI_TABLE_V5        *Tpm2AcpiTableV5;
+  EFI_TPM2_ACPI_TABLE_TEMPLATE  Tpm2AcpiTemplate;
 
   STATIC_ASSERT ((FixedPcdGet64 (PcdTpmMaxAddress) - FixedPcdGet64 (PcdTpmBaseAddress)) == (FixedPcdGet32 (PcdTpmCrbRegionSize) - 1), "TPM CRB region size mismatch");
+
+  // Zero the template so its measured contents are deterministic.
+  ZeroMem (&Tpm2AcpiTemplate, sizeof (Tpm2AcpiTemplate));
 
   //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA.
@@ -355,61 +326,64 @@ PublishTpm2 (
     EV_POST_CODE,
     EV_POSTCODE_INFO_ACPI_DATA,
     ACPI_DATA_LEN,
-    &mTpm2AcpiTemplate,
-    mTpm2AcpiTemplate.Header.Length
+    &Tpm2AcpiTemplate,
+    sizeof (EFI_TPM2_ACPI_TABLE_TEMPLATE)
     );
 
-  mTpm2AcpiTemplate.Header.Revision = PcdGet8 (PcdTpm2AcpiTableRev);
-  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", mTpm2AcpiTemplate.Header.Revision));
+  Tpm2AcpiTemplate.Header.Signature = EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE;
+  Tpm2AcpiTemplate.Header.Length    = sizeof (EFI_TPM2_ACPI_TABLE_V5);
+  Tpm2AcpiTemplate.Header.Revision  = PcdGet8 (PcdTpm2AcpiTableRev);
+  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", Tpm2AcpiTemplate.Header.Revision));
 
-  if (mTpm2AcpiTemplate.Header.Revision < EFI_TPM2_ACPI_TABLE_REVISION_5) {
-    DEBUG ((DEBUG_ERROR, "%a The minimum revision supported for TPM over FFA table is 5, not %d.\n", __func__, mTpm2AcpiTemplate.Header.Revision));
+  // FF-A is only supported in revisions 5 and up.
+  if (Tpm2AcpiTemplate.Header.Revision != EFI_TPM2_ACPI_TABLE_REVISION_5) {
+    DEBUG ((DEBUG_ERROR, "%a The minimum revision supported for TPM over FF-A table is 5 not %d\n", __func__, Tpm2AcpiTemplate.Header.Revision));
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
-  mTpm2AcpiTemplate.Flags = (mTpm2AcpiTemplate.Flags & 0xFFFF0000) | PcdGet8 (PcdTpmPlatformClass);
-  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table PlatformClass is %d\n", (mTpm2AcpiTemplate.Flags & 0x0000FFFF)));
-
-  mTpm2AcpiTemplate.Laml = PcdGet32 (PcdTpm2AcpiTableLaml);
-  mTpm2AcpiTemplate.Lasa = PcdGet64 (PcdTpm2AcpiTableLasa);
-  if ((mTpm2AcpiTemplate.Laml == 0) || (mTpm2AcpiTemplate.Lasa == 0)) {
-    //
-    // If version is smaller than 4 or Laml/Lasa is not valid, rollback to original Length.
-    //
-    mTpm2AcpiTemplate.Header.Length = sizeof (EFI_TPM2_ACPI_TABLE);
-  }
-
+  // CRB over FF-A only supports the CRB interface type.
   InterfaceType = PcdGet8 (PcdActiveTpmInterfaceType);
   DEBUG ((DEBUG_INFO, "Tpm Active Interface Type %d\n", InterfaceType));
-
-  PartitionId = PcdGet16 (PcdTpmServiceFfaPartitionId);
-  ASSERT (PartitionId != 0);
-  if (InterfaceType == Tpm2PtpInterfaceCrb) {
-    mTpm2AcpiTemplate.StartMethod              = EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_FFA;
-    mTpm2AcpiTemplate.AddressOfControlArea     = PcdGet64 (PcdTpmBaseAddress) + 0x40;
-    mTpm2AcpiTemplate.FfaParameters.Flags      = 0x00;           // Notifications Not Supported
-    mTpm2AcpiTemplate.FfaParameters.Attributes = (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_4KB << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_SHIFT) |
-                                                 (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_NOT_CACHEABLE << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_SHIFT);
-    mTpm2AcpiTemplate.FfaParameters.PartitionId = PartitionId;   // Partition ID
-    ControlArea                                 = (EFI_TPM2_ACPI_CONTROL_AREA *)(UINTN)mTpm2AcpiTemplate.AddressOfControlArea;
-    ControlArea->CommandSize                    = 0xF80;
-    ControlArea->ResponseSize                   = 0xF80;
-    ControlArea->Command                        = PcdGet64 (PcdTpmBaseAddress) + 0x80;
-    ControlArea->Response                       = PcdGet64 (PcdTpmBaseAddress) + 0x80;
-  } else {
-    DEBUG ((DEBUG_ERROR, "TPM2 InterfaceType get error! %d\n", InterfaceType));
+  if (InterfaceType != Tpm2PtpInterfaceCrb) {
+    DEBUG ((DEBUG_ERROR, "TPM over FF-A only supports CRB interface\n"));
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table size %d\n", mTpm2AcpiTemplate.Header.Length));
+  Tpm2AcpiTemplate.Flags = (Tpm2AcpiTemplate.Flags & ~EFI_TPM2_ACPI_TABLE_FLAGS_PLATFORM_CLASS_MASK) | PcdGet8 (PcdTpmPlatformClass);
+  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table PlatformClass is %d\n", (Tpm2AcpiTemplate.Flags & EFI_TPM2_ACPI_TABLE_FLAGS_PLATFORM_CLASS_MASK)));
 
-  CopyMem (mTpm2AcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (mTpm2AcpiTemplate.Header.OemId));
+  Tpm2AcpiTableV5       = (EFI_TPM2_ACPI_TABLE_V5 *)&Tpm2AcpiTemplate;
+  Tpm2AcpiTableV5->Laml = PcdGet32 (PcdTpm2AcpiTableLaml);
+  Tpm2AcpiTableV5->Lasa = PcdGet64 (PcdTpm2AcpiTableLasa);
+  if ((Tpm2AcpiTableV5->Laml == 0) || (Tpm2AcpiTableV5->Lasa == 0)) {
+    // Remove LAML/LASA from the length if either is 0.
+    Tpm2AcpiTemplate.Header.Length = OFFSET_OF (EFI_TPM2_ACPI_TABLE_V5, Laml);
+  }
+
+  DEBUG ((DEBUG_INFO, "Tpm2 ACPI table size %d\n", Tpm2AcpiTemplate.Header.Length));
+
+  Tpm2AcpiTemplate.StartMethod          = EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_FFA;
+  Tpm2AcpiTemplate.AddressOfControlArea = PcdGet64 (PcdTpmBaseAddress) + 0x40;
+  ControlArea                           = (EFI_TPM2_ACPI_CONTROL_AREA *)(UINTN)Tpm2AcpiTemplate.AddressOfControlArea;
+  ControlArea->CommandSize              = 0xF80;
+  ControlArea->ResponseSize             = 0xF80;
+  ControlArea->Command                  = PcdGet64 (PcdTpmBaseAddress) + 0x80;
+  ControlArea->Response                 = PcdGet64 (PcdTpmBaseAddress) + 0x80;
+
+  // Set the FF-A specific parameters.
+  Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.Flags      = 0x00;  // Notifications Not Supported
+  Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.Attributes = (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_4KB << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_SHIFT) |
+                                                                            (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_NOT_CACHABLE << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_SHIFT);
+  Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.PartitionId = PcdGet16 (PcdTpmServiceFfaPartitionId);
+  ASSERT (Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.PartitionId != 0);
+
+  CopyMem (Tpm2AcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (Tpm2AcpiTemplate.Header.OemId));
   OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
-  CopyMem (&mTpm2AcpiTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
-  mTpm2AcpiTemplate.Header.OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
-  mTpm2AcpiTemplate.Header.CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
-  mTpm2AcpiTemplate.Header.CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
+  CopyMem (&Tpm2AcpiTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+  Tpm2AcpiTemplate.Header.OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
+  Tpm2AcpiTemplate.Header.CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
+  Tpm2AcpiTemplate.Header.CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
 
   //
   // Construct ACPI table
@@ -419,8 +393,8 @@ PublishTpm2 (
 
   Status = AcpiTable->InstallAcpiTable (
                         AcpiTable,
-                        &mTpm2AcpiTemplate,
-                        mTpm2AcpiTemplate.Header.Length,
+                        &Tpm2AcpiTemplate,
+                        Tpm2AcpiTemplate.Header.Length,
                         &TableKey
                         );
   ASSERT_EFI_ERROR (Status);

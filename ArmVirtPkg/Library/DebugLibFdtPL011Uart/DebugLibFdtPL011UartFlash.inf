@@ -50,6 +50,7 @@
 
 [FixedPcd]
   gArmPlatformTokenSpaceGuid.PL011UartClkInHz
+  gArmVirtTokenSpaceGuid.PcdSerialDebugPrintErrorLevel
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity

@@ -1,0 +1,29 @@
+## @file
+#  Early Platform Probe Library instance for 16550 Uart.
+#
+#  Copyright (c) 2026, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = EarlyFdt16550SerialPortProbeLib
+  MODULE_UNI_FILE                = Fdt16550SerialPortHookLib.uni
+  FILE_GUID                      = 07a000d5-7de7-485f-ab59-a2ce4da5e488
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|SEC PEI_CORE PEIM
+  CONSTRUCTOR                    = EarlyFdt16550SerialPortProbeLibConstructor
+
+[Sources]
+  EarlyFdt16550SerialPortProbeLib.c
+
+[LibraryClasses]
+  PlatformHookLib
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec

@@ -45,6 +45,7 @@ Requirements:
   - EArchCommonObjCmRef (OPTIONAL)
   - EArchCommonObjLpiInfo (OPTIONAL)
   - EArchCommonObjPsdInfo (OPTIONAL)
+  - EArchCommonObjStaInfo (OPTIONAL)
 */
 
 /**
@@ -95,6 +96,15 @@ GET_OBJECT_LIST (
   EObjNameSpaceArchCommon,
   EArchCommonObjPsdInfo,
   CM_ARCH_COMMON_PSD_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    _STA (Device Status) information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjStaInfo,
+  CM_ARCH_COMMON_STA_INFO
   );
 
 /** Initialize the TokenTable.
@@ -696,6 +706,68 @@ CreateAmlCpu (
   return Status;
 }
 
+/** Create a "_STA" method and attach it to the parent node.
+
+  The function generate the following ASL code:
+  Method (_STA, 0, NotSerialized)  // _STA: Status
+  {
+      Return (0xXX)
+  }
+
+  @param [in]  Generator              The SSDT Cpu Topology generator.
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+  @param [in]  StaToken               Token referencing a CM_ARCH_COMMON_STA_INFO obj.
+  @param [in]  ParentNode             Parent node to attach the "_STA" method to.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateAmlStatus (
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN        CM_OBJECT_TOKEN                               StaToken,
+  IN        AML_NODE_HANDLE                               ParentNode
+  )
+{
+  EFI_STATUS               Status;
+  CM_ARCH_COMMON_STA_INFO  *StaInfo;
+
+  ASSERT (Generator != NULL);
+  ASSERT (CfgMgrProtocol != NULL);
+  ASSERT (ParentNode != NULL);
+  ASSERT (StaToken != CM_NULL_TOKEN);
+
+  Status = GetEArchCommonObjStaInfo (
+             CfgMgrProtocol,
+             StaToken,
+             &StaInfo,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  /// check STA bits
+  if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_BASE_SUPPORTED)) != 0) {
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, ParentNode, NULL);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  return Status;
+}
+
 /** Create a Cpu in the AML namespace from a CM_ARCH_COMMON_PROC_HIERARCHY_INFO
     CM object.
 
@@ -791,6 +863,19 @@ CreateAmlCpuFromProcHierarchy (
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
+  }
+
+  if (ProcHierarchyNodeInfo->StaToken != CM_NULL_TOKEN) {
+    Status = CreateAmlStatus (
+               Generator,
+               CfgMgrProtocol,
+               ProcHierarchyNodeInfo->StaToken,
+               CpuNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
   }
 
   return Status;
@@ -896,6 +981,19 @@ CreateAmlProcessorContainer (
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
+      return Status;
+    }
+  }
+
+  if (ProcHierarchyNodeInfo->StaToken != CM_NULL_TOKEN) {
+    Status = CreateAmlStatus (
+               Generator,
+               CfgMgrProtocol,
+               ProcHierarchyNodeInfo->StaToken,
+               ProcContainerNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
       return Status;
     }
   }

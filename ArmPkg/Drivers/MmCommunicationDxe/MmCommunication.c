@@ -19,6 +19,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmCommunication3.h>
@@ -28,6 +29,11 @@
 #include <IndustryStandard/MmCommunicate.h>
 
 #define COMM_BUFFER_ATTRS  (EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME)
+
+// This an absurdly high number. The timer cannot be used reliably at runtime so having some upper bound is necessary.
+// This number is chosen with back-of-the-envelope calculations where the rough time to get a BUSY response it around
+// 10 microseconds, so 500,000 retries is roughly 5 seconds.
+#define MAX_BUSY_RETRIES  500000
 
 //
 // Partition ID if FF-A support is enabled
@@ -47,41 +53,6 @@ STATIC EFI_EVENT  mSetVirtualAddressMapEvent;
 // Handle to install the MM Communication Protocol
 //
 STATIC EFI_HANDLE  mMmCommunicateHandle;
-
-/**
-  Send mm communicate request via FF-A.
-
-  @retval EFI_SUCCESS
-  @retval Others                   Error.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-SendFfaMmCommunicate (
-  IN VOID
-  )
-{
-  EFI_STATUS       Status;
-  DIRECT_MSG_ARGS  CommunicateArgs;
-
-  ZeroMem (&CommunicateArgs, sizeof (DIRECT_MSG_ARGS));
-
-  CommunicateArgs.Arg0 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
-
-  Status = ArmFfaLibMsgSendDirectReq (
-             mStMmPartId,
-             0,
-             &CommunicateArgs
-             );
-
-  while (Status == EFI_INTERRUPT_PENDING) {
-    // We are assuming vCPU0 of the StMM SP since it is UP.
-    Status = ArmFfaLibRun (mStMmPartId, 0x00, NULL);
-  }
-
-  return Status;
-}
 
 /**
   Convert SmcMmRet value to EFI_STATUS.
@@ -110,6 +81,56 @@ SmcMmRetToEfiStatus (
     default:
       return EFI_ACCESS_DENIED;
   }
+}
+
+/**
+  Send mm communicate request via FF-A.
+
+  @retval EFI_SUCCESS
+  @retval Others                   Error.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+SendFfaMmCommunicate (
+  IN VOID
+  )
+{
+  EFI_STATUS       Status;
+  DIRECT_MSG_ARGS  CommunicateArgs;
+  UINT64           Retries;
+
+  Retries = 0;
+  while (TRUE) {
+    ZeroMem (&CommunicateArgs, sizeof (DIRECT_MSG_ARGS));
+    CommunicateArgs.Arg0 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
+
+    Status = ArmFfaLibMsgSendDirectReq (
+               mStMmPartId,
+               0,
+               &CommunicateArgs
+               );
+
+    if (Status == EFI_NO_RESPONSE) {
+      // Only try for so long before just failing.
+      if (Retries >= MAX_BUSY_RETRIES) {
+        return EFI_TIMEOUT;
+      }
+
+      Retries++;
+      continue;
+    }
+
+    break;
+  }
+
+  while (Status == EFI_INTERRUPT_PENDING) {
+    // We are assuming vCPU0 of the StMM SP since it is UP.
+    Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (CommunicateArgs.Header.x1), 0x00, &CommunicateArgs);
+  }
+
+  return EFI_ERROR (Status) ? Status : SmcMmRetToEfiStatus (CommunicateArgs.Arg1);
 }
 
 /**
@@ -189,6 +210,7 @@ MmCommunicationCommon (
   EFI_MM_COMMUNICATE_HEADER     *CommunicateHeader;
   EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
   UINTN                         BufferSize;
+  UINTN                         InputBufferSize;
   UINTN                         *MessageSize;
   UINTN                         HeaderSize;
   EFI_STATUS                    Status;
@@ -219,14 +241,29 @@ MmCommunicationCommon (
     BufferSize          = CommunicateHeaderV3->BufferSize;
     MessageSize         = &CommunicateHeaderV3->MessageSize;
     HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+
+    if (BufferSize < HeaderSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (BufferSize - HeaderSize < *MessageSize) {
+      return EFI_INVALID_PARAMETER;
+    }
   } else {
-    BufferSize = CommunicateHeader->MessageLength +
-                 sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
+    Status = SafeUintnAdd (
+               CommunicateHeader->MessageLength,
+               OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+               &BufferSize
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     MessageSize = &CommunicateHeader->MessageLength;
-    HeaderSize  = sizeof (CommunicateHeader->HeaderGuid) +
-                  sizeof (CommunicateHeader->MessageLength);
+    HeaderSize  = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   }
+
+  InputBufferSize = BufferSize;
 
   // If CommSize is not omitted, perform size inspection before proceeding.
   if (CommSize != NULL) {
@@ -245,6 +282,8 @@ MmCommunicationCommon (
     if (*CommSize < BufferSize) {
       Status = EFI_INVALID_PARAMETER;
     }
+
+    InputBufferSize = *CommSize;
   }
 
   //
@@ -273,7 +312,6 @@ MmCommunicationCommon (
   }
 
   if (!EFI_ERROR (Status)) {
-    ZeroMem (CommBufferVirtual, BufferSize);
     // On successful return, the size of data being returned is inferred from
     // MessageLength + Header.
     CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
@@ -296,12 +334,17 @@ MmCommunicationCommon (
       CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateHeader;
       BufferSize          = CommunicateHeaderV3->BufferSize;
     } else {
-      BufferSize = CommunicateHeader->MessageLength +
-                   sizeof (CommunicateHeader->HeaderGuid) +
-                   sizeof (CommunicateHeader->MessageLength);
+      Status = SafeUintnAdd (
+                 CommunicateHeader->MessageLength,
+                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+                 &BufferSize
+                 );
+      if (EFI_ERROR (Status)) {
+        return EFI_INVALID_PARAMETER;
+      }
     }
 
-    if (BufferSize > mNsCommBuffMemRegion.Length) {
+    if (BufferSize > InputBufferSize) {
       // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
       Status = EFI_BAD_BUFFER_SIZE;
       DEBUG ((
@@ -309,7 +352,7 @@ MmCommunicationCommon (
         "%a Returned buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
         __func__,
         BufferSize,
-        (UINTN)mNsCommBuffMemRegion.Length
+        InputBufferSize
         ));
     } else {
       CopyMem (

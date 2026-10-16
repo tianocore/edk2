@@ -46,6 +46,7 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
   #
   # UEFI & PI
   #
@@ -183,6 +184,8 @@
 
 [LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+  ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
 
@@ -215,6 +218,7 @@
   MdeModulePkg/Logo/Logo.inf
   MdeModulePkg/Logo/LogoDxe.inf
   MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  MdeModulePkg/Library/GptLib/GptLib.inf
   MdeModulePkg/Library/BootDiscoveryPolicyUiLib/BootDiscoveryPolicyUiLib.inf
   MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
@@ -534,6 +538,9 @@
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
 
 [Components.AARCH64]
+  MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+  MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf

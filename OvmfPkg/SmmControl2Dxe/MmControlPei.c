@@ -185,6 +185,7 @@ MmControlPeiEntryPoint (
   UINT32      PmBase;
   UINT32      SmiEnableVal;
   EFI_STATUS  Status;
+  BOOLEAN     NegotiationSuccessful;
 
   //
   // This module should only be included if SMRAM support is required.
@@ -243,6 +244,13 @@ MmControlPeiEntryPoint (
       ));
     goto FatalError;
   }
+
+  //
+  // QEMU can inject SMIs in different ways, negotiate our preferences.
+  //
+  NegotiationSuccessful = NegotiateSmiFeatures ();
+
+  ASSERT (NegotiationSuccessful);
 
   //
   // We have no pointers to convert to virtual addresses. The handle itself

@@ -34,7 +34,8 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "PcAtChipsetPkg/PcAtChipsetPkg.dec",
-            "UefiCpuPkg/UefiCpuPkg.dec"
+            "UefiCpuPkg/UefiCpuPkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
@@ -61,5 +62,11 @@
             "PCATCHIPSET",
             "TXRDY"
         ]
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "AuditOnly": True,           # If True, log all errors and then mark as skipped
+        "IgnoreFiles": []            # package root relative file, folder, or glob pattern to ignore
     }
 }

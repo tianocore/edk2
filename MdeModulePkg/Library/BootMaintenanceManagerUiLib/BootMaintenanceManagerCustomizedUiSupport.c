@@ -36,7 +36,7 @@ BmmCreateBootNextMenu (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
   VOID             *OptionsOpCodeHandle;
   UINT32           BootNextIndex;
 
@@ -61,7 +61,7 @@ BmmCreateBootNextMenu (
         EFI_IFR_TYPE_NUM_SIZE_32,
         Index
         );
-      BootNextIndex = Index;
+      BootNextIndex = (UINT32)Index;
     } else {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
@@ -131,7 +131,7 @@ BmmCreateTimeOutMenu (
     EFI_IFR_NUMERIC_SIZE_2 | EFI_IFR_DISPLAY_UINT_DEC,
     0,
     65535,
-    0,
+    1,
     NULL
     );
 }
@@ -378,10 +378,18 @@ BmmListThirdPartyDrivers (
   }
 
   HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
+  if (HiiHandles == NULL) {
+    ASSERT (HiiHandles != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   gHiiDriverList = AllocateZeroPool (UI_HII_DRIVER_LIST_SIZE * sizeof (UI_HII_DRIVER_INSTANCE));
-  ASSERT (gHiiDriverList != NULL);
+  if (gHiiDriverList == NULL) {
+    ASSERT (gHiiDriverList != NULL);
+    FreePool (HiiHandles);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   DriverListPtr = gHiiDriverList;
   CurrentSize   = UI_HII_DRIVER_LIST_SIZE;
 

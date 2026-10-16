@@ -186,11 +186,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
         self.env.SetValue("PRODUCT_NAME", "EmulatorPkg", "Platform Hardcoded")
-        self.env.SetValue("TOOL_CHAIN_TAG", "VS2022", "Default Toolchain")
+        self.env.SetValue("TOOL_CHAIN_TAG", "VS2026", "Default Toolchain")
 
         # Add support for using the correct Platform Headers, tools, and Libs based on emulator architecture
-        # requested to be built when building VS2022 or VS2019
-        if self.env.GetValue("TOOL_CHAIN_TAG") == "VS2022" or self.env.GetValue("TOOL_CHAIN_TAG") == "VS2019":
+        # requested to be built when building VS2026, VS2022 or VS2019
+        if self.env.GetValue("TOOL_CHAIN_TAG") in ("VS2019", "VS2022", "VS2026"):
             key = self.env.GetValue("TOOL_CHAIN_TAG") + "_HOST"
             if self.env.GetValue("TARGET_ARCH") == "IA32":
                 shell_environment.ShellEnvironment().set_shell_var(key, "x86")

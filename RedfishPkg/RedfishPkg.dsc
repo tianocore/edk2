@@ -4,7 +4,7 @@
 # Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett-Packard Enterprise Development LP.
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
-# Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2023-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -48,6 +48,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   RedfishPlatformWantedDeviceLib|RedfishPkg/Library/RedfishPlatformWantedDeviceLibNull/RedfishPlatformWantedDeviceLibNull.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
   # NULL instance of IPMI related library.
   IpmiLib|MdeModulePkg/Library/BaseIpmiLibNull/BaseIpmiLibNull.inf

@@ -1,14 +1,12 @@
 /** @file
   RNG Driver to produce the UEFI Random Number Generator protocol.
 
-  The driver will use the new RDRAND instruction to produce high-quality, high-performance
-  entropy and random number.
+  The driver uses the platform RngLib to produce high-quality, high-performance
+  entropy and random numbers.
 
   RNG Algorithms defined in UEFI 2.4:
    - EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID  - Supported
-     (RDRAND implements a hardware NIST SP800-90 AES-CTR-256 based DRBG)
    - EFI_RNG_ALGORITHM_RAW                    - Supported
-     (Structuring RDRAND invocation can be guaranteed as high-quality entropy source)
    - EFI_RNG_ALGORITHM_SP800_90_HMAC_256_GUID - Unsupported
    - EFI_RNG_ALGORITHM_SP800_90_HASH_256_GUID - Unsupported
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID        - Unsupported
@@ -17,6 +15,7 @@
   Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -181,8 +180,6 @@ RngGetInfo (
   }
 
   CopyMem (&RNGAlgorithmList[0], &gEfiRngAlgorithmSp80090Ctr256Guid, sizeof (EFI_RNG_ALGORITHM));
-
-  // x86 platforms also support EFI_RNG_ALGORITHM_RAW via RDSEED
   CopyMem (&RNGAlgorithmList[1], &gEfiRngAlgorithmRaw, sizeof (EFI_RNG_ALGORITHM));
 
   *RNGAlgorithmListSize = RequiredSize;

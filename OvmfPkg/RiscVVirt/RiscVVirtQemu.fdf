@@ -154,6 +154,11 @@ INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
+#
+# Hash2 protocol, needed to dispatch TcpDxe
+#
+INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 #

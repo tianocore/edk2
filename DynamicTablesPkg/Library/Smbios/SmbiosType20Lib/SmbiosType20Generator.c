@@ -59,6 +59,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType20TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                   *CONST  This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL     *CONST  TableFactoryProtocol,
@@ -112,6 +113,7 @@ FreeSmbiosType20TableEx (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType20TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                          *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST   TableFactoryProtocol,

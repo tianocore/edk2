@@ -24,6 +24,8 @@
 
 [LibraryClasses]
   GoogleTestLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
   SubhookLib
 
 [Packages]

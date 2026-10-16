@@ -16,7 +16,7 @@ The sample modules are built as part of the normal `PrmPkg` build so you can fol
 workspace build output directory. For example, if your build workspace is called "edk2" and you build
 64-bit binaries on the Visual Studio 2017 tool chain, your sample module binaries will be in the following
 location: \
-``edk2/Build/Prm/DEBUG_VS2022/X64/PrmPkg/Samples``
+``edk2/Build/Prm/DEBUG_VS2026/X64/PrmPkg/Samples``
 
 ### Build an Individual PRM Sample Module
 
@@ -26,7 +26,7 @@ the module INF file with the "-m" argument to `build`. For example, this command
 with Visual Studio 2022: \
 
 ```shell
-build -p PrmPkg/PrmPkg.dsc -m PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf -a X64 -t VS2022
+build -p PrmPkg/PrmPkg.dsc -m PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf -a X64 -t VS2026
 ```
 
 ## PRM Sample Module User's Guide
@@ -44,7 +44,7 @@ and interact with their PRM modules.
 
 >* Name: `PrmSampleAcpiParameterBufferModule`
 >* GUID: `dc2a58a6-5927-4776-b995-d118a27335a2`
-> * Purpose:
+>* Purpose:
 >   * Provides an example of how to configure an ACPI parameter buffer
 
 **Handlers:**
@@ -68,7 +68,7 @@ and interact with their PRM modules.
 
 >* Name: `PrmSampleContextBufferModule`
 >* GUID: `5a6cf42b-8bb4-472c-a233-5c4dc4033dc7`
-> * Purpose:
+>* Purpose:
 >   * Provides an example of how to configure a static data buffer (which is pointed to in a context buffer) in
       firmware and consume the buffer contents at runtime
 
@@ -102,7 +102,7 @@ and interact with their PRM modules.
 
 >* Name: `PrmSampleHardwareAccessModule`
 >* GUID: `0ef93ed7-14ae-425b-928f-b85a6213b57e`
-> * Purpose:
+>* Purpose:
 >   * Demonstrate access of several types of hardware resources from a PRM module
 
 **Handlers:**

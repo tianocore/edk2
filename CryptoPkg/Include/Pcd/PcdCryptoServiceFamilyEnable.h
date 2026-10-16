@@ -126,6 +126,8 @@ typedef struct {
       UINT8    AuthenticodeVerify         : 1;
       UINT8    ImageTimestampVerify       : 1;
       UINT8    Pkcs1v2Decrypt             : 1;
+      UINT8    Pkcs7Encrypt               : 1;
+      UINT8    Pkcs7Decrypt               : 1;
     } Services;
     UINT32    Family;
   } Pkcs;
@@ -291,6 +293,9 @@ typedef struct {
       UINT8    Sha384ExtractAndExpand : 1;
       UINT8    Sha384Extract          : 1;
       UINT8    Sha384Expand           : 1;
+      UINT8    Sha512ExtractAndExpand : 1;
+      UINT8    Sha512Extract          : 1;
+      UINT8    Sha512Expand           : 1;
     } Services;
     UINT32    Family;
   } Hkdf;
@@ -441,6 +446,9 @@ typedef struct {
       UINT8    GroupSetGenerator             : 1;
       UINT8    PointMul2                     : 1;
       UINT8    PointsMul                     : 1;
+      UINT8    GetPublicKeyFromPem           : 1;
+      UINT8    PublicKeyToPEM                : 1;
+      UINT8    GetCurveNid                   : 1;
     } Services;
     UINT32    Family;
   } Ec;
@@ -468,4 +476,34 @@ typedef struct {
     } Services;
     UINT32    Family;
   } EdDsa;
+  union {
+    struct {
+      UINT8    NewByNid             : 1;
+      UINT8    Free                 : 1;
+      UINT8    SetPrivKey           : 1;
+      UINT8    GeneratePubKey       : 1;
+      UINT8    SetPubKey            : 1;
+      UINT8    GetPubKey            : 1;
+      UINT8    GetPublicKeyFromX509 : 1;
+      UINT8    GetPrivateKeyFromPem : 1;
+      UINT8    Sign                 : 1;
+      UINT8    Verify               : 1;
+    } Services;
+    UINT32    Family;
+  } MlDsa;
+  union {
+    struct {
+      UINT8    NewByNid             : 1;
+      UINT8    Free                 : 1;
+      UINT8    SetPrivKey           : 1;
+      UINT8    GeneratePubKey       : 1;
+      UINT8    SetPubKey            : 1;
+      UINT8    GetPubKey            : 1;
+      UINT8    GetPublicKeyFromX509 : 1;
+      UINT8    GetPrivateKeyFromPem : 1;
+      UINT8    Sign                 : 1;
+      UINT8    Verify               : 1;
+    } Services;
+    UINT32    Family;
+  } SlhDsa;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;

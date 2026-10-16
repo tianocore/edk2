@@ -1,7 +1,7 @@
 /** @file
   Arm generic timer parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -52,11 +52,10 @@ TimerNodeParser (
 {
   EFI_STATUS    Status;
   CONST UINT32  *Data;
-  INT32         IntcNode;
-  UINT32        GicVersion;
+  CONST UINT32  *DecodedInterruptData;
+  INT32         DecodedInterruptCells;
   INT32         DataSize;
-  INT32         IntCells;
-  BOOLEAN       AlwaysOnTimer;
+  UINT32        AlwaysOnTimerFlag;
 
   if ((Fdt == NULL) ||
       (GenericTimerInfo == NULL))
@@ -67,68 +66,99 @@ TimerNodeParser (
 
   Data = FdtGetProp (Fdt, TimerNode, "always-on", &DataSize);
   if ((Data == NULL) || (DataSize < 0)) {
-    AlwaysOnTimer = FALSE;
+    AlwaysOnTimerFlag = 0;
   } else {
-    AlwaysOnTimer = TRUE;
+    AlwaysOnTimerFlag = BIT2;
   }
 
-  // Get the associated interrupt-controller.
-  Status = FdtGetIntcParentNode (Fdt, TimerNode, &IntcNode);
-  if (EFI_ERROR (Status)) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtSecureTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     ASSERT (0);
     return Status;
+  } else if (Status == EFI_NOT_FOUND) {
+    GenericTimerInfo->SecurePL1TimerGSIV  = 0;
+    GenericTimerInfo->SecurePL1TimerFlags = 0;
+  } else {
+    GenericTimerInfo->SecurePL1TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->SecurePL1TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  // Check that the interrupt-controller node is a Gic.
-  Status = GetGicVersion (Fdt, IntcNode, &GicVersion);
-  if (EFI_ERROR (Status)) {
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtNonSecureTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     ASSERT (0);
     return Status;
+  } else if (Status == EFI_NOT_FOUND) {
+    GenericTimerInfo->NonSecurePL1TimerGSIV  = 0;
+    GenericTimerInfo->NonSecurePL1TimerFlags = 0;
+  } else {
+    GenericTimerInfo->NonSecurePL1TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->NonSecurePL1TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, &IntCells);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    if (Status == EFI_NOT_FOUND) {
-      // Should have found the node.
-      Status = EFI_ABORTED;
-    }
-
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtVirtualTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT (FALSE);
     return Status;
+  } else if (Status == EFI_NOT_FOUND) {
+    GenericTimerInfo->VirtualTimerGSIV  = 0;
+    GenericTimerInfo->VirtualTimerFlags = 0;
+  } else {
+    GenericTimerInfo->VirtualTimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->VirtualTimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  Data = FdtGetProp (Fdt, TimerNode, "interrupts", &DataSize);
-  if ((Data == NULL) ||
-      (DataSize != (FdtMaxTimerItem * IntCells * sizeof (UINT32))))
-  {
-    // If error or not FdtMaxTimerItem interrupts.
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtHypervisorTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     ASSERT (0);
-    return EFI_ABORTED;
+    return Status;
+  } else if (Status == EFI_NOT_FOUND) {
+    GenericTimerInfo->NonSecurePL2TimerGSIV  = 0;
+    GenericTimerInfo->NonSecurePL2TimerFlags = 0;
+  } else {
+    GenericTimerInfo->NonSecurePL2TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->NonSecurePL2TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
-  GenericTimerInfo->SecurePL1TimerGSIV =
-    FdtGetInterruptId (&Data[FdtSecureTimerIrq * IntCells]);
-  GenericTimerInfo->SecurePL1TimerFlags =
-    FdtGetInterruptFlags (&Data[FdtSecureTimerIrq * IntCells]);
-  GenericTimerInfo->NonSecurePL1TimerGSIV =
-    FdtGetInterruptId (&Data[FdtNonSecureTimerIrq * IntCells]);
-  GenericTimerInfo->NonSecurePL1TimerFlags =
-    FdtGetInterruptFlags (&Data[FdtNonSecureTimerIrq * IntCells]);
-  GenericTimerInfo->VirtualTimerGSIV =
-    FdtGetInterruptId (&Data[FdtVirtualTimerIrq * IntCells]);
-  GenericTimerInfo->VirtualTimerFlags =
-    FdtGetInterruptFlags (&Data[FdtVirtualTimerIrq * IntCells]);
-  GenericTimerInfo->NonSecurePL2TimerGSIV =
-    FdtGetInterruptId (&Data[FdtHypervisorTimerIrq * IntCells]);
-  GenericTimerInfo->NonSecurePL2TimerFlags =
-    FdtGetInterruptFlags (&Data[FdtHypervisorTimerIrq * IntCells]);
-
-  if (AlwaysOnTimer) {
-    GenericTimerInfo->SecurePL1TimerFlags    |= BIT2;
-    GenericTimerInfo->NonSecurePL1TimerFlags |= BIT2;
-    GenericTimerInfo->VirtualTimerFlags      |= BIT2;
-    GenericTimerInfo->NonSecurePL2TimerFlags |= BIT2;
+  Status = FdtResolveInterrupt (
+             Fdt,
+             TimerNode,
+             FdtHypervisorVTimerIrq,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT (0);
+    return Status;
+  } else if (Status == EFI_NOT_FOUND) {
+    GenericTimerInfo->VirtualPL2TimerGSIV  = 0;
+    GenericTimerInfo->VirtualPL2TimerFlags = 0;
+  } else {
+    GenericTimerInfo->VirtualPL2TimerGSIV  = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
+    GenericTimerInfo->VirtualPL2TimerFlags = FdtGetInterruptFlags (DecodedInterruptData, DecodedInterruptCells) | AlwaysOnTimerFlag;
   }
 
   // Setup default values
@@ -137,10 +167,6 @@ TimerNodeParser (
   // these to their default value.
   GenericTimerInfo->CounterControlBaseAddress = 0xFFFFFFFFFFFFFFFF;
   GenericTimerInfo->CounterReadBaseAddress    = 0xFFFFFFFFFFFFFFFF;
-
-  // For systems not implementing ARMv8.1 VHE, this field is 0.
-  GenericTimerInfo->VirtualPL2TimerGSIV  = 0;
-  GenericTimerInfo->VirtualPL2TimerFlags = 0;
 
   return EFI_SUCCESS;
 }

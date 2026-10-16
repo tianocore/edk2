@@ -100,11 +100,23 @@ extern TEST_DESC  mEcTest[];
 extern UINTN      mEdDsaTestNum;
 extern TEST_DESC  mEdDsaTest[];
 
+extern UINTN      mMlDsaTestNum;
+extern TEST_DESC  mMlDsaTest[];
+
+extern UINTN      mSlhDsaTestNum;
+extern TEST_DESC  mSlhDsaTest[];
+
 extern UINTN      mX509TestNum;
 extern TEST_DESC  mX509Test[];
 
 extern UINTN      mPkcs7ContentTestNum;
 extern TEST_DESC  mPkcs7ContentTest[];
+
+extern UINTN      mPkcs7EncryptTestNum;
+extern TEST_DESC  mPkcs7EncryptTest[];
+
+extern UINTN      mPkcs7DecryptTestNum;
+extern TEST_DESC  mPkcs7DecryptTest[];
 
 //
 // Test Case only for MbedTls.

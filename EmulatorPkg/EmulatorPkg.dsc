@@ -71,6 +71,8 @@
 !endif
 
 [LibraryClasses]
+  GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
+
   #
   # Entry point
   #
@@ -394,7 +396,6 @@
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
       SerialPortLib|EmulatorPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf
-      DxeEmuLib|EmulatorPkg/Library/DxeEmuLib/DxeEmuLib.inf
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
@@ -477,11 +478,6 @@
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-  #{
-  #  <LibraryClasses>
-  #    NULL|EmulatorPkg/Library/DevicePathTextLib/DevicePathTextLib.inf
-  #}
-
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
@@ -542,6 +538,27 @@
 
 !endif
 
+EmulatorPkg/Library/DxeCoreTimerLib/DxeCoreTimerLib.inf
+EmulatorPkg/Library/DxeEmuLib/DxeEmuLib.inf
+EmulatorPkg/Library/DxeEmuPeCoffExtraActionLib/DxeEmuPeCoffExtraActionLib.inf
+EmulatorPkg/Library/DxeEmuSerialPortLib/DxeEmuSerialPortLib.inf
+EmulatorPkg/Library/DxeEmuStdErrSerialPortLib/DxeEmuStdErrSerialPortLib.inf
+EmulatorPkg/Library/DxeTimerLib/DxeTimerLib.inf
+EmulatorPkg/Library/GuardUefiMemoryAllocationLib/GuardUefiMemoryAllocationLib.inf
+EmulatorPkg/Library/KeyMapLibNull/KeyMapLibNull.inf
+EmulatorPkg/Library/PeiCoreServicesTablePointerLib/PeiCoreServicesTablePointerLib.inf
+EmulatorPkg/Library/PeiEmuPeCoffExtraActionLib/PeiEmuPeCoffExtraActionLib.inf
+EmulatorPkg/Library/PeiEmuPeCoffGetEntryPointLib/PeiEmuPeCoffGetEntryPointLib.inf
+EmulatorPkg/Library/PeiEmuSerialPortLib/PeiEmuSerialPortLib.inf
+EmulatorPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+EmulatorPkg/Library/PeiServicesTablePointerLibMagicPage/PeiServicesTablePointerLibMagicPage.inf
+EmulatorPkg/Library/PeiTimerLib/PeiTimerLib.inf
+EmulatorPkg/Library/PlatformBmLib/PlatformBmLib.inf
+EmulatorPkg/Library/SecPeiServicesLib/SecPeiServicesLib.inf
+EmulatorPkg/Library/SecPpiListLib/SecPpiListLib.inf
+EmulatorPkg/Library/SmbiosLib/SmbiosLib.inf
+EmulatorPkg/Library/ThunkPpiList/ThunkPpiList.inf
+EmulatorPkg/Library/ThunkProtocolList/ThunkProtocolList.inf
 
 !if $(REDFISH_ENABLE) == TRUE
   EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf
@@ -555,6 +572,7 @@
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
 # |                    | VS2022 |          |            | GCCNOLTO |        |
+# |                    | VS2026 |          |            |          |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -595,7 +613,7 @@
 # macOS/XCODE: macOS environment with XCODE5 installed.
 #
 !if $(WIN_MINGW32_BUILD)
-  !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022"
+  !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022 VS2026"
     !error EmulatorPkg not supported for Mingw/VS20xx builds
   !endif
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
@@ -613,7 +631,7 @@
       !error EmulatorPkg not supported for Windows/CLANGDWARF builds
     !endif
   !else
-    !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022"
+    !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022 VS2026"
       !error EmulatorPkg not supported for Linux/VS20xx builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGPDB"

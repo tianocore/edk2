@@ -13,8 +13,7 @@
 //
 // Global Variables
 //
-BOOLEAN     InterruptState = FALSE;
-EFI_HANDLE  mCpuHandle     = NULL;
+EFI_HANDLE  mCpuHandle = NULL;
 BOOLEAN     mIsFlushingGCD;
 BOOLEAN     mIsAllocatingPageTable = FALSE;
 UINT64      mTimerPeriod           = 0;
@@ -88,7 +87,6 @@ CpuEnableInterrupt (
 {
   EnableInterrupts ();
 
-  InterruptState = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -109,7 +107,6 @@ CpuDisableInterrupt (
 {
   DisableInterrupts ();
 
-  InterruptState = FALSE;
   return EFI_SUCCESS;
 }
 
@@ -134,7 +131,7 @@ CpuGetInterruptState (
     return EFI_INVALID_PARAMETER;
   }
 
-  *State = InterruptState;
+  *State = GetInterruptState ();
   return EFI_SUCCESS;
 }
 

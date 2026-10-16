@@ -2,6 +2,7 @@
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
 Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -24,6 +25,120 @@ static CONST UINT8  mOidBasicConstraints[] = OID_BASIC_CONSTRAINTS;
 #define CRYPTO_ASN1_TAG_CLASS_MASK  0xC0
 #define CRYPTO_ASN1_TAG_PC_MASK     0x20
 #define CRYPTO_ASN1_TAG_VALUE_MASK  0x1F
+
+/**
+  Convert an ML-DSA type name string to an OpenSSL NID.
+
+  This helper function translates ML-DSA type name strings (e.g., "ML-DSA-87")
+  to their corresponding OpenSSL EVP_PKEY NIDs (e.g., EVP_PKEY_ML_DSA_87).
+
+  If the type name is not recognized, EVP_PKEY_NONE is returned.
+
+  @param[in]  TypeName   ML-DSA type name string (e.g., "ML-DSA-87").
+
+  @retval OpenSSL NID (e.g., EVP_PKEY_ML_DSA_87) if recognized.
+  @retval EVP_PKEY_NONE if the type name is not recognized.
+
+**/
+STATIC
+INT32
+MlDsaTypeNameToNid (
+  IN CONST CHAR8  *TypeName
+  )
+{
+  INT32  Nid;
+
+  if (AsciiStrCmp (TypeName, "ML-DSA-87") == 0) {
+    Nid = EVP_PKEY_ML_DSA_87;
+  } else {
+    Nid = EVP_PKEY_NONE;
+  }
+
+  return Nid;
+}
+
+/**
+  Check if the given NID is supported for ML-DSA.
+
+  This helper function checks if the provided NID corresponds to a supported
+  ML-DSA type. Currently, only EVP_PKEY_ML_DSA_87 is supported.
+
+  @param[in]  Nid   The NID to check.
+
+  @retval TRUE   The NID is supported for ML-DSA.
+  @retval FALSE  The NID is not supported for ML-DSA.
+
+**/
+STATIC
+BOOLEAN
+IsMlDsaNidSupported (
+  IN INT32  Nid
+  )
+{
+  switch (Nid) {
+    case EVP_PKEY_ML_DSA_87:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+  Convert an SLH-DSA type name string to an OpenSSL NID.
+
+  This helper function translates SLH-DSA type name strings (e.g., "SLH-DSA-SHAKE-256s")
+  to their corresponding OpenSSL EVP_PKEY NIDs (e.g., EVP_PKEY_SLH_DSA_SHAKE_256S).
+
+  If the type name is not recognized, EVP_PKEY_NONE is returned.
+
+  @param[in]  TypeName   SLH-DSA type name string (e.g., "SLH-DSA-SHAKE-256s").
+
+  @retval OpenSSL NID (e.g., EVP_PKEY_SLH_DSA_SHAKE_256S) if recognized.
+  @retval EVP_PKEY_NONE if the type name is not recognized.
+
+**/
+STATIC
+INT32
+SlhDsaTypeNameToNid (
+  IN CONST CHAR8  *TypeName
+  )
+{
+  INT32  Nid;
+
+  if (AsciiStrCmp (TypeName, "SLH-DSA-SHAKE-256s") == 0) {
+    Nid = EVP_PKEY_SLH_DSA_SHAKE_256S;
+  } else {
+    Nid = EVP_PKEY_NONE;
+  }
+
+  return Nid;
+}
+
+/**
+  Check if the given NID is supported for SLH-DSA.
+
+  This helper function checks if the provided NID corresponds to a supported
+  SLH-DSA type. Currently, only EVP_PKEY_SLH_DSA_SHAKE_256S is supported.
+
+  @param[in]  Nid   The NID to check.
+
+  @retval TRUE   The NID is supported for SLH-DSA.
+  @retval FALSE  The NID is not supported for SLH-DSA.
+
+**/
+STATIC
+BOOLEAN
+IsSlhDsaNidSupported (
+  IN INT32  Nid
+  )
+{
+  switch (Nid) {
+    case EVP_PKEY_SLH_DSA_SHAKE_256S:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
 
 /**
   Construct a X509 object from DER-encoded certificate data.
@@ -900,9 +1015,9 @@ EcGetPublicKeyFromX509 (
   OUT  VOID         **EcContext
   )
 {
-  BOOLEAN   Status;
-  EVP_PKEY  *Pkey;
-  X509      *X509Cert;
+  BOOLEAN     Status;
+  EC_CONTEXT  *EcCtx;
+  X509        *X509Cert;
 
   //
   // Check input parameters.
@@ -911,16 +1026,22 @@ EcGetPublicKeyFromX509 (
     return FALSE;
   }
 
+  *EcContext = NULL;
+
   //
   // If CertSize is 0, return FALSE to be safe.
   //
   if (CertSize == 0) {
-    *EcContext = NULL;
     return FALSE;
   }
 
-  Pkey     = NULL;
   X509Cert = NULL;
+  Status   = FALSE;
+
+  EcCtx = OPENSSL_zalloc (sizeof (EC_CONTEXT));
+  if (EcCtx == NULL) {
+    return FALSE;
+  }
 
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
@@ -936,17 +1057,19 @@ EcGetPublicKeyFromX509 (
   //
   // Retrieve and check EVP_PKEY data from X509 Certificate.
   //
-  Pkey = X509_get_pubkey (X509Cert);
-  if ((Pkey == NULL) || (EVP_PKEY_id (Pkey) != EVP_PKEY_EC)) {
+  EcCtx->EvpPkey = X509_get_pubkey (X509Cert);
+  if (EcCtx->EvpPkey == NULL) {
     goto _Exit;
   }
 
-  //
-  // Duplicate EC Context from the retrieved EVP_PKEY.
-  //
-  if ((*EcContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
-    Status = TRUE;
+  if (EVP_PKEY_id (EcCtx->EvpPkey) != EVP_PKEY_EC) {
+    EVP_PKEY_free (EcCtx->EvpPkey);
+    goto _Exit;
   }
+
+  Status     = TRUE;
+  *EcContext = EcCtx;
+  EcCtx      = NULL;
 
 _Exit:
   //
@@ -956,8 +1079,8 @@ _Exit:
     X509_free (X509Cert);
   }
 
-  if (Pkey != NULL) {
-    EVP_PKEY_free (Pkey);
+  if (EcCtx != NULL) {
+    OPENSSL_free (EcCtx);
   }
 
   return Status;
@@ -1060,6 +1183,232 @@ EdDsaGetPublicKeyFromX509 (
   Ctx->EvpPkey  = DupPkey;
   *EdDsaContext = (VOID *)Ctx;
   Status        = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  if (Pkey != NULL) {
+    EVP_PKEY_free (Pkey);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the ML-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert          Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize      Size of the X509 certificate in bytes.
+  @param[out] MlDsaContext  Pointer to new-generated ML DSA context which contain the retrieved
+                            ML-DSA public key component. Use MlDsaFree() function to free the
+                            resource.
+
+  If Cert is NULL, then return FALSE.
+  If MlDsaContext is NULL, then return FALSE.
+
+  @retval  TRUE   ML-DSA Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve ML-DSA public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+MlDsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **MlDsaContext
+  )
+{
+  BOOLEAN      Status;
+  EVP_PKEY     *Pkey;
+  EVP_PKEY     *DupPkey;
+  INT32        Nid;
+  X509         *X509Cert;
+  KEY_CONTEXT  *Ctx;
+
+  if ((Cert == NULL) || (MlDsaContext == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // If CertSize is 0, return FALSE to be safe.
+  //
+  if (CertSize == 0) {
+    *MlDsaContext = NULL;
+    return FALSE;
+  }
+
+  Pkey     = NULL;
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if (!Status || (X509Cert == NULL)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Retrieve and check EVP_PKEY data from X509 Certificate.
+  //
+  Pkey = X509_get_pubkey (X509Cert);
+  if (Pkey == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Check if the retrieved EVP_PKEY is one supported ML-DSA key type.
+  //
+  Nid = MlDsaTypeNameToNid (EVP_PKEY_get0_type_name (Pkey));
+  if (!IsMlDsaNidSupported (Nid)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Duplicate ML-DSA Context from the retrieved EVP_PKEY.
+  //
+  DupPkey = EVP_PKEY_dup (Pkey);
+  if (DupPkey == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Allocate KEY_CONTEXT wrapper structure
+  //
+  Ctx = (KEY_CONTEXT *)AllocateZeroPool (sizeof (KEY_CONTEXT));
+  if (Ctx == NULL) {
+    EVP_PKEY_free (DupPkey);
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Ctx->Nid      = Nid;
+  Ctx->EvpPkey  = DupPkey;
+  *MlDsaContext = (VOID *)Ctx;
+  Status        = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  if (Pkey != NULL) {
+    EVP_PKEY_free (Pkey);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the SLH-DSA Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert           Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize       Size of the X509 certificate in bytes.
+  @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contain the retrieved
+                             SLH-DSA public key component. Use SlhDsaFree() function to free the
+                             resource.
+
+  If Cert is NULL, then return FALSE.
+  If SlhDsaContext is NULL, then return FALSE.
+
+  @retval  TRUE   SLH-DSA Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve SLH-DSA public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+SlhDsaGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **SlhDsaContext
+  )
+{
+  BOOLEAN      Status;
+  EVP_PKEY     *Pkey;
+  EVP_PKEY     *DupPkey;
+  INT32        Nid;
+  X509         *X509Cert;
+  KEY_CONTEXT  *Ctx;
+
+  if ((Cert == NULL) || (SlhDsaContext == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // If CertSize is 0, return FALSE to be safe.
+  //
+  if (CertSize == 0) {
+    *SlhDsaContext = NULL;
+    return FALSE;
+  }
+
+  Pkey     = NULL;
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if (!Status || (X509Cert == NULL)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Retrieve and check EVP_PKEY data from X509 Certificate.
+  //
+  Pkey = X509_get_pubkey (X509Cert);
+  if (Pkey == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Check if the retrieved EVP_PKEY is one supported SLH-DSA key type.
+  //
+  Nid = SlhDsaTypeNameToNid (EVP_PKEY_get0_type_name (Pkey));
+  if (!IsSlhDsaNidSupported (Nid)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Duplicate SLH-DSA Context from the retrieved EVP_PKEY.
+  //
+  DupPkey = EVP_PKEY_dup (Pkey);
+  if (DupPkey == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Allocate KEY_CONTEXT wrapper structure
+  //
+  Ctx = (KEY_CONTEXT *)AllocateZeroPool (sizeof (KEY_CONTEXT));
+  if (Ctx == NULL) {
+    EVP_PKEY_free (DupPkey);
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Ctx->Nid       = Nid;
+  Ctx->EvpPkey   = DupPkey;
+  *SlhDsaContext = (VOID *)Ctx;
+  Status         = TRUE;
 
 _Exit:
   //

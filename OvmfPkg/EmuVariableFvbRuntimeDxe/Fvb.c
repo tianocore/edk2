@@ -8,6 +8,9 @@
 **/
 
 #include "PiDxe.h"
+
+#include <ConfidentialComputingGuestAttr.h>
+
 #include <Guid/EventGroup.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
@@ -567,16 +570,46 @@ ValidateFvHeader (
   )
 {
   UINT16  Checksum;
+  UINT8   Revision;
+  UINT32  Signature;
+  UINT64  FvLength;
+  UINT16  HeaderLength;
+
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    /*
+     * When in tdx mode the varstore must be in ram not pflash, so there are no
+     * mmio reads/writes needed.  Also in tdx mode BaseIoLibIntrinsic will
+     * translate the mmio access into TDVMCALL_MMIO calls instead of mov
+     * instructions, so memory access with MmioRead* functions does not work.
+     */
+    Revision     = FwVolHeader->Revision;
+    Signature    = FwVolHeader->Signature;
+    FvLength     = FwVolHeader->FvLength;
+    HeaderLength = FwVolHeader->HeaderLength;
+  } else {
+    /*
+     * In sev mode with varstore in pflash we must use MmioRead* functions so to
+     * make sure the mov instruction used to access pflash/memory is supported
+     * by the #VC handler instruction emulator.
+     *
+     * Note: Only sev + sev-es need proper pflash handling, sev-snp is like tdx
+     * incompatible with pflash emulation.
+     */
+    Revision     = MmioRead8 ((UINTN)(&FwVolHeader->Revision));
+    Signature    = MmioRead32 ((UINTN)(&FwVolHeader->Signature));
+    FvLength     = MmioRead64 ((UINTN)(&FwVolHeader->FvLength));
+    HeaderLength = MmioRead16 ((UINTN)(&FwVolHeader->HeaderLength));
+  }
 
   //
   // Verify the header revision, header signature, length
   // Length of FvBlock cannot be 2**64-1
   // HeaderLength cannot be an odd number
   //
-  if ((MmioRead8 ((UINTN)(&FwVolHeader->Revision)) != EFI_FVH_REVISION) ||
-      (MmioRead32 ((UINTN)(&FwVolHeader->Signature)) != EFI_FVH_SIGNATURE) ||
-      (MmioRead64 ((UINTN)(&FwVolHeader->FvLength)) != EMU_FVB_SIZE) ||
-      (MmioRead16 ((UINTN)(&FwVolHeader->HeaderLength)) != EMU_FV_HEADER_LENGTH)
+  if ((Revision != EFI_FVH_REVISION) ||
+      (Signature != EFI_FVH_SIGNATURE) ||
+      (FvLength != EMU_FVB_SIZE) ||
+      (HeaderLength != EMU_FV_HEADER_LENGTH)
       )
   {
     DEBUG ((DEBUG_INFO, "EMU Variable FVB: Basic FV headers were invalid\n"));

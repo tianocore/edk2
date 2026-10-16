@@ -3,8 +3,9 @@
   Refer to FIPS PUB 197 ("Advanced Encryption Standard (AES)") for detailed algorithm
   description of AES.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -208,6 +209,7 @@ AesExpandKey (
 
   @retval EFI_SUCCESS            AES Block Encryption succeeded.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
+  @retval Others                 AesExpandKey failed
 
 **/
 EFI_STATUS
@@ -218,17 +220,18 @@ AesEncrypt (
   OUT UINT8  *OutData
   )
 {
-  AES_KEY  AesKey;
-  UINTN    Nr;
-  UINT32   *Ek;
-  UINT32   State[4];
-  UINT32   TempState[4];
-  UINT32   *StateX;
-  UINT32   *StateY;
-  UINT32   *Temp;
-  UINTN    Index;
-  UINTN    NbIndex;
-  UINTN    Round;
+  AES_KEY     AesKey;
+  UINTN       Nr;
+  UINT32      *Ek;
+  UINT32      State[4];
+  UINT32      TempState[4];
+  UINT32      *StateX;
+  UINT32      *StateY;
+  UINT32      *Temp;
+  UINTN       Index;
+  UINTN       NbIndex;
+  UINTN       Round;
+  EFI_STATUS  Status;
 
   if ((Key == NULL) || (InData == NULL) || (OutData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -237,7 +240,10 @@ AesEncrypt (
   //
   // Expands AES Key for encryption.
   //
-  AesExpandKey (Key, 128, &AesKey);
+  Status = AesExpandKey (Key, 128, &AesKey);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Nr = AesKey.Nk + 6;
   Ek = AesKey.EncKey;

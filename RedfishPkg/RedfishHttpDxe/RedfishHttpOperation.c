@@ -2,6 +2,7 @@
   RedfishHttpOperation handles HTTP operations.
 
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2026, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -9,6 +10,19 @@
 
 #include "RedfishHttpOperation.h"
 #include "RedfishHttpData.h"
+
+/**
+  Return HTTP method in ASCII string. Caller does not need
+  to free returned string buffer.
+
+  @param[in]  Method         HTTP method.
+
+  @retval CHAR8 *   Method in string.
+**/
+CHAR8 *
+HttpMethodToString (
+  IN  EFI_HTTP_METHOD  Method
+  );
 
 /**
   This function copies all headers in SrcHeaders to DstHeaders.
@@ -47,16 +61,33 @@ CopyHttpHeaders (
   for (Index = 0; Index < SrcHeaderCount; Index++) {
     (*DstHeaders)[Index].FieldName = ASCII_STR_DUPLICATE (SrcHeaders[Index].FieldName);
     if ((*DstHeaders)[Index].FieldName == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
     }
 
     (*DstHeaders)[Index].FieldValue = ASCII_STR_DUPLICATE (SrcHeaders[Index].FieldValue);
     if ((*DstHeaders)[Index].FieldValue == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
     }
   }
 
   return EFI_SUCCESS;
+
+ON_ERROR:
+  for (Index = 0; Index < SrcHeaderCount; Index++) {
+    if ((*DstHeaders)[Index].FieldName != NULL) {
+      FreePool ((*DstHeaders)[Index].FieldName);
+    }
+
+    if ((*DstHeaders)[Index].FieldValue != NULL) {
+      FreePool ((*DstHeaders)[Index].FieldValue);
+    }
+  }
+
+  FreePool (*DstHeaders);
+  *DstHeaders     = NULL;
+  *DstHeaderCount = 0;
+
+  return EFI_OUT_OF_RESOURCES;
 }
 
 /**
@@ -640,6 +671,13 @@ HttpSendReceive (
   EFI_HTTP_HEADER          *XAuthTokenHeader;
   CHAR8                    *HttpContentEncoding;
 
+ #if REDFISH_HTTP_RESPONSE_TIME_DEBUG_ENABLED
+  UINT64  StartNs;
+  UINT64  EndNs;
+  UINT64  ElapsedNs;
+
+ #endif
+
   if ((Service == NULL) || IS_EMPTY_STRING (Uri) || (Response == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -661,6 +699,10 @@ HttpSendReceive (
     return EFI_PROTOCOL_ERROR;
   }
 
+ #if REDFISH_HTTP_RESPONSE_TIME_DEBUG_ENABLED
+  StartNs = GetTimeInNanoSecond (GetPerformanceCounter ());
+ #endif
+
   //
   // call RESTEx to get response from REST service.
   //
@@ -668,6 +710,12 @@ HttpSendReceive (
   if (EFI_ERROR (RestExStatus)) {
     DEBUG ((DEBUG_ERROR, "%a: %s SendReceive failure: %r\n", __func__, Uri, RestExStatus));
   }
+
+ #if REDFISH_HTTP_RESPONSE_TIME_DEBUG_ENABLED
+  EndNs     = GetTimeInNanoSecond (GetPerformanceCounter ());
+  ElapsedNs = EndNs - StartNs;
+  DEBUG ((DEBUG_ERROR, "%a: %a %s takes: %ld us\n", __func__, HttpMethodToString (Method), Uri, (ElapsedNs / 1000)));
+ #endif
 
   //
   // Return status code, headers and payload to caller as much as possible even when RestEx returns failure.

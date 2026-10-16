@@ -234,6 +234,7 @@ UsbCreateDevice (
   Device->ParentPort = ParentPort;
   Device->Tier       = (UINT8)(ParentIf->Device->Tier + 1);
   Device->EnumScript = 0;
+  Device->IsSSDev    = FALSE;
   return Device;
 }
 
@@ -416,6 +417,19 @@ UsbSelectConfig (
     // the endpoint toggles to zero for its endpoints.
     //
     IfDesc = ConfigDesc->Interfaces[Index];
+
+    //
+    // Protect against hang. This is added to work around faulty device like Digidesign Mbox3 mini
+    //
+    if ((IfDesc == NULL) || (IfDesc->Settings[0] ==  NULL)) {
+      //
+      // If UsbCreateDesc() bailed on an interface or endpoint desc, don't try to
+      // configure that interface here.
+      //
+      DEBUG ((DEBUG_INFO, "UsbSelectConfig: Skipping uninitialized interface %d.\n", Index));
+      continue;
+    }
+
     UsbSelectSetting (IfDesc, IfDesc->Settings[0]->Desc.AlternateSetting);
 
     //
@@ -851,6 +865,18 @@ DeviceRetry:
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: failed to build descriptor table - %r\n", Status));
+    goto ON_ERROR;
+  }
+
+  // Below code is ensuring the device can be executed with SS.
+  // Some device FW might execute with SS later but it would produce failure if the device is already enumerated with HS.
+  if (  (RetryCount > 0)
+     && (Bus->Usb2Hc != NULL)
+     && (Bus->Usb2Hc->MajorRevision >= 0x3)
+     && (Child->IsSSDev)
+     && (Child->Speed < EFI_USB_SPEED_SUPER)
+     && (Child->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE))
+  {
     goto ON_ERROR;
   }
 

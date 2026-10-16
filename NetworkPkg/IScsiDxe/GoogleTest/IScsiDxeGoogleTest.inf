@@ -1,0 +1,41 @@
+## @file
+# Unit test suite for the IScsiDxe using Google Test
+#
+# Copyright (c) 2026, 20000419. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = IScsiDxeGoogleTest
+  FILE_GUID           = F43D3E58-0E4D-4E94-84BE-51355C8F2D9E
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+[Sources]
+  IScsiDxeGoogleTest.cpp
+  IScsiDhcp6GoogleTest.cpp
+  ../IScsiDhcp6.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  DebugLib
+  NetLib
+  PcdLib
+
+[Protocols]
+  gEfiDhcp6ProtocolGuid
+  gEfiDhcp6ServiceBindingProtocolGuid
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber

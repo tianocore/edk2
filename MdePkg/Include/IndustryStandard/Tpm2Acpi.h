@@ -23,17 +23,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_5  16
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE             EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_5
 
+// Flags field is replaced in version 4 and above:
+//    BIT0~15:  PlatformClass      This field is only valid for version 4 and above
+//    BIT16~31: Reserved
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER    Header;
-  // Flags field is replaced in version 4 and above
-  //    BIT0~15:  PlatformClass      This field is only valid for version 4 and above
-  //    BIT16~31: Reserved
   UINT32                         Flags;
   UINT64                         AddressOfControlArea;
   UINT32                         StartMethod;
-  // UINT8                       PlatformSpecificParameters[];  // size up to 16
-  // UINT32                      Laml;                          // Optional
-  // UINT64                      Lasa;                          // Optional
 } EFI_TPM2_ACPI_TABLE;
 
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_ACPI                                         2
@@ -63,7 +60,8 @@ typedef struct {
   UINT32    Interrupt;
   UINT8     Flags;
   UINT8     OperationFlags;
-  UINT8     Reserved[2];
+  UINT8     Attributes;
+  UINT8     Reserved;
   UINT32    SmcFunctionId;
 } EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_SMC;
 
@@ -78,6 +76,68 @@ typedef struct {
   UINT16    PartitionId;
   UINT8     Reserved[8];
 } EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_FFA;
+
+typedef union {
+  UINT8                                                     PlatformSpecificParameters[EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4];
+  EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_SMC    SmcParameters;
+} EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V4;
+STATIC_ASSERT (
+  sizeof (EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V4) == EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4,
+  "EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V4 size mismatch"
+  );
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER                          Header;
+  UINT32                                               Flags;
+  UINT64                                               AddressOfControlArea;
+  UINT32                                               StartMethod;
+
+  // StartMethodSpecificParameters is variable in size and LAML/LASA are
+  // optional fields. It is the user's responsibility to access the
+  // Header.Length field to determine what is accessible in the table.
+  EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V4    StartMethodSpecificParameters;
+
+  UINT32                                               Laml; // Optional
+  UINT64                                               Lasa; // Optional
+} EFI_TPM2_ACPI_TABLE_V4;
+
+typedef union {
+  UINT8                                                     PlatformSpecificParameters[EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_5];
+  EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_SMC    SmcParameters;
+  EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_FFA    FfaParameters;
+} EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V5;
+STATIC_ASSERT (
+  sizeof (EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V5) == EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_5,
+  "EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V5 size mismatch"
+  );
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER                          Header;
+  UINT32                                               Flags;
+  UINT64                                               AddressOfControlArea;
+  UINT32                                               StartMethod;
+
+  // StartMethodSpecificParameters is variable in size and LAML/LASA are
+  // optional fields. It is the user's responsibility to access the
+  // Header.Length field to determine what is accessible in the table.
+  EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_V5    StartMethodSpecificParameters;
+
+  UINT32                                               Laml; // Optional
+  UINT64                                               Lasa; // Optional
+} EFI_TPM2_ACPI_TABLE_V5;
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT32                         Flags;
+  UINT64                         AddressOfControlArea;
+  UINT32                         StartMethod;
+  UINT8                          PlatformSpecificParameters[EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE];
+  UINT32                         Laml; // Optional
+  UINT64                         Lasa; // Optional
+} EFI_TPM2_ACPI_TABLE_TEMPLATE;
+
+// Mask for the PlatformClass field (BIT0~15) within the Flags field
+#define EFI_TPM2_ACPI_TABLE_FLAGS_PLATFORM_CLASS_MASK  0x0000FFFF
 
 #define EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_FLAG_NOTIFICATION_SUPPORT  BIT0
 

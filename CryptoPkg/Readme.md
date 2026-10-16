@@ -192,6 +192,8 @@ also configured.
 | Pkcs.Pkcs7GetSigners            |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.Pkcs7FreeSigners           |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.Pkcs7Sign                  |     N      |     N     |             |             |      C       |             |                 |
+| Pkcs.Pkcs7Encrypt               |     N      |     N     |             |             |      C       |      C      |                 |
+| Pkcs.Pkcs7Decrypt               |     N      |     N     |             |             |      C       |      C      |                 |
 | Pkcs.Pkcs7GetAttachedContent    |     N      |     N     |             |      C      |      C       |      C      |                 |
 | Pkcs.Pkcs7GetCertificatesList   |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.AuthenticodeVerify         |     N      |     N     |             |             |      C       |             |                 |
@@ -234,6 +236,9 @@ also configured.
 | Bn                              |     N      |     N     |             |             |      C       |      C      |                 |
 | Ec                              |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 | Camellia                        |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| EdDsa                           |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| MlDsa                           |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| SlhDsa                          |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 
 ## Platform Configuration of Cryptographic Services
 

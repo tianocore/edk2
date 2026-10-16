@@ -32,6 +32,9 @@
   Core/PrivateInclude
 
 [LibraryClasses]
+  ##  @libraryclass  Provides GPT partition table parsing and validation routines.
+  GptLib|Include/Library/GptLib.h
+
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
@@ -182,6 +185,14 @@
   ##  @libraryclass   Provides services to prints all HOB information.
   #
   HobPrintLib|Include/Library/HobPrintLib.h
+
+  ##  @libraryclass   Provides Arm CCA helper services.
+  #
+  ArmCcaLib|Include/Library/ArmCcaLib.h
+
+  ##  @libraryclass   Provides interfaces for Arm CCA Realm Services.
+  #
+  ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
 
 [Guids]
   ## MdeModule package token space guid
@@ -498,6 +509,10 @@
 
   ## Include/Guid/ArmFfaRxTxBufferInfo.h
   gArmFfaRxTxBufferInfoGuid = { 0x96fd3d26, 0x6fb1, 0x11ef, { 0x8c, 0x11, 0xf3, 0xc9, 0xc5, 0x02, 0x31, 0xab } }
+
+  ## Arm CCA Realm information GUIDs
+  gArmCcaIpaWidthGuid              = { 0xbdb66787, 0xfc8a, 0x412e, { 0xa0, 0x9b, 0x84, 0x96, 0x61, 0x81, 0x72, 0xc0 } }
+  gArmCcaIsRealmGuid               = { 0x45e4546d, 0x26ea, 0x449d, { 0xa4, 0xa6, 0xcb, 0x5a, 0x54, 0xe3, 0x03, 0x7c } }
 
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
@@ -2102,7 +2117,7 @@
 
   ## SMBIOS version.
   # @Prompt SMBIOS version.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0303|UINT16|0x00010055
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0308|UINT16|0x00010055
 
   ## SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
   # @Prompt SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.

@@ -27,6 +27,9 @@
 [Sources]
   SampleUnitTestGenerateException.c
 
+[Sources.IA32, Sources.X64]
+  SampleUnitTestGenerateExceptionIA32X64.c
+
 [Packages]
   MdePkg/MdePkg.dec
 

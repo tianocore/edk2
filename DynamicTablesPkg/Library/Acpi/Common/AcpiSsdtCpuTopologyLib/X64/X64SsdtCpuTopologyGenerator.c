@@ -25,19 +25,6 @@
 
 #include "SsdtCpuTopologyGenerator.h"
 
-/** This macro defines the supported ACPI Processor Status bits.
-    The following bits are supported:
-    - ACPI_AML_STA_DEVICE_STATUS_PRESET
-    - ACPI_AML_STA_DEVICE_STATUS_ENABLED
-    - ACPI_AML_STA_DEVICE_STATUS_UI
-    - ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING
-*/
-#define ACPI_AML_STA_PROC_SUPPORTED  (    \
-  ACPI_AML_STA_DEVICE_STATUS_PRESET |     \
-  ACPI_AML_STA_DEVICE_STATUS_ENABLED |    \
-  ACPI_AML_STA_DEVICE_STATUS_UI |         \
-  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING)
-
 /** This macro expands to a function that retrieves the
     Local APIC or X2APIC information from the Configuration Manager.
 */
@@ -854,7 +841,7 @@ CreateTopologyFromIntC (
       }
 
       /// check STA bits
-      if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_PROC_SUPPORTED)) != 0) {
+      if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_BASE_SUPPORTED)) != 0) {
         DEBUG ((
           DEBUG_ERROR,
           "Unsupported STA bits set for processor %d\n",

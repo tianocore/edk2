@@ -189,6 +189,137 @@ RtcWrite (
 }
 
 /**
+  Read the RTC time/date or alarm registers once, reporting whether an update
+  cycle crossed the read.
+
+  Time is written unconditionally, so the caller must not pass its own output
+  structure.
+
+  @param  Time       Receives the raw register values.
+  @param  ReadAlarm  TRUE to read the alarm registers, FALSE to read the time.
+
+  @retval EFI_SUCCESS       The registers were read with no intervening update.
+  @retval EFI_NOT_READY     An update crossed the read; the values are invalid.
+  @retval EFI_DEVICE_ERROR  The RTC is not functioning.
+
+**/
+static
+EFI_STATUS
+RtcReadTimeDateOrFail (
+  IN OUT EFI_TIME  *Time,
+  IN     BOOLEAN   ReadAlarm
+  )
+{
+  EFI_STATUS      Status;
+  UINT8           SecondsAtStart;
+  RTC_REGISTER_A  RegisterA;
+
+  //
+  // Locations 0-9 return undefined data during the update cycle, and a clear
+  // UIP bit guarantees only a documented minimum interval that a slow read can
+  // exceed. Enter a fresh update-free window; this also validates VRT.
+  //
+  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Sample Seconds as a witness: the update cycle increments it, so it changes
+  // if and only if an update occurred.
+  //
+  SecondsAtStart = RtcRead (RTC_ADDRESS_SECONDS);
+
+  if (ReadAlarm) {
+    Time->Second = RtcRead (RTC_ADDRESS_SECONDS_ALARM);
+    Time->Minute = RtcRead (RTC_ADDRESS_MINUTES_ALARM);
+    Time->Hour   = RtcRead (RTC_ADDRESS_HOURS_ALARM);
+  } else {
+    Time->Second = SecondsAtStart;
+    Time->Minute = RtcRead (RTC_ADDRESS_MINUTES);
+    Time->Hour   = RtcRead (RTC_ADDRESS_HOURS);
+  }
+
+  Time->Day   = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
+  Time->Month = RtcRead (RTC_ADDRESS_MONTH);
+  Time->Year  = RtcRead (RTC_ADDRESS_YEAR);
+
+  //
+  // If UIP is set an update is in progress or imminent, so the Seconds value
+  // read below could not be trusted as a witness.
+  //
+  RegisterA.Data = RtcRead (RTC_ADDRESS_REGISTER_A);
+  if (RegisterA.Bits.Uip == 1) {
+    return EFI_NOT_READY;
+  }
+
+  //
+  // UIP is clear, so this Seconds read is inside a guaranteed update-free
+  // window. A value different from the one sampled above means an update
+  // crossed the read.
+  //
+  if (RtcRead (RTC_ADDRESS_SECONDS) != SecondsAtStart) {
+    return EFI_NOT_READY;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Safely read the RTC time/date or alarm registers into Time.
+
+  Either Time contains values read with no intervening update cycle, or Time is
+  returned unmodified with an error status.
+
+  @param  Time       Receives the raw register values on success.
+  @param  ReadAlarm  TRUE to read the alarm registers, FALSE to read the time.
+
+  @retval EFI_SUCCESS       The registers were read with no intervening update.
+  @retval EFI_DEVICE_ERROR  The RTC is not functioning, or the registers could
+                            not be read without an intervening update.
+
+**/
+static
+EFI_STATUS
+RtcReadRegistersSafe (
+  IN OUT EFI_TIME  *Time,
+  IN     BOOLEAN   ReadAlarm
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TIME    SafeTime;
+
+  Status = RtcReadTimeDateOrFail (&SafeTime, ReadAlarm);
+  if (Status == EFI_NOT_READY) {
+    //
+    // Retry once. The update cycle that crossed the first attempt has now
+    // completed, so the next one is nearly a second away.
+    //
+    Status = RtcReadTimeDateOrFail (&SafeTime, ReadAlarm);
+    if (Status == EFI_NOT_READY) {
+      //
+      // A second failure means the RTC is not functioning correctly. Fold it
+      // here so EFI_NOT_READY stays internal to this file.
+      //
+      Status = EFI_DEVICE_ERROR;
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Time->Second = SafeTime.Second;
+  Time->Minute = SafeTime.Minute;
+  Time->Hour   = SafeTime.Hour;
+  Time->Day    = SafeTime.Day;
+  Time->Month  = SafeTime.Month;
+  Time->Year   = SafeTime.Year;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Sets the current local timezone & daylight information.
 
   @param  TimeZone         Timezone info.
@@ -309,9 +440,11 @@ PcRtcInit (
   RtcWrite (RTC_ADDRESS_REGISTER_D, RegisterD.Data);
 
   //
-  // Wait for up to 0.1 seconds for the RTC to be updated
+  // Get the Time/Date/Daylight Savings values. RtcReadRegistersSafe enters its
+  // own update-free window and validates VRT, so no separate RtcWaitToUpdate is
+  // needed here.
   //
-  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
+  Status = RtcReadRegistersSafe (&Time, FALSE);
   if (EFI_ERROR (Status)) {
     //
     // Set the variable with default value if the RTC is functioning incorrectly.
@@ -324,16 +457,6 @@ PcRtcInit (
 
     return EFI_DEVICE_ERROR;
   }
-
-  //
-  // Get the Time/Date/Daylight Savings values.
-  //
-  Time.Second = RtcRead (RTC_ADDRESS_SECONDS);
-  Time.Minute = RtcRead (RTC_ADDRESS_MINUTES);
-  Time.Hour   = RtcRead (RTC_ADDRESS_HOURS);
-  Time.Day    = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-  Time.Month  = RtcRead (RTC_ADDRESS_MONTH);
-  Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
   //
   // Release RTC Lock.
@@ -548,9 +671,17 @@ PcRtcGetTime (
   }
 
   //
-  // Wait for up to 0.1 seconds for the RTC to be updated
+  // Read Register B (format/mode info, not affected by the update cycle, so it
+  // needs no update-free window of its own).
   //
-  Status = RtcWaitToUpdate (PcdGet32 (PcdRealTimeClockUpdateTimeout));
+  RegisterB.Data = RtcRead (RTC_ADDRESS_REGISTER_B);
+
+  //
+  // Get the Time/Date/Daylight Savings values. RtcReadRegistersSafe enters its
+  // own update-free window and validates VRT, so no separate RtcWaitToUpdate is
+  // needed here.
+  //
+  Status = RtcReadRegistersSafe (Time, FALSE);
   if (EFI_ERROR (Status)) {
     if (!EfiAtRuntime ()) {
       EfiReleaseLock (&Global->RtcLock);
@@ -558,21 +689,6 @@ PcRtcGetTime (
 
     return Status;
   }
-
-  //
-  // Read Register B
-  //
-  RegisterB.Data = RtcRead (RTC_ADDRESS_REGISTER_B);
-
-  //
-  // Get the Time/Date/Daylight Savings values.
-  //
-  Time->Second = RtcRead (RTC_ADDRESS_SECONDS);
-  Time->Minute = RtcRead (RTC_ADDRESS_MINUTES);
-  Time->Hour   = RtcRead (RTC_ADDRESS_HOURS);
-  Time->Day    = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-  Time->Month  = RtcRead (RTC_ADDRESS_MONTH);
-  Time->Year   = RtcRead (RTC_ADDRESS_YEAR);
 
   //
   // Release RTC Lock.
@@ -798,12 +914,18 @@ PcRtcGetWakeupTime (
   *Enabled = RegisterB.Bits.Aie;
   *Pending = RegisterC.Bits.Af;
 
-  Time->Second   = RtcRead (RTC_ADDRESS_SECONDS_ALARM);
-  Time->Minute   = RtcRead (RTC_ADDRESS_MINUTES_ALARM);
-  Time->Hour     = RtcRead (RTC_ADDRESS_HOURS_ALARM);
-  Time->Day      = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-  Time->Month    = RtcRead (RTC_ADDRESS_MONTH);
-  Time->Year     = RtcRead (RTC_ADDRESS_YEAR);
+  //
+  // Read the alarm and date registers safely (see RtcReadRegistersSafe).
+  //
+  Status = RtcReadRegistersSafe (Time, TRUE);
+  if (EFI_ERROR (Status)) {
+    if (!EfiAtRuntime ()) {
+      EfiReleaseLock (&Global->RtcLock);
+    }
+
+    return EFI_DEVICE_ERROR;
+  }
+
   Time->TimeZone = Global->SavedTimeZone;
   Time->Daylight = Global->Daylight;
 
@@ -943,12 +1065,18 @@ PcRtcSetWakeupTime (
     //
     // if the alarm is disable, record the current setting.
     //
-    RtcTime.Second   = RtcRead (RTC_ADDRESS_SECONDS_ALARM);
-    RtcTime.Minute   = RtcRead (RTC_ADDRESS_MINUTES_ALARM);
-    RtcTime.Hour     = RtcRead (RTC_ADDRESS_HOURS_ALARM);
-    RtcTime.Day      = RtcRead (RTC_ADDRESS_DAY_OF_THE_MONTH);
-    RtcTime.Month    = RtcRead (RTC_ADDRESS_MONTH);
-    RtcTime.Year     = RtcRead (RTC_ADDRESS_YEAR);
+    //
+    // Read the alarm and date registers safely (see RtcReadRegistersSafe).
+    //
+    Status = RtcReadRegistersSafe (&RtcTime, TRUE);
+    if (EFI_ERROR (Status)) {
+      if (!EfiAtRuntime ()) {
+        EfiReleaseLock (&Global->RtcLock);
+      }
+
+      return EFI_DEVICE_ERROR;
+    }
+
     RtcTime.TimeZone = Global->SavedTimeZone;
     RtcTime.Daylight = Global->Daylight;
   }

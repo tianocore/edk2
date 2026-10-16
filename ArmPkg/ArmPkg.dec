@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2023, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2026, ARM Limited. All rights reserved.
 # Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -51,6 +51,11 @@
   #
   ArmMonitorLib|Include/Library/ArmMonitorLib.h
 
+  ##  @libraryclass  Provides access to the Arm SMCCC Architecture SoC ID
+  #                  interface.
+  #
+  ArmSmcccSocIdLib|Include/Library/ArmSmcccSocIdLib.h
+
   ##  @libraryclass  Provides an interface to query miscellaneous OEM
   #   information.
   #
@@ -68,10 +73,6 @@
   #
   StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
 
-  ##  @libraryclass  Provides an interface for a Arm Transfer List.
-  #
-  ArmTransferListLib|Include/Library/ArmTransferListLib.h
-
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
   ##                 AArch64.
   StandaloneMmCoreEntryPoint|Include/Library/ArmStandaloneMmCoreEntryPoint.h
@@ -82,8 +83,6 @@
   ## ARM MPCore table
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
-
-  gArmTransferListHobGuid = { 0xebe7bae8, 0xfe18, 0x43c5, { 0xbf, 0x3f, 0xf2, 0xb1, 0xaf, 0xb2, 0xdf, 0xb8 } }
 
   gPsaFwuUpdateAgentGuid =  { 0x6823a838, 0x1b06, 0x470e, { 0x97, 0x74, 0x0c, 0xce, 0x8b, 0xfb, 0x53, 0xfd } }
 
@@ -112,8 +111,6 @@
 [Ppis]
   ## Include/Ppi/ArmMpCoreInfo.h
   gArmMpCoreInfoPpiGuid = { 0x6847cc74, 0xe9ec, 0x4f8f, {0xa2, 0x9d, 0xab, 0x44, 0xe7, 0x54, 0xa8, 0xfc} }
-  gArmTransferListPpiGuid = { 0x6d2e9da1, 0x9414, 0x41c3, {0x86, 0xbe, 0xf9, 0x16, 0x9f, 0xb4, 0x76, 0x38} }
-
 [PcdsFeatureFlag.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
 
@@ -166,6 +163,7 @@
   gArmTokenSpaceGuid.PcdProcessorSerialNumber|L""|VOID*|0x30000073
   gArmTokenSpaceGuid.PcdProcessorAssetTag|L""|VOID*|0x30000074
   gArmTokenSpaceGuid.PcdProcessorPartNumber|L""|VOID*|0x30000075
+  gArmTokenSpaceGuid.PcdProcessorSocketType|L""|VOID*|0x30000076
 
   #
   # ARM L2x0 PCDs

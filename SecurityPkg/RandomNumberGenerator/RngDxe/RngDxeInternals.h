@@ -101,7 +101,7 @@ RngGetRNG (
   );
 
 /**
-  Runs CPU RNG instruction to fill a buffer of arbitrary size with random bytes.
+  Fills a buffer of arbitrary size with random bytes.
 
   @param[in]   Length        Size of the buffer, in bytes,  to fill with.
   @param[out]  RandBuffer    Pointer to the buffer to store the random result.
@@ -118,7 +118,7 @@ RngGetBytes (
   );
 
 /**
-  Generate high-quality entropy source using a TRNG or through RDRAND.
+  Generate high-quality entropy source.
 
   @param[in]   Length        Size of the buffer, in bytes, to fill with.
   @param[out]  Entropy       Pointer to the buffer to store the entropy data.

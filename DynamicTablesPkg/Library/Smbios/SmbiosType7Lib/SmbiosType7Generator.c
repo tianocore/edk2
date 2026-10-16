@@ -53,6 +53,7 @@ GET_OBJECT_LIST (
   );
 
 #define SMBIOS_TYPE7_MAX_STRINGS  (1)
+#define SMBIOS_CACHE_LEVEL_MAX    ((1U << 3) - 1)
 
 /**
  * Free any resources allocated when installing SMBIOS Type7 table.
@@ -79,6 +80,7 @@ GET_OBJECT_LIST (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType7TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -362,12 +364,12 @@ FindExistingCacheRecord (
   IN CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *SocketNode,
   IN SMBIOS_STRUCTURE                    **TableList,
   IN CM_OBJECT_TOKEN                     *SocketCmObjectList,
-  IN UINT32                              CmObjectCount
+  IN UINTN                               CmObjectCount
   )
 {
   SMBIOS_TABLE_TYPE7               *SmbiosRecord;
   SMBIOS_CACHE_CONFIGURATION_DATA  *ConfigurationData;
-  UINT32                           Index;
+  UINTN                            Index;
 
   for (Index = 0; Index < CmObjectCount; Index++) {
     if (SocketCmObjectList[Index] != SocketNode->Token) {
@@ -411,6 +413,7 @@ FindExistingCacheRecord (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType7TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,
@@ -471,6 +474,7 @@ BuildSmbiosType7TableEx (
   CmObjectList       = NULL;
   SocketCmObjectList = NULL;
   SocketNodeList     = NULL;
+  ObjIndex           = 0;
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
@@ -571,10 +575,19 @@ BuildSmbiosType7TableEx (
     }
   }
 
-  ObjIndex = 0;
-
   for (Index = 0; Index < CacheStructCount; Index++) {
     CacheNode = &CacheStructList[Index];
+
+    if (CacheNode->Level > SMBIOS_CACHE_LEVEL_MAX) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Cache level %u exceeds the SMBIOS limit.\n",
+        __func__,
+        CacheNode->Level
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      goto exitErrorBuildSmbiosType7Table;
+    }
 
     for (SocketListIndex = 0; SocketListIndex < SocketCount; SocketListIndex++) {
       SocketNode = SocketNodeList[SocketListIndex];
@@ -612,7 +625,7 @@ BuildSmbiosType7TableEx (
           goto exitErrorBuildSmbiosType7Table;
         }
 
-        CacheSize = CacheNode->Size * CacheUsers;
+        CacheSize = CacheNode->Size * (UINT32)CacheUsers;
 
         SmbiosRecord->MaximumCacheSize2.Size += CacheSize / 1024;
 
@@ -627,7 +640,13 @@ BuildSmbiosType7TableEx (
           SmbiosRecord->SystemCacheType = CacheTypeOther;
         }
 
-        SmbiosRecord->Associativity = CacheAssociativityOther;
+        // Preserve the associativity when all caches being aggregated have
+        // the same associativity.
+        if (SmbiosRecord->Associativity !=
+            GetCacheAssociativity (CacheNode->Associativity))
+        {
+          SmbiosRecord->Associativity = CacheAssociativityOther;
+        }
       } else {
         // No previously seen cache at this level, create new table entry
         Status = StringTableInitialize (&StrTable, SMBIOS_TYPE7_MAX_STRINGS);
@@ -668,7 +687,7 @@ BuildSmbiosType7TableEx (
         SmbiosRecord->SocketDesignation = SocketDesignationRef;
 
         ConfigurationData                = (SMBIOS_CACHE_CONFIGURATION_DATA *)&SmbiosRecord->CacheConfiguration;
-        ConfigurationData->CacheLevel    = CacheNode->Level;
+        ConfigurationData->CacheLevel    = (UINT16)CacheNode->Level;
         ConfigurationData->CacheSocketed = 0;
         ConfigurationData->Location      = 0;
         ConfigurationData->Enabled       = 1;
@@ -687,7 +706,7 @@ BuildSmbiosType7TableEx (
           goto exitErrorBuildSmbiosType7Table;
         }
 
-        CacheSize = CacheNode->Size * CacheUsers;
+        CacheSize = CacheNode->Size * (UINT32)CacheUsers;
 
         // Store cache size in MaximumCacheSize2.Size in 1K granularity. This will be
         // processed once all caches have been accumulated.
@@ -731,13 +750,13 @@ BuildSmbiosType7TableEx (
       SmbiosRecord->MaximumCacheSize2.Size           = (CacheSize / 64);
 
       SmbiosRecord->MaximumCacheSize.Granularity64K = 1;
-      SmbiosRecord->MaximumCacheSize.Size           = (CacheSize / 64);
+      SmbiosRecord->MaximumCacheSize.Size           = (UINT16)(CacheSize / 64);
     } else {
       SmbiosRecord->MaximumCacheSize2.Granularity64K = 0;
       SmbiosRecord->MaximumCacheSize2.Size           = CacheSize;
 
       SmbiosRecord->MaximumCacheSize.Granularity64K = 0;
-      SmbiosRecord->MaximumCacheSize.Size           = CacheSize;
+      SmbiosRecord->MaximumCacheSize.Size           = (UINT16)CacheSize;
     }
 
     SmbiosRecord->InstalledSize  = SmbiosRecord->MaximumCacheSize;

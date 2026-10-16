@@ -159,6 +159,7 @@ AddTemperatureProbeHandle (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSmbiosType27TableEx (
   IN      CONST SMBIOS_TABLE_GENERATOR                    *CONST   This,
   IN      CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL      *CONST   TableFactoryProtocol,
@@ -216,6 +217,7 @@ FreeSmbiosType27TableEx (
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 BuildSmbiosType27TableEx (
   IN  CONST SMBIOS_TABLE_GENERATOR                         *This,
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *CONST  TableFactoryProtocol,

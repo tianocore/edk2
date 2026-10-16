@@ -544,28 +544,6 @@ TEST (SanitizerTests, InvalidPointerWriteDeathTest) {
   EXPECT_DEATH (*(volatile UINT8 *)(-1) = 0, "ERROR: AddressSanitizer: ");
 }
 
-UINTN
-DivideWithNoParameterChecking (
-  UINTN  Dividend,
-  UINTN  Divisor
-  )
-{
-  //
-  // Perform integer division with no check for divide by zero
-  //
-  return (Dividend / Divisor);
-}
-
-/**
-  Sample unit test that performs a divide by 0
-**/
-TEST (SanitizerTests, DivideByZeroDeathTest) {
-  //
-  // Divide by 0 should be caught by address sanitizer, log details, and exit
-  //
-  EXPECT_DEATH (DivideWithNoParameterChecking (10, 0), "ERROR: AddressSanitizer: ");
-}
-
 /**
   Sample unit test that allocates and frees buffers below 4GB
 **/

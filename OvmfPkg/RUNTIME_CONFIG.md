@@ -240,6 +240,31 @@ qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/PagingLevel,string=5
 ```
 
 
+## Debug: opt/org.tianocore/DebugLevel
+
+Override the serial debug log level at boot time without rebuilding
+the firmware.  When set, serial port output uses this level; the
+memory debug log continues to use the compiled-in level.  Currently
+only supported on ArmVirtQemu.
+
+Accepted values:
+
+- ``silent`` — only error messages (DEBUG_ERROR)
+- ``verbose`` — use the compiled-in PcdDebugPrintErrorLevel
+- A hex bitmask (e.g. ``0x80000040``)
+
+When the fw_cfg entry is absent, the value of
+``PcdSerialDebugPrintErrorLevel`` is used (default: ``verbose``).
+
+Usage:
+
+```
+qemu-system-aarch64 -fw_cfg name=opt/org.tianocore/DebugLevel,string=silent
+qemu-system-aarch64 -fw_cfg name=opt/org.tianocore/DebugLevel,string=verbose
+qemu-system-aarch64 -fw_cfg name=opt/org.tianocore/DebugLevel,string=0x80000000
+```
+
+
 ## Other: opt/org.tianocore/UsbStorageSupport
 
 This enables/disables the edk2 driver for USB storage devices.

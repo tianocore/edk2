@@ -83,7 +83,12 @@ SkipIsaAliasAperture (
 
 /**
   This function inserts a resource node into the resource list.
-  The resource list is sorted in descend order.
+  The resource list is sorted in descending order of alignment. Resource
+  nodes with the same alignment are sorted by the remainder of their
+  length modulo the alignment: nodes without a remainder come first,
+  followed by the others in descending order of the remainder. Resource
+  nodes that rank equal, such as BARs of the same size, keep their
+  insertion order.
 
   @param Bridge  PCI resource node for bridge.
   @param ResNode Resource node want to be inserted.
@@ -103,25 +108,25 @@ InsertResourceNode (
   ASSERT (Bridge  != NULL);
   ASSERT (ResNode != NULL);
 
-  InsertHeadList (&Bridge->ChildList, &ResNode->Link);
+  InsertTailList (&Bridge->ChildList, &ResNode->Link);
 
-  CurrentLink = Bridge->ChildList.ForwardLink->ForwardLink;
+  CurrentLink = ResNode->Link.BackLink;
   while (CurrentLink != &Bridge->ChildList) {
     Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
 
-    if (ResNode->Alignment > Temp->Alignment) {
+    if (Temp->Alignment > ResNode->Alignment) {
       break;
-    } else if (ResNode->Alignment == Temp->Alignment) {
+    } else if (Temp->Alignment == ResNode->Alignment) {
       ResNodeAlignRest = ResNode->Length & ResNode->Alignment;
       TempAlignRest    = Temp->Length & Temp->Alignment;
-      if ((ResNodeAlignRest == 0) || (ResNodeAlignRest >= TempAlignRest)) {
+      if ((TempAlignRest == 0) || ((ResNodeAlignRest != 0) && (TempAlignRest >= ResNodeAlignRest))) {
         break;
       }
     }
 
-    SwapListEntries (&ResNode->Link, CurrentLink);
+    SwapListEntries (CurrentLink, &ResNode->Link);
 
-    CurrentLink = ResNode->Link.ForwardLink;
+    CurrentLink = ResNode->Link.BackLink;
   }
 }
 
@@ -430,12 +435,15 @@ GetResourceFromDevice (
 {
   UINT8              Index;
   PCI_RESOURCE_NODE  *Node;
+  PCI_RESOURCE_NODE  *DestNode;
   BOOLEAN            ResourceRequested;
 
   Node              = NULL;
   ResourceRequested = FALSE;
 
   for (Index = 0; Index < PCI_MAX_BAR; Index++) {
+    DestNode = NULL;
+    Node     = NULL;
     switch ((PciDev->PciBar)[Index].BarType) {
       case PciBarTypeMem32:
       case PciBarTypeOpRom:
@@ -448,13 +456,8 @@ GetResourceFromDevice (
                  (PciDev->PciBar)[Index].BarType,
                  PciResUsageTypical
                  );
+        DestNode = Mem32Node;
 
-        InsertResourceNode (
-          Mem32Node,
-          Node
-          );
-
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypeMem64:
@@ -467,13 +470,8 @@ GetResourceFromDevice (
                  PciBarTypeMem64,
                  PciResUsageTypical
                  );
+        DestNode = Mem64Node;
 
-        InsertResourceNode (
-          Mem64Node,
-          Node
-          );
-
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypePMem64:
@@ -486,13 +484,8 @@ GetResourceFromDevice (
                  PciBarTypePMem64,
                  PciResUsageTypical
                  );
+        DestNode = PMem64Node;
 
-        InsertResourceNode (
-          PMem64Node,
-          Node
-          );
-
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypePMem32:
@@ -505,12 +498,7 @@ GetResourceFromDevice (
                  PciBarTypePMem32,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          PMem32Node,
-          Node
-          );
-        ResourceRequested = TRUE;
+        DestNode = PMem32Node;
         break;
 
       case PciBarTypeIo16:
@@ -524,12 +512,8 @@ GetResourceFromDevice (
                  PciBarTypeIo16,
                  PciResUsageTypical
                  );
+        DestNode = IoNode;
 
-        InsertResourceNode (
-          IoNode,
-          Node
-          );
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypeUnknown:
@@ -538,12 +522,20 @@ GetResourceFromDevice (
       default:
         break;
     }
+
+    if ((DestNode != NULL) && (Node != NULL)) {
+      InsertResourceNode (DestNode, Node);
+      ResourceRequested = TRUE;
+    }
   }
 
   //
   // Add VF resource
   //
   for (Index = 0; Index < PCI_MAX_BAR; Index++) {
+    DestNode = NULL;
+    Node     = NULL;
+
     switch ((PciDev->VfPciBar)[Index].BarType) {
       case PciBarTypeMem32:
 
@@ -555,11 +547,7 @@ GetResourceFromDevice (
                  PciBarTypeMem32,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          Mem32Node,
-          Node
-          );
+        DestNode = Mem32Node;
 
         break;
 
@@ -573,11 +561,7 @@ GetResourceFromDevice (
                  PciBarTypeMem64,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          Mem64Node,
-          Node
-          );
+        DestNode = Mem64Node;
 
         break;
 
@@ -591,12 +575,7 @@ GetResourceFromDevice (
                  PciBarTypePMem64,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          PMem64Node,
-          Node
-          );
-
+        DestNode = PMem64Node;
         break;
 
       case PciBarTypePMem32:
@@ -609,11 +588,8 @@ GetResourceFromDevice (
                  PciBarTypePMem32,
                  PciResUsageTypical
                  );
+        DestNode = PMem32Node;
 
-        InsertResourceNode (
-          PMem32Node,
-          Node
-          );
         break;
 
       case PciBarTypeIo16:
@@ -625,6 +601,10 @@ GetResourceFromDevice (
 
       default:
         break;
+    }
+
+    if ((DestNode != NULL) && (Node != NULL)) {
+      InsertResourceNode (DestNode, Node);
     }
   }
 
@@ -783,6 +763,9 @@ CreateResourceMap (
                    PciBarTypeIo16,
                    PciResUsageTypical
                    );
+      if (IoBridge == NULL) {
+        return;
+      }
 
       Mem32Bridge = CreateResourceNode (
                       Temp,
@@ -792,6 +775,10 @@ CreateResourceMap (
                       PciBarTypeMem32,
                       PciResUsageTypical
                       );
+      if (Mem32Bridge == NULL) {
+        FreePool (IoBridge);
+        return;
+      }
 
       PMem32Bridge = CreateResourceNode (
                        Temp,
@@ -801,6 +788,11 @@ CreateResourceMap (
                        PciBarTypePMem32,
                        PciResUsageTypical
                        );
+      if (PMem32Bridge == NULL) {
+        FreePool (Mem32Bridge);
+        FreePool (IoBridge);
+        return;
+      }
 
       Mem64Bridge = CreateResourceNode (
                       Temp,
@@ -810,6 +802,12 @@ CreateResourceMap (
                       PciBarTypeMem64,
                       PciResUsageTypical
                       );
+      if (Mem64Bridge == NULL) {
+        FreePool (PMem32Bridge);
+        FreePool (Mem32Bridge);
+        FreePool (IoBridge);
+        return;
+      }
 
       PMem64Bridge = CreateResourceNode (
                        Temp,
@@ -819,6 +817,13 @@ CreateResourceMap (
                        PciBarTypePMem64,
                        PciResUsageTypical
                        );
+      if (PMem64Bridge == NULL) {
+        FreePool (Mem64Bridge);
+        FreePool (PMem32Bridge);
+        FreePool (Mem32Bridge);
+        FreePool (IoBridge);
+        return;
+      }
 
       //
       // Recursively create resource map on this bridge
@@ -1813,12 +1818,11 @@ ResourcePaddingForCardBusBridge (
            PciBarTypeMem32,
            PciResUsagePadding
            );
+  if (Node == NULL) {
+    return;
+  }
 
-  InsertResourceNode (
-    Mem32Node,
-    Node
-    );
-
+  InsertResourceNode (Mem32Node, Node);
   //
   // Memory Base/Limit Register 1
   // Bar 2 decodes memory range1
@@ -1831,11 +1835,11 @@ ResourcePaddingForCardBusBridge (
            PciBarTypePMem32,
            PciResUsagePadding
            );
+  if (Node == NULL) {
+    return;
+  }
 
-  InsertResourceNode (
-    PMem32Node,
-    Node
-    );
+  InsertResourceNode (PMem32Node, Node);
 
   //
   // Io Base/Limit
@@ -1850,10 +1854,11 @@ ResourcePaddingForCardBusBridge (
            PciResUsagePadding
            );
 
-  InsertResourceNode (
-    IoNode,
-    Node
-    );
+  if (Node == NULL) {
+    return;
+  }
+
+  InsertResourceNode (IoNode, Node);
 
   //
   // Io Base/Limit
@@ -1867,11 +1872,11 @@ ResourcePaddingForCardBusBridge (
            PciBarTypeIo16,
            PciResUsagePadding
            );
+  if (Node == NULL) {
+    return;
+  }
 
-  InsertResourceNode (
-    IoNode,
-    Node
-    );
+  InsertResourceNode (IoNode, Node);
 }
 
 /**
@@ -2142,10 +2147,13 @@ ApplyResourcePadding (
                  PciBarTypeIo16,
                  PciResUsagePadding
                  );
-        InsertResourceNode (
-          IoNode,
-          Node
-          );
+
+        if (Node != NULL) {
+          InsertResourceNode (
+            IoNode,
+            Node
+            );
+        }
       }
 
       Ptr++;
@@ -2167,10 +2175,12 @@ ApplyResourcePadding (
                      PciBarTypePMem32,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              PMem32Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                PMem32Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
@@ -2190,10 +2200,12 @@ ApplyResourcePadding (
                      PciBarTypeMem32,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              Mem32Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                Mem32Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
@@ -2215,10 +2227,12 @@ ApplyResourcePadding (
                      PciBarTypePMem64,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              PMem64Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                PMem64Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
@@ -2238,10 +2252,12 @@ ApplyResourcePadding (
                      PciBarTypeMem64,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              Mem64Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                Mem64Node,
+                Node
+                );
+            }
           }
 
           Ptr++;

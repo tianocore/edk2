@@ -102,7 +102,7 @@ VirtMmCommunication2Communicate (
     &CommunicateHeader->HeaderGuid,
     CommunicateHeader->MessageLength,
     BufferSize,
-    *CommSize
+    CommSize ? *CommSize : 0
     ));
 
   // If CommSize is not omitted, perform size inspection before proceeding.

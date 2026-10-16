@@ -84,5 +84,11 @@
         "BLD_*_NETWORK_HTTP_BOOT_ENABLE": "TRUE",
         "BLD_*_NETWORK_ISCSI_ENABLE": "TRUE",
         "BLD_*_NETWORK_PXE_BOOT_ENABLE": "TRUE",
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "AuditOnly": True,           # If True, log all errors and then mark as skipped
+        "IgnoreFiles": []            # package root relative file, folder, or glob pattern to ignore
     }
 }

@@ -118,7 +118,9 @@
             "corthon",      # Contact GitHub account in Readme
             "mdkinney",     # Contact GitHub account in Readme
             "spbrogan",     # Contact GitHub account in Readme
-            "uintn"
+            "uintn",
+            "mgeneral", # build flag for AArch64 cmocka in the INF
+            "mstrict",  # build flag for AArch64 cmocka in the INF
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
@@ -130,6 +132,15 @@
             "Library/CmockaLib/cmocka/**",
             "Library/GoogleTestLib/googletest/**",
             "Library/SubhookLib/subhook/**"
+        ],
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "AuditOnly": True,          # If True, log all errors and then mark as skipped
+        "IgnoreFiles": [
+            "Library/CmockaLib/cmocka",         # cmocka is submodule outside of control
+            "Library/GoogleTestLib/googletest"  # googletest is submodule outside of control
         ]
     }
 }

@@ -19,7 +19,7 @@
   PLATFORM_VERSION        = 0.1
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/UnitTestFrameworkPkg/HostTestExpectFail
-  SUPPORTED_ARCHITECTURES = IA32|X64
+  SUPPORTED_ARCHITECTURES = IA32|X64|AARCH64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -36,13 +36,15 @@
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestHostExpectFail.inf
 
   #
+  # Unit tests that deliberately trigger a NULL pointer access to demonstrate how
+  # the framework reports a test case that is terminated by the host operating system.
+  #
+  UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTestGenerateException/SampleGoogleTestHostGenerateException.inf
+
+  #
   # Disable warning for divide by zero to pass build of unit tests
   # that generate a divide by zero exception.
   #
-  UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTestGenerateException/SampleGoogleTestHostGenerateException.inf {
-    <BuildOptions>
-      MSFT:*_*_*_CC_FLAGS = /wd4723
-  }
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestHostGenerateException.inf {
     <BuildOptions>
       MSFT:*_*_*_CC_FLAGS = /wd4723

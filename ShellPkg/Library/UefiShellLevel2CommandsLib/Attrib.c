@@ -46,14 +46,6 @@ MainCmdAttrib (
   ListOfFiles = NULL;
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  }
-
   FileAttributesToAdd    = 0;
   FileAttributesToRemove = 0;
 

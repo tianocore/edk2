@@ -106,5 +106,11 @@
     "Defines": {
         "BLD_*_CONTINUOUS_INTEGRATION": "TRUE",
         "BLD_*_REDFISH_ENABLE": "TRUE"
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "AuditOnly": True,           # If True, log all errors and then mark as skipped
+        "IgnoreFiles": []            # package root relative file, folder, or glob pattern to ignore
     }
 }

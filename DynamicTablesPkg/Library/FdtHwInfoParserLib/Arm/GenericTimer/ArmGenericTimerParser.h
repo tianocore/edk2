@@ -17,6 +17,7 @@ typedef enum FdtTimerInterruptItems {
   FdtNonSecureTimerIrq,   ///< Non-secure timer IRQ
   FdtVirtualTimerIrq,     ///< Virtual timer IRQ
   FdtHypervisorTimerIrq,  ///< Hypervisor timer IRQ
+  FdtHypervisorVTimerIrq, ///< Hypervisor virtual timer IRQ
   FdtMaxTimerItem         ///< Max timer item
 } FDT_TIMER_INTERRUPT_ITEMS;
 

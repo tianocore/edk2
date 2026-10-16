@@ -287,9 +287,9 @@ Output1bitPixel (
       Byte = *(Data + OffsetY + Xpos);
       for (Index = 0; Index < 8; Index++) {
         if ((Byte & (1 << Index)) != 0) {
-          BitMapPtr[Ypos * Image->Width + Xpos * 8 + (8 - Index - 1)].Raw = PaletteValue[1].Raw;
+          CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 8 + (8 - Index - 1)], &PaletteValue[1], sizeof (*BitMapPtr));
         } else {
-          BitMapPtr[Ypos * Image->Width + Xpos * 8 + (8 - Index - 1)].Raw = PaletteValue[0].Raw;
+          CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 8 + (8 - Index - 1)], &PaletteValue[0], sizeof (*BitMapPtr));
         }
       }
     }
@@ -301,9 +301,9 @@ Output1bitPixel (
       Byte = *(Data + OffsetY + Xpos);
       for (Index = 0; Index < Image->Width % 8; Index++) {
         if ((Byte & (1 << (8 - Index - 1))) != 0) {
-          BitMapPtr[Ypos * Image->Width + Xpos * 8 + Index].Raw = PaletteValue[1].Raw;
+          CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 8 + Index], &PaletteValue[1], sizeof (*BitMapPtr));
         } else {
-          BitMapPtr[Ypos * Image->Width + Xpos * 8 + Index].Raw = PaletteValue[0].Raw;
+          CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 8 + Index], &PaletteValue[0], sizeof (*BitMapPtr));
         }
       }
     }
@@ -373,17 +373,17 @@ Output4bitPixel (
     // All bits in these bytes are meaningful
     //
     for (Xpos = 0; Xpos < Image->Width / 2; Xpos++) {
-      Byte                                              = *(Data + OffsetY + Xpos);
-      BitMapPtr[Ypos * Image->Width + Xpos * 2].Raw     = PaletteValue[Byte >> 4].Raw;
-      BitMapPtr[Ypos * Image->Width + Xpos * 2 + 1].Raw = PaletteValue[Byte & 0x0F].Raw;
+      Byte = *(Data + OffsetY + Xpos);
+      CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 2], &PaletteValue[Byte >> 4], sizeof (*BitMapPtr));
+      CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 2 + 1], &PaletteValue[Byte & 0x0F], sizeof (*BitMapPtr));
     }
 
     if (Image->Width % 2 != 0) {
       //
       // Padding bits in this byte should be ignored.
       //
-      Byte                                          = *(Data + OffsetY + Xpos);
-      BitMapPtr[Ypos * Image->Width + Xpos * 2].Raw = PaletteValue[Byte >> 4].Raw;
+      Byte = *(Data + OffsetY + Xpos);
+      CopyMem (&BitMapPtr[Ypos * Image->Width + Xpos * 2], &PaletteValue[Byte >> 4], sizeof (*BitMapPtr));
     }
   }
 }
@@ -450,8 +450,8 @@ Output8bitPixel (
     // All bits are meaningful since the bitmap is 8 bits per pixel.
     //
     for (Xpos = 0; Xpos < Image->Width; Xpos++) {
-      Byte                          = *(Data + OffsetY + Xpos);
-      BitMapPtr[OffsetY + Xpos].Raw = PaletteValue[Byte].Raw;
+      Byte = *(Data + OffsetY + Xpos);
+      CopyMem (&BitMapPtr[OffsetY + Xpos], &PaletteValue[Byte], sizeof (*BitMapPtr));
     }
   }
 }
@@ -528,8 +528,6 @@ ImageToBlt (
   UINTN                                OffsetY2; // dest buffer
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  SrcPixel;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  ZeroPixel;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  *BltBufferPixel;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  *ImageBitmap;
 
   if ((BltBuffer == NULL) || (Blt == NULL) || (*Blt == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -547,20 +545,17 @@ ImageToBlt (
 
   ZeroMem (&ZeroPixel, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
 
-  BltBufferPixel = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION *)BltBuffer;
-  ImageBitmap    = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION *)ImageOut->Image.Bitmap;
-
   for (Ypos = 0; Ypos < Height; Ypos++) {
     OffsetY1 = Width * Ypos;
     OffsetY2 = ImageOut->Width * (BltY + Ypos);
     for (Xpos = 0; Xpos < Width; Xpos++) {
-      SrcPixel.Raw = BltBufferPixel[OffsetY1 + Xpos].Raw;
+      CopyMem (&SrcPixel, &BltBuffer[OffsetY1 + Xpos], sizeof (SrcPixel));
       if (Transparent) {
         if (CompareMem (&SrcPixel, &ZeroPixel, 3) != 0) {
-          ImageBitmap[OffsetY2 + BltX + Xpos].Raw = SrcPixel.Raw;
+          CopyMem (&ImageOut->Image.Bitmap[OffsetY2 + BltX + Xpos], &SrcPixel, sizeof (SrcPixel));
         }
       } else {
-        ImageBitmap[OffsetY2 + BltX + Xpos].Raw = SrcPixel.Raw;
+        CopyMem (&ImageOut->Image.Bitmap[OffsetY2 + BltX + Xpos], &SrcPixel, sizeof (SrcPixel));
       }
     }
   }

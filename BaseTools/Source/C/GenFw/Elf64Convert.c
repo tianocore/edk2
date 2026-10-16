@@ -130,6 +130,8 @@ STATIC UINT32 mHiiRsrcOffset;
 STATIC UINT32 mRelocOffset;
 STATIC UINT32 mDebugOffset;
 STATIC UINT32 mExportOffset;
+STATIC UINT32 mBuildIdOffset;
+STATIC BOOLEAN mBuildIdFound;
 //
 // Used for RISC-V relocations.
 //
@@ -227,6 +229,10 @@ InitializeElf64 (
     ElfFunctions->WriteExport = WriteExport64;
   }
 
+  if (mBuildIdFlag) {
+    mCoffNbrSections++;
+  }
+
   return TRUE;
 }
 
@@ -288,6 +294,22 @@ IsHiiRsrcShdr (
   Elf_Shdr *Namedr = GetShdrByIndex(mEhdr->e_shstrndx);
 
   return (BOOLEAN) (strcmp((CHAR8*)mEhdr + Namedr->sh_offset + Shdr->sh_name, ELF_HII_SECTION_NAME) == 0);
+}
+
+STATIC
+BOOLEAN
+IsBuildIdShdr (
+  Elf_Shdr *Shdr
+  )
+{
+  Elf_Shdr *Namedr = GetShdrByIndex(mEhdr->e_shstrndx);
+
+  if (Namedr->sh_offset + Shdr->sh_name >= mFileBufferSize) {
+    Error (NULL, 0, 3000, "Invalid", "IsBuildIdShdr: Name offset %lu is larger then file size %lu", mEhdr->e_shstrndx, mFileBufferSize);
+    exit(EXIT_FAILURE);
+  }
+
+  return (BOOLEAN) (strcmp((CHAR8*)mEhdr + Namedr->sh_offset + Shdr->sh_name, ELF_BUILD_ID_SECTION_NAME) == 0);
 }
 
 STATIC
@@ -1123,6 +1145,40 @@ ScanSections64 (
     }
   }
 
+  //
+  //  The build-ID section.
+  //
+  mBuildIdOffset = mCoffOffset;
+  mBuildIdFound = FALSE;
+  if (mBuildIdFlag) {
+    for (i = 0; i < mEhdr->e_shnum; i++) {
+      Elf_Shdr *shdr = GetShdrByIndex(i);
+      if (IsBuildIdShdr(shdr)) {
+        if ((shdr->sh_addralign != 0) && (shdr->sh_addralign != 1)) {
+          // the alignment field is valid
+          if ((shdr->sh_addr & (shdr->sh_addralign - 1)) == 0) {
+            // if the section address is aligned we must align PE/COFF
+            mCoffOffset = (UINT32) ((mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1));
+          } else {
+            Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
+          }
+        }
+        if (shdr->sh_size != 0) {
+          mBuildIdOffset = mCoffOffset;
+          mCoffSectionsOffset[i] = mCoffOffset;
+          mCoffOffset += (UINT32) shdr->sh_size;
+          mCoffOffset = CoffAlign(mCoffOffset);
+          mBuildIdFound = TRUE;
+        }
+        break;
+      }
+    }
+
+    if (!mBuildIdFound) {
+      Warning (NULL, 0, 0, NULL, "Build ID section is not found in %s.", mInImageName);
+    }
+  }
+
   mRelocOffset = mCoffOffset;
 
   //
@@ -1242,16 +1298,39 @@ ScanSections64 (
     }
   }
 
-  if ((mRelocOffset - mHiiRsrcOffset) > 0) {
-    CreateSectionHeader (".rsrc", mHiiRsrcOffset, mRelocOffset - mHiiRsrcOffset,
+  //
+  // Determine the end offset for .rsrc section based on whether build-ID is present
+  //
+  if (mBuildIdFound) {
+    Offset = mBuildIdOffset;
+  } else {
+    Offset = mRelocOffset;
+  }
+
+  if ((Offset - mHiiRsrcOffset) > 0) {
+    CreateSectionHeader (".rsrc", mHiiRsrcOffset, Offset - mHiiRsrcOffset,
             EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
             | EFI_IMAGE_SCN_MEM_READ);
 
-    NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE].Size = mRelocOffset - mHiiRsrcOffset;
+    NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE].Size = Offset - mHiiRsrcOffset;
     NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE].VirtualAddress = mHiiRsrcOffset;
   } else {
     // Don't make a section of size 0.
     NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+  }
+
+  //
+  // Add build-ID section if requested and found
+  //
+  if (mBuildIdFlag) {
+    if (mBuildIdFound) {
+      CreateSectionHeader (".bldid", mBuildIdOffset, mRelocOffset - mBuildIdOffset,
+              EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
+              | EFI_IMAGE_SCN_MEM_READ);
+    } else {
+      // Don't make a section of size 0, decrement the section count
+      NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+    }
   }
 
 }
@@ -1280,6 +1359,9 @@ WriteSections64 (
       break;
     case SECTION_DATA:
       Filter = IsDataShdr;
+      break;
+    case SECTION_BUILD_ID:
+      Filter = IsBuildIdShdr;
       break;
     default:
       return FALSE;

@@ -20,6 +20,7 @@
 #include <Api/AmlApiHelper.h>
 #include <Tree/AmlNode.h>
 #include <ResourceData/AmlResourceData.h>
+#include <Utils/AmlUtility.h>
 
 /** If ParentNode is not NULL, append RdNode.
     If NewRdNode is not NULL, update its value to RdNode.
@@ -214,78 +215,6 @@ AddressSpaceGeneralFlags (
   return (IsPosDecode ? 0 : BIT1)    |
          (IsMinFixed ? BIT2 : 0)     |
          (IsMaxFixed ? BIT3 : 0);
-}
-
-/** Check Address Space Descriptor Fields.
-
-  Cf. ACPI 6.4 Table 6.44:
-  "Valid Combination of Address Space Descriptor Fields"
-
-  See ACPI 6.4 spec, s19.6.36 for more.
-
-  @param [in]  IsMinFixed           Minimum address is fixed.
-  @param [in]  IsMaxFixed           Maximum address is fixed.
-  @param [in]  AddressGranularity   Address granularity.
-  @param [in]  AddressMinimum       Minimum address.
-  @param [in]  AddressMaximum       Maximum address.
-  @param [in]  AddressTranslation   Address translation.
-  @param [in]  RangeLength          Range length.
-
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-CheckAddressSpaceFields (
-  IN  BOOLEAN  IsMinFixed,
-  IN  BOOLEAN  IsMaxFixed,
-  IN  UINT64   AddressGranularity,
-  IN  UINT64   AddressMinimum,
-  IN  UINT64   AddressMaximum,
-  IN  UINT64   AddressTranslation,
-  IN  UINT64   RangeLength
-  )
-{
-  if ((AddressMinimum > AddressMaximum)                     ||
-      (RangeLength > (AddressMaximum - AddressMinimum + 1)) ||
-      ((AddressGranularity != 0) &&
-       (((AddressGranularity + 1) & AddressGranularity) != 0)))
-  {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (RangeLength != 0) {
-    if (IsMinFixed ^ IsMaxFixed) {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    } else if (IsMinFixed                 &&
-               IsMaxFixed                 &&
-               (AddressGranularity != 0)  &&
-               ((AddressMaximum - AddressMinimum + 1) != RangeLength))
-    {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    }
-  } else {
-    if (IsMinFixed && IsMaxFixed) {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    } else if (IsMinFixed &&
-               ((AddressMinimum & AddressGranularity) != 0))
-    {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    } else if (IsMaxFixed &&
-               (((AddressMaximum + 1) & AddressGranularity) != 0))
-    {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    }
-  }
-
-  return EFI_SUCCESS;
 }
 
 /** Code generation for the "DWordSpace ()" ASL function.
@@ -1337,7 +1266,8 @@ AmlCodeGenRdInterrupt (
   EFI_STATUS  Status;
 
   AML_DATA_NODE                           *RdNode;
-  EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR  RdInterrupt;
+  EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR  *RdInterrupt;
+  UINT16                                  RdInterruptSize;
   UINT32                                  *FirstInterrupt;
 
   if ((IrqList == NULL) ||
@@ -1348,32 +1278,40 @@ AmlCodeGenRdInterrupt (
     return EFI_INVALID_PARAMETER;
   }
 
+  // EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR already includes the first interrupt
+  RdInterruptSize = sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR) + (IrqCount - 1) * sizeof (UINT32);
+  RdInterrupt     = (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR *)AllocateZeroPool (RdInterruptSize);
+  if (RdInterrupt == NULL) {
+    ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   // Header
-  RdInterrupt.Header.Header.Bits.Name =
+  RdInterrupt->Header.Header.Bits.Name =
     ACPI_LARGE_EXTENDED_IRQ_DESCRIPTOR_NAME;
-  RdInterrupt.Header.Header.Bits.Type = ACPI_LARGE_ITEM_FLAG;
-  RdInterrupt.Header.Length           = sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR) -
-                                        sizeof (ACPI_LARGE_RESOURCE_HEADER);
+  RdInterrupt->Header.Header.Bits.Type = ACPI_LARGE_ITEM_FLAG;
+  RdInterrupt->Header.Length           = RdInterruptSize - sizeof (ACPI_LARGE_RESOURCE_HEADER);
 
   // Body
-  RdInterrupt.InterruptVectorFlags = (ResourceConsumer ? BIT0 : 0) |
-                                     (EdgeTriggered ? BIT1 : 0)    |
-                                     (ActiveLow ? BIT2 : 0)        |
-                                     (Shared ? BIT3 : 0);
-  RdInterrupt.InterruptTableLength = IrqCount;
+  RdInterrupt->InterruptVectorFlags = (ResourceConsumer ? BIT0 : 0) |
+                                      (EdgeTriggered ? BIT1 : 0)    |
+                                      (ActiveLow ? BIT2 : 0)        |
+                                      (Shared ? BIT3 : 0);
+  RdInterrupt->InterruptTableLength = IrqCount;
 
   // Get the address of the first interrupt field.
-  FirstInterrupt = RdInterrupt.InterruptNumber;
+  FirstInterrupt = RdInterrupt->InterruptNumber;
 
   // Copy the list of interrupts.
   CopyMem (FirstInterrupt, IrqList, (sizeof (UINT32) * IrqCount));
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeResourceData,
-             (UINT8 *)&RdInterrupt,
-             sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR),
+             (UINT8 *)RdInterrupt,
+             RdInterruptSize,
              &RdNode
              );
+  FreePool (RdInterrupt);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;

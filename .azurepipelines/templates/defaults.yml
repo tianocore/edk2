@@ -11,4 +11,4 @@ variables:
   default_python_version: "3.12"
   default_linux_container: "ghcr.io/tianocore/containers/fedora-43-test:b562821"
   default_linux_vm: "ubuntu-24.04"
-  default_windows_vm: "windows-2022"
+  default_windows_vm: "windows-2025-vs2026"

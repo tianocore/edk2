@@ -418,6 +418,36 @@ TEST_F (BaseMemoryBinLibTest, ReturnsNotFoundWhenMemoryTypeInformationHobMissing
 //
 // Test: PopulateMemoryTypeInformation populates from valid HOB
 //
+//
+// Align a page count to the allocation granularity that
+// PopulateMemoryTypeInformation applies for the given memory type.  Runtime
+// memory types are rounded up to RUNTIME_PAGE_ALLOCATION_GRANULARITY, which is
+// larger than EFI_PAGE_SIZE on some architectures (e.g. 64 KiB on AArch64), so
+// the resulting page counts are architecture dependent.
+//
+static UINT32
+ExpectedAlignedPages (
+  EFI_MEMORY_TYPE  Type,
+  UINT32           NumberOfPages
+  )
+{
+  UINT32  Granularity;
+
+  if ((Type == EfiReservedMemoryType) ||
+      (Type == EfiACPIMemoryNVS) ||
+      (Type == EfiRuntimeServicesCode) ||
+      (Type == EfiRuntimeServicesData))
+  {
+    Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  } else {
+    Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+  }
+
+  return (UINT32)EFI_SIZE_TO_PAGES (
+                   ALIGN_VALUE (EFI_PAGES_TO_SIZE ((UINTN)NumberOfPages), Granularity)
+                   );
+}
+
 TEST_F (BaseMemoryBinLibTest, PopulatesFromValidHob) {
   EFI_STATUS                   Status;
   UINT8                        GuidHobBuffer[sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_MEMORY_TYPE_INFORMATION) * 7];
@@ -453,17 +483,17 @@ TEST_F (BaseMemoryBinLibTest, PopulatesFromValidHob) {
 
   ASSERT_EQ (Status, EFI_SUCCESS);
   ASSERT_EQ (gMemoryTypeInformation[0].Type, (UINT32)EfiReservedMemoryType);
-  ASSERT_EQ (gMemoryTypeInformation[0].NumberOfPages, (UINT32)5);
+  ASSERT_EQ (gMemoryTypeInformation[0].NumberOfPages, ExpectedAlignedPages (EfiReservedMemoryType, 5));
   ASSERT_EQ (gMemoryTypeInformation[1].Type, (UINT32)EfiRuntimeServicesCode);
-  ASSERT_EQ (gMemoryTypeInformation[1].NumberOfPages, (UINT32)10);
+  ASSERT_EQ (gMemoryTypeInformation[1].NumberOfPages, ExpectedAlignedPages (EfiRuntimeServicesCode, 10));
   ASSERT_EQ (gMemoryTypeInformation[2].Type, (UINT32)EfiRuntimeServicesData);
-  ASSERT_EQ (gMemoryTypeInformation[2].NumberOfPages, (UINT32)15);
+  ASSERT_EQ (gMemoryTypeInformation[2].NumberOfPages, ExpectedAlignedPages (EfiRuntimeServicesData, 15));
   ASSERT_EQ (gMemoryTypeInformation[3].Type, (UINT32)EfiACPIReclaimMemory);
-  ASSERT_EQ (gMemoryTypeInformation[3].NumberOfPages, (UINT32)20);
+  ASSERT_EQ (gMemoryTypeInformation[3].NumberOfPages, ExpectedAlignedPages (EfiACPIReclaimMemory, 20));
   ASSERT_EQ (gMemoryTypeInformation[4].Type, (UINT32)EfiACPIMemoryNVS);
-  ASSERT_EQ (gMemoryTypeInformation[4].NumberOfPages, (UINT32)25);
+  ASSERT_EQ (gMemoryTypeInformation[4].NumberOfPages, ExpectedAlignedPages (EfiACPIMemoryNVS, 25));
   ASSERT_EQ (gMemoryTypeInformation[5].Type, (UINT32)EfiPalCode);
-  ASSERT_EQ (gMemoryTypeInformation[5].NumberOfPages, (UINT32)8);
+  ASSERT_EQ (gMemoryTypeInformation[5].NumberOfPages, ExpectedAlignedPages (EfiPalCode, 8));
 }
 
 //

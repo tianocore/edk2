@@ -709,6 +709,8 @@ PrintLsOutputRec (
     return ShellStatus;
   }
 
+  ListHead = NULL;
+
   Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR (Status)) {
     SHELL_FREE_NON_NULL (CorrectedPath);
@@ -881,13 +883,6 @@ MainCmdLs (
   Count              = 0;
   ListUnfiltered     = FALSE;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");
     return SHELL_INVALID_PARAMETER;
@@ -984,7 +979,6 @@ MainCmdLs (
     if (StrStr (PathName, L":") == NULL) {
       StrnCatGrow (&FullPath, &Size, gEfiShellProtocol->GetCurDir (NULL), 0);
       if (FullPath == NULL) {
-        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 
@@ -994,7 +988,6 @@ MainCmdLs (
 
     StrnCatGrow (&FullPath, &Size, PathName, 0);
     if (FullPath == NULL) {
-      ShellCommandLineFreeVarList (Package);
       return SHELL_OUT_OF_RESOURCES;
     }
 
@@ -1011,7 +1004,6 @@ MainCmdLs (
       StrnCatGrow (&SearchString, NULL, FullPath, 0);
       if (SearchString == NULL) {
         FreePool (FullPath);
-        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 

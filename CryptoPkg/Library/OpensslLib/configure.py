@@ -51,7 +51,6 @@ def openssl_configure(openssldir, target, ec = True, lite = True):
         'no-module',
         'no-md4',
         'no-mdc2',
-        'no-ml-dsa',
         'no-ml-kem',
         'no-multiblock',
         'no-nextprotoneg',
@@ -73,7 +72,6 @@ def openssl_configure(openssldir, target, ec = True, lite = True):
         'no-shared',
         'no-siphash',
         'no-siv',
-        'no-slh-dsa',
         'no-sm2',
         'no-sm4',
         'no-sock',
@@ -94,7 +92,7 @@ def openssl_configure(openssldir, target, ec = True, lite = True):
     if not ec:
         cmdline += [ 'no-ec', 'no-camellia', 'no-cmac' ]
     if lite:
-        cmdline += [ 'no-camellia', 'no-dh', 'no-ecx']
+        cmdline += [ 'no-camellia', 'no-dh', 'no-ecx', 'no-ml-dsa', 'no-slh-dsa' ]
     print('')
     print(f'# -*-  configure openssl for {target} (ec={ec}, lite={lite})  -*-')
     rc = subprocess.run(cmdline, cwd = openssldir,
@@ -248,7 +246,7 @@ def get_sources(cfg, obj, asm):
     asm_list = list(filter(asm_filter_fn, asm_list))
     return srclist + c_list + asm_list
 
-def sources_filter_fn(filename):
+def sources_filter_fn(filename, full):
     """
     Filter source lists.  Drops files we don't want include or
     need replace with our own uefi-specific version.
@@ -257,7 +255,6 @@ def sources_filter_fn(filename):
         'randfile.c',
         '/store/',
         '/storemgmt/',
-        '/encode_decode/encode',
         'statem_srvr.c',
         'extensions_srvr.c',
         'defltprov.c',
@@ -267,22 +264,26 @@ def sources_filter_fn(filename):
         'x86_64-gcc.c',
         'armcap.c',
     ]
+
+    if not full:
+        exclude.append('/encode_decode/encode')
+
     for item in exclude:
         if item in filename:
             return False
     return True
 
-def libcrypto_sources(cfg, asm = None):
+def libcrypto_sources(cfg, full, asm = None):
     """ Get source file list for libcrypto """
     files = get_sources(cfg, 'libcrypto', asm)
     files += get_sources(cfg, 'providers/libcommon.a', asm)
-    files = list(filter(sources_filter_fn, files))
+    files = list(filter(lambda f: sources_filter_fn(f, full), files))
     return files
 
-def libssl_sources(cfg, asm = None):
+def libssl_sources(cfg, full, asm = None):
     """ Get source file list for libssl """
     files = get_sources(cfg, 'libssl', asm)
-    files = list(filter(sources_filter_fn, files))
+    files = list(filter(lambda f: sources_filter_fn(f, full), files))
     return files
 
 def update_inf(filename, sources, arch = None, defines = []):
@@ -351,12 +352,15 @@ def main():
         if ec and not lite:
             inf = 'OpensslLibFullAccel.inf'
             hdr = 'configuration-ec.h'
+            full = True
         elif not ec and not lite:
             inf = 'OpensslLibAccel.inf'
             hdr = 'configuration-noec.h'
+            full = False
         elif ec and lite:
             inf = 'OpensslLibFullAccelLite.inf'
             hdr = 'configuration-ec-lite.h'
+            full = True
         sources = {}
         defines = {}
         for asm in [ 'UEFI-IA32-MSFT', 'UEFI-IA32-GCC',
@@ -372,7 +376,7 @@ def main():
                         os.path.join(opensslgendir, 'include', 'openssl', hdr))
             openssl_run_make(openssldir, 'distclean')
 
-            srclist = libcrypto_sources(cfg, archcc) + libssl_sources(cfg, archcc)
+            srclist = libcrypto_sources(cfg, full, archcc) + libssl_sources(cfg, full, archcc)
             if arch in ['AARCH64']:
                 featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStylePe'
             else:
@@ -403,7 +407,7 @@ def main():
         defines = cfg['unified_info']['defines']['libcrypto']
 
     update_inf('OpensslLibFull.inf',
-               libcrypto_sources(cfg) + libssl_sources(cfg),
+               libcrypto_sources(cfg, True) + libssl_sources(cfg, True),
                defines)
 
     # noaccel - ec disabled
@@ -413,10 +417,10 @@ def main():
     openssl_run_make(openssldir, 'distclean')
 
     update_inf('OpensslLibCrypto.inf',
-               libcrypto_sources(cfg),
+               libcrypto_sources(cfg, False),
                None, defines)
     update_inf('OpensslLib.inf',
-               libcrypto_sources(cfg) + libssl_sources(cfg),
+               libcrypto_sources(cfg, False) + libssl_sources(cfg, False),
                None, defines)
 
     # lite version (full but lite) - ec enabled
@@ -430,7 +434,7 @@ def main():
         defines = cfg['unified_info']['defines']['libcrypto']
 
     update_inf('OpensslLibFullLite.inf',
-               libcrypto_sources(cfg) + libssl_sources(cfg),
+               libcrypto_sources(cfg, True) + libssl_sources(cfg, True),
                None, defines)
 
     # wrap header file

@@ -219,10 +219,10 @@ NvmeCreatePrpList (
   OUT VOID                     **Mapping
   )
 {
-  UINTN                 PrpEntryNo;
+  UINT64                PrpEntryNo;
   UINT64                PrpListBase;
-  UINTN                 PrpListIndex;
-  UINTN                 PrpEntryIndex;
+  UINT64                PrpListIndex;
+  UINT64                PrpEntryIndex;
   UINT64                Remainder;
   EFI_PHYSICAL_ADDRESS  PrpListPhyAddr;
   UINTN                 Bytes;
@@ -236,7 +236,7 @@ NvmeCreatePrpList (
   //
   // Calculate total PrpList number.
   //
-  *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, (UINT64)PrpEntryNo - 1, &Remainder);
+  *PrpListNo = (UINTN)DivU64x64Remainder ((UINT64)Pages, PrpEntryNo - 1, &Remainder);
   if (*PrpListNo == 0) {
     *PrpListNo = 1;
   } else if ((Remainder != 0) && (Remainder != 1)) {
@@ -280,20 +280,20 @@ NvmeCreatePrpList (
   //
   ZeroMem (*PrpListHost, Bytes);
   for (PrpListIndex = 0; PrpListIndex < *PrpListNo - 1; ++PrpListIndex) {
-    PrpListBase = *(UINT64 *)PrpListHost + PrpListIndex * EFI_PAGE_SIZE;
+    PrpListBase = *(UINT64 *)PrpListHost + MultU64x32 (PrpListIndex, EFI_PAGE_SIZE);
 
     for (PrpEntryIndex = 0; PrpEntryIndex < PrpEntryNo; ++PrpEntryIndex) {
       if (PrpEntryIndex != PrpEntryNo - 1) {
         //
         // Fill all PRP entries except of last one.
         //
-        *((UINT64 *)(UINTN)PrpListBase + PrpEntryIndex) = PhysicalAddr;
-        PhysicalAddr                                   += EFI_PAGE_SIZE;
+        *((UINT64 *)(UINTN)PrpListBase + (UINTN)PrpEntryIndex) = PhysicalAddr;
+        PhysicalAddr                                          += EFI_PAGE_SIZE;
       } else {
         //
         // Fill last PRP entries with next PRP List pointer.
         //
-        *((UINT64 *)(UINTN)PrpListBase + PrpEntryIndex) = PrpListPhyAddr + (PrpListIndex + 1) * EFI_PAGE_SIZE;
+        *((UINT64 *)(UINTN)PrpListBase + (UINTN)PrpEntryIndex) = PrpListPhyAddr + MultU64x32 (PrpListIndex + 1, EFI_PAGE_SIZE);
       }
     }
   }
@@ -301,10 +301,10 @@ NvmeCreatePrpList (
   //
   // Fill last PRP list.
   //
-  PrpListBase = *(UINT64 *)PrpListHost + PrpListIndex * EFI_PAGE_SIZE;
+  PrpListBase = *(UINT64 *)PrpListHost + MultU64x32 (PrpListIndex, EFI_PAGE_SIZE);
   for (PrpEntryIndex = 0; PrpEntryIndex < Remainder; ++PrpEntryIndex) {
-    *((UINT64 *)(UINTN)PrpListBase + PrpEntryIndex) = PhysicalAddr;
-    PhysicalAddr                                   += EFI_PAGE_SIZE;
+    *((UINT64 *)(UINTN)PrpListBase + (UINTN)PrpEntryIndex) = PhysicalAddr;
+    PhysicalAddr                                          += EFI_PAGE_SIZE;
   }
 
   return (VOID *)(UINTN)PrpListPhyAddr;
