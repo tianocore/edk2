@@ -30,6 +30,10 @@
   ##
   UefiCpuBaseArchSupportLib|Include/Library/BaseArchLibSupport.h
 
+  ##  @libraryclass   Provides helper interface for mapping mmio memory regions.
+  #
+  MapMmioLib|Include/Library/MapMmioLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
   ##

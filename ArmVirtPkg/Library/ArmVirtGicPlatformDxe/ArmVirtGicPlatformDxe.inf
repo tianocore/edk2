@@ -35,6 +35,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [Protocols]
   gFdtClientProtocolGuid                                ## CONSUMES
