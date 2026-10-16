@@ -66,18 +66,21 @@ PxeGetStnAddr (
   //
   // Set new station address in SNP->Mode structure and return success.
   //
+  ZeroMem (&Snp->Mode.CurrentAddress, sizeof (EFI_MAC_ADDRESS));
   CopyMem (
     &(Snp->Mode.CurrentAddress),
     &Db->StationAddr,
     Snp->Mode.HwAddressSize
     );
 
+  ZeroMem (&Snp->Mode.BroadcastAddress, sizeof (EFI_MAC_ADDRESS));
   CopyMem (
     &Snp->Mode.BroadcastAddress,
     &Db->BroadcastAddr,
     Snp->Mode.HwAddressSize
     );
 
+  ZeroMem (&Snp->Mode.PermanentAddress, sizeof (EFI_MAC_ADDRESS));
   CopyMem (
     &Snp->Mode.PermanentAddress,
     &Db->PermanentAddr,
