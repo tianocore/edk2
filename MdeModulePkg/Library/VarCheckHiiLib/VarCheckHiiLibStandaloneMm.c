@@ -136,7 +136,7 @@ VarCheckHiiLibConstructorStandaloneMm (
 
   DEBUG ((DEBUG_INFO, "%a: starts.\n", __func__));
   //
-  // Register a handler to recieve the HII variable checking data.
+  // Register a handler to receive the HII variable checking data.
   //
   Status = gMmst->MmiHandlerRegister (VarCheckHiiLibReceiveHiiBinHandler, &gVarCheckReceivedHiiBinHandlerGuid, &DispatchHandle);
   if (EFI_ERROR (Status)) {
