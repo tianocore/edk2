@@ -32,6 +32,7 @@ APPLICATIONS = \
   GenSec \
   GenCrc32 \
   LzmaCompress \
+  Lz4Compress \
   TianoCompress \
   VolInfo \
   DevicePath
