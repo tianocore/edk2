@@ -901,6 +901,8 @@ PxeBcDiscoverBootFile (
   UINT16                      Type;
   UINT16                      Layer;
   BOOLEAN                     UseBis;
+  PXEBC_DHCP_PACKET_CACHE     *Cache;
+  PXEBC_VENDOR_OPTION         *VendorOpt;
 
   PxeBc = &Private->PxeBc;
   Mode  = PxeBc->Mode;
@@ -915,6 +917,9 @@ PxeBcDiscoverBootFile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  Cache     = Mode->ProxyOfferReceived ? &Private->ProxyOffer : &Private->DhcpAck;
+  VendorOpt = &Cache->Dhcp4.VendorOpt;
 
   //
   // Select a boot server from boot server list.
@@ -931,6 +936,21 @@ PxeBcDiscoverBootFile (
     // Choose by default item.
     //
     Status = PxeBcSelectBootMenu (Private, &Type, TRUE);
+  }
+
+  //
+  // According to PXE spec 2.1, Table 2-1, when PXE_DISCOVERY_CONTROL bit 3 is
+  // set in Vendor Options (43) and a boot file name is present in the offer,
+  // PxeBcSelectBootPrompt() returns EFI_ABORTED to signal that boot prompt and
+  // menu must be skipped; fall through to PxeBcDhcp4BootInfo() in that case.
+  // Any other EFI_ABORTED (e.g. user pressed ESC) must abort PXE boot.
+  //
+  if ((Status == EFI_ABORTED) &&
+      (Mode->UsingIpv6 ||
+       !IS_DISABLE_PROMPT_MENU (VendorOpt->DiscoverCtrl) ||
+       (Cache->Dhcp4.OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL)))
+  {
+    return EFI_ABORTED;
   }
 
   if (!EFI_ERROR (Status)) {
