@@ -125,10 +125,10 @@ MeasureFspFirmwareBlobWithCfg (
   {
     if (Description != NULL) {
       AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "%a", Description);
-      AsciiSPrint ((CHAR8 *)UpdBlob2.BlobDescription, sizeof (UpdBlob2.BlobDescription), "%aUDP", Description);
+      AsciiSPrint ((CHAR8 *)UpdBlob2.BlobDescription, sizeof (UpdBlob2.BlobDescription), "%aUPD", Description);
     } else {
       AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "Fv(%g)", FvName);
-      AsciiSPrint ((CHAR8 *)UpdBlob2.BlobDescription, sizeof (UpdBlob2.BlobDescription), "(%g)UDP", FvName);
+      AsciiSPrint ((CHAR8 *)UpdBlob2.BlobDescription, sizeof (UpdBlob2.BlobDescription), "(%g)UPD", FvName);
     }
 
     FvBlob2.BlobDescriptionSize = sizeof (FvBlob2.BlobDescription);
@@ -163,7 +163,7 @@ MeasureFspFirmwareBlobWithCfg (
     return Status;
   }
 
-  /** Hash FSP binary before UDP **/
+  /** Hash FSP binary before UPD **/
   HashBase = (UINT8 *)(UINTN)FirmwareBlobBase;
   HashSize = (UINTN)CfgRegionOffset;
   Status   = HashUpdate (HashHandle, HashBase, HashSize);
@@ -172,7 +172,7 @@ MeasureFspFirmwareBlobWithCfg (
     return Status;
   }
 
-  /** Hash FSP binary after UDP **/
+  /** Hash FSP binary after UPD **/
   HashBase = (UINT8 *)(UINTN)FirmwareBlobBase + CfgRegionOffset + CfgRegionSize;
   HashSize = (UINTN)(FirmwareBlobLength - CfgRegionOffset - CfgRegionSize);
   Status   = HashUpdate (HashHandle, HashBase, HashSize);
