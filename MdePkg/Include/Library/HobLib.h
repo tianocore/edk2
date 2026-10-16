@@ -245,7 +245,7 @@ BuildResourceDescriptorHob (
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
@@ -277,7 +277,7 @@ BuildGuidHob (
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
