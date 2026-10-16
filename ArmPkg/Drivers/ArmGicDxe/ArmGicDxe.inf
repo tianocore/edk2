@@ -2,32 +2,27 @@
 #
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #  Copyright (c) 2012 - 2017, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2025, Google LLC. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #**/
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.30
   BASE_NAME                      = ArmGicDxe
   FILE_GUID                      = DE371F7C-DEC4-4D21-ADF1-593ABCC15882
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-
-  ENTRY_POINT                    = InterruptDxeInitialize
+  ENTRY_POINT                    = GicV3DxeInitialize
 
 [Sources.common]
-  ArmGicDxe.h
-  ArmGicDxe.c
   ArmGicCommonDxe.c
-
-  GicV2/ArmGicV2Dxe.c
+  ArmGicDxe.h
   GicV3/ArmGicV3Dxe.c
-
-[Sources.AARCH64]
   GicV3/AArch64/ArmGicV3.S
-  GicV5/AArch64/ArmGicV5.S
   GicV5/ArmGicV5Dxe.c
+  GicV5/AArch64/ArmGicV5.S
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -37,15 +32,14 @@
 [LibraryClasses]
   ArmLib
   BaseLib
-  UefiLib
-  UefiBootServicesTableLib
   DebugLib
-  PrintLib
-  MemoryAllocationLib
-  UefiDriverEntryPoint
   IoLib
   PcdLib
+  PrintLib
   TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
 
 [Protocols]
   gHardwareInterruptProtocolGuid  ## PRODUCES
@@ -54,9 +48,8 @@
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
 
 [Depex]
   gEfiCpuArchProtocolGuid

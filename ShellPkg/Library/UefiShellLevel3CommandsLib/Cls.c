@@ -104,13 +104,7 @@ MainCmdCls (
   Background  = 0;
   Foreground  = 0;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetFlag (Package, L"-sfo")) {
+  if (ShellCommandLineGetFlag (Package, L"-sfo")) {
     if (ShellCommandLineGetCount (Package) > 1) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
       ShellStatus = SHELL_INVALID_PARAMETER;

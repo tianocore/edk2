@@ -70,8 +70,15 @@
 
     ## options defined .pytool/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [""],
-        "DscPath": ""  # Don't support this test
+        "IgnoreInf": [
+        # Only built when REDFISH_ENABLE is TRUE
+        "EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf",
+        # Only built when REDFISH_ENABLE is TRUE
+        "EmulatorPkg/Library/RedfishPlatformCredentialLib/RedfishPlatformCredentialLib.inf",
+        # Only built when REDFISH_ENABLE is TRUE
+        "EmulatorPkg/Library/RedfishPlatformHostInterfaceLib/RedfishPlatformHostInterfaceLib.inf",
+        ],
+        "DscPath": "EmulatorPkg.dsc"
     },
 
     ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
@@ -111,7 +118,7 @@
 
     ## options defined .pytool/Plugin/MarkdownLintCheck
     "MarkdownLintCheck": {
-        "AuditOnly": True,           # If True, log all errors and then mark as skipped
+        "AuditOnly": False,          # If True, log all errors and then mark as skipped
         "IgnoreFiles": []            # package root relative file, folder, or glob pattern to ignore
     }
 }
