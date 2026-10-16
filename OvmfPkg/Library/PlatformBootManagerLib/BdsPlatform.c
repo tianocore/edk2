@@ -152,23 +152,24 @@ PlatformRegisterOptionsAndKeys (
   Esc.ScanCode    = SCAN_ESC;
   Esc.UnicodeChar = CHAR_NULL;
   Status          = EfiBootManagerGetBootManagerMenu (&BootOption);
-  ASSERT_EFI_ERROR (Status);
-  Status = EfiBootManagerAddKeyOptionVariable (
-             NULL,
-             (UINT16)BootOption.OptionNumber,
-             0,
-             &F2,
-             NULL
-             );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
-  Status = EfiBootManagerAddKeyOptionVariable (
-             NULL,
-             (UINT16)BootOption.OptionNumber,
-             0,
-             &Esc,
-             NULL
-             );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  if (!EFI_ERROR (Status)) {
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               (UINT16)BootOption.OptionNumber,
+               0,
+               &F2,
+               NULL
+               );
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               (UINT16)BootOption.OptionNumber,
+               0,
+               &Esc,
+               NULL
+               );
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  }
 }
 
 EFI_STATUS
