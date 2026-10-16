@@ -1831,10 +1831,6 @@ GetMmioAddressTranslationOffset (
     Configuration++;
   }
 
-  //
-  // The resource occupied by BAR should be in the range reported by RootBridge.
-  //
-  ASSERT (FALSE);
   return (UINT64)-1;
 }
 
@@ -1973,8 +1969,27 @@ PciIoGetBarAttributes (
                                             Descriptor->AddrLen
                                             );
       if (Descriptor->AddrTranslationOffset == (UINT64)-1) {
-        FreePool (Descriptor);
-        return EFI_UNSUPPORTED;
+        if (PciIoDevice->PciBar[BarIndex].AddressFixed) {
+          //
+          // Enhanced Allocation BARs are only reported by the root bridge if
+          // the host bridge driver supports fixed resources. Otherwise, assume
+          // that there is no address translation.
+          //
+          DEBUG ((
+            DEBUG_WARN,
+            "%a: fixed BAR[%d] not reported by root bridge, assuming no translation\n",
+            __func__,
+            BarIndex
+            ));
+          Descriptor->AddrTranslationOffset = 0;
+        } else {
+          //
+          // The resource occupied by BAR should be in the range reported by RootBridge.
+          //
+          ASSERT (FALSE);
+          FreePool (Descriptor);
+          return EFI_UNSUPPORTED;
+        }
       }
     }
 
