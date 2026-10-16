@@ -3,6 +3,7 @@
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright 2026 Insyde Software. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -22,7 +23,7 @@
 
 **/
 EFI_STATUS
-ShellConnectDevicePath (
+ConnectDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePathToConnect
   )
 {
@@ -334,7 +335,7 @@ ShellConnectFromDevPaths (
       //
       // connect the entire device path
       //
-      Status = ShellConnectDevicePath (Instance);
+      Status = ConnectDevicePath (Instance);
       if (!EFI_ERROR (Status)) {
         AtLeastOneConnected = TRUE;
       }
