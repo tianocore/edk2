@@ -165,6 +165,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
   EArchCommonObjOemString,                         ///< 96 - OEM String
   EArchCommonObjPortConnectorInfo,                 ///< 97 - Port Connector Information
+  EArchCommonObjSmc91xInfo,                        ///< 98 - SMC91X Network Device Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2551,5 +2552,18 @@ typedef struct CmArchCommonSystemSlotInfo {
   /// Slot height.
   UINT8              SlotHeight;
 } CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
+
+/** SMC91X network device resources.
+
+  ID: EArchCommonObjSmc91xInfo
+**/
+typedef struct CmArchCommonSmc91xInfo {
+  /// Physical base address of the device registers.
+  UINT64                              BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                              BaseAddressLength;
+  /// Interrupt number and polarity/trigger flags.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
+} CM_ARCH_COMMON_SMC91X_INFO;
 
 #pragma pack()
