@@ -450,7 +450,7 @@ Returns:
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
 #ifndef __CYGWIN__
-char *strlwr(char *s);
+signed char *strlwr(signed char *s);
 #endif
 #endif
 

@@ -478,9 +478,9 @@ size_t _filelength(int fd)
 }
 
 #ifndef __CYGWIN__
-char *strlwr(char *s)
+signed char *strlwr(signed char *s)
 {
-  char *p = s;
+  signed char *p = s;
   for(;*s;s++) {
     *s = tolower(*s);
   }
