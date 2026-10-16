@@ -1,0 +1,60 @@
+## @file # [CODE_FIRST] 13226
+#  The SPI NOR Flash JEDEC Serial Flash Discoverable Parameters (SFDP) # [CODE_FIRST] 13226
+#  PEIM INF file. # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+#  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved. # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+#  SPDX-License-Identifier: BSD-2-Clause-Patent # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+# @par Revision Reference: # [CODE_FIRST] 13226
+#   - JEDEC Standard, JESD216F.02 # [CODE_FIRST] 13226
+#     https://www.jedec.org/document_search?search_api_views_fulltext=JESD216 # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+# @par Glossary: # [CODE_FIRST] 13226
+#   - SFDP - Serial Flash Discoverable Parameters # [CODE_FIRST] 13226
+#   - PTP  - Parameter Table Pointer # [CODE_FIRST] 13226
+## # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Defines] # [CODE_FIRST] 13226
+  INF_VERSION               = 1.30 # [CODE_FIRST] 13226
+  BASE_NAME                 = SpiNorFlashJedecSfdpPei # [CODE_FIRST] 13226
+  FILE_GUID                 = 7D2A4C68-1B39-4E05-8F7A-9C3B60D2158E # [CODE_FIRST] 13226
+  MODULE_TYPE               = PEIM # [CODE_FIRST] 13226
+  VERSION_STRING            = 0.1 # [CODE_FIRST] 13226
+  PI_SPECIFICATION_VERSION  = 1.10 # [CODE_FIRST] 13226
+  ENTRY_POINT               = SpiNorFlashSfdpPeiEntry # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Packages] # [CODE_FIRST] 13226
+  MdePkg/MdePkg.dec # [CODE_FIRST] 13226
+  MdeModulePkg/MdeModulePkg.dec # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[LibraryClasses] # [CODE_FIRST] 13226
+  BaseLib # [CODE_FIRST] 13226
+  BaseMemoryLib # [CODE_FIRST] 13226
+  DebugLib # [CODE_FIRST] 13226
+  DevicePathLib # [CODE_FIRST] 13226
+  MemoryAllocationLib # [CODE_FIRST] 13226
+  PeimEntryPoint # [CODE_FIRST] 13226
+  PeiServicesLib # [CODE_FIRST] 13226
+  TimerLib # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Sources] # [CODE_FIRST] 13226
+  SpiNorFlashJedecSfdpPei.c # [CODE_FIRST] 13226
+  SpiNorFlash.c # [CODE_FIRST] 13226
+  SpiNorFlashJedecSfdp.c # [CODE_FIRST] 13226
+  SpiNorFlashJedecSfdpInternal.h # [CODE_FIRST] 13226
+  SpiNorFlash.h # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Ppis] # [CODE_FIRST] 13226
+  gEfiPeiSpiNorFlashPpiGuid  ## PRODUCES # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[FixedPcd] # [CODE_FIRST] 13226
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationRetryCount # [CODE_FIRST] 13226
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashFixedTimeoutRetryCount # [CODE_FIRST] 13226
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationDelayMicroseconds # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Guids] # [CODE_FIRST] 13226
+  gEdk2JedecSfdpSpiPeiDriverGuid # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Depex] # [CODE_FIRST] 13226
+  gEdk2JedecSfdpSpiPeiDriverGuid # [CODE_FIRST] 13226

@@ -287,6 +287,9 @@
   MdeModulePkg/Bus/Spi/SpiBus/SpiBusSmm.inf
   MdeModulePkg/Bus/Spi/SpiHc/SpiHcDxe.inf
   MdeModulePkg/Bus/Spi/SpiHc/SpiHcSmm.inf
+  MdeModulePkg/Bus/Spi/SpiHc/SpiHcPei.inf # [CODE_FIRST] 13226
+  MdeModulePkg/Bus/Spi/SpiBus/SpiBusPei.inf # [CODE_FIRST] 13226
+  MdeModulePkg/Bus/Spi/SpiNorFlashJedecSfdp/SpiNorFlashJedecSfdpPei.inf # [CODE_FIRST] 13226
 
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
