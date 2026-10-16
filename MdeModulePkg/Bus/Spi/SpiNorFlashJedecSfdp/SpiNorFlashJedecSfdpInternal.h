@@ -16,7 +16,8 @@
 
 #define SPI_NOR_FLASH_SIGNATURE  SIGNATURE_32 ('s', 'n', 'f', 'm')
 
-#define SPI_NOR_FLASH_FROM_THIS(a)  CR (a, SPI_NOR_FLASH_INSTANCE, Protocol, SPI_NOR_FLASH_SIGNATURE)
+#define SPI_NOR_FLASH_FROM_THIS(a)     CR (a, SPI_NOR_FLASH_INSTANCE, Protocol, SPI_NOR_FLASH_SIGNATURE)
+#define SPI_NOR_FLASH_FROM_THIS_EX(a)  CR (a, SPI_NOR_FLASH_INSTANCE, ProtocolEx, SPI_NOR_FLASH_SIGNATURE)
 
 typedef struct {
   LIST_ENTRY    NextFastReadCap;     ///< Link list to next Fast read capability
@@ -74,22 +75,23 @@ typedef struct {
 } SFDP_SECTOR_MAP_RECORD;
 
 typedef struct {
-  UINTN                         Signature;
-  EFI_HANDLE                    Handle;
-  EFI_SPI_NOR_FLASH_PROTOCOL    Protocol;
-  EFI_SPI_IO_PROTOCOL           *SpiIo;
-  UINT32                        SfdpBasicFlashByteCount;
-  UINT32                        SfdpSectorMapByteCount;
-  SFDP_BASIC_FLASH_PARAMETER    *SfdpBasicFlash;
-  SFDP_SECTOR_MAP_TABLE         *SfdpFlashSectorMap;
-  UINT8                         *SpiTransactionWriteBuffer;
-  UINT32                        SpiTransactionWriteBufferIndex;
+  UINTN                            Signature;
+  EFI_HANDLE                       Handle;
+  EFI_SPI_NOR_FLASH_PROTOCOL       Protocol;
+  EFI_SPI_NOR_FLASH_PROTOCOL_EX    ProtocolEx;
+  EFI_SPI_IO_PROTOCOL              *SpiIo;
+  UINT32                           SfdpBasicFlashByteCount;
+  UINT32                           SfdpSectorMapByteCount;
+  SFDP_BASIC_FLASH_PARAMETER       *SfdpBasicFlash;
+  SFDP_SECTOR_MAP_TABLE            *SfdpFlashSectorMap;
+  UINT8                            *SpiTransactionWriteBuffer;
+  UINT32                           SpiTransactionWriteBufferIndex;
   //
   // SFDP information.
   //
-  SFDP_HEADER                   SfdpHeader;              ///< SFDP header.
-  UINT32                        FlashDeviceSize;         ///< The total size of this flash device.
-  UINT8                         CurrentAddressBytes;     ///< The current address bytes.
+  SFDP_HEADER                      SfdpHeader;           ///< SFDP header.
+  UINT32                           FlashDeviceSize;      ///< The total size of this flash device.
+  UINT8                            CurrentAddressBytes;  ///< The current address bytes.
 
   //
   // This is a linked list in which the Fast Read capability tables
@@ -97,25 +99,25 @@ typedef struct {
   // transfer. The SPI read would use the first Fast Read entry for
   // SPI read operation.
   //
-  LIST_ENTRY                    FastReadTableList;
+  LIST_ENTRY                       FastReadTableList;
 
-  LIST_ENTRY                    SupportedEraseTypes;      ///< The linked list of supported erase types.
-  BOOLEAN                       Uniform4KEraseSupported;  ///< The flash device supoprts uniform 4K erase.
-  BOOLEAN                       WriteEnableLatchRequired; ///< Wether Write Enable Latch is supported.
-  UINT8                         WriteEnableLatchCommand;  ///< Write Enable Latch command.
+  LIST_ENTRY                       SupportedEraseTypes;      ///< The linked list of supported erase types.
+  BOOLEAN                          Uniform4KEraseSupported;  ///< The flash device supoprts uniform 4K erase.
+  BOOLEAN                          WriteEnableLatchRequired; ///< Wether Write Enable Latch is supported.
+  UINT8                            WriteEnableLatchCommand;  ///< Write Enable Latch command.
   //
   // Below is the linked list of flash device sector
   // map configuration detection command and map descriptors.
   //
-  BOOLEAN                       ConfigurationCommandsNeeded; ///< Indicates whether sector map
-                                                             ///< configuration detection is
-                                                             ///< required.
-  LIST_ENTRY                    ConfigurationCommandList;    ///< The linked list of configuration
-                                                             ///< detection command sequence.
-  LIST_ENTRY                    ConfigurationMapList;        ///< The linked list of configuration
-                                                             ///< map descriptors.
-  SFDP_SECTOR_MAP_RECORD        *CurrentSectorMap;           ///< The current activated flash device
-                                                             ///< sector map.
+  BOOLEAN                          ConfigurationCommandsNeeded; ///< Indicates whether sector map
+                                                                ///< configuration detection is
+                                                                ///< required.
+  LIST_ENTRY                       ConfigurationCommandList;    ///< The linked list of configuration
+                                                                ///< detection command sequence.
+  LIST_ENTRY                       ConfigurationMapList;        ///< The linked list of configuration
+                                                                ///< map descriptors.
+  SFDP_SECTOR_MAP_RECORD           *CurrentSectorMap;           ///< The current activated flash device
+                                                                ///< sector map.
 } SPI_NOR_FLASH_INSTANCE;
 
 /**

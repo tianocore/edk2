@@ -24,4 +24,11 @@ typedef
   struct _EFI_SPI_NOR_FLASH_PROTOCOL
 EFI_SPI_SMM_NOR_FLASH_PROTOCOL;
 
+#define EFI_SPI_SMM_NOR_FLASH_PROTOCOL_EX_GUID  \
+  { 0x67435ded, 0xcaa9, 0x4ba5,                 \
+    { 0xb9, 0x3e, 0x9c, 0xe4, 0x28, 0xd4, 0x94, 0xa2 } }
+
+typedef EFI_SPI_NOR_FLASH_PROTOCOL_EX EFI_SPI_SMM_NOR_FLASH_PROTOCOL_EX;
+
 extern EFI_GUID  gEfiSpiSmmNorFlashProtocolGuid;
+extern EFI_GUID  gEfiSpiSmmNorFlashProtocolExGuid;

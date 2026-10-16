@@ -69,13 +69,34 @@ CreateSpiNorFlashSfdpInstance (
       // Install SPI NOR Flash Protocol.
       Status = gSmst->SmmInstallProtocolInterface (
                         &Instance->Handle,
-                        &gEfiSpiSmmNorFlashProtocolGuid,
+                        &gEfiSpiSmmNorFlashProtocolExGuid,
                         EFI_NATIVE_INTERFACE,
-                        &Instance->Protocol
+                        &Instance->ProtocolEx
                         );
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a: Fail to Install gEfiSpiSmmNorFlashProtocolGuid protocol.\n", __func__));
+        DEBUG ((DEBUG_ERROR, "%a: Fail to install extended SPI NOR Flash protocol: %r\n", __func__, Status));
         FreePool (Instance);
+      } else {
+        Status = gSmst->SmmInstallProtocolInterface (
+                          &Instance->Handle,
+                          &gEfiSpiSmmNorFlashProtocolGuid,
+                          EFI_NATIVE_INTERFACE,
+                          &Instance->Protocol
+                          );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "%a: Fail to install gEfiSpiSmmNorFlashProtocolGuid protocol.\n", __func__));
+          Status = gSmst->SmmUninstallProtocolInterface (
+                            Instance->Handle,
+                            &gEfiSpiSmmNorFlashProtocolExGuid,
+                            &Instance->ProtocolEx
+                            );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "%a: Fail to roll back extended SPI NOR Flash protocol: %r\n", __func__, Status));
+            return Status;
+          }
+
+          FreePool (Instance);
+        }
       }
     }
   }
