@@ -36,7 +36,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CONFIG_HEADER_BN_H
 
 #if !defined (SIXTY_FOUR_BIT) && !defined (THIRTY_TWO_BIT)
-  #if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_IA64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
+  #if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
 //
 // With GCC we would normally use SIXTY_FOUR_BIT_LONG, but MSVC needs
 // SIXTY_FOUR_BIT, because 'long' is 32-bit and only 'long long' is
@@ -62,10 +62,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Cannot use MAX_UINTN because that expands to a cast and cannot be used for
 // preprocessor expressions.
 //
-#if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_IA64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
+#if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
 #define CRT_MAX_UINTN  0xFFFFFFFFFFFFFFFFUL
-#elif defined (MDE_CPU_IA32) || defined (MDE_CPU_EBC)
+#elif defined (MDE_CPU_IA32)
 #define CRT_MAX_UINTN  0xFFFFFFFFUL
+#elif defined (MDE_CPU_EBC)
+  //
+  // On EBC, sizeof(UINTN) is evaluated at runtime, so we cannot provide valid
+  // preprocessor expressions for it.
+  //
+  #error Unsupported target architecture - EBC's runtime sizeof(UINTN) conflicts with SIZE_MAX and UINTPTR_MAX preprocessor definitions
 #else
   #error Unknown target architecture
 #endif
