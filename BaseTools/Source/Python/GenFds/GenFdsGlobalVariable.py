@@ -950,12 +950,17 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
         MatchItem = None
         MatchPathItem = None
         MatchOptionsItem = None
+        # Flatten grouped BuildOptions into a single dict for key lookup
+        FlatBuildOptions = {}
         for KeyString in KeyStringList:
             KeyStringBuildTarget, KeyStringToolChain, KeyStringArch = KeyString.split('_')
             if KeyStringArch != Arch:
                 continue
             Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, KeyStringBuildTarget, KeyStringToolChain]
-            for Item in Platform.BuildOptions:
+            FlatBuildOptions = {}
+            for Group in Platform.BuildOptions:
+                FlatBuildOptions.update(Group)
+            for Item in FlatBuildOptions:
                 if len(Item[1].split('_')) < 5:
                     continue
                 ItemTarget, ItemToolChain, ItemArch, ItemTool, ItemAttr = Item[1].split('_')
@@ -974,7 +979,7 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
                 if ItemAttr != DataType.TAB_GUID:
                     # Not GUID attribute match
                     continue
-                if Platform.BuildOptions[Item].lower() != NameGuid.lower():
+                if FlatBuildOptions[Item].lower() != NameGuid.lower():
                     # No GUID value match
                     continue
                 if MatchItem:
@@ -988,7 +993,7 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
             if not MatchItem:
                 continue
             ToolName = MatchItem[1].split('_')[3]
-            for Item in Platform.BuildOptions:
+            for Item in FlatBuildOptions:
                 if len(Item[1].split('_')) < 5:
                     continue
                 ItemTarget, ItemToolChain, ItemArch, ItemTool, ItemAttr = Item[1].split('_')
@@ -1019,8 +1024,8 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
                     else:
                         MatchOptionsItem = Item
     if MatchPathItem:
-        ToolPathTmp = Platform.BuildOptions[MatchPathItem]
+        ToolPathTmp = FlatBuildOptions[MatchPathItem]
     if MatchOptionsItem:
-        ToolOption = Platform.BuildOptions[MatchOptionsItem]
+        ToolOption = FlatBuildOptions[MatchOptionsItem]
     GenFdsGlobalVariable.GuidToolDefinition[NameGuid] = (ToolPathTmp, ToolOption)
     return ToolPathTmp, ToolOption
