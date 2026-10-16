@@ -16,11 +16,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Macros used for an IPv4 or an IPv6 address.
 //
-#define URI_STR_MIN_SIZE  0
-#define URI_STR_MAX_SIZE  255
+#define URI_STR_MIN_SIZE     0
+#define URI_STR_MAX_SIZE     255
+#define URI_STR_UI_MAX_SIZE  256
 
-#define DESCRIPTION_STR_MIN_SIZE  6
-#define DESCRIPTION_STR_MAX_SIZE  75
+#define DESCRIPTION_STR_MIN_SIZE     6
+#define DESCRIPTION_STR_MAX_SIZE     75
+#define DESCRIPTION_STR_UI_MAX_SIZE  76
 
 #define CONFIGURATION_VARSTORE_ID  0x1234
 
@@ -35,8 +37,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct _HTTP_BOOT_CONFIG_IFR_NVDATA {
   UINT8     IpVersion;
   UINT8     Padding;
-  CHAR16    Description[DESCRIPTION_STR_MAX_SIZE];
-  CHAR16    Uri[URI_STR_MAX_SIZE];
-  CHAR16    ProxyUri[URI_STR_MAX_SIZE];
+  CHAR16    Description[DESCRIPTION_STR_UI_MAX_SIZE];
+  CHAR16    Uri[URI_STR_UI_MAX_SIZE];
+  CHAR16    ProxyUri[URI_STR_UI_MAX_SIZE];
 } HTTP_BOOT_CONFIG_IFR_NVDATA;
 #pragma pack()

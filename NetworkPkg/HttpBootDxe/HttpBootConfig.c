@@ -33,13 +33,14 @@ HttpBootAddBootOption (
   IN   CHAR16                  *ProxyUri
   )
 {
-  EFI_DEV_PATH                  *Node;
-  EFI_DEVICE_PATH_PROTOCOL      *TmpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL      *FinalDevicePath;
-  UINTN                         Length;
-  CHAR8                         AsciiUri[URI_STR_MAX_SIZE];
-  CHAR8                         AsciiProxyUri[URI_STR_MAX_SIZE];
+  EFI_DEV_PATH              *Node;
+  EFI_DEVICE_PATH_PROTOCOL  *TmpDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *FinalDevicePath;
+  UINTN                     Length;
+  CHAR8                     AsciiUri[URI_STR_UI_MAX_SIZE];
+  CHAR8                     AsciiProxyUri[URI_STR_UI_MAX_SIZE];
+
   UINTN                         AsciiProxyUriSize;
   EFI_STATUS                    Status;
   EFI_BOOT_MANAGER_LOAD_OPTION  NewOption;
