@@ -69,6 +69,7 @@
   PcdLib
   TimerLib
   SafeIntLib
+  HobPrintLib
 
 [Guids]
   gPeiAprioriFileNameGuid       ## SOMETIMES_CONSUMES   ## File
