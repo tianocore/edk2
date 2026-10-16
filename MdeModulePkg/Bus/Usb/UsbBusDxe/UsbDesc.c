@@ -357,22 +357,47 @@ UsbIsSSDevice (
   UINT8                       Index;
   UINT8                       NumCapDesc;
   EFI_USB_DEV_CAP_DESCRIPTOR  *DevCapDesc;
+  UINTN                       Remaining;
+  UINTN                       CapLength;
+  BOOLEAN                     IsSsDevice;
 
-  if ((BosDesc->DescriptorType != USB_DESC_TYPE_BOS) || (Len == 0)) {
+  if (  (BosDesc == NULL)
+     || (Len < sizeof (*BosDesc))
+     || (BosDesc->DescriptorType != USB_DESC_TYPE_BOS)
+     || (BosDesc->Length < sizeof (*BosDesc))
+     || (BosDesc->Length > Len)
+     || (BosDesc->TotalLength < BosDesc->Length)
+     || (BosDesc->TotalLength > Len))
+  {
     return FALSE;
   }
 
   NumCapDesc = BosDesc->NumDeviceCaps;
   NextCap    = (UINT8 *)BosDesc + BosDesc->Length;
+  Remaining  = BosDesc->TotalLength - BosDesc->Length;
+  IsSsDevice = FALSE;
 
-  for (Index = 0; Index < NumCapDesc; Index++, NextCap += DevCapDesc->Length) {
-    DevCapDesc = (EFI_USB_DEV_CAP_DESCRIPTOR *)NextCap;
-    if ((DevCapDesc->DescriptorType == USB_DESC_TYPE_DEV_CAP) && (DevCapDesc->DevCapabilityType == USB_DEV_CAP_SUPPERSPEED_USB)) {
-      return TRUE;
+  for (Index = 0; Index < NumCapDesc; Index++) {
+    if (Remaining < sizeof (*DevCapDesc)) {
+      return FALSE;
     }
+
+    DevCapDesc = (EFI_USB_DEV_CAP_DESCRIPTOR *)NextCap;
+
+    CapLength = DevCapDesc->Length;
+    if ((CapLength < sizeof (*DevCapDesc)) || (CapLength > Remaining)) {
+      return FALSE;
+    }
+
+    if ((DevCapDesc->DescriptorType == USB_DESC_TYPE_DEV_CAP) && (DevCapDesc->DevCapabilityType == USB_DEV_CAP_SUPPERSPEED_USB)) {
+      IsSsDevice = TRUE;
+    }
+
+    NextCap   += CapLength;
+    Remaining -= CapLength;
   }
 
-  return FALSE;
+  return IsSsDevice;
 }
 
 /**
