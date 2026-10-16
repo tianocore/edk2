@@ -87,7 +87,7 @@ GetMemoryAttributes (
       ));
 
     if (EFI_ERROR (Status)) {
-      return EFI_NO_MAPPING;
+      return EFI_UNSUPPORTED;
     }
 
     Union        |= RegionAttributes;
