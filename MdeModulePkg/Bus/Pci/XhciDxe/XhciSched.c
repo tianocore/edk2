@@ -6,7 +6,7 @@
 Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
-Copyright (C) 2025 Qualcomm Technologies, Inc. All rights reserved.<BR>
+Copyright (C) 2025 - 2026 Qualcomm Technologies, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2919,15 +2919,20 @@ CalculateInterval (
 {
   UINT8  OriginalInterval = Interval;
 
+  if (Interval == 0) {
+    goto ON_ERROR;
+  }
+
   if ((EpType == USB_ENDPOINT_ISO) && (DeviceSpeed == EFI_USB_SPEED_FULL)) {
-    ASSERT (Interval >= 1 && Interval <= 16);
+    if (Interval > 16) {
+      Interval = 0;
+      goto ON_ERROR;
+    }
+
     Interval = Interval + 2;
   } else if ((EpType == USB_ENDPOINT_INTERRUPT) && ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW))) {
-    ASSERT (Interval != 0);
     Interval = (UINT8)HighBitSet32 ((UINT32)Interval) + 3;
   } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-    ASSERT (Interval != 0);
-
     //
     // Some devices incorrectly report full-speed bInterval values in
     // their high/super-speed interrupt endpoint descriptors.  Try to
@@ -2936,18 +2941,23 @@ CalculateInterval (
     //
     if (Interval > 16) {
       Interval = (UINT8)HighBitSet32 ((UINT32)Interval*8);
-
-      DEBUG ((
-        DEBUG_WARN,
-        "EpDesc->Interval (%u) out of range. Adjusted to %u\n",
-        OriginalInterval,
-        Interval
-        ));
+      goto ON_ERROR;
     } else {
       Interval = Interval - 1;
     }
   }
 
+  return Interval;
+
+ON_ERROR:
+  DEBUG ((
+    DEBUG_WARN,
+    "EpType 0x%x, DevSpd 0x%x, EpDesc->Interval (%u) out of range. Adjusted to %u\n",
+    EpType,
+    DeviceSpeed,
+    OriginalInterval,
+    Interval
+    ));
   return Interval;
 }
 
@@ -3076,6 +3086,12 @@ XhcInitializeEndpointContext (
         InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
         InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
         InputContext->EP[Dci-1].Interval         = CalculateInterval (USB_ENDPOINT_INTERRUPT, DeviceSpeed, EpDesc->Interval);
+        // Device reports out of range interval; gracefully skip unsupported endpoint
+        if (InputContext->EP[Dci-1].Interval == 0) {
+          DEBUG ((DEBUG_INFO, "XhcInitializeEndpointContext: Unsupport INT EP found, Transfer ring is not allocated.\n"));
+          EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+          continue;
+        }
 
         if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
@@ -3252,6 +3268,12 @@ XhcInitializeEndpointContext64 (
         InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
         InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
         InputContext->EP[Dci-1].Interval         = CalculateInterval (USB_ENDPOINT_INTERRUPT, DeviceSpeed, EpDesc->Interval);
+        // Device reports out of range interval; gracefully skip unsupported endpoint
+        if (InputContext->EP[Dci-1].Interval == 0) {
+          DEBUG ((DEBUG_INFO, "XhcInitializeEndpointContext: Unsupport INT EP found, Transfer ring is not allocated.\n"));
+          EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+          continue;
+        }
 
         if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
