@@ -289,14 +289,15 @@ PlatformBootManagerBeforeConsole (
   // Dispatch deferred images after EndOfDxe event and ReadyToLock
   // installation.
   //
-  EfiBootManagerDispatchDeferredImages ();
-
-  //
-  // GPU passthrough only allows Console enablement after ROM image load
-  //
-  PlatformInitializeConsole (
-    XenDetected () ? gXenPlatformConsole : gPlatformConsole
-    );
+  Status = EfiBootManagerDispatchDeferredImages ();
+  if (!EFI_ERROR (Status)) {
+    //
+    // GPU passthrough only allows Console enablement after ROM image load
+    //
+    PlatformInitializeConsole (
+      XenDetected () ? gXenPlatformConsole : gPlatformConsole
+      );
+  }
 
   FrontPageTimeout = GetFrontPageTimeoutFromQemu ();
   PcdStatus        = PcdSet16S (PcdPlatformBootTimeOut, FrontPageTimeout);
