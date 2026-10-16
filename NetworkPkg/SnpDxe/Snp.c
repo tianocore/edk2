@@ -318,7 +318,7 @@ SimpleNetworkDriverStart (
   UINT8                                      BarIndex;
   PXE_STATFLAGS                              InitStatFlags;
   EFI_PCI_IO_PROTOCOL                        *PciIo;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR          *BarDesc;
+  EFI_ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR    *BarDesc;
   BOOLEAN                                    FoundIoBar;
   BOOLEAN                                    FoundMemoryBar;
 
@@ -554,6 +554,11 @@ SimpleNetworkDriverStart (
       continue;
     } else if (EFI_ERROR (Status)) {
       goto ErrorDeleteSnp;
+    }
+
+    if (BarDesc->Header.Header.Byte != ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR) {
+      FreePool (BarDesc);
+      continue;
     }
 
     if ((!FoundMemoryBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM)) {
