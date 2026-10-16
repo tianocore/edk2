@@ -144,7 +144,7 @@ NOTE: User MUST set a UNIQUE "Common Name" on the different certificate
 1) Sign a Binary File to generate a detached PKCS7 signature:
 
     ```cmd
-    openssl smime -sign -binary -signer TestCert.pem -outform DER -md sha256 -certfile TestSub.pub.pem -out test.bin.p7 -in test.bin
+    openssl smime -sign -binary -noattr -signer TestCert.pem -outform DER -md sha256 -certfile TestSub.pub.pem -out test.bin.p7 -in test.bin
     ```
 
 2) Verify PKCS7 Signature of a Binary File:
