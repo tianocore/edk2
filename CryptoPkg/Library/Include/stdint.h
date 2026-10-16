@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <CrtLibSupport.h>
 
 //
-// only use in Mbedlts. The Openssl has defined them internally.
+// Don't use inside the Openssl submodule, which has these defined internally.
 //
 #ifndef OPENSSL_SYS_UEFI
 typedef INT8    int8_t;
