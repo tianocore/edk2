@@ -264,11 +264,11 @@ Mtftp6ParsePacketOption (
   IN     EFI_MTFTP6_OPTION  *Options          OPTIONAL
   )
 {
-  UINT8  *Cur;
-  UINT8  *Last;
-  UINT8  Num;
-  UINT8  *Name;
-  UINT8  *Value;
+  UINT8   *Cur;
+  UINT8   *Last;
+  UINT32  Num;
+  UINT8   *Name;
+  UINT8   *Value;
 
   Num  = 0;
   Cur  = (UINT8 *)Packet + MTFTP6_OPCODE_LEN;
