@@ -18,11 +18,16 @@
 
 [Sources]
   AestGenerator.c
+  AestGenerator.h
 
 [Packages]
   MdePkg/MdePkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  MetadataHandlerLib
+  TableHelperLib
