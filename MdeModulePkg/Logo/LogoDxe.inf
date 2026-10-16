@@ -1,8 +1,11 @@
 ## @file
-#  The default logo bitmap picture shown on setup screen.
+#  Logo DXE Driver for HII-based embedded logo loading.
+#
+#  This driver installs the Edkii Platform Logo protocol configured to render
+#  the default logo from HII resources.
 #
 #  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
-#
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
@@ -15,7 +18,6 @@
   FILE_GUID                      = F74D20EE-37E7-48FC-97F7-9B1047749C69
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-
   ENTRY_POINT                    = InitializeLogo
 #
 #  This flag specifies whether HII resource section is generated into PE image.
@@ -38,14 +40,14 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  DebugLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  DebugLib
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid        ## CONSUMES
   gEfiHiiImageExProtocolGuid         ## CONSUMES
-  gEfiHiiPackageListProtocolGuid     ## PRODUCES CONSUMES
+  gEfiHiiPackageListProtocolGuid     ## CONSUMES
   gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
 
 [Depex]

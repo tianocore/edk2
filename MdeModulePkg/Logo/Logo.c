@@ -2,17 +2,18 @@
   Logo DXE Driver, install Edkii Platform Logo protocol.
 
 Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <Uefi.h>
-#include <Protocol/HiiDatabase.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiImageEx.h>
-#include <Protocol/PlatformLogo.h>
 #include <Protocol/HiiPackageList.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/PlatformLogo.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 typedef struct {
   EFI_IMAGE_ID                             ImageId;
