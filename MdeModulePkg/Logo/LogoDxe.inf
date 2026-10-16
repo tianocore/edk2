@@ -34,15 +34,24 @@
   Logo.bmp
   Logo.c
   Logo.idf
+  LogoImageId.h
+  LogoImageId.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BmpSupportLib
   DebugLib
+  DxeServicesLib
+  MemoryAllocationLib
+  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLogoFileGuid ## CONSUMES
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid        ## CONSUMES
