@@ -262,6 +262,60 @@ GetHighestResourceDescriptor (
 }
 
 /**
+  Check whether an MMIO range overlaps TD-private or unaccepted memory.
+
+  @param[in] MmioStart  Start address of the MMIO range.
+  @param[in] MmioEnd    End address (exclusive) of the MMIO range.
+
+  @retval TRUE   The MMIO range overlaps protected memory.
+  @retval FALSE  The MMIO range does not overlap protected memory.
+**/
+STATIC
+BOOLEAN
+MmioRangeOverlapsMemory (
+  IN EFI_PHYSICAL_ADDRESS  MmioStart,
+  IN EFI_PHYSICAL_ADDRESS  MmioEnd
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  MemStart;
+  EFI_PHYSICAL_ADDRESS  MemEnd;
+  EFI_PHYSICAL_ADDRESS  FwStart;
+  EFI_PHYSICAL_ADDRESS  FwEnd;
+
+  FwStart = FixedPcdGet32 (PcdOvmfSecPageTablesBase);
+  FwEnd   = (EFI_PHYSICAL_ADDRESS)FixedPcdGet32 (PcdOvmfDxeNonCcFvBase) +
+            FixedPcdGet32 (PcdOvmfDxeNonCcFvSize);
+  if ((MmioStart < FwEnd) && (MmioEnd > FwStart)) {
+    return TRUE;
+  }
+
+  Hob.Raw = (UINT8 *)GetHobList ();
+
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (  (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR)
+       && ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
+           (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED)))
+    {
+      MemStart = Hob.ResourceDescriptor->PhysicalStart;
+      MemEnd   = MemStart + Hob.ResourceDescriptor->ResourceLength;
+
+      if (MemEnd < MemStart) {
+        return TRUE;
+      }
+
+      if ((MmioStart < MemEnd) && (MmioEnd > MemStart)) {
+        return TRUE;
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return FALSE;
+}
+
+/**
   Set the shared bit for mmio region in Tdx guest.
 
   In Tdx guest there are 2 ways to access mmio, TdVmcall or direct access.
@@ -278,6 +332,8 @@ SetMmioSharedBit (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  MmioStart;
+  EFI_PHYSICAL_ADDRESS  MmioEnd;
 
   Hob.Raw = (UINT8 *)GetHobList ();
 
@@ -288,11 +344,41 @@ SetMmioSharedBit (
     if (  (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR)
        && (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO))
     {
-      MemEncryptTdxSetPageSharedBit (
-        0,
-        Hob.ResourceDescriptor->PhysicalStart,
-        EFI_SIZE_TO_PAGES (Hob.ResourceDescriptor->ResourceLength)
-        );
+      MmioStart = Hob.ResourceDescriptor->PhysicalStart;
+      MmioEnd   = MmioStart + Hob.ResourceDescriptor->ResourceLength;
+
+      //
+      // The MMIO resource descriptor is VMM-controlled. Reject a range that
+      // wraps the address space or is empty, and refuse to mark a range that
+      // overlaps TD-private system memory as shared: doing so would expose or
+      // corrupt private guest data.
+      //
+      if ((MmioEnd <= MmioStart) ||
+          ((MmioStart & EFI_PAGE_MASK) != 0) ||
+          ((Hob.ResourceDescriptor->ResourceLength & EFI_PAGE_MASK) != 0))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: skipping invalid MMIO range 0x%llx len 0x%llx\n",
+          __func__,
+          MmioStart,
+          Hob.ResourceDescriptor->ResourceLength
+          ));
+      } else if (MmioRangeOverlapsMemory (MmioStart, MmioEnd)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: skipping MMIO range 0x%llx-0x%llx overlapping private memory\n",
+          __func__,
+          MmioStart,
+          MmioEnd
+          ));
+      } else {
+        MemEncryptTdxSetPageSharedBit (
+          0,
+          MmioStart,
+          EFI_SIZE_TO_PAGES (Hob.ResourceDescriptor->ResourceLength)
+          );
+      }
     }
 
     Hob.Raw = GET_NEXT_HOB (Hob);
