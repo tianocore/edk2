@@ -13,17 +13,12 @@
 
 #include <Library/CpuLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/PcdLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
 
 #include "VirtualMemory.h"
 #include "SnpPageStateChange.h"
-
-STATIC BOOLEAN          mAddressEncMaskChecked = FALSE;
-STATIC UINT64           mAddressEncMask;
-STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
-
-STATIC VOID  *mPscBuffer = NULL;
 
 typedef enum {
   SetCBit,
@@ -42,16 +37,8 @@ InternalGetMemEncryptionAddressMask (
   VOID
   )
 {
-  UINT64  EncryptionMask;
-
-  if (mAddressEncMaskChecked) {
-    return mAddressEncMask;
-  }
-
-  EncryptionMask = MemEncryptSevGetEncryptionMask ();
-
-  mAddressEncMask        = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
-  mAddressEncMaskChecked = TRUE;
+  UINT64  EncryptionMask  = MemEncryptSevGetEncryptionMask ();
+  UINT64  mAddressEncMask = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
 
   return mAddressEncMask;
 }
@@ -80,7 +67,13 @@ InitializePageTablePool (
   IN  UINTN  PoolPages
   )
 {
-  VOID  *Buffer;
+  SEC_SEV_ES_WORK_AREA  *WorkArea;
+  PAGE_TABLE_POOL       *mPageTablePool;
+  VOID                  *Buffer;
+
+  WorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  mPageTablePool = (PAGE_TABLE_POOL *)(UINTN)WorkArea->PageTablePool;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
@@ -113,6 +106,9 @@ InitializePageTablePool (
   mPageTablePool->FreePages = PoolPages - 1;
   mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
 
+  // Writeback to WorkArea Pointer
+  WorkArea->PageTablePool = (UINT64)(UINTN)mPageTablePool;
+
   return TRUE;
 }
 
@@ -140,7 +136,13 @@ AllocatePageTableMemory (
   IN UINTN  Pages
   )
 {
-  VOID  *Buffer;
+  SEC_SEV_ES_WORK_AREA  *WorkArea;
+  PAGE_TABLE_POOL       *mPageTablePool;
+  VOID                  *Buffer;
+
+  WorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  mPageTablePool = (PAGE_TABLE_POOL *)(UINTN)WorkArea->PageTablePool;
 
   if (Pages == 0) {
     return NULL;
@@ -155,6 +157,9 @@ AllocatePageTableMemory (
     if (!InitializePageTablePool (Pages)) {
       return NULL;
     }
+
+    // Refetch after init
+    mPageTablePool = (PAGE_TABLE_POOL *)(UINTN)WorkArea->PageTablePool;
   }
 
   Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
@@ -388,8 +393,11 @@ EnablePageTableProtection (
   PAGE_TABLE_POOL       *Pool;
   UINT64                PoolSize;
   EFI_PHYSICAL_ADDRESS  Address;
+  SEC_SEV_ES_WORK_AREA  *WorkArea;
 
-  if (mPageTablePool == NULL) {
+  WorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  if ((PAGE_TABLE_POOL *)(UINTN)WorkArea->PageTablePool == NULL) {
     return;
   }
 
@@ -397,7 +405,7 @@ EnablePageTableProtection (
   // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
   // remember original one in advance.
   //
-  HeadPool = mPageTablePool;
+  HeadPool = (PAGE_TABLE_POOL *)(UINTN)WorkArea->PageTablePool;
   Pool     = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
@@ -730,6 +738,12 @@ SetMemoryEncDec (
   UINTN                           OrigLength;
   RETURN_STATUS                   Status;
 
+  VOID                  *mPscBuffer;
+  SEC_SEV_ES_WORK_AREA  *WorkArea;
+
+  WorkArea   = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  mPscBuffer = WorkArea->VirtualMemoryPscBuffer;
+
   DEBUG ((
     DEBUG_PAGING,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
@@ -796,6 +810,9 @@ SetMemoryEncDec (
       mPscBuffer,
       EFI_PAGE_SIZE
       );
+
+    // Writeback to the WorkArea pointer
+    WorkArea->VirtualMemoryPscBuffer = mPscBuffer;
   }
 
   //
@@ -997,6 +1014,9 @@ SetMemoryEncDec (
       mPscBuffer,
       EFI_PAGE_SIZE
       );
+
+    // Writeback to the WorkArea pointer
+    WorkArea->VirtualMemoryPscBuffer = mPscBuffer;
   }
 
 Done:
