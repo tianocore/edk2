@@ -77,6 +77,10 @@ GetMemoryAttributes (
                &RegionAttributes
                );
 
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
+
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: RegionAddress == 0x%lx, RegionLength == 0x%lx, RegionAttributes == 0x%lx\n",
@@ -85,10 +89,6 @@ GetMemoryAttributes (
       (UINT64)RegionLength,
       (UINT64)RegionAttributes
       ));
-
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
 
     Union        |= RegionAttributes;
     Intersection &= RegionAttributes;
