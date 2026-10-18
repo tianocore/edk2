@@ -1252,7 +1252,17 @@ typedef struct {
 } EFI_ARM_AARCH64_EL3_CONTEXT_SYSTEM_REGISTERS;
 
 ///
-/// ARMv8 AARCH64 MISC Context System Register(Type8)-Single Reister Entry.
+/// ARMv8 AARCH64 Misc. Context System Register (Type 8) - Single Register Entry.
+///
+/// This structure describes AArch64 miscellaneous system registers only.
+///
+/// The System Register Name field contains the MRS instruction encoding:
+///   Bits 0:2   - Op2
+///   Bits 3:6   - CRm
+///   Bits 7:10  - CRn
+///   Bits 11:13 - Op1
+///   Bit 14     - O0
+///   Bit 15     - Reserved
 ///
 typedef struct {
   UINT16    MRS_Op2  : 3;
