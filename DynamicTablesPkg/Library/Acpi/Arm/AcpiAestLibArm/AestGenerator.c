@@ -35,7 +35,7 @@ STATIC AEST_NODE_GROUP  mNodeGroups[] = {
   { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              TRUE,  NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            FALSE, NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), FALSE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), TRUE,  NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY,     sizeof (CM_ARM_AEST_PROXY_NODE),             FALSE, NULL, 0 }
 };
 
@@ -71,6 +71,14 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjAestGicNode,
   CM_ARM_AEST_GIC_NODE
+  );
+
+/** Retrieve AEST PCIe Root Complex nodes from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjAestPcieRootComplexNode,
+  CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE
   );
 
 /** Retrieve one of the variable-length AEST interface bitmap arrays.
@@ -228,6 +236,13 @@ GetAestNodeList (
                (CM_ARM_AEST_GIC_NODE **)List,
                Count
                );
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE:
+      return GetEArmObjAestPcieRootComplexNode (
+               CfgMgrProtocol,
+               CM_NULL_TOKEN,
+               (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE **)List,
+               Count
+               );
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unknown node type 0x%x\n", NodeType));
       return EFI_UNSUPPORTED;
@@ -242,8 +257,10 @@ GetAestNodeList (
   Record SRAT presence for memory controller node validation.
 
   SMMU nodes reference IORT node Identifiers and require a nonzero IORT
-  revision. Check IORT only when an SMMU node is present.
-  Cf. DEN0085 2.0 EAC2, Section 2.1.3, Table 11.
+  revision. PCIe nodes use RC Identifiers from IORT issue E onward; node
+  offsets used by earlier issues are not supported by this generator.
+  Check IORT only when an SMMU or PCIe node is present.
+  Cf. DEN0085 2.0 EAC2, Sections 2.1.3 and 2.1.6, Tables 11 and 14.
 
   @param [in] CfgMgrProtocol  Configuration Manager protocol.
 
@@ -269,7 +286,8 @@ CheckTableDependencies (
   IortRequired = FALSE;
   for (Index = 0; Index < ARRAY_SIZE (mNodeGroups); Index++) {
     if (mNodeGroups[Index].Supported &&
-        (mNodeGroups[Index].NodeType == EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU) &&
+        ((mNodeGroups[Index].NodeType == EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU) ||
+         (mNodeGroups[Index].NodeType == EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE)) &&
         (mNodeGroups[Index].Count != 0))
     {
       IortRequired = TRUE;
@@ -1360,6 +1378,65 @@ ResolveAndValidateGicData (
   return EFI_SUCCESS;
 }
 
+/** Resolve and validate PCIe Root Complex-specific node data.
+
+  @param [in]      CfgMgrProtocol  Configuration Manager protocol.
+  @param [in]      Source          PCIe Root Complex node CM object.
+  @param [in, out] NodeInfo        Node information receiving PCIe data.
+
+  @retval EFI_SUCCESS           The Root Complex Identifier was resolved.
+  @retval EFI_NOT_FOUND         The Root Complex token was not found.
+  @retval EFI_INVALID_PARAMETER The token or selected object is invalid.
+  @retval Others                Configuration Manager error.
+**/
+STATIC
+EFI_STATUS
+ResolveAndValidatePcieData (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE    *CONST  Source,
+  IN OUT    AEST_NODE_INFO                        *CONST  NodeInfo
+  )
+{
+  CM_ARM_ROOT_COMPLEX_NODE  *RootComplex;
+  EFI_STATUS                Status;
+  UINT32                    Count;
+
+  if (Source->RootComplexToken == CM_NULL_TOKEN) {
+    DEBUG ((DEBUG_ERROR, "AEST: PCIe Root Complex reference requires a non-null token\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetEArmObjRootComplex (
+             CfgMgrProtocol,
+             Source->RootComplexToken,
+             &RootComplex,
+             &Count
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "AEST: Failed to resolve PCIe Root Complex reference: token 0x%p, status %r\n",
+      Source->RootComplexToken,
+      Status
+      ));
+    return Status;
+  }
+
+  if ((Count != 1) || (RootComplex == NULL)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "AEST: Invalid PCIe Root Complex reference: token 0x%p, count %u, data 0x%p\n",
+      Source->RootComplexToken,
+      Count,
+      RootComplex
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NodeInfo->Data.Pcie.IortNodeReference = RootComplex->Identifier;
+  return EFI_SUCCESS;
+}
+
 /** Resolve, validate, and size one AEST node.
 
   @param [in]  CfgMgrProtocol  Configuration Manager protocol.
@@ -1422,6 +1499,13 @@ ResolveAndValidateAestNode (
       Status = ResolveAndValidateGicData (
                  CfgMgrProtocol,
                  (CONST CM_ARM_AEST_GIC_NODE *)Source,
+                 NodeInfo
+                 );
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE:
+      Status = ResolveAndValidatePcieData (
+                 CfgMgrProtocol,
+                 (CONST CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE *)Source,
                  NodeInfo
                  );
       break;
@@ -1631,6 +1715,7 @@ WriteAestNode (
   EFI_ACPI_AEST_2_0_MEMORY_DATA  *Memory;
   EFI_ACPI_AEST_2_0_SMMU_DATA    *Smmu;
   EFI_ACPI_AEST_2_0_GIC_DATA     *Gic;
+  EFI_ACPI_AEST_2_0_PCIE_DATA    *Pcie;
   UINT32                         Offset;
 
   Source                            = NodeInfo->Source;
@@ -1661,6 +1746,10 @@ WriteAestNode (
       Gic                     = (EFI_ACPI_AEST_2_0_GIC_DATA *)(Buffer + Node->DataOffset);
       Gic->InterfaceType      = NodeInfo->Data.Gic.InterfaceType;
       Gic->InstanceIdentifier = NodeInfo->Data.Gic.InstanceIdentifier;
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE:
+      Pcie                    = (EFI_ACPI_AEST_2_0_PCIE_DATA *)(Buffer + Node->DataOffset);
+      Pcie->IortNodeReference = NodeInfo->Data.Pcie.IortNodeReference;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unsupported node type 0x%x\n", NodeInfo->Type));
