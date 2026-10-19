@@ -139,6 +139,38 @@ GET_OBJECT_LIST (
   CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
   );
 
+/** Retrieve an IORT SMMUv1 or SMMUv2 identifier owner.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjSmmuV1SmmuV2,
+  CM_ARM_SMMUV1_SMMUV2_NODE
+  );
+
+/** Retrieve an IORT SMMUv3 identifier owner.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjSmmuV3,
+  CM_ARM_SMMUV3_NODE
+  );
+
+/** Retrieve an IORT Root Complex identifier owner.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjRootComplex,
+  CM_ARM_ROOT_COMPLEX_NODE
+  );
+
+/** Retrieve an IORT Named Component identifier owner.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjNamedComponent,
+  CM_ARM_NAMED_COMPONENT_NODE
+  );
+
 /** Retrieve an AEST node list for the requested node type.
 
   @param [in]  CfgMgrProtocol  Configuration Manager protocol.
@@ -902,6 +934,234 @@ ResolveAndValidateMemoryData (
   return EFI_SUCCESS;
 }
 
+/** Resolve the IORT Identifier for an SMMU token.
+
+  Look up an SMMUv3 object first. If it is not found, look up an
+  SMMUv1/v2 object.
+
+  @param [in]  CfgMgrProtocol  Configuration Manager protocol.
+  @param [in]  Token           Token selecting an IORT SMMU object.
+  @param [out] Identifier      Identifier owned by the selected SMMU.
+
+  @retval EFI_SUCCESS           The SMMU Identifier was resolved.
+  @retval EFI_NOT_FOUND         The token does not select an SMMU.
+  @retval EFI_INVALID_PARAMETER The token or selected object is invalid.
+  @retval Others                Configuration Manager error.
+**/
+STATIC
+EFI_STATUS
+ResolveSmmuIdentifier (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN        CM_OBJECT_TOKEN                               Token,
+  OUT       UINT32                               *CONST   Identifier
+  )
+{
+  CM_ARM_SMMUV1_SMMUV2_NODE  *SmmuV1V2;
+  CM_ARM_SMMUV3_NODE         *SmmuV3;
+  EFI_STATUS                 Status;
+  UINT32                     Count;
+
+  if (Token == CM_NULL_TOKEN) {
+    DEBUG ((DEBUG_ERROR, "AEST: SMMU reference requires a non-null token\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetEArmObjSmmuV3 (CfgMgrProtocol, Token, &SmmuV3, &Count);
+  if (Status != EFI_NOT_FOUND) {
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if ((Count != 1) || (SmmuV3 == NULL)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "AEST: Invalid SMMUv3 reference: token 0x%p, count %u, data 0x%p\n",
+        Token,
+        Count,
+        SmmuV3
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    *Identifier = SmmuV3->Identifier;
+    return EFI_SUCCESS;
+  }
+
+  Status = GetEArmObjSmmuV1SmmuV2 (CfgMgrProtocol, Token, &SmmuV1V2, &Count);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_ERROR, "AEST: No SMMU found for token 0x%p\n", Token));
+    }
+
+    return Status;
+  }
+
+  if ((Count != 1) || (SmmuV1V2 == NULL)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "AEST: Invalid SMMUv1/v2 reference: token 0x%p, count %u, data 0x%p\n",
+      Token,
+      Count,
+      SmmuV1V2
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Identifier = SmmuV1V2->Identifier;
+  return EFI_SUCCESS;
+}
+
+/** Resolve an SMMU subcomponent's IORT Identifier.
+
+  The subcomponent token must select one Root Complex, Named Component,
+  or the same SMMU selected by the node's SmmuToken.
+  Cf. DEN0085 2.0 EAC2, Section 2.1.3, Table 11.
+
+  @param [in]  CfgMgrProtocol  Configuration Manager protocol.
+  @param [in]  Source          SMMU node CM object.
+  @param [in]  SmmuIdentifier  Identifier of the selected SMMU.
+  @param [out] Identifier      Identifier owned by the selected subcomponent.
+
+  @retval EFI_SUCCESS           The subcomponent Identifier was resolved.
+  @retval EFI_NOT_FOUND         No permitted subcomponent matches the token.
+  @retval EFI_INVALID_PARAMETER The token or selected object is invalid.
+  @retval Others                Configuration Manager error.
+**/
+STATIC
+EFI_STATUS
+ResolveSmmuSubcomponentIdentifier (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST CM_ARM_AEST_SMMU_NODE                 *CONST  Source,
+  IN        UINT32                                        SmmuIdentifier,
+  OUT       UINT32                                *CONST  Identifier
+  )
+{
+  CM_ARM_ROOT_COMPLEX_NODE     *RootComplex;
+  CM_ARM_NAMED_COMPONENT_NODE  *NamedComponent;
+  EFI_STATUS                   Status;
+  UINT32                       Count;
+
+  if (Source->SubcomponentToken == CM_NULL_TOKEN) {
+    DEBUG ((DEBUG_ERROR, "AEST: SMMU subcomponent requires a non-null token\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Source->SubcomponentToken == Source->SmmuToken) {
+    *Identifier = SmmuIdentifier;
+    return EFI_SUCCESS;
+  }
+
+  Status = GetEArmObjRootComplex (
+             CfgMgrProtocol,
+             Source->SubcomponentToken,
+             &RootComplex,
+             &Count
+             );
+  if (Status != EFI_NOT_FOUND) {
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if ((Count != 1) || (RootComplex == NULL)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "AEST: Invalid SMMU Root Complex reference: token 0x%p, count %u, data 0x%p\n",
+        Source->SubcomponentToken,
+        Count,
+        RootComplex
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    *Identifier = RootComplex->Identifier;
+    return EFI_SUCCESS;
+  }
+
+  Status = GetEArmObjNamedComponent (
+             CfgMgrProtocol,
+             Source->SubcomponentToken,
+             &NamedComponent,
+             &Count
+             );
+  if (Status != EFI_NOT_FOUND) {
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if ((Count != 1) || (NamedComponent == NULL)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "AEST: Invalid SMMU Named Component reference: token 0x%p, count %u, data 0x%p\n",
+        Source->SubcomponentToken,
+        Count,
+        NamedComponent
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    *Identifier = NamedComponent->Identifier;
+    return EFI_SUCCESS;
+  }
+
+  DEBUG ((
+    DEBUG_ERROR,
+    "AEST: No SMMU subcomponent found for token 0x%p\n",
+    Source->SubcomponentToken
+    ));
+  return EFI_NOT_FOUND;
+}
+
+/** Resolve and validate SMMU-specific node data.
+
+  The platform CM supplies a subcomponent associated with the SMMU.
+  This function resolves the IORT Identifier owners for both references.
+  Cf. DEN0085 2.0 EAC2, Section 2.1.3, Table 11.
+
+  @param [in]      CfgMgrProtocol  Configuration Manager protocol.
+  @param [in]      Source          SMMU node CM object.
+  @param [in, out] NodeInfo        Node information receiving SMMU data.
+
+  @retval EFI_SUCCESS           Both IORT references were resolved.
+  @retval EFI_NOT_FOUND         A token has no permitted target.
+  @retval EFI_INVALID_PARAMETER A reference is invalid.
+  @retval Others                Configuration Manager error.
+**/
+STATIC
+EFI_STATUS
+ResolveAndValidateSmmuData (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST CM_ARM_AEST_SMMU_NODE                 *CONST  Source,
+  IN OUT    AEST_NODE_INFO                        *CONST  NodeInfo
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      SmmuIdentifier;
+  UINT32      SubcomponentIdentifier;
+
+  Status = ResolveSmmuIdentifier (
+             CfgMgrProtocol,
+             Source->SmmuToken,
+             &SmmuIdentifier
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ResolveSmmuSubcomponentIdentifier (
+             CfgMgrProtocol,
+             Source,
+             SmmuIdentifier,
+             &SubcomponentIdentifier
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  NodeInfo->Data.Smmu.IortNodeReference     = SmmuIdentifier;
+  NodeInfo->Data.Smmu.SubcomponentReference = SubcomponentIdentifier;
+  return EFI_SUCCESS;
+}
+
 /** Resolve, validate, and size one AEST node.
 
   @param [in]  CfgMgrProtocol  Configuration Manager protocol.
@@ -950,6 +1210,13 @@ ResolveAndValidateAestNode (
       Status = ResolveAndValidateMemoryData (
                  CfgMgrProtocol,
                  (CONST CM_ARM_AEST_MEMORY_NODE *)Source,
+                 NodeInfo
+                 );
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU:
+      Status = ResolveAndValidateSmmuData (
+                 CfgMgrProtocol,
+                 (CONST CM_ARM_AEST_SMMU_NODE *)Source,
                  NodeInfo
                  );
       break;
@@ -1157,6 +1424,7 @@ WriteAestNode (
   CONST CM_ARM_AEST_COMMON       *Source;
   EFI_ACPI_AEST_2_0_NODE         *Node;
   EFI_ACPI_AEST_2_0_MEMORY_DATA  *Memory;
+  EFI_ACPI_AEST_2_0_SMMU_DATA    *Smmu;
   UINT32                         Offset;
 
   Source                            = NodeInfo->Source;
@@ -1177,6 +1445,11 @@ WriteAestNode (
     case EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY:
       Memory                  = (EFI_ACPI_AEST_2_0_MEMORY_DATA *)(Buffer + Node->DataOffset);
       Memory->ProximityDomain = NodeInfo->Data.Memory.ProximityDomain;
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU:
+      Smmu                        = (EFI_ACPI_AEST_2_0_SMMU_DATA *)(Buffer + Node->DataOffset);
+      Smmu->IortNodeReference     = NodeInfo->Data.Smmu.IortNodeReference;
+      Smmu->SubcomponentReference = NodeInfo->Data.Smmu.SubcomponentReference;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unsupported node type 0x%x\n", NodeInfo->Type));
@@ -1235,7 +1508,7 @@ BuildAestTable (
   STATIC AEST_NODE_GROUP  NodeGroups[] = {
     { EFI_ACPI_AEST_2_0_NODE_TYPE_PROCESSOR, sizeof (CM_ARM_AEST_PROCESSOR_NODE),         TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            TRUE,  NULL, 0 },
-    { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              FALSE, NULL, 0 },
+    { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            FALSE, NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               FALSE, NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), FALSE, NULL, 0 },
