@@ -165,6 +165,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
   EArchCommonObjOemString,                         ///< 96 - OEM String
   EArchCommonObjPortConnectorInfo,                 ///< 97 - Port Connector Information
+  EArchCommonObjSmc91xInfo,                        ///< 98 - SMC91X Network Device Information
+  EArchCommonObjGroupAssociationInfo,              ///< 99 - Group Association Information
+  EArchCommonObjGroupAssociationItem,              ///< 100 - Group Association Item
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2313,6 +2316,39 @@ typedef struct CmArchCommonPortConnectorInfo {
   UINT8              PortType;
 } CM_ARCH_COMMON_PORT_CONNECTOR_INFO;
 
+/** A structure that identifies an SMBIOS object in a group association.
+
+  SMBIOS Specification v3.9.0 Type 14
+
+  ID: EArchCommonObjGroupAssociationItem
+**/
+typedef struct CmArchCommonGroupAssociationItem {
+  /// CM Object Token identifying the associated SMBIOS object.
+  CM_OBJECT_TOKEN              ReferencedObjectToken;
+
+  /// Generator ID for the associated SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    ReferencedTableGeneratorId;
+} CM_ARCH_COMMON_GROUP_ASSOCIATION_ITEM;
+
+/** A structure that describes Group Association Information.
+
+  SMBIOS Specification v3.9.0 Type 14
+
+  ID: EArchCommonObjGroupAssociationInfo
+**/
+typedef struct CmArchCommonGroupAssociationInfo {
+  /// CM Object Token uniquely identifying this Group Association.
+  CM_OBJECT_TOKEN    GroupAssociationInfoToken;
+
+  /// Token referencing a non-empty array of Group Association Items.
+  /// This token must not be CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    GroupItemListToken;
+
+  /// Null-terminated group name encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              GroupName[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_GROUP_ASSOCIATION_INFO;
+
 /** A structure that describes an installable firmware language.
 
   SMBIOS Specification v3.9.0 Type 13
@@ -2551,5 +2587,18 @@ typedef struct CmArchCommonSystemSlotInfo {
   /// Slot height.
   UINT8              SlotHeight;
 } CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
+
+/** SMC91X network device resources.
+
+  ID: EArchCommonObjSmc91xInfo
+**/
+typedef struct CmArchCommonSmc91xInfo {
+  /// Physical base address of the device registers.
+  UINT64                              BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                              BaseAddressLength;
+  /// Interrupt number and polarity/trigger flags.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
+} CM_ARCH_COMMON_SMC91X_INFO;
 
 #pragma pack()
