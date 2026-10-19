@@ -34,7 +34,7 @@ STATIC AEST_NODE_GROUP  mNodeGroups[] = {
   { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            TRUE,  NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              TRUE,  NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            FALSE, NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               FALSE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               TRUE,  NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), FALSE, NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY,     sizeof (CM_ARM_AEST_PROXY_NODE),             FALSE, NULL, 0 }
 };
@@ -63,6 +63,14 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjAestSmmuNode,
   CM_ARM_AEST_SMMU_NODE
+  );
+
+/** Retrieve AEST GIC nodes from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjAestGicNode,
+  CM_ARM_AEST_GIC_NODE
   );
 
 /** Retrieve one of the variable-length AEST interface bitmap arrays.
@@ -103,6 +111,14 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjGicCInfo,
   CM_ARM_GICC_INFO
+  );
+
+/** Retrieve a GIC ITS object that owns a GIC ITS ID.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjGicItsInfo,
+  CM_ARM_GIC_ITS_INFO
   );
 
 /** Retrieve a PPTT cache object that owns a Cache ID.
@@ -203,6 +219,13 @@ GetAestNodeList (
                CfgMgrProtocol,
                CM_NULL_TOKEN,
                (CM_ARM_AEST_SMMU_NODE **)List,
+               Count
+               );
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_GIC:
+      return GetEArmObjAestGicNode (
+               CfgMgrProtocol,
+               CM_NULL_TOKEN,
+               (CM_ARM_AEST_GIC_NODE **)List,
                Count
                );
     default:
@@ -1212,6 +1235,131 @@ ResolveAndValidateSmmuData (
   return EFI_SUCCESS;
 }
 
+/** Resolve and validate GIC-specific node data.
+
+  Resolve the processor UID for GICC/GICR and the ITS ID for GITS.
+  GICD uses zero to match the Arm MADT generator and ignores InstanceToken.
+  Cf. DEN0085 2.0 EAC2, Section 2.1.5, Table 13.
+
+  @param [in]      CfgMgrProtocol  Configuration Manager protocol.
+  @param [in]      Source          GIC node CM object.
+  @param [in, out] NodeInfo        Node information receiving GIC data.
+
+  @retval EFI_SUCCESS           GIC data was resolved.
+  @retval EFI_NOT_FOUND         The instance token was not found.
+  @retval EFI_INVALID_PARAMETER The interface type or reference is invalid.
+  @retval Others                Configuration Manager error.
+**/
+STATIC
+EFI_STATUS
+ResolveAndValidateGicData (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST CM_ARM_AEST_GIC_NODE                  *CONST  Source,
+  IN OUT    AEST_NODE_INFO                        *CONST  NodeInfo
+  )
+{
+  CM_ARM_GICC_INFO     *Gicc;
+  CM_ARM_GIC_ITS_INFO  *GicIts;
+  EFI_STATUS           Status;
+  UINT32               Count;
+  UINT32               InstanceIdentifier;
+
+  switch (Source->InterfaceType) {
+    case EFI_ACPI_AEST_2_0_GIC_INTERFACE_TYPE_GICC:
+    case EFI_ACPI_AEST_2_0_GIC_INTERFACE_TYPE_GICR:
+      if (Source->InstanceToken == CM_NULL_TOKEN) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "AEST: GIC interface type 0x%x requires a non-null GICC token\n",
+          Source->InterfaceType
+          ));
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Status = GetEArmObjGicCInfo (
+                 CfgMgrProtocol,
+                 Source->InstanceToken,
+                 &Gicc,
+                 &Count
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "AEST: Failed to resolve GICC reference: token 0x%p, status %r\n",
+          Source->InstanceToken,
+          Status
+          ));
+        return Status;
+      }
+
+      if ((Count != 1) || (Gicc == NULL)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "AEST: Invalid GICC reference: token 0x%p, count %u, data 0x%p\n",
+          Source->InstanceToken,
+          Count,
+          Gicc
+          ));
+        return EFI_INVALID_PARAMETER;
+      }
+
+      InstanceIdentifier = Gicc->AcpiProcessorUid;
+      break;
+    case EFI_ACPI_AEST_2_0_GIC_INTERFACE_TYPE_GICD:
+      // Cf. ACPI Specification 6.6, Section 5.2.12.15, which requires
+      // exactly one GICD structure in an Arm MADT. Use zero to match the
+      // Arm MADT generator's GIC ID.
+      InstanceIdentifier = 0;
+      break;
+    case EFI_ACPI_AEST_2_0_GIC_INTERFACE_TYPE_GITS:
+      if (Source->InstanceToken == CM_NULL_TOKEN) {
+        DEBUG ((DEBUG_ERROR, "AEST: GITS requires a non-null ITS token\n"));
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Status = GetEArmObjGicItsInfo (
+                 CfgMgrProtocol,
+                 Source->InstanceToken,
+                 &GicIts,
+                 &Count
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "AEST: Failed to resolve GIC ITS reference: token 0x%p, status %r\n",
+          Source->InstanceToken,
+          Status
+          ));
+        return Status;
+      }
+
+      if ((Count != 1) || (GicIts == NULL)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "AEST: Invalid GIC ITS reference: token 0x%p, count %u, data 0x%p\n",
+          Source->InstanceToken,
+          Count,
+          GicIts
+          ));
+        return EFI_INVALID_PARAMETER;
+      }
+
+      InstanceIdentifier = GicIts->GicItsId;
+      break;
+    default:
+      DEBUG ((
+        DEBUG_ERROR,
+        "AEST: Invalid GIC interface type 0x%x\n",
+        Source->InterfaceType
+        ));
+      return EFI_INVALID_PARAMETER;
+  }
+
+  NodeInfo->Data.Gic.InterfaceType      = Source->InterfaceType;
+  NodeInfo->Data.Gic.InstanceIdentifier = InstanceIdentifier;
+  return EFI_SUCCESS;
+}
+
 /** Resolve, validate, and size one AEST node.
 
   @param [in]  CfgMgrProtocol  Configuration Manager protocol.
@@ -1267,6 +1415,13 @@ ResolveAndValidateAestNode (
       Status = ResolveAndValidateSmmuData (
                  CfgMgrProtocol,
                  (CONST CM_ARM_AEST_SMMU_NODE *)Source,
+                 NodeInfo
+                 );
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_GIC:
+      Status = ResolveAndValidateGicData (
+                 CfgMgrProtocol,
+                 (CONST CM_ARM_AEST_GIC_NODE *)Source,
                  NodeInfo
                  );
       break;
@@ -1475,6 +1630,7 @@ WriteAestNode (
   EFI_ACPI_AEST_2_0_NODE         *Node;
   EFI_ACPI_AEST_2_0_MEMORY_DATA  *Memory;
   EFI_ACPI_AEST_2_0_SMMU_DATA    *Smmu;
+  EFI_ACPI_AEST_2_0_GIC_DATA     *Gic;
   UINT32                         Offset;
 
   Source                            = NodeInfo->Source;
@@ -1500,6 +1656,11 @@ WriteAestNode (
       Smmu                        = (EFI_ACPI_AEST_2_0_SMMU_DATA *)(Buffer + Node->DataOffset);
       Smmu->IortNodeReference     = NodeInfo->Data.Smmu.IortNodeReference;
       Smmu->SubcomponentReference = NodeInfo->Data.Smmu.SubcomponentReference;
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_GIC:
+      Gic                     = (EFI_ACPI_AEST_2_0_GIC_DATA *)(Buffer + Node->DataOffset);
+      Gic->InterfaceType      = NodeInfo->Data.Gic.InterfaceType;
+      Gic->InstanceIdentifier = NodeInfo->Data.Gic.InstanceIdentifier;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unsupported node type 0x%x\n", NodeInfo->Type));
