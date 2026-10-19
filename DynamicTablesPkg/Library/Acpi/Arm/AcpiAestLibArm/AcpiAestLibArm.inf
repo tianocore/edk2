@@ -27,6 +27,7 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  CmObjHelperLib
   DebugLib
   MemoryAllocationLib
   MetadataHandlerLib
