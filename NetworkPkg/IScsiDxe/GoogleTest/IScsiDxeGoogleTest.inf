@@ -18,7 +18,11 @@
 [Sources]
   IScsiDxeGoogleTest.cpp
   IScsiDhcp6GoogleTest.cpp
+  IScsiConfigGoogleTest.cpp
+  ../IScsiConfig.c
+  ../IScsiConfigStrings.uni
   ../IScsiDhcp6.c
+  ../IScsiInitiatorName.c
 
 [Packages]
   CryptoPkg/CryptoPkg.dec
@@ -30,12 +34,22 @@
 [LibraryClasses]
   GoogleTestLib
   DebugLib
+  HiiLib
   NetLib
   PcdLib
+  UefiHiiServicesLib
+  UefiRuntimeServicesTableLib
 
 [Protocols]
+  gEfiDevicePathProtocolGuid
   gEfiDhcp6ProtocolGuid
   gEfiDhcp6ServiceBindingProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
+  gEfiIScsiInitiatorNameProtocolGuid
+
+[Guids]
+  gEfiIfrTianoGuid
+  gIScsiConfigGuid
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber
