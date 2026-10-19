@@ -260,6 +260,62 @@ UpdateVariableStore (
 }
 
 /**
+  Adjust the variable quota accounting when a hardware error record variable
+  is marked as deleted.
+
+  The space of a deleted hardware error record is moved from the hardware
+  error record quota to the common variable quota, so that:
+
+    - the hardware error record quota only reflects active records, and a
+      new record can be stored without triggering a reclaim;
+    - the space taken by the deleted record is still accounted for and is
+      only released by the next reclaim, which is triggered by common
+      variable writes.
+
+  Note that CommonVariableTotalSize may temporarily exceed
+  CommonVariableSpace because of this adjustment. The next common variable
+  write (or the reclaim at boot) cleans up the deleted records.
+
+  @param[in] Variable             The variable header that has just been
+                                  marked as deleted.
+**/
+STATIC
+VOID
+DeletedHwErrRecToCommonQuota (
+  IN VARIABLE_HEADER  *Variable
+  )
+{
+  UINTN  VariableSize;
+
+  ASSERT (Variable != NULL);
+  if (Variable == NULL) {
+    return;
+  }
+
+  //
+  // Only non-volatile hardware error record variables in the deleted state
+  // need the quota adjustment. A variable is in the deleted state when all
+  // of its remaining state bits are within VAR_DELETED.
+  //
+  if (((Variable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) !=
+       (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) ||
+      ((Variable->State | VAR_DELETED) != VAR_DELETED))
+  {
+    return;
+  }
+
+  VariableSize = (UINTN)GetNextVariablePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat) - (UINTN)Variable;
+
+  if (mVariableModuleGlobal->HwErrVariableTotalSize > VariableSize) {
+    mVariableModuleGlobal->HwErrVariableTotalSize -= VariableSize;
+  } else {
+    mVariableModuleGlobal->HwErrVariableTotalSize = 0;
+  }
+
+  mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+}
+
+/**
   Record variable error flag.
 
   @param[in] Flag               Variable error flag to record.
@@ -777,7 +833,15 @@ Reclaim (
         NextVariable = GetNextVariablePtr (Variable, AuthFormat);
         VariableSize = (UINTN)NextVariable - (UINTN)Variable;
         if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
-          mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+          if ((Variable->State | VAR_DELETED) == VAR_DELETED) {
+            //
+            // Keep deleted hardware error records in the common quota when
+            // rebuilding the totals after a failed reclaim.
+            //
+            mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+          } else {
+            mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+          }
         } else if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
           mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
           if (IsUserVariable (Variable)) {
@@ -1860,6 +1924,7 @@ UpdateVariable (
         if (!EFI_ERROR (Status)) {
           if (!Variable->Volatile) {
             CacheVariable->InDeletedTransitionPtr->State = State;
+            DeletedHwErrRecToCommonQuota (CacheVariable->InDeletedTransitionPtr);
           }
         } else {
           goto Done;
@@ -1882,6 +1947,7 @@ UpdateVariable (
         UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, FALSE, TRUE, FALSE, &gVariableInfo);
         if (!Variable->Volatile) {
           CacheVariable->CurrPtr->State = State;
+          DeletedHwErrRecToCommonQuota (CacheVariable->CurrPtr);
           FlushHobVariableToFlash (VariableName, VendorGuid);
         }
       }
@@ -2122,6 +2188,19 @@ UpdateVariable (
        || (IsCommonVariable && AtRuntime () && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonRuntimeVariableSpace))
        || (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace)))
     {
+      //
+      // A hardware error record write that would exceed the hardware error
+      // record quota is rejected with EFI_OUT_OF_RESOURCES instead of
+      // triggering a variable store reclaim, since a reclaim must not be
+      // performed while handling a hardware error. The space taken by
+      // deleted hardware error records is accounted against the common
+      // variable quota and is released by the next reclaim.
+      //
+      if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+
       if (AtRuntime ()) {
         if (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace)) {
           RecordVarErrorFlag (VAR_ERROR_FLAG_USER_ERROR, VariableName, VendorGuid, Attributes, VarSize);
@@ -2322,6 +2401,7 @@ UpdateVariable (
       if (!EFI_ERROR (Status)) {
         if (!Variable->Volatile) {
           CacheVariable->InDeletedTransitionPtr->State = State;
+          DeletedHwErrRecToCommonQuota (CacheVariable->InDeletedTransitionPtr);
         }
       } else {
         goto Done;
@@ -2342,6 +2422,7 @@ UpdateVariable (
                );
     if (!EFI_ERROR (Status) && !Variable->Volatile) {
       CacheVariable->CurrPtr->State = State;
+      DeletedHwErrRecToCommonQuota (CacheVariable->CurrPtr);
     }
   }
 
