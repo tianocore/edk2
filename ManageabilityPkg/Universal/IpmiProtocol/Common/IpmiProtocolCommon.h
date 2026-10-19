@@ -4,22 +4,22 @@
 
   Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #pragma once
 
-#include <IndustryStandard/IpmiKcs.h>
+#include <Library/ManageabilityTransportIpmiLib.h>
 #include <Library/ManageabilityTransportLib.h>
 
 ///
 /// IPMI KCS hardware information.
 ///
-#define IPMI_KCS_BASE_ADDRESS  PcdGet16 (PcdIpmiKcsIoBaseAddress)
-#define IPMI_KCS_REG_DATA_IN   IPMI_KCS_BASE_ADDRESS + IPMI_KCS_DATA_IN_REGISTER_OFFSET
-#define IPMI_KCS_REG_DATA_OUT  IPMI_KCS_BASE_ADDRESS + IPMI_KCS_DATA_OUT_REGISTER_OFFSET
-#define IPMI_KCS_REG_COMMAND   IPMI_KCS_BASE_ADDRESS + IPMI_KCS_COMMAND_REGISTER_OFFSET
-#define IPMI_KCS_REG_STATUS    IPMI_KCS_BASE_ADDRESS + IPMI_KCS_STATUS_REGISTER_OFFSET
+#define IPMI_KCS_REG_DATA_IN   MANAGEABILITY_IPMI_KCS_DATA_ADDRESS
+#define IPMI_KCS_REG_DATA_OUT  IPMI_KCS_REG_DATA_IN
+#define IPMI_KCS_REG_COMMAND   MANAGEABILITY_IPMI_KCS_COMMAND_ADDRESS
+#define IPMI_KCS_REG_STATUS    IPMI_KCS_REG_COMMAND
 
 ///
 /// IPMI SSIF hardware information.

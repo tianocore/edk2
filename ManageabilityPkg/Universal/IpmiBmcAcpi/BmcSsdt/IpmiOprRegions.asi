@@ -2,9 +2,20 @@
   IPMI ACPI SSDT.
 
 Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#if ((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == 0xFFFF) != \
+     (FixedPcdGet16 (PcdIpmiKcsIoCommandAddress) == 0xFFFF))
+#error "IPMI KCS explicit addresses must both be configured or both be 0xFFFF"
+#endif
+
+#if ((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) != 0xFFFF) && \
+     (FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == FixedPcdGet16 (PcdIpmiKcsIoCommandAddress)))
+#error "IPMI KCS data and command addresses must be different"
+#endif
 
 Device(IPMC)
 {
@@ -42,8 +53,13 @@ Device(IPMC)
     // Return the x86 resources consumed by BMC
     Name(_CRS, ResourceTemplate()
     {
-        // Uses 8-bit ports 0xCA2-0xCA5
+#if (FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == 0xFFFF)
+        // The legacy base address is patched by BmcAcpi at runtime.
         IO(Decode16, 0xCA2, 0xCA2, 0, 2)
+#else
+        IO(Decode16, FixedPcdGet16 (PcdIpmiKcsIoDataAddress), FixedPcdGet16 (PcdIpmiKcsIoDataAddress), 0, 1)
+        IO(Decode16, FixedPcdGet16 (PcdIpmiKcsIoCommandAddress), FixedPcdGet16 (PcdIpmiKcsIoCommandAddress), 0, 1)
+#endif
     })
 
     Name(_HID, "IPI0001")           // IPMI device
@@ -54,5 +70,4 @@ Device(IPMC)
 
 
 } // end of  Device(IPMC)
-
 

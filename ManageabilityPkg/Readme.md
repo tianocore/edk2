@@ -177,3 +177,53 @@ platform design.
    invoke the existing edk2 protocol which is defined in UEFI or PI specifications.
    This is the implementation decision made by the developer when introduce a new
    manageability transport library.
+
+## IPMI KCS Register Addresses
+
+Existing platforms may continue configuring `PcdIpmiKcsIoBaseAddress`. When
+both explicit register PCDs retain their `0xFFFF` defaults, the data register
+is at the legacy base and the command/status register is at base plus one.
+The default addresses remain `0xCA2/0xCA3`. The base PCD is deprecated for new
+platform configurations, but remains supported with no removal scheduled.
+
+New platforms should configure both explicit register addresses as FixedAtBuild.
+For example, non-contiguous ports `0x62/0x66` are configured as:
+
+```text
+[PcdsFixedAtBuild]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoDataAddress|0x62
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress|0x66
+```
+
+Explicit addresses are used directly, regardless of the legacy base. Configuring
+only one explicit address, or specifying the same address for both registers,
+fails the build. Command addresses below data addresses are supported. `0xFFFF`
+is reserved for selecting the legacy configuration.
+
+This selection applies to the DXE, PEI, SMM and Standalone MM IPMI modules,
+the KCS transport's default hardware configuration, and the BmcAcpi SSDT.
+Caller-provided KCS hardware information and MCTP address configuration are
+unchanged.
+
+BmcAcpi retains generic access to `PcdIpmiKcsIoBaseAddress`, preserving both
+FixedAtBuild and PatchableInModule configurations. Legacy mode retains one
+two-byte I/O resource whose base is patched at runtime. Explicit mode describes
+two one-byte I/O resources generated at build time; the legacy base does not
+modify them. ACPI OEM ID and OEM table ID PCDs remain generic inputs.
+
+### IPMI BMC ACPI Namespace
+
+`PcdIpmiBmcAcpiUseGenericNamespace` is a FixedAtBuild BOOLEAN PCD. Its `FALSE`
+default preserves `\_SB.PC00.LPC0.IPMC`. Set it to `TRUE` in the platform DSC
+to place the device directly under the system bus at `\_SB.IPMC`:
+
+```text
+[PcdsFixedAtBuild]
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiBmcAcpiUseGenericNamespace|TRUE
+```
+
+Only these two namespace placements are supported; the device name remains `IPMC`.
+Namespace selection is independent of the KCS register address configuration.
+The existing ASL preprocessing rules select matching `External` and `Scope`
+paths at build time, without BaseTools changes or runtime namespace rewriting.
+The default placement still requires the platform to provide `\_SB.PC00.LPC0`.
