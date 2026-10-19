@@ -433,12 +433,14 @@ BuildModuleHob (
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
   If Guid is NULL, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
-  If DataLength >= (0x10000 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  If DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  HobLength is UINT16 and multiples of 8 bytes, so the max HobLength is 0xFFF8.
 
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @return The start address of GUID HOB data.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
+  @retval  others       The start address of GUID HOB data.
 
 **/
 VOID *
@@ -453,7 +455,10 @@ BuildGuidHob (
   //
   // Make sure that data length is not too long.
   //
-  ASSERT (DataLength <= (0xffff - sizeof (EFI_HOB_GUID_TYPE)));
+  ASSERT (DataLength <= (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)));
+  if (DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE))) {
+    return NULL;
+  }
 
   Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16)(sizeof (EFI_HOB_GUID_TYPE) + DataLength));
   ASSERT (Hob != NULL);
@@ -476,13 +481,15 @@ BuildGuidHob (
   If Guid is NULL, then ASSERT().
   If Data is NULL and DataLength > 0, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
-  If DataLength >= (0x10000 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  If DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  HobLength is UINT16 and multiples of 8 bytes, so the max HobLength is 0xFFF8.
 
   @param  Guid          The GUID to tag the customized HOB.
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @return The start address of GUID HOB data.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
+  @retval  others       The start address of GUID HOB data.
 
 **/
 VOID *
