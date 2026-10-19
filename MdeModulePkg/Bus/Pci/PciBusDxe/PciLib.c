@@ -4,6 +4,7 @@
 Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) Microsoft Corporation.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -439,7 +440,7 @@ AdjustPciDeviceBarSize (
         //
         // Start to parse the bars
         //
-        for (Offset = 0x10; Offset <= 0x24;) {
+        for (Offset = PCI_BASE_ADDRESSREG_OFFSET; Offset <= PCI_BASE_ADDRESSREG5_OFFSET;) {
           Offset = PciParseBar (PciIoDevice, Offset);
         }
 
