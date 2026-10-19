@@ -398,7 +398,7 @@ BuildResourceDescriptorHob (
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
@@ -420,6 +420,9 @@ BuildGuidHob (
   // Make sure that data length is not too long.
   //
   ASSERT (DataLength <= (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)));
+  if (DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE))) {
+    return NULL;
+  }
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16)(sizeof (EFI_HOB_GUID_TYPE) + DataLength));
   if (Hob == NULL) {
@@ -451,7 +454,7 @@ BuildGuidHob (
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
