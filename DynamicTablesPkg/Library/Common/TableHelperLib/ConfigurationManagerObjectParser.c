@@ -1516,6 +1516,19 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonIpmiDeviceInfoParser[] = {
   { "InterruptNumber",                  sizeof (UINT8),           "0x%x",  NULL },
 };
 
+/** A parser for EArchCommonObjSmc91xInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSmc91xInfoParser[] = {
+  { "BaseAddress",       8, "0x%llx", NULL },
+  { "BaseAddressLength", 8, "0x%llx", NULL },
+  { "Interrupt",
+    sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL,
+    NULL,
+    CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) }
+};
+
 /** A parser for EArchCommonObjSystemPowerSupplyInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemPowerSupplyInfoParser[] = {
@@ -1905,6 +1918,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjOemStringsInfo,                   CmArchCommonOemStringsInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjOemString,                        CmArchCommonOemStringParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPortConnectorInfo,                CmArchCommonPortConnectorInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSmc91xInfo,                       CmArchCommonSmc91xInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
