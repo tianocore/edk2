@@ -329,6 +329,21 @@ IsVirtioSerial (
 }
 
 /**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio input device at
+  the VIRTIO_DEVICE_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioInput (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtio (Handle, ReportText, VIRTIO_SUBSYSTEM_INPUT);
+}
+
+/**
   This function checks if a handle corresponds to the Virtio Device ID given
   at the EFI_PCI_IO_PROTOCOL level.
 **/
@@ -478,6 +493,21 @@ IsVirtioPciSerial (
 }
 
 /**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio input device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciInput (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtioPci (Handle, ReportText, VIRTIO_SUBSYSTEM_INPUT);
+}
+
+/**
   This CALLBACK_FUNCTION attempts to connect a handle non-recursively, asking
   the matching driver to produce all first-level child handles.
 **/
@@ -560,6 +590,53 @@ AddOutput (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: %s: added to ConOut and ErrOut\n",
+    __func__,
+    ReportText
+    ));
+}
+
+/**
+  This CALLBACK_FUNCTION retrieves the EFI_DEVICE_PATH_PROTOCOL from the
+  handle, and adds it to ConIn.
+**/
+STATIC
+VOID
+EFIAPI
+AddInput (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+  DevicePath = DevicePathFromHandle (Handle);
+  if (DevicePath == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: handle %p: device path not found\n",
+      __func__,
+      ReportText,
+      Handle
+      ));
+    return;
+  }
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: adding to ConIn: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: %s: added to ConIn\n",
     __func__,
     ReportText
     ));
@@ -818,6 +895,13 @@ PlatformBootManagerBeforeConsole (
   // ErrOut.
   //
   FilterAndProcess (&gEfiGraphicsOutputProtocolGuid, NULL, AddOutput);
+
+  //
+  // Find all virtio-input PCI devices and connect them non-recursively,
+  // then add device paths to ConIn.
+  //
+  FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciInput, Connect);
+  FilterAndProcess (&gVirtioDeviceProtocolGuid, IsVirtioInput, AddInput);
 
   //
   // Add the hardcoded short-form USB keyboard device path to ConIn.

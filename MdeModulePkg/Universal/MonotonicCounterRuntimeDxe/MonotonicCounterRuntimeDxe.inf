@@ -38,6 +38,7 @@
   UefiRuntimeLib
   UefiDriverEntryPoint
   BaseLib
+  VariablePolicyHelperLib
 
 [Guids]
   ## PRODUCES ## Variable:L"MTC"
@@ -46,7 +47,7 @@
 
 [Protocols]
   gEfiMonotonicCounterArchProtocolGuid  ## PRODUCES
-
+  gEdkiiVariablePolicyProtocolGuid      ## CONSUMES
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

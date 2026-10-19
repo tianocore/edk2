@@ -2,7 +2,7 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-  Copyright (c) 2017 - 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -454,12 +454,12 @@ GetServiceType (
 }
 
 /**
-  Check command buffer is belong to secure shared buffer.
+  Check whether the communication buffer belongs to the secure shared buffer.
 
-  @param  [in] CommBufferAddr   Address of the common buffer.
+  @param  [in] CommBufferAddr   Address of the communication buffer.
 
-  @retval   TRUE                    CommBufferAddr is in secure shared buffer
-  @retval   FALSE                   Other
+  @retval   TRUE                CommBufferAddr is in secure shared buffer.
+  @retval   FALSE               CommBufferAddr is outside the secure shared buffer.
 
 **/
 STATIC
@@ -468,13 +468,8 @@ IsSecureMmCommBufferAddr (
   IN UINTN  CommBufferAddr
   )
 {
-  if ((CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
-      (CommBufferAddr < (mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize)))
-  {
-    return TRUE;
-  }
-
-  return FALSE;
+  return (CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
+         (CommBufferAddr < (mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize));
 }
 
 /**
@@ -527,6 +522,10 @@ ValidateMmCommBufferAddr (
         &gEfiMmCommunicateHeaderV3Guid
         ))
   {
+    if (CommBufferRange < sizeof (EFI_MM_COMMUNICATE_HEADER_V3)) {
+      return EFI_ACCESS_DENIED;
+    }
+
     CommBufferHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferAddr;
     Status             = SafeUint64Add (
                            CommBufferHeaderV3->MessageSize,
@@ -536,9 +535,21 @@ ValidateMmCommBufferAddr (
     if (EFI_ERROR (Status)) {
       return EFI_ACCESS_DENIED;
     }
+
+    if (BufferSize > CommBufferHeaderV3->BufferSize) {
+      return EFI_ACCESS_DENIED;
+    }
+
+    BufferSize = CommBufferHeaderV3->BufferSize;
   } else {
-    BufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
-                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+    Status = SafeUint64Add (
+               ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength,
+               OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+               &BufferSize
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_ACCESS_DENIED;
+    }
   }
 
   Status = SafeUint64Add (
@@ -764,47 +775,99 @@ SetEventCompleteSvcArgs (
   if (CommProtocol == CommProtocolFfa) {
     FfaMsgInfo = CommData;
 
-    if (EFI_ERROR (Status)) {
-      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_ERROR;
-
+    /*
+     * Once StandaloneMm is entered via FFA_SEND_DIRECT_MSG/MSGv2, it must
+     * return via FFA_SEND_DIRECT_RESP/RESPv2.
+     *
+     * For ServiceTypeMmCommunication, protocol errors are returned through
+     * the communication buffer, so the handler itself should return
+     * EFI_SUCCESS (See the MmiMange()). There are, however, a few failure
+     * cases outside the handler, such as when no matching service handler
+     * is found. In such cases, FFA_SEND_DIRECT_RESP/RESPv2 can be
+     * constructed with ARM_SPM_MM_RET_* return code.
+     *
+     * For ServiceTypeMisc, however, the response, including any protocol
+     * error code and arguments, is returned directly through FfaArgs.
+     * Therefore, the handler is responsible for constructing FfaArgs and
+     * should return EFI_SUCCESS.
+     *
+     * The SPMC does not forward requests for unknown services to StandaloneMm,
+     * and StandaloneMm is not initialized if any service handler fails to
+     * register. Therefore, a failure reported by a ServiceTypeMisc handler
+     * is unexpected.
+     *
+     * In such a case, there is no generic way to construct FfaArgs for
+     * FFA_SEND_DIRECT_RESP/RESPv2. Call CpuDeadLoop() rather than returning
+     * an invalid response.
+     */
+    if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
       /*
-       * StandaloneMm is secure instance. So set as 0x00.
+       * DirectMsgV1 is only used for ServiceTypeMmCommunication:
+       *
+       *   - FFA_SEND_DIRECT_RESP:
+       *     x0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP
+       *     x1 = Source/Dest Partition Id.
+       *     x2 = 0x00
+       *     x3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE
+       *     x4 = ARM_SPM_MM_RET_*
        */
-      EventCompleteSvcArgs->Arg1 = 0x00;
-      EventCompleteSvcArgs->Arg2 = EfiStatusToFfaStatus (Status);
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
+      EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+      EventCompleteSvcArgs->Arg4 = EfiStatusToSpmMmStatus (Status);
     } else {
-      if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
-        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
-        EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
-      } else {
-        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
 
-        if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
-          EventCompleteSvcArgs->Arg4  = mMiscMmCommunicateBuffer->FfaArgs.Arg4;
-          EventCompleteSvcArgs->Arg5  = mMiscMmCommunicateBuffer->FfaArgs.Arg5;
-          EventCompleteSvcArgs->Arg6  = mMiscMmCommunicateBuffer->FfaArgs.Arg6;
-          EventCompleteSvcArgs->Arg7  = mMiscMmCommunicateBuffer->FfaArgs.Arg7;
-          EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->FfaArgs.Arg8;
-          EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->FfaArgs.Arg9;
-          EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->FfaArgs.Arg10;
-          EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->FfaArgs.Arg11;
-          EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->FfaArgs.Arg12;
-          EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->FfaArgs.Arg13;
-          EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->FfaArgs.Arg14;
-          EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->FfaArgs.Arg15;
-          EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->FfaArgs.Arg16;
-          EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->FfaArgs.Arg17;
+      if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
+        /*
+         * This case occurs when StandaloneMm receives a direct request but
+         * has no registered service handler matching the service GUID.
+         * It likely indicates a configuration mismatch: the SPMC expects
+         * StandaloneMm to support the service, but StandaloneMm does not.
+         */
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Error: ServiceTypeMisc, Status: %r\n", Status));
+          ASSERT (0);
+          CpuDeadLoop ();
         }
-      }
 
-      /*
-       * Swap source & dest partition id.
-       */
-      EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
-                                     FfaMsgInfo->DestPartId,
-                                     FfaMsgInfo->SourcePartId
-                                     );
+        EventCompleteSvcArgs->Arg4  = mMiscMmCommunicateBuffer->FfaArgs.Arg4;
+        EventCompleteSvcArgs->Arg5  = mMiscMmCommunicateBuffer->FfaArgs.Arg5;
+        EventCompleteSvcArgs->Arg6  = mMiscMmCommunicateBuffer->FfaArgs.Arg6;
+        EventCompleteSvcArgs->Arg7  = mMiscMmCommunicateBuffer->FfaArgs.Arg7;
+        EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->FfaArgs.Arg8;
+        EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->FfaArgs.Arg9;
+        EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->FfaArgs.Arg10;
+        EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->FfaArgs.Arg11;
+        EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->FfaArgs.Arg12;
+        EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->FfaArgs.Arg13;
+        EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->FfaArgs.Arg14;
+        EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->FfaArgs.Arg15;
+        EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->FfaArgs.Arg16;
+        EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->FfaArgs.Arg17;
+      } else {
+        /*
+         * ServiceTypeMmCommunication with DirectMsgV2:
+         *
+         *  - FFA_SEND_DIRECT_RESPv2:
+         *    x0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP
+         *    x1 = Source/Dest Partition Id.
+         *    x2 = 0x00 (SBZ)
+         *    x3 = 0x00 (SBZ)
+         *    x4 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE
+         *    x5 = ARM_SPM_MM_RET_*
+         */
+        EventCompleteSvcArgs->Arg4 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+        EventCompleteSvcArgs->Arg5 = EfiStatusToSpmMmStatus (Status);
+      }
     }
+
+    /*
+     * Swap source & dest partition id.
+     */
+    EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
+                                   FfaMsgInfo->DestPartId,
+                                   FfaMsgInfo->SourcePartId
+                                   );
   } else {
     EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
@@ -1119,6 +1182,7 @@ CEntryPoint (
   EFI_CONFIGURATION_TABLE             *ConfigurationTable;
   UINTN                               Idx;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK      *MmramRangesHob;
+  UINT64                              CommBufferEnd;
 
   CpuDriverEntryPoint = NULL;
 
@@ -1250,6 +1314,16 @@ CEntryPoint (
     goto finish;
   }
 
+  Status = SafeUint64Add (
+             mNsCommBuffer->PhysicalStart,
+             mNsCommBuffer->PhysicalSize,
+             &CommBufferEnd
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Non-secure communication buffer range overflows.\n"));
+    goto finish;
+  }
+
   //
   // The base and size of buffer shared with
   // privileged Secure world software is in PeiMmramMemoryReservedGuid Hob.
@@ -1271,6 +1345,16 @@ CEntryPoint (
   }
 
   mSCommBuffer = &MmramRangesHob->Descriptor[MMRAM_DESC_IDX_SECURE_SHARED_BUFFER];
+
+  Status = SafeUint64Add (
+             mSCommBuffer->PhysicalStart,
+             mSCommBuffer->PhysicalSize,
+             &CommBufferEnd
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Secure communication buffer range overflows.\n"));
+    goto finish;
+  }
 
   //
   // Find out cpu driver entry point used in DelegatedEventLoop

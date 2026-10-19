@@ -12,8 +12,8 @@
 #include <Uefi.h>
 
 /**
-  @brief      Starts a transaction to transfer of ownership of a memory region
-              from a Sender endpoint to a Receiver endpoint.
+  Starts a transaction to transfer of ownership of a memory region from a Sender
+  endpoint to a Receiver endpoint.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
                               in bytes
@@ -39,8 +39,8 @@ ArmFfaMemLibDonate (
   );
 
 /**
-  @brief      Starts a transaction to transfer of ownership of a memory region
-              from a Sender endpoint to a Receiver endpoint.
+  Starts a transaction to transfer of ownership of a memory region from a Sender
+  endpoint to a Receiver endpoint.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
                               in bytes
@@ -60,8 +60,8 @@ ArmFfaMemLibDonateRxTx (
   );
 
 /**
-  @brief      Starts a transaction to transfer an Owner's access to a memory
-              region and  grant access to it to one or more Borrowers.
+  Starts a transaction to transfer an Owner's access to a memory region and grant
+  access to it to one or more Borrowers.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
                               in bytes
@@ -88,9 +88,8 @@ ArmFfaMemLibLend (
   );
 
 /**
-  @brief      Starts a transaction to transfer an Owner's access to a memory
-              region and  grant access to it to one or more Borrowers through
-              Rx/Tx buffer.
+  Starts a transaction to transfer an Owner's access to a memory region and grant
+  access to it to one or more Borrowers through Rx/Tx buffer.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
                               in bytes
@@ -110,8 +109,7 @@ ArmFfaMemLibLendRxTx (
   );
 
 /**
-  @brief      Starts a transaction to grant access to a memory region to one or
-              more Borrowers.
+  Starts a transaction to grant access to a memory region to one or more Borrowers.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
                               in bytes
@@ -137,8 +135,8 @@ ArmFfaMemLibShare (
   );
 
 /**
-  @brief      Starts a transaction to grant access to a memory region to one or
-              more Borrowers through Rx/Tx buffer.
+  Starts a transaction to grant access to a memory region to one or more Borrowers
+  through Rx/Tx buffer.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
                               in bytes
@@ -158,8 +156,7 @@ ArmFfaMemLibShareRxTx (
   );
 
 /**
-  @brief      Requests completion of a donate, lend or share memory management
-              transaction.
+  Requests completion of a donate, lend or share memory management transaction.
 
   @param[in]  TotalLength         Total length of the memory transaction descriptor
                                   in bytes
@@ -188,8 +185,8 @@ ArmFfaMemLibRetrieveReq (
   );
 
 /**
-  @brief      Requests completion of a donate, lend or share memory management
-              transaction through Rx/Tx buffer.
+  Requests completion of a donate, lend or share memory management transaction
+  through Rx/Tx buffer.
 
   @param[in]  TotalLength         Total length of the memory transaction descriptor
                                   in bytes
@@ -212,8 +209,8 @@ ArmFfaMemLibRetrieveReqRxTx (
   );
 
 /**
-  @brief      Starts a transaction to transfer access to a shared or lent
-              memory region from a Borrower back to its Owner.
+  Starts a transaction to transfer access to a shared or lent memory region from
+  a Borrower back to its Owner.
 
   @retval     The translated FF-A error status code
 **/
@@ -224,7 +221,7 @@ ArmFfaMemLibRelinquish (
   );
 
 /**
-  @brief      Restores exclusive access to a memory region back to its Owner.
+  Restores exclusive access to a memory region back to its Owner.
 
   @param[in]  Handle  Globally unique Handle to identify the memory region
   @param[in]  Flags   Flags for modifying the reclaim behavior
@@ -239,10 +236,9 @@ ArmFfaMemLibReclaim (
   );
 
 /**
-  @brief       Queries the memory attributes of a memory region. This function
-               can only access the regions of the SP's own translation regine.
-               Moreover this interface is only available in the boot phase,
-               i.e. before invoking FFA_MSG_WAIT interface.
+  Queries the memory attributes of a memory region. This function can only access
+  the regions of the SP's own translation regine. Moreover this interface is only
+  available in the boot phase, i.e. before invoking FFA_MSG_WAIT interface.
 
   @param[in]   BaseAddr     Base VA of a translation granule whose
                             permission attributes must be returned.
@@ -262,10 +258,9 @@ ArmFfaMemLibPermGet (
   );
 
 /**
-  @brief       Sets the memory attributes of a memory regions. This function
-               can only access the regions of the SP's own translation regine.
-               Moreover this interface is only available in the boot phase,
-               i.e. before invoking FFA_MSG_WAIT interface.
+  Sets the memory attributes of a memory regions. This function can only access
+  the regions of the SP's own translation regine. Moreover this interface is only
+  available in the boot phase, i.e. before invoking FFA_MSG_WAIT interface.
 
   @param[in]   BaseAddr     Base VA of a memory region whose permission
                             attributes must be set.

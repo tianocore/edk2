@@ -1378,10 +1378,12 @@ ValidateQuestionFromVfr (
                 //
                 // This question is not in the current configuration string. Skip it.
                 //
+                FreePool (QuestionName);
                 break;
               }
 
               Status = GetValueFromRequest (RequestElement, QuestionName, &VarValue);
+              FreePool (QuestionName);
               if (EFI_ERROR (Status)) {
                 return Status;
               }
@@ -1477,10 +1479,12 @@ ValidateQuestionFromVfr (
                 //
                 // This question is not in the current configuration string. Skip it.
                 //
+                FreePool (QuestionName);
                 break;
               }
 
               Status = GetValueFromRequest (RequestElement, QuestionName, &VarValue);
+              FreePool (QuestionName);
               if (EFI_ERROR (Status)) {
                 return Status;
               }
@@ -1672,10 +1676,12 @@ ValidateQuestionFromVfr (
                 //
                 // This question is not in the current configuration string. Skip it.
                 //
+                FreePool (QuestionName);
                 break;
               }
 
               Status = GetValueFromRequest (RequestElement, QuestionName, &VarValue);
+              FreePool (QuestionName);
               if (EFI_ERROR (Status)) {
                 return Status;
               }
@@ -1778,6 +1784,7 @@ ValidateQuestionFromVfr (
                 //
                 // This question is not in the current configuration string. Skip it.
                 //
+                FreePool (QuestionName);
                 break;
               }
 
@@ -1785,6 +1792,7 @@ ValidateQuestionFromVfr (
               // Skip the VarName.
               //
               StringPtr += StrLen (QuestionName);
+              FreePool (QuestionName);
 
               //
               // Skip the "=".

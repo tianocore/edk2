@@ -210,6 +210,13 @@ MmcTransferBlock (
         break;  // Prevents delay once finished
       }
     }
+
+    gBS->Stall (1);
+  }
+
+  if (Timeout < 0) {
+    DEBUG ((DEBUG_ERROR, "%s: The Card is busy\n", __func__));
+    return EFI_NOT_READY;
   }
 
   if (BufferSize > This->Media->BlockSize) {
@@ -323,9 +330,11 @@ MmcIoBlocks (
       if (!EFI_ERROR (Status)) {
         MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1, Response);
       }
+
+      gBS->Stall (1);
     }
 
-    if (0 == Timeout) {
+    if (Timeout < 0) {
       DEBUG ((DEBUG_ERROR, "The Card is busy\n"));
       return EFI_NOT_READY;
     }

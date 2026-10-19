@@ -513,6 +513,8 @@ MmEntryPoint (
   EFI_GUID                      *CommGuid;
   UINTN                         CommGuidOffset;
   UINTN                         CommHeaderSize;
+  EFI_STATUS                    SafeIntStatus;
+  UINTN                         MaxBufferSize;
 
   //
   // Update MMST using the context
@@ -560,10 +562,31 @@ MmEntryPoint (
         LegacyCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
         CommGuidOffset          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, HeaderGuid);
         CommHeaderSize          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
-        BufferSize              = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + LegacyCommunicateHeader->MessageLength;
+
+        SafeIntStatus = SafeUintnAdd (
+                          OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data),
+                          LegacyCommunicateHeader->MessageLength,
+                          &BufferSize
+                          );
+        if (EFI_ERROR (SafeIntStatus)) {
+          DEBUG ((DEBUG_ERROR, "Failed to calculate buffer size: %r\n", SafeIntStatus));
+          ASSERT_EFI_ERROR (SafeIntStatus);
+          return;
+        }
       }
 
-      if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
+      SafeIntStatus = SafeUintnMult (
+                        EFI_PAGE_SIZE,
+                        mMmCommunicationBuffer->NumberOfPages,
+                        &MaxBufferSize
+                        );
+      if (EFI_ERROR (SafeIntStatus)) {
+        DEBUG ((DEBUG_ERROR, "Failed to convert number of pages to bytes: %r\n", SafeIntStatus));
+        ASSERT_EFI_ERROR (SafeIntStatus);
+        return;
+      }
+
+      if (BufferSize <= MaxBufferSize) {
         //
         // Shadow the data from MM Communication Buffer to internal buffer
         //
@@ -574,19 +597,39 @@ MmEntryPoint (
           );
         ZeroMem (
           (UINT8 *)mInternalCommBufferCopy + BufferSize,
-          EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages) - BufferSize
+          MaxBufferSize - BufferSize
           );
 
-        BufferSize -= CommHeaderSize;
-        Status      = MmiManage (
-                        (EFI_GUID *)((UINT8 *)mInternalCommBufferCopy + CommGuidOffset),
-                        NULL,
-                        (UINT8 *)mInternalCommBufferCopy + CommHeaderSize,
-                        &BufferSize
-                        );
+        SafeIntStatus = SafeUintnSub (
+                          BufferSize,
+                          CommHeaderSize,
+                          &BufferSize
+                          );
+        if (EFI_ERROR (SafeIntStatus)) {
+          DEBUG ((DEBUG_ERROR, "Failed to subtract header from buffer size: %r\n", SafeIntStatus));
+          ASSERT_EFI_ERROR (SafeIntStatus);
+          return;
+        }
 
-        BufferSize = BufferSize + CommHeaderSize;
-        if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
+        Status = MmiManage (
+                   (EFI_GUID *)((UINT8 *)mInternalCommBufferCopy + CommGuidOffset),
+                   NULL,
+                   (UINT8 *)mInternalCommBufferCopy + CommHeaderSize,
+                   &BufferSize
+                   );
+
+        SafeIntStatus = SafeUintnAdd (
+                          BufferSize,
+                          CommHeaderSize,
+                          &BufferSize
+                          );
+        if (EFI_ERROR (SafeIntStatus)) {
+          DEBUG ((DEBUG_ERROR, "Failed to calculate total buffer size: %r\n", SafeIntStatus));
+          ASSERT_EFI_ERROR (SafeIntStatus);
+          return;
+        }
+
+        if (BufferSize <= MaxBufferSize) {
           //
           // Copy the data back to MM Communication Buffer
           //
