@@ -1375,8 +1375,9 @@ ResolveAndValidateAestNode (
   OUT       AEST_NODE_INFO                        *CONST  NodeInfo
   )
 {
-  EFI_STATUS  Status;
-  UINT64      Length;
+  CONST CM_ARM_AEST_VENDOR_NODE  *Vendor;
+  EFI_STATUS                     Status;
+  UINT64                         Length;
 
   NodeInfo->Type   = NodeType;
   NodeInfo->Source = Source;
@@ -1411,6 +1412,21 @@ ResolveAndValidateAestNode (
                  (CONST CM_ARM_AEST_SMMU_NODE *)Source,
                  NodeInfo
                  );
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR:
+      Vendor = (CONST CM_ARM_AEST_VENDOR_NODE *)Source;
+      CopyMem (
+        NodeInfo->Data.Vendor.HardwareId,
+        Vendor->HardwareId,
+        sizeof (NodeInfo->Data.Vendor.HardwareId)
+        );
+      NodeInfo->Data.Vendor.UniqueId = Vendor->UniqueId;
+      CopyMem (
+        NodeInfo->Data.Vendor.VendorData,
+        Vendor->VendorData,
+        sizeof (NodeInfo->Data.Vendor.VendorData)
+        );
+      Status = EFI_SUCCESS;
       break;
     case EFI_ACPI_AEST_2_0_NODE_TYPE_GIC:
       Status = ResolveAndValidateGicData (
@@ -1631,6 +1647,7 @@ WriteAestNode (
   EFI_ACPI_AEST_2_0_NODE         *Node;
   EFI_ACPI_AEST_2_0_MEMORY_DATA  *Memory;
   EFI_ACPI_AEST_2_0_SMMU_DATA    *Smmu;
+  EFI_ACPI_AEST_2_0_VENDOR_DATA  *Vendor;
   EFI_ACPI_AEST_2_0_GIC_DATA     *Gic;
   EFI_ACPI_AEST_2_0_PCIE_DATA    *Pcie;
   UINT32                         Offset;
@@ -1658,6 +1675,20 @@ WriteAestNode (
       Smmu                        = (EFI_ACPI_AEST_2_0_SMMU_DATA *)(Buffer + Node->DataOffset);
       Smmu->IortNodeReference     = NodeInfo->Data.Smmu.IortNodeReference;
       Smmu->SubcomponentReference = NodeInfo->Data.Smmu.SubcomponentReference;
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR:
+      Vendor = (EFI_ACPI_AEST_2_0_VENDOR_DATA *)(Buffer + Node->DataOffset);
+      CopyMem (
+        Vendor->HardwareId,
+        NodeInfo->Data.Vendor.HardwareId,
+        sizeof (Vendor->HardwareId)
+        );
+      Vendor->UniqueId = NodeInfo->Data.Vendor.UniqueId;
+      CopyMem (
+        Vendor->VendorData,
+        NodeInfo->Data.Vendor.VendorData,
+        sizeof (Vendor->VendorData)
+        );
       break;
     case EFI_ACPI_AEST_2_0_NODE_TYPE_GIC:
       Gic                     = (EFI_ACPI_AEST_2_0_GIC_DATA *)(Buffer + Node->DataOffset);
@@ -1726,7 +1757,7 @@ BuildAestTable (
     { EFI_ACPI_AEST_2_0_NODE_TYPE_PROCESSOR, sizeof (CM_ARM_AEST_PROCESSOR_NODE),         TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              TRUE,  NULL, 0 },
-    { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            FALSE, NULL, 0 },
+    { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), TRUE,  NULL, 0 },
     { EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY,     sizeof (CM_ARM_AEST_PROXY_NODE),             FALSE, NULL, 0 }
