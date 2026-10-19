@@ -80,11 +80,9 @@
   ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
   ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
 
-[LibraryClasses.common.SEC]
-  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
-
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
   PlatformHookLib|ArmVirtPkg/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortHookLib.inf
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
