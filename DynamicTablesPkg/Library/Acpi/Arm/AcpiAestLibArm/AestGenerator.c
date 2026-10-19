@@ -20,6 +20,7 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerHelper.h>
 #include <ConfigurationManagerObject.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/MetadataHandlerLib.h>
 #include <Library/TableHelperLib.h>
 #include <MetadataHelpers.h>
@@ -31,7 +32,7 @@
 */
 STATIC AEST_NODE_GROUP  mNodeGroups[] = {
   { EFI_ACPI_AEST_2_0_NODE_TYPE_PROCESSOR, sizeof (CM_ARM_AEST_PROCESSOR_NODE),         TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            FALSE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            TRUE,  NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              FALSE, NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            FALSE, NULL, 0 },
   { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               FALSE, NULL, 0 },
@@ -39,12 +40,22 @@ STATIC AEST_NODE_GROUP  mNodeGroups[] = {
   { EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY,     sizeof (CM_ARM_AEST_PROXY_NODE),             FALSE, NULL, 0 }
 };
 
+STATIC BOOLEAN  mSratPresent;
+
 /** Retrieve AEST processor nodes from the Configuration Manager.
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjAestProcessorNode,
   CM_ARM_AEST_PROCESSOR_NODE
+  );
+
+/** Retrieve AEST memory controller nodes from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjAestMemoryNode,
+  CM_ARM_AEST_MEMORY_NODE
   );
 
 /** Retrieve one of the variable-length AEST interface bitmap arrays.
@@ -125,6 +136,13 @@ GetAestNodeList (
                (CM_ARM_AEST_PROCESSOR_NODE **)List,
                Count
                );
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY:
+      return GetEArmObjAestMemoryNode (
+               CfgMgrProtocol,
+               CM_NULL_TOKEN,
+               (CM_ARM_AEST_MEMORY_NODE **)List,
+               Count
+               );
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unknown node type 0x%x\n", NodeType));
       return EFI_UNSUPPORTED;
@@ -136,6 +154,7 @@ GetAestNodeList (
   Processor nodes use PPTT to identify processors. This AEST revision works
   with PPTT revision 3 or later. Cf. DEN0085 2.0 EAC2, Section 2.1.1.
 
+  Record SRAT presence for memory controller node validation.
 
   @param [in] CfgMgrProtocol  Configuration Manager protocol.
 
@@ -155,6 +174,8 @@ CheckTableDependencies (
   UINT32                      TableCount;
   UINT32                      Index;
   BOOLEAN                     PpttPresent;
+
+  mSratPresent = FALSE;
 
   Status = GetEStdObjAcpiTableList (
              CfgMgrProtocol,
@@ -189,6 +210,8 @@ CheckTableDependencies (
           ));
         return EFI_UNSUPPORTED;
       }
+    } else if (TableList[Index].AcpiTableSignature == EFI_ACPI_6_7_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE) {
+      mSratPresent = TRUE;
     }
   }
 
@@ -698,6 +721,67 @@ ResolveAndValidateProcessorData (
   return EFI_SUCCESS;
 }
 
+/** Resolve and validate memory controller-specific node data.
+
+  Cf. DEN0085 2.0 EAC2, Section 2.1.2, Table 10: the proximity domain
+  must be zero when SRAT is absent. When SRAT is present, the CM token
+  must identify one proximity domain object. The proximity domain ID is
+  resolved using CmObjHelperLib.
+
+  @param [in]      CfgMgrProtocol  Configuration Manager protocol.
+  @param [in]      Source          Memory controller node CM object.
+  @param [in, out] NodeInfo        Node information receiving memory data.
+
+  @retval EFI_SUCCESS           Memory controller data was resolved.
+  @retval EFI_NOT_FOUND         The proximity domain token was not found.
+  @retval EFI_INVALID_PARAMETER The proximity domain token or object is invalid.
+  @retval Others                Configuration Manager or metadata error.
+**/
+STATIC
+EFI_STATUS
+ResolveAndValidateMemoryData (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST CM_ARM_AEST_MEMORY_NODE               *CONST  Source,
+  IN OUT    AEST_NODE_INFO                        *CONST  NodeInfo
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      ProximityDomainId;
+
+  NodeInfo->Data.Memory.ProximityDomain = 0;
+  if (!mSratPresent) {
+    return EFI_SUCCESS;
+  }
+
+  if (Source->ProximityDomainToken == CM_NULL_TOKEN) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "AEST: Memory node requires a non-null proximity domain token "
+      "when SRAT is requested\n"
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetProximityDomainId (
+             CfgMgrProtocol,
+             0,
+             Source->ProximityDomainToken,
+             &ProximityDomainId
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "AEST: Failed to resolve memory proximity domain: token 0x%p, status %r\n",
+      Source->ProximityDomainToken,
+      Status
+      ));
+    return Status;
+  }
+
+  NodeInfo->Data.Memory.ProximityDomain = ProximityDomainId;
+  return EFI_SUCCESS;
+}
+
 /** Resolve, validate, and size one AEST node.
 
   @param [in]  CfgMgrProtocol  Configuration Manager protocol.
@@ -739,6 +823,13 @@ ResolveAndValidateAestNode (
       Status = ResolveAndValidateProcessorData (
                  CfgMgrProtocol,
                  (CONST CM_ARM_AEST_PROCESSOR_NODE *)Source,
+                 NodeInfo
+                 );
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY:
+      Status = ResolveAndValidateMemoryData (
+                 CfgMgrProtocol,
+                 (CONST CM_ARM_AEST_MEMORY_NODE *)Source,
                  NodeInfo
                  );
       break;
@@ -943,9 +1034,10 @@ WriteAestNode (
   IN OUT    UINT8           *CONST  Buffer
   )
 {
-  CONST CM_ARM_AEST_COMMON  *Source;
-  EFI_ACPI_AEST_2_0_NODE    *Node;
-  UINT32                    Offset;
+  CONST CM_ARM_AEST_COMMON       *Source;
+  EFI_ACPI_AEST_2_0_NODE         *Node;
+  EFI_ACPI_AEST_2_0_MEMORY_DATA  *Memory;
+  UINT32                         Offset;
 
   Source                            = NodeInfo->Source;
   Node                              = (EFI_ACPI_AEST_2_0_NODE *)Buffer;
@@ -961,6 +1053,10 @@ WriteAestNode (
   switch (NodeInfo->Type) {
     case EFI_ACPI_AEST_2_0_NODE_TYPE_PROCESSOR:
       WriteProcessorNodeData (NodeInfo, Buffer + Node->DataOffset);
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY:
+      Memory                  = (EFI_ACPI_AEST_2_0_MEMORY_DATA *)(Buffer + Node->DataOffset);
+      Memory->ProximityDomain = NodeInfo->Data.Memory.ProximityDomain;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unsupported node type 0x%x\n", NodeInfo->Type));
