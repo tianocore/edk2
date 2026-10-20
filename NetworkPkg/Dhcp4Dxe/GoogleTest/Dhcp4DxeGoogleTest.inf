@@ -1,0 +1,52 @@
+## @file
+# Unit test suite for the Dhcp4Dxe using Google Test
+#
+# Copyright (c) 2026 Loongson Technology Corporation Limited. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = Dhcp4DxeGoogleTest
+  FILE_GUID                      = 4D3E2A1B-9C8F-4B2A-A1D0-1E2F3A4B5C6D
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = HOST_APPLICATION
+  ENTRY_POINT                    = main
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 LOONGARCH64
+#
+[Sources]
+  Dhcp4DxeGoogleTest.cpp
+  Dhcp4IoGoogleTest.cpp
+  Dhcp4IoGoogleTest.h
+  ../Dhcp4Io.c
+  ../Dhcp4Option.c
+  ../Dhcp4Impl.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  NetLib
+  UdpIoLib
+  DpcLib
+
+[Protocols]
+  gEfiDhcp4ProtocolGuid
+  gEfiDhcp4ServiceBindingProtocolGuid
+  gEfiUdp4ProtocolGuid
+  gEfiUdp4ServiceBindingProtocolGuid
+  gEfiArpProtocolGuid
+  gEfiArpServiceBindingProtocolGuid
+  gEfiIp4ProtocolGuid
+  gEfiIp4ServiceBindingProtocolGuid
