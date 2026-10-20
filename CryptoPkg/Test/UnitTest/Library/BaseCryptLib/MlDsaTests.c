@@ -11,7 +11,7 @@
 
   The test structure mirrors EdDsaTests.c and validates:
   - Context creation and destruction (MlDsaNewByNid, MlDsaFree)
-  - Key setting and retrieval error cases (MlDsaSetPrivKey, MlDsaSetPubKey, MlDsaGetPubKey)
+  - Public key setting and retrieval error cases (MlDsaSetPubKey, MlDsaGetPubKey)
   - Signature verification through the fixed X.509 certificate vector
   - Error handling for invalid inputs
 
@@ -164,24 +164,6 @@ TestVerifyMlDsaKeySetGet (
   UT_ASSERT_NOT_EQUAL (TooSmallSize, ML_DSA_87_PUBLIC_KEY_SIZE);
 
   //
-  // Test MlDsaSetPrivKey with NULL context
-  //
-  Status = MlDsaSetPrivKey (NULL, (UINT8 *)mMlDsa87TestPemKey, 100);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaSetPrivKey with NULL key
-  //
-  Status = MlDsaSetPrivKey (MlDsaContext1, NULL, ML_DSA_87_PRIVATE_KEY_SIZE);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaSetPrivKey with wrong size
-  //
-  Status = MlDsaSetPrivKey (MlDsaContext1, (UINT8 *)mMlDsa87TestPemKey, 32);
-  UT_ASSERT_FALSE (Status);
-
-  //
   // Test MlDsaSetPubKey with NULL context
   //
   Status = MlDsaSetPubKey (NULL, (UINT8 *)mMlDsa87TestCert, 100);
@@ -317,23 +299,9 @@ TestVerifyMlDsaPemX509 (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
   VOID     *MlDsaPubKey;
 
-  MlDsaPrivKey = NULL;
-  MlDsaPubKey  = NULL;
-
-  //
-  // Retrieve ML-DSA private key from PEM data.
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (MlDsaPrivKey);
+  MlDsaPubKey = NULL;
 
   //
   // Retrieve ML-DSA public key from X509 certificate.
@@ -357,7 +325,6 @@ TestVerifyMlDsaPemX509 (
              );
   UT_ASSERT_TRUE (Status);
 
-  MlDsaFree (MlDsaPrivKey);
   MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -456,30 +423,25 @@ TestVerifyMlDsaGetPubKey (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
+  VOID     *MlDsaPubKey;
   UINT8    PublicKey[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINTN    PublicKeySize;
 
-  MlDsaPrivKey = NULL;
-
-  //
-  // Retrieve ML-DSA private key from PEM data.
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
+  MlDsaPubKey = NULL;
+  Status      = MlDsaGetPublicKeyFromX509 (
+                  mMlDsa87TestCert,
+                  sizeof (mMlDsa87TestCert),
+                  &MlDsaPubKey
+                  );
   UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (MlDsaPrivKey);
+  UT_ASSERT_NOT_NULL (MlDsaPubKey);
 
   //
-  // Get public key from private key context
+  // Get public key from the certificate context
   //
   PublicKeySize = sizeof (PublicKey);
   Status        = MlDsaGetPubKey (
-                    MlDsaPrivKey,
+                    MlDsaPubKey,
                     PublicKey,
                     &PublicKeySize
                     );
@@ -502,7 +464,7 @@ TestVerifyMlDsaGetPubKey (
 
   UT_ASSERT_FALSE (AllZeros);
 
-  MlDsaFree (MlDsaPrivKey);
+  MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
@@ -621,39 +583,6 @@ TestVerifyMlDsaPemErrors (
   VOID     *MlDsaKey;
 
   MlDsaKey = NULL;
-
-  //
-  // Test MlDsaGetPrivateKeyFromPem with NULL PEM data
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             NULL,
-             100,
-             NULL,
-             &MlDsaKey
-             );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaGetPrivateKeyFromPem with NULL context pointer
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             NULL
-             );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaGetPrivateKeyFromPem with invalid PEM data
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             (UINT8 *)"Invalid PEM data",
-             16,
-             NULL,
-             &MlDsaKey
-             );
-  UT_ASSERT_FALSE (Status);
 
   //
   // Test MlDsaGetPublicKeyFromX509 with NULL certificate
@@ -811,20 +740,15 @@ TestVerifyMlDsaGetPubKeyNullBuffer (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
+  VOID     *MlDsaPubKey;
   UINTN    PublicKeySize;
 
-  MlDsaPrivKey = NULL;
-
-  //
-  // Get valid private key
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
+  MlDsaPubKey = NULL;
+  Status      = MlDsaGetPublicKeyFromX509 (
+                  mMlDsa87TestCert,
+                  sizeof (mMlDsa87TestCert),
+                  &MlDsaPubKey
+                  );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -833,14 +757,14 @@ TestVerifyMlDsaGetPubKeyNullBuffer (
   //
   PublicKeySize = 9999;
   Status        = MlDsaGetPubKey (
-                    MlDsaPrivKey,
+                    MlDsaPubKey,
                     NULL,
                     &PublicKeySize
                     );
   UT_ASSERT_FALSE (Status);
   UT_ASSERT_EQUAL (PublicKeySize, 0);
 
-  MlDsaFree (MlDsaPrivKey);
+  MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
@@ -1105,29 +1029,24 @@ TestVerifyMlDsaKeyReplacement (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
+  VOID     *SourceKey;
   UINT8    PublicKey1[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINT8    PublicKey2[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINTN    PubKeySize;
 
-  PrivKey = NULL;
-
-  //
-  // Load first key
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
-             );
+  SourceKey = NULL;
+  Status    = MlDsaGetPublicKeyFromX509 (
+                mMlDsa87TestCert,
+                sizeof (mMlDsa87TestCert),
+                &SourceKey
+                );
   UT_ASSERT_TRUE (Status);
 
   //
   // Get public key
   //
   PubKeySize = sizeof (PublicKey1);
-  Status     = MlDsaGetPubKey (PrivKey, PublicKey1, &PubKeySize);
+  Status     = MlDsaGetPubKey (SourceKey, PublicKey1, &PubKeySize);
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1153,7 +1072,7 @@ TestVerifyMlDsaKeyReplacement (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_EQUAL (PubKeySize, ML_DSA_87_PUBLIC_KEY_SIZE);
 
-  MlDsaFree (PrivKey);
+  MlDsaFree (SourceKey);
   MlDsaFree (MlDsaContext1);
   MlDsaContext1 = NULL;
 
@@ -1229,19 +1148,17 @@ TestVerifyMlDsaGetPubKeyRepeated (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
+  VOID     *PubKey;
   UINT8    PubKey1[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINT8    PubKey2[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINT8    PubKey3[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINTN    Size1, Size2, Size3;
 
-  PrivKey = NULL;
-
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
+  PubKey = NULL;
+  Status = MlDsaGetPublicKeyFromX509 (
+             mMlDsa87TestCert,
+             sizeof (mMlDsa87TestCert),
+             &PubKey
              );
   UT_ASSERT_TRUE (Status);
 
@@ -1249,15 +1166,15 @@ TestVerifyMlDsaGetPubKeyRepeated (
   // Get public key three times
   //
   Size1  = sizeof (PubKey1);
-  Status = MlDsaGetPubKey (PrivKey, PubKey1, &Size1);
+  Status = MlDsaGetPubKey (PubKey, PubKey1, &Size1);
   UT_ASSERT_TRUE (Status);
 
   Size2  = sizeof (PubKey2);
-  Status = MlDsaGetPubKey (PrivKey, PubKey2, &Size2);
+  Status = MlDsaGetPubKey (PubKey, PubKey2, &Size2);
   UT_ASSERT_TRUE (Status);
 
   Size3  = sizeof (PubKey3);
-  Status = MlDsaGetPubKey (PrivKey, PubKey3, &Size3);
+  Status = MlDsaGetPubKey (PubKey, PubKey3, &Size3);
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1268,7 +1185,7 @@ TestVerifyMlDsaGetPubKeyRepeated (
   UT_ASSERT_MEM_EQUAL (PubKey1, PubKey2, Size1);
   UT_ASSERT_MEM_EQUAL (PubKey2, PubKey3, Size2);
 
-  MlDsaFree (PrivKey);
+  MlDsaFree (PubKey);
 
   return UNIT_TEST_PASSED;
 }
