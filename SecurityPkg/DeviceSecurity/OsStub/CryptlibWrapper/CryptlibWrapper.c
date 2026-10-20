@@ -434,7 +434,7 @@ libspdm_rsa_get_private_key_from_pem (
   void           **rsa_context
   )
 {
-  return RsaGetPrivateKeyFromPem (pem_data, pem_size, password, rsa_context);
+  return false;
 }
 
 bool
@@ -475,7 +475,7 @@ libspdm_ec_get_private_key_from_pem (
   void           **ec_context
   )
 {
-  return EcGetPrivateKeyFromPem (pem_data, pem_size, password, ec_context);
+  return false;
 }
 
 bool
