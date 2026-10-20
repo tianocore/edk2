@@ -31,13 +31,13 @@
 /** AEST node groups and their Configuration Manager lists.
 */
 STATIC AEST_NODE_GROUP  mNodeGroups[] = {
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_PROCESSOR, sizeof (CM_ARM_AEST_PROCESSOR_NODE),         TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), TRUE,  NULL, 0 },
-  { EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY,     sizeof (CM_ARM_AEST_PROXY_NODE),             FALSE, NULL, 0 }
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_PROCESSOR, sizeof (CM_ARM_AEST_PROCESSOR_NODE),         TRUE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_MEMORY,    sizeof (CM_ARM_AEST_MEMORY_NODE),            TRUE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_SMMU,      sizeof (CM_ARM_AEST_SMMU_NODE),              TRUE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_VENDOR,    sizeof (CM_ARM_AEST_VENDOR_NODE),            TRUE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_GIC,       sizeof (CM_ARM_AEST_GIC_NODE),               TRUE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE,      sizeof (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE), TRUE, NULL, 0 },
+  { EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY,     sizeof (CM_ARM_AEST_PROXY_NODE),             TRUE, NULL, 0 }
 };
 
 STATIC BOOLEAN  mSratPresent;
@@ -88,6 +88,14 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjAestPcieRootComplexNode,
   CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE
+  );
+
+/** Retrieve AEST proxy nodes from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjAestProxyNode,
+  CM_ARM_AEST_PROXY_NODE
   );
 
 /** Retrieve one of the variable-length AEST interface bitmap arrays.
@@ -249,6 +257,13 @@ GetAestNodeList (
                CfgMgrProtocol,
                CM_NULL_TOKEN,
                (CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE **)List,
+               Count
+               );
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY:
+      return GetEArmObjAestProxyNode (
+               CfgMgrProtocol,
+               CM_NULL_TOKEN,
+               (CM_ARM_AEST_PROXY_NODE **)List,
                Count
                );
     default:
@@ -1421,6 +1436,7 @@ ResolveAndValidateAestNode (
   )
 {
   CONST CM_ARM_AEST_VENDOR_NODE  *Vendor;
+  CONST CM_ARM_AEST_PROXY_NODE   *Proxy;
   EFI_STATUS                     Status;
   UINT64                         Length;
 
@@ -1486,6 +1502,11 @@ ResolveAndValidateAestNode (
                  (CONST CM_ARM_AEST_PCIE_ROOT_COMPLEX_NODE *)Source,
                  NodeInfo
                  );
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY:
+      Proxy                            = (CONST CM_ARM_AEST_PROXY_NODE *)Source;
+      NodeInfo->Data.Proxy.NodeAddress = Proxy->NodeAddress;
+      Status                           = EFI_SUCCESS;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unsupported node type 0x%x\n", NodeType));
@@ -1695,6 +1716,7 @@ WriteAestNode (
   EFI_ACPI_AEST_2_0_VENDOR_DATA  *Vendor;
   EFI_ACPI_AEST_2_0_GIC_DATA     *Gic;
   EFI_ACPI_AEST_2_0_PCIE_DATA    *Pcie;
+  EFI_ACPI_AEST_2_0_PROXY_DATA   *Proxy;
   UINT32                         Offset;
 
   Source                            = NodeInfo->Source;
@@ -1743,6 +1765,10 @@ WriteAestNode (
     case EFI_ACPI_AEST_2_0_NODE_TYPE_PCIE:
       Pcie                    = (EFI_ACPI_AEST_2_0_PCIE_DATA *)(Buffer + Node->DataOffset);
       Pcie->IortNodeReference = NodeInfo->Data.Pcie.IortNodeReference;
+      break;
+    case EFI_ACPI_AEST_2_0_NODE_TYPE_PROXY:
+      Proxy              = (EFI_ACPI_AEST_2_0_PROXY_DATA *)(Buffer + Node->DataOffset);
+      Proxy->NodeAddress = NodeInfo->Data.Proxy.NodeAddress;
       break;
     default:
       DEBUG ((DEBUG_ERROR, "AEST: Unsupported node type 0x%x\n", NodeInfo->Type));
