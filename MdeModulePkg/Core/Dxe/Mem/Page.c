@@ -1579,7 +1579,7 @@ Done:
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range
   @retval EFI_INVALID_PARAMETER  Address not aligned
-  @return EFI_SUCCESS         -Pages successfully freed.
+  @return EFI_SUCCESS            Pages successfully freed.
 
 **/
 EFI_STATUS
@@ -1592,6 +1592,8 @@ CoreFreePages (
   EFI_STATUS       Status;
   EFI_MEMORY_TYPE  MemoryType;
   UINT64           Attributes;
+  EFI_STATUS       LeakStatus;
+  MEMORY_MAP       *Entry;
 
   if (((Memory & EFI_PAGE_MASK) != 0) || (NumberOfPages == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -1616,17 +1618,29 @@ CoreFreePages (
     if ((EFI_ERROR (Status)) ||
         (!EFI_ERROR (Status) && ((Attributes & EFI_MEMORY_RO) || (Attributes & EFI_MEMORY_RP))))
     {
-      DEBUG ((
-        DEBUG_WARN,
-        "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
-        "Attributes: %llx. Leaking memory!\n",
-        __func__,
-        Memory,
-        NumberOfPages,
-        Status,
-        Attributes
-        ));
-      return EFI_SUCCESS;
+      // Before we leak, confirm the memory is actually valid to free. If it isn't we need to return an error instead
+      // of success.
+      CoreAcquireMemoryLock ();
+      LeakStatus = GetMemoryMapEntry (Memory, NumberOfPages, &Entry);
+      CoreReleaseMemoryLock ();
+
+      if (!EFI_ERROR (LeakStatus)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
+          "Attributes: %llx. Leaking memory!\n",
+          __func__,
+          Memory,
+          NumberOfPages,
+          Status,
+          Attributes
+          ));
+
+        // This memory was valid to free, so we can safely leak it and report success
+        LeakStatus = EFI_SUCCESS;
+      }
+
+      return LeakStatus;
     }
   }
 
