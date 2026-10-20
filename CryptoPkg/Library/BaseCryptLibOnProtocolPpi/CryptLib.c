@@ -1934,71 +1934,6 @@ RsaGetKey (
 }
 
 /**
-  Generates RSA key components.
-
-  This function generates RSA key components. It takes RSA public exponent E and
-  length in bits of RSA modulus N as input, and generates all key components.
-  If PublicExponent is NULL, the default RSA public exponent (0x10001) will be used.
-
-  Before this function can be invoked, pseudorandom number generator must be correctly
-  initialized by RandomSeed().
-
-  If RsaContext is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  RsaContext           Pointer to RSA context being set.
-  @param[in]       ModulusLength        Length of RSA modulus N in bits.
-  @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
-
-  @retval  TRUE   RSA key component was generated successfully.
-  @retval  FALSE  Invalid RSA key component tag.
-  @retval  FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-RsaGenerateKey (
-  IN OUT  VOID         *RsaContext,
-  IN      UINTN        ModulusLength,
-  IN      CONST UINT8  *PublicExponent,
-  IN      UINTN        PublicExponentSize
-  )
-{
-  CALL_CRYPTO_SERVICE (RsaGenerateKey, (RsaContext, ModulusLength, PublicExponent, PublicExponentSize), FALSE);
-}
-
-/**
-  Validates key components of RSA context.
-  NOTE: This function performs integrity checks on all the RSA key material, so
-        the RSA key structure must contain all the private key data.
-
-  This function validates key components of RSA context in following aspects:
-  - Whether p is a prime
-  - Whether q is a prime
-  - Whether n = p * q
-  - Whether d*e = 1  mod lcm(p-1,q-1)
-
-  If RsaContext is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  RsaContext  Pointer to RSA context to check.
-
-  @retval  TRUE   RSA key components are valid.
-  @retval  FALSE  RSA key components are not valid.
-  @retval  FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-RsaCheckKey (
-  IN  VOID  *RsaContext
-  )
-{
-  CALL_CRYPTO_SERVICE (RsaCheckKey, (RsaContext), FALSE);
-}
-
-/**
   Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
 
@@ -2087,37 +2022,6 @@ RsaPssVerifyDigest (
   )
 {
   CALL_CRYPTO_SERVICE (RsaPssVerifyDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
-}
-
-/**
-  Retrieve the RSA Private Key from the password-protected PEM key data.
-
-  If PemData is NULL, then return FALSE.
-  If RsaContext is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
-  @param[in]  PemSize      Size of the PEM key data in bytes.
-  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] RsaContext   Pointer to new-generated RSA context which contain the retrieved
-                           RSA private key component. Use RsaFree() function to free the
-                           resource.
-
-  @retval  TRUE   RSA Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-  @retval  FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-RsaGetPrivateKeyFromPem (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password,
-  OUT  VOID         **RsaContext
-  )
-{
-  CALL_CRYPTO_SERVICE (RsaGetPrivateKeyFromPem, (PemData, PemSize, Password, RsaContext), FALSE);
 }
 
 /**
@@ -2944,37 +2848,6 @@ Pkcs1v2Encrypt (
 }
 
 /**
-  Decrypts a blob using PKCS1v2 (RSAES-OAEP) schema. On success, will return the
-  decrypted message in a newly allocated buffer.
-  Things that can cause a failure include:
-  - Fail to parse private key.
-  - Fail to allocate an intermediate buffer.
-  - Null pointer provided for a non-optional parameter.
-  @param[in]  PrivateKey          A pointer to the DER-encoded private key.
-  @param[in]  PrivateKeySize      Size of the private key buffer.
-  @param[in]  EncryptedData       Data to be decrypted.
-  @param[in]  EncryptedDataSize   Size of the encrypted buffer.
-  @param[out] OutData             Pointer to an allocated buffer containing the encrypted
-                                  message.
-  @param[out] OutDataSize         Size of the encrypted message buffer.
-  @retval     TRUE                Encryption was successful.
-  @retval     FALSE               Encryption failed.
-**/
-BOOLEAN
-EFIAPI
-Pkcs1v2Decrypt (
-  IN   CONST UINT8  *PrivateKey,
-  IN   UINTN        PrivateKeySize,
-  IN   UINT8        *EncryptedData,
-  IN   UINTN        EncryptedDataSize,
-  OUT  UINT8        **OutData,
-  OUT  UINTN        *OutDataSize
-  )
-{
-  CALL_CRYPTO_SERVICE (Pkcs1v2Decrypt, (PrivateKey, PrivateKeySize, EncryptedData, EncryptedDataSize, OutData, OutDataSize), FALSE);
-}
-
-/**
   Encrypts a blob using PKCS1v2 (RSAES-OAEP) schema. On success, will return the
   encrypted message in a newly allocated buffer.
   Things that can cause a failure include:
@@ -2998,29 +2871,6 @@ Pkcs1v2Decrypt (
                                   SHA512_DIGEST_SIZE
                                   0 to use default (SHA1)
   @param[out] EncryptedData       Pointer to an allocated buffer containing the encrypted
-                                  message.
-  @param[out] EncryptedDataSize   Size of the encrypted message buffer.
-  @retval     TRUE                Encryption was successful.
-  @retval     FALSE               Encryption failed.
-**/
-BOOLEAN
-EFIAPI
-RsaOaepEncrypt (
-  IN   VOID         *RsaContext,
-  IN   UINT8        *InData,
-  IN   UINTN        InDataSize,
-  IN   CONST UINT8  *PrngSeed   OPTIONAL,
-  IN   UINTN        PrngSeedSize   OPTIONAL,
-  IN   UINT16       DigestLen   OPTIONAL,
-  OUT  UINT8        **EncryptedData,
-  OUT  UINTN        *EncryptedDataSize
-  )
-{
-  CALL_CRYPTO_SERVICE (RsaOaepEncrypt, (RsaContext, InData, InDataSize, PrngSeed, PrngSeedSize, DigestLen, EncryptedData, EncryptedDataSize), FALSE);
-}
-
-/**
-  Decrypts a blob using PKCS1v2 (RSAES-OAEP) schema. On success, will return the
   decrypted message in a newly allocated buffer.
   Things that can cause a failure include:
   - Fail to parse private key.
@@ -3042,20 +2892,6 @@ RsaOaepEncrypt (
   @retval     TRUE                Encryption was successful.
   @retval     FALSE               Encryption failed.
 **/
-BOOLEAN
-EFIAPI
-RsaOaepDecrypt (
-  IN   VOID    *RsaContext,
-  IN   UINT8   *EncryptedData,
-  IN   UINTN   EncryptedDataSize,
-  IN   UINT16  DigestLen   OPTIONAL,
-  OUT  UINT8   **OutData,
-  OUT  UINTN   *OutDataSize
-  )
-{
-  CALL_CRYPTO_SERVICE (RsaOaepDecrypt, (RsaContext, EncryptedData, EncryptedDataSize, DigestLen, OutData, OutDataSize), FALSE);
-}
-
 /**
   Get the signer's certificates from PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
@@ -3193,70 +3029,6 @@ Pkcs7Encrypt (
   )
 {
   CALL_CRYPTO_SERVICE (Pkcs7Encrypt, (X509Stack, InData, InDataSize, CipherNid, Flags, ContentInfo, ContentInfoSize), FALSE);
-}
-
-/**
-  Decrypts a DER-encoded PKCS#7 ContentInfo containing an envelopedData structure
-  (such as one produced by Pkcs7Encrypt) and recovers the original content.
-
-  The private key is supplied in PEM form so that this interface is not tied to any
-  particular key algorithm (currently supports RSA).
-
-  The correct recipient within the envelopedData is identified automatically. The
-  envelopedData carries, for each recipient, an issuer name and serial number that
-  identify the recipient certificate. If RecipientCert is supplied, its issuer name
-  and serial number are used to select the matching recipient. If RecipientCert is
-  NULL, the supplied private key is tried against every recipient in the envelope.
-
-  If this interface is not supported, return FALSE.
-
-  @param[in]  PemData           Pointer to the PEM-encoded private key of a recipient
-                                of the message. May be an RSA or other supported key
-                                type.
-  @param[in]  PemSize           Size of the PEM key data in bytes.
-  @param[in]  Password          [Optional] NULL-terminated passphrase used to decrypt an
-                                encrypted PEM key. Pass NULL if the PEM key is not
-                                password protected.
-  @param[in]  RecipientCert     [Optional] Pointer to the DER-encoded X.509 certificate
-                                of the recipient whose private key is supplied in
-                                PemData. If provided, it is used to select the matching
-                                recipient in the envelope by issuer name and serial
-                                number. Pass NULL to try the private key against every
-                                recipient.
-  @param[in]  RecipientCertSize Size of the DER-encoded certificate in bytes. Ignored
-                                (and may be 0) when RecipientCert is NULL.
-  @param[in]  ContentInfo       Pointer to the PKCS#7 DER-encoded ContentInfo that wraps
-                                an envelopedData to be decrypted.
-  @param[in]  ContentInfoSize   Size of the ContentInfo in bytes.
-  @param[in]  Flags             Flags for the decryption operation. Currently only
-                                CRYPTO_PKCS7_DEFAULT is supported, which indicates that
-                                the decrypted content is treated as binary data.
-  @param[out] OutData           Receives a pointer to the newly allocated buffer
-                                containing the decrypted content. The caller must free
-                                the returned buffer with FreePool().
-  @param[out] OutDataSize       Receives the size of the decrypted content in bytes.
-
-  @retval     TRUE              PKCS#7 data decryption succeeded.
-  @retval     FALSE             PKCS#7 data decryption failed.
-  @retval     FALSE             This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Pkcs7Decrypt (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password           OPTIONAL,
-  IN   CONST UINT8  *RecipientCert      OPTIONAL,
-  IN   UINTN        RecipientCertSize   OPTIONAL,
-  IN   CONST UINT8  *ContentInfo,
-  IN   UINTN        ContentInfoSize,
-  IN   UINT32       Flags,
-  OUT  UINT8        **OutData,
-  OUT  UINTN        *OutDataSize
-  )
-{
-  CALL_CRYPTO_SERVICE (Pkcs7Decrypt, (PemData, PemSize, Password, RecipientCert, RecipientCertSize, ContentInfo, ContentInfoSize, Flags, OutData, OutDataSize), FALSE);
 }
 
 /**
@@ -6344,35 +6116,6 @@ EcGetPublicKeyFromX509 (
 }
 
 /**
-  Retrieve the EC Private Key from the password-protected PEM key data.
-
-  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
-  @param[in]  PemSize      Size of the PEM key data in bytes.
-  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
-                           EC private key component. Use EcFree() function to free the
-                           resource.
-
-  If PemData is NULL, then return FALSE.
-  If EcContext is NULL, then return FALSE.
-
-  @retval  TRUE   EC Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-
-**/
-BOOLEAN
-EFIAPI
-EcGetPrivateKeyFromPem (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password,
-  OUT  VOID         **EcContext
-  )
-{
-  CALL_CRYPTO_SERVICE (EcGetPrivateKeyFromPem, (PemData, PemSize, Password, EcContext), FALSE);
-}
-
-/**
   Verifies the EC-DSA signature.
 
   If EcContext is NULL, then return FALSE.
@@ -6459,75 +6202,6 @@ EdDsaFree (
 }
 
 /**
-  Sets the EdDSA private key in the EdDSA context.
-
-  This function imports a raw private key into the EdDSA context. The private key
-  must be in raw binary format (not PEM or DER encoded). The key size must match
-  the expected size for the curve type (57 bytes for Ed448).
-
-  OpenSSL automatically derives the public key from the private key, so after
-  calling this function, both signing and verification operations are possible.
-
-  If EdDsaContext is NULL, then return FALSE.
-  If PrivateKey is NULL, then return FALSE.
-  If PrivateKeySize is 0, then return FALSE.
-  If PrivateKeySize does not match the expected size for the curve, then return FALSE.
-
-  @param[in]  EdDsaContext    Pointer to EdDSA context created by EdDsaNewByNid().
-  @param[in]  PrivateKey      Pointer to raw private key bytes.
-  @param[in]  PrivateKeySize  Size of the private key in bytes.
-
-  @retval TRUE   EdDSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaSetPrivKey (
-  IN    VOID   *EdDsaContext,
-  IN    UINT8  *PrivateKey,
-  IN    UINTN  PrivateKeySize
-  )
-{
-  CALL_CRYPTO_SERVICE (EdDsaSetPrivKey, (EdDsaContext, PrivateKey, PrivateKeySize), FALSE);
-}
-
-/**
-  Extracts the EdDSA public key from the EdDSA context.
-
-  This function retrieves the public key from the EdDSA context and copies it to
-  the provided buffer. The context must have a key set (either via EdDsaSetPrivKey()
-  or EdDsaSetPubKey()) before calling this function. OpenSSL automatically derives
-  the public key when a private key is set.
-
-  The public key is returned in raw binary format (57 bytes for Ed448).
-
-  If EdDsaContext is NULL, then return FALSE.
-  If PublicKey is NULL, then return FALSE.
-  If the context does not contain a valid key, then return FALSE.
-  If PublicKeySize does not match the expected size for the curve, then return FALSE.
-
-  @param[in]   EdDsaContext    Pointer to EdDSA context containing the key.
-  @param[out]  PublicKey       Pointer to buffer to receive the public key.
-  @param[in]   PublicKeySize   Size of the public key buffer in bytes.
-                               Must match the key size for the curve (57 bytes for Ed448).
-
-  @retval TRUE   EdDSA public key extracted successfully.
-  @retval FALSE  Invalid parameters or key extraction failed.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaGeneratePubKey (
-  IN   VOID   *EdDsaContext,
-  OUT  UINT8  *PublicKey,
-  IN   UINTN  PublicKeySize
-  )
-{
-  CALL_CRYPTO_SERVICE (EdDsaGeneratePubKey, (EdDsaContext, PublicKey, PublicKeySize), TRUE);
-}
-
-/**
   Sets the EdDSA public key in the EdDSA context.
 
   This function imports a raw public key into the EdDSA context. The public key
@@ -6594,35 +6268,6 @@ EdDsaGetPubKey (
   )
 {
   CALL_CRYPTO_SERVICE (EdDsaGetPubKey, (EdDsaContext, PublicKey, PublicKeySize), FALSE);
-}
-
-/**
-   Retrieve the EdDSA Private Key from the password-protected PEM key data.
-
-   @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
-   @param[in]  PemSize        Size of the PEM key data in bytes.
-   @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
-   @param[out] EdDsaContext   Pointer to new-generated EdDSA context which contains the retrieved
-                              EdDSA private key component. Use EdDsaFree() function to free the
-                              resource.
-
-   If PemData is NULL, then return FALSE.
-   If EdDsaContext is NULL, then return FALSE.
-
-   @retval  TRUE   EdDSA Private Key was retrieved successfully.
-   @retval  FALSE  Invalid PEM key data or incorrect password.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaGetPrivateKeyFromPem (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password,
-  OUT  VOID         **EdDsaContext
-  )
-{
-  CALL_CRYPTO_SERVICE (EdDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, EdDsaContext), FALSE);
 }
 
 /**
@@ -6751,72 +6396,6 @@ MlDsaFree (
 }
 
 /**
-  Sets the ML-DSA private key in the ML-DSA context.
-
-  This function imports a raw private key into the ML-DSA context. The private key
-  must be in raw binary format (not PEM or DER encoded). The key size must match
-  the expected size for the ML-DSA variant (4896 bytes for ML-DSA-87).
-
-  OpenSSL automatically derives the public key from the private key, so after
-  calling this function, both signing and verification operations are possible.
-
-  If MlDsaContext is NULL, then return FALSE.
-  If PrivateKey is NULL, then return FALSE.
-  If PrivateKeySize does not match the expected size for the variant, then return FALSE.
-
-  @param[in]  MlDsaContext     Pointer to ML-DSA context created by MlDsaNewByNid().
-  @param[in]  PrivateKey       Pointer to raw private key bytes.
-  @param[in]  PrivateKeySize   Size of the private key in bytes.
-
-  @retval TRUE   ML-DSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
-
-**/
-BOOLEAN
-EFIAPI
-MlDsaSetPrivKey (
-  IN  VOID   *MlDsaContext,
-  IN  UINT8  *PrivateKey,
-  IN  UINTN  PrivateKeySize
-  )
-{
-  CALL_CRYPTO_SERVICE (MlDsaSetPrivKey, (MlDsaContext, PrivateKey, PrivateKeySize), FALSE);
-}
-
-/**
-  Generates and retrieves the public key from a private key context.
-
-  This function extracts the public key from an ML-DSA context that contains
-  a private key. It is equivalent to calling MlDsaGetPubKey() but is provided
-  for API consistency with other cryptographic implementations.
-
-  The context must contain a private key (set via MlDsaSetPrivKey()) before
-  calling this function.
-
-  If MlDsaContext is NULL, then return FALSE.
-  If PublicKey is NULL, then return FALSE.
-  If PublicKeySize does not match the expected size for the variant, then return FALSE.
-
-  @param[in]   MlDsaContext    Pointer to ML-DSA context containing the private key.
-  @param[out]  PublicKey       Pointer to buffer to receive the public key.
-  @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
-
-  @retval TRUE   Public key generated and retrieved successfully.
-  @retval FALSE  Invalid parameters or public key extraction failed.
-
-**/
-BOOLEAN
-EFIAPI
-MlDsaGeneratePubKey (
-  IN  VOID   *MlDsaContext,
-  OUT UINT8  *PublicKey,
-  IN  UINTN  PublicKeySize
-  )
-{
-  CALL_CRYPTO_SERVICE (MlDsaGeneratePubKey, (MlDsaContext, PublicKey, PublicKeySize), FALSE);
-}
-
-/**
   Sets the ML-DSA public key in the ML-DSA context.
 
   This function imports a raw public key into the ML-DSA context. The public key
@@ -6881,34 +6460,6 @@ MlDsaGetPubKey (
   )
 {
   CALL_CRYPTO_SERVICE (MlDsaGetPubKey, (MlDsaContext, PublicKey, PublicKeySize), FALSE);
-}
-
-/**
-  Retrieve the ML-DSA Private Key from the password-protected PEM key data.
-
-  If PemData is NULL, then return FALSE.
-  If MlDsaContext is NULL, then return FALSE.
-
-  @param[in]  PemData       Pointer to the PEM-encoded key data to be retrieved.
-  @param[in]  PemSize       Size of the PEM key data in bytes.
-  @param[in]  Password      NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] MlDsaContext  Pointer to new-generated ML-DSA context which contains
-                            the retrieved ML-DSA private key. Use MlDsaFree() to free.
-
-  @retval  TRUE   ML-DSA Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-
-**/
-BOOLEAN
-EFIAPI
-MlDsaGetPrivateKeyFromPem (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password,
-  OUT  VOID         **MlDsaContext
-  )
-{
-  CALL_CRYPTO_SERVICE (MlDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, MlDsaContext), FALSE);
 }
 
 /**
@@ -7032,72 +6583,6 @@ SlhDsaFree (
 }
 
 /**
-  Sets the SLH-DSA private key in the SLH-DSA context.
-
-  This function imports a raw private key into the SLH-DSA context. The private key
-  must be in raw binary format (not PEM or DER encoded). The key size must match
-  the expected size for the SLH-DSA variant (128 bytes for SLH-DSA-SHAKE-256s).
-
-  OpenSSL automatically derives the public key from the private key, so after
-  calling this function, both signing and verification operations are possible.
-
-  If SlhDsaContext is NULL, then return FALSE.
-  If PrivateKey is NULL, then return FALSE.
-  If PrivateKeySize does not match the expected size for the variant, then return FALSE.
-
-  @param[in]  SlhDsaContext    Pointer to SLH-DSA context created by SlhDsaNewByNid().
-  @param[in]  PrivateKey       Pointer to raw private key bytes.
-  @param[in]  PrivateKeySize   Size of the private key in bytes.
-
-  @retval TRUE   SLH-DSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
-
-**/
-BOOLEAN
-EFIAPI
-SlhDsaSetPrivKey (
-  IN  VOID   *SlhDsaContext,
-  IN  UINT8  *PrivateKey,
-  IN  UINTN  PrivateKeySize
-  )
-{
-  CALL_CRYPTO_SERVICE (SlhDsaSetPrivKey, (SlhDsaContext, PrivateKey, PrivateKeySize), FALSE);
-}
-
-/**
-  Generates and retrieves the public key from a private key context.
-
-  This function extracts the public key from an SLH-DSA context that contains
-  a private key. It is equivalent to calling SlhDsaGetPubKey() but is provided
-  for API consistency with other cryptographic implementations.
-
-  The context must contain a private key (set via SlhDsaSetPrivKey()) before
-  calling this function.
-
-  If SlhDsaContext is NULL, then return FALSE.
-  If PublicKey is NULL, then return FALSE.
-  If PublicKeySize does not match the expected size for the variant, then return FALSE.
-
-  @param[in]   SlhDsaContext   Pointer to SLH-DSA context containing the private key.
-  @param[out]  PublicKey       Pointer to buffer to receive the public key.
-  @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
-
-  @retval TRUE   Public key generated and retrieved successfully.
-  @retval FALSE  Invalid parameters or public key extraction failed.
-
-**/
-BOOLEAN
-EFIAPI
-SlhDsaGeneratePubKey (
-  IN  VOID   *SlhDsaContext,
-  OUT UINT8  *PublicKey,
-  IN  UINTN  PublicKeySize
-  )
-{
-  CALL_CRYPTO_SERVICE (SlhDsaGeneratePubKey, (SlhDsaContext, PublicKey, PublicKeySize), FALSE);
-}
-
-/**
   Sets the SLH-DSA public key in the SLH-DSA context.
 
   This function imports a raw public key into the SLH-DSA context. The public key
@@ -7162,34 +6647,6 @@ SlhDsaGetPubKey (
   )
 {
   CALL_CRYPTO_SERVICE (SlhDsaGetPubKey, (SlhDsaContext, PublicKey, PublicKeySize), FALSE);
-}
-
-/**
-  Retrieve the SLH-DSA Private Key from the password-protected PEM key data.
-
-  If PemData is NULL, then return FALSE.
-  If SlhDsaContext is NULL, then return FALSE.
-
-  @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
-  @param[in]  PemSize        Size of the PEM key data in bytes.
-  @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] SlhDsaContext  Pointer to new-generated SLH-DSA context which contains
-                             the retrieved SLH-DSA private key. Use SlhDsaFree() to free.
-
-  @retval  TRUE   SLH-DSA Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-
-**/
-BOOLEAN
-EFIAPI
-SlhDsaGetPrivateKeyFromPem (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password,
-  OUT  VOID         **SlhDsaContext
-  )
-{
-  CALL_CRYPTO_SERVICE (SlhDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, SlhDsaContext), FALSE);
 }
 
 /**
