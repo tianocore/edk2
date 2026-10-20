@@ -88,42 +88,54 @@ RsaGetKey (
     // RSA Private Exponent (d)
     //
     case RsaKeyD:
-      RSA_get0_key (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
+      //
+      // Deprecated: RSA private exponent (d) is no longer supported.
+      //
       break;
 
     //
     // RSA Secret Prime Factor of Modulus (p)
     //
     case RsaKeyP:
-      RSA_get0_factors (RsaKey, (const BIGNUM **)&BnKey, NULL);
+      //
+      // Deprecated: RSA secret prime factor p is no longer supported.
+      //
       break;
 
     //
     // RSA Secret Prime Factor of Modules (q)
     //
     case RsaKeyQ:
-      RSA_get0_factors (RsaKey, NULL, (const BIGNUM **)&BnKey);
+      //
+      // Deprecated: RSA secret prime factor q is no longer supported.
+      //
       break;
 
     //
     // p's CRT Exponent (== d mod (p - 1))
     //
     case RsaKeyDp:
-      RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
+      //
+      // Deprecated: RSA CRT exponent dp is no longer supported.
+      //
       break;
 
     //
     // q's CRT Exponent (== d mod (q - 1))
     //
     case RsaKeyDq:
-      RSA_get0_crt_params (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
+      //
+      // Deprecated: RSA CRT exponent dq is no longer supported.
+      //
       break;
 
     //
     // The CRT Coefficient (== 1/q mod p)
     //
     case RsaKeyQInv:
-      RSA_get0_crt_params (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
+      //
+      // Deprecated: RSA CRT coefficient qInv is no longer supported.
+      //
       break;
 
     default:
@@ -148,120 +160,6 @@ RsaGetKey (
   }
 
   *BnSize = BN_bn2bin (BnKey, BigNumber);
-
-  return TRUE;
-}
-
-/**
-  Generates RSA key components.
-
-  This function generates RSA key components. It takes RSA public exponent E and
-  length in bits of RSA modulus N as input, and generates all key components.
-  If PublicExponent is NULL, the default RSA public exponent (0x10001) will be used.
-
-  Before this function can be invoked, pseudorandom number generator must be correctly
-  initialized by RandomSeed().
-
-  If RsaContext is NULL, then return FALSE.
-
-  @param[in, out]  RsaContext           Pointer to RSA context being set.
-  @param[in]       ModulusLength        Length of RSA modulus N in bits.
-  @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
-
-  @retval  TRUE   RSA key component was generated successfully.
-  @retval  FALSE  Invalid RSA key component tag.
-
-**/
-BOOLEAN
-EFIAPI
-RsaGenerateKey (
-  IN OUT  VOID         *RsaContext,
-  IN      UINTN        ModulusLength,
-  IN      CONST UINT8  *PublicExponent,
-  IN      UINTN        PublicExponentSize
-  )
-{
-  BIGNUM   *KeyE;
-  BOOLEAN  RetVal;
-
-  //
-  // Check input parameters.
-  //
-  if ((RsaContext == NULL) || (ModulusLength > INT_MAX) || (PublicExponentSize > INT_MAX)) {
-    return FALSE;
-  }
-
-  KeyE = BN_new ();
-  if (KeyE == NULL) {
-    return FALSE;
-  }
-
-  RetVal = FALSE;
-
-  if (PublicExponent == NULL) {
-    if (BN_set_word (KeyE, 0x10001) == 0) {
-      goto _Exit;
-    }
-  } else {
-    if (BN_bin2bn (PublicExponent, (UINT32)PublicExponentSize, KeyE) == NULL) {
-      goto _Exit;
-    }
-  }
-
-  if (RSA_generate_key_ex ((RSA *)RsaContext, (UINT32)ModulusLength, KeyE, NULL) == 1) {
-    RetVal = TRUE;
-  }
-
-_Exit:
-  BN_free (KeyE);
-  return RetVal;
-}
-
-/**
-  Validates key components of RSA context.
-  NOTE: This function performs integrity checks on all the RSA key material, so
-        the RSA key structure must contain all the private key data.
-
-  This function validates key components of RSA context in following aspects:
-  - Whether p is a prime
-  - Whether q is a prime
-  - Whether n = p * q
-  - Whether d*e = 1  mod lcm(p-1,q-1)
-
-  If RsaContext is NULL, then return FALSE.
-
-  @param[in]  RsaContext  Pointer to RSA context to check.
-
-  @retval  TRUE   RSA key components are valid.
-  @retval  FALSE  RSA key components are not valid.
-
-**/
-BOOLEAN
-EFIAPI
-RsaCheckKey (
-  IN  VOID  *RsaContext
-  )
-{
-  UINTN  Reason;
-
-  //
-  // Check input parameters.
-  //
-  if (RsaContext == NULL) {
-    return FALSE;
-  }
-
-  if (RSA_check_key ((RSA *)RsaContext) != 1) {
-    Reason = ERR_GET_REASON (ERR_peek_last_error ());
-    if ((Reason == RSA_R_P_NOT_PRIME) ||
-        (Reason == RSA_R_Q_NOT_PRIME) ||
-        (Reason == RSA_R_N_DOES_NOT_EQUAL_P_Q) ||
-        (Reason == RSA_R_D_E_NOT_CONGRUENT_TO_1))
-    {
-      return FALSE;
-    }
-  }
 
   return TRUE;
 }
