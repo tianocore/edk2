@@ -193,7 +193,7 @@ also configured.
 | Pkcs.Pkcs7FreeSigners           |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.Pkcs7Sign                  |     Y      |     Y     |             |             |              |             |                 |
 | Pkcs.Pkcs7Encrypt               |     N      |     N     |             |             |      C       |      C      |                 |
-| Pkcs.Pkcs7Decrypt               |     N      |     N     |             |             |      C       |      C      |                 |
+| Pkcs.Pkcs7Decrypt               |     Y      |     Y     |             |             |              |             |                 |
 | Pkcs.Pkcs7GetAttachedContent    |     N      |     N     |             |      C      |      C       |      C      |                 |
 | Pkcs.Pkcs7GetCertificatesList   |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.AuthenticodeVerify         |     N      |     N     |             |             |      C       |             |                 |
@@ -205,8 +205,8 @@ also configured.
 | Rsa.Free                        |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Rsa.SetKey                      |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Rsa.GetKey                      |     N      |     N     |             |             |      C       |             |                 |
-| Rsa.GenerateKey                 |     N      |     N     |             |             |      C       |             |                 |
-| Rsa.CheckKey                    |     N      |     N     |             |             |      C       |             |                 |
+| Rsa.GenerateKey                 |     Y      |     Y     |             |             |              |             |                 |
+| Rsa.CheckKey                    |     Y      |     Y     |             |             |              |             |                 |
 | Rsa.Pkcs1Sign                   |     Y      |     Y     |             |             |              |             |                 |
 | Rsa.Pkcs1Verify                 |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Sha1                            |     N      |     Y     |             |      C      |      C       |      C      |        C        |

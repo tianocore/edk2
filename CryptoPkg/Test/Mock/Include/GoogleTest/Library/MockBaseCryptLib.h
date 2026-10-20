@@ -583,25 +583,6 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
-    RsaGenerateKey,
-    (
-     IN OUT  VOID         *RsaContext,
-     IN      UINTN        ModulusLength,
-     IN      CONST UINT8  *PublicExponent,
-     IN      UINTN        PublicExponentSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaCheckKey,
-    (
-     IN  VOID  *RsaContext
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
     RsaPkcs1Verify,
     (
      IN  VOID         *RsaContext,
@@ -623,17 +604,6 @@ struct MockBaseCryptLib {
      IN  UINTN        SigSize,
      IN  UINT16       DigestLen,
      IN  UINT16       SaltLen
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaGetPrivateKeyFromPem,
-    (
-     IN   CONST UINT8  *PemData,
-     IN   UINTN        PemSize,
-     IN   CONST CHAR8  *Password,
-     OUT  VOID         **RsaContext
     )
     );
 
@@ -770,32 +740,6 @@ struct MockBaseCryptLib {
      IN   UINT16       DigestLen   OPTIONAL,
      OUT  UINT8        **EncryptedData,
      OUT  UINTN        *EncryptedDataSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    Pkcs1v2Decrypt,
-    (
-     IN   CONST UINT8  *PrivateKey,
-     IN   UINTN        PrivateKeySize,
-     IN   UINT8        *EncryptedData,
-     IN   UINTN        EncryptedDataSize,
-     OUT  UINT8        **OutData,
-     OUT  UINTN        *OutDataSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaOaepDecrypt,
-    (
-     IN   VOID    *RsaContext,
-     IN   UINT8   *EncryptedData,
-     IN   UINTN   EncryptedDataSize,
-     IN   UINT16  DigestLen   OPTIONAL,
-     OUT  UINT8   **OutData,
-     OUT  UINTN   *OutDataSize
     )
     );
 
@@ -1698,17 +1642,6 @@ struct MockBaseCryptLib {
      IN      CONST INT32  *CompressFlag,
      OUT     UINT8        *Key,
      IN OUT  UINTN        *KeySize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    EcGetPrivateKeyFromPem,
-    (
-     IN   CONST UINT8  *PemData,
-     IN   UINTN        PemSize,
-     IN   CONST CHAR8  *Password,
-     OUT  VOID         **EcContext
     )
     );
 
