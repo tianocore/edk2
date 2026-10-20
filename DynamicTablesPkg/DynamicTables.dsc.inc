@@ -85,6 +85,7 @@
   DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType45Lib/SmbiosType45Lib.inf
 
   # AML Fixup (Common)
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
@@ -236,6 +237,7 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType45Lib/SmbiosType45Lib.inf
   }
 
 [Components.RISCV64]
