@@ -5,6 +5,8 @@ Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -622,7 +624,6 @@ GatherDeviceInfo (
   )
 {
   UINTN          Offset;
-  UINTN          BarIndex;
   PCI_IO_DEVICE  *PciIoDevice;
 
   PciIoDevice = CreatePciIoDevice (
@@ -647,20 +648,18 @@ GatherDeviceInfo (
   //
   // Start to parse the bars
   //
-  for (Offset = 0x10, BarIndex = 0; Offset <= 0x24 && BarIndex < PCI_MAX_BAR; BarIndex++) {
-    Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
+  for (Offset = PCI_BASE_ADDRESSREG_OFFSET; Offset <= PCI_BASE_ADDRESSREG5_OFFSET;) {
+    Offset = PciParseBar (PciIoDevice, Offset);
   }
 
   //
   // Parse the SR-IOV VF bars
   //
   if (PcdGetBool (PcdSrIovSupport) && (PciIoDevice->SrIovCapabilityOffset != 0)) {
-    for (Offset = PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0, BarIndex = 0;
-         Offset <= PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR5;
-         BarIndex++)
+    for (Offset = PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0;
+         Offset <= PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR5;)
     {
-      ASSERT (BarIndex < PCI_MAX_BAR);
-      Offset = PciIovParseVfBar (PciIoDevice, Offset, BarIndex);
+      Offset = PciIovParseVfBar (PciIoDevice, Offset);
     }
   }
 
@@ -724,11 +723,11 @@ GatherPpbInfo (
   //
   // PPB can have two BARs
   //
-  if (PciParseBar (PciIoDevice, 0x10, PPB_BAR_0) == 0x14) {
+  if (PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG_OFFSET) == PCI_BASE_ADDRESSREG1_OFFSET) {
     //
     // Not 64-bit bar
     //
-    PciParseBar (PciIoDevice, 0x14, PPB_BAR_1);
+    PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG1_OFFSET);
   }
 
   PciIo = &PciIoDevice->PciIo;
@@ -736,10 +735,10 @@ GatherPpbInfo (
   //
   // Test whether it support 32 decode or not
   //
-  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Temp);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &gAllOne);
-  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Temp);
+  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &Temp);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &gAllOne);
+  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &Value);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &Temp);
 
   if (Value != 0) {
     if ((Value & 0x01) != 0) {
@@ -762,9 +761,9 @@ GatherPpbInfo (
     // Per spec, bit 3-1 of I/O Base Register are reserved bits, so its content can't be assumed.
     //
     Value = (UINT8)(Temp ^ (BIT3 | BIT2 | BIT1));
-    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
-    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
-    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Temp);
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &Value);
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &Value);
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &Temp);
     Value = (UINT8)((Value ^ Temp) & (BIT3 | BIT2 | BIT1));
     switch (Value) {
       case BIT3:
@@ -781,7 +780,7 @@ GatherPpbInfo (
 
   Status = BarExisted (
              PciIoDevice,
-             0x24,
+             PCI_BRIDGE_64BIT_MEMORY_BASE_REGISTER_OFFSET,
              NULL,
              &PMemBaseLimit
              );
@@ -802,7 +801,7 @@ GatherPpbInfo (
   {
     Status = BarExisted (
                PciIoDevice,
-               0x28,
+               PCI_BRIDGE_64BIT_MEMORY_BASE_UPPER_REGISTER_OFFSET,
                NULL,
                NULL
                );
@@ -877,7 +876,7 @@ GatherP2CInfo (
   //
   // P2C only has one bar that is in 0x10
   //
-  PciParseBar (PciIoDevice, 0x10, P2C_BAR_0);
+  PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG_OFFSET);
 
   //
   // Read PciBar information from the bar register
@@ -1728,7 +1727,6 @@ SetNewAlign (
 
   @param PciIoDevice  Pci device instance.
   @param Offset       Bar offset.
-  @param BarIndex     Bar index.
 
   @return Next bar offset.
 
@@ -1736,14 +1734,14 @@ SetNewAlign (
 UINTN
 PciIovParseVfBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
-  IN UINTN          Offset,
-  IN UINTN          BarIndex
+  IN UINTN          Offset
   )
 {
   UINT32      Value;
   UINT32      OriginalValue;
   UINT32      Mask;
   EFI_STATUS  Status;
+  UINTN       BarIndex;
 
   //
   // Ensure it is called properly
@@ -1752,6 +1750,13 @@ PciIovParseVfBar (
   if (PciIoDevice->SrIovCapabilityOffset == 0) {
     return 0;
   }
+
+  BarIndex = (
+              Offset -
+              PciIoDevice->SrIovCapabilityOffset -
+              EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0
+              ) / sizeof (UINT32);
+  ASSERT (BarIndex < PCI_MAX_BAR);
 
   OriginalValue = 0;
   Value         = 0;
@@ -1926,17 +1931,19 @@ PciIovParseVfBar (
 UINTN
 PciParseBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
-  IN UINTN          Offset,
-  IN UINTN          BarIndex
+  IN UINTN          Offset
   )
 {
   UINT32      Value;
   UINT32      OriginalValue;
   UINT32      Mask;
   EFI_STATUS  Status;
+  UINTN       BarIndex;
 
   OriginalValue = 0;
   Value         = 0;
+
+  BarIndex = (Offset - 0x10) / sizeof (UINT32);
 
   Status = BarExisted (
              PciIoDevice,
@@ -2148,7 +2155,7 @@ InitializePciDevice (
   // Resource base is set to all ones so as to indicate its resource
   // has not been allocated
   //
-  for (Offset = 0x10; Offset <= 0x24; Offset += sizeof (UINT32)) {
+  for (Offset = PCI_BASE_ADDRESSREG_OFFSET; Offset <= PCI_BASE_ADDRESSREG5_OFFSET; Offset += sizeof (UINT32)) {
     PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllOne);
   }
 }
@@ -2173,28 +2180,28 @@ InitializePpb (
   // Io32, pMem32, pMem64 to quiescent state
   // Resource base all ones, Resource limit all zeros
   //
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1D, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_BASE_REGISTER_OFFSET, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_IO_LIMIT_REGISTER_OFFSET, 1, &gAllZero);
 
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0x20, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0x22, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PCI_BRIDGE_MEMORY_BASE_REGISTER_OFFSET, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PCI_BRIDGE_MEMORY_LIMIT_REGISTER_OFFSET, 1, &gAllZero);
 
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0x24, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0x26, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PCI_BRIDGE_64BIT_MEMORY_BASE_REGISTER_OFFSET, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PCI_BRIDGE_64BIT_MEMORY_LIMIT_REGISTER_OFFSET, 1, &gAllZero);
 
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x28, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x2C, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_BRIDGE_64BIT_MEMORY_BASE_UPPER_REGISTER_OFFSET, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_BRIDGE_64BIT_MEMORY_LIMIT_UPPER_REGISTER_OFFSET, 1, &gAllZero);
 
   //
   // Don't support use io32 as for now
   //
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0x30, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, 0x32, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PCI_BRIDGE_IO_BASE_UPPER_REGISTER_OFFSET, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PCI_BRIDGE_IO_LIMIT_UPPER_REGISTER_OFFSET, 1, &gAllZero);
 
   //
   // Force Interrupt line to zero for cards that come up randomly
   //
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_INTERRUPT_LINE_REGISTER_OFFSET, 1, &gAllZero);
 }
 
 /**
@@ -2217,22 +2224,22 @@ InitializeP2C (
   // Io32, pMem32, pMem64 to quiescent state(
   // Resource base all ones, Resource limit all zeros
   //
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x1c, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x20, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_MEMORY_BASE_0, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_MEMORY_LIMIT_0, 1, &gAllZero);
 
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x24, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x28, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_MEMORY_BASE_1, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_MEMORY_LIMIT_1, 1, &gAllZero);
 
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x2c, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x30, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_IO_BASE_0_LOWER, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_IO_LIMIT_0_LOWER, 1, &gAllZero);
 
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x34, 1, &gAllOne);
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x38, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_IO_BASE_1_LOWER, 1, &gAllOne);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, PCI_CARD_IO_LIMIT_1_LOWER, 1, &gAllZero);
 
   //
   // Force Interrupt line to zero for cards that come up randomly
   //
-  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
+  PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_INTERRUPT_LINE_REGISTER_OFFSET, 1, &gAllZero);
 }
 
 /**
@@ -2887,8 +2894,8 @@ IsPciDeviceRejected (
     //
     // Only test base registers for P2C
     //
-    for (BarOffset = 0x1C; BarOffset <= 0x38; BarOffset += 2 * sizeof (UINT32)) {
-      Mask   = (BarOffset < 0x2C) ? 0xFFFFF000 : 0xFFFFFFFC;
+    for (BarOffset = PCI_CARD_MEMORY_BASE_0; BarOffset <= PCI_CARD_IO_LIMIT_1_LOWER; BarOffset += 2 * sizeof (UINT32)) {
+      Mask   = (BarOffset < PCI_CARD_IO_BASE_0_LOWER) ? 0xFFFFF000 : 0xFFFFFFFC;
       Status = BarExisted (PciIoDevice, BarOffset, &TestValue, &OldValue);
       if (EFI_ERROR (Status)) {
         continue;
@@ -2906,7 +2913,7 @@ IsPciDeviceRejected (
     return FALSE;
   }
 
-  for (BarOffset = 0x14; BarOffset <= 0x24; BarOffset += sizeof (UINT32)) {
+  for (BarOffset = PCI_BASE_ADDRESSREG1_OFFSET; BarOffset <= PCI_BASE_ADDRESSREG5_OFFSET; BarOffset += sizeof (UINT32)) {
     //
     // Test PCI devices
     //
@@ -3005,7 +3012,7 @@ ResetAllPpbBusNumber (
 
       if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci))) {
         Register = 0;
-        Address  = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
+        Address  = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET);
         Status   = PciRootBridgeIo->Pci.Read (
                                           PciRootBridgeIo,
                                           EfiPciWidthUint32,

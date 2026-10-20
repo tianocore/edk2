@@ -59,8 +59,9 @@ typedef enum ArmObjectID {
   EArmObjGicIrsInfo,                                           ///< 29 - GIC IRS Info
   EArmObjGicItsV5Info,                                         ///< 30 - GIC ITS v5 Info
   EArmObjGicItsV5TranslateFrameInfo,                           ///< 31 - GIC ITS v5 Translate Frame Info
-  EArmObjGicIwbInfo,                                           ///< 34 - GIC IWB Info
-  EArmObjBmuRegInfo,                                           ///< 35 - BMU Reg Info
+  EArmObjGicIwbInfo,                                           ///< 32 - GIC IWB Info
+  EArmObjBmuRegInfo,                                           ///< 33 - BMU Reg Info
+  EArmObjPl050Info,                                            ///< 34 - PL050 Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -677,6 +678,21 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
                 See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
+
+/** A structure that describes a PL050 keyboard or mouse interface.
+
+    ID: EArmObjPl050Info
+*/
+typedef struct CmArmPl050Info {
+  /// FALSE for a keyboard interface; TRUE for a mouse interface.
+  BOOLEAN                      IsMouse;
+
+  /// Controller MMIO base address.
+  UINT64                       BaseAddress;
+
+  /// AML Extended Interrupt descriptor information.
+  CM_ARM_EXTENDED_INTERRUPT    Interrupt;
+} CM_ARM_PL050_INFO;
 
 /** CMN implementation types. */
 typedef enum ArmCmnType {

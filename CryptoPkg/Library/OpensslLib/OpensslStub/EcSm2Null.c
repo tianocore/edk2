@@ -2,6 +2,7 @@
   Null implementation of EC and SM2 functions called by BaseCryptLib.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -416,6 +417,27 @@ ECDSA_do_verify (
   int                  dgst_len,
   const ECDSA_SIG      *sig,
   EC_KEY               *eckey
+  )
+{
+  ASSERT (FALSE);
+  return -1;
+}
+
+ECDSA_SIG *
+d2i_ECDSA_SIG (
+  ECDSA_SIG            **psig,
+  const unsigned char  **ppin,
+  long                 len
+  )
+{
+  ASSERT (FALSE);
+  return NULL;
+}
+
+int
+i2d_ECDSA_SIG (
+  const ECDSA_SIG  *sig,
+  unsigned char    **ppout
   )
 {
   ASSERT (FALSE);
