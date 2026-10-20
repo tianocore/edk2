@@ -1435,44 +1435,45 @@ CoreAllocatePages (
 }
 
 /**
-  Frees previous allocated pages.
+  Checks if the specified memory address is owned by gMemoryMap. If so, the entry is
+  returned. This function must be called with the memory lock held.
 
-  @param  Memory                 Base address of memory being freed
-  @param  NumberOfPages          The number of pages to free
-  @param  MemoryType             Pointer to memory type
+  @param Memory                 Base address of memory range
+  @param Entry                  Pointer to receive the memory map entry that covers the range if it exists
 
-  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
-  @retval EFI_INVALID_PARAMETER  Address not aligned
-  @return EFI_SUCCESS         -Pages successfully freed.
-
+  @retval EFI_NOT_FOUND         Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER Lock not held or null pointer passed
+  @return EFI_SUCCESS           The memory range is valid for freeing and Entry contains a pointer to the memory map
+                                entry that covers the range
 **/
+static
 EFI_STATUS
-EFIAPI
-CoreInternalFreePages (
-  IN EFI_PHYSICAL_ADDRESS  Memory,
-  IN UINTN                 NumberOfPages,
-  OUT EFI_MEMORY_TYPE      *MemoryType OPTIONAL
+GetMemoryMapEntry (
+  IN  EFI_PHYSICAL_ADDRESS  Memory,
+  OUT MEMORY_MAP            **Entry
   )
 {
   EFI_STATUS  Status;
   LIST_ENTRY  *Link;
-  MEMORY_MAP  *Entry;
-  UINTN       Alignment;
-  BOOLEAN     IsGuarded;
 
-  //
-  // Free the range
-  //
-  CoreAcquireMemoryLock ();
+  Status = EFI_SUCCESS;
+
+  if (gMemoryLock.Lock != EfiLockAcquired) {
+    ASSERT_LOCKED (&gMemoryLock);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Entry == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Find the entry that the covers the range
   //
-  IsGuarded = FALSE;
-  Entry     = NULL;
+  *Entry = NULL;
   for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    if ((Entry->Start <= Memory) && (Entry->End > Memory)) {
+    *Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    if (((*Entry)->Start <= Memory) && ((*Entry)->End > Memory)) {
       break;
     }
   }
@@ -1482,9 +1483,48 @@ CoreInternalFreePages (
     goto Done;
   }
 
-  if (Entry == NULL) {
-    ASSERT (Entry != NULL);
+  if (*Entry == NULL) {
+    ASSERT (*Entry != NULL);
     Status = EFI_NOT_FOUND;
+    goto Done;
+  }
+
+Done:
+  return Status;
+}
+
+/**
+  Frees previous allocated pages.
+
+  @param  Memory                 Base address of memory being freed
+  @param  NumberOfPages          The number of pages to free
+  @param  MemoryType             Pointer to memory type
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER  Address not aligned
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalFreePages (
+  IN  EFI_PHYSICAL_ADDRESS  Memory,
+  IN  UINTN                 NumberOfPages,
+  OUT EFI_MEMORY_TYPE       *MemoryType OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  MEMORY_MAP  *Entry;
+  UINTN       Alignment;
+  BOOLEAN     IsGuarded;
+
+  //
+  // Free the range
+  //
+  CoreAcquireMemoryLock ();
+
+  Status = GetMemoryMapEntry (Memory, &Entry);
+  if (EFI_ERROR (Status)) {
     goto Done;
   }
 
