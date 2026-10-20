@@ -1524,6 +1524,31 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGroupAssociationItemParser[] = {
   { "ReferencedTableGeneratorId", sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
 };
 
+/** A parser for EArchCommonObjFirmwareInventoryInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonFirmwareInventoryInfoParser[] = {
+  { "FirmwareInventoryInfoToken",   sizeof (CM_OBJECT_TOKEN),          "0x%p",  NULL        },
+  { "FirmwareComponentName",        SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "FirmwareVersion",              SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "FirmwareVersionFormat",        sizeof (UINT8),                    "0x%x",  NULL        },
+  { "FirmwareId",                   SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "FirmwareIdFormat",             sizeof (UINT8),                    "0x%x",  NULL        },
+  { "ReleaseDate",                  SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "Manufacturer",                 SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "LowestSupportedVersion",       SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "ImageSize",                    sizeof (UINT64),                   "0x%lx", NULL        },
+  { "Characteristics",              sizeof (FIRMWARE_CHARACTERISTICS), NULL,    HexDump     },
+  { "State",                        sizeof (UINT8),                    "0x%x",  NULL        },
+  { "AssociatedComponentListToken", sizeof (CM_OBJECT_TOKEN),          "0x%p",  NULL        },
+};
+
+/** A parser for EArchCommonObjFirmwareInventoryComponent.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonFirmwareInventoryComponentParser[] = {
+  { "ReferencedObjectToken",      sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "ReferencedTableGeneratorId", sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjBiosLanguageInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageInfoParser[] = {
@@ -1994,6 +2019,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationInfo,             CmArchCommonGroupAssociationInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationItem,             CmArchCommonGroupAssociationItemParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjVirtioMmioDeviceInfo,             CmArchCommonVirtioMmioDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjFirmwareInventoryInfo,            CmArchCommonFirmwareInventoryInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjFirmwareInventoryComponent,       CmArchCommonFirmwareInventoryComponentParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
