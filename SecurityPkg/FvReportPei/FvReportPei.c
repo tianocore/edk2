@@ -71,7 +71,10 @@ InstallPreHashFvPpi (
             + HashSize;
 
   PreHashedFvPpi = AllocatePool (PpiSize);
-  ASSERT (PreHashedFvPpi != NULL);
+  if (PreHashedFvPpi == NULL) {
+    ASSERT (PreHashedFvPpi != NULL);
+    return;
+  }
 
   PreHashedFvPpi->FvBase   = (UINT32)(UINTN)FvBuffer;
   PreHashedFvPpi->FvLength = (UINT32)FvLength;
@@ -83,7 +86,11 @@ InstallPreHashFvPpi (
   CopyMem (HASH_VALUE_PTR (HashInfo), HashValue, HashSize);
 
   FvInfoPpiDescriptor = AllocatePool (sizeof (EFI_PEI_PPI_DESCRIPTOR));
-  ASSERT (FvInfoPpiDescriptor != NULL);
+  if (FvInfoPpiDescriptor == NULL) {
+    ASSERT (FvInfoPpiDescriptor != NULL);
+    FreePool (PreHashedFvPpi);
+    return;
+  }
 
   FvInfoPpiDescriptor->Guid  = &gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid;
   FvInfoPpiDescriptor->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
@@ -202,8 +209,11 @@ VerifyHashedFv (
     // Copy FV to permanent memory to avoid potential TOC/TOU.
     //
     FvBuffer = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)FvInfo[FvIndex].Length));
-
-    ASSERT (FvBuffer != NULL);
+    if (FvBuffer == NULL) {
+      ASSERT (FvBuffer != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
 
     if (FvShadowPpi != NULL) {
       Status = FvShadowPpi->FirmwareVolumeShadow (

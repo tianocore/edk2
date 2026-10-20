@@ -37,6 +37,14 @@ STATIC UINTN  mGicDistributorBase;
 STATIC UINTN                       mGicNumInterrupts;
 STATIC HARDWARE_INTERRUPT_HANDLER  *mRegisteredInterruptHandlers;
 
+/**
+  Check whether an interrupt source is supported by the GIC.
+
+  @param[in] Source  Interrupt source to check.
+
+  @retval TRUE   Source is within the supported interrupt range.
+  @retval FALSE  Source is outside the supported interrupt range.
+**/
 STATIC
 BOOLEAN
 EFIAPI
@@ -47,6 +55,13 @@ GicIsValidSource (
   return Source < mGicNumInterrupts;
 }
 
+/**
+  Enable an interrupt in the GIC distributor.
+
+  @param[in] GicDistributorBase    Base address of the GIC distributor.
+  @param[in] GicRedistributorBase  Unused for GICv2.
+  @param[in] Source                Interrupt source, validated by the caller.
+**/
 STATIC
 VOID
 ArmGicEnableInterrupt (
@@ -69,6 +84,13 @@ ArmGicEnableInterrupt (
     );
 }
 
+/**
+  Disable an interrupt in the GIC distributor.
+
+  @param[in] GicDistributorBase    Base address of the GIC distributor.
+  @param[in] GicRedistributorBase  Unused for GICv2.
+  @param[in] Source                Interrupt source, validated by the caller.
+**/
 STATIC
 VOID
 ArmGicDisableInterrupt (
@@ -91,6 +113,16 @@ ArmGicDisableInterrupt (
     );
 }
 
+/**
+  Get the enable state of an interrupt in the GIC distributor.
+
+  @param[in] GicDistributorBase    Base address of the GIC distributor.
+  @param[in] GicRedistributorBase  Unused for GICv2.
+  @param[in] Source                Interrupt source, validated by the caller.
+
+  @retval TRUE   The interrupt is enabled.
+  @retval FALSE  The interrupt is disabled.
+**/
 STATIC
 BOOLEAN
 ArmGicIsInterruptEnabled (
@@ -132,7 +164,7 @@ GicV2EnableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -160,7 +192,7 @@ GicV2DisableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -190,7 +222,7 @@ GicV2GetInterruptSourceState (
   IN BOOLEAN                          *InterruptState
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -200,6 +232,14 @@ GicV2GetInterruptSourceState (
   return EFI_SUCCESS;
 }
 
+/**
+  Read the GICv2 interrupt acknowledge register.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+
+  @return The interrupt acknowledge register value, including the interrupt
+          ID and source CPU ID. A special interrupt ID may be returned.
+**/
 STATIC
 UINTN
 ArmGicV2AcknowledgeInterrupt (
@@ -210,6 +250,13 @@ ArmGicV2AcknowledgeInterrupt (
   return MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
 }
 
+/**
+  Signal completion of an interrupt to the GICv2 CPU interface.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+  @param[in] Source                     Interrupt acknowledge register value
+                                        for the interrupt being completed.
+**/
 STATIC
 VOID
 ArmGicV2EndOfInterrupt (
@@ -240,7 +287,7 @@ GicV2EndOfInterrupt (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -291,6 +338,20 @@ GicV2IrqInterruptHandler (
   }
 }
 
+/**
+  Register or unregister a handler for a GICv2 interrupt source.
+
+  Validate Source before indexing the registered interrupt handler array.
+
+  @param[in] This     Instance pointer for this protocol.
+  @param[in] Source   Hardware source of the interrupt.
+  @param[in] Handler  Interrupt handler to register. NULL unregisters the handler.
+
+  @retval EFI_SUCCESS            The handler was registered or unregistered.
+  @retval EFI_UNSUPPORTED        Source is not a supported interrupt source.
+  @retval EFI_INVALID_PARAMETER  Handler is NULL and no handler is registered.
+  @retval EFI_ALREADY_STARTED    A handler is already registered for Source.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -300,6 +361,10 @@ GicV2RegisterInterruptSource (
   IN HARDWARE_INTERRUPT_HANDLER       Handler
   )
 {
+  if (!GicIsValidSource (Source)) {
+    return EFI_UNSUPPORTED;
+  }
+
   return GicCommonRegisterInterruptSource (
            This,
            Source,
@@ -454,6 +519,11 @@ GicV2SetTriggerType (
   return EFI_SUCCESS;
 }
 
+/**
+  Enable interrupt forwarding from the GIC distributor.
+
+  @param[in] GicDistributorBase  Base address of the GIC distributor.
+**/
 STATIC
 VOID
 ArmGicEnableDistributor (
@@ -473,6 +543,11 @@ EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol = {
   GicV2SetTriggerType
 };
 
+/**
+  Enable the GICv2 CPU interface for the Non-Secure world.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+**/
 STATIC
 VOID
 ArmGicV2EnableInterruptInterface (
@@ -486,6 +561,11 @@ ArmGicV2EnableInterruptInterface (
   MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x1);
 }
 
+/**
+  Disable the GICv2 CPU interface and clear its priority mask.
+
+  @param[in] GicInterruptInterfaceBase  Base address of the GIC CPU interface.
+**/
 STATIC
 VOID
 ArmGicV2DisableInterruptInterface (

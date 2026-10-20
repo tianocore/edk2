@@ -13,7 +13,7 @@ By default, an Uncrustify configuration file named "uncrustify.cfg" located in t
 used. The value can be overridden to a package-specific path with the `ConfigFilePath` configuration file option.
 
 * Uncrustify source code and documentation: https://github.com/uncrustify/uncrustify
-* Project Mu Uncrustify fork source code and documentation: https://dev.azure.com/projectmu/Uncrustify
+* TianoCore Uncrustify fork source code and documentation: https://github.com/tianocore/uncrustify
 
 ## Files Checked in a Package
 

@@ -2,7 +2,9 @@
 #  Provides firmware device specific services to support updates of a firmware
 #  image stored in a firmware device.
 #
-#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  This is a NULL instance used for building when an actual instance is not needed.
+#
+#  Copyright (c) Microsoft Corporation.<BR>
 #  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent

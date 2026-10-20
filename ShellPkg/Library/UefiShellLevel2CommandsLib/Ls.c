@@ -709,6 +709,8 @@ PrintLsOutputRec (
     return ShellStatus;
   }
 
+  ListHead = NULL;
+
   Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR (Status)) {
     SHELL_FREE_NON_NULL (CorrectedPath);
@@ -880,13 +882,6 @@ MainCmdLs (
   CurDir             = NULL;
   Count              = 0;
   ListUnfiltered     = FALSE;
-
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
 
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");

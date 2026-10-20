@@ -23,6 +23,11 @@ class MetaFileTable():
     _ID_STEP_ = 1
     _ID_MAX_ = 99999999
 
+    # Column offsets into the rows this class appends to DB.TblFile. Keep in
+    # sync with the list built in __init__.
+    _FILE_PATH_ = 3
+    _FILE_FROM_ITEM_ = 6
+
     ## Constructor
     def __init__(self, DB, MetaFile, FileType, Temporary, FromItem=None):
         self.MetaFile = MetaFile
@@ -30,6 +35,7 @@ class MetaFileTable():
         self.DB = DB
 
         self.CurrentContent = []
+        # Columns here are addressed by the _FILE_*_ offsets above.
         DB.TblFile.append([MetaFile.Name,
                         MetaFile.Ext,
                         MetaFile.Dir,
@@ -297,6 +303,10 @@ class PlatformTable(MetaFileTable):
     # used as table end flag, in case the changes to database is not committed to db file
     _DUMMY_ = [-1, -1, '====', '====', '====', '====', '====','====', -1, -1, -1, -1, -1, -1, -1]
 
+    # Column offsets into the rows built by Insert(), matching _COLUMN_ above.
+    _ID_ = 0
+    _FROM_ITEM_ = 9
+
     ## Constructor
     def __init__(self, Cursor, MetaFile, Temporary, FromItem=0):
         MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_DSC, Temporary, FromItem)
@@ -385,6 +395,35 @@ class PlatformTable(MetaFileTable):
         for item in self.CurrentContent:
             if item[0] == comp_id or item[8] == comp_id:
                 item[-1] = -1
+
+    ## Find the file a record's line number refers to
+    #
+    # Records brought in by !include are spliced into the including file's
+    # record list, so this table's MetaFile is not necessarily the file the
+    # record's StartLine counts against. Such a record keeps the ID of the
+    # !include statement that pulled it in as its FromItem, and the table
+    # built for the included file stored that same ID, so FromItem maps back
+    # to the included file's path.
+    #
+    # @param RecordId:   ID of the record to locate
+    #
+    # @retval:       Path of the file the record was parsed from, or None if
+    #                this table holds no such record
+    #
+    def GetOriginFile(self, RecordId):
+        for Record in self.CurrentContent:
+            if Record[self._ID_] != RecordId:
+                continue
+            FromItem = Record[self._FROM_ITEM_]
+            # A record parsed straight out of this file has no originating
+            # !include statement to resolve.
+            if not FromItem or FromItem < 0:
+                return self.MetaFile
+            for File in self.DB.TblFile:
+                if File[self._FILE_FROM_ITEM_] == FromItem:
+                    return File[self._FILE_PATH_]
+            return self.MetaFile
+        return None
 
 ## Factory class to produce different storage for different type of meta-file
 class MetaFileStorage(object):
