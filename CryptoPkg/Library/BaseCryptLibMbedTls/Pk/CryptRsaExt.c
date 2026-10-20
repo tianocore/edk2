@@ -73,21 +73,24 @@ RsaGetKey (
   RsaKey = (mbedtls_rsa_context *)RsaContext;
 
   switch (KeyTag) {
+    //
+    // RSA Public Modulus (N)
+    //
     case RsaKeyN:
       Ret = mbedtls_rsa_export (RsaKey, &Value, NULL, NULL, NULL, NULL);
       break;
+    //
+    // RSA Public Exponent (e)
+    //
     case RsaKeyE:
       Ret = mbedtls_rsa_export (RsaKey, NULL, NULL, NULL, NULL, &Value);
       break;
+    //
+    // Deprecated: Private RSA key components are no longer supported.
+    //
     case RsaKeyD:
-      Ret = mbedtls_rsa_export (RsaKey, NULL, NULL, NULL, &Value, NULL);
-      break;
     case RsaKeyQ:
-      Ret = mbedtls_rsa_export (RsaKey, NULL, NULL, &Value, NULL, NULL);
-      break;
     case RsaKeyP:
-      Ret = mbedtls_rsa_export (RsaKey, NULL, &Value, NULL, NULL, NULL);
-      break;
     case RsaKeyDp:
     case RsaKeyDq:
     case RsaKeyQInv:
@@ -127,125 +130,5 @@ RsaGetKey (
 
 End:
   mbedtls_mpi_free (&Value);
-  return Ret == 0;
-}
-
-/**
-  Generates RSA key components.
-
-  This function generates RSA key components. It takes RSA public exponent Pe and
-  length in bits of RSA modulus N as input, and generates all key components.
-  If PublicExponent is NULL, the default RSA public exponent (0x10001) will be used.
-
-  Before this function can be invoked, pseudorandom number generator must be correctly
-  initialized by RandomSeed().
-
-  If RsaContext is NULL, then return FALSE.
-
-  @param[in, out]  RsaContext           Pointer to RSA context being set.
-  @param[in]       ModulusLength        Length of RSA modulus N in bits.
-  @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
-
-  @retval  TRUE   RSA key component was generated successfully.
-  @retval  FALSE  Invalid RSA key component tag.
-
-**/
-BOOLEAN
-EFIAPI
-RsaGenerateKey (
-  IN OUT VOID     *RsaContext,
-  IN UINTN        ModulusLength,
-  IN CONST UINT8  *PublicExponent,
-  IN UINTN        PublicExponentSize
-  )
-{
-  INT32                Ret;
-  mbedtls_rsa_context  *Rsa;
-  INT32                Pe;
-
-  //
-  // Check input parameters.
-  //
-  if ((RsaContext == NULL) || (ModulusLength > INT_MAX) || (PublicExponentSize > INT_MAX)) {
-    return FALSE;
-  }
-
-  Rsa = (mbedtls_rsa_context *)RsaContext;
-
-  if (PublicExponent == NULL) {
-    Pe = 0x10001;
-  } else {
-    if (PublicExponentSize == 0) {
-      return FALSE;
-    }
-
-    switch (PublicExponentSize) {
-      case 1:
-        Pe = PublicExponent[0];
-        break;
-      case 2:
-        Pe = PublicExponent[0] << 8 | PublicExponent[1];
-        break;
-      case 3:
-        Pe = PublicExponent[0] << 16 | PublicExponent[1] << 8 |
-             PublicExponent[2];
-        break;
-      case 4:
-        Pe = PublicExponent[0] << 24 | PublicExponent[1] << 16 |
-             PublicExponent[2] << 8 | PublicExponent[3];
-        break;
-      default:
-        return FALSE;
-    }
-  }
-
-  Ret = mbedtls_rsa_gen_key (
-          Rsa,
-          MbedtlsRand,
-          NULL,
-          (UINT32)ModulusLength,
-          Pe
-          );
-
-  return Ret == 0;
-}
-
-/**
-  Validates key components of RSA context.
-  NOTE: This function performs integrity checks on all the RSA key material, so
-        the RSA key structure must contain all the private key data.
-
-  This function validates key components of RSA context in following aspects:
-  - Whether p is a prime
-  - Whether q is a prime
-  - Whether n = p * q
-  - Whether d*e = 1  mod lcm(p-1,q-1)
-
-  If RsaContext is NULL, then return FALSE.
-
-  @param[in]  RsaContext  Pointer to RSA context to check.
-
-  @retval  TRUE   RSA key components are valid.
-  @retval  FALSE  RSA key components are not valid.
-
-**/
-BOOLEAN
-EFIAPI
-RsaCheckKey (
-  IN VOID  *RsaContext
-  )
-{
-  if (RsaContext == NULL) {
-    return FALSE;
-  }
-
-  UINT32  Ret;
-
-  Ret = mbedtls_rsa_complete (RsaContext);
-  if (Ret == 0) {
-    Ret = mbedtls_rsa_check_privkey (RsaContext);
-  }
-
   return Ret == 0;
 }
