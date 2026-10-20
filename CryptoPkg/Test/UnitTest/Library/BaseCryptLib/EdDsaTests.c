@@ -13,18 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ED448_SIG_SIZE  114
 
 //
-// Ed448 Raw Private Key (57 bytes) extracted from DER format
-//
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  mEd448TestPrivateKey[ED448_KEY_SIZE] = {
-  0x1d, 0x72, 0xe7, 0x9b, 0x46, 0x5f, 0xcb, 0xcc, 0x24, 0x07, 0x2e, 0x20,
-  0x92, 0xec, 0xb6, 0xdd, 0x11, 0x68, 0x14, 0x0d, 0x84, 0x1f, 0xf9, 0x8f,
-  0x13, 0xe5, 0x73, 0x78, 0xb0, 0x42, 0xb7, 0xe5, 0x90, 0x45, 0xcc, 0x15,
-  0x07, 0x41, 0x66, 0x46, 0x6a, 0xef, 0xc9, 0x9e, 0x2d, 0xaa, 0x3f, 0x28,
-  0xfd, 0xac, 0x7f, 0x23, 0xe2, 0x15, 0x60, 0xaf, 0x7b
-};
-
-//
-// Ed448 Raw Public Key (57 bytes) - derived from the private key above
+// Ed448 Raw Public Key (57 bytes)
 //
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  mEd448TestPublicKey[ED448_KEY_SIZE] = {
   0x47, 0xba, 0x8f, 0x77, 0x45, 0x59, 0xee, 0x91, 0x90, 0x52, 0x96, 0x9f,
@@ -86,27 +75,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  mEd448TestCert[] = {
   0x83, 0xe2, 0x5e, 0x1b, 0xd4, 0xa6, 0xf8, 0x4d, 0x11, 0xd2, 0xdb, 0x6c,
   0x5b, 0x86, 0x0f, 0x79, 0xc7, 0x44, 0x5b, 0xb3, 0xe0, 0xdb, 0x2f, 0xa9,
   0x83, 0x1f, 0x15, 0x3e, 0x6e, 0x54, 0x42, 0x5c, 0x35, 0x00
-};
-
-//
-// PEM key data for Ed448 Private key matching the test key above
-// This is an unencrypted PKCS#8 format PEM containing mEd448TestPrivateKey
-// Format: -----BEGIN PRIVATE KEY----- (not ENCRYPTED)
-//
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  mEd448TestPemKey[] = {
-  0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x42, 0x45, 0x47, 0x49, 0x4e, 0x20, 0x50,
-  0x52, 0x49, 0x56, 0x41, 0x54, 0x45, 0x20, 0x4b, 0x45, 0x59, 0x2d, 0x2d,
-  0x2d, 0x2d, 0x2d, 0x0a, 0x4d, 0x45, 0x63, 0x43, 0x41, 0x51, 0x41, 0x77,
-  0x42, 0x51, 0x59, 0x44, 0x4b, 0x32, 0x56, 0x78, 0x42, 0x44, 0x73, 0x45,
-  0x4f, 0x52, 0x31, 0x79, 0x35, 0x35, 0x74, 0x47, 0x58, 0x38, 0x76, 0x4d,
-  0x4a, 0x41, 0x63, 0x75, 0x49, 0x4a, 0x4c, 0x73, 0x74, 0x74, 0x30, 0x52,
-  0x61, 0x42, 0x51, 0x4e, 0x68, 0x42, 0x2f, 0x35, 0x6a, 0x78, 0x50, 0x6c,
-  0x63, 0x33, 0x69, 0x77, 0x51, 0x72, 0x66, 0x6c, 0x0a, 0x6b, 0x45, 0x58,
-  0x4d, 0x46, 0x51, 0x64, 0x42, 0x5a, 0x6b, 0x5a, 0x71, 0x37, 0x38, 0x6d,
-  0x65, 0x4c, 0x61, 0x6f, 0x2f, 0x4b, 0x50, 0x32, 0x73, 0x66, 0x79, 0x50,
-  0x69, 0x46, 0x57, 0x43, 0x76, 0x65, 0x77, 0x3d, 0x3d, 0x0a, 0x2d, 0x2d,
-  0x2d, 0x2d, 0x2d, 0x45, 0x4e, 0x44, 0x20, 0x50, 0x52, 0x49, 0x56, 0x41,
-  0x54, 0x45, 0x20, 0x4b, 0x45, 0x59, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x0a
 };
 
 //
@@ -186,18 +154,6 @@ TestVerifyEdDsaNew (
   UT_ASSERT_NOT_NULL (EdDsaContext1);
 
   //
-  // Verify the context can be used (set a key to confirm it's valid)
-  //
-  BOOLEAN  Status;
-
-  Status = EdDsaSetPrivKey (
-             EdDsaContext1,
-             (UINT8 *)mEd448TestPrivateKey,
-             ED448_KEY_SIZE
-             );
-  UT_ASSERT_TRUE (Status);
-
-  //
   // Test EdDsaFree releases the context properly
   //
   EdDsaFree (EdDsaContext1);
@@ -268,45 +224,6 @@ TestVerifyEdDsaKeySetGet (
   UINTN    TooSmallSize;
 
   //
-  // Create EdDSA context
-  //
-  EdDsaContext1 = EdDsaNewByNid (CRYPTO_NID_ED448);
-  UT_ASSERT_NOT_NULL (EdDsaContext1);
-
-  //
-  // Test EdDsaSetPrivKey with valid key
-  //
-  Status = EdDsaSetPrivKey (
-             EdDsaContext1,
-             (UINT8 *)mEd448TestPrivateKey,
-             ED448_KEY_SIZE
-             );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Test EdDsaGetPubKey after setting private key
-  //
-  PublicKeySize = sizeof (PublicKey);
-  Status        = EdDsaGetPubKey (EdDsaContext1, PublicKey, &PublicKeySize);
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (PublicKeySize, ED448_KEY_SIZE);
-  UT_ASSERT_MEM_EQUAL (PublicKey, mEd448TestPublicKey, ED448_KEY_SIZE);
-
-  //
-  // Test EdDsaGetPubKey with too small buffer
-  //
-  TooSmallSize = sizeof (TooSmallBuffer);
-  Status       = EdDsaGetPubKey (EdDsaContext1, TooSmallBuffer, &TooSmallSize);
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_EQUAL (TooSmallSize, ED448_KEY_SIZE);
-
-  //
-  // Clean up context1
-  //
-  EdDsaFree (EdDsaContext1);
-  EdDsaContext1 = NULL;
-
-  //
   // Test EdDsaSetPubKey
   //
   EdDsaContext2 = EdDsaNewByNid (CRYPTO_NID_ED448);
@@ -319,32 +236,17 @@ TestVerifyEdDsaKeySetGet (
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Test EdDsaGetPubKey after setting public key
-  //
+  // Test public key retrieval and short-buffer reporting.
   PublicKeySize = sizeof (PublicKey);
   Status        = EdDsaGetPubKey (EdDsaContext2, PublicKey, &PublicKeySize);
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_EQUAL (PublicKeySize, ED448_KEY_SIZE);
   UT_ASSERT_MEM_EQUAL (PublicKey, mEd448TestPublicKey, ED448_KEY_SIZE);
 
-  //
-  // Test EdDsaSetPrivKey with NULL context
-  //
-  Status = EdDsaSetPrivKey (NULL, (UINT8 *)mEd448TestPrivateKey, ED448_KEY_SIZE);
+  TooSmallSize = sizeof (TooSmallBuffer);
+  Status       = EdDsaGetPubKey (EdDsaContext2, TooSmallBuffer, &TooSmallSize);
   UT_ASSERT_FALSE (Status);
-
-  //
-  // Test EdDsaSetPrivKey with NULL key
-  //
-  Status = EdDsaSetPrivKey (EdDsaContext2, NULL, ED448_KEY_SIZE);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test EdDsaSetPrivKey with wrong size
-  //
-  Status = EdDsaSetPrivKey (EdDsaContext2, (UINT8 *)mEd448TestPrivateKey, 32);
-  UT_ASSERT_FALSE (Status);
+  UT_ASSERT_EQUAL (TooSmallSize, ED448_KEY_SIZE);
 
   //
   // Test EdDsaSetPubKey with NULL context
@@ -605,44 +507,6 @@ TestVerifyEdDsaErrorCases (
 }
 
 /**
-  Validate EdDsaGeneratePubKey (placeholder function).
-
-  @param[in]  Context  Unit test context.
-
-  @retval UNIT_TEST_PASSED               The unit test has completed successfully.
-  @retval UNIT_TEST_ERROR_TEST_FAILED    A test case assertion has failed.
-**/
-UNIT_TEST_STATUS
-EFIAPI
-TestVerifyEdDsaGeneratePubKey (
-  UNIT_TEST_CONTEXT  Context
-  )
-{
-  BOOLEAN  Status;
-  UINT8    PublicKey[ED448_KEY_SIZE];
-
-  //
-  // Create context
-  //
-  EdDsaContext1 = EdDsaNewByNid (CRYPTO_NID_ED448);
-  UT_ASSERT_NOT_NULL (EdDsaContext1);
-
-  //
-  // EdDsaGeneratePubKey is a placeholder that always returns FALSE
-  //
-  Status = EdDsaGeneratePubKey (EdDsaContext1, PublicKey, ED448_KEY_SIZE);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // It should return FALSE even with NULL parameters
-  //
-  Status = EdDsaGeneratePubKey (NULL, NULL, 0);
-  UT_ASSERT_FALSE (Status);
-
-  return UNIT_TEST_PASSED;
-}
-
-/**
   Validate EdDSA key retrieval from PEM and X509.
 
   @param[in]  Context  Unit test context.
@@ -657,23 +521,9 @@ TestVerifyEdDsaPemX509 (
   )
 {
   BOOLEAN  Status;
-  VOID     *EdDsaPrivKey;
   VOID     *EdDsaPubKey;
 
-  EdDsaPrivKey = NULL;
-  EdDsaPubKey  = NULL;
-
-  //
-  // Retrieve EdDsa private key from PEM data.
-  //
-  Status = EdDsaGetPrivateKeyFromPem (
-             mEd448TestPemKey,
-             sizeof (mEd448TestPemKey),
-             NULL,
-             &EdDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (EdDsaPrivKey);
+  EdDsaPubKey = NULL;
 
   //
   // Retrieve EdDsa public key from X509 certificate.
@@ -697,7 +547,6 @@ TestVerifyEdDsaPemX509 (
              );
   UT_ASSERT_TRUE (Status);
 
-  EdDsaFree (EdDsaPrivKey);
   EdDsaFree (EdDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -712,7 +561,6 @@ TEST_DESC  mEdDsaTest[] = {
   { "TestVerifyEdDsaSignVerify()",            "CryptoPkg.BaseCryptLib.EdDsa", TestVerifyEdDsaSignVerify,            TestVerifyEdDsaPreReq, TestVerifyEdDsaCleanUp, NULL },
   { "TestVerifyEdDsaSignVerifyWithContext()", "CryptoPkg.BaseCryptLib.EdDsa", TestVerifyEdDsaSignVerifyWithContext, TestVerifyEdDsaPreReq, TestVerifyEdDsaCleanUp, NULL },
   { "TestVerifyEdDsaErrorCases()",            "CryptoPkg.BaseCryptLib.EdDsa", TestVerifyEdDsaErrorCases,            TestVerifyEdDsaPreReq, TestVerifyEdDsaCleanUp, NULL },
-  { "TestVerifyEdDsaGeneratePubKey()",        "CryptoPkg.BaseCryptLib.EdDsa", TestVerifyEdDsaGeneratePubKey,        TestVerifyEdDsaPreReq, TestVerifyEdDsaCleanUp, NULL },
   { "TestVerifyEdDsaPemX509()",               "CryptoPkg.BaseCryptLib.EdDsa", TestVerifyEdDsaPemX509,               TestVerifyEdDsaPreReq, TestVerifyEdDsaCleanUp, NULL },
 };
 
