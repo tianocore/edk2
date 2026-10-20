@@ -444,23 +444,10 @@ TestVerifyEcKey (
   )
 {
   BOOLEAN  Status;
-  VOID     *EcPrivKey;
   VOID     *EcPubKey;
   UINT8    MessageHash[SHA256_DIGEST_SIZE];
 
-  EcPrivKey = NULL;
-  EcPubKey  = NULL;
-
-  //
-  // Retrieve EC private key from PEM data.
-  //
-  Status = EcGetPrivateKeyFromPem (
-             mEccTestPemKey,
-             sizeof (mEccTestPemKey),
-             NULL,
-             &EcPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
+  EcPubKey = NULL;
 
   //
   // Retrieve EC public key from X509 Certificate.
@@ -489,7 +476,6 @@ TestVerifyEcKey (
              );
   UT_ASSERT_TRUE (Status);
 
-  EcFree (EcPrivKey);
   EcFree (EcPubKey);
 
   return UNIT_TEST_PASSED;
