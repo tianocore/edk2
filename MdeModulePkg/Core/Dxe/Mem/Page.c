@@ -1549,6 +1549,10 @@ CoreFreePages (
   EFI_MEMORY_TYPE  MemoryType;
   UINT64           Attributes;
 
+  if (((Memory & EFI_PAGE_MASK) != 0) || (NumberOfPages == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   // check if this memory is returned to the core as RW at a minimum. If the memory attribute protocol is not installed,
   // then we assume that the memory is RW by default and continue to free it.
   if (gMemoryAttributeProtocol != NULL) {
