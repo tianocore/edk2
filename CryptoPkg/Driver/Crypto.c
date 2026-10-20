@@ -2808,7 +2808,7 @@ CryptoServiceRsaGenerateKey (
   IN      UINTN        PublicExponentSize
   )
 {
-  return CALL_BASECRYPTLIB (Rsa.Services.GenerateKey, RsaGenerateKey, (RsaContext, ModulusLength, PublicExponent, PublicExponentSize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -2838,7 +2838,7 @@ CryptoServiceRsaCheckKey (
   IN  VOID  *RsaContext
   )
 {
-  return CALL_BASECRYPTLIB (Rsa.Services.CheckKey, RsaCheckKey, (RsaContext), FALSE);
+  return FALSE;
 }
 
 /**
@@ -2946,7 +2946,7 @@ CryptoServiceRsaGetPrivateKeyFromPem (
   OUT  VOID         **RsaContext
   )
 {
-  return CALL_BASECRYPTLIB (Rsa.Services.GetPrivateKeyFromPem, RsaGetPrivateKeyFromPem, (PemData, PemSize, Password, RsaContext), FALSE);
+  return FALSE;
 }
 
 /**
@@ -3852,7 +3852,7 @@ CryptoServicePkcs1v2Decrypt (
   OUT  UINTN        *OutDataSize
   )
 {
-  return CALL_BASECRYPTLIB (Pkcs.Services.Pkcs1v2Decrypt, Pkcs1v2Decrypt, (PrivateKey, PrivateKeySize, EncryptedData, EncryptedDataSize, OutData, OutDataSize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -3893,7 +3893,7 @@ CryptoServiceRsaOaepDecrypt (
   OUT  UINTN   *OutDataSize
   )
 {
-  return CALL_BASECRYPTLIB (Rsa.Services.RsaOaepDecrypt, RsaOaepDecrypt, (RsaContext, EncryptedData, EncryptedDataSize, DigestLen, OutData, OutDataSize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -4148,7 +4148,7 @@ CryptoServicePkcs7Decrypt (
   OUT  UINTN        *OutDataSize
   )
 {
-  return CALL_BASECRYPTLIB (Pkcs.Services.Pkcs7Decrypt, Pkcs7Decrypt, (PemData, PemSize, Password, RecipientCert, RecipientCertSize, ContentInfo, ContentInfoSize, Flags, OutData, OutDataSize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -7536,7 +7536,7 @@ CryptoServiceEcGetPrivateKeyFromPem (
   OUT  VOID         **EcContext
   )
 {
-  return CALL_BASECRYPTLIB (Ec.Services.GetPrivateKeyFromPem, EcGetPrivateKeyFromPem, (PemData, PemSize, Password, EcContext), FALSE);
+  return FALSE;
 }
 
 /**
@@ -7706,7 +7706,7 @@ CryptoServiceEdDsaSetPrivKey (
   IN    UINTN  PrivateKeySize
   )
 {
-  return CALL_BASECRYPTLIB (EdDsa.Services.SetPrivKey, EdDsaSetPrivKey, (EdDsaContext, PrivateKey, PrivateKeySize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -7733,7 +7733,7 @@ CryptoServiceEdDsaGeneratePubKey (
   IN   UINTN  PublicKeySize
   )
 {
-  return CALL_BASECRYPTLIB (EdDsa.Services.GeneratePubKey, EdDsaGeneratePubKey, (EdDsaContext, PublicKey, PublicKeySize), TRUE);
+  return FALSE;
 }
 
 /**
@@ -7858,7 +7858,7 @@ CryptoServiceEdDsaGetPrivateKeyFromPem (
   OUT  VOID         **EdDsaContext
   )
 {
-  return CALL_BASECRYPTLIB (EdDsa.Services.GetPrivateKeyFromPem, EdDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, EdDsaContext), FALSE);
+  return FALSE;
 }
 
 /**
@@ -8031,7 +8031,7 @@ CryptoServiceMlDsaSetPrivKey (
   IN    UINTN  PrivateKeySize
   )
 {
-  return CALL_BASECRYPTLIB (MlDsa.Services.SetPrivKey, MlDsaSetPrivKey, (MlDsaContext, PrivateKey, PrivateKeySize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -8053,7 +8053,7 @@ CryptoServiceMlDsaGeneratePubKey (
   IN  UINTN  PublicKeySize
   )
 {
-  return CALL_BASECRYPTLIB (MlDsa.Services.GeneratePubKey, MlDsaGeneratePubKey, (MlDsaContext, PublicKey, PublicKeySize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -8147,7 +8147,7 @@ CryptoServiceMlDsaGetPrivateKeyFromPem (
   OUT  VOID         **MlDsaContext
   )
 {
-  return CALL_BASECRYPTLIB (MlDsa.Services.GetPrivateKeyFromPem, MlDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, MlDsaContext), FALSE);
+  return FALSE;
 }
 
 /**
@@ -8285,7 +8285,7 @@ CryptoServiceSlhDsaSetPrivKey (
   IN    UINTN  PrivateKeySize
   )
 {
-  return CALL_BASECRYPTLIB (SlhDsa.Services.SetPrivKey, SlhDsaSetPrivKey, (SlhDsaContext, PrivateKey, PrivateKeySize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -8307,7 +8307,7 @@ CryptoServiceSlhDsaGeneratePubKey (
   IN  UINTN  PublicKeySize
   )
 {
-  return CALL_BASECRYPTLIB (SlhDsa.Services.GeneratePubKey, SlhDsaGeneratePubKey, (SlhDsaContext, PublicKey, PublicKeySize), FALSE);
+  return FALSE;
 }
 
 /**
@@ -8401,7 +8401,7 @@ CryptoServiceSlhDsaGetPrivateKeyFromPem (
   OUT  VOID         **SlhDsaContext
   )
 {
-  return CALL_BASECRYPTLIB (SlhDsa.Services.GetPrivateKeyFromPem, SlhDsaGetPrivateKeyFromPem, (PemData, PemSize, Password, SlhDsaContext), FALSE);
+  return FALSE;
 }
 
 /**
