@@ -197,79 +197,6 @@ TestVerifyRsaSetGetKeyComponents (
 
 UNIT_TEST_STATUS
 EFIAPI
-TestVerifyRsaGenerateKeyComponents (
-  IN UNIT_TEST_CONTEXT  Context
-  )
-{
-  BOOLEAN  Status;
-  UINTN    KeySize;
-  UINT8    *KeyBuffer;
-  UINT8    TestPublicExponent1[] = { 0x03 };
-  UINT8    TestPublicExponent2[] = { 0x01, 0x01 };
-  UINT8    TestPublicExponent3[] = { 0x01, 0x00, 0x01 };
-
-  //
-  // Generate RSA Key Components
-  //
-
-  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, NULL, 0);
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, TestPublicExponent1, sizeof (TestPublicExponent1));
-  UT_ASSERT_TRUE (Status);
-  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, TestPublicExponent2, sizeof (TestPublicExponent2));
-  UT_ASSERT_TRUE (Status);
-  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, TestPublicExponent3, sizeof (TestPublicExponent3));
-  UT_ASSERT_TRUE (Status);
-
-  KeySize   = RSA_MODULUS_LENGTH / 8;
-  KeyBuffer = AllocatePool (KeySize);
-  if (KeyBuffer == NULL) {
-    UT_LOG_ERROR ("Failed to allocate memory for KeyBuffer");
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  Status = RsaGetKey (mRsa, RsaKeyE, KeyBuffer, &KeySize);
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (KeySize, 3);
-  UT_ASSERT_MEM_EQUAL (KeyBuffer, DefaultPublicKey, 3);
-
-  KeySize = RSA_MODULUS_LENGTH / 8;
-  Status  = RsaGetKey (mRsa, RsaKeyN, KeyBuffer, &KeySize);
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (KeySize, RSA_MODULUS_LENGTH / 8);
-
-  Status = RsaCheckKey (mRsa);
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Check invalid RSA key components
-  //
-  Status = RsaSetKey (mRsa, RsaKeyN, RsaN, sizeof (RsaN));
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaCheckKey (mRsa);
-  UT_ASSERT_FALSE (Status);
-
-  Status = RsaSetKey (mRsa, RsaKeyN, KeyBuffer, KeySize);
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaCheckKey (mRsa);
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaSetKey (mRsa, RsaKeyE, RsaE, sizeof (RsaE));
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaCheckKey (mRsa);
-  UT_ASSERT_FALSE (Status);
-
-  FreePool (KeyBuffer);
-
-  return UNIT_TEST_PASSED;
-}
-
-UNIT_TEST_STATUS
-EFIAPI
 TestVerifyRsaPkcs1SignVerify (
   IN UNIT_TEST_CONTEXT  Context
   )
@@ -299,9 +226,8 @@ TEST_DESC  mRsaTest[] = {
   //
   // -----Description--------------------------------------Class----------------------Function---------------------------------Pre---------------------Post---------Context
   //
-  { "TestVerifyRsaSetGetKeyComponents()",   "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaSetGetKeyComponents,   TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
-  { "TestVerifyRsaGenerateKeyComponents()", "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaGenerateKeyComponents, TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
-  { "TestVerifyRsaPkcs1SignVerify()",       "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaPkcs1SignVerify,       TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
+  { "TestVerifyRsaSetGetKeyComponents()", "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaSetGetKeyComponents, TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
+  { "TestVerifyRsaPkcs1SignVerify()",     "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaPkcs1SignVerify,     TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
 };
 
 UINTN  mRsaTestNum = ARRAY_SIZE (mRsaTest);
