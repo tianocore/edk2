@@ -873,9 +873,6 @@ EnableDisableAP (
   UINTN        StatusFlag;
   CPU_AP_DATA  *CpuData;
 
-  StatusFlag = mCpuMpData.CpuData[ProcessorNumber].Info.StatusFlag;
-  CpuData    = &mCpuMpData.CpuData[ProcessorNumber];
-
   if (!IsCurrentProcessorBSP ()) {
     return EFI_DEVICE_ERROR;
   }
@@ -887,6 +884,9 @@ EnableDisableAP (
   if (IsProcessorBSP (ProcessorNumber)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  CpuData    = &mCpuMpData.CpuData[ProcessorNumber];
+  StatusFlag = CpuData->Info.StatusFlag;
 
   if ((GetApState (CpuData) != CpuStateIdle) &&
       (GetApState (CpuData) != CpuStateFinished))
