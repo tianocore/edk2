@@ -81,6 +81,21 @@ ParseSmbiosTable (
   );
 
 /**
+  Parse the boot mode from the coreboot table in memory.
+
+  @param  Mode              Pointer to the boot mode variable
+
+  @retval RETURN_SUCCESS     Successfully find out the memory information.
+  @retval RETURN_NOT_FOUND   Failed to find the memory information.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseBootMode (
+  OUT EFI_BOOT_MODE  *Mode
+  );
+
+/**
   Acquire ACPI table from bootloader.
 
   @param  AcpiTableHob              Pointer to the ACPI table info.

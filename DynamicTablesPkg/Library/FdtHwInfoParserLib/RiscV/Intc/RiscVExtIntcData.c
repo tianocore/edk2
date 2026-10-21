@@ -31,7 +31,7 @@ typedef struct {
       RISCV_EXT_INTC_DATA_SIGNATURE       \
       );
 
-STATIC LIST_ENTRY  mExtIntcList;
+STATIC LIST_ENTRY  mExtIntcList = INITIALIZE_LIST_HEAD_VARIABLE (mExtIntcList);
 
 /** Create list of external interrupt controllers.
 
@@ -59,8 +59,6 @@ FdtCreateExtIntcList (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  // Initialise the list head.
-  InitializeListHead (&mExtIntcList);
   Node->Signature   = RISCV_EXT_INTC_DATA_SIGNATURE;
   Node->ExtIntcNode = ExtIntcNode;
   Node->GsiBase     = GsiBase;

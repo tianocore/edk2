@@ -14,6 +14,7 @@
 #include "FdtHwInfoParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
 #include "Arm/Gic/ArmGicItsParser.h"
+#include "Arm/Iort/ArmIortParser.h"
 
 /** Parse a Gic compatible interrupt-controller node,
     extracting GicIts information.
@@ -85,7 +86,7 @@ GicItsIntcNodeParser (
     CM_OBJECT_TOKEN    Token;                          // {default = CM_NULL_TOKEN}
     UINT32             ItsIdCount;                     // {Populated}
     CM_OBJECT_TOKEN    ItsIdToken;                     // {Populated}
-    UINT32             Identifier;                     // {default = 0}
+    UINT32             Identifier;                     // {Populated}
   } CM_ARM_ITS_GROUP_NODE;
 
   typedef struct CmArmGicItsIdentifier {
@@ -233,6 +234,7 @@ ArmGicItsInfoParser (
 
     ItsGroupNodeInfo.ItsIdCount = 1;
     ItsGroupNodeInfo.ItsIdToken = Token;
+    ItsGroupNodeInfo.Identifier = GetNextIortIdentifier ();
 
     // Add the CmObj to the Configuration Manager.
     // Abstract token allows the IORT parser to link to this object

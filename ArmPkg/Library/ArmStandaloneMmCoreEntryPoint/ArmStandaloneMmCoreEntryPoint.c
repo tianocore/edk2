@@ -2,7 +2,7 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-  Copyright (c) 2017 - 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -454,12 +454,12 @@ GetServiceType (
 }
 
 /**
-  Check command buffer is belong to secure shared buffer.
+  Check whether the communication buffer belongs to the secure shared buffer.
 
-  @param  [in] CommBufferAddr   Address of the common buffer.
+  @param  [in] CommBufferAddr   Address of the communication buffer.
 
-  @retval   TRUE                    CommBufferAddr is in secure shared buffer
-  @retval   FALSE                   Other
+  @retval   TRUE                CommBufferAddr is in secure shared buffer.
+  @retval   FALSE               CommBufferAddr is outside the secure shared buffer.
 
 **/
 STATIC
@@ -468,13 +468,8 @@ IsSecureMmCommBufferAddr (
   IN UINTN  CommBufferAddr
   )
 {
-  if ((CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
-      (CommBufferAddr < (mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize)))
-  {
-    return TRUE;
-  }
-
-  return FALSE;
+  return (CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
+         (CommBufferAddr < (mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize));
 }
 
 /**
@@ -1187,6 +1182,7 @@ CEntryPoint (
   EFI_CONFIGURATION_TABLE             *ConfigurationTable;
   UINTN                               Idx;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK      *MmramRangesHob;
+  UINT64                              CommBufferEnd;
 
   CpuDriverEntryPoint = NULL;
 
@@ -1318,6 +1314,16 @@ CEntryPoint (
     goto finish;
   }
 
+  Status = SafeUint64Add (
+             mNsCommBuffer->PhysicalStart,
+             mNsCommBuffer->PhysicalSize,
+             &CommBufferEnd
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Non-secure communication buffer range overflows.\n"));
+    goto finish;
+  }
+
   //
   // The base and size of buffer shared with
   // privileged Secure world software is in PeiMmramMemoryReservedGuid Hob.
@@ -1339,6 +1345,16 @@ CEntryPoint (
   }
 
   mSCommBuffer = &MmramRangesHob->Descriptor[MMRAM_DESC_IDX_SECURE_SHARED_BUFFER];
+
+  Status = SafeUint64Add (
+             mSCommBuffer->PhysicalStart,
+             mSCommBuffer->PhysicalSize,
+             &CommBufferEnd
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Secure communication buffer range overflows.\n"));
+    goto finish;
+  }
 
   //
   // Find out cpu driver entry point used in DelegatedEventLoop
