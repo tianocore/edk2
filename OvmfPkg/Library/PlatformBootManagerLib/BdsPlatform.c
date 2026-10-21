@@ -958,14 +958,15 @@ VisitingAPciInstance (
   PciIo = (EFI_PCI_IO_PROTOCOL *)Instance;
 
   //
-  // Check for all PCI device
+  // Read the device-independent PCI header region
   //
+  ZeroMem (&Pci, sizeof (Pci));
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint32,
                         0,
-                        sizeof (Pci) / sizeof (UINT32),
-                        &Pci
+                        sizeof (Pci.Hdr) / sizeof (UINT32),
+                        &Pci.Hdr
                         );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1163,8 +1164,8 @@ PlatformInitializeConsole (
   Ported from SeaBIOS, src/fw/pciinit.c, *_pci_slot_get_irq()
 
   @param[in]  Handle - Handle of PCI device instance
-  @param[in]  PciIo - PCI IO protocol instance
-  @param[in]  PciHdr - PCI Header register block
+  @param[in]  Instance - PCI IO protocol instance
+  @param[in]  Context - Context pointer (unused)
 
   @retval EFI_SUCCESS - PCI Interrupt Line register configured successfully.
 
@@ -1172,22 +1173,35 @@ PlatformInitializeConsole (
 EFI_STATUS
 EFIAPI
 SetPciIntLine (
-  IN EFI_HANDLE           Handle,
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN PCI_TYPE00           *PciHdr
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance,
+  IN VOID        *Context
   )
 {
+  EFI_PCI_IO_PROTOCOL       *PciIo;
   EFI_DEVICE_PATH_PROTOCOL  *DevPathNode;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     RootSlot;
   UINTN                     Idx;
+  UINT8                     InterruptPin;
   UINT8                     IrqLine;
   EFI_STATUS                Status;
   UINT32                    RootBusNumber;
 
-  Status = EFI_SUCCESS;
+  PciIo = (EFI_PCI_IO_PROTOCOL *)Instance;
 
-  if (PciHdr->Device.InterruptPin != 0) {
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        PCI_INT_PIN_OFFSET,
+                        1,
+                        &InterruptPin
+                        );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (InterruptPin != 0) {
     DevPathNode = DevicePathFromHandle (Handle);
     ASSERT (DevPathNode != NULL);
     DevPath = DevPathNode;
@@ -1206,7 +1220,7 @@ SetPciIntLine (
     //
     Status   = EFI_NOT_FOUND;
     RootSlot = 0;
-    Idx      = PciHdr->Device.InterruptPin - 1;
+    Idx      = InterruptPin - 1;
     while (!IsDevicePathEnd (DevPathNode)) {
       if ((DevicePathType (DevPathNode) == HARDWARE_DEVICE_PATH) &&
           (DevicePathSubType (DevPathNode) == HW_PCI_DP))
@@ -1380,7 +1394,11 @@ PciAcpiInitialization (
   //
   // Initialize PCI_INTERRUPT_LINE for applicable present PCI devices
   //
-  VisitAllPciInstances (SetPciIntLine);
+  VisitAllInstancesOfProtocol (
+    &gEfiPciIoProtocolGuid,
+    SetPciIntLine,
+    NULL
+    );
 
   //
   // Set ACPI SCI_EN bit in PMCNTRL
