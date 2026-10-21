@@ -1544,6 +1544,23 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSmc91xInfoParser[] = {
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) }
 };
 
+/** A parser for EArchCommonObjVirtioMmioDeviceInfo.
+
+  Extended and generic interrupts have the same layout, so the generic
+  interrupt parser is reused.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonVirtioMmioDeviceInfoParser[] = {
+  { "BaseAddress",       8,                "0x%llx", NULL },
+  { "BaseAddressLength", 8,                "0x%llx", NULL },
+  { "Interrupt",
+    sizeof (CM_ARCH_COMMON_EXTENDED_INTERRUPT),
+    NULL,
+    NULL,
+    CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "CacheCoherent",     sizeof (BOOLEAN), "0x%x",   NULL }
+};
+
 /** A parser for EArchCommonObjSystemPowerSupplyInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonSystemPowerSupplyInfoParser[] = {
@@ -1936,6 +1953,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjSmc91xInfo,                       CmArchCommonSmc91xInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationInfo,             CmArchCommonGroupAssociationInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationItem,             CmArchCommonGroupAssociationItemParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjVirtioMmioDeviceInfo,             CmArchCommonVirtioMmioDeviceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
