@@ -2,7 +2,7 @@
   Support routines for memory allocation routines based on Standalone MM Core internal functions.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -154,7 +154,8 @@ FreePages (
   If there is not enough memory at the specified alignment remaining to satisfy the request, then
   NULL is returned.
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
+  If Alignment is invalid and assertions are disabled, then NULL is returned.
+  If the total number of pages required overflows, then NULL is returned.
 
   @param  MemoryType            The type of memory to allocate.
   @param  Pages                 The number of 4 KB pages to allocate.
@@ -164,6 +165,7 @@ FreePages (
   @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
+STATIC
 VOID *
 InternalAllocateAlignedPages (
   IN EFI_MEMORY_TYPE  MemoryType,
@@ -183,20 +185,22 @@ InternalAllocateAlignedPages (
   //
   ASSERT ((Alignment & (Alignment - 1)) == 0);
 
-  if (Pages == 0) {
+  if ((Pages == 0) ||
+      ((Alignment & (Alignment - 1)) != 0))
+  {
     return NULL;
   }
 
   if (Alignment > EFI_PAGE_SIZE) {
     //
-    // Calculate the total number of pages since alignment is larger than page size.
+    // Check for overflow before calculating the total page count.
     //
+    if (Pages > (MAX_UINTN - EFI_SIZE_TO_PAGES (Alignment))) {
+      return NULL;
+    }
+
     AlignmentMask = Alignment - 1;
     RealPages     = Pages + EFI_SIZE_TO_PAGES (Alignment);
-    //
-    // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
-    //
-    ASSERT (RealPages > Pages);
 
     Status = gMmst->MmAllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
     if (EFI_ERROR (Status)) {
@@ -246,7 +250,8 @@ InternalAllocateAlignedPages (
   request, then NULL is returned.
 
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
+  If Alignment is invalid and assertions are disabled, then NULL is returned.
+  If the total number of pages required overflows, then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
@@ -274,7 +279,8 @@ AllocateAlignedPages (
   request, then NULL is returned.
 
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
+  If Alignment is invalid and assertions are disabled, then NULL is returned.
+  If the total number of pages required overflows, then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
@@ -302,7 +308,7 @@ AllocateAlignedRuntimePages (
   request, then NULL is returned.
 
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
+  If the total number of pages required overflows, then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
