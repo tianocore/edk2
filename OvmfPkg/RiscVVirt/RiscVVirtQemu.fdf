@@ -129,6 +129,7 @@ INF  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 INF  UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
 INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+INF  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
 
 #
 # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
