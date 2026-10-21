@@ -167,7 +167,14 @@ GetNameFromUiSection (
   UINTN                          StringSize;
   UINT32                         AuthenticationStatus;
 
-  Status = gBS->HandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
+  Status = gBS->OpenProtocol (
+                  FvHandle,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  (VOID **)&Fv,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
