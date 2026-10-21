@@ -215,6 +215,7 @@
   MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   MdeModulePkg/Logo/Logo.inf
   MdeModulePkg/Logo/LogoDxe.inf
+  MdeModulePkg/Logo/LogoFfsDxe.inf
   MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   MdeModulePkg/Library/GptLib/GptLib.inf
   MdeModulePkg/Library/BootDiscoveryPolicyUiLib/BootDiscoveryPolicyUiLib.inf

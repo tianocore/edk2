@@ -2372,6 +2372,13 @@
   # @Prompt PCI CRS timeout in seconds.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds|0|UINT32|0x1000002B
 
+  ## GUID of the FFS file containing the BMP logo used by LogoDxe.
+  #  When set to all zeros (default), LogoDxe uses the embedded HII logo.
+  #  When set to a non-zero GUID, LogoDxe loads the logo from the specified
+  #  FFS file in the firmware volume.<BR><BR>
+  # @Prompt Logo FFS file GUID.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLogoFileGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x1000002C
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
