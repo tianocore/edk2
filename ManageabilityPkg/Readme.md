@@ -180,14 +180,16 @@ platform design.
 
 ## IPMI KCS Register Addresses
 
-Existing platforms may continue configuring `PcdIpmiKcsIoBaseAddress`. When
-both explicit register PCDs retain their `0xFFFF` defaults, the data register
-is at the legacy base and the command/status register is at base plus one.
-The default addresses remain `0xCA2/0xCA3`. The base PCD is deprecated for new
-platform configurations, but remains supported with no removal scheduled.
+Platforms may choose either supported address configuration:
 
-New platforms should configure both explicit register addresses as FixedAtBuild.
-For example, non-contiguous ports `0x62/0x66` are configured as:
+- Set `PcdIpmiKcsIoBaseAddress` for a contiguous layout. When both explicit
+  register PCDs are `0xFFFF`, data is at the base address and command/status is
+  at base plus one. The default addresses remain `0xCA2/0xCA3`.
+- Set both explicit register address PCDs as FixedAtBuild for an explicit layout.
+  The explicit addresses are used directly and the base PCD is ignored.
+
+Neither configuration is deprecated. For example, non-contiguous ports
+`0x62/0x66` are configured as:
 
 ```text
 [PcdsFixedAtBuild]
@@ -195,10 +197,9 @@ For example, non-contiguous ports `0x62/0x66` are configured as:
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress|0x66
 ```
 
-Explicit addresses are used directly, regardless of the legacy base. Configuring
-only one explicit address, or specifying the same address for both registers,
-fails the build. Command addresses below data addresses are supported. `0xFFFF`
-is reserved for selecting the legacy configuration.
+Configuring only one explicit address, or specifying the same address for both
+registers, fails the build. Command addresses below data addresses are supported.
+`0xFFFF` is reserved for selecting the base-address configuration.
 
 This selection applies to the DXE, PEI, SMM and Standalone MM IPMI modules,
 the KCS transport's default hardware configuration, and the BmcAcpi SSDT.
@@ -206,9 +207,9 @@ Caller-provided KCS hardware information and MCTP address configuration are
 unchanged.
 
 BmcAcpi retains generic access to `PcdIpmiKcsIoBaseAddress`, preserving both
-FixedAtBuild and PatchableInModule configurations. Legacy mode retains one
+FixedAtBuild and PatchableInModule configurations. Base-address mode retains one
 two-byte I/O resource whose base is patched at runtime. Explicit mode describes
-two one-byte I/O resources generated at build time; the legacy base does not
+two one-byte I/O resources generated at build time; the base PCD does not
 modify them. ACPI OEM ID and OEM table ID PCDs remain generic inputs.
 
 ### IPMI BMC ACPI Namespace

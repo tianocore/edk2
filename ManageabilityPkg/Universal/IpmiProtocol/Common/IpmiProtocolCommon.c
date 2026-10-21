@@ -19,7 +19,8 @@
 
 STATIC_ASSERT (
   MANAGEABILITY_IPMI_KCS_PCD_CONFIGURATION_VALID,
-  "Invalid IPMI KCS register configuration: configure both distinct explicit addresses or leave both as 0xFFFF"
+  "PcdIpmiKcsIoDataAddress and PcdIpmiKcsIoCommandAddress must both be 0xFFFF, "
+  "or both be distinct non-0xFFFF addresses"
   );
 
 /**

@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #if ((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == 0xFFFF) != \
      (FixedPcdGet16 (PcdIpmiKcsIoCommandAddress) == 0xFFFF))
-#error "IPMI KCS explicit addresses must both be configured or both be 0xFFFF"
+#error "PcdIpmiKcsIoDataAddress and PcdIpmiKcsIoCommandAddress must both be 0xFFFF, or both be distinct non-0xFFFF addresses"
 #endif
 
 #if ((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) != 0xFFFF) && \
      (FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == FixedPcdGet16 (PcdIpmiKcsIoCommandAddress)))
-#error "IPMI KCS data and command addresses must be different"
+#error "PcdIpmiKcsIoDataAddress and PcdIpmiKcsIoCommandAddress must both be 0xFFFF, or both be distinct non-0xFFFF addresses"
 #endif
 
 Device(IPMC)
@@ -70,4 +70,3 @@ Device(IPMC)
 
 
 } // end of  Device(IPMC)
-

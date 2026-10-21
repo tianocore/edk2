@@ -40,6 +40,10 @@ typedef struct {
   ((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED) && \
    (FixedPcdGet16 (PcdIpmiKcsIoCommandAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED))
 
+///
+/// Both explicit address PCDs must be 0xFFFF, or both must contain distinct
+/// non-0xFFFF addresses.
+///
 #define MANAGEABILITY_IPMI_KCS_PCD_CONFIGURATION_VALID  \
   (((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED) == \
     (FixedPcdGet16 (PcdIpmiKcsIoCommandAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED)) && \
