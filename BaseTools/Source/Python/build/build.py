@@ -263,18 +263,22 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
     if Proc.stdout:
         StdOutThread.join()
 
+    RespFile = os.path.join(WorkingDir, 'OUTPUT', 'respfilelist.txt')
+    if os.path.isfile(RespFile):
+        with open(RespFile) as f:
+            RespContent = f.read().splitlines()
+
+        RespLog = [f"Build flags for module directory: {WorkingDir}"]
+        for i in range(0, len(RespContent), 2):
+            cmd = os.path.basename(RespContent[i][1:]).removesuffix('_resp.txt').upper()
+            flags = RespContent[i+1]
+            RespLog.append(f'  "{cmd}_FLAGS" : {flags}')
+        EdkLogger.info('\n'.join(RespLog))
+
     # check the return code of the program
     if Proc.returncode != 0:
-        if not isinstance(Command, type("")):
+        if not isinstance(Command, str):
             Command = " ".join(Command)
-        # print out the Response file and its content when make failure
-        RespFile = os.path.join(WorkingDir, 'OUTPUT', 'respfilelist.txt')
-        if os.path.isfile(RespFile):
-            f = open(RespFile)
-            RespContent = f.read()
-            f.close()
-            EdkLogger.info(RespContent)
-
         EdkLogger.error("build", COMMAND_FAILURE, ExtraData="%s [%s]" % (Command, WorkingDir))
     if ModuleAuto:
         iau = IncludesAutoGen(WorkingDir,ModuleAuto)
