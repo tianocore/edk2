@@ -571,15 +571,17 @@ OnResetNotificationInstall (
   @param [in]  ImageHandle  Handle for this image.
   @param [in]  SystemTable  Pointer to the EFI system table.
 
-  @retval EFI_SUCCESS             When executing in a Realm the RAMP was
-                                  installed successfully.
-                                  When execution context is not a Realm, this
-                                  function returns success indicating nothing
-                                  needs to be done and allow other modules to
-                                  run.
-  @retval EFI_OUT_OF_RESOURCES    There was not enough memory to install the
-                                  protocols.
-  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+  @retval EFI_SUCCESS               When executing in a Realm the RAMP was
+                                    installed successfully.
+  @retval EFI_REQUEST_UNLOAD_IMAGE  When execution context is not a Realm, this
+                                    function installs the RAMP absent protocol
+                                    to allow other modules to continue and
+                                    returns EFI_REQUEST_UNLOAD_IMAGE to unload
+                                    the image.
+  @retval EFI_OUT_OF_RESOURCES      There was not enough memory to install the
+                                    protocols.
+  @retval EFI_INVALID_PARAMETER     A parameter is invalid.
+
 
 **/
 EFI_STATUS
@@ -595,9 +597,9 @@ RealmApertureManagementProtocolDxeInitialize (
   EFI_EVENT   ExitBootEvent;
   VOID        *Registration;
 
-  // When the execution context is a Realm, install the Realm Aperture
-  // Management protocol otherwise return success so that other modules
-  // can run.
+  // When the execution context is not a Realm, install the Realm Aperture
+  // Management Absent protocol and return EFI_REQUEST_UNLOAD_IMAGE so the
+  // image can be unloaded.
   if (!ArmCcaIsRealm ()) {
     Handle = NULL;
     Status = gBS->InstallMultipleProtocolInterfaces (
@@ -606,8 +608,11 @@ RealmApertureManagementProtocolDxeInitialize (
                     NULL,
                     NULL
                     );
-    ASSERT_EFI_ERROR (Status);
-    return Status;
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    return EFI_REQUEST_UNLOAD_IMAGE;
   }
 
   /*

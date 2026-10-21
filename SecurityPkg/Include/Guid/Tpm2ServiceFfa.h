@@ -20,7 +20,7 @@
 #define TPM2_FFA_SERVICE_MINOR_VER_SHIFT  0
 
 /**
-  Interfaces added in TPM CRB over FF-A specificaiton v1.0
+  Interfaces added in TPM CRB over FF-A specification v1.0
 **/
 #define TPM2_FFA_GET_INTERFACE_VERSION         0x0f000001
 #define TPM2_FFA_GET_FEATURE_INFO              0x0f000101
@@ -30,9 +30,10 @@
 #define TPM2_FFA_FINISH_NOTIFIED               0x0f000501
 
 /**
-  Interfaces added in TPM CRB over FF-A specificaiton v1.1
+  Interfaces added in TPM CRB over FF-A specification v1.1
 **/
-#define TPM2_FFA_GET_CRB_INFO  0x0f000601
+#define TPM2_FFA_GET_CRB_INFO     0x0f000601
+#define TPM2_FFA_MANAGE_LOCALITY  0x0f000701
 
 #define TPM2_FFA_SUCCESS_OK                   0x05000001
 #define TPM2_FFA_SUCCESS_OK_RESULTS_RETURNED  0x05000002
@@ -60,6 +61,11 @@
 #define TPM2_FFA_CRB_REGION_SIZE_4K   0
 #define TPM2_FFA_CRB_REGION_SIZE_16K  1
 #define TPM2_FFA_CRB_REGION_SIZE_64K  2
+
+#define TPM2_FFA_MANAGE_LOCALITY_OPEN     0x0
+#define TPM2_FFA_MANAGE_LOCALITY_CLOSE    0x1
+#define TPM2_FFA_MANAGE_LOCALITY_SELECT2  0x2
+#define TPM2_FFA_MANAGE_LOCALITY_SELECT3  0x3
 
 extern EFI_GUID  gTpm2ServiceFfaGuid;
 

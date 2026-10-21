@@ -84,6 +84,7 @@ INF  OvmfPkg/LoongArchVirt/Drivers/StableTimerDxe/TimerDxe.inf
 INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+INF  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
 INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -210,7 +211,6 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
-INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 
 #
 # TPM support

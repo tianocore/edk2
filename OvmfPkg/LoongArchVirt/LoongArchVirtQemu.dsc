@@ -606,6 +606,7 @@
       CpuMmuLib | UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
   }
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
@@ -810,10 +811,6 @@
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
-  ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf {
-    <PcdsFixedAtBuild>
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-  }
 
   #
   # TPM2 support
