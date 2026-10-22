@@ -335,7 +335,7 @@ MemInfoCallback (
 **/
 EFI_STATUS
 BuildHobFromBl (
-  VOID
+  IN OUT EFI_HOB_HANDOFF_INFO_TABLE  *HobInfo
   )
 {
   EFI_STATUS                        Status;
@@ -350,6 +350,8 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *NewGfxDeviceInfo;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE    *SmBiosTableHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE      *AcpiTableHob;
+  UINT64                            SmBiosEntryPoint;
+  EFI_BOOT_MODE                     BootMode;
 
   //
   // First find TOLUD
@@ -413,16 +415,26 @@ BuildHobFromBl (
   }
 
   //
+  // Get boot mode from bootloader and set it in HOB
+  //
+  Status = ParseBootMode (&BootMode);
+  if (!EFI_ERROR (Status)) {
+    HobInfo->BootMode = BootMode;
+    DEBUG ((DEBUG_INFO, "BootMode from bootloader: %x\n", BootMode));
+  }
+
+  //
   // Create SmBios table Hob
   //
-  SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
-  ASSERT (SmBiosTableHob != NULL);
-  SmBiosTableHob->Header.Revision = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
-  SmBiosTableHob->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
-  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
-  Status = ParseSmbiosTable (SmBiosTableHob);
+  Status = ParseSmbiosTable (&SmBiosEntryPoint);
   if (!EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx\n", SmBiosTableHob->SmBiosEntryPoint));
+    DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx\n", SmBiosEntryPoint));
+    SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+    ASSERT (SmBiosTableHob != NULL);
+    SmBiosTableHob->Header.Revision  = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
+    SmBiosTableHob->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
+    SmBiosTableHob->SmBiosEntryPoint = SmBiosEntryPoint;
+    DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
   }
 
   //
@@ -590,7 +602,7 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "HobMemBase    = 0x%llx\n", (UINT64)HobMemBase));
 
   // Build HOB based on information from Bootloader
-  Status = BuildHobFromBl ();
+  Status = BuildHobFromBl (HobInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "BuildHobFromBl Status = %r\n", Status));
     return Status;

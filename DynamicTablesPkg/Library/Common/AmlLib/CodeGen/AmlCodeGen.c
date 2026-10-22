@@ -84,8 +84,10 @@ LinkNode (
 
   @param[in]  TableSignature       4-character ACPI signature.
                                    Must be 'DSDT' or 'SSDT'.
-  @param[in]  OemId                6-character string OEM identifier.
-  @param[in]  OemTableId           8-character string OEM table identifier.
+  @param[in]  OemId                OEM identifier, up to 6 characters.
+                                   Shorter values are padded with spaces.
+  @param[in]  OemTableId           OEM table identifier, up to 8 characters.
+                                   Shorter values are padded with spaces.
   @param[in]  OemRevision          OEM revision number.
   @param[out] NewRootNode          Pointer to the root node representing a
                                    Definition Block.
@@ -116,11 +118,50 @@ AmlCodeGenDefinitionBlock (
     return EFI_INVALID_PARAMETER;
   }
 
-  CopyMem (&AcpiHeader.Signature, TableSignature, 4);
+  SetMem (
+    &AcpiHeader.Signature,
+    sizeof (AcpiHeader.Signature),
+    ' '
+    );
+  CopyMem (
+    &AcpiHeader.Signature,
+    TableSignature,
+    AsciiStrnLenS (
+      TableSignature,
+      sizeof (AcpiHeader.Signature)
+      )
+    );
+
   AcpiHeader.Length   = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   AcpiHeader.Revision = 2;
-  CopyMem (&AcpiHeader.OemId, OemId, 6);
-  CopyMem (&AcpiHeader.OemTableId, OemTableId, 8);
+
+  SetMem (
+    &AcpiHeader.OemId,
+    sizeof (AcpiHeader.OemId),
+    ' '
+    );
+  CopyMem (
+    &AcpiHeader.OemId,
+    OemId,
+    AsciiStrnLenS (
+      OemId,
+      sizeof (AcpiHeader.OemId)
+      )
+    );
+
+  SetMem (
+    &AcpiHeader.OemTableId,
+    sizeof (AcpiHeader.OemTableId),
+    ' '
+    );
+  CopyMem (
+    &AcpiHeader.OemTableId,
+    OemTableId,
+    AsciiStrnLenS (
+      OemTableId,
+      sizeof (AcpiHeader.OemTableId)
+      )
+    );
   AcpiHeader.OemRevision     = OemRevision;
   AcpiHeader.CreatorId       = TABLE_GENERATOR_CREATOR_ID;
   AcpiHeader.CreatorRevision = CREATE_REVISION (1, 0);

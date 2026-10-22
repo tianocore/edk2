@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UsbBus.h"
 
+#define INTERFACE_NOT_SET  0xFF
+
 /**
   Free the interface setting descriptor.
 
@@ -355,22 +357,47 @@ UsbIsSSDevice (
   UINT8                       Index;
   UINT8                       NumCapDesc;
   EFI_USB_DEV_CAP_DESCRIPTOR  *DevCapDesc;
+  UINTN                       Remaining;
+  UINTN                       CapLength;
+  BOOLEAN                     IsSsDevice;
 
-  if ((BosDesc->DescriptorType != USB_DESC_TYPE_BOS) || (Len == 0)) {
+  if (  (BosDesc == NULL)
+     || (Len < sizeof (*BosDesc))
+     || (BosDesc->DescriptorType != USB_DESC_TYPE_BOS)
+     || (BosDesc->Length < sizeof (*BosDesc))
+     || (BosDesc->Length > Len)
+     || (BosDesc->TotalLength < BosDesc->Length)
+     || (BosDesc->TotalLength > Len))
+  {
     return FALSE;
   }
 
   NumCapDesc = BosDesc->NumDeviceCaps;
   NextCap    = (UINT8 *)BosDesc + BosDesc->Length;
+  Remaining  = BosDesc->TotalLength - BosDesc->Length;
+  IsSsDevice = FALSE;
 
-  for (Index = 0; Index < NumCapDesc; Index++, NextCap += DevCapDesc->Length) {
-    DevCapDesc = (EFI_USB_DEV_CAP_DESCRIPTOR *)NextCap;
-    if ((DevCapDesc->DescriptorType == USB_DESC_TYPE_DEV_CAP) && (DevCapDesc->DevCapabilityType == USB_DEV_CAP_SUPPERSPEED_USB)) {
-      return TRUE;
+  for (Index = 0; Index < NumCapDesc; Index++) {
+    if (Remaining < OFFSET_OF (EFI_USB_DEV_CAP_DESCRIPTOR, CapData)) {
+      return FALSE;
     }
+
+    DevCapDesc = (EFI_USB_DEV_CAP_DESCRIPTOR *)NextCap;
+
+    CapLength = DevCapDesc->Length;
+    if ((CapLength < OFFSET_OF (EFI_USB_DEV_CAP_DESCRIPTOR, CapData)) || (CapLength > Remaining)) {
+      return FALSE;
+    }
+
+    if ((DevCapDesc->DescriptorType == USB_DESC_TYPE_DEV_CAP) && (DevCapDesc->DevCapabilityType == USB_DEV_CAP_SUPPERSPEED_USB)) {
+      IsSsDevice = TRUE;
+    }
+
+    NextCap   += CapLength;
+    Remaining -= CapLength;
   }
 
-  return FALSE;
+  return IsSsDevice;
 }
 
 /**
@@ -394,6 +421,7 @@ UsbParseConfigDesc (
   UINTN                  Index;
   UINTN                  NumIf;
   UINTN                  Consumed;
+  UINT8                  FirstIntfNum;
 
   ASSERT (DescBuf != NULL);
 
@@ -441,6 +469,8 @@ UsbParseConfigDesc (
   DescBuf += Consumed;
   Len     -= Consumed;
 
+  FirstIntfNum = INTERFACE_NOT_SET;
+
   //
   // Make allowances for devices that return extra data at the
   // end of their config descriptors
@@ -448,10 +478,19 @@ UsbParseConfigDesc (
   while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
     Setting = UsbParseInterfaceDesc (DescBuf, Len, &Consumed);
 
+    // Usb standard spec expects the interface number to start from 0.
+    // Some devices might have the first interface number not equal to zero.
+    // This is a work around for these devices. For example, Dell WWAN DW2811e
+    if (Setting != NULL) {
+      if (FirstIntfNum == INTERFACE_NOT_SET) {
+        FirstIntfNum = Setting->Desc.InterfaceNumber;
+      }
+    }
+
     if (Setting == NULL) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: warning: failed to get interface setting, stop parsing now.\n"));
       break;
-    } else if (Setting->Desc.InterfaceNumber >= NumIf) {
+    } else if (Setting->Desc.InterfaceNumber >= (NumIf + FirstIntfNum)) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: malformatted interface descriptor\n"));
 
       UsbFreeInterfaceDesc (Setting);
@@ -461,7 +500,7 @@ UsbParseConfigDesc (
     //
     // Insert the descriptor to the corresponding set.
     //
-    Interface = Config->Interfaces[Setting->Desc.InterfaceNumber];
+    Interface = Config->Interfaces[(Setting->Desc.InterfaceNumber - FirstIntfNum)];
 
     if (Interface->NumOfSetting >= USB_MAX_INTERFACE_SETTING) {
       goto ON_ERROR;
@@ -717,32 +756,41 @@ UsbGetDevBosDesc (
              Buf,
              sizeof (EFI_USB_BOS_DESCRIPTOR)
              );
-  if (!EFI_ERROR (Status)) {
-    TotalLength = ((EFI_USB_BOS_DESCRIPTOR *)Buf)->TotalLength;
+  if (EFI_ERROR (Status)) {
     gBS->FreePool (Buf);
-    Buf = NULL;
-    Buf = AllocateZeroPool (TotalLength);
-    if (Buf == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Status = UsbCtrlGetDesc (
-               UsbDev,
-               USB_DESC_TYPE_BOS,
-               0,
-               0,
-               Buf,
-               TotalLength
-               );
-
-    if (EFI_ERROR (Status)) {
-      gBS->FreePool (Buf);
-      Buf = NULL;
-    }
-
-    UsbDev->DevDesc->BosDesc = (EFI_USB_BOS_DESCRIPTOR *)Buf;
+    return Status;
   }
 
+  TotalLength = ((EFI_USB_BOS_DESCRIPTOR *)Buf)->TotalLength;
+
+  // The reported BOS length must include its fixed header before allocating.
+  if (TotalLength < sizeof (EFI_USB_BOS_DESCRIPTOR)) {
+    gBS->FreePool (Buf);
+    return EFI_DEVICE_ERROR;
+  }
+
+  gBS->FreePool (Buf);
+  Buf = NULL;
+  Buf = AllocateZeroPool (TotalLength);
+  if (Buf == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = UsbCtrlGetDesc (
+             UsbDev,
+             USB_DESC_TYPE_BOS,
+             0,
+             0,
+             Buf,
+             TotalLength
+             );
+
+  if (EFI_ERROR (Status)) {
+    gBS->FreePool (Buf);
+    Buf = NULL;
+  }
+
+  UsbDev->DevDesc->BosDesc = (EFI_USB_BOS_DESCRIPTOR *)Buf;
   return Status;
 }
 

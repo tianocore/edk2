@@ -73,6 +73,13 @@ _______________________________________________________________________________
       26 - SSDT DMC
       27 - HEST
       28 - EINJ
+      29 - HMAT
+      30 - APMT
+      31 - MSCT
+      32 - BERT
+      33 - ERST
+      34 - SSDT BMU
+      35 - SSDT PL050
 
     Standard SMBIOS Table IDs:
        0 - Reserved

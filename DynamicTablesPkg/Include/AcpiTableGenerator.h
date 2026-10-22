@@ -72,6 +72,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT DMC PMU generator collates the PMU specific information
             from the Configuration Manager and uses the Dynamic AML CodeGen
             API's to build the SSDT DMC PMU table.
+  - SSDT PL050:
+            The SSDT PL050 generator collates keyboard and mouse interface
+            information from the Configuration Manager and uses the Dynamic
+            AML CodeGen APIs to build the SSDT PL050 table.
   - SSDT Pci-Express:
             The SSDT Pci Express generator collates the Pci Express
             information from the Configuration Manager and generates a
@@ -94,6 +98,15 @@ The Dynamic Tables Framework implements the following ACPI table generators:
   - MSCT  : The MSCT (Maximum System Characteristics Table) generator collates
             the Maximum System Characteristics information from the
             Configuration Manager and builds the MSCT table.
+  - BERT  : The BERT generator collates the boot error region information from
+            the Configuration Manager and builds the BERT table.
+  - ERST  : The ERST generator collates the error record serialization
+            instructions from the Configuration Manager and builds the ERST
+            table.
+  - SSDT BMU:
+            The SSDT BMU generator collates the BMU specific information
+            from the Configuration Manager and uses the Dynamic AML CodeGen
+            API's to build the SSDT BMU table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -138,6 +151,11 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdHmat,                          ///< HMAT Generator
   EStdAcpiTableIdApmt,                          ///< APMT Generator
   EStdAcpiTableIdMsct,                          ///< MSCT Generator
+  EStdAcpiTableIdBert,                          ///< BERT Generator
+  EStdAcpiTableIdErst,                          ///< ERST Generator
+  EStdAcpiTableIdSsdtBmu,                       ///< SSDT BMU Generator
+  EStdAcpiTableIdSsdtPl050,                     ///< SSDT PL050 Generator
+  EStdAcpiTableIdSsdtSmc91x,                    ///< SSDT SMC91X Network Device Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

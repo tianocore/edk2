@@ -205,7 +205,7 @@ GetRtcAddress (
       //
       RegProp = FdtGetProp (Fdt, Node, "reg", &Len);
       if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
-        *RtcBaseAddress = SwapBytes64 (RegProp[0]);
+        *RtcBaseAddress = SwapBytes64 (ReadUnaligned64 (&RegProp[0]));
         Status          = RETURN_SUCCESS;
         DEBUG ((DEBUG_INFO, "%a Len %d RtcBase %llx\n", __func__, Len, *RtcBaseAddress));
         break;
