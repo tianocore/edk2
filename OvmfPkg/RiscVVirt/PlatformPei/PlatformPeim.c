@@ -66,6 +66,7 @@ FindInstallPeiMemory (
   VOID                         *HobList;
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_PHYSICAL_ADDRESS         PeiMemoryBase;
+  EFI_STATUS                   Status;
 
   // Get the HOB list from PEI services
   HobList = GetHobList ();
@@ -93,7 +94,8 @@ FindInstallPeiMemory (
   }
 
   ASSERT (PeiMemoryBase != 0);
-  ASSERT_EFI_ERROR (PeiServicesInstallPeiMemory (PeiMemoryBase, PEI_MEMORY_SIZE));
+  Status = PeiServicesInstallPeiMemory (PeiMemoryBase, PEI_MEMORY_SIZE);
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
@@ -118,6 +120,7 @@ SetupTPMResources (
   CONST UINT32  *RangesProp;
   UINT64        TpmBase;
   UINT64        TpmBaseSize;
+  EFI_STATUS    Status;
 
   //
   // Empty TpmBaseSize indicates no TPM found.
@@ -217,7 +220,8 @@ SetupTPMResources (
       ALIGN_VALUE (TpmBaseSize, EFI_PAGE_SIZE)
       );
 
-    ASSERT_EFI_ERROR ((EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase));
+    Status = (EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase);
+    ASSERT_EFI_ERROR (Status);
     PeiServicesInstallPpi (&mTpm2DiscoveredPpi);
   }
 }

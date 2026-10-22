@@ -52,7 +52,6 @@
   Pk/CryptPkcs7DecryptNull.c
   Pk/CryptPkcs7VerifyNull.c
   Pk/CryptPkcs7VerifyEkuNull.c
-  Pk/CryptDhNull.c
   Pk/CryptX509Null.c
   Pk/CryptAuthenticodeNull.c
   Pk/CryptTsNull.c
