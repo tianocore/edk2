@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -383,7 +384,7 @@ PciAssignBusNumber (
 
         Register = (UINT16)((SecondBus << 8) | (UINT16)StartBusNumber);
 
-        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x18);
+        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_PRIMARY_BUS_REGISTER_OFFSET);
 
         Status = PciRootBridgeIo->Pci.Write (
                                         PciRootBridgeIo,
@@ -396,7 +397,7 @@ PciAssignBusNumber (
         //
         // Initialize SubBusNumber to SecondBus
         //
-        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
+        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
         Status  = PciRootBridgeIo->Pci.Write (
                                          PciRootBridgeIo,
                                          EfiPciWidthUint8,
@@ -431,7 +432,7 @@ PciAssignBusNumber (
         //
         // Set the current maximum bus number under the PPB
         //
-        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0x1A);
+        Address = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
 
         Status = PciRootBridgeIo->Pci.Write (
                                         PciRootBridgeIo,
@@ -1384,7 +1385,7 @@ PciBridgeEnumerator (
   SubBusNumber   = 0;
   StartBusNumber = 0;
   PciIo          = &(BridgeDev->PciIo);
-  Status         = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x19, 1, &StartBusNumber);
+  Status         = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET, 1, &StartBusNumber);
 
   if (EFI_ERROR (Status)) {
     return Status;

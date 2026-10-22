@@ -875,6 +875,7 @@ DeviceRetry:
      && (Bus->Usb2Hc->MajorRevision >= 0x3)
      && (Child->IsSSDev)
      && (Child->Speed < EFI_USB_SPEED_SUPER)
+     && (Child->DevDesc != NULL)
      && (Child->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE))
   {
     goto ON_ERROR;
@@ -931,6 +932,7 @@ ON_ERROR:
     if ((Child != NULL) && (Child->DevDesc != NULL)) {
       UsbFreeDevDesc (Child->DevDesc);
       Child->DevDesc = NULL;
+      Child->IsSSDev = FALSE;
     }
 
     Status = HubApi->ResetPort (HubIf, Port);
