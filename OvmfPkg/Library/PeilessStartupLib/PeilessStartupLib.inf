@@ -86,6 +86,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeNonCcFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeNonCcFvSize
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
 
 [FixedPcd]
