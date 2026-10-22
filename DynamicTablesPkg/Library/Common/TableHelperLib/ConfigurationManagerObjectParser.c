@@ -1469,6 +1469,21 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPortConnectorInfoParser[] = {
   { "PortType",                    sizeof (UINT8),           "0x%x", NULL        },
 };
 
+/** A parser for EArchCommonObjGroupAssociationInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGroupAssociationInfoParser[] = {
+  { "GroupAssociationInfoToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "GroupItemListToken",        sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "GroupName",                 SMBIOS_MAX_STRING_SIZE,   NULL,   PrintString },
+};
+
+/** A parser for EArchCommonObjGroupAssociationItem.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGroupAssociationItemParser[] = {
+  { "ReferencedObjectToken",      sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "ReferencedTableGeneratorId", sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjBiosLanguageInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageInfoParser[] = {
@@ -1514,6 +1529,36 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonIpmiDeviceInfoParser[] = {
   { "BaseAddress",                      sizeof (UINT64),          "0x%lx", NULL },
   { "BaseAddressModifierInterruptInfo", sizeof (UINT8),           "0x%x",  NULL },
   { "InterruptNumber",                  sizeof (UINT8),           "0x%x",  NULL },
+};
+
+/** A parser for EArchCommonObjSmc91xInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSmc91xInfoParser[] = {
+  { "BaseAddress",       8, "0x%llx", NULL },
+  { "BaseAddressLength", 8, "0x%llx", NULL },
+  { "Interrupt",
+    sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL,
+    NULL,
+    CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) }
+};
+
+/** A parser for EArchCommonObjVirtioMmioDeviceInfo.
+
+  Extended and generic interrupts have the same layout, so the generic
+  interrupt parser is reused.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonVirtioMmioDeviceInfoParser[] = {
+  { "BaseAddress",       8,                "0x%llx", NULL },
+  { "BaseAddressLength", 8,                "0x%llx", NULL },
+  { "Interrupt",
+    sizeof (CM_ARCH_COMMON_EXTENDED_INTERRUPT),
+    NULL,
+    NULL,
+    CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "CacheCoherent",     sizeof (BOOLEAN), "0x%x",   NULL }
 };
 
 /** A parser for EArchCommonObjSystemPowerSupplyInfo.
@@ -1905,6 +1950,10 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjOemStringsInfo,                   CmArchCommonOemStringsInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjOemString,                        CmArchCommonOemStringParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPortConnectorInfo,                CmArchCommonPortConnectorInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSmc91xInfo,                       CmArchCommonSmc91xInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationInfo,             CmArchCommonGroupAssociationInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationItem,             CmArchCommonGroupAssociationItemParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjVirtioMmioDeviceInfo,             CmArchCommonVirtioMmioDeviceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
