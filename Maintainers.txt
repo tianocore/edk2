@@ -609,6 +609,7 @@ R: Qihang Gao <gaoqihang@loongson.cn> [EricGao2015]
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/pc_at_chipset_pkg.html
+M: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 PrmPkg
 F: PrmPkg/
