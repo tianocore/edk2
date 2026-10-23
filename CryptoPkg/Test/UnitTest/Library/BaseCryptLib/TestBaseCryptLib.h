@@ -112,6 +112,12 @@ extern TEST_DESC  mX509Test[];
 extern UINTN      mPkcs7ContentTestNum;
 extern TEST_DESC  mPkcs7ContentTest[];
 
+extern UINTN      mPkcs7EncryptTestNum;
+extern TEST_DESC  mPkcs7EncryptTest[];
+
+extern UINTN      mPkcs7DecryptTestNum;
+extern TEST_DESC  mPkcs7DecryptTest[];
+
 //
 // Test Case only for MbedTls.
 //

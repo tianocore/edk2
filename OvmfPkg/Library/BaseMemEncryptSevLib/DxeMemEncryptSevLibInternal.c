@@ -16,92 +16,48 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
-#include <ConfidentialComputingGuestAttr.h>
+#include "PeiDxeMemEncryptSevLibInternal.h"
 
-STATIC UINT64   mCurrentAttr              = 0;
-STATIC BOOLEAN  mCurrentAttrRead          = FALSE;
-STATIC UINT64   mSevEncryptionMask        = 0;
-STATIC BOOLEAN  mSevEncryptionMaskSaved   = FALSE;
-STATIC BOOLEAN  mSevSnpCoherencySfwNo     = FALSE;
-STATIC BOOLEAN  mSevSnpCoherencySfwNoRead = FALSE;
+STATIC UINT64   mSevEncryptionMask      = 0;
+STATIC BOOLEAN  mSevIsEnabled           = FALSE;
+STATIC BOOLEAN  mSevEsIsEnabled         = FALSE;
+STATIC BOOLEAN  mSevSnpIsEnabled        = FALSE;
+STATIC BOOLEAN  mSevDebugVirtualization = FALSE;
+STATIC BOOLEAN  mSevSnpCoherencySfwNo   = FALSE;
 
-/**
-  The function check if the specified Attr is set.
-
-  @param[in]  CurrentAttr   The current attribute.
-  @param[in]  Attr          The attribute to check.
-
-  @retval  TRUE      The specified Attr is set.
-  @retval  FALSE     The specified Attr is not set.
-
-**/
-STATIC
-BOOLEAN
-AmdMemEncryptionAttrCheck (
-  IN  UINT64                             CurrentAttr,
-  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
-  )
-{
-  UINT64  CurrentLevel;
-
-  CurrentLevel = CurrentAttr & CCAttrTypeMask;
-
-  switch (Attr) {
-    case CCAttrAmdSev:
-      //
-      // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
-      //
-      return CurrentLevel >= CCAttrAmdSev;
-    case CCAttrAmdSevEs:
-      //
-      // SEV-ES is automatically enabled if SEV-SNP is active.
-      //
-      return CurrentLevel >= CCAttrAmdSevEs;
-    case CCAttrAmdSevSnp:
-      return CurrentLevel == CCAttrAmdSevSnp;
-    case CCAttrFeatureAmdSevEsDebugVirtualization:
-      return !!(CurrentAttr & CCAttrFeatureAmdSevEsDebugVirtualization);
-    default:
-      return FALSE;
-  }
-}
-
-/**
-  Check if the specified confidential computing attribute is active.
-
-  @param[in]  Attr          The attribute to check.
-
-  @retval TRUE   The specified Attr is active.
-  @retval FALSE  The specified Attr is not active.
-
-**/
-STATIC
-BOOLEAN
+RETURN_STATUS
 EFIAPI
-ConfidentialComputingGuestHas (
-  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+DxeMemEncryptSevLibConstructor (
+  VOID
   )
 {
+  SEC_SEV_ES_WORK_AREA     *SevEsWorkArea;
+  MSR_SEV_STATUS_REGISTER  Msr;
+
   //
-  // Get the current CC attribute.
+  // The work area should at least be EfiBootServicesData since the work area
+  // is also used for AP bring up to setup the AP jump table.
   //
-  // We avoid reading the PCD on every check because this routine could be indirectly
-  // called during the virtual pointer conversion. And its not safe to access the
-  // PCDs during the virtual pointer conversion.
-  //
-  if (!mCurrentAttrRead) {
-    mCurrentAttr     = PcdGet64 (PcdConfidentialComputingGuestAttr);
-    mCurrentAttrRead = TRUE;
+  SevEsWorkArea = GetSevEsWorkArea ();
+  if (SevEsWorkArea == NULL) {
+    return RETURN_SUCCESS;
   }
 
   //
-  // If attr is for the AMD group then call AMD specific checks.
+  // The work area will not be mapped at the expected physical address once
+  // SetVirtualAddressMap() is called. So fetch the values from the work area
+  // and store them in variables so the MemEncryptSev*() functions do not need
+  // to access the work area.
   //
-  if (((RShiftU64 (mCurrentAttr, 8)) & 0xff) == 1) {
-    return AmdMemEncryptionAttrCheck (mCurrentAttr, Attr);
-  }
+  Msr.Uint32              = (UINT32)(UINTN)SevEsWorkArea->SevStatusMsrValue;
+  mSevEncryptionMask      = SevEsWorkArea->EncryptionMask;
+  mSevIsEnabled           = Msr.Bits.SevBit ? TRUE : FALSE;
+  mSevEsIsEnabled         = Msr.Bits.SevEsBit ? TRUE : FALSE;
+  mSevSnpIsEnabled        = Msr.Bits.SevSnpBit ? TRUE : FALSE;
+  mSevDebugVirtualization = Msr.Bits.DebugVirtualization ? TRUE : FALSE;
+  mSevSnpCoherencySfwNo   = (SevEsWorkArea->Flags & SEV_ES_WORK_AREA_FLAG_CSFW_NO) != 0;
 
-  return (mCurrentAttr == Attr);
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -116,7 +72,7 @@ MemEncryptSevSnpIsEnabled (
   VOID
   )
 {
-  return ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
+  return mSevSnpIsEnabled;
 }
 
 /**
@@ -131,7 +87,7 @@ MemEncryptSevEsIsEnabled (
   VOID
   )
 {
-  return ConfidentialComputingGuestHas (CCAttrAmdSevEs);
+  return mSevEsIsEnabled;
 }
 
 /**
@@ -146,7 +102,7 @@ MemEncryptSevIsEnabled (
   VOID
   )
 {
-  return ConfidentialComputingGuestHas (CCAttrAmdSev);
+  return mSevIsEnabled;
 }
 
 /**
@@ -160,11 +116,6 @@ MemEncryptSevGetEncryptionMask (
   VOID
   )
 {
-  if (!mSevEncryptionMaskSaved) {
-    mSevEncryptionMask      = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask);
-    mSevEncryptionMaskSaved = TRUE;
-  }
-
   return mSevEncryptionMask;
 }
 
@@ -180,34 +131,7 @@ MemEncryptSevEsDebugVirtualizationIsEnabled (
   VOID
   )
 {
-  return ConfidentialComputingGuestHas (CCAttrFeatureAmdSevEsDebugVirtualization);
-}
-
-/**
-  Returns a boolean to indicate if the CPUID COHERENCY_SFW_NO bit is set.
-
-  @retval  TRUE      The COHERENCY_SFW_NO bit is set.
-  @retval  FALSE     The COHERENCY_SFW_NO bit is not set.
-
-**/
-STATIC
-BOOLEAN
-MemEncryptCoherencSfwNo (
-  VOID
-  )
-{
-  CPUID_MEMORY_ENCRYPTION_INFO_EBX  RegEbx;
-
-  if (!mSevSnpCoherencySfwNoRead) {
-    AsmCpuid (0x8000001F, NULL, &RegEbx.Uint32, NULL, NULL);
-    if (RegEbx.Bits.CoherencySfwNo == 1) {
-      mSevSnpCoherencySfwNo = TRUE;
-    }
-
-    mSevSnpCoherencySfwNoRead = TRUE;
-  }
-
-  return mSevSnpCoherencySfwNo;
+  return mSevDebugVirtualization;
 }
 
 /**
@@ -224,5 +148,5 @@ MemEncryptSevSnpDoCoherencyMitigation (
   VOID
   )
 {
-  return MemEncryptSevSnpIsEnabled () && !MemEncryptCoherencSfwNo ();
+  return MemEncryptSevSnpIsEnabled () && !mSevSnpCoherencySfwNo;
 }

@@ -15,6 +15,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PayloadEntryHelperLib.h>
+#include <Guid/ZeroGuid.h>
 
 VOID  *mHobList;
 
@@ -87,6 +88,51 @@ HobConstructor (
 }
 
 /**
+  Builds a HOB that describes a chunk of system memory with memory attributes.
+
+  This function builds a HOB that describes a chunk of system memory.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  ResourceType               The type of resource described by this HOB.
+  @param  ResourceCapabilities       The resource capabilities of the memory described by this HOB.
+  @param  PhysicalStart              The 64 bit physical address of memory described by this HOB.
+  @param  ResourceLength             The length of the memory described by this HOB in bytes.
+  @param  ResourceMemoryAttributes   The memory attribute for the memory described by this HOB.
+  @param  OwnerGuid                  GUID for the owner of this resource.
+
+**/
+VOID
+EFIAPI
+BuildResourceDescriptor2Hob (
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceCapabilities,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       ResourceLength,
+  IN UINT64                       ResourceMemoryAttributes,
+  IN EFI_GUID                     *OwnerGuid OPTIONAL
+  )
+{
+  EFI_HOB_RESOURCE_DESCRIPTOR2  *Hob;
+
+  Hob = CreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2));
+  if (Hob == NULL) {
+    return;
+  }
+
+  Hob->ResourceType             = ResourceType;
+  Hob->ResourceCapabilities     = ResourceCapabilities;
+  Hob->PhysicalStart            = PhysicalStart;
+  Hob->ResourceLength           = ResourceLength;
+  Hob->ResourceMemoryAttributes = ResourceMemoryAttributes;
+
+  if (OwnerGuid == NULL) {
+    OwnerGuid = &gZeroGuid;
+  }
+
+  CopyGuid (&Hob->Owner, OwnerGuid);
+}
+
+/**
   Builds a HOB that describes a chunk of system memory.
 
   This function builds a HOB that describes a chunk of system memory.
@@ -155,6 +201,36 @@ GetNextHob (
   //
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == Type) {
+      return Hob.Raw;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return NULL;
+}
+
+/**
+  Returns the next Resource Descriptor HOB from the starting HOB.
+
+  @param  HobStart      The starting HOB pointer to search from.
+
+  @return The next Resource Descriptor HOB from the starting HOB.
+
+**/
+VOID *
+EFIAPI
+GetNextResourceHob (
+  IN CONST VOID  *HobStart
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (HobStart != NULL);
+
+  Hob.Raw = (UINT8 *)HobStart;
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       return Hob.Raw;
     }
 
@@ -632,22 +708,18 @@ UpdateStackHob (
   Hob.Raw = GetHobList ();
   ASSERT (Hob.Raw != NULL);
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
-    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
+    if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name)) &&
+        (Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress != BaseAddress))
+    {
       //
-      // Build a new memory allocation HOB with old stack info with EfiConventionalMemory type
+      // Convert this memory allocation HOB with the old stack info to EfiConventionalMemory type
       // to be reclaimed by DXE core.
       //
-      BuildMemoryAllocationHob (
-        Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress,
-        Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength,
-        EfiConventionalMemory
-        );
-      //
-      // Update the BSP Stack Hob to reflect the new stack info.
-      //
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress = BaseAddress;
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength      = Length;
-      break;
+      ZeroMem (&(Hob.MemoryAllocationStack->AllocDescriptor.Name), sizeof (EFI_GUID));
+      Hob.MemoryAllocationStack->AllocDescriptor.MemoryType = EfiConventionalMemory;
+    } else if ((Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == BaseAddress) && (Hob.MemoryAllocation->AllocDescriptor.MemoryLength == Length)) {
+      // Find the memory allocation HOB for the new stack and mark it as the stack HOB.
+      CopyGuid (&(Hob.MemoryAllocation->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
     }
 
     Hob.Raw = GET_NEXT_HOB (Hob);

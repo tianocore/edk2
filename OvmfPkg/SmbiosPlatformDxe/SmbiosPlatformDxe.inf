@@ -40,6 +40,7 @@
   UefiDriverEntryPoint
 
 [Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdCloudHvSmbiosBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor

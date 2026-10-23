@@ -5,6 +5,7 @@
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
   (c) Copyright 2026 HP Development Company, L.P.
+  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -4028,6 +4029,115 @@ CryptoServicePkcs7Sign (
 }
 
 /**
+  Creates a DER-encoded PKCS#7 ContentInfo containing an envelopedData structure
+  that wraps content encrypted for secure transmission to one or more recipients.
+
+  If this interface is not supported, return FALSE.
+
+  @param[in]  X509Stack        Pointer to a stack of X.509 certificates for the
+                               intended recipients of this message, created using
+                               X509ConstructCertificateStack or similar. Each
+                               certificate must provide an RSA public key. Any of the
+                               corresponding private keys will be able to decrypt the
+                               content of the returned ContentInfo.
+  @param[in]  InData           Pointer to the content to be encrypted.
+  @param[in]  InDataSize       Size of the content to be encrypted in bytes.
+  @param[in]  CipherNid        NID of the symmetric cipher to use for encryption.
+                               Supported values are CRYPTO_NID_AES128CBC,
+                               CRYPTO_NID_AES192CBC, and CRYPTO_NID_AES256CBC.
+  @param[in]  Flags            Flags for the encryption operation. Currently only
+                               CRYPTO_PKCS7_DEFAULT is supported, which indicates that
+                               the input data is treated as binary data.
+  @param[out] ContentInfo      Receives a pointer to the output, which is a PKCS#7
+                               DER-encoded ContentInfo that wraps an envelopedData. The
+                               caller must free the returned buffer with FreePool().
+  @param[out] ContentInfoSize  Receives the size of the output in bytes.
+
+  @retval     TRUE             PKCS#7 data encryption succeeded.
+  @retval     FALSE            PKCS#7 data encryption failed.
+  @retval     FALSE            This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServicePkcs7Encrypt (
+  IN   UINT8   *X509Stack,
+  IN   UINT8   *InData,
+  IN   UINTN   InDataSize,
+  IN   UINT32  CipherNid,
+  IN   UINT32  Flags,
+  OUT  UINT8   **ContentInfo,
+  OUT  UINTN   *ContentInfoSize
+  )
+{
+  return CALL_BASECRYPTLIB (Pkcs.Services.Pkcs7Encrypt, Pkcs7Encrypt, (X509Stack, InData, InDataSize, CipherNid, Flags, ContentInfo, ContentInfoSize), FALSE);
+}
+
+/**
+  Decrypts a DER-encoded PKCS#7 ContentInfo containing an envelopedData structure
+  (such as one produced by Pkcs7Encrypt) and recovers the original content.
+
+  The private key is supplied in PEM form so that this interface is not tied to any
+  particular key algorithm (currently supports RSA).
+
+  The correct recipient within the envelopedData is identified automatically. The
+  envelopedData carries, for each recipient, an issuer name and serial number that
+  identify the recipient certificate. If RecipientCert is supplied, its issuer name
+  and serial number are used to select the matching recipient. If RecipientCert is
+  NULL, the supplied private key is tried against every recipient in the envelope.
+
+  If this interface is not supported, return FALSE.
+
+  @param[in]  PemData           Pointer to the PEM-encoded private key of a recipient
+                                of the message. May be an RSA or other supported key
+                                type.
+  @param[in]  PemSize           Size of the PEM key data in bytes.
+  @param[in]  Password          [Optional] NULL-terminated passphrase used to decrypt an
+                                encrypted PEM key. Pass NULL if the PEM key is not
+                                password protected.
+  @param[in]  RecipientCert     [Optional] Pointer to the DER-encoded X.509 certificate
+                                of the recipient whose private key is supplied in
+                                PemData. If provided, it is used to select the matching
+                                recipient in the envelope by issuer name and serial
+                                number. Pass NULL to try the private key against every
+                                recipient.
+  @param[in]  RecipientCertSize Size of the DER-encoded certificate in bytes. Ignored
+                                (and may be 0) when RecipientCert is NULL.
+  @param[in]  ContentInfo       Pointer to the PKCS#7 DER-encoded ContentInfo that wraps
+                                an envelopedData to be decrypted.
+  @param[in]  ContentInfoSize   Size of the ContentInfo in bytes.
+  @param[in]  Flags             Flags for the decryption operation. Currently only
+                                CRYPTO_PKCS7_DEFAULT is supported, which indicates that
+                                the decrypted content is treated as binary data.
+  @param[out] OutData           Receives a pointer to the newly allocated buffer
+                                containing the decrypted content. The caller must free
+                                the returned buffer with FreePool().
+  @param[out] OutDataSize       Receives the size of the decrypted content in bytes.
+
+  @retval     TRUE              PKCS#7 data decryption succeeded.
+  @retval     FALSE             PKCS#7 data decryption failed.
+  @retval     FALSE             This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServicePkcs7Decrypt (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password           OPTIONAL,
+  IN   CONST UINT8  *RecipientCert      OPTIONAL,
+  IN   UINTN        RecipientCertSize   OPTIONAL,
+  IN   CONST UINT8  *ContentInfo,
+  IN   UINTN        ContentInfoSize,
+  IN   UINT32       Flags,
+  OUT  UINT8        **OutData,
+  OUT  UINTN        *OutDataSize
+  )
+{
+  return CALL_BASECRYPTLIB (Pkcs.Services.Pkcs7Decrypt, Pkcs7Decrypt, (PemData, PemSize, Password, RecipientCert, RecipientCertSize, ContentInfo, ContentInfoSize, Flags, OutData, OutDataSize), FALSE);
+}
+
+/**
   Verifies the validity of a PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
@@ -4628,6 +4738,94 @@ CryptoServiceHkdfSha384Expand (
   )
 {
   return CALL_BASECRYPTLIB (Hkdf.Services.Sha384Expand, HkdfSha384Expand, (Prk, PrkSize, Info, InfoSize, Out, OutSize), FALSE);
+}
+
+/**
+  Derive SHA512 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceHkdfSha512ExtractAndExpand (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  )
+{
+  return CALL_BASECRYPTLIB (Hkdf.Services.Sha512ExtractAndExpand, HkdfSha512ExtractAndExpand, (Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize), FALSE);
+}
+
+/**
+  Derive SHA512 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceHkdfSha512Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  return CALL_BASECRYPTLIB (Hkdf.Services.Sha512Extract, HkdfSha512Extract, (Key, KeySize, Salt, SaltSize, PrkOut, PrkOutSize), FALSE);
+}
+
+/**
+  Derive SHA512 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceHkdfSha512Expand (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  )
+{
+  return CALL_BASECRYPTLIB (Hkdf.Services.Sha512Expand, HkdfSha512Expand, (Prk, PrkSize, Info, InfoSize, Out, OutSize), FALSE);
 }
 
 /**
@@ -6928,6 +7126,68 @@ CryptoServiceEcPointsMul (
 }
 
 /**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted
+                           PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which
+                           contain the retrieved EC public key component.
+                           Use EcFree() function to free the resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcGetPublicKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.GetPublicKeyFromPem, EcGetPublicKeyFromPem, (PemData, PemSize, Password, EcContext), FALSE);
+}
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]      EcContext   Pointer to EC DSA context.
+  @param[out]     PemData     Pointer to the PEM-encoded key data to be
+                              retrieved.
+  @param[in, out] PemSize     On input, size of PemData in bytes.
+                              On output, size of data returned or required size.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and *PemSize is zero, then return FALSE and set
+  *PemSize to the required size of the PemData buffer.
+  If PemData is NULL and *PemSize is not zero, then return FALSE.
+  If PemData is not NULL and *PemSize is too small, then return FALSE and
+  set *PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcPublicKeyToPEM (
+  IN  VOID      *EcContext,
+  OUT UINT8     *PemData,
+  IN OUT UINTN  *PemSize
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.PublicKeyToPEM, EcPublicKeyToPEM, (EcContext, PemData, PemSize), FALSE);
+}
+
+/**
   Calculate the inverse of the supplied EC point.
 
   @param[in]     EcGroup   EC group object.
@@ -7074,6 +7334,26 @@ CryptoServiceEcFree (
   )
 {
   CALL_VOID_BASECRYPTLIB (Ec.Services.Free, EcFree, (EcContext));
+}
+
+/**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component or Nid is NULL.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.GetCurveNid, EcGetCurveNid, (EcContext, Nid), FALSE);
 }
 
 /**
@@ -8081,6 +8361,9 @@ CryptoServiceSlhDsaGetPrivateKeyFromPem (
 /**
   Generates an SLH-DSA signature for a given message.
 
+  This callback is deprecated and retained only for protocol ABI compatibility.
+  It always returns FALSE.
+
   @param[in]      SlhDsaContext  Pointer to SLH-DSA context containing the private key.
   @param[in]      Context        Optional context string for domain separation.
                                  May be NULL for default context.
@@ -8091,8 +8374,7 @@ CryptoServiceSlhDsaGetPrivateKeyFromPem (
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature.
 
-  @retval TRUE   SLH-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  SLH-DSA signing is deprecated and unsupported.
 
 **/
 BOOLEAN
@@ -8107,7 +8389,14 @@ CryptoServiceSlhDsaSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return CALL_BASECRYPTLIB (SlhDsa.Services.Sign, SlhDsaSign, (SlhDsaContext, Context, ContextSize, Message, MessageSize, Signature, SigSize), FALSE);
+  (VOID)SlhDsaContext;
+  (VOID)Context;
+  (VOID)ContextSize;
+  (VOID)Message;
+  (VOID)MessageSize;
+  (VOID)Signature;
+  (VOID)SigSize;
+  return FALSE;
 }
 
 /**
@@ -8503,4 +8792,15 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceSlhDsaGetPrivateKeyFromPem,
   CryptoServiceSlhDsaSign,
   CryptoServiceSlhDsaVerify,
+  /// Pkcs (Continued)
+  CryptoServicePkcs7Encrypt,
+  CryptoServicePkcs7Decrypt,
+  /// Ec (Continued)
+  CryptoServiceEcGetPublicKeyFromPem,
+  CryptoServiceEcPublicKeyToPEM,
+  CryptoServiceEcGetCurveNid,
+  /// HKDF (continued)
+  CryptoServiceHkdfSha512ExtractAndExpand,
+  CryptoServiceHkdfSha512Extract,
+  CryptoServiceHkdfSha512Expand,
 };

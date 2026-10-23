@@ -152,23 +152,24 @@ PlatformRegisterOptionsAndKeys (
   Esc.ScanCode    = SCAN_ESC;
   Esc.UnicodeChar = CHAR_NULL;
   Status          = EfiBootManagerGetBootManagerMenu (&BootOption);
-  ASSERT_EFI_ERROR (Status);
-  Status = EfiBootManagerAddKeyOptionVariable (
-             NULL,
-             (UINT16)BootOption.OptionNumber,
-             0,
-             &F2,
-             NULL
-             );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
-  Status = EfiBootManagerAddKeyOptionVariable (
-             NULL,
-             (UINT16)BootOption.OptionNumber,
-             0,
-             &Esc,
-             NULL
-             );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  if (!EFI_ERROR (Status)) {
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               (UINT16)BootOption.OptionNumber,
+               0,
+               &F2,
+               NULL
+               );
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               (UINT16)BootOption.OptionNumber,
+               0,
+               &Esc,
+               NULL
+               );
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  }
 }
 
 EFI_STATUS
@@ -288,14 +289,15 @@ PlatformBootManagerBeforeConsole (
   // Dispatch deferred images after EndOfDxe event and ReadyToLock
   // installation.
   //
-  EfiBootManagerDispatchDeferredImages ();
-
-  //
-  // GPU passthrough only allows Console enablement after ROM image load
-  //
-  PlatformInitializeConsole (
-    XenDetected () ? gXenPlatformConsole : gPlatformConsole
-    );
+  Status = EfiBootManagerDispatchDeferredImages ();
+  if (!EFI_ERROR (Status)) {
+    //
+    // GPU passthrough only allows Console enablement after ROM image load
+    //
+    PlatformInitializeConsole (
+      XenDetected () ? gXenPlatformConsole : gPlatformConsole
+      );
+  }
 
   FrontPageTimeout = GetFrontPageTimeoutFromQemu ();
   PcdStatus        = PcdSet16S (PcdPlatformBootTimeOut, FrontPageTimeout);
@@ -783,6 +785,7 @@ PreparePciDisplayDevicePath (
   DevicePath = GopDevicePath;
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }

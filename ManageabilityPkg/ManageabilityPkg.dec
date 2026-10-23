@@ -11,6 +11,7 @@
 # Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
 # Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -24,16 +25,20 @@
 [Includes]
   Include
 
-[LibraryClasses]
-  ##  @libraryclass Manageability Transport Library
-  #   Manageability Transport Library definitions
-  ManageabilityTransportLib|Include/Library/ManageabilityTransportLib.h
-  ManageabilityTransportLib|Include/Library/ManageabilityTransportIpmiLib.h
-  ManageabilityTransportLib|Include/Library/ManageabilityTransportMctpLib.h
+[Includes.Common.Private]
+  PrivateInclude
 
+[LibraryClasses.Common.Private]
+  ##  @libraryclass Private manageability Transport Library
+  #   Manageability Transport Library definitions
+  ManageabilityTransportLib|PrivateInclude/Library/ManageabilityTransportLib.h
+  ManageabilityTransportLib|PrivateInclude/Library/ManageabilityTransportIpmiLib.h
+  ManageabilityTransportLib|PrivateInclude/Library/ManageabilityTransportMctpLib.h
+
+[LibraryClasses]
   ##  @libraryclass Manageability Transport Helper Library
   #   Provide the help functions to use ManageabilityTransportLib
-  ManageabilityTransportHelperLib|Include/Library/ManageabilityTransportHelperLib.h
+  ManageabilityTransportHelperLib|PrivateInclude/Library/ManageabilityTransportHelperLib.h
 
   ##  @libraryclass PLDM Protocol Library
   #   PLDM Protocol Library Definitions
@@ -108,6 +113,7 @@
 [PcdsFeatureFlag]
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiEnable|FALSE|BOOLEAN|0x10000001
   gManageabilityPkgTokenSpaceGuid.PcdManageabilitySmmIpmiEnable|FALSE|BOOLEAN|0x10000002
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityStandaloneMmIpmiEnable|FALSE|BOOLEAN|0x1000000F
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiEnable|FALSE|BOOLEAN|0x10000003
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmEnable|FALSE|BOOLEAN|0x10000004
   gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeMctpEnable|FALSE|BOOLEAN|0x10000005

@@ -979,14 +979,16 @@ TranslatePciOfwNodes (
                 TargetLun[1]
                 );
   } else if ((NumNodes >= FirstNonBridge + 2) &&
-             SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "pci8086,5845") &&
+             (SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "pci8086,5845") ||
+              SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "pci1b36,0010")) &&
              SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "namespace")
              )
   {
     //
     // OpenFirmware device path (NVMe device):
     //
-    //   /pci@i0cf8/pci8086,5845@6[,1]/namespace@1,0
+    //   /pci@i0cf8/pci8086,5845@6[,1]/namespace@1,0  (legacy QEMU NVMe)
+    //   /pci@i0cf8/pci1b36,0010@3[,0]/namespace@2,0  (standard QEMU NVMe)
     //        ^                  ^  ^            ^ ^
     //        |                  |  |            | Extended Unique Identifier
     //        |                  |  |            | (EUI-64), big endian interp.

@@ -15,6 +15,32 @@
 #include <Register/Amd/SmramSaveStateMap.h>
 #include <Register/SmramSaveStateMap.h>
 #include <Uefi/UefiBaseType.h>
+#include "PeiDxeMemEncryptSevLibInternal.h"
+
+/**
+   Read the workarea to determine whether SEV is enabled. If enabled,
+   then return the SevEsWorkArea pointer.
+
+  **/
+SEC_SEV_ES_WORK_AREA *
+EFIAPI
+GetSevEsWorkArea (
+  VOID
+  )
+{
+  OVMF_WORK_AREA  *WorkArea;
+
+  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+
+  //
+  // If its not SEV guest then SevEsWorkArea is not valid.
+  //
+  if ((WorkArea == NULL) || (WorkArea->Header.GuestType != CcGuestTypeAmdSev)) {
+    return NULL;
+  }
+
+  return (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+}
 
 /**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM

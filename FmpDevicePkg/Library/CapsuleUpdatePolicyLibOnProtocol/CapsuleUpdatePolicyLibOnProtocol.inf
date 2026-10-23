@@ -1,10 +1,14 @@
 ## @file
 #  Provides platform policy services used during a capsule update that uses the
-#  services of the EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL.  If the
-#  EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL is not available, then assume the
-#  platform is in a state that supports a firmware update.
+#  services of the EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL.
 #
-#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  If the protocol is not found, CheckSystemPower(), CheckSystemThermal(),
+#  and CheckSystemEnvironment() assume the platform state supports a
+#  capsule update, while IsLowestSupportedVersionCheckRequired() and
+#  IsLockFmpDeviceAtLockEventGuidRequired() default to TRUE so the lowest
+#  supported version check and FMP device locking are still performed.
+#
+#  Copyright (c) Microsoft Corporation.<BR>
 #  Copyright (c) 2018-2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent

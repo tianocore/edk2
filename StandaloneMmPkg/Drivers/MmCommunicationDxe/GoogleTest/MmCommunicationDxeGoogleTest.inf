@@ -1,0 +1,51 @@
+## @file
+# GoogleTest for MmCommunicationDxe.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x0001001A
+  BASE_NAME           = MmCommunicationDxeGoogleTest
+  FILE_GUID           = 5bf153cc-013c-4c61-95b7-cd86b263bd9f
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+[Sources]
+  MmCommunicationDxeGoogleTest.cpp
+  ../MmCommunicationDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeLib
+  SafeIntLib
+[Protocols]
+  gEfiMmCommunication3ProtocolGuid
+  gEfiMmCommunication2ProtocolGuid
+  gEfiMmCommunicationProtocolGuid
+  gEfiSmmControl2ProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
+
+[Guids]
+  gMmCommBufferHobGuid
+  gEfiEventVirtualAddressChangeGuid
+  gEfiMmCommunicateHeaderV3Guid
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
