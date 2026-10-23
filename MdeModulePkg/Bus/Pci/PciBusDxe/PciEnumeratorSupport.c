@@ -637,6 +637,7 @@ GatherDeviceInfo (
   )
 {
   UINTN          Offset;
+  UINTN          BarIndex;
   PCI_IO_DEVICE  *PciIoDevice;
 
   PciIoDevice = CreatePciIoDevice (
@@ -661,8 +662,8 @@ GatherDeviceInfo (
   //
   // Start to parse the bars
   //
-  for (Offset = PCI_BASE_ADDRESSREG_OFFSET; Offset <= PCI_BASE_ADDRESSREG5_OFFSET;) {
-    Offset = PciParseBar (PciIoDevice, Offset);
+  for (Offset = PCI_BASE_ADDRESSREG_OFFSET, BarIndex = 0; Offset <= PCI_BASE_ADDRESSREG5_OFFSET && BarIndex < PCI_MAX_BAR; BarIndex++) {
+    Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
   }
 
   PciParseEnhancedAllocation (PciIoDevice);
@@ -671,10 +672,12 @@ GatherDeviceInfo (
   // Parse the SR-IOV VF bars
   //
   if (PcdGetBool (PcdSrIovSupport) && (PciIoDevice->SrIovCapabilityOffset != 0)) {
-    for (Offset = PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0;
-         Offset <= PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR5;)
+    for (Offset = PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0, BarIndex = 0;
+         Offset <= PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR5;
+         BarIndex++)
     {
-      Offset = PciIovParseVfBar (PciIoDevice, Offset);
+      ASSERT (BarIndex < PCI_MAX_BAR);
+      Offset = PciIovParseVfBar (PciIoDevice, Offset, BarIndex);
     }
   }
 
@@ -738,11 +741,11 @@ GatherPpbInfo (
   //
   // PPB can have two BARs
   //
-  if (PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG_OFFSET) == PCI_BASE_ADDRESSREG1_OFFSET) {
+  if (PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG_OFFSET, PPB_BAR_0) == PCI_BASE_ADDRESSREG1_OFFSET) {
     //
     // Not 64-bit bar
     //
-    PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG1_OFFSET);
+    PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG1_OFFSET, PPB_BAR_1);
   }
 
   PciParseEnhancedAllocation (PciIoDevice);
@@ -893,7 +896,7 @@ GatherP2CInfo (
   //
   // P2C only has one bar that is in 0x10
   //
-  PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG_OFFSET);
+  PciParseBar (PciIoDevice, PCI_BASE_ADDRESSREG_OFFSET, P2C_BAR_0);
 
   //
   // Read PciBar information from the bar register
@@ -1759,14 +1762,14 @@ SetNewAlign (
 UINTN
 PciIovParseVfBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
-  IN UINTN          Offset
+  IN UINTN          Offset,
+  IN UINTN          BarIndex
   )
 {
   UINT32      Value;
   UINT32      OriginalValue;
   UINT32      Mask;
   EFI_STATUS  Status;
-  UINTN       BarIndex;
 
   //
   // Ensure it is called properly
@@ -1775,13 +1778,6 @@ PciIovParseVfBar (
   if (PciIoDevice->SrIovCapabilityOffset == 0) {
     return 0;
   }
-
-  BarIndex = (
-              Offset -
-              PciIoDevice->SrIovCapabilityOffset -
-              EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0
-              ) / sizeof (UINT32);
-  ASSERT (BarIndex < PCI_MAX_BAR);
 
   OriginalValue = 0;
   Value         = 0;
@@ -1956,19 +1952,17 @@ PciIovParseVfBar (
 UINTN
 PciParseBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
-  IN UINTN          Offset
+  IN UINTN          Offset,
+  IN UINTN          BarIndex
   )
 {
   UINT32      Value;
   UINT32      OriginalValue;
   UINT32      Mask;
   EFI_STATUS  Status;
-  UINTN       BarIndex;
 
   OriginalValue = 0;
   Value         = 0;
-
-  BarIndex = (Offset - 0x10) / sizeof (UINT32);
 
   Status = BarExisted (
              PciIoDevice,
