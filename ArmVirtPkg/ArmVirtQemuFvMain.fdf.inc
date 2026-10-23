@@ -82,6 +82,7 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   INF OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  INF MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
   INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
   #
@@ -109,6 +110,7 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
   INF OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+  INF OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 

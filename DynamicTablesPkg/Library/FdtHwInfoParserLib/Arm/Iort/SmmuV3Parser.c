@@ -205,11 +205,13 @@ FindIommuMsiMapForSmmuV3 (
   @param [in]  MsiMapData         Pointer to msi-map array.
   @param [in]  MsiMapSize         Size of the msi-map array, in entries.
   @param [out] IdMappings         Location to store ID mappings.
+  @param [out] IdMappingCount     Number of Id mappings.
 
   @retval The number of ID mappings generated
 **/
 STATIC
-UINT32
+EFI_STATUS
+EFIAPI
 GenerateSmmuV3IdMappings (
   IN  CONST VOID         *Fdt,
   IN  CONST UINT32       SmmuV3Node,
@@ -217,7 +219,8 @@ GenerateSmmuV3IdMappings (
   IN  CONST UINT32       IommuMapSize,
   IN  CONST UINT32       *MsiMapData,
   IN  CONST UINT32       MsiMapSize,
-  OUT CM_ARM_ID_MAPPING  *IdMappings
+  OUT CM_ARM_ID_MAPPING  *IdMappings,
+  OUT       UINT32       *IdMappingCount
   )
 {
   UINT32  *IommuMapEntry;
@@ -232,6 +235,10 @@ GenerateSmmuV3IdMappings (
   UINT32  MsiOutputId;
   UINT32  MsiNumIds;
   UINT32  MapIndex;
+  UINT32  NumIds;
+
+  ASSERT (IdMappings != NULL);
+  ASSERT (IdMappingCount != NULL);
 
   MapIndex = 0;
 
@@ -255,12 +262,24 @@ GenerateSmmuV3IdMappings (
 
       if ((IommuNode == SmmuV3Node) && (MsiInputId < (IommuInputId + IommuNumIds)) && ((MsiInputId + MsiNumIds) > IommuInputId)) {
         if (MsiInputId < IommuInputId) {
+          NumIds = MIN ((MsiInputId + MsiNumIds) - IommuInputId, IommuNumIds);
+          if (NumIds == 0) {
+            ASSERT (FALSE);
+            return EFI_ABORTED;
+          }
+
           IdMappings[MapIndex].InputBase  = IommuOutputId;
-          IdMappings[MapIndex].NumIds     = MIN ((MsiInputId + MsiNumIds) - IommuInputId, IommuNumIds);
+          IdMappings[MapIndex].NumIds     = NumIds - 1;
           IdMappings[MapIndex].OutputBase = MsiOutputId + (IommuInputId - MsiInputId);
         } else {
+          NumIds = MIN ((IommuInputId + IommuNumIds) - MsiInputId, MsiNumIds);
+          if (NumIds == 0) {
+            ASSERT (FALSE);
+            return EFI_ABORTED;
+          }
+
           IdMappings[MapIndex].InputBase  = IommuOutputId + (MsiInputId - IommuInputId);
-          IdMappings[MapIndex].NumIds     = MIN ((IommuInputId + IommuNumIds) - MsiInputId, MsiNumIds);
+          IdMappings[MapIndex].NumIds     = NumIds - 1;
           IdMappings[MapIndex].OutputBase = MsiOutputId;
         }
 
@@ -271,7 +290,8 @@ GenerateSmmuV3IdMappings (
     }
   }
 
-  return MapIndex;
+  *IdMappingCount = MapIndex;
+  return EFI_SUCCESS;
 }
 
 /** Parse an SmmuV3 node.
@@ -307,6 +327,7 @@ SmmuV3NodeParser (
   UINT32             IommuMapSize;
   CONST UINT32       *MsiMapData;
   UINT32             MsiMapSize;
+  UINT32             CombinedIrq;
 
   if ((Fdt == NULL) || (SmmuV3Info == NULL)) {
     ASSERT ((Fdt != NULL) && (SmmuV3Info != NULL));
@@ -326,6 +347,11 @@ SmmuV3NodeParser (
   }
 
   InterruptNames = FdtGetProp (Fdt, SmmuV3Node, "interrupt-names", &InterruptNamesSize);
+  if (InterruptNames == NULL) {
+    // If error.
+    ASSERT (InterruptNames != NULL);
+    return EFI_ABORTED;
+  }
 
   Data = FdtGetProp (Fdt, SmmuV3Node, "interrupts", &DataSize);
   if (Data == NULL) {
@@ -334,17 +360,31 @@ SmmuV3NodeParser (
     return EFI_ABORTED;
   }
 
-  /// GSIV of the Event interrupt if SPI based
-  SmmuV3Info->EventInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "eventq");
-  /// PRI Interrupt if SPI based
-  SmmuV3Info->PriInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "priq");
-  /// GERR interrupt if GSIV based
-  SmmuV3Info->GerrInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "gerror");
-  /// Sync interrupt if GSIV based
-  SmmuV3Info->SyncInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "cmdq-sync");
+  CombinedIrq = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "combined");
+  if (CombinedIrq != 0) {
+    // Use the combined IRQ for all entries.
+    SmmuV3Info->EventInterrupt = CombinedIrq;
+    SmmuV3Info->PriInterrupt   = CombinedIrq;
+    SmmuV3Info->GerrInterrupt  = CombinedIrq;
+    SmmuV3Info->SyncInterrupt  = CombinedIrq;
+  } else {
+    /// GSIV of the Event interrupt if SPI based
+    SmmuV3Info->EventInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "eventq");
+    /// PRI Interrupt if SPI based
+    SmmuV3Info->PriInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "priq");
+    /// GERR interrupt if GSIV based
+    SmmuV3Info->GerrInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "gerror");
+    /// Sync interrupt if GSIV based
+    SmmuV3Info->SyncInterrupt = FdtGetInterruptFromName ((CONST CHAR8 *)InterruptNames, InterruptNamesSize, Data, IntCells, "cmdq-sync");
+  }
 
   /// SMMU flags
   SmmuV3Info->Flags = 0;
+  Data              = FdtGetProp (Fdt, SmmuV3Node, "dma-coherent", &DataSize);
+  if ((Data != NULL) && (DataSize >= 0)) {
+    SmmuV3Info->Flags |= EFI_ACPI_IORT_SMMUv3_FLAG_COHAC_OVERRIDE;
+  }
+
   /// VATOS address
   SmmuV3Info->VatosAddress = 0;
 
@@ -389,15 +429,21 @@ SmmuV3NodeParser (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  SmmuV3Info->IdMappingCount = GenerateSmmuV3IdMappings (
-                                 Fdt,
-                                 SmmuV3Node,
-                                 IommuMapData,
-                                 IommuMapSize,
-                                 MsiMapData,
-                                 MsiMapSize,
-                                 IdMappings
-                                 );
+  Status = GenerateSmmuV3IdMappings (
+             Fdt,
+             SmmuV3Node,
+             IommuMapData,
+             IommuMapSize,
+             MsiMapData,
+             MsiMapSize,
+             IdMappings,
+             &SmmuV3Info->IdMappingCount
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (IdMappings);
+    return Status;
+  }
 
   if ((SmmuV3Info->EventInterrupt == 0) || (SmmuV3Info->PriInterrupt  == 0) ||
       (SmmuV3Info->GerrInterrupt  == 0) || (SmmuV3Info->SyncInterrupt == 0))
