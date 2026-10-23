@@ -210,14 +210,16 @@ SetupTPMResources (
   }
 
   if (TpmBaseSize > 0) {
-    BuildResourceDescriptorHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_MEMORY_MAPPED_IO,
       EFI_RESOURCE_ATTRIBUTE_PRESENT     |
       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
       EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
       EFI_RESOURCE_ATTRIBUTE_TESTED,
       TpmBase,
-      ALIGN_VALUE (TpmBaseSize, EFI_PAGE_SIZE)
+      ALIGN_VALUE (TpmBaseSize, EFI_PAGE_SIZE),
+      EFI_MEMORY_UC,
+      NULL
       );
 
     Status = (EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase);

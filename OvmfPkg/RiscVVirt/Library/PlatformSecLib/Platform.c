@@ -25,14 +25,16 @@ AddIoMemoryBaseSizeHob (
 {
   /* Align to EFI_PAGE_SIZE */
   MemorySize = ALIGN_VALUE (MemorySize, EFI_PAGE_SIZE);
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_MEMORY_MAPPED_IO,
     EFI_RESOURCE_ATTRIBUTE_PRESENT     |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
     EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
-    MemorySize
+    MemorySize,
+    EFI_MEMORY_UC,
+    NULL
     );
 }
 
