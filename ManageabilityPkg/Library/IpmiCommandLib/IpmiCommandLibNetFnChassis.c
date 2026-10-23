@@ -362,7 +362,6 @@ IpmiReadBootInitiatorMailbox (
   IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_7  *BootOptionsParameterData;
   UINT8                                   *BlockData;
   EFI_STATUS                              Status;
-  UINT8                                   Count;
 
   if (ReadData == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -401,12 +400,13 @@ IpmiReadBootInitiatorMailbox (
     return Status;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "IPMI Mailbox Read Data: "));
-  for (Count = 0; Count < 16; Count++) {
-    DEBUG ((DEBUG_VERBOSE, "%x ", BootOptionsParameterData->BlockData[Count]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DUMP_HEX (
+    DEBUG_VERBOSE,
+    0,
+    BootOptionsParameterData->BlockData,
+    sizeof (BootOptionsParameterData->BlockData),
+    "IPMI Mailbox Read Data: "
+    );
 
   // Copy data over to buffer and return this
   CopyMem (BlockData, BootOptionsParameterData->BlockData, sizeof (BootOptionsParameterData->BlockData));
