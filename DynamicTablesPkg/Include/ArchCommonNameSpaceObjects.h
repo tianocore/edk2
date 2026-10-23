@@ -169,6 +169,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjGroupAssociationInfo,              ///< 99 - Group Association Information
   EArchCommonObjGroupAssociationItem,              ///< 100 - Group Association Item
   EArchCommonObjVirtioMmioDeviceInfo,              ///< 101 - Virtio MMIO Device Information
+  EArchCommonObjFirmwareInventoryInfo,             ///< 102 - Firmware Inventory Information
+  EArchCommonObjFirmwareInventoryComponent,        ///< 103 - Firmware Inventory Associated Component
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2363,6 +2365,68 @@ typedef struct CmArchCommonGroupAssociationInfo {
   /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
   CHAR8              GroupName[SMBIOS_MAX_STRING_SIZE];
 } CM_ARCH_COMMON_GROUP_ASSOCIATION_INFO;
+
+/** A structure that identifies an SMBIOS component associated with firmware.
+
+  SMBIOS Specification v3.9.0 Type 45
+
+  ID: EArchCommonObjFirmwareInventoryComponent
+**/
+typedef struct CmArchCommonFirmwareInventoryComponent {
+  /// CM Object Token identifying the associated SMBIOS object.
+  CM_OBJECT_TOKEN              ReferencedObjectToken;
+
+  /// Generator ID for the associated SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    ReferencedTableGeneratorId;
+} CM_ARCH_COMMON_FIRMWARE_INVENTORY_COMPONENT;
+
+/** A structure that describes Firmware Inventory Information.
+
+  SMBIOS Specification v3.9.0 Type 45
+
+  ID: EArchCommonObjFirmwareInventoryInfo
+**/
+typedef struct CmArchCommonFirmwareInventoryInfo {
+  /// CM Object Token uniquely identifying this firmware component.
+  CM_OBJECT_TOKEN             FirmwareInventoryInfoToken;
+
+  /// Firmware component name encoded as UTF-8.
+  CHAR8                       FirmwareComponentName[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware version encoded as UTF-8.
+  CHAR8                       FirmwareVersion[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware version format defined by SMBIOS Specification v3.9.0, Table 134.
+  UINT8                       FirmwareVersionFormat;
+
+  /// Firmware identifier encoded as UTF-8.
+  CHAR8                       FirmwareId[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware ID format defined by SMBIOS Specification v3.9.0, Table 135.
+  UINT8                       FirmwareIdFormat;
+
+  /// Firmware release date encoded as a DSP0266 Date-Time value, or an empty string.
+  CHAR8                       ReleaseDate[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware manufacturer encoded as UTF-8.
+  CHAR8                       Manufacturer[SMBIOS_MAX_STRING_SIZE];
+
+  /// Lowest supported firmware version encoded as UTF-8.
+  CHAR8                       LowestSupportedVersion[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware image size in bytes, or MAX_UINT64 if unknown.
+  UINT64                      ImageSize;
+
+  /// Firmware characteristics defined by SMBIOS Specification v3.9.0, Table 136.
+  FIRMWARE_CHARACTERISTICS    Characteristics;
+
+  /// Firmware state defined by SMBIOS Specification v3.9.0, Table 137.
+  UINT8                       State;
+
+  /// Token referencing an array of associated SMBIOS components.
+  /// CM_NULL_TOKEN indicates that no associated components are supplied.
+  CM_OBJECT_TOKEN             AssociatedComponentListToken;
+} CM_ARCH_COMMON_FIRMWARE_INVENTORY_INFO;
 
 /** A structure that describes an installable firmware language.
 
