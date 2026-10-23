@@ -37,3 +37,4 @@
 [Guids]
   gEfiHobMemoryAllocModuleGuid
   gEfiHobMemoryAllocStackGuid
+  gZeroGuid

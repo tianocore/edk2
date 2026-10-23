@@ -168,6 +168,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSmc91xInfo,                        ///< 98 - SMC91X Network Device Information
   EArchCommonObjGroupAssociationInfo,              ///< 99 - Group Association Information
   EArchCommonObjGroupAssociationItem,              ///< 100 - Group Association Item
+  EArchCommonObjVirtioMmioDeviceInfo,              ///< 101 - Virtio MMIO Device Information
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -331,6 +332,20 @@ typedef struct CmArchCommonGenericInterrupt {
   ///       1: Interrupt is Active low
   UINT32    Flags;
 } CM_ARCH_COMMON_GENERIC_INTERRUPT;
+
+/** An AML Extended Interrupt resource descriptor interrupt.
+
+  Interrupt is the interrupt number. Flags follows the Interrupt Vector Flags
+  (Byte 3) of the Extended Interrupt resource descriptor:
+  - BIT0: 0: ResourceProducer, 1: ResourceConsumer.
+  - BIT1: 0: Level triggered, 1: Edge triggered.
+  - BIT2: 0: Active high, 1: Active low.
+  - BIT3: 0: Exclusive, 1: Shared.
+  - BIT4: 0: Not wake capable, 1: Wake capable.
+  Other bits are reserved.
+  See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h.
+**/
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARCH_COMMON_EXTENDED_INTERRUPT;
 
 /** A structure that describes a PCI Interrupt Map.
 
@@ -2600,5 +2615,23 @@ typedef struct CmArchCommonSmc91xInfo {
   /// Interrupt number and polarity/trigger flags.
   CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
 } CM_ARCH_COMMON_SMC91X_INFO;
+
+/** A structure describing a Virtio MMIO device.
+
+  ID: EArchCommonObjVirtioMmioDeviceInfo
+**/
+typedef struct CmArchCommonVirtioMmioDeviceInfo {
+  /// Physical base address of the device registers.
+  UINT64                               BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                               BaseAddressLength;
+  /// Interrupt number and Extended Interrupt descriptor flags.
+  /// Wake-capable interrupts are not supported by this generator.
+  CM_ARCH_COMMON_EXTENDED_INTERRUPT    Interrupt;
+
+  /// Indicates whether the device supports hardware-managed cache coherency.
+  /// TRUE indicates coherent DMA; FALSE indicates non-coherent DMA.
+  BOOLEAN                              CacheCoherent;
+} CM_ARCH_COMMON_VIRTIO_MMIO_DEVICE_INFO;
 
 #pragma pack()
