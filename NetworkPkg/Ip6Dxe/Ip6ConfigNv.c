@@ -2,6 +2,7 @@
   Helper functions for configuring or obtaining the parameters relating to IP6.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2082,11 +2083,23 @@ Ip6ConfigFormUnload (
 
   Ip6NvData = &Instance->Ip6NvData;
 
-  Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
-  Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
-  Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
+  //
+  // A zero count means the list head may not have been initialized yet
+  // (e.g. an error path in Ip6ConfigFormInit() before InitializeListHead()
+  // ran), so skip the free in that case to avoid walking a bogus list.
+  //
+  if (Ip6NvData->ManualAddressCount > 0) {
+    Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
+    Ip6NvData->ManualAddressCount = 0;
+  }
 
-  Ip6NvData->ManualAddressCount  = 0;
-  Ip6NvData->GatewayAddressCount = 0;
-  Ip6NvData->DnsAddressCount     = 0;
+  if (Ip6NvData->GatewayAddressCount > 0) {
+    Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
+    Ip6NvData->GatewayAddressCount = 0;
+  }
+
+  if (Ip6NvData->DnsAddressCount > 0) {
+    Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
+    Ip6NvData->DnsAddressCount = 0;
+  }
 }
