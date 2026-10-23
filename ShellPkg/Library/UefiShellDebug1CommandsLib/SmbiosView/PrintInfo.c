@@ -1213,6 +1213,9 @@ SmbiosPrintStructure (
         PRINT_STRUCT_VALUE_LH (Struct, Type38, BaseAddress);
       }
 
+      PRINT_STRUCT_VALUE_H (Struct, Type38, BaseAddressModifier_InterruptInfo);
+      PRINT_STRUCT_VALUE_H (Struct, Type38, InterruptNumber);
+
       break;
 
     //
