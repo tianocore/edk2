@@ -510,6 +510,46 @@ STATIC CONST CM_OBJ_PARSER  CmArmBmuRegInfoParser[] = {
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
+/** A parser for SCMI transport token arrays.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiTransportTokenParser[] = {
+  { "A2pTransportToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "P2aTransportToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiDeviceInfoParser[] = {
+  { "Token",                sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CommonTransportToken",
+    sizeof (CM_OBJECT_TOKEN) * ArmScmiTransportDirectionMax,
+    NULL,
+    NULL,
+    CmArmScmiTransportTokenParser,
+    ARRAY_SIZE (CmArmScmiTransportTokenParser) },
+  { "ProtocolInfoToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiPccTransportInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiPccTransportInfoParser[] = {
+  { "Token",            sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "PccSubspaceToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiProtocolInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiProtocolInfoParser[] = {
+  { "ProtocolType",            sizeof (CM_ARM_SCMI_PROTOCOL_TYPE), "0x%x", NULL },
+  { "ExclusiveTransportToken",
+    sizeof (CM_OBJECT_TOKEN) * ArmScmiTransportDirectionMax,
+    NULL,
+    NULL,
+    CmArmScmiTransportTokenParser,
+    ARRAY_SIZE (CmArmScmiTransportTokenParser) },
+  { "NotificationsSupported",  sizeof (BOOLEAN),                   "0x%x", NULL },
+};
+
 /** A parser for EArmObjCmnInfo containing CMN information.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
@@ -1995,6 +2035,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPl050Info,                       CmArmPl050InfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiDeviceInfo,                  CmArmScmiDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiPccTransportInfo,            CmArmScmiPccTransportInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiProtocolInfo,                CmArmScmiProtocolInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
