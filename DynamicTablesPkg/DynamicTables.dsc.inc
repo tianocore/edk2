@@ -85,6 +85,7 @@
   DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
   DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
+  DynamicTablesPkg/Library/Smbios/SmbiosType45Lib/SmbiosType45Lib.inf
 
   # AML Fixup (Common)
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
@@ -157,6 +158,7 @@
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmcPmuLibArm/SsdtDmcPmuLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtBmuLibArm/SsdtBmuLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtPl050LibArm/SsdtPl050LibArm.inf
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtScmiLibArm/SsdtScmiLibArm.inf
 
   #
   # Dynamic Table Factory Dxe
@@ -197,6 +199,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmcPmuLibArm/SsdtDmcPmuLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtBmuLibArm/SsdtBmuLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtPl050LibArm/SsdtPl050LibArm.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtScmiLibArm/SsdtScmiLibArm.inf
 
       # AML Codegen
       #  Common
@@ -234,6 +237,7 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType42Lib/SmbiosType42Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
+      NULL|DynamicTablesPkg/Library/Smbios/SmbiosType45Lib/SmbiosType45Lib.inf
   }
 
 [Components.RISCV64]
