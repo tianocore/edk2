@@ -416,6 +416,7 @@ AdjustPciDeviceBarSize (
   LIST_ENTRY     *CurrentLink;
   BOOLEAN        Adjusted;
   UINTN          Offset;
+  UINTN          BarIndex;
 
   Adjusted    = FALSE;
   CurrentLink = RootBridgeDev->ChildList.ForwardLink;
@@ -440,8 +441,8 @@ AdjustPciDeviceBarSize (
         //
         // Start to parse the bars
         //
-        for (Offset = PCI_BASE_ADDRESSREG_OFFSET; Offset <= PCI_BASE_ADDRESSREG5_OFFSET;) {
-          Offset = PciParseBar (PciIoDevice, Offset);
+        for (Offset = PCI_BASE_ADDRESSREG_OFFSET, BarIndex = 0; Offset <= PCI_BASE_ADDRESSREG5_OFFSET && BarIndex < PCI_MAX_BAR; BarIndex++) {
+          Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
         }
 
         Adjusted = TRUE;
