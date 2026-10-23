@@ -201,7 +201,7 @@ if __name__ == '__main__':
     #
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
-    Process = subprocess.Popen('%s smime -sign -binary -signer "%s" -outform DER -md sha256 -certfile "%s"' % (OpenSslCommand, args.SignerPrivateCertFileName, args.OtherPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    Process = subprocess.Popen('%s smime -sign -binary -noattr -signer "%s" -outform DER -md sha256 -certfile "%s"' % (OpenSslCommand, args.SignerPrivateCertFileName, args.OtherPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
     if Process.returncode != 0:
       sys.exit(Process.returncode)
