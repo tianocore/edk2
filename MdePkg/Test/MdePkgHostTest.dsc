@@ -72,5 +72,12 @@
   MdePkg/Test/Mock/Library/GoogleTest/MockUefiDevicePathLib/MockUefiDevicePathLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeLib/MockUefiRuntimeLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockRngLib/MockRngLib.inf
+  MdePkg/Test/Mock/Library/GoogleTest/MockTimerLib/MockTimerLib.inf
 
   MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
+
+  MdePkg/Test/Library/SynchronizationLibHostUnitTest/SynchronizationLibHostUnitTest.inf
+  MdePkg/Test/Mock/Library/Cmocka/MockUefiBootServicesTableLib/MockUefiBootServicesTableLib.inf
+  MdePkg/Test/Mock/Library/Cmocka/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
+  MdePkg/Test/Mock/Library/Stub/StubHobLib/StubHobLib.inf
+  MdePkg/Test/Mock/Library/Stub/StubUefiLib/StubUefiLib.inf

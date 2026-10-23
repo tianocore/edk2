@@ -26,6 +26,7 @@
   # Build HOST_APPLICATION that tests StandaloneMmPkg
   #
   StandaloneMmPkg/Drivers/MmCommunicationDxe/GoogleTest/MmCommunicationDxeGoogleTest.inf
+  StandaloneMmPkg/Test/Mock/Library/GoogleTest/MockStandaloneMmMemLib/MockStandaloneMmMemLib.inf
 
 [LibraryClasses]
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf

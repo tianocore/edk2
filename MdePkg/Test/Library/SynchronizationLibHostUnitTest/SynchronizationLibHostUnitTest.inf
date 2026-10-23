@@ -1,0 +1,27 @@
+## @file
+#  Host-based, single threaded implementation of synchronization functions.
+#  Only to be used in unit test suites.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SynchronizationLibHostUnitTest
+  FILE_GUID                      = BF9C3D8E-E248-4ED2-8E7E-426C01725AB5
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SynchronizationLib|HOST_APPLICATION
+
+
+[Sources]
+  SynchronizationLibHostUnitTest.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  DebugLib
