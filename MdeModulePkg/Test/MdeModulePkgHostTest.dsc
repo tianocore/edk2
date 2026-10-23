@@ -67,6 +67,8 @@
 
   MdeModulePkg/Bus/Pci/PciBusDxe/GoogleTest/PciBusDxeGoogleTest.inf
 
+  MdeModulePkg/Bus/Usb/UsbBusDxe/GoogleTest/UsbBusDxeGoogleTest.inf
+
   MdeModulePkg/Library/DxeReportStatusCodeLib/GoogleTest/DxeReportStatusCodeLibGoogleTest.inf {
     <LibraryClasses>
       ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf

@@ -370,6 +370,391 @@ error_handler:
   return Status;
 }
 
+/**
+  Create and attach an empty Package to a parent node.
+
+  @param [in]  ParentNode  Node to which the new Package is attached.
+  @param [out] NewPackage  On success, receives the new Package.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+AmlAttachNewPackage (
+  IN  AML_OBJECT_NODE_HANDLE  ParentNode,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPackage
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+
+  if ((ParentNode == NULL) || (NewPackage == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *NewPackage = NULL;
+  PackageNode = NULL;
+
+  Status = AmlCodeGenPackage (&PackageNode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)ParentNode,
+             (AML_NODE_HEADER *)PackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    AmlDeleteTree ((AML_NODE_HANDLE)PackageNode);
+    return Status;
+  }
+
+  *NewPackage = PackageNode;
+  return EFI_SUCCESS;
+}
+
+/**
+  Create and attach an Integer object to a parent node.
+
+  @param [in] ParentNode  Node to which the Integer object is attached.
+  @param [in] Value       Value of the Integer object.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+AmlAttachNewInteger (
+  IN AML_OBJECT_NODE_HANDLE  ParentNode,
+  IN UINT64                  Value
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  IntegerNode;
+
+  if (ParentNode == NULL) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IntegerNode = NULL;
+  Status      = AmlCodeGenInteger (Value, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)ParentNode,
+             (AML_NODE_HEADER *)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    AmlDeleteTree ((AML_NODE_HANDLE)IntegerNode);
+  }
+
+  return Status;
+}
+
+/**
+  Create and attach a String object to a parent node.
+
+  @param [in] ParentNode  Node to which the String object is attached.
+  @param [in] String      String value to attach.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+AmlAttachNewString (
+  IN AML_OBJECT_NODE_HANDLE  ParentNode,
+  IN CONST CHAR8             *String
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  StringNode;
+
+  if ((ParentNode == NULL) || (String == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  StringNode = NULL;
+  Status     = AmlCodeGenString (String, &StringNode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)ParentNode,
+             (AML_NODE_HEADER *)StringNode
+             );
+  if (EFI_ERROR (Status)) {
+    AmlDeleteTree ((AML_NODE_HANDLE)StringNode);
+  }
+
+  return Status;
+}
+
+/**
+  Create an SCMI PCC transport property.
+
+  The property contains the revision, transport count, and an initially empty
+  list of transport descriptors.
+
+  It generates the following ASL package:
+    Package () {
+      "arm-arml0001-transport-pcc",
+      Package () {
+        Revision,
+        TransportCount
+      }
+    }
+
+  @param [in]  Revision           SCMI Device Properties revision.
+  @param [in]  TransportCount     Number of PCC transport descriptors.
+  @param [in]  PropertiesNode     SCMI Device Properties Package.
+  @param [out] TransportListNode  Package receiving transport descriptors.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenScmiPccTransportProperty (
+  IN  UINT64                  Revision,
+  IN  UINT64                  TransportCount,
+  IN  AML_OBJECT_NODE_HANDLE  PropertiesNode,
+  OUT AML_OBJECT_NODE_HANDLE  *TransportListNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  Property;
+
+  if ((TransportCount == 0) ||
+      (PropertiesNode == NULL) ||
+      (TransportListNode == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAttachNewPackage (PropertiesNode, &Property);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewString (
+             Property,
+             "arm-arml0001-transport-pcc"
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewPackage (Property, TransportListNode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewInteger (*TransportListNode, Revision);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return AmlAttachNewInteger (
+           *TransportListNode,
+           TransportCount
+           );
+}
+
+/**
+  Add a PCC transport descriptor to an SCMI transport property.
+
+  It appends the following ASL package to the transport list:
+    Package () {
+      PccSubspaceId,
+      TransportUid,
+      Flags
+    }
+
+  @param [in] PccSubspaceId      PCCT subspace identifier.
+  @param [in] TransportUid       SCMI transport UID.
+  @param [in] Flags              SCMI PCC transport flags.
+  @param [in] TransportListNode  Package receiving the descriptor.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddScmiPccTransportDescriptor (
+  IN UINT64                  PccSubspaceId,
+  IN UINT64                  TransportUid,
+  IN UINT64                  Flags,
+  IN AML_OBJECT_NODE_HANDLE  TransportListNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  Descriptor;
+
+  if (TransportListNode == NULL) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAttachNewPackage (TransportListNode, &Descriptor);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewInteger (Descriptor, PccSubspaceId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewInteger (Descriptor, TransportUid);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return AmlAttachNewInteger (Descriptor, Flags);
+}
+
+/**
+  Create an SCMI protocol property.
+
+  The property contains the revision, an initially empty exclusive transport
+  package, and the empty revision 1 protocol association package.
+
+  It generates the following ASL package:
+    Package () {
+      PropertyName,
+      Package () {
+        Revision,
+        Package () {},
+        Package () {}
+      }
+    }
+
+  @param [in]  PropertyName           SCMI protocol property name.
+  @param [in]  Revision               SCMI Device Properties revision.
+  @param [in]  PropertiesNode         SCMI Device Properties Package.
+  @param [out] ExclusiveTransportNode Package receiving exclusive transports.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenScmiProtocolProperty (
+  IN  CONST CHAR8                   *PropertyName,
+  IN        UINT64                  Revision,
+  IN        AML_OBJECT_NODE_HANDLE  PropertiesNode,
+  OUT       AML_OBJECT_NODE_HANDLE  *ExclusiveTransportNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  Property;
+  AML_OBJECT_NODE_HANDLE  Value;
+  AML_OBJECT_NODE_HANDLE  Association;
+
+  if ((PropertyName == NULL) ||
+      (PropertiesNode == NULL) ||
+      (ExclusiveTransportNode == NULL))
+  {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAttachNewPackage (PropertiesNode, &Property);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewString (Property, PropertyName);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewPackage (Property, &Value);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewInteger (Value, Revision);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewPackage (
+             Value,
+             ExclusiveTransportNode
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // The protocol association package must be empty in revision 1.
+  return AmlAttachNewPackage (Value, &Association);
+}
+
+/**
+  Add an exclusive transport descriptor to an SCMI protocol property.
+
+  It appends the following ASL package to the exclusive transport list:
+    Package () {
+      TransportUid,
+      Flags
+    }
+
+  @param [in] TransportUid           SCMI transport UID.
+  @param [in] Flags                  Reserved transport flags.
+  @param [in] ExclusiveTransportNode Package receiving the descriptor.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddScmiProtocolTransportDescriptor (
+  IN UINT64                  TransportUid,
+  IN UINT64                  Flags,
+  IN AML_OBJECT_NODE_HANDLE  ExclusiveTransportNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  Descriptor;
+
+  if (ExclusiveTransportNode == NULL) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAttachNewPackage (
+             ExclusiveTransportNode,
+             &Descriptor
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = AmlAttachNewInteger (Descriptor, TransportUid);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return AmlAttachNewInteger (Descriptor, Flags);
+}
+
 /** AML code generation for a Buffer object node.
 
   To create a Buffer object node with an empty buffer,
