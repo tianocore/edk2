@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PiPei.h"
+#include <Uefi/UefiSpec.h>
 #include <Ppi/EmuThunk.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
@@ -81,7 +82,7 @@ Returns:
         //  All these strange offests are needed to keep in
         //  sync with the FlashMap and NT32.dsc file
         //
-        BuildResourceDescriptorHob (
+        BuildResourceDescriptor2Hob (
           EFI_RESOURCE_FIRMWARE_DEVICE,
           (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE),
           FdBase,
@@ -91,7 +92,9 @@ Returns:
            PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
            PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
            PcdGet32 (PcdEmuFlashNvStorageEventLogSize)
-          )
+          ),
+          EFI_MEMORY_UC,
+          NULL
           );
 
         //
@@ -109,11 +112,13 @@ Returns:
         //
         // For other FD's just map them in.
         //
-        BuildResourceDescriptorHob (
+        BuildResourceDescriptor2Hob (
           EFI_RESOURCE_FIRMWARE_DEVICE,
           (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE),
           FdBase,
-          FdSize
+          FdSize,
+          EFI_MEMORY_UC,
+          NULL
           );
       }
     }
