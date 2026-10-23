@@ -9,6 +9,7 @@
 
 #include <Base.h>
 #include <PiPei.h>
+#include <Uefi/UefiSpec.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -25,12 +26,12 @@
  * Build ResourceDescriptorHob for the unaccepted memory region.
  * This memory region may be splitted into 2 parts because of lazy accept.
  *
- * @param Hob     Point to the EFI_HOB_RESOURCE_DESCRIPTOR
+ * @param Hob     Point to a Resource Descriptor HOB of either version.
  * @return VOID
  */
 VOID
 BuildResourceDescriptorHobForUnacceptedMemory (
-  IN EFI_HOB_RESOURCE_DESCRIPTOR  *Hob
+  IN EFI_HOB_RESOURCE_DESCRIPTOR2  *Hob
   )
 {
   EFI_PHYSICAL_ADDRESS         PhysicalStart;
@@ -43,7 +44,7 @@ BuildResourceDescriptorHobForUnacceptedMemory (
   ASSERT (Hob->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED);
 
   ResourceType      = EFI_RESOURCE_MEMORY_UNACCEPTED;
-  ResourceAttribute = Hob->ResourceAttribute;
+  ResourceAttribute = Hob->ResourceCapabilities;
   PhysicalStart     = Hob->PhysicalStart;
   ResourceLength    = Hob->ResourceLength;
   PhysicalEnd       = PhysicalStart + ResourceLength;
@@ -67,11 +68,15 @@ BuildResourceDescriptorHobForUnacceptedMemory (
     //
   }
 
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     ResourceType,
     ResourceAttribute,
     PhysicalStart,
-    ResourceLength
+    ResourceLength,
+    (Hob->Header.HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) ?
+    Hob->ResourceMemoryAttributes :
+    ((ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ? EFI_MEMORY_WB : EFI_MEMORY_UC),
+    &Hob->Owner
     );
 }
 
@@ -106,13 +111,17 @@ TransferTdxHobList (
         ResourceAttribute = Hob.ResourceDescriptor2->ResourceCapabilities;
 
         if (ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-          BuildResourceDescriptorHobForUnacceptedMemory (Hob.ResourceDescriptor);
+          BuildResourceDescriptorHobForUnacceptedMemory (Hob.ResourceDescriptor2);
         } else {
-          BuildResourceDescriptorHob (
+          BuildResourceDescriptor2Hob (
             ResourceType,
             ResourceAttribute,
             Hob.ResourceDescriptor2->PhysicalStart,
-            Hob.ResourceDescriptor2->ResourceLength
+            Hob.ResourceDescriptor2->ResourceLength,
+            (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) ?
+            Hob.ResourceDescriptor2->ResourceMemoryAttributes :
+            ((ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ? EFI_MEMORY_WB : EFI_MEMORY_UC),
+            &Hob.ResourceDescriptor2->Owner
             );
         }
 

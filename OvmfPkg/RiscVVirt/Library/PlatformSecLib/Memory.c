@@ -50,7 +50,7 @@ AddMemoryBaseSizeHob (
   IN UINT64                MemorySize
   )
 {
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_SYSTEM_MEMORY,
     EFI_RESOURCE_ATTRIBUTE_PRESENT |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -60,7 +60,9 @@ AddMemoryBaseSizeHob (
     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
-    MemorySize
+    MemorySize,
+    EFI_MEMORY_WB,
+    NULL
     );
 }
 

@@ -79,7 +79,7 @@ AddMemoryBaseSizeHob (
   UINT64                MemorySize
   )
 {
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_SYSTEM_MEMORY,
     EFI_RESOURCE_ATTRIBUTE_PRESENT |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -89,7 +89,9 @@ AddMemoryBaseSizeHob (
     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
-    MemorySize
+    MemorySize,
+    EFI_MEMORY_WB,
+    NULL
     );
 }
 
@@ -481,14 +483,16 @@ SetupTPMResources (
     ));
 
   if (TpmBaseSize > 0) {
-    BuildResourceDescriptorHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_MEMORY_MAPPED_IO,
       EFI_RESOURCE_ATTRIBUTE_PRESENT     |
       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
       EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
       EFI_RESOURCE_ATTRIBUTE_TESTED,
       TpmBase,
-      ALIGN_VALUE (TpmBaseSize, EFI_PAGE_SIZE)
+      ALIGN_VALUE (TpmBaseSize, EFI_PAGE_SIZE),
+      EFI_MEMORY_UC,
+      NULL
       );
 
     ASSERT_EFI_ERROR ((EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase));
