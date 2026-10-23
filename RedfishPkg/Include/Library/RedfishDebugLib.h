@@ -157,21 +157,3 @@ DumpIpv4Address (
   IN UINTN             ErrorLevel,
   IN EFI_IPv4_ADDRESS  *Ipv4Address
   );
-
-/**
-  Debug output raw data buffer.
-
-  @param[in]    ErrorLevel  DEBUG macro error level
-  @param[in]    Buffer      Debug output data buffer.
-  @param[in]    BufferSize  The size of Buffer in byte.
-
-  @retval EFI_SUCCESS             Debug dump finished.
-  @retval EFI_INVALID_PARAMETER   Buffer is NULL.
-
-**/
-EFI_STATUS
-DumpBuffer (
-  IN  UINTN  ErrorLevel,
-  IN  UINT8  *Buffer,
-  IN  UINTN  BufferSize
-  );
