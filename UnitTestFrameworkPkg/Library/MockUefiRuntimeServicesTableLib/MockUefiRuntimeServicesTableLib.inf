@@ -1,0 +1,32 @@
+## @file MockUefiRuntimeServicesTableLib.inf
+#  Mock Unit Test UEFI Runtime Services Table Library
+#
+#  This library provides mock implementations of UEFI Runtime Services
+#  functions for unit testing purposes using CMocka framework.
+
+#  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockUefiRuntimeServicesTableLib
+  FILE_GUID                      = 87654321-4321-4321-4321-210987654321
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiRuntimeServicesTableLib
+  LIBRARY_CLASS                  = MockUefiRuntimeServicesTableLib
+
+[Sources]
+  MockUefiRuntimeServicesTableLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+
