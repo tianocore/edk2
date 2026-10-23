@@ -13,6 +13,7 @@
 
   InitCommunicateBuffer() is really function to check the variable data size.
 
+Copyright (c) 2026, ARM Ltd. All rights reserved.<BR>
 Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -760,10 +761,10 @@ FindVariableInSmm (
     // Only update DataSize when needed
     //
     *DataSize = SmmVariableHeader->DataSize;
-  }
 
-  if (Attributes != NULL) {
-    *Attributes = SmmVariableHeader->Attributes;
+    if (Attributes != NULL) {
+      *Attributes = SmmVariableHeader->Attributes;
+    }
   }
 
   if (EFI_ERROR (Status)) {
