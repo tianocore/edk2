@@ -47,6 +47,7 @@
   DEFINE NVME_ENABLE                  = TRUE
   DEFINE LOCKBOX_SUPPORT              = FALSE
   DEFINE LOAD_OPTION_ROMS             = FALSE
+  DEFINE VIRTIO_ENABLE                = FALSE
 
   #
   # Capsule updates
@@ -423,6 +424,12 @@
 !endif
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
+
+!if $(VIRTIO_ENABLE) == TRUE
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+  PciCapLib|OvmfPkg/Library/BasePciCapLib/BasePciCapLib.inf
+  PciCapPciIoLib|OvmfPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
+!endif
 
 [LibraryClasses.AARCH64]
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
@@ -1218,6 +1225,14 @@
   }
 !else
   !error "Invalid TIMER_SUPPORT"
+!endif
+
+!if $(VIRTIO_ENABLE) == TRUE
+  # virtio-blk for QEMU/Q35 targets. The legacy/transitional (0x1001) and
+  # non-transitional modern (0x1042) PCI device IDs need different drivers.
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  OvmfPkg/Virtio10Dxe/Virtio10.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 !endif
 
 [Components.AARCH64]

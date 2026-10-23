@@ -170,6 +170,15 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
   !elseif $(TIMER_SUPPORT) == "LAPIC"
     INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   !endif
+
+  !if $(VIRTIO_ENABLE) == TRUE
+    # virtio-blk. Listed here rather than with the other block drivers below
+    # because the AARCH64 branch names them and placing them in the common
+    # section would produce duplicate INF entries.
+    INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+    INF OvmfPkg/Virtio10Dxe/Virtio10.inf
+    INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  !endif
 !elseif "AARCH64" IN "$(ARCH)"
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
