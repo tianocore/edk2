@@ -73,27 +73,63 @@ BmForEachVariable (
 }
 
 /**
+  Check whether a load option variable exists without reading its content.
+
+  @param  LoadOptionType      The load option type.
+  @param  OptionNumber        The load option number.
+
+  @retval EFI_SUCCESS     The load option variable exists.
+  @retval EFI_NOT_FOUND   The load option variable does not exist.
+  @return Others          The status returned by gRT->GetVariable ().
+**/
+EFI_STATUS
+BmCheckLoadOptionVariable (
+  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LoadOptionType,
+  IN UINT16                             OptionNumber
+  )
+{
+  EFI_STATUS  Status;
+  CHAR16      OptionName[BM_OPTION_NAME_LEN];
+  UINTN       VariableSize;
+
+  UnicodeSPrint (OptionName, sizeof (OptionName), L"%s%04x", mBmLoadOptionName[LoadOptionType], OptionNumber);
+
+  VariableSize = 0;
+  Status       = gRT->GetVariable (OptionName, &gEfiGlobalVariableGuid, NULL, &VariableSize, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
   Get the Option Number that wasn't used.
 
   @param  LoadOptionType      The load option type.
+  @param  SkipUnlisted        TRUE to also skip numbers whose load option
+                              variable exists but is not in ****Order.
   @param  FreeOptionNumber    Return the minimal free option number.
 
   @retval EFI_SUCCESS           The option number is found and will be returned.
   @retval EFI_OUT_OF_RESOURCES  There is no free option number that can be used.
   @retval EFI_INVALID_PARAMETER FreeOptionNumber is NULL
+  @return Others                The status returned by gRT->GetVariable ().
 
 **/
 EFI_STATUS
 BmGetFreeOptionNumber (
   IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LoadOptionType,
+  IN  BOOLEAN                            SkipUnlisted,
   OUT UINT16                             *FreeOptionNumber
   )
 {
-  UINTN   OptionNumber;
-  UINTN   Index;
-  UINT16  *OptionOrder;
-  UINTN   OptionOrderSize;
-  UINT16  *BootNext;
+  EFI_STATUS  Status;
+  UINTN       OptionNumber;
+  UINTN       Index;
+  UINT16      *OptionOrder;
+  UINTN       OptionOrderSize;
+  UINT16      *BootNext;
 
   ASSERT (FreeOptionNumber != NULL);
   ASSERT (
@@ -110,12 +146,8 @@ BmGetFreeOptionNumber (
     GetEfiGlobalVariable2 (L"BootNext", (VOID **)&BootNext, NULL);
   }
 
-  for (OptionNumber = 0;
-       OptionNumber < OptionOrderSize / sizeof (UINT16)
-       + ((BootNext != NULL) ? 1 : 0);
-       OptionNumber++
-       )
-  {
+  Status = EFI_OUT_OF_RESOURCES;
+  for (OptionNumber = 0; OptionNumber < LoadOptionNumberMax; OptionNumber++) {
     //
     // Search in OptionOrder whether the OptionNumber exists
     //
@@ -125,16 +157,30 @@ BmGetFreeOptionNumber (
       }
     }
 
-    //
-    // We didn't find it in the ****Order array and it doesn't equal to BootNext
-    // Otherwise, OptionNumber equals to OptionOrderSize / sizeof (UINT16) + 1
-    //
-    if ((Index == OptionOrderSize / sizeof (UINT16)) &&
-        ((BootNext == NULL) || (OptionNumber != *BootNext))
+    if ((Index < OptionOrderSize / sizeof (UINT16)) ||
+        ((BootNext != NULL) && (OptionNumber == *BootNext))
         )
     {
-      break;
+      continue;
     }
+
+    //
+    // A load option variable may exist without being in ****Order.
+    //
+    if (SkipUnlisted) {
+      Status = BmCheckLoadOptionVariable (LoadOptionType, (UINT16)OptionNumber);
+      if (Status == EFI_SUCCESS) {
+        continue;
+      }
+
+      if (Status != EFI_NOT_FOUND) {
+        break;
+      }
+    }
+
+    *FreeOptionNumber = (UINT16)OptionNumber;
+    Status            = EFI_SUCCESS;
+    break;
   }
 
   if (OptionOrder != NULL) {
@@ -146,16 +192,13 @@ BmGetFreeOptionNumber (
   }
 
   //
-  // When BootOrder & BootNext conver all numbers in the range [0 ... 0xffff],
-  //   OptionNumber equals to 0x10000 which is not valid.
+  // All numbers in the range [0 ... 0xffff] are in use.
   //
-  ASSERT (OptionNumber <= 0x10000);
-  if (OptionNumber == 0x10000) {
-    return EFI_OUT_OF_RESOURCES;
-  } else {
-    *FreeOptionNumber = (UINT16)OptionNumber;
-    return EFI_SUCCESS;
+  if (OptionNumber == LoadOptionNumberMax) {
+    Status = EFI_OUT_OF_RESOURCES;
   }
+
+  return Status;
 }
 
 /**
@@ -401,7 +444,7 @@ EfiBootManagerAddLoadOptionVariable (
   // Get the free option number if the option number is unassigned
   //
   if (Option->OptionNumber == LoadOptionNumberUnassigned) {
-    Status = BmGetFreeOptionNumber (Option->OptionType, &OptionNumber);
+    Status = BmGetFreeOptionNumber (Option->OptionType, TRUE, &OptionNumber);
     if (EFI_ERROR (Status)) {
       return Status;
     }
