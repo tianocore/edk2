@@ -955,10 +955,10 @@ BdsEntry (
   // was detected, then display a warning message on the debug log and the console
   //
   if (PcdGetBool (PcdTestKeyUsed)) {
-    DEBUG ((DEBUG_ERROR, "**********************************\n"));
-    DEBUG ((DEBUG_ERROR, "**  WARNING: Test Key is used.  **\n"));
-    DEBUG ((DEBUG_ERROR, "**********************************\n"));
-    Print (L"**  WARNING: Test Key is used.  **\n");
+    DEBUG ((DEBUG_ERROR, "**********************************************\n"));
+    DEBUG ((DEBUG_ERROR, "**  WARNING: Test Key is used for updates.  **\n"));
+    DEBUG ((DEBUG_ERROR, "**********************************************\n"));
+    Print (L"**  WARNING: The firmware accepts updates signed with a public test key.  **\n");
   }
 
   //
