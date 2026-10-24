@@ -55,8 +55,8 @@ ConvertRuntimeMemoryRangeAddresses (
 /**
   Sets the runtime memory range attributes.
 
-  The EFI_MEMORY_RUNTIME attribute is set for each PRM_RUNTIME_MMIO_RANGE present
-  in the buffer provided.
+  The EFI_MEMORY_RUNTIME and EFI_MEMORY_XP attributes are set for each
+  PRM_RUNTIME_MMIO_RANGE present in the buffer provided.
 
   @param[in]  RuntimeMmioRanges     A pointer to a PRM_RUNTIME_MMIO_RANGES buffer.
 
@@ -123,7 +123,7 @@ SetRuntimeMemoryRangeAttributes (
                       EfiGcdMemoryTypeMemoryMappedIo,
                       RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
                       (UINT64)RuntimeMmioRanges->Range[Index].Length,
-                      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
                       );
       ASSERT_EFI_ERROR (Status);
 
@@ -153,19 +153,39 @@ SetRuntimeMemoryRangeAttributes (
       continue;
     }
 
-    if ((Descriptor.Attributes & EFI_MEMORY_RUNTIME) != 0) {
+    if ((Descriptor.Capabilities & EFI_MEMORY_XP) == 0) {
+      Status = gDS->SetMemorySpaceCapabilities (
+                      RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
+                      (UINT64)RuntimeMmioRanges->Range[Index].Length,
+                      Descriptor.Capabilities | EFI_MEMORY_XP
+                      );
+      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "      %a %a: Error [%r] enabling XP capability for runtime memory range 0x%016llx.\n",
+          _DBGMSGID_,
+          __func__,
+          Status,
+          RuntimeMmioRanges->Range[Index].PhysicalBaseAddress
+          ));
+        continue;
+      }
+    }
+
+    if ((Descriptor.Attributes & (EFI_MEMORY_RUNTIME | EFI_MEMORY_XP | EFI_MEMORY_RP | EFI_MEMORY_RO)) ==
+        (EFI_MEMORY_RUNTIME | EFI_MEMORY_XP))
+    {
       continue;
     }
 
-    // The memory space descriptor access attributes are not accurate. Don't pass
-    // in access attributes so SetMemorySpaceAttributes() doesn't update them.
-    // EFI_MEMORY_RUNTIME is not a CPU arch attribute, so calling
-    // SetMemorySpaceAttributes() with only it set will not clear existing page table
-    // attributes for this region, such as EFI_MEMORY_XP
+    // PRM requires read/write access to runtime MMIO, but the range must never
+    // remain executable. Preserve cache attributes explicitly because XP bypasses
+    // the GCD path that preserves attributes for runtime-only updates.
     Status = gDS->SetMemorySpaceAttributes (
                     RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
                     (UINT64)RuntimeMmioRanges->Range[Index].Length,
-                    EFI_MEMORY_RUNTIME
+                    EFI_MEMORY_RUNTIME | (Descriptor.Attributes & EFI_CACHE_ATTRIBUTE_MASK) | EFI_MEMORY_XP
                     );
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
@@ -178,7 +198,7 @@ SetRuntimeMemoryRangeAttributes (
         RuntimeMmioRanges->Range[Index].PhysicalBaseAddress
         ));
     } else {
-      DEBUG ((DEBUG_INFO, "      %a %a: Successfully set runtime attribute for the MMIO range.\n", _DBGMSGID_, __func__));
+      DEBUG ((DEBUG_INFO, "%a %a: Successfully set runtime and XP attributes for the MMIO range.\n", _DBGMSGID_, __func__));
     }
   }
 }
@@ -375,7 +395,7 @@ PrmConfigVirtualAddressChangeEvent (
   The PRM Config END_OF_DXE protocol notification event handler.
 
   Finds all of the PRM_CONFIG_PROTOCOL instances installed at end of DXE and
-  marks all PRM_RUNTIME_MMIO_RANGE entries as EFI_MEMORY_RUNTIME.
+  marks all PRM_RUNTIME_MMIO_RANGE entries as EFI_MEMORY_RUNTIME and EFI_MEMORY_XP.
 
   @param[in]  Event           Event whose notification function is being invoked.
   @param[in]  Context         The pointer to the notification function's context,
