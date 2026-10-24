@@ -200,6 +200,25 @@ SendStartupIpiAllExcludingSelf (
   );
 
 /**
+  Send a Start-up IPI to a specified target processor.
+
+  This function returns after the IPI has been accepted by the target processor.
+
+  if StartupRoutine >= 1M, then ASSERT.
+  if StartupRoutine is not multiple of 4K, then ASSERT.
+
+  @param  ApicId          Specify the local APIC ID of the target processor.
+  @param  StartupRoutine  Points to a start-up routine which is below 1M physical
+                          address and 4K aligned.
+**/
+VOID
+EFIAPI
+SendStartupIpi (
+  IN UINT32  ApicId,
+  IN UINT32  StartupRoutine
+  );
+
+/**
   Send an INIT-Start-up-Start-up IPI sequence to a specified target processor.
 
   This function returns after the IPI has been accepted by the target processor.

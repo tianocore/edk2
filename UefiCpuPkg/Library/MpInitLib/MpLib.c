@@ -943,15 +943,62 @@ DxeApEntryPoint (
 }
 
 /**
+  Calculate timeout value and return the current performance counter value.
+
+  @param[in]  TimeoutInMicroseconds  The timeout value in microseconds.
+  @param[out] CurrentTime            Returns the current value of the performance counter.
+
+  @return Expected timestamp counter for timeout, or 0 if TimeoutInMicroseconds is 0.
+**/
+UINT64
+CalculateTimeout (
+  IN  UINTN   TimeoutInMicroseconds,
+  OUT UINT64  *CurrentTime
+  );
+
+/**
+  Checks whether timeout expires.
+
+  @param[in, out]  PreviousTime   On input, the requested time. On output, the elapsed time.
+  @param[in]       TotalTime      The total amount of elapsed time.
+  @param[in]       Timeout        The timeout ticks, 0 means infinity.
+
+  @retval TRUE   A timeout occurred.
+  @retval FALSE  No timeout occurred.
+**/
+BOOLEAN
+CheckTimeout (
+  IN OUT UINT64  *PreviousTime,
+  IN     UINT64  *TotalTime,
+  IN     UINT64  Timeout
+  );
+
+/**
   Wait for AP wakeup and write AP start-up signal till AP is waken up.
 
   @param[in] ApStartupSignalBuffer  Pointer to AP wakeup signal
+  @param[in] ApicId                 Local APIC ID of the AP being woken
+  @param[in] StartupRoutine         AP reset vector, or 0 if the AP was not
+                                    woken by INIT-SIPI-SIPI and no Start-up
+                                    IPI may be resent
 **/
 VOID
 WaitApWakeup (
-  IN volatile UINT32  *ApStartupSignalBuffer
+  IN volatile UINT32  *ApStartupSignalBuffer,
+  IN UINT32           ApicId,
+  IN UINT32           StartupRoutine
   )
 {
+  UINT64  CurrentTime;
+  UINT64  TotalTime;
+  UINT64  Timeout;
+
+  Timeout = CalculateTimeout (
+              (StartupRoutine != 0) ? AP_SIPI_RESEND_TIMEOUT_US : 0,
+              &CurrentTime
+              );
+  TotalTime = 0;
+
   //
   // If AP is waken up, StartupApSignal should be cleared.
   // Otherwise, write StartupApSignal again till AP waken up.
@@ -962,6 +1009,12 @@ WaitApWakeup (
            WAKEUP_AP_SIGNAL
            ) != 0)
   {
+    if (CheckTimeout (&CurrentTime, &TotalTime, Timeout)) {
+      SendStartupIpi (ApicId, StartupRoutine);
+      Timeout   = CalculateTimeout (AP_SIPI_RESEND_TIMEOUT_US, &CurrentTime);
+      TotalTime = 0;
+    }
+
     CpuPause ();
   }
 }
@@ -1256,8 +1309,10 @@ WakeUpAP (
   CPU_AP_DATA                    *CpuData;
   BOOLEAN                        ResetVectorRequired;
   CPU_INFO_IN_HOB                *CpuInfoInHob;
+  UINT32                         SipiVector;
 
   CpuMpData->FinishedCount = 0;
+  SipiVector               = 0;
   ResetVectorRequired      = FALSE;
 
   if (CpuMpData->WakeUpByInitSipiSipi ||
@@ -1320,13 +1375,14 @@ WakeUpAP (
       if (CanUseSevSnpCreateAP (CpuMpData)) {
         SevSnpCreateAP (CpuMpData, -1);
       } else {
+        SipiVector = (UINT32)ExchangeInfo->BufferStart;
         if ((CpuMpData->InitFlag == ApInitConfig) && FixedPcdGetBool (PcdFirstTimeWakeUpAPsBySipi)) {
           //
           // SIPI can be used for the first time wake up after reset to reduce boot time.
           //
-          SendStartupIpiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+          SendStartupIpiAllExcludingSelf (SipiVector);
         } else {
-          SendInitSipiSipiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+          SendInitSipiSipiAllExcludingSelf (SipiVector);
         }
       }
     }
@@ -1398,10 +1454,15 @@ WakeUpAP (
       //
       // Wait all APs waken up if this is not the 1st broadcast of SIPI
       //
+      CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
       for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
         CpuData = &CpuMpData->CpuData[Index];
         if (Index != CpuMpData->BspNumber) {
-          WaitApWakeup (CpuData->StartupApSignal);
+          WaitApWakeup (
+            CpuData->StartupApSignal,
+            CpuInfoInHob[Index].ApicId,
+            SipiVector
+            );
         }
       }
     }
@@ -1430,9 +1491,10 @@ WakeUpAP (
       if (CanUseSevSnpCreateAP (CpuMpData)) {
         SevSnpCreateAP (CpuMpData, (INTN)ProcessorNumber);
       } else {
+        SipiVector = (UINT32)ExchangeInfo->BufferStart;
         SendInitSipiSipi (
           CpuInfoInHob[ProcessorNumber].ApicId,
-          (UINT32)ExchangeInfo->BufferStart
+          SipiVector
           );
       }
     }
@@ -1440,7 +1502,12 @@ WakeUpAP (
     //
     // Wait specified AP waken up
     //
-    WaitApWakeup (CpuData->StartupApSignal);
+    CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+    WaitApWakeup (
+      CpuData->StartupApSignal,
+      CpuInfoInHob[ProcessorNumber].ApicId,
+      SipiVector
+      );
   }
 
   if (ResetVectorRequired) {
@@ -2017,7 +2084,11 @@ SwitchApContext (
   {
     for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
       if (MpHandOff->ProcessorIndex + Index != BspNumber) {
-        WaitApWakeup ((UINT32 *)(UINTN)(MpHandOff->Info[Index].StartupSignalAddress));
+        WaitApWakeup (
+          (UINT32 *)(UINTN)(MpHandOff->Info[Index].StartupSignalAddress),
+          0,
+          0
+          );
       }
     }
   }
