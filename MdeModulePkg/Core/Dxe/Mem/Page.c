@@ -1435,44 +1435,47 @@ CoreAllocatePages (
 }
 
 /**
-  Frees previous allocated pages.
+  Checks if the specified memory range is owned by gMemoryMap and covered by a single descriptor. If so, the entry is
+  returned. This function must be called with the memory lock held.
 
-  @param  Memory                 Base address of memory being freed
-  @param  NumberOfPages          The number of pages to free
-  @param  MemoryType             Pointer to memory type
+  @param Memory                 Base address of memory range
+  @param NumberOfPages          The number of pages of the memory range
+  @param Entry                  Pointer to receive the memory map entry that covers the range if it exists
 
-  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
-  @retval EFI_INVALID_PARAMETER  Address not aligned
-  @return EFI_SUCCESS         -Pages successfully freed.
-
+  @retval EFI_NOT_FOUND         Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER Lock not held or null pointer passed
+  @return EFI_SUCCESS           The memory range is valid for freeing and Entry contains a pointer to the memory map
+                                entry that covers the range
 **/
+static
 EFI_STATUS
-EFIAPI
-CoreInternalFreePages (
-  IN EFI_PHYSICAL_ADDRESS  Memory,
-  IN UINTN                 NumberOfPages,
-  OUT EFI_MEMORY_TYPE      *MemoryType OPTIONAL
+GetMemoryMapEntry (
+  IN  EFI_PHYSICAL_ADDRESS  Memory,
+  IN  UINTN                 NumberOfPages,
+  OUT MEMORY_MAP            **Entry
   )
 {
   EFI_STATUS  Status;
   LIST_ENTRY  *Link;
-  MEMORY_MAP  *Entry;
-  UINTN       Alignment;
-  BOOLEAN     IsGuarded;
 
-  //
-  // Free the range
-  //
-  CoreAcquireMemoryLock ();
+  Status = EFI_SUCCESS;
+
+  if (gMemoryLock.Lock != EfiLockAcquired) {
+    ASSERT (gMemoryLock.Lock == EfiLockAcquired);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Entry == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Find the entry that the covers the range
   //
-  IsGuarded = FALSE;
-  Entry     = NULL;
+  *Entry = NULL;
   for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    if ((Entry->Start <= Memory) && (Entry->End > Memory)) {
+    *Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    if (((*Entry)->Start <= Memory) && ((*Entry)->End > Memory)) {
       break;
     }
   }
@@ -1482,9 +1485,50 @@ CoreInternalFreePages (
     goto Done;
   }
 
-  if (Entry == NULL) {
-    ASSERT (Entry != NULL);
+  if (*Entry == NULL) {
+    ASSERT (*Entry != NULL);
     Status = EFI_NOT_FOUND;
+    goto Done;
+  }
+
+Done:
+  return Status;
+}
+
+/**
+  Frees previous allocated pages.
+
+  @param  Memory                 Base address of memory being freed
+  @param  NumberOfPages          The number of pages to free
+  @param  MemoryType             Pointer to memory type
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER  Address not aligned
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalFreePages (
+  IN  EFI_PHYSICAL_ADDRESS  Memory,
+  IN  UINTN                 NumberOfPages,
+  OUT EFI_MEMORY_TYPE       *MemoryType OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  MEMORY_MAP  *Entry;
+  UINTN       Alignment;
+  BOOLEAN     IsGuarded;
+
+  IsGuarded = FALSE;
+
+  //
+  // Free the range
+  //
+  CoreAcquireMemoryLock ();
+
+  Status = GetMemoryMapEntry (Memory, NumberOfPages, &Entry);
+  if (EFI_ERROR (Status)) {
     goto Done;
   }
 
@@ -1535,7 +1579,7 @@ Done:
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range
   @retval EFI_INVALID_PARAMETER  Address not aligned
-  @return EFI_SUCCESS         -Pages successfully freed.
+  @return EFI_SUCCESS            Pages successfully freed.
 
 **/
 EFI_STATUS
@@ -1548,6 +1592,12 @@ CoreFreePages (
   EFI_STATUS       Status;
   EFI_MEMORY_TYPE  MemoryType;
   UINT64           Attributes;
+  EFI_STATUS       LeakStatus;
+  MEMORY_MAP       *Entry;
+
+  if (((Memory & EFI_PAGE_MASK) != 0) || (NumberOfPages == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   // check if this memory is returned to the core as RW at a minimum. If the memory attribute protocol is not installed,
   // then we assume that the memory is RW by default and continue to free it.
@@ -1565,20 +1615,32 @@ CoreFreePages (
     // free memory that is marked RO, which can crash the core if DebugClearMemory is enabled or can be passed out to a
     // driver in the next AllocatePages() call, which can cause a crash later on. It is deemed lower risk to leak the
     // memory than to attempt to fix up the attributes as that requires syncing the GCD and the page table.
-    if ((Status == EFI_NO_MAPPING) ||
+    if ((EFI_ERROR (Status)) ||
         (!EFI_ERROR (Status) && ((Attributes & EFI_MEMORY_RO) || (Attributes & EFI_MEMORY_RP))))
     {
-      DEBUG ((
-        DEBUG_WARN,
-        "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
-        "Attributes: %llx. Leaking memory!\n",
-        __func__,
-        Memory,
-        NumberOfPages,
-        Status,
-        Attributes
-        ));
-      return EFI_SUCCESS;
+      // Before we leak, confirm the memory is actually valid to free. If it isn't we need to return an error instead
+      // of success.
+      CoreAcquireMemoryLock ();
+      LeakStatus = GetMemoryMapEntry (Memory, NumberOfPages, &Entry);
+      CoreReleaseMemoryLock ();
+
+      if (!EFI_ERROR (LeakStatus)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
+          "Attributes: %llx. Leaking memory!\n",
+          __func__,
+          Memory,
+          NumberOfPages,
+          Status,
+          Attributes
+          ));
+
+        // This memory was valid to free, so we can safely leak it and report success
+        LeakStatus = EFI_SUCCESS;
+      }
+
+      return LeakStatus;
     }
   }
 
