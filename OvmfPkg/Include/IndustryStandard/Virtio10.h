@@ -32,18 +32,35 @@ typedef struct {
   EFI_PCI_CAPABILITY_VENDOR_HDR    VendorHdr;
   UINT8                            ConfigType; // Identifies the specific VirtIo 1.0 config structure
   UINT8                            Bar;        // The BAR that contains the structure
-  UINT8                            Padding[3];
+  UINT8                            Id;         // Identifies multiple capabilities of the same type
+  UINT8                            Padding[2];
   UINT32                           Offset; // Offset within Bar until the start of the structure
   UINT32                           Length; // Length of the structure
 } VIRTIO_PCI_CAP;
+
+//
+// Extended capability layout for structures that may exceed 4 GB in offset or
+// size, such as shared memory regions (VIRTIO_PCI_CAP_SHARED_MEMORY_CFG).
+//
+typedef struct {
+  VIRTIO_PCI_CAP    Cap;
+  UINT32            OffsetHi; // High 32 bits of the offset within Bar
+  UINT32            LengthHi; // High 32 bits of the length
+} VIRTIO_PCI_CAP64;
 #pragma pack ()
 
 //
 // Values for the VIRTIO_PCI_CAP.ConfigType field
 //
-#define VIRTIO_PCI_CAP_COMMON_CFG  1 // Common configuration
-#define VIRTIO_PCI_CAP_NOTIFY_CFG  2 // Notifications
-#define VIRTIO_PCI_CAP_DEVICE_CFG  4 // Device specific configuration
+#define VIRTIO_PCI_CAP_COMMON_CFG         1 // Common configuration
+#define VIRTIO_PCI_CAP_NOTIFY_CFG         2 // Notifications
+#define VIRTIO_PCI_CAP_DEVICE_CFG         4 // Device specific configuration
+#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG  8 // Shared memory region
+
+//
+// Shared memory regions must be aligned to, and sized in multiples of, 4 KB
+//
+#define VIRTIO_PCI_SHM_ALIGNMENT  SIZE_4KB
 
 //
 // Structure pointed-to by Bar and Offset in VIRTIO_PCI_CAP when ConfigType is
