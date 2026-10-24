@@ -1,0 +1,33 @@
+## @file
+#  AEST Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiAestLibArm
+  FILE_GUID      = 29CC4857-BE7F-4D04-843D-1A2516C2FFDC
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiAestLibConstructor
+  DESTRUCTOR     = AcpiAestLibDestructor
+
+[Sources]
+  AestGenerator.c
+  AestGenerator.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  MetadataHandlerLib
+  TableHelperLib
