@@ -2,6 +2,7 @@
   Helper functions for configuring or getting the parameters relating to HTTP Boot.
 
 Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,13 +34,14 @@ HttpBootAddBootOption (
   IN   CHAR16                  *ProxyUri
   )
 {
-  EFI_DEV_PATH                  *Node;
-  EFI_DEVICE_PATH_PROTOCOL      *TmpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL      *FinalDevicePath;
-  UINTN                         Length;
-  CHAR8                         AsciiUri[URI_STR_MAX_SIZE];
-  CHAR8                         AsciiProxyUri[URI_STR_MAX_SIZE];
+  EFI_DEV_PATH              *Node;
+  EFI_DEVICE_PATH_PROTOCOL  *TmpDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *FinalDevicePath;
+  UINTN                     Length;
+  CHAR8                     AsciiUri[URI_STR_UI_MAX_SIZE];
+  CHAR8                     AsciiProxyUri[URI_STR_UI_MAX_SIZE];
+
   UINTN                         AsciiProxyUriSize;
   EFI_STATUS                    Status;
   EFI_BOOT_MANAGER_LOAD_OPTION  NewOption;
