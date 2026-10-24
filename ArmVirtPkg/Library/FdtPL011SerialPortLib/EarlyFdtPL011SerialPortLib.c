@@ -11,7 +11,7 @@
 **/
 
 #include <Base.h>
-
+#include <Library/ArmCcaLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PL011UartLib.h>
 #include <Library/SerialPortLib.h>
@@ -59,6 +59,10 @@ SerialPortGetBaseAddress (
   FDT_SERIAL_PORTS    Ports;
   UINT64              UartBase;
   RETURN_STATUS       Status;
+
+  if (ArmCcaIsRealm ()) {
+    return 0;
+  }
 
   DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
 
@@ -121,6 +125,10 @@ SerialPortWrite (
   )
 {
   UINT64  SerialRegisterBase;
+
+  if (ArmCcaIsRealm ()) {
+    return 0;
+  }
 
   SerialRegisterBase = SerialPortGetBaseAddress ();
   if (SerialRegisterBase != 0) {
