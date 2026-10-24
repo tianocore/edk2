@@ -156,7 +156,7 @@ TlsUnload (
   EFI_STATUS                    Status;
   UINTN                         HandleNum;
   EFI_HANDLE                    *HandleBuffer;
-  UINT32                        Index;
+  UINTN                         Index;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
   TLS_SERVICE                   *TlsService;
 
