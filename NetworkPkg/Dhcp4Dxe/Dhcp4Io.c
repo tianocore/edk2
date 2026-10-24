@@ -913,6 +913,137 @@ ON_EXIT:
 }
 
 /**
+  Remove malformed non-Alert options from the private packet copy.
+
+  Some DHCP servers send optional options with a format that does not
+  strictly comply with RFC standards. Alert options consumed by the
+  DHCP state machine must remain strictly validated, but malformed
+  non-Alert options can be safely removed from the private packet copy
+  before strict validation.
+
+  RFC 3396 allows an option to be split across several same-tag
+  instances. The merged length is used for validation; if the merged
+  value fails, all instances of that tag are removed.
+
+  @param[in, out] Packet  The DHCP packet to sanitize.
+
+**/
+VOID
+EFIAPI
+DhcpRemoveMalformedNonAlertOptions (
+  IN OUT EFI_DHCP4_PACKET  *Packet
+  )
+{
+  UINT8               *Cur;
+  UINT8               *End;
+  UINT8               Tag;
+  UINT8               Len;
+  UINTN               Index;
+  DHCP_OPTION_FORMAT  *Format;
+  BOOLEAN             RemoveTag[DHCP_MAX_OPTIONS];
+  UINT16              MergedLen[DHCP_MAX_OPTIONS];
+
+  SetMem (RemoveTag, sizeof (RemoveTag), 0);
+  SetMem (MergedLen, sizeof (MergedLen), 0);
+
+  //
+  // First pass: compute merged length per tag.
+  //
+  Cur = Packet->Dhcp4.Option;
+  End = (UINT8 *)&Packet->Dhcp4 + Packet->Length;
+
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    MergedLen[Tag] = (UINT16)(MergedLen[Tag] + Len);
+    Cur           += Len;
+  }
+
+  //
+  // Mark malformed non-Alert tags for removal.
+  //
+  for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {
+    if (MergedLen[Index] == 0) {
+      continue;
+    }
+
+    Tag    = (UINT8)Index;
+    Format = DhcpFindOptionFormat (Tag);
+    if ((Format == NULL) || Format->Alert) {
+      continue;
+    }
+
+    if (!DhcpOptionIsValid (Format, NULL, MergedLen[Index])) {
+      RemoveTag[Index] = TRUE;
+      DEBUG ((
+        DEBUG_WARN,
+        "DhcpRemoveMalformedNonAlertOptions: Remove Tag=%d MergedLen=%d\n",
+        Tag,
+        MergedLen[Index]
+        ));
+    }
+  }
+
+  //
+  // Second pass: remove all instances of marked tags.
+  //
+  Cur = Packet->Dhcp4.Option;
+  End = (UINT8 *)&Packet->Dhcp4 + Packet->Length;
+
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    if (RemoveTag[Tag]) {
+      CopyMem (Cur - 2, Cur + Len, (UINTN)(End - (Cur + Len)));
+      Packet->Length -= (UINT32)(Len + 2);
+      End            -= (Len + 2);
+      Cur            -= 2;
+      continue;
+    }
+
+    Cur += Len;
+  }
+
+  ASSERT (Packet->Length >= sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32));
+}
+
+/**
   Handle the received DHCP packets. This function drives the DHCP
   state machine.
 
@@ -993,14 +1124,20 @@ DhcpInput (
   }
 
   //
-  // Validate the options and retrieve the interested options
+  // Validate the options and retrieve the interested options. Remove
+  // malformed non-Alert options from the private copy first, so
+  // downstream consumers do not read malformed data. Alert options and
+  // public APIs remain strictly validated.
   //
   Para = NULL;
   if ((Packet->Length > sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)) &&
-      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC) &&
-      EFI_ERROR (DhcpValidateOptions (Packet, &Para)))
+      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC))
   {
-    goto RESTART;
+    DhcpRemoveMalformedNonAlertOptions (Packet);
+
+    if (EFI_ERROR (DhcpValidateOptions (Packet, &Para))) {
+      goto RESTART;
+    }
   }
 
   //
