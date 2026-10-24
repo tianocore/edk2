@@ -131,6 +131,13 @@ typedef struct {
 typedef struct {
   EFI_PHYSICAL_ADDRESS    Rsdp;
 } ACPI_SILICON_HOB;
+
+//
+// ACPI LIGHT HOB produced specific ACPI table that will be installed during PCI enumeration phase.
+//
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    Rsdp;
+} ACPI_SILICON_LIGHT_HOB;
 //
 // Protocol Constructor functions
 //

@@ -1952,6 +1952,154 @@ InstallAcpiTableFromHob (
 }
 
 /**
+  This callback is called after gEfiPciEnumerationCompleteProtocolGuid event.
+  It's responsible for installing specific ACPI table during Pci enumeration phase.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+InstallTableDuringPciEnumeration (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  VOID                                          *Protocol;
+  EFI_HOB_GUID_TYPE                             *GuidHob;
+  ACPI_SILICON_LIGHT_HOB                        *AcpiSiliconLightHob;
+  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *SiAcpiLightHobRsdp;
+  UINT8                                         *Buffer;
+  EFI_ACPI_DESCRIPTION_HEADER                   *SiCommonAcpiLightTable;
+  UINTN                                         NumberOfTableEntries;
+  UINTN                                         Index;
+  UINT64                                        LightTablePtr;
+  EFI_ACPI_DESCRIPTION_HEADER                   *LightEntryTable;
+  EFI_ACPI_TABLE_PROTOCOL                       *AcpiTableProtocol;
+  UINTN                                         AcpiTableHandle;
+  EFI_STATUS                                    Status;
+
+  //
+  // Initial variable.
+  //
+  SiAcpiLightHobRsdp     = NULL;
+  SiCommonAcpiLightTable = NULL;
+  AcpiTableHandle        = 0;
+  //
+  // Check whether gEfiPciEnumerationCompleteProtocolGuid is installed, if not then return
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiPciEnumerationCompleteProtocolGuid,
+                  NULL,
+                  &Protocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "gEfiPciEnumerationCompleteProtocolGuid isn't installed\n"));
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "Event InstallTableDuringPciEnumeration callback Starts\n"));
+  //
+  // Locate ACPI support protocol
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiTableProtocolGuid,
+                  NULL,
+                  (VOID **)&AcpiTableProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to locate ACPI Protocol.\n"));
+    return;
+  }
+  //
+  // Check Silicon ACPI Light Hob.
+  //
+  GuidHob = GetFirstGuidHob (&gAcpiTableHobLightGuid);
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "ACPI table Light HOB is NULL.\n"));
+    return;
+  }
+
+  AcpiSiliconLightHob = GET_GUID_HOB_DATA (GuidHob);
+  SiAcpiLightHobRsdp  = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)(AcpiSiliconLightHob->Rsdp);
+  if (SiAcpiLightHobRsdp == NULL) {
+    DEBUG ((DEBUG_ERROR, "Fail to locate RSDP from AcpiSiliconLightHob!!\n"));
+    return;
+  } else {
+    DEBUG ((DEBUG_INFO, "InstallTableDuringPciEnumeration: ACPI LIGHT HOB RSDP address : 0x%016lx\n", SiAcpiLightHobRsdp));
+  }
+
+  if (SiAcpiLightHobRsdp->XsdtAddress == 0) {
+    DEBUG ((DEBUG_ERROR, "InstallTableDuringPciEnumeration: XSDT address is NULL\n"));
+    return;
+  }
+
+  //
+  // Got XSDT address from RSDP table.
+  //
+  Buffer                 = (UINT8 *)(UINTN)(SiAcpiLightHobRsdp->XsdtAddress);
+  SiCommonAcpiLightTable = (EFI_ACPI_DESCRIPTION_HEADER*)Buffer;
+  if ((SiCommonAcpiLightTable->Signature != EFI_ACPI_3_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) ||
+      (SiCommonAcpiLightTable->Length <= sizeof (EFI_ACPI_DESCRIPTION_HEADER)) ||
+      (((SiCommonAcpiLightTable->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) % sizeof (UINT64)) != 0))
+  {
+    DEBUG ((DEBUG_ERROR, "XSDT length is incorrect\n"));
+    return;
+  } else {
+    DEBUG ((DEBUG_INFO, "InstallTableDuringPciEnumeration: ACPI LIGHT HOB XSDT address : 0x%016lx\n", SiCommonAcpiLightTable));
+  }
+  //
+  // Calcaue 64bit Acpi table number.
+  //
+  NumberOfTableEntries = (SiCommonAcpiLightTable->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof (UINT64);
+  if (NumberOfTableEntries == 0) {
+    DEBUG ((DEBUG_ERROR, "No ACPI table need to be installed during PCI PciEnumeration Done.\n"));
+    return;
+  } else {
+    DEBUG ((DEBUG_INFO, "InstallTableDuringPciEnumeration: 64bit NumberOfTableEntries : 0x%x\n", NumberOfTableEntries));
+  }
+  //
+  // Extract ACPI table from AcpiSiliconLightHob XSDT.
+  //
+
+  for (Index = 0; Index < NumberOfTableEntries; Index++) {
+    CopyMem (&LightTablePtr, (((UINT8 *)(SiCommonAcpiLightTable + 1)) + ((sizeof (UINT64)) * Index)), sizeof (UINT64));
+    if (LightTablePtr == 0) {
+      DEBUG ((DEBUG_ERROR, "XSDT entry [0x%x] is NULL\n", Index));
+      return;
+    }
+
+    LightEntryTable = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)LightTablePtr;
+    if (LightEntryTable->Length < sizeof (EFI_ACPI_DESCRIPTION_HEADER)) {
+      DEBUG ((DEBUG_ERROR, "Invalid table length at XSDT entry %u\n", Index));
+      return;
+    }
+
+    DEBUG((DEBUG_INFO, "[%x] Table address : 0x%016lx\n", Index, LightEntryTable));
+
+    Buffer = (UINT8*)&LightEntryTable->Signature;
+    DEBUG((DEBUG_INFO, "Table signature = %c%c%c%c\n", Buffer[0], Buffer[1], Buffer[2], Buffer[3]));
+    DEBUG((DEBUG_INFO, "Table Length : 0x%x\n", LightEntryTable->Length));
+
+    Status = AcpiTableProtocol->InstallAcpiTable (
+                                  AcpiTableProtocol,
+                                  LightEntryTable,
+                                  LightEntryTable->Length,
+                                  &AcpiTableHandle
+                                  );
+    if (EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "Fail to install ACPI table at 0x%p\n", LightEntryTable));
+    } else {
+      DEBUG ((DEBUG_INFO, "InstallTableDuringPciEnumeration: Installed ACPI table at 0x%p\n", LightEntryTable));
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "Event InstallTableDuringPciEnumeration callback End\n"));
+  return;
+}
+
+
+/**
   This function is updating the instance with RSDP and RSDT, these are steps in the constructor that will be skipped if this HOB is available.
 
   @param  AcpiTableInstance  Protocol instance private data.
@@ -1985,6 +2133,8 @@ InstallAcpiTableFromAcpiSiliconHob (
   UINT8                                         *Pointer;
   EFI_MEMORY_TYPE                               AcpiAllocateMemoryType;
   UINTN                                         AcpiRsdpSize;
+  VOID                                          *Registration;
+  EFI_EVENT                                     Event;
 
   DEBUG ((DEBUG_INFO, "InstallAcpiTableFromAcpiSiliconHob - Start\n"));
   //
@@ -2289,6 +2439,17 @@ InstallAcpiTableFromAcpiSiliconHob (
         DEBUG ((DEBUG_ERROR, "The FACS Table not initialized during PEI phase yet.\n"));
       }
     }
+  }
+
+  Event = EfiCreateProtocolNotifyEvent (
+            &gEfiPciEnumerationCompleteProtocolGuid,
+            TPL_NOTIFY,
+            InstallTableDuringPciEnumeration,
+            NULL,
+            &Registration
+            );
+  if (Event == NULL) {
+    DEBUG ((DEBUG_ERROR, "The InstallTableDuringPciEnumeration callback function cannot be registered!!\n"));
   }
 
   DEBUG ((DEBUG_INFO, "InstallAcpiTableFromAcpiSiliconHob - End\n"));
