@@ -21,11 +21,6 @@ UINT8  mInterestedDhcp4Tags[HTTP_BOOT_DHCP4_TAG_INDEX_MAX] = {
   DHCP4_TAG_DNS_SERVER
 };
 
-//
-// There are 4 times retries with the value of 4, 8, 16 and 32, refers to UEFI 2.5 spec.
-//
-UINT32  mHttpDhcpTimeout[4] = { 4, 8, 16, 32 };
-
 /**
   Build the options buffer for the DHCPv4 request packet.
 
@@ -817,12 +812,31 @@ HttpBootDhcp4Dora (
   EFI_DHCP4_CONFIG_DATA    Config;
   EFI_STATUS               Status;
   EFI_DHCP4_MODE_DATA      Mode;
+  UINT32                   DiscoverTryCount;
+  UINT32                   *DiscoverTimeout;
 
   Dhcp4 = Private->Dhcp4;
   ASSERT (Dhcp4 != NULL);
 
+  DiscoverTryCount = PcdGet32 (PcdHttpBootDhcp4DiscoverTryCount);
+  if ((PcdGetSize (PcdHttpBootDhcp4DiscoverTimeout) % sizeof (UINT32) != 0) ||
+      (DiscoverTryCount == 0) ||
+      (DiscoverTryCount > (PcdGetSize (PcdHttpBootDhcp4DiscoverTimeout) / sizeof (UINT32))))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DiscoverTimeout = AllocateCopyPool (
+                      DiscoverTryCount * sizeof (UINT32),
+                      PcdGetPtr (PcdHttpBootDhcp4DiscoverTimeout)
+                      );
+  if (DiscoverTimeout == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   Status = HttpBootSetIp4Policy (Private);
   if (EFI_ERROR (Status)) {
+    FreePool (DiscoverTimeout);
     return Status;
   }
 
@@ -837,13 +851,14 @@ HttpBootDhcp4Dora (
   Config.OptionList       = OptList;
   Config.Dhcp4Callback    = HttpBootDhcp4CallBack;
   Config.CallbackContext  = Private;
-  Config.DiscoverTryCount = HTTP_BOOT_DHCP_RETRIES;
-  Config.DiscoverTimeout  = mHttpDhcpTimeout;
+  Config.DiscoverTryCount = DiscoverTryCount;
+  Config.DiscoverTimeout  = DiscoverTimeout;
 
   //
   // Configure the DHCPv4 instance for HTTP boot.
   //
   Status = Dhcp4->Configure (Dhcp4, &Config);
+  FreePool (DiscoverTimeout);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
