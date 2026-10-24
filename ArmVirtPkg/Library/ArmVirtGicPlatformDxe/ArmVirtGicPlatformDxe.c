@@ -14,7 +14,7 @@
 #include <Library/ArmGicLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/MapMmioLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 

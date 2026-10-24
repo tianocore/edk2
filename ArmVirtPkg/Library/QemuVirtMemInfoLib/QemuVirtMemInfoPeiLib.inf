@@ -27,9 +27,11 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   ArmLib
+  ArmMmuLib
   BaseLib
   BaseMemoryLib
   DebugLib

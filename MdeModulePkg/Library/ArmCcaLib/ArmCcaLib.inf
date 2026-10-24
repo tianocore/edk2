@@ -13,10 +13,11 @@
   FILE_GUID                      = 11C18743-52F9-405E-B35B-D7BE91A26F9F
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmCcaLib
+  LIBRARY_CLASS                  = ArmCcaLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
 
 [Sources]
   ArmCcaLib.c
+  ArmCcaLibCommon.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
