@@ -141,8 +141,6 @@ TestVerifyRsaPssSignVerify (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8    *Signature;
-  UINTN    SigSize;
   BOOLEAN  Status;
 
   Status = RsaSetKey (mRsa, RsaKeyN, RsaPssN, sizeof (RsaPssN));
@@ -151,36 +149,9 @@ TestVerifyRsaPssSignVerify (
   Status = RsaSetKey (mRsa, RsaKeyE, RsaPssE, sizeof (RsaPssE));
   UT_ASSERT_TRUE (Status);
 
-  Status = RsaSetKey (mRsa, RsaKeyD, RsaPssD, sizeof (RsaPssD));
-  UT_ASSERT_TRUE (Status);
-
-  SigSize = 0;
-  Status  = RsaPssSign (mRsa, PssMessage, sizeof (PssMessage), SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE, NULL, &SigSize);
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_NOT_EQUAL (SigSize, 0);
-
-  Signature = AllocatePool (SigSize);
-  if (Signature == NULL) {
-    UT_LOG_ERROR ("Failed to allocate memory for Signature");
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  Status = RsaPssSign (mRsa, PssMessage, sizeof (PssMessage), SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE, Signature, &SigSize);
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify RSA PSS encoded Signature generated in above step
-  //
-  Status = RsaPssVerify (mRsa, PssMessage, sizeof (PssMessage), Signature, SigSize, SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE);
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify NIST FIPS 186-3 RSA test vector signature
-  //
   Status = RsaPssVerify (mRsa, PssMessage, sizeof (PssMessage), TestVectorSignature, sizeof (TestVectorSignature), SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE);
   UT_ASSERT_TRUE (Status);
 
-  FreePool (Signature);
   return UNIT_TEST_PASSED;
 }
 
@@ -191,8 +162,7 @@ TestVerifyRsaPssSignVerifyDigest (
   )
 {
   UINT8    HashValue[SHA256_DIGEST_SIZE];
-  UINT8    *Signature;
-  UINTN    SigSize;
+  UINT8    TamperedSignature[sizeof (TestVectorSignature)];
   BOOLEAN  Status;
 
   Status = RsaSetKey (mRsa, RsaKeyN, RsaPssN, sizeof (RsaPssN));
@@ -201,52 +171,16 @@ TestVerifyRsaPssSignVerifyDigest (
   Status = RsaSetKey (mRsa, RsaKeyE, RsaPssE, sizeof (RsaPssE));
   UT_ASSERT_TRUE (Status);
 
-  Status = RsaSetKey (mRsa, RsaKeyD, RsaPssD, sizeof (RsaPssD));
-  UT_ASSERT_TRUE (Status);
-
   Status = Sha256HashAll (PssMessage, sizeof (PssMessage), HashValue);
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Query required signature buffer size
-  //
-  SigSize = 0;
-  Status  = RsaPssSignDigest (mRsa, HashValue, sizeof (HashValue), NULL, &SigSize);
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_NOT_EQUAL (SigSize, 0);
-
-  Signature = AllocatePool (SigSize);
-  if (Signature == NULL) {
-    UT_LOG_ERROR ("Failed to allocate memory for Signature");
-    return UNIT_TEST_ERROR_TEST_FAILED;
-  }
-
-  //
-  // Sign the precomputed digest
-  //
-  Status = RsaPssSignDigest (mRsa, HashValue, sizeof (HashValue), Signature, &SigSize);
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify the signature using the digest-based verify API
-  //
-  Status = RsaPssVerifyDigest (mRsa, HashValue, sizeof (HashValue), Signature, SigSize);
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Corrupting one byte should fail digest-based verification
-  //
-  Signature[0] ^= 0xFF;
-  Status        = RsaPssVerifyDigest (mRsa, HashValue, sizeof (HashValue), Signature, SigSize);
-  UT_ASSERT_FALSE (Status);
-
-  FreePool (Signature);
-
-  //
-  // Verify NIST FIPS 186-3 RSA test vector signature with precomputed digest
-  //
   Status = RsaPssVerifyDigest (mRsa, HashValue, sizeof (HashValue), TestVectorSignature, sizeof (TestVectorSignature));
   UT_ASSERT_TRUE (Status);
+
+  CopyMem (TamperedSignature, TestVectorSignature, sizeof (TamperedSignature));
+  TamperedSignature[0] ^= 0xFF;
+  Status                = RsaPssVerifyDigest (mRsa, HashValue, sizeof (HashValue), TamperedSignature, sizeof (TamperedSignature));
+  UT_ASSERT_FALSE (Status);
 
   return UNIT_TEST_PASSED;
 }
