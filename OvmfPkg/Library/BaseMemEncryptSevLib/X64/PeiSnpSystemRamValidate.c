@@ -19,8 +19,6 @@
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
 
-STATIC UINT8  mPscBufferPage[EFI_PAGE_SIZE];
-
 typedef struct {
   UINT64    StartAddress;
   UINT64    EndAddress;
@@ -107,6 +105,9 @@ MemEncryptSevSnpPreValidateSystemRam (
   PHYSICAL_ADDRESS         EndAddress;
   SNP_PRE_VALIDATED_RANGE  OverlapRange;
   EFI_STATUS               Status;
+  SEC_SEV_ES_WORK_AREA     *WorkArea;
+
+  WorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
@@ -146,8 +147,8 @@ MemEncryptSevSnpPreValidateSystemRam (
           NumPages,
           SevSnpPagePrivate,
           TRUE,
-          mPscBufferPage,
-          sizeof (mPscBufferPage)
+          WorkArea->PscBufferPage,
+          sizeof (WorkArea->PscBufferPage)
           );
       }
 
@@ -162,8 +163,8 @@ MemEncryptSevSnpPreValidateSystemRam (
       NumPages,
       SevSnpPagePrivate,
       TRUE,
-      mPscBufferPage,
-      sizeof (mPscBufferPage)
+      WorkArea->PscBufferPage,
+      sizeof (WorkArea->PscBufferPage)
       );
     BaseAddress = EndAddress;
   }

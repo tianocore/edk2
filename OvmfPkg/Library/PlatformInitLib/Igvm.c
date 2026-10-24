@@ -118,7 +118,6 @@ PlatformIgvmScanE820 (
   IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  STATIC BOOLEAN         First = TRUE;
   IGVM_MEMORY_MAP_ENTRY  *Map;
   EFI_E820_ENTRY64       Entry;
   UINT32                 Index;
@@ -130,7 +129,7 @@ PlatformIgvmScanE820 (
   }
 
   for (Index = 0; Map[Index].PageCount > 0; Index++) {
-    if (First) {
+    if (!PlatformInfoHob->IgvmScanned) {
       DEBUG ((
         DEBUG_INFO,
         "%a: IgvmMemoryMap[%d]: PageStart %lx, PageCount %lx, EntryType %d\n",
@@ -156,7 +155,7 @@ PlatformIgvmScanE820 (
     }
   }
 
-  First = FALSE;
+  PlatformInfoHob->IgvmScanned = TRUE;
   return EFI_SUCCESS;
 }
 
