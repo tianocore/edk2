@@ -1541,24 +1541,24 @@ WriteSections64 (
             VerboseMsg ("R_X86_64_64");
             VerboseMsg ("Offset: 0x%08X, Addend: 0x%016LX",
               (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
-              *(UINT64 *)Targ);
-            *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
+              (Sym->st_value + Rel->r_addend));
+            *(UINT64 *)Targ = (Sym->st_value + Rel->r_addend) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
             VerboseMsg ("Relocation:  0x%016LX", *(UINT64*)Targ);
             break;
           case R_X86_64_32:
             VerboseMsg ("R_X86_64_32");
             VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
               (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
-              *(UINT32 *)Targ);
-            *(UINT32 *)Targ = (UINT32)((UINT64)(*(UINT32 *)Targ) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
+              (Sym->st_value + Rel->r_addend));
+            *(UINT32 *)Targ = (UINT32)((UINT64)(Sym->st_value + Rel->r_addend) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
             VerboseMsg ("Relocation:  0x%08X", *(UINT32*)Targ);
             break;
           case R_X86_64_32S:
             VerboseMsg ("R_X86_64_32S");
             VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
               (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
-              *(UINT32 *)Targ);
-            *(INT32 *)Targ = (INT32)((INT64)(*(INT32 *)Targ) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
+              (Sym->st_value + Rel->r_addend));
+            *(INT32 *)Targ = (INT32)((INT64)(Sym->st_value + Rel->r_addend) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
             VerboseMsg ("Relocation:  0x%08X", *(UINT32*)Targ);
             break;
 
@@ -1627,8 +1627,8 @@ WriteSections64 (
               //
               VerboseMsg ("Offset: 0x%08X, Addend: 0x%016LX",
                 (UINT32)GOTEntryRva,
-                *(UINT64 *)Targ);
-              *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
+                (Sym->st_value + Rel->r_addend));
+              *(UINT64 *)Targ = (Sym->st_value + Rel->r_addend) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
               VerboseMsg ("Relocation:  0x%016LX", *(UINT64*)Targ);
             }
             break;
@@ -1803,7 +1803,7 @@ WriteSections64 (
 
           // Absolute relocations.
           case R_AARCH64_ABS64:
-            *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
+            *(UINT64 *)Targ = (Sym->st_value + Rel->r_addend) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
             break;
 
           default:
@@ -1835,7 +1835,7 @@ WriteSections64 (
             // WriteRelocations64() still emits the PE/COFF base relocation
             // for load-time image rebasing.
             //
-            *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
+            *(UINT64 *)Targ = (Sym->st_value + Rel->r_addend) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
             break;
 
           case R_LARCH_MARK_LA:
