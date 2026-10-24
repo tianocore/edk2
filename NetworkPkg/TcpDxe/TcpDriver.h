@@ -2,6 +2,7 @@
   The prototype of driver binding and service binding protocol for TCP driver.
 
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -27,6 +28,12 @@ typedef struct _TCP_SERVICE_DATA {
   IP_IO                           *IpIo;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   LIST_ENTRY                      SocketList;
+  EFI_HANDLE                      Hash2ServiceHandle;
+  //
+  // The Hash2 protocol instance used to compute ISNs for this service - either the
+  // above child's protocol, or the platform's shared instance.
+  //
+  EFI_HASH2_PROTOCOL              *Hash2Protocol;
 } TCP_SERVICE_DATA;
 
 typedef struct _TCP_PROTO_DATA {

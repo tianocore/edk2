@@ -4,6 +4,7 @@
 
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -786,6 +787,8 @@ Tcp6Poll (
     secret data. For discussion of the selection of a specific hash algorithm and
     management of the secret key data."
 
+  @param[in]       Hash2Protocol  A pointer to the Hash2 protocol instance owned by the TCP
+                                  service this connection belongs to.
   @param[in]       LocalIp        A pointer to the local IP address of the TCP connection.
   @param[in]       LocalIpSize    The size, in bytes, of the LocalIp buffer.
   @param[in]       LocalPort      The local port number of the TCP connection.
@@ -803,11 +806,12 @@ Tcp6Poll (
 **/
 EFI_STATUS
 TcpGetIsn (
-  IN UINT8       *LocalIp,
-  IN UINTN       LocalIpSize,
-  IN UINT16      LocalPort,
-  IN UINT8       *RemoteIp,
-  IN UINTN       RemoteIpSize,
-  IN UINT16      RemotePort,
-  OUT TCP_SEQNO  *Isn
+  IN EFI_HASH2_PROTOCOL  *Hash2Protocol,
+  IN UINT8               *LocalIp,
+  IN UINTN               LocalIpSize,
+  IN UINT16              LocalPort,
+  IN UINT8               *RemoteIp,
+  IN UINTN               RemoteIpSize,
+  IN UINT16              RemotePort,
+  OUT TCP_SEQNO          *Isn
   );
