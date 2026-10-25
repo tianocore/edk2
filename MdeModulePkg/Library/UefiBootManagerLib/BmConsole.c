@@ -3,6 +3,7 @@
 
 Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -204,7 +205,6 @@ EfiBootManagerGetGopDevicePath (
           // Recursively look for GOP child in this frame buffer handle
           //
           DEBUG ((DEBUG_INFO, "[Bds] Looking for GOP child deeper ... \n"));
-          TempDevicePath   = GopPool;
           ReturnDevicePath = EfiBootManagerGetGopDevicePath (OpenInfoBuffer[Index].ControllerHandle);
           if (ReturnDevicePath != NULL) {
             TempDevicePath = GopPool;
@@ -214,10 +214,6 @@ EfiBootManagerGetGopDevicePath (
             }
 
             gBS->FreePool (ReturnDevicePath);
-          }
-
-          if (TempDevicePath != NULL) {
-            gBS->FreePool (TempDevicePath);
           }
         }
       }
