@@ -71,6 +71,7 @@ RedfishRestExSendReceive (
 
   Status                  = EFI_SUCCESS;
   ResponseData            = NULL;
+  ChunkListLink           = NULL;
   IsGetChunkedTransfer    = FALSE;
   SendChunkProcess        = HttpIoSendChunkNone;
   SendNonChunkProcess     = HttpIoSendNonChunkNone;
