@@ -123,6 +123,7 @@ UsbSelectSetting (
 
   @param  Device                The device to select configuration.
   @param  ConfigIndex           The index of the configuration ( != 0).
+  @param  ConnectDrivers        Whether to connect function drivers.
 
   @retval EFI_NOT_FOUND         There is no configuration with the index.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource.
@@ -132,7 +133,16 @@ UsbSelectSetting (
 EFI_STATUS
 UsbSelectConfig (
   IN USB_DEVICE  *Device,
-  IN UINT8       ConfigIndex
+  IN UINT8       ConfigIndex,
+  IN BOOLEAN     ConnectDrivers
+  );
+
+/**
+  Connect an interface, guarding bus-owned driver binding against reset teardown.
+**/
+EFI_STATUS
+UsbConnectDriver (
+  IN USB_INTERFACE  *UsbIf
   );
 
 /**

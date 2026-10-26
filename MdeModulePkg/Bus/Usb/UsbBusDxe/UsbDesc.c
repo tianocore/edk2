@@ -263,7 +263,8 @@ UsbCreateDesc (
   @param  Len                   The length of the raw descriptor buffer.
   @param  Consumed              The number of raw descriptor consumed.
 
-  @return The create interface setting or NULL if failed.
+  @return The created interface setting, or NULL if parsing failed or the
+          endpoint list is incomplete.
 
 **/
 USB_INTERFACE_SETTING *
@@ -326,6 +327,14 @@ UsbParseInterfaceDesc (
 
     Setting->Endpoints[Index] = Ep;
     Offset                   += Used;
+  }
+
+  //
+  // Do not expose a partially populated endpoint array to descriptor consumers.
+  //
+  if (Index != NumEp) {
+    DEBUG ((DEBUG_ERROR, "UsbParseInterfaceDesc: incomplete endpoint list (%d of %d)\n", (UINT32)Index, (UINT32)NumEp));
+    goto ON_ERROR;
   }
 
 ON_EXIT:
