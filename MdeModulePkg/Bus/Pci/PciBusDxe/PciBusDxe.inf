@@ -101,6 +101,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize     ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsRetryIntervalUs       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieInitializeMps           ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni
