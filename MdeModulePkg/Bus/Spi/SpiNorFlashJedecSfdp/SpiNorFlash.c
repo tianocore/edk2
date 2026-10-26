@@ -31,7 +31,7 @@
   @param[in]    WriteBytes             Number of bytes to write to SPI device
   @param[in]    WriteBuffer            Buffer containing bytes to write to SPI device
 
-  @retval       Size of Data in Buffer
+  @return       Size of data in buffer, or zero if buffer construction fails.
 **/
 UINT32
 FillWriteBuffer (
@@ -45,10 +45,11 @@ FillWriteBuffer (
   IN      UINT8                   *WriteBuffer
   )
 {
-  UINT32  AddressSize;
-  UINT32  BigEndianAddress;
-  UINT32  Index;
-  UINT8   SfdpAddressBytes;
+  UINT32      AddressSize;
+  UINT32      BigEndianAddress;
+  UINT32      Index;
+  UINT8       SfdpAddressBytes;
+  EFI_STATUS  AddressModeStatus;
 
   if ((Instance == NULL) || ((WriteBytes != 0) && (WriteBuffer == NULL))) {
     ASSERT (Instance != NULL);
@@ -96,15 +97,32 @@ FillWriteBuffer (
         }
       }
 
-      if (Instance->Protocol.FlashSize <= SIZE_16MB) {
-        AddressSize = 3;
+      // The device defaults to 3-byte addressing and must be switched per
+      // transaction once the target address crosses the 16MB
+      // (3-byte addressable) boundary. Enter4Byte/Exit4Byte no-op when the
+      // device is already in the requested mode (see CurrentAddressBytes).
+      DEBUG ((DEBUG_VERBOSE, "%a: Flash size=0x%x, target address=0x%x\n", __func__, SfdpGetFlashSize (Instance), Address));
+
+      if (Address >= SIZE_16MB) {
+        AddressModeStatus = Instance->ProtocolEx.Enter4Byte (&Instance->ProtocolEx);
       } else {
-        // SPI part is > 16MB use 4-byte addressing.
-        AddressSize = 4;
+        AddressModeStatus = Instance->ProtocolEx.Exit4Byte (&Instance->ProtocolEx);
       }
+
+      if (EFI_ERROR (AddressModeStatus)) {
+        DEBUG ((DEBUG_ERROR, "%a: Failed to switch address mode: %r\n", __func__, AddressModeStatus));
+        return 0;
+      }
+
+      AddressSize = Instance->CurrentAddressBytes;
     } else {
       DEBUG ((DEBUG_ERROR, "%a: Invalid Address Bytes\n", __func__));
       ASSERT (FALSE);
+    }
+
+    if ((AddressSize != 3) && (AddressSize != 4)) {
+      DEBUG ((DEBUG_ERROR, "%a: Invalid address size: %u\n", __func__, AddressSize));
+      return 0;
     }
 
     BigEndianAddress   = SwapBytes32 ((UINT32)Address);
@@ -115,14 +133,6 @@ FillWriteBuffer (
       AddressSize
       );
     Index += AddressSize;
-  }
-
-  if (SfdpAddressBytes == SPI_ADDR_3OR4BYTE) {
-    //
-    // TODO:
-    // We may need to enter/exit 4-Byte mode if SPI flash
-    // device is currently operated in 3-Bytes mode.
-    //
   }
 
   // Fill DummyBytes
@@ -183,6 +193,10 @@ InternalReadStatus (
                               0,
                               NULL
                               );
+  if (TransactionBufferLength == 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
   Status = Instance->SpiIo->Transaction (
                               Instance->SpiIo,
                               SPI_TRANSACTION_WRITE_THEN_READ,
@@ -225,6 +239,10 @@ SetWel (
                               0,
                               NULL
                               );
+  if (TransactionBufferLength == 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
   Status = Instance->SpiIo->Transaction (
                               Instance->SpiIo,
                               SPI_TRANSACTION_WRITE_ONLY,
@@ -456,6 +474,10 @@ GetFlashId (
                                 0,
                                 NULL
                                 );
+    if (TransactionBufferLength == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Status = Instance->SpiIo->Transaction (
                                 Instance->SpiIo,
                                 SPI_TRANSACTION_WRITE_THEN_READ,
@@ -550,6 +572,10 @@ LfReadData (
                                 0,
                                 NULL
                                 );
+    if (TransactionBufferLength == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Status = Instance->SpiIo->Transaction (
                                 Instance->SpiIo,
                                 SPI_TRANSACTION_WRITE_THEN_READ,
@@ -682,6 +708,10 @@ ReadData (
                                 0,
                                 NULL
                                 );
+    if (TransactionBufferLength == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Status = Instance->SpiIo->Transaction (
                                 Instance->SpiIo,
                                 SPI_TRANSACTION_WRITE_THEN_READ,
@@ -777,8 +807,11 @@ WriteStatus (
   if (!EFI_ERROR (Status)) {
     if (Instance->WriteEnableLatchRequired) {
       Status = SetWel (Instance);
-      DEBUG ((DEBUG_ERROR, "%a: set Write Enable Error.\n", __func__));
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: set Write Enable Error.\n", __func__));
+        ASSERT_EFI_ERROR (Status);
+      }
+
       // Check not WIP & WEL enabled
       Status = WaitWelNotWip (Instance, FixedPcdGet32 (PcdSpiNorFlashOperationDelayMicroseconds), FixedPcdGet32 (PcdSpiNorFlashFixedTimeoutRetryCount));
     }
@@ -795,6 +828,10 @@ WriteStatus (
                                   0,
                                   NULL
                                   );
+      if (TransactionBufferLength == 0) {
+        return EFI_DEVICE_ERROR;
+      }
+
       Status = Instance->SpiIo->Transaction (
                                   Instance->SpiIo,
                                   SPI_TRANSACTION_WRITE_ONLY,
@@ -924,6 +961,10 @@ WriteData (
                                 Length,
                                 CurrentBuffer
                                 );
+    if (TransactionBufferLength == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Status = Instance->SpiIo->Transaction (
                                 Instance->SpiIo,
                                 SPI_TRANSACTION_WRITE_ONLY,
@@ -1109,6 +1150,10 @@ Erase (
                                 0,
                                 NULL
                                 );
+    if (TransactionBufferLength == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
     Status = Instance->SpiIo->Transaction (
                                 Instance->SpiIo,
                                 SPI_TRANSACTION_WRITE_ONLY,

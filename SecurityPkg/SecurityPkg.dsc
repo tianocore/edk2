@@ -312,6 +312,7 @@
   #
   SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+  SecurityPkg/RandomNumberGenerator/RngStandaloneMm/RngStandaloneMm.inf
 
   #
   # SPDM
