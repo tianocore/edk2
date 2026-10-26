@@ -2474,6 +2474,13 @@
   # @Prompt USB Transfer Timeout (ms).
   gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue|3000|UINT32|0x00000026
 
+  ## Indicates the consecutive USB mass storage read failure threshold for no-media promotion.
+  #  A value of 0 disables no-media promotion.
+  #  Positive values set the consecutive read failure threshold.
+  # @Prompt USB Mass Storage Maximum Consecutive Read Errors.
+  # @ValidRange 0x80000001 | 0x00000000 - 0xFFFFFFFF
+  gEfiMdePkgTokenSpaceGuid.PcdUsbMassStorageMaxConsecutiveReadErrors|0x0|UINT32|0x0000002F
+
   ## This value is used to set the available memory address to store Guided Extract Handlers.
   #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
   # @Prompt Memory Address of GuidedExtractHandler Table.
