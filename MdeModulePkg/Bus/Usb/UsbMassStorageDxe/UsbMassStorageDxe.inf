@@ -64,6 +64,7 @@
   UefiDriverEntryPoint
   BaseMemoryLib
   DebugLib
+  PcdLib
   DevicePathLib
 
 
@@ -76,6 +77,11 @@
 # [Event]
 # EVENT_TYPE_RELATIVE_TIMER        ## CONSUMES
 #
+
+[Pcd]
+  # 0 disables no-media promotion. Positive values set the consecutive read
+  # failure threshold.
+  gEfiMdePkgTokenSpaceGuid.PcdUsbMassStorageMaxConsecutiveReadErrors  ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UsbMassStorageDxeExtra.uni
