@@ -289,9 +289,26 @@ EventLogIteratorGetNext (
     goto ExitHandler;
   }
 
-  Event += DigestListSize;
+  Event         += DigestListSize;
+  RemainingSize -= (UINTN)Event - (UINTN)Iter->Event;
+  if (RemainingSize < sizeof (TcgPcrEvent2->EventSize)) {
+    Status          = EFI_INVALID_PARAMETER;
+    Iter->Event     = NULL;
+    Iter->EventSize = 0;
+    goto ExitHandler;
+  }
+
   CopyMem (&EventSize, Event, sizeof (TcgPcrEvent2->EventSize));
   Event += sizeof (TcgPcrEvent2->EventSize);
+
+  RemainingSize -= sizeof (TcgPcrEvent2->EventSize);
+  if (RemainingSize < EventSize) {
+    Status          = EFI_INVALID_PARAMETER;
+    Iter->Event     = NULL;
+    Iter->EventSize = 0;
+    goto ExitHandler;
+  }
+
   Event += EventSize;
 
   Iter->EventSize = (UINTN)Event - (UINTN)Iter->Event;
