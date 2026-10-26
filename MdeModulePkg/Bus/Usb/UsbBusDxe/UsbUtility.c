@@ -1106,8 +1106,7 @@ UsbBusRecursivelyConnectWantedUsbIo (
           Tpl = gBS->RaiseTPL (TPL_CALLBACK);
         }
 
-        Status           = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
-        UsbIf->IsManaged = (BOOLEAN) !EFI_ERROR (Status);
+        Status = UsbConnectDriver (UsbIf);
         DEBUG ((DEBUG_INFO, "UsbBusRecursivelyConnectWantedUsbIo: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
         if (Tpl < TPL_CALLBACK) {
           gBS->RestoreTPL (Tpl);

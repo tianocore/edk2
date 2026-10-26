@@ -197,6 +197,9 @@ struct _USB_DEVICE {
   UINT8                                 ParentPort; // Start at 0
   UINT8                                 Tier;
   BOOLEAN                               DisconnectFail;
+  BOOLEAN                               Connected;
+  BOOLEAN                               ResetInProgress;
+  BOOLEAN                               BindingInProgress;
   UINT8                                 EnumScript;
   BOOLEAN                               IsSSDev;
 };
@@ -648,6 +651,10 @@ UsbIoGetStringDescriptor (
 /**
   Reset the device, then if that succeeds, reconfigure the
   device with its address and current active configuration.
+  Changed personalities disconnect and uninstall all old interfaces before
+  publishing replacements, without connecting drivers. Callers must coordinate
+  safe teardown, cancel outstanding transfers, and reacquire USB I/O afterward.
+  Replacement is rejected during bus-owned binding or above TPL_CALLBACK.
 
   @param  This                   The USB IO instance.
 
