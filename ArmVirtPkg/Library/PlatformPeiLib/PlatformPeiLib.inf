@@ -55,6 +55,7 @@
   gPeiTpmInitializationDonePpiGuid                            ## SOMETIMES_PRODUCES
 
 [Guids]
+  gArmMpCoreInfoGuid
   gEarlyPL011BaseAddressGuid
   gFdtHobGuid
 
