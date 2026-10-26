@@ -1095,6 +1095,14 @@ UsbBusRecursivelyConnectWantedUsbIo (
 
     UsbIf = USB_INTERFACE_FROM_USBIO (UsbIo);
 
+    //
+    // Initialized hubs do not set IsManaged because the bus driver owns them.
+    // Skip them to avoid reinitializing the hub and repowering its ports.
+    //
+    if (UsbIf->IsHub) {
+      continue;
+    }
+
     if (UsbBusIsWantedUsbIO (Bus, UsbIf)) {
       if (!UsbIf->IsManaged) {
         //
@@ -1106,8 +1114,7 @@ UsbBusRecursivelyConnectWantedUsbIo (
           Tpl = gBS->RaiseTPL (TPL_CALLBACK);
         }
 
-        Status           = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
-        UsbIf->IsManaged = (BOOLEAN) !EFI_ERROR (Status);
+        Status = UsbConnectDriver (UsbIf);
         DEBUG ((DEBUG_INFO, "UsbBusRecursivelyConnectWantedUsbIo: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
         if (Tpl < TPL_CALLBACK) {
           gBS->RestoreTPL (Tpl);
