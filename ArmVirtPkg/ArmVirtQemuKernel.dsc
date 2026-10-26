@@ -31,6 +31,7 @@
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE QEMU_PV_VARS            = FALSE
+  DEFINE MP_SERVICES_ENABLE      = FALSE
 
   #
   # Network definition
@@ -252,6 +253,13 @@
   #
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
   OvmfPkg/VirtioInputDxe/VirtioInput.inf
+
+  #
+  # MP Services
+  #
+!if $(MP_SERVICES_ENABLE) == TRUE
+  ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
+!endif
 
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {

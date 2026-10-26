@@ -35,6 +35,7 @@
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
   DEFINE CAVIUM_ERRATUM_27456    = FALSE
   DEFINE DEBUG_TO_MEM            = FALSE
+  DEFINE MP_SERVICES_ENABLE      = FALSE
 
   #
   # Network definition
@@ -363,6 +364,13 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0
   }
   OvmfPkg/VirtioInputDxe/VirtioInput.inf
+
+  #
+  # MP Services
+  #
+!if $(MP_SERVICES_ENABLE) == TRUE
+  ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
+!endif
 
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
