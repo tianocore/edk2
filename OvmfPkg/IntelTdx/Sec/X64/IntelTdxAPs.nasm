@@ -9,6 +9,17 @@
 
 %include "TdxCommondefs.inc"
 
+; Mailbox execution targets must be outside firmware scratch memory.
+%macro REJECT_MAILBOX_SCRATCH_TARGET 0
+    test    rax, rax
+    jz      .invalid_target
+    cmp     rax, MAILBOX_SCRATCH_START
+    jb      %%valid
+    cmp     rax, MAILBOX_SCRATCH_END
+    jb      .invalid_target
+%%valid:
+%endmacro
+
     ;
     ; Note: BSP never gets here. APs will be unblocked by DXE
     ;
@@ -17,6 +28,13 @@
     ; R9  [31:0]  VCPU_INDEX
     ;
 ParkAp:
+    ;
+    ; Initialize the header before registering arrival, but never reset
+    ; a command on subsequent rounds.
+    ;
+    mov     dword[rsp + CommandOffset], MpProtectedModeWakeupCommandNoop
+    mov     dword[rsp + ApicidOffset], MailboxApicIdInvalid
+    mov     qword[rsp + WakeupVectorOffset], 0
 
 do_wait_loop:
     ;
@@ -66,6 +84,7 @@ do_wait_loop:
     ;
     ; Read the function address which will be called
     mov     rax, [rsp + WakeupVectorOffset]
+    REJECT_MAILBOX_SCRATCH_TARGET
 
     ;
     ; vCPU index as the first argument
@@ -113,7 +132,14 @@ do_wait_loop:
     ;
     mov     rax, 0
     mov     eax, dword[rsp + WakeupVectorOffset]
+    REJECT_MAILBOX_SCRATCH_TARGET
     mov     rbx, [rsp + WakeupArgsRelocatedMailBox]
     nop
     jmp     rax
     jmp     $
+
+.invalid_target:
+    cli
+.halt:
+    hlt
+    jmp     .halt

@@ -100,4 +100,6 @@ InitStack:
     sub     rsp, 0x20
     call    ASM_PFX(SecCoreStartupWithStack)
 
+%define MAILBOX_SCRATCH_START FixedPcdGet32 (PcdOvmfSecPageTablesBase)
+%define MAILBOX_SCRATCH_END (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
 %include "IntelTdxAPs.nasm"
