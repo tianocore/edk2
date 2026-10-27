@@ -77,6 +77,11 @@
       HobLib|MdePkg/Test/Mock/Library/GoogleTest/MockHobLib/MockHobLib.inf
   }
 
+  MdeModulePkg/Core/Pei/PeiMemoryServicesGoogleTestHost.inf {
+    <LibraryClasses>
+      HobLib|MdePkg/Test/Mock/Library/GoogleTest/MockHobLib/MockHobLib.inf
+  }
+
   MdeModulePkg/Library/GptLib/UnitTest/GptLibUnitTestHost.inf {
     <LibraryClasses>
       GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
