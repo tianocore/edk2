@@ -3,12 +3,15 @@
   This file defines the manageability IPMI protocol specific transport data.
 
   Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #pragma once
 
+#include <IndustryStandard/IpmiKcs.h>
 #include <Library/ManageabilityTransportLib.h>
+#include <Library/PcdLib.h>
 
 ///
 /// The IPMI command header which is apart from
@@ -27,6 +30,35 @@ typedef struct {
 #define MANAGEABILITY_IPMI_BMC_LUN  0
 
 #define MANAGEABILITY_IPMI_NET_FUNC_MAX  0x3F
+
+///
+/// IPMI KCS register address configuration.
+///
+#define MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED  MAX_UINT16
+
+#define MANAGEABILITY_IPMI_KCS_USE_LEGACY_ADDRESSES  \
+  ((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED) && \
+   (FixedPcdGet16 (PcdIpmiKcsIoCommandAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED))
+
+///
+/// Both explicit address PCDs must be 0xFFFF, or both must contain distinct
+/// non-0xFFFF addresses.
+///
+#define MANAGEABILITY_IPMI_KCS_PCD_CONFIGURATION_VALID  \
+  (((FixedPcdGet16 (PcdIpmiKcsIoDataAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED) == \
+    (FixedPcdGet16 (PcdIpmiKcsIoCommandAddress) == MANAGEABILITY_IPMI_KCS_ADDRESS_NOT_SPECIFIED)) && \
+   (MANAGEABILITY_IPMI_KCS_USE_LEGACY_ADDRESSES || \
+    (FixedPcdGet16 (PcdIpmiKcsIoDataAddress) != FixedPcdGet16 (PcdIpmiKcsIoCommandAddress))))
+
+#define MANAGEABILITY_IPMI_KCS_DATA_ADDRESS  \
+  (MANAGEABILITY_IPMI_KCS_USE_LEGACY_ADDRESSES ? \
+   (FixedPcdGet16 (PcdIpmiKcsIoBaseAddress) + IPMI_KCS_DATA_IN_REGISTER_OFFSET) : \
+   FixedPcdGet16 (PcdIpmiKcsIoDataAddress))
+
+#define MANAGEABILITY_IPMI_KCS_COMMAND_ADDRESS  \
+  (MANAGEABILITY_IPMI_KCS_USE_LEGACY_ADDRESSES ? \
+   (FixedPcdGet16 (PcdIpmiKcsIoBaseAddress) + IPMI_KCS_COMMAND_REGISTER_OFFSET) : \
+   FixedPcdGet16 (PcdIpmiKcsIoCommandAddress))
 
 ///
 /// The IPMI Completion Code mapping.

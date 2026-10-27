@@ -2479,10 +2479,23 @@
   # @Prompt Memory Address of GuidedExtractHandler Table.
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
 
-  ## This value is the IPMI KCS Interface I/O base address used to transmit IPMI commands.
-  #  The value of 0xca2 is the default I/O base address defined in IPMI specification.
+  ## IPMI KCS I/O base address for a contiguous register layout.
+  #  The data register is at the base address and command/status is at base + 1.
+  #  This PCD is used when both explicit register address PCDs are 0xffff.
   # @Prompt IPMI KCS Interface I/O Base Address
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xca2|UINT16|0x00000031
+
+  ## This value is the explicit IPMI KCS data register I/O address.
+  #  Set both explicit address PCDs to distinct values, or leave both at 0xffff
+  #  to use PcdIpmiKcsIoBaseAddress.
+  # @Prompt IPMI KCS Data Register I/O Address
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoDataAddress|0xffff|UINT16|0x00000039
+
+  ## This value is the explicit IPMI KCS command/status register I/O address.
+  #  Set both explicit address PCDs to distinct values, or leave both at 0xffff
+  #  to use PcdIpmiKcsIoBaseAddress.
+  # @Prompt IPMI KCS Command/Status Register I/O Address
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress|0xffff|UINT16|0x00000038
 
   ## This is SMBus slave address for the SSIF to the BMC.
   #  The recommended value defined by IPMI specification is 0x20 (section 12.12).

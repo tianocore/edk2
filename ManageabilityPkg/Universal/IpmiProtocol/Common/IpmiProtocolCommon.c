@@ -4,6 +4,7 @@
 
   Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -15,6 +16,12 @@
 #include <Library/ManageabilityTransportLib.h>
 
 #include "IpmiProtocolCommon.h"
+
+STATIC_ASSERT (
+  MANAGEABILITY_IPMI_KCS_PCD_CONFIGURATION_VALID,
+  "PcdIpmiKcsIoDataAddress and PcdIpmiKcsIoCommandAddress must both be 0xFFFF, "
+  "or both be distinct non-0xFFFF addresses"
+  );
 
 /**
   This functions setup the IPMI transport hardware information according
@@ -50,7 +57,7 @@ SetupIpmiTransportHardwareInformation (
     }
 
     KcsHardwareInfo->MemoryMap                    = MANAGEABILITY_TRANSPORT_KCS_IO_MAP_IO;
-    KcsHardwareInfo->IoBaseAddress.IoAddress16    = IPMI_KCS_BASE_ADDRESS;
+    KcsHardwareInfo->IoBaseAddress.IoAddress16    = IPMI_KCS_REG_DATA_IN;
     KcsHardwareInfo->IoDataInAddress.IoAddress16  = IPMI_KCS_REG_DATA_IN;
     KcsHardwareInfo->IoDataOutAddress.IoAddress16 = IPMI_KCS_REG_DATA_OUT;
     KcsHardwareInfo->IoCommandAddress.IoAddress16 = IPMI_KCS_REG_COMMAND;
