@@ -41,12 +41,11 @@ X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitCr4;
 X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitStack;
 
 //
-// The size 0x20 must be bigger than
-// the size of template code of SmmInit. Currently,
-// the size of SmmInit requires the 0x16 Bytes buffer
-// at least.
+// Reserve enough space for the complete 16-bit SMM initialization template,
+// including its embedded GDT descriptor. SmmRelocateBases checks this size
+// before backing up and replacing the default SMI entry point.
 //
-#define BACK_BUF_SIZE  0x20
+#define BACK_BUF_SIZE  0x80
 
 #define CR4_CET_ENABLE  BIT23
 

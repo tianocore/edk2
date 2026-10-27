@@ -239,6 +239,7 @@ INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 !endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+INF  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf

@@ -67,6 +67,7 @@ FmpAuthenticatedHandlerPkcs7 (
   VOID           *P7Data;
   UINTN          P7Length;
   VOID           *TempBuffer;
+  UINTN          TempBufferPages;
 
   DEBUG ((DEBUG_INFO, "FmpAuthenticatedHandlerPkcs7 - Image: 0x%08x - 0x%08x\n", (UINTN)Image, (UINTN)ImageSize));
 
@@ -74,7 +75,8 @@ FmpAuthenticatedHandlerPkcs7 (
   P7Data   = Image->AuthInfo.CertData;
 
   // It is a signature across the variable data and the Monotonic Count value.
-  TempBuffer = AllocatePool (ImageSize - Image->AuthInfo.Hdr.dwLength);
+  TempBufferPages = EFI_SIZE_TO_PAGES (ImageSize - Image->AuthInfo.Hdr.dwLength);
+  TempBuffer      = AllocatePages (TempBufferPages);
   if (TempBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpAuthenticatedHandlerPkcs7: TempBuffer == NULL\n"));
     Status = RETURN_OUT_OF_RESOURCES;
@@ -99,7 +101,7 @@ FmpAuthenticatedHandlerPkcs7 (
                    (UINT8 *)TempBuffer,
                    ImageSize - Image->AuthInfo.Hdr.dwLength
                    );
-  FreePool (TempBuffer);
+  FreePages (TempBuffer, TempBufferPages);
   if (!CryptoStatus) {
     //
     // If PKCS7 signature verification fails, AUTH tested failed bit is set.

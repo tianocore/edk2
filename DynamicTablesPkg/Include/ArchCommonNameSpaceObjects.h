@@ -111,8 +111,10 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryLatBwInfo,                   ///< 43 - Memory Latency Bandwidth Info
   EArchCommonObjMemoryCacheInfo,                   ///< 44 - Memory Cache Info
   EArchCommonObjSpcrInfo,                          ///< 45 - Serial Terminal and Interrupt Info
-  EArchCommonObjTpm2DeviceInfo,                    ///< 46 - TPM2 Device Info
-  EArchCommonObjMcfgPciConfigSpaceInfo,            ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjTpmDeviceInfo,                     ///< 46 - TPM Device Info
+  /// Deprecated alias for EArchCommonObjTpmDeviceInfo.
+  EArchCommonObjTpm2DeviceInfo         = EArchCommonObjTpmDeviceInfo,
+  EArchCommonObjMcfgPciConfigSpaceInfo = 47,       ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                   ///< 48 - PCI root port configuration Info
   EArchCommonObjErrSourcePciRootPortInfo,          ///< 49 - PCI Express AER Info for RootPort
   EArchCommonObjErrSourcePciDeviceInfo,            ///< 50 - PCI Express AER Info for Device (Endpoint)
@@ -157,6 +159,18 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjBootErrorRegionInfo,               ///< 89 - Boot Error Region Info
   EArchCommonObjErstInstructionsInfo,              ///< 90 - ERST Instruction Info
   EArchCommonObjIpmiDeviceInfo,                    ///< 91 - IPMI Device Information
+  EArchCommonObjSystemPowerSupplyInfo,             ///< 92 - System Power Supply Information
+  EArchCommonObjSystemSlotInfo,                    ///< 93 - System Slot Information
+  EArchCommonObjSystemSlotPeerInfo,                ///< 94 - System Slot Peer Information
+  EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
+  EArchCommonObjOemString,                         ///< 96 - OEM String
+  EArchCommonObjPortConnectorInfo,                 ///< 97 - Port Connector Information
+  EArchCommonObjSmc91xInfo,                        ///< 98 - SMC91X Network Device Information
+  EArchCommonObjGroupAssociationInfo,              ///< 99 - Group Association Information
+  EArchCommonObjGroupAssociationItem,              ///< 100 - Group Association Item
+  EArchCommonObjVirtioMmioDeviceInfo,              ///< 101 - Virtio MMIO Device Information
+  EArchCommonObjFirmwareInventoryInfo,             ///< 102 - Firmware Inventory Information
+  EArchCommonObjFirmwareInventoryComponent,        ///< 103 - Firmware Inventory Associated Component
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -320,6 +334,20 @@ typedef struct CmArchCommonGenericInterrupt {
   ///       1: Interrupt is Active low
   UINT32    Flags;
 } CM_ARCH_COMMON_GENERIC_INTERRUPT;
+
+/** An AML Extended Interrupt resource descriptor interrupt.
+
+  Interrupt is the interrupt number. Flags follows the Interrupt Vector Flags
+  (Byte 3) of the Extended Interrupt resource descriptor:
+  - BIT0: 0: ResourceProducer, 1: ResourceConsumer.
+  - BIT1: 0: Level triggered, 1: Edge triggered.
+  - BIT2: 0: Active high, 1: Active low.
+  - BIT3: 0: Exclusive, 1: Shared.
+  - BIT4: 0: Not wake capable, 1: Wake capable.
+  Other bits are reserved.
+  See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h.
+**/
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARCH_COMMON_EXTENDED_INTERRUPT;
 
 /** A structure that describes a PCI Interrupt Map.
 
@@ -868,17 +896,52 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
   UINT64    Lasa;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
-/** A structure that describes TPM2 device.
+/** A structure that describes a TPM device.
 
-  ID: EArchCommonObjTpm2DeviceInfo
+  The TPM2 device base address and size are used by the ACPI TPM2 generator.
+  The remaining fields describe the SMBIOS Type 43 TPM device.
+
+  Cf. SMBIOS Specification v3.9.0, Type 43.
+
+  ID: EArchCommonObjTpmDeviceInfo
 */
-typedef struct CmArchCommonTpm2DeviceInfo {
-  /** TPM2 Device's Base Address */
-  UINT64    Tpm2DeviceBaseAddress;
+typedef struct CmArchCommonTpmDeviceInfo {
+  /** TPM2 device base address. */
+  UINT64             Tpm2DeviceBaseAddress;
 
-  /** TPM2 Device' Size */
-  UINT64    Tpm2DeviceSize;
-} CM_ARCH_COMMON_TPM2_DEVICE_INFO;
+  /** TPM2 device size. */
+  UINT64             Tpm2DeviceSize;
+
+  /// CM Object Token uniquely identifying this TPM device.
+  CM_OBJECT_TOKEN    TpmDeviceInfoToken;
+
+  /// Four-character TCG Vendor ID.
+  UINT8              VendorId[4];
+
+  /// Major TPM specification version.
+  UINT8              MajorSpecVersion;
+
+  /// Minor TPM specification version.
+  UINT8              MinorSpecVersion;
+
+  /// First firmware version value.
+  UINT32             FirmwareVersion1;
+
+  /// Second firmware version value.
+  UINT32             FirmwareVersion2;
+
+  /// Descriptive information for the TPM device.
+  CHAR8              Description[SMBIOS_MAX_STRING_SIZE];
+
+  /// TPM device characteristics.
+  UINT64             Characteristics;
+
+  /// OEM-defined value.
+  UINT32             OemDefined;
+} CM_ARCH_COMMON_TPM_DEVICE_INFO;
+
+/** Deprecated alias for CM_ARCH_COMMON_TPM_DEVICE_INFO. */
+typedef CM_ARCH_COMMON_TPM_DEVICE_INFO CM_ARCH_COMMON_TPM2_DEVICE_INFO;
 
 /** A structure that describes the
     SPMI (Service Processor Management Interface) Info.
@@ -2216,6 +2279,155 @@ typedef struct CmArchCommonMchiNetworkDeviceDescPciInfo {
   CM_OBJECT_TOKEN    IpmiToken;
 } CM_ARCH_COMMON_MCHI_NETWORK_DEVICE_DESC_PCI_INFO;
 
+/** A structure that describes an OEM-defined string.
+
+  SMBIOS Specification v3.9.0 Type 11
+
+  ID: EArchCommonObjOemString
+**/
+typedef struct CmArchCommonOemString {
+  /// Null-terminated OEM-defined string encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8    String[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_OEM_STRING;
+
+/** A structure that describes OEM Strings Information.
+
+  SMBIOS Specification v3.9.0 Type 11
+
+  ID: EArchCommonObjOemStringsInfo
+**/
+typedef struct CmArchCommonOemStringsInfo {
+  /// CM Object Token uniquely identifying this OEM Strings Information.
+  CM_OBJECT_TOKEN    OemStringsInfoToken;
+
+  /// Token referencing an array of OEM-defined strings.
+  CM_OBJECT_TOKEN    StringListToken;
+} CM_ARCH_COMMON_OEM_STRINGS_INFO;
+
+/** A structure that describes Port Connector Information.
+
+  SMBIOS Specification v3.9.0 Type 8
+
+  ID: EArchCommonObjPortConnectorInfo
+**/
+typedef struct CmArchCommonPortConnectorInfo {
+  /// CM Object Token uniquely identifying this Port Connector Information.
+  CM_OBJECT_TOKEN    PortConnectorInfoToken;
+
+  /// Null-terminated internal reference designator encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              InternalReferenceDesignator[SMBIOS_MAX_STRING_SIZE];
+
+  /// Internal connector type defined by SMBIOS Specification v3.9.0, Table 42.
+  UINT8              InternalConnectorType;
+
+  /// Null-terminated external reference designator encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              ExternalReferenceDesignator[SMBIOS_MAX_STRING_SIZE];
+
+  /// External connector type defined by SMBIOS Specification v3.9.0, Table 42.
+  UINT8              ExternalConnectorType;
+
+  /// Port type defined by SMBIOS Specification v3.9.0, Table 43.
+  UINT8              PortType;
+} CM_ARCH_COMMON_PORT_CONNECTOR_INFO;
+
+/** A structure that identifies an SMBIOS object in a group association.
+
+  SMBIOS Specification v3.9.0 Type 14
+
+  ID: EArchCommonObjGroupAssociationItem
+**/
+typedef struct CmArchCommonGroupAssociationItem {
+  /// CM Object Token identifying the associated SMBIOS object.
+  CM_OBJECT_TOKEN              ReferencedObjectToken;
+
+  /// Generator ID for the associated SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    ReferencedTableGeneratorId;
+} CM_ARCH_COMMON_GROUP_ASSOCIATION_ITEM;
+
+/** A structure that describes Group Association Information.
+
+  SMBIOS Specification v3.9.0 Type 14
+
+  ID: EArchCommonObjGroupAssociationInfo
+**/
+typedef struct CmArchCommonGroupAssociationInfo {
+  /// CM Object Token uniquely identifying this Group Association.
+  CM_OBJECT_TOKEN    GroupAssociationInfoToken;
+
+  /// Token referencing a non-empty array of Group Association Items.
+  /// This token must not be CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    GroupItemListToken;
+
+  /// Null-terminated group name encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              GroupName[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_GROUP_ASSOCIATION_INFO;
+
+/** A structure that identifies an SMBIOS component associated with firmware.
+
+  SMBIOS Specification v3.9.0 Type 45
+
+  ID: EArchCommonObjFirmwareInventoryComponent
+**/
+typedef struct CmArchCommonFirmwareInventoryComponent {
+  /// CM Object Token identifying the associated SMBIOS object.
+  CM_OBJECT_TOKEN              ReferencedObjectToken;
+
+  /// Generator ID for the associated SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    ReferencedTableGeneratorId;
+} CM_ARCH_COMMON_FIRMWARE_INVENTORY_COMPONENT;
+
+/** A structure that describes Firmware Inventory Information.
+
+  SMBIOS Specification v3.9.0 Type 45
+
+  ID: EArchCommonObjFirmwareInventoryInfo
+**/
+typedef struct CmArchCommonFirmwareInventoryInfo {
+  /// CM Object Token uniquely identifying this firmware component.
+  CM_OBJECT_TOKEN             FirmwareInventoryInfoToken;
+
+  /// Firmware component name encoded as UTF-8.
+  CHAR8                       FirmwareComponentName[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware version encoded as UTF-8.
+  CHAR8                       FirmwareVersion[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware version format defined by SMBIOS Specification v3.9.0, Table 134.
+  UINT8                       FirmwareVersionFormat;
+
+  /// Firmware identifier encoded as UTF-8.
+  CHAR8                       FirmwareId[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware ID format defined by SMBIOS Specification v3.9.0, Table 135.
+  UINT8                       FirmwareIdFormat;
+
+  /// Firmware release date encoded as a DSP0266 Date-Time value, or an empty string.
+  CHAR8                       ReleaseDate[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware manufacturer encoded as UTF-8.
+  CHAR8                       Manufacturer[SMBIOS_MAX_STRING_SIZE];
+
+  /// Lowest supported firmware version encoded as UTF-8.
+  CHAR8                       LowestSupportedVersion[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware image size in bytes, or MAX_UINT64 if unknown.
+  UINT64                      ImageSize;
+
+  /// Firmware characteristics defined by SMBIOS Specification v3.9.0, Table 136.
+  FIRMWARE_CHARACTERISTICS    Characteristics;
+
+  /// Firmware state defined by SMBIOS Specification v3.9.0, Table 137.
+  UINT8                       State;
+
+  /// Token referencing an array of associated SMBIOS components.
+  /// CM_NULL_TOKEN indicates that no associated components are supplied.
+  CM_OBJECT_TOKEN             AssociatedComponentListToken;
+} CM_ARCH_COMMON_FIRMWARE_INVENTORY_INFO;
+
 /** A structure that describes an installable firmware language.
 
   SMBIOS Specification v3.9.0 Type 13
@@ -2321,5 +2533,169 @@ typedef struct CmArchCommonIpmiDeviceInfo {
   /// Interrupt number, or zero if unspecified.
   UINT8              InterruptNumber;
 } CM_ARCH_COMMON_IPMI_DEVICE_INFO;
+
+/** A structure that describes a system power supply.
+
+  SMBIOS Specification v3.9.0 Type 39
+
+  ID: EArchCommonObjSystemPowerSupplyInfo
+**/
+typedef struct CmArchCommonSystemPowerSupplyInfo {
+  /// CM Object Token uniquely identifying this power supply.
+  CM_OBJECT_TOKEN    PowerSupplyInfoToken;
+
+  /// Token identifying the input voltage probe, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    InputVoltageProbeToken;
+
+  /// Token identifying the associated cooling device, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    CoolingDeviceToken;
+
+  /// Token identifying the input current probe, or CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    InputCurrentProbeToken;
+
+  /// Redundant power-unit group, or zero if not redundant.
+  UINT8              PowerUnitGroup;
+
+  /// Physical location of the power supply.
+  CHAR8              Location[SMBIOS_MAX_STRING_SIZE];
+
+  /// Device name.
+  CHAR8              DeviceName[SMBIOS_MAX_STRING_SIZE];
+
+  /// Manufacturer name.
+  CHAR8              Manufacturer[SMBIOS_MAX_STRING_SIZE];
+
+  /// Serial number.
+  CHAR8              SerialNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Asset tag number.
+  CHAR8              AssetTagNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Model or part number.
+  CHAR8              ModelPartNumber[SMBIOS_MAX_STRING_SIZE];
+
+  /// Revision level.
+  CHAR8              RevisionLevel[SMBIOS_MAX_STRING_SIZE];
+
+  /// Maximum sustained power output in watts, or 0x8000 if unknown.
+  UINT16             MaxPowerCapacity;
+
+  /// Power supply characteristics as defined by SMBIOS Type 39.
+  UINT16             PowerSupplyCharacteristics;
+} CM_ARCH_COMMON_SYSTEM_POWER_SUPPLY_INFO;
+
+/** A structure that describes a peer device associated with a system slot.
+
+  SMBIOS Specification v3.9.0 Type 9
+
+  ID: EArchCommonObjSystemSlotPeerInfo
+**/
+typedef struct CmArchCommonSystemSlotPeerInfo {
+  /// PCI segment group number.
+  UINT16    SegmentGroupNum;
+
+  /// PCI bus number.
+  UINT8     BusNum;
+
+  /// PCI device number in bits 7:3 and function number in bits 2:0.
+  UINT8     DevFuncNum;
+
+  /// Electrical bus width of the peer device.
+  UINT8     DataBusWidth;
+} CM_ARCH_COMMON_SYSTEM_SLOT_PEER_INFO;
+
+/** A structure that describes a system slot.
+
+  SMBIOS Specification v3.9.0 Type 9
+
+  ID: EArchCommonObjSystemSlotInfo
+**/
+typedef struct CmArchCommonSystemSlotInfo {
+  /// CM Object Token uniquely identifying this system slot.
+  CM_OBJECT_TOKEN    SystemSlotInfoToken;
+
+  /// Token referencing an array of system-slot peer records.
+  /// CM_NULL_TOKEN indicates that no peer devices are supplied.
+  CM_OBJECT_TOKEN    PeerGroupListToken;
+
+  /// Slot designation string.
+  CHAR8              SlotDesignation[SMBIOS_MAX_STRING_SIZE];
+
+  /// Slot type.
+  UINT8              SlotType;
+
+  /// Maximum electrical width of the slot.
+  UINT8              SlotDataBusWidth;
+
+  /// Current slot usage.
+  UINT8              CurrentUsage;
+
+  /// Slot length.
+  UINT8              SlotLength;
+
+  /// Slot identifier.
+  UINT16             SlotId;
+
+  /// Slot Characteristics 1 bit field.
+  UINT8              SlotCharacteristics1;
+
+  /// Slot Characteristics 2 bit field.
+  UINT8              SlotCharacteristics2;
+
+  /// PCI segment group number for the base device.
+  UINT16             SegmentGroupNum;
+
+  /// PCI bus number for the base device.
+  UINT8              BusNum;
+
+  /// PCI device number in bits 7:3 and function number in bits 2:0.
+  UINT8              DevFuncNum;
+
+  /// Electrical bus width of the base device.
+  UINT8              DataBusWidth;
+
+  /// Slot-type-specific information.
+  UINT8              SlotInformation;
+
+  /// Physical width of the slot.
+  UINT8              SlotPhysicalWidth;
+
+  /// Slot pitch in 1/100 millimeter units, or zero if unknown.
+  UINT16             SlotPitch;
+
+  /// Slot height.
+  UINT8              SlotHeight;
+} CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
+
+/** SMC91X network device resources.
+
+  ID: EArchCommonObjSmc91xInfo
+**/
+typedef struct CmArchCommonSmc91xInfo {
+  /// Physical base address of the device registers.
+  UINT64                              BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                              BaseAddressLength;
+  /// Interrupt number and polarity/trigger flags.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
+} CM_ARCH_COMMON_SMC91X_INFO;
+
+/** A structure describing a Virtio MMIO device.
+
+  ID: EArchCommonObjVirtioMmioDeviceInfo
+**/
+typedef struct CmArchCommonVirtioMmioDeviceInfo {
+  /// Physical base address of the device registers.
+  UINT64                               BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                               BaseAddressLength;
+  /// Interrupt number and Extended Interrupt descriptor flags.
+  /// Wake-capable interrupts are not supported by this generator.
+  CM_ARCH_COMMON_EXTENDED_INTERRUPT    Interrupt;
+
+  /// Indicates whether the device supports hardware-managed cache coherency.
+  /// TRUE indicates coherent DMA; FALSE indicates non-coherent DMA.
+  BOOLEAN                              CacheCoherent;
+} CM_ARCH_COMMON_VIRTIO_MMIO_DEVICE_INFO;
 
 #pragma pack()

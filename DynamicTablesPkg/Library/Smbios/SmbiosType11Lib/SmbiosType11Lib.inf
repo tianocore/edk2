@@ -1,0 +1,35 @@
+## @file
+#  SMBIOS Type 11 OEM Strings Table Generator.
+#
+#  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x0001001B
+  BASE_NAME       = SmbiosType11Lib
+  FILE_GUID       = bcedfcfe-84e3-4ad5-9f5f-5cd2f67cbb32
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = NULL|DXE_DRIVER
+  CONSTRUCTOR     = SmbiosType11LibConstructor
+  DESTRUCTOR      = SmbiosType11LibDestructor
+
+[Sources]
+  SmbiosType11Generator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+  gEdkiiDynamicTableFactoryProtocolGuid

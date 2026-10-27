@@ -61,6 +61,7 @@ CONST UINT64        gApStackSize = AP_STACK_SIZE;
 VOID                *gTtbr0;
 UINTN               gTcr;
 UINTN               gMair;
+UINTN               gHcr;
 
 STATIC
 BOOLEAN
@@ -872,9 +873,6 @@ EnableDisableAP (
   UINTN        StatusFlag;
   CPU_AP_DATA  *CpuData;
 
-  StatusFlag = mCpuMpData.CpuData[ProcessorNumber].Info.StatusFlag;
-  CpuData    = &mCpuMpData.CpuData[ProcessorNumber];
-
   if (!IsCurrentProcessorBSP ()) {
     return EFI_DEVICE_ERROR;
   }
@@ -886,6 +884,9 @@ EnableDisableAP (
   if (IsProcessorBSP (ProcessorNumber)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  CpuData    = &mCpuMpData.CpuData[ProcessorNumber];
+  StatusFlag = CpuData->Info.StatusFlag;
 
   if ((GetApState (CpuData) != CpuStateIdle) &&
       (GetApState (CpuData) != CpuStateFinished))
@@ -1358,6 +1359,9 @@ MpServicesInitialize (
   gTcr   = ArmGetTCR ();
   gMair  = ArmGetMAIR ();
   gTtbr0 = ArmGetTTBR0BaseAddress ();
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    gHcr = ArmReadHcr ();
+  }
 
   //
   // The global pointer variables as well as the gProcessorIDs array contents
@@ -1365,6 +1369,7 @@ MpServicesInitialize (
   //
   WriteBackDataCacheRange (&gProcessorIDs, sizeof (UINT64 *));
   WriteBackDataCacheRange (&gApStacksBase, sizeof (UINT64 *));
+  WriteBackDataCacheRange (&gHcr, sizeof (gHcr));
 
   WriteBackDataCacheRange (
     gProcessorIDs,
