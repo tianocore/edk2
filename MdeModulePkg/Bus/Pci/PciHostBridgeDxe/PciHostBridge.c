@@ -400,6 +400,97 @@ FreeMemorySpaceMap:
 }
 
 /**
+  Select the memory attributes for mapping an MMIO aperture.
+
+  Use EFI_MEMORY_WB or EFI_MEMORY_WC, in this order of preference, if the
+  platform requested it via the attributes of the root bridge, and if doing so
+  does not conflict with memory space descriptors that already cover (parts of)
+  the aperture in the GCD memory space map, e.g., because the platform added
+  them before this driver was dispatched. Use EFI_MEMORY_UC otherwise.
+
+  Gaps in the GCD memory space map (EfiGcdMemoryTypeNonExistent) impose no
+  constraints, as they will be added as MMIO space with the capabilities that
+  correspond with the selected attributes. Existing MMIO descriptors only permit
+  attributes that are covered by their capabilities, and descriptors of any
+  other type conflict with the aperture regardless.
+
+  @param[in] Base                 Base address of the aperture.
+  @param[in] Length               Length of the aperture.
+  @param[in] RequestedAttributes  The memory attributes requested by the
+                                  platform: zero or more of EFI_MEMORY_WB and
+                                  EFI_MEMORY_WC.
+
+  @return  EFI_MEMORY_WB, EFI_MEMORY_WC or EFI_MEMORY_UC.
+**/
+UINT64
+SelectMmioApertureAttributes (
+  IN  UINT64  Base,
+  IN  UINT64  Length,
+  IN  UINT64  RequestedAttributes
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            Index;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Descriptor;
+  UINT64                           Supported;
+  UINT64                           Attributes;
+
+  if (RequestedAttributes == 0) {
+    return EFI_MEMORY_UC;
+  }
+
+  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  if (EFI_ERROR (Status)) {
+    return EFI_MEMORY_UC;
+  }
+
+  Supported = RequestedAttributes;
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    Descriptor = &MemorySpaceMap[Index];
+    if ((Descriptor->GcdMemoryType == EfiGcdMemoryTypeNonExistent) ||
+        (Descriptor->BaseAddress >= Base + Length) ||
+        (Descriptor->BaseAddress + Descriptor->Length <= Base))
+    {
+      continue;
+    }
+
+    if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
+      Supported &= Descriptor->Capabilities;
+    } else {
+      Supported = 0;
+    }
+  }
+
+  FreePool (MemorySpaceMap);
+
+  if ((Supported & EFI_MEMORY_WB) != 0) {
+    Attributes = EFI_MEMORY_WB;
+  } else if ((Supported & EFI_MEMORY_WC) != 0) {
+    Attributes = EFI_MEMORY_WC;
+  } else {
+    Attributes = EFI_MEMORY_UC;
+  }
+
+  if (Supported != RequestedAttributes) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: %a: attributes 0x%Lx conflict with existing GCD memory space for "
+      "MMIO aperture [%Lx, %Lx), using 0x%Lx\n",
+      gEfiCallerBaseName,
+      __func__,
+      RequestedAttributes & ~Supported,
+      Base,
+      Base + Length,
+      Attributes
+      ));
+  }
+
+  return Attributes;
+}
+
+/**
   Event notification that is fired when IOMMU protocol is installed.
 
   @param  Event                 The Event that is being processed.
@@ -450,6 +541,8 @@ InitializePciHostBridge (
   BOOLEAN                   ResourceAssigned;
   LIST_ENTRY                *Link;
   UINT64                    HostAddress;
+  UINT64                    RequestedAttributes;
+  UINT64                    MemAttributes;
 
   RootBridges = PciHostBridgeGetRootBridges (&RootBridgeCount);
   if ((RootBridges == NULL) || (RootBridgeCount == 0)) {
@@ -532,6 +625,22 @@ InitializePciHostBridge (
     MemApertures[2] = &RootBridges[Index].PMem;
     MemApertures[3] = &RootBridges[Index].PMemAbove4G;
 
+    //
+    // The platform may request EFI_MEMORY_WB and/or EFI_MEMORY_WC mappings of
+    // the MMIO apertures instead of EFI_MEMORY_UC, by setting the MEMORY_CACHED
+    // and/or MEMORY_WRITE_COMBINE attributes on the root bridge. These are only
+    // honoured for apertures where they don't conflict with existing GCD
+    // memory space descriptors - see SelectMmioApertureAttributes().
+    //
+    RequestedAttributes = 0;
+    if ((RootBridges[Index].Attributes & EFI_PCI_ATTRIBUTE_MEMORY_CACHED) != 0) {
+      RequestedAttributes |= EFI_MEMORY_WB;
+    }
+
+    if ((RootBridges[Index].Attributes & EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE) != 0) {
+      RequestedAttributes |= EFI_MEMORY_WC;
+    }
+
     for (MemApertureIndex = 0; MemApertureIndex < ARRAY_SIZE (MemApertures); MemApertureIndex++) {
       if (MemApertures[MemApertureIndex]->Base <= MemApertures[MemApertureIndex]->Limit) {
         //
@@ -542,19 +651,29 @@ InitializePciHostBridge (
                         MemApertures[MemApertureIndex]->Base,
                         MemApertures[MemApertureIndex]->Translation
                         );
+        MemAttributes = SelectMmioApertureAttributes (
+                          HostAddress,
+                          MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
+                          RequestedAttributes
+                          );
         Status = AddMemoryMappedIoSpace (
                    HostAddress,
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                   EFI_MEMORY_UC
+                   MemAttributes
                    );
         ASSERT_EFI_ERROR (Status);
         Status = gDS->SetMemorySpaceAttributes (
                         HostAddress,
                         MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                        EFI_MEMORY_UC
+                        MemAttributes
                         );
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
+          DEBUG ((
+            DEBUG_WARN,
+            "PciHostBridge driver failed to set attributes 0x%Lx on MMIO aperture - %r.\n",
+            MemAttributes,
+            Status
+            ));
         }
 
         if (ResourceAssigned) {
