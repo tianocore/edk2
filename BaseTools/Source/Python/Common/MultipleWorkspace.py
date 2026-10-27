@@ -8,8 +8,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-import Common.LongFilePathOs as os
+import Common.LongFilePathOs as Os
 from Common.DataType import TAB_WORKSPACE
+
 
 ## MultipleWorkspace
 #
@@ -34,8 +35,8 @@ class MultipleWorkspace(object):
     #
     @classmethod
     def convertPackagePath(cls, Ws, Path):
-        if str(os.path.normcase (os.path.normpath(Path))).startswith(os.path.normcase(os.path.normpath(Ws))):
-            return os.path.join(Ws, os.path.relpath(Path, Ws))
+        if str(Os.path.normcase (Os.path.normpath(Path))).startswith(Os.path.normcase(Os.path.normpath(Ws))):
+            return Os.path.join(Ws, Os.path.relpath(Path, Ws))
         return Path
 
     ## setWs()
@@ -50,7 +51,7 @@ class MultipleWorkspace(object):
     def setWs(cls, Ws, PackagesPath=None):
         cls.WORKSPACE = Ws
         if PackagesPath:
-            cls.PACKAGES_PATH = [cls.convertPackagePath (Ws, os.path.normpath(Path.strip())) for Path in PackagesPath.split(os.pathsep)]
+            cls.PACKAGES_PATH = [cls.convertPackagePath (Ws, Os.path.normpath(Path.strip())) for Path in PackagesPath.split(Os.pathsep)]
         else:
             cls.PACKAGES_PATH = []
 
@@ -65,13 +66,13 @@ class MultipleWorkspace(object):
     #
     @classmethod
     def join(cls, Ws, *p):
-        Path = os.path.join(Ws, *p)
-        if not os.path.exists(Path):
+        Path = Os.path.join(Ws, *p)
+        if not Os.path.exists(Path):
             for Pkg in cls.PACKAGES_PATH:
-                Path = os.path.join(Pkg, *p)
-                if os.path.exists(Path):
+                Path = Os.path.join(Pkg, *p)
+                if Os.path.exists(Path):
                     return Path
-            Path = os.path.join(Ws, *p)
+            Path = Os.path.join(Ws, *p)
         return Path
 
     ## relpath()
@@ -87,10 +88,10 @@ class MultipleWorkspace(object):
     def relpath(cls, Path, Ws):
         for Pkg in cls.PACKAGES_PATH:
             if Path.lower().startswith(Pkg.lower()):
-                Path = os.path.relpath(Path, Pkg)
+                Path = Os.path.relpath(Path, Pkg)
                 return Path
         if Path.lower().startswith(Ws.lower()):
-            Path = os.path.relpath(Path, Ws)
+            Path = Os.path.relpath(Path, Ws)
         return Path
 
     ## getWs()
@@ -104,11 +105,11 @@ class MultipleWorkspace(object):
     #
     @classmethod
     def getWs(cls, Ws, Path):
-        absPath = os.path.join(Ws, Path)
-        if not os.path.exists(absPath):
+        absPath = Os.path.join(Ws, Path)
+        if not Os.path.exists(absPath):
             for Pkg in cls.PACKAGES_PATH:
-                absPath = os.path.join(Pkg, Path)
-                if os.path.exists(absPath):
+                absPath = Os.path.join(Pkg, Path)
+                if Os.path.exists(absPath):
                     return Pkg
         return Ws
 
@@ -129,10 +130,10 @@ class MultipleWorkspace(object):
                     if MacroStartPos != -1:
                         Substr = str[MacroStartPos:]
                         Path = Substr.replace(TAB_WORKSPACE, cls.WORKSPACE).strip()
-                        if not os.path.exists(Path):
+                        if not Os.path.exists(Path):
                             for Pkg in cls.PACKAGES_PATH:
                                 Path = Substr.replace(TAB_WORKSPACE, Pkg).strip()
-                                if os.path.exists(Path):
+                                if Os.path.exists(Path):
                                     break
                         PathList[i] = str[0:MacroStartPos] + Path
             PathStr = ' '.join(PathList)
@@ -147,4 +148,3 @@ class MultipleWorkspace(object):
     @classmethod
     def getPkgPath(cls):
         return cls.PACKAGES_PATH
-
