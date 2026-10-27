@@ -1745,7 +1745,11 @@ PciIoAttributes (
     //
     // Enable relevant attributes to command register and bridge control register
     //
-    Status = PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, Command);
+    Status = EFI_SUCCESS;
+    if (Command != 0) {
+      Status = PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, Command);
+    }
+
     if (BridgeControl != 0) {
       Status = PCI_ENABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, BridgeControl);
     }
@@ -1755,17 +1759,22 @@ PciIoAttributes (
     //
     // Enable attributes of the upstream bridge
     //
-    Status = UpStreamBridge->PciIo.Attributes (
-                                     &(UpStreamBridge->PciIo),
-                                     EfiPciIoAttributeOperationEnable,
-                                     UpStreamAttributes,
-                                     NULL
-                                     );
+    if (UpStreamAttributes != 0) {
+      Status = UpStreamBridge->PciIo.Attributes (
+                                       &(UpStreamBridge->PciIo),
+                                       EfiPciIoAttributeOperationEnable,
+                                       UpStreamAttributes,
+                                       NULL
+                                       );
+    }
   } else {
     //
     // Disable relevant attributes to command register and bridge control register
     //
-    Status = PCI_DISABLE_COMMAND_REGISTER (PciIoDevice, Command);
+    if (Command != 0) {
+      Status = PCI_DISABLE_COMMAND_REGISTER (PciIoDevice, Command);
+    }
+
     if (BridgeControl != 0) {
       Status = PCI_DISABLE_BRIDGE_CONTROL_REGISTER (PciIoDevice, BridgeControl);
     }
