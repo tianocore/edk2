@@ -1,5 +1,5 @@
 /** @file
-Ported ELF include files from FreeBSD
+ELF definitions common to ELF32 and ELF64, ported from FreeBSD.
 
 Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>

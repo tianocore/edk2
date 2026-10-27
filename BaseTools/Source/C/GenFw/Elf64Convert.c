@@ -1,5 +1,5 @@
 /** @file
-Elf64 convert solution
+Converts ELF64 images (X64, AArch64, RISC-V64 and LoongArch64) into PE32+ images.
 
 Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013-2022, ARM Ltd. All rights reserved.<BR>
