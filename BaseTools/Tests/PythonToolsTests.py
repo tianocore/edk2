@@ -9,8 +9,6 @@
 ##
 # Import Modules
 #
-import os
-import sys
 import unittest
 
 
@@ -29,4 +27,3 @@ def TheTestSuite():
 if __name__ == '__main__':
     allTests = TheTestSuite()
     unittest.TextTestRunner().run(allTests)
-
