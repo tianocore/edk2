@@ -209,5 +209,13 @@ DynamicTableManagerDxeUnInitialize (
 
   FreeHiiFormResources ();
 
+  if (mSmbiosEvent != NULL) {
+    gBS->CloseEvent (mSmbiosEvent);
+  }
+
+  if (mAcpiEvent != NULL) {
+    gBS->CloseEvent (mAcpiEvent);
+  }
+
   return EFI_SUCCESS;
 }
