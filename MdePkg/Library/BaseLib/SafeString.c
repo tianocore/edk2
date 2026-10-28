@@ -2697,9 +2697,10 @@ UnicodeStrToAsciiStrS (
     //
     // If any Unicode characters in Source contain
     // non-zero value in the upper 8 bits, then ASSERT().
+    // Replace with '?' so non-assert enabled builds are safe too.
     //
     ASSERT (*Source < 0x100);
-    *(Destination++) = (CHAR8)*(Source++);
+    *(Destination++) = (*Source < 0x100) ? (CHAR8)*(Source++) : '?';
   }
 
   *Destination = '\0';
