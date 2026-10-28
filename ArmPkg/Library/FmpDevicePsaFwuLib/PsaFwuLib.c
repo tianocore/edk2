@@ -150,6 +150,56 @@ FwuGetAvailableRespDataSize (
          sizeof (PSA_MM_FWU_PARAMETER_HEADER) - GetMmFwuRespDataSize (Command);
 }
 
+/** Validate the complete response returned by the shared-buffer RPC. **/
+STATIC
+EFI_STATUS
+ValidateFwuResponse (
+  IN UINT32  Command,
+  IN UINTN   ResponseSize
+  )
+{
+  PSA_MM_FWU_CMD_DATA          *Response;
+  PSA_MM_FWU_DISCOVER_RESP     *Discovery;
+  PSA_MM_FWU_READ_STREAM_RESP  *ReadResponse;
+  UINTN                        FixedSize;
+
+  if ((ResponseSize < sizeof (PSA_MM_FWU_PARAMETER_HEADER)) ||
+      (ResponseSize > mPsaFwuMaxBufferSize))
+  {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  Response = mPsaFwuBuffer;
+  if ((Response->Header.ResponseStatus != PSA_MM_FWU_SUCCESS) &&
+      (Response->Header.ResponseStatus != PSA_MM_FWU_RESUME))
+  {
+    return EFI_SUCCESS;
+  }
+
+  FixedSize = sizeof (PSA_MM_FWU_PARAMETER_HEADER) + GetMmFwuRespDataSize (Command);
+  if (ResponseSize < FixedSize) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  if (Command == PSA_MM_FWU_COMMAND_DISCOVER) {
+    Discovery = GET_FWU_DATA_BUFFER (Response);
+    if ((Discovery->OffFunctionPresence < FixedSize) ||
+        (Discovery->OffFunctionPresence > ResponseSize) ||
+        (Discovery->NumFunc >
+         (ResponseSize - Discovery->OffFunctionPresence) / sizeof (UINT16)))
+    {
+      return EFI_PROTOCOL_ERROR;
+    }
+  } else if (Command == PSA_MM_FWU_COMMAND_READ_STREAM) {
+    ReadResponse = GET_FWU_DATA_BUFFER (Response);
+    if (ReadResponse->ReadBytes > ResponseSize - FixedSize) {
+      return EFI_PROTOCOL_ERROR;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Send a firmware update function request to StMM and Receive response.
 
   @param[in]  Command               Firmware update function id.
@@ -219,6 +269,11 @@ SendFwuRequest (
   }
 
   Status = PsaFwuTransportSendRequest (mPsaFwuBuffer, TotalReqCommBufferSize, &ResponseSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ValidateFwuResponse (Command, ResponseSize);
   if (EFI_ERROR (Status)) {
     return Status;
   }
