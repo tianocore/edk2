@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -36,6 +36,8 @@
   FmpDevicePsaFwuLib.c
   PsaFwuLib.c
   PsaFwuLib.h
+  PsaFwuTransport.h
+  StaticFwuTransport.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -47,12 +49,10 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  PcdLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
-
-[Protocols]
-  gEfiMmCommunication2ProtocolGuid              ## CONSUMES
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event

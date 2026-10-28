@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -13,8 +13,6 @@
 #pragma once
 
 #include <IndustryStandard/PsaMmFwUpdate.h>
-
-#define MM_SHARED_BUFFER_SIZE  FixedPcdGet64 (PcdMmBufferSize)
 
 /**
  * Send a FWU discovery request to StMM and get the associated response.
