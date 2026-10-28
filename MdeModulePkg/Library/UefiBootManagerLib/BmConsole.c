@@ -505,6 +505,19 @@ EfiBootManagerUpdateConsoleVariable (
                     GetDevicePathSize (NewDevicePath),
                     NewDevicePath
                     );
+  } else if (VarConsole != NULL) {
+    //
+    // Removing ExclusiveDevicePath left no instance in the variable. Delete the
+    // variable instead of leaving the old value, which still holds the path
+    // the caller asked to remove.
+    //
+    Status = gRT->SetVariable (
+                    mConVarName[ConsoleType],
+                    &gEfiGlobalVariableGuid,
+                    0,
+                    0,
+                    NULL
+                    );
   }
 
   if (VarConsole == NewDevicePath) {
