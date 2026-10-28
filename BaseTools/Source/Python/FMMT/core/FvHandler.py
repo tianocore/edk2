@@ -148,7 +148,7 @@ def ModifyFvSystemGuid(TargetFv) -> None:
 def SetFvFreeSpace(TargetFv, NewFreeSpace: int) -> None:
     FreeSpaceTree = (
         TargetFv.Child[-1]
-        if TargetFv.Child[-1].type == FFS_FREE_SPACE
+        if TargetFv.Child and TargetFv.Child[-1].type == FFS_FREE_SPACE
         else None
     )
     if NewFreeSpace:
