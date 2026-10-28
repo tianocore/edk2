@@ -1423,7 +1423,7 @@ EFI_STATUS
   );
 
 ///
-/// EFI Oprn Protocol Information Entry
+/// EFI Open Protocol Information Entry
 ///
 typedef struct {
   EFI_HANDLE    AgentHandle;
