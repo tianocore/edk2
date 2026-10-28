@@ -1,0 +1,74 @@
+## @file
+#  PSA firmware update client using Trusted Services RPC over FF-A.
+#
+#  Requires an update agent implementing the Trusted Services RPC protocol
+#  for service lookup, shared-memory management, and FWU request dispatch.
+#  This instance does not implement the EFI_MM_COMMUNICATE_HEADER framing
+#  required by the DEN0118 1.0 A FF-A 1.1 transport.
+#
+#  Copyright (C) 2026, Arm Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#  @par Reference(s):
+#  - Platform Security Firmware Update for the A-profile Specification 1.0
+#    (https://developer.arm.com/documentation/den0118/latest)
+#
+#  @par Glossary:
+#    - FW    - Firmware
+#    - FWU   - Firmware Update
+#    - PSA   - Platform Security update for the A-profile specification
+#    - FMP   - Firmware Management Protocol Device.
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = TsFmpDevicePsaFwuLib
+  FILE_GUID                      = 09C101A2-CB85-4F11-A467-88D863EF3E11
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpDeviceLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = FmpDevicePsaFwuLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  FmpDevicePsaFwuLib.c
+  PsaFwuLib.c
+  PsaFwuLib.h
+  PsaFwuTransport.c
+  PsaFwuTransport.h
+  TsFwuTransport.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmFfaLib
+  ArmFfaMemMgmtLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gPsaFwuUpdateAgentGuid                        ## CONSUMES
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
+  gEfiEventReadyToBootGuid                      ## CONSUMES             ## Event
+  gPsaFwuImageDirectoryGuid                     ## CONSUMES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdMmBufferSize
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpLowestSupportedVersion
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpVersion
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpVersionString
