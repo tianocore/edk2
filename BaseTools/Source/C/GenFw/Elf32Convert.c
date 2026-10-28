@@ -86,7 +86,6 @@ typedef Elf32_Dyn Elf_Dyn;
 //
 STATIC Elf_Ehdr *mEhdr;
 STATIC Elf_Shdr *mShdrBase;
-STATIC Elf_Phdr *mPhdrBase;
 
 //
 // Coff information
@@ -154,7 +153,6 @@ InitializeElf32 (
   // Update section header pointers
   //
   mShdrBase  = (Elf_Shdr *)((UINT8 *)mEhdr + mEhdr->e_shoff);
-  mPhdrBase = (Elf_Phdr *)((UINT8 *)mEhdr + mEhdr->e_phoff);
 
   //
   // Create COFF Section offset buffer and zero.
