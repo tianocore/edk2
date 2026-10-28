@@ -3048,6 +3048,31 @@ X509GetSignatureAlgorithm (
   );
 
 /**
+  Determine whether the provider supports signature verification with a public key.
+
+  Support is determined by the active cryptographic implementation, not by a
+  fixed list of algorithm identifiers. This function does not verify the
+  certificate signature, validity period, trust chain, or key usage. TRUE does
+  not guarantee support for every digest or signature scheme using the key;
+  callers must still validate the signed data and enforce enrollment policy.
+
+  @param[in]  Cert      Pointer to the DER-encoded X.509 certificate.
+  @param[in]  CertSize  Size of Cert in bytes.
+
+  @retval TRUE   The certificate was parsed and its subject public key supports
+                 signature verification in the active implementation.
+  @retval FALSE  Cert is NULL, CertSize is zero, the certificate cannot be
+                 parsed, or the provider cannot verify with its public key.
+  @retval FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509IsPublicKeySupported (
+  IN CONST UINT8  *Cert,
+  IN UINTN        CertSize
+  );
+
+/**
   Retrieve Extension data from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
