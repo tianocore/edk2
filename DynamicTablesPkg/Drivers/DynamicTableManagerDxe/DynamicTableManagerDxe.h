@@ -23,6 +23,14 @@
 /// The FADT table must be placed at index 0 in mAcpiVerifyTables.
 #define ACPI_TABLE_VERIFY_FADT  0
 
+/** ACPI Table generation event handle.
+*/
+extern EFI_EVENT  mAcpiEvent;
+
+/** SMBIOS Table generation event handle.
+*/
+extern EFI_EVENT  mSmbiosEvent;
+
 ///
 /// Private data structure to verify the presence of mandatory
 /// or optional ACPI tables.
