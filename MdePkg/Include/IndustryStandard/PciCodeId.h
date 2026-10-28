@@ -43,6 +43,14 @@
 ///@}
 
 ///
+/// PCI_CLASS_MEMORY_CONTROLLER, Base Class 05h.
+///
+///@{
+#define PCI_CLASS_MEMORY_CXL  0x02
+#define   PCI_IF_MEMORY_CXL   0x10
+///@}
+
+///
 /// PCI_CLASS_BRIDGE, Base Class 06h.
 ///
 ///@{
@@ -88,3 +96,10 @@
 ///@{
 #define PCI_CLASS_PROCESSING_ACCELERATOR  0x12
 ///@}
+
+///
+/// Macro that checks whether a device is a CXL memory device
+/// (Base Class 05h, Sub Class 02h, Prog IF 10h). _p points to the PCI
+/// configuration header.
+///
+#define IS_PCI_CXL(_p)  IS_CLASS3 (_p, PCI_CLASS_MEMORY_CONTROLLER, PCI_CLASS_MEMORY_CXL, PCI_IF_MEMORY_CXL)
