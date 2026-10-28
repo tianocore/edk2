@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -700,6 +700,24 @@ FwuOpen (
   *Handle = RespData->Handle;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Return the maximum write payload fitting in the communication buffer.
+
+  @return Maximum firmware payload size in bytes, excluding the parameter
+          header and fixed write-stream arguments, capped at MAX_UINT32.
+**/
+UINT32
+EFIAPI
+FwuGetMaxWriteSize (
+  VOID
+  )
+{
+  return (UINT32)MIN (
+                   FwuGetAvailableReqDataSize (PSA_MM_FWU_COMMAND_WRITE_STREAM),
+                   MAX_UINT32
+                   );
 }
 
 /**

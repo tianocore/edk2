@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -833,6 +833,7 @@ FmpDeviceSetImageWithStatus (
   UINT32      Updatable;
   UINT32      WriteBytes;
   UINT32      TotalBytes;
+  UINT32      MaxChunkSize;
   UINT32      Handle;
   UINT32      CommitProgress;
   UINT32      CommitTotalWorks;
@@ -849,6 +850,8 @@ FmpDeviceSetImageWithStatus (
     DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: FmpDeviceSetImageWithStatus - Check Image returned that the Image was not valid for update.  Updatable value = 0x%X.\n", Updatable));
     return EFI_ABORTED;
   }
+
+  MaxChunkSize = FwuGetMaxWriteSize ();
 
   if ((mFwuFlags & FWU_DISCOVER_FLAGS_PARTIAL_UPDATE_SUPPORT) ==
       FWU_DISCOVER_FLAGS_PARTIAL_UPDATE_SUPPORT)
@@ -893,10 +896,10 @@ FmpDeviceSetImageWithStatus (
   }
 
   TotalBytes = 0;
-  WriteBytes = MIN (ImageSize, mMaxPayloadSize);
+  WriteBytes = (UINT32)MIN (ImageSize, MaxChunkSize);
 
   do {
-    Status = FwuWriteStream (Handle, Image + TotalBytes, WriteBytes);
+    Status = FwuWriteStream (Handle, (CONST UINT8 *)Image + TotalBytes, WriteBytes);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -907,7 +910,7 @@ FmpDeviceSetImageWithStatus (
     }
 
     TotalBytes += WriteBytes;
-    WriteBytes  = MIN ((ImageSize - TotalBytes), mMaxPayloadSize);
+    WriteBytes  = (UINT32)MIN (ImageSize - TotalBytes, MaxChunkSize);
 
     /**
      * Set the progress percentage between 5% to 55%
