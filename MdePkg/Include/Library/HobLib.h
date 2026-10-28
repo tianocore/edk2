@@ -62,6 +62,29 @@ GetNextHob (
   );
 
 /**
+  Returns the next Resource Descriptor HOB from the starting HOB.
+
+  This function searches for the first Resource Descriptor HOB of either
+  EFI_HOB_TYPE_RESOURCE_DESCRIPTOR or EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2 from
+  the starting HOB pointer. If no Resource Descriptor HOB exists from the
+  starting HOB pointer, this function returns NULL. This function returns
+  HobStart if HobStart is a Resource Descriptor HOB. The caller must use
+  GET_NEXT_HOB() to skip the current HOB.
+
+  If HobStart is NULL, then ASSERT().
+
+  @param  HobStart      The starting HOB pointer to search from.
+
+  @return The next Resource Descriptor HOB from the starting HOB.
+
+**/
+VOID *
+EFIAPI
+GetNextResourceHob (
+  IN CONST VOID  *HobStart
+  );
+
+/**
   Returns the first instance of a HOB type among the whole HOB list.
 
   This function searches the first instance of a HOB type among the whole HOB list.
@@ -228,6 +251,31 @@ BuildResourceDescriptorHob (
   );
 
 /**
+Builds a HOB that describes a chunk of system memory with memory attributes.
+
+This function builds a HOB that describes a chunk of system memory.
+If there is no additional space for HOB creation, then ASSERT().
+
+@param  ResourceType               The type of resource described by this HOB.
+@param  ResourceCapabilities       The resource capabilities of the memory described by this HOB.
+@param  PhysicalStart              The 64 bit physical address of memory described by this HOB.
+@param  ResourceLength             The length of the memory described by this HOB in bytes.
+@param  ResourceMemoryAttributes   The memory attribute for the memory described by this HOB.
+@param  OwnerGuid                  GUID for the owner of this resource.
+
+**/
+VOID
+EFIAPI
+BuildResourceDescriptor2Hob (
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceCapabilities,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       ResourceLength,
+  IN UINT64                       ResourceMemoryAttributes,
+  IN EFI_GUID                     *OwnerGuid OPTIONAL
+  );
+
+/**
   Builds a customized HOB tagged with a GUID for identification and returns
   the start address of GUID HOB data.
 
@@ -245,7 +293,7 @@ BuildResourceDescriptorHob (
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
@@ -277,7 +325,7 @@ BuildGuidHob (
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
@@ -602,3 +650,19 @@ TagMemoryAllocationHobWithGuid (
 **/
 #define GET_GUID_HOB_DATA_SIZE(HobStart) \
   (UINT16)(GET_HOB_LENGTH (HobStart) - sizeof (EFI_HOB_GUID_TYPE))
+
+/**
+  Determines if a HOB is a Resource Descriptor HOB (v1 or v2).
+
+  This macro returns TRUE if the HOB specified by Hob is of type
+  EFI_HOB_TYPE_RESOURCE_DESCRIPTOR or EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2.
+
+  @param  Hob   A pointer to a HOB.
+
+  @retval TRUE   The HOB is a Resource Descriptor v1 or v2.
+  @retval FALSE  The HOB is not a Resource Descriptor.
+
+**/
+#define IS_RESOURCE_DESCRIPTOR_HOB(Hob)  \
+  ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) || \
+   (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2))
