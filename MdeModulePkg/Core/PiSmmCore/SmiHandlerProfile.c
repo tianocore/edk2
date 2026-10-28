@@ -113,25 +113,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED SMI_HANDLER_PROFILE_PROTOCOL  mSmiHandlerProfile =
 };
 
 /**
-  This function dump raw data.
-
-  @param  Data  raw data
-  @param  Size  raw data size
-**/
-VOID
-InternalDumpData (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < Size; Index++) {
-    DEBUG ((DEBUG_INFO, "%02x ", (UINTN)Data[Index]));
-  }
-}
-
-/**
   Get GUID name for an image.
 
   @param[in]  LoadedImage LoadedImage protocol.
@@ -403,9 +384,7 @@ DumpSmiChildContext (
       FreePool (Str);
     }
   } else {
-    DEBUG ((DEBUG_INFO, "  Context - "));
-    InternalDumpData (Context, ContextSize);
-    DEBUG ((DEBUG_INFO, "\n"));
+    DUMP_HEX (DEBUG_INFO, 0, Context, ContextSize, "  Context - ");
   }
 }
 

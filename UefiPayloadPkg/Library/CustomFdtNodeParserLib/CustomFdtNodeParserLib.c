@@ -80,8 +80,8 @@ FitIsHobNeed (
       }
     }
 
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
         return FALSE;
       }
     }
