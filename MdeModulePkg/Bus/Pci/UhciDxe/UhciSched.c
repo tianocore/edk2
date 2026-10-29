@@ -503,6 +503,18 @@ UhciCheckTdStatus (
       //
       Len = (TdHw->ActualLen + 1) & 0x7FF;
 
+      //
+      // A malfunctioning or malicious device can report an ActualLen larger
+      // than the length that was programmed into this TD. Clamp the reported
+      // length to the requested length so the accumulated transfer length can
+      // never exceed the caller's buffer, which would otherwise drive a
+      // device-controlled out-of-bounds write in the upper USB transport
+      // layers.
+      //
+      if (Len > Td->DataLen) {
+        Len = Td->DataLen;
+      }
+
       if (TdHw->PidCode != SETUP_PACKET_ID) {
         QhResult->Complete += Len;
       }
