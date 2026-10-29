@@ -469,6 +469,23 @@ DestroySpdmDeviceContext (
   IN SPDM_DEVICE_CONTEXT  *SpdmDeviceContext
   )
 {
+  LIST_ENTRY                    *Link;
+  SPDM_DEVICE_CONTEXT_INSTANCE  *Instance;
+
+  //
+  // Remove this context from the tracking list before freeing it, otherwise a
+  // later GetSpdmIoProtocolViaSpdmContext () would dereference freed memory.
+  //
+  Link = GetFirstNode (&mSpdmDeviceContextList);
+  while (!IsNull (&mSpdmDeviceContextList, Link)) {
+    Instance = SPDM_DEVICE_CONTEXT_INSTANCE_FROM_LINK (Link);
+    Link     = GetNextNode (&mSpdmDeviceContextList, Link);
+    if (Instance->SpdmDeviceContext == SpdmDeviceContext) {
+      RemoveEntryList (&Instance->Link);
+      FreePool (Instance);
+    }
+  }
+
   // need zero memory in case of secret in memory.
   if (SpdmDeviceContext->SpdmContext != NULL) {
     ZeroMem (SpdmDeviceContext->SpdmContext, SpdmDeviceContext->SpdmContextSize);
