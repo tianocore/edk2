@@ -867,16 +867,12 @@ Ip4FormExtractConfig (
   IP4_FORM_CALLBACK_INFO  *Private;
   IP4_CONFIG2_IFR_NVDATA  *IfrFormNvData;
   EFI_STRING              ConfigRequest;
-  BOOLEAN                 AllocatedRequest;
   EFI_STRING              FormResult;
 
   if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  ConfigRequest      = NULL;
-  AllocatedRequest   = FALSE;
-  ConfigRequest      = Request;
   Private            = IP4_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
   Ip4Config2Instance = IP4_CONFIG2_INSTANCE_FROM_FORM_CALLBACK (Private);
   *Progress          = Request;
@@ -912,8 +908,6 @@ Ip4FormExtractConfig (
       goto Failure;
     }
 
-    AllocatedRequest = TRUE;
-
     UnicodeSPrint (
       ConfigRequest,
       Size,
@@ -922,6 +916,8 @@ Ip4FormExtractConfig (
       (UINT64)sizeof (IP4_CONFIG2_IFR_NVDATA)
       );
     FreePool (ConfigRequestHdr);
+  } else {
+    ConfigRequest = Request;
   }
 
   //
@@ -941,7 +937,7 @@ Ip4FormExtractConfig (
   //
   // Free the allocated config request string.
   //
-  if (AllocatedRequest) {
+  if (ConfigRequest != Request) {
     FreePool (ConfigRequest);
     ConfigRequest = NULL;
   }
