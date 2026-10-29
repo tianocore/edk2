@@ -43,6 +43,10 @@
   FspWrapperApiLib
   TcgEventLogRecordLib
   HashLib
+  HobLib
+
+[Guids]
+  gFspImageBaseHobGuid                                               ## SOMETIMES_CONSUMES ## HOB
 
 [Ppis]
   gEdkiiTcgPpiGuid                                                   ## CONSUMES

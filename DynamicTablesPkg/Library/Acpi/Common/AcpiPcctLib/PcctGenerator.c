@@ -524,7 +524,7 @@ AddSubspaceStructType34 (
   ChannelTiming     = &GenericPccCmObj->ChannelTiming;
 
   ASSERT ((PccCmObj->PlatIrq.Flags & ~MAX_UINT8) == 0);
-  ASSERT ((GenericPccCmObj->AddressLength & ~MAX_UINT32) == 0);
+  ASSERT (GenericPccCmObj->AddressLength <= MAX_UINT32);
 
   PccAcpi->Type                   = GenericPccCmObj->Type;
   PccAcpi->Length                 = sizeof (EFI_ACPI_6_4_PCCT_SUBSPACE_3_EXTENDED_PCC);
