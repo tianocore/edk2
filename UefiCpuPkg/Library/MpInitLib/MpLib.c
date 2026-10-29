@@ -1389,10 +1389,17 @@ WakeUpAP (
           PcdGet32 (PcdCpuMaxLogicalProcessorNumber) - 1,
           PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds)
           );
+      }
 
-        while (CpuMpData->MpCpuExchangeInfo->NumApsExecuting != 0) {
-          CpuPause ();
-        }
+      //
+      // ApWakeupFunction() increments FinishedCount before decrementing
+      // NumApsExecuting (or before SevEsPlaceApHlt() decrements it prior to
+      // SVM_EXIT_AP_RESET_HOLD). Wait for NumApsExecuting to reach 0 before
+      // FreeResetVector() restores WakeupBuffer and CollectProcessorCount()
+      // sets InitFlag to ApInitDone.
+      //
+      while (CpuMpData->MpCpuExchangeInfo->NumApsExecuting != 0) {
+        CpuPause ();
       }
     } else {
       //
