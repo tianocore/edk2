@@ -150,20 +150,6 @@ if not defined WINSDK_PATH_FOR_RC_EXE (
 
 if /I "%1"=="VS2022" goto SetWinDDK
 
-:SetWinDDK
-if not defined WINDDK3790_PREFIX (
-  set WINDDK3790_PREFIX=C:\WINDDK\3790.1830\bin\
-)
-
-if not defined IASL_PREFIX (
-  if exist "C:\ASL\" (
-    set IASL_PREFIX=C:\ASL\
-  ) else (
-      @echo.
-      @echo !!! WARNING !!! IASL_PREFIX environment variable is not set
-  )
-)
-
 :SetVS2026
 if not defined VS180COMNTOOLS (
   @REM clear two envs so that vcvars32.bat can run successfully.

@@ -796,32 +796,43 @@ GeneratePciCrs (
         break;
 
       case PCI_SS_M32:
-        ASSERT ((AddrMapInfo->PciAddress & ~MAX_UINT32) == 0);
-        ASSERT (((AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & ~MAX_UINT32) == 0);
-        ASSERT (((Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & ~MAX_UINT32) == 0);
-        ASSERT ((AddrMapInfo->AddressSize & ~MAX_UINT32) == 0);
+        if ((AddrMapInfo->AddressSize == 0) ||
+            (AddrMapInfo->PciAddress > MAX_UINT32) ||
+            ((AddrMapInfo->AddressSize - 1) >
+             (MAX_UINT32 - AddrMapInfo->PciAddress)))
+        {
+          Status = EFI_INVALID_PARAMETER;
+          break;
+        }
 
-        Status = AmlCodeGenRdDWordMemory (
-                   FALSE,
-                   IsPosDecode,
-                   TRUE,
-                   TRUE,
-                   AmlMemoryCacheable,
-                   TRUE,
-                   0,
-                   (UINT32)(AddrMapInfo->PciAddress),
-                   (UINT32)(AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1),
-                   (UINT32)(Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0),
-                   (UINT32)(AddrMapInfo->AddressSize),
-                   0,
-                   NULL,
-                   AmlAddressRangeMemory,
-                   TRUE,
-                   CrsNode,
-                   NULL
-                   );
-        break;
+        // Use the QWord descriptor of PCI_SS_M64 if the range length or the
+        // translation offset does not fit the DWord descriptor.
+        if ((AddrMapInfo->AddressSize <= MAX_UINT32) &&
+            ((AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress) <= MAX_UINT32))
+        {
+          Status = AmlCodeGenRdDWordMemory (
+                     FALSE,
+                     IsPosDecode,
+                     TRUE,
+                     TRUE,
+                     AmlMemoryCacheable,
+                     TRUE,
+                     0,
+                     (UINT32)(AddrMapInfo->PciAddress),
+                     (UINT32)(AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1),
+                     (UINT32)(Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0),
+                     (UINT32)(AddrMapInfo->AddressSize),
+                     0,
+                     NULL,
+                     AmlAddressRangeMemory,
+                     TRUE,
+                     CrsNode,
+                     NULL
+                     );
+          break;
+        }
 
+      // Fall through.
       case PCI_SS_M64:
         Status = AmlCodeGenRdQWordMemory (
                    FALSE,
@@ -868,31 +879,43 @@ GeneratePciCrs (
                    );
         break;
       case PCI_SS_M32_UC:
-        ASSERT ((AddrMapInfo->PciAddress & ~MAX_UINT32) == 0);
-        ASSERT (((AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & ~MAX_UINT32) == 0);
-        ASSERT (((Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & ~MAX_UINT32) == 0);
-        ASSERT ((AddrMapInfo->AddressSize & ~MAX_UINT32) == 0);
+        if ((AddrMapInfo->AddressSize == 0) ||
+            (AddrMapInfo->PciAddress > MAX_UINT32) ||
+            ((AddrMapInfo->AddressSize - 1) >
+             (MAX_UINT32 - AddrMapInfo->PciAddress)))
+        {
+          Status = EFI_INVALID_PARAMETER;
+          break;
+        }
 
-        Status = AmlCodeGenRdDWordMemory (
-                   FALSE,
-                   IsPosDecode,
-                   TRUE,
-                   TRUE,
-                   AmlMemoryNonCacheable,
-                   TRUE,
-                   0,
-                   (UINT32)(AddrMapInfo->PciAddress),
-                   (UINT32)(AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1),
-                   (UINT32)(Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0),
-                   (UINT32)(AddrMapInfo->AddressSize),
-                   0,
-                   NULL,
-                   AmlAddressRangeMemory,
-                   TRUE,
-                   CrsNode,
-                   NULL
-                   );
-        break;
+        // Use the QWord descriptor of PCI_SS_M64_UC if the range length or the
+        // translation offset does not fit the DWord descriptor.
+        if ((AddrMapInfo->AddressSize <= MAX_UINT32) &&
+            ((AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress) <= MAX_UINT32))
+        {
+          Status = AmlCodeGenRdDWordMemory (
+                     FALSE,
+                     IsPosDecode,
+                     TRUE,
+                     TRUE,
+                     AmlMemoryNonCacheable,
+                     TRUE,
+                     0,
+                     (UINT32)(AddrMapInfo->PciAddress),
+                     (UINT32)(AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1),
+                     (UINT32)(Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0),
+                     (UINT32)(AddrMapInfo->AddressSize),
+                     0,
+                     NULL,
+                     AmlAddressRangeMemory,
+                     TRUE,
+                     CrsNode,
+                     NULL
+                     );
+          break;
+        }
+
+      // Fall through.
       case PCI_SS_M64_UC:
         Status = AmlCodeGenRdQWordMemory (
                    FALSE,
