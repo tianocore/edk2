@@ -877,9 +877,7 @@ Ip4FormExtractConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  IfrFormNvData      = NULL;
   ConfigRequest      = NULL;
-  FormResult         = NULL;
   Size               = 0;
   AllocatedRequest   = FALSE;
   ConfigRequest      = Request;
