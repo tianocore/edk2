@@ -2673,10 +2673,10 @@ UpdateDeletePage (
             );
         }
       }
-
-      ItemDataSize -= CertList->SignatureListSize;
-      CertList      = (EFI_SIGNATURE_LIST *)((UINT8 *)CertList + CertList->SignatureListSize);
     }
+
+    ItemDataSize -= CertList->SignatureListSize;
+    CertList      = (EFI_SIGNATURE_LIST *)((UINT8 *)CertList + CertList->SignatureListSize);
   }
 
 ON_EXIT:
