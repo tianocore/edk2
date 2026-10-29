@@ -228,6 +228,83 @@ edk2-platforms repository.
 
 **Companion PR**: None required; no edk2-platforms consumer was identified.
 
+##### Breaking Change: Add Configuration Manager and generator parameters to BuildSsdtSerialPortTable
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13418](https://github.com/tianocore/edk2/issues/13418)
+- **Pull Request**: [tianocore/edk2#13417](https://github.com/tianocore/edk2/pull/13417)
+- **Type**: Source-Level (Non-removal) - API signature change
+
+**What changed**: `BuildSsdtSerialPortTable ()` of the `SsdtSerialPortFixupLib`
+library class takes the Configuration Manager protocol and the calling generator
+as two new leading parameters. The serial port SSDT built by it now gets its OEM
+ID, OEM table ID and OEM revision in the same way as the other tables whose
+header is built by `AddSsdtAcpiHeader ()`, instead of `ARMLTD`/`SERIAL` from
+the AML template (common implementation) or `AMDINC`/`SERIAL` (X64 implementation).
+
+**Old signature**:
+
+```c
+EFI_STATUS
+EFIAPI
+BuildSsdtSerialPortTable (
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO       *AcpiTableInfo,
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo,
+  IN  CONST CHAR8                            *Name,
+  IN  CONST UINT64                           Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER      **Table
+  );
+```
+
+**New signature**:
+
+```c
+EFI_STATUS
+EFIAPI
+BuildSsdtSerialPortTable (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO                    *AcpiTableInfo,
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO               *SerialPortInfo,
+  IN  CONST CHAR8                                         *Name,
+  IN  CONST UINT64                                        Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER                   **Table
+  );
+```
+
+**Why it changed**: The OEM information of the serial port SSDT came from the
+AML template or was hardcoded, so the platform could not set it.
+`AddSsdtAcpiHeader ()` needs the Configuration Manager protocol and the
+generator to build the header.
+
+**What replaces it**: The same function with the new signature.
+
+**How to migrate**: Pass the Configuration Manager protocol and the calling
+generator as the first two parameters, for example in a generator's
+`BuildAcpiTable` or `BuildAcpiTableEx` function:
+
+```c
+Status = BuildSsdtSerialPortTable (
+           CfgMgrProtocol,
+           This,
+           AcpiTableInfo,
+           SerialPortInfo,
+           Name,
+           Uid,
+           &Table
+           );
+```
+
+No new library class mapping is required: `SsdtSerialPortFixupLib` now depends
+on `TableHelperLib`, which `DynamicTableFactoryDxe` already requires.
+
+**Breaking conditions**: This affects out-of-tree code that calls
+`BuildSsdtSerialPortTable ()`. All callers in edk2 (SPCR, DBG2 and SSDT serial
+port generators) are updated. No consumer was found in the current edk2-platforms
+repository.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
+
 ### edk2-stable202611: Behavioral Breaking Changes
 
 ##### Breaking Change: IntelTdxX64 enables Secure Boot and omits the UEFI Shell by default
