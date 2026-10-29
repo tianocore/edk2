@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -330,6 +330,8 @@ FmpPsaReadyToBootEvent (
   Status = FwuAcceptImage (&gEfiCallerIdGuid);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: Failed to accept the image: %g\n", &gEfiCallerIdGuid));
+  } else {
+    gBS->CloseEvent (Event);
   }
 
   /**
