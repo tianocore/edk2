@@ -866,18 +866,15 @@ Ip4FormExtractConfig (
   IP4_CONFIG2_INSTANCE    *Ip4Config2Instance;
   IP4_FORM_CALLBACK_INFO  *Private;
   IP4_CONFIG2_IFR_NVDATA  *IfrFormNvData;
-  EFI_STRING              ConfigRequestHdr;
   EFI_STRING              ConfigRequest;
   BOOLEAN                 AllocatedRequest;
   EFI_STRING              FormResult;
-  UINTN                   Size;
 
   if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ConfigRequest      = NULL;
-  Size               = 0;
   AllocatedRequest   = FALSE;
   ConfigRequest      = Request;
   Private            = IP4_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
@@ -899,6 +896,9 @@ Ip4FormExtractConfig (
   Ip4Config2ConvertConfigNvDataToIfrNvData (Ip4Config2Instance, IfrFormNvData);
 
   if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    EFI_STRING  ConfigRequestHdr;
+    UINTN       Size;
+
     //
     // Request has no request element, construct full request string.
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
