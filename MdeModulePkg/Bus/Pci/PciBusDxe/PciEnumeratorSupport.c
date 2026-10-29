@@ -1662,6 +1662,22 @@ UpdatePciInfo (
         if (Ptr->AddrLen != 0) {
           PciIoDevice->PciBar[BarIndex].Length = Ptr->AddrLen;
         }
+
+        //
+        // When both _MIF (BIT2) and _MAF (BIT3) are set in GenFlag the
+        // descriptor carries a fixed base address in AddrRangeMin. Mark the
+        // BAR fixed so that the resource allocator does not assign it.
+        //
+        if ((Ptr->GenFlag & (BIT2 | BIT3)) == (BIT2 | BIT3)) {
+          PciIoDevice->PciBar[BarIndex].AddressFixed = TRUE;
+          PciIoDevice->PciBar[BarIndex].BaseAddress  = Ptr->AddrRangeMin;
+          DEBUG ((
+            DEBUG_INFO,
+            "PciBus: UpdatePciInfo BAR[%u] fixed address=0x%016Lx\n",
+            (UINT32)BarIndex,
+            Ptr->AddrRangeMin
+            ));
+        }
       }
     }
 
@@ -1989,9 +2005,10 @@ PciParseBar (
     return Offset + 4;
   }
 
-  PciIoDevice->PciBar[BarIndex].BarTypeFixed = FALSE;
-  PciIoDevice->PciBar[BarIndex].AddressFixed = FALSE;
-  PciIoDevice->PciBar[BarIndex].Offset       = (UINT8)Offset;
+  PciIoDevice->PciBar[BarIndex].BarTypeFixed      = FALSE;
+  PciIoDevice->PciBar[BarIndex].AddressFixed      = FALSE;
+  PciIoDevice->PciBar[BarIndex].AddressProgrammed = FALSE;
+  PciIoDevice->PciBar[BarIndex].Offset            = (UINT8)Offset;
   if ((Value & 0x01) != 0) {
     //
     // Device I/Os
@@ -2485,10 +2502,11 @@ PciParseEnhancedAllocation (
     // The address is fixed, so the alignment is merely informational: use the
     // natural alignment of the base address.
     //
-    Bar->Alignment    = (Base == 0) ? 0 : (LShiftU64 (1, LowBitSet64 (Base)) - 1);
-    Bar->BarType      = BarType;
-    Bar->BarTypeFixed = TRUE;
-    Bar->AddressFixed = TRUE;
+    Bar->Alignment         = (Base == 0) ? 0 : (LShiftU64 (1, LowBitSet64 (Base)) - 1);
+    Bar->BarType           = BarType;
+    Bar->BarTypeFixed      = TRUE;
+    Bar->AddressFixed      = TRUE;
+    Bar->AddressProgrammed = TRUE;
 
     DEBUG ((
       DEBUG_INFO,

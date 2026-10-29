@@ -98,10 +98,19 @@ struct _PCI_BAR {
   PCI_BAR_TYPE    BarType;
   BOOLEAN         BarTypeFixed;
   //
-  // TRUE if the BAR is described by an Enhanced Allocation entry, meaning
-  // its BaseAddress is fixed by hardware and must not be reassigned.
+  // TRUE if the BAR is described by an Enhanced Allocation entry or by a
+  // platform supplied fixed address descriptor through
+  // EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL, meaning its BaseAddress
+  // is fixed and must not be reassigned.
   //
   BOOLEAN         AddressFixed;
+  //
+  // TRUE if the BAR register already holds BaseAddress, as for a BAR described
+  // by an Enhanced Allocation entry whose hardware decodes the fixed range
+  // itself. FALSE if BaseAddress comes from a platform supplied descriptor and
+  // must be written to the BAR register.
+  //
+  BOOLEAN         AddressProgrammed;
   UINT16          Offset;
 };
 
