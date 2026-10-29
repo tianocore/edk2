@@ -909,7 +909,7 @@ Ip4FormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    Size             = (StrLen (ConfigRequestHdr) * sizeof (CHAR16)) + sizeof (L"&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW");
     ConfigRequest    = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
