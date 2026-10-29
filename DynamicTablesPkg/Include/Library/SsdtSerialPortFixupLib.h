@@ -12,6 +12,9 @@
 
   The table created by this function must be freed by FreeSsdtSerialTable.
 
+  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager protocol
+                                interface.
+  @param [in]  Generator        Pointer to the ACPI table Generator.
   @param [in]  AcpiTableInfo    Pointer to the ACPI table information.
   @param [in]  SerialPortInfo   Serial port to describe in the SSDT table.
   @param [in]  Name             The Name to give to the Device.
@@ -28,11 +31,13 @@
 EFI_STATUS
 EFIAPI
 BuildSsdtSerialPortTable (
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO       *AcpiTableInfo,
-  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo,
-  IN  CONST CHAR8                            *Name,
-  IN  CONST UINT64                           Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER      **Table
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO                    *AcpiTableInfo,
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO               *SerialPortInfo,
+  IN  CONST CHAR8                                         *Name,
+  IN  CONST UINT64                                        Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER                   **Table
   );
 
 /** Free an SSDT table previously created by
