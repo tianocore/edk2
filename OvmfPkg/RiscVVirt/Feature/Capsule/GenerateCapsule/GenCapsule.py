@@ -325,8 +325,28 @@ if __name__ == '__main__':
     #
     Copy ((EdkiiBuildOutput, UefiArch, 'CapsuleApp.efi'), (CapsulesPath, CapsulesSubDir))
 
+    # Default firmware revision and LSV(LowestSupportedVersion)
+    FwRevision = 0x00010000
+    Lsv = 0x00000000
+
+    # Override from -D FIRMWARE_REVISION= / -D LSV= if provided
+    if gArgs.Define:
+        for define_group in gArgs.Define:
+            for item in define_group:
+                if '=' in item:
+                    name, val = item.split('=', 1)
+                    name = name.strip()
+                    val = val.strip()
+                    try:
+                        if name == 'FIRMWARE_REVISION':
+                            FwRevision = int(val, 0)
+                        elif name == 'LSV':
+                            Lsv = int(val, 0)
+                    except ValueError:
+                        Error('Invalid %s value: %s' % (name, val))
+
     #
     # Generate capsules for RiscVVirt Firmware Updates
     #
     CodeFW = os.path.join (EdkiiBuildOutput, 'FV', 'RISCV_VIRT_CODE.fd')
-    GenCapsuleDevice('RISCVVIRT', CodeFW,'bcbacac2-1d1d-4c14-89a3-5e27496b702d',0x00010000,0x00000000, CapsulesPath, CapsulesSubDir)
+    GenCapsuleDevice('RISCVVIRT', CodeFW,'bcbacac2-1d1d-4c14-89a3-5e27496b702d',FwRevision,Lsv, CapsulesPath, CapsulesSubDir)
