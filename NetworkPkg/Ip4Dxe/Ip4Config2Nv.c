@@ -871,7 +871,6 @@ Ip4FormExtractConfig (
   BOOLEAN                 AllocatedRequest;
   EFI_STRING              FormResult;
   UINTN                   Size;
-  UINTN                   BufferSize;
 
   if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -883,7 +882,6 @@ Ip4FormExtractConfig (
   ConfigRequest      = Request;
   Private            = IP4_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
   Ip4Config2Instance = IP4_CONFIG2_INSTANCE_FROM_FORM_CALLBACK (Private);
-  BufferSize         = sizeof (IP4_CONFIG2_IFR_NVDATA);
   *Progress          = Request;
 
   //
@@ -916,7 +914,13 @@ Ip4FormExtractConfig (
 
     AllocatedRequest = TRUE;
 
-    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    UnicodeSPrint (
+      ConfigRequest,
+      Size,
+      L"%s&OFFSET=0&WIDTH=%016LX",
+      ConfigRequestHdr,
+      (UINT64)sizeof (IP4_CONFIG2_IFR_NVDATA)
+      );
     FreePool (ConfigRequestHdr);
   }
 
@@ -927,7 +931,7 @@ Ip4FormExtractConfig (
                                 gHiiConfigRouting,
                                 ConfigRequest,
                                 (UINT8 *)IfrFormNvData,
-                                BufferSize,
+                                sizeof (IP4_CONFIG2_IFR_NVDATA),
                                 &FormResult,
                                 Progress
                                 );
