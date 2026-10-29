@@ -189,7 +189,6 @@ BaseTools
 F: BaseTools/
 W: https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/base_tools.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 M: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
 R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
@@ -246,13 +245,11 @@ F: FmpDevicePkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/fmp_device_pkg.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
-R: Wei6 Xu <wei6.xu@intel.com> [xuweiintel]
 
 IntelFsp2Pkg
 F: IntelFsp2Pkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_pkg.html
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
@@ -280,7 +277,6 @@ MdeModulePkg: ACPI modules
 F: MdeModulePkg/Include/*Acpi*.h
 F: MdeModulePkg/Universal/Acpi/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: George Liao <george.liao@intel.com> [GeorgeLiao012]
 
@@ -293,7 +289,6 @@ F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -346,7 +341,6 @@ MdeModulePkg: Disk modules
 F: MdeModulePkg/Include/Library/GptLib.h
 F: MdeModulePkg/Library/GptLib/
 F: MdeModulePkg/Universal/Disk/
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Richard Lyu <richard.lyu@suse.com> [r1chard-lyu]
 
 MdeModulePkg: Firmware Update modules
@@ -375,7 +369,6 @@ F: MdeModulePkg/Library/CustomizedDisplayLib/
 F: MdeModulePkg/Universal/DisplayEngineDxe/
 F: MdeModulePkg/Universal/DriverSampleDxe/
 F: MdeModulePkg/Universal/SetupBrowserDxe/
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Management Mode (MM, SMM) modules
 F: MdeModulePkg/*Smi*/
@@ -383,7 +376,6 @@ F: MdeModulePkg/*Smm*/
 F: MdeModulePkg/Include/*Smi*.h
 F: MdeModulePkg/Include/*Smm*.h
 R: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 MdeModulePkg: Pei Core
@@ -395,7 +387,6 @@ R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 MdeModulePkg: SMBIOS modules
 F: MdeModulePkg/Universal/Smbios*/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 MdeModulePkg: UEFI Variable modules
@@ -618,7 +609,7 @@ R: Qihang Gao <gaoqihang@loongson.cn> [EricGao2015]
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/pc_at_chipset_pkg.html
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 PrmPkg
 F: PrmPkg/
@@ -646,7 +637,6 @@ SecurityPkg: Secure boot related modules
 F: SecurityPkg/Library/DxeImageVerificationLib/
 F: SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/
 F: SecurityPkg/Library/AuthVariableLib/
-R: Min Xu <min.m.xu@intel.com> [mxu9]
 
 SecurityPkg: Tcg related modules
 F: SecurityPkg/Tcg/
@@ -679,12 +669,9 @@ StandaloneMmPkg
 F: StandaloneMmPkg/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 R: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
-R: Dun Tan <dun.tan@intel.com> [td36]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
-R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 TcgTpmPkg
 F: TcgTpmPkg/
@@ -694,14 +681,11 @@ M: Yeoreum Yun <yeoreum.yun@arm.com> [LeviYeoReum]
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/uefi_cpu_pkg.html
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
+M: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
-R: Dun Tan <dun.tan@intel.com> [td36]
 R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
-R: Star Zeng <star.zeng@intel.com> [lzeng14]
-R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg: AMD related files
 F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
@@ -717,7 +701,6 @@ M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
-R: Shuo Liu <shuo.liu@intel.com> [shuoliu0]
 S: Maintained
 
 UnitTestFrameworkPkg
