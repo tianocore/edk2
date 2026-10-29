@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 
 typedef struct _USB_MASS_TRANSPORT  USB_MASS_TRANSPORT;
 typedef struct _USB_MASS_DEVICE     USB_MASS_DEVICE;
@@ -180,4 +181,11 @@ struct _USB_MASS_DEVICE {
   EFI_DISK_INFO_PROTOCOL      DiskInfo;
   USB_BOOT_INQUIRY_DATA       InquiryData;
   BOOLEAN                     Cdb16Byte;
+
+  //
+  // Read-failure tracking for current enumeration instance. StickyNoMedia is set
+  // only when PcdUsbMassStorageMaxConsecutiveReadErrors is a positive threshold.
+  //
+  UINTN                       ConsecutiveReadErrorCount;
+  BOOLEAN                     StickyNoMedia;
 };

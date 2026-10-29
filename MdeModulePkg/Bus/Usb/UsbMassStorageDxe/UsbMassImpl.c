@@ -111,6 +111,8 @@ UsbMassReadBlocks (
   VOID                *OriginalBuffer;
   EFI_LBA             OriginalLba;
   UINTN               OriginalBufferSize;
+  UINT32              MaxConsecutiveReadErrors;
+  BOOLEAN             FatalReadError;
 
   //
   // Raise TPL to TPL_CALLBACK to serialize all its operations
@@ -120,10 +122,27 @@ UsbMassReadBlocks (
   UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Media   = &UsbMass->BlockIoMedia;
 
+  //
+  // Once this non-removable device has been promoted to "no media" for this
+  // boot/enumeration, fail fast so upper layers stop probing the broken medium.
+  // Removable media must still run media detection below so replacement media
+  // can clear StickyNoMedia in the same driver binding instance.
+  //
+  if (UsbMass->StickyNoMedia && !Media->RemovableMedia) {
+    Status = EFI_NO_MEDIA;
+    goto ON_EXIT;
+  }
+
   ResetRetryCount    = 3;
   OriginalBuffer     = Buffer;
   OriginalBufferSize = BufferSize;
   OriginalLba        = Lba;
+
+  //
+  // PcdUsbMassStorageMaxConsecutiveReadErrors controls no-media promotion:
+  // zero disables it; a positive value is the consecutive read error threshold.
+  //
+  MaxConsecutiveReadErrors = PcdGet32 (PcdUsbMassStorageMaxConsecutiveReadErrors);
 
   while (ResetRetryCount >= 0) {
     Buffer     = OriginalBuffer;
@@ -137,6 +156,11 @@ UsbMassReadBlocks (
     //
     if (Media->RemovableMedia) {
       Status = UsbBootDetectMedia (UsbMass);
+      if (UsbMass->StickyNoMedia && Media->MediaPresent) {
+        UsbMass->StickyNoMedia             = FALSE;
+        UsbMass->ConsecutiveReadErrorCount = 0;
+      }
+
       if (EFI_ERROR (Status)) {
         goto ON_EXIT;
       }
@@ -186,13 +210,58 @@ UsbMassReadBlocks (
       Status = UsbBootReadWriteBlocks (UsbMass, FALSE, (UINT32)Lba, TotalBlock, Buffer);
     }
 
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
-      UsbMassReset (This, TRUE);
-      ResetRetryCount--;
-    } else {
+    if (!EFI_ERROR (Status)) {
+      UsbMass->ConsecutiveReadErrorCount = 0;
       break;
     }
+
+    FatalReadError = (BOOLEAN)((Status != EFI_NO_MEDIA) &&
+                               (Status != EFI_MEDIA_CHANGED));
+    if (!FatalReadError) {
+      UsbMass->ConsecutiveReadErrorCount = 0;
+    } else {
+      UsbMass->ConsecutiveReadErrorCount++;
+    }
+
+    DEBUG ((
+      DEBUG_ERROR,
+      "UsbMassReadBlocks: MediaId:0x%x UsbBootReadBlocks (%r) "
+      "Lba=0x%Lx Blocks=0x%Lx Consecutive=%u -> Reset\n",
+      MediaId,
+      Status,
+      (UINT64)Lba,
+      (UINT64)TotalBlock,
+      (UINT32)UsbMass->ConsecutiveReadErrorCount
+      ));
+
+    //
+    // Keep existing local recovery attempt. This tree intentionally leaves the
+    // port reset disabled, so honor that decision and do not re-enable it here.
+    //
+    UsbMassReset (This, TRUE);
+
+    if (FatalReadError &&
+        (MaxConsecutiveReadErrors > 0) &&
+        (UsbMass->ConsecutiveReadErrorCount >= (UINTN)MaxConsecutiveReadErrors))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "UsbMassReadBlocks: promote repeated read failure to EFI_NO_MEDIA "
+        "(ReadStatus=%r Count=%u Threshold=%u)\n",
+        Status,
+        (UINT32)UsbMass->ConsecutiveReadErrorCount,
+        MaxConsecutiveReadErrors
+        ));
+
+      UsbMass->StickyNoMedia             = TRUE;
+      UsbMass->ConsecutiveReadErrorCount = 0;
+      Media->MediaPresent                = FALSE;
+      Media->LastBlock                   = 0;
+      Status                             = EFI_NO_MEDIA;
+      goto ON_EXIT;
+    }
+
+    ResetRetryCount--;
   }
 
 ON_EXIT:
@@ -310,7 +379,7 @@ UsbMassWriteBlocks (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbMassWriteBlocks: MediaId:0x%x UsbBootWriteBlocks (%r) -> Reset\n", MediaId, Status));
     UsbMassReset (This, TRUE);
   }
 
@@ -371,6 +440,9 @@ UsbMassInitMedia (
   Media->WriteCaching     = FALSE;
   Media->IoAlign          = 0;
   Media->MediaId          = 1;
+
+  UsbMass->StickyNoMedia             = FALSE;
+  UsbMass->ConsecutiveReadErrorCount = 0;
 
   Status = UsbBootGetParams (UsbMass);
   DEBUG ((DEBUG_INFO, "UsbMassInitMedia: UsbBootGetParams (%r)\n", Status));
