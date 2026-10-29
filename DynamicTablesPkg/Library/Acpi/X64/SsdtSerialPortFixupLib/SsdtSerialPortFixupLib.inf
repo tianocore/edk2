@@ -27,6 +27,7 @@
   AcpiHelperLib
   AmlLib
   BaseLib
+  TableHelperLib
 
 [Pcd]
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid

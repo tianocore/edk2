@@ -30,6 +30,7 @@
 #include <ConfigurationManagerHelper.h>
 #include <Library/AcpiHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
+#include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 /** UART address range length.
@@ -282,6 +283,9 @@ CreateSerialPortCrs (
 
   The table created by this function must be freed by FreeSsdtSerialTable.
 
+  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager protocol
+                                interface.
+  @param [in]  Generator        Pointer to the ACPI table Generator.
   @param [in]  AcpiTableInfo    Pointer to the ACPI table information.
   @param [in]  SerialPortInfo   Serial port to describe in the SSDT table.
   @param [in]  Name             The Name to give to the Device.
@@ -298,11 +302,13 @@ CreateSerialPortCrs (
 EFI_STATUS
 EFIAPI
 BuildSsdtSerialPortTable (
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO       *AcpiTableInfo,
-  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo,
-  IN  CONST CHAR8                            *Name,
-  IN  CONST UINT64                           Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER      **Table
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO                    *AcpiTableInfo,
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO               *SerialPortInfo,
+  IN  CONST CHAR8                                         *Name,
+  IN  CONST UINT64                                        Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER                   **Table
   )
 {
   AML_OBJECT_NODE_HANDLE  DeviceNode;
@@ -313,6 +319,8 @@ BuildSsdtSerialPortTable (
   EFI_STATUS              Status1;
   UINT32                  EisaId;
 
+  ASSERT (CfgMgrProtocol != NULL);
+  ASSERT (Generator != NULL);
   ASSERT (AcpiTableInfo != NULL);
   ASSERT (SerialPortInfo != NULL);
   ASSERT (Name != NULL);
@@ -324,11 +332,10 @@ BuildSsdtSerialPortTable (
     return Status;
   }
 
-  Status = AmlCodeGenDefinitionBlock (
-             "SSDT",
-             "AMDINC",
-             "SERIAL",
-             0x01,
+  Status = AddSsdtAcpiHeader (
+             CfgMgrProtocol,
+             Generator,
+             AcpiTableInfo,
              &RootNode
              );
   if (EFI_ERROR (Status)) {

@@ -687,6 +687,8 @@ BuildSpcrTableEx (
 
   // Build a SSDT table describing the serial port.
   Status = BuildSsdtSerialPortTable (
+             CfgMgrProtocol,
+             This,
              AcpiTableInfo,
              SerialPortInfo,
              NAME_STR_SPCR_PORT,
