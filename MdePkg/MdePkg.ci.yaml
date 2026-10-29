@@ -231,6 +231,7 @@
             "screl",            # Cpucfg.h
             "sence",            # Atapi.h
             "sigle",            # SmBios.h
+            "tlbrprmd",         # Csr.h
             "toleremce",        # IpmiNetFnStorage.h
             "unownered",        # TcgPhysicalPresence.h
             "vfrecipe",         # Cpucfg.h

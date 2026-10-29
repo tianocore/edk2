@@ -1,0 +1,39 @@
+## @file
+# Unit tests for PEI Core page allocation.
+#
+# Builds the host-based test application that exercises AllocatePages() against
+# synthetic HOB lists and verifies freed-range reuse and fallback behavior.
+#
+# Copyright (c) 2026, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = PeiMemoryServicesGoogleTest
+  FILE_GUID      = 28D287A7-50AC-4A49-AB33-76FC0A392784
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+[Sources]
+  GoogleTest/PeiMemoryServicesGoogleTest.cpp
+  Memory/MemoryServices.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable

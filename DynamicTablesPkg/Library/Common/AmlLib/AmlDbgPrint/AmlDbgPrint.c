@@ -224,8 +224,6 @@ AmlDbgPrintDataNode (
   IN  UINT8          Level
   )
 {
-  UINT32  Idx;
-
   if (!IS_AML_DATA_NODE (DataNode)) {
     ASSERT (0);
     return;
@@ -274,9 +272,7 @@ AmlDbgPrintDataNode (
     }
   } else {
     // No specific format.
-    for (Idx = 0; Idx < DataNode->Size; Idx++) {
-      DEBUG ((DEBUG_INFO, "%02x ", DataNode->Buffer[Idx]));
-    }
+    DUMP_HEX (DEBUG_INFO, 0, DataNode->Buffer, DataNode->Size, "");
   }
 
   DEBUG ((DEBUG_INFO, "\n"));
@@ -494,69 +490,6 @@ AmlDbgPrintTree (
 {
   AmlDbgPrintTableHeader ();
   AmlDbgPrintTreeInternal (Node, TRUE, 0);
-}
-
-/** This function performs a raw data dump of the ACPI table.
-
-  @param  [in]  Ptr     Pointer to the start of the table buffer.
-  @param  [in]  Length  The length of the buffer.
-**/
-VOID
-EFIAPI
-AmlDbgDumpRaw (
-  IN  CONST UINT8   *Ptr,
-  IN        UINT32  Length
-  )
-{
-  UINT32  ByteCount;
-  UINT32  PartLineChars;
-  UINT32  AsciiBufferIndex;
-  CHAR8   AsciiBuffer[17];
-
-  ByteCount        = 0;
-  AsciiBufferIndex = 0;
-
-  DEBUG ((DEBUG_VERBOSE, "Address  : 0x%p\n", Ptr));
-  DEBUG ((DEBUG_VERBOSE, "Length   : %lld", Length));
-
-  while (ByteCount < Length) {
-    if ((ByteCount & 0x0F) == 0) {
-      AsciiBuffer[AsciiBufferIndex] = '\0';
-      DEBUG ((DEBUG_VERBOSE, "  %a\n%08X : ", AsciiBuffer, ByteCount));
-      AsciiBufferIndex = 0;
-    } else if ((ByteCount & 0x07) == 0) {
-      DEBUG ((DEBUG_VERBOSE, "- "));
-    }
-
-    if ((*Ptr >= ' ') && (*Ptr < 0x7F)) {
-      AsciiBuffer[AsciiBufferIndex++] = *Ptr;
-    } else {
-      AsciiBuffer[AsciiBufferIndex++] = '.';
-    }
-
-    DEBUG ((DEBUG_VERBOSE, "%02X ", *Ptr++));
-
-    ByteCount++;
-  }
-
-  // Justify the final line using spaces before printing
-  // the ASCII data.
-  PartLineChars = (Length & 0x0F);
-  if (PartLineChars != 0) {
-    PartLineChars = 48 - (PartLineChars * 3);
-    if ((Length & 0x0F) <= 8) {
-      PartLineChars += 2;
-    }
-
-    while (PartLineChars > 0) {
-      DEBUG ((DEBUG_VERBOSE, " "));
-      PartLineChars--;
-    }
-  }
-
-  // Print ASCII data for the final line.
-  AsciiBuffer[AsciiBufferIndex] = '\0';
-  DEBUG ((DEBUG_VERBOSE, "  %a\n\n", AsciiBuffer));
 }
 
 #endif // MDEPKG_NDEBUG
