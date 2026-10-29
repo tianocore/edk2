@@ -152,23 +152,24 @@ PlatformRegisterOptionsAndKeys (
   Esc.ScanCode    = SCAN_ESC;
   Esc.UnicodeChar = CHAR_NULL;
   Status          = EfiBootManagerGetBootManagerMenu (&BootOption);
-  ASSERT_EFI_ERROR (Status);
-  Status = EfiBootManagerAddKeyOptionVariable (
-             NULL,
-             (UINT16)BootOption.OptionNumber,
-             0,
-             &F2,
-             NULL
-             );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
-  Status = EfiBootManagerAddKeyOptionVariable (
-             NULL,
-             (UINT16)BootOption.OptionNumber,
-             0,
-             &Esc,
-             NULL
-             );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  if (!EFI_ERROR (Status)) {
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               (UINT16)BootOption.OptionNumber,
+               0,
+               &F2,
+               NULL
+               );
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               (UINT16)BootOption.OptionNumber,
+               0,
+               &Esc,
+               NULL
+               );
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  }
 }
 
 EFI_STATUS
@@ -288,14 +289,15 @@ PlatformBootManagerBeforeConsole (
   // Dispatch deferred images after EndOfDxe event and ReadyToLock
   // installation.
   //
-  EfiBootManagerDispatchDeferredImages ();
-
-  //
-  // GPU passthrough only allows Console enablement after ROM image load
-  //
-  PlatformInitializeConsole (
-    XenDetected () ? gXenPlatformConsole : gPlatformConsole
-    );
+  Status = EfiBootManagerDispatchDeferredImages ();
+  if (!EFI_ERROR (Status)) {
+    //
+    // GPU passthrough only allows Console enablement after ROM image load
+    //
+    PlatformInitializeConsole (
+      XenDetected () ? gXenPlatformConsole : gPlatformConsole
+      );
+  }
 
   FrontPageTimeout = GetFrontPageTimeoutFromQemu ();
   PcdStatus        = PcdSet16S (PcdPlatformBootTimeOut, FrontPageTimeout);
@@ -956,14 +958,15 @@ VisitingAPciInstance (
   PciIo = (EFI_PCI_IO_PROTOCOL *)Instance;
 
   //
-  // Check for all PCI device
+  // Read the device-independent PCI header region
   //
+  ZeroMem (&Pci, sizeof (Pci));
   Status = PciIo->Pci.Read (
                         PciIo,
                         EfiPciIoWidthUint32,
                         0,
-                        sizeof (Pci) / sizeof (UINT32),
-                        &Pci
+                        sizeof (Pci.Hdr) / sizeof (UINT32),
+                        &Pci.Hdr
                         );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1009,16 +1012,6 @@ DetectAndPreparePlatformPciDevicePath (
   IN PCI_TYPE00           *Pci
   )
 {
-  EFI_STATUS  Status;
-
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationEnable,
-                    EFI_PCI_DEVICE_ENABLE,
-                    NULL
-                    );
-  ASSERT_EFI_ERROR (Status);
-
   //
   // Here we decide whether it is LPC Bridge
   //
@@ -1076,7 +1069,7 @@ DetectAndPreparePlatformPciDevicePath (
     return EFI_SUCCESS;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
@@ -1171,8 +1164,8 @@ PlatformInitializeConsole (
   Ported from SeaBIOS, src/fw/pciinit.c, *_pci_slot_get_irq()
 
   @param[in]  Handle - Handle of PCI device instance
-  @param[in]  PciIo - PCI IO protocol instance
-  @param[in]  PciHdr - PCI Header register block
+  @param[in]  Instance - PCI IO protocol instance
+  @param[in]  Context - Context pointer (unused)
 
   @retval EFI_SUCCESS - PCI Interrupt Line register configured successfully.
 
@@ -1180,22 +1173,35 @@ PlatformInitializeConsole (
 EFI_STATUS
 EFIAPI
 SetPciIntLine (
-  IN EFI_HANDLE           Handle,
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN PCI_TYPE00           *PciHdr
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance,
+  IN VOID        *Context
   )
 {
+  EFI_PCI_IO_PROTOCOL       *PciIo;
   EFI_DEVICE_PATH_PROTOCOL  *DevPathNode;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     RootSlot;
   UINTN                     Idx;
+  UINT8                     InterruptPin;
   UINT8                     IrqLine;
   EFI_STATUS                Status;
   UINT32                    RootBusNumber;
 
-  Status = EFI_SUCCESS;
+  PciIo = (EFI_PCI_IO_PROTOCOL *)Instance;
 
-  if (PciHdr->Device.InterruptPin != 0) {
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        PCI_INT_PIN_OFFSET,
+                        1,
+                        &InterruptPin
+                        );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (InterruptPin != 0) {
     DevPathNode = DevicePathFromHandle (Handle);
     ASSERT (DevPathNode != NULL);
     DevPath = DevPathNode;
@@ -1214,7 +1220,7 @@ SetPciIntLine (
     //
     Status   = EFI_NOT_FOUND;
     RootSlot = 0;
-    Idx      = PciHdr->Device.InterruptPin - 1;
+    Idx      = InterruptPin - 1;
     while (!IsDevicePathEnd (DevPathNode)) {
       if ((DevicePathType (DevPathNode) == HARDWARE_DEVICE_PATH) &&
           (DevicePathSubType (DevPathNode) == HW_PCI_DP))
@@ -1388,7 +1394,11 @@ PciAcpiInitialization (
   //
   // Initialize PCI_INTERRUPT_LINE for applicable present PCI devices
   //
-  VisitAllPciInstances (SetPciIntLine);
+  VisitAllInstancesOfProtocol (
+    &gEfiPciIoProtocolGuid,
+    SetPciIntLine,
+    NULL
+    );
 
   //
   // Set ACPI SCI_EN bit in PMCNTRL

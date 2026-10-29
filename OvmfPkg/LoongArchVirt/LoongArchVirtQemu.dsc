@@ -23,6 +23,8 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/LoongArchVirt/LoongArchVirtQemu.fdf
 
+  DEFINE CUSTOM_STACK_CHECK_LIB = DYNAMIC
+
 !include LoongArchVirt.fdf.inc
 
   #
@@ -141,8 +143,10 @@
   UefiLib                          | MdePkg/Library/UefiLib/UefiLib.inf
   UefiBootServicesTableLib         | MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib      | MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+!if $(CUSTOM_STACK_CHECK_LIB) != DYNAMIC
   UefiDriverEntryPoint             | MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiApplicationEntryPoint        | MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+!endif
   DevicePathLib                    | MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   FileHandleLib                    | MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SecurityManagementLib            | MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
@@ -280,7 +284,9 @@
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                           | MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
+!if $(CUSTOM_STACK_CHECK_LIB) != DYNAMIC
   DxeCoreEntryPoint                | MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
+!endif
   MemoryAllocationLib              | MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
@@ -290,7 +296,9 @@
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                           | MdePkg/Library/DxeHobLib/DxeHobLib.inf
+!if $(CUSTOM_STACK_CHECK_LIB) != DYNAMIC
   DxeCoreEntryPoint                | MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
+!endif
   MemoryAllocationLib              | MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
   UefiRuntimeLib                   | MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
@@ -310,7 +318,9 @@
 [LibraryClasses.common.UEFI_DRIVER]
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                           | MdePkg/Library/DxeHobLib/DxeHobLib.inf
+!if $(CUSTOM_STACK_CHECK_LIB) != DYNAMIC
   DxeCoreEntryPoint                | MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
+!endif
   PerformanceLib                   | MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib              | MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
@@ -609,6 +619,7 @@
       CpuMmuLib | UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
   }
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE

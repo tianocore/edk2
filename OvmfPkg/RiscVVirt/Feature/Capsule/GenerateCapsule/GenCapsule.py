@@ -163,7 +163,7 @@ def GenCapsuleDevice (BaseName, PayloadFileName, Guid, Version, Lsv, CapsulesPat
         LogAlways (ProcessOutput[0].decode())
         Error ('GenerateCapsule returned an error')
 
-    Copy (PayloadFileName, (CapsulesPath, 'firmware.bin'))
+    Copy (FmpCapsuleFile, (CapsulesPath, 'firmware.bin'))
     MetaInfoXml = MetaInfoXmlTemplate
     MetaInfoXml = MetaInfoXml.replace ('FMP_CAPSULE_GUID', Guid)
     MetaInfoXml = MetaInfoXml.replace ('FMP_CAPSULE_BASE_NAME', BaseName)

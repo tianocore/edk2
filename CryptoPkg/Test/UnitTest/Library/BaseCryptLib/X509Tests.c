@@ -2,6 +2,7 @@
   Application for X509 Cert Validation.
 
 Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -626,11 +627,215 @@ TestVerifyX509 (
   return UNIT_TEST_PASSED;
 }
 
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackNullInput (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+
+  Status = X509ConstructCertificateStack (NULL, mTestCaCert, sizeof (mTestCaCert), NULL);
+  UT_ASSERT_TRUE (!Status);
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackSingleCert (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (&X509Stack, mTestCaCert, sizeof (mTestCaCert), NULL);
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  X509StackFree (X509Stack);
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackAppend (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+
+  X509Stack = NULL;
+
+  Status = X509ConstructCertificateStack (&X509Stack, mTestCaCert, sizeof (mTestCaCert), NULL);
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  Status = X509ConstructCertificateStack (&X509Stack, mTestCert, sizeof (mTestCert), NULL);
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  Status = X509ConstructCertificateStack (&X509Stack, mTestEndCert, sizeof (mTestEndCert), NULL);
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  X509StackFree (X509Stack);
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackInvalidCert (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (&X509Stack, mTestCaCert, sizeof (mTestCaCert), NULL);
+  UT_ASSERT_TRUE (Status);
+
+  Status = X509ConstructCertificateStack (&X509Stack, mTestCert, 8, NULL);
+  UT_ASSERT_TRUE (!Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  X509StackFree (X509Stack);
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackMultipleCertsOneCall (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+
+  //
+  // Pass multiple cert/size pairs in a single variadic call.
+  //
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (
+                &X509Stack,
+                mTestCaCert,
+                sizeof (mTestCaCert),
+                mTestCert,
+                sizeof (mTestCert),
+                mTestEndCert,
+                sizeof (mTestEndCert),
+                NULL
+                );
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  X509StackFree (X509Stack);
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackZeroSize (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+
+  //
+  // A cert with size 0 should fail without corrupting the stack pointer.
+  //
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (&X509Stack, mTestCaCert, (UINTN)0, NULL);
+  UT_ASSERT_TRUE (!Status);
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackEmptyList (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+  UINT8    *OriginalStack;
+
+  //
+  // Passing only NULL terminator should succeed with an empty stack.
+  //
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (&X509Stack, NULL);
+  UT_ASSERT_TRUE (Status);
+
+  if (X509Stack != NULL) {
+    X509StackFree (X509Stack);
+  }
+
+  //
+  // Passing only NULL terminator with an existing stack should be a no-op.
+  //
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (&X509Stack, mTestCaCert, sizeof (mTestCaCert), NULL);
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  OriginalStack = X509Stack;
+  Status        = X509ConstructCertificateStack (&X509Stack, NULL);
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack == OriginalStack);
+
+  X509StackFree (X509Stack);
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestX509ConstructCertificateStackVDirect (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    *X509Stack;
+
+  //
+  // Call the V variant through the public Stack wrapper to exercise
+  // the VA_LIST path with two certs.
+  //
+  X509Stack = NULL;
+  Status    = X509ConstructCertificateStack (
+                &X509Stack,
+                mTestCaCert,
+                sizeof (mTestCaCert),
+                mTestCert,
+                sizeof (mTestCert),
+                NULL
+                );
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (X509Stack != NULL);
+
+  X509StackFree (X509Stack);
+  return UNIT_TEST_PASSED;
+}
+
 TEST_DESC  mX509Test[] = {
   //
   // -----Description--------------------------------------Class----------------------Function---------------------------------Pre---------------------Post---------Context
   //
-  { "TestVerifyX509()", "CryptoPkg.BaseCryptLib.Hkdf", TestVerifyX509, NULL, NULL, NULL },
+  { "TestVerifyX509()",                                        "CryptoPkg.BaseCryptLib.X509", TestVerifyX509,                                        NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackNullInput()",            "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackNullInput,            NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackSingleCert()",           "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackSingleCert,           NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackAppend()",               "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackAppend,               NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackInvalidCert()",          "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackInvalidCert,          NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackMultipleCertsOneCall()", "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackMultipleCertsOneCall, NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackZeroSize()",             "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackZeroSize,             NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackEmptyList()",            "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackEmptyList,            NULL, NULL, NULL },
+  { "TestX509ConstructCertificateStackVDirect()",              "CryptoPkg.BaseCryptLib.X509", TestX509ConstructCertificateStackVDirect,              NULL, NULL, NULL },
 };
 
 UINTN  mX509TestNum = ARRAY_SIZE (mX509Test);
