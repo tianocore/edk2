@@ -2,7 +2,7 @@
   ACPI 6.6 definitions from the ACPI Specification Revision 6.6 May, 2025.
 
   Copyright (c) 2017 - 2025, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2024, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
   Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
@@ -1232,6 +1232,16 @@ typedef struct {
   UINT16                         PccCount;
   // EFI_ACPI_RAS2_PCC_DESCRIPTOR Descriptors[PccCount];
 } EFI_ACPI_6_6_RAS2_FEATURE_TABLE;
+
+///
+/// RAS2 Version (as defined in ACPI 6.6 spec.)
+///
+#define EFI_ACPI_6_6_RAS2_FEATURE_TABLE_REVISION  0x01
+
+///
+/// ACPI RAS2 Feature Types
+///
+#define EFI_ACPI_6_6_RAS2_FEATURE_TYPE_MEMORY  0x00
 
 ///
 /// Memory Power State Table definition.
