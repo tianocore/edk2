@@ -440,8 +440,8 @@ Dns4CopyConfigure (
   IN  EFI_DNS4_CONFIG_DATA  *Src
   )
 {
-  UINTN   Len;
-  UINT32  Index;
+  UINTN  Len;
+  UINTN  Index;
 
   CopyMem (Dst, Src, sizeof (*Dst));
   Dst->DnsServerList = NULL;
