@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/ArmCcaLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/FdtSerialPortAddressLib.h>
@@ -97,6 +98,10 @@ DebugLibFdtPL011UartWrite (
   EFI_PARITY_TYPE     Parity;
   UINT8               DataBits;
   EFI_STOP_BITS_TYPE  StopBits;
+
+  if (ArmCcaIsRealm ()) {
+    return 0;
+  }
 
   DeviceTree = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   if (DeviceTree == NULL) {
