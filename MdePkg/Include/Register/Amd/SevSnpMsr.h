@@ -217,7 +217,12 @@ typedef union {
     ///
     UINT32    SecureAVIC          : 1;
 
-    UINT32    Reserved2           : 4;
+    ///
+    /// [Bit 19] Enhanced SMT Protection feature is enabled in SEV_FEATURES[17]
+    ///
+    UINT32    EnhSmtProtection    : 1;
+
+    UINT32    Reserved2           : 3;
 
     ///
     /// [Bit 23] IBPB on Entry feature is enabled in SEV_FEATURES[21]
