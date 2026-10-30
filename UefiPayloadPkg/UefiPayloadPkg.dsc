@@ -801,6 +801,26 @@
    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
 !endif
 
+[PcdsPatchableInModule.RISCV64]
+  gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|16
+  gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8
+
+  #
+  # Use default settings from virt NS16550 UART for QEMU platform
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|3686400
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
+
+!if $(TARGET) == DEBUG
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07
+!else
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
+!endif
+
+
 ################################################################################
 #
 # Pcd DynamicEx Section - list of all EDK II PCD Entries defined by this Platform
