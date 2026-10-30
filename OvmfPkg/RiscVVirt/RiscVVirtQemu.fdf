@@ -59,7 +59,7 @@ APRIORI DXE {
   INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
-  INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
   INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
 }
 
@@ -77,7 +77,7 @@ INF  OvmfPkg/IoMmuAbsentDxe/IoMmuAbsentDxe.inf
 #
 # PI DXE Drivers producing Architectural Protocols (EFI Services)
 #
-INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -293,6 +293,7 @@ INF  UefiCpuPkg/SecCore/SecCoreNative.inf
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 !if $(TPM2_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !if $(TPM2_CONFIG_ENABLE) == TRUE
