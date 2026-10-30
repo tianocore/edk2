@@ -3,6 +3,7 @@
 
   Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
   Copyright (c) 2023, Rivos Inc
+  Copyright 2026 NewFW Technology
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -14,9 +15,57 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
+#include <Guid/RiscVSecHobData.h>
 #include "UefiPayloadEntry.h"
 
 #define STACK_SIZE  0x20000
+
+STATIC UINTN  mRiscVBootHartId;
+STATIC VOID   *mRiscVFdtBase;
+
+/**
+  Record the boot hart and the handoff FDT for the SEC HOB consumed by CpuDxe.
+
+  @param[in] BootHartId  Hart id passed by the bootloader in a0.
+  @param[in] FdtBase     Handoff FDT passed by the bootloader in a1.
+**/
+VOID
+RiscVRecordSecHandoff (
+  IN UINTN  BootHartId,
+  IN VOID   *FdtBase
+  )
+{
+  mRiscVBootHartId = BootHartId;
+  mRiscVFdtBase    = FdtBase;
+}
+
+/**
+  Publish RISCV_SEC_HANDOFF_DATA before DXE starts.
+
+  CpuDxeRiscV64 reads this HOB for the boot hart id. The FIT entry is the
+  SEC phase for a universal payload, so the HOB has to be built here.
+**/
+STATIC
+VOID
+RiscVBuildSecHandoffHob (
+  VOID
+  )
+{
+  RISCV_SEC_HANDOFF_DATA  SecData;
+  EFI_GUID                SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
+
+  SecData.BootHartId = mRiscVBootHartId;
+  SecData.FdtPointer = mRiscVFdtBase;
+  BuildGuidDataHob (&SecHobDataGuid, &SecData, sizeof (SecData));
+
+  DEBUG ((
+    DEBUG_INFO,
+    "RISC-V SEC handoff: BootHartId = 0x%x, FDT = 0x%p\n",
+    mRiscVBootHartId,
+    mRiscVFdtBase
+    ));
+}
+
 
 /**
    Transfers control to DxeCore.
@@ -59,6 +108,12 @@ HandOffToDxeCore (
   // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
   //
   UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack, STACK_SIZE);
+
+  //
+  // CpuDxe reads the boot hart id from this HOB. Publish it while the
+  // payload HOB list is still the one DXE core inherits.
+  //
+  RiscVBuildSecHandoffHob ();
 
   DEBUG ((DEBUG_INFO, "DXE Core new stack at %llx, stack pointer at %llx\n", BaseOfStack, TopOfStack));
 
