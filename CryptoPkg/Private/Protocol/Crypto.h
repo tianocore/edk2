@@ -22,7 +22,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  32
+#define EDKII_CRYPTO_VERSION  33
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -2668,6 +2668,25 @@ BOOLEAN
   IN       UINTN CertSize,
   OUT   UINT8 *Oid, OPTIONAL
   IN OUT   UINTN       *OidSize
+  );
+
+/**
+  Determine whether the provider supports signature verification with a public key.
+
+  This function does not verify the certificate signature, validity period,
+  trust chain, or key usage.
+
+  @param[in]  Cert      Pointer to the DER-encoded X.509 certificate.
+  @param[in]  CertSize  Size of Cert in bytes.
+
+  @retval TRUE   The provider supports verification with the public key.
+  @retval FALSE  The input is invalid or verification is not supported.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_X509_IS_PUBLIC_KEY_SUPPORTED)(
+  IN CONST UINT8  *Cert,
+  IN UINTN        CertSize
   );
 
 /**
@@ -7368,6 +7387,8 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_HKDF_SHA_512_EXTRACT_AND_EXPAND        HkdfSha512ExtractAndExpand;
   EDKII_CRYPTO_HKDF_SHA_512_EXTRACT                   HkdfSha512Extract;
   EDKII_CRYPTO_HKDF_SHA_512_EXPAND                    HkdfSha512Expand;
+  /// X509 (Continued)
+  EDKII_CRYPTO_X509_IS_PUBLIC_KEY_SUPPORTED           X509IsPublicKeySupported;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

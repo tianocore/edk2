@@ -3387,6 +3387,25 @@ CryptoServiceX509GetSignatureAlgorithm (
 }
 
 /**
+  Determine whether the provider supports signature verification with a public key.
+
+  @param[in]  Cert      Pointer to the DER-encoded X.509 certificate.
+  @param[in]  CertSize  Size of Cert in bytes.
+
+  @retval TRUE   The provider supports verification with the public key.
+  @retval FALSE  The input is invalid or verification is not supported.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceX509IsPublicKeySupported (
+  IN CONST UINT8  *Cert,
+  IN UINTN        CertSize
+  )
+{
+  return CALL_BASECRYPTLIB (X509.Services.IsPublicKeySupported, X509IsPublicKeySupported, (Cert, CertSize), FALSE);
+}
+
+/**
   Retrieve Extension data from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
@@ -8803,4 +8822,6 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceHkdfSha512ExtractAndExpand,
   CryptoServiceHkdfSha512Extract,
   CryptoServiceHkdfSha512Expand,
+  /// X509 (Continued)
+  CryptoServiceX509IsPublicKeySupported,
 };
