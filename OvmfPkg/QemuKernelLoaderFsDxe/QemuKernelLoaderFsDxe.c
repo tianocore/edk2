@@ -1251,8 +1251,7 @@ QemuKernelLoaderFsDxeEntrypoint (
 
   Status = gRT->GetTime (&mInitTime, NULL /* Capabilities */);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: GetTime(): %r\n", __func__, Status));
-    return Status;
+    DEBUG ((DEBUG_WARN, "%a: GetTime(): %r\n", __func__, Status));
   }
 
   //

@@ -22,6 +22,22 @@
 #include "QemuFwCfgLibMmioInternal.h"
 
 /**
+  Get the IOMMU protocol instance
+
+  @param VOID
+
+  @retval  Pointer to the IoMMU protocol.
+**/
+EDKII_IOMMU_PROTOCOL *
+GetIoMmuProtocol (
+  VOID
+  )
+{
+  // We do not have the IoMMU protocol in the Pei phase.
+  return NULL;
+}
+
+/**
   To get firmware configure selector address.
 
   @param VOID
