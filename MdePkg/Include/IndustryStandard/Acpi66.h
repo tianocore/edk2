@@ -1023,6 +1023,11 @@ typedef struct {
   UINT32    ClockDomain;
 } EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE;
 
+///
+/// RINTC Affinity Structure Flags. All other bits are reserved and must be 0.
+///
+#define EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE_ENABLED  BIT0
+
 //
 // Generic Initiator Affinity Structure Device Handle Types
 // All other values between 0x02 an 0xFF are reserved and
