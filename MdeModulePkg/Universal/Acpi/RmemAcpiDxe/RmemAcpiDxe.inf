@@ -1,0 +1,49 @@
+## @file  # [CODE_FIRST] 13253
+#  Publishes the Reserved-Memory Reporting (RMEM) ACPI table.  # [CODE_FIRST] 13253
+#  # [CODE_FIRST] 13253
+#  Copyright (c) Microsoft Corporation.  # [CODE_FIRST] 13253
+#  SPDX-License-Identifier: BSD-2-Clause-Patent  # [CODE_FIRST] 13253
+##  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Defines]  # [CODE_FIRST] 13253
+  INF_VERSION                    = 0x00010005  # [CODE_FIRST] 13253
+  BASE_NAME                      = RmemAcpiDxe  # [CODE_FIRST] 13253
+  FILE_GUID                      = 4D89C8F5-C0A8-4289-8F8B-5C69586A85AB  # [CODE_FIRST] 13253
+  MODULE_TYPE                    = DXE_DRIVER  # [CODE_FIRST] 13253
+  VERSION_STRING                 = 1.0  # [CODE_FIRST] 13253
+  ENTRY_POINT                    = RmemAcpiDxeEntryPoint  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Sources]  # [CODE_FIRST] 13253
+  RmemAcpiDxe.c  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Packages]  # [CODE_FIRST] 13253
+  MdePkg/MdePkg.dec  # [CODE_FIRST] 13253
+  MdeModulePkg/MdeModulePkg.dec  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[LibraryClasses]  # [CODE_FIRST] 13253
+  BaseLib  # [CODE_FIRST] 13253
+  BaseMemoryLib  # [CODE_FIRST] 13253
+  DebugLib  # [CODE_FIRST] 13253
+  HobLib  # [CODE_FIRST] 13253
+  MemoryAllocationLib  # [CODE_FIRST] 13253
+  PcdLib  # [CODE_FIRST] 13253
+  UefiBootServicesTableLib  # [CODE_FIRST] 13253
+  UefiDriverEntryPoint  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Guids]  # [CODE_FIRST] 13253
+  gEdkiiRmemRecordHobGuid                 ## CONSUMES ## HOB  # [CODE_FIRST] 13253
+  gEfiEventReadyToBootGuid                ## CONSUMES ## Event  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Protocols]  # [CODE_FIRST] 13253
+  gEdkiiRmemRegistrationProtocolGuid      ## PRODUCES  # [CODE_FIRST] 13253
+  gEfiAcpiTableProtocolGuid               ## CONSUMES  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Pcd]  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Depex]  # [CODE_FIRST] 13253
+  gEfiAcpiTableProtocolGuid  # [CODE_FIRST] 13253
