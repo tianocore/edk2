@@ -26,6 +26,13 @@ RiscVRecordSecHandoff (
   IN VOID   *FdtBase
   );
 
+/**
+  Clear sstatus.SPP left set by kexec so EnableInterrupts() can set SIE.
+**/
+VOID
+RiscVClearSupervisorTrapShadow (
+  VOID
+  );
 
 /**
   Entry point to the C language phase of UEFI payload.
@@ -40,6 +47,7 @@ _ModuleEntryPoint (
   IN UINTN  Param2
   )
 {
+  RiscVClearSupervisorTrapShadow ();
   RiscVRecordSecHandoff (Param1, (VOID *)Param2);
   return FitUplEntryPoint (Param2);
 }
