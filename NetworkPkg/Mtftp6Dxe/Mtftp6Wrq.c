@@ -48,7 +48,11 @@ Mtftp6WrqSendBlock (
                                   MTFTP6_DATA_HEAD_LEN,
                                   FALSE
                                   );
-  ASSERT (Packet != NULL);
+  if (Packet == NULL) {
+    ASSERT (Packet != NULL);
+    NetbufFree (UdpPacket);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Packet->Data.OpCode = HTONS (EFI_MTFTP6_OPCODE_DATA);
   Packet->Data.Block  = HTONS (BlockNum);
@@ -69,7 +73,11 @@ Mtftp6WrqSendBlock (
     }
 
     if (DataLen > 0) {
-      NetbufAllocSpace (UdpPacket, DataLen, FALSE);
+      if (NetbufAllocSpace (UdpPacket, DataLen, FALSE) == NULL) {
+        NetbufFree (UdpPacket);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (Packet->Data.Data, (UINT8 *)Token->Buffer + Start, DataLen);
     }
   } else {
@@ -102,7 +110,12 @@ Mtftp6WrqSendBlock (
     }
 
     if (DataLen > 0) {
-      NetbufAllocSpace (UdpPacket, DataLen, FALSE);
+      if (NetbufAllocSpace (UdpPacket, DataLen, FALSE) == NULL) {
+        gBS->FreePool (DataBuf);
+        NetbufFree (UdpPacket);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (Packet->Data.Data, DataBuf, DataLen);
       gBS->FreePool (DataBuf);
     }
@@ -436,7 +449,11 @@ Mtftp6WrqInput (
     NetbufCopy (UdpPacket, 0, Len, (UINT8 *)Packet);
   } else {
     Packet = (EFI_MTFTP6_PACKET *)NetbufGetByte (UdpPacket, 0, NULL);
-    ASSERT (Packet != NULL);
+    if (Packet == NULL) {
+      ASSERT (Packet != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
   }
 
   Opcode = NTOHS (Packet->OpCode);
