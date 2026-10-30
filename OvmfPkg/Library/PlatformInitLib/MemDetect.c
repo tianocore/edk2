@@ -157,6 +157,32 @@ PlatformGetFirstNonAddressCB (
 }
 
 /**
+  Store the top of the cold-plugged RAM above 4GB in
+  PlatformInfoHob->HotPlugMemoryStart.
+
+  This is the highest exclusive end address among the >=4GB RAM entries, which
+  is where the QEMU memory hotplug window begins.
+**/
+STATIC
+VOID
+PlatformGetHotPlugMemoryStartCB (
+  IN     EFI_E820_ENTRY64       *E820Entry,
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT64  Candidate;
+
+  if (E820Entry->Type != EfiAcpiAddressRangeMemory) {
+    return;
+  }
+
+  Candidate = E820Entry->BaseAddr + E820Entry->Length;
+  if (PlatformInfoHob->HotPlugMemoryStart < Candidate) {
+    PlatformInfoHob->HotPlugMemoryStart = Candidate;
+  }
+}
+
+/**
   Store the low memory size in PlatformInfoHob->LowMemory.
 
   The first memory block with base address zero is considered "low memory".
@@ -658,6 +684,74 @@ PlatformGetFirstNonAddress (
   return;
 }
 
+/**
+  Detect the QEMU memory hotplug window, if any, and record it in
+  PlatformInfoHob->HotPlugMemoryStart / HotPlugMemoryEnd.
+
+  The window spans from the top of the cold-plugged RAM above 4GB up to the
+  absolute, exclusive end address reported by the "etc/reserved-memory-end"
+  fw_cfg file.
+**/
+STATIC
+VOID
+PlatformGetHotPlugMemory (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  EFI_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
+  UINT64                HotPlugMemoryEnd;
+
+  PlatformInfoHob->HotPlugMemoryStart = 0;
+  PlatformInfoHob->HotPlugMemoryEnd   = 0;
+
+  //
+  // The "etc/reserved-memory-end" fw_cfg file is present only when QEMU has
+  // configured a memory hotplug area. Its absence means there is no window.
+  //
+  Status = QemuFwCfgFindFile ("etc/reserved-memory-end", &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status) || (FwCfgSize != sizeof HotPlugMemoryEnd)) {
+    return;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (FwCfgSize, &HotPlugMemoryEnd);
+
+  //
+  // Find the top of the cold-plugged RAM above 4GB; this is where the hotplug
+  // window starts. Prefer the QEMU E820 map (which can express addresses
+  // >= 4GB+1TB) and fall back to the CMOS-reported size above 4GB.
+  //
+  PlatformInfoHob->HotPlugMemoryStart = BASE_4GB;
+  Status                              = PlatformScanE820 (
+                                          PlatformGetHotPlugMemoryStartCB,
+                                          PlatformInfoHob
+                                          );
+  if (EFI_ERROR (Status)) {
+    PlatformInfoHob->HotPlugMemoryStart = BASE_4GB +
+                                          PlatformGetSystemMemorySizeAbove4gb ();
+  }
+
+  //
+  // Drop an empty window.
+  //
+  if (HotPlugMemoryEnd <= PlatformInfoHob->HotPlugMemoryStart) {
+    PlatformInfoHob->HotPlugMemoryStart = 0;
+    return;
+  }
+
+  PlatformInfoHob->HotPlugMemoryEnd = HotPlugMemoryEnd;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: HotPlugMemory [0x%Lx, 0x%Lx)\n",
+    __func__,
+    PlatformInfoHob->HotPlugMemoryStart,
+    PlatformInfoHob->HotPlugMemoryEnd
+    ));
+}
+
 /*
  * Use CPUID to figure physical address width.
  *
@@ -1108,6 +1202,8 @@ PlatformAddressWidthInitialization (
     //
     PlatformGetFirstNonAddress (PlatformInfoHob);
   }
+
+  PlatformGetHotPlugMemory (PlatformInfoHob);
 
   PlatformSetupPagingLevel (PlatformInfoHob);
 
