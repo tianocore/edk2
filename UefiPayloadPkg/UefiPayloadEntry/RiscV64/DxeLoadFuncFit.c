@@ -18,8 +18,18 @@
 #include "UefiPayloadEntry.h"
 
 /**
+  Save the boot hart id and handoff FDT for the SEC HOB built before DXE.
+**/
+VOID
+RiscVRecordSecHandoff (
+  IN UINTN  BootHartId,
+  IN VOID   *FdtBase
+  );
+
+
+/**
   Entry point to the C language phase of UEFI payload.
-  @param[in]   Param1, Hartid which is ignored
+  @param[in]   Param1, Hartid
   @param[in]   Param2, Device Tree
   @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
 **/
@@ -30,5 +40,6 @@ _ModuleEntryPoint (
   IN UINTN  Param2
   )
 {
+  RiscVRecordSecHandoff (Param1, (VOID *)Param2);
   return FitUplEntryPoint (Param2);
 }
