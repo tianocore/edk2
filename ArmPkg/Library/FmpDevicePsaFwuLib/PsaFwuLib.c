@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -841,6 +841,10 @@ FwuReadStream (
   Payload = (VOID *)GET_FWU_DATA_BUFFER (RespData);
 
   if (Buffer != NULL) {
+    if (RespData->ReadBytes > BufferSize) {
+      return EFI_PROTOCOL_ERROR;
+    }
+
     CopyMem (Buffer, Payload, RespData->ReadBytes);
   }
 
