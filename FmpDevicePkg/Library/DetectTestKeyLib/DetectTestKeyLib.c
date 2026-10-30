@@ -131,8 +131,7 @@ DetectTestKey (
     //
     // Point to start of next key
     //
-    PublicKeyDataXdr += PublicKeyDataLength;
-    PublicKeyDataXdr  = (UINT8 *)ALIGN_POINTER (PublicKeyDataXdr, sizeof (UINT32));
+    PublicKeyDataXdr += ALIGN_VALUE (PublicKeyDataLength, sizeof (UINT32));
   }
 
   //
