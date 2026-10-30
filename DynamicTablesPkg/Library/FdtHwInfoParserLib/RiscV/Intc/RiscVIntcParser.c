@@ -333,6 +333,20 @@ CpuNodeParser (
   RintcInfo->AcpiProcessorUid = ProcUid;
   RintcInfo->ExtIntcId        = 0; // Will be updated later
 
+  // Get the proximity domain from the optional "numa-node-id" property.
+  Prop = FdtGetProp (Fdt, CpuNode, "numa-node-id", &PropSize);
+  if (Prop != NULL) {
+    if (PropSize != sizeof (UINT32)) {
+      ASSERT (0);
+      return EFI_ABORTED;
+    }
+
+    RintcInfo->ProximityDomain = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if ((RintcInfo->Flags & EFI_ACPI_6_6_RINTC_FLAG_ENABLE) != 0) {
+      RintcInfo->AffinityFlags = EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE_ENABLED;
+    }
+  }
+
   Status = IsaStringInfoParser (FdtParserHandle, CpuNode, &RintcInfo->IsaStringInfoToken);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
