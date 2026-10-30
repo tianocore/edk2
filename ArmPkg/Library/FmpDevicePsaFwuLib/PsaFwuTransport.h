@@ -72,3 +72,27 @@ PsaFwuTransportSendRequest (
   IN UINTN     RequestSize,
   OUT UINTN    *ResponseSize
   );
+
+/**
+  Find an endpoint advertising a service and the required FF-A properties.
+
+  Call before ExitBootServices(). Release the RX buffer after a successful
+  partition query. AgentId is cleared on failure.
+
+  @param[in]  ServiceGuid         Service advertised by the endpoint.
+  @param[in]  RequiredProperties  Required FF-A partition property bits.
+  @param[out] AgentId             Selected endpoint ID.
+
+  @retval EFI_SUCCESS            A matching endpoint was found.
+  @retval EFI_INVALID_PARAMETER  ServiceGuid or AgentId is NULL.
+  @retval EFI_NOT_FOUND          No endpoint has the required properties.
+  @retval EFI_PROTOCOL_ERROR     The partition descriptors are invalid.
+  @retval Others                 FF-A discovery or RX release failed.
+**/
+EFI_STATUS
+EFIAPI
+FindFwuEndpoint (
+  IN CONST EFI_GUID  *ServiceGuid,
+  IN UINT32          RequiredProperties,
+  OUT UINT16         *AgentId
+  );

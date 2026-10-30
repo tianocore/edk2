@@ -36,6 +36,7 @@
   FmpDevicePsaFwuLib.c
   PsaFwuLib.c
   PsaFwuLib.h
+  PsaFwuTransport.c
   PsaFwuTransport.h
   StaticFwuTransport.c
 

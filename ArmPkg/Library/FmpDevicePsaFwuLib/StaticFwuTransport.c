@@ -10,105 +10,12 @@
 #include <IndustryStandard/PsaMmFwUpdate.h>
 #include <Library/ArmFfaLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
 STATIC BOOLEAN  mInitialized;
 STATIC UINT16   mAgentId;
 STATIC VOID     *mBuffer;
 STATIC UINTN    mBufferSize;
-
-/**
- * Get firmware update agent partition id.
- *
- * @param [out]   UpdateAgentId           Update agent partition id
- *
- * @retval EFI_SUCCESS                    Success to get Update agent id
- * @retval EFI_UNSUPPORTED                Firmware update doesn't support
- * @retval Others                         Error for FF-A request.
- *
- */
-STATIC
-EFI_STATUS
-EFIAPI
-FwuGetUpdateAgentId (
-  OUT UINT16  *UpdateAgentId
-  )
-{
-  EFI_STATUS              Status;
-  EFI_FFA_PART_INFO_DESC  *PartInfo;
-  EFI_GUID                *ServiceGuid;
-  VOID                    *RxBuffer;
-  UINT64                  RxBufferSize;
-  UINT32                  Count;
-  UINT32                  Size;
-  UINT16                  PartId;
-
-  if (!IsFfaSupported ()) {
-    return EFI_UNSUPPORTED;
-  }
-
-  Status = ArmFfaLibPartitionIdGet (&PartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Failed to get my partition id. Status:%r\n",
-      __func__,
-      Status
-      ));
-    return Status;
-  }
-
-  Status = ArmFfaLibGetRxTxBuffers (
-             NULL,
-             NULL,
-             &RxBuffer,
-             &RxBufferSize
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Failed to get Rx Buffer. Status:%r\n",
-      __func__,
-      Status
-      ));
-    return Status;
-  }
-
-  ServiceGuid = &gPsaFwuUpdateAgentGuid;
-  Status      = ArmFfaLibPartitionInfoGet (
-                  ServiceGuid,
-                  FFA_PART_INFO_FLAG_TYPE_DESC,
-                  &Count,
-                  &Size
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: (Fallback) Failed to get Update agent partition info. Status:%r\n",
-      __func__,
-      Status
-      ));
-    goto ErrorHandler;
-  }
-
-  PartInfo = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-  if ((PartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ2) == 0x00) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: (Fallback) Update agent doesn't support direct msg v2...\n",
-      __func__
-      ));
-    Status = EFI_UNSUPPORTED;
-    goto ErrorHandler;
-  }
-
-  *UpdateAgentId = PartInfo->PartitionId;
-
-ErrorHandler:
-  ArmFfaLibRxRelease (PartId);
-  return Status;
-}
 
 /** Initialize the static-buffer transport before ExitBootServices(). **/
 EFI_STATUS
@@ -135,7 +42,7 @@ GetPsaFwuTransportBuffer (
   }
 
   if (!mInitialized) {
-    Status = FwuGetUpdateAgentId (&mAgentId);
+    Status = FindFwuEndpoint (&gPsaFwuUpdateAgentGuid, FFA_PART_PROP_RECV_DIRECT_REQ2, &mAgentId);
     if (EFI_ERROR (Status)) {
       return Status;
     }
