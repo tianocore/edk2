@@ -48,6 +48,9 @@
   #                  from firmware device.
   FmpDependencyDeviceLib|Include/Library/FmpDependencyDeviceLib.h
 
+  ##  @libraryclass  Provides utilities for handling FMP payloads.
+  FmpPayloadLib|Include/Library/FmpPayloadLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
   #                  Payload Header.  The structure is not included in the
