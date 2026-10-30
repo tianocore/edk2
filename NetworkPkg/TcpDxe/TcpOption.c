@@ -99,6 +99,7 @@ TcpComputeScale (
   @param[in]  Nbuf    Pointer to the buffer to store the options.
 
   @return             The total length of the TCP option field.
+  @retval MAX_UINT16  Insufficient buffer space. Any options added are removed.
 
 **/
 UINT16
@@ -130,7 +131,11 @@ TcpSynBuildOption (
              NET_BUF_HEAD
              );
 
-    ASSERT (Data != NULL);
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      return MAX_UINT16;
+    }
+
     Len += TCP_OPTION_TS_ALIGNED_LEN;
 
     TcpPutUint32 (Data, TCP_OPTION_TS_FAST);
@@ -154,7 +159,11 @@ TcpSynBuildOption (
              NET_BUF_HEAD
              );
 
-    ASSERT (Data != NULL);
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      NetbufTrim (Nbuf, Len, NET_BUF_HEAD);
+      return MAX_UINT16;
+    }
 
     Len += TCP_OPTION_WS_ALIGNED_LEN;
     TcpPutUint32 (Data, TCP_OPTION_WS_FAST | TcpComputeScale (Tcb));
@@ -164,7 +173,11 @@ TcpSynBuildOption (
   // Build the MSS option.
   //
   Data = NetbufAllocSpace (Nbuf, TCP_OPTION_MSS_LEN, 1);
-  ASSERT (Data != NULL);
+  if (Data == NULL) {
+    ASSERT (Data != NULL);
+    NetbufTrim (Nbuf, Len, NET_BUF_HEAD);
+    return MAX_UINT16;
+  }
 
   Len += TCP_OPTION_MSS_LEN;
   TcpPutUint32 (Data, TCP_OPTION_MSS_FAST | Tcb->RcvMss);
@@ -179,6 +192,7 @@ TcpSynBuildOption (
   @param[in]  Nbuf    Pointer to the buffer to store the options.
 
   @return             The total length of the TCP option field.
+  @retval MAX_UINT16  Insufficient buffer space. The buffer is unchanged.
 
 **/
 UINT16
@@ -206,7 +220,11 @@ TcpBuildOption (
              NET_BUF_HEAD
              );
 
-    ASSERT (Data != NULL);
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      return MAX_UINT16;
+    }
+
     Len += TCP_OPTION_TS_ALIGNED_LEN;
 
     TcpPutUint32 (Data, TCP_OPTION_TS_FAST);
