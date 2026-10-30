@@ -116,3 +116,6 @@ gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|TRUE|BOOLEAN|0x00
 
 ## Indicates whether allows PCI Root Bridge to allocate DMA memory resource above 4G
 gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE|BOOLEAN|0x0000002E
+
+## RISC-V time CSR frequency in Hz. QEMU virt uses 10 MHz.
+gUefiPayloadPkgTokenSpaceGuid.PcdRiscVTimeBaseFrequency|10000000|UINT32|0x0000002F
