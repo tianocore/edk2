@@ -1,6 +1,6 @@
 # @ GenYamlCfg.py
 #
-# Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2020 - 2026, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
@@ -164,11 +164,10 @@ class ExpressionEval(ast.NodeVisitor):
         else:
             return self._namespace[node.id]
 
-    def visit_Num(self, node):
-        return node.value
-
-    def visit_NameConstant(self, node):
-        return node.value
+    def visit_Constant(self, node):
+        if isinstance(node.value, (int, float, complex)) or node.value is None:
+            return node.value
+        return self.generic_visit(node)
 
     def visit_BoolOp(self, node):
         result = False
@@ -212,7 +211,7 @@ class ExpressionEval(ast.NodeVisitor):
             return val_true if condition else val_false
         elif node.func.id in ['offset', 'length']:
             if self._get_variable is not None:
-                return self._get_variable(node.args[0].s, node.func.id)
+                return self._get_variable(node.args[0].value, node.func.id)
         else:
             raise ValueError("Unsupported function: " + repr(node))
 
