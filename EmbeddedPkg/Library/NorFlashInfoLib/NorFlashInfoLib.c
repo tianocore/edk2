@@ -59,6 +59,7 @@ STATIC CONST NOR_FLASH_INFO  NorFlashIds[] = {
   { L"mx25l25635f",    { 0xc2, 0x20, 0x19 }, 3, 256, 64 * 1024,  512,  0                                        },
   { L"mx25l51235f",    { 0xc2, 0x20, 0x1a }, 3, 256, 64 * 1024,  1024, 0                                        },
   { L"mx25l12855e",    { 0xc2, 0x26, 0x18 }, 3, 256, 64 * 1024,  256,  0                                        },
+  { L"mx25um51245g",   { 0xc2, 0x80, 0x3a }, 3, 256, 64 * 1024,  1024, NOR_FLASH_ERASE_4K                       },
   { L"mx66u51235f",    { 0xc2, 0x25, 0x3a }, 3, 256, 64 * 1024,  1024, 0                                        },
   { L"mx66u1g45g",     { 0xc2, 0x25, 0x3b }, 3, 256, 64 * 1024,  2048, 0                                        },
   { L"mx66l1g45g",     { 0xc2, 0x20, 0x1b }, 3, 256, 64 * 1024,  2048, 0                                        },
@@ -138,6 +139,7 @@ STATIC CONST NOR_FLASH_INFO  NorFlashIds[] = {
   { L"w25q32dw",       { 0xef, 0x60, 0x16 }, 3, 256, 64 * 1024,  64,   NOR_FLASH_ERASE_4K                       },
   { L"w25q64dw",       { 0xef, 0x60, 0x17 }, 3, 256, 64 * 1024,  128,  NOR_FLASH_ERASE_4K                       },
   { L"w25q128fw",      { 0xef, 0x60, 0x18 }, 3, 256, 64 * 1024,  256,  NOR_FLASH_ERASE_4K                       },
+  { L"w25q256fw",      { 0xef, 0x60, 0x19 }, 3, 256, 64 * 1024,  512,  NOR_FLASH_ERASE_4K                       },
   { },                 /* Empty entry to terminate the list */
 };
 
