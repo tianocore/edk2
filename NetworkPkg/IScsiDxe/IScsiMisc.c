@@ -2047,7 +2047,7 @@ IScsiDnsIsConfigured (
   @param[in]  Private   The iSCSI driver data.
 
   @retval EFI_SUCCESS            The configuration data is retrieved.
-  @retval EFI_NOT_FOUND          This iSCSI driver is not configured yet.
+  @retval EFI_NOT_FOUND          This iSCSI driver is not configured yet or the required NIC was not found.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
 
 **/
@@ -2219,7 +2219,12 @@ IScsiGetConfigData (
     //
 
     NicInfo = IScsiGetNicInfoByIndex (mPrivate->CurrentNic);
-    ASSERT (NicInfo != NULL);
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      FreePool (AttemptConfigOrder);
+      return EFI_NOT_FOUND;
+    }
+
     IScsiMacAddrToStr (&NicInfo->PermanentAddress, NicInfo->HwAddressSize, NicInfo->VlanId, MacString);
     UnicodeSPrint (
       mPrivate->PortString,
