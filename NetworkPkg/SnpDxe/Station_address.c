@@ -64,20 +64,24 @@ PxeGetStnAddr (
   }
 
   //
-  // Set new station address in SNP->Mode structure and return success.
+  // Only HwAddressSize bytes are read back from the NIC.
+  // Clear the remaining EFI_MAC_ADDRESS bytes to prevent stale data.
   //
+  ZeroMem (&Snp->Mode.CurrentAddress, sizeof (EFI_MAC_ADDRESS));
   CopyMem (
     &(Snp->Mode.CurrentAddress),
     &Db->StationAddr,
     Snp->Mode.HwAddressSize
     );
 
+  ZeroMem (&Snp->Mode.BroadcastAddress, sizeof (EFI_MAC_ADDRESS));
   CopyMem (
     &Snp->Mode.BroadcastAddress,
     &Db->BroadcastAddr,
     Snp->Mode.HwAddressSize
     );
 
+  ZeroMem (&Snp->Mode.PermanentAddress, sizeof (EFI_MAC_ADDRESS));
   CopyMem (
     &Snp->Mode.PermanentAddress,
     &Db->PermanentAddr,
@@ -163,6 +167,17 @@ PxeSetStnAddr (
   // read the changed address and save it in SNP->Mode structure
   //
   PxeGetStnAddr (Snp);
+
+  //
+  // Preserve the complete EFI_MAC_ADDRESS provided by the caller.
+  // Only HwAddressSize bytes are passed to the underlying hardware
+  // interface. Updating CurrentAddress with the full address preserves
+  // the complete EFI_MAC_ADDRESS structure while maintaining the
+  // hardware-programmed address.
+  //
+  if (NewMacAddr != NULL) {
+    CopyMem (&Snp->Mode.CurrentAddress, NewMacAddr, sizeof (EFI_MAC_ADDRESS));
+  }
 
   return EFI_SUCCESS;
 }
