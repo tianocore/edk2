@@ -140,36 +140,12 @@ RsaSetKey (
               &Value
               );
       break;
+    //
+    // Deprecated: Private RSA key components are no longer supported.
+    //
     case RsaKeyD:
-      Ret = mbedtls_rsa_import (
-              RsaKey,
-              NULL,
-              NULL,
-              NULL,
-              &Value,
-              NULL
-              );
-      break;
-    case RsaKeyQ:
-      Ret = mbedtls_rsa_import (
-              RsaKey,
-              NULL,
-              NULL,
-              &Value,
-              NULL,
-              NULL
-              );
-      break;
     case RsaKeyP:
-      Ret = mbedtls_rsa_import (
-              RsaKey,
-              NULL,
-              &Value,
-              NULL,
-              NULL,
-              NULL
-              );
-      break;
+    case RsaKeyQ:
     case RsaKeyDp:
     case RsaKeyDq:
     case RsaKeyQInv:

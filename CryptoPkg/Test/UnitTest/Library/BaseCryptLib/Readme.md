@@ -1,34 +1,52 @@
-# BaseCryptLib Host Unit Tests
+# BaseCryptLib Signature Vectors
 
-## SLH-DSA Precomputed Signatures
+These verifier tests use checked-in signature vectors. To regenerate a vector, run the listed profile
+from the `edk2` repository root. The generator updates that profile's arrays in the corresponding
+header; generation is a maintainer task and is not performed by unit tests.
 
-### Background
-SLH-DSA (FIPS 205, formerly SPHINCS+) is a stateless hash-based digital signature algorithm.
-Generating an SLH-DSA-SHAKE-256s signature involves evaluating millions of Keccak hash rounds
-across FORS and XMSS tree structures. On unoptimized or 32-bit builds (`NOOPT` / `IA32`), a single
-live signing operation takes several minutes of CPU time.
+The helper's requirements, options, design, all generated cases, and Python test instructions are in
+[`CryptoPkg/Test/Tools/README.md`](../../../Tools/README.md).
 
-To maintain complete test coverage across all 18 test cases without excessive execution times,
-precomputed signature test vectors are stored in `SlhDsaTestVectors.h` and used for verification,
-tampering, context validation, and boundary checking tests.
+## ECDSA: `EcTests.c`
 
-### Generated Test Vectors
-`SlhDsaTestVectors.h` contains the following precomputed signatures matching `mSlhDsaShake256sTestPemKey` / `mSlhDsaShake256sTestCert`:
-* `mSlhDsaShake256sTestSignature`: Default test message without context.
-* `mSlhDsaShake256sTestContextSignature`: Default test message with context string `"SLH-DSA test context"`.
-* `mSlhDsaShake256sTestEmptyMsgSignature`: Empty test message (`""`) without context.
-* `mSlhDsaShake256sTestMaxContextSignature`: Default test message with 255-byte maximum context.
-* `mSlhDsaShake256sTestMsg2Signature`: Secondary test message (`"Second message"`) for multi-signature tests.
+Updates `VerifyTestSignatures.h` with the P-256 SHA-256 verifier signature.
 
-### Regenerating Signatures
-When test keys or test messages are updated, the signatures can be regenerated using `GenerateSlhDsaSignatures.py`:
-
-#### Prerequisites
-* Python 3.10+
-* OpenSSL 3.5+ CLI with SLH-DSA support
-
-#### Command
-```bash
-python GenerateSlhDsaSignatures.py --openssl /path/to/openssl --output new_signatures.h
+```powershell
+python CryptoPkg/Test/Tools/GenerateBaseCryptLibTestSignatures.py --algorithm ecdsa
 ```
-Paste the generated arrays into `SlhDsaTestVectors.h`.
+
+## EdDSA: `EdDsaTests.c`
+
+Updates `VerifyTestSignatures.h` with the Ed448 message and context signatures.
+
+```powershell
+python CryptoPkg/Test/Tools/GenerateBaseCryptLibTestSignatures.py --algorithm eddsa
+```
+
+## ML-DSA: `MlDsaTests.c`
+
+Updates `VerifyTestSignatures.h` with the ML-DSA-87 message, context, empty-message, maximum-context,
+and multiple-message signatures.
+
+```powershell
+python CryptoPkg/Test/Tools/GenerateBaseCryptLibTestSignatures.py --algorithm mldsa
+```
+
+## PKCS#7: `RsaPkcs7Tests.c`
+
+Updates `VerifyTestSignatures.h` with attached PKCS#7 message and partial-chain signatures.
+
+```powershell
+python CryptoPkg/Test/Tools/GenerateBaseCryptLibTestSignatures.py --algorithm pkcs7
+```
+
+## SLH-DSA: `SlhDsaTests.c`
+
+Updates `SlhDsaTestVectors.h` with the SLH-DSA-SHAKE-256s message, context, empty-message,
+255-byte binary-context, and second-message signatures.
+
+```powershell
+python CryptoPkg/Test/Tools/GenerateBaseCryptLibTestSignatures.py --algorithm slh-dsa
+```
+
+To provide a separate SLH-DSA PEM key, add `--key C:\path\to\slh-dsa-key.pem` to that command.

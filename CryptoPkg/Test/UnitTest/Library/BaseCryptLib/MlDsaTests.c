@@ -11,13 +11,11 @@
 
   The test structure mirrors EdDsaTests.c and validates:
   - Context creation and destruction (MlDsaNewByNid, MlDsaFree)
-  - Key setting and retrieval error cases (MlDsaSetPrivKey, MlDsaSetPubKey, MlDsaGetPubKey)
-  - Signature generation and verification via PEM/X509 (TestVerifyMlDsaPemX509)
+  - Public key setting and retrieval error cases (MlDsaSetPubKey, MlDsaGetPubKey)
+  - Signature verification through the fixed X.509 certificate vector
   - Error handling for invalid inputs
 
-  NOTE: TestVerifyMlDsaSignVerify() and TestVerifyMlDsaSignVerifyWithContext() are
-  currently skipped as they require raw key arrays. The main signing/verification test
-  is TestVerifyMlDsaPemX509() which uses real PEM and X509 test vectors.
+  Signing-only coverage has been removed. Verification and invalid-input coverage remain.
 
 Copyright (c) 2026, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -25,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "TestBaseCryptLib.h"
-
+#include "VerifyTestSignatures.h"
 #define ML_DSA_87_PRIVATE_KEY_SIZE  4896
 #define ML_DSA_87_PUBLIC_KEY_SIZE   2592
 #define ML_DSA_87_SIGNATURE_SIZE    4627
@@ -54,7 +52,7 @@ VOID  *MlDsaContext2;
 
   @param[in]  Context  Unit test context.
 
-  @retval UNIT_TEST_PASSED               The unit test has completed successfully.
+  @retval UNIT_TEST_PASSED               The test case has completed successfully.
   @retval UNIT_TEST_ERROR_TEST_FAILED    A test case assertion has failed.
 **/
 UNIT_TEST_STATUS
@@ -166,24 +164,6 @@ TestVerifyMlDsaKeySetGet (
   UT_ASSERT_NOT_EQUAL (TooSmallSize, ML_DSA_87_PUBLIC_KEY_SIZE);
 
   //
-  // Test MlDsaSetPrivKey with NULL context
-  //
-  Status = MlDsaSetPrivKey (NULL, (UINT8 *)mMlDsa87TestPemKey, 100);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaSetPrivKey with NULL key
-  //
-  Status = MlDsaSetPrivKey (MlDsaContext1, NULL, ML_DSA_87_PRIVATE_KEY_SIZE);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaSetPrivKey with wrong size
-  //
-  Status = MlDsaSetPrivKey (MlDsaContext1, (UINT8 *)mMlDsa87TestPemKey, 32);
-  UT_ASSERT_FALSE (Status);
-
-  //
   // Test MlDsaSetPubKey with NULL context
   //
   Status = MlDsaSetPubKey (NULL, (UINT8 *)mMlDsa87TestCert, 100);
@@ -238,62 +218,12 @@ TestVerifyMlDsaErrorCases (
   )
 {
   BOOLEAN  Status;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
-  UINT8    TooSmallBuffer[10];
-  UINTN    TooSmallSize;
 
   //
   // Create ML-DSA context
   //
   MlDsaContext1 = MlDsaNewByNid (CRYPTO_NID_ML_DSA_87);
   UT_ASSERT_NOT_NULL (MlDsaContext1);
-
-  //
-  // Test MlDsaSign with NULL context
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              NULL,
-              NULL,
-              0,
-              (UINT8 *)mMlDsaTestMessage,
-              AsciiStrLen (mMlDsaTestMessage),
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaSign with NULL message
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaContext1,
-              NULL,
-              0,
-              NULL,
-              0,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaSign with too small buffer
-  //
-  TooSmallSize = sizeof (TooSmallBuffer);
-  Status       = MlDsaSign (
-                   MlDsaContext1,
-                   NULL,
-                   0,
-                   (UINT8 *)mMlDsaTestMessage,
-                   AsciiStrLen (mMlDsaTestMessage),
-                   TooSmallBuffer,
-                   &TooSmallSize
-                   );
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_NOT_EQUAL (TooSmallSize, sizeof (Signature));
 
   //
   // Test MlDsaVerify with NULL context
@@ -304,8 +234,8 @@ TestVerifyMlDsaErrorCases (
              0,
              (UINT8 *)mMlDsaTestMessage,
              AsciiStrLen (mMlDsaTestMessage),
-             Signature,
-             sizeof (Signature)
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -318,8 +248,8 @@ TestVerifyMlDsaErrorCases (
              0,
              NULL,
              0,
-             Signature,
-             sizeof (Signature)
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -333,7 +263,7 @@ TestVerifyMlDsaErrorCases (
              (UINT8 *)mMlDsaTestMessage,
              AsciiStrLen (mMlDsaTestMessage),
              NULL,
-             sizeof (Signature)
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -346,7 +276,7 @@ TestVerifyMlDsaErrorCases (
              0,
              (UINT8 *)mMlDsaTestMessage,
              AsciiStrLen (mMlDsaTestMessage),
-             Signature,
+             (UINT8 *)mMlDsaTestSignature,
              0
              );
   UT_ASSERT_FALSE (Status);
@@ -369,27 +299,9 @@ TestVerifyMlDsaPemX509 (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
   VOID     *MlDsaPubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
-  UINTN    MessageSize;
 
-  MlDsaPrivKey = NULL;
-  MlDsaPubKey  = NULL;
-  MessageSize  = AsciiStrLen (mMlDsaTestMessage);
-
-  //
-  // Retrieve ML-DSA private key from PEM data.
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (MlDsaPrivKey);
+  MlDsaPubKey = NULL;
 
   //
   // Retrieve ML-DSA public key from X509 certificate.
@@ -402,48 +314,28 @@ TestVerifyMlDsaPemX509 (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_NOT_NULL (MlDsaPubKey);
 
-  //
-  // ML-DSA signing with key from PEM (no context string)
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mMlDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, ML_DSA_87_SIGNATURE_SIZE);
-
-  //
-  // ML-DSA verification with key from X509
-  //
   Status = MlDsaVerify (
              MlDsaPubKey,
              NULL,
              0,
              (UINT8 *)mMlDsaTestMessage,
-             MessageSize,
-             Signature,
-             SigSize
+             AsciiStrLen (mMlDsaTestMessage),
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_TRUE (Status);
 
-  MlDsaFree (MlDsaPrivKey);
   MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
 
 /**
-  Validate ML-DSA signing and verification with context string.
+  Validate ML-DSA signature verification with a context string.
 
   @param[in]  Context  Unit test context.
 
-  @retval UNIT_TEST_PASSED               The unit test has completed successfully.
+  @retval UNIT_TEST_PASSED               The test case has completed successfully.
   @retval UNIT_TEST_ERROR_TEST_FAILED    A test case assertion has failed.
 **/
 UNIT_TEST_STATUS
@@ -453,29 +345,13 @@ TestVerifyMlDsaSignVerifyWithContext (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
   VOID     *MlDsaPubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
   UINTN    MessageSize;
   UINTN    ContextSize;
 
-  MlDsaPrivKey = NULL;
-  MlDsaPubKey  = NULL;
-  MessageSize  = AsciiStrLen (mMlDsaTestMessage);
-  ContextSize  = AsciiStrLen (mMlDsaTestContext);
-
-  //
-  // Retrieve ML-DSA private key from PEM data.
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (MlDsaPrivKey);
+  MlDsaPubKey = NULL;
+  MessageSize = AsciiStrLen (mMlDsaTestMessage);
+  ContextSize = AsciiStrLen (mMlDsaTestContext);
 
   //
   // Retrieve ML-DSA public key from X509 certificate.
@@ -488,33 +364,14 @@ TestVerifyMlDsaSignVerifyWithContext (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_NOT_NULL (MlDsaPubKey);
 
-  //
-  // ML-DSA signing with context string
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaPrivKey,
-              (UINT8 *)mMlDsaTestContext,
-              ContextSize,
-              (UINT8 *)mMlDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, ML_DSA_87_SIGNATURE_SIZE);
-
-  //
-  // ML-DSA verification with matching context string
-  //
   Status = MlDsaVerify (
              MlDsaPubKey,
              (UINT8 *)mMlDsaTestContext,
              ContextSize,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaTestContextSignature,
+             sizeof (mMlDsaTestContextSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -527,8 +384,8 @@ TestVerifyMlDsaSignVerifyWithContext (
              AsciiStrLen ("Different context"),
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaTestContextSignature,
+             sizeof (mMlDsaTestContextSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -541,12 +398,11 @@ TestVerifyMlDsaSignVerifyWithContext (
              0,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaTestContextSignature,
+             sizeof (mMlDsaTestContextSignature)
              );
   UT_ASSERT_FALSE (Status);
 
-  MlDsaFree (MlDsaPrivKey);
   MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -567,30 +423,25 @@ TestVerifyMlDsaGetPubKey (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
+  VOID     *MlDsaPubKey;
   UINT8    PublicKey[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINTN    PublicKeySize;
 
-  MlDsaPrivKey = NULL;
-
-  //
-  // Retrieve ML-DSA private key from PEM data.
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
+  MlDsaPubKey = NULL;
+  Status      = MlDsaGetPublicKeyFromX509 (
+                  mMlDsa87TestCert,
+                  sizeof (mMlDsa87TestCert),
+                  &MlDsaPubKey
+                  );
   UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (MlDsaPrivKey);
+  UT_ASSERT_NOT_NULL (MlDsaPubKey);
 
   //
-  // Get public key from private key context
+  // Get public key from the certificate context
   //
   PublicKeySize = sizeof (PublicKey);
   Status        = MlDsaGetPubKey (
-                    MlDsaPrivKey,
+                    MlDsaPubKey,
                     PublicKey,
                     &PublicKeySize
                     );
@@ -613,7 +464,7 @@ TestVerifyMlDsaGetPubKey (
 
   UT_ASSERT_FALSE (AllZeros);
 
-  MlDsaFree (MlDsaPrivKey);
+  MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
@@ -633,29 +484,13 @@ TestVerifyMlDsaTamperedData (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
   VOID     *MlDsaPubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
   UINT8    TamperedSignature[ML_DSA_87_SIGNATURE_SIZE];
   CHAR8    TamperedMessage[100];
-  UINTN    SigSize;
   UINTN    MessageSize;
 
-  MlDsaPrivKey = NULL;
-  MlDsaPubKey  = NULL;
-  MessageSize  = AsciiStrLen (mMlDsaTestMessage);
-
-  //
-  // Retrieve ML-DSA private key from PEM data.
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (MlDsaPrivKey);
+  MlDsaPubKey = NULL;
+  MessageSize = AsciiStrLen (mMlDsaTestMessage);
 
   //
   // Retrieve ML-DSA public key from X509 certificate.
@@ -668,32 +503,14 @@ TestVerifyMlDsaTamperedData (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_NOT_NULL (MlDsaPubKey);
 
-  //
-  // Generate valid signature
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mMlDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify original signature works
-  //
   Status = MlDsaVerify (
              MlDsaPubKey,
              NULL,
              0,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -708,15 +525,15 @@ TestVerifyMlDsaTamperedData (
                          0,
                          (UINT8 *)TamperedMessage,
                          MessageSize,
-                         Signature,
-                         SigSize
+                         (UINT8 *)mMlDsaTestSignature,
+                         sizeof (mMlDsaTestSignature)
                          );
   UT_ASSERT_FALSE (Status);
 
   //
   // Test with tampered signature (should fail)
   //
-  CopyMem (TamperedSignature, Signature, sizeof (Signature));
+  CopyMem (TamperedSignature, mMlDsaTestSignature, sizeof (TamperedSignature));
   TamperedSignature[0] ^= 0x01;
   Status                = MlDsaVerify (
                             MlDsaPubKey,
@@ -725,7 +542,7 @@ TestVerifyMlDsaTamperedData (
                             (UINT8 *)mMlDsaTestMessage,
                             MessageSize,
                             TamperedSignature,
-                            SigSize
+                            sizeof (mMlDsaTestSignature)
                             );
   UT_ASSERT_FALSE (Status);
 
@@ -738,12 +555,11 @@ TestVerifyMlDsaTamperedData (
              0,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize - 1
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature) - 1
              );
   UT_ASSERT_FALSE (Status);
 
-  MlDsaFree (MlDsaPrivKey);
   MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -767,39 +583,6 @@ TestVerifyMlDsaPemErrors (
   VOID     *MlDsaKey;
 
   MlDsaKey = NULL;
-
-  //
-  // Test MlDsaGetPrivateKeyFromPem with NULL PEM data
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             NULL,
-             100,
-             NULL,
-             &MlDsaKey
-             );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaGetPrivateKeyFromPem with NULL context pointer
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             NULL
-             );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test MlDsaGetPrivateKeyFromPem with invalid PEM data
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             (UINT8 *)"Invalid PEM data",
-             16,
-             NULL,
-             &MlDsaKey
-             );
-  UT_ASSERT_FALSE (Status);
 
   //
   // Test MlDsaGetPublicKeyFromX509 with NULL certificate
@@ -851,9 +634,7 @@ TestVerifyMlDsaNoKeyOperations (
   )
 {
   BOOLEAN  Status;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
   UINT8    PublicKey[ML_DSA_87_PUBLIC_KEY_SIZE];
-  UINTN    SigSize;
   UINTN    PublicKeySize;
 
   //
@@ -861,21 +642,6 @@ TestVerifyMlDsaNoKeyOperations (
   //
   MlDsaContext1 = MlDsaNewByNid (CRYPTO_NID_ML_DSA_87);
   UT_ASSERT_NOT_NULL (MlDsaContext1);
-
-  //
-  // MlDsaSign should fail when EvpPkey is NULL
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaContext1,
-              NULL,
-              0,
-              (UINT8 *)mMlDsaTestMessage,
-              AsciiStrLen (mMlDsaTestMessage),
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
 
   //
   // MlDsaVerify should fail when EvpPkey is NULL
@@ -886,8 +652,8 @@ TestVerifyMlDsaNoKeyOperations (
              0,
              (UINT8 *)mMlDsaTestMessage,
              AsciiStrLen (mMlDsaTestMessage),
-             Signature,
-             sizeof (Signature)
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
@@ -925,62 +691,17 @@ TestVerifyMlDsaInvalidContextParams (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
   VOID     *MlDsaPubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
   UINTN    MessageSize;
 
-  MlDsaPrivKey = NULL;
-  MlDsaPubKey  = NULL;
-  MessageSize  = AsciiStrLen (mMlDsaTestMessage);
-
-  //
-  // Get valid keys
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
+  MlDsaPubKey = NULL;
+  MessageSize = AsciiStrLen (mMlDsaTestMessage);
 
   Status = MlDsaGetPublicKeyFromX509 (
              mMlDsa87TestCert,
              sizeof (mMlDsa87TestCert),
              &MlDsaPubKey
              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Test MlDsaSign with NULL Context but ContextSize > 0 (invalid combination)
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaPrivKey,
-              NULL,
-              10,
-              (UINT8 *)mMlDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Generate valid signature for verify test
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mMlDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -992,12 +713,11 @@ TestVerifyMlDsaInvalidContextParams (
              5,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaTestSignature,
+             sizeof (mMlDsaTestSignature)
              );
   UT_ASSERT_FALSE (Status);
 
-  MlDsaFree (MlDsaPrivKey);
   MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -1020,20 +740,15 @@ TestVerifyMlDsaGetPubKeyNullBuffer (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
+  VOID     *MlDsaPubKey;
   UINTN    PublicKeySize;
 
-  MlDsaPrivKey = NULL;
-
-  //
-  // Get valid private key
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
+  MlDsaPubKey = NULL;
+  Status      = MlDsaGetPublicKeyFromX509 (
+                  mMlDsa87TestCert,
+                  sizeof (mMlDsa87TestCert),
+                  &MlDsaPubKey
+                  );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1042,14 +757,14 @@ TestVerifyMlDsaGetPubKeyNullBuffer (
   //
   PublicKeySize = 9999;
   Status        = MlDsaGetPubKey (
-                    MlDsaPrivKey,
+                    MlDsaPubKey,
                     NULL,
                     &PublicKeySize
                     );
   UT_ASSERT_FALSE (Status);
   UT_ASSERT_EQUAL (PublicKeySize, 0);
 
-  MlDsaFree (MlDsaPrivKey);
+  MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
@@ -1071,26 +786,12 @@ TestVerifyMlDsaSignatureSizeExact (
   )
 {
   BOOLEAN  Status;
-  VOID     *MlDsaPrivKey;
   VOID     *MlDsaPubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
+  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE + 1] = { 0 };
   UINTN    MessageSize;
 
-  MlDsaPrivKey = NULL;
-  MlDsaPubKey  = NULL;
-  MessageSize  = AsciiStrLen (mMlDsaTestMessage);
-
-  //
-  // Get valid keys
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &MlDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
+  MlDsaPubKey = NULL;
+  MessageSize = AsciiStrLen (mMlDsaTestMessage);
 
   Status = MlDsaGetPublicKeyFromX509 (
              mMlDsa87TestCert,
@@ -1099,32 +800,16 @@ TestVerifyMlDsaSignatureSizeExact (
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Generate valid signature
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              MlDsaPrivKey,
-              NULL,
-              0,
-              (UINT8 *)mMlDsaTestMessage,
-              MessageSize,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_EQUAL (SigSize, ML_DSA_87_SIGNATURE_SIZE);
+  CopyMem (Signature, mMlDsaTestSignature, sizeof (mMlDsaTestSignature));
 
-  //
-  // Verify with exact size - should succeed
-  //
+  // Verify with exact size.
   Status = MlDsaVerify (
              MlDsaPubKey,
              NULL,
              0,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
+             (UINT8 *)mMlDsaTestSignature,
              ML_DSA_87_SIGNATURE_SIZE
              );
   UT_ASSERT_TRUE (Status);
@@ -1152,12 +837,11 @@ TestVerifyMlDsaSignatureSizeExact (
              0,
              (UINT8 *)mMlDsaTestMessage,
              MessageSize,
-             Signature,
+             (UINT8 *)mMlDsaTestSignature,
              ML_DSA_87_SIGNATURE_SIZE - 1
              );
   UT_ASSERT_FALSE (Status);
 
-  MlDsaFree (MlDsaPrivKey);
   MlDsaFree (MlDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -1213,7 +897,7 @@ TestVerifyMlDsaContextLifecycle (
 }
 
 /**
-  Test ML-DSA empty message signing and verification.
+  Test ML-DSA verification of an empty message.
 
   Tests edge case of zero-length messages.
 
@@ -1229,25 +913,10 @@ TestVerifyMlDsaEmptyMessage (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
   VOID     *PubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
   UINT8    EmptyMsg[1];
 
-  PrivKey = NULL;
-  PubKey  = NULL;
-
-  //
-  // Load keys
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
-             );
-  UT_ASSERT_TRUE (Status);
+  PubKey = NULL;
 
   Status = MlDsaGetPublicKeyFromX509 (
              mMlDsa87TestCert,
@@ -1256,51 +925,17 @@ TestVerifyMlDsaEmptyMessage (
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Sign empty message - should fail with NULL message
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              PrivKey,
-              NULL,
-              0,
-              NULL,
-              0,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Sign with valid pointer but zero size - should succeed
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              PrivKey,
-              NULL,
-              0,
-              EmptyMsg,
-              0,
-              Signature,
-              &SigSize
-              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Verify the zero-length message signature
-  //
   Status = MlDsaVerify (
              PubKey,
              NULL,
              0,
              EmptyMsg,
              0,
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaEmptyMessageSignature,
+             sizeof (mMlDsaEmptyMessageSignature)
              );
   UT_ASSERT_TRUE (Status);
 
-  MlDsaFree (PrivKey);
   MlDsaFree (PubKey);
 
   return UNIT_TEST_PASSED;
@@ -1323,54 +958,24 @@ TestVerifyMlDsaMaxContextString (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
   VOID     *PubKey;
-  UINT8    Signature[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
   UINT8    MaxContext[ML_DSA_MAX_CONTEXT_SIZE];
   UINTN    Index;
 
-  PrivKey = NULL;
-  PubKey  = NULL;
+  PubKey = NULL;
 
   //
-  // Fill context with pattern
+  // Fill the maximum-length context with ASCII bytes for offline vector generation.
   //
   for (Index = 0; Index < ML_DSA_MAX_CONTEXT_SIZE; Index++) {
-    MaxContext[Index] = (UINT8)(Index & 0xFF);
+    MaxContext[Index] = 'A';
   }
-
-  //
-  // Load keys
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
-             );
-  UT_ASSERT_TRUE (Status);
 
   Status = MlDsaGetPublicKeyFromX509 (
              mMlDsa87TestCert,
              sizeof (mMlDsa87TestCert),
              &PubKey
              );
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Sign with maximum context
-  //
-  SigSize = sizeof (Signature);
-  Status  = MlDsaSign (
-              PrivKey,
-              MaxContext,
-              ML_DSA_MAX_CONTEXT_SIZE,
-              (UINT8 *)mMlDsaTestMessage,
-              AsciiStrLen (mMlDsaTestMessage),
-              Signature,
-              &SigSize
-              );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1382,8 +987,8 @@ TestVerifyMlDsaMaxContextString (
              ML_DSA_MAX_CONTEXT_SIZE,
              (UINT8 *)mMlDsaTestMessage,
              AsciiStrLen (mMlDsaTestMessage),
-             Signature,
-             SigSize
+             (UINT8 *)mMlDsaMaxContextSignature,
+             sizeof (mMlDsaMaxContextSignature)
              );
   UT_ASSERT_TRUE (Status);
 
@@ -1397,12 +1002,11 @@ TestVerifyMlDsaMaxContextString (
                      ML_DSA_MAX_CONTEXT_SIZE,
                      (UINT8 *)mMlDsaTestMessage,
                      AsciiStrLen (mMlDsaTestMessage),
-                     Signature,
-                     SigSize
+                     (UINT8 *)mMlDsaMaxContextSignature,
+                     sizeof (mMlDsaMaxContextSignature)
                      );
   UT_ASSERT_FALSE (Status);
 
-  MlDsaFree (PrivKey);
   MlDsaFree (PubKey);
 
   return UNIT_TEST_PASSED;
@@ -1425,29 +1029,24 @@ TestVerifyMlDsaKeyReplacement (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
+  VOID     *SourceKey;
   UINT8    PublicKey1[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINT8    PublicKey2[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINTN    PubKeySize;
 
-  PrivKey = NULL;
-
-  //
-  // Load first key
-  //
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
-             );
+  SourceKey = NULL;
+  Status    = MlDsaGetPublicKeyFromX509 (
+                mMlDsa87TestCert,
+                sizeof (mMlDsa87TestCert),
+                &SourceKey
+                );
   UT_ASSERT_TRUE (Status);
 
   //
   // Get public key
   //
   PubKeySize = sizeof (PublicKey1);
-  Status     = MlDsaGetPubKey (PrivKey, PublicKey1, &PubKeySize);
+  Status     = MlDsaGetPubKey (SourceKey, PublicKey1, &PubKeySize);
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1473,7 +1072,7 @@ TestVerifyMlDsaKeyReplacement (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_EQUAL (PubKeySize, ML_DSA_87_PUBLIC_KEY_SIZE);
 
-  MlDsaFree (PrivKey);
+  MlDsaFree (SourceKey);
   MlDsaFree (MlDsaContext1);
   MlDsaContext1 = NULL;
 
@@ -1481,9 +1080,9 @@ TestVerifyMlDsaKeyReplacement (
 }
 
 /**
-  Test ML-DSA multiple signatures with same key.
+  Test verification of multiple signatures with the same key.
 
-  Tests that the same key can generate multiple signatures.
+  Tests that distinct messages and signatures are correctly paired.
 
   @param[in]  Context  Unit test context.
 
@@ -1497,27 +1096,12 @@ TestVerifyMlDsaMultipleSignatures (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
   VOID     *PubKey;
-  UINT8    Sig1[ML_DSA_87_SIGNATURE_SIZE];
-  UINT8    Sig2[ML_DSA_87_SIGNATURE_SIZE];
-  UINT8    Sig3[ML_DSA_87_SIGNATURE_SIZE];
-  UINTN    SigSize;
   CHAR8    *Msg1 = "First message";
   CHAR8    *Msg2 = "Second message";
   CHAR8    *Msg3 = "Third message";
 
-  PrivKey = NULL;
-  PubKey  = NULL;
-
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-
+  PubKey = NULL;
   Status = MlDsaGetPublicKeyFromX509 (
              mMlDsa87TestCert,
              sizeof (mMlDsa87TestCert),
@@ -1525,43 +1109,23 @@ TestVerifyMlDsaMultipleSignatures (
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Generate three different signatures
-  //
-  SigSize = sizeof (Sig1);
-  Status  = MlDsaSign (PrivKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), Sig1, &SigSize);
+  // Verify every signature with its corresponding message.
+  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), (UINT8 *)mMlDsaMultipleMessage1Signature, sizeof (mMlDsaMultipleMessage1Signature));
   UT_ASSERT_TRUE (Status);
 
-  SigSize = sizeof (Sig2);
-  Status  = MlDsaSign (PrivKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), Sig2, &SigSize);
+  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), (UINT8 *)mMlDsaMultipleMessage2Signature, sizeof (mMlDsaMultipleMessage2Signature));
   UT_ASSERT_TRUE (Status);
 
-  SigSize = sizeof (Sig3);
-  Status  = MlDsaSign (PrivKey, NULL, 0, (UINT8 *)Msg3, AsciiStrLen (Msg3), Sig3, &SigSize);
+  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg3, AsciiStrLen (Msg3), (UINT8 *)mMlDsaMultipleMessage3Signature, sizeof (mMlDsaMultipleMessage3Signature));
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Verify all three with correct messages
-  //
-  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), Sig1, sizeof (Sig1));
-  UT_ASSERT_TRUE (Status);
-
-  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), Sig2, sizeof (Sig2));
-  UT_ASSERT_TRUE (Status);
-
-  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg3, AsciiStrLen (Msg3), Sig3, sizeof (Sig3));
-  UT_ASSERT_TRUE (Status);
-
-  //
-  // Cross-verify should fail (wrong message/signature pairs)
-  //
-  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), Sig2, sizeof (Sig2));
+  // Cross-verification with a different message must fail.
+  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg1, AsciiStrLen (Msg1), (UINT8 *)mMlDsaMultipleMessage2Signature, sizeof (mMlDsaMultipleMessage2Signature));
   UT_ASSERT_FALSE (Status);
 
-  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), Sig3, sizeof (Sig3));
+  Status = MlDsaVerify (PubKey, NULL, 0, (UINT8 *)Msg2, AsciiStrLen (Msg2), (UINT8 *)mMlDsaMultipleMessage3Signature, sizeof (mMlDsaMultipleMessage3Signature));
   UT_ASSERT_FALSE (Status);
 
-  MlDsaFree (PrivKey);
   MlDsaFree (PubKey);
 
   return UNIT_TEST_PASSED;
@@ -1584,19 +1148,17 @@ TestVerifyMlDsaGetPubKeyRepeated (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
+  VOID     *PubKey;
   UINT8    PubKey1[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINT8    PubKey2[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINT8    PubKey3[ML_DSA_87_PUBLIC_KEY_SIZE];
   UINTN    Size1, Size2, Size3;
 
-  PrivKey = NULL;
-
-  Status = MlDsaGetPrivateKeyFromPem (
-             mMlDsa87TestPemKey,
-             sizeof (mMlDsa87TestPemKey),
-             NULL,
-             &PrivKey
+  PubKey = NULL;
+  Status = MlDsaGetPublicKeyFromX509 (
+             mMlDsa87TestCert,
+             sizeof (mMlDsa87TestCert),
+             &PubKey
              );
   UT_ASSERT_TRUE (Status);
 
@@ -1604,15 +1166,15 @@ TestVerifyMlDsaGetPubKeyRepeated (
   // Get public key three times
   //
   Size1  = sizeof (PubKey1);
-  Status = MlDsaGetPubKey (PrivKey, PubKey1, &Size1);
+  Status = MlDsaGetPubKey (PubKey, PubKey1, &Size1);
   UT_ASSERT_TRUE (Status);
 
   Size2  = sizeof (PubKey2);
-  Status = MlDsaGetPubKey (PrivKey, PubKey2, &Size2);
+  Status = MlDsaGetPubKey (PubKey, PubKey2, &Size2);
   UT_ASSERT_TRUE (Status);
 
   Size3  = sizeof (PubKey3);
-  Status = MlDsaGetPubKey (PrivKey, PubKey3, &Size3);
+  Status = MlDsaGetPubKey (PubKey, PubKey3, &Size3);
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1623,7 +1185,7 @@ TestVerifyMlDsaGetPubKeyRepeated (
   UT_ASSERT_MEM_EQUAL (PubKey1, PubKey2, Size1);
   UT_ASSERT_MEM_EQUAL (PubKey2, PubKey3, Size2);
 
-  MlDsaFree (PrivKey);
+  MlDsaFree (PubKey);
 
   return UNIT_TEST_PASSED;
 }

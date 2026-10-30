@@ -53,9 +53,7 @@
   Pk/CryptRsaExt.c
   Pk/CryptPkcs1Oaep.c
   Pk/CryptPkcs5Pbkdf2.c
-  Pk/CryptPkcs7Sign.c
   Pk/CryptPkcs7Encrypt.c
-  Pk/CryptPkcs7Decrypt.c
   Pk/CryptPkcs7VerifyCommon.c
   Pk/CryptPkcs7VerifyBase.c
   Pk/CryptPkcs7VerifyEku.c
@@ -64,7 +62,6 @@
   Pk/CryptAuthenticodeNull.c
   Pk/CryptTsNull.c
   Pk/CryptRsaPss.c
-  Pk/CryptRsaPssSignNull.c
   Pk/CryptEc.c
   Pk/CryptEdDsa.c
   Pk/CryptMlDsa.c
