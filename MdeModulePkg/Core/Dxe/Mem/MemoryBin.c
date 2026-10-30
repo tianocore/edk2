@@ -215,11 +215,11 @@ GetMemoryTypeInformationResourceHob (
   IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation
   )
 {
-  UINTN                        Count;
-  EFI_PEI_HOB_POINTERS         Hob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
-  EFI_PHYSICAL_ADDRESS         BinTop;
+  UINTN                         Count;
+  EFI_PEI_HOB_POINTERS          Hob;
+  EFI_HOB_RESOURCE_DESCRIPTOR   *MemoryTypeInformationResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR2  *ResourceHob;
+  EFI_PHYSICAL_ADDRESS          BinTop;
 
   ASSERT (HobStart != NULL);
   ASSERT (MemoryTypeInformation != NULL);
@@ -233,11 +233,11 @@ GetMemoryTypeInformationResourceHob (
   MemoryTypeInformationResourceHob = NULL;
   Count                            = 0;
   for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       continue;
     }
 
-    ResourceHob = Hob.ResourceDescriptor;
+    ResourceHob = Hob.ResourceDescriptor2;
     if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
       continue;
     }
@@ -247,13 +247,13 @@ GetMemoryTypeInformationResourceHob (
       continue;
     }
 
-    if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+    if ((ResourceHob->ResourceCapabilities & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
       continue;
     }
 
     BinTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
     if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded (&BinTop, MemoryTypeInformation)) {
-      MemoryTypeInformationResourceHob = ResourceHob;
+      MemoryTypeInformationResourceHob = Hob.ResourceDescriptor;
     }
   }
 

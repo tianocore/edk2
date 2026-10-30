@@ -164,6 +164,13 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSystemSlotPeerInfo,                ///< 94 - System Slot Peer Information
   EArchCommonObjOemStringsInfo,                    ///< 95 - OEM Strings Information
   EArchCommonObjOemString,                         ///< 96 - OEM String
+  EArchCommonObjPortConnectorInfo,                 ///< 97 - Port Connector Information
+  EArchCommonObjSmc91xInfo,                        ///< 98 - SMC91X Network Device Information
+  EArchCommonObjGroupAssociationInfo,              ///< 99 - Group Association Information
+  EArchCommonObjGroupAssociationItem,              ///< 100 - Group Association Item
+  EArchCommonObjVirtioMmioDeviceInfo,              ///< 101 - Virtio MMIO Device Information
+  EArchCommonObjFirmwareInventoryInfo,             ///< 102 - Firmware Inventory Information
+  EArchCommonObjFirmwareInventoryComponent,        ///< 103 - Firmware Inventory Associated Component
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -327,6 +334,20 @@ typedef struct CmArchCommonGenericInterrupt {
   ///       1: Interrupt is Active low
   UINT32    Flags;
 } CM_ARCH_COMMON_GENERIC_INTERRUPT;
+
+/** An AML Extended Interrupt resource descriptor interrupt.
+
+  Interrupt is the interrupt number. Flags follows the Interrupt Vector Flags
+  (Byte 3) of the Extended Interrupt resource descriptor:
+  - BIT0: 0: ResourceProducer, 1: ResourceConsumer.
+  - BIT1: 0: Level triggered, 1: Edge triggered.
+  - BIT2: 0: Active high, 1: Active low.
+  - BIT3: 0: Exclusive, 1: Shared.
+  - BIT4: 0: Not wake capable, 1: Wake capable.
+  Other bits are reserved.
+  See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h.
+**/
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARCH_COMMON_EXTENDED_INTERRUPT;
 
 /** A structure that describes a PCI Interrupt Map.
 
@@ -2284,6 +2305,129 @@ typedef struct CmArchCommonOemStringsInfo {
   CM_OBJECT_TOKEN    StringListToken;
 } CM_ARCH_COMMON_OEM_STRINGS_INFO;
 
+/** A structure that describes Port Connector Information.
+
+  SMBIOS Specification v3.9.0 Type 8
+
+  ID: EArchCommonObjPortConnectorInfo
+**/
+typedef struct CmArchCommonPortConnectorInfo {
+  /// CM Object Token uniquely identifying this Port Connector Information.
+  CM_OBJECT_TOKEN    PortConnectorInfoToken;
+
+  /// Null-terminated internal reference designator encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              InternalReferenceDesignator[SMBIOS_MAX_STRING_SIZE];
+
+  /// Internal connector type defined by SMBIOS Specification v3.9.0, Table 42.
+  UINT8              InternalConnectorType;
+
+  /// Null-terminated external reference designator encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              ExternalReferenceDesignator[SMBIOS_MAX_STRING_SIZE];
+
+  /// External connector type defined by SMBIOS Specification v3.9.0, Table 42.
+  UINT8              ExternalConnectorType;
+
+  /// Port type defined by SMBIOS Specification v3.9.0, Table 43.
+  UINT8              PortType;
+} CM_ARCH_COMMON_PORT_CONNECTOR_INFO;
+
+/** A structure that identifies an SMBIOS object in a group association.
+
+  SMBIOS Specification v3.9.0 Type 14
+
+  ID: EArchCommonObjGroupAssociationItem
+**/
+typedef struct CmArchCommonGroupAssociationItem {
+  /// CM Object Token identifying the associated SMBIOS object.
+  CM_OBJECT_TOKEN              ReferencedObjectToken;
+
+  /// Generator ID for the associated SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    ReferencedTableGeneratorId;
+} CM_ARCH_COMMON_GROUP_ASSOCIATION_ITEM;
+
+/** A structure that describes Group Association Information.
+
+  SMBIOS Specification v3.9.0 Type 14
+
+  ID: EArchCommonObjGroupAssociationInfo
+**/
+typedef struct CmArchCommonGroupAssociationInfo {
+  /// CM Object Token uniquely identifying this Group Association.
+  CM_OBJECT_TOKEN    GroupAssociationInfoToken;
+
+  /// Token referencing a non-empty array of Group Association Items.
+  /// This token must not be CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    GroupItemListToken;
+
+  /// Null-terminated group name encoded as UTF-8.
+  /// US-ASCII is recommended for compatibility with older SMBIOS parsers.
+  CHAR8              GroupName[SMBIOS_MAX_STRING_SIZE];
+} CM_ARCH_COMMON_GROUP_ASSOCIATION_INFO;
+
+/** A structure that identifies an SMBIOS component associated with firmware.
+
+  SMBIOS Specification v3.9.0 Type 45
+
+  ID: EArchCommonObjFirmwareInventoryComponent
+**/
+typedef struct CmArchCommonFirmwareInventoryComponent {
+  /// CM Object Token identifying the associated SMBIOS object.
+  CM_OBJECT_TOKEN              ReferencedObjectToken;
+
+  /// Generator ID for the associated SMBIOS object.
+  SMBIOS_TABLE_GENERATOR_ID    ReferencedTableGeneratorId;
+} CM_ARCH_COMMON_FIRMWARE_INVENTORY_COMPONENT;
+
+/** A structure that describes Firmware Inventory Information.
+
+  SMBIOS Specification v3.9.0 Type 45
+
+  ID: EArchCommonObjFirmwareInventoryInfo
+**/
+typedef struct CmArchCommonFirmwareInventoryInfo {
+  /// CM Object Token uniquely identifying this firmware component.
+  CM_OBJECT_TOKEN             FirmwareInventoryInfoToken;
+
+  /// Firmware component name encoded as UTF-8.
+  CHAR8                       FirmwareComponentName[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware version encoded as UTF-8.
+  CHAR8                       FirmwareVersion[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware version format defined by SMBIOS Specification v3.9.0, Table 134.
+  UINT8                       FirmwareVersionFormat;
+
+  /// Firmware identifier encoded as UTF-8.
+  CHAR8                       FirmwareId[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware ID format defined by SMBIOS Specification v3.9.0, Table 135.
+  UINT8                       FirmwareIdFormat;
+
+  /// Firmware release date encoded as a DSP0266 Date-Time value, or an empty string.
+  CHAR8                       ReleaseDate[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware manufacturer encoded as UTF-8.
+  CHAR8                       Manufacturer[SMBIOS_MAX_STRING_SIZE];
+
+  /// Lowest supported firmware version encoded as UTF-8.
+  CHAR8                       LowestSupportedVersion[SMBIOS_MAX_STRING_SIZE];
+
+  /// Firmware image size in bytes, or MAX_UINT64 if unknown.
+  UINT64                      ImageSize;
+
+  /// Firmware characteristics defined by SMBIOS Specification v3.9.0, Table 136.
+  FIRMWARE_CHARACTERISTICS    Characteristics;
+
+  /// Firmware state defined by SMBIOS Specification v3.9.0, Table 137.
+  UINT8                       State;
+
+  /// Token referencing an array of associated SMBIOS components.
+  /// CM_NULL_TOKEN indicates that no associated components are supplied.
+  CM_OBJECT_TOKEN             AssociatedComponentListToken;
+} CM_ARCH_COMMON_FIRMWARE_INVENTORY_INFO;
+
 /** A structure that describes an installable firmware language.
 
   SMBIOS Specification v3.9.0 Type 13
@@ -2522,5 +2666,36 @@ typedef struct CmArchCommonSystemSlotInfo {
   /// Slot height.
   UINT8              SlotHeight;
 } CM_ARCH_COMMON_SYSTEM_SLOT_INFO;
+
+/** SMC91X network device resources.
+
+  ID: EArchCommonObjSmc91xInfo
+**/
+typedef struct CmArchCommonSmc91xInfo {
+  /// Physical base address of the device registers.
+  UINT64                              BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                              BaseAddressLength;
+  /// Interrupt number and polarity/trigger flags.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    Interrupt;
+} CM_ARCH_COMMON_SMC91X_INFO;
+
+/** A structure describing a Virtio MMIO device.
+
+  ID: EArchCommonObjVirtioMmioDeviceInfo
+**/
+typedef struct CmArchCommonVirtioMmioDeviceInfo {
+  /// Physical base address of the device registers.
+  UINT64                               BaseAddress;
+  /// Size of the register range in bytes.
+  UINT64                               BaseAddressLength;
+  /// Interrupt number and Extended Interrupt descriptor flags.
+  /// Wake-capable interrupts are not supported by this generator.
+  CM_ARCH_COMMON_EXTENDED_INTERRUPT    Interrupt;
+
+  /// Indicates whether the device supports hardware-managed cache coherency.
+  /// TRUE indicates coherent DMA; FALSE indicates non-coherent DMA.
+  BOOLEAN                              CacheCoherent;
+} CM_ARCH_COMMON_VIRTIO_MMIO_DEVICE_INFO;
 
 #pragma pack()
