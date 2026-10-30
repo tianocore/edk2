@@ -33,6 +33,7 @@
   BaseMemoryLib
   DebugLib
   MemEncryptSevLib
+  AmdSevLib
   MemEncryptTdxLib
   MemoryAllocationLib
   SynchronizationLib

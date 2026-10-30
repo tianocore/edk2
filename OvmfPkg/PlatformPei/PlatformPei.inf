@@ -67,6 +67,7 @@
   QemuFwCfgSimpleParserLib
   MtrrLib
   MemEncryptSevLib
+  AmdSevLib
   PcdLib
   CcExitLib
   PlatformInitLib

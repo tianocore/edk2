@@ -51,6 +51,7 @@
   QemuFwCfgSimpleParserLib
   LocalApicLib
   MemEncryptSevLib
+  AmdSevLib
   MemoryAllocationLib
   MtrrLib
   PcdLib

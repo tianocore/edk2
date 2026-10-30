@@ -26,6 +26,7 @@
 [LibraryClasses]
   DebugLib
   MemEncryptSevLib
+  AmdSevLib
   PcdLib
   PeimEntryPoint
   PeiServicesLib

@@ -49,6 +49,7 @@
   DebugLib
   IoLib
   MemEncryptSevLib
+  AmdSevLib
   MemoryAllocationLib
   PcdLib
   PciLib

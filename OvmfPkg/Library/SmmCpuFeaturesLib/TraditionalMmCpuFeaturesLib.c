@@ -12,6 +12,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/SafeIntLib.h>
@@ -128,7 +129,7 @@ SmmCpuFeaturesSmmRelocationComplete (
 
   InitCpuHotEjectData ();
 
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return;
   }
 

@@ -53,6 +53,7 @@
   ExtractGuidedSectionLib
   LocalApicLib
   MemEncryptSevLib
+  AmdSevLib
   CpuExceptionHandlerLib
   CcProbeLib
   CpuPageTableLib

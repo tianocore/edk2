@@ -54,6 +54,7 @@
   IoLib
   LocalApicLib
   MemEncryptSevLib
+  AmdSevLib
   MtrrLib
   PciLib
   PeimEntryPoint

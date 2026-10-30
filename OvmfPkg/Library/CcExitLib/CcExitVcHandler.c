@@ -11,6 +11,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/CcExitLib.h>
 #include <Library/AmdSvsmLib.h>
 #include <Register/Amd/Msr.h>
@@ -1613,7 +1614,7 @@ Dr7WriteExit (
   UINT64                     *Register;
   UINT64                     Status;
 
-  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+  if (AmdSevEsDebugVirtualizationIsEnabled ()) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
 
@@ -1667,7 +1668,7 @@ Dr7ReadExit (
   SEV_ES_PER_CPU_DATA        *SevEsData;
   UINT64                     *Register;
 
-  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+  if (AmdSevEsDebugVirtualizationIsEnabled ()) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
 

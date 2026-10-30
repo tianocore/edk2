@@ -47,42 +47,6 @@ typedef enum {
 } MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE;
 
 /**
-  Returns a boolean to indicate whether SEV-SNP is enabled
-
-  @retval TRUE           SEV-SNP is enabled
-  @retval FALSE          SEV-SNP is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevSnpIsEnabled (
-  VOID
-  );
-
-/**
-  Returns a boolean to indicate whether SEV-ES is enabled.
-
-  @retval TRUE           SEV-ES is enabled
-  @retval FALSE          SEV-ES is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevEsIsEnabled (
-  VOID
-  );
-
-/**
-  Returns a boolean to indicate whether SEV is enabled
-
-  @retval TRUE           SEV is enabled
-  @retval FALSE          SEV is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevIsEnabled (
-  VOID
-  );
-
-/**
   This function clears memory encryption bit for the memory region specified by
   BaseAddress and NumPages from the current page table context.
 
@@ -162,32 +126,6 @@ MemEncryptSevLocateInitialSmramSaveStateMapPages (
 UINT64
 EFIAPI
 MemEncryptSevGetEncryptionMask (
-  VOID
-  );
-
-/**
-  Returns a boolean to indicate whether DebugVirtualization is enabled.
-
-  @retval TRUE           DebugVirtualization is enabled
-  @retval FALSE          DebugVirtualization is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevEsDebugVirtualizationIsEnabled (
-  VOID
-  );
-
-/**
-  Returns a boolean to indicate whether the SEV-SNP cache line eviction
-  mitigation is needed.
-
-  @retval TRUE           Cache line eviction mitigation required
-  @retval FALSE          Cache line eviction migigation not required
-
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevSnpDoCoherencyMitigation (
   VOID
   );
 
