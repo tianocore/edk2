@@ -164,11 +164,11 @@ Mtftp4FillOptions (
   OUT EFI_MTFTP4_OPTION     *Options          OPTIONAL
   )
 {
-  UINT8  *Cur;
-  UINT8  *Last;
-  UINT8  Num;
-  UINT8  *Name;
-  UINT8  *Value;
+  UINT8   *Cur;
+  UINT8   *Last;
+  UINT32  Num;
+  UINT8   *Name;
+  UINT8   *Value;
 
   Num  = 0;
   Cur  = (UINT8 *)Packet + MTFTP4_OPCODE_LEN;
@@ -194,13 +194,12 @@ Mtftp4FillOptions (
       Cur++;
     }
 
-    Num++;
-
-    if ((Options != NULL) && (Num <= *Count)) {
-      Options[Num - 1].OptionStr = Name;
-      Options[Num - 1].ValueStr  = Value;
+    if ((Options != NULL) && (Num < *Count)) {
+      Options[Num].OptionStr = Name;
+      Options[Num].ValueStr  = Value;
     }
 
+    Num++;
     Cur++;
   }
 
