@@ -87,6 +87,11 @@ READ_LOCK_STATUS   = TRUE
   INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
   #
+  # MP Services
+  #
+  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
+
+  #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf

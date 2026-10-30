@@ -369,6 +369,11 @@
   }
   OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
+  #
+  # MP Services
+  #
+  ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
+
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>

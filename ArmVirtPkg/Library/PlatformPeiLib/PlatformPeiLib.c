@@ -2,6 +2,7 @@
 *
 *  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  Copyright (c) 2014-2020, Linaro Limited. All rights reserved.
+*  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -21,6 +22,7 @@
 #include <Library/FdtSerialPortAddressLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 
+#include <Guid/ArmMpCoreInfo.h>
 #include <Guid/EarlyPL011BaseAddress.h>
 #include <Guid/FdtHob.h>
 
@@ -86,6 +88,148 @@ STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mTpm2InitializationDonePpi = {
   NULL
 };
 
+/**
+  Get the MPIDR from an FDT CPU node.
+
+  @param[in]  Fdt          The device tree.
+  @param[in]  AddressCells The number of address cells in the /cpus node.
+  @param[in]  CpuNode      The CPU node offset.
+  @param[out] Mpidr        The MPIDR from the CPU node's reg property.
+
+  @retval EFI_SUCCESS           The node is an enabled CPU with a valid MPIDR.
+  @retval EFI_NOT_FOUND         The node is not an enabled CPU node.
+  @retval EFI_COMPROMISED_DATA  The CPU node has an invalid reg property.
+**/
+STATIC
+EFI_STATUS
+GetFdtCpuMpidr (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       AddressCells,
+  IN  INT32       CpuNode,
+  OUT UINT64      *Mpidr
+  )
+{
+  CONST CHAR8   *DeviceType;
+  CONST CHAR8   *NodeStatus;
+  CONST UINT32  *RegProp;
+  INT32         PropSize;
+
+  DeviceType = FdtGetProp (Fdt, CpuNode, "device_type", &PropSize);
+  if ((DeviceType == NULL) || (AsciiStrCmp (DeviceType, "cpu") != 0)) {
+    return EFI_NOT_FOUND;
+  }
+
+  NodeStatus = FdtGetProp (Fdt, CpuNode, "status", &PropSize);
+  if ((NodeStatus != NULL) && (AsciiStrCmp (NodeStatus, "disabled") == 0)) {
+    return EFI_NOT_FOUND;
+  }
+
+  RegProp = FdtGetProp (Fdt, CpuNode, "reg", &PropSize);
+  if ((RegProp == NULL) || (PropSize != AddressCells * sizeof (UINT32))) {
+    return EFI_COMPROMISED_DATA;
+  }
+
+  if (AddressCells == 1) {
+    *Mpidr = Fdt32ToCpu (ReadUnaligned32 (RegProp));
+  } else {
+    *Mpidr = Fdt64ToCpu (ReadUnaligned64 (RegProp));
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Build the MP core information HOB from the CPU nodes in the device tree.
+
+  @param[in] Fdt  The device tree.
+
+  @retval EFI_SUCCESS            The MP core info HOB was built.
+  @retval EFI_DEVICE_ERROR       The FDT is invalid.
+  @retval EFI_NOT_FOUND          No enabled CPU nodes were found.
+  @retval EFI_COMPROMISED_DATA   A CPU node contained malformed data.
+  @retval EFI_UNSUPPORTED        The FDT uses an unsupported address-cell size.
+  @retval EFI_OUT_OF_RESOURCES   The HOB could not be allocated.
+**/
+STATIC
+EFI_STATUS
+BuildFdtMpCoreInfoHob (
+  IN CONST VOID  *Fdt
+  )
+{
+  EFI_STATUS     Status;
+  INT32          CpusNode;
+  INT32          CpuNode;
+  INT32          AddressCells;
+  UINTN          CpuCount;
+  UINTN          CpuIndex;
+  UINT64         Mpidr;
+  ARM_CORE_INFO  *CoreInfo;
+
+  if ((Fdt == NULL) || (FdtCheckHeader (Fdt) != 0)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  CpusNode = FdtPathOffset (Fdt, "/cpus");
+  if (CpusNode < 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  AddressCells = FdtAddressCells (Fdt, CpusNode);
+  if ((AddressCells != 1) && (AddressCells != 2)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  // Count the enabled CPU nodes
+  CpuCount = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    Status = GetFdtCpuMpidr (Fdt, AddressCells, CpuNode, &Mpidr);
+    if (Status == EFI_NOT_FOUND) {
+      continue;
+    }
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    CpuCount++;
+  }
+
+  if (CpuCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  CoreInfo = BuildGuidHob (&gArmMpCoreInfoGuid, sizeof (*CoreInfo) * CpuCount);
+  if (CoreInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Preserve the device-tree order when filling the HOB.
+  ZeroMem (CoreInfo, sizeof (*CoreInfo) * CpuCount);
+
+  CpuIndex = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    Status = GetFdtCpuMpidr (Fdt, AddressCells, CpuNode, &Mpidr);
+    if (Status == EFI_NOT_FOUND) {
+      continue;
+    }
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    CoreInfo[CpuIndex].Mpidr               = Mpidr;
+    CoreInfo[CpuIndex].MailboxSetAddress   = (EFI_PHYSICAL_ADDRESS)0;
+    CoreInfo[CpuIndex].MailboxGetAddress   = (EFI_PHYSICAL_ADDRESS)0;
+    CoreInfo[CpuIndex].MailboxClearAddress = (EFI_PHYSICAL_ADDRESS)0;
+    CoreInfo[CpuIndex].MailboxClearValue   = (UINT64)0xFFFFFFFF;
+    DEBUG ((DEBUG_INFO, "%a: MPIDR 0x%Lx\n", __func__, Mpidr));
+    CpuIndex++;
+  }
+
+  ASSERT (CpuIndex == CpuCount);
+  return EFI_SUCCESS;
+}
+
 EFI_STATUS
 EFIAPI
 PlatformPeim (
@@ -127,6 +271,11 @@ PlatformPeim (
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
   ASSERT (FdtHobData != NULL);
   *FdtHobData = (UINTN)NewBase;
+
+  Status = BuildFdtMpCoreInfoHob (NewBase);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to build MP core info HOB: %r\n", __func__, Status));
+  }
 
   UartHobData = BuildGuidHob (&gEarlyPL011BaseAddressGuid, sizeof *UartHobData);
   ASSERT (UartHobData != NULL);
