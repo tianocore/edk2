@@ -73,6 +73,7 @@
   ## SOMETIMES_CONSUMES
   ## SOMETIMES_PRODUCES
   gEfiDevicePathProtocolGuid
+  gEfiHash2ServiceBindingProtocolGuid
   gEfiIp4ProtocolGuid                           ## TO_START
   gEfiIp4ServiceBindingProtocolGuid             ## TO_START
   gEfiTcp4ProtocolGuid                          ## BY_START
@@ -87,9 +88,6 @@
 [Guids]
   gEfiHashAlgorithmMD5Guid                      ## CONSUMES
   gEfiHashAlgorithmSha256Guid                   ## CONSUMES
-
-[Depex]
-  gEfiHash2ServiceBindingProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   TcpDxeExtra.uni
