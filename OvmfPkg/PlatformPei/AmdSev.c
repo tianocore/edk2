@@ -15,6 +15,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Pi/PiHob.h>
@@ -128,7 +129,7 @@ AmdSevSnpInitialize (
   UINT64                       HvFeatures;
   EFI_STATUS                   PcdStatus;
 
-  if (!MemEncryptSevSnpIsEnabled ()) {
+  if (!AmdSevSnpIsEnabled ()) {
     return;
   }
 
@@ -322,7 +323,7 @@ AmdSevEsInitialize (
   IA32_DESCRIPTOR      Gdtr;
   VOID                 *Gdt;
 
-  if (!MemEncryptSevEsIsEnabled ()) {
+  if (!AmdSevEsIsEnabled ()) {
     return;
   }
 
@@ -395,7 +396,7 @@ AmdSevEsInitialize (
   //
   // SEV-SNP guest requires that GHCB GPA must be registered before using it.
   //
-  if (MemEncryptSevSnpIsEnabled ()) {
+  if (AmdSevSnpIsEnabled ()) {
     GhcbRegister (GhcbBasePa);
   }
 
@@ -450,7 +451,7 @@ AmdSevInitialize (
   //
   // Check if SEV is enabled
   //
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return;
   }
 
@@ -527,15 +528,15 @@ AmdSevInitialize (
   // Set the Confidential computing attr PCD to communicate which SEV
   // technology is active.
   //
-  if (MemEncryptSevSnpIsEnabled ()) {
+  if (AmdSevSnpIsEnabled ()) {
     CCGuestAttr = CCAttrAmdSevSnp;
-  } else if (MemEncryptSevEsIsEnabled ()) {
+  } else if (AmdSevEsIsEnabled ()) {
     CCGuestAttr = CCAttrAmdSevEs;
   } else {
     CCGuestAttr = CCAttrAmdSev;
   }
 
-  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+  if (AmdSevEsDebugVirtualizationIsEnabled ()) {
     CCGuestAttr |= CCAttrFeatureAmdSevEsDebugVirtualization;
   }
 
@@ -553,7 +554,7 @@ SevInitializeRam (
   VOID
   )
 {
-  if (MemEncryptSevSnpIsEnabled ()) {
+  if (AmdSevSnpIsEnabled ()) {
     //
     // If SEV-SNP is enabled, reserve the Secrets and CPUID memory area.
     //

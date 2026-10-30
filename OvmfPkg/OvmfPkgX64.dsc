@@ -207,6 +207,7 @@
   LoadLinuxLib|OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
 !if $(STANDALONE_MM_ENABLE) != TRUE
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
+  AmdSevLib|OvmfPkg/Library/AmdSevLib/DxeAmdSevLib.inf
 !else
   # CC is not supported with standalone MM enabled
   MemEncryptSevLib|OvmfPkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
@@ -307,6 +308,7 @@
   CcExitLib|OvmfPkg/Library/CcExitLib/SecCcExitLib.inf
 !if $(STANDALONE_MM_ENABLE) != TRUE
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  AmdSevLib|OvmfPkg/Library/AmdSevLib/SecAmdSevLib.inf
 !endif
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
   TdxMeasurementLib|OvmfPkg/IntelTdx/TdxMeasurementLib/SecPeiTdxMeasurementLib.inf
@@ -365,6 +367,7 @@
 
 !if $(STANDALONE_MM_ENABLE) != TRUE
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
+  AmdSevLib|OvmfPkg/Library/AmdSevLib/PeiAmdSevLib.inf
 !endif
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf

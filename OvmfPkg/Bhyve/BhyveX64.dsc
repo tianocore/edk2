@@ -181,6 +181,7 @@
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   LoadLinuxLib|OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
+  AmdSevLib|OvmfPkg/Library/AmdSevLib/DxeAmdSevLib.inf
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
   MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLib.inf
   PeiHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/PeiHardwareInfoLib.inf
@@ -269,6 +270,7 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
   CcExitLib|OvmfPkg/Library/CcExitLib/SecCcExitLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  AmdSevLib|OvmfPkg/Library/AmdSevLib/SecAmdSevLib.inf
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
   TdxMeasurementLib|OvmfPkg/IntelTdx/TdxMeasurementLib/SecPeiTdxMeasurementLib.inf
 
@@ -322,6 +324,7 @@
   PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
 
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
+  AmdSevLib|OvmfPkg/Library/AmdSevLib/PeiAmdSevLib.inf
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   TdxMeasurementLib|OvmfPkg/IntelTdx/TdxMeasurementLib/SecPeiTdxMeasurementLib.inf

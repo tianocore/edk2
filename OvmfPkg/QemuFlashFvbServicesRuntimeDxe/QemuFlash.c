@@ -10,6 +10,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/PcdLib.h>
 
 #include "QemuFlash.h"
@@ -80,7 +81,7 @@ QemuFlashDetected (
 
   DEBUG ((DEBUG_INFO, "QEMU Flash: Attempting flash detection at %p\n", Ptr));
 
-  if (MemEncryptSevEsIsEnabled ()) {
+  if (AmdSevEsIsEnabled ()) {
     //
     // When SEV-ES is enabled, the check below can result in an infinite
     // loop with respect to a nested page fault. When the memslot is mapped
@@ -263,7 +264,7 @@ QemuFlashInitialize (
   // The SNP model does not provide for QEMU flash device support, so exit
   // early before attempting to initialize any QEMU flash device support.
   //
-  if (MemEncryptSevSnpIsEnabled ()) {
+  if (AmdSevSnpIsEnabled ()) {
     return EFI_UNSUPPORTED;
   }
 

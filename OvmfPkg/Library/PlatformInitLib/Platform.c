@@ -36,6 +36,7 @@
 #include <OvmfPlatforms.h>
 #include <Library/TdxLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 
 #include <Library/PlatformInitLib.h>
 
@@ -816,7 +817,7 @@ PlatformValidateNvVarStore (
   // mapped unencrypted. If the initial validation fails, remap the
   // NV variable store as unencrypted and retry the validation.
   //
-  Retry = MemEncryptSevIsEnabled ();
+  Retry = AmdSevIsEnabled ();
 
 RETRY:
   if ((!IsZeroBuffer (NvVarStoreFvHeader->ZeroVector, 16)) ||

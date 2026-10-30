@@ -11,6 +11,7 @@
 
 #include <Library/UefiRuntimeLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/CcExitLib.h>
 #include <Register/Amd/Msr.h>
 
@@ -23,7 +24,7 @@ QemuFlashConvertPointers (
   VOID
   )
 {
-  if (MemEncryptSevEsIsEnabled ()) {
+  if (AmdSevEsIsEnabled ()) {
     mSevEsFlashPhysBase = (UINTN)mFlashBase;
   }
 
@@ -55,7 +56,7 @@ QemuFlashPtrWrite (
   IN        UINT8           Value
   )
 {
-  if (MemEncryptSevEsIsEnabled ()) {
+  if (AmdSevEsIsEnabled ()) {
     MSR_SEV_ES_GHCB_REGISTER  Msr;
     GHCB                      *Ghcb;
     EFI_PHYSICAL_ADDRESS      PhysAddr;

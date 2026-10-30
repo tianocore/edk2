@@ -13,6 +13,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -206,7 +207,7 @@ MarkIoMemoryRangeForRuntimeAccess (
   // the mapping so that both guest and hyervisor can access the flash
   // memory range.
   //
-  if (MemEncryptSevIsEnabled ()) {
+  if (AmdSevIsEnabled ()) {
     Status = MemEncryptSevClearMmioPageEncMask (
                0,
                BaseAddress,

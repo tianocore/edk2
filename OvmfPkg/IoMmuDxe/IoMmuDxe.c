@@ -25,7 +25,7 @@ IoMmuDxeEntryPoint (
   // When SEV or TDX is enabled, install IoMmu protocol otherwise install the
   // placeholder protocol so that other dependent module can run.
   //
-  if (MemEncryptSevIsEnabled () || MemEncryptTdxIsEnabled ()) {
+  if (AmdSevIsEnabled () || MemEncryptTdxIsEnabled ()) {
     Status = InstallIoMmuProtocol ();
   } else {
     Handle = NULL;

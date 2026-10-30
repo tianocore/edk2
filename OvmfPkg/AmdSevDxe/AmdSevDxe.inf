@@ -30,6 +30,7 @@
   DebugLib
   DxeServicesTableLib
   MemEncryptSevLib
+  AmdSevLib
   MemoryAllocationLib
   PcdLib
   UefiDriverEntryPoint
