@@ -151,7 +151,7 @@ class SpellCheck(ICiBuildPlugin):
 
         # Parse the config for other ignored paths and use os separator.
         if "IgnoreFiles" in pkgconfig:
-            pkgfiles = [os.path.join(packagename, x).replace(os.sep, "/")
+            pkgfiles = [os.path.join(relpath, x).replace(os.sep, "/")
                         for x in pkgconfig["IgnoreFiles"]]
             config["ignorePaths"].extend(pkgfiles)
 
