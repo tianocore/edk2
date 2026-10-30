@@ -1,0 +1,34 @@
+## @file
+#  RISC-V instance of the Timer Library for the Universal Payload.
+#
+#  The time CSR is free-running. Its frequency comes from
+#  PcdRiscVTimeBaseFrequency so the FIT entry can delay before any HOB exists.
+#
+#  Copyright (c) 2026, NewFW Technology. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = RiscV64TimerLib
+  FILE_GUID                      = 7C1E4B2A-9D63-4F18-A5E0-6B8C2D4F1A70
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib
+
+[Sources]
+  RiscV64TimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+
+[FixedPcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdRiscVTimeBaseFrequency
