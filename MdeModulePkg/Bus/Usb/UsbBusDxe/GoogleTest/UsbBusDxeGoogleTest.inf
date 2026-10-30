@@ -1,7 +1,8 @@
 ## @file
-# Google Test suite for UsbBusDxe.
+# Google Test suite for USB descriptors, root hub resets, and DFU transitions.
 #
 # Copyright (c) 2026, Intel Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -14,8 +15,12 @@
 
 [Sources]
   UsbBusDxeGoogleTest.cpp
+  ../UsbBus.c
+  ../UsbEnumer.c
   ../UsbDesc.c
+  ../UsbUtility.c
   ../UsbHub.c
+  ../ComponentName.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -23,8 +28,17 @@
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [LibraryClasses]
+  GoogleTestLib
   BaseLib
   BaseMemoryLib
   DebugLib
-  GoogleTestLib
   MemoryAllocationLib
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiLib
+  ReportStatusCodeLib
+
+[Protocols]
+  gEfiUsbIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiUsb2HcProtocolGuid
