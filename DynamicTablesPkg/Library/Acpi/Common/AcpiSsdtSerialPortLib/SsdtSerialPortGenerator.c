@@ -253,6 +253,8 @@ BuildSsdtSerialPortTableEx (
 
     // Build a SSDT table describing the serial port.
     Status = BuildSsdtSerialPortTable (
+               CfgMgrProtocol,
+               This,
                AcpiTableInfo,
                &SerialPortInfo[Index],
                NewName,
