@@ -12,6 +12,7 @@
 //
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/PcdLib.h>
 #include <PiPei.h>
 
@@ -34,7 +35,7 @@ AmdSevInitialize (
   //
   // Check if SEV is enabled
   //
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return;
   }
 

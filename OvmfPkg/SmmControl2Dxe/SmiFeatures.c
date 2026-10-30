@@ -11,6 +11,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -146,7 +147,7 @@ NegotiateSmiFeatures (
   // and nothing else.
   //
   RequestedFeaturesMask = ICH9_LPC_SMI_F_BROADCAST;
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     //
     // For now, we only support hotplug with SEV disabled.
     //

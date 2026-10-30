@@ -13,51 +13,6 @@
 #include <Library/MemEncryptSevLib.h>
 
 /**
-  Returns a boolean to indicate whether SEV-SNP is enabled.
-
-  @retval TRUE           SEV-SNP is enabled
-  @retval FALSE          SEV-SNP is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevSnpIsEnabled (
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
-  Returns a boolean to indicate whether SEV-ES is enabled.
-
-  @retval TRUE           SEV-ES is enabled
-  @retval FALSE          SEV-ES is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevEsIsEnabled (
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
-  Returns a boolean to indicate whether SEV is enabled.
-
-  @retval TRUE           SEV is enabled
-  @retval FALSE          SEV is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevIsEnabled (
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
   This function clears memory encryption bit for the memory region specified by
   BaseAddress and NumPages from the current page table context.
 
@@ -150,21 +105,6 @@ MemEncryptSevGetEncryptionMask (
   )
 {
   return 0;
-}
-
-/**
-  Returns a boolean to indicate whether DebugVirtualization is enabled.
-
-  @retval TRUE           DebugVirtualization is enabled
-  @retval FALSE          DebugVirtualization is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevEsDebugVirtualizationIsEnabled (
-  VOID
-  )
-{
-  return FALSE;
 }
 
 /**

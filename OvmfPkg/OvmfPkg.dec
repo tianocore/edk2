@@ -41,6 +41,11 @@
   #                  Virtualization (SEV) guests.
   MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
 
+  ##  @libraryclass  Declares enablement helper functions which are moved
+  #                  out from MemEncryptSevLib.h for Secure Encrypted
+  #                  Virtualization (SEV) guests.
+  AmdSevLib|Include/Library/AmdSevLib.h
+
   ##  @libraryclass  Declares helper functions for TDX guests.
   #
   MemEncryptTdxLib|Include/Library/MemEncryptTdxLib.h

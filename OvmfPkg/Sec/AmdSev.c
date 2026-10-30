@@ -190,7 +190,7 @@ SevEsProtocolCheck (
   }
 
   //
-  // We cannot use the MemEncryptSevSnpIsEnabled () because the
+  // We cannot use the AmdSevSnpIsEnabled () because the
   // ProcessLibraryConstructorList () is not called yet.
   //
   if (SevSnpIsEnabled ()) {

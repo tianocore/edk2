@@ -50,6 +50,7 @@
   DxeServicesTableLib
   MemoryAllocationLib
   MemEncryptSevLib
+  AmdSevLib
   PcdLib
   SmmServicesTableLib
   UefiBootServicesTableLib

@@ -46,6 +46,7 @@
   ExtractGuidedSectionLib
   LocalApicLib
   MemEncryptSevLib
+  AmdSevLib
   CpuExceptionHandlerLib
   PeilessStartupLib
   PlatformInitLib

@@ -16,6 +16,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
@@ -207,7 +208,7 @@ AmdSevDxeEntryPoint (
   //
   // Do nothing when SEV is not enabled
   //
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return EFI_UNSUPPORTED;
   }
 
@@ -320,7 +321,7 @@ AmdSevDxeEntryPoint (
     CpuDeadLoop ();
   }
 
-  if (MemEncryptSevSnpIsEnabled ()) {
+  if (AmdSevSnpIsEnabled ()) {
     //
     // Memory acceptance began being required in SEV-SNP, so install the
     // memory accept protocol implementation for a SEV-SNP active guest.
