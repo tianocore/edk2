@@ -13,10 +13,10 @@
 
 [FD.MEMFD]
 BaseAddress   = $(MEMFD_BASE_ADDRESS)
-Size          = 0xF80000
+Size          = 0x1400000
 ErasePolarity = 1
 BlockSize     = 0x10000
-NumBlocks     = 0xF8
+NumBlocks     = 0x140
 
 #
 # initial page tables, created by the reset vector
@@ -125,14 +125,14 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase|gUefiOvmfPkgTokenSpaceGui
 #
 # PEI firmware volume is uncompressed to this area
 #
-0x030000|0x0D0000
+0x200000|0x200000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
 FV = PEIFV
 
 #
 # DXE firmware volume is uncompressed to this area
 #
-0x100000|0xE80000
+0x400000|0x1000000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
 FV = DXEFV
 
