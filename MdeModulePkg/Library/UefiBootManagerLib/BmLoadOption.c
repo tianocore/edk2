@@ -73,6 +73,37 @@ BmForEachVariable (
 }
 
 /**
+  Check whether a load option variable exists without reading its content.
+
+  @param  LoadOptionType      The load option type.
+  @param  OptionNumber        The load option number.
+
+  @retval EFI_SUCCESS     The load option variable exists.
+  @retval EFI_NOT_FOUND   The load option variable does not exist.
+  @return Others          The status returned by gRT->GetVariable ().
+**/
+EFI_STATUS
+BmCheckLoadOptionVariable (
+  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LoadOptionType,
+  IN UINT16                             OptionNumber
+  )
+{
+  EFI_STATUS  Status;
+  CHAR16      OptionName[BM_OPTION_NAME_LEN];
+  UINTN       VariableSize;
+
+  UnicodeSPrint (OptionName, sizeof (OptionName), L"%s%04x", mBmLoadOptionName[LoadOptionType], OptionNumber);
+
+  VariableSize = 0;
+  Status       = gRT->GetVariable (OptionName, &gEfiGlobalVariableGuid, NULL, &VariableSize, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
   Get the Option Number that wasn't used.
 
   @param  LoadOptionType      The load option type.
@@ -1146,13 +1177,26 @@ EfiBootManagerGetLoadOptions (
       UnicodeSPrint (OptionName, sizeof (OptionName), L"%s%04x", mBmLoadOptionName[LoadOptionType], OptionNumber);
 
       Status = EfiBootManagerVariableToLoadOption (OptionName, &Options[OptionIndex]);
-      if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_INFO, "[Bds] %s doesn't exist - Update ****Order variable to remove the reference!!", OptionName));
-        EfiBootManagerDeleteLoadOptionVariable (OptionNumber, LoadOptionType);
-      } else {
+      if (!EFI_ERROR (Status)) {
         ASSERT (Options[OptionIndex].OptionNumber == OptionNumber);
         OptionIndex++;
+        continue;
       }
+
+      //
+      // A failed read is reported as EFI_NOT_FOUND, the same as a missing
+      // variable. Keep the load option unless it is missing or invalid.
+      //
+      if (Status != EFI_INVALID_PARAMETER) {
+        Status = BmCheckLoadOptionVariable (LoadOptionType, OptionNumber);
+        if (Status != EFI_NOT_FOUND) {
+          DEBUG ((DEBUG_WARN, "[Bds] Failed to read %s - keep it in ****Order variable\n", OptionName));
+          continue;
+        }
+      }
+
+      DEBUG ((DEBUG_INFO, "[Bds] %s doesn't exist - Update ****Order variable to remove the reference!!", OptionName));
+      EfiBootManagerDeleteLoadOptionVariable (OptionNumber, LoadOptionType);
     }
 
     if (OptionOrder != NULL) {

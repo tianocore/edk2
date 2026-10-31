@@ -173,6 +173,22 @@ typedef struct {
 #define BM_HOTKEY_FROM_LINK(a)  CR (a, BM_HOTKEY, Link, BM_HOTKEY_SIGNATURE)
 
 /**
+  Check whether a load option variable exists without reading its content.
+
+  @param  LoadOptionType      The load option type.
+  @param  OptionNumber        The load option number.
+
+  @retval EFI_SUCCESS     The load option variable exists.
+  @retval EFI_NOT_FOUND   The load option variable does not exist.
+  @return Others          The status returned by gRT->GetVariable ().
+**/
+EFI_STATUS
+BmCheckLoadOptionVariable (
+  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LoadOptionType,
+  IN UINT16                             OptionNumber
+  );
+
+/**
   Get the Option Number that wasn't used.
 
   @param  LoadOptionType      Load option type.
