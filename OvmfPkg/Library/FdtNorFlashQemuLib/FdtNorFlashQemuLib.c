@@ -28,6 +28,20 @@ VirtNorFlashPlatformInitialization (
   return EFI_SUCCESS;
 }
 
+/**
+  Return the NOR flash devices exposed by the platform.
+
+  @param[out] NorFlashDescriptions  Pointer to the platform NOR flash device
+                                    description array.
+  @param[out] Count                 Number of entries in NorFlashDescriptions.
+
+  @retval EFI_SUCCESS            The NOR flash device descriptions were
+                                 returned successfully.
+  @retval EFI_INVALID_PARAMETER  NorFlashDescriptions or Count is NULL.
+  @retval EFI_NOT_FOUND          No NOR flash devices are available.
+  @retval Others                 The platform failed to retrieve the NOR flash
+                                 device descriptions.
+**/
 EFI_STATUS
 VirtNorFlashPlatformGetDevices (
   OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
@@ -160,6 +174,12 @@ VirtNorFlashPlatformGetDevices (
 
   *NorFlashDescriptions = mNorFlashDevices;
   *Count                = Num;
+
+  if (Num == 0) {
+    // No Flash Device found.
+    DEBUG ((DEBUG_INFO, "No Flash Device found.\n"));
+    return EFI_NOT_FOUND;
+  }
 
   return EFI_SUCCESS;
 }

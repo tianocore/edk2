@@ -19,8 +19,6 @@
 #include "VirtualMemory.h"
 #include "SnpPageStateChange.h"
 
-STATIC BOOLEAN          mAddressEncMaskChecked = FALSE;
-STATIC UINT64           mAddressEncMask;
 STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 STATIC VOID  *mPscBuffer = NULL;
@@ -42,18 +40,10 @@ InternalGetMemEncryptionAddressMask (
   VOID
   )
 {
-  UINT64  EncryptionMask;
+  UINT64  EncryptionMask = MemEncryptSevGetEncryptionMask ();
+  UINT64  AddressEncMask = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
 
-  if (mAddressEncMaskChecked) {
-    return mAddressEncMask;
-  }
-
-  EncryptionMask = MemEncryptSevGetEncryptionMask ();
-
-  mAddressEncMask        = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
-  mAddressEncMaskChecked = TRUE;
-
-  return mAddressEncMask;
+  return AddressEncMask;
 }
 
 /**
