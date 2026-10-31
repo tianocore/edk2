@@ -49,6 +49,7 @@ typedef struct {
   BOOLEAN    UseMmio;
   UINT32     BaudRate;
   UINT8      RegisterStride;
+  UINT32     InputHz;
 } UART_INFO;
 
 UART_INFO  mUartInfo[MAX_SIZE];
@@ -135,6 +136,7 @@ SerialPortInitialize (
   UINT32                              Divisor;
   UINT32                              CurrentDivisor;
   UINT32                              BaudRate;
+  UINT32                              InputHz;
   BOOLEAN                             Initialized;
   BOOLEAN                             MmioEnable;
   UINT8                               Value;
@@ -149,15 +151,17 @@ SerialPortInitialize (
     MmioEnable         = PcdGetBool (PcdSerialUseMmio);
     BaudRate           = PcdGet32 (PcdSerialBaudRate);
     RegisterStride     = (UINT8)PcdGet32 (PcdSerialRegisterStride);
+    InputHz            = PcdGet32 (PcdSerialClockRate);
 
     mUartInfo[mUartCount].BaseAddress    = SerialRegisterBase;
     mUartInfo[mUartCount].UseMmio        = MmioEnable;
     mUartInfo[mUartCount].BaudRate       = BaudRate;
     mUartInfo[mUartCount].RegisterStride = RegisterStride;
+    mUartInfo[mUartCount].InputHz        = InputHz;
     mUartCount++;
 
-    Divisor = PcdGet32 (PcdSerialClockRate) / (BaudRate * 16);
-    if ((PcdGet32 (PcdSerialClockRate) % (BaudRate * 16)) >= BaudRate * 8) {
+    Divisor = InputHz / (BaudRate * 16);
+    if ((InputHz % (BaudRate * 16)) >= BaudRate * 8) {
       Divisor++;
     }
 
@@ -220,6 +224,18 @@ SerialPortInitialize (
     BaudRate           = SerialPortInfo->BaudRate;
     RegisterStride     = SerialPortInfo->RegisterStride;
 
+    if ((SerialPortInfo->Header.Revision >= 2) &&
+        (SerialPortInfo->Header.Length >= UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO, InputHertz)) &&
+        (SerialPortInfo->InputHertz > 0))
+    {
+      InputHz = SerialPortInfo->InputHertz;
+    } else {
+      //
+      // Use the default clock rate if the InputHz is not specified in the HOB.
+      //
+      InputHz = PcdGet32 (PcdSerialClockRate);
+    }
+
     if (SerialRegisterBase == 0) {
       GuidHob = GET_NEXT_HOB (GuidHob);
       GuidHob = GetNextGuidHob (&gUniversalPayloadSerialPortInfoGuid, GuidHob);
@@ -230,10 +246,12 @@ SerialPortInitialize (
     mUartInfo[mUartCount].UseMmio        = MmioEnable;
     mUartInfo[mUartCount].BaudRate       = BaudRate;
     mUartInfo[mUartCount].RegisterStride = RegisterStride;
+    mUartInfo[mUartCount].InputHz        = InputHz;
+
     mUartCount++;
 
-    Divisor = PcdGet32 (PcdSerialClockRate) / (BaudRate * 16);
-    if ((PcdGet32 (PcdSerialClockRate) % (BaudRate * 16)) >= BaudRate * 8) {
+    Divisor = InputHz / (BaudRate * 16);
+    if ((InputHz % (BaudRate * 16)) >= BaudRate * 8) {
       Divisor++;
     }
 
@@ -764,6 +782,7 @@ SerialPortSetAttributes (
   UINTN    BaseAddress;
   BOOLEAN  UseMmio;
   UINT32   SerialBaudRate;
+  UINT32   InputHertz;
   UINTN    Divisor;
   UINT8    Lcr;
   UINT8    LcrData;
@@ -777,6 +796,7 @@ SerialPortSetAttributes (
     BaseAddress = mUartInfo[Count].BaseAddress;
     UseMmio     = mUartInfo[Count].UseMmio;
     Stride      = mUartInfo[Count].RegisterStride;
+    InputHertz  = mUartInfo[Count].InputHz;
 
     if (BaseAddress == 0) {
       Count++;
@@ -901,8 +921,8 @@ SerialPortSetAttributes (
     // Calculate divisor for baud generator
     //    Ref_Clk_Rate / Baud_Rate / 16
     //
-    Divisor = PcdGet32 (PcdSerialClockRate) / (SerialBaudRate * 16);
-    if ((PcdGet32 (PcdSerialClockRate) % (SerialBaudRate * 16)) >= SerialBaudRate * 8) {
+    Divisor = InputHertz / (SerialBaudRate * 16);
+    if ((InputHertz % (SerialBaudRate * 16)) >= SerialBaudRate * 8) {
       Divisor++;
     }
 
