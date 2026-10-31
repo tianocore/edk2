@@ -44,6 +44,10 @@ typedef struct {
   UINT64                      Attributes;            ///< Initial attributes.
                                                      ///< Refer to EFI_PCI_ATTRIBUTE_xxx used by GetAttributes()
                                                      ///< and SetAttributes() in EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
+                                                     ///< Set EFI_PCI_ATTRIBUTE_MEMORY_CACHED and/or MEMORY_WRITE_COMBINE to
+                                                     ///< request EFI_MEMORY_WB or EFI_MEMORY_WC (in this order of preference)
+                                                     ///< mappings of the MMIO apertures instead of EFI_MEMORY_UC. Ignored for
+                                                     ///< apertures covered by existing GCD descriptors that don't permit it.
   BOOLEAN                     DmaAbove4G;            ///< DMA above 4GB memory.
                                                      ///< Set to TRUE when root bridge supports DMA above 4GB memory.
   BOOLEAN                     NoExtendedConfigSpace; ///< When FALSE, the root bridge supports
