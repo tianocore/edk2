@@ -138,3 +138,21 @@ AmdSevSnpDoCoherencyMitigation (
   return AmdSevSnpIsEnabled () &&
          ((SevEsWorkArea->Flags & SEV_ES_WORK_AREA_FLAG_CSFW_NO) == 0);
 }
+
+/**
+  Returns a boolean to indicate whether Alternate Injection is enabled.
+
+  @retval TRUE           AlternateInjection is enabled
+  @retval FALSE          AlternateInjection is not enabled
+**/
+BOOLEAN
+EFIAPI
+AmdSevSnpAlternateInjectionIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalAmdSevStatus ();
+  return Msr.Bits.AlternateInjection ? TRUE : FALSE;
+}

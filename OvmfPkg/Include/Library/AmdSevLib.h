@@ -87,4 +87,16 @@ AmdSevSnpDoCoherencyMitigation (
   VOID
   );
 
+/**
+  Returns a boolean to indicate whether Alternate Injection is enabled.
+
+  @retval TRUE           Alternate Injection is enabled
+  @retval FALSE          Alternate Injection is not enabled
+**/
+BOOLEAN
+EFIAPI
+AmdSevSnpAlternateInjectionIsEnabled (
+  VOID
+  );
+
 #endif // _AMD_SEV_LIB_H_

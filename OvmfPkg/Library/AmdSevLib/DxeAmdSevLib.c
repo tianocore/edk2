@@ -22,6 +22,7 @@ STATIC BOOLEAN  SevEsIsEnabled         = FALSE;
 STATIC BOOLEAN  SevSnpIsEnabled        = FALSE;
 STATIC BOOLEAN  SevDebugVirtualization = FALSE;
 STATIC BOOLEAN  SevSnpCoherencySfwNo   = FALSE;
+STATIC BOOLEAN  SevSnpAltInjEnabled    = FALSE;
 
 RETURN_STATUS
 EFIAPI
@@ -53,6 +54,7 @@ DxeAmdSevLibConstructor (
   SevSnpIsEnabled        = Msr.Bits.SevSnpBit ? TRUE : FALSE;
   SevDebugVirtualization = Msr.Bits.DebugVirtualization ? TRUE : FALSE;
   SevSnpCoherencySfwNo   = (SevEsWorkArea->Flags & SEV_ES_WORK_AREA_FLAG_CSFW_NO) != 0;
+  SevSnpAltInjEnabled    = Msr.Bits.AlternateInjection ? TRUE : FALSE;
 
   return RETURN_SUCCESS;
 }
@@ -132,4 +134,19 @@ AmdSevSnpDoCoherencyMitigation (
   )
 {
   return AmdSevSnpIsEnabled () && !SevSnpCoherencySfwNo;
+}
+
+/**
+  Returns a boolean to indicate whether Alternate Injection is enabled.
+
+  @retval TRUE           Alternate Injection is enabled
+  @retval FALSE          Alternate Injection is not enabled
+**/
+BOOLEAN
+EFIAPI
+AmdSevSnpAlternateInjectionIsEnabled (
+  VOID
+  )
+{
+  return SevSnpAltInjEnabled;
 }
