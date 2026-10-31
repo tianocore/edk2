@@ -506,6 +506,70 @@ TestEntryLbaMultiplicationOverflowIsRejected (
 }
 
 /**
+  Verify that an entry array size that truncates in UINT32 is rejected.
+
+  @param[in]  Context  Unit test context.
+
+  @retval  UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+TestEntryArraySizeOverflowIsRejected (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  EFI_PARTITION_TABLE_HEADER  Header;
+
+  SetupDiskWithValidPrimary ();
+
+  //
+  // 0x02000001 * PARTITION_ENTRY_SIZE (128) truncates to 0x80 in UINT32. The
+  // entry array CRC is computed over the truncated size so that only the
+  // overflow check can reject this header.
+  //
+  GetPrimaryHeader ()->NumberOfPartitionEntries = 0x02000001;
+  GetPrimaryHeader ()->PartitionEntryArrayCRC32 = CalculateCrc32 (GetDiskLba (PRIMARY_PART_HEADER_LBA + 1), 0x80);
+  UpdateGptHeaderCrc (GetPrimaryHeader ());
+
+  UT_ASSERT_FALSE (ValidateAt (PRIMARY_PART_HEADER_LBA, &Header));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Verify that an entry array size that truncates in UINT32 is rejected when
+  the partition entry size is larger than 128 bytes.
+
+  @param[in]  Context  Unit test context.
+
+  @retval  UNIT_TEST_PASSED  The test passed.
+**/
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+TestEntryArraySizeOverflowWithLargerEntrySizeIsRejected (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  EFI_PARTITION_TABLE_HEADER  Header;
+
+  SetupDiskWithValidPrimary ();
+
+  //
+  // 0x01000001 * 256 truncates to 0x100 in UINT32.
+  //
+  GetPrimaryHeader ()->NumberOfPartitionEntries = 0x01000001;
+  GetPrimaryHeader ()->SizeOfPartitionEntry     = 256;
+  GetPrimaryHeader ()->PartitionEntryArrayCRC32 = CalculateCrc32 (GetDiskLba (PRIMARY_PART_HEADER_LBA + 1), 0x100);
+  UpdateGptHeaderCrc (GetPrimaryHeader ());
+
+  UT_ASSERT_FALSE (ValidateAt (PRIMARY_PART_HEADER_LBA, &Header));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
   Verify that an entry array CRC mismatch is rejected.
 
   @param[in]  Context  Unit test context.
@@ -995,6 +1059,8 @@ UefiTestMain (
   AddTestCase (ValidSuite, "Zero entry size is rejected", "ZeroEntrySize", TestZeroEntrySizeIsRejected, NULL, NULL, NULL);
   AddTestCase (ValidSuite, "Non power-of-two entry size is rejected", "NonPowerOfTwoEntrySize", TestNonPowerOfTwoEntrySizeIsRejected, NULL, NULL, NULL);
   AddTestCase (ValidSuite, "PartitionEntryLBA overflow is rejected", "EntryLbaOverflow", TestEntryLbaMultiplicationOverflowIsRejected, NULL, NULL, NULL);
+  AddTestCase (ValidSuite, "Entry array size overflow is rejected", "EntryArraySizeOverflow", TestEntryArraySizeOverflowIsRejected, NULL, NULL, NULL);
+  AddTestCase (ValidSuite, "Entry array size overflow with 256-byte entries is rejected", "EntryArraySizeOverflow256", TestEntryArraySizeOverflowWithLargerEntrySizeIsRejected, NULL, NULL, NULL);
   AddTestCase (ValidSuite, "Entry array CRC mismatch is rejected", "EntryArrayCrcMismatch", TestEntryArrayCrcMismatchIsRejected, NULL, NULL, NULL);
   AddTestCase (ValidSuite, "Entry array read failure is rejected", "EntryArrayReadFailure", TestEntryArrayReadFailureIsRejected, NULL, NULL, NULL);
 
