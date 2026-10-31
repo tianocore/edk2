@@ -1,5 +1,5 @@
 /** @file
-Ported ELF include files from FreeBSD
+ELF64 file format definitions ported from FreeBSD.
 
 Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

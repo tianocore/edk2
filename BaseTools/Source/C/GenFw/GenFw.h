@@ -1,5 +1,6 @@
 /** @file
-Header file for GenFw
+GenFw action definitions and function prototypes shared by GenFw and its
+ELF converter.
 
 Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
