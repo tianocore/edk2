@@ -2,19 +2,24 @@
   Google Test mocks for DxeServicesTableLib
 
   Copyright (c) Microsoft Corporation.
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include <GoogleTest/Library/MockDxeServicesTableLib.h>
 
 MOCK_INTERFACE_DEFINITION (MockDxeServicesTableLib);
 MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_Dispatch, 0, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_AddMemorySpace, 4, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_AllocateMemorySpace, 7, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_FreeMemorySpace, 2, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_RemoveMemorySpace, 2, EFIAPI);
 
 static EFI_DXE_SERVICES  LocalDs = {
   { 0, 0, 0, 0, 0 },                                                                   // EFI_TABLE_HEADER
-  NULL,                                                                                // EFI_ADD_MEMORY_SPACE
-  NULL,                                                                                // EFI_ALLOCATE_MEMORY_SPACE
-  NULL,                                                                                // EFI_FREE_MEMORY_SPACE
-  NULL,                                                                                // EFI_REMOVE_MEMORY_SPACE
+  gDS_AddMemorySpace,                                                                  // EFI_ADD_MEMORY_SPACE
+  gDS_AllocateMemorySpace,                                                             // EFI_ALLOCATE_MEMORY_SPACE
+  gDS_FreeMemorySpace,                                                                 // EFI_FREE_MEMORY_SPACE
+  gDS_RemoveMemorySpace,                                                               // EFI_REMOVE_MEMORY_SPACE
   NULL,                                                                                // EFI_GET_MEMORY_SPACE_DESCRIPTOR
   NULL,                                                                                // EFI_SET_MEMORY_SPACE_ATTRIBUTES
   NULL,                                                                                // EFI_GET_MEMORY_SPACE_MAP

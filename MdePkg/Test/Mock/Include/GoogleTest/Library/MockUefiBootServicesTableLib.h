@@ -2,6 +2,7 @@
   Google Test mocks for UefiBootServicesTableLib
 
   Copyright (c) Microsoft Corporation.
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -55,11 +56,52 @@ struct MockUefiBootServicesTableLib {
     );
 
   MOCK_FUNCTION_DECLARATION (
+    VOID,
+    gBS_SetMem,
+    (IN VOID   *Buffer,
+     IN UINTN  Size,
+     IN UINT8  Value)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_LocateHandleBuffer,
+    (IN     EFI_LOCATE_SEARCH_TYPE  SearchType,
+     IN     EFI_GUID                *Protocol  OPTIONAL,
+     IN     VOID                    *SearchKey  OPTIONAL,
+     OUT    UINTN                   *NoHandles,
+     OUT    EFI_HANDLE              **Buffer)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
     gBS_LocateProtocol,
     (IN  EFI_GUID *Protocol,
      IN  VOID      *Registration  OPTIONAL,
      OUT VOID      **Interface)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_RegisterProtocolNotify,
+    (IN  EFI_GUID  *Protocol,
+     IN  EFI_EVENT Event,
+     OUT VOID      **Registration)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_SignalEvent,
+    (IN EFI_EVENT Event)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_InstallProtocolInterface,
+    (IN OUT EFI_HANDLE          *Handle,
+     IN     EFI_GUID            *Protocol,
+     IN     EFI_INTERFACE_TYPE  InterfaceType,
+     IN     VOID                *Interface)
     );
 
   MOCK_FUNCTION_DECLARATION (
@@ -106,5 +148,19 @@ struct MockUefiBootServicesTableLib {
     gBS_InstallConfigurationTable,
     (IN EFI_GUID  *Guid,
      IN VOID      *Table)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_AllocatePool,
+    (IN  EFI_MEMORY_TYPE  PoolType,
+     IN  UINTN            Size,
+     OUT VOID             **Buffer)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_FreePool,
+    (IN VOID  *Buffer)
     );
 };
