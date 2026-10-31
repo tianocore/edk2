@@ -2,6 +2,7 @@
   The Hii functions for WiFi Connection Manager.
 
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1139,7 +1140,7 @@ WifiMgrDxeHiiConfigAccessExtractConfig (
   UINTN                    BufferSize;
   EFI_STATUS               Status;
 
-  if ((This == NULL) || (Progress == NULL) || (Results == NULL)) {
+  if ((This == NULL) || (Progress == NULL) || (Results == NULL) || (gHiiConfigRouting == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1286,7 +1287,7 @@ WifiMgrDxeHiiConfigAccessRouteConfig (
   WIFI_MGR_PRIVATE_DATA    *Private;
   WIFI_MANAGER_IFR_NVDATA  *IfrNvData;
 
-  if ((Configuration == NULL) || (Progress == NULL)) {
+  if ((Configuration == NULL) || (Progress == NULL) || (gHiiConfigRouting == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

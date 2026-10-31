@@ -10,6 +10,7 @@
 #  3). EAP Networks (EAP-TLS, EAP-TTLS/MSCHAPv2 and PEAPv0/MSCHAPv2)
 #
 #  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -19,7 +20,7 @@
   INF_VERSION               = 0x00010005
   BASE_NAME                 = WifiConnectionManagerDxe
   FILE_GUID                 = c6df98f2-5ec0-4a94-8c11-9a9828ef03f2
-  MODULE_TYPE               = DXE_DRIVER
+  MODULE_TYPE               = UEFI_DRIVER
   VERSION_STRING            = 0.1
   ENTRY_POINT               = WifiMgrDxeDriverEntryPoint
 
@@ -77,6 +78,3 @@
   gWifiConfigGuid                               ## PRODUCES  ## GUID
   gEfiIfrTianoGuid                              ## CONSUMES  ## GUID (Extended IFR Guid Opcode)
   gEfiAdapterInfoMediaStateGuid                 ## SOMETIMES_CONSUMES  ## GUID  # Indicate the current media state status
-
-[Depex]
-  gEfiHiiConfigRoutingProtocolGuid
