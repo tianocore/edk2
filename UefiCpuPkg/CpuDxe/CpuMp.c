@@ -655,6 +655,7 @@ InitializeMpExceptionStackSwitchHandlers (
   )
 {
   UINTN                           Index;
+  UINTN                           Bsp;
   EXCEPTION_STACK_SWITCH_CONTEXT  *SwitchStackData;
   UINTN                           BufferSize;
   EFI_STATUS                      Status;
@@ -673,6 +674,22 @@ InitializeMpExceptionStackSwitchHandlers (
     // to indicate the procedure haven't been run yet.
     //
     SwitchStackData[Index].Status = EFI_NOT_STARTED;
+  }
+
+  //
+  // Unless stack guard is enabled, only do this for the APs. Loading TR on the
+  // BSP cannot be undone, and the OS loader inherits it: the Windows Server
+  // 2016 hypervisor (Hyper-V / Credential Guard) fails to launch if TR != 0 at
+  // handoff. The OS starts the APs with INIT-SIPI-SIPI, which resets their TR,
+  // so it is never exposed. Marking the BSP's entry as done makes
+  // InitializeExceptionStackSwitchHandlers() skip it.
+  //
+  if (!PcdGetBool (PcdCpuStackGuard)) {
+    Status = MpInitLibWhoAmI (&Bsp);
+    ASSERT_EFI_ERROR (Status);
+    if (!EFI_ERROR (Status)) {
+      SwitchStackData[Bsp].Status = EFI_SUCCESS;
+    }
   }
 
   Status = MpInitLibStartupAllCPUs (
