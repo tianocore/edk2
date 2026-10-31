@@ -1753,6 +1753,22 @@
   # @Prompt Enable Capsule On Disk support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport|FALSE|BOOLEAN|0x0000002d
 
+  ## Whether Capsule On Disk should be processed without a reboot.<BR><BR>
+  #  This PCD depends on PcdCapsuleOnDiskSupport being enabled.<BR><BR>
+  #  Either solution described for that PCD involves a reboot, with the
+  #  disk-backed one requiring file-system modifications and FatPei.<BR>
+  #  In contrast, this PCD causes capsules to be loaded from disk into memory
+  #  and processed immediately.<BR>
+  #  This makes processing of RAM and disk capsules largely identical,
+  #  eliminates the need for an extra non-volatile storage.  It also avoids
+  #  two-step processing of on-disk capsules when RAM capsules are enabled
+  #  (i.e., loading them from disk into memory and rebooting to properly handle
+  #  them on the second try).<BR><BR>
+  #  This can be freely combined with RAM capsules, including processing a mix
+  #  of capsules of different kinds during a single boot.
+  # @Prompt Enable handling of Capsule On Disk without a reboot.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskImmediate|FALSE|BOOLEAN|0x00000039
+
   ## Indicates whether the platform supports processing Capsules that include EmbeddedDrivers.
   #  Default value is FALSE, meaning embedded drivers are not supported.
   #  Platforms that require embedded driver support must explicitly opt-in by setting this PCD to TRUE.

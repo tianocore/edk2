@@ -58,15 +58,3 @@ typedef struct {
   CHAR16           *FileNameFirstPart;   ///  Text to the left of right-most period in the file name. String is capitialized
   CHAR16           *FileNameSecondPart;  ///  Text to the right of right-most period in the file name.String is capitialized. Maybe NULL
 } FILE_INFO_ENTRY;
-
-typedef struct {
-  //
-  // image address.
-  //
-  VOID             *ImageAddress;
-  //
-  // The file info of the image comes from.
-  //  if FileInfo == NULL. means image does not come from file
-  //
-  EFI_FILE_INFO    *FileInfo;
-} IMAGE_INFO;
