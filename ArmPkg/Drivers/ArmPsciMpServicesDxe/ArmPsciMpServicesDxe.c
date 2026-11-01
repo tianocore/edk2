@@ -1368,18 +1368,6 @@ MpServicesInitialize (
     gHcr = ArmReadHcr ();
   }
 
-  //
-  // The global pointer variables as well as the gProcessorIDs array contents
-  // are accessed by the other cores so we must clean them to the PoC
-  //
-  WriteBackDataCacheRange (&gProcessorIDs, sizeof (UINT64 *));
-  WriteBackDataCacheRange (&gHcr, sizeof (gHcr));
-
-  WriteBackDataCacheRange (
-    gProcessorIDs,
-    (mCpuMpData.NumberOfProcessors + 1) * sizeof (UINT64)
-    );
-
   mNonBlockingModeAllowed = TRUE;
 
   Status = EfiCreateEventReadyToBootEx (
@@ -1446,13 +1434,6 @@ ArmPsciMpServicesDxeInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Parts of the code in this driver may be executed by other cores running
-  // with the MMU off so we need to ensure that everything is clean to the
-  // point of coherency (PoC)
-  //
-  WriteBackDataCacheRange (Image->ImageBase, Image->ImageSize);
-
   Hob = GetFirstGuidHob (&gArmMpCoreInfoGuid);
   if (Hob != NULL) {
     HobData     = GET_GUID_HOB_DATA (Hob);
@@ -1472,6 +1453,15 @@ ArmPsciMpServicesDxeInitialize (
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
+
+  //
+  // Parts of the code in this driver may be executed by other cores running
+  // with the MMU off so we need to ensure that everything is clean to the
+  // point of coherency (PoC). This includes the global variables that are
+  // set by MpServicesInitialize(), which the other cores load before they
+  // enable their MMU.
+  //
+  WriteBackDataCacheRange (Image->ImageBase, Image->ImageSize);
 
   //
   // Now install the MP services protocol.
