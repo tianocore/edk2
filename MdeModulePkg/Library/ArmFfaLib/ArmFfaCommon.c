@@ -1246,7 +1246,7 @@ ArmFfaLibIsFfaSupported (
 }
 
 /**
-  Send FF-A Non-secure Resoure Info Get Command.
+  Send FF-A Non-secure Resource Info Get Command.
 
   @param [in]   TargetId         Partition ID to query info from
   @param [in]   Flags            Additional flags
@@ -1254,7 +1254,7 @@ ArmFfaLibIsFfaSupported (
   @param [out]  RemainingSize    How much data remains to be read
 
   @retval EFI_SUCCESS               Success, info returned in Rx/Tx buffer
-  @retval EFI_INVALID PARAMETER     Invalid parameter(s)
+  @retval EFI_INVALID_PARAMETER     Invalid parameter(s)
   @retval Others                    Error
 
 **/
