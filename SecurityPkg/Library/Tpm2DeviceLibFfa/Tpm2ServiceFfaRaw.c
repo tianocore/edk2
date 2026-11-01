@@ -21,6 +21,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/ArmFfaLib.h>
 
@@ -99,25 +100,47 @@ FfaTpm2GetServicePartitionId (
   )
 {
   EFI_STATUS              Status;
-  EFI_FFA_PART_INFO_DESC  TpmPartInfo;
+  EFI_FFA_PART_INFO_DESC  *TpmPartInfo;
+  UINT32                  TpmPartInfoSize;
 
   if (PartitionId == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = ArmFfaLibGetPartitionInfo (&gTpm2ServiceFfaGuid, &TpmPartInfo);
-  if (EFI_ERROR (Status)) {
+  *PartitionId    = TPM2_FFA_PARTITION_ID_INVALID;
+  TpmPartInfoSize = 0;
+  Status          = ArmFfaLibGetPartitionInfoEx (&gTpm2ServiceFfaGuid, NULL, &TpmPartInfoSize);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
     DEBUG ((DEBUG_ERROR, "Failed to get Tpm2 partition info. Status: %r\n", Status));
     return Status;
   }
 
-  *PartitionId = TpmPartInfo.PartitionId;
-  if (TpmPartInfo.PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
+  if (TpmPartInfoSize < sizeof (EFI_FFA_PART_INFO_DESC)) {
+    DEBUG ((DEBUG_ERROR, "Partition Info descriptor size is too small. Size: %u\n", TpmPartInfoSize));
+    return EFI_UNSUPPORTED;
+  }
+
+  TpmPartInfo = AllocateZeroPool (TpmPartInfoSize);
+  if (TpmPartInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = ArmFfaLibGetPartitionInfoEx (&gTpm2ServiceFfaGuid, TpmPartInfo, &TpmPartInfoSize);
+  if (EFI_ERROR (Status)) {
+    FreePool (TpmPartInfo);
+    return Status;
+  }
+
+  *PartitionId = TpmPartInfo->PartitionId;
+  if (TpmPartInfo->PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     /*
      * Tpm partition id never be TPM2_FFA_PARTITION_ID_INVALID.
      */
+    FreePool (TpmPartInfo);
     return EFI_DEVICE_ERROR;
   }
+
+  FreePool (TpmPartInfo);
 
   return EFI_SUCCESS;
 }
