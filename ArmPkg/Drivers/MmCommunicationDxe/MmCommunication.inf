@@ -38,6 +38,7 @@
   DebugLib
   DxeServicesTableLib
   HobLib
+  MemoryAllocationLib
   UefiDriverEntryPoint
   SafeIntLib
 
