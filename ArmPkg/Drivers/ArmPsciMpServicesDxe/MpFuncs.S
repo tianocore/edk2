@@ -8,13 +8,13 @@
 .align 3
 
 #include <AsmMacroLib.h>
-#include <IndustryStandard/ArmStdSmc.h>
 #include <Library/ArmLib.h>
 
 #include "MpServicesInternal.h"
 
 GCC_ASM_IMPORT (gProcessorIDs)
 GCC_ASM_IMPORT (ApProcedure)
+GCC_ASM_IMPORT (ApCpuOff)
 GCC_ASM_IMPORT (gTcr)
 GCC_ASM_IMPORT (gTtbr0)
 GCC_ASM_IMPORT (gMair)
@@ -78,7 +78,11 @@ ASM_PFX(ApEntryPoint):
   bl ApProcedure              // doesn't return
 
 ProcessorNotFound:
-// Turn off the processor
-  MOV32 (w0, ARM_SMC_ID_PSCI_CPU_OFF)
-  smc #0
+// Not expected to be reached: only processors listed in gProcessorIDs are
+// started with ApEntryPoint. Turn off the processor through ApCpuOff, which
+// needs a stack, so use the stack passed by DispatchCpu.
+  mov sp, x19
+  mov x29, xzr
+  bl ArmEnableVFP             // Do not trap SIMD instructions
+  bl ApCpuOff                 // doesn't return
   b .
