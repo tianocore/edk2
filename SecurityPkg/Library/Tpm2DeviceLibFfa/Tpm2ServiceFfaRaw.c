@@ -21,6 +21,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/ArmFfaLib.h>
 
@@ -99,25 +100,29 @@ FfaTpm2GetServicePartitionId (
   )
 {
   EFI_STATUS              Status;
-  EFI_FFA_PART_INFO_DESC  TpmPartInfo;
+  EFI_FFA_PART_INFO_DESC  *TpmPartInfo;
+  UINT32                  TpmPartInfoSize;
 
   if (PartitionId == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = ArmFfaLibGetPartitionInfo (&gTpm2ServiceFfaGuid, &TpmPartInfo);
+  *PartitionId = TPM2_FFA_PARTITION_ID_INVALID;
+  Status       = ArmFfaLibGetAllocatedPartitionInfo (&gTpm2ServiceFfaGuid, (VOID **)&TpmPartInfo, &TpmPartInfoSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get Tpm2 partition info. Status: %r\n", Status));
     return Status;
   }
 
-  *PartitionId = TpmPartInfo.PartitionId;
-  if (TpmPartInfo.PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
+  *PartitionId = TpmPartInfo->PartitionId;
+  if (TpmPartInfo->PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     /*
      * Tpm partition id never be TPM2_FFA_PARTITION_ID_INVALID.
      */
+    FreePool (TpmPartInfo);
     return EFI_DEVICE_ERROR;
   }
+
+  FreePool (TpmPartInfo);
 
   return EFI_SUCCESS;
 }
