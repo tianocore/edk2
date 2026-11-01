@@ -13,10 +13,8 @@
 
 #include "MpServicesInternal.h"
 
-GCC_ASM_IMPORT (gApStacksBase)
 GCC_ASM_IMPORT (gProcessorIDs)
 GCC_ASM_IMPORT (ApProcedure)
-GCC_ASM_IMPORT (gApStackSize)
 GCC_ASM_IMPORT (gTcr)
 GCC_ASM_IMPORT (gTtbr0)
 GCC_ASM_IMPORT (gMair)
@@ -32,6 +30,10 @@ GCC_ASM_EXPORT (ApEntryPoint)
 //   VOID
 //   );
 ASM_PFX(ApEntryPoint):
+  // x0 contains the context_id passed to PSCI CPU_ON by DispatchCpu, which is
+  // the top of this AP's stack. Keep it in a callee-saved register.
+  mov x19, x0
+
   // Restore HCR_EL2 when running at EL2
   EL1_OR_EL2(x1)
 1:
@@ -70,12 +72,7 @@ ASM_PFX(ApEntryPoint):
   cmp x0, x3                  // if mpidr_el1 != gProcessorIDs[x] then loop
   bne 1b
 
-// Calculate stack address
-  // x2 contains the index for the current processor plus 1
-  LDR_LIT(x0, gApStacksBase)
-  LDR_LIT(x1, gApStackSize)
-  mul x3, x2, x1              // x3 = (ProcessorIndex + 1) * gApStackSize
-  add sp, x0, x3              // sp = gApStacksBase + x3
+  mov sp, x19                 // stack passed by DispatchCpu
   mov x29, xzr
   bl ArmEnableVFP             // Do not trap SIMD instructions
   bl ApProcedure              // doesn't return
