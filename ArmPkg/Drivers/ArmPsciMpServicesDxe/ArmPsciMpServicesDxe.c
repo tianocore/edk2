@@ -1485,6 +1485,25 @@ ArmPsciMpServicesDxeInitialize (
   return Status;
 }
 
+/** Turns off the calling AP using PSCI CPU_OFF. Does not return.
+
+**/
+VOID
+ApCpuOff (
+  VOID
+  )
+{
+  ARM_SMC_ARGS  Args;
+
+  ZeroMem (&Args, sizeof (Args));
+  Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
+  ArmCallSmc (&Args);
+
+  /* Should never be reached */
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
 /** AP exception handler.
 
   @param InterruptType The AArch64 CPU exception type.
@@ -1499,10 +1518,9 @@ ApExceptionHandler (
   IN CONST EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  ARM_SMC_ARGS  Args;
-  UINT64        Mpidr;
-  UINTN         Index;
-  UINTN         ProcessorIndex;
+  UINT64  Mpidr;
+  UINTN   Index;
+  UINTN   ProcessorIndex;
 
   Mpidr = GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ());
 
@@ -1523,13 +1541,7 @@ ApExceptionHandler (
     ArmDataMemoryBarrier ();
   }
 
-  ZeroMem (&Args, sizeof (Args));
-  Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
-  ArmCallSmc (&Args);
-
-  /* Should never be reached */
-  ASSERT (FALSE);
-  CpuDeadLoop ();
+  ApCpuOff ();
 }
 
 /** C entry-point for the AP.
@@ -1541,7 +1553,6 @@ ApProcedure (
   VOID
   )
 {
-  ARM_SMC_ARGS      Args;
   EFI_AP_PROCEDURE  UserApProcedure;
   VOID              *UserApParameter;
   UINTN             ProcessorIndex;
@@ -1567,13 +1578,7 @@ ApProcedure (
   ArmDataMemoryBarrier ();
 
   /* Since we're finished with this AP, turn it off */
-  ZeroMem (&Args, sizeof (Args));
-  Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
-  ArmCallSmc (&Args);
-
-  /* Should never be reached */
-  ASSERT (FALSE);
-  CpuDeadLoop ();
+  ApCpuOff ();
 }
 
 /** Returns whether the processor executing this function is the BSP.
