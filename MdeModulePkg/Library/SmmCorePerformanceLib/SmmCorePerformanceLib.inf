@@ -10,6 +10,7 @@
 #
 #  Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation.
+#  (c) Copyright 2026 HP Development Company, L.P.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -45,7 +46,6 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  DxeServicesLib
   MemoryAllocationLib
   PcdLib
   PeCoffGetEntryPointLib
@@ -57,6 +57,7 @@
   UefiLib
 
 [Protocols]
+  gEfiFirmwareVolume2ProtocolGuid           ## CONSUMES
   gEfiSmmBase2ProtocolGuid                  ## CONSUMES
   gEdkiiSmmExitBootServicesProtocolGuid     ## CONSUMES ## NOTIFY
   gEfiLoadedImageProtocolGuid               ## CONSUMES
