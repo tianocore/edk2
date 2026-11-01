@@ -449,3 +449,25 @@ ArmFfaLibGetPartitionInfo (
   IN EFI_GUID                 *ServiceGuid,
   OUT EFI_FFA_PART_INFO_DESC  *PartDesc
   );
+
+/**
+  Send FF-A Non-secure Resource Info Get Command.
+
+  @param [in]   TargetId         Partition ID to query info from
+  @param [in]   Flags            Additional flags
+  @param [out]  WrittenSize      How much data was written in the transaction
+  @param [out]  RemainingSize    How much data remains to be read
+
+  @retval EFI_SUCCESS               Success, info returned in Rx/Tx buffer
+  @retval EFI_INVALID_PARAMETER     Invalid parameter(s)
+  @retval Others                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibFfaNsResInfoGet (
+  IN UINT16   TargetId,
+  IN UINT64   Flags,
+  OUT UINT32  *WrittenSize,
+  OUT UINT32  *RemainingSize
+  );
