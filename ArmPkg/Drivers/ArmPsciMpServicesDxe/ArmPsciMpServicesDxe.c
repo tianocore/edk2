@@ -35,8 +35,8 @@
 
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
+#include <Library/ArmMonitorLib.h>
 #include <Library/ArmPlatformLib.h>
-#include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
@@ -84,8 +84,8 @@ DispatchCpu (
   IN UINTN  ProcessorIndex
   )
 {
-  ARM_SMC_ARGS  Args;
-  EFI_STATUS    Status;
+  ARM_MONITOR_ARGS  Args;
+  EFI_STATUS        Status;
 
   Status = EFI_SUCCESS;
 
@@ -107,7 +107,7 @@ DispatchCpu (
   //
   Args.Arg3 = (UINTN)mApStacksBase + (ProcessorIndex + 1) * AP_STACK_SIZE;
 
-  ArmCallSmc (&Args);
+  ArmMonitorCall (&Args);
 
   if (Args.Arg0 == ARM_SMC_PSCI_RET_ALREADY_ON) {
     Status = EFI_NOT_READY;
@@ -1496,11 +1496,11 @@ ApCpuOff (
   VOID
   )
 {
-  ARM_SMC_ARGS  Args;
+  ARM_MONITOR_ARGS  Args;
 
   ZeroMem (&Args, sizeof (Args));
   Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
-  ArmCallSmc (&Args);
+  ArmMonitorCall (&Args);
 
   /* Should never be reached */
   ASSERT (FALSE);
