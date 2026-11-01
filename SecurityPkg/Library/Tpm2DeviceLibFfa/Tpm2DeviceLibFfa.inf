@@ -43,6 +43,7 @@
   BaseMemoryLib
   IoLib
   ArmFfaLib
+  MemoryAllocationLib
 
 [Guids]
   gTpm2ServiceFfaGuid
