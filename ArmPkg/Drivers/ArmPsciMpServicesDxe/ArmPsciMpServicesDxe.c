@@ -55,9 +55,8 @@
 
 STATIC CPU_MP_DATA  mCpuMpData;
 STATIC BOOLEAN      mNonBlockingModeAllowed;
-UINT64              *gApStacksBase;
+STATIC UINT64       *mApStacksBase;
 UINT64              *gProcessorIDs;
-CONST UINT64        gApStackSize = AP_STACK_SIZE;
 VOID                *gTtbr0;
 UINTN               gTcr;
 UINTN               gMair;
@@ -102,6 +101,11 @@ DispatchCpu (
 
   Args.Arg1 = gProcessorIDs[ProcessorIndex];
   Args.Arg2 = (UINTN)ApEntryPoint;
+  //
+  // Pass the top of the AP's stack as context_id, which ApEntryPoint receives
+  // in x0 and uses as its stack.
+  //
+  Args.Arg3 = (UINTN)mApStacksBase + (ProcessorIndex + 1) * AP_STACK_SIZE;
 
   ArmCallSmc (&Args);
 
@@ -1326,13 +1330,13 @@ MpServicesInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  gApStacksBase = AllocatePages (
+  mApStacksBase = AllocatePages (
                     EFI_SIZE_TO_PAGES (
                       mCpuMpData.NumberOfProcessors *
-                      gApStackSize
+                      AP_STACK_SIZE
                       )
                     );
-  ASSERT (gApStacksBase != NULL);
+  ASSERT (mApStacksBase != NULL);
 
   for (Index = 0; Index < mCpuMpData.NumberOfProcessors; Index++) {
     if (GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ()) == GET_MPIDR_AFFINITY_BITS (CoreInfo[Index].Mpidr)) {
@@ -1369,7 +1373,6 @@ MpServicesInitialize (
   // are accessed by the other cores so we must clean them to the PoC
   //
   WriteBackDataCacheRange (&gProcessorIDs, sizeof (UINT64 *));
-  WriteBackDataCacheRange (&gApStacksBase, sizeof (UINT64 *));
   WriteBackDataCacheRange (&gHcr, sizeof (gHcr));
 
   WriteBackDataCacheRange (
