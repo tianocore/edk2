@@ -93,6 +93,7 @@ DispatchCpu (
   mCpuMpData.CpuData[ProcessorIndex].State = CpuStateBusy;
 
   /* Turn the AP on */
+  ZeroMem (&Args, sizeof (Args));
   if (sizeof (Args.Arg0) == sizeof (UINT32)) {
     Args.Arg0 = ARM_SMC_ID_PSCI_CPU_ON_AARCH32;
   } else {
@@ -1522,6 +1523,7 @@ ApExceptionHandler (
     ArmDataMemoryBarrier ();
   }
 
+  ZeroMem (&Args, sizeof (Args));
   Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
   ArmCallSmc (&Args);
 
@@ -1565,6 +1567,7 @@ ApProcedure (
   ArmDataMemoryBarrier ();
 
   /* Since we're finished with this AP, turn it off */
+  ZeroMem (&Args, sizeof (Args));
   Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
   ArmCallSmc (&Args);
 
