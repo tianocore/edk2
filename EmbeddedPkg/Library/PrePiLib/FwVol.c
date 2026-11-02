@@ -449,18 +449,15 @@ FfsProcessSection (
       }
 
       //
-      // Allocate destination buffer, extra one page for adjustment
+      // Allocate destination buffer. The buffer is page aligned, and the
+      // decompressed section stream keeps the alignment of the embedded FV
+      // (GenFds pads the FV_IMAGE section data to the FvAlignment recorded in
+      // the inner FV header), so no further adjustment is needed here.
       //
-      DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
+      DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
       if (DstBuffer == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-
-      //
-      // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
-      // to make section data at page alignment.
-      //
-      DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - SectionHeaderSize;
 
       //
       // Call decompress function
