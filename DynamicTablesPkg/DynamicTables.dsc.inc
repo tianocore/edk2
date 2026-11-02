@@ -45,6 +45,7 @@
   DynamicTablesPkg/Library/Acpi/Common/AcpiMsctLib/AcpiMsctLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiPcctLib/AcpiPcctLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiPpttLib/AcpiPpttLib.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiRas2Lib/AcpiRas2Lib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiRawLib/AcpiRawLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiSpcrLib/AcpiSpcrLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiSratLib/AcpiSratLib.inf
@@ -176,6 +177,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiMsctLib/AcpiMsctLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiPcctLib/AcpiPcctLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiPpttLib/AcpiPpttLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiRas2Lib/AcpiRas2Lib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiRawLib/AcpiRawLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSpcrLib/AcpiSpcrLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSlitLib/AcpiSlitLib.inf
