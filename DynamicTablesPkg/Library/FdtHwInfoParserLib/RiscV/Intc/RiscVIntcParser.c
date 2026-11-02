@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
+#include "ArchUtility.h"
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "RiscV/Intc/RiscVIntcParser.h"
@@ -1336,15 +1337,18 @@ RiscVIntcInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
   EFI_STATUS         Status;
+  UINT32             Index;
+  CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
+  CM_OBJECT_TOKEN    *CpuTokenTable;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  NewCmObjDesc = NULL;
+  NewCmObjDesc  = NULL;
+  CpuTokenTable = NULL;
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
   // and create a CM_OBJ_DESCRIPTOR.
@@ -1368,14 +1372,29 @@ RiscVIntcInfoParser (
     goto exit_handler;
   }
 
+  CpuTokenTable = AllocateZeroPool (sizeof (*CpuTokenTable) * NewCmObjDesc->Count);
+  if (CpuTokenTable == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  for (Index = 0; Index < NewCmObjDesc->Count; Index++) {
+    CpuTokenTable[Index] = GetCpuToken (Index);
+  }
+
   // Finally, add all the RINTC CmObjs to the Configuration Manager.
-  Status = AddMultipleCmObj (FdtParserHandle, NewCmObjDesc, 0, NULL);
+  Status = AddMultipleCmObjWithToken (FdtParserHandle, NewCmObjDesc, CpuTokenTable);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
   }
 
 exit_handler:
+  if (CpuTokenTable != NULL) {
+    FreePool (CpuTokenTable);
+  }
+
   FreeCmObjDesc (NewCmObjDesc);
   return Status;
 }
