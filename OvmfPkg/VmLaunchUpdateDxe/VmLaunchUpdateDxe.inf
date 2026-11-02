@@ -1,0 +1,42 @@
+## @file
+#  vm launch update protocol
+#  qemu fwcfg implementation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = VmLaunchUpdateDxe
+  FILE_GUID                      = 6eaed786-90ef-4d11-8b92-dc0750c1a8ac
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VmLaunchUpdateDxeEntrypoint
+
+[Sources]
+  VmLaunchUpdateDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemEncryptSevLib
+  MemoryAllocationLib
+  QemuFwCfgLib
+  ResetSystemLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gVMLaunchUpdateProtocolGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+
+[Depex]
+  TRUE
