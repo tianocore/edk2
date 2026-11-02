@@ -154,7 +154,6 @@ FreePages (
   If there is not enough memory at the specified alignment remaining to satisfy the request, then
   NULL is returned.
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Alignment is invalid and assertions are disabled, then NULL is returned.
   If the total number of pages required overflows, then NULL is returned.
 
   @param  MemoryType            The type of memory to allocate.
@@ -250,7 +249,6 @@ InternalAllocateAlignedPages (
   request, then NULL is returned.
 
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Alignment is invalid and assertions are disabled, then NULL is returned.
   If the total number of pages required overflows, then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
@@ -279,7 +277,6 @@ AllocateAlignedPages (
   request, then NULL is returned.
 
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
-  If Alignment is invalid and assertions are disabled, then NULL is returned.
   If the total number of pages required overflows, then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
