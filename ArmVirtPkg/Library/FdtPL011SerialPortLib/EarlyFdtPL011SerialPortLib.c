@@ -11,7 +11,7 @@
 **/
 
 #include <Base.h>
-
+#include <Library/ArmCcaLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PL011UartLib.h>
 #include <Library/SerialPortLib.h>
@@ -121,6 +121,10 @@ SerialPortWrite (
   )
 {
   UINT64  SerialRegisterBase;
+
+  if (ArmCcaIsRealm ()) {
+    return 0;
+  }
 
   SerialRegisterBase = SerialPortGetBaseAddress ();
   if (SerialRegisterBase != 0) {

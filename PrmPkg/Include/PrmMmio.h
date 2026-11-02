@@ -16,7 +16,8 @@
 ///
 /// Describes a memory range that needs to be made accessible at OS runtime.
 ///
-/// The memory range with the given base address and length will be marked as EFI_MEMORY_RUNTIME.
+/// The memory range with the given base address and length will be marked as
+/// EFI_MEMORY_RUNTIME and EFI_MEMORY_XP.
 ///
 typedef struct {
   EFI_PHYSICAL_ADDRESS    PhysicalBaseAddress;
