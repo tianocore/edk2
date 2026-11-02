@@ -215,6 +215,7 @@ INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
 INF  OvmfPkg/VirtioInputDxe/VirtioInput.inf
+INF  OvmfPkg/VmLaunchUpdateDxe/VmLaunchUpdateDxe.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
