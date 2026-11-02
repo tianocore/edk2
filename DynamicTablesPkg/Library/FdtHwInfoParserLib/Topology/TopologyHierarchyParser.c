@@ -455,6 +455,12 @@ AddCpuToProcHierarchy (
   UINT32                              Flags;
   UINT32                              CpuIndex;
 
+  Status = FindCpuIndex (Context, CpuNode, &CpuIndex);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
   Flags = PPTT_LEAF_FLAG_MASK;
   if (IsThread) {
     Flags |= PPTT_THREAD_FLAG_MASK;
@@ -464,17 +470,11 @@ AddCpuToProcHierarchy (
              Context,
              ParentIndex,
              ParentToken,
-             (CM_OBJECT_TOKEN)CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceFdtHwInfo, EFdtHwInfoGicCObject, (UINT32)CpuNode),
+             GetCpuToken (CpuIndex),
              Flags,
              &ProcHierarchyNode,
              &CurrProcHierarchyIndex
              );
-  if (EFI_ERROR (Status)) {
-    ASSERT (FALSE);
-    return Status;
-  }
-
-  Status = FindCpuIndex (Context, CpuNode, &CpuIndex);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return Status;
