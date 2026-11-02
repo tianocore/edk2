@@ -103,6 +103,8 @@ The Dynamic Tables Framework implements the following ACPI table generators:
   - ERST  : The ERST generator collates the error record serialization
             instructions from the Configuration Manager and builds the ERST
             table.
+  - RAS2  : The RAS2 generator collates PCC references for RAS features
+            from the Configuration Manager and builds the RAS2 table.
   - SSDT BMU:
             The SSDT BMU generator collates the BMU specific information
             from the Configuration Manager and uses the Dynamic AML CodeGen
@@ -162,6 +164,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtSmc91x,                    ///< SSDT SMC91X Network Device Generator
   EStdAcpiTableIdSsdtVirtioMmioDevice,          ///< SSDT Virtio MMIO Device Generator
   EStdAcpiTableIdSsdtScmi,                      ///< SSDT SCMI Generator
+  EStdAcpiTableIdRas2,                          ///< RAS2 Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
