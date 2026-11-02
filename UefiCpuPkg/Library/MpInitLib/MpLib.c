@@ -286,7 +286,7 @@ RestoreVolatileRegisters (
       // descriptor could be mistaken for a TSS descriptor but those are
       // never created by EDK2.
       //
-      ASSERT (Tss->Bits.Reserved_43 == 0);
+      ASSERT (Tss->Bits.Reserved_44 == 0);
 
       // TR is used to enable a separate safe stack when a stack overflow occurs.
       // When PEI starts up the APs, TR is non-zero and so each processor has its
@@ -792,7 +792,7 @@ ClearStaleTssBusyFlag (
   Tss = (IA32_TSS_DESCRIPTOR *)(VolatileRegisters->Gdtr.Base +
                                 VolatileRegisters->Tr);
   if ((Tss->Bits.P == 1) && (Tss->Bits.Type == (IA32_GDT_TYPE_TSS | BIT1))) {
-    ASSERT (Tss->Bits.Reserved_43 == 0);
+    ASSERT (Tss->Bits.Reserved_44 == 0);
     Tss->Bits.Type = IA32_GDT_TYPE_TSS;
   }
 }

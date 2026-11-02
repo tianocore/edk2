@@ -5867,12 +5867,12 @@ typedef union {
     UINT32    BaseLow     : 16; ///< Base Address  15..00
     UINT32    BaseMid     : 8;  ///< Base Address  23..16
     UINT32    Type        : 4;  ///< Type (1 0 B 1)
-    UINT32    Reserved_43 : 1;  ///< 0
+    UINT32    Reserved_44 : 1;  ///< 0
     UINT32    DPL         : 2;  ///< Descriptor Privilege Level
     UINT32    P           : 1;  ///< Segment Present
     UINT32    LimitHigh   : 4;  ///< Segment Limit 19..16
     UINT32    AVL         : 1;  ///< Available for use by system software
-    UINT32    Reserved_52 : 2;  ///< 0 0
+    UINT32    Reserved_53 : 2;  ///< 0 0
     UINT32    G           : 1;  ///< Granularity
     UINT32    BaseHigh    : 8;  ///< Base Address 31..24
   } Bits;
@@ -5924,12 +5924,12 @@ typedef union {
     UINT32    BaseLow     : 16; ///< Base Address  15..00
     UINT32    BaseMidl    : 8;  ///< Base Address  23..16
     UINT32    Type        : 4;  ///< Type (1 0 B 1)
-    UINT32    Reserved_43 : 1;  ///< 0
+    UINT32    Reserved_44 : 1;  ///< 0
     UINT32    DPL         : 2;  ///< Descriptor Privilege Level
     UINT32    P           : 1;  ///< Segment Present
     UINT32    LimitHigh   : 4;  ///< Segment Limit 19..16
     UINT32    AVL         : 1;  ///< Available for use by system software
-    UINT32    Reserved_52 : 2;  ///< 0 0
+    UINT32    Reserved_53 : 2;  ///< 0 0
     UINT32    G           : 1;  ///< Granularity
     UINT32    BaseMidh    : 8;  ///< Base Address  31..24
     UINT32    BaseHigh    : 32; ///< Base Address  63..32
