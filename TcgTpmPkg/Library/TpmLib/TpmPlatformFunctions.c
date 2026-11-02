@@ -866,21 +866,7 @@ DebugDumpBuffer (
   IN CONST CHAR8    *identifier
   )
 {
-  INT32  Idx;
-
-  DEBUG ((DEBUG_INFO, "%a\n", identifier));
-
-  for (Idx = 0; Idx < size; Idx++) {
-    if (((Idx % 16) == 0) && (Idx != 0)) {
-      DEBUG ((DEBUG_INFO, "\n"));
-    }
-
-    DEBUG ((DEBUG_INFO, "%02x\n", buf[Idx]));
-  }
-
-  if ((size % 16) != 0) {
-    DEBUG ((DEBUG_INFO, "\n"));
-  }
+  DUMP_HEX (DEBUG_INFO, 0, buf, size, "%a\n", identifier);
 }
 
 #endif // CERTIFYX509_DEBUG

@@ -188,33 +188,7 @@ EhcDumpQh (
     EhcDumpQtd (Qtd, NULL);
 
     if (DumpBuf && (Qtd->DataLen != 0)) {
-      EhcDumpBuf (Qtd->Data, Qtd->DataLen);
+      DUMP_HEX (DEBUG_VERBOSE, 0, Qtd->Data, Qtd->DataLen, "");
     }
   }
-}
-
-/**
-  Dump the buffer in the form of hex.
-
-  @param  Buf      The buffer to dump.
-  @param  Len      The length of buffer.
-
-**/
-VOID
-EhcDumpBuf (
-  IN UINT8  *Buf,
-  IN UINTN  Len
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < Len; Index++) {
-    if (Index % 16 == 0) {
-      DEBUG ((DEBUG_VERBOSE, "\n"));
-    }
-
-    DEBUG ((DEBUG_VERBOSE, "%02x ", Buf[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
 }

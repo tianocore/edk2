@@ -44,6 +44,7 @@
   IoLib
   MemoryAllocationLib
   HobLib
+  SafeIntLib
   TpmMeasurementLib
 
 [Guids]

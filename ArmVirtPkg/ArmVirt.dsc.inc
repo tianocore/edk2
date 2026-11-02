@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
+#  Copyright (c) 2011 - 2026, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.
 #  Copyright (c) Microsoft Corporation.
@@ -140,6 +140,10 @@ DEFINE FD_SIZE_IN_MB    = 3
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
+  # Arm CCA Libraries
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
@@ -232,8 +236,6 @@ DEFINE FD_SIZE_IN_MB    = 3
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
-  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
-
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -248,7 +250,9 @@ DEFINE FD_SIZE_IN_MB    = 3
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
 
-  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLibNull/ArmCcaInitPeiLibNull.inf
+  # Arm CCA Libraries
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -268,6 +272,10 @@ DEFINE FD_SIZE_IN_MB    = 3
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
 
+  # Arm CCA Libraries
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
+
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -285,6 +293,10 @@ DEFINE FD_SIZE_IN_MB    = 3
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
+
+  # Arm CCA Libraries
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   # resolve RngLib via RngDxe's EFI_RNG_PROTOCOL for UEFI_DRIVER type drivers such as TlsDxe
@@ -540,6 +552,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {

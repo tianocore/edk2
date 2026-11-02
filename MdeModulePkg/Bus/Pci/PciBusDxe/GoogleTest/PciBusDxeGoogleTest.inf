@@ -1,0 +1,46 @@
+## @file
+# Google Test suite for PciBusDxe.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = PciBusDxeGoogleTest
+  FILE_GUID      = 2B88A0E1-D62D-4C4A-94F7-475B1C7AB54C
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+[Sources]
+  PciBarGoogleTest.cpp
+  PciBusDxeGoogleTestStubs.c
+  ../PciEnumeratorSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  GoogleTestLib
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciScanFuncIfFunc0Absent
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsRetryIntervalUs
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiIncompatiblePciDeviceSupportProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid

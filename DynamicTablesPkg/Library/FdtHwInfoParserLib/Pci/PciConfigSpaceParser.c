@@ -45,9 +45,11 @@ STATIC CONST COMPATIBILITY_INFO  PciCompatibleInfo = {
   Either all host-pci nodes must have this property, or none of them. If the
   property is available, read it. Otherwise dynamically assign the Ids.
 
-  @param [in]  Fdt          Pointer to a Flattened Device Tree (Fdt).
-  @param [in]  HostPciNode  Offset of a host-pci node.
-  @param [out] SegGroup     Segment group assigned to the host-pci controller.
+  @param [in]       Fdt            Pointer to a Flattened Device Tree (Fdt).
+  @param [in]       HostPciNode    Offset of a host-pci node.
+  @param [out]      SegGroup       Segment group assigned to the host-pci controller.
+  @param [in, out]  LocalSegGroup  Next automatic segment group, or -1 if an
+                                   explicit domain has been encountered.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -57,17 +59,18 @@ STATIC
 EFI_STATUS
 EFIAPI
 GetPciSegGroup (
-  IN  CONST VOID   *Fdt,
-  IN        INT32  HostPciNode,
-  OUT       INT32  *SegGroup
+  IN      CONST VOID   *Fdt,
+  IN            INT32  HostPciNode,
+  OUT           INT32  *SegGroup,
+  IN OUT        INT32  *LocalSegGroup
   )
 {
-  CONST UINT8   *Data;
-  INT32         DataSize;
-  STATIC INT32  LocalSegGroup = 0;
+  CONST UINT8  *Data;
+  INT32        DataSize;
 
   if ((Fdt == NULL) ||
-      (SegGroup == NULL))
+      (SegGroup == NULL) ||
+      (LocalSegGroup == NULL))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -76,18 +79,18 @@ GetPciSegGroup (
   Data = FdtGetProp (Fdt, HostPciNode, "linux,pci-domain", &DataSize);
   if ((Data == NULL) || (DataSize < 0)) {
     // Did not find property, assign the DomainIds ourselves.
-    if (LocalSegGroup < 0) {
+    if (*LocalSegGroup < 0) {
       // "linux,pci-domain" property was defined for another node.
       ASSERT (0);
       return EFI_ABORTED;
     }
 
-    *SegGroup = LocalSegGroup++;
+    *SegGroup = (*LocalSegGroup)++;
     return EFI_SUCCESS;
   }
 
   if ((DataSize > sizeof (UINT32))  ||
-      (LocalSegGroup > 0))
+      (*LocalSegGroup > 0))
   {
     // Property on more than 1 cell or
     // "linux,pci-domain" property was not defined for a node.
@@ -97,7 +100,7 @@ GetPciSegGroup (
 
   // If one node has the "linux,pci-domain" property, then all the host-pci
   // nodes must have it.
-  LocalSegGroup = -1;
+  *LocalSegGroup = -1;
 
   *SegGroup = Fdt32ToCpu (*(UINT32 *)Data);
   return EFI_SUCCESS;
@@ -407,9 +410,11 @@ ParseIrqMap (
 
 /** Parse a Host-pci node.
 
-  @param [in]       Fdt          Pointer to a Flattened Device Tree (Fdt).
-  @param [in]       HostPciNode  Offset of a host-pci node.
-  @param [in, out]  PciInfo      The CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO to populate.
+  @param [in]       Fdt            Pointer to a Flattened Device Tree (Fdt).
+  @param [in]       HostPciNode    Offset of a host-pci node.
+  @param [in, out]  PciInfo        The CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO to populate.
+  @param [in, out]  LocalSegGroup  Next automatic segment group, or -1 if an
+                                   explicit domain has been encountered.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -422,7 +427,8 @@ EFIAPI
 PciNodeParser (
   IN      CONST VOID              *Fdt,
   IN            INT32             HostPciNode,
-  IN OUT        PCI_PARSER_TABLE  *PciInfo
+  IN OUT        PCI_PARSER_TABLE  *PciInfo,
+  IN OUT        INT32             *LocalSegGroup
   )
 {
   EFI_STATUS   Status;
@@ -434,14 +440,15 @@ PciNodeParser (
   INT32        SegGroup;
 
   if ((Fdt == NULL) ||
-      (PciInfo == NULL))
+      (PciInfo == NULL) ||
+      (LocalSegGroup == NULL))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // Segment Group / DomainId
-  Status = GetPciSegGroup (Fdt, HostPciNode, &SegGroup);
+  Status = GetPciSegGroup (Fdt, HostPciNode, &SegGroup, LocalSegGroup);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -682,6 +689,7 @@ PciConfigInfoParser (
   EFI_STATUS        Status;
   UINT32            Index;
   INT32             PciNode;
+  INT32             LocalSegGroup;
   UINT32            PciNodeCount;
   PCI_PARSER_TABLE  PciTableInfo;
   VOID              *Fdt;
@@ -714,7 +722,8 @@ PciConfigInfoParser (
   }
 
   // Parse each host-pci node in the branch.
-  PciNode = FdtBranch;
+  LocalSegGroup = 0;
+  PciNode       = FdtBranch;
   for (Index = 0; Index < PciNodeCount; Index++) {
     ZeroMem (&PciTableInfo, sizeof (PCI_PARSER_TABLE));
 
@@ -734,7 +743,7 @@ PciConfigInfoParser (
       return Status;
     }
 
-    Status = PciNodeParser (Fdt, PciNode, &PciTableInfo);
+    Status = PciNodeParser (Fdt, PciNode, &PciTableInfo, &LocalSegGroup);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       goto error_handler;

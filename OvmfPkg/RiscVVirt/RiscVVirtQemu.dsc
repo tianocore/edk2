@@ -433,6 +433,7 @@
   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
 
   #
   # Status Code Routing
@@ -451,6 +452,7 @@
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   }
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
+  OvmfPkg/IoMmuAbsentDxe/IoMmuAbsentDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioNetDxe/VirtioNet.inf

@@ -441,7 +441,6 @@ CoreInstallProtocolInterfaceNotify (
   PROTOCOL_ENTRY      *ProtEntry;
   IHANDLE             *Handle;
   EFI_STATUS          Status;
-  VOID                *ExistingInterface;
 
   //
   // returns EFI_INVALID_PARAMETER if InterfaceType is invalid.
@@ -465,7 +464,14 @@ CoreInstallProtocolInterfaceNotify (
   Handle = NULL;
 
   if (*UserHandle != NULL) {
-    Status = CoreHandleProtocol (*UserHandle, Protocol, (VOID **)&ExistingInterface);
+    Status = CoreOpenProtocol (
+               *UserHandle,
+               Protocol,
+               NULL,
+               gDxeCoreImageHandle,
+               NULL,
+               EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+               );
     if (!EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }

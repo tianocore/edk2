@@ -202,10 +202,10 @@ GetWakeupBuffer (
   // Collect memory ranges
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if ((Hob.ResourceDescriptor->PhysicalStart < BASE_1MB) &&
-          (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-          ((Hob.ResourceDescriptor->ResourceAttribute &
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if ((Hob.ResourceDescriptor2->PhysicalStart < BASE_1MB) &&
+          (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
+          ((Hob.ResourceDescriptor2->ResourceCapabilities &
             (EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
              EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
              EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED
@@ -215,7 +215,7 @@ GetWakeupBuffer (
         //
         // Need memory under 1MB to be collected here
         //
-        WakeupBufferEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        WakeupBufferEnd = Hob.ResourceDescriptor2->PhysicalStart + Hob.ResourceDescriptor2->ResourceLength;
         if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
             (WakeupBufferEnd > mSevEsPeiWakeupBuffer))
         {
@@ -235,7 +235,7 @@ GetWakeupBuffer (
           // Wakeup buffer should be aligned on 4KB
           //
           WakeupBufferStart = (WakeupBufferEnd - WakeupBufferSize) & ~(SIZE_4KB - 1);
-          if (WakeupBufferStart < Hob.ResourceDescriptor->PhysicalStart) {
+          if (WakeupBufferStart < Hob.ResourceDescriptor2->PhysicalStart) {
             break;
           }
 

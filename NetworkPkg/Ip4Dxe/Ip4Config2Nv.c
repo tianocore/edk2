@@ -866,26 +866,15 @@ Ip4FormExtractConfig (
   IP4_CONFIG2_INSTANCE    *Ip4Config2Instance;
   IP4_FORM_CALLBACK_INFO  *Private;
   IP4_CONFIG2_IFR_NVDATA  *IfrFormNvData;
-  EFI_STRING              ConfigRequestHdr;
   EFI_STRING              ConfigRequest;
-  BOOLEAN                 AllocatedRequest;
   EFI_STRING              FormResult;
-  UINTN                   Size;
-  UINTN                   BufferSize;
 
   if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  IfrFormNvData      = NULL;
-  ConfigRequest      = NULL;
-  FormResult         = NULL;
-  Size               = 0;
-  AllocatedRequest   = FALSE;
-  ConfigRequest      = Request;
   Private            = IP4_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
   Ip4Config2Instance = IP4_CONFIG2_INSTANCE_FROM_FORM_CALLBACK (Private);
-  BufferSize         = sizeof (IP4_CONFIG2_IFR_NVDATA);
   *Progress          = Request;
 
   //
@@ -903,23 +892,32 @@ Ip4FormExtractConfig (
   Ip4Config2ConvertConfigNvDataToIfrNvData (Ip4Config2Instance, IfrFormNvData);
 
   if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    EFI_STRING  ConfigRequestHdr;
+    UINTN       Size;
+
     //
     // Request has no request element, construct full request string.
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    Size             = (StrLen (ConfigRequestHdr) * sizeof (CHAR16)) + sizeof (L"&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW");
     ConfigRequest    = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Failure;
     }
 
-    AllocatedRequest = TRUE;
-
-    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    UnicodeSPrint (
+      ConfigRequest,
+      Size,
+      L"%s&OFFSET=0&WIDTH=%016LX",
+      ConfigRequestHdr,
+      (UINT64)sizeof (IP4_CONFIG2_IFR_NVDATA)
+      );
     FreePool (ConfigRequestHdr);
+  } else {
+    ConfigRequest = Request;
   }
 
   //
@@ -929,7 +927,7 @@ Ip4FormExtractConfig (
                                 gHiiConfigRouting,
                                 ConfigRequest,
                                 (UINT8 *)IfrFormNvData,
-                                BufferSize,
+                                sizeof (IP4_CONFIG2_IFR_NVDATA),
                                 &FormResult,
                                 Progress
                                 );
@@ -939,7 +937,7 @@ Ip4FormExtractConfig (
   //
   // Free the allocated config request string.
   //
-  if (AllocatedRequest) {
+  if (ConfigRequest != Request) {
     FreePool (ConfigRequest);
     ConfigRequest = NULL;
   }

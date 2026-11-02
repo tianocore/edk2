@@ -491,13 +491,15 @@ CoreCreateEventInternal (
     InsertTailList (&gRuntime->EventHead, &IEvent->RuntimeData.Link);
   }
 
-  if ((Type & EVT_NOTIFY_SIGNAL) != 0) {
+  if (((Type & EVT_NOTIFY_SIGNAL) != 0) &&
+      ((IEvent->ExFlag & EVT_EXFLAG_EVENT_GROUP) != 0))
+  {
     if (!IsZeroGuid (&IEvent->EventGroup) && !CompareGuid (&IEvent->EventGroup, &gIdleLoopEventGuid)) {
       DEBUG ((DEBUG_EVENT, "Register Event Group Notify: %g (%p)\n", &IEvent->EventGroup, IEvent->NotifyFunction));
     }
 
     //
-    // The Event's NotifyFunction must be queued whenever the event is signaled
+    // Group members need to be visited when a group is signaled.
     //
     CoreAcquireEventLock ();
 

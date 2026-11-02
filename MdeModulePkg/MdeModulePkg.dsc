@@ -217,6 +217,7 @@
   MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   MdeModulePkg/Logo/Logo.inf
   MdeModulePkg/Logo/LogoDxe.inf
+  MdeModulePkg/Logo/LogoFfsDxe.inf
   MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   MdeModulePkg/Library/GptLib/GptLib.inf
   MdeModulePkg/Library/BootDiscoveryPolicyUiLib/BootDiscoveryPolicyUiLib.inf
@@ -539,6 +540,7 @@
 
 [Components.AARCH64]
   MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
   MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
   MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf

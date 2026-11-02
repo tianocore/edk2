@@ -279,25 +279,18 @@ Tpm12TisTpmCommand (
   DEBUG_CODE_BEGIN ();
   UINTN  DebugSize;
 
-  DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand Send - "));
   if (SizeIn > 0x100) {
     DebugSize = 0x40;
   } else {
     DebugSize = SizeIn;
   }
 
-  for (Index = 0; Index < DebugSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-  }
+  DUMP_HEX (DEBUG_VERBOSE, 0, BufferIn, DebugSize, "Tpm12TisTpmCommand Send - ");
 
   if (DebugSize != SizeIn) {
-    DEBUG ((DEBUG_VERBOSE, "...... "));
-    for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-    }
+    DUMP_HEX (DEBUG_VERBOSE, SizeIn - 0x20, BufferIn + SizeIn - 0x20, 0x20, "Tpm12TisTpmCommand Send - ...... ");
   }
 
-  DEBUG ((DEBUG_VERBOSE, "\n"));
   DEBUG_CODE_END ();
   TpmOutSize = 0;
 
@@ -377,12 +370,7 @@ Tpm12TisTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand ReceiveHeader - "));
-  for (Index = 0; Index < sizeof (TPM_RSP_COMMAND_HDR); Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DUMP_HEX (DEBUG_VERBOSE, 0, BufferOut, sizeof (TPM_RSP_COMMAND_HDR), "Tpm12TisTpmCommand ReceiveHeader - ");
   DEBUG_CODE_END ();
   //
   // Check the response data header (tag, parasize and returncode)
@@ -425,12 +413,7 @@ Tpm12TisTpmCommand (
 
 Exit:
   DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand Receive - "));
-  for (Index = 0; Index < *SizeOut; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DUMP_HEX (DEBUG_VERBOSE, 0, BufferOut, *SizeOut, "Tpm12TisTpmCommand Receive - ");
   DEBUG_CODE_END ();
   MmioWrite8 ((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;

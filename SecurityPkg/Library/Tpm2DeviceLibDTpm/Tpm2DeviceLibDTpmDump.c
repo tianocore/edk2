@@ -219,50 +219,6 @@ TPM2_CODE_STRING  ResponseCodeStrings[] = {
 UINTN             ResponseCodeStringsCount = sizeof (ResponseCodeStrings) / sizeof (ResponseCodeStrings[0]);
 
 /**
-  This simple function will dump up to MAX_TPM_BUFFER_DUMP bytes
-  of a TPM data buffer and apppend '...' if buffer is larger.
-
-  @param[in]  Preamble      [Optional] A string to print before the buffer dump.
-  @param[in]  BufferSize    The actual size of the provided buffer.
-  @param[in]  Buffer        A pointer to the buffer in question.
-
-**/
-VOID
-DumpTpmBuffer (
-  IN CHAR8        *Preamble OPTIONAL,
-  IN UINTN        BufferSize,
-  IN CONST UINT8  *Buffer
-  )
-{
-  UINTN  DebugBufferCount, Index;
-
-  // TODO: Don't even evaluate if below required debugging level.
-  // TODO: Pass in max buffer size? Format nicely?
-
-  // Determine max buffer size.
-  DebugBufferCount = MIN (BufferSize, MAX_TPM_BUFFER_DUMP);
-
-  // Print the preamble, if supplied.
-  if (Preamble) {
-    DEBUG ((DEBUG_SECURITY, "%a", Preamble));
-  }
-
-  // Dump them bytes.
-  for (Index = 0; Index < DebugBufferCount; Index++) {
-    DEBUG ((DEBUG_SECURITY, "%02X ", Buffer[Index]));
-  }
-
-  // FINISH HIM!!!
-  if (DebugBufferCount != BufferSize) {
-    DEBUG ((DEBUG_SECURITY, "...\n"));
-  } else {
-    DEBUG ((DEBUG_SECURITY, "\n"));
-  }
-
-  return;
-}
-
-/**
   This abstract function takes in a list of codes and strings and returns either
   a string matching the code or the supplied "default" string.
 
@@ -347,7 +303,7 @@ Dump2bDigest (
 
   DigestSize = SwapBytes16 (Digest->size);
   if (DigestSize) {
-    DumpTpmBuffer (Preamble, SwapBytes16 (Digest->size), Digest->buffer);
+    DUMP_HEX (DEBUG_SECURITY, 0, Digest->buffer, MIN (DigestSize, MAX_TPM_BUFFER_DUMP), "%a", Preamble == NULL ? "" : Preamble);
   } else {
     DEBUG ((DEBUG_SECURITY, "%a<EMPTY>\n", Preamble));
   }
@@ -446,13 +402,13 @@ DumpTpmPcrCommand (
       // Print the current digest.
       switch (SwapBytes16 (CurrentDigest->hashAlg)) {
         case TPM_ALG_SHA1:
-          DumpTpmBuffer ("- SHA1:   ", SHA1_DIGEST_SIZE, CurrentDigest->digest.sha1);
+          DUMP_HEX (DEBUG_SECURITY, 0, CurrentDigest->digest.sha1, SHA1_DIGEST_SIZE, "- SHA1:   ");
           CurrentDigest = (TPMT_HA *)((UINT8 *)CurrentDigest + OFFSET_OF (TPMT_HA, digest) + SHA1_DIGEST_SIZE);
           DigestCount--;    // Account for this digest.
           break;
 
         case TPM_ALG_SHA256:
-          DumpTpmBuffer ("- SHA256: ", SHA256_DIGEST_SIZE, CurrentDigest->digest.sha256);
+          DUMP_HEX (DEBUG_SECURITY, 0, CurrentDigest->digest.sha256, SHA256_DIGEST_SIZE, "- SHA256: ");
           CurrentDigest = (TPMT_HA *)((UINT8 *)CurrentDigest + OFFSET_OF (TPMT_HA, digest) + SHA256_DIGEST_SIZE);
           DigestCount--;    // Account for this digest.
           break;
@@ -674,7 +630,7 @@ DumpTpmInputBlock (
   }
 
   // If verbose, dump all of the buffer contents for deeper analysis.
-  DumpTpmBuffer ("DATA:     ", MIN (InputBlockSize, NativeSize), InputBlock);
+  DUMP_HEX (DEBUG_SECURITY, 0, InputBlock, MIN (MIN (InputBlockSize, NativeSize), MAX_TPM_BUFFER_DUMP), "DATA:     ");
 
   return;
 }
@@ -725,7 +681,7 @@ DumpTpmOutputBlock (
   }
 
   // If verbose, dump all of the buffer contents for deeper analysis.
-  DumpTpmBuffer ("DATA:     ", MIN (OutputBlockSize, NativeSize), OutputBlock);
+  DUMP_HEX (DEBUG_SECURITY, 0, OutputBlock, MIN (MIN (OutputBlockSize, NativeSize), MAX_TPM_BUFFER_DUMP), "DATA:     ");
 
   DEBUG ((DEBUG_SECURITY, "=== END TPM COMMAND ===\n\n"));
 

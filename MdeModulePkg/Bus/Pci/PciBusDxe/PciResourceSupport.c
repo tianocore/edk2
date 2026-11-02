@@ -2,6 +2,7 @@
   PCI resources support functions implementation for PCI Bus module.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -14,6 +15,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN  mReserveIsaAliases = FALSE;
 BOOLEAN  mReserveVgaAliases = FALSE;
 BOOLEAN  mPolicyDetermined  = FALSE;
+
+extern CHAR16  *mBarTypeStr[];
 
 /**
   The function is used to skip VGA range.
@@ -83,7 +86,12 @@ SkipIsaAliasAperture (
 
 /**
   This function inserts a resource node into the resource list.
-  The resource list is sorted in descend order.
+  The resource list is sorted in descending order of alignment. Resource
+  nodes with the same alignment are sorted by the remainder of their
+  length modulo the alignment: nodes without a remainder come first,
+  followed by the others in descending order of the remainder. Resource
+  nodes that rank equal, such as BARs of the same size, keep their
+  insertion order.
 
   @param Bridge  PCI resource node for bridge.
   @param ResNode Resource node want to be inserted.
@@ -103,25 +111,25 @@ InsertResourceNode (
   ASSERT (Bridge  != NULL);
   ASSERT (ResNode != NULL);
 
-  InsertHeadList (&Bridge->ChildList, &ResNode->Link);
+  InsertTailList (&Bridge->ChildList, &ResNode->Link);
 
-  CurrentLink = Bridge->ChildList.ForwardLink->ForwardLink;
+  CurrentLink = ResNode->Link.BackLink;
   while (CurrentLink != &Bridge->ChildList) {
     Temp = RESOURCE_NODE_FROM_LINK (CurrentLink);
 
-    if (ResNode->Alignment > Temp->Alignment) {
+    if (Temp->Alignment > ResNode->Alignment) {
       break;
-    } else if (ResNode->Alignment == Temp->Alignment) {
+    } else if (Temp->Alignment == ResNode->Alignment) {
       ResNodeAlignRest = ResNode->Length & ResNode->Alignment;
       TempAlignRest    = Temp->Length & Temp->Alignment;
-      if ((ResNodeAlignRest == 0) || (ResNodeAlignRest >= TempAlignRest)) {
+      if ((TempAlignRest == 0) || ((ResNodeAlignRest != 0) && (TempAlignRest >= ResNodeAlignRest))) {
         break;
       }
     }
 
-    SwapListEntries (&ResNode->Link, CurrentLink);
+    SwapListEntries (CurrentLink, &ResNode->Link);
 
-    CurrentLink = ResNode->Link.ForwardLink;
+    CurrentLink = ResNode->Link.BackLink;
   }
 }
 
@@ -168,6 +176,600 @@ MergeResourceTree (
     RemoveEntryList (CurrentLink);
     InsertResourceNode (Dst, Temp);
   }
+}
+
+/**
+  Check whether a resource node describes a window of a PCI-PCI bridge, as
+  opposed to a BAR of a device (which may itself be a PCI-PCI bridge).
+
+  @param Node  PCI resource node.
+
+  @retval TRUE   The node describes a PCI-PCI bridge window.
+  @retval FALSE  The node does not describe a PCI-PCI bridge window.
+
+**/
+STATIC
+BOOLEAN
+IsPpbWindowNode (
+  IN PCI_RESOURCE_NODE  *Node
+  )
+{
+  return (BOOLEAN)(IS_PCI_BRIDGE (&Node->PciDev->Pci) && (Node->Bar >= PPB_IO_RANGE));
+}
+
+/**
+  Invalidate the BARs consuming the resources described by a resource node and
+  its children, as they cannot be assigned.
+
+  @param Node  PCI resource node.
+
+**/
+STATIC
+VOID
+DropResourceTree (
+  IN PCI_RESOURCE_NODE  *Node
+  )
+{
+  LIST_ENTRY  *Link;
+  PCI_BAR     *Bar;
+
+  for ( Link = GetFirstNode (&Node->ChildList)
+        ; !IsNull (&Node->ChildList, Link)
+        ; Link = GetNextNode (&Node->ChildList, Link)
+        )
+  {
+    DropResourceTree (RESOURCE_NODE_FROM_LINK (Link));
+  }
+
+  if ((Node->ResourceUsage != PciResUsageTypical) || IsPpbWindowNode (Node)) {
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_ERROR,
+    "PciBus: [%02x|%02x|%02x] %aBAR[%d] cannot be placed in a bridge window pinned by fixed resources\n",
+    Node->PciDev->BusNumber,
+    Node->PciDev->DeviceNumber,
+    Node->PciDev->FunctionNumber,
+    Node->Virtual ? "VF " : "",
+    Node->Bar
+    ));
+
+  Bar                    = Node->Virtual ? Node->PciDev->VfPciBar : Node->PciDev->PciBar;
+  Bar[Node->Bar].BarType = PciBarTypeUnknown;
+  Bar[Node->Bar].Length  = 0;
+}
+
+/**
+  Warn if the fixed resources below a bridge overlap each other. This may
+  happen when rounding pinned bridge windows to their granularity.
+
+  @param Bridge  PCI resource node for a bridge.
+
+**/
+STATIC
+VOID
+WarnOnFixedOverlap (
+  IN PCI_RESOURCE_NODE  *Bridge
+  )
+{
+  LIST_ENTRY         *Link;
+  LIST_ENTRY         *Link2;
+  PCI_RESOURCE_NODE  *Node;
+  PCI_RESOURCE_NODE  *Node2;
+
+  for ( Link = GetFirstNode (&Bridge->ChildList)
+        ; !IsNull (&Bridge->ChildList, Link)
+        ; Link = GetNextNode (&Bridge->ChildList, Link)
+        )
+  {
+    Node = RESOURCE_NODE_FROM_LINK (Link);
+    if (!Node->Fixed) {
+      continue;
+    }
+
+    for ( Link2 = GetNextNode (&Bridge->ChildList, Link)
+          ; !IsNull (&Bridge->ChildList, Link2)
+          ; Link2 = GetNextNode (&Bridge->ChildList, Link2)
+          )
+    {
+      Node2 = RESOURCE_NODE_FROM_LINK (Link2);
+      if (Node2->Fixed &&
+          (Node->FixedBase <= Node2->FixedLimit) &&
+          (Node2->FixedBase <= Node->FixedLimit))
+      {
+        DEBUG ((
+          DEBUG_WARN,
+          "PciBus: fixed resources [%lx, %lx] of [%02x|%02x|%02x] and [%lx, %lx] of [%02x|%02x|%02x] overlap\n",
+          Node->FixedBase,
+          Node->FixedLimit,
+          Node->PciDev->BusNumber,
+          Node->PciDev->DeviceNumber,
+          Node->PciDev->FunctionNumber,
+          Node2->FixedBase,
+          Node2->FixedLimit,
+          Node2->PciDev->BusNumber,
+          Node2->PciDev->DeviceNumber,
+          Node2->PciDev->FunctionNumber
+          ));
+      }
+    }
+  }
+}
+
+/**
+  Remove the relocatable resources (including padding) below a bridge window,
+  and invalidate the BARs consuming them.
+
+  @param Bridge  PCI resource node for a bridge.
+
+**/
+STATIC
+VOID
+DropRelocatableResources (
+  IN PCI_RESOURCE_NODE  *Bridge
+  )
+{
+  LIST_ENTRY         *Link;
+  LIST_ENTRY         *NextLink;
+  PCI_RESOURCE_NODE  *Node;
+
+  for (Link = GetFirstNode (&Bridge->ChildList); !IsNull (&Bridge->ChildList, Link); Link = NextLink) {
+    NextLink = GetNextNode (&Bridge->ChildList, Link);
+    Node     = RESOURCE_NODE_FROM_LINK (Link);
+    if (!Node->Fixed) {
+      RemoveEntryList (Link);
+      DropResourceTree (Node);
+      DestroyResourceTree (Node);
+      FreePool (Node);
+    }
+  }
+}
+
+/**
+  Return the fixed window described by an Enhanced Allocation capability for a
+  PCI-PCI bridge window resource node, if any.
+
+  The prefetchable window is shared between the PPB_PMEM32_RANGE and
+  PPB_PMEM64_RANGE nodes, and is associated with the one that matches its
+  placement below or above 4 GB.
+
+  @param Node  PCI resource node.
+
+  @return The fixed window, or NULL if there is none.
+
+**/
+STATIC
+PCI_BAR *
+GetEaBridgeWindow (
+  IN PCI_RESOURCE_NODE  *Node
+  )
+{
+  PCI_BAR  *Window;
+
+  if (!IsPpbWindowNode (Node)) {
+    return NULL;
+  }
+
+  switch (Node->Bar) {
+    case PPB_IO_RANGE:
+      Window = &Node->PciDev->EaWindow[PCI_EA_WINDOW_IO];
+      break;
+
+    case PPB_MEM32_RANGE:
+      Window = &Node->PciDev->EaWindow[PCI_EA_WINDOW_MEM];
+      break;
+
+    case PPB_PMEM32_RANGE:
+    case PPB_PMEM64_RANGE:
+      Window = &Node->PciDev->EaWindow[PCI_EA_WINDOW_PMEM];
+      if ((Window->BarType == PciBarTypePMem64) != (Node->Bar == PPB_PMEM64_RANGE)) {
+        return NULL;
+      }
+
+      break;
+
+    default:
+      return NULL;
+  }
+
+  return (Window->Length != 0) ? Window : NULL;
+}
+
+/**
+  Check whether a relocatable resource may be placed above 4 GB.
+
+  Note that the resource type recorded in the node may have been degraded, so
+  the type of the underlying BAR or bridge window is taken into account.
+
+  @param Node  PCI resource node.
+
+  @retval TRUE   The resource may be placed above 4 GB.
+  @retval FALSE  The resource must be placed below 4 GB.
+
+**/
+STATIC
+BOOLEAN
+IsResource64BitCapable (
+  IN PCI_RESOURCE_NODE  *Node
+  )
+{
+  PCI_BAR  *Bar;
+
+  if (IsPpbWindowNode (Node)) {
+    return (BOOLEAN)(Node->Bar == PPB_PMEM64_RANGE);
+  }
+
+  if ((Node->ResourceUsage != PciResUsageTypical) || (Node->Bar >= PCI_MAX_BAR)) {
+    return FALSE;
+  }
+
+  Bar = Node->Virtual ? Node->PciDev->VfPciBar : Node->PciDev->PciBar;
+  return (BOOLEAN)((Bar[Node->Bar].BarType == PciBarTypeMem64) ||
+                   (Bar[Node->Bar].BarType == PciBarTypePMem64));
+}
+
+/**
+  Check whether fixed resources below a PCI-PCI bridge window are passed
+  through to the upstream bus, rather than covered by the window.
+
+  A bridge that implements the Enhanced Allocation capability may describe the
+  ranges that it forwards to its secondary side using entries with BEI 6. If a
+  bridge implements the capability but has no such entry for the type of
+  window in question, assume that it forwards the fixed (EA) resources of that
+  type below it regardless of its Base/Limit registers. This is the case for
+  the on-chip bridges of some SoCs, which only carry an EA capability to
+  describe their fixed bus numbers, and whose downstream fixed resources may
+  be interleaved with those below other bridges, which means they could not be
+  covered by a window to begin with.
+
+  @param Node  PCI resource node.
+
+  @retval TRUE   Node is a bridge window whose fixed resources are passed
+                 through to the upstream bus.
+  @retval FALSE  Node is not such a bridge window.
+
+**/
+STATIC
+BOOLEAN
+IsEaPassThroughWindow (
+  IN PCI_RESOURCE_NODE  *Node
+  )
+{
+  UINTN  Window;
+
+  if (!IsPpbWindowNode (Node) || (Node->PciDev->EaCapabilityOffset == 0)) {
+    return FALSE;
+  }
+
+  switch (Node->Bar) {
+    case PPB_IO_RANGE:
+      Window = PCI_EA_WINDOW_IO;
+      break;
+    case PPB_PMEM32_RANGE:
+    case PPB_PMEM64_RANGE:
+      Window = PCI_EA_WINDOW_PMEM;
+      break;
+    default:
+      Window = PCI_EA_WINDOW_MEM;
+      break;
+  }
+
+  return (BOOLEAN)(Node->PciDev->EaWindow[Window].Length == 0);
+}
+
+/**
+  Move the fixed resources below a PCI-PCI bridge window to the resource
+  nodes of the upstream bus, if the bridge passes them through.
+
+  Fixed resources of devices regain the type of the BAR they describe, as
+  their type may have been degraded to fit the windows of the bridge.
+
+  @param Window      PCI resource node for a bridge window.
+  @param IoNode      Resource node for I/O of the upstream bus.
+  @param Mem32Node   Resource node for 32-bit memory of the upstream bus.
+  @param PMem32Node  Resource node for 32-bit prefetchable memory of the
+                     upstream bus.
+  @param Mem64Node   Resource node for 64-bit memory of the upstream bus.
+  @param PMem64Node  Resource node for 64-bit prefetchable memory of the
+                     upstream bus.
+
+**/
+STATIC
+VOID
+PassThroughFixedResources (
+  IN PCI_RESOURCE_NODE  *Window,
+  IN PCI_RESOURCE_NODE  *IoNode,
+  IN PCI_RESOURCE_NODE  *Mem32Node,
+  IN PCI_RESOURCE_NODE  *PMem32Node,
+  IN PCI_RESOURCE_NODE  *Mem64Node,
+  IN PCI_RESOURCE_NODE  *PMem64Node
+  )
+{
+  LIST_ENTRY         *Link;
+  LIST_ENTRY         *NextLink;
+  PCI_RESOURCE_NODE  *Node;
+  PCI_RESOURCE_NODE  *DestNode;
+  PCI_BAR            *Bar;
+
+  if (!IsEaPassThroughWindow (Window)) {
+    return;
+  }
+
+  for (Link = GetFirstNode (&Window->ChildList); !IsNull (&Window->ChildList, Link); Link = NextLink) {
+    NextLink = GetNextNode (&Window->ChildList, Link);
+    Node     = RESOURCE_NODE_FROM_LINK (Link);
+    if (!Node->Fixed) {
+      continue;
+    }
+
+    if (!IsPpbWindowNode (Node)) {
+      Bar           = Node->Virtual ? Node->PciDev->VfPciBar : Node->PciDev->PciBar;
+      Node->ResType = Bar[Node->Bar].BarType;
+    }
+
+    switch (Node->ResType) {
+      case PciBarTypeIo16:
+      case PciBarTypeIo32:
+        Node->ResType = PciBarTypeIo16;
+        DestNode      = IoNode;
+        break;
+      case PciBarTypeMem32:
+        DestNode = Mem32Node;
+        break;
+      case PciBarTypePMem32:
+        DestNode = PMem32Node;
+        break;
+      case PciBarTypeMem64:
+        DestNode = Mem64Node;
+        break;
+      case PciBarTypePMem64:
+        DestNode = PMem64Node;
+        break;
+      default:
+        continue;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "PciBus: [%02x|%02x|%02x] fixed %s resource [%lx, %lx] passed through by bridge [%02x|%02x|%02x]\n",
+      Node->PciDev->BusNumber,
+      Node->PciDev->DeviceNumber,
+      Node->PciDev->FunctionNumber,
+      mBarTypeStr[MIN (Node->ResType, PciBarTypeMaxType)],
+      Node->FixedBase,
+      Node->FixedLimit,
+      Window->PciDev->BusNumber,
+      Window->PciDev->DeviceNumber,
+      Window->PciDev->FunctionNumber
+      ));
+
+    RemoveEntryList (Link);
+    InsertResourceNode (DestNode, Node);
+  }
+}
+
+/**
+  Pin the window of a PCI-PCI bridge if there are fixed resources below it.
+
+  The window must cover the fixed ranges, and so its placement is dictated by
+  them rather than by the resource allocator. The window is sized to span all
+  fixed ranges below it, rounded to the window granularity, and becomes a fixed
+  resource itself, which may in turn pin the windows of upstream bridges.
+
+  Relocatable resources of the same type below the bridge cannot be
+  accommodated in the pinned window, so they are dropped.
+
+  Windows that are described by an Enhanced Allocation capability are handled
+  by PinEaBridgeWindow () instead, and windows whose fixed resources are passed
+  through to the upstream bus are left alone.
+
+  @param Bridge  PCI resource node for a bridge.
+
+  @retval TRUE   The window was pinned.
+  @retval FALSE  The node is not a PCI-PCI bridge window, or there are no fixed
+                 resources below it.
+
+**/
+STATIC
+BOOLEAN
+PinBridgeWindow (
+  IN PCI_RESOURCE_NODE  *Bridge
+  )
+{
+  LIST_ENTRY         *Link;
+  PCI_RESOURCE_NODE  *Node;
+  UINT64             FixedBase;
+  UINT64             FixedLimit;
+  UINT64             Granularity;
+  BOOLEAN            HasFixed;
+
+  if (!IsPpbWindowNode (Bridge) || (GetEaBridgeWindow (Bridge) != NULL) ||
+      IsEaPassThroughWindow (Bridge))
+  {
+    return FALSE;
+  }
+
+  HasFixed   = FALSE;
+  FixedBase  = MAX_UINT64;
+  FixedLimit = 0;
+
+  for ( Link = GetFirstNode (&Bridge->ChildList)
+        ; !IsNull (&Bridge->ChildList, Link)
+        ; Link = GetNextNode (&Bridge->ChildList, Link)
+        )
+  {
+    Node = RESOURCE_NODE_FROM_LINK (Link);
+    if (Node->Fixed) {
+      HasFixed   = TRUE;
+      FixedBase  = MIN (FixedBase, Node->FixedBase);
+      FixedLimit = MAX (FixedLimit, Node->FixedLimit);
+    }
+  }
+
+  if (!HasFixed) {
+    return FALSE;
+  }
+
+  DropRelocatableResources (Bridge);
+
+  if (Bridge->ResType == PciBarTypeIo16) {
+    Granularity = Bridge->PciDev->BridgeIoAlignment;
+  } else {
+    Granularity = SIZE_1MB - 1;
+  }
+
+  Bridge->Fixed      = TRUE;
+  Bridge->FixedBase  = FixedBase & ~Granularity;
+  Bridge->FixedLimit = FixedLimit | Granularity;
+  Bridge->Length     = Bridge->FixedLimit - Bridge->FixedBase + 1;
+  Bridge->Alignment  = 0;
+  Bridge->Offset     = 0;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "PciBus: [%02x|%02x|%02x] %s window pinned to [%lx, %lx] by fixed resources\n",
+    Bridge->PciDev->BusNumber,
+    Bridge->PciDev->DeviceNumber,
+    Bridge->PciDev->FunctionNumber,
+    mBarTypeStr[MIN (Bridge->ResType, PciBarTypeMaxType)],
+    Bridge->FixedBase,
+    Bridge->FixedLimit
+    ));
+
+  return TRUE;
+}
+
+/**
+  Pin the window of a PCI-PCI bridge to the fixed range described by its
+  Enhanced Allocation capability, if any.
+
+  This must be called after the relocatable aperture of the window has been
+  calculated, i.e., after the offsets of the relocatable resources below it
+  have been assigned.
+
+  Fixed resources below the bridge must reside inside the window, and are
+  dropped otherwise. Relocatable resources are placed inside the window at the
+  offsets calculated for them, provided that the window does not hold any
+  fixed resources, and is large enough and suitably aligned to accommodate
+  them. Otherwise, they are dropped.
+
+  @param Bridge  PCI resource node for a bridge.
+
+**/
+STATIC
+VOID
+PinEaBridgeWindow (
+  IN PCI_RESOURCE_NODE  *Bridge
+  )
+{
+  PCI_BAR            *Window;
+  LIST_ENTRY         *Link;
+  LIST_ENTRY         *NextLink;
+  PCI_RESOURCE_NODE  *Node;
+  UINT64             Limit;
+  UINT64             Extent;
+  UINT64             MaxAlignment;
+  BOOLEAN            HasFixed;
+  BOOLEAN            HasRelocatable;
+  BOOLEAN            Above4G;
+  BOOLEAN            Fits;
+
+  Window = GetEaBridgeWindow (Bridge);
+  if (Window == NULL) {
+    return;
+  }
+
+  Limit          = Window->BaseAddress + Window->Length - 1;
+  Above4G        = (BOOLEAN)((Bridge->ResType != PciBarTypeIo16) && (Limit > MAX_UINT32));
+  HasFixed       = FALSE;
+  HasRelocatable = FALSE;
+  Fits           = TRUE;
+  Extent         = 0;
+  MaxAlignment   = 0;
+
+  for (Link = GetFirstNode (&Bridge->ChildList); !IsNull (&Bridge->ChildList, Link); Link = NextLink) {
+    NextLink = GetNextNode (&Bridge->ChildList, Link);
+    Node     = RESOURCE_NODE_FROM_LINK (Link);
+
+    if (Node->Fixed) {
+      if ((Node->FixedBase < Window->BaseAddress) || (Node->FixedLimit > Limit)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "PciBus: [%02x|%02x|%02x] fixed resource [%lx, %lx] is outside the fixed window [%lx, %lx] of bridge [%02x|%02x|%02x]\n",
+          Node->PciDev->BusNumber,
+          Node->PciDev->DeviceNumber,
+          Node->PciDev->FunctionNumber,
+          Node->FixedBase,
+          Node->FixedLimit,
+          Window->BaseAddress,
+          Limit,
+          Bridge->PciDev->BusNumber,
+          Bridge->PciDev->DeviceNumber,
+          Bridge->PciDev->FunctionNumber
+          ));
+        RemoveEntryList (Link);
+        DropResourceTree (Node);
+        DestroyResourceTree (Node);
+        FreePool (Node);
+      } else {
+        HasFixed = TRUE;
+      }
+
+      continue;
+    }
+
+    //
+    // The size of the window is fixed, so there is no point in padding it.
+    //
+    if (Node->ResourceUsage == PciResUsagePadding) {
+      RemoveEntryList (Link);
+      DestroyResourceTree (Node);
+      FreePool (Node);
+      continue;
+    }
+
+    HasRelocatable = TRUE;
+    Extent         = MAX (Extent, Node->Offset + Node->Length);
+    MaxAlignment   = MAX (MaxAlignment, Node->Alignment);
+    if (Above4G && !IsResource64BitCapable (Node)) {
+      Fits = FALSE;
+    }
+  }
+
+  if (HasRelocatable &&
+      (HasFixed || !Fits || (Extent > Window->Length) || ((Window->BaseAddress & MaxAlignment) != 0)))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "PciBus: [%02x|%02x|%02x] relocatable resources cannot be placed in the fixed %s window [%lx, %lx]\n",
+      Bridge->PciDev->BusNumber,
+      Bridge->PciDev->DeviceNumber,
+      Bridge->PciDev->FunctionNumber,
+      mBarTypeStr[MIN (Bridge->ResType, PciBarTypeMaxType)],
+      Window->BaseAddress,
+      Limit
+      ));
+    DropRelocatableResources (Bridge);
+  }
+
+  Bridge->Fixed      = TRUE;
+  Bridge->FixedBase  = Window->BaseAddress;
+  Bridge->FixedLimit = Limit;
+  Bridge->Length     = Window->Length;
+  Bridge->Alignment  = 0;
+  Bridge->Offset     = 0;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "PciBus: [%02x|%02x|%02x] %s window fixed at [%lx, %lx] by Enhanced Allocation\n",
+    Bridge->PciDev->BusNumber,
+    Bridge->PciDev->DeviceNumber,
+    Bridge->PciDev->FunctionNumber,
+    mBarTypeStr[MIN (Bridge->ResType, PciBarTypeMaxType)],
+    Bridge->FixedBase,
+    Bridge->FixedLimit
+    ));
 }
 
 /**
@@ -239,6 +841,13 @@ CalculateApertureIo16 (
         )
   {
     Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
+    if (Node->Fixed) {
+      //
+      // Fixed resources don't occupy any of the bridge's relocatable aperture.
+      //
+      continue;
+    }
+
     if (Node->ResourceUsage == PciResUsagePadding) {
       ASSERT (PaddingAperture == 0);
       PaddingAperture = Node->Length;
@@ -344,8 +953,17 @@ CalculateResourceAperture (
     return;
   }
 
+  DEBUG_CODE (
+    WarnOnFixedOverlap (Bridge);
+    );
+
+  if (PinBridgeWindow (Bridge)) {
+    return;
+  }
+
   if (Bridge->ResType == PciBarTypeIo16) {
     CalculateApertureIo16 (Bridge);
+    PinEaBridgeWindow (Bridge);
     return;
   }
 
@@ -360,6 +978,12 @@ CalculateResourceAperture (
         )
   {
     Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
+    if (Node->Fixed) {
+      //
+      // Fixed resources don't occupy any of the bridge's relocatable aperture.
+      //
+      continue;
+    }
 
     //
     // It's possible for a bridge to contain multiple padding resource
@@ -405,6 +1029,8 @@ CalculateResourceAperture (
       Bridge->Alignment = Node->Alignment;
     }
   }
+
+  PinEaBridgeWindow (Bridge);
 }
 
 /**
@@ -439,6 +1065,55 @@ GetResourceFromDevice (
   for (Index = 0; Index < PCI_MAX_BAR; Index++) {
     DestNode = NULL;
     Node     = NULL;
+
+    if ((PciDev->PciBar)[Index].AddressFixed) {
+      //
+      // BARs described by an Enhanced Allocation entry decode a range that is
+      // fixed by hardware. They must not be assigned by the resource allocator,
+      // but the windows of upstream bridges must cover them. So create a fixed
+      // resource node, which does not consume any of the parent's resources.
+      //
+      switch ((PciDev->PciBar)[Index].BarType) {
+        case PciBarTypeMem32:
+          DestNode = Mem32Node;
+          break;
+        case PciBarTypePMem32:
+          DestNode = PMem32Node;
+          break;
+        case PciBarTypeMem64:
+          DestNode = Mem64Node;
+          break;
+        case PciBarTypePMem64:
+          DestNode = PMem64Node;
+          break;
+        case PciBarTypeIo16:
+        case PciBarTypeIo32:
+          DestNode = IoNode;
+          break;
+        default:
+          break;
+      }
+
+      if (DestNode != NULL) {
+        Node = CreateResourceNode (
+                 PciDev,
+                 (PciDev->PciBar)[Index].Length,
+                 0,
+                 Index,
+                 (DestNode == IoNode) ? PciBarTypeIo16 : (PciDev->PciBar)[Index].BarType,
+                 PciResUsageTypical
+                 );
+        if (Node != NULL) {
+          Node->Fixed      = TRUE;
+          Node->FixedBase  = (PciDev->PciBar)[Index].BaseAddress;
+          Node->FixedLimit = Node->FixedBase + Node->Length - 1;
+          InsertResourceNode (DestNode, Node);
+        }
+      }
+
+      continue;
+    }
+
     switch ((PciDev->PciBar)[Index].BarType) {
       case PciBarTypeMem32:
       case PciBarTypeOpRom:
@@ -832,6 +1507,16 @@ CreateResourceMap (
         PMem64Bridge
         );
 
+      //
+      // Fixed resources that are passed through by the bridge are accounted
+      // for at this level instead.
+      //
+      PassThroughFixedResources (IoBridge, IoNode, Mem32Node, PMem32Node, Mem64Node, PMem64Node);
+      PassThroughFixedResources (Mem32Bridge, IoNode, Mem32Node, PMem32Node, Mem64Node, PMem64Node);
+      PassThroughFixedResources (PMem32Bridge, IoNode, Mem32Node, PMem32Node, Mem64Node, PMem64Node);
+      PassThroughFixedResources (Mem64Bridge, IoNode, Mem32Node, PMem32Node, Mem64Node, PMem64Node);
+      PassThroughFixedResources (PMem64Bridge, IoNode, Mem32Node, PMem32Node, Mem64Node, PMem64Node);
+
       if (ResourceRequestExisted (IoBridge)) {
         InsertResourceNode (
           IoNode,
@@ -1205,7 +1890,27 @@ ProgramResource (
   PCI_RESOURCE_NODE  *Node;
   EFI_STATUS         Status;
 
-  if (Base == gAllOne) {
+  //
+  // Program the windows of bridges that are pinned by fixed resources first,
+  // as they don't depend on the resources allocated to this bridge. Fixed BARs
+  // retain the base address that was recorded during enumeration.
+  //
+  for ( CurrentLink = GetFirstNode (&Bridge->ChildList)
+        ; !IsNull (&Bridge->ChildList, CurrentLink)
+        ; CurrentLink = GetNextNode (&Bridge->ChildList, CurrentLink)
+        )
+  {
+    Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
+    if (Node->Fixed && IsPpbWindowNode (Node)) {
+      ProgramResource (Node->FixedBase, Node);
+      ProgramPpbApperture (Base, Node);
+    }
+  }
+
+  //
+  // A bridge that only holds fixed resources has not requested an aperture.
+  //
+  if ((Base == gAllOne) && ResourceRequestExisted (Bridge)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1213,6 +1918,18 @@ ProgramResource (
 
   while (CurrentLink != &Bridge->ChildList) {
     Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
+
+    if (Node->Fixed) {
+      //
+      // Fixed BARs are not programmed, but they are allocated by definition.
+      //
+      if (!IsPpbWindowNode (Node)) {
+        Node->PciDev->Allocated = TRUE;
+      }
+
+      CurrentLink = CurrentLink->ForwardLink;
+      continue;
+    }
 
     if (!IS_PCI_BRIDGE (&(Node->PciDev->Pci))) {
       if (IS_CARDBUS_BRIDGE (&(Node->PciDev->Pci))) {
@@ -1454,8 +2171,39 @@ ProgramPpbApperture (
     return;
   }
 
-  PciIo   = &(Node->PciDev->PciIo);
-  Address = Base + Node->Offset;
+  PciIo = &(Node->PciDev->PciIo);
+
+  if (Node->Fixed) {
+    //
+    // The window is pinned by fixed resources below the bridge.
+    //
+    Address = Node->FixedBase;
+
+    if (GetEaBridgeWindow (Node) != NULL) {
+      //
+      // The window is described by the bridge's Enhanced Allocation
+      // capability, and so it does not depend on the Base/Limit registers.
+      //
+      Node->PciDev->Allocated                     = TRUE;
+      Node->PciDev->PciBar[Node->Bar].BaseAddress = Address;
+      Node->PciDev->PciBar[Node->Bar].Length      = Node->Length;
+      return;
+    }
+
+    if ((Node->Bar == PPB_MEM32_RANGE) && (Node->FixedLimit > MAX_UINT32)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "PciBus: [%02x|%02x|%02x] fixed resources [%lx, %lx] exceed the 32-bit memory window\n",
+        Node->PciDev->BusNumber,
+        Node->PciDev->DeviceNumber,
+        Node->PciDev->FunctionNumber,
+        Node->FixedBase,
+        Node->FixedLimit
+        ));
+    }
+  } else {
+    Address = Base + Node->Offset;
+  }
 
   //
   // Indicate the PPB resource has been allocated
@@ -1522,7 +2270,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint8,
-                   0x1C,
+                   PCI_BRIDGE_IO_BASE_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1531,7 +2279,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint16,
-                   0x30,
+                   PCI_BRIDGE_IO_BASE_UPPER_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1541,7 +2289,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint8,
-                   0x1D,
+                   PCI_BRIDGE_IO_LIMIT_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1550,7 +2298,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint16,
-                   0x32,
+                   PCI_BRIDGE_IO_LIMIT_UPPER_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1565,7 +2313,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint16,
-                   0x20,
+                   PCI_BRIDGE_MEMORY_BASE_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1575,7 +2323,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint16,
-                   0x22,
+                   PCI_BRIDGE_MEMORY_LIMIT_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1591,7 +2339,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint16,
-                   0x24,
+                   PCI_BRIDGE_64BIT_MEMORY_BASE_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1601,7 +2349,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint16,
-                   0x26,
+                   PCI_BRIDGE_64BIT_MEMORY_LIMIT_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1610,7 +2358,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint32,
-                   0x28,
+                   PCI_BRIDGE_64BIT_MEMORY_BASE_UPPER_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1619,7 +2367,7 @@ ProgramPpbApperture (
       PciIo->Pci.Write (
                    PciIo,
                    EfiPciIoWidthUint32,
-                   0x2C,
+                   PCI_BRIDGE_64BIT_MEMORY_LIMIT_UPPER_REGISTER_OFFSET,
                    1,
                    &Address32
                    );
@@ -1717,9 +2465,27 @@ ResourceRequestExisted (
   IN PCI_RESOURCE_NODE  *Bridge
   )
 {
+  LIST_ENTRY         *Link;
+  PCI_RESOURCE_NODE  *Node;
+
   if (Bridge != NULL) {
-    if (!IsListEmpty (&Bridge->ChildList) || (Bridge->Length != 0)) {
+    if (Bridge->Length != 0) {
       return TRUE;
+    }
+
+    //
+    // Fixed resources don't occupy any of the bridge's relocatable aperture,
+    // so a bridge that only holds fixed resources has no request.
+    //
+    for ( Link = GetFirstNode (&Bridge->ChildList)
+          ; !IsNull (&Bridge->ChildList, Link)
+          ; Link = GetNextNode (&Bridge->ChildList, Link)
+          )
+    {
+      Node = RESOURCE_NODE_FROM_LINK (Link);
+      if (!Node->Fixed) {
+        return TRUE;
+      }
     }
   }
 

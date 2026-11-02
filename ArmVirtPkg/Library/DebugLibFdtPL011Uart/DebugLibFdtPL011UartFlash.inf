@@ -30,9 +30,11 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmCcaLib
   BaseLib
   BaseMemoryLib
   DebugPrintErrorLevelLib
