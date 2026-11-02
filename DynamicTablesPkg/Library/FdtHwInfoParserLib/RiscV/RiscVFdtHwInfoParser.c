@@ -12,6 +12,7 @@
 #include "Serial/SerialPortParser.h"
 #include "Intc/RiscVIntcParser.h"
 #include "HartInfo/RiscVTimerDispatcher.h"
+#include "Topology/TopologyParser.h"
 
 /** Ordered table of parsers/dispatchers.
 
@@ -25,6 +26,7 @@
 */
 STATIC CONST FDT_HW_INFO_PARSER_FUNC  mHwInfoParserTable[] = {
   RiscVIntcDispatcher,
+  TopologyInfoParser,
   RiscVTimerDispatcher,
   PciConfigInfoParser,
   SerialPortDispatcher
