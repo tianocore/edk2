@@ -1274,6 +1274,8 @@ ArmFfaLibFfaNsResInfoGet (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
   FfaArgs.Arg0 = ARM_FID_FFA_NS_RES_INFO_GET;
   FfaArgs.Arg1 = TargetId;
   FfaArgs.Arg2 = Flags;
