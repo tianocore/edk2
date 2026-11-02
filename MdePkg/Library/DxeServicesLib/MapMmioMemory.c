@@ -13,6 +13,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Protocol/Cpu.h>
 
 /**
   Ensure a range is present in the GCD memory space map as MMIO.
@@ -155,6 +156,7 @@ AddMmioMemorySpace (
                                  requested attributes.
   @retval EFI_ABORTED            An existing GCD descriptor is malformed.
   @retval EFI_ACCESS_DENIED      DXE Services are not available.
+  @retval EFI_NOT_READY          CPU Architecture Protocol is not available.
   @retval Others                 The GCD memory services returned an error.
 **/
 EFI_STATUS
@@ -165,9 +167,10 @@ MapMmioMemory (
   IN UINT64                Attributes
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  RegionEnd;
-  EFI_DXE_SERVICES      *DxeServices;
+  EFI_STATUS             Status;
+  EFI_PHYSICAL_ADDRESS   RegionEnd;
+  EFI_DXE_SERVICES       *DxeServices;
+  EFI_CPU_ARCH_PROTOCOL  *Cpu;
 
   Status = EfiGetSystemConfigurationTable (
              &gEfiDxeServicesTableGuid,
@@ -208,6 +211,17 @@ MapMmioMemory (
 
   // Calculate the total region size.
   Length = RegionEnd - Base;
+
+  //
+  // SetMemorySpaceAttributes() may need to update CPU memory attributes
+  // through the CPU Architecture Protocol. Do not add MMIO descriptors before
+  // that dependency is available, because failures after AddMemorySpace() are
+  // not rolled back.
+  //
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
+  if (EFI_ERROR (Status)) {
+    return EFI_NOT_READY;
+  }
 
   Status = AddMmioMemorySpace (DxeServices, Base, Length, Attributes);
   if (EFI_ERROR (Status)) {

@@ -351,6 +351,7 @@ AllocatePeiAccessiblePages (
                                  requested attributes.
   @retval EFI_ABORTED            An existing GCD descriptor is malformed.
   @retval EFI_ACCESS_DENIED      DXE Services are not available.
+  @retval EFI_NOT_READY          CPU Architecture Protocol is not available.
   @retval Others                 The GCD memory services returned an error.
 **/
 EFI_STATUS

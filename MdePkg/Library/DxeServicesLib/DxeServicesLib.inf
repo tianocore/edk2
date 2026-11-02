@@ -59,3 +59,4 @@
   gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiCpuArchProtocolGuid                       ## SOMETIMES_CONSUMES
