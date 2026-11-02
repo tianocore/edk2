@@ -621,7 +621,10 @@ MnpAnalysePacket (
   // Get the packet buffer.
   //
   BufPtr = NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (BufPtr != NULL);
+  if (BufPtr == NULL) {
+    ASSERT (BufPtr != NULL);
+    return;
+  }
 
   //
   // Set the initial values.
@@ -873,7 +876,10 @@ MnpReceivePacket (
   Nbuf   = MnpDeviceData->RxNbufCache;
   BufLen = Nbuf->TotalSize;
   BufPtr = NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (BufPtr != NULL);
+  if (BufPtr == NULL) {
+    ASSERT (BufPtr != NULL);
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // Receive packet through Snp.
