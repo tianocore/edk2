@@ -51,7 +51,10 @@
 # Different build options can be specified:
 #   * for different architectures:
 #       -DARCH_X64, -DARCH_IA32
-#   * for using 1G page table:
-#       -DPAGE_TABLE_1G
+#   * for using 1G page table with specified size (in units of 512GB, 1 to
+#     512; each 512GB adds one 4KB PDPT to the image):
+#       -DPAGE_TABLE_1G                               (512GB)
+#       -DPAGE_TABLE_1G -DPAGE_TABLE_SIZE_X_512GB=2   (1024GB)
+#       -DPAGE_TABLE_1G -DPAGE_TABLE_SIZE_X_512GB=8   (4096GB)
 #   * for different debug channels:
 #       -DDEBUG_SERIAL, -DDEBUG_PORT80, or not specify any debug channel
