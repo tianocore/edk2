@@ -20,9 +20,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/FspMeasurementLib.h>
 #include <Library/TcgEventLogRecordLib.h>
 #include <Library/HashLib.h>
+#include <Library/HobLib.h>
 
+#include <Guid/FspImageBaseHob.h>
 #include <Ppi/Tcg.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
+
+#define FSP_NO_IMAGE_BASE_OFFSET  MAX_UINTN
 
 /**
   Tpm measure and log data, and extend the measurement result into a specific PCR.
@@ -89,6 +93,10 @@ TpmMeasureAndLogDataWithFlags (
   @param[in]  FirmwareBlobLength      Size in bytes of this FirmwareBlob.
   @param[in]  CfgRegionOffset         Configuration region offset in bytes.
   @param[in]  CfgRegionSize           Configuration region in bytes.
+  @param[in]  ImageBaseOffset         Offset in bytes of the ImageBase field to
+                                      replace, or FSP_NO_IMAGE_BASE_OFFSET.
+  @param[in]  OriginalImageBase       Value hashed in place of the ImageBase
+                                      field when ImageBaseOffset is used.
 
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_UNSUPPORTED       TPM device not available.
@@ -103,7 +111,9 @@ MeasureFspFirmwareBlobWithCfg (
   IN EFI_PHYSICAL_ADDRESS  FirmwareBlobBase,
   IN UINT64                FirmwareBlobLength,
   IN UINT32                CfgRegionOffset,
-  IN UINT32                CfgRegionSize
+  IN UINT32                CfgRegionSize,
+  IN UINTN                 ImageBaseOffset,
+  IN UINT32                OriginalImageBase
   )
 {
   EFI_PLATFORM_FIRMWARE_BLOB      FvBlob, UpdBlob;
@@ -163,13 +173,51 @@ MeasureFspFirmwareBlobWithCfg (
     return Status;
   }
 
-  /** Hash FSP binary before UDP **/
-  HashBase = (UINT8 *)(UINTN)FirmwareBlobBase;
-  HashSize = (UINTN)CfgRegionOffset;
-  Status   = HashUpdate (HashHandle, HashBase, HashSize);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "HashUpdate failed - %r\n", Status));
-    return Status;
+  //
+  // The FSP specification places the FSP_INFO_HEADER before the UPD region.
+  // Hash ImageBase as is if it is not inside the blob before the UPD region.
+  //
+  if ((ImageBaseOffset > MAX_UINTN - sizeof (UINT32)) ||
+      (ImageBaseOffset + sizeof (UINT32) > FirmwareBlobLength) ||
+      (ImageBaseOffset + sizeof (UINT32) > CfgRegionOffset))
+  {
+    ImageBaseOffset = FSP_NO_IMAGE_BASE_OFFSET;
+  }
+
+  if (ImageBaseOffset == FSP_NO_IMAGE_BASE_OFFSET) {
+    /** Hash FSP binary before UDP **/
+    HashBase = (UINT8 *)(UINTN)FirmwareBlobBase;
+    HashSize = (UINTN)CfgRegionOffset;
+    Status   = HashUpdate (HashHandle, HashBase, HashSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HashUpdate failed - %r\n", Status));
+      return Status;
+    }
+  } else {
+    /** Hash FSP binary before ImageBase **/
+    HashBase = (UINT8 *)(UINTN)FirmwareBlobBase;
+    HashSize = ImageBaseOffset;
+    Status   = HashUpdate (HashHandle, HashBase, HashSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HashUpdate failed - %r\n", Status));
+      return Status;
+    }
+
+    /** Hash the original ImageBase in place of the current one **/
+    Status = HashUpdate (HashHandle, &OriginalImageBase, sizeof (OriginalImageBase));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HashUpdate failed - %r\n", Status));
+      return Status;
+    }
+
+    /** Hash FSP binary after ImageBase, before UPD **/
+    HashBase = (UINT8 *)(UINTN)FirmwareBlobBase + ImageBaseOffset + sizeof (UINT32);
+    HashSize = (UINTN)CfgRegionOffset - ImageBaseOffset - sizeof (UINT32);
+    Status   = HashUpdate (HashHandle, HashBase, HashSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HashUpdate failed - %r\n", Status));
+      return Status;
+    }
   }
 
   /** Hash FSP binary after UDP **/
@@ -215,6 +263,53 @@ MeasureFspFirmwareBlobWithCfg (
 }
 
 /**
+  Find the ImageBase value an FSP component had before its wrapper wrote
+  the load address into FSP_INFO_HEADER.ImageBase.
+
+  @param[in]  FspBase                 Base address of the FSP component.
+  @param[out] OriginalImageBase       The saved ImageBase value.
+
+  @retval TRUE   One FSP_IMAGE_BASE_HOB value was found for FspBase.
+  @retval FALSE  No HOB was found, or the HOBs for FspBase disagree.
+**/
+STATIC
+BOOLEAN
+FspGetOriginalImageBase (
+  IN  EFI_PHYSICAL_ADDRESS  FspBase,
+  OUT UINT32                *OriginalImageBase
+  )
+{
+  EFI_HOB_GUID_TYPE   *GuidHob;
+  FSP_IMAGE_BASE_HOB  *ImageBaseHob;
+  BOOLEAN             Found;
+
+  Found = FALSE;
+  for (GuidHob = GetFirstGuidHob (&gFspImageBaseHobGuid);
+       GuidHob != NULL;
+       GuidHob = GetNextGuidHob (&gFspImageBaseHobGuid, GET_NEXT_HOB (GuidHob)))
+  {
+    if (GET_GUID_HOB_DATA_SIZE (GuidHob) < sizeof (FSP_IMAGE_BASE_HOB)) {
+      continue;
+    }
+
+    ImageBaseHob = GET_GUID_HOB_DATA (GuidHob);
+    if ((EFI_PHYSICAL_ADDRESS)ImageBaseHob->FspBase != FspBase) {
+      continue;
+    }
+
+    if (Found && (*OriginalImageBase != ImageBaseHob->OriginalImageBase)) {
+      DEBUG ((DEBUG_ERROR, "Conflicting ImageBase HOBs for FSP at 0x%lx\n", FspBase));
+      return FALSE;
+    }
+
+    *OriginalImageBase = ImageBaseHob->OriginalImageBase;
+    Found              = TRUE;
+  }
+
+  return Found;
+}
+
+/**
   Measure a FSP FirmwareBlob.
 
   @param[in]  PcrIndex                PCR Index.
@@ -238,17 +333,30 @@ MeasureFspFirmwareBlob (
 {
   UINT32           FspMeasureMask;
   FSP_INFO_HEADER  *FspHeaderPtr;
+  UINTN            ImageBaseOffset;
+  UINT32           OriginalImageBase;
 
   FspMeasureMask = PcdGet32 (PcdFspMeasurementConfig);
   if ((FspMeasureMask & FSP_MEASURE_FSPUPD) != 0) {
     FspHeaderPtr = (FSP_INFO_HEADER *)FspFindFspHeader (FirmwareBlobBase);
     if (FspHeaderPtr != NULL) {
+      ImageBaseOffset   = FSP_NO_IMAGE_BASE_OFFSET;
+      OriginalImageBase = 0;
+      if (((FspMeasureMask & FSP_MEASURE_ORIGINAL_IMAGEBASE) != 0) &&
+          (FspHeaderPtr->ImageBase == FirmwareBlobBase) &&
+          FspGetOriginalImageBase (FirmwareBlobBase, &OriginalImageBase))
+      {
+        ImageBaseOffset = (UINTN)FspHeaderPtr - (UINTN)FirmwareBlobBase + OFFSET_OF (FSP_INFO_HEADER, ImageBase);
+      }
+
       return MeasureFspFirmwareBlobWithCfg (
                Description,
                FirmwareBlobBase,
                FirmwareBlobLength,
                FspHeaderPtr->CfgRegionOffset,
-               FspHeaderPtr->CfgRegionSize
+               FspHeaderPtr->CfgRegionSize,
+               ImageBaseOffset,
+               OriginalImageBase
                );
     }
   }

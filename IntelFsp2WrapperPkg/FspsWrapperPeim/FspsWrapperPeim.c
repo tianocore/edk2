@@ -26,6 +26,7 @@
 #include <Library/PerformanceLib.h>
 #include <Library/FspWrapperApiLib.h>
 #include <Library/FspMeasurementLib.h>
+#include <Guid/FspImageBaseHob.h>
 
 #include <Ppi/FspSiliconInitDone.h>
 #include <Ppi/EndOfPeiPhase.h>
@@ -383,13 +384,14 @@ PeiMemoryDiscoveredNotify (
   IN VOID                       *Ppi
   )
 {
-  FSP_INFO_HEADER    *FspsHeaderPtr;
-  UINT64             TimeStampCounterStart;
-  EFI_STATUS         Status;
-  VOID               *FspHobListPtr;
-  EFI_HOB_GUID_TYPE  *GuidHob;
-  FSPS_UPD_COMMON    *FspsUpdDataPtr;
-  UINTN              *SourceData;
+  FSP_INFO_HEADER     *FspsHeaderPtr;
+  UINT64              TimeStampCounterStart;
+  EFI_STATUS          Status;
+  VOID                *FspHobListPtr;
+  EFI_HOB_GUID_TYPE   *GuidHob;
+  FSPS_UPD_COMMON     *FspsUpdDataPtr;
+  UINTN               *SourceData;
+  FSP_IMAGE_BASE_HOB  *ImageBaseHob;
 
   DEBUG ((DEBUG_INFO, "PeiMemoryDiscoveredNotify enter\n"));
   FspsUpdDataPtr = NULL;
@@ -401,6 +403,18 @@ PeiMemoryDiscoveredNotify (
   }
 
   if (FspsHeaderPtr->ImageBase != PcdGet32 (PcdFspsBaseAddress)) {
+    if ((PcdGet32 (PcdFspMeasurementConfig) & (FSP_MEASURE_FSPUPD | FSP_MEASURE_ORIGINAL_IMAGEBASE)) ==
+        (FSP_MEASURE_FSPUPD | FSP_MEASURE_ORIGINAL_IMAGEBASE))
+    {
+      ImageBaseHob = BuildGuidHob (&gFspImageBaseHobGuid, sizeof (FSP_IMAGE_BASE_HOB));
+      if (ImageBaseHob != NULL) {
+        ImageBaseHob->FspBase           = PcdGet32 (PcdFspsBaseAddress);
+        ImageBaseHob->OriginalImageBase = FspsHeaderPtr->ImageBase;
+      } else {
+        DEBUG ((DEBUG_ERROR, "FSP-S ImageBase HOB not built\n"));
+      }
+    }
+
     FspsHeaderPtr->ImageBase = PcdGet32 (PcdFspsBaseAddress);
     Status                   = RebaseFspFv (PcdGet32 (PcdFspsBaseAddress));
     ASSERT_EFI_ERROR (Status);

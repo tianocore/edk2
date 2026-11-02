@@ -759,6 +759,11 @@ PCI_CLASS_ENTRY  PCISubClass_0c[] = {
     PCIBlankEntry
   },
   {
+    0x0A,
+    L"MIPI I3C Host Controller",
+    PCIBlankEntry
+  },
+  {
     0x80,
     L"Other bus type",
     PCIBlankEntry
