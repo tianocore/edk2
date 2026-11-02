@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Helper Library.
 
-  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2025 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -89,17 +89,27 @@ CheckAcpiTablePresent (
   Proximity Domain Id should be preferably placed in
   CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO objects now.
 
+  DefaultDomainId is used only when Token is CM_NULL_TOKEN. For a non-null
+  Token, any error retrieving the referenced object is returned without
+  falling back to DefaultDomainId.
+
   @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
                                 Protocol Interface.
-  @param [in]  DefaultDomainId  Default per-CmObj Proximity Domain Id.
+  @param [in]  DefaultDomainId  Default per-CmObj Proximity Domain Id, used
+                                only when Token is CM_NULL_TOKEN.
                                 The CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
                                 should be preferably used.
   @param [in]  Token            Token referencing a
                                 CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO object.
   @param [out] DomainId         If Success, contains DomainId to use.
 
-  @retval EFI_SUCCESS           Table generated successfully.
-  @retval EFI_INVALID_PARAMETER The table pointer is NULL or invalid.
+  @retval EFI_SUCCESS           The Proximity Domain Id was returned.
+  @retval EFI_INVALID_PARAMETER CfgMgrProtocol or DomainId is NULL, or a
+                                parameter is invalid during retrieval
+                                or metadata processing.
+  @retval EFI_NOT_FOUND         A non-null Token could not be resolved.
+  @return                       Other errors from object retrieval or
+                                metadata processing are propagated.
 **/
 EFI_STATUS
 EFIAPI
@@ -122,6 +132,8 @@ GetProximityDomainId (
     return EFI_INVALID_PARAMETER;
   }
 
+  ProximityDomain = NULL;
+
   if (Token != CM_NULL_TOKEN) {
     Status = GetEArchCommonObjProximityDomainInfo (
                CfgMgrProtocol,
@@ -129,20 +141,20 @@ GetProximityDomainId (
                &ProximityDomain,
                NULL
                );
-  } else {
-    // If CM_NULL_TOKEN, cannot found any Proximity Domain
-    Status = EFI_NOT_FOUND;
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: CM_OBJ_HELPER_LIB: Failed to get Proximity Domain. Status=%r Token=%llx\n",
+        Status,
+        Token
+        ));
+      return Status;
+    }
   }
 
-  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: CM_OBJ_HELPER_LIB: Failed to get Proximity Domain. Status=%r Token=%llx\n",
-      Status,
-      Token
-      ));
-    return Status;
-  } else if ((Status == EFI_SUCCESS) && (ProximityDomain->GenerateDomainId)) {
+  if ((ProximityDomain != NULL) &&
+      (ProximityDomain->GenerateDomainId))
+  {
     // A Proximity Domain was found and the Id must be generated.
     Status = MetadataHandlerGenerate (
                GetMetadataRoot (),
@@ -161,8 +173,8 @@ GetProximityDomainId (
   } else {
     // A hard-coded DomainId is used.
 
-    if (Status == EFI_NOT_FOUND) {
-      // No ProximityDomain CmObj was found.
+    if (Token == CM_NULL_TOKEN) {
+      // No ProximityDomain token was supplied.
       // Use the default Id.
       *DomainId = DefaultDomainId;
 
