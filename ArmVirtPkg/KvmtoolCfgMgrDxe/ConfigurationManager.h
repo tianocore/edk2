@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -62,7 +62,7 @@ typedef EFI_STATUS (*CM_OBJECT_HANDLER_PROC) (
 ///
 /// The number of ACPI tables to install
 ///
-#define PLAT_ACPI_TABLE_COUNT  11
+#define PLAT_ACPI_TABLE_COUNT  12
 
 ///
 /// A structure describing the platform configuration

@@ -2,6 +2,8 @@
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
 Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -216,6 +218,7 @@ X509ConstructCertificateStackV (
   X509   *X509Cert;
 
   STACK_OF (X509)  *CertStack;
+  STACK_OF (X509)  *NewCertStack;
   BOOLEAN  Status;
 
   //
@@ -225,19 +228,13 @@ X509ConstructCertificateStackV (
     return FALSE;
   }
 
-  Status = FALSE;
-
-  //
-  // Initialize X509 stack object.
-  //
-  CertStack = (STACK_OF (X509) *)(*X509Stack);
-  if (CertStack == NULL) {
-    CertStack = sk_X509_new_null ();
-    if (CertStack == NULL) {
-      return Status;
-    }
+  CertStack    = (STACK_OF (X509) *)(*X509Stack);
+  NewCertStack = sk_X509_new_null ();
+  if (NewCertStack == NULL) {
+    return FALSE;
   }
 
+  Status = TRUE;
   while (TRUE) {
     //
     // If Cert is NULL, then it is the end of the list.
@@ -249,6 +246,7 @@ X509ConstructCertificateStackV (
 
     CertSize = VA_ARG (Args, UINTN);
     if (CertSize == 0) {
+      Status = FALSE;
       break;
     }
 
@@ -272,16 +270,43 @@ X509ConstructCertificateStackV (
     //
     // Insert the new X509 object into X509 stack object.
     //
-    sk_X509_push (CertStack, X509Cert);
+    if (sk_X509_push (NewCertStack, X509Cert) == 0) {
+      X509_free (X509Cert);
+      Status = FALSE;
+      break;
+    }
   }
 
   if (!Status) {
-    sk_X509_pop_free (CertStack, X509_free);
-  } else {
-    *X509Stack = (UINT8 *)CertStack;
+    sk_X509_pop_free (NewCertStack, X509_free);
+    return FALSE;
   }
 
-  return Status;
+  if (CertStack == NULL) {
+    *X509Stack = (UINT8 *)NewCertStack;
+    return TRUE;
+  }
+
+  if (sk_X509_num (NewCertStack) == 0) {
+    sk_X509_free (NewCertStack);
+    return TRUE;
+  }
+
+  if (sk_X509_reserve (CertStack, sk_X509_num (NewCertStack)) == 0) {
+    sk_X509_pop_free (NewCertStack, X509_free);
+    return FALSE;
+  }
+
+  while ((X509Cert = sk_X509_shift (NewCertStack)) != NULL) {
+    if (sk_X509_push (CertStack, X509Cert) == 0) {
+      X509_free (X509Cert);
+      sk_X509_pop_free (NewCertStack, X509_free);
+      return FALSE;
+    }
+  }
+
+  sk_X509_free (NewCertStack);
+  return TRUE;
 }
 
 /**
@@ -1014,9 +1039,9 @@ EcGetPublicKeyFromX509 (
   OUT  VOID         **EcContext
   )
 {
-  BOOLEAN   Status;
-  EVP_PKEY  *Pkey;
-  X509      *X509Cert;
+  BOOLEAN     Status;
+  EC_CONTEXT  *EcCtx;
+  X509        *X509Cert;
 
   //
   // Check input parameters.
@@ -1025,16 +1050,22 @@ EcGetPublicKeyFromX509 (
     return FALSE;
   }
 
+  *EcContext = NULL;
+
   //
   // If CertSize is 0, return FALSE to be safe.
   //
   if (CertSize == 0) {
-    *EcContext = NULL;
     return FALSE;
   }
 
-  Pkey     = NULL;
   X509Cert = NULL;
+  Status   = FALSE;
+
+  EcCtx = OPENSSL_zalloc (sizeof (EC_CONTEXT));
+  if (EcCtx == NULL) {
+    return FALSE;
+  }
 
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
@@ -1050,17 +1081,19 @@ EcGetPublicKeyFromX509 (
   //
   // Retrieve and check EVP_PKEY data from X509 Certificate.
   //
-  Pkey = X509_get_pubkey (X509Cert);
-  if ((Pkey == NULL) || (EVP_PKEY_id (Pkey) != EVP_PKEY_EC)) {
+  EcCtx->EvpPkey = X509_get_pubkey (X509Cert);
+  if (EcCtx->EvpPkey == NULL) {
     goto _Exit;
   }
 
-  //
-  // Duplicate EC Context from the retrieved EVP_PKEY.
-  //
-  if ((*EcContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
-    Status = TRUE;
+  if (EVP_PKEY_id (EcCtx->EvpPkey) != EVP_PKEY_EC) {
+    EVP_PKEY_free (EcCtx->EvpPkey);
+    goto _Exit;
   }
+
+  Status     = TRUE;
+  *EcContext = EcCtx;
+  EcCtx      = NULL;
 
 _Exit:
   //
@@ -1070,8 +1103,8 @@ _Exit:
     X509_free (X509Cert);
   }
 
-  if (Pkey != NULL) {
-    EVP_PKEY_free (Pkey);
+  if (EcCtx != NULL) {
+    OPENSSL_free (EcCtx);
   }
 
   return Status;

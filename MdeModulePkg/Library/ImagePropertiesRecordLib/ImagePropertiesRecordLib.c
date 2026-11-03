@@ -864,7 +864,7 @@ GetFilename (
     }
   }
 
-  if (Index == sizeof (EfiFileName) - 4) {
+  if (Index == EfiFileNameSize - 4) {
     EfiFileName[Index] = 0;
   }
 }

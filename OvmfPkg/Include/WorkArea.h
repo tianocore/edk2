@@ -41,6 +41,13 @@ typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
 //
 typedef struct _SEC_SEV_ES_WORK_AREA {
   //
+  // AP jump table - must be offset 0 since the AP's initial RIP points
+  // here. This buffer must at least be the size of struct SEV_ES_AP_JMP_FAR.
+  // See SetSevEsJumpTable()
+  //
+  UINT8     ApJumpBuffer[16];
+
+  //
   // Hold the SevStatus MSR value read by OvmfPkg/ResetVector/Ia32/AmdSev.c
   //
   UINT64    SevStatusMsrValue;

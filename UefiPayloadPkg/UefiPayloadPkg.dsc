@@ -572,6 +572,10 @@
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/SmmPerformanceLib.inf
 !endif
+
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SmmDebugAgentLib.inf
+!endif
 !endif
 !if $(VARIABLE_SUPPORT) == "SPI"
   SpiFlashLib|UefiPayloadPkg/Library/SpiFlashLib/SpiFlashLib.inf
@@ -602,11 +606,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
-!if $(VARIABLE_SUPPORT) == "EMU"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable        |TRUE
-!elseif $(VARIABLE_SUPPORT) == "SPI" || $(VARIABLE_SUPPORT) == "SMMSTORE"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable        |FALSE
-!endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
@@ -668,6 +667,16 @@
 
   ## Whether allows PCI RB to allocate DMA memory above 4GB
   gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE
+
+  #
+  # PcdFirstTimeWakeUpAPsBySipi determines whether to employ
+  # SIPI instead of the INIT-SIPI-SIPI sequence during APs
+  # initialization. Deactivate this parameter to preserve
+  # the original execution of INIT-SIPI-SIPI as the bootloader might
+  # have halted the APs using a 'hlt' instruction where after they don't
+  # respond to a SIPI sequence any more.
+  #
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
 [PcdsFixedAtBuild.AARCH64]
   # System Memory Base -- fixed at 0x4000_0000
@@ -816,6 +825,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
 !endif
+
+!if $(VARIABLE_SUPPORT) == "EMU"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable        |TRUE
+!elseif $(VARIABLE_SUPPORT) == "SPI" || $(VARIABLE_SUPPORT) == "SMMSTORE"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable        |FALSE
+!endif
+
   # Disable SMM S3 script
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
 

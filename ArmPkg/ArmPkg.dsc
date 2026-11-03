@@ -70,6 +70,7 @@
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   OpteeLib|ArmPkg/Library/OpteeLib/OpteeLib.inf
 
@@ -85,7 +86,7 @@
 
   ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmTransferListLib|MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
   ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlLibNull/ArmMtlLibNull.inf
@@ -134,8 +135,6 @@
   ArmPkg/Library/ArmHvcLibNull/ArmHvcLibNull.inf
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
-  ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf

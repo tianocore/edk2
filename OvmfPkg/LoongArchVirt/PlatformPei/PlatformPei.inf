@@ -53,7 +53,7 @@
   PeimEntryPoint
   PeiServicesLib
   PlatformHookLib
-  PeiResourcePublicationLib
+  ResourcePublicationLib
   QemuFwCfgLib
 
 [Pcd]

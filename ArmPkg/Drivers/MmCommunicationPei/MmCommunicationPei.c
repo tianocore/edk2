@@ -22,11 +22,41 @@
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/SafeIntLib.h>
 
 //
 // Partition ID if FF-A support is enabled
 //
 STATIC UINT16  mStMmPartId;
+
+/**
+  Convert SmcMmRet value to EFI_STATUS.
+
+  @param[in] SmcMmRet              Mm return code
+
+  @retval EFI_SUCCESS
+  @retval Others                   Error status correspond to SmcMmRet
+
+**/
+STATIC
+EFI_STATUS
+SmcMmRetToEfiStatus (
+  IN UINTN  SmcMmRet
+  )
+{
+  switch ((UINT32)SmcMmRet) {
+    case ARM_SMC_MM_RET_SUCCESS:
+      return EFI_SUCCESS;
+    case ARM_SMC_MM_RET_INVALID_PARAMS:
+      return EFI_INVALID_PARAMETER;
+    case ARM_SMC_MM_RET_DENIED:
+      return EFI_ACCESS_DENIED;
+    case ARM_SMC_MM_RET_NO_MEMORY:
+      return EFI_OUT_OF_RESOURCES;
+    default:
+      return EFI_ACCESS_DENIED;
+  }
+}
 
 /**
   Check mm communication compatibility when use SPM_MM.
@@ -220,36 +250,7 @@ SendFfaMmCommunicate (
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (CommunicateArgs.Header.x1), 0x00, &CommunicateArgs);
   }
 
-  return Status;
-}
-
-/**
-  Convert SmcMmRet value to EFI_STATUS.
-
-  @param[in] SmcMmRet              Mm return code
-
-  @retval EFI_SUCCESS
-  @retval Others                   Error status correspond to SmcMmRet
-
-**/
-STATIC
-EFI_STATUS
-SmcMmRetToEfiStatus (
-  IN UINTN  SmcMmRet
-  )
-{
-  switch ((UINT32)SmcMmRet) {
-    case ARM_SMC_MM_RET_SUCCESS:
-      return EFI_SUCCESS;
-    case ARM_SMC_MM_RET_INVALID_PARAMS:
-      return EFI_INVALID_PARAMETER;
-    case ARM_SMC_MM_RET_DENIED:
-      return EFI_ACCESS_DENIED;
-    case ARM_SMC_MM_RET_NO_MEMORY:
-      return EFI_OUT_OF_RESOURCES;
-    default:
-      return EFI_ACCESS_DENIED;
-  }
+  return EFI_ERROR (Status) ? Status : SmcMmRetToEfiStatus (CommunicateArgs.Arg1);
 }
 
 /**
@@ -323,6 +324,8 @@ MmCommunicationPeimCommon (
   EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
   EFI_STATUS                    Status;
   UINTN                         BufferSize;
+  UINTN                         InputBufferSize;
+  UINTN                         HeaderSize;
 
   //
   // Check parameters
@@ -341,7 +344,28 @@ MmCommunicationPeimCommon (
   {
     // This is a v3 header
     CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)CommBuffer;
-    BufferSize          = CommunicateHeaderV3->BufferSize;
+    HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+    InputBufferSize     = CommunicateHeaderV3->BufferSize;
+
+    if (InputBufferSize < HeaderSize) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Invalid BufferSize value 0x%llx!\n",
+        __func__,
+        InputBufferSize
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (InputBufferSize - HeaderSize < CommunicateHeaderV3->MessageSize) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Invalid BufferSize value 0x%llx!\n",
+        __func__,
+        InputBufferSize
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
   } else {
     // This is a v1 header, do some checks
     if (CommSize == NULL) {
@@ -373,28 +397,46 @@ MmCommunicationPeimCommon (
     // MessageLength + Header to ascertain the
     // total size of the communication payload rather than
     // rely on optional CommSize parameter
-    BufferSize = CommunicateHeader->MessageLength +
-                 sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
+    Status = SafeUintnAdd (CommunicateHeader->MessageLength, OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data), &InputBufferSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Overflow occurred while calculating input BufferSize!\n",
+        __func__
+        ));
+      return Status;
+    }
+
     //
     // If CommSize is supplied it must match MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
     //
-    if (*CommSize != BufferSize) {
+    if (*CommSize != InputBufferSize) {
       DEBUG ((
         DEBUG_ERROR,
         "%a Unexpected CommSize value, has: 0x%llx vs. expected: 0x%llx!\n",
         __func__,
         *CommSize,
-        BufferSize
+        InputBufferSize
         ));
       return EFI_INVALID_PARAMETER;
     }
   }
 
+  if (InputBufferSize > (UINTN)PcdGet64 (PcdMmBufferSize)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a Input buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
+      __func__,
+      InputBufferSize,
+      (UINTN)PcdGet64 (PcdMmBufferSize)
+      ));
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
   // Now we know that the size is something we can handle, copy it over to the designated comm buffer.
   CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)(PcdGet64 (PcdMmBufferBase));
 
-  CopyMem (CommunicateHeader, CommBuffer, BufferSize);
+  CopyMem (CommunicateHeader, CommBuffer, InputBufferSize);
   if (IsFfaSupported ()) {
     Status = SendFfaMmCommunicate ();
   } else {
@@ -423,20 +465,26 @@ MmCommunicationPeimCommon (
       CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateHeader;
       BufferSize          = CommunicateHeaderV3->BufferSize;
     } else {
-      BufferSize = CommunicateHeader->MessageLength +
-                   sizeof (CommunicateHeader->HeaderGuid) +
-                   sizeof (CommunicateHeader->MessageLength);
+      Status = SafeUintnAdd (CommunicateHeader->MessageLength, OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data), &BufferSize);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a Overflow occurred while calculating returned BufferSize!\n",
+          __func__
+          ));
+        return Status;
+      }
     }
 
-    if (BufferSize > (UINTN)PcdGet64 (PcdMmBufferSize)) {
+    if (InputBufferSize < BufferSize) {
       // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
       Status = EFI_BAD_BUFFER_SIZE;
       DEBUG ((
         DEBUG_ERROR,
-        "%a Returned buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
+        "%a Returned buffer size is larger than input buffer size. Input: 0x%llx vs. returned: 0x%llx!\n",
         __func__,
-        BufferSize,
-        (UINTN)PcdGet64 (PcdMmBufferSize)
+        InputBufferSize,
+        BufferSize
         ));
     } else {
       CopyMem (CommBuffer, CommunicateHeader, BufferSize);

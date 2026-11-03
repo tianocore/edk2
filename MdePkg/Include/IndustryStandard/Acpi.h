@@ -11,4 +11,4 @@
 
 #pragma once
 
-#include <IndustryStandard/Acpi66.h>
+#include <IndustryStandard/Acpi67.h>

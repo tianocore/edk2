@@ -1,7 +1,7 @@
 ## @file
 # CI configuration for DynamicTablesPkg
 #
-# Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2026, Arm Limited. All rights reserved.<BR>
 # Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -102,6 +102,7 @@
            "ARMHD",                  # ARMHD620
            "ARMLTD",
            "AMLDBG",
+           "ARMHE",                  # ARMHE001
            "EISAID",
            "cacheablity",
            "cavium",
@@ -112,12 +113,17 @@
            "deviceid",
            "EArch",
            "edynamic",
+           "eloongarch",
            "eventq",
            "EOBJECT",
            "gerror",
            "invoc",
            "ITARGETSR",
+           "iwbdevicetabletemplate",
            "GTBLOCK",
+           "KMICR",
+           "KMIDATA",
+           "KMISTAT",
            "lgreater",
            "lless",
            "MPIDR",
@@ -125,6 +131,8 @@
            "NUVIA",
            "PASID",
            "PERIPHBASE",
+           "PMIIDR",
+           "PMPIDR",
            "phandle",
            "pytool",
            "Rdword",
@@ -132,6 +140,7 @@
            "ROOTNODEBASE",
            "sapic",
            "ssdtcmn",
+           "ssdtcmntemplate",
            "ssdtdmc",
            "ssdtserialporttemplate",
            "SMCCC",

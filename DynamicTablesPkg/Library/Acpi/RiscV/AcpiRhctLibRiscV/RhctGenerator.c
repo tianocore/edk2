@@ -851,8 +851,8 @@ BuildRhctTable (
   }
 
   // CMO Nodes
+  CmoOffset = (UINT32)TableSize;
   if (CmoNodeCount > 0) {
-    CmoOffset = (UINT32)TableSize;
     // Size of CMO node list.
     NodeSize = GetSizeofCmoNodes (
                  CmoOffset,
@@ -882,8 +882,8 @@ BuildRhctTable (
   }
 
   // MMU Nodes
+  MmuOffset = (UINT32)TableSize;
   if (MmuNodeCount > 0) {
-    MmuOffset = (UINT32)TableSize;
     // Size of MMU node list.
     NodeSize = GetSizeofMmuNodes (
                  MmuOffset,
@@ -913,8 +913,8 @@ BuildRhctTable (
   }
 
   // Hart Info Nodes
+  HartInfoOffset = (UINT32)TableSize;
   if (HartInfoNodeCount > 0) {
-    HartInfoOffset = (UINT32)TableSize;
     // Size of Hart Info node list.
     NodeSize = GetSizeofHartInfoNodes (
                  Generator,

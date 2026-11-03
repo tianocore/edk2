@@ -144,7 +144,7 @@ AmdSevSnpInitialize (
   // Iterate through the system RAM and validate it.
   //
   for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if ((Hob.Raw != NULL) && (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR)) {
+    if ((Hob.Raw != NULL) && IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       ResourceHob = Hob.ResourceDescriptor;
 
       if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {

@@ -21,7 +21,9 @@ jobs:
         python-version: ['3.12']
         tool-chain: ['VS2026']
         target: ['DEBUG']
-        extra-build-args: ['FIT_BUILD=TRUE', 'FIT_BUILD=FALSE']
+        # 'FIT_BUILD=TRUE' is not passed since the FIT build depends on fdtlib and that currently
+        # fails to compile when the wheel is built during pip installation.
+        extra-build-args: ['FIT_BUILD=FALSE']
     name: Build UPL VS2026
     uses: ./.github/workflows/BuildPlatform.yml
     with:
@@ -31,7 +33,6 @@ jobs:
       tool-chain: ${{ matrix.tool-chain }}
       target: ${{ matrix.target }}
       extra-build-args: ${{ matrix.extra-build-args }}
-      extra-pip-requirements: 'pefile pylibfdt'
       extra-artifact-path: |
         Build/**/*.elf
         Build/**/*.fit
@@ -44,7 +45,9 @@ jobs:
         python-version: ['3.12']
         tool-chain: ['GCC']
         target: ['DEBUG']
-        extra-build-args: ['FIT_BUILD=TRUE', 'FIT_BUILD=FALSE']
+        # 'FIT_BUILD=TRUE' is not passed since the FIT build depends on fdtlib and that currently
+        # fails to compile when the wheel is built during pip installation.
+        extra-build-args: ['FIT_BUILD=FALSE']
     name: Build UPL GCC
     uses: ./.github/workflows/BuildPlatform.yml
     with:
@@ -54,7 +57,6 @@ jobs:
       tool-chain: ${{ matrix.tool-chain }}
       target: ${{ matrix.target }}
       extra-build-args: ${{ matrix.extra-build-args }}
-      extra-pip-requirements: 'pefile pylibfdt'
       extra-setup-cmd: 'sudo dnf install -y llvm clang llvm-libs llvm-devel lldb'
       extra-artifact-path: |
         Build/**/*.elf

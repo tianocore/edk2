@@ -401,7 +401,7 @@ Sha512Final (
   //
   // OpenSSL SHA-512 Hash Finalization
   //
-  return (BOOLEAN)(SHA384_Final (HashValue, (SHA512_CTX *)Sha512Context));
+  return (BOOLEAN)(SHA512_Final (HashValue, (SHA512_CTX *)Sha512Context));
 }
 
 /**

@@ -100,6 +100,15 @@ VariableNotifySmmReady (
   );
 
 /**
+  Revert the variable ready notification.
+  This function will be called when an error happens in variable initializing process.
+**/
+VOID
+VariableClearNotifySmmReady (
+  VOID
+  );
+
+/**
   Notify the system that the SMM variable write driver is ready.
 **/
 VOID
@@ -113,7 +122,12 @@ VariableNotifySmmWriteReady (
   for variable read and write services being available. It also registers
   a notification function for an EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
-  @retval EFI_SUCCESS       Variable service successfully initialized.
+  @retval EFI_SUCCESS           Variable service successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES  Insufficient memory to allocate variable
+                                storage or communication buffers.
+  @retval EFI_VOLUME_CORRUPTED  The non-volatile variable store is corrupted.
+  @retval Others                An error from protocol installation, SMI handler
+                                registration, or protocol notification registration.
 **/
 EFI_STATUS
 EFIAPI

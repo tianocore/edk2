@@ -35,8 +35,8 @@
 
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
+#include <Library/ArmMonitorLib.h>
 #include <Library/ArmPlatformLib.h>
-#include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
@@ -55,12 +55,12 @@
 
 STATIC CPU_MP_DATA  mCpuMpData;
 STATIC BOOLEAN      mNonBlockingModeAllowed;
-UINT64              *gApStacksBase;
+STATIC UINT64       *mApStacksBase;
 UINT64              *gProcessorIDs;
-CONST UINT64        gApStackSize = AP_STACK_SIZE;
 VOID                *gTtbr0;
 UINTN               gTcr;
 UINTN               gMair;
+UINTN               gHcr;
 
 STATIC
 BOOLEAN
@@ -84,14 +84,15 @@ DispatchCpu (
   IN UINTN  ProcessorIndex
   )
 {
-  ARM_SMC_ARGS  Args;
-  EFI_STATUS    Status;
+  ARM_MONITOR_ARGS  Args;
+  EFI_STATUS        Status;
 
   Status = EFI_SUCCESS;
 
   mCpuMpData.CpuData[ProcessorIndex].State = CpuStateBusy;
 
   /* Turn the AP on */
+  ZeroMem (&Args, sizeof (Args));
   if (sizeof (Args.Arg0) == sizeof (UINT32)) {
     Args.Arg0 = ARM_SMC_ID_PSCI_CPU_ON_AARCH32;
   } else {
@@ -100,8 +101,13 @@ DispatchCpu (
 
   Args.Arg1 = gProcessorIDs[ProcessorIndex];
   Args.Arg2 = (UINTN)ApEntryPoint;
+  //
+  // Pass the top of the AP's stack as context_id, which ApEntryPoint receives
+  // in x0 and uses as its stack.
+  //
+  Args.Arg3 = (UINTN)mApStacksBase + (ProcessorIndex + 1) * AP_STACK_SIZE;
 
-  ArmCallSmc (&Args);
+  ArmMonitorCall (&Args);
 
   if (Args.Arg0 == ARM_SMC_PSCI_RET_ALREADY_ON) {
     Status = EFI_NOT_READY;
@@ -872,9 +878,6 @@ EnableDisableAP (
   UINTN        StatusFlag;
   CPU_AP_DATA  *CpuData;
 
-  StatusFlag = mCpuMpData.CpuData[ProcessorNumber].Info.StatusFlag;
-  CpuData    = &mCpuMpData.CpuData[ProcessorNumber];
-
   if (!IsCurrentProcessorBSP ()) {
     return EFI_DEVICE_ERROR;
   }
@@ -886,6 +889,9 @@ EnableDisableAP (
   if (IsProcessorBSP (ProcessorNumber)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  CpuData    = &mCpuMpData.CpuData[ProcessorNumber];
+  StatusFlag = CpuData->Info.StatusFlag;
 
   if ((GetApState (CpuData) != CpuStateIdle) &&
       (GetApState (CpuData) != CpuStateFinished))
@@ -1324,13 +1330,13 @@ MpServicesInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  gApStacksBase = AllocatePages (
+  mApStacksBase = AllocatePages (
                     EFI_SIZE_TO_PAGES (
                       mCpuMpData.NumberOfProcessors *
-                      gApStackSize
+                      AP_STACK_SIZE
                       )
                     );
-  ASSERT (gApStacksBase != NULL);
+  ASSERT (mApStacksBase != NULL);
 
   for (Index = 0; Index < mCpuMpData.NumberOfProcessors; Index++) {
     if (GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ()) == GET_MPIDR_AFFINITY_BITS (CoreInfo[Index].Mpidr)) {
@@ -1358,13 +1364,16 @@ MpServicesInitialize (
   gTcr   = ArmGetTCR ();
   gMair  = ArmGetMAIR ();
   gTtbr0 = ArmGetTTBR0BaseAddress ();
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    gHcr = ArmReadHcr ();
+  }
 
   //
   // The global pointer variables as well as the gProcessorIDs array contents
   // are accessed by the other cores so we must clean them to the PoC
   //
   WriteBackDataCacheRange (&gProcessorIDs, sizeof (UINT64 *));
-  WriteBackDataCacheRange (&gApStacksBase, sizeof (UINT64 *));
+  WriteBackDataCacheRange (&gHcr, sizeof (gHcr));
 
   WriteBackDataCacheRange (
     gProcessorIDs,
@@ -1479,6 +1488,25 @@ ArmPsciMpServicesDxeInitialize (
   return Status;
 }
 
+/** Turns off the calling AP using PSCI CPU_OFF. Does not return.
+
+**/
+VOID
+ApCpuOff (
+  VOID
+  )
+{
+  ARM_MONITOR_ARGS  Args;
+
+  ZeroMem (&Args, sizeof (Args));
+  Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
+  ArmMonitorCall (&Args);
+
+  /* Should never be reached */
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
 /** AP exception handler.
 
   @param InterruptType The AArch64 CPU exception type.
@@ -1493,10 +1521,9 @@ ApExceptionHandler (
   IN CONST EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  ARM_SMC_ARGS  Args;
-  UINT64        Mpidr;
-  UINTN         Index;
-  UINTN         ProcessorIndex;
+  UINT64  Mpidr;
+  UINTN   Index;
+  UINTN   ProcessorIndex;
 
   Mpidr = GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ());
 
@@ -1517,12 +1544,7 @@ ApExceptionHandler (
     ArmDataMemoryBarrier ();
   }
 
-  Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
-  ArmCallSmc (&Args);
-
-  /* Should never be reached */
-  ASSERT (FALSE);
-  CpuDeadLoop ();
+  ApCpuOff ();
 }
 
 /** C entry-point for the AP.
@@ -1534,7 +1556,6 @@ ApProcedure (
   VOID
   )
 {
-  ARM_SMC_ARGS      Args;
   EFI_AP_PROCEDURE  UserApProcedure;
   VOID              *UserApParameter;
   UINTN             ProcessorIndex;
@@ -1560,12 +1581,7 @@ ApProcedure (
   ArmDataMemoryBarrier ();
 
   /* Since we're finished with this AP, turn it off */
-  Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
-  ArmCallSmc (&Args);
-
-  /* Should never be reached */
-  ASSERT (FALSE);
-  CpuDeadLoop ();
+  ApCpuOff ();
 }
 
 /** Returns whether the processor executing this function is the BSP.

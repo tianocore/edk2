@@ -320,13 +320,6 @@ MainCmdRm (
   ParamCount  = 0;
   FileList    = NULL;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     //
     // we insufficient parameters

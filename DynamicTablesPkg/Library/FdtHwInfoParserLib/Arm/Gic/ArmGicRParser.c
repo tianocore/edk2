@@ -1,7 +1,7 @@
 /** @file
   Arm Gic Redistributor Parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -42,6 +42,7 @@ GicRIntcNodeParser (
   UINT32                  RegSize;
   INT32                   AddressCells;
   INT32                   SizeCells;
+  UINT64                  DiscoveryRangeSize;
   CONST UINT8             *Data;
   INT32                   DataSize;
   CM_ARM_GIC_REDIST_INFO  GicRInfo;
@@ -78,13 +79,19 @@ GicRIntcNodeParser (
   // The "#redistributor-regions" property is optional.
   // It indicates the number of GicR.
   Data = FdtGetProp (Fdt, GicIntcNode, "#redistributor-regions", &DataSize);
-  if ((Data != NULL) && (DataSize == sizeof (UINT32))) {
-    // If available, must be on one cell.
-    RedistReg = Fdt32ToCpu (*(UINT32 *)Data);
-  } else {
+  if (Data == NULL) {
     // The DT Spec says GicR is mandatory so we will
     // always have one.
     RedistReg = 1;
+  } else if (DataSize != sizeof (UINT32)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  } else {
+    RedistReg = Fdt32ToCpu (*(UINT32 *)Data);
+    if ((RedistReg < 1) || (RedistReg > 4096)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
   }
 
   /*
@@ -126,33 +133,33 @@ GicRIntcNodeParser (
   */
   RegSize = (AddressCells + SizeCells) * sizeof (UINT32);
   Data    = FdtGetProp (Fdt, GicIntcNode, "reg", &DataSize);
-  if ((Data == NULL)  ||
-      (DataSize < 0)  ||
-      ((DataSize % RegSize) != 0))
+  if ((Data == NULL)                              ||
+      (DataSize < 0)                              ||
+      ((DataSize % RegSize) != 0)                 ||
+      ((DataSize / RegSize) < (RedistReg + 1)))
   {
     // If error or wrong size.
-    ASSERT (0);
+    ASSERT (FALSE);
     return EFI_ABORTED;
   }
 
-  Data += GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells)
-          * sizeof (UINT32);
   for (Index = 0; Index < RedistReg; Index++) {
     ZeroMem (&GicRInfo, sizeof (CM_ARM_GIC_REDIST_INFO));
 
-    if (AddressCells == 2) {
-      GicRInfo.DiscoveryRangeBaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
-    } else {
-      GicRInfo.DiscoveryRangeBaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
+    Status = FdtGetTranslatedReg (
+               Fdt,
+               GicIntcNode,
+               1 + Index,
+               &GicRInfo.DiscoveryRangeBaseAddress,
+               &DiscoveryRangeSize
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
     }
 
-    Data += sizeof (UINT32) * AddressCells;
-
-    if (SizeCells == 2) {
-      GicRInfo.DiscoveryRangeLength = (UINT32)Fdt64ToCpu (*(UINT64 *)Data);
-    } else {
-      GicRInfo.DiscoveryRangeLength = Fdt32ToCpu (*(UINT32 *)Data);
-    }
+    ASSERT (DiscoveryRangeSize <= MAX_UINT32);
+    GicRInfo.DiscoveryRangeLength = (UINT32)DiscoveryRangeSize;
 
     // Add the CmObj to the Configuration Manager.
     Status = AddSingleCmObj (
@@ -166,8 +173,6 @@ GicRIntcNodeParser (
       ASSERT (0);
       return Status;
     }
-
-    Data += sizeof (UINT32) * SizeCells;
   } // for
 
   return Status;

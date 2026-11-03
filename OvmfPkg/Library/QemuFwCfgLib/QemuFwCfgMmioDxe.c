@@ -25,6 +25,35 @@ STATIC UINTN  mFwCfgSelectorAddress;
 STATIC UINTN  mFwCfgDataAddress;
 STATIC UINTN  mFwCfgDmaAddress;
 
+STATIC EDKII_IOMMU_PROTOCOL  *mIoMmuProtocol;
+
+/**
+  Initialize the IOMMU protocol
+**/
+STATIC
+RETURN_STATUS
+InternalInitIoMmu (
+  VOID
+  )
+{
+  return gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmuProtocol);
+}
+
+/**
+  Get the IOMMU protocol instance
+
+  @param VOID
+
+  @retval  Pointer to the IoMMU protocol.
+**/
+EDKII_IOMMU_PROTOCOL *
+GetIoMmuProtocol (
+  VOID
+  )
+{
+  return mIoMmuProtocol;
+}
+
 /**
   To get firmware configure selector address.
 
@@ -106,6 +135,7 @@ QemuFwCfgInitialize (
       InternalQemuFwCfgReadBytes  = DmaReadBytes;
       InternalQemuFwCfgWriteBytes = DmaWriteBytes;
       InternalQemuFwCfgSkipBytes  = DmaSkipBytes;
+      InternalInitIoMmu ();
     }
 
     return RETURN_SUCCESS;
@@ -140,7 +170,7 @@ QemuFwCfgInitialize (
   ASSERT (SizeCells == 2);
   ASSERT (RegSize == 2 * sizeof (UINT64));
 
-  FwCfgDataAddress     = SwapBytes64 (Reg[0]);
+  FwCfgDataAddress     = SwapBytes64 (ReadUnaligned64 (&Reg[0]));
   FwCfgDataSize        = 8;
   FwCfgSelectorAddress = FwCfgDataAddress + FwCfgDataSize;
   FwCfgSelectorSize    = 2;
@@ -168,7 +198,7 @@ QemuFwCfgInitialize (
     FwCfgDataAddress
     ));
 
-  if (SwapBytes64 (Reg[1]) >= 0x18) {
+  if (SwapBytes64 (ReadUnaligned64 (&Reg[1])) >= 0x18) {
     FwCfgDmaAddress = FwCfgDataAddress + 0x10;
     FwCfgDmaSize    = 0x08;
 
@@ -203,6 +233,8 @@ QemuFwCfgInitialize (
           InternalQemuFwCfgWriteBytes = DmaWriteBytes;
           InternalQemuFwCfgSkipBytes  = DmaSkipBytes;
         }
+
+        InternalInitIoMmu ();
       }
     } else {
       mFwCfgSelectorAddress = 0;

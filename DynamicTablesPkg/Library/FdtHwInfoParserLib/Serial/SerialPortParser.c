@@ -1,13 +1,13 @@
 /** @file
   Serial Port Parser.
 
-  Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
   - linux/Documentation/devicetree/bindings/serial/serial.yaml
   - linux/Documentation/devicetree/bindings/serial/8250.txt
-  - linux/Documentation/devicetree/bindings/serial/arm_sbsa_uart.txt
+  - linux/Documentation/devicetree/bindings/serial/arm,sbsa-uart.yaml
   - linux/Documentation/devicetree/bindings/serial/pl011.yaml
 **/
 
@@ -19,6 +19,11 @@
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
 #include "Serial/SerialPortParser.h"
+
+/** Default baudrate.
+    Some DT bindings don't permit specifying the baudrate.
+*/
+#define DEFAULT_UART_BAUD_RATE  115200
 
 /** List of "compatible" property values for serial port nodes.
 
@@ -54,13 +59,10 @@ CONST COMPATIBILITY_INFO  Serial16550CompatibleInfo = {
 
 /** SBSA UART compatible strings.
 
-  Include PL011 as SBSA uart is a subset of PL011.
-
   Any string of this list must be part of SerialCompatible.
 */
 STATIC CONST COMPATIBILITY_STR  SerialSbsaCompatibleStr[] = {
-  { "arm,sbsa-uart" },
-  { "arm,pl011"     }
+  { "arm,sbsa-uart" }
 };
 
 /** COMPATIBILITY_INFO structure for the SerialSbsaCompatible.
@@ -69,6 +71,206 @@ CONST COMPATIBILITY_INFO  SerialSbsaCompatibleInfo = {
   ARRAY_SIZE (SerialSbsaCompatibleStr),
   SerialSbsaCompatibleStr
 };
+
+/** PL011 UART compatible strings.
+
+  Any string of this list must be part of SerialCompatible.
+*/
+STATIC CONST COMPATIBILITY_STR  SerialPl011CompatibleStr[] = {
+  { "arm,pl011" }
+};
+
+/** COMPATIBILITY_INFO structure for the SerialPl011Compatible.
+*/
+CONST COMPATIBILITY_INFO  SerialPl011CompatibleInfo = {
+  ARRAY_SIZE (SerialPl011CompatibleStr),
+  SerialPl011CompatibleStr
+};
+
+/** Read the "clock-frequency" property from a node.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node            Offset of the node to inspect.
+  @param [out] ClockFrequency  Clock frequency retrieved from the node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The node does not expose "clock-frequency".
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetNodeClockFrequency (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       Node,
+  OUT UINT32      *ClockFrequency
+  )
+{
+  CONST UINT32  *Data;
+  INT32         DataSize;
+
+  if ((Fdt == NULL) || (ClockFrequency == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Data = FdtGetProp (Fdt, Node, "clock-frequency", &DataSize);
+  if (Data == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (DataSize < sizeof (*Data)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  *ClockFrequency = Fdt32ToCpu (*Data);
+  return EFI_SUCCESS;
+}
+
+/** Resolve the first clock node referenced by a node's "clocks" property.
+
+  @param [in]  Fdt        Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  Node       Offset of the node to inspect.
+  @param [out] ClockNode  Clock node referenced by the first phandle.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           The node does not expose "clocks".
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetNodeClockNode (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       Node,
+  OUT INT32       *ClockNode
+  )
+{
+  CONST UINT32  *Data;
+  INT32         DataSize;
+  UINT32        ClockPHandle;
+
+  if ((Fdt == NULL) || (ClockNode == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Data = FdtGetProp (Fdt, Node, "clocks", &DataSize);
+  if (Data == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (DataSize < sizeof (*Data)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  ClockPHandle = Fdt32ToCpu (*Data);
+  *ClockNode   = FdtNodeOffsetByPhandle (Fdt, ClockPHandle);
+  if (*ClockNode < 0) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Get the 16550 UART input clock frequency.
+
+  One of "clock-frequency", "clocks" properties is required.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  SerialPortNode  Offset of the serial-port node.
+  @param [out] ClockFrequency  Clock frequency retrieved from DT.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No clock frequency was found.
+  @retval EFI_UNSUPPORTED         Unsupported DT clock encoding.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+Get16550UartClockFrequency (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       SerialPortNode,
+  OUT UINT32      *ClockFrequency
+  )
+{
+  INT32       ClockNode;
+  EFI_STATUS  Status;
+
+  if ((Fdt == NULL) || (ClockFrequency == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetNodeClockFrequency (Fdt, SerialPortNode, ClockFrequency);
+  if (Status == EFI_SUCCESS) {
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = GetNodeClockNode (Fdt, SerialPortNode, &ClockNode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return GetNodeClockFrequency (Fdt, ClockNode, ClockFrequency);
+}
+
+/** Get the PL011 UART input clock frequency.
+
+  The "clocks" property is optional.
+
+  @param [in]  Fdt             Pointer to a Flattened Device Tree (Fdt).
+  @param [in]  SerialPortNode  Offset of the serial-port node.
+  @param [out] ClockFrequency  Clock frequency retrieved from DT.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No clock frequency was found.
+  @retval EFI_UNSUPPORTED         Unsupported DT clock encoding.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetPl011UartClockFrequency (
+  IN  CONST VOID  *Fdt,
+  IN  INT32       SerialPortNode,
+  OUT UINT32      *ClockFrequency
+  )
+{
+  EFI_STATUS  Status;
+  INT32       ClockNode;
+
+  if ((Fdt == NULL) || (ClockFrequency == NULL)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *ClockFrequency = 0;
+
+  Status = GetNodeClockNode (Fdt, SerialPortNode, &ClockNode);
+  if (!EFI_ERROR (Status)) {
+    Status = GetNodeClockFrequency (Fdt, ClockNode, ClockFrequency);
+  }
+
+  // Advertising the clock frequency is optional.
+  if (Status == EFI_NOT_FOUND) {
+    Status = EFI_SUCCESS;
+  }
+
+  ASSERT_EFI_ERROR (Status);
+  return Status;
+}
 
 /** Parse a serial port node.
 
@@ -90,13 +292,11 @@ SerialPortNodeParser (
   IN  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo
   )
 {
-  EFI_STATUS   Status;
-  INT32        IntcNode;
-  CONST UINT8  *SizeValue;
-
-  INT32  AddressCells;
-  INT32  SizeCells;
-  INT32  IntCells;
+  EFI_STATUS    Status;
+  INT32         IntcNode;
+  CONST UINT32  *DecodedInterruptData;
+  INT32         DecodedInterruptCells;
+  UINT32        ClockFrequency;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -109,53 +309,20 @@ SerialPortNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetParentAddressInfo (
+  Status = FdtGetTranslatedReg (
              Fdt,
              SerialPortNode,
-             &AddressCells,
-             &SizeCells
+             0,
+             &SerialPortInfo->BaseAddress,
+             &SerialPortInfo->BaseAddressLength
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
   }
 
-  // Don't support more than 64 bits and less than 32 bits addresses.
-  if ((AddressCells < 1)  ||
-      (AddressCells > 2)  ||
-      (SizeCells < 1)     ||
-      (SizeCells > 2))
-  {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  Data = FdtGetProp (Fdt, SerialPortNode, "reg", &DataSize);
-  if ((Data == NULL) ||
-      (DataSize < (INT32)(sizeof (UINT32) *
-                          GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells)) - 1))
-  {
-    // If error or not enough space.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  if (AddressCells == 2) {
-    SerialPortInfo->BaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
-  } else {
-    SerialPortInfo->BaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
-  }
-
-  SizeValue = Data + (sizeof (UINT32) *
-                      GET_DT_REG_SIZE_OFFSET (0, AddressCells, SizeCells));
-  if (SizeCells == 2) {
-    SerialPortInfo->BaseAddressLength = Fdt64ToCpu (*(UINT64 *)SizeValue);
-  } else {
-    SerialPortInfo->BaseAddressLength = Fdt32ToCpu (*(UINT32 *)SizeValue);
-  }
-
   // Get the associated interrupt-controller.
-  Status = FdtGetIntcParentNode (Fdt, SerialPortNode, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, SerialPortNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {
@@ -166,21 +333,19 @@ SerialPortNodeParser (
     return Status;
   }
 
-  // Get the number of cells used to encode an interrupt.
-  Status = FdtGetInterruptCellsInfo (Fdt, IntcNode, &IntCells);
+  Status = FdtResolveInterrupt (
+             Fdt,
+             SerialPortNode,
+             0,
+             &DecodedInterruptData,
+             &DecodedInterruptCells
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
   }
 
-  Data = FdtGetProp (Fdt, SerialPortNode, "interrupts", &DataSize);
-  if ((Data == NULL) || (DataSize != (IntCells * sizeof (UINT32)))) {
-    // If error or not 1 interrupt.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  SerialPortInfo->Interrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
+  SerialPortInfo->Interrupt = FdtGetInterruptId (DecodedInterruptData, DecodedInterruptCells);
 
   /*
    * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.
@@ -191,26 +356,28 @@ SerialPortNodeParser (
   SerialPortInfo->Interrupt = FdtConvertToGsi (IntcNode, SerialPortInfo->Interrupt);
  #endif
 
-  // Note: clock-frequency is optional for SBSA UART.
-  Data = FdtGetProp (Fdt, SerialPortNode, "clock-frequency", &DataSize);
-  if (Data != NULL) {
-    if (DataSize < sizeof (UINT32)) {
-      // If error or not enough space.
-      ASSERT (0);
-      return EFI_ABORTED;
-    } else if (FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*Data)) >= 0) {
-      // "clock-frequency" can be a "clocks phandle to refer to the clk used".
-      // This is not supported.
-      ASSERT (0);
-      return EFI_UNSUPPORTED;
-    }
-
-    SerialPortInfo->Clock = Fdt32ToCpu (*(UINT32 *)Data);
-  }
+  SerialPortInfo->BaudRate = DEFAULT_UART_BAUD_RATE;
 
   if (FdtNodeIsCompatible (Fdt, SerialPortNode, &Serial16550CompatibleInfo)) {
+    Status = Get16550UartClockFrequency (Fdt, SerialPortNode, &ClockFrequency);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    SerialPortInfo->Clock       = ClockFrequency;
     SerialPortInfo->PortSubtype =
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS;
+
+    Data = FdtGetProp (Fdt, SerialPortNode, "current-speed", &DataSize);
+    if (Data != NULL) {
+      if (DataSize != sizeof (UINT32)) {
+        ASSERT (0);
+        return EFI_ABORTED;
+      }
+
+      SerialPortInfo->BaudRate = Fdt32ToCpu (*(CONST UINT32 *)Data);
+    }
 
     /* reg-io-width:
          description: |
@@ -227,12 +394,24 @@ SerialPortNodeParser (
       }
 
       AccessSize = Fdt32ToCpu (*(UINT32 *)Data);
-      if (AccessSize > EFI_ACPI_6_3_QWORD) {
-        ASSERT (0);
-        return EFI_INVALID_PARAMETER;
+      // Convert the DT byte width to the ACPI GAS access-size encoding.
+      switch (AccessSize) {
+        case 1:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_BYTE;
+          break;
+        case 2:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_WORD;
+          break;
+        case 4:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_DWORD;
+          break;
+        case 8:
+          SerialPortInfo->AccessSize = EFI_ACPI_6_3_QWORD;
+          break;
+        default:
+          ASSERT (0);
+          return EFI_INVALID_PARAMETER;
       }
-
-      SerialPortInfo->AccessSize = AccessSize;
     } else {
       // 8250/16550 defaults to byte access.
       SerialPortInfo->AccessSize = EFI_ACPI_6_3_BYTE;
@@ -243,15 +422,47 @@ SerialPortNodeParser (
                &SerialSbsaCompatibleInfo
                ))
   {
+    //
+    // SBSA-UART doesn't have a clock specifier.
+    //
+    SerialPortInfo->Clock       = 0;
     SerialPortInfo->PortSubtype =
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART;
+
+    Data = FdtGetProp (Fdt, SerialPortNode, "current-speed", &DataSize);
+    if (Data != NULL) {
+      if (DataSize != sizeof (UINT32)) {
+        ASSERT (0);
+        return EFI_ABORTED;
+      }
+
+      SerialPortInfo->BaudRate = Fdt32ToCpu (*(CONST UINT32 *)Data);
+    }
+  } else if (FdtNodeIsCompatible (
+               Fdt,
+               SerialPortNode,
+               &SerialPl011CompatibleInfo
+               ))
+  {
+    //
+    // Clock frequency is not mandatory for pl011 nodes.
+    //
+    ClockFrequency = 0;
+
+    Status = GetPl011UartClockFrequency (Fdt, SerialPortNode, &ClockFrequency);
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    SerialPortInfo->Clock       = ClockFrequency;
+    SerialPortInfo->PortSubtype =
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART;
   } else {
     ASSERT (0);
     return EFI_UNSUPPORTED;
   }
 
-  // Set Baudrate to 115200 by default
-  SerialPortInfo->BaudRate = 115200;
   return EFI_SUCCESS;
 }
 
@@ -392,7 +603,7 @@ SerialPortInfoDispatch (
   typedef struct EArchCommonSerialPortInfo {
     UINT64  BaseAddress;                      // {Populated}
     UINT32  Interrupt;                        // {Populated}
-    UINT64  BaudRate;                         // {default}
+    UINT64  BaudRate;                         // {Populated, default to 115200}
     UINT32  Clock;                            // {Populated}
     UINT16  PortSubtype;                      // {Populated}
     UINT64  BaseAddressLength                 // {Populated}

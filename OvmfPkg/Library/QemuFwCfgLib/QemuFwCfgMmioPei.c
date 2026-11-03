@@ -22,6 +22,22 @@
 #include "QemuFwCfgLibMmioInternal.h"
 
 /**
+  Get the IOMMU protocol instance
+
+  @param VOID
+
+  @retval  Pointer to the IoMMU protocol.
+**/
+EDKII_IOMMU_PROTOCOL *
+GetIoMmuProtocol (
+  VOID
+  )
+{
+  // We do not have the IoMMU protocol in the Pei phase.
+  return NULL;
+}
+
+/**
   To get firmware configure selector address.
 
   @param VOID
@@ -146,7 +162,7 @@ QemuFwCfgInitialize (
       //
       Reg = FdtGetProp (DeviceTreeBase, Node, "reg", &Len);
       if ((Reg != 0) && (Len == (2 * sizeof (UINT64)))) {
-        FwCfgDataAddress     = SwapBytes64 (Reg[0]);
+        FwCfgDataAddress     = SwapBytes64 (ReadUnaligned64 (&Reg[0]));
         FwCfgDataSize        = 8;
         FwCfgSelectorAddress = FwCfgDataAddress + FwCfgDataSize;
         FwCfgSelectorSize    = 2;
@@ -174,7 +190,7 @@ QemuFwCfgInitialize (
           FwCfgDataAddress
           ));
 
-        if (SwapBytes64 (Reg[1]) >= 0x18) {
+        if (SwapBytes64 (ReadUnaligned64 (&Reg[1])) >= 0x18) {
           FwCfgDmaAddress = FwCfgDataAddress + 0x10;
           FwCfgDmaSize    = 0x08;
 

@@ -2755,7 +2755,6 @@ def Main():
                     "\nbuild",
                     CODE_ERROR,
                     "Unknown fatal error when processing [%s]" % MetaFile,
-                    ExtraData="\n(Please send email to %s for help, attaching following call stack trace!)\n" % MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())

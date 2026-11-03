@@ -131,7 +131,7 @@ BmmCreateTimeOutMenu (
     EFI_IFR_NUMERIC_SIZE_2 | EFI_IFR_DISPLAY_UINT_DEC,
     0,
     65535,
-    0,
+    1,
     NULL
     );
 }

@@ -70,9 +70,10 @@ typedef enum StdSmbiosTableGeneratorId {
   EStdSmbiosTableIdType40,
   EStdSmbiosTableIdType41,
   EStdSmbiosTableIdType42,
-  // IDs 43 are reserved
-  EStdSmbiosTableIdType44 = (EStdSmbiosTableIdType00 + 44),
-  // IDs 45 - 125 are reserved
+  EStdSmbiosTableIdType43,
+  EStdSmbiosTableIdType44,
+  EStdSmbiosTableIdType45,
+  // IDs 46 - 125 are reserved
   EStdSmbiosTableIdType126 = (EStdSmbiosTableIdType00 + 126),
   EStdSmbiosTableIdType127,
   EStdSmbiosTableIdMax

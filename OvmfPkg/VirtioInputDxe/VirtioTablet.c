@@ -11,9 +11,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/VirtioLib.h>
-
-#include <IndustryStandard/VirtioInput.h>
 
 #include "VirtioInput.h"
 #include "VirtioKeyCodes.h"

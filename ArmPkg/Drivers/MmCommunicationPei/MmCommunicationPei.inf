@@ -29,6 +29,7 @@
   PeimEntryPoint
   PeiServicesLib
   HobLib
+  SafeIntLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdMmBufferBase

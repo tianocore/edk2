@@ -31,6 +31,7 @@
 
 [Sources]
   PeiDxeMemEncryptSevLibInternal.c
+  PeiDxeMemEncryptSevLibInternal.h
   PeiMemEncryptSevLibInternal.c
 
 [Sources.X64]

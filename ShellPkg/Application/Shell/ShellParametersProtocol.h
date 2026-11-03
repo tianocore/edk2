@@ -179,6 +179,16 @@ ParseCommandLineToArgs (
   );
 
 /**
+  Return the next parameter's end from a command line string.
+
+  @param[in] String        the string to parse
+**/
+CONST CHAR16 *
+FindEndOfParameter (
+  IN CONST CHAR16  *String
+  );
+
+/**
   return the next parameter from a command line string;
 
   This function moves the next parameter from Walker into TempParameter and moves

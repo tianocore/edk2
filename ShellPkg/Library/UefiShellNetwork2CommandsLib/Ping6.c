@@ -77,10 +77,6 @@ SHELL_PARAM_ITEM  Ping6ParamList[] = {
     TypeValue
   },
   {
-    L"-?",
-    TypeFlag
-  },
-  {
     NULL,
     TypeMax
   },

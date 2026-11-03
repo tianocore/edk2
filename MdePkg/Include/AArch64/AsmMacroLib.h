@@ -37,10 +37,19 @@
   Name:                                           ; \
   AARCH64_BTI(c)
 
+// CLANGPDB does not merge ELF style sections with .text.<name> any longer,
+// which greatly affects the binary size, so we need to name sections in a PE friendly way
+#ifdef __ELF__
 #define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
 
 #define ASM_FUNC_ALIGN(Name, Align)  \
   _ASM_FUNC_ALIGN(ASM_PFX(Name), .text. ## Name, Align)
+#else
+#define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text$ ## Name)
+
+#define ASM_FUNC_ALIGN(Name, Align)  \
+  _ASM_FUNC_ALIGN(ASM_PFX(Name), .text$ ## Name, Align)
+#endif
 
 #define MOV32(Reg, Val)                             \
   movz      Reg, ((Val) >> 16) & 0xffff, lsl #16  ; \

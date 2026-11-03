@@ -115,12 +115,12 @@ PlatformScanE820Tdx (
   Hob.Raw = (UINT8 *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
 
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) ||
-          (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY))
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if ((Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) ||
+          (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY))
       {
-        E820Entry.BaseAddr = Hob.ResourceDescriptor->PhysicalStart;
-        E820Entry.Length   = Hob.ResourceDescriptor->ResourceLength;
+        E820Entry.BaseAddr = Hob.ResourceDescriptor2->PhysicalStart;
+        E820Entry.Length   = Hob.ResourceDescriptor2->ResourceLength;
         E820Entry.Type     = EfiAcpiAddressRangeMemory;
         Callback (&E820Entry, PlatformInfoHob);
       }
@@ -815,7 +815,7 @@ PlatformDynamicMmioWindow (
   UINT64  AddrSpace, MmioSpace;
 
   AddrSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
-  MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 3);
+  MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 2);
 
   if (PlatformInfoHob->PcdPciMmio64Override) {
     DEBUG ((DEBUG_INFO, "%a: using fwcfg override for mmio window\n", __func__));

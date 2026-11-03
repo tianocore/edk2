@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SmmMemLib.h>
 #include "Variable.h"
 
+EFI_HANDLE  mDxeSmmVariableHandle = NULL;
+
 /**
   This function checks if the Primary Buffer (CommBuffer) is valid.
 
@@ -60,13 +62,32 @@ VariableNotifySmmReady (
   )
 {
   EFI_STATUS  Status;
-  EFI_HANDLE  Handle;
 
-  Handle = NULL;
+  mDxeSmmVariableHandle = NULL;
+
   Status = gBS->InstallProtocolInterface (
-                  &Handle,
+                  &mDxeSmmVariableHandle,
                   &gEfiSmmVariableProtocolGuid,
                   EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Revert the variable ready notification.
+  This function will be called when an error happens in variable initializing process.
+**/
+VOID
+VariableClearNotifySmmReady (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->UninstallProtocolInterface (
+                  mDxeSmmVariableHandle,
+                  &gEfiSmmVariableProtocolGuid,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

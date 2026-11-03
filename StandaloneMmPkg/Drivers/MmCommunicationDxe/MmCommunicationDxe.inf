@@ -38,7 +38,7 @@
   UefiLib
   UefiRuntimeLib
   ReportStatusCodeLib
-
+  SafeIntLib
 [Guids]
   gMmCommBufferHobGuid
   gEfiEventVirtualAddressChangeGuid

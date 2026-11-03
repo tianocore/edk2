@@ -32,6 +32,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MBEDTLS_OID_PKCS7_ENCRYPTED_DATA             MBEDTLS_OID_PKCS7 "\x06"
 
 ///
+/// id-RSAES-OAEP ::= { pkcs-1 7 }
+///
+#define MBEDTLS_OID_RSAES_OAEP  MBEDTLS_OID_PKCS1 "\x07"
+
+///
 /// PKCS7 SignerInfo type
 /// https://tools.ietf.org/html/rfc2315#section-9.2
 ///

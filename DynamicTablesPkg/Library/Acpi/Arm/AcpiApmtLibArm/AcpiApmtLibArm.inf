@@ -1,0 +1,36 @@
+## @file
+#  APMT Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiApmtLibArm
+  FILE_GUID      = b8b4df32-948a-11f1-b583-67e69f29609b
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiApmtLibConstructor
+  DESTRUCTOR     = AcpiApmtLibDestructor
+
+[Sources]
+  ApmtGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[Pcd]
+
+[Protocols]
+
+[Guids]
+

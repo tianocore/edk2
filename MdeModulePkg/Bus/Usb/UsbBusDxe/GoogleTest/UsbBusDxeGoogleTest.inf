@@ -1,0 +1,30 @@
+## @file
+# Google Test suite for UsbBusDxe.
+#
+# Copyright (c) 2026, Intel Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = UsbBusDxeGoogleTest
+  FILE_GUID      = 3B8E90B2-8468-4552-A720-0F0D4A6BBE13
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+[Sources]
+  UsbBusDxeGoogleTest.cpp
+  ../UsbDesc.c
+  ../UsbHub.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  GoogleTestLib
+  MemoryAllocationLib

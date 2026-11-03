@@ -43,7 +43,7 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  BltLib
+  FrameBufferBltLib
   DebugLib
   DevicePathLib
   MemoryAllocationLib

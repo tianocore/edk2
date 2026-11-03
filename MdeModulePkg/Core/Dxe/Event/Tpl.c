@@ -9,6 +9,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "Event.h"
 
+//
+// Maximum interrupt nesting depth allowed by the UEFI/PI specifications.
+// Comprised of 3 software TPL levels (TPL_APPLICATION, TPL_CALLBACK,
+// TPL_NOTIFY) plus 16 hardware interrupt priority levels (TPL 16..31).
+//
+#define MAX_INTERRUPT_ENABLE_NEST_DEPTH  (3 + 16)
+
+//
+// Counter for tracking interrupt enable recursion depth.
+// Incremented on entry to CoreSetInterruptState(TRUE) and decremented on exit.
+// Prevents stack overflow from infinite interrupt recursion loops.
+// Must not exceed MAX_INTERRUPT_ENABLE_NEST_DEPTH per UEFI/PI specs.
+//
+static volatile UINTN  mInterruptEnableNestDepth = 0;
+
 /**
   Set Interrupt State.
 
@@ -32,15 +47,19 @@ CoreSetInterruptState (
     return;
   }
 
-  if (gSmmBase2 == NULL) {
-    gCpu->EnableInterrupt (gCpu);
-    return;
+  if (gSmmBase2 != NULL) {
+    Status = gSmmBase2->InSmm (gSmmBase2, &InSmm);
+    if (EFI_ERROR (Status) || InSmm) {
+      return;
+    }
   }
 
-  Status = gSmmBase2->InSmm (gSmmBase2, &InSmm);
-  if (!EFI_ERROR (Status) && !InSmm) {
-    gCpu->EnableInterrupt (gCpu);
-  }
+  mInterruptEnableNestDepth++;
+  ASSERT (mInterruptEnableNestDepth < MAX_INTERRUPT_ENABLE_NEST_DEPTH);
+
+  gCpu->EnableInterrupt (gCpu);
+
+  mInterruptEnableNestDepth--;
 }
 
 /**

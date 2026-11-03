@@ -45,6 +45,33 @@ _ReLabel = re.compile(r'LABEL\((\w+)\)')
 _ReOffset = re.compile(r'OFFSET_OF\((\w+)\)')
 PcdPattern = re.compile(r'^[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
 
+## Fast path for the simple byte array
+#
+#  Simple byte array refers to PCD data in the form of {0x01, 0x02, 0x03}
+#  - Enclosed in {}.
+#  - One or more comma-separated elements.
+#  - Each element is 0x followed by one or two hexadecimal digits.
+#  - Only spaces or tabs surround elements.
+#  - Used only for top-level VOID* real-value evaluation.
+#
+#  Return the stripped original value when valid. Otherwise None.
+def _NormalizeSimpleByteArray(Value):
+    Value = Value.strip()
+    if not Value.startswith('{') or not Value.endswith('}'):
+        return None
+
+    Items = Value[1:-1].split(',')
+    if not Items:
+        return None
+
+    for Item in Items:
+        Item = Item.strip(' \t')
+        if len(Item) < 3 or len(Item) > 4 or Item[:2].lower() != '0x' or \
+           not all(Char in string.hexdigits for Char in Item[2:]):
+            return None
+
+    return Value
+
 ## SplitString
 #  Split string to list according double quote
 #  For example: abc"de\"f"ghi"jkl"mn will be: ['abc', '"de\"f"', 'ghi', '"jkl"', 'mn']
@@ -821,6 +848,10 @@ class ValueExpressionEx(ValueExpression):
 
     def __call__(self, RealValue=False, Depth=0):
         PcdValue = self.PcdValue
+        if RealValue and Depth == 0 and self.PcdType == TAB_VOID and "{CODE(" not in PcdValue:
+            SimpleByteArray = _NormalizeSimpleByteArray(PcdValue)
+            if SimpleByteArray is not None:
+                return SimpleByteArray
         if "{CODE(" not in PcdValue:
             try:
                 PcdValue = ValueExpression.__call__(self, RealValue, Depth)

@@ -3,6 +3,7 @@
 
   Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -474,6 +475,28 @@ typedef struct {
   UINT32    VFMigrationStateArrayOffset;
 } SR_IOV_CAPABILITY_REGISTER;
 
+typedef union {
+  struct {
+    UINT16    VfEnable                        : 1;
+    UINT16    VfMigrationEnable               : 1;
+    UINT16    VfMigrationInterruptEnable      : 1;
+    UINT16    VfMemorySpaceEnable             : 1;
+    UINT16    AriCapableHierarchy             : 1;
+    UINT16    VfTenBitTagRequesterEnable      : 1;
+    UINT16    VfFourteenBitTagRequesterEnable : 1;
+    UINT16    Reserved                        : 9;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_SRIOV_CONTROL_REGISTER;
+
+typedef union {
+  struct {
+    UINT16    VfMigrationStatus : 1;
+    UINT16    Reserved          : 15;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_SRIOV_STATUS_REGISTER;
+
 #define EFI_PCIE_CAPABILITY_ID_SRIOV_CAPABILITIES              0x04
 #define EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL                   0x08
 #define EFI_PCIE_CAPABILITY_ID_SRIOV_STATUS                    0x0A
@@ -548,9 +571,61 @@ typedef struct {
   UINT32                                      TlpPrefixLog[4];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ADVANCED_ERROR_REPORTING;
 
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_ID    0x0002
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_MFVC  0x0009
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_VER1  0x1
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_ID                          0x0002
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_MFVC                        0x0009
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_VER1                        0x1
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_PORT_VIRTUAL_CHANNEL_CAPABILITIES_1_OFFSET  0x004
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_PORT_VIRTUAL_CHANNEL_CAPABILITIES_2_OFFSET  0x008
+
+typedef union {
+  struct {
+    UINT32    ExtendedVirtualChannelCnt       : 3;
+    UINT32    Reserved1                       : 1;
+    UINT32    LowPriExtendedVirtualChannelCnt : 3;
+    UINT32    Reserved2                       : 1;
+    UINT32    ReferenceClock                  : 2;
+    UINT32    PortArbitrationTableEntrySize   : 2;
+    UINT32    Reserved                        : 20;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PORT_VC_CAPABILITY_REGISTER_1;
+
+typedef union {
+  struct {
+    UINT32    VirtualChannelArbitrationCapability  : 8;
+    UINT32    Reserved                             : 16;
+    UINT32    VirtualChannelArbitrationTableOffset : 8;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PORT_VC_CAPABILITY_REGISTER_2;
+
+typedef union {
+  struct {
+    UINT32    PortArbitrationCapability  : 8;
+    UINT32    Reserved1                  : 6;
+    UINT32    Undefined                  : 1;
+    UINT32    RejectSnoopTransactions    : 1;
+    UINT32    MaximumTimeSlots           : 7;
+    UINT32    Reserved2                  : 1;
+    UINT32    PortArbitrationTableOffset : 8;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_VC_RESOURCE_CAPABILITY_REGISTER;
+
+typedef union {
+  struct {
+    UINT32    TcVcMap                           : 8;
+    UINT32    Reserved1                         : 8;
+    UINT32    LoadPortArbitrationTable          : 1;
+    UINT32    PortArbitrationSelect             : 3;
+    UINT32    Reserved2                         : 4;
+    UINT32    VirtualChannelId                  : 3;
+    UINT32    SharedFlowControlUsageLimit       : 3;
+    UINT32    SharedFlowControlUsageLimitEnable : 1;
+    UINT32    VirtualChannelEnable              : 1;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_VC_RESOURCE_CONTROL_REGISTER;
 
 typedef struct {
   UINT32    VcResourceCapability : 24;
@@ -624,6 +699,39 @@ typedef struct {
   UINT8                                       EgressControlVectorArray[1];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_EXTENDED;
 
+typedef union {
+  struct {
+    UINT16    AcsSourceValidation             : 1;
+    UINT16    AcsTranslationBlocking          : 1;
+    UINT16    AcsPeerToPeerRequestRedirect    : 1;
+    UINT16    AcsPeerToPeerCompletionRedirect : 1;
+    UINT16    AcsUpstreamForwarding           : 1;
+    UINT16    AcsPeerToPeerEgressControl      : 1;
+    UINT16    AcsDirectTranslatedPeerToPeer   : 1;
+    UINT16    AcsEnhancedCapability           : 1;
+    UINT16    EgressControlVectorSize         : 8;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_CAPABILITY_REGISTER;
+
+typedef union {
+  struct {
+    UINT16    AcsSourceValidationEnable             : 1;
+    UINT16    AcsTranslationBlockingEnable          : 1;
+    UINT16    AcsPeerToPeerRequestRedirectEnable    : 1;
+    UINT16    AcsPeerToPeerCompletionRedirectEnable : 1;
+    UINT16    AcsUpstreamForwardingEnable           : 1;
+    UINT16    AcsPeerToPeerEgressControlEnable      : 1;
+    UINT16    AcsDirectTranslatedPeerToPeerEnable   : 1;
+    UINT16    AcsIoRequestBlockingEnable            : 1;
+    UINT16    AcsDspMemoryTargetAccessControl       : 2;
+    UINT16    AcsUspMemoryTargetAccessControl       : 2;
+    UINT16    AcsUnclaimedRequestRedirectControl    : 1;
+    UINT16    Reserved                              : 3;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_CONTROL_REGISTER;
+
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_CONTROL(ACS_EXTENDED)      (UINT8)(((ACS_EXTENDED->AcsCapability)&0x00000020))
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_VECTOR_SIZE(ACS_EXTENDED)  (UINT8)(((ACS_EXTENDED->AcsCapability)&0x0000FF00))
 
@@ -658,8 +766,26 @@ typedef struct {
 
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_VENDOR_SPECIFIC_GET_SIZE(VENDOR)  (UINT16)(((VENDOR->VendorSpecificHeader)&0xFFF00000)>>20)
 
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_HEADER_ID    0x000A
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_HEADER_VER1  0x1
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_HEADER_ID            0x000A
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_HEADER_VER1          0x1
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_CAPABILITIES_OFFSET  0x8
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_CONTROL_OFFSET       0xC
+
+typedef union {
+  struct {
+    UINT32    ConfigRrsSoftwareVisibility : 1;
+    UINT32    Reserved                    : 31;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_CAPABILITY_REGISTER;
+
+typedef union {
+  struct {
+    UINT32    ConfigRrsSoftwareVisibilityEnable : 1;
+    UINT32    Reserved                          : 31;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_CONTROL_REGISTER;
 
 typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
@@ -727,6 +853,27 @@ typedef struct {
   UINT16                                      AriCapability;
   UINT16                                      AriControl;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT16    MfvcFunctionGroupsCapability : 1;
+    UINT16    AcsFunctionGroupsCapability  : 1;
+    UINT16    Reserved                     : 6;
+    UINT16    NextFunctionNumber           : 8;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY_REGISTER;
+
+typedef union {
+  struct {
+    UINT16    MfvcFunctionGroupsEnable : 1;
+    UINT16    AcsFunctionGroupsEnable  : 1;
+    UINT16    Reserved1                : 2;
+    UINT16    FunctionGroup            : 3;
+    UINT16    Reserved2                : 9;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CONTROL_REGISTER;
 
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_ID    0x0016
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_VER1  0x1

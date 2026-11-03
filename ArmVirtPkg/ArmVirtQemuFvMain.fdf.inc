@@ -42,6 +42,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   INF EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+  INF ArmVirtPkg/QemuPlatformDxe/QemuPlatformDxe.inf
   INF OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
 
   #
@@ -76,11 +77,21 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
+  INF ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
+  INF ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   INF OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  INF MdeModulePkg/Universal/TimestampDxe/TimestampDxe.inf
   INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+  #
+  # MP Services
+  #
+!if $(MP_SERVICES_ENABLE) == TRUE
+  INF ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
+!endif
 
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
@@ -107,6 +118,7 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
   INF OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+  INF OvmfPkg/VirtioInputDxe/VirtioInput.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
@@ -152,6 +164,16 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   INF OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+
+  #
+  # Realm Aperture Management
+  #
+  INF ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  INF ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
 
   #
   # PCI support

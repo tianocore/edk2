@@ -34,12 +34,11 @@ BlUpdateMemoryMap (
   UINTN                        TranslationTableSize;
   UINTN                        Idx = 0;
 
-  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
-
+  Hob.Raw = GetNextResourceHob (GetHobList ());
   while (Hob.Raw != NULL) {
     Resource = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
     Hob.Raw  = GET_NEXT_HOB (Hob);
-    Hob.Raw  = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+    Hob.Raw  = GetNextResourceHob (Hob.Raw);
 
     VirtualMemoryTable[Idx].PhysicalBase = Resource->PhysicalStart;
     VirtualMemoryTable[Idx].VirtualBase  = VirtualMemoryTable[Idx].PhysicalBase;

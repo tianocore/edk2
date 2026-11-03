@@ -50,7 +50,6 @@
   gEdkIIRedfishCredentialProtocolGuid          ## CONSUMES
   gEdkIIRedfishConfigHandlerProtocolGuid       ## CONSUMES
   gEdkIIRedfishHostInterfaceReadyProtocolGuid  ## CONSUMES
-  gEdkIIRedfishCredentialProtocolGuid          ## CONSUMES
 
 [Guids]
   gEfiEventExitBootServicesGuid                       ## CONSUMES ## Event

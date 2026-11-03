@@ -128,7 +128,7 @@ IScsiDhcpExtractRootPath (
     }
 
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
-    ConfigNvData->TargetUrl[Field->Len + 1] = '\0';
+    ConfigNvData->TargetUrl[Field->Len] = '\0';
   } else {
     ConfigNvData->DnsMode = FALSE;
     ZeroMem (ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));

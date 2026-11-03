@@ -38,6 +38,7 @@ UINT16  mManageabilitySpecNum = sizeof (ManageabilitySpecNameTable)/ sizeof (MAN
                       not supported.
 **/
 CHAR16 *
+EFIAPI
 HelperManageabilitySpecName (
   IN EFI_GUID  *SpecificationGuid
   )
@@ -87,6 +88,7 @@ HelperManageabilitySpecName (
                Otherwise              Other errors.
 **/
 EFI_STATUS
+EFIAPI
 HelperManageabilityCheckSupportedSpec (
   IN  EFI_GUID  *TransportGuid,
   IN  EFI_GUID  **SupportedManageabilityProtocolArray,
@@ -155,6 +157,7 @@ HelperManageabilityCheckSupportedSpec (
                Otherwise              Other errors.
 **/
 EFI_STATUS
+EFIAPI
 HelperAcquireManageabilityTransport (
   IN  EFI_GUID                       *ManageabilityProtocolSpec,
   OUT MANAGEABILITY_TRANSPORT_TOKEN  **TransportToken
@@ -219,6 +222,7 @@ HelperAcquireManageabilityTransport (
                Otherwise              Other errors.
 **/
 EFI_STATUS
+EFIAPI
 HelperInitManageabilityTransport (
   IN  MANAGEABILITY_TRANSPORT_TOKEN                 *TransportToken,
   IN  MANAGEABILITY_TRANSPORT_HARDWARE_INFORMATION  HardwareInfo OPTIONAL,
@@ -274,6 +278,7 @@ HelperInitManageabilityTransport (
   @retval  UINT8 CRC value.
 **/
 UINT8
+EFIAPI
 HelperManageabilityGenerateCrc8 (
   IN UINT8   Polynomial,
   IN UINT8   CrcInitialValue,
@@ -324,6 +329,7 @@ HelperManageabilityGenerateCrc8 (
                                  MANAGEABILITY_TRANSMISSION_MULTI_PACKAGES structure.
 **/
 EFI_STATUS
+EFIAPI
 HelperManageabilitySplitPayload (
   IN UINT16                                      PreambleSize,
   IN UINT16                                      PostambleSize,
@@ -397,54 +403,8 @@ HelperManageabilityPayLoadDebugPrint (
   IN  UINT32  PayloadSize
   )
 {
-  UINTN  Block;
-  UINTN  BlockSize;
-  UINTN  RowSize;
-  UINTN  RemainingBytes;
-  UINTN  BytesPrinted;
-
-  RemainingBytes = PayloadSize;
-  BlockSize      = 256;
-  RowSize        = 16;
-
-  for (Block = 0, BytesPrinted = 0; RemainingBytes > 0;) {
-    UINTN  BlockBase;
-    UINTN  Row;
-    UINTN  RowsToPrint;
-    UINTN  Column;
-
-    Block     = BytesPrinted / BlockSize;
-    BlockBase = Block * BlockSize;
-
-    if (BytesPrinted % BlockSize == 0) {
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "======== Manageability Payload %04xH - %04xH =========\n", BlockBase, BlockBase + MIN (RemainingBytes, BlockSize) - 1));
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "       "));
-      for (Column = 0; Column < RowSize; Column++) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", Column));
-      }
-
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n       -----------------------------------------------\n"));
-    }
-
-    if (RemainingBytes >= BlockSize) {
-      RowsToPrint = BlockSize / RowSize;
-    } else {
-      RowsToPrint = RemainingBytes / RowSize + 1;
-    }
-
-    for (Row = 0; Row < RowsToPrint; Row++) {
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "%04x | ", BlockBase + Row * RowSize));
-      for (Column = 0; Column < MIN (RemainingBytes, RowSize); Column++) {
-        DEBUG ((DEBUG_MANAGEABILITY_INFO, "%02x ", *((UINT8 *)Payload + BlockBase + Row * RowSize + Column)));
-      }
-
-      RemainingBytes -= Column;
-      BytesPrinted   += Column;
-
-      DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n"));
-    }
-
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "\n"));
+  if (PayloadSize > 0) {
+    DUMP_HEX (DEBUG_MANAGEABILITY_INFO, 0, Payload, PayloadSize, "Manageability Payload: ");
   }
 }
 

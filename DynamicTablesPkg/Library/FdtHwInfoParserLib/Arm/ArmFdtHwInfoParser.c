@@ -10,6 +10,7 @@
 #include "Arm/BootArch/ArmBootArchParser.h"
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
+#include "Topology/TopologyParser.h"
 #include "Pci/PciConfigSpaceParser.h"
 #include "Serial/SerialPortParser.h"
 #include "Arm/Iort/RootComplexParser.h"
@@ -28,6 +29,7 @@ STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
   ArmBootArchInfoParser,
   ArmGenericTimerInfoParser,
   ArmGicDispatcher,
+  TopologyInfoParser, // Must be after GIC parsers, cf EFdtHwInfoGicCObject.
   PciConfigInfoParser,
   SerialPortDispatcher,
   ArmPciRootComplexParser,

@@ -1143,7 +1143,12 @@ SmmFtwNotificationEvent (
   for variable read and write services being available. It also registers
   a notification function for an EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
-  @retval EFI_SUCCESS       Variable service successfully initialized.
+  @retval EFI_SUCCESS           Variable service successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES  Insufficient memory to allocate variable
+                                storage or communication buffers.
+  @retval EFI_VOLUME_CORRUPTED  The non-volatile variable store is corrupted.
+  @retval Others                An error from protocol installation, SMI handler
+                                registration, or protocol notification registration.
 
 **/
 EFI_STATUS
@@ -1154,14 +1159,63 @@ MmVariableServiceInitialize (
 {
   EFI_STATUS  Status;
   EFI_HANDLE  VariableHandle;
+  EFI_HANDLE  SmmVariableDispatchHandle;
   VOID        *SmmFtwRegistration;
   VOID        *SmmEndOfDxeRegistration;
+  BOOLEAN     SmmVariableProtocolInstalled;
+  BOOLEAN     SmmVarCheckProtocolInstalled;
+  BOOLEAN     SmmVariableHandlerRegistered;
+  BOOLEAN     SmmEndOfDxeNotifyRegistered;
+  BOOLEAN     SmmFtwNotifyRegistered;
+  BOOLEAN     SmmNotifiedSmmReady;
+
+  SmmVariableDispatchHandle    = NULL;
+  SmmFtwRegistration           = NULL;
+  SmmEndOfDxeRegistration      = NULL;
+  SmmVariableProtocolInstalled = FALSE;
+  SmmVarCheckProtocolInstalled = FALSE;
+  SmmVariableHandlerRegistered = FALSE;
+  SmmEndOfDxeNotifyRegistered  = FALSE;
+  SmmFtwNotifyRegistered       = FALSE;
+  SmmNotifiedSmmReady          = FALSE;
 
   //
   // Variable initialize.
   //
   Status = VariableCommonInitialize ();
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: VariableCommonInitialize failed - %r. Aborting SMM variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  //
+  // Allocate the communication payload buffer before installing any protocols or
+  // registering any handlers. A failure here requires no global state cleanup.
+  //
+  mVariableBufferPayloadSize = GetMaxVariableSize () +
+                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) -
+                               GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+
+  Status = gMmst->MmAllocatePool (
+                    EfiRuntimeServicesData,
+                    mVariableBufferPayloadSize,
+                    (VOID **)&mVariableBufferPayload
+                    );
+  if (EFI_ERROR (Status)) {
+    mVariableBufferPayloadSize = 0;
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: MmAllocatePool for variable buffer payload failed - %r. Aborting SMM variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
 
   //
   // Install the Smm Variable Protocol on a new handle.
@@ -1173,7 +1227,17 @@ MmVariableServiceInitialize (
                             EFI_NATIVE_INTERFACE,
                             &gSmmVariable
                             );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Installing gEfiSmmVariableProtocolGuid failed - %r. Aborting SMM variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  SmmVariableProtocolInstalled = TRUE;
 
   Status = gMmst->MmInstallProtocolInterface (
                     &VariableHandle,
@@ -1181,30 +1245,43 @@ MmVariableServiceInitialize (
                     EFI_NATIVE_INTERFACE,
                     &mSmmVarCheck
                     );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Installing gEdkiiSmmVarCheckProtocolGuid failed - %r. Aborting SMM variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
 
-  mVariableBufferPayloadSize =  GetMaxVariableSize () +
-                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) -
-                               GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
-
-  Status = gMmst->MmAllocatePool (
-                    EfiRuntimeServicesData,
-                    mVariableBufferPayloadSize,
-                    (VOID **)&mVariableBufferPayload
-                    );
-  ASSERT_EFI_ERROR (Status);
+  SmmVarCheckProtocolInstalled = TRUE;
 
   ///
   /// Register SMM variable SMI handler
   ///
-  VariableHandle = NULL;
-  Status         = gMmst->MmiHandlerRegister (SmmVariableHandler, &gEfiSmmVariableProtocolGuid, &VariableHandle);
-  ASSERT_EFI_ERROR (Status);
+  Status = gMmst->MmiHandlerRegister (
+                    SmmVariableHandler,
+                    &gEfiSmmVariableProtocolGuid,
+                    &SmmVariableDispatchHandle
+                    );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: MmiHandlerRegister failed - %r. Aborting SMM variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  SmmVariableHandlerRegistered = TRUE;
 
   //
   // Notify the variable wrapper driver the variable service is ready
   //
   VariableNotifySmmReady ();
+  SmmNotifiedSmmReady = TRUE;
 
   //
   // Register EFI_SMM_END_OF_DXE_PROTOCOL_GUID notify function.
@@ -1214,7 +1291,17 @@ MmVariableServiceInitialize (
                     SmmEndOfDxeCallback,
                     &SmmEndOfDxeRegistration
                     );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Register MmEndOfDxe notify failed - %r. Aborting SMM variable init.\n",
+      __func__,
+      Status
+      ));
+    goto ErrorExit;
+  }
+
+  SmmEndOfDxeNotifyRegistered = TRUE;
 
   if (!PcdGetBool (PcdEmuVariableNvModeEnable)) {
     //
@@ -1225,9 +1312,22 @@ MmVariableServiceInitialize (
                       SmmFtwNotificationEvent,
                       &SmmFtwRegistration
                       );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Register SmmFaultTolerantWrite protocol notify failed - %r. Aborting SMM variable init.\n",
+        __func__,
+        Status
+        ));
+      goto ErrorExit;
+    }
 
-    SmmFtwNotificationEvent (NULL, NULL, NULL);
+    SmmFtwNotifyRegistered = TRUE;
+
+    Status = SmmFtwNotificationEvent (NULL, NULL, NULL);
+    if ((Status != EFI_SUCCESS) && (Status != EFI_NOT_FOUND)) {
+      goto ErrorExit;
+    }
   } else {
     //
     // Emulated non-volatile variable mode does not depend on FVB and FTW.
@@ -1236,4 +1336,56 @@ MmVariableServiceInitialize (
   }
 
   return EFI_SUCCESS;
+
+ErrorExit:
+  if (SmmFtwNotifyRegistered) {
+    gMmst->MmRegisterProtocolNotify (
+             &gEfiSmmFaultTolerantWriteProtocolGuid,
+             NULL,
+             &SmmFtwRegistration
+             );
+  }
+
+  if (SmmEndOfDxeNotifyRegistered) {
+    gMmst->MmRegisterProtocolNotify (
+             &gEfiMmEndOfDxeProtocolGuid,
+             NULL,
+             &SmmEndOfDxeRegistration
+             );
+  }
+
+  if (SmmNotifiedSmmReady) {
+    VariableClearNotifySmmReady ();
+  }
+
+  if (SmmVariableHandlerRegistered) {
+    gMmst->MmiHandlerUnRegister (SmmVariableDispatchHandle);
+  }
+
+  if (mVariableBufferPayload != NULL) {
+    gMmst->MmFreePool (mVariableBufferPayload);
+    mVariableBufferPayload     = NULL;
+    mVariableBufferPayloadSize = 0;
+  }
+
+  if (SmmVarCheckProtocolInstalled) {
+    gMmst->MmUninstallProtocolInterface (
+             VariableHandle,
+             &gEdkiiSmmVarCheckProtocolGuid,
+             &mSmmVarCheck
+             );
+  }
+
+  if (SmmVariableProtocolInstalled) {
+    gMmst->MmUninstallProtocolInterface (
+             VariableHandle,
+             &gEfiSmmVariableProtocolGuid,
+             &gSmmVariable
+             );
+  }
+
+  VariableCommonUninitialize ();
+
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }

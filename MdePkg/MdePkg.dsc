@@ -163,6 +163,7 @@
   MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 [Components.IA32, Components.X64]
+  MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
@@ -209,6 +210,7 @@
   MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
   MdePkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
   MdePkg/Library/ArmLib/ArmBaseLib.inf
+  MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf

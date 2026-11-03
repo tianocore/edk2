@@ -16,6 +16,7 @@
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/AcpiTable.h>
@@ -53,11 +54,20 @@ NOTE: This implementation ignores the possibility that the Serial settings may
   (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 | \
    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC | \
    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC | \
-   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC)
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_RISCV)
 
 /** A string representing the name of the SPCR port.
 */
 #define NAME_STR_SPCR_PORT  "COM1"
+
+/** _SB scope of the AML namespace.
+*/
+#define SB_SCOPE  "\\_SB_."
+
+/** The fully qualified ACPI namespace path of the SPCR port.
+*/
+#define NAMESPACE_STR_SPCR_PORT  SB_SCOPE NAME_STR_SPCR_PORT
 
 /** An UID representing the SPCR port.
 */
@@ -103,7 +113,7 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  AcpiSpcr = {
   0x00,
   0, // {Template}: UART Clock Frequency
   0, // {Template}: Precise Baud Rate
-  sizeof (NAME_STR_SPCR_PORT),
+  sizeof (NAMESPACE_STR_SPCR_PORT),
   OFFSET_OF (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4, NameSpaceString)
 };
 
@@ -201,13 +211,16 @@ ValidateSerialTerminalInterruptInfo (
     }
 
     if ((((SpcrInfo->InterruptType) &
-          (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC)) != 0) &&
+          (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC |
+           EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_RISCV)) != 0) &&
         (SpcrInfo->InterruptType !=
-         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC))
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC) &&
+        (SpcrInfo->InterruptType !=
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_RISCV))
     {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: SPCR: %d GIC interrupt type cannot be combined with others.\n",
+        "ERROR: SPCR: %d GIC or RISC-V interrupt type cannot be combined with others.\n",
         SpcrInfo->InterruptType
         ));
       Status |= EFI_INVALID_PARAMETER;
@@ -350,9 +363,13 @@ FreeSpcrTableEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Only need to free the SSDT table at index 1. The SPCR table is static.
   Status = FreeSsdtSerialPortTable (TableList[1]);
   ASSERT_EFI_ERROR (Status);
+
+  // Free the SPCR table.
+  if (TableList[0] != NULL) {
+    FreePool (TableList[0]);
+  }
 
   // Free the table list.
   FreePool (*Table);
@@ -396,13 +413,14 @@ BuildSpcrTableEx (
   OUT       UINTN                                  *CONST  TableCount
   )
 {
-  EFI_STATUS                       Status;
-  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
-  UINT32                           SerialPortCount;
-  EFI_ACPI_DESCRIPTION_HEADER      **TableList;
-  UINT32                           Size;
-  CM_ARCH_COMMON_SPCR_INFO         *SpcrInfo;
-  UINT32                           SpcrInfoCount;
+  EFI_STATUS                                        Status;
+  CM_ARCH_COMMON_SERIAL_PORT_INFO                   *SerialPortInfo;
+  UINT32                                            SerialPortCount;
+  EFI_ACPI_DESCRIPTION_HEADER                       **TableList;
+  UINT32                                            Size;
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  *Spcr;
+  CM_ARCH_COMMON_SPCR_INFO                          *SpcrInfo;
+  UINT32                                            SpcrInfoCount;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -513,7 +531,8 @@ BuildSpcrTableEx (
   if (AcpiTableInfo->AcpiTableRevision < EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
     Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE);
   } else {
-    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4) + sizeof (NAME_STR_SPCR_PORT);
+    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4) +
+           sizeof (NAMESPACE_STR_SPCR_PORT);
   }
 
   // Build SPCR table.
@@ -624,8 +643,6 @@ BuildSpcrTableEx (
   if (AcpiTableInfo->AcpiTableRevision > EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION) {
     // UartClockFrequency supported on revision 3 and higher
     AcpiSpcr.UartClockFrequency = SerialPortInfo->Clock;
-
-    AsciiStrCpyS (AcpiSpcr.NameSpaceString, sizeof (NAME_STR_SPCR_PORT), NAME_STR_SPCR_PORT);
   }
 
   if (SpcrInfoCount != 0) {
@@ -644,7 +661,29 @@ BuildSpcrTableEx (
     }
   }
 
-  TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiSpcr;
+  // The NameSpaceString[] flexible array member of the template has no storage,
+  // so build the table in a buffer of the full table size.
+  Spcr = AllocateZeroPool (Size);
+  if (Spcr == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SPCR: Failed to allocate memory for SPCR table. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  CopyMem (Spcr, &AcpiSpcr, MIN (Size, sizeof (AcpiSpcr)));
+  if (AcpiTableInfo->AcpiTableRevision >= EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
+    CopyMem (
+      Spcr->NameSpaceString,
+      NAMESPACE_STR_SPCR_PORT,
+      sizeof (NAMESPACE_STR_SPCR_PORT)
+      );
+  }
+
+  TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)Spcr;
 
   // Build a SSDT table describing the serial port.
   Status = BuildSsdtSerialPortTable (
@@ -670,6 +709,10 @@ BuildSpcrTableEx (
 
 error_handler:
   if (TableList != NULL) {
+    if (TableList[0] != NULL) {
+      FreePool (TableList[0]);
+    }
+
     FreePool (TableList);
   }
 

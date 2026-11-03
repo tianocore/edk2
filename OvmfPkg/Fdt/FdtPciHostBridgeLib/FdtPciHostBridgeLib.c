@@ -138,8 +138,8 @@ ProcessPciHost (
   //
   // Fetch the ECAM window.
   //
-  ConfigBase = SwapBytes64 (((CONST UINT64 *)Prop)[0]);
-  ConfigSize = SwapBytes64 (((CONST UINT64 *)Prop)[1]);
+  ConfigBase = SwapBytes64 (ReadUnaligned64 (Prop));
+  ConfigSize = SwapBytes64 (ReadUnaligned64 ((CONST UINT64 *)Prop + 1));
 
   //
   // Fetch the bus range (note: inclusive).

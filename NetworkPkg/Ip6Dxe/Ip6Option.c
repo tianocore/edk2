@@ -173,10 +173,12 @@ Ip6IsNDOptionValid (
 
   //
   // RFC 4861 states that Neighbor Discovery packet can contain zero or more
-  // options. Start processing the options if at least Type + Length fields
-  // fit within the input buffer.
+  // options. RFC 4861 Section 4.6 states that every ND option length is in
+  // units of 8 octets, so the smallest valid option is 8 bytes (Length
+  // field = 1). Only enter the loop when at least one complete minimum-size
+  // option can exist in the remaining buffer.
   //
-  while (Offset + sizeof (IP6_OPTION_HEADER) - 1 < OptionLen) {
+  while (Offset + 8 <= (UINT32)OptionLen) {
     OptionHeader = (IP6_OPTION_HEADER *)(Option + Offset);
     Length       = (UINT16)OptionHeader->Length * 8;
 
@@ -234,7 +236,12 @@ Ip6IsNDOptionValid (
     Offset += Length;
   }
 
-  return TRUE;
+  //
+  // Per RFC 4861 Section 4.6, a well-formed option region is an exact
+  // integer multiple of 8 octets. If any bytes remain after the loop,
+  // the option region contains a malformed trailing fragment.
+  //
+  return (Offset == (UINT32)OptionLen);
 }
 
 /**
