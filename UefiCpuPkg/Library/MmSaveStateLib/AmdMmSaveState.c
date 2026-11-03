@@ -353,6 +353,8 @@ MmSaveStateReadRegisterByIndex (
   OUT VOID  *Buffer
   )
 {
+  UINT64  TmpVal;
+
   if (RegisterIndex == 0) {
     return EFI_NOT_FOUND;
   }
@@ -375,13 +377,14 @@ MmSaveStateReadRegisterByIndex (
   // Write lower 32-bits of return buffer
   //
   if (NeedSysCall () == TRUE) {
-    *(UINT32 *)Buffer = (UINT32)SysCall (
-                                  SMM_SC_SVST_READ,
-                                  CpuIndex,
-                                  (UINTN)((UINT8 *)gMmst->CpuSaveState[CpuIndex]
-                                          + mCpuWidthOffset[RegisterIndex].Offset64Lo),
-                                  MIN (4, Width)
-                                  );
+    TmpVal = SysCall (
+               SMM_SC_SVST_READ,
+               CpuIndex,
+               (UINTN)((UINT8 *)gMmst->CpuSaveState[CpuIndex]
+                       + mCpuWidthOffset[RegisterIndex].Offset64Lo),
+               MIN (4, Width)
+               );
+    CopyMem (Buffer, &TmpVal, MIN (4, Width));
   } else {
     CopyMem (
       Buffer,
@@ -395,12 +398,14 @@ MmSaveStateReadRegisterByIndex (
     // Write upper 32-bits of return buffer
     //
     if (NeedSysCall () == TRUE) {
-      *((UINT32 *)Buffer + 1) = (UINT32)SysCall (
-                                          SMM_SC_SVST_READ,
-                                          CpuIndex,
-                                          (UINTN)((UINT8 *)gMmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Hi),
-                                          Width - 4
-                                          );
+      TmpVal = SysCall (
+                 SMM_SC_SVST_READ,
+                 CpuIndex,
+                 (UINTN)((UINT8 *)gMmst->CpuSaveState[CpuIndex]
+                         + mCpuWidthOffset[RegisterIndex].Offset64Hi),
+                 Width - 4
+                 );
+      CopyMem ((UINT8 *)Buffer + 4, &TmpVal, Width - 4);
     } else {
       CopyMem (
         (UINT8 *)Buffer + 4,
