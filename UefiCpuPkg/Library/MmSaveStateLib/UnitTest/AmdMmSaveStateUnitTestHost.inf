@@ -1,0 +1,38 @@
+## @file
+# Unit tests for the AMD MmSaveStateLib (AmdMmSaveState.c)
+#
+# Tests the MmSaveStateReadRegisterByIndex() function for out-of-bounds
+# writes in the SysCall path.
+#
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = AmdMmSaveStateUnitTestHost
+  FILE_GUID                      = 3E7B8D1F-4A92-4C6E-B531-9F2D0E1C8A47
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  AmdMmSaveStateUnitTest.c
+  ../AmdMmSaveState.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UnitTestLib
+  MemoryAllocationLib
