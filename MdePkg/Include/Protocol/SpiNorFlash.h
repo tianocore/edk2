@@ -22,6 +22,14 @@
 
 typedef struct _EFI_SPI_NOR_FLASH_PROTOCOL EFI_SPI_NOR_FLASH_PROTOCOL;
 
+#define EDKII_SPI_NOR_FLASH_PROTOCOL_EX_GUID  \
+  { 0x99def701, 0x7ff9, 0x46b5,             \
+    { 0x84, 0x52, 0x56, 0x8e, 0xfe, 0x5b, 0xa9, 0x9b }}
+
+#define EDKII_SPI_NOR_FLASH_PROTOCOL_EX_VERSION  0x0100
+
+typedef struct _EDKII_SPI_NOR_FLASH_PROTOCOL_EX EDKII_SPI_NOR_FLASH_PROTOCOL_EX;
+
 /**
   Read the 3 byte manufacture and device ID from the SPI flash.
 
@@ -175,6 +183,34 @@ EFI_STATUS
   IN UINT32                            BlockCount
   );
 
+/**
+  Switch the SPI NOR flash device to 4-byte address mode.
+
+  @param[in]  This    Pointer to an EDKII_SPI_NOR_FLASH_PROTOCOL_EX data structure.
+
+  @retval EFI_SUCCESS   Device is in 4-byte address mode.
+  @retval Other         Failed to switch address mode.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_SPI_NOR_FLASH_PROTOCOL_ENTER_4BYTE)(
+  IN CONST EDKII_SPI_NOR_FLASH_PROTOCOL_EX  *This
+  );
+
+/**
+  Switch the SPI NOR flash device to 3-byte address mode.
+
+  @param[in]  This    Pointer to an EDKII_SPI_NOR_FLASH_PROTOCOL_EX data structure.
+
+  @retval EFI_SUCCESS   Device is in 3-byte address mode.
+  @retval Other         Failed to switch address mode.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_SPI_NOR_FLASH_PROTOCOL_EXIT_4BYTE)(
+  IN CONST EDKII_SPI_NOR_FLASH_PROTOCOL_EX  *This
+  );
+
 ///
 /// The EFI_SPI_NOR_FLASH_PROTOCOL exists in the SPI peripheral layer.
 /// This protocol manipulates the SPI NOR flash parts using a common set of
@@ -250,4 +286,22 @@ struct _EFI_SPI_NOR_FLASH_PROTOCOL {
   EFI_SPI_NOR_FLASH_PROTOCOL_ERASE           Erase;
 };
 
+struct _EDKII_SPI_NOR_FLASH_PROTOCOL_EX {
+  ///
+  /// Version of this extended protocol.
+  ///
+  UINT16                                      Version;
+
+  ///
+  /// Switch to 4-byte address mode.
+  ///
+  EDKII_SPI_NOR_FLASH_PROTOCOL_ENTER_4BYTE    Enter4Byte;
+
+  ///
+  /// Switch to 3-byte address mode.
+  ///
+  EDKII_SPI_NOR_FLASH_PROTOCOL_EXIT_4BYTE     Exit4Byte;
+};
+
 extern EFI_GUID  gEfiSpiNorFlashProtocolGuid;
+extern EFI_GUID  gEdkiiSpiNorFlashProtocolExGuid;

@@ -45,6 +45,7 @@
   gEfiDevicePathProtocolGuid                      ## BY_START
   gEfiPciRootBridgeIoProtocolGuid                 ## BY_START
   gEfiPciHostBridgeResourceAllocationProtocolGuid ## BY_START
+  gEdkiiPciHostBridgeFixedResourceProtocolGuid    ## BY_START
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
 
 [Depex]
