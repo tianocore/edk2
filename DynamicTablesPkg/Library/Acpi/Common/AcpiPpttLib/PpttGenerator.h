@@ -180,3 +180,31 @@ typedef struct AcpiPpttGenerator {
 } ACPI_PPTT_GENERATOR;
 
 #pragma pack()
+
+/** Get the ACPI Processor UID of the CPU interface objects.
+
+  The CPU interface objects are the GICC objects on Arm and the RINTC objects on
+  RISC-V.
+
+  @param [in]  CfgMgrProtocol    Pointer to the Configuration Manager Protocol
+                                 Interface.
+  @param [in]  Token             Token of the CPU interface object to get or
+                                 CM_NULL_TOKEN to get all of them.
+  @param [out] AcpiProcessorUid  ACPI Processor UID of the first CPU interface
+                                 object found.
+  @param [out] Count             Number of CPU interface objects found.
+
+  @retval EFI_SUCCESS            The CPU interface information was returned.
+  @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
+  @retval EFI_NOT_FOUND          No CPU interface object was found.
+  @retval EFI_BAD_BUFFER_SIZE    The size returned by the Configuration Manager
+                                 is less than the object size.
+**/
+EFI_STATUS
+EFIAPI
+GetCpuInterfaceInfo (
+  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN        CM_OBJECT_TOKEN                              Token,
+  OUT       UINT32                                       *AcpiProcessorUid,
+  OUT       UINT32                                       *Count
+  );
