@@ -370,7 +370,8 @@ PciHostBridgeGetRootBridges (
   Attributes = EFI_PCI_ATTRIBUTE_ISA_IO_16 |
                EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
                EFI_PCI_ATTRIBUTE_VGA_IO_16  |
-               EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+               EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16 |
+               EFI_PCI_ATTRIBUTE_MEMORY_CACHED;
 
   AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
 
