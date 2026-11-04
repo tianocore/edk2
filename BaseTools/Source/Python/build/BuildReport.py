@@ -2004,13 +2004,19 @@ class FdRegionReport(object):
                 if Match:
                     FvTakenSize = int(Match.group(1), 16)
                 FvFreeSize = FvTotalSize - FvTakenSize
+                if FvTotalSize > 0:
+                    FvUsage = "%.1f%% Full" % (FvTakenSize * 100.0 / FvTotalSize)
+                    FvFreeSizeText = "0x%X (%.0fK)" % (FvFreeSize, FvFreeSize / 1024.0)
+                else:
+                    FvUsage = "N/A"
+                    FvFreeSizeText = "N/A"
                 #
                 # Write size information to the report file.
                 #
                 FileWrite(File, "Size:               0x%X (%.0fK)" % (FvTotalSize, FvTotalSize / 1024.0))
-                FileWrite(File, "Fv Name:            %s (%.1f%% Full)" % (FvName, FvTakenSize * 100.0 / FvTotalSize))
+                FileWrite(File, "Fv Name:            %s (%s)" % (FvName, FvUsage))
                 FileWrite(File, "Occupied Size:      0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0))
-                FileWrite(File, "Free Size:          0x%X (%.0fK)" % (FvFreeSize, FvFreeSize / 1024.0))
+                FileWrite(File, "Free Size:          %s" % FvFreeSizeText)
                 FileWrite(File, "Offset     Module")
                 FileWrite(File, gSubSectionSep)
                 #
