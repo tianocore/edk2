@@ -116,39 +116,37 @@ SioBusDriverBindingSupported (
 
   if (!EFI_ERROR (Status)) {
     Status = EFI_UNSUPPORTED;
-    if ((Pci.Hdr.Command & 0x03) == 0x03) {
-      if (Pci.Hdr.ClassCode[2] == PCI_CLASS_BRIDGE) {
-        //
-        // See if this is a standard PCI to ISA Bridge from the Base Code and
-        // Class Code
-        //
-        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA) {
-          Status = EFI_SUCCESS;
-        }
+    if (Pci.Hdr.ClassCode[2] == PCI_CLASS_BRIDGE) {
+      //
+      // See if this is a standard PCI to ISA Bridge from the Base Code and
+      // Class Code
+      //
+      if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA) {
+        Status = EFI_SUCCESS;
+      }
 
+      //
+      // See if this is an Intel PCI to ISA bridge in Positive Decode Mode
+      //
+      if ((Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE) &&
+          (Pci.Hdr.VendorId     == 0x8086))
+      {
         //
-        // See if this is an Intel PCI to ISA bridge in Positive Decode Mode
+        // See if this is on Function #0 to avoid false positives on
+        // PCI_CLASS_BRIDGE_OTHER that has the same value as
+        // PCI_CLASS_BRIDGE_ISA_PDECODE
         //
-        if ((Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE) &&
-            (Pci.Hdr.VendorId     == 0x8086))
-        {
-          //
-          // See if this is on Function #0 to avoid false positives on
-          // PCI_CLASS_BRIDGE_OTHER that has the same value as
-          // PCI_CLASS_BRIDGE_ISA_PDECODE
-          //
-          Status = PciIo->GetLocation (
-                            PciIo,
-                            &SegmentNumber,
-                            &BusNumber,
-                            &DeviceNumber,
-                            &FunctionNumber
-                            );
-          if (!EFI_ERROR (Status) && (FunctionNumber == 0)) {
-            Status = EFI_SUCCESS;
-          } else {
-            Status = EFI_UNSUPPORTED;
-          }
+        Status = PciIo->GetLocation (
+                          PciIo,
+                          &SegmentNumber,
+                          &BusNumber,
+                          &DeviceNumber,
+                          &FunctionNumber
+                          );
+        if (!EFI_ERROR (Status) && (FunctionNumber == 0)) {
+          Status = EFI_SUCCESS;
+        } else {
+          Status = EFI_UNSUPPORTED;
         }
       }
     }
