@@ -238,7 +238,8 @@ FreeIoSpaceMap:
   Otherwise, the type of the descriptor is investigated again. If the type is
   EfiGcdMemoryTypeNonExistent (representing a gap, or a genuine descriptor with
   such a type), then an attempt is made to add the intersection as MMIO space
-  to the GCD memory space map, with the specified capabilities. This ensures
+  to the GCD memory space map, with the specified capabilities as well as
+  EFI_MEMORY_XP, so that it can be mapped non-executable. This ensures
   continuity for the aperture, and the descriptor is deemed compatible with the
   aperture.
 
@@ -292,7 +293,7 @@ IntersectMemoryDescriptor (
                     EfiGcdMemoryTypeMemoryMappedIo,
                     IntersectionBase,
                     IntersectionEnd - IntersectionBase,
-                    Capabilities
+                    Capabilities | EFI_MEMORY_XP
                     );
 
     DEBUG ((
@@ -397,6 +398,48 @@ FreeMemorySpaceMap:
   FreePool (MemorySpaceMap);
 
   return Status;
+}
+
+/**
+  Apply memory attributes to an MMIO aperture, and try to map it non-executable.
+
+  Mapping the aperture non-executable may not be possible, e.g., because (part
+  of) the aperture was already described in the GCD memory space map by the
+  platform without the EFI_MEMORY_XP capability. In this case, only the given
+  memory attributes are applied.
+
+  @param[in] Base        Base address of the aperture.
+  @param[in] Length      Length of the aperture.
+  @param[in] Attributes  The memory attributes to apply to the aperture.
+
+  @return  The return value of gDS->SetMemorySpaceAttributes().
+**/
+STATIC
+EFI_STATUS
+SetMmioApertureAttributes (
+  IN  UINT64  Base,
+  IN  UINT64  Length,
+  IN  UINT64  Attributes
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gDS->SetMemorySpaceAttributes (Base, Length, Attributes | EFI_MEMORY_XP);
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: %a: unable to map MMIO aperture [%Lx, %Lx) non-executable - %r\n",
+    gEfiCallerBaseName,
+    __func__,
+    Base,
+    Base + Length,
+    Status
+    ));
+
+  return gDS->SetMemorySpaceAttributes (Base, Length, Attributes);
 }
 
 /**
@@ -548,11 +591,11 @@ InitializePciHostBridge (
                    EFI_MEMORY_UC
                    );
         ASSERT_EFI_ERROR (Status);
-        Status = gDS->SetMemorySpaceAttributes (
-                        HostAddress,
-                        MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                        EFI_MEMORY_UC
-                        );
+        Status = SetMmioApertureAttributes (
+                   HostAddress,
+                   MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
+                   EFI_MEMORY_UC
+                   );
         if (EFI_ERROR (Status)) {
           DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
         }
