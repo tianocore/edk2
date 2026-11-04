@@ -1619,8 +1619,11 @@ CoreFreePages (
   )
 {
   EFI_STATUS       Status;
+  EFI_STATUS       LeakStatus;
   EFI_MEMORY_TYPE  MemoryType;
   UINT64           Attributes;
+  UINT64           Alignment;
+  MEMORY_MAP       *Entry;
 
   if (((Memory & EFI_PAGE_MASK) != 0) || (NumberOfPages == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -1645,17 +1648,49 @@ CoreFreePages (
     if (EFI_ERROR (Status) ||
         ((Attributes & EFI_MEMORY_RO) || (Attributes & EFI_MEMORY_RP)))
     {
-      DEBUG ((
-        DEBUG_WARN,
-        "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
-        "Attributes: %llx. Leaking memory!\n",
-        __func__,
-        Memory,
-        NumberOfPages,
-        Status,
-        Attributes
-        ));
-      return EFI_SUCCESS;
+      // Before we leak, confirm the memory is actually valid to free. If it isn't, we need to return an error instead
+      // of success.
+      CoreAcquireMemoryLock ();
+      LeakStatus = GetMemoryMapEntry (Memory, &Entry);
+      if (EFI_ERROR (LeakStatus)) {
+        goto LeakDone;
+      }
+
+      Alignment = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+
+      if ((Entry->Type == EfiReservedMemoryType) ||
+          (Entry->Type == EfiACPIMemoryNVS) ||
+          (Entry->Type == EfiRuntimeServicesCode) ||
+          (Entry->Type == EfiRuntimeServicesData))
+      {
+        Alignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+      }
+
+      if ((Memory & (Alignment - 1)) != 0) {
+        LeakStatus = EFI_INVALID_PARAMETER;
+        goto LeakDone;
+      }
+
+      NumberOfPages += EFI_SIZE_TO_PAGES (Alignment) - 1;
+      NumberOfPages &= ~(EFI_SIZE_TO_PAGES (Alignment) - 1);
+      LeakStatus     = CoreConvertPagesEx (Memory, NumberOfPages, CONVERT_PAGES_CHANGING_TYPE | CONVERT_PAGES_DRY_RUN, EfiConventionalMemory, 0);
+
+      if (!EFI_ERROR (LeakStatus)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
+          "Attributes: %llx. Leaking memory!\n",
+          __func__,
+          Memory,
+          NumberOfPages,
+          Status,
+          Attributes
+          ));
+      }
+
+LeakDone:
+      CoreReleaseMemoryLock ();
+      return LeakStatus;
     }
   }
 
