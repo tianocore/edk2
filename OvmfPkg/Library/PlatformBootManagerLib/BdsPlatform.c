@@ -1012,6 +1012,8 @@ DetectAndPreparePlatformPciDevicePath (
   IN PCI_TYPE00           *Pci
   )
 {
+  EFI_STATUS  Status;
+
   //
   // Here we decide whether it is LPC Bridge
   //
@@ -1027,6 +1029,13 @@ DetectAndPreparePlatformPciDevicePath (
     // add IsaSerial to ConOut, ConIn, ErrOut
     //
     DEBUG ((DEBUG_INFO, "Found LPC Bridge device\n"));
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      EFI_PCI_DEVICE_ENABLE,
+                      NULL
+                      );
+    ASSERT_EFI_ERROR (Status);
     PrepareLpcBridgeDevicePath (Handle);
     return EFI_SUCCESS;
   }
