@@ -1601,6 +1601,110 @@ Done:
 }
 
 /**
+  Determines whether the specified memory range should be leaked instead of freed because the attributes
+  are different than what the core expects.
+
+  @param  Memory                 Base address of memory being checked
+  @param  NumberOfPages          The number of pages to check
+  @param  LeakStatus             The status to return if the memory should be leaked
+
+  @retval TRUE                  Memory should be leaked or the memory is not valid to free. The caller should return
+                                *LeakStatus.
+  @retval FALSE                 Memory should not be leaked and the caller can proceed with freeing it.
+**/
+static
+BOOLEAN
+EFIAPI
+ShouldLeakMemory (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages,
+  OUT EFI_STATUS           *LeakStatus
+  )
+{
+  EFI_STATUS  Status;
+  UINT64      Attributes;
+  UINTN       Alignment;
+  MEMORY_MAP  *Entry;
+
+  if (LeakStatus == NULL) {
+    ASSERT (LeakStatus != NULL);
+    return TRUE;
+  }
+
+  // If the memory attributes protocol does not exist, a bootloader does not have an official way to change
+  // memory attributes, so we can safely assume it did not.
+  if (gMemoryAttributeProtocol == NULL) {
+    return FALSE;
+  }
+
+  Attributes = 0;
+
+  Status = gMemoryAttributeProtocol->GetMemoryAttributes (
+                                       gMemoryAttributeProtocol,
+                                       Memory,
+                                       EFI_PAGES_TO_SIZE (NumberOfPages),
+                                       &Attributes
+                                       );
+
+  // if we failed to get the attributes, or if the memory is read-only or read-protected,
+  // then we leak the memory and return success. This is done because the UEFI spec does not specify whether pages
+  // should be freed with any specific permission attributes. As such, there exist bootloaders in the wild that will
+  // free memory that is marked RO, which can crash the core if DebugClearMemory is enabled or can be passed out to a
+  // driver in the next AllocatePages() call, which can cause a crash later on. It is deemed lower risk to leak the
+  // memory than to attempt to fix up the attributes as that requires syncing the GCD and the page table.
+  if ((Status == EFI_SUCCESS) &&
+      ((Attributes & (EFI_MEMORY_RO | EFI_MEMORY_RP)) == 0))
+  {
+    return FALSE;
+  }
+
+  // Before we leak, confirm the memory is actually valid to free. If it isn't, we need to return an error instead
+  // of success.
+  CoreAcquireMemoryLock ();
+  *LeakStatus = GetMemoryMapEntry (Memory, &Entry);
+  if (EFI_ERROR (*LeakStatus)) {
+    goto LeakDone;
+  }
+
+  Alignment = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+
+  if ((Entry->Type == EfiReservedMemoryType) ||
+      (Entry->Type == EfiACPIMemoryNVS) ||
+      (Entry->Type == EfiRuntimeServicesCode) ||
+      (Entry->Type == EfiRuntimeServicesData))
+  {
+    Alignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  }
+
+  if ((Memory & (Alignment - 1)) != 0) {
+    *LeakStatus = EFI_INVALID_PARAMETER;
+    goto LeakDone;
+  }
+
+  NumberOfPages += EFI_SIZE_TO_PAGES (Alignment) - 1;
+  NumberOfPages &= ~(EFI_SIZE_TO_PAGES (Alignment) - 1);
+  *LeakStatus    = CoreConvertPagesEx (Memory, NumberOfPages, CONVERT_PAGES_CHANGING_TYPE | CONVERT_PAGES_DRY_RUN, EfiConventionalMemory, 0);
+
+  if (!EFI_ERROR (*LeakStatus)) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
+      "Attributes: %llx. Leaking memory!\n",
+      __func__,
+      Memory,
+      NumberOfPages,
+      Status,
+      Attributes
+      ));
+  }
+
+LeakDone:
+  CoreReleaseMemoryLock ();
+
+  return TRUE;
+}
+
+/**
   Frees previous allocated pages.
 
   @param  Memory                 Base address of memory being freed
@@ -1621,77 +1725,13 @@ CoreFreePages (
   EFI_STATUS       Status;
   EFI_STATUS       LeakStatus;
   EFI_MEMORY_TYPE  MemoryType;
-  UINT64           Attributes;
-  UINT64           Alignment;
-  MEMORY_MAP       *Entry;
 
   if (((Memory & EFI_PAGE_MASK) != 0) || (NumberOfPages == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  // check if this memory is returned to the core as RW at a minimum. If the memory attribute protocol is not installed,
-  // then we assume that the memory is RW by default and continue to free it.
-  if (gMemoryAttributeProtocol != NULL) {
-    Status = gMemoryAttributeProtocol->GetMemoryAttributes (
-                                         gMemoryAttributeProtocol,
-                                         Memory,
-                                         EFI_PAGES_TO_SIZE (NumberOfPages),
-                                         &Attributes
-                                         );
-
-    // if we failed to get the attributes, or if the memory is read-only or read-protected,
-    // then we leak the memory and return success. This is done because the UEFI spec does not specify whether pages
-    // should be freed with any specific permission attributes. As such, there exist bootloaders in the wild that will
-    // free memory that is marked RO, which can crash the core if DebugClearMemory is enabled or can be passed out to a
-    // driver in the next AllocatePages() call, which can cause a crash later on. It is deemed lower risk to leak the
-    // memory than to attempt to fix up the attributes as that requires syncing the GCD and the page table.
-    if (EFI_ERROR (Status) ||
-        ((Attributes & EFI_MEMORY_RO) || (Attributes & EFI_MEMORY_RP)))
-    {
-      // Before we leak, confirm the memory is actually valid to free. If it isn't, we need to return an error instead
-      // of success.
-      CoreAcquireMemoryLock ();
-      LeakStatus = GetMemoryMapEntry (Memory, &Entry);
-      if (EFI_ERROR (LeakStatus)) {
-        goto LeakDone;
-      }
-
-      Alignment = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
-
-      if ((Entry->Type == EfiReservedMemoryType) ||
-          (Entry->Type == EfiACPIMemoryNVS) ||
-          (Entry->Type == EfiRuntimeServicesCode) ||
-          (Entry->Type == EfiRuntimeServicesData))
-      {
-        Alignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
-      }
-
-      if ((Memory & (Alignment - 1)) != 0) {
-        LeakStatus = EFI_INVALID_PARAMETER;
-        goto LeakDone;
-      }
-
-      NumberOfPages += EFI_SIZE_TO_PAGES (Alignment) - 1;
-      NumberOfPages &= ~(EFI_SIZE_TO_PAGES (Alignment) - 1);
-      LeakStatus     = CoreConvertPagesEx (Memory, NumberOfPages, CONVERT_PAGES_CHANGING_TYPE | CONVERT_PAGES_DRY_RUN, EfiConventionalMemory, 0);
-
-      if (!EFI_ERROR (LeakStatus)) {
-        DEBUG ((
-          DEBUG_WARN,
-          "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "
-          "Attributes: %llx. Leaking memory!\n",
-          __func__,
-          Memory,
-          NumberOfPages,
-          Status,
-          Attributes
-          ));
-      }
-
-LeakDone:
-      CoreReleaseMemoryLock ();
-      return LeakStatus;
-    }
+  if (ShouldLeakMemory (Memory, NumberOfPages, &LeakStatus)) {
+    return LeakStatus;
   }
 
   Status = CoreInternalFreePages (Memory, NumberOfPages, &MemoryType);
