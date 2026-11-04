@@ -17,9 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Valid Options:
 //   CONVERT_PAGES_CHANGING_TYPE        - Indicates that the type of the pages is being changed
 //   CONVERT_PAGES_CHANGING_ATTRIBUTES  - Indicates that the attributes of the pages are being changed
+//   CONVERT_PAGES_DRY_RUN              - Validates whether a given memory range is valid to have the conversion
+//                                        performed without doing the conversion
 //
 #define CONVERT_PAGES_CHANGING_TYPE        0x1
 #define CONVERT_PAGES_CHANGING_ATTRIBUTES  0x2
+#define CONVERT_PAGES_DRY_RUN              0x4
 
 //
 // MemoryMap - The current memory map
@@ -631,7 +634,8 @@ CoreAddMemoryDescriptor (
                                  aligned
   @param  NumberOfPages          The number of pages to convert
   @param  Flags                  Flags indicating the operation to perform. Valid options are:
-                                 CONVERT_PAGES_CHANGING_TYPE, CONVERT_PAGES_CHANGING_ATTRIBUTES. Only one of CONVERT_PAGES_CHANGING_TYPE or
+                                 CONVERT_PAGES_CHANGING_TYPE, CONVERT_PAGES_CHANGING_ATTRIBUTES,
+                                 CONVERT_PAGES_DRY_RUN. Only one of CONVERT_PAGES_CHANGING_TYPE or
                                  CONVERT_PAGES_CHANGING_ATTRIBUTES may be specified.
   @param  NewType                The new type for the memory range if CONVERT_PAGES_CHANGING_TYPE is specified.
   @param  NewAttributes          The new attributes for the memory range if CONVERT_PAGES_CHANGING_ATTRIBUTES is
@@ -662,12 +666,14 @@ CoreConvertPagesEx (
   MEMORY_MAP       *Entry;
   BOOLEAN          ChangingType;
   BOOLEAN          ChangingAttributes;
+  BOOLEAN          DryRun;
 
   Entry              = NULL;
   NumberOfBytes      = LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT);
   End                = Start + NumberOfBytes - 1;
   ChangingType       = (Flags & CONVERT_PAGES_CHANGING_TYPE) != 0;
   ChangingAttributes = (Flags & CONVERT_PAGES_CHANGING_ATTRIBUTES) != 0;
+  DryRun             = (Flags & CONVERT_PAGES_DRY_RUN) != 0;
 
   ASSERT (NumberOfPages);
   ASSERT ((Start & EFI_PAGE_MASK) == 0);
@@ -754,17 +760,25 @@ CoreConvertPagesEx (
         return EFI_NOT_FOUND;
       }
 
-      UpdateMemoryStatistics (
-        Entry->Type,
-        NewType,
-        Start,
-        (UINTN)NumberOfPages,
-        &mMemoryTypeInformationInitialized,
-        mMemoryTypeStatistics,
-        gMemoryTypeInformation,
-        mDefaultBaseAddress,
-        mDefaultMaximumAddress
-        );
+      if (!DryRun) {
+        UpdateMemoryStatistics (
+          Entry->Type,
+          NewType,
+          Start,
+          (UINTN)NumberOfPages,
+          &mMemoryTypeInformationInitialized,
+          mMemoryTypeStatistics,
+          gMemoryTypeInformation,
+          mDefaultBaseAddress,
+          mDefaultMaximumAddress
+          );
+      }
+    }
+
+    // If doing the dry run, continue on here before we make any changes
+    if (DryRun) {
+      Start = RangeEnd + 1;
+      continue;
     }
 
     //
