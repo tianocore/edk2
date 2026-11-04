@@ -91,6 +91,11 @@
       GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
   }
 
+  MdeModulePkg/Core/Dxe/Mem/GoogleTest/CoreFreePagesGoogleTestHost.inf {
+    <LibraryClasses>
+      HobLib|MdePkg/Test/Mock/Library/GoogleTest/MockHobLib/MockHobLib.inf
+  }
+
   #
   # Build HOST_APPLICATION Libraries
   #
