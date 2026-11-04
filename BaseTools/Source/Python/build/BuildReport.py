@@ -2014,7 +2014,7 @@ class FdRegionReport(object):
                 # Write size information to the report file.
                 #
                 FileWrite(File, "Size:               0x%X (%.0fK)" % (FvTotalSize, FvTotalSize / 1024.0))
-                FileWrite(File, "Fv Name:            %s (%s)" % (FvName, FvUsage))
+                FileWrite(File, "Fv Name:            %s (%s)" % (FvReportName, FvUsage))
                 FileWrite(File, "Occupied Size:      0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0))
                 FileWrite(File, "Free Size:          %s" % FvFreeSizeText)
                 FileWrite(File, "Offset     Module")
