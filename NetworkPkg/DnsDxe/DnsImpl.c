@@ -3,6 +3,7 @@ DnsDxe support functions implementation.
 
 Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1179,7 +1180,6 @@ ParseDnsResponse (
   Dns6RR = NULL;
 
   *Completed      = TRUE;
-  Status          = EFI_SUCCESS;
   RemainingLength = Length;
 
   //
@@ -1257,6 +1257,12 @@ ParseDnsResponse (
     }
 
     ASSERT (Item != NULL);
+    if (Item == NULL) {
+      *Completed = FALSE;
+      Status     = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns4TokenEntry = (DNS4_TOKEN_ENTRY *)(Item->Key);
   } else {
     if (!IsValidDnsResponse (
@@ -1273,6 +1279,12 @@ ParseDnsResponse (
     }
 
     ASSERT (Item != NULL);
+    if (Item == NULL) {
+      *Completed = FALSE;
+      Status     = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns6TokenEntry = (DNS6_TOKEN_ENTRY *)(Item->Key);
   }
 
@@ -1299,6 +1311,10 @@ ParseDnsResponse (
   //
   if (Instance->Service->IpVersion == IP_VERSION_4) {
     ASSERT (Dns4TokenEntry != NULL);
+    if (Dns4TokenEntry == NULL) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns4TokenEntry->GeneralLookUp) {
       //
@@ -1338,6 +1354,10 @@ ParseDnsResponse (
     }
   } else {
     ASSERT (Dns6TokenEntry != NULL);
+    if (Dns6TokenEntry == NULL) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns6TokenEntry->GeneralLookUp) {
       //
@@ -1499,6 +1519,10 @@ ParseDnsResponse (
           // This is address entry, get Data.
           //
           ASSERT (Dns4TokenEntry != NULL);
+          if (Dns4TokenEntry == NULL) {
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
 
           if (AnswerSection->DataLength != 4) {
             Status = EFI_ABORTED;
@@ -1561,6 +1585,10 @@ ParseDnsResponse (
           // This is address entry, get Data.
           //
           ASSERT (Dns6TokenEntry != NULL);
+          if (Dns6TokenEntry == NULL) {
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
 
           if (AnswerSection->DataLength != 16) {
             Status = EFI_ABORTED;
@@ -1625,6 +1653,7 @@ ParseDnsResponse (
           // CNAME record. So, just record the TTL value of the CNAME, then skip to parse the next record.
           //
           CNameTtl = AnswerSection->Ttl;
+          Status   = EFI_SUCCESS;
           break;
         default:
           Status = EFI_UNSUPPORTED;
@@ -1640,6 +1669,10 @@ ParseDnsResponse (
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
     ASSERT (Dns4TokenEntry != NULL);
+    if (Dns4TokenEntry == NULL) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns4TokenEntry->GeneralLookUp) {
       Dns4TokenEntry->Token->RspData.GLookupData->RRCount = RRCount;
@@ -1653,6 +1686,10 @@ ParseDnsResponse (
     }
   } else {
     ASSERT (Dns6TokenEntry != NULL);
+    if (Dns6TokenEntry == NULL) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
 
     if (Dns6TokenEntry->GeneralLookUp) {
       Dns6TokenEntry->Token->RspData.GLookupData->RRCount = RRCount;
@@ -1676,6 +1713,11 @@ ON_COMPLETE:
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
     ASSERT (Dns4TokenEntry != NULL);
+    if (Dns4TokenEntry == NULL) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, Dns4TokenEntry);
     Dns4TokenEntry->Token->Status = Status;
     if (Dns4TokenEntry->Token->Event != NULL) {
@@ -1684,6 +1726,11 @@ ON_COMPLETE:
     }
   } else {
     ASSERT (Dns6TokenEntry != NULL);
+    if (Dns6TokenEntry == NULL) {
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
     Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, Dns6TokenEntry);
     Dns6TokenEntry->Token->Status = Status;
     if (Dns6TokenEntry->Token->Event != NULL) {
