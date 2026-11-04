@@ -25,7 +25,7 @@
   This can also be a dispatcher. I.e. a function that not parsing a
   Device Tree but calling other parsers.
 */
-STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
+STATIC CONST FDT_HW_INFO_PARSER_FUNC  mHwInfoParserTable[] = {
   ArmBootArchInfoParser,
   ArmGenericTimerInfoParser,
   ArmGicDispatcher,
@@ -37,7 +37,7 @@ STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
 };
 
 /** Main dispatcher: sequentially call the parsers/dispatchers
-    of the HwInfoParserTable.
+    of the mHwInfoParserTable.
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -71,11 +71,8 @@ ArchFdtHwInfoMainDispatcher (
     return EFI_INVALID_PARAMETER;
   }
 
-  for (Index = 0; Index < ARRAY_SIZE (HwInfoParserTable); Index++) {
-    Status = HwInfoParserTable[Index](
-                                      FdtParserHandle,
-                                      FdtBranch
-                                      );
+  for (Index = 0; Index < ARRAY_SIZE (mHwInfoParserTable); Index++) {
+    Status = mHwInfoParserTable[Index](FdtParserHandle, FdtBranch);
     if (EFI_ERROR (Status)  &&
         (Status != EFI_NOT_FOUND))
     {
