@@ -720,18 +720,31 @@ ArmSetMemoryAttributes (
   }
 
   //
-  // Full memory type updates replace the normal descriptor attributes, but must
-  // not change the Realm protected/unprotected state. UpdateRegionMapping()
-  // preserves bits that are set in PageAttributeMask by copying them from the
-  // existing descriptor, i.e. (*Entry & AttributeClearMask) | AttributeSetMask
-  // which is something equivalent to:
+  // Full memory type updates replace the normal descriptor attributes. By
+  // default, preserve the Realm protected/unprotected state from the old
+  // descriptor. UpdateRegionMapping() preserves bits that are set in
+  // PageAttributeMask by copying them from the existing descriptor, i.e.
+  // (*Entry & AttributeClearMask) | AttributeSetMask, which is equivalent to:
   //   NewEntry = (OldEntry & PageAttributeMask) | PageAttributes;
-  // Therefore, clear the CCA protection bit from PageAttributes so that
-  // the new value cannot force it, then add the bit to PageAttributeMask so
-  // the old descriptor keeps supplying the protected/unprotected state.
+  // Therefore, clear the CCA protection bit from PageAttributes so that the new
+  // value cannot force it, then add the bit to PageAttributeMask so the old
+  // descriptor keeps supplying the protected/unprotected state.
   //
   PageAttributes   &= ~CcaProtectionAttribute;
   PageAttributeMask = CcaProtectionAttribute;
+
+  //
+  // Check the CcaProtectionAttribute to determine if we are running in a Realm.
+  // EFI_MEMORY_UC is used for MMIO mappings. In a Realm, MMIO must be mapped in
+  // the unprotected IPA space, so force the CCA protection bit instead of
+  // preserving the old descriptor value for this memory type.
+  //
+  if ((CcaProtectionAttribute != 0) &&
+      ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_UC))
+  {
+    PageAttributes    |= CcaProtectionAttribute;
+    PageAttributeMask &= ~CcaProtectionAttribute;
+  }
 
   if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
     //
@@ -761,8 +774,9 @@ ArmSetMemoryAttributes (
   } else {
     //
     // Full memory type update, this means update the
-    // cacheability/shareability/permission bits from PageAttributes,
-    // but preserve the CCA protection bit from the old descriptor.
+    // cacheability/shareability/permission bits from PageAttributes.
+    // The CCA protection bit is preserved from the old descriptor, except for
+    // EFI_MEMORY_UC Realm mappings where it was forced above.
     //
     ASSERT (AttributeMask == 0);
     if (AttributeMask != 0) {
