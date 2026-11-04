@@ -1822,14 +1822,32 @@ class FdRegionReport(object):
                                 self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
                                 self.FvList.append(FvSection.FvName)
                                 self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
+                                self._AddPrebuiltFv(FvSection.FvName, getattr(FvSection, 'FvFileName', None), Wa)
                                 self._DiscoverNestedFvList(FvSection.FvName, Wa)
                         else:
                             self._GuidsDb[Ffs.NameGuid.upper()] = Section.FvFileName
                             self.FvList.append(Section.FvName)
                             self.FvInfo[Section.FvName] = ("Nested FV", 0, 0)
+                            self._AddPrebuiltFv(Section.FvName, Section.FvFileName, Wa)
                             self._DiscoverNestedFvList(Section.FvName, Wa)
                     except AttributeError:
                         pass
+
+    ##
+    # Record a prebuilt FV, i.e. one that is not defined in the FDF file.
+    #
+    # The FDF parser upper-cases FV names, so keep the original-case file
+    # name (when known) to locate the FV report file on case-sensitive
+    # file systems.
+    #
+    # @param self            The object pointer
+    # @param FvName          The FV name as listed in FvList
+    # @param FvFileName      The original-case FV file name, or None
+    # @param Wa              Workspace context information
+    #
+    def _AddPrebuiltFv(self, FvName, FvFileName, Wa):
+        if FvName.upper() not in Wa.FdfProfile.FvDict:
+            self._PrebuiltFvFiles[FvName] = FvFileName or FvName
 
     ##
     # Constructor function for class FdRegionReport
@@ -1850,6 +1868,7 @@ class FdRegionReport(object):
         self.FvList = []
         self.FvInfo = {}
         self._GuidsDb = {}
+        self._PrebuiltFvFiles = {}
         self._FvDir = Wa.FvDir
         self._WorkspaceDir = Wa.WorkspaceDir
 
@@ -1868,6 +1887,7 @@ class FdRegionReport(object):
                 continue
             self.FvList.append(FvName)
             self.FvInfo[FvName] = ("Fd Region", self.BaseAddress, self.Size)
+            self._AddPrebuiltFv(FvName, None, Wa)
             self._DiscoverNestedFvList(FvName, Wa)
 
         PlatformPcds = {}
@@ -1955,16 +1975,23 @@ class FdRegionReport(object):
             FvTotalSize = 0
             FvTakenSize = 0
             FvFreeSize  = 0
-            if FvName.upper().endswith('.FV'):
-                FileExt = FvName + ".txt"
+            FvReportName = self._PrebuiltFvFiles.get(FvName, FvName)
+            if FvReportName.upper().endswith('.FV'):
+                FileExt = FvReportName + ".txt"
             else:
-                FileExt = FvName + ".Fv.txt"
+                FileExt = FvReportName + ".Fv.txt"
 
             FvReportFileName = FileExt
             if not os.path.isfile(FvReportFileName):
                 FvReportFileName = mws.join(self._WorkspaceDir, FileExt)
                 if not os.path.isfile(FvReportFileName):
                     FvReportFileName = os.path.join(self._FvDir, FileExt)
+            if FvName in self._PrebuiltFvFiles and not os.path.isfile(FvReportFileName):
+                #
+                # A prebuilt FV may not come with a report file. Only list it.
+                #
+                FileWrite(File, gSubSectionEnd)
+                return
             try:
                 #
                 # Collect size info in the firmware volume.
