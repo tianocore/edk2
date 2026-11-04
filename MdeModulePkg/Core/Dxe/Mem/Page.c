@@ -12,6 +12,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Pi/PiDxeCis.h>
 
 //
+// Flags for ConvertPagesEx()
+//
+// Valid Options:
+//   CONVERT_PAGES_CHANGING_TYPE        - Indicates that the type of the pages is being changed
+//   CONVERT_PAGES_CHANGING_ATTRIBUTES  - Indicates that the attributes of the pages are being changed
+//
+#define CONVERT_PAGES_CHANGING_TYPE        0x1
+#define CONVERT_PAGES_CHANGING_ATTRIBUTES  0x2
+
+//
 // MemoryMap - The current memory map
 //
 UINTN  mMemoryMapKey = 0;
@@ -615,21 +625,22 @@ CoreAddMemoryDescriptor (
 
 /**
   Internal function.  Converts a memory range to the specified type or attributes.
-  The range must exist in the memory map.  Either ChangingType or
-  ChangingAttributes must be set, but not both.
+  The range must exist in the memory map.
 
   @param  Start                  The first address of the range Must be page
                                  aligned
   @param  NumberOfPages          The number of pages to convert
-  @param  ChangingType           Boolean indicating that type value should be changed
-  @param  NewType                The new type for the memory range
-  @param  ChangingAttributes     Boolean indicating that attributes value should be changed
-  @param  NewAttributes          The new attributes for the memory range
+  @param  Flags                  Flags indicating the operation to perform. Valid options are:
+                                 CONVERT_PAGES_CHANGING_TYPE, CONVERT_PAGES_CHANGING_ATTRIBUTES. Only one of CONVERT_PAGES_CHANGING_TYPE or
+                                 CONVERT_PAGES_CHANGING_ATTRIBUTES may be specified.
+  @param  NewType                The new type for the memory range if CONVERT_PAGES_CHANGING_TYPE is specified.
+  @param  NewAttributes          The new attributes for the memory range if CONVERT_PAGES_CHANGING_ATTRIBUTES is
+                                 specified.
 
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
-                                 range  or convertion not allowed.
-  @retval EFI_SUCCESS            Successfully converts the memory range to the
+                                 range or the conversion not allowed.
+  @retval EFI_SUCCESS            Successfully converted the memory range to the
                                  specified type.
 
 **/
@@ -637,9 +648,8 @@ EFI_STATUS
 CoreConvertPagesEx (
   IN UINT64           Start,
   IN UINT64           NumberOfPages,
-  IN BOOLEAN          ChangingType,
+  IN UINT32           Flags,
   IN EFI_MEMORY_TYPE  NewType,
-  IN BOOLEAN          ChangingAttributes,
   IN UINT64           NewAttributes
   )
 {
@@ -650,10 +660,14 @@ CoreConvertPagesEx (
   EFI_MEMORY_TYPE  MemType;
   LIST_ENTRY       *Link;
   MEMORY_MAP       *Entry;
+  BOOLEAN          ChangingType;
+  BOOLEAN          ChangingAttributes;
 
-  Entry         = NULL;
-  NumberOfBytes = LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT);
-  End           = Start + NumberOfBytes - 1;
+  Entry              = NULL;
+  NumberOfBytes      = LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT);
+  End                = Start + NumberOfBytes - 1;
+  ChangingType       = (Flags & CONVERT_PAGES_CHANGING_TYPE) != 0;
+  ChangingAttributes = (Flags & CONVERT_PAGES_CHANGING_ATTRIBUTES) != 0;
 
   ASSERT (NumberOfPages);
   ASSERT ((Start & EFI_PAGE_MASK) == 0);
@@ -661,7 +675,12 @@ CoreConvertPagesEx (
   ASSERT_LOCKED (&gMemoryLock);
   ASSERT ((ChangingType == FALSE) || (ChangingAttributes == FALSE));
 
-  if ((NumberOfPages == 0) || ((Start & EFI_PAGE_MASK) != 0) || (Start >= End)) {
+  if ((NumberOfPages == 0) ||
+      ((Start & EFI_PAGE_MASK) != 0) ||
+      (Start >= End) ||
+      (gMemoryLock.Lock != EfiLockAcquired) ||
+      (ChangingType && ChangingAttributes))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -865,8 +884,8 @@ CoreConvertPagesEx (
 
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
-                                 range  or convertion not allowed.
-  @retval EFI_SUCCESS            Successfully converts the memory range to the
+                                 range or the conversion not allowed.
+  @retval EFI_SUCCESS            Successfully converted the memory range to the
                                  specified type.
 
 **/
@@ -877,7 +896,7 @@ CoreConvertPages (
   IN EFI_MEMORY_TYPE  NewType
   )
 {
-  return CoreConvertPagesEx (Start, NumberOfPages, TRUE, NewType, FALSE, 0);
+  return CoreConvertPagesEx (Start, NumberOfPages, CONVERT_PAGES_CHANGING_TYPE, NewType, 0);
 }
 
 /**
@@ -901,7 +920,7 @@ CoreUpdateMemoryAttributes (
   //
   // Update the attributes to the new value
   //
-  CoreConvertPagesEx (Start, NumberOfPages, FALSE, (EFI_MEMORY_TYPE)0, TRUE, NewAttributes);
+  CoreConvertPagesEx (Start, NumberOfPages, CONVERT_PAGES_CHANGING_ATTRIBUTES, (EFI_MEMORY_TYPE)0, NewAttributes);
 
   CoreReleaseMemoryLock ();
 }
