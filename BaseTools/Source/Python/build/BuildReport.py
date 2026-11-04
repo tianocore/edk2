@@ -1960,7 +1960,8 @@ class FdRegionReport(object):
             else:
                 FileExt = FvName + ".Fv.txt"
 
-            if not os.path.isfile(FileExt):
+            FvReportFileName = FileExt
+            if not os.path.isfile(FvReportFileName):
                 FvReportFileName = mws.join(self._WorkspaceDir, FileExt)
                 if not os.path.isfile(FvReportFileName):
                     FvReportFileName = os.path.join(self._FvDir, FileExt)
