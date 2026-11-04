@@ -230,7 +230,29 @@ edk2-platforms repository.
 
 ### edk2-stable202611: Behavioral Breaking Changes
 
-None
+##### Breaking Change: IntelTdxX64 enables Secure Boot and omits the UEFI Shell by default
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13218](https://github.com/tianocore/edk2/issues/13218)
+- **Type**: Behavioral (Non-removal) - Changed default behavior, security hardening, and error handling
+
+**What changed**: IntelTdxX64 now defaults to `SECURE_BOOT_ENABLE=TRUE` and `BUILD_SHELL=FALSE`. When Secure Boot is
+supported, the PEI-less startup also stops on an emulated variable-store initialization failure instead of proceeding
+with an invalid store.
+
+**Why it changed**: Booting without Secure Boot verification or with a failed authenticated-variable store can leave
+images unverified. Including the UEFI Shell by default exposes an unauthenticated command environment.
+
+**What replaces it**: Secure Boot support is built in and the shell is omitted by default. Both build flags remain
+overridable; no API or build option is removed.
+
+**How to migrate**: Sign boot images and provision the Secure Boot keys required by the platform. For development
+builds that need the previous defaults, pass `-D SECURE_BOOT_ENABLE=FALSE -D BUILD_SHELL=TRUE`. Fix any invalid
+variable-store template rather than relying on startup to continue after initialization fails.
+
+**Breaking conditions**: Affects default IntelTdxX64 builds that rely on the built-in shell or on unsigned boot
+images when Secure Boot enforcement is active. An invalid emulated variable-store template now prevents boot when
+Secure Boot is supported.
 
 ### edk2-stable202611: Build-System Breaking Changes
 

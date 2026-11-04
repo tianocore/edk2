@@ -42,6 +42,7 @@
   gEfiHobMemoryAllocModuleGuid
   gEfiHobMemoryAllocStackGuid
   gEfiMemoryTypeInformationGuid
+  gZeroGuid
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory

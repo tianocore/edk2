@@ -2,6 +2,7 @@
   The implementation of the ARP protocol.
 
 Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1097,6 +1098,7 @@ ArpSendFrame (
   if (Packet == NULL) {
     DEBUG ((DEBUG_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
     ASSERT (Packet != NULL);
+    goto CLEAN_EXIT;
   }
 
   TmpPtr = Packet;
@@ -1462,7 +1464,7 @@ ArpFindCacheEntry (
   LIST_ENTRY         *StartEntry;
   ARP_CACHE_ENTRY    *CacheEntry;
   NET_MAP            FoundEntries;
-  UINT32             FoundCount;
+  UINTN              FoundCount;
   EFI_ARP_FIND_DATA  *FindData;
   LIST_ENTRY         *CacheTable;
   UINT32             FoundEntryLength;
@@ -1576,9 +1578,18 @@ ArpFindCacheEntry (
 
   Status = EFI_SUCCESS;
 
-  FoundCount = (UINT32)NetMapGetCount (&FoundEntries);
+  FoundCount = NetMapGetCount (&FoundEntries);
   if (FoundCount == 0) {
     Status = EFI_NOT_FOUND;
+    goto CLEAN_EXIT;
+  }
+
+  //
+  // EntryCount is a UINT32, make sure the found count can be returned without truncation.
+  //
+  if (FoundCount > MAX_UINT32) {
+    DEBUG ((DEBUG_ERROR, "ArpFindCacheEntry: Found entry count exceeds MAX_UINT32.\n"));
+    Status = EFI_OUT_OF_RESOURCES;
     goto CLEAN_EXIT;
   }
 
@@ -1596,7 +1607,7 @@ ArpFindCacheEntry (
     //
     // Return the found entry count.
     //
-    *EntryCount = FoundCount;
+    *EntryCount = (UINT32)FoundCount;
   }
 
   if (Entries == NULL) {

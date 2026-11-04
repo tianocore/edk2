@@ -54,40 +54,6 @@ CHAR8  *mResource_Type_List[] = {
 };
 
 /**
-  Print the Hex value of a given range.
-
-  @param[in]  ErrorLevel     Error Level to print the Hex value.
-  @param[in]  DataStart      A pointer to the start of data to be printed.
-  @param[in]  DataSize       The length of the data to be printed.
-
-  @retval EFI_SUCCESS        If it completed successfully.
-**/
-EFI_STATUS
-PrintHex (
-  IN  UINT32  ErrorLevel,
-  IN  UINT8   *DataStart,
-  IN  UINT16  DataSize
-  )
-{
-  UINTN  Index1;
-  UINTN  Index2;
-  UINT8  *StartAddr;
-
-  StartAddr = DataStart;
-  for (Index1 = 0; Index1 * ROW_LIMITER < DataSize; Index1++) {
-    DEBUG ((ErrorLevel, "   0x%04p:", (DataStart - StartAddr)));
-    for (Index2 = 0; (Index2 < ROW_LIMITER) && (Index1 * ROW_LIMITER + Index2 < DataSize); Index2++) {
-      DEBUG ((ErrorLevel, " %02x", *DataStart));
-      DataStart++;
-    }
-
-    DEBUG ((ErrorLevel, "\n"));
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Print the Hex value of the Invalid HOB.
 
   @param[in]  HobStart       A pointer to the Invalid HOB.
@@ -102,7 +68,7 @@ PrintInvalidHob (
   )
 {
   DEBUG ((DEBUG_ERROR, "   Invalid HOB. Full hex dump in below:\n"));
-  PrintHex (DEBUG_ERROR, HobStart, HobLength);
+  DUMP_HEX (DEBUG_ERROR, 0, HobStart, HobLength, "");
   return RETURN_INVALID_PARAMETER;
 }
 
@@ -187,13 +153,13 @@ PrintMemoryAllocationHob (
 }
 
 /**
-  Print the information in Resource Discriptor Hob.
+  Print the information in Resource Descriptor Hob.
   @param[in]  HobStart       A pointer to HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR.
   @param[in]  HobLength      The Length in bytes of HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR.
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
-PrintResourceDiscriptorHob (
+PrintResourceDescriptorHob (
   IN  VOID    *HobStart,
   IN  UINT16  HobLength
   )
@@ -211,6 +177,34 @@ PrintResourceDiscriptorHob (
   DEBUG ((DEBUG_INFO, "   ResourceAttribute = 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
   DEBUG ((DEBUG_INFO, "   PhysicalStart     = 0x%lx\n", Hob.ResourceDescriptor->PhysicalStart));
   DEBUG ((DEBUG_INFO, "   ResourceLength    = 0x%lx\n", Hob.ResourceDescriptor->ResourceLength));
+  return EFI_SUCCESS;
+}
+
+/**
+  Print the information in Resource Descriptor2 Hob.
+  @param[in]  HobStart       A pointer to HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2.
+  @param[in]  HobLength      The Length in bytes of HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2.
+  @retval EFI_SUCCESS        If it completed successfully.
+**/
+EFI_STATUS
+PrintResourceDescriptor2Hob (
+  IN  VOID    *HobStart,
+  IN  UINT16  HobLength
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Hob.Raw = (UINT8 *)HobStart;
+  if (HobLength < sizeof (*Hob.ResourceDescriptor2)) {
+    return PrintInvalidHob (HobStart, HobLength);
+  }
+
+  DEBUG ((DEBUG_INFO, "   ResourceType             = %a\n", mResource_Type_List[Hob.ResourceDescriptor2->ResourceType]));
+  DEBUG ((DEBUG_INFO, "   Owner                    = %g\n", &Hob.ResourceDescriptor2->Owner));
+  DEBUG ((DEBUG_INFO, "   ResourceCapabilities     = 0x%x\n", Hob.ResourceDescriptor2->ResourceCapabilities));
+  DEBUG ((DEBUG_INFO, "   PhysicalStart            = 0x%lx\n", Hob.ResourceDescriptor2->PhysicalStart));
+  DEBUG ((DEBUG_INFO, "   ResourceLength           = 0x%lx\n", Hob.ResourceDescriptor2->ResourceLength));
+  DEBUG ((DEBUG_INFO, "   ResourceMemoryAttributes = 0x%lx\n", Hob.ResourceDescriptor2->ResourceMemoryAttributes));
   return EFI_SUCCESS;
 }
 
@@ -236,7 +230,7 @@ PrintGuidHob (
 
   DEBUG ((DEBUG_INFO, "   Name       = %g\n", &Hob.Guid->Name));
   DEBUG ((DEBUG_INFO, "   DataLength = 0x%x\n", DataLength));
-  PrintHex (DEBUG_VERBOSE, GET_GUID_HOB_DATA (Hob.Raw), DataLength);
+  DUMP_HEX (DEBUG_VERBOSE, 0, GET_GUID_HOB_DATA (Hob.Raw), DataLength, "");
   return EFI_SUCCESS;
 }
 
@@ -305,7 +299,7 @@ PrintMemoryPoolHob (
   AllocationSize = HobLength - sizeof (EFI_HOB_GENERIC_HEADER);
   DEBUG ((DEBUG_INFO, "   AllocationSize    = 0x%lx\n", AllocationSize));
 
-  PrintHex (DEBUG_VERBOSE, Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER), AllocationSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER), AllocationSize, "");
 
   return EFI_SUCCESS;
 }
@@ -386,17 +380,18 @@ PrintFv3Hob (
 // Mapping table from Hob type to Hob print function.
 //
 HOB_PRINT_HANDLER_TABLE  mHobHandles[] = {
-  { EFI_HOB_TYPE_HANDOFF,             "EFI_HOB_TYPE_HANDOFF",             PrintHandOffHob            },
-  { EFI_HOB_TYPE_MEMORY_ALLOCATION,   "EFI_HOB_TYPE_MEMORY_ALLOCATION",   PrintMemoryAllocationHob   },
-  { EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, "EFI_HOB_TYPE_RESOURCE_DESCRIPTOR", PrintResourceDiscriptorHob },
-  { EFI_HOB_TYPE_GUID_EXTENSION,      "EFI_HOB_TYPE_GUID_EXTENSION",      PrintGuidHob               },
-  { EFI_HOB_TYPE_FV,                  "EFI_HOB_TYPE_FV",                  PrintFvHob                 },
-  { EFI_HOB_TYPE_CPU,                 "EFI_HOB_TYPE_CPU",                 PrintCpuHob                },
-  { EFI_HOB_TYPE_MEMORY_POOL,         "EFI_HOB_TYPE_MEMORY_POOL",         PrintMemoryPoolHob         },
-  { EFI_HOB_TYPE_FV2,                 "EFI_HOB_TYPE_FV2",                 PrintFv2Hob                },
-  { EFI_HOB_TYPE_UEFI_CAPSULE,        "EFI_HOB_TYPE_UEFI_CAPSULE",        PrintCapsuleHob            },
-  { EFI_HOB_TYPE_FV3,                 "EFI_HOB_TYPE_FV3",                 PrintFv3Hob                },
-  { EFI_HOB_TYPE_UNUSED,              "EFI_HOB_TYPE_UNUSED",              NULL                       }
+  { EFI_HOB_TYPE_HANDOFF,              "EFI_HOB_TYPE_HANDOFF",              PrintHandOffHob             },
+  { EFI_HOB_TYPE_MEMORY_ALLOCATION,    "EFI_HOB_TYPE_MEMORY_ALLOCATION",    PrintMemoryAllocationHob    },
+  { EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,  "EFI_HOB_TYPE_RESOURCE_DESCRIPTOR",  PrintResourceDescriptorHob  },
+  { EFI_HOB_TYPE_GUID_EXTENSION,       "EFI_HOB_TYPE_GUID_EXTENSION",       PrintGuidHob                },
+  { EFI_HOB_TYPE_FV,                   "EFI_HOB_TYPE_FV",                   PrintFvHob                  },
+  { EFI_HOB_TYPE_CPU,                  "EFI_HOB_TYPE_CPU",                  PrintCpuHob                 },
+  { EFI_HOB_TYPE_MEMORY_POOL,          "EFI_HOB_TYPE_MEMORY_POOL",          PrintMemoryPoolHob          },
+  { EFI_HOB_TYPE_FV2,                  "EFI_HOB_TYPE_FV2",                  PrintFv2Hob                 },
+  { EFI_HOB_TYPE_UEFI_CAPSULE,         "EFI_HOB_TYPE_UEFI_CAPSULE",         PrintCapsuleHob             },
+  { EFI_HOB_TYPE_FV3,                  "EFI_HOB_TYPE_FV3",                  PrintFv3Hob                 },
+  { EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2, "EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2", PrintResourceDescriptor2Hob },
+  { EFI_HOB_TYPE_UNUSED,               "EFI_HOB_TYPE_UNUSED",               NULL                        }
 };
 
 /**
@@ -460,7 +455,7 @@ PrintHobList (
         }
       } else {
         DEBUG ((DEBUG_INFO, "   Unknown Hob type, full hex dump in below:\n"));
-        PrintHex (DEBUG_INFO, Hob.Raw, Hob.Header->HobLength);
+        DUMP_HEX (DEBUG_INFO, 0, Hob.Raw, Hob.Header->HobLength, "");
       }
     }
 

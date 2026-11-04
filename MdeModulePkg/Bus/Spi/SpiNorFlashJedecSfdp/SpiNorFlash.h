@@ -28,7 +28,7 @@
   @param[in]    WriteBytes             Number of bytes to write to SPI device
   @param[in]    WriteBuffer            Buffer containing bytes to write to SPI device
 
-  @retval       Size of Data in Buffer
+  @return       Size of data in buffer, or zero if buffer construction fails.
 **/
 UINT32
 FillWriteBuffer (

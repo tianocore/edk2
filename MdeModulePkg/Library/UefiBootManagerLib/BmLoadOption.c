@@ -3,6 +3,7 @@
 
 Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1163,7 +1164,6 @@ EfiBootManagerGetLoadOptions (
       Options = ReallocatePool (*OptionCount * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION), OptionIndex * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION), Options);
       if (Options == NULL) {
         ASSERT (Options != NULL);
-        FreePool (OptionOrder);
         return NULL;
       }
 
