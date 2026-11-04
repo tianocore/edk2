@@ -91,6 +91,11 @@
       GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
   }
 
+  MdeModulePkg/Library/ArmFfaLib/GoogleTest/ArmFfaLibGoogleTest.inf {
+    <LibraryClasses>
+      HobLib|MdePkg/Test/Mock/Library/Stub/StubHobLib/StubHobLib.inf
+  }
+
   #
   # Build HOST_APPLICATION Libraries
   #
