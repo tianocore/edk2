@@ -221,6 +221,7 @@ typedef struct {
   // Data fields for Hii functionlity
   //
   BOOLEAN                                    OneTimeScanRequest;
+  BOOLEAN                                    NetworkListFormOpen;
   BOOLEAN                                    OneTimeConnectRequest;
   BOOLEAN                                    OneTimeDisconnectRequest;
   WIFI_MGR_SCAN_STATE                        ScanState;
