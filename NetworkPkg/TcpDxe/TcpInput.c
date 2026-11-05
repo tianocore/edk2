@@ -1625,7 +1625,7 @@ TcpIcmpInput (
                     &IcmpErrNotify
                     );
 
-  if (IcmpErrNotify) {
+  if (EFI_ERROR (IcmpErrStatus) && IcmpErrNotify) {
     SOCK_ERROR (Tcb->Sk, IcmpErrStatus);
   }
 
