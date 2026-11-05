@@ -13,4 +13,9 @@
 typedef struct {
   INT32       Nid;
   EVP_PKEY    *EvpPkey;
+  EVP_PKEY    *EvpParam;
 } KEY_CONTEXT;
+
+/** Define an EC Key context.
+*/
+typedef KEY_CONTEXT EC_CONTEXT;

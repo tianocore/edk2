@@ -146,6 +146,12 @@
 #define LOONGARCH_CSR_TINTCLR        0x44    // Timer interrupt clear
 
 //
+// Implementation control registers
+//
+#define LOONGARCH_CSR_IMPCTL1  0x80
+#define LOONGARCH_CSR_IMPCTL2  0x81
+
+//
 // TLB refill exception base address
 //
 #define LOONGARCH_CSR_TLBREBASE  0x88    // TLB refill exception entry
@@ -155,6 +161,7 @@
 #define LOONGARCH_CSR_TLBRELO0   0x8c    // TLB refill entrylo0
 #define LOONGARCH_CSR_TLBRELO1   0x8d    // TLB refill entrylo1
 #define LOONGARCH_CSR_TLBREHI    0x8e    // TLB refill entryhi
+#define LOONGARCH_CSR_TLBRPRMD   0x8F    // TLB refill pre-exception mode
 
 //
 // Direct map windows registers

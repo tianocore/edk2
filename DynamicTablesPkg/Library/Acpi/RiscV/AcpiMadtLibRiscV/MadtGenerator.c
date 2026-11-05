@@ -245,7 +245,9 @@ AddIMSIC (
   Imsic->NumIds = ImsicInfo->NumIds;
 
   // UINT16 NumGuestIds
+  // ACPI 6.6, Table 5.57: zero denotes no implemented guest interrupt files.
   ASSERT (
+    (ImsicInfo->NumGuestIds == 0) ||
     ((ImsicInfo->NumGuestIds >= IMSIC_MIN_NUM_GUEST_IDS) &&
      (ImsicInfo->NumGuestIds <= IMSIC_MAX_NUM_GUEST_IDS) &&
      ((ImsicInfo->NumGuestIds + 1) % 64 == 0))

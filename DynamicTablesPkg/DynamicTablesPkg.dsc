@@ -15,7 +15,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001a
   OUTPUT_DIRECTORY               = Build/DynamicTables
-  SUPPORTED_ARCHITECTURES        = AARCH64|X64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64|X64|LOONGARCH64|RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -61,6 +61,9 @@
 
 [Components.AARCH64]
   DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
+
+[Components.RISCV64]
+  DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

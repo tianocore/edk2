@@ -1,0 +1,33 @@
+## @file
+# SSDT SCMI Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtScmiLibArm
+  FILE_GUID      = 0ab760c1-5f62-4d91-bbb4-3362fee7cadc
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtScmiConstructor
+  DESTRUCTOR     = AcpiSsdtScmiDestructor
+
+[Sources]
+  SsdtScmiGenerator.c
+  SsdtScmiGenerator.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
+  DebugLib
+  MemoryAllocationLib

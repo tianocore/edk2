@@ -176,6 +176,10 @@
   #  Include/Guid/MeasuredFvHob.h
   gMeasuredFvHobGuid                 = { 0xb2360b42, 0x7173, 0x420a, { 0x86, 0x96, 0x46, 0xca, 0x6b, 0xab, 0x10, 0x60 }}
 
+  ## HOB GUID used to pass all Excluded FVs to Dxe phase.
+  #  Include/Guid/FirmwareVolumeMeasurementExcludedHob.h
+  gEdkiiFirmwareVolumeMeasurementExcludedHobGuid = { 0xdd55d497, 0x5ed5, 0x403c, { 0x92, 0xb5, 0x70, 0x3a, 0x72, 0x59, 0xae, 0x2a }}
+
   ## GUID used to "PhysicalPresence" variable and "PhysicalPresenceFlags" variable for TPM request and response.
   #  Include/Guid/PhysicalPresenceData.h
   gEfiPhysicalPresenceGuid           = { 0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }}

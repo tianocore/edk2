@@ -48,6 +48,41 @@ GetPlatformPpi (
 }
 
 /**
+  Decompress firmware volumes only until the DXE Core is found.
+
+**/
+STATIC
+VOID
+DecompressFvsUntilDxeCoreFound (
+  VOID
+  )
+{
+  UINTN                Instance;
+  EFI_PEI_FV_HANDLE    VolumeHandle;
+  EFI_PEI_FILE_HANDLE  FileHandle;
+  EFI_PEI_FV_HANDLE    DxeVolumeHandle;
+  EFI_PEI_FILE_HANDLE  DxeFileHandle;
+
+  if (!EFI_ERROR (FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_DXE_CORE, &DxeVolumeHandle, &DxeFileHandle))) {
+    DEBUG ((DEBUG_INFO, "DXE Core already found, skipping FV decompression.\n\r"));
+    return;
+  }
+
+  for (Instance = 0; !EFI_ERROR (FfsFindNextVolume (Instance, &VolumeHandle)); Instance++) {
+    FileHandle = NULL;
+    DEBUG ((DEBUG_INFO, "Processing next firmware volume instance %u.\n\r", Instance));
+    while (!EFI_ERROR (FfsFindNextFile (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, VolumeHandle, &FileHandle))) {
+      FfsProcessFvFile (FileHandle, VolumeHandle);
+      DEBUG ((DEBUG_INFO, "Processed firmware volume image file.\n\r"));
+      if (!EFI_ERROR (FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_DXE_CORE, &DxeVolumeHandle, &DxeFileHandle))) {
+        DEBUG ((DEBUG_INFO, "DXE Core found, stopping FV decompression.\n\r"));
+        return;
+      }
+    }
+  }
+}
+
+/**
   SEC main routine.
 
   @param[in]  UefiMemoryBase  Start of the PI/UEFI memory region
@@ -176,15 +211,15 @@ SecMain (
   // SEC phase needs to run library constructors by hand.
   ProcessLibraryConstructorList ();
 
-  // Assume the FV that contains the SEC (our code) also contains a compressed FV.
-  Status = DecompressFirstFv ();
-  ASSERT_EFI_ERROR (Status);
+  // Decompress firmware volumes and load the DXE Core
+  DecompressFvsUntilDxeCoreFound ();
 
   Status = MeasurePeilessSec ();
   ASSERT_EFI_ERROR (Status);
 
   // Load the DXE Core and transfer control to it
   Status = LoadDxeCoreFromFv (NULL, 0);
+  DEBUG ((DEBUG_ERROR, "Failed to load DXE Core from any FV\n"));
   ASSERT_EFI_ERROR (Status);
 }
 

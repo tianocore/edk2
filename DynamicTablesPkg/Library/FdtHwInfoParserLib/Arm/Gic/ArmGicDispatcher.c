@@ -155,6 +155,13 @@ ArmGicDispatcher (
     return Status;
   }
 
+  // PPI partitions are not supported.
+  if (FdtSubnodeOffset (Fdt, IntcNode, "ppi-partitions") >= 0) {
+    DEBUG ((DEBUG_ERROR, "%a: PPI partitions are not supported\n", __func__));
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
+  }
+
   // Parse the GicC information.
   Status = ArmGicCInfoParser (FdtParserHandle, CpusNode);
   if (EFI_ERROR (Status)) {

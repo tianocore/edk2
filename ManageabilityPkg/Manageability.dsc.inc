@@ -3,6 +3,7 @@
 #
 # Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -35,6 +36,10 @@
 !if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiEnable == TRUE
   ManageabilityPkg/Universal/IpmiProtocol/Dxe/IpmiProtocolDxe.inf
   ManageabilityPkg/Universal/IpmiBlobTransferDxe/IpmiBlobTransferDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityStandaloneMmIpmiEnable == TRUE
+  ManageabilityPkg/Universal/IpmiProtocol/Smm/IpmiProtocolStandaloneMm.inf
 !endif
 
 !if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiSmbiosTransferEnable == TRUE

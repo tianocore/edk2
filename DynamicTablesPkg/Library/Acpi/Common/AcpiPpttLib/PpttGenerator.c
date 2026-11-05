@@ -1240,8 +1240,8 @@ BuildPpttTable (
   }
 
   // Include the size of Cache Type Structures and index them
+  CacheStructOffset = TableSize;
   if (Generator->CacheStructCount != 0) {
-    CacheStructOffset                 = TableSize;
     Generator->CacheStructIndexedList = NodeIndexer;
     TableSize                        += GetSizeofCacheTypeStructs (
                                           CacheStructOffset,

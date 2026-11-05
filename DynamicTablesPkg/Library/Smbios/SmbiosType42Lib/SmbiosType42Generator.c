@@ -809,6 +809,8 @@ GetMchiNetworkUsbDeviceDescCmObj (
   ASSERT (CmObject != NULL);
   ASSERT (Count != NULL);
 
+  UsbInfo = NULL;
+
   Status = GetEArchCommonObjMchiNetworkDeviceDescUsbInfo (
              CfgMgrProtocol,
              Token,
@@ -861,6 +863,8 @@ GetMchiNetworkPciDeviceDescCmObj (
   ASSERT (Token != CM_NULL_TOKEN);
   ASSERT (CmObject != NULL);
   ASSERT (Count != NULL);
+
+  PciInfo = NULL;
 
   Status = GetEArchCommonObjMchiNetworkDeviceDescPciInfo (
              CfgMgrProtocol,
@@ -1361,6 +1365,8 @@ GetMchiMctpDataCmObj (
 
   ASSERT (Token != CM_NULL_TOKEN);
 
+  DataInfo = NULL;
+
   Status = GetEArchCommonObjMchiMctpDataInfo (
              CfgMgrProtocol,
              Token,
@@ -1413,6 +1419,8 @@ GetMchiNetworkDataCmObj (
   ASSERT (Token != CM_NULL_TOKEN);
   ASSERT (CmObject != NULL);
   ASSERT (Count != NULL);
+
+  DataInfo = NULL;
 
   Status = GetEArchCommonObjMchiNetworkDataInfo (
              CfgMgrProtocol,

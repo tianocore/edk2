@@ -10,6 +10,7 @@
   SmmPerformanceHandlerEx(), SmmPerformanceHandler() will receive untrusted input and do basic validation.
 
   Copyright (c) Microsoft Corporation.
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -98,6 +99,7 @@ GetLoadedImageProtocol (
 /**
   Get the module name from the user interface section.
 
+  @param[in]  FvHandle      The firmware volume device handle of the target image.
   @param[in]  ModuleGuid    The GUID of the module.
   @param[out] NameString    The buffer to store the name string.
   @param[in]  BufferSize    The size of the buffer in bytes.
@@ -108,9 +110,10 @@ GetLoadedImageProtocol (
 **/
 EFI_STATUS
 GetNameFromUiSection (
-  IN EFI_GUID  *ModuleGuid,
-  OUT CHAR8    *NameString,
-  IN UINTN     BufferSize
+  IN EFI_HANDLE  FvHandle,
+  IN EFI_GUID    *ModuleGuid,
+  OUT CHAR8      *NameString,
+  IN UINTN       BufferSize
   )
 {
   return EFI_NOT_FOUND;

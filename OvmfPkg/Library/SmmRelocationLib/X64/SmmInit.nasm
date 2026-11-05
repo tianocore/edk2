@@ -84,10 +84,6 @@ CodeSeg64:
             DB      0                   ; BaseHigh
 GDT_SIZE equ $ -   NullSeg
 
-ASM_PFX(gcSmmInitGdtr):
-    DW      GDT_SIZE - 1
-    DQ      NullSeg
-
 
     DEFAULT REL
     SECTION .text
@@ -95,6 +91,11 @@ ASM_PFX(gcSmmInitGdtr):
 global ASM_PFX(SmmStartup)
 
 BITS 16
+;
+; Run the entire 16-bit transition at SMBASE + 0x8000. Jumping to the
+; image with a high EIP in 16-bit mode is unsafe across QEMU page boundaries.
+;
+ASM_PFX(gcSmmInitTemplate):
 ASM_PFX(SmmStartup):
     mov     eax, 0x80000001             ; read capability
     cpuid
@@ -102,7 +103,7 @@ ASM_PFX(SmmStartup):
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
-o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
+o32 lgdt    [cs:ASM_PFX(gcSmmInitGdtr) - ASM_PFX(gcSmmInitTemplate) + 0x8000]
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitCr4):
     or      ah,  2                      ; enable XMM registers access
@@ -120,6 +121,12 @@ ASM_PFX(gPatchSmmInitCr0):
     mov     cr0, eax                    ; enable protected mode & paging
     jmp     LONG_MODE_CS : dword 0      ; offset will be patched to @LongMode
 @PatchLongModeOffset:
+
+ASM_PFX(gcSmmInitGdtr):
+    DW      GDT_SIZE - 1
+    DQ      NullSeg                     ; GDT base relocated with the image before copying
+
+ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
 
 BITS 64
 @LongMode:                              ; long-mode starts here
@@ -155,16 +162,6 @@ ASM_PFX(gPatchSmmInitStack):
     StuffRsb64
     rsm
 
-BITS 16
-ASM_PFX(gcSmmInitTemplate):
-    mov ebp, [cs:@L1 - ASM_PFX(gcSmmInitTemplate) + 0x8000]
-    sub ebp, 0x30000
-    jmp ebp
-@L1:
-    DQ     0; ASM_PFX(SmmStartup)
-
-ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
-
 BITS 64
 global ASM_PFX(SmmRelocationSemaphoreComplete)
 ASM_PFX(SmmRelocationSemaphoreComplete):
@@ -195,7 +192,4 @@ ASM_PFX(SmmInitFixupAddress):
     lea    rcx, [@PatchLongModeOffset - 6]
     mov    dword [rcx], eax
 
-    lea    rax, [ASM_PFX(SmmStartup)]
-    lea    rcx, [@L1]
-    mov    qword [rcx], rax
     ret

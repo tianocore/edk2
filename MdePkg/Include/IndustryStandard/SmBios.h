@@ -1579,10 +1579,12 @@ typedef enum {
 /// System Slots - Slot Length.
 ///
 typedef enum {
-  SlotLengthOther   = 0x01,
-  SlotLengthUnknown = 0x02,
-  SlotLengthShort   = 0x03,
-  SlotLengthLong    = 0x04
+  SlotLengthOther                  = 0x01,
+  SlotLengthUnknown                = 0x02,
+  SlotLengthShort                  = 0x03,
+  SlotLengthLong                   = 0x04,
+  SlotLength2_5InchDriveFormFactor = 0x05,
+  SlotLength3_5InchDriveFormFactor = 0x06
 } MISC_SLOT_LENGTH;
 
 ///

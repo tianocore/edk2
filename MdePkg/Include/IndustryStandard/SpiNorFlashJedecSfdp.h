@@ -145,14 +145,18 @@ typedef struct _SFDP_BASIC_FLASH_PARAMETER {
   // DWORD 15
   UINT32    Unused15;
   // DWORD 16
-  UINT32    Unused16;
+  UINT32    StatusRegister1WriteEnable : 7;  // Bits 6:0   - Volatile/non-volatile Status Register 1 write enable method.
+  UINT32    Unused16Dw16               : 1;  // Bit  7     - Reserved.
+  UINT32    SoftResetRescueSequence    : 6;  // Bits 13:8  - Soft Reset and Rescue Sequence support.
+  UINT32    Exit4ByteAddressing        : 10; // Bits 23:14 - Exit 4-Byte Addressing method(s).
+  UINT32    Enter4ByteAddressing       : 8;  // Bits 31:24 - Enter 4-Byte Addressing method(s).
   // DWORD 17
-  UINT32    FastRead188Dummy   : 5;
-  UINT32    FastRead188ModeClk : 3;
-  UINT32    FastRead188Instr   : 8;
-  UINT32    FastRead118Dummy   : 5;
-  UINT32    FastRead118ModeClk : 3;
-  UINT32    FastRead118Instr   : 8;
+  UINT32    FastRead188Dummy           : 5;
+  UINT32    FastRead188ModeClk         : 3;
+  UINT32    FastRead188Instr           : 8;
+  UINT32    FastRead118Dummy           : 5;
+  UINT32    FastRead118ModeClk         : 3;
+  UINT32    FastRead118Instr           : 8;
   //
   // Don't care about remaining DWORDs
   // DWORD 18 to DWORD 23
@@ -175,6 +179,24 @@ typedef struct _SFDP_BASIC_FLASH_PARAMETER {
 #define SPI_ADDR_3BYTE_ONLY  0x00
 #define SPI_ADDR_3OR4BYTE    0x01
 #define SPI_ADDR_4BYTE_ONLY  0x02
+
+///
+/// DWORD 16, bits 31:24 - Enter 4-Byte Addressing methods.
+///
+#define SFDP_ENTER_4BYTE_B7H_NO_WREN  BIT0 // Issue B7h; preceding write enable not required.
+#define SFDP_ENTER_4BYTE_WREN_B7H     BIT1 // Issue write enable (06h), then B7h.
+
+///
+/// DWORD 16, bits 23:14 - Exit 4-Byte Addressing methods.
+///
+#define SFDP_EXIT_4BYTE_E9H_NO_WREN  BIT0 // Issue E9h; write enable not required.
+#define SFDP_EXIT_4BYTE_WREN_E9H     BIT1 // Issue write enable (06h), then E9h.
+
+///
+/// EN4B/EX4B opcodes.
+///
+#define SPI_FLASH_EN4B  0xB7
+#define SPI_FLASH_EX4B  0xE9
 
 #define SFDP_ERASE_TYPES_NUMBER  4
 #define SFDP_ERASE_TYPE_1        0x0001

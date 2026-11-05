@@ -1,11 +1,12 @@
 /** @file
   Root Complex parser.
 
-  Copyright (c) 2025, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2025 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
   - linux/Documentation/devicetree/bindings/pci/host-generic-pci.yaml
+  - linux/Documentation/devicetree/bindings/virtio/pci-iommu.yaml
 **/
 
 #include <Library/BaseLib.h>
@@ -187,6 +188,7 @@ RootComplexNodeParser (
   INT32              DataSize;
   CM_ARM_ID_MAPPING  *IdMappings;
   INT32              MapIndex;
+  UINT32             NumIds;
 
   if ((Fdt == NULL) || (RootComplexInfo == NULL)) {
     ASSERT ((Fdt != NULL) && (RootComplexInfo != NULL));
@@ -260,8 +262,15 @@ RootComplexNodeParser (
     }
 
     for (MapIndex = 0; MapIndex < DataSize; MapIndex++) {
+      NumIds = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 3]);
+      if (NumIds == 0) {
+        ASSERT (FALSE);
+        FreePool (IdMappings);
+        return EFI_ABORTED;
+      }
+
       IdMappings[MapIndex].InputBase            = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT]);
-      IdMappings[MapIndex].NumIds               = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 3]);
+      IdMappings[MapIndex].NumIds               = NumIds - 1;
       IdMappings[MapIndex].OutputBase           = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 2]);
       IdMappings[MapIndex].OutputReferenceToken = CM_ABSTRACT_TOKEN_MAKE (
                                                     ETokenNameSpaceFdtHwInfo,

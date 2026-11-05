@@ -1166,8 +1166,10 @@ AmlCodeGenRdIo (
 
   @param[in]  TableSignature       4-character ACPI signature.
                                    Must be 'DSDT' or 'SSDT'.
-  @param[in]  OemId                6-character string OEM identifier.
-  @param[in]  OemTableId           8-character string OEM table identifier.
+  @param[in]  OemId                OEM identifier, up to 6 characters.
+                                   Shorter values are padded with spaces.
+  @param[in]  OemTableId           OEM table identifier, up to 8 characters.
+                                   Shorter values are padded with spaces.
   @param[in]  OemRevision          OEM revision number.
   @param[out] DefinitionBlockTerm  The ASL Term handle representing a
                                    Definition Block.
@@ -1184,6 +1186,130 @@ AmlCodeGenDefinitionBlock (
   IN  CONST CHAR8                 *OemTableId,
   IN        UINT32                OemRevision,
   OUT       AML_ROOT_NODE_HANDLE  *NewRootNode
+  );
+
+/** Create an SCMI PCC transport property.
+
+  The property contains the revision, transport count, and an initially empty
+  list of transport descriptors.
+
+  It generates the following ASL package:
+    Package () {
+      "arm-arml0001-transport-pcc",
+      Package () {
+        Revision,
+        TransportCount
+      }
+    }
+
+  @ingroup CodeGenApis
+
+  @param [in]  Revision           SCMI Device Properties revision.
+  @param [in]  TransportCount     Number of PCC transport descriptors.
+  @param [in]  PropertiesNode     SCMI Device Properties Package.
+  @param [out] TransportListNode  Package receiving transport descriptors.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenScmiPccTransportProperty (
+  IN  UINT64                  Revision,
+  IN  UINT64                  TransportCount,
+  IN  AML_OBJECT_NODE_HANDLE  PropertiesNode,
+  OUT AML_OBJECT_NODE_HANDLE  *TransportListNode
+  );
+
+/** Add a PCC transport descriptor to an SCMI transport property.
+
+  It appends the following ASL package to the transport list:
+    Package () {
+      PccSubspaceId,
+      TransportUid,
+      Flags
+    }
+
+  @ingroup CodeGenApis
+
+  @param [in] PccSubspaceId     PCCT subspace identifier.
+  @param [in] TransportUid      SCMI transport UID.
+  @param [in] Flags             SCMI PCC transport flags.
+  @param [in] TransportListNode Package receiving the descriptor.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddScmiPccTransportDescriptor (
+  IN UINT64                  PccSubspaceId,
+  IN UINT64                  TransportUid,
+  IN UINT64                  Flags,
+  IN AML_OBJECT_NODE_HANDLE  TransportListNode
+  );
+
+/** Create an SCMI protocol property.
+
+  The property contains the revision, an initially empty exclusive transport
+  package, and the empty revision 1 protocol association package.
+
+  It generates the following ASL package:
+    Package () {
+      PropertyName,
+      Package () {
+        Revision,
+        Package () {},
+        Package () {}
+      }
+    }
+
+  @ingroup CodeGenApis
+
+  @param [in]  PropertyName           SCMI protocol property name.
+  @param [in]  Revision               SCMI Device Properties revision.
+  @param [in]  PropertiesNode         SCMI Device Properties Package.
+  @param [out] ExclusiveTransportNode Package receiving exclusive transports.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenScmiProtocolProperty (
+  IN  CONST CHAR8                   *PropertyName,
+  IN        UINT64                  Revision,
+  IN        AML_OBJECT_NODE_HANDLE  PropertiesNode,
+  OUT       AML_OBJECT_NODE_HANDLE  *ExclusiveTransportNode
+  );
+
+/** Add an exclusive transport descriptor to an SCMI protocol property.
+
+  It appends the following ASL package to the exclusive transport list:
+    Package () {
+      TransportUid,
+      Flags
+    }
+
+  @ingroup CodeGenApis
+
+  @param [in] TransportUid           SCMI transport UID.
+  @param [in] Flags                  Reserved transport flags.
+  @param [in] ExclusiveTransportNode Package receiving the descriptor.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddScmiProtocolTransportDescriptor (
+  IN UINT64                  TransportUid,
+  IN UINT64                  Flags,
+  IN AML_OBJECT_NODE_HANDLE  ExclusiveTransportNode
   );
 
 /** AML code generation for a Name object node, containing a String.

@@ -1023,7 +1023,13 @@ BmExpandPartitionDevicePath (
 
     Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
     if (EFI_ERROR (Status)) {
-      return NULL;
+      //
+      // No Block I/O handles found.  Set count to 0 and buffer to NULL and
+      // continue to allow search for Block I/O handles to be tried again after
+      // attempting a ConnectAll.
+      //
+      BlockIoHandleCount = 0;
+      BlockIoBuffer      = NULL;
     }
 
     //

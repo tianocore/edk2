@@ -79,13 +79,19 @@ GicRIntcNodeParser (
   // The "#redistributor-regions" property is optional.
   // It indicates the number of GicR.
   Data = FdtGetProp (Fdt, GicIntcNode, "#redistributor-regions", &DataSize);
-  if ((Data != NULL) && (DataSize == sizeof (UINT32))) {
-    // If available, must be on one cell.
-    RedistReg = Fdt32ToCpu (*(UINT32 *)Data);
-  } else {
+  if (Data == NULL) {
     // The DT Spec says GicR is mandatory so we will
     // always have one.
     RedistReg = 1;
+  } else if (DataSize != sizeof (UINT32)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  } else {
+    RedistReg = Fdt32ToCpu (*(UINT32 *)Data);
+    if ((RedistReg < 1) || (RedistReg > 4096)) {
+      ASSERT (FALSE);
+      return EFI_ABORTED;
+    }
   }
 
   /*
@@ -127,12 +133,13 @@ GicRIntcNodeParser (
   */
   RegSize = (AddressCells + SizeCells) * sizeof (UINT32);
   Data    = FdtGetProp (Fdt, GicIntcNode, "reg", &DataSize);
-  if ((Data == NULL)  ||
-      (DataSize < 0)  ||
-      ((DataSize % RegSize) != 0))
+  if ((Data == NULL)                              ||
+      (DataSize < 0)                              ||
+      ((DataSize % RegSize) != 0)                 ||
+      ((DataSize / RegSize) < (RedistReg + 1)))
   {
     // If error or wrong size.
-    ASSERT (0);
+    ASSERT (FALSE);
     return EFI_ABORTED;
   }
 
