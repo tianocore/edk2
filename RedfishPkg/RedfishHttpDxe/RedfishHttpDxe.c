@@ -449,7 +449,7 @@ ON_RELEASE:
   }
 
   if (EncodedAuthString != NULL) {
-    ZeroMem (BasicAuthString, EncodedAuthStrSize);
+    ZeroMem (EncodedAuthString, EncodedAuthStrSize);
     FreePool (EncodedAuthString);
   }
 
