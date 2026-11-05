@@ -2434,7 +2434,7 @@ CoreTerminateMemoryMap (
 
     for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
       Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-      if (Entry->Type < EfiMaxMemoryType) {
+      if ((UINT32)Entry->Type < EfiMaxMemoryType) {
         if (mMemoryTypeStatistics[Entry->Type].Runtime) {
           ASSERT (Entry->Type != EfiACPIReclaimMemory);
           ASSERT (Entry->Type != EfiACPIMemoryNVS);

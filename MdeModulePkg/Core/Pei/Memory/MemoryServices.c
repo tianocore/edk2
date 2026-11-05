@@ -484,7 +484,7 @@ InternalBuildMemoryAllocationHob (
   // If we are using PEI memory bins, track this allocation with the Memory Type Information GUID for DXE to consume.
   // Otherwise, just produce a HOB with a zeroed GUID.
   //
-  if (PrivateData->MemoryTypeInformationInitialized && (MemoryType < EfiMaxMemoryType) &&
+  if (PrivateData->MemoryTypeInformationInitialized && ((UINT32)MemoryType < EfiMaxMemoryType) &&
       (PrivateData->MemoryTypeStatistics[MemoryType].NumberOfPages != 0))
   {
     CopyGuid (&(MemoryAllocationHob->AllocDescriptor.Name), &gEfiMemoryTypeInformationGuid);
