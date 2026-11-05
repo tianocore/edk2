@@ -24,6 +24,7 @@
 #include <Library/PcdLib.h>
 #include <Pi/PiDxeCis.h>
 #include <Protocol/SevMemoryAcceptance.h>
+#include <Protocol/SevAltInjRegister.h>
 #include <Protocol/MemoryAccept.h>
 #include <Uefi/UefiSpec.h>
 
@@ -193,6 +194,43 @@ STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
   AmdSevMemoryAccept
 };
 
+STATIC
+VOID
+EFIAPI
+SvsmRegisterAltInj (
+  VOID
+  )
+{
+  AmdSvsmSnpApicConfigEmulation (SVSM_AI_REGISTER);
+}
+
+/**
+  Register the guest kernel with Alternate Injection.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+SevRegisterAltInj (
+  IN OVMF_SEV_ALT_INJ_REGISTER_PROTOCOL  *This
+  )
+{
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!AmdSvsmIsSvsmPresent () || !AmdSvsmAltInjEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  SvsmRegisterAltInj ();
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+OVMF_SEV_ALT_INJ_REGISTER_PROTOCOL
+  mSevAltInjRegisterProtocol = { SevRegisterAltInj };
+
 STATIC EFI_EVENT  mDeregisterAlternateInjectionEvent = NULL;
 
 /**
@@ -355,6 +393,8 @@ AmdSevDxeEntryPoint (
                     &mMemoryAcceptProtocol,
                     &gOvmfSevMemoryAcceptanceProtocolGuid,
                     &mMemoryAcceptanceProtocol,
+                    &gOvmfSevAltInjRegisterProtocolGuid,
+                    &mSevAltInjRegisterProtocol,
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);

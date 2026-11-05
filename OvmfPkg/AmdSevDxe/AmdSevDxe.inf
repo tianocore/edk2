@@ -53,6 +53,7 @@
 [Protocols]
   gEdkiiMemoryAcceptProtocolGuid
   gOvmfSevMemoryAcceptanceProtocolGuid
+  gOvmfSevAltInjRegisterProtocolGuid
 
 [Guids]
   gConfidentialComputingSevSnpBlobGuid
