@@ -44,6 +44,7 @@
     ## options defined .pytool/Plugin/DependencyCheck
     "DependencyCheck": {
         "AcceptableDependencies": [
+            "CryptoPkg/CryptoPkg.dec",
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "ArmVirtPkg/ArmVirtPkg.dec",

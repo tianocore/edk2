@@ -73,16 +73,26 @@ StableTimerCsrRd:
   li.w     $t0, LOONGARCH_CSR_TMID
   bltu     $a0, $t0, ReadSelNumErr
   li.w     $t0, LOONGARCH_CSR_TINTCLR
-  bltu     $t0, $a0, TlbRefillCsrRd
+  bltu     $t0, $a0, ImplCsrRd
   la.pcrel $t0, StableTimerCsrRead
   addi.w   $t1, $a0, -LOONGARCH_CSR_TMID
+  alsl.d   $t0, $t1, $t0, 3
+  jirl     $zero, $t0, 0
+
+ImplCsrRd:
+  li.w     $t0, LOONGARCH_CSR_IMPCTL1
+  bltu     $a0, $t0, ReadSelNumErr
+  li.w     $t0, LOONGARCH_CSR_IMPCTL2
+  bltu     $t0, $a0, TlbRefillCsrRd
+  la.pcrel $t0, ImplCsrRead
+  addi.w   $t1, $a0, -LOONGARCH_CSR_IMPCTL1
   alsl.d   $t0, $t1, $t0, 3
   jirl     $zero, $t0, 0
 
 TlbRefillCsrRd:
   li.w     $t0, LOONGARCH_CSR_TLBREBASE
   bltu     $a0, $t0, ReadSelNumErr
-  li.w     $t0, LOONGARCH_CSR_TLBREHI
+  li.w     $t0, LOONGARCH_CSR_TLBRPRMD
   bltu     $t0, $a0, DirMapCsrRd
   la.pcrel $t0, TlbRefillCsrRead
   addi.w   $t1, $a0, -LOONGARCH_CSR_TLBREBASE
@@ -137,9 +147,16 @@ StableTimerCsrRead:
     CsrSel = CsrSel + 1
   .endr
 
+ImplCsrRead:
+  CsrSel = LOONGARCH_CSR_IMPCTL1
+  .rept LOONGARCH_CSR_IMPCTL2 - LOONGARCH_CSR_IMPCTL1 + 1
+    AsmCsrRd CsrSel
+    CsrSel = CsrSel + 1
+  .endr
+
 TlbRefillCsrRead:
   CsrSel = LOONGARCH_CSR_TLBREBASE
-  .rept LOONGARCH_CSR_TLBREHI - LOONGARCH_CSR_TLBREBASE + 1
+  .rept LOONGARCH_CSR_TLBRPRMD - LOONGARCH_CSR_TLBREBASE + 1
     AsmCsrRd CsrSel
     CsrSel = CsrSel + 1
   .endr
@@ -199,9 +216,20 @@ StableTimerCsrWr:
   li.w     $t0, LOONGARCH_CSR_TMID
   bltu     $a0, $t0, WriteSelNumErr
   li.w     $t0, LOONGARCH_CSR_TINTCLR
-  bltu     $t0, $a0, TlbRefillCsrWr
+  bltu     $t0, $a0, ImplCsrWr
   la.pcrel $t0, StableTimerCsrWrite
   addi.w   $t1, $a0, -LOONGARCH_CSR_TMID
+  alsl.d   $t0, $t1, $t0, 3
+  move     $a0, $a1
+  jirl     $zero, $t0, 0
+
+ImplCsrWr:
+  li.w     $t0, LOONGARCH_CSR_IMPCTL1
+  bltu     $a0, $t0, WriteSelNumErr
+  li.w     $t0, LOONGARCH_CSR_IMPCTL2
+  bltu     $t0, $a0, TlbRefillCsrWr
+  la.pcrel $t0, ImplCsrWrite
+  addi.w   $t1, $a0, -LOONGARCH_CSR_IMPCTL1
   alsl.d   $t0, $t1, $t0, 3
   move     $a0, $a1
   jirl     $zero, $t0, 0
@@ -209,7 +237,7 @@ StableTimerCsrWr:
 TlbRefillCsrWr:
   li.w     $t0, LOONGARCH_CSR_TLBREBASE
   bltu     $a0, $t0, WriteSelNumErr
-  li.w     $t0, LOONGARCH_CSR_TLBREHI
+  li.w     $t0, LOONGARCH_CSR_TLBRPRMD
   bltu     $t0, $a0, DirMapCsrWr
   la.pcrel $t0, TlbRefillCsrWrite
   addi.w   $t1, $a0, -LOONGARCH_CSR_TLBREBASE
@@ -266,9 +294,16 @@ StableTimerCsrWrite:
     CsrSel = CsrSel + 1
   .endr
 
+ImplCsrWrite:
+  CsrSel = LOONGARCH_CSR_IMPCTL1
+  .rept LOONGARCH_CSR_IMPCTL2 - LOONGARCH_CSR_IMPCTL1 + 1
+    AsmCsrWr CsrSel
+    CsrSel = CsrSel + 1
+  .endr
+
 TlbRefillCsrWrite:
   CsrSel = LOONGARCH_CSR_TLBREBASE
-  .rept LOONGARCH_CSR_TLBREHI - LOONGARCH_CSR_TLBREBASE + 1
+  .rept LOONGARCH_CSR_TLBRPRMD - LOONGARCH_CSR_TLBREBASE + 1
     AsmCsrWr CsrSel
     CsrSel = CsrSel + 1
   .endr
@@ -333,9 +368,21 @@ StableTimerCsrXchg:
   li.w     $t0, LOONGARCH_CSR_TMID
   bltu     $a0, $t0, XchgSelNumErr
   li.w     $t0, LOONGARCH_CSR_TINTCLR
-  bltu     $t0, $a0, TlbRefillCsrXchg
+  bltu     $t0, $a0, ImplCsrXchg
   la.pcrel $t0, StableTimerCsrXchange
   addi.w   $t1, $a0, -LOONGARCH_CSR_TMID
+  alsl.d   $t0, $t1, $t0, 3
+  move     $a0, $a1
+  move     $a1, $a2
+  jirl     $zero, $t0, 0
+
+ImplCsrXchg:
+  li.w     $t0, LOONGARCH_CSR_IMPCTL1
+  bltu     $a0, $t0, XchgSelNumErr
+  li.w     $t0, LOONGARCH_CSR_IMPCTL2
+  bltu     $t0, $a0, TlbRefillCsrXchg
+  la.pcrel $t0, ImplCsrXchange
+  addi.w   $t1, $a0, -LOONGARCH_CSR_IMPCTL1
   alsl.d   $t0, $t1, $t0, 3
   move     $a0, $a1
   move     $a1, $a2
@@ -344,7 +391,7 @@ StableTimerCsrXchg:
 TlbRefillCsrXchg:
   li.w     $t0, LOONGARCH_CSR_TLBREBASE
   bltu     $a0, $t0, XchgSelNumErr
-  li.w     $t0, LOONGARCH_CSR_TLBREHI
+  li.w     $t0, LOONGARCH_CSR_TLBRPRMD
   bltu     $t0, $a0, DirMapCsrXchg
   la.pcrel $t0, TlbRefillCsrXchange
   addi.w   $t1, $a0, -LOONGARCH_CSR_TLBREBASE
@@ -403,9 +450,16 @@ StableTimerCsrXchange:
     CsrSel = CsrSel + 1
   .endr
 
+ImplCsrXchange:
+  CsrSel = LOONGARCH_CSR_IMPCTL1
+  .rept LOONGARCH_CSR_IMPCTL2 - LOONGARCH_CSR_IMPCTL1 + 1
+    AsmCsrXChange CsrSel
+    CsrSel = CsrSel + 1
+  .endr
+
 TlbRefillCsrXchange:
   CsrSel = LOONGARCH_CSR_TLBREBASE
-  .rept LOONGARCH_CSR_TLBREHI - LOONGARCH_CSR_TLBREBASE + 1
+  .rept LOONGARCH_CSR_TLBRPRMD - LOONGARCH_CSR_TLBREBASE + 1
     AsmCsrXChange CsrSel
     CsrSel = CsrSel + 1
   .endr

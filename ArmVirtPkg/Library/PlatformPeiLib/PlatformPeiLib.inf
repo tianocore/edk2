@@ -30,6 +30,7 @@
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled
 
 [LibraryClasses]
+  ArmCcaInitPeiLib
   BaseLib
   BaseMemoryLib
   DebugLib
@@ -55,6 +56,7 @@
   gPeiTpmInitializationDonePpiGuid                            ## SOMETIMES_PRODUCES
 
 [Guids]
+  gArmMpCoreInfoGuid
   gEarlyPL011BaseAddressGuid
   gFdtHobGuid
 
