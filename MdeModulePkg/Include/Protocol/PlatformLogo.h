@@ -28,7 +28,12 @@ typedef enum {
   EdkiiPlatformLogoDisplayAttributeCenterBottom,
   EdkiiPlatformLogoDisplayAttributeLeftBottom,
   EdkiiPlatformLogoDisplayAttributeCenterLeft,
-  EdkiiPlatformLogoDisplayAttributeCenter
+  EdkiiPlatformLogoDisplayAttributeCenter,
+  //
+  // Use Microsoft's guidance at:
+  // https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/boot-screen-components
+  //
+  EdkiiPlatformLogoDisplayAttributeMicrosoft
 } EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE;
 
 /**
