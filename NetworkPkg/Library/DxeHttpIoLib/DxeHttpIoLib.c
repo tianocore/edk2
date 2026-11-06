@@ -850,12 +850,14 @@ HttpIoGetChunkedTransferContent (
         )
     {
       DEBUG ((DEBUG_ERROR, "     This is an invalid End-of-chunk notation.\n"));
+      Status = EFI_INVALID_PARAMETER;
       goto ExitDeleteChunks;
     }
 
     TotalLength += *ContentLength;
     if (TotalLength > MaxTotalLength) {
       DEBUG ((DEBUG_ERROR, "     Total chunk transfer payload exceeds the size defined by PcdMaxHttpChunkTransfer.\n"));
+      Status = EFI_BAD_BUFFER_SIZE;
       goto ExitDeleteChunks;
     }
   }
