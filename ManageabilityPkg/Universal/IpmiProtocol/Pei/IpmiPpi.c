@@ -15,6 +15,7 @@
 #include <Library/ManageabilityTransportIpmiLib.h>
 #include <Library/ManageabilityTransportHelperLib.h>
 #include <Library/PeiServicesLib.h>
+#include <IndustryStandard/Ipmi.h>
 
 #include <Ppi/IpmiPpi.h>
 #include <Ppi/MemoryDiscovered.h>
@@ -296,6 +297,69 @@ PeiIpmiMemoryDiscovered (
 }
 
 /**
+  Query the BMC Get Device ID command and log the result.
+
+  @param[in]  TransportToken  The transport token used to send the command.
+
+  @retval EFI_SUCCESS  The Device ID was retrieved and logged.
+  @retval EFI_DEVICE_ERROR  The response is truncated or reports a command error.
+  @retval Others       The Get Device ID command failed.
+
+**/
+STATIC
+EFI_STATUS
+PrintDeviceId (
+  IN MANAGEABILITY_TRANSPORT_TOKEN  *TransportToken
+  )
+{
+  EFI_STATUS                   Status;
+  IPMI_GET_DEVICE_ID_RESPONSE  DeviceIdResponse;
+  UINT32                       DataSize;
+
+  ZeroMem (&DeviceIdResponse, sizeof (DeviceIdResponse));
+  DataSize = sizeof (DeviceIdResponse);
+  Status   = CommonIpmiSubmitCommand (
+               TransportToken,
+               IPMI_NETFN_APP,
+               IPMI_APP_GET_DEVICE_ID,
+               NULL,
+               0,
+               (UINT8 *)&DeviceIdResponse,
+               &DataSize
+               );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: IPMI Get Device ID failed - %r\n", __func__, Status));
+    return Status;
+  }
+
+  // Auxiliary firmware revision information is optional in Get Device ID.
+  if ((DataSize < OFFSET_OF (IPMI_GET_DEVICE_ID_RESPONSE, AuxFirmwareRevInfo)) ||
+      (DeviceIdResponse.CompletionCode != IPMI_COMP_CODE_NORMAL))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Invalid Get Device ID response (size %u, completion 0x%02x).\n",
+      __func__,
+      DataSize,
+      DeviceIdResponse.CompletionCode
+      ));
+    return EFI_DEVICE_ERROR;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a IPMI BMC Device ID: 0x%02X, firmware version: %d.%02X UpdateMode:%x\n",
+    __func__,
+    DeviceIdResponse.DeviceId,
+    DeviceIdResponse.FirmwareRev1.Bits.MajorFirmwareRev,
+    DeviceIdResponse.MinorFirmwareRev,
+    DeviceIdResponse.FirmwareRev1.Bits.UpdateMode
+    ));
+
+  return EFI_SUCCESS;
+}
+
+/**
   The entry point of the Ipmi PPI PEIM.
 
   @param  FileHandle  Handle of the file being invoked.
@@ -353,6 +417,11 @@ PeiIpmiEntry (
 
   PeiIpmiPpiinternal->Enabled = TRUE;
   Status                      = PeiIpmiEnsureTransportReady (PeiIpmiPpiinternal);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  Status = PrintDeviceId (PeiIpmiPpiinternal->TransportToken);
   if (EFI_ERROR (Status)) {
     goto Error;
   }

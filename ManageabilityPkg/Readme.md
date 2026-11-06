@@ -208,6 +208,11 @@ that mapping with a phase-appropriate implementation. The hook must not call
 back into the IPMI provider being initialized. PEI implementations must not
 write image globals or retain temporary-memory pointers across migration.
 
+Before publishing the PEI IPMI PPI, the provider issues Get Device ID and logs
+the BMC device ID and firmware version. A transport failure, truncated mandatory
+response, or nonzero completion code prevents PPI publication. The optional
+auxiliary firmware revision field is not required.
+
 The host test DSC is `ManageabilityPkg/Test/ManageabilityPkgHostTest.dsc`.
 Run its package CI build and tests with:
 
