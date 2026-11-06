@@ -2948,6 +2948,16 @@ Dhcp6HandleStateless (
     goto ON_EXIT;
   }
 
+  if (InfCb == NULL) {
+    ASSERT (InfCb != NULL);
+    goto ON_EXIT;
+  }
+
+  if (InfCb->ReplyCallback == NULL) {
+    ASSERT (InfCb->ReplyCallback != NULL);
+    goto ON_EXIT;
+  }
+
   //
   // Check whether include server Id or not.
   //
@@ -3084,6 +3094,11 @@ Dhcp6ReceivePacket (
       TxCb = NET_LIST_USER_STRUCT (Entry2, DHCP6_TX_CB, Link);
 
       if (Packet->Dhcp6.Header.TransactionId == TxCb->Xid) {
+        if (TxCb->TxPacket == NULL) {
+          ASSERT (TxCb->TxPacket != NULL);
+          continue;
+        }
+
         //
         // Find the corresponding packet in tx list, and check it whether belongs
         // to stateful exchange process.
@@ -3106,6 +3121,11 @@ Dhcp6ReceivePacket (
   // Skip this packet if not dispatched to any instance.
   //
   if (!IsDispatched) {
+    goto ON_CONTINUE;
+  }
+
+  if (Instance == NULL) {
+    ASSERT (Instance != NULL);
     goto ON_CONTINUE;
   }
 
