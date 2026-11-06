@@ -57,6 +57,7 @@
 
 [Guids]
   gEfiIgvmDataHobGuid
+  gPscBufferGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
