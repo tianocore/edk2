@@ -2,6 +2,7 @@
   Routines used to operate the Ip4Dxe.
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -27,6 +28,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ADDRESS_STR_MAX_SIZE  255
 #define MAX_IP4_CONFIG_DNS    16
 
+//
+// ADDRESS_STR_MAX_SIZE matches the VFR maxsize for the DnsAddress input, so
+// a maximum-length string leaves no room for the CHAR16 NUL terminator.
+// ADDRESS_STR_STORAGE reserves space for it in the DnsAddress storage
+// buffer.
+//
+#define ADDRESS_STR_STORAGE  256
+
 ///
 /// IP4_CONFIG2_IFR_NVDATA contains the IP4 configure
 /// parameters for that NIC.
@@ -37,5 +46,5 @@ typedef struct {
   CHAR16    StationAddress[IP4_STR_MAX_SIZE];        ///< IP addresses
   CHAR16    SubnetMask[IP4_STR_MAX_SIZE];            ///< Subnet address
   CHAR16    GatewayAddress[IP4_STR_MAX_SIZE];        ///< Gateway address
-  CHAR16    DnsAddress[ADDRESS_STR_MAX_SIZE];        ///< DNS server address
+  CHAR16    DnsAddress[ADDRESS_STR_STORAGE];         ///< DNS server address
 } IP4_CONFIG2_IFR_NVDATA;
