@@ -109,9 +109,6 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
 
-  # Use MMIO for accessing RTC controller registers.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcUseMmio|TRUE
-
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
@@ -171,10 +168,6 @@
   # CFI flash is absent.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
 
-  ## RTC Register address in MMIO space.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0x0
-
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -202,11 +195,6 @@
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/NorFlashKvmtoolLib/NorFlashKvmtoolLib.inf
-  }
-
-  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtMc146818RtcDepexLib/UfdtMc146818RtcDepexLib.inf
   }
 
   #

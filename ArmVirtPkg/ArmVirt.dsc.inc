@@ -349,6 +349,9 @@ DEFINE FD_SIZE_IN_MB    = 3
 ################################################################################
 
 [PcdsFeatureFlag.common]
+  # Use MMIO for accessing RTC controller registers.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcUseMmio|TRUE
+
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
@@ -479,6 +482,13 @@ DEFINE FD_SIZE_IN_MB    = 3
 !endif
 
 [PcdsDynamicDefault.common]
+  ## RTC Register address in MMIO space.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0x0
+
+  ## PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
+
   #
   # ARM Watchdog
   #
@@ -567,6 +577,16 @@ DEFINE FD_SIZE_IN_MB    = 3
   #
   # Architectural Protocols
   #
+  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtMc146818RtcDepexLib/UfdtMc146818RtcDepexLib.inf
+  }
+  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
+!if $(PLAT_XEN) == FALSE
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtRtcDepexLib/UfdtRtcDepexLib.inf
+!endif
+  }
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf

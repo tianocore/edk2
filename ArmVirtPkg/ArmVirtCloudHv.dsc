@@ -144,9 +144,6 @@
   # System Memory Size -- 1 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x00100000
 
-  ## PL031 RealTimeClock
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
-
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
 
   # ArmVirtCloudHv is by construction the Cloud Hypervisor platform. On X64
@@ -196,10 +193,6 @@
   # Architectural Protocols
   #
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtRtcDepexLib/UfdtRtcDepexLib.inf
-  }
 
   #
   # Status Code Routing
