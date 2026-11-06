@@ -2,6 +2,7 @@
   Google Test mock for Configuration Manager Protocol
 
   Copyright (c) Microsoft Corporation.
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -9,11 +10,12 @@
 
 MOCK_INTERFACE_DEFINITION (MockConfigurationManagerProtocol);
 MOCK_FUNCTION_DEFINITION (MockConfigurationManagerProtocol, GetObject, 4, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockConfigurationManagerProtocol, SetObject, 4, EFIAPI);
 
 EDKII_CONFIGURATION_MANAGER_PROTOCOL  CONFIG_MGR_PROTOCOL_INSTANCE = {
   CREATE_REVISION (1, 0), // Revision
   GetObject,              // GetObject
-  NULL,                   // SetObject
+  SetObject,              // SetObject
   NULL                    // PlatRepoInfo
 };
 
