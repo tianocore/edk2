@@ -2,6 +2,7 @@
   RISC-V IO Mapping Table (RIMT) parser
 
   Copyright (c) 2025, Plasteli.net. All rights reserved.
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   Reference(s):
@@ -704,12 +705,38 @@ RimtParsePcieRcNode (
 }
 
 /**
-  This function parses the RIMT Platform Device node.
+  An ACPI_PARSER array describing the Platform Device Node.
+**/
+STATIC CONST ACPI_PARSER  RimtPlatformDeviceNodeParser[] = {
+  RIMT_PARSE_NODE_HEADER,
+  {
+    L"ID Mapping Array Offset",
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE,IdMappingArrayOffset),
+    OFFSET_OF (EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE,IdMappingArrayOffset),
+    L"0x%x",
+    NULL,
+    (VOID **)&mIdMappingArrayOffset,
+    NULL,
+    NULL
+  },
+  {
+    L"Number of ID Mappings",
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE,NumberOfIdMappings),
+    OFFSET_OF (EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE,NumberOfIdMappings),
+    L"%d",
+    NULL,
+    (VOID **)&mNumberOfIdMappings,
+    NULL,
+    NULL
+  },
+};
 
-  TODO: Add parsers when PLatform Device node generator in Qemu is ready.
+/**
+  This function parses the RIMT Platform Device node.
 
   @param [in] Ptr            Pointer to the start of the buffer.
   @param [in] Length         Length of the buffer.
+  @param [in] Index          Index of the Platform Device node.
 **/
 STATIC
 VOID
@@ -720,7 +747,98 @@ RimtParsePlatformDeviceNode (
   IN UINT32  Index
   )
 {
-  Print (L"WARNING: Platform type of RIMT Node not supported yet.\n");
+  UINT8   *IdMappingArray;
+  UINT8   *PlatformDeviceNode;
+  CHAR8   Buffer[32];
+  UINT8   *DeviceObjectName;
+  UINT32  DeviceObjectNameLength;
+  UINT32  DeviceObjectNameOffset;
+  UINT32  PaddingLength;
+
+  PlatformDeviceNode = Ptr;
+  AsciiSPrint (
+    Buffer,
+    sizeof (Buffer),
+    "RIMT Node [%d]",
+    Index
+    );
+
+  ParseAcpi (
+    TRUE,
+    2,
+    Buffer,
+    PlatformDeviceNode,
+    Length,
+    PARSER_PARAMS (RimtPlatformDeviceNodeParser)
+    );
+
+  if ((mIdMappingArrayOffset == NULL) || (mNumberOfIdMappings == NULL)) {
+    IncrementErrorCount ();
+    Print (L"ERROR: Failed to parse Platform Device node fields\n");
+    return;
+  }
+
+  DeviceObjectNameOffset = OFFSET_OF (
+                             EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE,
+                             DeviceObjectName
+                             );
+
+  if ((*mIdMappingArrayOffset <= DeviceObjectNameOffset) ||
+      (*mIdMappingArrayOffset > Length) ||
+      (*mNumberOfIdMappings >
+       ((Length - *mIdMappingArrayOffset) /
+        sizeof (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE))))
+  {
+    IncrementErrorCount ();
+    Print (L"ERROR: Invalid ID Mapping Array bounds.\n");
+    return;
+  }
+
+  DeviceObjectName       = PlatformDeviceNode + DeviceObjectNameOffset;
+  DeviceObjectNameLength = 0;
+  PrintFieldName (2, L"Device Object Name");
+  while (((DeviceObjectNameOffset + DeviceObjectNameLength) <
+          *mIdMappingArrayOffset) &&
+         (DeviceObjectName[DeviceObjectNameLength] != '\0'))
+  {
+    Print (L"%c", DeviceObjectName[DeviceObjectNameLength]);
+    DeviceObjectNameLength++;
+  }
+
+  Print (L"\n");
+
+  if ((DeviceObjectNameOffset + DeviceObjectNameLength) >=
+      *mIdMappingArrayOffset)
+  {
+    IncrementErrorCount ();
+    Print (L"ERROR: Device Object Name is not NULL terminated.\n");
+    return;
+  }
+
+  DeviceObjectNameLength++;
+
+  PaddingLength = *mIdMappingArrayOffset -
+                  (DeviceObjectNameOffset + DeviceObjectNameLength);
+  if (PaddingLength > (sizeof (UINT32) - 1)) {
+    IncrementErrorCount ();
+    Print (L"ERROR: Platform Device node padding exceeds 3 bytes.\n");
+    return;
+  }
+
+  if ((PaddingLength > 0)) {
+    ValidateReserved (
+      DeviceObjectName + DeviceObjectNameLength,
+      PaddingLength,
+      NULL
+      );
+  }
+
+  IdMappingArray = PlatformDeviceNode + *mIdMappingArrayOffset;
+  RimtParseIdMappingArray (
+    IdMappingArray,
+    Length - *mIdMappingArrayOffset,
+    *mNumberOfIdMappings
+    );
 }
 
 /**
