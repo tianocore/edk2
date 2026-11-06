@@ -533,17 +533,8 @@ TestVerifyPkcs7SignVerify (
   BOOLEAN  Status;
   UINT8    *P7SignedData;
   UINTN    P7SignedDataSize;
-  UINT8    *SignCert;
 
   P7SignedData = NULL;
-  SignCert     = NULL;
-
-  //
-  // Construct Signer Certificate from RAW data.
-  //
-  Status = X509ConstructCertificate (TestCert, sizeof (TestCert), (UINT8 **)&SignCert);
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SignCert);
 
   //
   // Create PKCS#7 signedData on Payload.
@@ -555,7 +546,8 @@ TestVerifyPkcs7SignVerify (
              (CONST UINT8 *)PemPass,
              (UINT8 *)Payload,
              AsciiStrLen (Payload),
-             SignCert,
+             TestCert,
+             sizeof (TestCert),
              NULL,
              &P7SignedData,
              &P7SignedDataSize
@@ -575,10 +567,6 @@ TestVerifyPkcs7SignVerify (
 
   if (P7SignedData != NULL) {
     FreePool (P7SignedData);
-  }
-
-  if (SignCert != NULL) {
-    X509Free (SignCert);
   }
 
   return UNIT_TEST_PASSED;
@@ -622,6 +610,7 @@ TestVerifyPkcs7SignVerifyNonSelfIssued (
              (UINT8 *)Payload,
              AsciiStrLen (Payload),
              SignCert,
+             sizeof (SignCert),
              NULL,
              &P7SignedData,
              &P7SignedDataSize
