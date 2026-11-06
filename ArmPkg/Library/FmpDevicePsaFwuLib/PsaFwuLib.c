@@ -66,13 +66,14 @@ PsaFwuVirtualAddressChangeEvent (
   @param DataType  Fixed request or response structure type.
 **/
 #define RETURN_FWU_DATA_SIZE(Command, DataType)                   \
-  case Command:                                                   \
+  case Command: {                                                 \
     STATIC_ASSERT (                                               \
       MM_SHARED_BUFFER_SIZE >=                                    \
       (sizeof (PSA_MM_FWU_PARAMETER_HEADER) + sizeof (DataType)), \
       "MM shared buffer is too small for the fixed FWU message"   \
       );                                                          \
-    return sizeof (DataType)
+    return sizeof (DataType);                                     \
+  }
 
 /**
  * Get firmware update function request fixed data size.
