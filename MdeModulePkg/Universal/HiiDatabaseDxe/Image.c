@@ -274,6 +274,7 @@ Output1bitPixel (
   CopyRgbToGopPixel (&PaletteValue[0].Pixel, &Palette->PaletteValue[0], 1);
   CopyRgbToGopPixel (&PaletteValue[1].Pixel, &Palette->PaletteValue[1], 1);
   FreePool (Palette);
+  Palette = NULL;
 
   //
   // Convert the pixel from one bit to corresponding color.
@@ -363,6 +364,7 @@ Output4bitPixel (
   ZeroMem (PaletteValue, sizeof (PaletteValue));
   CopyRgbToGopPixel (&PaletteValue->Pixel, Palette->PaletteValue, MIN (PaletteNum, ARRAY_SIZE (PaletteValue)));
   FreePool (Palette);
+  Palette = NULL;
 
   //
   // Convert the pixel from 4 bit to corresponding color.
@@ -440,6 +442,7 @@ Output8bitPixel (
   ZeroMem (PaletteValue, sizeof (PaletteValue));
   CopyRgbToGopPixel (&PaletteValue->Pixel, Palette->PaletteValue, MIN (PaletteNum, ARRAY_SIZE (PaletteValue)));
   FreePool (Palette);
+  Palette = NULL;
 
   //
   // Convert the pixel from 8 bits to corresponding color.
