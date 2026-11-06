@@ -302,19 +302,6 @@ ProcessPciHost (
     }
   }
 
-  if (*Mmio32Size != 0) {
-    Status = MapMmioMemory (*Mmio32Base, *Mmio32Size, EFI_MEMORY_UC | EFI_MEMORY_XP);
-    ASSERT_EFI_ERROR (Status);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-
-  if (*Mmio64Size != 0) {
-    Status = MapMmioMemory (*Mmio64Base, *Mmio64Size, EFI_MEMORY_UC | EFI_MEMORY_XP);
-    ASSERT_EFI_ERROR (Status);
-  }
-
   return Status;
 }
 
@@ -383,7 +370,8 @@ PciHostBridgeGetRootBridges (
   Attributes = EFI_PCI_ATTRIBUTE_ISA_IO_16 |
                EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
                EFI_PCI_ATTRIBUTE_VGA_IO_16  |
-               EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+               EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16 |
+               EFI_PCI_ATTRIBUTE_MEMORY_CACHED;
 
   AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
 
