@@ -1071,8 +1071,8 @@ AhciModeInitialization (
   );
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command
-  with PIO Protocol.
+  This function is used to send out ATAPI commands.
+  Data transfers use DMA if the device is capable, otherwise PIO.
 
   @param Instance           The ATA_ATAPI_PASS_THRU_INSTANCE protocol instance.
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.

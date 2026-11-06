@@ -2108,8 +2108,8 @@ AhciDeviceSetFeature (
 }
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command
-  with PIO Protocol.
+  This function is used to send out ATAPI commands.
+  Data transfers use DMA if the device is capable, otherwise PIO.
 
   @param Instance           The ATA_ATAPI_PASS_THRU_INSTANCE protocol instance.
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
@@ -2149,10 +2149,6 @@ AhciPacketCommandExecute (
   ZeroMem (&AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
   AtaCommandBlock.AtaCommand = ATA_CMD_PACKET;
   //
-  // No OVL; No DMA
-  //
-  AtaCommandBlock.AtaFeatures = 0x00;
-  //
   // set the transfersize to ATAPI_MAX_BYTE_COUNT to let the device
   // determine how many data should be transferred.
   //
@@ -2170,6 +2166,10 @@ AhciPacketCommandExecute (
   }
 
   if (Length == 0) {
+    //
+    // No OVL; No DMA
+    //
+    AtaCommandBlock.AtaFeatures = 0x00;
     Status = AhciNonDataTransfer (
                Instance->PciIo,
                AhciRegisters,
@@ -2182,7 +2182,31 @@ AhciPacketCommandExecute (
                Packet->Timeout,
                NULL
                );
+  } else if (DeviceInfo->DmaCapable) {
+    //
+    // No OVL; DMA
+    //
+    AtaCommandBlock.AtaFeatures = 0x01;
+    Status = AhciDmaTransfer (
+               Instance,
+               AhciRegisters,
+               Port,
+               PortMultiplier,
+               Packet->Cdb,
+               Packet->CdbLength,
+               Read,
+               &AtaCommandBlock,
+               &AtaStatusBlock,
+               Buffer,
+               Length,
+               Packet->Timeout,
+               NULL
+               );
   } else {
+    //
+    // No OVL; No DMA
+    //
+    AtaCommandBlock.AtaFeatures = 0x00;
     Status = AhciPioTransfer (
                Instance->PciIo,
                AhciRegisters,
