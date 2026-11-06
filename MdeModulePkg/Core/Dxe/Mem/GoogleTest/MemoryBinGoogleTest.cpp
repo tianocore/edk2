@@ -377,7 +377,7 @@ TEST_F (BaseMemoryBinLibTest, AllocatesPagesAndInitializesBins) {
   gMemoryTypeInformation[5].Type          = EfiMaxMemoryType;
 
   // HOB should not be built in this case
-  EXPECT_CALL (HobLib, BuildResourceDescriptorWithOwnerHob (_, _, _, _, _))
+  EXPECT_CALL (HobLib, BuildResourceDescriptor2Hob (_, _, _, _, _, _))
     .Times (0);
 
   AllocateMemoryTypeInformationBins (&mMemoryTypeInformationInitialized, gMemoryTypeInformation, mMemoryTypeStatistics, &mDefaultMaximumAddress, FALSE);
@@ -411,11 +411,12 @@ TEST_F (BaseMemoryBinLibTest, CreatesHobWhenRequested) {
 
   EXPECT_CALL (
     HobLib,
-    BuildResourceDescriptorWithOwnerHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED,
       _,
       TotalPages * EFI_PAGE_SIZE,
+      EFI_MEMORY_WB,
       &gEfiMemoryTypeInformationGuid
       )
     )
