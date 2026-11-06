@@ -19,8 +19,6 @@
 
 #include "ManageabilityTransportKcs.h"
 
-MANAGEABILITY_TRANSPORT_KCS  *mSingleSessionToken = NULL;
-
 EFI_GUID  *SupportedManageabilityProtocol[] = {
   &gManageabilityProtocolIpmiGuid,
   &gManageabilityProtocolMctpGuid
@@ -28,7 +26,28 @@ EFI_GUID  *SupportedManageabilityProtocol[] = {
 
 UINT8  NumberOfSupportedProtocol = (sizeof (SupportedManageabilityProtocol)/sizeof (EFI_GUID *));
 
-MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO  mKcsHardwareInfo;
+/**
+  Validate ownership without dereferencing a caller-supplied token.
+
+  The phase backend checks memory generation before returning its owner.
+
+  @param[in] TransportToken  Token to compare with the current session.
+
+  @retval TRUE   The token belongs to the current session.
+  @retval FALSE  NULL, stale, unowned, or unavailable session.
+**/
+STATIC
+BOOLEAN
+KcsIsCurrentTransportToken (
+  IN MANAGEABILITY_TRANSPORT_TOKEN  *TransportToken
+  )
+{
+  MANAGEABILITY_TRANSPORT_KCS  *SessionToken;
+
+  SessionToken = KcsGetSessionToken ();
+  return (TransportToken != NULL) && (SessionToken != NULL) &&
+         (TransportToken == &SessionToken->Token);
+}
 
 /**
   This function initializes the transport interface.
@@ -40,7 +59,10 @@ MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO  mKcsHardwareInfo;
 
   @retval      EFI_SUCCESS              Transport interface is initialized
                                         successfully.
-  @retval      EFI_INVALID_PARAMETER    The invalid transport token.
+  @retval      EFI_INVALID_PARAMETER    The invalid transport token, or the token
+                                        does not belong to the current session.
+  @retval      EFI_OUT_OF_RESOURCES     The KCS hardware information storage is
+                                        not available.
   @retval      EFI_NOT_READY            The transport interface works fine but
   @retval                               is not ready.
   @retval      EFI_DEVICE_ERROR         The transport interface has problems.
@@ -55,48 +77,57 @@ KcsTransportInit (
   IN  MANAGEABILITY_TRANSPORT_HARDWARE_INFORMATION  HardwareInfo OPTIONAL
   )
 {
-  CHAR16  *ManageabilityProtocolName;
+  CHAR16                                     *ManageabilityProtocolName;
+  UINT16                                     KcsIoCmdAddress;
+  MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO  *KcsHardwareInfo;
 
-  if (TransportToken == NULL) {
+  if (!KcsIsCurrentTransportToken (TransportToken)) {
     DEBUG ((DEBUG_ERROR, "%a: Invalid transport token.\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
+  KcsHardwareInfo = KcsGetHardwareInfo ();
+
+  if (KcsHardwareInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: can not allocate KCS hardware info.\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   if (HardwareInfo.Kcs == NULL) {
     DEBUG ((DEBUG_MANAGEABILITY_INFO, "%a: Hardware information is not provided, use dfault settings.\n", __func__));
-    mKcsHardwareInfo.MemoryMap                    = MANAGEABILITY_TRANSPORT_KCS_IO_MAP_IO;
-    mKcsHardwareInfo.IoBaseAddress.IoAddress16    = PcdGet16 (PcdIpmiKcsIoBaseAddress);
-    mKcsHardwareInfo.IoDataInAddress.IoAddress16  = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_IN_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoDataOutAddress.IoAddress16 = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_OUT_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoCommandAddress.IoAddress16 = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_COMMAND_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoStatusAddress.IoAddress16  = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_STATUS_REGISTER_OFFSET;
+    KcsHardwareInfo->MemoryMap                    = MANAGEABILITY_TRANSPORT_KCS_IO_MAP_IO;
+    KcsHardwareInfo->IoBaseAddress.IoAddress16    = PcdGet16 (PcdIpmiKcsIoBaseAddress);
+    KcsHardwareInfo->IoDataInAddress.IoAddress16  = KcsHardwareInfo->IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_IN_REGISTER_OFFSET;
+    KcsHardwareInfo->IoDataOutAddress.IoAddress16 = KcsHardwareInfo->IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_OUT_REGISTER_OFFSET;
+    KcsHardwareInfo->IoCommandAddress.IoAddress16 = KcsHardwareInfo->IoBaseAddress.IoAddress16 + IPMI_KCS_COMMAND_REGISTER_OFFSET;
+    KcsHardwareInfo->IoStatusAddress.IoAddress16  = KcsHardwareInfo->IoBaseAddress.IoAddress16 + IPMI_KCS_STATUS_REGISTER_OFFSET;
   } else {
-    mKcsHardwareInfo.MemoryMap        = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->MemoryMap;
-    mKcsHardwareInfo.IoBaseAddress    = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoBaseAddress;
-    mKcsHardwareInfo.IoDataInAddress  = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoDataInAddress;
-    mKcsHardwareInfo.IoDataOutAddress = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoDataOutAddress;
-    mKcsHardwareInfo.IoCommandAddress = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoCommandAddress;
-    mKcsHardwareInfo.IoStatusAddress  = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoStatusAddress;
+    KcsHardwareInfo->MemoryMap        = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->MemoryMap;
+    KcsHardwareInfo->IoBaseAddress    = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoBaseAddress;
+    KcsHardwareInfo->IoDataInAddress  = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoDataInAddress;
+    KcsHardwareInfo->IoDataOutAddress = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoDataOutAddress;
+    KcsHardwareInfo->IoCommandAddress = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoCommandAddress;
+    KcsHardwareInfo->IoStatusAddress  = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoStatusAddress;
   }
 
   // Get protocol specification name.
   ManageabilityProtocolName = HelperManageabilitySpecName (TransportToken->ManageabilityProtocolSpecification);
 
   DEBUG ((DEBUG_MANAGEABILITY_INFO, "%a: KCS transport hardware for %s is:\n", __func__, ManageabilityProtocolName));
-  if (mKcsHardwareInfo.MemoryMap) {
+  if (KcsHardwareInfo->MemoryMap) {
     DEBUG ((DEBUG_MANAGEABILITY_INFO, "Memory Map I/O\n"));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Base Memory Address : 0x%08x\n", mKcsHardwareInfo.IoBaseAddress.IoAddress32));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data in Address     : 0x%08x\n", mKcsHardwareInfo.IoDataInAddress.IoAddress32));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data out Address    : 0x%08x\n", mKcsHardwareInfo.IoDataOutAddress.IoAddress32));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Command Address     : 0x%08x\n", mKcsHardwareInfo.IoCommandAddress.IoAddress32));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Status Address      : 0x%08x\n", mKcsHardwareInfo.IoStatusAddress.IoAddress32));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Base Memory Address : 0x%08x\n", KcsHardwareInfo->IoBaseAddress.IoAddress32));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data in Address     : 0x%08x\n", KcsHardwareInfo->IoDataInAddress.IoAddress32));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data out Address    : 0x%08x\n", KcsHardwareInfo->IoDataOutAddress.IoAddress32));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Command Address     : 0x%08x\n", KcsHardwareInfo->IoCommandAddress.IoAddress32));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Status Address      : 0x%08x\n", KcsHardwareInfo->IoStatusAddress.IoAddress32));
   } else {
     DEBUG ((DEBUG_MANAGEABILITY_INFO, "I/O Map I/O\n"));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Base I/O port    : 0x%04x\n", mKcsHardwareInfo.IoBaseAddress.IoAddress16));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data in I/O port : 0x%04x\n", mKcsHardwareInfo.IoDataInAddress.IoAddress16));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data out I/O port: 0x%04x\n", mKcsHardwareInfo.IoDataOutAddress.IoAddress16));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Command I/O port : 0x%04x\n", mKcsHardwareInfo.IoCommandAddress.IoAddress16));
-    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Status I/O port  : 0x%04x\n", mKcsHardwareInfo.IoStatusAddress.IoAddress16));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Base I/O port    : 0x%04x\n", KcsHardwareInfo->IoBaseAddress.IoAddress16));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data in I/O port : 0x%04x\n", KcsHardwareInfo->IoDataInAddress.IoAddress16));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Data out I/O port: 0x%04x\n", KcsHardwareInfo->IoDataOutAddress.IoAddress16));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Command I/O port : 0x%04x\n", KcsHardwareInfo->IoCommandAddress.IoAddress16));
+    DEBUG ((DEBUG_MANAGEABILITY_INFO, "Status I/O port  : 0x%04x\n", KcsHardwareInfo->IoStatusAddress.IoAddress16));
   }
 
   return EFI_SUCCESS;
@@ -115,10 +146,15 @@ KcsTransportInit (
   @param [out]  TransportAdditionalStatus  The additional status of transport
                                            interface.
                                            NULL means no additional status of this
-                                           transport interface.
+                                           transport interface. It is set to
+                                           MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS_NOT_AVAILABLE
+                                           when this function fails.
 
   @retval      EFI_SUCCESS              Transport interface status is returned.
-  @retval      EFI_INVALID_PARAMETER    The invalid transport token.
+  @retval      EFI_INVALID_PARAMETER    The invalid transport token, or the token
+                                        does not belong to the current session.
+  @retval      EFI_OUT_OF_RESOURCES     The KCS hardware information storage is
+                                        not available.
   @retval      EFI_DEVICE_ERROR         The transport interface has problems to return
   @retval      EFI_UNSUPPORTED          The transport interface doesn't have status report.
                Otherwise                Other errors.
@@ -131,9 +167,14 @@ KcsTransportStatus (
   OUT MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  *TransportAdditionalStatus OPTIONAL
   )
 {
-  UINT8  TransportStatus;
+  UINT8                                      TransportStatus;
+  MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO  *KcsHardwareInfo;
 
-  if (TransportToken == NULL) {
+  if (TransportAdditionalStatus != NULL) {
+    *TransportAdditionalStatus = MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS_NOT_AVAILABLE;
+  }
+
+  if (!KcsIsCurrentTransportToken (TransportToken)) {
     DEBUG ((DEBUG_ERROR, "%a: Invalid transport token.\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
@@ -142,7 +183,14 @@ KcsTransportStatus (
     return EFI_SUCCESS;
   }
 
-  TransportStatus            = IPMI_KCS_GET_STATE (KcsRegisterRead8 (KCS_REG_STATUS));
+  KcsHardwareInfo = KcsGetHardwareInfo ();
+
+  if (KcsHardwareInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: can not allocate KCS hardware info.\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  TransportStatus            = IPMI_KCS_GET_STATE (KcsRegisterRead8 (KcsHardwareInfo->IoStatusAddress, KcsHardwareInfo->MemoryMap));
   *TransportAdditionalStatus = MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS_NO_ERRORS;
   if (TransportStatus != IpmiKcsIdleState) {
     if (TransportStatus == IpmiKcsReadState) {
@@ -206,9 +254,14 @@ KcsTransportReset (
   See the definition of MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS.
 
   @param [in]  TransportToken           The transport token acquired through
-                                        AcquireTransportSession function.
+                                        AcquireTransportSession function. It must
+                                        belong to the current session, otherwise
+                                        TransferToken->TransferStatus is set to
+                                        EFI_INVALID_PARAMETER.
   @param [in]  TransferToken            The transfer token, see the definition of
-                                        MANAGEABILITY_TRANSFER_TOKEN.
+                                        MANAGEABILITY_TRANSFER_TOKEN. The result is
+                                        returned in TransferStatus and
+                                        TransportAdditionalStatus.
 
 **/
 VOID
@@ -220,26 +273,56 @@ KcsTransportTransmitReceive (
 {
   EFI_STATUS                                 Status;
   MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  AdditionalStatus;
+  MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO  *KcsHardwareInfo;
+  MANAGEABILITY_TRANSPORT_KCS                *SessionToken;
 
-  if ((TransportToken == NULL) || (TransferToken == NULL)) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid transport token or transfer token.\n", __func__));
+  if (TransferToken == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid transfer token.\n", __func__));
     return;
   }
 
-  Status = KcsTransportSendCommand (
-             TransferToken->TransmitHeader,
-             TransferToken->TransmitHeaderSize,
-             TransferToken->TransmitTrailer,
-             TransferToken->TransmitTrailerSize,
-             TransferToken->TransmitPackage.TransmitPayload,
-             TransferToken->TransmitPackage.TransmitSizeInByte,
-             TransferToken->ReceivePackage.ReceiveBuffer,
-             &TransferToken->ReceivePackage.ReceiveSizeInByte,
-             &AdditionalStatus
-             );
+  TransferToken->TransferStatus            = EFI_INVALID_PARAMETER;
+  TransferToken->TransportAdditionalStatus = MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS_NOT_AVAILABLE;
+  if (!KcsIsCurrentTransportToken (TransportToken)) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid or stale transport token.\n", __func__));
+    return;
+  }
+
+  KcsHardwareInfo = KcsGetHardwareInfo ();
+  SessionToken    = KcsGetSessionToken ();
+  if (KcsHardwareInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: can not allocate KCS hardware info.\n", __func__));
+    TransferToken->TransferStatus = EFI_OUT_OF_RESOURCES;
+    return;
+  }
+
+  if (SessionToken == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: can not obtain session token.\n", __func__));
+    TransferToken->TransferStatus = EFI_NOT_READY;
+    return;
+  }
+
+  AdditionalStatus = MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS_NO_ERRORS;
+  Status           = KcsTransportSendCommand (
+                       TransferToken->TransmitHeader,
+                       TransferToken->TransmitHeaderSize,
+                       TransferToken->TransmitTrailer,
+                       TransferToken->TransmitTrailerSize,
+                       TransferToken->TransmitPackage.TransmitPayload,
+                       TransferToken->TransmitPackage.TransmitSizeInByte,
+                       SessionToken,
+                       KcsHardwareInfo,
+                       TransferToken->ReceivePackage.ReceiveBuffer,
+                       &TransferToken->ReceivePackage.ReceiveSizeInByte,
+                       &AdditionalStatus
+                       );
 
   TransferToken->TransferStatus = Status;
-  KcsTransportStatus (TransportToken, &TransferToken->TransportAdditionalStatus);
+  Status                        = KcsTransportStatus (TransportToken, &TransferToken->TransportAdditionalStatus);
+  if (EFI_ERROR (Status) && !EFI_ERROR (TransferToken->TransferStatus)) {
+    TransferToken->TransferStatus = Status;
+  }
+
   TransferToken->TransportAdditionalStatus |= AdditionalStatus;
 }
 
@@ -249,7 +332,8 @@ KcsTransportTransmitReceive (
 
   @param [in]   ManageabilityProtocolSpec  The protocol spec the transport interface is acquired.
   @param [out]  TransportToken             The pointer to receive the transport token created by
-                                           the target transport interface library.
+                                           the target transport interface library. It is set to
+                                           NULL when this function fails.
   @retval       EFI_SUCCESS                Token is created successfully.
   @retval       EFI_OUT_OF_RESOURCES       Out of resource to create a new transport session.
   @retval       EFI_UNSUPPORTED            Protocol is not supported on this transport interface.
@@ -265,6 +349,11 @@ AcquireTransportSession (
 {
   EFI_STATUS                   Status;
   MANAGEABILITY_TRANSPORT_KCS  *KcsTransportToken;
+  MANAGEABILITY_TRANSPORT_KCS  *SessionToken;
+
+  if (TransportToken != NULL) {
+    *TransportToken = NULL;
+  }
 
   if (ManageabilityProtocolSpec == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: No Manageability protocol specification specified.\n", __func__));
@@ -287,7 +376,8 @@ AcquireTransportSession (
     return EFI_UNSUPPORTED;
   }
 
-  if (mSingleSessionToken != NULL) {
+  SessionToken = KcsGetSessionToken ();
+  if (SessionToken != NULL) {
     DEBUG ((DEBUG_ERROR, "%a: This manageability transport library only supports one session transport token.\n", __func__));
     return EFI_OUT_OF_RESOURCES;
   }
@@ -313,8 +403,8 @@ AcquireTransportSession (
   KcsTransportToken->Token.Transport->Function.Version1_0                 = AllocateZeroPool (sizeof (MANAGEABILITY_TRANSPORT_FUNCTION_V1_0));
   if (KcsTransportToken->Token.Transport->Function.Version1_0 == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Fail to allocate memory for MANAGEABILITY_TRANSPORT_FUNCTION_V1_0\n", __func__));
-    FreePool (KcsTransportToken);
     FreePool (KcsTransportToken->Token.Transport);
+    FreePool (KcsTransportToken);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -323,8 +413,16 @@ AcquireTransportSession (
   KcsTransportToken->Token.Transport->Function.Version1_0->TransportStatus          = KcsTransportStatus;
   KcsTransportToken->Token.Transport->Function.Version1_0->TransportTransmitReceive = KcsTransportTransmitReceive;
 
-  mSingleSessionToken = KcsTransportToken;
-  *TransportToken     = &KcsTransportToken->Token;
+  Status = KcsSetSessionToken (KcsTransportToken);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Fail to set session token - %r\n", __func__, Status));
+    FreePool (KcsTransportToken->Token.Transport->Function.Version1_0);
+    FreePool (KcsTransportToken->Token.Transport);
+    FreePool (KcsTransportToken);
+    return Status;
+  }
+
+  *TransportToken = &KcsTransportToken->Token;
   return EFI_SUCCESS;
 }
 
@@ -338,7 +436,8 @@ AcquireTransportSession (
                                            See the definitions of
                                            MANAGEABILITY_TRANSPORT_CAPABILITY.
   @retval       EFI_SUCCESS                TransportCapability is returned successfully.
-  @retval       EFI_INVALID_PARAMETER      TransportToken is not a valid token.
+  @retval       EFI_INVALID_PARAMETER      TransportToken is not a valid token of the
+                                           current session, or TransportCapability is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -347,7 +446,8 @@ GetTransportCapability (
   OUT MANAGEABILITY_TRANSPORT_CAPABILITY  *TransportCapability
   )
 {
-  if ((TransportToken == NULL) || (TransportCapability == NULL)) {
+  if ((TransportCapability == NULL) || !KcsIsCurrentTransportToken (TransportToken)) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid transport token or capability output.\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -377,7 +477,8 @@ GetTransportCapability (
   @param [in]  TransportToken         The transport token acquired through
                                       AcquireTransportSession.
   @retval      EFI_SUCCESS            Token is released successfully.
-  @retval      EFI_INVALID_PARAMETER  Invalid TransportToken.
+  @retval      EFI_INVALID_PARAMETER  Invalid TransportToken, or it is not the
+                                      token of the current session.
   @retval      Otherwise              Other errors.
 
 **/
@@ -389,27 +490,27 @@ ReleaseTransportSession (
 {
   EFI_STATUS                   Status;
   MANAGEABILITY_TRANSPORT_KCS  *KcsTransportToken;
+  MANAGEABILITY_TRANSPORT_KCS  *SessionToken;
 
-  if (TransportToken == NULL) {
-    Status = EFI_INVALID_PARAMETER;
+  SessionToken = KcsGetSessionToken ();
+  if ((TransportToken == NULL) || (SessionToken == NULL) ||
+      (TransportToken != &SessionToken->Token))
+  {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid or stale KCS transport token.\n", __func__));
+    return EFI_INVALID_PARAMETER;
   }
 
-  KcsTransportToken = MANAGEABILITY_TRANSPORT_KCS_FROM_LINK (TransportToken);
-  if (mSingleSessionToken != KcsTransportToken) {
-    Status = EFI_INVALID_PARAMETER;
-  }
-
-  if (KcsTransportToken != NULL) {
-    FreePool (KcsTransportToken->Token.Transport->Function.Version1_0);
-    FreePool (KcsTransportToken->Token.Transport);
-    FreePool (KcsTransportToken);
-    mSingleSessionToken = NULL;
-    Status              = EFI_SUCCESS;
-  }
-
+  // Detach ownership before freeing. On failure keep the current graph intact
+  // so its owner can retry; never derive a container from an untrusted pointer.
+  KcsTransportToken = SessionToken;
+  Status            = KcsSetSessionToken (NULL);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Fail to release KCS transport token (%r).\n", __func__, Status));
+    return Status;
   }
 
-  return Status;
+  FreePool (KcsTransportToken->Token.Transport->Function.Version1_0);
+  FreePool (KcsTransportToken->Token.Transport);
+  FreePool (KcsTransportToken);
+  return EFI_SUCCESS;
 }

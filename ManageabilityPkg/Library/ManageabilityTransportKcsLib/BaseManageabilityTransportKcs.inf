@@ -24,6 +24,7 @@
   ManageabilityTransportKcs.c
   KcsCommon.c
   ManageabilityTransportKcs.h
+  ManageabilityTransportKcsDxeSmm.c
 
 [Packages]
   ManageabilityPkg/ManageabilityPkg.dec

@@ -173,7 +173,20 @@ platform design.
 
 ## Transport Implementation
 
-   The manageability transport library could have the implementation in library or
-   invoke the existing edk2 protocol which is defined in UEFI or PI specifications.
-   This is the implementation decision made by the developer when introduce a new
-   manageability transport library.
+The manageability transport library can implement a transport directly or
+invoke an existing protocol defined by the UEFI or PI specifications. This is
+the transport library developer's implementation decision.
+
+### KCS library instances
+
+For PEIM consumers, map `ManageabilityTransportLib` to
+`ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcsPei.inf`.
+This instance stores hardware configuration and session ownership in a GUID HOB.
+After permanent memory is discovered, temporary-memory sessions are no longer
+valid: consumers must acquire and initialize a new transport session before
+issuing commands. Stale tokens are rejected without dereferencing them.
+
+DXE, SMM and Standalone MM consumers use
+`ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf`.
+The former `Dxe/DxeManageabilityTransportKcs.inf` duplicate has been removed;
+platform DSC files referencing it must use the base instance instead.
