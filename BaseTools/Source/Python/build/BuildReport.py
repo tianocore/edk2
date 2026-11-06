@@ -1826,6 +1826,8 @@ class FdRegionReport(object):
                                 self._DiscoverNestedFvList(FvSection.FvName, Wa)
                         else:
                             self._GuidsDb[Ffs.NameGuid.upper()] = Section.FvFileName
+                            if Section.FvName in self.FvList:
+                                continue
                             self.FvList.append(Section.FvName)
                             self.FvInfo[Section.FvName] = ("Nested FV", 0, 0)
                             self._AddPrebuiltFv(Section, Wa)
