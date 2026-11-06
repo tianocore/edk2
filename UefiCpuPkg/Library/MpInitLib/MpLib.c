@@ -1256,6 +1256,7 @@ WakeUpAP (
   CPU_AP_DATA                    *CpuData;
   BOOLEAN                        ResetVectorRequired;
   CPU_INFO_IN_HOB                *CpuInfoInHob;
+  UINT32                         BootCpuCount;
 
   CpuMpData->FinishedCount = 0;
   ResetVectorRequired      = FALSE;
@@ -1332,7 +1333,8 @@ WakeUpAP (
     }
 
     if (CpuMpData->InitFlag == ApInitConfig) {
-      if (PcdGet32 (PcdCpuBootLogicalProcessorNumber) > 0) {
+      BootCpuCount = PcdGet32 (PcdCpuBootLogicalProcessorNumber);
+      if (BootCpuCount > 0) {
         //
         // The AP enumeration algorithm below is suitable only when the
         // platform can tell us the *exact* boot CPU count in advance.
@@ -1346,11 +1348,9 @@ WakeUpAP (
         // misconfiguration), then some APs may complete initialization after
         // the wait finishes, and cause undefined behavior.
         //
-        TimedWaitForApFinish (
-          CpuMpData,
-          PcdGet32 (PcdCpuBootLogicalProcessorNumber) - 1,
-          MAX_UINT32 // approx. 71 minutes
-          );
+        while (CpuMpData->FinishedCount < (BootCpuCount - 1)) {
+          CpuPause ();
+        }
       } else {
         //
         // The AP enumeration algorithm below is suitable for two use cases.
@@ -1389,10 +1389,17 @@ WakeUpAP (
           PcdGet32 (PcdCpuMaxLogicalProcessorNumber) - 1,
           PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds)
           );
+      }
 
-        while (CpuMpData->MpCpuExchangeInfo->NumApsExecuting != 0) {
-          CpuPause ();
-        }
+      //
+      // ApWakeupFunction() increments FinishedCount before decrementing
+      // NumApsExecuting (or before SevEsPlaceApHlt() decrements it prior to
+      // SVM_EXIT_AP_RESET_HOLD). Wait for NumApsExecuting to reach 0 before
+      // FreeResetVector() restores WakeupBuffer and CollectProcessorCount()
+      // sets InitFlag to ApInitDone.
+      //
+      while (CpuMpData->MpCpuExchangeInfo->NumApsExecuting != 0) {
+        CpuPause ();
       }
     } else {
       //
