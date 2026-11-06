@@ -428,7 +428,7 @@ GetEfiSysPartitionFromDevPath (
 
 /**
   This routine is called to get Simple File System protocol on the first EFI system partition found in
-  active boot option. The boot option list is detemined in order by
+  active boot option. The boot option list is determined in order by
     1. "BootNext"
     2. "BootOrder"
 
@@ -563,7 +563,7 @@ GetEfiSysPartitionFromActiveBootOption (
           break;
         }
 
-        DEBUG ((DEBUG_ERROR, "GetEfiSysPartitionFromDevPath Loop %x\n", Status));
+        DEBUG ((DEBUG_ERROR, "GetEfiSysPartitionFromDevPath retry error: %r.\n", Status));
         //
         // Stall 100ms if connection failed to ensure USB stack is ready
         //
@@ -603,11 +603,11 @@ GetEfiSysPartitionFromActiveBootOption (
   if (*FsHandle != NULL) {
     DevicePathStr2 = ConvertDevicePathToText (CurFullPath, TRUE, TRUE);
     if (DevicePathStr2 != NULL) {
-      DEBUG ((DEBUG_INFO, "Found Active EFI System Partion on %s\n", DevicePathStr2));
+      DEBUG ((DEBUG_INFO, "Found Active EFI System Partition on %s\n", DevicePathStr2));
       FreePool (DevicePathStr2);
     }
   } else {
-    DEBUG ((DEBUG_INFO, "Failed to found Active EFI System Partion\n"));
+    DEBUG ((DEBUG_INFO, "Failed to find Active EFI System Partition\n"));
   }
 
   DEBUG_CODE_END ();
@@ -636,6 +636,56 @@ GetEfiSysPartitionFromActiveBootOption (
   FreePool (BootOptionBuf);
 
   return Status;
+}
+
+/**
+  Free a FILE_INFO_ENTRY structure and all or most of the data its fields are pointing at.
+
+  @param[in]  Entry     An entry to free.
+  @param[in]  FreeInfo  Whether Entry->FileInfo should be freed.
+
+**/
+STATIC
+VOID
+FreeFileInfoEntry (
+  IN FILE_INFO_ENTRY  *Entry,
+  IN BOOLEAN          FreeInfo
+  )
+{
+  if (FreeInfo) {
+    FreePool (Entry->FileInfo);
+  }
+
+  FreePool (Entry->FileNameFirstPart);
+  FreePool (Entry->FileNameSecondPart);
+  FreePool (Entry);
+}
+
+/**
+  Free a list of FILE_INFO_ENTRY structures and all or most of the data their fields are
+  pointing at.
+
+  @param[in]  List      Head of the list to free.
+  @param[in]  FreeInfo  Whether FileInfo field of each FILE_INFO_ENTRY should be freed.
+
+**/
+STATIC
+VOID
+FreeFileInfoEntries (
+  IN LIST_ENTRY  *List,
+  IN BOOLEAN     FreeInfo
+  )
+{
+  FILE_INFO_ENTRY  *FileInfoEntry;
+  LIST_ENTRY       *Link;
+
+  while (!IsListEmpty (List)) {
+    Link = List->ForwardLink;
+    RemoveEntryList (Link);
+
+    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
+    FreeFileInfoEntry (FileInfoEntry, FreeInfo);
+  }
 }
 
 /**
@@ -861,17 +911,7 @@ EXIT:
   }
 
   if (EFI_ERROR (Status)) {
-    while (!IsListEmpty (FileInfoList)) {
-      Link = FileInfoList->ForwardLink;
-      RemoveEntryList (Link);
-
-      TempFileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
-
-      FreePool (TempFileInfoEntry->FileInfo);
-      FreePool (TempFileInfoEntry->FileNameFirstPart);
-      FreePool (TempFileInfoEntry->FileNameSecondPart);
-      FreePool (TempFileInfoEntry);
-    }
+    FreeFileInfoEntries (FileInfoList, /*FreeInfo=*/ TRUE);
 
     *FileNum = 0;
   }
@@ -989,10 +1029,7 @@ GetFileImageInAlphabetFromDir (
       Link = RemoveEntryList (Link);
       Link = Link->BackLink;
 
-      FreePool (FileInfoEntry->FileInfo);
-      FreePool (FileInfoEntry->FileNameFirstPart);
-      FreePool (FileInfoEntry->FileNameSecondPart);
-      FreePool (FileInfoEntry);
+      FreeFileInfoEntry (FileInfoEntry, /*FreeInfo=*/ TRUE);
 
       FreePool (TempFilePtrBuf[FileCount].ImageAddress);
       TempFilePtrBuf[FileCount].ImageAddress = NULL;
@@ -1020,18 +1057,9 @@ EXIT:
   *FileNum = FileCount;
 
   //
-  // FileInfo will be freed by Calller
+  // FileInfo will be freed by the caller
   //
-  while (!IsListEmpty (&FileInfoList)) {
-    Link = FileInfoList.ForwardLink;
-    RemoveEntryList (Link);
-
-    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
-
-    FreePool (FileInfoEntry->FileNameFirstPart);
-    FreePool (FileInfoEntry->FileNameSecondPart);
-    FreePool (FileInfoEntry);
-  }
+  FreeFileInfoEntries (&FileInfoList, /*FreeInfo=*/ FALSE);
 
   return Status;
 }
@@ -1121,7 +1149,7 @@ EXIT:
 }
 
 /**
-  This routine is called to get all caspules from file. The capsule file image is
+  This routine is called to get all capsules from file. The capsule file image is
   copied to BS memory. Caller is responsible to free them.
 
   @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
@@ -1135,7 +1163,8 @@ EXIT:
 
 **/
 EFI_STATUS
-GetAllCapsuleOnDisk (
+EFIAPI
+CoDGetAll (
   IN  UINTN       MaxRetry,
   OUT IMAGE_INFO  **CapsulePtr,
   OUT UINTN       *CapsuleNum,
@@ -1175,7 +1204,7 @@ GetAllCapsuleOnDisk (
                       0
                       );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "CodLibGetAllCapsuleOnDisk fail to open RootDir!\n"));
+    DEBUG ((DEBUG_ERROR, "CoDGetAll fail to open RootDir!\n"));
     RootDir->Close (RootDir);
     return Status;
   }
@@ -1307,6 +1336,10 @@ CoDCheckCapsuleOnDiskFlag (
   UINT64      OsIndication;
   UINTN       DataSize;
 
+  if (!PcdGetBool (PcdCapsuleOnDiskSupport)) {
+    return FALSE;
+  }
+
   //
   // Check File Capsule Delivery Supported Flag in OsIndication variable
   //
@@ -1388,6 +1421,25 @@ CoDClearCapsuleOnDiskFlag (
 }
 
 /**
+  This routine is called to check if on-disk capsules should be handled during
+  this boot (i.e., no invocation of CoDRelocateCapsule()).  Depends on
+  CapsuleOnDisk flag being set in OsIndications Variable and
+  PcdCapsuleOnDiskImmediate being enabled.
+
+  @retval TRUE     Processing of disk capsules was requested and is permitted
+  @retval FALSE    At least one of the prerequisites isn't met
+
+**/
+BOOLEAN
+EFIAPI
+CoDShouldProcessThisBoot (
+  VOID
+  )
+{
+  return PcdGetBool (PcdCapsuleOnDiskImmediate) && CoDCheckCapsuleOnDiskFlag ();
+}
+
+/**
   This routine is called to clear CapsuleOnDisk Relocation Info variable.
   Total Capsule On Disk length is recorded in this variable
 
@@ -1406,6 +1458,34 @@ CoDClearCapsuleRelocationInfo (
                 0,
                 NULL
                 );
+}
+
+/**
+  Free resources allocated by CoDGetAll.
+
+  @param[in]  ImageInfo  An array of data and information of files
+  @param[in]  Count      Length of the array.
+
+**/
+VOID
+EFIAPI
+CoDFreeImages (
+  IN IMAGE_INFO  *ImageInfo,
+  IN UINTN       Count
+  )
+{
+  UINTN  Index;
+
+  if ((ImageInfo == NULL) || (Count == 0)) {
+    return;
+  }
+
+  for (Index = 0; Index < Count; Index++) {
+    FreePool (ImageInfo[Index].ImageAddress);
+    FreePool (ImageInfo[Index].FileInfo);
+  }
+
+  FreePool (ImageInfo);
 }
 
 /**
@@ -1465,9 +1545,9 @@ RelocateCapsuleToDisk (
   //
   // 1. Load all Capsule On Disks in to memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "RelocateCapsule: CoDGetAll Status - %r\n", Status));
     return EFI_NOT_FOUND;
   }
 
@@ -1704,17 +1784,7 @@ EXIT:
     FreePool (CapsuleDataBuf);
   }
 
-  if (CapsuleOnDiskBuf != NULL) {
-    //
-    // Free resources allocated by CodLibGetAllCapsuleOnDisk
-    //
-    for (Index = 0; Index < CapsuleOnDiskNum; Index++ ) {
-      FreePool (CapsuleOnDiskBuf[Index].ImageAddress);
-      FreePool (CapsuleOnDiskBuf[Index].FileInfo);
-    }
-
-    FreePool (CapsuleOnDiskBuf);
-  }
+  CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
 
   if (TempCodFile != NULL) {
     if (EFI_ERROR (Status)) {
@@ -1772,9 +1842,9 @@ RelocateCapsuleToRam (
   //
   // 1. Load all Capsule On Disks into memory
   //
-  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
+  Status = CoDGetAll (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "CoDGetAll Status - %r\n", Status));
     return EFI_NOT_FOUND;
   }
 
@@ -1784,6 +1854,7 @@ RelocateCapsuleToRam (
   CapsuleBuffer = AllocateZeroPool ((CapsuleOnDiskNum + 1) * sizeof (VOID *));
   if (CapsuleBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for capsules.\n"));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1791,6 +1862,7 @@ RelocateCapsuleToRam (
   if (CapsuleSize == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for capsules.\n"));
     FreePool (CapsuleBuffer);
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1813,6 +1885,7 @@ RelocateCapsuleToRam (
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for name capsule.\n"));
     FreePool (CapsuleBuffer);
     FreePool (CapsuleSize);
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1843,8 +1916,16 @@ BuildGather:
       FreePool (FileNameCapsule);
     }
 
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
+
     return EFI_OUT_OF_RESOURCES;
   }
+
+  for (Index = 0; Index < CapsuleOnDiskNum; Index++) {
+    FreePool (CapsuleOnDiskBuf[Index].FileInfo);
+  }
+
+  FreePool (CapsuleOnDiskBuf);
 
   //
   // 4. Call UpdateCapsule() service

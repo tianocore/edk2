@@ -339,6 +339,12 @@ PlatformBootManagerAfterConsole (
     }
 
     //
+    // This also clears BootNext variable which may be used to find on-disk
+    // capsules, and thus must not be invoked before ProcessCapsules().
+    //
+    CoDClearCapsuleOnDiskFlag ();
+
+    //
     // Reset the system to disable SMI handler in order to exclude the
     // possibility of it being used outside of the firmware.
     //
@@ -348,6 +354,9 @@ PlatformBootManagerAfterConsole (
     // a case when this doesn't happen which is possible on error.
     //
     gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+  } else {
+    // Don't leave the flag in OsIndications set.
+    CoDClearCapsuleOnDiskFlag ();
   }
 
   //

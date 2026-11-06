@@ -9,6 +9,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma once
 
+#include <Guid/FileInfo.h>
+
+typedef struct {
+  //
+  // image address.
+  //
+  VOID             *ImageAddress;
+  //
+  // The file info of the image comes from.
+  //  if FileInfo == NULL. means image does not come from file
+  //
+  EFI_FILE_INFO    *FileInfo;
+} IMAGE_INFO;
+
 //
 // BOOLEAN Variable to indicate whether system is in the capsule on disk state.
 //
@@ -112,6 +126,22 @@ CoDClearCapsuleOnDiskFlag (
   );
 
 /**
+  This routine is called to check if on-disk capsules should be handled during
+  this boot (i.e., no invocation of CoDRelocateCapsule()).  Depends on
+  CapsuleOnDisk flag being set in OsIndications Variable and
+  PcdCapsuleOnDiskImmediate being enabled.
+
+  @retval TRUE     Processing of disk capsules was requested and is permitted
+  @retval FALSE    At least one of the prerequisites isn't met
+
+**/
+BOOLEAN
+EFIAPI
+CoDShouldProcessThisBoot (
+  VOID
+  );
+
+/**
   Relocate Capsule on Disk from EFI system partition.
 
   Two solution to deliver Capsule On Disk:
@@ -154,4 +184,42 @@ EFI_STATUS
 EFIAPI
 CoDRemoveTempFile (
   UINTN  MaxRetry
+  );
+
+/**
+  This routine is called to get all capsules from file. The capsule file image is
+  copied to BS memory. Caller is responsible to free them.
+
+  @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
+                                     devices like USB can get enumerated.
+  @param[out]   CapsulePtr           Copied Capsule file Image Info buffer
+  @param[out]   CapsuleNum           CapsuleNumber
+  @param[out]   FsHandle             File system handle
+  @param[out]   LoadOptionNumber     OptionNumber of boot option
+
+  @retval EFI_SUCCESS  Succeed to get all capsules.
+
+**/
+EFI_STATUS
+EFIAPI
+CoDGetAll (
+  IN  UINTN       MaxRetry,
+  OUT IMAGE_INFO  **CapsulePtr,
+  OUT UINTN       *CapsuleNum,
+  OUT EFI_HANDLE  *FsHandle,
+  OUT UINT16      *LoadOptionNumber
+  );
+
+/**
+  Free resources allocated by CoDGetAll.
+
+  @param[in]  ImageInfo  An array of data and information of files
+  @param[in]  Count      Length of the array.
+
+**/
+VOID
+EFIAPI
+CoDFreeImages (
+  IN IMAGE_INFO  *ImageInfo,
+  IN UINTN       Count
   );
