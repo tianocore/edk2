@@ -55,6 +55,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -81,7 +82,7 @@
 [Pcd]
   # 0 disables no-media promotion. Positive values set the consecutive read
   # failure threshold.
-  gEfiMdePkgTokenSpaceGuid.PcdUsbMassStorageMaxConsecutiveReadErrors  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbMassStorageMaxConsecutiveReadErrors  ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UsbMassStorageDxeExtra.uni
