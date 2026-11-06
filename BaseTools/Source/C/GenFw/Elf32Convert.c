@@ -1,5 +1,5 @@
 /** @file
-Elf32 Convert solution
+Converts ELF32 images into PE32 images.
 
 Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
