@@ -2,7 +2,7 @@
   Implement EFI RealTimeClock runtime services via RTC Lib.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2011 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2019, Linaro Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -16,6 +16,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -321,26 +322,46 @@ LibRtcInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  RtcBase;
 
   // Initialize RTC Base Address
-  mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
+  RtcBase = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdPL031RtcBase);
 
   // Declare the controller as EFI_MEMORY_RUNTIME
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo,
-                  mPL031RtcBase,
-                  SIZE_4KB,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
-                  );
+  Status = MapMmioMemory (
+             RtcBase,
+             SIZE_4KB,
+             EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
+             );
   if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to map memory. Status = %r\n",
+      Status
+      ));
     return Status;
   }
 
-  Status = gDS->SetMemorySpaceAttributes (mPL031RtcBase, SIZE_4KB, EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP);
+  Status = gDS->AllocateMemorySpace (
+                  EfiGcdAllocateAddress,
+                  EfiGcdMemoryTypeMemoryMappedIo,
+                  0,
+                  SIZE_4KB,
+                  &RtcBase,
+                  ImageHandle,
+                  NULL
+                  );
   if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to allocate memory space. Status = %r\n",
+      Status
+      ));
     return Status;
   }
+
+  mPL031RtcBase = (UINTN)RtcBase;
 
   //
   // Register for the virtual address change event

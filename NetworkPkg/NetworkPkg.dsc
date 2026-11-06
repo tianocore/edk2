@@ -77,6 +77,10 @@
 [LibraryClasses.LOONGARCH64]
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
+[LibraryClasses.AARCH64]
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+
 [PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
