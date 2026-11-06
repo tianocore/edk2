@@ -489,6 +489,13 @@ UsbParseConfigDesc (
 
     if (Setting == NULL) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: warning: failed to get interface setting, stop parsing now.\n"));
+      // After stop parsing, if no valid interface on default(0) interface, return error.
+      Interface = Config->Interfaces[0];
+      if ((Interface != NULL) && (Interface->NumOfSetting == 0)) {
+        DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: malformatted interface descriptor, no valid interface %d\n", Interface->NumOfSetting));
+        goto ON_ERROR;
+      }
+
       break;
     } else if (Setting->Desc.InterfaceNumber >= (NumIf + FirstIntfNum)) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: malformatted interface descriptor\n"));
