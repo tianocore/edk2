@@ -15,6 +15,7 @@
 #include <AcpiTableGenerator.h>
 #include <SmbiosTableGenerator.h>
 #include <DeviceTreeTableGenerator.h>
+#include <HiiFormsGenerator.h>
 #include <Library/MetadataObjLib.h>
 
 /** This macro defines the Dynamic Table Factory Protocol GUID.
@@ -200,6 +201,60 @@ EFI_STATUS
   IN  CONST DT_TABLE_GENERATOR                *CONST Generator
   );
 
+/** Return a pointer to the HII Form generator.
+
+  @param [in]  This       Pointer to the dynamic table factory
+                          protocol.
+  @param [in]  TableId    The HII form generator ID for the
+                          requested generator.
+  @param [out] Generator  Pointer to the requested HII form
+                          generator.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_NOT_FOUND         The requested generator is not found
+                                in the list of registered generators.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_GET_HII_FORM_GENERATOR)(
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
+  IN  CONST HII_FORM_GENERATOR_ID                         GeneratorId,
+  OUT CONST HII_FORM_GENERATOR                    **CONST Generator
+  );
+
+/** Registers a HII form generator.
+
+  @param [in]  Generator        Pointer to the HII Form generator.
+
+  @retval EFI_SUCCESS           The Generator was registered
+                                successfully.
+  @retval EFI_INVALID_PARAMETER The Generator ID is invalid or
+                                the Generator pointer is NULL.
+  @retval EFI_ALREADY_STARTED   The Generator for the Table ID is
+                                already registered.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_HII_FORM_GENERATOR)(
+  IN  CONST HII_FORM_GENERATOR          *CONST  Generator
+  );
+
+/** Deregister a HII form generator.
+
+  @param [in]  Generator        Pointer to the HII form generator.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER The generator is invalid.
+  @retval EFI_NOT_FOUND         The requested generator is not found
+                                in the list of registered generators.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_HII_FORM_GENERATOR)(
+  IN  CONST  HII_FORM_GENERATOR         *CONST Generator
+  );
+
 /** Get the Root handle of the MetadataObjLib.
 
   During the firmware table generation, some Metadata information might be
@@ -252,6 +307,17 @@ typedef struct DynamicTableFactoryProtocol {
   /// Deregister a DT generator
   EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_DT_TABLE_GENERATOR
                                                             DeregisterDtTableGenerator;
+
+  /// The interface used to request a HII form generator.
+  EDKII_DYNAMIC_TABLE_FACTORY_GET_HII_FORM_GENERATOR        GetHiiFormGenerator;
+
+  /// Register a HII form generator
+  EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_HII_FORM_GENERATOR
+                                                            RegisterHiiFormGenerator;
+
+  /// Deregister a HII form generator
+  EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_HII_FORM_GENERATOR
+                                                            DeregisterHiiFormGenerator;
 
   /// Finalization step
   EDKII_DYNAMIC_TABLE_FACTORY_GET_METADATA_ROOT
