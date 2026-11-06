@@ -60,7 +60,7 @@ EFI_STATUS
   );
 
 /** Main dispatcher: sequentially call the parsers/dispatchers
-    of the HwInfoParserTable.
+    of the mHwInfoParserTable.
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
