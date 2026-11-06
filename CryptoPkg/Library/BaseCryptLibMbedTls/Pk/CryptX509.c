@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <mbedtls/ecp.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
+#include <mbedtls/oid.h>
 
 ///
 /// OID
@@ -1430,6 +1431,95 @@ InternalX509FindExtensionData (
   }
 
   return ReturnStatus;
+}
+
+/**
+  Determine whether the provider supports signature verification with a public key.
+
+  This function does not verify the certificate signature, validity period,
+  trust chain, or key usage.
+
+  @param[in]  Cert      Pointer to the DER-encoded X.509 certificate.
+  @param[in]  CertSize  Size of Cert in bytes.
+
+  @retval TRUE   The certificate has a supported RSA public key.
+  @retval FALSE  The input is invalid or verification is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509IsPublicKeySupported (
+  IN CONST UINT8  *Cert,
+  IN UINTN        CertSize
+  )
+{
+  mbedtls_x509_crt  Crt;
+  BOOLEAN           Supported;
+  UINT8             *Ptr;
+  UINT8             *Tbs;
+  UINTN             TbsSize;
+  CONST UINT8       *End;
+  UINTN             Length;
+  UINTN             Index;
+  mbedtls_x509_buf  Algorithm;
+  mbedtls_x509_buf  Parameters;
+
+  if ((Cert == NULL) || (CertSize == 0) ||
+      !X509GetTBSCert (Cert, CertSize, &Tbs, &TbsSize))
+  {
+    return FALSE;
+  }
+
+  Ptr = Tbs;
+  End = Tbs + TbsSize;
+  if (mbedtls_asn1_get_tag (&Ptr, End, &Length, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE) != 0) {
+    return FALSE;
+  }
+
+  End = Ptr + Length;
+  if ((Ptr < End) && (*Ptr == (MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED))) {
+    if (mbedtls_asn1_get_tag (&Ptr, End, &Length, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED) != 0) {
+      return FALSE;
+    }
+
+    Ptr += Length;
+  }
+
+  // Skip serialNumber, signature, issuer, validity, and subject.
+  for (Index = 0; Index < 5; Index++) {
+    if (mbedtls_asn1_get_tag (
+          &Ptr,
+          End,
+          &Length,
+          (Index == 0) ? MBEDTLS_ASN1_INTEGER : (MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE)
+          ) != 0)
+    {
+      return FALSE;
+    }
+
+    Ptr += Length;
+  }
+
+  if (mbedtls_asn1_get_tag (&Ptr, End, &Length, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE) != 0) {
+    return FALSE;
+  }
+
+  End = Ptr + Length;
+  if (mbedtls_asn1_get_alg (&Ptr, End, &Algorithm, &Parameters) != 0) {
+    return FALSE;
+  }
+
+  // This MbedTlsLib instance links EC stubs; reject non-RSA keys before parsing.
+  if ((Algorithm.len != MBEDTLS_OID_SIZE (MBEDTLS_OID_PKCS1_RSA)) ||
+      (CompareMem (Algorithm.p, MBEDTLS_OID_PKCS1_RSA, Algorithm.len) != 0))
+  {
+    return FALSE;
+  }
+
+  mbedtls_x509_crt_init (&Crt);
+  Supported = (BOOLEAN)(mbedtls_x509_crt_parse_der (&Crt, Cert, CertSize) == 0);
+
+  mbedtls_x509_crt_free (&Crt);
+  return Supported;
 }
 
 /**

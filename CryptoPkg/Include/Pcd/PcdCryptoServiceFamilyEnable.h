@@ -237,6 +237,7 @@ typedef struct {
       UINT8    GetCertFromCertChain        : 1;
       UINT8    Asn1GetTag                  : 1;
       UINT8    GetExtendedBasicConstraints : 1;
+      UINT8    IsPublicKeySupported        : 1;
     } Services;
     UINT32    Family;
   } X509;

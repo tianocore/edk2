@@ -7,6 +7,8 @@
 **/
 #include "TestBaseCryptLib.h"
 
+CONST BOOLEAN  mX509EcSupported = FALSE;
+
 SUITE_DESC  mSuiteDesc[] = {
   //
   // Title--------------------------Package-------------------Sup--Tdn----TestNum------------TestDesc
