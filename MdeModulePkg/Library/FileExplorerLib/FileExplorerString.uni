@@ -53,3 +53,7 @@
                                        #language fr-FR  "Create Folder and Exit"
 #string STR_NO_CREATE_FOLDER_AND_EXIT  #language en-US  "Discard Create and Exit"
                                        #language fr-FR  "Discard Create and Exit"
+#string STR_UP_ONE_LEVEL               #language en-US  "<.. Up one level>"
+                                       #language fr-FR  "<.. Up one level>"
+#string STR_UP_ONE_LEVEL_HELP          #language en-US  "Return to the parent directory, or to the volume list when at the root of a volume"
+                                       #language fr-FR  "Return to the parent directory, or to the volume list when at the root of a volume"
