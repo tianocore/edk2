@@ -2033,16 +2033,34 @@ class FdRegionReport(object):
                 if Match:
                     FvTotalSize = int(Match.group(1), 16)
                 Match = gFvTakenSizePattern.search(FvReport)
+                FvTakenSizeFound = Match is not None
                 if Match:
                     FvTakenSize = int(Match.group(1), 16)
                 FvFreeSize = FvTotalSize - FvTakenSize
+                if FvTotalSize > 0:
+                    FvTotalSizeText = "0x%X (%.0fK)" % (FvTotalSize, FvTotalSize / 1024.0)
+                    FvUsage = "%.1f%% Full" % (FvTakenSize * 100.0 / FvTotalSize)
+                    FvTakenSizeText = "0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0)
+                    FvFreeSizeText = "0x%X (%.0fK)" % (FvFreeSize, FvFreeSize / 1024.0)
+                else:
+                    #
+                    # The total size is missing or zero, so the report file
+                    # is incomplete. Do not report size values derived from it.
+                    #
+                    FvTotalSizeText = "N/A"
+                    FvUsage = "N/A"
+                    if FvTakenSizeFound:
+                        FvTakenSizeText = "0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0)
+                    else:
+                        FvTakenSizeText = "N/A"
+                    FvFreeSizeText = "N/A"
                 #
                 # Write size information to the report file.
                 #
-                FileWrite(File, "Size:               0x%X (%.0fK)" % (FvTotalSize, FvTotalSize / 1024.0))
-                FileWrite(File, "Fv Name:            %s (%.1f%% Full)" % (FvReportName, FvTakenSize * 100.0 / FvTotalSize))
-                FileWrite(File, "Occupied Size:      0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0))
-                FileWrite(File, "Free Size:          0x%X (%.0fK)" % (FvFreeSize, FvFreeSize / 1024.0))
+                FileWrite(File, "Size:               %s" % FvTotalSizeText)
+                FileWrite(File, "Fv Name:            %s (%s)" % (FvReportName, FvUsage))
+                FileWrite(File, "Occupied Size:      %s" % FvTakenSizeText)
+                FileWrite(File, "Free Size:          %s" % FvFreeSizeText)
                 FileWrite(File, "Offset     Module")
                 FileWrite(File, gSubSectionSep)
                 #
