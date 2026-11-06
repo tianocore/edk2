@@ -1,0 +1,40 @@
+## @file
+#  Register SBSA watchdog configuration callbacks.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtWatchdogBindingDriver
+  FILE_GUID                      = 03a87533-710e-47bc-8f16-70b9198c1305
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = UfdtWatchdogBindingDriverConstructor
+
+[Sources]
+  UfdtWatchdogBindingDriver.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UfdtDispatcherLib
+  PcdLib
+  MapMmioLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Protocols]
+  gEdkiiUfdtWatchdogInfoProtocolGuid  ## SOMETIMES_PRODUCES
+  gEdkiiUfdtWatchdogAbsentProtocolGuid  ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum

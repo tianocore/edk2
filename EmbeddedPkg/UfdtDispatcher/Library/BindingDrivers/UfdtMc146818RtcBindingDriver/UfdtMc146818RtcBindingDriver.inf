@@ -1,0 +1,41 @@
+## @file
+#  Register MC146818 RTC configuration callbacks.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtMc146818RtcBindingDriver
+  FILE_GUID                      = b30f6bd7-8663-413a-8ce3-6c6144504bc2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = UfdtMc146818RtcBindingDriverConstructor
+
+[Sources]
+  UfdtMc146818RtcBindingDriver.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UfdtDispatcherLib
+  PcdLib
+  MapMmioLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Protocols]
+  gEdkiiUfdtGenericRtcProtocolGuid  ## SOMETIMES_PRODUCES ## CONSUMES
+  gEdkiiUfdtMc146818RtcInfoProtocolGuid  ## SOMETIMES_PRODUCES
+  gEdkiiUfdtMc146818RtcAbsentProtocolGuid  ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64

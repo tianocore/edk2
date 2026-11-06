@@ -73,6 +73,8 @@ DEFINE FD_SIZE_IN_MB    = 3
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
+  UfdtDispatcherLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDispatcherLib/UfdtDispatcherLib.inf
+  UfdtDepexLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDepexLib/UfdtDepexLib.inf
   GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -347,6 +349,9 @@ DEFINE FD_SIZE_IN_MB    = 3
 ################################################################################
 
 [PcdsFeatureFlag.common]
+  # Use MMIO for accessing RTC controller registers.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcUseMmio|TRUE
+
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
@@ -477,6 +482,20 @@ DEFINE FD_SIZE_IN_MB    = 3
 !endif
 
 [PcdsDynamicDefault.common]
+  ## RTC Register address in MMIO space.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0x0
+
+  ## PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
+
+  #
+  # ARM Watchdog
+  #
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x0
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x0
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|0x0
+
   #
   # ARM Timers
   #
@@ -529,23 +548,45 @@ DEFINE FD_SIZE_IN_MB    = 3
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
-  ArmVirtPkg/Library/ArmVirtGicPlatformDxe/ArmVirtGicPlatformDxe.inf
+  EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtWatchdogBindingDriver/UfdtWatchdogBindingDriver.inf
+!if $(PLAT_KVMTOOL) == TRUE
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtMc146818RtcBindingDriver/UfdtMc146818RtcBindingDriver.inf
+!elseif $(PLAT_XEN) == FALSE
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtPl031BindingDriver/UfdtPl031BindingDriver.inf
+!endif
+  }
   ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV2DepexLib.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
   }
   ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmGicDepexLib/ArmGicV3DepexLib.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV3DepexLib/UfdtGicV3DepexLib.inf
   }
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
     <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtTimerDepexLib/UfdtTimerDepexLib.inf
   }
 
   #
   # Architectural Protocols
   #
+  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtMc146818RtcDepexLib/UfdtMc146818RtcDepexLib.inf
+  }
+  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
+!if $(PLAT_XEN) == FALSE
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtRtcDepexLib/UfdtRtcDepexLib.inf
+!endif
+  }
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
