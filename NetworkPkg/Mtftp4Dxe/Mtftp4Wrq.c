@@ -44,7 +44,11 @@ Mtftp4WrqSendBlock (
   }
 
   Packet = (EFI_MTFTP4_PACKET *)NetbufAllocSpace (UdpPacket, MTFTP4_DATA_HEAD_LEN, FALSE);
-  ASSERT (Packet != NULL);
+  if (Packet == NULL) {
+    ASSERT (Packet != NULL);
+    NetbufFree (UdpPacket);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Packet->Data.OpCode = HTONS (EFI_MTFTP4_OPCODE_DATA);
   Packet->Data.Block  = HTONS (BlockNum);
@@ -65,7 +69,11 @@ Mtftp4WrqSendBlock (
     }
 
     if (DataLen > 0) {
-      NetbufAllocSpace (UdpPacket, DataLen, FALSE);
+      if (NetbufAllocSpace (UdpPacket, DataLen, FALSE) == NULL) {
+        NetbufFree (UdpPacket);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (Packet->Data.Data, (UINT8 *)Token->Buffer + Start, DataLen);
     }
   } else {
@@ -104,7 +112,12 @@ Mtftp4WrqSendBlock (
     }
 
     if (DataLen > 0) {
-      NetbufAllocSpace (UdpPacket, DataLen, FALSE);
+      if (NetbufAllocSpace (UdpPacket, DataLen, FALSE) == NULL) {
+        FreePool (DataBuf);
+        NetbufFree (UdpPacket);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (Packet->Data.Data, DataBuf, DataLen);
       FreePool (DataBuf);
     }
@@ -387,7 +400,11 @@ Mtftp4WrqInput (
     NetbufCopy (UdpPacket, 0, Len, (UINT8 *)Packet);
   } else {
     Packet = (EFI_MTFTP4_PACKET *)NetbufGetByte (UdpPacket, 0, NULL);
-    ASSERT (Packet != NULL);
+    if (Packet == NULL) {
+      ASSERT (Packet != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
   }
 
   Opcode = NTOHS (Packet->OpCode);
