@@ -213,9 +213,9 @@ IpmiSendMessage (
 }
 
 /**
-  This function gets the system UUID.
+  This function gets the system UUID as a canonical EFI_GUID.
 
-  @param[out] SystemGuid   The pointer to retrieve system UUID.
+  @param[out] SystemGuid   The pointer to retrieve system UUID. Unchanged on failure.
 
   @retval EFI_UNSUPPORTED  Unsupported in the NULL lib.
 **/

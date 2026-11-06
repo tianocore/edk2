@@ -211,13 +211,14 @@ IpmiSendMessage (
   );
 
 /**
-  This function gets the system UUID.
+  This function gets the system UUID as a canonical EFI_GUID.
 
-  @param[out] SystemGuid   The pointer to retrieve system UUID.
+  @param[out] SystemGuid   The pointer to retrieve system UUID. Unchanged on failure.
 
-  @retval EFI_SUCCESS            Command is sent successfully.
-  @retval EFI_NOT_AVAILABLE_YET  Transport interface is not ready yet.
-  @retval Others                 Other errors.
+  @retval EFI_SUCCESS            UUID is returned.
+  @retval EFI_INVALID_PARAMETER  SystemGuid is a NULL pointer.
+  @retval EFI_DEVICE_ERROR       The command failed or its response is invalid.
+  @retval EFI_UNSUPPORTED        This library instance does not implement the command.
 
 **/
 EFI_STATUS
