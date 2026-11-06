@@ -735,3 +735,44 @@ IpmiGetSdr (
   OUT IPMI_GET_SDR_RESPONSE  *GetSdrResponse,
   IN OUT UINT32              *GetSdrResponseSize
   );
+
+/**
+  This function sends the Set Sensor Thresholds command for a sensor.
+
+  @param[in]  SetSensorThresholdRequestData  The filled out Set Sensor Thresholds
+                                             request.
+  @param[out] CompletionCode                 The command completion code.
+
+  @retval EFI_SUCCESS            The command was sent successfully.
+  @retval EFI_INVALID_PARAMETER  SetSensorThresholdRequestData or CompletionCode
+                                 is NULL.
+  @retval EFI_UNSUPPORTED        This library instance does not implement the command.
+  @retval Others                 See the return values of IpmiSubmitCommand () function.
+
+**/
+EFI_STATUS
+EFIAPI
+IpmiSetSensorThreshold (
+  IN  IPMI_SENSOR_SET_SENSOR_THRESHOLD_REQUEST_DATA  *SetSensorThresholdRequestData,
+  OUT UINT8                                          *CompletionCode
+  );
+
+/**
+  This function sends the Get Sensor Thresholds command for a sensor.
+
+  @param[in]  SensorNumber                The unique identifier of the sensor being queried.
+  @param[out] GetSensorThresholdResponse  The Get Sensor Thresholds response, including
+                                          the completion code.
+
+  @retval EFI_SUCCESS            The command was sent successfully.
+  @retval EFI_INVALID_PARAMETER  GetSensorThresholdResponse is NULL.
+  @retval EFI_UNSUPPORTED        This library instance does not implement the command.
+  @retval Others                 See the return values of IpmiSubmitCommand () function.
+
+**/
+EFI_STATUS
+EFIAPI
+IpmiGetSensorThreshold (
+  IN  UINT8                                           SensorNumber,
+  OUT IPMI_SENSOR_GET_SENSOR_THRESHOLD_RESPONSE_DATA  *GetSensorThresholdResponse
+  );
