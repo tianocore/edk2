@@ -3,6 +3,7 @@
   KCS instance of Manageability Transport Library
 
   Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -18,6 +19,12 @@
 #include <Library/ManageabilityTransportHelperLib.h>
 
 #include "ManageabilityTransportKcs.h"
+
+STATIC_ASSERT (
+  MANAGEABILITY_IPMI_KCS_PCD_CONFIGURATION_VALID,
+  "PcdIpmiKcsIoDataAddress and PcdIpmiKcsIoCommandAddress must both be 0xFFFF, "
+  "or both be distinct non-0xFFFF addresses"
+  );
 
 MANAGEABILITY_TRANSPORT_KCS  *mSingleSessionToken = NULL;
 
@@ -65,11 +72,11 @@ KcsTransportInit (
   if (HardwareInfo.Kcs == NULL) {
     DEBUG ((DEBUG_MANAGEABILITY_INFO, "%a: Hardware information is not provided, use dfault settings.\n", __func__));
     mKcsHardwareInfo.MemoryMap                    = MANAGEABILITY_TRANSPORT_KCS_IO_MAP_IO;
-    mKcsHardwareInfo.IoBaseAddress.IoAddress16    = PcdGet16 (PcdIpmiKcsIoBaseAddress);
-    mKcsHardwareInfo.IoDataInAddress.IoAddress16  = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_IN_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoDataOutAddress.IoAddress16 = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_DATA_OUT_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoCommandAddress.IoAddress16 = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_COMMAND_REGISTER_OFFSET;
-    mKcsHardwareInfo.IoStatusAddress.IoAddress16  = mKcsHardwareInfo.IoBaseAddress.IoAddress16 + IPMI_KCS_STATUS_REGISTER_OFFSET;
+    mKcsHardwareInfo.IoBaseAddress.IoAddress16    = MANAGEABILITY_IPMI_KCS_DATA_ADDRESS;
+    mKcsHardwareInfo.IoDataInAddress.IoAddress16  = MANAGEABILITY_IPMI_KCS_DATA_ADDRESS;
+    mKcsHardwareInfo.IoDataOutAddress.IoAddress16 = MANAGEABILITY_IPMI_KCS_DATA_ADDRESS;
+    mKcsHardwareInfo.IoCommandAddress.IoAddress16 = MANAGEABILITY_IPMI_KCS_COMMAND_ADDRESS;
+    mKcsHardwareInfo.IoStatusAddress.IoAddress16  = MANAGEABILITY_IPMI_KCS_COMMAND_ADDRESS;
   } else {
     mKcsHardwareInfo.MemoryMap        = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->MemoryMap;
     mKcsHardwareInfo.IoBaseAddress    = ((MANAGEABILITY_TRANSPORT_KCS_HARDWARE_INFO *)HardwareInfo.Kcs)->IoBaseAddress;
