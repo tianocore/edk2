@@ -973,6 +973,22 @@ Tpm2PolicyCommandCode (
   );
 
 /**
+  This command indicates that the authorization will be limited to a specific locality.
+
+  @param[in]  PolicySession      Handle for the policy session being extended.
+  @param[in]  Locality           The allowed locality(ies).
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicyLocality (
+  IN      TPMI_SH_POLICY  PolicySession,
+  IN      TPMA_LOCALITY   Locality
+  );
+
+/**
   This command returns the current policyDigest of the session. This command allows the TPM
   to be used to perform the actions required to precompute the authPolicy for an object.
 
