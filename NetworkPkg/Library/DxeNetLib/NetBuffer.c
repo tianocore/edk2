@@ -268,7 +268,8 @@ NetbufClone (
 
   @param[in]       Nbuf         Pointer to the net buffer to be duplicated from.
   @param[in, out]  Duplicate    Pointer to the net buffer to duplicate to, if
-                                NULL a new net buffer is allocated.
+                                NULL a new net buffer is allocated. A supplied
+                                buffer remains owned by the caller on failure.
   @param[in]      HeadSpace     Length of the head space to reserve.
 
   @return                       Pointer to the duplicated net buffer, or NULL if
@@ -283,11 +284,13 @@ NetbufDuplicate (
   IN UINT32       HeadSpace
   )
 {
-  UINT8  *Dst;
+  UINT8    *Dst;
+  BOOLEAN  AllocatedDuplicate;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
-  if (Duplicate == NULL) {
+  AllocatedDuplicate = (BOOLEAN)(Duplicate == NULL);
+  if (AllocatedDuplicate) {
     Duplicate = NetbufAlloc (Nbuf->TotalSize + HeadSpace);
   }
 
@@ -303,6 +306,15 @@ NetbufDuplicate (
   NetbufReserve (Duplicate, HeadSpace);
 
   Dst = NetbufAllocSpace (Duplicate, Nbuf->TotalSize, NET_BUF_TAIL);
+  if (Dst == NULL) {
+    ASSERT (Dst != NULL);
+    if (AllocatedDuplicate) {
+      NetbufFree (Duplicate);
+    }
+
+    return NULL;
+  }
+
   NetbufCopy (Nbuf, 0, Nbuf->TotalSize, Dst);
 
   return Duplicate;
