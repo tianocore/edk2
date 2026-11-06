@@ -51,11 +51,10 @@ class FMMT():
     def __init__(self) -> None:
         pass
 
-    def SetConfigFilePath(self, configfilepath:str) -> str:
+    def SetConfigFilePath(self, configfilepath:str) -> None:
         os.environ['FmmtConfPath'] = os.path.abspath(configfilepath)
 
-    def SetDestPath(self, inputfile:str) -> str:
-        os.environ['FmmtConfPath'] = ''
+    def SetDestPath(self, inputfile:str) -> None:
         self.dest_path = os.path.dirname(os.path.abspath(inputfile))
         old_env = os.environ['PATH']
         os.environ['PATH'] = self.dest_path + os.pathsep + old_env
