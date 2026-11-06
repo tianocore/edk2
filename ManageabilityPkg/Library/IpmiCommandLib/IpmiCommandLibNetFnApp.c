@@ -355,13 +355,13 @@ IpmiSendMessage (
 }
 
 /**
-  This function gets the system UUID.
+  This function gets the system UUID as a canonical EFI_GUID.
 
-  @param[out] SystemGuid   The pointer to retrieve system UUID.
+  @param[out] SystemGuid   The pointer to retrieve system UUID. Unchanged on failure.
 
   @retval EFI_SUCCESS               UUID is returned.
   @retval EFI_INVALID_PARAMETER     SystemGuid is a NULL pointer.
-  @retval Others                    See the return values of IpmiSubmitCommand () function.
+  @retval EFI_DEVICE_ERROR          The command failed or its response is invalid.
 
 **/
 EFI_STATUS
@@ -371,35 +371,51 @@ IpmiGetSystemUuid (
   )
 {
   EFI_STATUS                     Status;
-  UINT32                         RequestSize;
   UINT32                         ResponseSize;
   IPMI_GET_SYSTEM_UUID_RESPONSE  GetSystemUuidResponse;
+  CONST UINT8                    *GuidBytes;
+  UINTN                          Index;
 
   if (SystemGuid == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: SystemGuid is NULL\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
-  RequestSize  = 0;
+  ZeroMem (&GetSystemUuidResponse, sizeof (GetSystemUuidResponse));
   ResponseSize = sizeof (IPMI_GET_SYSTEM_UUID_RESPONSE);
   Status       = IpmiSubmitCommand (
                    IPMI_NETFN_APP,
                    IPMI_APP_GET_SYSTEM_GUID,
-                   (VOID *)NULL,
-                   RequestSize,
+                   NULL,
+                   0,
                    (VOID *)&GetSystemUuidResponse,
                    &ResponseSize
                    );
-  if (!EFI_ERROR (Status) && (GetSystemUuidResponse.CompletionCode == IPMI_COMP_CODE_NORMAL)) {
-    CopyMem (
-      (VOID *)SystemGuid,
-      (VOID *)&GetSystemUuidResponse.SystemUuid,
-      sizeof (EFI_GUID)
-      );
-  } else {
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a: Get System GUID transport failed: %r\n", __func__, Status));
     return EFI_DEVICE_ERROR;
   }
 
-  return Status;
+  if (ResponseSize != sizeof (GetSystemUuidResponse)) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid Get System GUID response size: %u\n", __func__, ResponseSize));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (GetSystemUuidResponse.CompletionCode != IPMI_COMP_CODE_NORMAL) {
+    DEBUG ((DEBUG_ERROR, "%a: Get System GUID completion code: 0x%02X\n", __func__, GetSystemUuidResponse.CompletionCode));
+    return EFI_DEVICE_ERROR;
+  }
+
+  // IPMI sends node and clock sequence first, then the time fields, all LSB-first.
+  GuidBytes = (CONST UINT8 *)&GetSystemUuidResponse.SystemUuid;
+  CopyMem (&SystemGuid->Data1, &GuidBytes[12], sizeof (SystemGuid->Data1));
+  CopyMem (&SystemGuid->Data2, &GuidBytes[10], sizeof (SystemGuid->Data2));
+  CopyMem (&SystemGuid->Data3, &GuidBytes[8], sizeof (SystemGuid->Data3));
+  for (Index = 0; Index < sizeof (SystemGuid->Data4); Index++) {
+    SystemGuid->Data4[Index] = GuidBytes[sizeof (SystemGuid->Data4) - 1 - Index];
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
