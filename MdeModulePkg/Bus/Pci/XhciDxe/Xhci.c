@@ -928,19 +928,19 @@ XhcControlTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((MaximumPacketLength != 8)  && (MaximumPacketLength != 16) &&
-      (MaximumPacketLength != 32) && (MaximumPacketLength != 64) &&
-      (MaximumPacketLength != 512)
+  if ((MaximumPacketLength != USB_LOW_SPEED_MAX_PACKET_SIZE)  && (MaximumPacketLength != USB_FULL_SPEED_CTRL_MAX_PACKET_SIZE_16) &&
+      (MaximumPacketLength != USB_FULL_SPEED_CTRL_MAX_PACKET_SIZE_32) && (MaximumPacketLength != USB_FULL_SPEED_CTRL_MAX_PACKET_SIZE_64) &&
+      (MaximumPacketLength != USB_SUPER_SPEED_CTRL_MAX_PACKET_SIZE)
       )
   {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((DeviceSpeed == EFI_USB_SPEED_LOW) && (MaximumPacketLength != 8)) {
+  if ((DeviceSpeed == EFI_USB_SPEED_LOW) && (MaximumPacketLength != USB_LOW_SPEED_MAX_PACKET_SIZE)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((DeviceSpeed == EFI_USB_SPEED_SUPER) && (MaximumPacketLength != 512)) {
+  if ((DeviceSpeed == EFI_USB_SPEED_SUPER) && (MaximumPacketLength != USB_SUPER_SPEED_CTRL_MAX_PACKET_SIZE)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1037,7 +1037,7 @@ XhcControlTransfer (
        ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_DEVICE)))))
   {
     DescriptorType = (UINT8)(Request->Value >> 8);
-    if ((DescriptorType == USB_DESC_TYPE_DEVICE) && ((*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR)) || ((DeviceSpeed == EFI_USB_SPEED_FULL) && (*DataLength == 8)))) {
+      if ((DescriptorType == USB_DESC_TYPE_DEVICE) && ((*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR)) || ((DeviceSpeed == EFI_USB_SPEED_FULL) && (*DataLength == USB_LOW_SPEED_MAX_PACKET_SIZE)))) {
       ASSERT (Data != NULL);
       //
       // Store a copy of device scriptor as hub device need this info to configure endpoint.
@@ -1072,6 +1072,21 @@ XhcControlTransfer (
         // Default to use AlternateSetting 0 for all interfaces.
         //
         Xhc->UsbDevContext[SlotId].ActiveAlternateSetting = AllocateZeroPool (Xhc->UsbDevContext[SlotId].ConfDesc[Index]->NumInterfaces * sizeof (UINT8));
+      } else if (*DataLength == USB_LOW_SPEED_MAX_PACKET_SIZE) {
+        //
+        // Allow the initial 8-byte probe issued by UsbGetOneConfig() to read
+        // TotalLength. To distinguish the valid initial probe request from an invalid
+        // descriptor transfer, explicitly allow the 8-byte request used to
+        // retrieve TotalLength and report an error for any other size mismatch.
+        //
+      } else {
+        //
+        // Descriptor length mismatch on the full-length request indicating corrupt descriptor,
+        // treat as ERROR
+        DEBUG ((DEBUG_ERROR, "XHCI: Invalid configuration descriptor length: received %u, expected %u\n", (UINT32)*DataLength, (UINT32)((UINT16 *)Data)[1]));
+        Status          = EFI_DEVICE_ERROR;
+        *TransferResult = EFI_USB_ERR_SYSTEM;
+        goto ON_EXIT;
       }
     } else if (((DescriptorType == USB_DESC_TYPE_HUB) ||
                 (DescriptorType == USB_DESC_TYPE_HUB_SUPER_SPEED)) && (*DataLength > 2))
@@ -1106,6 +1121,12 @@ XhcControlTransfer (
     // Hook Set_Config request from UsbBus as we need configure device endpoint.
     //
     for (Index = 0; Index < Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations; Index++) {
+      if (Xhc->UsbDevContext[SlotId].ConfDesc[Index] == NULL) {
+        // ConfDesc[Index] is NULL because GET_DESCRIPTOR failed with mismatch size.
+        DEBUG ((DEBUG_ERROR, "XhcControlTransfer: ConfDesc[%d] is NULL\n", Index));
+        continue;
+      }
+
       if (Xhc->UsbDevContext[SlotId].ConfDesc[Index]->ConfigurationValue == (UINT8)Request->Value) {
         if (Xhc->HcCParams.Data.Csz == 0) {
           Status = XhcSetConfigCmd (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Index]);
@@ -1287,9 +1308,9 @@ XhcBulkTransfer (
   }
 
   if ((DeviceSpeed == EFI_USB_SPEED_LOW) ||
-      ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > 64)) ||
-      ((EFI_USB_SPEED_HIGH == DeviceSpeed) && (MaximumPacketLength > 512)) ||
-      ((EFI_USB_SPEED_SUPER == DeviceSpeed) && (MaximumPacketLength > 1024)))
+      ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > USB_FULL_SPEED_BULK_MAX_PACKET_SIZE)) ||
+      ((EFI_USB_SPEED_HIGH == DeviceSpeed) && (MaximumPacketLength > USB_HIGH_SPEED_BULK_MAX_PACKET_SIZE)) ||
+      ((EFI_USB_SPEED_SUPER == DeviceSpeed) && (MaximumPacketLength > USB_SUPER_SPEED_BULK_MAX_PACKET_SIZE)))
   {
     return EFI_INVALID_PARAMETER;
   }
@@ -1553,9 +1574,9 @@ XhcSyncInterruptTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((DeviceSpeed == EFI_USB_SPEED_LOW) && (MaximumPacketLength != 8))  ||
-      ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > 64)) ||
-      ((DeviceSpeed == EFI_USB_SPEED_HIGH) && (MaximumPacketLength > 3072)))
+  if (((DeviceSpeed == EFI_USB_SPEED_LOW) && (MaximumPacketLength != USB_LOW_SPEED_MAX_PACKET_SIZE))  ||
+      ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > USB_FULL_SPEED_BULK_MAX_PACKET_SIZE)) ||
+      ((DeviceSpeed == EFI_USB_SPEED_HIGH) && (MaximumPacketLength > USB_HIGH_SPEED_INT_MAX_PACKET_SIZE)))
   {
     return EFI_INVALID_PARAMETER;
   }
