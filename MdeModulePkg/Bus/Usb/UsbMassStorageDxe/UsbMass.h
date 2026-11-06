@@ -183,9 +183,9 @@ struct _USB_MASS_DEVICE {
   BOOLEAN                     Cdb16Byte;
 
   //
-  // Read-failure tracking for current enumeration instance. StickyNoMedia is set
+  // Read-failure tracking for current enumeration instance. StickyReadError is set
   // only when PcdUsbMassStorageMaxConsecutiveReadErrors is a positive threshold.
   //
   UINTN                       ConsecutiveReadErrorCount;
-  BOOLEAN                     StickyNoMedia;
+  BOOLEAN                     StickyReadError;
 };

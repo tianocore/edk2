@@ -798,6 +798,13 @@ UsbBootDetectMedia (
       Media->MediaId++;
     }
 
+    //
+    // A detected media change allows reads to be attempted on the new medium.
+    // This also covers changes detected by WriteBlocks().
+    //
+    UsbMass->StickyReadError           = FALSE;
+    UsbMass->ConsecutiveReadErrorCount = 0;
+
     Status = Media->MediaPresent ? EFI_MEDIA_CHANGED : EFI_NO_MEDIA;
   }
 

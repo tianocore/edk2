@@ -1806,8 +1806,8 @@
   # @Prompt SATA device ready for operations timoeout (s), default value is 16s.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSataDeviceReadyTimeout|16|UINT8|0x00000038
 
-  ## Indicates the consecutive USB mass storage read failure threshold for no-media promotion.
-  #  A value of 0 disables no-media promotion.
+  ## Indicates the consecutive USB mass storage read failure threshold for latching EFI_DEVICE_ERROR.
+  #  A value of 0 disables read-error latching.
   #  Positive values set the consecutive read failure threshold.
   # @Prompt USB Mass Storage Maximum Consecutive Read Errors.
   # @ValidRange 0x80000001 | 0x00000000 - 0xFFFFFFFF

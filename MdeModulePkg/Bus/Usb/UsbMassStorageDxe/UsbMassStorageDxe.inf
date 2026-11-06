@@ -80,7 +80,7 @@
 #
 
 [Pcd]
-  # 0 disables no-media promotion. Positive values set the consecutive read
+  # 0 disables read-error latching. Positive values set the consecutive read
   # failure threshold.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbMassStorageMaxConsecutiveReadErrors  ## CONSUMES
 

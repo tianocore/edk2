@@ -122,24 +122,13 @@ UsbMassReadBlocks (
   UsbMass = USB_MASS_DEVICE_FROM_BLOCK_IO (This);
   Media   = &UsbMass->BlockIoMedia;
 
-  //
-  // Once this non-removable device has been promoted to "no media" for this
-  // boot/enumeration, fail fast so upper layers stop probing the broken medium.
-  // Removable media must still run media detection below so replacement media
-  // can clear StickyNoMedia in the same driver binding instance.
-  //
-  if (UsbMass->StickyNoMedia && !Media->RemovableMedia) {
-    Status = EFI_NO_MEDIA;
-    goto ON_EXIT;
-  }
-
   ResetRetryCount    = 3;
   OriginalBuffer     = Buffer;
   OriginalBufferSize = BufferSize;
   OriginalLba        = Lba;
 
   //
-  // PcdUsbMassStorageMaxConsecutiveReadErrors controls no-media promotion:
+  // PcdUsbMassStorageMaxConsecutiveReadErrors controls read-error latching:
   // zero disables it; a positive value is the consecutive read error threshold.
   //
   MaxConsecutiveReadErrors = PcdGet32 (PcdUsbMassStorageMaxConsecutiveReadErrors);
@@ -156,11 +145,6 @@ UsbMassReadBlocks (
     //
     if (Media->RemovableMedia) {
       Status = UsbBootDetectMedia (UsbMass);
-      if (UsbMass->StickyNoMedia && Media->MediaPresent) {
-        UsbMass->StickyNoMedia             = FALSE;
-        UsbMass->ConsecutiveReadErrorCount = 0;
-      }
-
       if (EFI_ERROR (Status)) {
         goto ON_EXIT;
       }
@@ -201,6 +185,15 @@ UsbMassReadBlocks (
     //
     if (Lba + TotalBlock - 1 > Media->LastBlock) {
       Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    //
+    // Stop issuing reads after the configured failure threshold. Keep the
+    // media geometry intact because an unreadable medium is still present.
+    //
+    if (UsbMass->StickyReadError) {
+      Status = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
 
@@ -246,18 +239,16 @@ UsbMassReadBlocks (
     {
       DEBUG ((
         DEBUG_ERROR,
-        "UsbMassReadBlocks: promote repeated read failure to EFI_NO_MEDIA "
+        "UsbMassReadBlocks: latch repeated read failure as EFI_DEVICE_ERROR "
         "(ReadStatus=%r Count=%u Threshold=%u)\n",
         Status,
         (UINT32)UsbMass->ConsecutiveReadErrorCount,
         MaxConsecutiveReadErrors
         ));
 
-      UsbMass->StickyNoMedia             = TRUE;
+      UsbMass->StickyReadError           = TRUE;
       UsbMass->ConsecutiveReadErrorCount = 0;
-      Media->MediaPresent                = FALSE;
-      Media->LastBlock                   = 0;
-      Status                             = EFI_NO_MEDIA;
+      Status                             = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
 
@@ -441,7 +432,7 @@ UsbMassInitMedia (
   Media->IoAlign          = 0;
   Media->MediaId          = 1;
 
-  UsbMass->StickyNoMedia             = FALSE;
+  UsbMass->StickyReadError           = FALSE;
   UsbMass->ConsecutiveReadErrorCount = 0;
 
   Status = UsbBootGetParams (UsbMass);
