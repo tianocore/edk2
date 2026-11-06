@@ -692,6 +692,10 @@ BOOLEAN
 /**
   Decrypts a blob using PKCS1v2 (RSAES-OAEP) schema. On success, will return the
   decrypted message in a newly allocated buffer.
+
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   Things that can cause a failure include:
   - Fail to parse private key.
   - Fail to allocate an intermediate buffer.
@@ -703,8 +707,7 @@ BOOLEAN
   @param[out] OutData             Pointer to an allocated buffer containing the encrypted
                                   message.
   @param[out] OutDataSize         Size of the encrypted message buffer.
-  @retval     TRUE                Encryption was successful.
-  @retval     FALSE               Encryption failed.
+  @retval     FALSE               This deprecated protocol callback always returns FALSE.
 **/
 typedef
 BOOLEAN
@@ -762,6 +765,10 @@ BOOLEAN
 /**
   Decrypts a blob using PKCS1v2 (RSAES-OAEP) schema. On success, will return the
   decrypted message in a newly allocated buffer.
+
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   Things that can cause a failure include:
   - Fail to parse private key.
   - Fail to allocate an intermediate buffer.
@@ -779,8 +786,7 @@ BOOLEAN
   @param[out] OutData             Pointer to an allocated buffer containing the encrypted
                                   message.
   @param[out] OutDataSize         Size of the encrypted message buffer.
-  @retval     TRUE                Encryption was successful.
-  @retval     FALSE               Encryption failed.
+  @retval     FALSE               This deprecated protocol callback always returns FALSE.
 **/
 typedef
 BOOLEAN
@@ -977,6 +983,9 @@ VOID
   Syntax Standard, version 1.5". This interface is only intended to be used for
   application to perform PKCS#7 functionality validation.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   If this interface is not supported, then return FALSE.
 
   @param[in]  PrivateKey       Pointer to the PEM-formatted private key data for
@@ -994,9 +1003,7 @@ VOID
                                responsibility to free the buffer with FreePool().
   @param[out] SignedDataSize   Size of SignedData in bytes.
 
-  @retval     TRUE             PKCS#7 data signing succeeded.
-  @retval     FALSE            PKCS#7 data signing failed.
-  @retval     FALSE            This interface is not supported.
+  @retval     FALSE            This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -1059,6 +1066,9 @@ BOOLEAN
   Decrypts a DER-encoded PKCS#7 ContentInfo containing an envelopedData structure
   (such as one produced by Pkcs7Encrypt) and recovers the original content.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   The private key is supplied in PEM form so that this interface is not tied to any
   particular key algorithm (currently supports RSA).
 
@@ -1096,9 +1106,7 @@ BOOLEAN
                                 the returned buffer with FreePool().
   @param[out] OutDataSize       Receives the size of the decrypted content in bytes.
 
-  @retval     TRUE              PKCS#7 data decryption succeeded.
-  @retval     FALSE             PKCS#7 data decryption failed.
-  @retval     FALSE             This interface is not supported.
+  @retval     FALSE             This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -1586,6 +1594,9 @@ BOOLEAN
 /**
   Generates RSA key components.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function generates RSA key components. It takes RSA public exponent E and
   length in bits of RSA modulus N as input, and generates all key components.
   If PublicExponent is NULL, the default RSA public exponent (0x10001) will be used.
@@ -1601,9 +1612,7 @@ BOOLEAN
   @param[in]       PublicExponent       Pointer to RSA public exponent.
   @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
 
-  @retval  TRUE   RSA key component was generated successfully.
-  @retval  FALSE  Invalid RSA key component tag.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -1617,6 +1626,10 @@ BOOLEAN
 
 /**
   Validates key components of RSA context.
+
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   NOTE: This function performs integrity checks on all the RSA key material, so
         the RSA key structure must contain all the private key data.
 
@@ -1631,9 +1644,7 @@ BOOLEAN
 
   @param[in]  RsaContext  Pointer to RSA context to check.
 
-  @retval  TRUE   RSA key components are valid.
-  @retval  FALSE  RSA key components are not valid.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -1644,6 +1655,9 @@ BOOLEAN
 
 /**
   Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
+
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
 
   This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
@@ -1663,10 +1677,7 @@ BOOLEAN
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
                                On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -1711,6 +1722,9 @@ BOOLEAN
 /**
   Retrieve the RSA Private Key from the password-protected PEM key data.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   If PemData is NULL, then return FALSE.
   If RsaContext is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
@@ -1722,9 +1736,7 @@ BOOLEAN
                            RSA private key component. Use RsaFree() function to free the
                            resource.
 
-  @retval  TRUE   RSA Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -4585,6 +4597,9 @@ EFI_STATUS
 /**
   Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
   RFC 8017.
   Mask generation function is the same as the message digest algorithm.
@@ -4608,10 +4623,7 @@ EFI_STATUS
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
                                On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -4659,6 +4671,9 @@ BOOLEAN
 /**
   Carries out the RSA-PSS signature generation over a precomputed message digest.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   @param[in]      RsaContext   Pointer to RSA context for signature generation.
   @param[in]      Digest       Pointer to the precomputed message digest.
   @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
@@ -4666,10 +4681,7 @@ BOOLEAN
   @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
                                On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-  @retval  FALSE  This interface is not supported.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -5965,6 +5977,9 @@ BOOLEAN
 /**
   Retrieve the EC Private Key from the password-protected PEM key data.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
   @param[in]  PemSize      Size of the PEM key data in bytes.
   @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
@@ -5975,8 +5990,7 @@ BOOLEAN
   If PemData is NULL, then return FALSE.
   If EcContext is NULL, then return FALSE.
 
-  @retval  TRUE   EC Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -5990,6 +6004,9 @@ BOOLEAN
 
 /**
   Carries out the EC-DSA signature.
+
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
 
   This function carries out the EC-DSA signature.
   If the Signature buffer is too small to hold the contents of signature, FALSE
@@ -6012,9 +6029,7 @@ BOOLEAN
   @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
                                 On output, the size of data returned in Signature buffer in bytes.
 
-  @retval  TRUE   Signature successfully generated in EC-DSA.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6069,8 +6084,8 @@ BOOLEAN
   curve. The context contains an EVP_PKEY structure initialized with the curve
   parameters. The caller must call EdDsaFree() to release the context when done.
 
-  Before keys can be used for signing or verification, they must be set using
-  EdDsaSetPrivKey() or EdDsaSetPubKey().
+  Before the context can be used for signature verification, a public key must
+  be set using EdDsaSetPubKey().
 
   If Nid is not a supported EdDSA curve, then return NULL.
   If memory allocation fails, then return NULL.
@@ -6108,6 +6123,9 @@ VOID
 /**
   Sets the EdDSA private key in the EdDSA context.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function imports a raw private key into the EdDSA context. The private key
   must be in raw binary format (not PEM or DER encoded). The key size must match
   the expected size for the curve type (57 bytes for Ed448).
@@ -6124,8 +6142,7 @@ VOID
   @param[in]  PrivateKey      Pointer to raw private key bytes.
   @param[in]  PrivateKeySize  Size of the private key in bytes.
 
-  @retval TRUE   EdDSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6139,17 +6156,20 @@ BOOLEAN
 /**
   Generates the EdDSA public key from the private key.
 
-  This function is a placeholder and always returns TRUE. In practice, OpenSSL
-  automatically derives the public key when a private key is set using
-  EdDsaSetPrivKey(), so explicit public key generation is not needed.
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
 
-  Use EdDsaGetPubKey() to retrieve the public key after setting the private key.
+  Historically, this function was a placeholder and always returned TRUE.
+  OpenSSL automatically derived the public key when a private key was set using
+  EdDsaSetPrivKey(), so explicit public key generation was not needed.
+
+  The public key could then be retrieved using EdDsaGetPubKey().
 
   @param[in]  EdDsaContext    Pointer to EdDSA context.
   @param[in]  PublicKey       Pointer to buffer for public key (unused).
   @param[in]  PublicKeySize   Size of public key buffer (unused).
 
-  @retval TRUE   Always returns TRUE.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6197,8 +6217,8 @@ BOOLEAN
   This function extracts the public key from the EdDSA context and copies it to
   the provided buffer. The public key is returned in raw binary format.
 
-  The context must have a key set (either via EdDsaSetPrivKey() or EdDsaSetPubKey())
-  before calling this function.
+  The context must have a public key set via EdDsaSetPubKey() before calling
+  this function.
 
   If EdDsaContext is NULL, then return FALSE.
   If PublicKey is NULL, then return FALSE.
@@ -6250,6 +6270,9 @@ BOOLEAN
 /**
    Retrieve the EdDSA Private Key from the password-protected PEM key data.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
    @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
    @param[in]  PemSize        Size of the PEM key data in bytes.
    @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
@@ -6260,8 +6283,7 @@ BOOLEAN
    If PemData is NULL, then return FALSE.
    If EdDsaContext is NULL, then return FALSE.
 
-   @retval  TRUE   EdDSA Private Key was retrieved successfully.
-   @retval  FALSE  Invalid PEM key data or incorrect password.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6332,6 +6354,9 @@ BOOLEAN
 /**
   Generates an EdDSA signature for a given message.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function creates an EdDSA signature using the private key stored in the
   EdDSA context. EdDSA uses a 'pure' signature scheme where the entire message
   is processed directly without pre-computing a hash digest.
@@ -6360,8 +6385,7 @@ BOOLEAN
   @param[in,out]  SigSize         On input, size of Signature buffer.
                                   On output, actual size of signature (114 bytes for Ed448).
 
-  @retval TRUE   EdDSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6428,8 +6452,8 @@ BOOLEAN
   ML-DSA variant. The context contains an EVP_PKEY structure initialized with the
   ML-DSA parameters. The caller must call MlDsaFree() to release the context when done.
 
-  Before keys can be used for signing or verification, they must be set using
-  MlDsaSetPrivKey() or MlDsaSetPubKey().
+  Before the context can be used for signature verification, a public key must
+  be set using MlDsaSetPubKey().
 
   If Nid is not a supported ML-DSA variant, then return NULL.
   If memory allocation fails, then return NULL.
@@ -6470,8 +6494,8 @@ VOID
   This function extracts the public key from the ML-DSA context and copies it to
   the provided buffer. The public key is returned in raw binary format.
 
-  The context must have a key set (either via MlDsaSetPrivKey() or MlDsaSetPubKey())
-  before calling this function.
+  The context must have a public key set via MlDsaSetPubKey() before calling
+  this function.
 
   If MlDsaContext is NULL, then return FALSE.
   If PublicKey is NULL, then return FALSE.
@@ -6530,6 +6554,9 @@ BOOLEAN
 /**
   Sets the ML-DSA private key in the ML-DSA context.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function imports a raw private key into the ML-DSA context. The private key
   must be in raw binary format (not PEM or DER encoded). The key size must match
   the expected size for the ML-DSA variant (4896 bytes for ML-DSA-87).
@@ -6546,8 +6573,7 @@ BOOLEAN
   @param[in]  PrivateKey       Pointer to raw private key bytes.
   @param[in]  PrivateKeySize   Size of the private key in bytes.
 
-  @retval TRUE   ML-DSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6561,12 +6587,14 @@ BOOLEAN
 /**
   Generates and retrieves the public key from a private key context.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   @param[in]   MlDsaContext    Pointer to ML-DSA context containing the private key.
   @param[out]  PublicKey       Pointer to buffer to receive the public key.
   @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
 
-  @retval TRUE   Public key generated and retrieved successfully.
-  @retval FALSE  Invalid parameters or public key extraction failed.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6604,6 +6632,9 @@ BOOLEAN
 /**
    Retrieve the ML-DSA Private Key from the password-protected PEM key data.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
    @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
    @param[in]  PemSize        Size of the PEM key data in bytes.
    @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
@@ -6614,8 +6645,7 @@ BOOLEAN
    If PemData is NULL, then return FALSE.
    If MlDsaContext is NULL, then return FALSE.
 
-   @retval  TRUE   ML-DSA Private Key was retrieved successfully.
-   @retval  FALSE  Invalid PEM key data or incorrect password.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6629,6 +6659,9 @@ BOOLEAN
 
 /**
   Generates an ML-DSA signature for a given message.
+
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
 
   This function creates an ML-DSA signature using the private key stored in the
   ML-DSA context. ML-DSA signatures can include an optional context string for
@@ -6655,8 +6688,7 @@ BOOLEAN
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature (4627 bytes for ML-DSA-87).
 
-  @retval TRUE   ML-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6678,8 +6710,8 @@ BOOLEAN
   contained in the ML-DSA context. An optional context string can be provided which
   must match the context used during signing.
 
-  The context must contain a key (either public or private) set via MlDsaSetPrivKey()
-  or MlDsaSetPubKey() before calling this function.
+  The context must contain a public key set via MlDsaSetPubKey() before calling
+  this function.
 
   If MlDsaContext is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
@@ -6722,8 +6754,8 @@ BOOLEAN
   SLH-DSA variant. The context contains an EVP_PKEY structure initialized with the
   SLH-DSA parameters. The caller must call SlhDsaFree() to release the context when done.
 
-  Before keys can be used for signing or verification, they must be set using
-  SlhDsaSetPrivKey() or SlhDsaSetPubKey().
+  Before the context can be used for signature verification, a public key must
+  be set using SlhDsaSetPubKey().
 
   If Nid is not a supported SLH-DSA variant, then return NULL.
   If memory allocation fails, then return NULL.
@@ -6761,6 +6793,9 @@ VOID
 /**
   Sets the SLH-DSA private key in the SLH-DSA context.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   This function imports a raw private key into the SLH-DSA context. The private key
   must be in raw binary format (not PEM or DER encoded). The key size must match
   the expected size for the SLH-DSA variant (128 bytes for SLH-DSA-SHAKE-256s).
@@ -6777,8 +6812,7 @@ VOID
   @param[in]  PrivateKey       Pointer to raw private key bytes.
   @param[in]  PrivateKeySize   Size of the private key in bytes.
 
-  @retval TRUE   SLH-DSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6792,12 +6826,14 @@ BOOLEAN
 /**
   Generates and retrieves the public key from a private key context.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
   @param[in]   SlhDsaContext   Pointer to SLH-DSA context containing the private key.
   @param[out]  PublicKey       Pointer to buffer to receive the public key.
   @param[in]   PublicKeySize   Size of the PublicKey buffer in bytes.
 
-  @retval TRUE   Public key generated and retrieved successfully.
-  @retval FALSE  Invalid parameters or public key extraction failed.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6845,8 +6881,8 @@ BOOLEAN
   This function extracts the public key from the SLH-DSA context and copies it to
   the provided buffer. The public key is returned in raw binary format.
 
-  The context must have a key set (either via SlhDsaSetPrivKey() or SlhDsaSetPubKey())
-  before calling this function.
+  The context must have a public key set via SlhDsaSetPubKey() before calling
+  this function.
 
   If SlhDsaContext is NULL, then return FALSE.
   If PublicKey is NULL, then return FALSE.
@@ -6898,6 +6934,9 @@ BOOLEAN
 /**
    Retrieve the SLH-DSA Private Key from the password-protected PEM key data.
 
+  This callback is deprecated, always returns FALSE, and is retained only for
+  binary compatibility. The original function contract follows.
+
    @param[in]  PemData        Pointer to the PEM-encoded key data to be retrieved.
    @param[in]  PemSize        Size of the PEM key data in bytes.
    @param[in]  Password       NULL-terminated passphrase used for encrypted PEM key data.
@@ -6908,8 +6947,7 @@ BOOLEAN
    If PemData is NULL, then return FALSE.
    If SlhDsaContext is NULL, then return FALSE.
 
-   @retval  TRUE   SLH-DSA Private Key was retrieved successfully.
-   @retval  FALSE  Invalid PEM key data or incorrect password.
+  @retval  FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6952,8 +6990,7 @@ BOOLEAN
   @param[in,out]  SigSize        On input, size of Signature buffer.
                                  On output, actual size of signature (29792 bytes for SLH-DSA-SHAKE-256s).
 
-  @retval FALSE  Invalid parameters or signature generation failed. This deprecated
-                 protocol callback always returns FALSE.
+  @retval FALSE  This deprecated protocol callback always returns FALSE.
 
 **/
 typedef
@@ -6975,8 +7012,8 @@ BOOLEAN
   contained in the SLH-DSA context. An optional context string can be provided which
   must match the context used during signing.
 
-  The context must contain a key (either public or private) set via SlhDsaSetPrivKey()
-  or SlhDsaSetPubKey() before calling this function.
+  The context must contain a public key set via SlhDsaSetPubKey() before calling
+  this function.
 
   If SlhDsaContext is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
@@ -7060,6 +7097,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_PKCS7_VERIFY_EKU                       VerifyEKUsInPkcs7Signature;
   EDKII_CRYPTO_PKCS7_GET_SIGNERS                      Pkcs7GetSigners;
   EDKII_CRYPTO_PKCS7_FREE_SIGNERS                     Pkcs7FreeSigners;
+  /// PKCS7 Sign - deprecated and unsupported
   EDKII_CRYPTO_PKCS7_SIGN                             Pkcs7Sign;
   EDKII_CRYPTO_PKCS7_GET_ATTACHED_CONTENT             Pkcs7GetAttachedContent;
   EDKII_CRYPTO_PKCS7_GET_CERTIFICATES_LIST            Pkcs7GetCertificatesList;
@@ -7081,10 +7119,14 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_RSA_FREE                               RsaFree;
   EDKII_CRYPTO_RSA_SET_KEY                            RsaSetKey;
   EDKII_CRYPTO_RSA_GET_KEY                            RsaGetKey;
+  /// RSA Key Generation - deprecated and unsupported
   EDKII_CRYPTO_RSA_GENERATE_KEY                       RsaGenerateKey;
+  /// RSA Key Validation - deprecated and unsupported
   EDKII_CRYPTO_RSA_CHECK_KEY                          RsaCheckKey;
+  /// RSA PKCS1 Sign - deprecated and unsupported
   EDKII_CRYPTO_RSA_PKCS1_SIGN                         RsaPkcs1Sign;
   EDKII_CRYPTO_RSA_PKCS1_VERIFY                       RsaPkcs1Verify;
+  /// RSA Private Key PEM Import - deprecated and unsupported
   EDKII_CRYPTO_RSA_GET_PRIVATE_KEY_FROM_PEM           RsaGetPrivateKeyFromPem;
   EDKII_CRYPTO_RSA_GET_PUBLIC_KEY_FROM_X509           RsaGetPublicKeyFromX509;
   /// Sha1
@@ -7197,6 +7239,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY               TlsGetHostPrivateKey;
   EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST           TlsGetCertRevocationList;
   /// RSA PSS
+  /// RSA PSS Sign - deprecated and unsupported
   EDKII_CRYPTO_RSA_PSS_SIGN                           RsaPssSign;
   EDKII_CRYPTO_RSA_PSS_VERIFY                         RsaPssVerify;
   /// Parallel hash
@@ -7277,7 +7320,9 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_GET_EXPORT_KEY                     TlsGetExportKey;
   /// Ec (Continued)
   EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_X509            EcGetPublicKeyFromX509;
+  /// EC Private Key PEM Import - deprecated and unsupported
   EDKII_CRYPTO_EC_GET_PRIVATE_KEY_FROM_PEM            EcGetPrivateKeyFromPem;
+  /// EC-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_EC_DSA_SIGN                            EcDsaSign;
   EDKII_CRYPTO_EC_DSA_VERIFY                          EcDsaVerify;
   /// X509 (Continued)
@@ -7295,8 +7340,10 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_X509_GET_CERT_FROM_CERT_CHAIN          X509GetCertFromCertChain;
   EDKII_CRYPTO_ASN1_GET_TAG                           Asn1GetTag;
   EDKII_CRYPTO_X509_GET_EXTENDED_BASIC_CONSTRAINTS    X509GetExtendedBasicConstraints;
+  /// PKCS1v2 Decrypt - deprecated and unsupported
   EDKII_CRYPTO_PKCS1V2_DECRYPT                        Pkcs1v2Decrypt;
   EDKII_CRYPTO_RSA_OAEP_ENCRYPT                       RsaOaepEncrypt;
+  /// RSA OAEP Decrypt - deprecated and unsupported
   EDKII_CRYPTO_RSA_OAEP_DECRYPT                       RsaOaepDecrypt;
   /// TLS Set (Continued)
   EDKII_CRYPTO_TLS_SET_SERVER_NAME                    TlsSetServerName;
@@ -7322,43 +7369,57 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_EC_POINT_MUL2                          EcPointMul2;
   EDKII_CRYPTO_EC_POINTS_MUL                          EcPointsMul;
   /// RSA PSS (Continued)
+  /// RSA PSS Sign Digest - deprecated and unsupported
   EDKII_CRYPTO_RSA_PSS_SIGN_DIGEST                    RsaPssSignDigest;
   EDKII_CRYPTO_RSA_PSS_VERIFY_DIGEST                  RsaPssVerifyDigest;
   /// Ed-DSA
   EDKII_CRYPTO_ED_DSA_NEW_BY_NID                      EdDsaNewByNid;
   EDKII_CRYPTO_ED_DSA_FREE                            EdDsaFree;
+  /// Ed-DSA Private Key Setup - deprecated and unsupported
   EDKII_CRYPTO_ED_DSA_SET_PRIV_KEY                    EdDsaSetPrivKey;
+  /// Ed-DSA Public Key Generation - deprecated and unsupported
   EDKII_CRYPTO_ED_DSA_GENERATE_PUB_KEY                EdDsaGeneratePubKey;
   EDKII_CRYPTO_ED_DSA_SET_PUB_KEY                     EdDsaSetPubKey;
   EDKII_CRYPTO_ED_DSA_GET_PUB_KEY                     EdDsaGetPubKey;
   EDKII_CRYPTO_ED_DSA_GET_PUBLIC_KEY_FROM_X509        EdDsaGetPublicKeyFromX509;
+  /// Ed-DSA Private Key PEM Import - deprecated and unsupported
   EDKII_CRYPTO_ED_DSA_GET_PRIVATE_KEY_FROM_PEM        EdDsaGetPrivateKeyFromPem;
+  /// Ed-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_ED_DSA_SIGN                            EdDsaSign;
   EDKII_CRYPTO_ED_DSA_VERIFY                          EdDsaVerify;
   /// ML-DSA
   EDKII_CRYPTO_ML_DSA_NEW_BY_NID                      MlDsaNewByNid;
   EDKII_CRYPTO_ML_DSA_FREE                            MlDsaFree;
+  /// ML-DSA Private Key Setup - deprecated and unsupported
   EDKII_CRYPTO_ML_DSA_SET_PRIV_KEY                    MlDsaSetPrivKey;
+  /// ML-DSA Public Key Generation - deprecated and unsupported
   EDKII_CRYPTO_ML_DSA_GENERATE_PUB_KEY                MlDsaGeneratePubKey;
   EDKII_CRYPTO_ML_DSA_SET_PUB_KEY                     MlDsaSetPubKey;
   EDKII_CRYPTO_ML_DSA_GET_PUB_KEY                     MlDsaGetPubKey;
   EDKII_CRYPTO_ML_DSA_GET_PUBLIC_KEY_FROM_X509        MlDsaGetPublicKeyFromX509;
+  /// ML-DSA Private Key PEM Import - deprecated and unsupported
   EDKII_CRYPTO_ML_DSA_GET_PRIVATE_KEY_FROM_PEM        MlDsaGetPrivateKeyFromPem;
+  /// ML-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_ML_DSA_SIGN                            MlDsaSign;
   EDKII_CRYPTO_ML_DSA_VERIFY                          MlDsaVerify;
   /// SLH-DSA
   EDKII_CRYPTO_SLH_DSA_NEW_BY_NID                     SlhDsaNewByNid;
   EDKII_CRYPTO_SLH_DSA_FREE                           SlhDsaFree;
+  /// SLH-DSA Private Key Setup - deprecated and unsupported
   EDKII_CRYPTO_SLH_DSA_SET_PRIV_KEY                   SlhDsaSetPrivKey;
+  /// SLH-DSA Public Key Generation - deprecated and unsupported
   EDKII_CRYPTO_SLH_DSA_GENERATE_PUB_KEY               SlhDsaGeneratePubKey;
   EDKII_CRYPTO_SLH_DSA_SET_PUB_KEY                    SlhDsaSetPubKey;
   EDKII_CRYPTO_SLH_DSA_GET_PUB_KEY                    SlhDsaGetPubKey;
   EDKII_CRYPTO_SLH_DSA_GET_PUBLIC_KEY_FROM_X509       SlhDsaGetPublicKeyFromX509;
+  /// SLH-DSA Private Key PEM Import - deprecated and unsupported
   EDKII_CRYPTO_SLH_DSA_GET_PRIVATE_KEY_FROM_PEM       SlhDsaGetPrivateKeyFromPem;
+  /// SLH-DSA Sign - deprecated and unsupported
   EDKII_CRYPTO_SLH_DSA_SIGN                           SlhDsaSign;
   EDKII_CRYPTO_SLH_DSA_VERIFY                         SlhDsaVerify;
   /// Pkcs (Continued)
   EDKII_CRYPTO_PKCS7_ENCRYPT                          Pkcs7Encrypt;
+  /// PKCS7 Decrypt - deprecated and unsupported
   EDKII_CRYPTO_PKCS7_DECRYPT                          Pkcs7Decrypt;
   /// Ec (Continued)
   EDKII_CRYPTO_EC_GET_PUBLIC_KEY_FROM_PEM             EcGetPublicKeyFromPem;
