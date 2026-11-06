@@ -38,9 +38,11 @@
   ManageabilityTransportHelperLib
   ManageabilityTransportLib
   PeimEntryPoint
+  PeiServicesLib
 
 [Ppis]
   gPeiIpmiPpiGuid       # PPI ALWAYS PRODUCED
+  gEfiPeiMemoryDiscoveredPpiGuid  # PPI NOTIFY
 
 [Guids]
   gManageabilityProtocolIpmiGuid

@@ -185,6 +185,9 @@ This instance stores hardware configuration and session ownership in a GUID HOB.
 After permanent memory is discovered, temporary-memory sessions are no longer
 valid: consumers must acquire and initialize a new transport session before
 issuing commands. Stale tokens are rejected without dereferencing them.
+The IPMI PEI provider registers a Memory Discovered notification to rebind its
+PPI method and rebuild its transport automatically. If that rebuild fails, the
+next command retries initialization before using the transport.
 
 DXE, SMM and Standalone MM consumers use
 `ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf`.
