@@ -43,6 +43,8 @@
 #include "MpHandOff.h"
 
 #define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
+
+#define AP_SIPI_RESEND_TIMEOUT_US  10000
 //
 // To trigger the start-up signal, BSP writes the specified
 // StartupSignalValue to the StartupSignalAddress of each processor.
