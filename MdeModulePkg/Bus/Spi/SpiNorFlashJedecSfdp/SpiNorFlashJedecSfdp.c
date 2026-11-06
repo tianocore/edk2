@@ -19,9 +19,9 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Protocol/DevicePath.h> // [CODE_FIRST] 13226
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/SpiConfiguration.h>
 #include <Protocol/SpiIo.h>
 #include <IndustryStandard/SpiNorFlashJedecSfdp.h>
