@@ -734,7 +734,11 @@ Uhci2ControlTransfer (
     *TransferResult = QhResult.Result;
 
     if (DataLength != NULL) {
-      *DataLength = QhResult.Complete;
+      //
+      // Never report more data than was requested: a device must not be able
+      // to inflate the returned length beyond the caller's buffer.
+      //
+      *DataLength = MIN (QhResult.Complete, TransferDataLength);
     }
   }
 
@@ -889,7 +893,13 @@ Uhci2BulkTransfer (
   if (!EFI_ERROR (Status)) {
     *TransferResult = QhResult.Result;
     *DataToggle     = QhResult.NextToggle;
-    *DataLength     = QhResult.Complete;
+    //
+    // Never report more data than was requested: a device must not be able to
+    // inflate the returned length beyond the caller's buffer.
+    //
+    if (QhResult.Complete < *DataLength) {
+      *DataLength = QhResult.Complete;
+    }
   }
 
   UhciDestoryTds (Uhc, TDs);
@@ -1217,7 +1227,13 @@ Uhci2SyncInterruptTransfer (
   if (!EFI_ERROR (Status)) {
     *TransferResult = QhResult.Result;
     *DataToggle     = QhResult.NextToggle;
-    *DataLength     = QhResult.Complete;
+    //
+    // Never report more data than was requested: a device must not be able to
+    // inflate the returned length beyond the caller's buffer.
+    //
+    if (QhResult.Complete < *DataLength) {
+      *DataLength = QhResult.Complete;
+    }
   }
 
   UhciDestoryTds (Uhc, TDs);

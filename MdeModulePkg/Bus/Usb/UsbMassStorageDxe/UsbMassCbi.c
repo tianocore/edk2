@@ -257,6 +257,7 @@ UsbCbiDataTransfer (
   UINT32                       TransStatus;
   UINTN                        Remain;
   UINTN                        Increment;
+  UINTN                        ChunkSize;
   UINT8                        *Next;
   UINTN                        Retry;
 
@@ -294,6 +295,7 @@ UsbCbiDataTransfer (
       Increment = Remain;
     }
 
+    ChunkSize = Increment;
     Status = UsbCbi->UsbIo->UsbBulkTransfer (
                               UsbCbi->UsbIo,
                               Endpoint->EndpointAddress,
@@ -302,6 +304,15 @@ UsbCbiDataTransfer (
                               Timeout,
                               &TransStatus
                               );
+    //
+    // An over-reported transfer length can skip data or advance Next past
+    // the caller's buffer. Reject it before updating Remain and Next.
+    //
+    if (Increment > ChunkSize) {
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
+
     if (EFI_ERROR (Status)) {
       if (TransStatus == EFI_USB_ERR_NAK) {
         //
