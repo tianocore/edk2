@@ -676,3 +676,77 @@ TEST_F (PxeBcDhcp6DiscoverTest, MultipleRequestsAttemptOverflow) {
     EFI_OUT_OF_RESOURCES
     );
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// PxeBcExtractBootFileUrlTest Tests
+///////////////////////////////////////////////////////////////////////////////
+
+class PxeBcExtractBootFileUrlTest : public ::testing::Test {
+public:
+  PXEBC_PRIVATE_DATA Private   = { 0 };
+  EFI_IPv6_ADDRESS   SrvAddr   = { 0 };
+  UINT8              *FileName = NULL;
+
+protected:
+  virtual void
+  TearDown (
+    )
+  {
+    if (FileName != NULL) {
+      FreePool (FileName);
+      FileName = NULL;
+    }
+  }
+};
+
+// A boot file URL whose name ends in a bare '%' (or '%' with a single hex
+// digit) must be rejected rather than reading/writing past the decode buffer.
+TEST_F (PxeBcExtractBootFileUrlTest, RejectTruncatedPercentEncoding) {
+  CHAR8  Url[] = "tftp://[fe80::1]/boot.efi%";
+
+  ASSERT_EQ (
+    PxeBcExtractBootFileUrl (
+      &Private,
+      &FileName,
+      &SrvAddr,
+      Url,
+      (UINT16)AsciiStrLen (Url)
+      ),
+    EFI_INVALID_PARAMETER
+    );
+  ASSERT_EQ (FileName, (UINT8 *)NULL);
+}
+
+TEST_F (PxeBcExtractBootFileUrlTest, RejectSinglePercentHexDigit) {
+  CHAR8  Url[] = "tftp://[fe80::1]/boot.efi%4";
+
+  ASSERT_EQ (
+    PxeBcExtractBootFileUrl (
+      &Private,
+      &FileName,
+      &SrvAddr,
+      Url,
+      (UINT16)AsciiStrLen (Url)
+      ),
+    EFI_INVALID_PARAMETER
+    );
+  ASSERT_EQ (FileName, (UINT8 *)NULL);
+}
+
+// A well formed URL with valid percent-encoding is still decoded.
+TEST_F (PxeBcExtractBootFileUrlTest, DecodeValidPercentEncoding) {
+  CHAR8  Url[] = "tftp://[fe80::1]/%41%42.efi";
+
+  ASSERT_EQ (
+    PxeBcExtractBootFileUrl (
+      &Private,
+      &FileName,
+      &SrvAddr,
+      Url,
+      (UINT16)AsciiStrLen (Url)
+      ),
+    EFI_SUCCESS
+    );
+  ASSERT_NE (FileName, (UINT8 *)NULL);
+  EXPECT_STREQ ((CHAR8 *)FileName, "AB.efi");
+}
