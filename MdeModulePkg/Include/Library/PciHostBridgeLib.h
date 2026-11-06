@@ -63,6 +63,12 @@ typedef struct {
   PCI_ROOT_BRIDGE_APERTURE    PMem;                  ///< Prefetchable MMIO aperture below 4GB which can be used by the root bridge.
   PCI_ROOT_BRIDGE_APERTURE    PMemAbove4G;           ///< Prefetchable MMIO aperture above 4GB which can be used by the root bridge.
   EFI_DEVICE_PATH_PROTOCOL    *DevicePath;           ///< Device path.
+  //
+  // Minimum bus number that may be assigned to a PCI bridge below the root
+  // bus. Values less than or equal to Bus.Base + 1 preserve the default
+  // consecutive bus number allocation.
+  //
+  UINT8                       MinSecondaryBusNumber;
 } PCI_ROOT_BRIDGE;
 
 /**
