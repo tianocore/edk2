@@ -31,6 +31,8 @@ CONST UINT8  mTimerLibLocalApicDivisor[] = {
   0x20, 0x40, 0x80, 0x01
 };
 
+UINT32  mFSBClock = 0;
+
 /**
   Internal function to retrieve the base address of local APIC.
 
@@ -90,8 +92,15 @@ InternalX86GetTimerFrequency (
   IN      UINTN  ApicBase
   )
 {
+  if (mFSBClock == 0) {
+    //
+    // Cache current value of PcdFSBClock in case it's a dynamic PCD.
+    //
+    mFSBClock = PcdGet32 (PcdFSBClock);
+  }
+
   return
-    PcdGet32 (PcdFSBClock) /
+    mFSBClock /
     mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + APIC_TDCR, 0, 3)];
 }
 

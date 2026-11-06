@@ -172,6 +172,7 @@
   MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+  MdePkg/Library/SecPeiDxeTimerLibCpu/RuntimeTimerLibCpu.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   MdePkg/Library/SmmIoLibSmmCpuIo2/SmmIoLibSmmCpuIo2.inf
