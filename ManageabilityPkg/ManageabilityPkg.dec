@@ -48,6 +48,10 @@
   #   Provide the help functions to check the BMC state
   PlatformBmcReadyLib|Include/Library/PlatformBmcReadyLib.h
 
+  ##  @libraryclass Explicit IPMI Platform Initialization Library
+  #   Prepare platform hardware before IPMI transport initialization
+  IpmiPlatformInitLib|Include/Library/IpmiPlatformInitLib.h
+
 [Guids]
   gManageabilityPkgTokenSpaceGuid   = { 0xBDEFFF48, 0x1C31, 0x49CD, { 0xA7, 0x6D, 0x92, 0x9E, 0x60, 0xDB, 0xB9, 0xF8 } }
 

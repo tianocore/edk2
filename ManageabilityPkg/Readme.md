@@ -193,3 +193,24 @@ DXE, SMM and Standalone MM consumers use
 `ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf`.
 The former `Dxe/DxeManageabilityTransportKcs.inf` duplicate has been removed;
 platform DSC files referencing it must use the base instance instead.
+
+### IPMI platform initialization
+
+Each PEI, DXE, SMM and Standalone MM IPMI provider calls
+`IpmiPlatformInitialize()` before acquiring its transport or publishing its
+interface. A failure is logged and prevents provider initialization. This hook
+is not called again during PEI memory recovery or command submission.
+
+`Manageability.dsc.inc` maps `IpmiPlatformInitLib` to the no-op
+`ManageabilityPkg/Library/IpmiPlatformInitLibNull/IpmiPlatformInitLibNull.inf`.
+Platforms needing KCS I/O decode or other hardware preparation must override
+that mapping with a phase-appropriate implementation. The hook must not call
+back into the IPMI provider being initialized. PEI implementations must not
+write image globals or retain temporary-memory pointers across migration.
+
+The host test DSC is `ManageabilityPkg/Test/ManageabilityPkgHostTest.dsc`.
+Run its package CI build and tests with:
+
+```text
+stuart_ci_build -c .pytool/CISettings.py -p ManageabilityPkg -a X64 -t NOOPT -d HostUnitTestCompilerPlugin=run
+```

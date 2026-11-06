@@ -33,6 +33,7 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  IpmiPlatformInitLib
   ManageabilityTransportHelperLib
   ManageabilityTransportLib
   MemoryAllocationLib

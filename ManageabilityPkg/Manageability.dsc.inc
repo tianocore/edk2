@@ -9,6 +9,7 @@
 ##
 [LibraryClasses]
   IpmiCommandLib|ManageabilityPkg/Library/IpmiCommandLib/IpmiCommandLib.inf
+  IpmiPlatformInitLib|ManageabilityPkg/Library/IpmiPlatformInitLibNull/IpmiPlatformInitLibNull.inf
   ManageabilityTransportHelperLib|ManageabilityPkg/Library/BaseManageabilityTransportHelperLib/BaseManageabilityTransportHelper.inf
   ManageabilityTransportLib|ManageabilityPkg/Library/BaseManageabilityTransportNullLib/BaseManageabilityTransportNull.inf
   PlatformBmcReadyLib|ManageabilityPkg/Library/PlatformBmcReadyLibNull/PlatformBmcReadyLibNull.inf
@@ -92,6 +93,7 @@
   ManageabilityPkg/Library/BaseManageabilityTransportNullLib/BaseManageabilityTransportNull.inf
   ManageabilityPkg/Library/IpmiCommandLib/IpmiCommandLib.inf
   ManageabilityPkg/Library/IpmiCommandLib/IpmiCommandLibPei.inf
+  ManageabilityPkg/Library/IpmiPlatformInitLibNull/IpmiPlatformInitLibNull.inf
   ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf
   ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcsPei.inf
   ManageabilityPkg/Library/ManageabilityTransportMctpLib/Dxe/DxeManageabilityTransportMctp.inf

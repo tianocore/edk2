@@ -32,6 +32,7 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  IpmiPlatformInitLib
   ManageabilityTransportHelperLib
   ManageabilityTransportLib
   UefiDriverEntryPoint
