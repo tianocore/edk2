@@ -347,7 +347,7 @@ ShellLibConstructorWorker (
 
   if (gEfiShellProtocol == NULL) {
     //
-    // Moved to seperate function due to complexity
+    // Moved to separate function due to complexity
     //
     Status = ShellFindSE2 (ImageHandle);
 
