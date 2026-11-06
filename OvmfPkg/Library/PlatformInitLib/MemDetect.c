@@ -1321,22 +1321,10 @@ PlatformQemuInitializeRam (
   }
 
   //
-  // We'd like to keep the following ranges uncached:
-  // - [640 KB, 1 MB)
-  // - [Uc32Base, 4 GB)
-  //
-  // Everything else should be WB. Unfortunately, programming the inverse (ie.
-  // keeping the default UC, and configuring the complement set of the above as
-  // WB) is not reliable in general, because the end of the upper RAM can have
-  // practically any alignment, and we may not have enough variable MTRRs to
-  // cover it exactly.
-  //
-  // Because of that PlatformQemuUc32BaseInitialization() will round
-  // up PlatformInfoHob->LowMemory to make sure a single mtrr register
-  // is enough.  The the result will be stored in
-  // PlatformInfoHob->Uc32Base.  On a typical qemu configuration with
-  // gigabyte-alignment being used LowMemory will be 2 or 3 GB and no
-  // rounding is needed, so LowMemory and Uc32Base will be identical.
+  // Keep the legacy memory hole [640 KB, 1 MB) uncached. PCI MMIO ranges
+  // are left to the PCI bus and the platform's memory policy. In particular,
+  // do not install an aperture-wide UC MTRR because it would override the
+  // cache policy for host-backed PCI BARs.
   //
   if (IsMtrrSupported () && (PlatformInfoHob->HostBridgeDevId != CLOUDHV_DEVICE_ID)) {
     MtrrGetAllMtrrs (&MtrrSettings);
@@ -1362,17 +1350,6 @@ PlatformQemuInitializeRam (
     Status = MtrrSetMemoryAttribute (
                BASE_512KB + BASE_128KB,
                BASE_1MB - (BASE_512KB + BASE_128KB),
-               CacheUncacheable
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Set the memory range from the start of the 32-bit PCI MMIO
-    // aperture to 4GB as uncacheable.
-    //
-    Status = MtrrSetMemoryAttribute (
-               PlatformInfoHob->Uc32Base,
-               SIZE_4GB - PlatformInfoHob->Uc32Base,
                CacheUncacheable
                );
     ASSERT_EFI_ERROR (Status);
