@@ -11,6 +11,7 @@
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiMultiPhase.h>
+#include <Uefi/UefiSpec.h>
 #include <Pi/PiMultiPhase.h>
 
 #include <Guid/MemoryTypeInformation.h>
@@ -561,11 +562,12 @@ AllocateMemoryTypeInformationBins (
     //
     // Create a Resource Descriptor HOB to report the Memory Type Information bins to DXE Core
     //
-    BuildResourceDescriptorWithOwnerHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       TESTED_MEMORY_ATTRIBUTES,
       BaseAddress,
       RequiredSize,
+      EFI_MEMORY_WB,
       &gEfiMemoryTypeInformationGuid
       );
   }

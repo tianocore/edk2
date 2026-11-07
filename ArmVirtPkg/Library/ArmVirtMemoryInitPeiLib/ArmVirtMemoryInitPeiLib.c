@@ -8,6 +8,7 @@
 **/
 
 #include <PiPei.h>
+#include <Uefi/UefiSpec.h>
 
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmVirtMemInfoLib.h>
@@ -78,24 +79,30 @@ MemoryPeim (
   SystemMemoryTop = PcdGet64 (PcdSystemMemoryBase) + SystemMemorySize;
 
   if (SystemMemoryTop - 1 > MAX_ALLOC_ADDRESS) {
-    BuildResourceDescriptorHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
       PcdGet64 (PcdSystemMemoryBase),
-      (UINT64)MAX_ALLOC_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1
+      (UINT64)MAX_ALLOC_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1,
+      EFI_MEMORY_WB,
+      NULL
       );
-    BuildResourceDescriptorHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
       (UINT64)MAX_ALLOC_ADDRESS + 1,
-      SystemMemoryTop - MAX_ALLOC_ADDRESS - 1
+      SystemMemoryTop - MAX_ALLOC_ADDRESS - 1,
+      EFI_MEMORY_WB,
+      NULL
       );
   } else {
-    BuildResourceDescriptorHob (
+    BuildResourceDescriptor2Hob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
       PcdGet64 (PcdSystemMemoryBase),
-      SystemMemorySize
+      SystemMemorySize,
+      EFI_MEMORY_WB,
+      NULL
       );
   }
 
