@@ -128,7 +128,7 @@ ProcessTableReportOptions (
       }
 
       Print (
-        L"\t%4d. %c%c%c%c\n",
+        L"        %4d. %c%c%c%c\n",
         ++mTableCount,
         SignaturePtr[0],
         SignaturePtr[1],
@@ -295,7 +295,7 @@ AcpiView (
         gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
       }
 
-      Print (L"\t%d Error(s)\n", GetErrorCount ());
+      Print (L"        %d Error(s)\n", GetErrorCount ());
 
       if (GetColourHighlighting ()) {
         PrintAttribute = (GetWarningCount () > 0) ?
@@ -308,7 +308,7 @@ AcpiView (
         gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
       }
 
-      Print (L"\t%d Warning(s)\n", GetWarningCount ());
+      Print (L"        %d Warning(s)\n", GetWarningCount ());
 
       if (GetColourHighlighting ()) {
         gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
