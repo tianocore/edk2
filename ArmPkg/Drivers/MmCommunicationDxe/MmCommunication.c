@@ -15,6 +15,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/HobLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -589,10 +590,34 @@ InitializeFfaCommunication (
   )
 {
   EFI_STATUS              Status;
-  EFI_FFA_PART_INFO_DESC  StmmPartInfo;
+  EFI_FFA_PART_INFO_DESC  *StmmPartInfo;
+  UINT32                  StmmPartInfoSize;
 
-  Status = ArmFfaLibGetPartitionInfo (&gEfiMmCommunication2ProtocolGuid, &StmmPartInfo);
+  StmmPartInfoSize = 0;
+  Status           = ArmFfaLibGetPartitionInfoEx (&gEfiMmCommunication2ProtocolGuid, NULL, &StmmPartInfoSize);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to query the partition Info(%g) descriptor size. Status: %r\n",
+      &gEfiMmCommunication2ProtocolGuid,
+      Status
+      ));
+    return Status;
+  }
+
+  if (StmmPartInfoSize < sizeof (EFI_FFA_PART_INFO_DESC)) {
+    DEBUG ((DEBUG_ERROR, "Partition Info descriptor size is too small. Size: %u\n", StmmPartInfoSize));
+    return EFI_UNSUPPORTED;
+  }
+
+  StmmPartInfo = AllocateZeroPool (StmmPartInfoSize);
+  if (StmmPartInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = ArmFfaLibGetPartitionInfoEx (&gEfiMmCommunication2ProtocolGuid, StmmPartInfo, &StmmPartInfoSize);
   if (EFI_ERROR (Status)) {
+    FreePool (StmmPartInfo);
     DEBUG ((
       DEBUG_ERROR,
       "Failed to get partition Info(%g). Status: %r\n",
@@ -602,13 +627,15 @@ InitializeFfaCommunication (
     return Status;
   }
 
-  if ((StmmPartInfo.PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
+  if ((StmmPartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
     Status = EFI_UNSUPPORTED;
     DEBUG ((DEBUG_ERROR, "StandaloneMm doesn't receive DIRECT_MSG_REQ...\n"));
+    FreePool (StmmPartInfo);
     return Status;
   }
 
-  mStMmPartId = StmmPartInfo.PartitionId;
+  mStMmPartId = StmmPartInfo->PartitionId;
+  FreePool (StmmPartInfo);
 
   return EFI_SUCCESS;
 }
