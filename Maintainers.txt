@@ -492,6 +492,7 @@ W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-pa
 M: Antaeus Kleinert-Strand <antklein@microsoft.com> [antklein]
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
+R: Varshit Pandya <varshit.pandya@arm.com> [vbpandya]
 
 OvmfPkg
 F: OvmfPkg/
