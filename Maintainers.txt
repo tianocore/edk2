@@ -494,6 +494,7 @@ M: Antaeus Kleinert-Strand <antklein@microsoft.com> [antklein]
 R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
+R: Varshit Pandya <varshit.pandya@arm.com> [vbpandya]
 
 OvmfPkg
 F: OvmfPkg/
