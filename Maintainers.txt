@@ -687,6 +687,7 @@ M: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 UefiCpuPkg: AMD related files
 F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
