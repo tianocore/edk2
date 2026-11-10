@@ -27,7 +27,7 @@ HttpUtilitiesDxeUnload (
   EFI_STATUS                   Status;
   UINTN                        HandleNum;
   EFI_HANDLE                   *HandleBuffer;
-  UINT32                       Index;
+  UINTN                        Index;
   EFI_HTTP_UTILITIES_PROTOCOL  *HttpUtilitiesProtocol;
 
   HandleBuffer = NULL;

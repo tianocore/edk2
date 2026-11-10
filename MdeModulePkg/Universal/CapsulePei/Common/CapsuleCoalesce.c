@@ -1151,7 +1151,7 @@ CapsuleDataCoalesce (
   // Don't go below some min address. If the base is below it,
   // then move it up and adjust the size accordingly.
   //
-  DEBUG ((DEBUG_INFO, "Capsule Memory range from 0x%8X to 0x%8X\n", (UINTN)*MemoryBase, (UINTN)*MemoryBase + *MemorySize));
+  DEBUG ((DEBUG_INFO, "Capsule Memory range from 0x%lX to 0x%lX\n", (UINT64)(UINTN)*MemoryBase, (UINT64)((UINTN)*MemoryBase + *MemorySize)));
   if ((UINTN)*MemoryBase < (UINTN)MIN_COALESCE_ADDR) {
     if (((UINTN)*MemoryBase + *MemorySize) < (UINTN)MIN_COALESCE_ADDR) {
       DEBUG ((DEBUG_ERROR, "ERROR: *MemoryBase + *MemorySize - 0x%x\n", (UINTN)*MemoryBase + *MemorySize));
@@ -1169,7 +1169,7 @@ CapsuleDataCoalesce (
 
   FreeMemBase = *MemoryBase;
   FreeMemSize = *MemorySize;
-  DEBUG ((DEBUG_INFO, "Capsule Free Memory from 0x%8X to 0x%8X\n", (UINTN)FreeMemBase, (UINTN)FreeMemBase + FreeMemSize));
+  DEBUG ((DEBUG_INFO, "Capsule Free Memory from 0x%lX to 0x%lX\n", (UINT64)(UINTN)FreeMemBase, (UINT64)((UINTN)FreeMemBase + FreeMemSize)));
 
   //
   // Relocate all the block descriptors to low memory to make further
