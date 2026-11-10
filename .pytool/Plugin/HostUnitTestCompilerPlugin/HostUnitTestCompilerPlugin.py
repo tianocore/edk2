@@ -69,6 +69,9 @@ class HostUnitTestCompilerPlugin(ICiBuildPlugin):
         elif GetHostInfo().arch == 'ARM':
             if GetHostInfo().bit == '64':
                 host.append("AARCH64")
+        elif GetHostInfo().arch == 'LOONGARCH':
+            if GetHostInfo().bit == '64':
+                host.append("LOONGARCH64")
 
         willrun = set(requested) & set(host)
         return (len(willrun), " ".join(willrun))
