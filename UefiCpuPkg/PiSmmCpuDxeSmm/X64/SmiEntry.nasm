@@ -1,6 +1,7 @@
 ;------------------------------------------------------------------------------ ;
 ; Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
 ; Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
+; Copyright (C) Advanced Micro Devices, Inc. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -55,6 +56,7 @@ extern ASM_PFX(CpuSmmDebugExit)
 global ASM_PFX(gPatchSmbase)
 extern ASM_PFX(mXdSupported)
 global ASM_PFX(gPatchXdSupported)
+global ASM_PFX(mPatchVerwSupported)
 global ASM_PFX(gPatchMsrIa32MiscEnableSupported)
 global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmiCr3)
@@ -366,6 +368,23 @@ mXdSupportedAbsAddr:
 .1:
 
     StuffRsb64
+
+    ;
+    ; Clear CPU microarchitectural buffers immediately before RSM so SMM state
+    ; is not left observable to less-privileged code (TSA).
+    ; Must be the last buffer-affecting operation before RSM. Gated by a
+    ; patchable flag set only on AuthenticAMD processors in PiSmmCpuCommon.c.
+    ;
+    mov     al, strict byte 0           ; source operand will be patched
+ASM_PFX(mPatchVerwSupported):
+    cmp     al, 0
+    jz      .SkipClearCpuBuffers
+    sub     rsp, 8
+    mov     word [rsp], ds
+    verw    word [rsp]
+    add     rsp, 8
+.SkipClearCpuBuffers:
+
     rsm
 
 ASM_PFX(gcSmiHandlerSize)    DW      $ - _SmiEntryPoint
