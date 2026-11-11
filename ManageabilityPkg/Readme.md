@@ -194,6 +194,24 @@ DXE, SMM and Standalone MM consumers use
 The former `Dxe/DxeManageabilityTransportKcs.inf` duplicate has been removed;
 platform DSC files referencing it must use the base instance instead.
 
+The IPMI KCS data port comes from
+`gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress`. Set
+`gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress` to an absolute
+command/status port when it is not adjacent to the data port. Its default value
+of zero preserves the data-base-plus-one mapping. For example, data port
+`0xCA0` and command/status port `0xCA4` are configured as:
+
+```ini
+[PcdsFixedAtBuild]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xCA0
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress|0xCA4
+```
+
+Command ports below the data port are also supported. The IPMI providers use
+this setting in PEI, DXE, SMM and Standalone MM. Direct KCS transport consumers
+that provide explicit hardware information retain control of all register
+addresses; the PCDs are defaults only when that information is absent.
+
 ### IPMI platform initialization
 
 Each PEI, DXE, SMM and Standalone MM IPMI provider calls

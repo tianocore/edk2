@@ -51,6 +51,7 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress

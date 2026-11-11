@@ -43,4 +43,5 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress                        # Used as default KCS I/O base adddress
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress
   gManageabilityPkgTokenSpaceGuid.PcdKcsStatusCheckTimeout                 # Use the predefined timeout value in micro seconds
