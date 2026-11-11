@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -17,11 +17,8 @@
 **/
 #include <Uefi.h>
 
-#include <IndustryStandard/ArmFfaSvc.h>
-#include <IndustryStandard/ArmFfaPartInfo.h>
 #include <IndustryStandard/PsaMmFwUpdate.h>
 
-#include <Library/ArmFfaLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
@@ -30,17 +27,15 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/FmpDeviceLib.h>
 
-#include <Protocol/MmCommunication2.h>
+#include "PsaFwuTransport.h"
 
 #include "PsaFwuLib.h"
-
-STATIC UINT16  mUpdateAgentId;
 
 STATIC VOID   *mPsaFwuBuffer = NULL;
 STATIC UINTN  mPsaFwuMaxBufferSize;
 
 /**
- * Convert MmCommunication related addresses on VirtualAddress Change Event.
+ * Convert the FWU buffer address on the VirtualAddress Change Event.
  *
  * @param [in]   Event      Registered VirtualAddress Change Event.
  * @param [in]   Context    Additional Data.
@@ -53,25 +48,20 @@ PsaFwuVirtualAddressChangeEvent (
   IN VOID       *Context
   )
 {
-  gRT->ConvertPointer (0x00, (VOID **)&mPsaFwuBuffer);
+  gRT->ConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mPsaFwuBuffer);
 }
 
 /**
   Generate a switch case returning the fixed data size for an FWU command.
 
-  Assert at build time that the shared buffer can hold the parameter header
-  and fixed request or response data for the command.
+  PsaFwuLibInit() checks that the acquired buffer can hold the parameter
+  header and fixed request or response data before any command is sent.
 
   @param Command   Firmware update command identifier.
   @param DataType  Fixed request or response structure type.
 **/
-#define RETURN_FWU_DATA_SIZE(Command, DataType)                   \
-  case Command:                                                   \
-    STATIC_ASSERT (                                               \
-      MM_SHARED_BUFFER_SIZE >=                                    \
-      (sizeof (PSA_MM_FWU_PARAMETER_HEADER) + sizeof (DataType)), \
-      "MM shared buffer is too small for the fixed FWU message"   \
-      );                                                          \
+#define RETURN_FWU_DATA_SIZE(Command, DataType) \
+  case Command: \
     return sizeof (DataType)
 
 /**
@@ -160,6 +150,56 @@ FwuGetAvailableRespDataSize (
          sizeof (PSA_MM_FWU_PARAMETER_HEADER) - GetMmFwuRespDataSize (Command);
 }
 
+/** Validate the complete response returned by the shared-buffer RPC. **/
+STATIC
+EFI_STATUS
+ValidateFwuResponse (
+  IN UINT32  Command,
+  IN UINTN   ResponseSize
+  )
+{
+  PSA_MM_FWU_CMD_DATA          *Response;
+  PSA_MM_FWU_DISCOVER_RESP     *Discovery;
+  PSA_MM_FWU_READ_STREAM_RESP  *ReadResponse;
+  UINTN                        FixedSize;
+
+  if ((ResponseSize < sizeof (PSA_MM_FWU_PARAMETER_HEADER)) ||
+      (ResponseSize > mPsaFwuMaxBufferSize))
+  {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  Response = mPsaFwuBuffer;
+  if ((Response->Header.ResponseStatus != PSA_MM_FWU_SUCCESS) &&
+      (Response->Header.ResponseStatus != PSA_MM_FWU_RESUME))
+  {
+    return EFI_SUCCESS;
+  }
+
+  FixedSize = sizeof (PSA_MM_FWU_PARAMETER_HEADER) + GetMmFwuRespDataSize (Command);
+  if (ResponseSize < FixedSize) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  if (Command == PSA_MM_FWU_COMMAND_DISCOVER) {
+    Discovery = GET_FWU_DATA_BUFFER (Response);
+    if ((Discovery->OffFunctionPresence < FixedSize) ||
+        (Discovery->OffFunctionPresence > ResponseSize) ||
+        (Discovery->NumFunc >
+         (ResponseSize - Discovery->OffFunctionPresence) / sizeof (UINT16)))
+    {
+      return EFI_PROTOCOL_ERROR;
+    }
+  } else if (Command == PSA_MM_FWU_COMMAND_READ_STREAM) {
+    ReadResponse = GET_FWU_DATA_BUFFER (Response);
+    if (ReadResponse->ReadBytes > ResponseSize - FixedSize) {
+      return EFI_PROTOCOL_ERROR;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Send a firmware update function request to StMM and Receive response.
 
   @param[in]  Command               Firmware update function id.
@@ -194,7 +234,7 @@ SendFwuRequest (
   UINTN                TotalReqCommBufferSize;
   UINTN                TotalRespCommBufferSize;
   UINTN                TotalBufferSize;
-  DIRECT_MSG_ARGS      EmptyArgs;
+  UINTN                ResponseSize;
 
   if ((RespMsg == NULL) || (mPsaFwuBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -219,7 +259,6 @@ SendFwuRequest (
   TotalBufferSize = MAX (TotalReqCommBufferSize, TotalRespCommBufferSize);
 
   ZeroMem (mPsaFwuBuffer, TotalBufferSize);
-  ZeroMem (&EmptyArgs, sizeof (DIRECT_MSG_ARGS));
   CmdData = (PSA_MM_FWU_CMD_DATA *)mPsaFwuBuffer;
 
   CmdData->Header.Command = Command;
@@ -229,11 +268,12 @@ SendFwuRequest (
     CopyMem (((UINT8 *)Buffer + ReqDataSize), ClientSendData, ClientSendDataSize);
   }
 
-  Status = ArmFfaLibMsgSendDirectReq2 (
-             mUpdateAgentId,
-             &gPsaFwuUpdateAgentGuid,
-             &EmptyArgs
-             );
+  Status = PsaFwuTransportSendRequest (mPsaFwuBuffer, TotalReqCommBufferSize, &ResponseSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ValidateFwuResponse (Command, ResponseSize);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -340,98 +380,6 @@ FwuCommunicate (
   }
 
   return FwuStatusToEfiStatus (FwuStatus);
-}
-
-/**
- * Get firmware update agent partition id.
- *
- * @param [out]   UpdateAgentId           Update agent partition id
- *
- * @retval EFI_SUCCESS                    Success to get Update agent id
- * @retval EFI_UNSUPPORTED                Firmware update doesn't support
- * @retval Others                         Error for FF-A request.
- *
- */
-STATIC
-EFI_STATUS
-EFIAPI
-FwuGetUpdateAgentId (
-  OUT UINT16  *UpdateAgentId
-  )
-{
-  EFI_STATUS              Status;
-  EFI_FFA_PART_INFO_DESC  *PartInfo;
-  EFI_GUID                *ServiceGuid;
-  VOID                    *RxBuffer;
-  UINT64                  RxBufferSize;
-  UINT32                  Count;
-  UINT32                  Size;
-  UINT16                  PartId;
-
-  if (!IsFfaSupported ()) {
-    return EFI_UNSUPPORTED;
-  }
-
-  Status = ArmFfaLibPartitionIdGet (&PartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Failed to get my partition id. Status:%r\n",
-      __func__,
-      Status
-      ));
-    return Status;
-  }
-
-  Status = ArmFfaLibGetRxTxBuffers (
-             NULL,
-             NULL,
-             &RxBuffer,
-             &RxBufferSize
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Failed to get Rx Buffer. Status:%r\n",
-      __func__,
-      Status
-      ));
-    return Status;
-  }
-
-  ServiceGuid = &gPsaFwuUpdateAgentGuid;
-  Status      = ArmFfaLibPartitionInfoGet (
-                  ServiceGuid,
-                  FFA_PART_INFO_FLAG_TYPE_DESC,
-                  &Count,
-                  &Size
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: (Fallback) Failed to get Update agent partition info. Status:%r\n",
-      __func__,
-      Status
-      ));
-    goto ErrorHandler;
-  }
-
-  PartInfo = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-  if ((PartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ2) == 0x00) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: (Fallback) Update agent doesn't support direct msg v2...\n",
-      __func__
-      ));
-    Status = EFI_UNSUPPORTED;
-    goto ErrorHandler;
-  }
-
-  *UpdateAgentId = PartInfo->PartitionId;
-
-ErrorHandler:
-  ArmFfaLibRxRelease (PartId);
-  return Status;
 }
 
 /**
@@ -1059,23 +1007,45 @@ PsaFwuLibInit (
   )
 {
   EFI_STATUS  Status;
+  VOID        *Buffer;
+  UINTN       BufferSize;
+  UINT32      Command;
+  UINTN       FixedSize;
 
-  if (MM_SHARED_BUFFER_SIZE == 0) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Status = FwuGetUpdateAgentId (&mUpdateAgentId);
+  Status = GetPsaFwuTransportBuffer (&Buffer, &BufferSize);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorHandler;
   }
 
-  // Buffer used to communicate with update agent.
-  // currently, use Non secure shared buffer.
-  mPsaFwuBuffer        = (VOID *)(UINTN)PcdGet64 (PcdMmBufferBase);
-  mPsaFwuMaxBufferSize = MM_SHARED_BUFFER_SIZE;
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto ErrorHandler;
+  }
 
-  DEBUG ((DEBUG_INFO, "%a: Update agent partition id: 0x%x\n", __func__, mUpdateAgentId));
-  DEBUG ((DEBUG_INFO, "%a: mPsaFwuMaxBufferSize: %d\n", __func__, mPsaFwuMaxBufferSize));
+  // Validate capacity before any command subtracts its fixed header size.
+  for (Command = 0; Command < PSA_MM_FWU_COMMAND_MAX_ID; Command++) {
+    FixedSize = sizeof (PSA_MM_FWU_PARAMETER_HEADER) +
+                MAX (GetMmFwuReqDataSize (Command), GetMmFwuRespDataSize (Command));
+    if (BufferSize < FixedSize) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: FWU command %u needs %lu bytes; buffer capacity is %lu.\n",
+        __func__,
+        Command,
+        (UINT64)FixedSize,
+        (UINT64)BufferSize
+        ));
+      Status = EFI_BAD_BUFFER_SIZE;
+      goto ErrorHandler;
+    }
+  }
 
+  mPsaFwuBuffer        = Buffer;
+  mPsaFwuMaxBufferSize = BufferSize;
+  DEBUG ((DEBUG_INFO, "%a: FWU communication buffer capacity: %lu bytes.\n", __func__, (UINT64)BufferSize));
   return EFI_SUCCESS;
+
+ErrorHandler:
+  PsaFwuLibExit ();
+  return Status;
 }

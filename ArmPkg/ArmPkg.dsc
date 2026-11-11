@@ -88,6 +88,7 @@
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmTransferListLib|MdePkg/Library/ArmTransferListLib/ArmTransferListLib.inf
   ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+  ArmFfaMemMgmtLib|MdePkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlLibNull/ArmMtlLibNull.inf
 
@@ -153,6 +154,7 @@
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
 
   ArmPkg/Library/FmpDevicePsaFwuLib/FmpDevicePsaFwuLib.inf
+  ArmPkg/Library/FmpDevicePsaFwuLib/TsFmpDevicePsaFwuLib.inf
 
   ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
 

@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -133,7 +133,7 @@ CheckFwuSupport (
   )
 {
   EFI_STATUS                Status;
-  UINT16                    *FunctionPresence;
+  CONST UINT8               *FunctionPresence;
   PSA_MM_FWU_DISCOVER_RESP  *FwuInfo;
   UINT16                    Idx;
 
@@ -153,10 +153,12 @@ CheckFwuSupport (
     return EFI_UNSUPPORTED;
   }
 
-  FunctionPresence = (UINT16 *)GET_FWU_DATA_BUFFER (FwuInfo);
+  // The wire offset includes the status header preceding FwuInfo.
+  FunctionPresence = (CONST UINT8 *)FwuInfo -
+                     sizeof (PSA_MM_FWU_PARAMETER_HEADER) + FwuInfo->OffFunctionPresence;
 
   for (Idx = 0; Idx < FwuInfo->NumFunc; Idx++) {
-    mSupportFunction |= 1ULL << FunctionPresence[Idx];
+    mSupportFunction |= 1ULL << ReadUnaligned16 ((CONST UINT16 *)(FunctionPresence + Idx * sizeof (UINT16)));
   }
 
   if ((!IS_FWU_FUNC_SUPPORTED (PSA_MM_FWU_COMMAND_BEGIN_STAGING)) ||
