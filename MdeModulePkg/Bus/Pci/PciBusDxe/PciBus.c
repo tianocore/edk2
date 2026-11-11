@@ -36,7 +36,6 @@ UINT64                                        gAllZero                       = 0
 
 EFI_PCI_PLATFORM_PROTOCOL       *gPciPlatformProtocol;
 EFI_PCI_OVERRIDE_PROTOCOL       *gPciOverrideProtocol;
-EDKII_IOMMU_PROTOCOL            *mIoMmuProtocol;
 EDKII_DEVICE_SECURITY_PROTOCOL  *mDeviceSecurityProtocol;
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL  mPciHotPlugRequest = {
@@ -283,14 +282,6 @@ PciBusDriverBindingStart (
            &gEfiPciOverrideProtocolGuid,
            NULL,
            (VOID **)&gPciOverrideProtocol
-           );
-  }
-
-  if (mIoMmuProtocol == NULL) {
-    gBS->LocateProtocol (
-           &gEdkiiIoMmuProtocolGuid,
-           NULL,
-           (VOID **)&mIoMmuProtocol
            );
   }
 
