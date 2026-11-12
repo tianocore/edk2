@@ -37,6 +37,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApInitTimeOutInMicroSeconds_HELP  #language en-US "Specifies timeout value in microseconds for the BSP to detect all APs for the first time."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApSipiResendIntervalInMicroSeconds_PROMPT  #language en-US "Interval for the BSP to resend the Start-up IPI to an AP."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApSipiResendIntervalInMicroSeconds_HELP  #language en-US "Specifies the interval in microseconds after which the BSP resends the Start-up IPI to an AP that has not yet started. A hypervisor can drop the Start-up IPI of an INIT-SIPI-SIPI sequence, leaving the AP in wait-for-SIPI. 0 disables the resend."
+
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuBootLogicalProcessorNumber_PROMPT  #language en-US "Number of Logical Processors available after platform reset."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuBootLogicalProcessorNumber_HELP  #language en-US "Specifies the number of Logical Processors that are available in the preboot environment after platform reset, including BSP and APs."
