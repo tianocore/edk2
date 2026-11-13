@@ -597,6 +597,16 @@ Tcp4DriverBindingSupported (
   )
 {
   EFI_STATUS  Status;
+  VOID        *Interface;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiHash2ServiceBindingProtocolGuid,
+                  NULL,
+                  &Interface
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Test for the Tcp4ServiceBinding Protocol
@@ -714,6 +724,16 @@ Tcp6DriverBindingSupported (
   )
 {
   EFI_STATUS  Status;
+  VOID        *Interface;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiHash2ServiceBindingProtocolGuid,
+                  NULL,
+                  &Interface
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Test for the Tcp6ServiceBinding Protocol
