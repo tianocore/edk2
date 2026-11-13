@@ -548,15 +548,12 @@ InitializePciHostBridge (
                    EFI_MEMORY_UC
                    );
         ASSERT_EFI_ERROR (Status);
-        Status = gDS->SetMemorySpaceAttributes (
-                        HostAddress,
-                        MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                        EFI_MEMORY_UC
-                        );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
-        }
-
+        //
+        // Do not apply a memory type to the complete aperture here. An
+        // aperture can contain both assigned BARs and unused address space.
+        // The PCI bus driver applies cache attributes to individual memory
+        // BARs according to the platform cache policy.
+        //
         if (ResourceAssigned) {
           Status = gDS->AllocateMemorySpace (
                           EfiGcdAllocateAddress,
