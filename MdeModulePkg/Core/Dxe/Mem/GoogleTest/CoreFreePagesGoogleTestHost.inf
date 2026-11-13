@@ -1,0 +1,48 @@
+## @file
+# Unit tests for CoreFreePages.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = CoreFreePagesGoogleTest
+  FILE_GUID      = C7DDC258-CAF0-4AF5-890B-B940D4B788BA
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+[Sources]
+  CoreFreePagesGoogleTest.cpp
+  ../Page.c
+  ../MemoryBin.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  HobLib
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -I$(WORKSPACE)/MdeModulePkg/Core/Dxe
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gEfiEventMemoryMapChangeGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType
