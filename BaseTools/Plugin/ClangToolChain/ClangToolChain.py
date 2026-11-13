@@ -157,7 +157,7 @@ class ClangToolChain(IUefiBuildPlugin):
             self.Logger.warning("Could not determine clang version")
 
         # Report the linker version based on toolchain
-        linker_name = {"CLANGPDB": "lld-link", "CLANGDWARF": "lld"}.get(tool_chain_tag)
+        linker_name = {"CLANGPDB": "lld-link", "CLANGDWARF": "ld.lld"}.get(tool_chain_tag)
         if linker_name:
             lld_version = self._get_linker_version(clang_bin_parent, linker_name)
             if lld_version:
