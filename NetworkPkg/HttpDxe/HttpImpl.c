@@ -291,6 +291,10 @@ EfiHttpRequest (
   // Only support GET, HEAD, DELETE, CONNECT, PATCH, PUT and POST method in current implementation.
   //
   if (Request != NULL) {
+    if (Request->Url == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     switch (Request->Method) {
       case HttpMethodGet:
       case HttpMethodHead:
@@ -717,7 +721,7 @@ EfiHttpRequest (
     HttpUrlFreeParser (EndPointUrlParser);
   } else {
     FileUrl = Url;
-    if ((Url != NULL) && (*FileUrl != '/')) {
+    if ((FileUrl != NULL) && (*FileUrl != '/')) {
       //
       // Convert the absolute-URI to the absolute-path
       //
@@ -1201,7 +1205,12 @@ HttpResponseWorker (
       goto Error;
     }
 
-    ASSERT (HttpHeaders != NULL);
+    if ((HttpHeaders == NULL) || (EndofHeader == NULL)) {
+      ASSERT (HttpHeaders != NULL);
+      ASSERT (EndofHeader != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto Error;
+    }
 
     //
     // Cache the part of body.
