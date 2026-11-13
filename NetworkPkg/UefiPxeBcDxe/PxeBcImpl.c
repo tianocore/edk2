@@ -321,6 +321,7 @@ EfiPxeBcStop (
     Private->Dhcp6->Stop (Private->Dhcp6);
     Private->Dhcp6->Configure (Private->Dhcp6, NULL);
     Private->Udp6Write->Configure (Private->Udp6Write, NULL);
+    Private->Udp6Read->Cancel (Private->Udp6Read, &Private->Udp6Token);
     Private->Udp6Read->Groups (Private->Udp6Read, FALSE, NULL);
     Private->Udp6Read->Configure (Private->Udp6Read, NULL);
     Private->Ip6->Cancel (Private->Ip6, &Private->Icmp6Token);
@@ -329,6 +330,11 @@ EfiPxeBcStop (
     if (Private->Icmp6Token.Event != NULL) {
       gBS->CloseEvent (Private->Icmp6Token.Event);
       Private->Icmp6Token.Event = NULL;
+    }
+
+    if (Private->Udp6Token.Event != NULL) {
+      gBS->CloseEvent (Private->Udp6Token.Event);
+      Private->Udp6Token.Event = NULL;
     }
 
     if (Private->Dhcp6Request != NULL) {
@@ -351,6 +357,7 @@ EfiPxeBcStop (
     Private->Dhcp4->Stop (Private->Dhcp4);
     Private->Dhcp4->Configure (Private->Dhcp4, NULL);
     Private->Udp4Write->Configure (Private->Udp4Write, NULL);
+    Private->Udp4Read->Cancel (Private->Udp4Read, &Private->Udp4Token);
     Private->Udp4Read->Groups (Private->Udp4Read, FALSE, NULL);
     Private->Udp4Read->Configure (Private->Udp4Read, NULL);
     Private->Ip4->Cancel (Private->Ip4, &Private->IcmpToken);
@@ -363,6 +370,11 @@ EfiPxeBcStop (
     if (Private->IcmpToken.Event != NULL) {
       gBS->CloseEvent (Private->IcmpToken.Event);
       Private->IcmpToken.Event = NULL;
+    }
+
+    if (Private->Udp4Token.Event != NULL) {
+      gBS->CloseEvent (Private->Udp4Token.Event);
+      Private->Udp4Token.Event = NULL;
     }
 
     Private->BootFileName = NULL;
@@ -1293,22 +1305,20 @@ EfiPxeBcUdpRead (
   IN     VOID                        *BufferPtr
   )
 {
-  PXEBC_PRIVATE_DATA         *Private;
-  EFI_PXE_BASE_CODE_MODE     *Mode;
-  EFI_UDP4_COMPLETION_TOKEN  Udp4Token;
-  EFI_UDP6_COMPLETION_TOKEN  Udp6Token;
-  EFI_UDP4_RECEIVE_DATA      *Udp4Rx;
-  EFI_UDP6_RECEIVE_DATA      *Udp6Rx;
-  EFI_STATUS                 Status;
-  BOOLEAN                    IsDone;
-  BOOLEAN                    IsMatched;
-  UINTN                      CopiedLen;
-  UINTN                      HeaderLen;
-  UINTN                      HeaderCopiedLen;
-  UINTN                      BufferCopiedLen;
-  UINT32                     FragmentLength;
-  UINTN                      FragmentIndex;
-  UINT8                      *FragmentBuffer;
+  PXEBC_PRIVATE_DATA      *Private;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_UDP4_RECEIVE_DATA   *Udp4Rx;
+  EFI_UDP6_RECEIVE_DATA   *Udp6Rx;
+  EFI_STATUS              Status;
+  BOOLEAN                 IsDone;
+  BOOLEAN                 IsMatched;
+  UINTN                   CopiedLen;
+  UINTN                   HeaderLen;
+  UINTN                   HeaderCopiedLen;
+  UINTN                   BufferCopiedLen;
+  UINT32                  FragmentLength;
+  UINTN                   FragmentIndex;
+  UINT8                   *FragmentBuffer;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1340,8 +1350,8 @@ EfiPxeBcUdpRead (
     return EFI_NOT_STARTED;
   }
 
-  ZeroMem (&Udp6Token, sizeof (EFI_UDP6_COMPLETION_TOKEN));
-  ZeroMem (&Udp4Token, sizeof (EFI_UDP4_COMPLETION_TOKEN));
+  ZeroMem (&Private->Udp6Token, sizeof (EFI_UDP6_COMPLETION_TOKEN));
+  ZeroMem (&Private->Udp4Token, sizeof (EFI_UDP4_COMPLETION_TOKEN));
 
   if (Mode->UsingIpv6) {
     Status = gBS->CreateEvent (
@@ -1349,7 +1359,7 @@ EfiPxeBcUdpRead (
                     TPL_NOTIFY,
                     PxeBcCommonNotify,
                     &IsDone,
-                    &Udp6Token.Event
+                    &Private->Udp6Token.Event
                     );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
@@ -1360,7 +1370,7 @@ EfiPxeBcUdpRead (
                     TPL_NOTIFY,
                     PxeBcCommonNotify,
                     &IsDone,
-                    &Udp4Token.Event
+                    &Private->Udp4Token.Event
                     );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
@@ -1380,7 +1390,7 @@ EfiPxeBcUdpRead (
     if (Mode->UsingIpv6) {
       Status = PxeBcUdp6Read (
                  Private->Udp6Read,
-                 &Udp6Token,
+                 &Private->Udp6Token,
                  Mode,
                  Private->UdpTimeOutEvent,
                  OpFlags,
@@ -1394,7 +1404,7 @@ EfiPxeBcUdpRead (
     } else {
       Status = PxeBcUdp4Read (
                  Private->Udp4Read,
-                 &Udp4Token,
+                 &Private->Udp4Token,
                  Mode,
                  Private->UdpTimeOutEvent,
                  OpFlags,
@@ -1427,7 +1437,7 @@ EfiPxeBcUdpRead (
     // Copy the received packet to user if matched by filter.
     //
     if (Mode->UsingIpv6) {
-      Udp6Rx = Udp6Token.Packet.RxData;
+      Udp6Rx = Private->Udp6Token.Packet.RxData;
       ASSERT (Udp6Rx != NULL);
 
       HeaderLen = 0;
@@ -1483,8 +1493,8 @@ EfiPxeBcUdpRead (
       //
       gBS->SignalEvent (Udp6Rx->RecycleSignal);
     } else {
-      Udp4Rx = Udp4Token.Packet.RxData;
-      ASSERT (Udp4Rx != NULL);
+      Udp4Rx = Private->Udp4Token.Packet.RxData;
+      ASSERT (Udp4Rx !=  NULL);
 
       HeaderLen = 0;
       if (HeaderSize != NULL) {
@@ -1542,11 +1552,13 @@ EfiPxeBcUdpRead (
   }
 
   if (Mode->UsingIpv6) {
-    Private->Udp6Read->Cancel (Private->Udp6Read, &Udp6Token);
-    gBS->CloseEvent (Udp6Token.Event);
+    Private->Udp6Read->Cancel (Private->Udp6Read, &Private->Udp6Token);
+    gBS->CloseEvent (Private->Udp6Token.Event);
+    Private->Udp6Token.Event = NULL;
   } else {
-    Private->Udp4Read->Cancel (Private->Udp4Read, &Udp4Token);
-    gBS->CloseEvent (Udp4Token.Event);
+    Private->Udp4Read->Cancel (Private->Udp4Read, &Private->Udp4Token);
+    gBS->CloseEvent (Private->Udp4Token.Event);
+    Private->Udp4Token.Event = NULL;
   }
 
   return Status;
