@@ -1,7 +1,7 @@
 /** @file
   Arm FF-A library Header file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -404,6 +404,29 @@ ArmFfaLibMsgSendDirectReq (
   IN  UINT16               DestPartId,
   IN  UINT32               Flags,
   IN  OUT DIRECT_MSG_ARGS  *ImpDefArgs
+  );
+
+/**
+  Send a direct request using the 32-bit ABI, including on AArch64.
+
+  Resume interrupted requests until a direct response or error is returned.
+  Only the low 32 bits of the five payload registers are transmitted.
+
+  @param[in]      DestPartId  Destination partition ID.
+  @param[in]      Flags       Direct-message flags.
+  @param[in,out]  ImpDefArgs  Payload registers w3-w7, using Arg0-Arg4.
+
+  @retval EFI_SUCCESS            A 32-bit direct response was received.
+  @retval EFI_INVALID_PARAMETER  Invalid destination or NULL arguments.
+  @retval EFI_PROTOCOL_ERROR     Unexpected response function identifier.
+  @retval Others                 FF-A request or continuation failed.
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibMsgSendDirectReq32 (
+  IN UINT16               DestPartId,
+  IN UINT32               Flags,
+  IN OUT DIRECT_MSG_ARGS  *ImpDefArgs
   );
 
 /**
