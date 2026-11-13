@@ -1,5 +1,6 @@
 /** @file
-Header file for Elf convert solution
+Definitions, PRM export structures and function prototypes shared by the ELF
+to PE/COFF converters.
 
 Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
