@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1125,10 +1125,17 @@ FmpDeviceCheckImageWithStatus (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((ImageSize > mImageEntry->ImgMaxSize) || (mUpdateDisabled)) {
+  if (mUpdateDisabled || (mImageEntry == NULL)) {
+    *ImageUpdatable    = IMAGE_UPDATABLE_INVALID;
+    *LastAttemptStatus = ErrStatusToAttemptStatus (EFI_UNSUPPORTED);
+    DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Firmware update unavailable.\n"));
+    return EFI_UNSUPPORTED;
+  }
+
+  if (ImageSize > mImageEntry->ImgMaxSize) {
     *ImageUpdatable    = IMAGE_UPDATABLE_INVALID;
     *LastAttemptStatus = ErrStatusToAttemptStatus (EFI_INVALID_PARAMETER);
-    DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Invalid Status.\n"));
+    DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Image too large.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
