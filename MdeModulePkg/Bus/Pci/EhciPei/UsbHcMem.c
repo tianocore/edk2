@@ -104,11 +104,7 @@ UsbHcAllocMemBlock (
   return Block;
 
 FreeBuffer:
-  if (Ehc->IoMmu != NULL) {
-    IoMmuFreeBuffer (Ehc->IoMmu, Pages, BufHost, Mapping);
-  } else {
-    PeiServicesFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)BufHost, Pages);
-  }
+  IoMmuFreeBuffer (Ehc->IoMmu, Pages, BufHost, Mapping);
 
 FreeBitArray:
   PeiServicesFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Block->Bits, BitArrayPages);
@@ -480,6 +476,7 @@ UsbHcFreeMem (
 {
   USBHC_MEM_BLOCK  *Head;
   USBHC_MEM_BLOCK  *Block;
+  USBHC_MEM_BLOCK  *Prev;
   UINT8            *ToFree;
   UINTN            AllocSize;
   UINTN            Byte;
@@ -490,7 +487,7 @@ UsbHcFreeMem (
   AllocSize = USBHC_MEM_ROUND (Size);
   ToFree    = (UINT8 *)Mem;
 
-  for (Block = Head; Block != NULL; Block = Block->Next) {
+  for (Block = Head, Prev = NULL; Block != NULL; Prev = Block, Block = Block->Next) {
     //
     // scan the memory block list for the memory block that
     // completely contains the memory to free.
@@ -527,6 +524,7 @@ UsbHcFreeMem (
   // Release the current memory block if it is empty and not the head
   //
   if ((Block != Head) && UsbHcIsMemBlockEmpty (Block)) {
+    Prev->Next = Block->Next;
     UsbHcFreeMemBlock (Ehc, Pool, Block);
   }
 
