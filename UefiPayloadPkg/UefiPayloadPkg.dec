@@ -76,7 +76,7 @@ gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize|0|UINT32|0x10000002
 gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter|0|UINT64|0x10000004
 
 ## Used to help reduce fragmentation in the EFI memory map
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x19|UINT32|0x10000012
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x40|UINT32|0x10000012
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x04|UINT32|0x10000013
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x08|UINT32|0x00000014
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100|UINT32|0x00000015
