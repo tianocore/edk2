@@ -32,14 +32,15 @@
 #include "PpttGenerator.h"
 
 /**
-  ARM standard PPTT Generator
+  Standard PPTT Generator
 
   Requirements:
     The following Configuration Manager Object(s) are used by this Generator:
     - EArchCommonObjProcHierarchyInfo (REQUIRED)
     - EArchCommonObjCacheInfo
     - EArchCommonObjCmRef
-    - EArmObjGicCInfo (REQUIRED)
+    - EArmObjGicCInfo (REQUIRED on Arm)
+    - ERiscVObjRintcInfo (REQUIRED on RISC-V)
 */
 
 /**
@@ -70,16 +71,6 @@ GET_OBJECT_LIST (
   EObjNameSpaceArchCommon,
   EArchCommonObjCmRef,
   CM_ARCH_COMMON_OBJ_REF
-  );
-
-/**
-  This macro expands to a function that retrieves the GIC CPU interface
-  information from the Configuration Manager.
-*/
-GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjGicCInfo,
-  CM_ARM_GICC_INFO
   );
 
 /**
@@ -482,9 +473,9 @@ AddProcHierarchyNodes (
   UINT32                                 *PrivateResources;
   BOOLEAN                                IsAcpiIdObjectTokenDuplicated;
 
-  CM_ARM_GICC_INFO  *GicCInfoList;
-  UINT32            GicCInfoCount;
-  UINT32            UniqueGicCRefCount;
+  UINT32  AcpiProcessorUid;
+  UINT32  CpuInterfaceCount;
+  UINT32  UniqueCpuInterfaceRefCount;
 
   PPTT_NODE_INDEXER                   *PpttNodeFound;
   CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcInfoNode;
@@ -510,20 +501,20 @@ AddProcHierarchyNodes (
 
   SsdtCpuTopoPresent = CheckAcpiTablePresent (CfgMgrProtocol, EStdAcpiTableIdSsdtCpuTopology);
 
-  // Check if every GICC Object is referenced by onlu one Proc Node
+  // Check if every CPU interface object is referenced by only one Proc Node
   IsAcpiIdObjectTokenDuplicated = FindDuplicateValue (
                                     ProcNodeIterator,
                                     NodeCount,
                                     sizeof (PPTT_NODE_INDEXER),
                                     IsAcpiIdObjectTokenEqual
                                     );
-  // Duplicate GIC CPU Interface Token was found so two PPTT Processor Hierarchy
-  // Nodes map to the same MADT GICC structure
+  // Duplicate CPU interface Token was found so two PPTT Processor Hierarchy
+  // Nodes map to the same MADT CPU interface structure
   if (IsAcpiIdObjectTokenDuplicated) {
     return EFI_INVALID_PARAMETER;
   }
 
-  UniqueGicCRefCount = 0;
+  UniqueCpuInterfaceRefCount = 0;
 
   while (NodeCount-- != 0) {
     ProcInfoNode = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)ProcNodeIterator->Object;
@@ -662,11 +653,11 @@ AddProcHierarchyNodes (
         ProcStruct->AcpiProcessorId = MetadataUid.Uid;
       }
     } else {
-      Status = GetEArmObjGicCInfo (
+      Status = GetCpuInterfaceInfo (
                  CfgMgrProtocol,
                  ProcInfoNode->AcpiIdObjectToken,
-                 &GicCInfoList,
-                 &GicCInfoCount
+                 &AcpiProcessorUid,
+                 &CpuInterfaceCount
                  );
       if (EFI_ERROR (Status)) {
         DEBUG ((
@@ -681,15 +672,15 @@ AddProcHierarchyNodes (
         return Status;
       }
 
-      if (GicCInfoCount != 1) {
+      if (CpuInterfaceCount != 1) {
         Status = EFI_INVALID_PARAMETER;
         DEBUG ((
           DEBUG_ERROR,
-          "ERROR: PPTT: Failed to find a unique GICC structure. " \
+          "ERROR: PPTT: Failed to find a unique CPU interface structure. " \
           "ACPI Processor ID can't be populated. " \
-          "GICC Structure Count = %d. AcpiIdObjectToken = %p. RequestorToken = %p " \
+          "CPU interface Structure Count = %d. AcpiIdObjectToken = %p. RequestorToken = %p " \
           "Status = %r\n",
-          GicCInfoCount,
+          CpuInterfaceCount,
           ProcInfoNode->AcpiIdObjectToken,
           ProcInfoNode->Token,
           Status
@@ -698,11 +689,11 @@ AddProcHierarchyNodes (
       }
 
       // Update the ACPI Processor Id
-      ProcStruct->AcpiProcessorId = GicCInfoList->AcpiProcessorUid;
+      ProcStruct->AcpiProcessorId = AcpiProcessorUid;
 
       // Increment the reference count for the number of
-      // Unique GICC objects that were retrieved.
-      UniqueGicCRefCount++;
+      // Unique CPU interface objects that were retrieved.
+      UniqueCpuInterfaceRefCount++;
     }
 
     ProcStruct->NumberOfPrivateResources = ProcInfoNode->NoOfPrivateResources;
@@ -735,36 +726,37 @@ AddProcHierarchyNodes (
     ProcNodeIterator++;
   } // Processor Hierarchy Node
 
-  // Knowing the total number of GICC references made and that all GICC Token
-  // references are unique, we can test if no GICC instances have been left out.
-  Status = GetEArmObjGicCInfo (
+  // Knowing the total number of CPU interface references made and that all CPU
+  // interface Token references are unique, we can test if no CPU interface
+  // instances have been left out.
+  Status = GetCpuInterfaceInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
-             &GicCInfoList,
-             &GicCInfoCount
+             &AcpiProcessorUid,
+             &CpuInterfaceCount
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: PPTT: Failed to get GICC Info. Status = %r\n",
+      "ERROR: PPTT: Failed to get CPU interface Info. Status = %r\n",
       Status
       ));
     return Status;
   }
 
   // MADT - PPTT cross validation
-  // This checks that one and only one GICC structure is referenced by a
-  // Processor Hierarchy Node in the PPTT.
-  // Since we have already checked that the GICC objects referenced by the
-  // Proc Nodes are unique, the UniqueGicCRefCount cannot be greater than
-  // the total number of GICC objects in the platform.
-  if (GicCInfoCount > UniqueGicCRefCount) {
+  // This checks that one and only one CPU interface structure is referenced by
+  // a Processor Hierarchy Node in the PPTT.
+  // Since we have already checked that the CPU interface objects referenced by
+  // the Proc Nodes are unique, the UniqueCpuInterfaceRefCount cannot be greater
+  // than the total number of CPU interface objects in the platform.
+  if (CpuInterfaceCount > UniqueCpuInterfaceRefCount) {
     Status = EFI_INVALID_PARAMETER;
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: PPTT: %d GICC structure(s) exposed by MADT don't have " \
+      "ERROR: PPTT: %d CPU interface structure(s) exposed by MADT don't have " \
       "a corresponding Processor Hierarchy Node. Status = %r\n",
-      GicCInfoCount - UniqueGicCRefCount,
+      CpuInterfaceCount - UniqueCpuInterfaceRefCount,
       Status
       ));
   }
