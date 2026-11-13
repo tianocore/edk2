@@ -544,6 +544,39 @@ EhcRunHC (
 }
 
 /**
+  Turn off the periodic and asynchronous schedules and wait for the
+  controller to report both of them as disabled.
+
+  @param  Ehc          The EHCI device.
+  @param  Timeout      Time to wait before abort.
+
+  @retval EFI_SUCCESS  Both schedules are disabled.
+  @retval EFI_TIMEOUT  Failed to disable the schedules before Timeout.
+
+**/
+EFI_STATUS
+EhcQuiesceHC (
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
+  )
+{
+  EFI_STATUS  Status;
+
+  EhcClearOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_PERIOD | USBCMD_ENABLE_ASYNC);
+
+  Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_PERIOD_ENABLED, FALSE, Timeout);
+  if (!EFI_ERROR (Status)) {
+    Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_ASYNC_ENABLED, FALSE, Timeout);
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EhcQuiesceHC: schedules still active, USBSTS = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBSTS_OFFSET)));
+  }
+
+  return Status;
+}
+
+/**
   Initialize the HC hardware.
   EHCI spec lists the five things to do to initialize the hardware:
   1. Program CTRLDSSEGMENT
