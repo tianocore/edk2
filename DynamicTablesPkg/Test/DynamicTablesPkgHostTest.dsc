@@ -48,3 +48,5 @@
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiHmatLib/AcpiHmatLib.inf
   }
+
+  DynamicTablesPkg/Library/Common/AmlLib/GoogleTest/AmlResourceUsageGoogleTest.inf
