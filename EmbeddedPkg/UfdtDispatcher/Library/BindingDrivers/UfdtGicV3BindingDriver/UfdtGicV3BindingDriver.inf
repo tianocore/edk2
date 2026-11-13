@@ -1,0 +1,43 @@
+## @file
+#  Register GICv3 configuration callbacks with UfdtDispatcher.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtGicV3BindingDriver
+  FILE_GUID                      = b1ff946a-493a-49a9-a6ba-cc48910a9f6d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = UfdtGicV3BindingDriverConstructor
+
+[Sources]
+  UfdtGicV3BindingDriver.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UfdtDispatcherLib
+  BaseLib
+  DebugLib
+  MapMmioLib
+  PcdLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Protocols]
+  gEdkiiUfdtGenericIntCProtocolGuid  ## SOMETIMES_PRODUCES ## CONSUMES
+  gEdkiiUfdtGicV3InfoProtocolGuid  ## SOMETIMES_PRODUCES
+  gEdkiiUfdtGicV3AbsentProtocolGuid  ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase

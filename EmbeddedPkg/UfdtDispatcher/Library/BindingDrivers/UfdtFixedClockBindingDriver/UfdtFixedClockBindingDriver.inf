@@ -1,0 +1,30 @@
+## @file
+# Fixed-clock resource provider registered with UfdtDispatcher.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtFixedClockBindingDriver
+  FILE_GUID                      = d5ae43c0-768f-43f6-9567-0c26a94e1d57
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = UfdtFixedClockBindingDriverConstructor
+
+[Sources]
+  UfdtFixedClockBindingDriver.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UfdtDispatcherLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEdkiiUfdtClockInfoProtocolGuid  ## BY_START
+  gEdkiiUfdtClockAbsentProtocolGuid  ## SOMETIMES_PRODUCES

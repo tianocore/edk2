@@ -1,0 +1,31 @@
+## @file
+#  Gate legacy architectural timer consumers on completed device configuration.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtTimerDepexLib
+  FILE_GUID                      = 0eaa6138-6043-4f5a-a4db-364a4db81d3b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = UfdtTimerDepexLibConstructor
+
+[Sources]
+  UfdtTimerDepexLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UfdtDepexLib
+
+[Protocols]
+  gEdkiiUfdtTimerInfoProtocolGuid  ## CONSUMES
+
+[Depex]
+  gEdkiiUfdtTimerInfoProtocolGuid

@@ -1,0 +1,31 @@
+## @file
+#  Gate legacy GICv2 consumers on completed device configuration.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtGicV2DepexLib
+  FILE_GUID                      = a5438b37-107c-459f-8a42-019a04d3a20e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = UfdtGicV2DepexLibConstructor
+
+[Sources]
+  UfdtGicV2DepexLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UfdtDepexLib
+
+[Protocols]
+  gEdkiiUfdtGicV2InfoProtocolGuid  ## CONSUMES
+
+[Depex]
+  gEdkiiUfdtGicV2InfoProtocolGuid

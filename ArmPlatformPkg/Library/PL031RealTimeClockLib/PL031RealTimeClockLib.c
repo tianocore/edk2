@@ -321,20 +321,28 @@ LibRtcInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
 
   // Initialize RTC Base Address
   mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
 
-  // Declare the controller as EFI_MEMORY_RUNTIME
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeMemoryMappedIo,
-                  mPL031RtcBase,
-                  SIZE_4KB,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
-                  );
+  // An FDT resource producer may already have registered this runtime window.
+  Status = gDS->GetMemorySpaceDescriptor (mPL031RtcBase, &Descriptor);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (Descriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+    Status = gDS->AddMemorySpace (
+                    EfiGcdMemoryTypeMemoryMappedIo,
+                    mPL031RtcBase,
+                    SIZE_4KB,
+                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   Status = gDS->SetMemorySpaceAttributes (mPL031RtcBase, SIZE_4KB, EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP);
