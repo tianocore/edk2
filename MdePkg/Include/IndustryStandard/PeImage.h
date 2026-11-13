@@ -625,11 +625,11 @@ typedef struct {
 /// Import Directory Table
 ///
 typedef struct {
-  UINT32                  Characteristics;
-  UINT32                  TimeDateStamp;
-  UINT32                  ForwarderChain;
-  UINT32                  Name;
-  EFI_IMAGE_THUNK_DATA    *FirstThunk;
+  UINT32    Characteristics;
+  UINT32    TimeDateStamp;
+  UINT32    ForwarderChain;
+  UINT32    Name;
+  UINT32    FirstThunk;                        ///< RVA to the import address table.
 } EFI_IMAGE_IMPORT_DESCRIPTOR;
 
 ///
