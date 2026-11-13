@@ -1,0 +1,43 @@
+## @file
+#  Library provides the helper functions for SEV guest
+#
+# Copyright (c) 2017 - 2026, Advanced Micro Devices. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = DxeAmdSevLib
+  FILE_GUID                      = 343ae1b7-f70b-4df7-bd39-11eccf5790d6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AmdSevLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+  CONSTRUCTOR                    = DxeAmdSevLibConstructor
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+# VALID_ARCHITECTURES           = X64
+#
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[Sources]
+  DxeAmdSevLib.c
+  AmdSevLib.c
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

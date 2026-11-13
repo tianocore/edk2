@@ -12,6 +12,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/AmdSvsmLib.h>
 
 #include "SnpPageStateChange.h"
@@ -69,7 +70,7 @@ MemEncryptSevSnpPreValidateSystemRam (
 {
   SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
 
-  if (!MemEncryptSevSnpIsEnabled ()) {
+  if (!AmdSevSnpIsEnabled ()) {
     return;
   }
 

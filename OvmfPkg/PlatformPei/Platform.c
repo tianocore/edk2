@@ -37,6 +37,7 @@
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <OvmfPlatforms.h>
 #include <Library/TdxHelperLib.h>
 
@@ -369,7 +370,7 @@ InitializePlatform (
   }
 
   PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
-  PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
+  PlatformInfoHob->SevEsIsEnabled      = AmdSevEsIsEnabled ();
   PlatformInfoHob->PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
   PlatformInfoHob->DefaultMaxCpuNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
 

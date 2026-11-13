@@ -128,7 +128,7 @@ SmmCpuFeaturesSmmRelocationComplete (
 
   InitCpuHotEjectData ();
 
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return;
   }
 

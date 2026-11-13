@@ -949,7 +949,13 @@ AddLocalApicMemorySpace (
   EFI_PHYSICAL_ADDRESS  BaseAddress;
 
   BaseAddress = (EFI_PHYSICAL_ADDRESS)GetLocalApicBaseAddress ();
-  Status      = AddMemoryMappedIoSpace (BaseAddress, SIZE_4KB, EFI_MEMORY_UC);
+
+  // Alternate Injection is enabled, XAPIC is disabled.
+  if (BaseAddress == 0) {
+    return;
+  }
+
+  Status = AddMemoryMappedIoSpace (BaseAddress, SIZE_4KB, EFI_MEMORY_UC);
   ASSERT_EFI_ERROR (Status);
 
   //

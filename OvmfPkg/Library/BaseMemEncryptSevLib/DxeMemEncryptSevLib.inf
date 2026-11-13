@@ -33,7 +33,6 @@
 [Sources]
   DxeMemEncryptSevLibInternal.c
   PeiDxeMemEncryptSevLibInternal.c
-  PeiDxeMemEncryptSevLibInternal.h
   X64/DxeSnpSystemRamValidate.c
   X64/MemEncryptSevLib.c
   X64/PeiDxeVirtualMemory.c
@@ -50,6 +49,7 @@
   PcdLib
   CcExitLib
   AmdSvsmLib
+  AmdSevLib
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

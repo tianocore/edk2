@@ -16,12 +16,15 @@
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
+#include <Library/AmdSvsmLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
 #include <Pi/PiDxeCis.h>
 #include <Protocol/SevMemoryAcceptance.h>
+#include <Protocol/SevAltInjRegister.h>
 #include <Protocol/MemoryAccept.h>
 #include <Uefi/UefiSpec.h>
 
@@ -191,6 +194,65 @@ STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
   AmdSevMemoryAccept
 };
 
+STATIC
+VOID
+EFIAPI
+SvsmRegisterAltInj (
+  VOID
+  )
+{
+  AmdSvsmSnpApicConfigEmulation (SVSM_AI_REGISTER);
+}
+
+/**
+  Register the guest kernel with Alternate Injection.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+SevRegisterAltInj (
+  IN OVMF_SEV_ALT_INJ_REGISTER_PROTOCOL  *This
+  )
+{
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!AmdSvsmIsSvsmPresent () || !AmdSvsmAltInjEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  SvsmRegisterAltInj ();
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+OVMF_SEV_ALT_INJ_REGISTER_PROTOCOL
+  mSevAltInjRegisterProtocol = { SevRegisterAltInj };
+
+STATIC EFI_EVENT  mDeregisterAlternateInjectionEvent = NULL;
+
+/**
+  Deregister Alternate Injection in ExitBootServices.
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    The pointer to the notification function's context,
+                        which is implementation-dependent.
+**/
+STATIC
+VOID
+EFIAPI
+DeregisterAlternateInjection (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  AmdSvsmSnpApicConfigEmulation (SVSM_AI_DEREGISTER);
+
+  gBS->CloseEvent (mDeregisterAlternateInjectionEvent);
+}
+
 EFI_STATUS
 EFIAPI
 AmdSevDxeEntryPoint (
@@ -207,7 +269,7 @@ AmdSevDxeEntryPoint (
   //
   // Do nothing when SEV is not enabled
   //
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return EFI_UNSUPPORTED;
   }
 
@@ -320,7 +382,7 @@ AmdSevDxeEntryPoint (
     CpuDeadLoop ();
   }
 
-  if (MemEncryptSevSnpIsEnabled ()) {
+  if (AmdSevSnpIsEnabled ()) {
     //
     // Memory acceptance began being required in SEV-SNP, so install the
     // memory accept protocol implementation for a SEV-SNP active guest.
@@ -331,6 +393,8 @@ AmdSevDxeEntryPoint (
                     &mMemoryAcceptProtocol,
                     &gOvmfSevMemoryAcceptanceProtocolGuid,
                     &mMemoryAcceptanceProtocol,
+                    &gOvmfSevAltInjRegisterProtocolGuid,
+                    &mSevAltInjRegisterProtocol,
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
@@ -349,6 +413,24 @@ AmdSevDxeEntryPoint (
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "AllowUnacceptedMemory event creation for EventBeforeExitBootServices failed.\n"));
+    }
+
+    if (AmdSvsmIsSvsmPresent () && AmdSvsmAltInjEnabled ()) {
+      Status = gBS->CreateEventEx (
+                      EVT_NOTIFY_SIGNAL,
+                      TPL_CALLBACK,
+                      DeregisterAlternateInjection,
+                      NULL,
+                      &gEfiEventBeforeExitBootServicesGuid,
+                      &mDeregisterAlternateInjectionEvent
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "DeregisterAlternateInjection event creation for EventBeforeExitBootServices failed.\n"
+          ));
+      }
     }
 
     //

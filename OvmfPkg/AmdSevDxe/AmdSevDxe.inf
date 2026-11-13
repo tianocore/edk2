@@ -23,6 +23,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -30,6 +31,8 @@
   DebugLib
   DxeServicesTableLib
   MemEncryptSevLib
+  AmdSevLib
+  AmdSvsmLib
   MemoryAllocationLib
   PcdLib
   UefiDriverEntryPoint
@@ -50,6 +53,7 @@
 [Protocols]
   gEdkiiMemoryAcceptProtocolGuid
   gOvmfSevMemoryAcceptanceProtocolGuid
+  gOvmfSevAltInjRegisterProtocolGuid
 
 [Guids]
   gConfidentialComputingSevSnpBlobGuid

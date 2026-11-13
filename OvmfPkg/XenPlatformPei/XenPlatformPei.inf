@@ -60,6 +60,7 @@
   QemuFwCfgS3Lib
   MtrrLib
   MemEncryptSevLib
+  AmdSevLib
   PcdLib
   SafeIntLib
   XenHypercallLib

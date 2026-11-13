@@ -12,6 +12,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/DebugLib.h>
 #include <Library/CcExitLib.h>
 #include <Library/AmdSvsmLib.h>
@@ -315,7 +316,7 @@ InternalSetPageState (
     if (State == SevSnpPagePrivate) {
       AmdSvsmSnpPvalidate (Info);
 
-      if (MemEncryptSevSnpDoCoherencyMitigation ()) {
+      if (AmdSevSnpDoCoherencyMitigation ()) {
         for (Index = 0; Index <= Info->Header.EndEntry; Index++) {
           Address     = LShiftU64 ((UINT64)Info->Entry[Index].GuestFrameNumber, EFI_PAGE_SHIFT);
           RmpPageSize = Info->Entry[Index].PageSize;

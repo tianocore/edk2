@@ -11,6 +11,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 
 #include "QemuFlash.h"
 
@@ -25,7 +26,7 @@ QemuFlashBeforeProbe (
 
   ASSERT (FeaturePcdGet (PcdSmmSmramRequire));
 
-  if (!MemEncryptSevIsEnabled ()) {
+  if (!AmdSevIsEnabled ()) {
     return;
   }
 

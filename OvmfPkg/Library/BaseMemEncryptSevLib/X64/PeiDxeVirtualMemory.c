@@ -13,6 +13,7 @@
 
 #include <Library/CpuLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
 
@@ -772,7 +773,7 @@ SetMemoryEncDec (
   //
   // The InternalSetPageState() is used for setting the page state in the RMP table.
   //
-  if (!Mmio && (Mode == ClearCBit) && MemEncryptSevSnpIsEnabled ()) {
+  if (!Mmio && (Mode == ClearCBit) && AmdSevSnpIsEnabled ()) {
     if (mPscBuffer == NULL) {
       mPscBuffer = AllocateReservedPages (1);
       ASSERT (mPscBuffer != NULL);
@@ -973,7 +974,7 @@ SetMemoryEncDec (
   //
   // The InternalSetPageState() is used for setting the page state in the RMP table.
   //
-  if ((Mode == SetCBit) && MemEncryptSevSnpIsEnabled ()) {
+  if ((Mode == SetCBit) && AmdSevSnpIsEnabled ()) {
     if (mPscBuffer == NULL) {
       mPscBuffer = AllocateReservedPages (1);
       ASSERT (mPscBuffer != NULL);

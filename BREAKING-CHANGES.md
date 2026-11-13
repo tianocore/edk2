@@ -595,3 +595,30 @@ toolchain.
 
 **Earliest removal**: Already removed in this change. The toolchains were removed in the same PR with no compatibility
 window.
+
+#### Breaking Change: SEV query APIs moved from MemEncryptSevLib to AmdSevLib
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13494](https://github.com/tianocore/edk2/issues/13494)
+- **Deprecation Issue**: N/A
+- **Removal Issue**: N/A
+- **Pull Request**: [tianocore/edk2#13495]
+- **Type**: Source-Level (Removal) - API Move and Rename
+
+**What Changed**
+General SEV query functions were refactored out of `MemEncryptSevLib` into a new dedicated library class `AmdSevLib`. API prefixes were renamed from `MemEncryptSev*` to `AmdSev*` (e.g., `MemEncryptSevIsEnabled()` is now `AmdSevIsEnabled()`).
+
+**What Replaces It**
+* Library Class: `AmdSevLib` (e.g., `OvmfPkg/Library/AmdSevLib/DxeAmdSevLib.inf`)
+* Functions: `AmdSevIsEnabled()`, `AmdSevEsIsEnabled()`, `AmdSevSnpIsEnabled()`, etc.
+
+**How to Migrate**
+In Platform DSC Files (e.g., `QemuOpenBoardPkg.dsc`):
+   Add mapping for `AmdSevLib` in your `[LibraryClasses]` section:
+   [LibraryClasses.Common.DXE_DRIVER, ...]
+     AmdSevLib|OvmfPkg/Library/AmdSevLib/DxeAmdSevLib.inf
+
+**Breaking Conditions**
+Affects drivers, libraries, and out-of-tree platforms (such as `edk2-platforms`) referencing general AMD SEV query APIs.
+
+**Earliest removal**: Already removed in this change.

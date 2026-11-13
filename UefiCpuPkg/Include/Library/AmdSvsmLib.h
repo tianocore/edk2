@@ -14,6 +14,19 @@
 #include <Protocol/DebugSupport.h>
 #include <Register/Amd/Ghcb.h>
 
+typedef enum {
+  SVSM_IRQ_DISABLE_SINGLE,
+  SVSM_IRQ_ENABLE_SINGLE,
+  SVSM_IRQ_DISABLE_ALL,
+  SVSM_IRQ_ENABLE_ALL,
+} SVSM_VEC_ENABLE;
+
+typedef enum {
+  SVSM_AI_DISABLE,
+  SVSM_AI_DEREGISTER,
+  SVSM_AI_REGISTER,
+} SVSM_AI_CTRL;
+
 /**
   Report the presence of an Secure Virtual Services Module (SVSM).
 
@@ -152,4 +165,84 @@ EFIAPI
 AmdSvsmUefiMmRequest (
   IN  UINT64  BufferAddr,
   IN  UINT64  BufferSize
+  );
+
+/**
+  Issue an SVSM request to perform a SVSM APIC read operation.
+
+  @param[in]    MsrIndex        APIC register MSR.
+
+  @return                       The value of the register.
+
+**/
+UINT64
+EFIAPI
+AmdSvsmSnpReadApicMsr (
+  IN UINT32  MsrIndex
+  );
+
+/**
+  Issue an SVSM request to perform a SVSM APIC write operation.
+
+  @param[in]    MsrIndex        APIC register MSR.
+  @param[in]    Value           The value of the register.
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpWriteApicMsr (
+  IN UINT32  MsrIndex,
+  IN UINT64  Value
+  );
+
+/**
+  Issue an SVSM request to perform a SVSM APIC features query operation.
+
+  @return               bitmask of supported features.
+
+**/
+UINT64
+EFIAPI
+AmdSvsmSnpApicQueryFeatures (
+  VOID
+  );
+
+/**
+  Issue an SVSM request to perform a register/deregister Alternate Injection
+  operation.
+
+  @param[in]    Vector          bitmask of the intended operation
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpApicConfigEmulation (
+  IN SVSM_AI_CTRL  Vector
+  );
+
+/**
+  Issue an SVSM request to configure interrupt vectors which is allowed to be
+  delivered from the Hypervisor.
+
+  @param[in]    Vector  bitmask of the single interrupt vector.
+  @param[in]    Value   bitmask of the intended operation.
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpApicConfigVector (
+  IN UINT8            Vector,
+  IN SVSM_VEC_ENABLE  Value
+  );
+
+/**
+  Check Alternate Injection enablement.
+  @retval TRUE                 Alternate Injection enabled
+  @retval FALSE                Alternate Injection not enabled
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmAltInjEnabled (
+  VOID
   );

@@ -11,6 +11,7 @@
 
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
 
@@ -56,7 +57,7 @@ TpmMmioSevDecryptPeimEntryPoint (
   // that MMIO is being done to/from an unencrypted address. To prevent guest
   // termination in this scenario, mark the range unencrypted ahead of access.
   //
-  if (MemEncryptSevEsIsEnabled ()) {
+  if (AmdSevEsIsEnabled ()) {
     DEBUG ((
       DEBUG_INFO,
       "%a: mapping TPM MMIO address range unencrypted\n",
