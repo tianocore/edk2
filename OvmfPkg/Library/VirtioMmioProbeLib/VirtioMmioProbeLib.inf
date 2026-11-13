@@ -28,8 +28,8 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  DxeServicesLib
   DxeServicesTableLib
-  MapMmioLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
