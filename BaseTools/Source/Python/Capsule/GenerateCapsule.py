@@ -192,7 +192,7 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
         ToolPath = ''
     Command = ''
     Command = Command + '"{Path}" '.format (Path = os.path.join (ToolPath, 'openssl'))
-    Command = Command + 'smime -sign -binary -outform DER -md {HashAlgorithm} '.format (HashAlgorithm = HashAlgorithm)
+    Command = Command + 'smime -sign -binary -noattr -outform DER -md {HashAlgorithm} '.format (HashAlgorithm = HashAlgorithm)
     Command = Command + '-signer "{Private}" -certfile "{Public}" '.format (Private = SignerPrivateCertFile, Public = OtherPublicCertFile)
     Command = Command + '-out "{Output}"'.format (Output = TempSignatureFilePath)
     if Verbose:
