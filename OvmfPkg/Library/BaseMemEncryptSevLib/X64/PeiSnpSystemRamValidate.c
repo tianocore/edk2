@@ -19,8 +19,6 @@
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
 
-STATIC UINT8  mPscBufferPage[EFI_PAGE_SIZE];
-
 typedef struct {
   UINT64    StartAddress;
   UINT64    EndAddress;
@@ -39,6 +37,37 @@ STATIC SNP_PRE_VALIDATED_RANGE  mPreValidatedRange[] = {
     FixedPcdGet32 (PcdOvmfSecValidatedEnd)
   },
 };
+
+/**
+  Get or allocate a 4KiB page-aligned PSC buffer using a GUID HOB.
+
+  @return VOID*  Pointer to the 4KiB PSC buffer.
+**/
+STATIC
+VOID *
+GetPscBuffer (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  VOID                  *PscBuffer;
+
+  Hob.Raw = GetFirstGuidHob (&gPscBufferGuid);
+
+  // Check if the HOB has already been created in this boot phase
+  if (Hob.Raw != NULL) {
+    return GET_GUID_HOB_DATA (Hob.Guid);
+  }
+
+  // Allocate a new HOB to be used as PscBufferPage
+  PscBuffer = BuildGuidHob (&gPscBufferGuid, EFI_PAGE_SIZE);
+  ASSERT (PscBuffer != NULL);
+
+  // Zero out the buffer to ensure clean initial state
+  ZeroMem (PscBuffer, EFI_PAGE_SIZE);
+
+  return PscBuffer;
+}
 
 STATIC
 BOOLEAN
@@ -107,10 +136,13 @@ MemEncryptSevSnpPreValidateSystemRam (
   PHYSICAL_ADDRESS         EndAddress;
   SNP_PRE_VALIDATED_RANGE  OverlapRange;
   EFI_STATUS               Status;
+  VOID                     *PscBuffer;
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
   }
+
+  PscBuffer = GetPscBuffer ();
 
   EndAddress = BaseAddress + EFI_PAGES_TO_SIZE (NumPages);
 
@@ -146,8 +178,8 @@ MemEncryptSevSnpPreValidateSystemRam (
           NumPages,
           SevSnpPagePrivate,
           TRUE,
-          mPscBufferPage,
-          sizeof (mPscBufferPage)
+          PscBuffer,
+          EFI_PAGE_SIZE
           );
       }
 
@@ -162,8 +194,8 @@ MemEncryptSevSnpPreValidateSystemRam (
       NumPages,
       SevSnpPagePrivate,
       TRUE,
-      mPscBufferPage,
-      sizeof (mPscBufferPage)
+      PscBuffer,
+      EFI_PAGE_SIZE
       );
     BaseAddress = EndAddress;
   }
