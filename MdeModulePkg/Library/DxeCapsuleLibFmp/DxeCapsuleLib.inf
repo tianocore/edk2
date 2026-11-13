@@ -67,6 +67,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleInRamSupport                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskImmediate                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath                     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName                    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES

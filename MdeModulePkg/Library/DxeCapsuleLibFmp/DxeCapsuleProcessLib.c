@@ -225,11 +225,18 @@ InitCapsulePtr (
   UINTN                 CapsuleNameCapsuleTotalNumber;
   VOID                  **CapsuleNameCapsulePtr;
   EFI_PHYSICAL_ADDRESS  *CapsuleNameAddress;
+  EFI_STATUS            Status;
+  UINTN                 CapsuleOnDiskNum;
+  IMAGE_INFO            *CapsuleOnDiskBuf;
+  EFI_HANDLE            EspFsHandle;
+  UINT16                LoadOptionNumber;
 
   CapsuleNameNumber             = 0;
   CapsuleNameTotalNumber        = 0;
   CapsuleNameCapsuleTotalNumber = 0;
+  CapsuleOnDiskNum              = 0;
   CapsuleNameCapsulePtr         = NULL;
+  CapsuleOnDiskBuf              = NULL;
 
   //
   // Find all capsule images from hob
@@ -249,6 +256,31 @@ InitCapsulePtr (
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
 
+  if (CoDShouldProcessThisBoot ()) {
+    //
+    // Load all Capsule On Disks into memory to process them during this boot.
+    //
+    // Hard-coding MaxRetry to 3 as a sane default to not introduce parameters
+    // up the call chain.  The value could have a PCD.
+    //
+    Status = CoDGetAll (
+               /*MaxRetry=*/ 3,
+               &CapsuleOnDiskBuf,
+               &CapsuleOnDiskNum,
+               &EspFsHandle,
+               &LoadOptionNumber
+               );
+    if (EFI_ERROR (Status) || (CapsuleOnDiskBuf == NULL)) {
+      DEBUG ((DEBUG_WARN, "%a(): CoDGetAll Status: %r.\n", __func__, Status));
+      // Don't return, this isn't a fatal error, just ensure no weird fails.
+      CapsuleOnDiskNum = 0;
+    }
+
+    mCapsuleTotalNumber += (UINT32)CapsuleOnDiskNum;
+
+    DEBUG ((DEBUG_INFO, "%a(): loaded %d on-disk capsule(s)\n", __func__, CapsuleOnDiskNum));
+  }
+
   DEBUG ((DEBUG_INFO, "mCapsuleTotalNumber - 0x%x\n", mCapsuleTotalNumber));
 
   if (mCapsuleTotalNumber == 0) {
@@ -262,12 +294,14 @@ InitCapsulePtr (
   if (mCapsulePtr == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate mCapsulePtr fail!\n"));
     mCapsuleTotalNumber = 0;
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     return;
   }
 
   mCapsuleStatusArray = (EFI_STATUS *)AllocateZeroPool (sizeof (EFI_STATUS) * mCapsuleTotalNumber);
   if (mCapsuleStatusArray == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate mCapsuleStatusArray fail!\n"));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     FreePool (mCapsulePtr);
     mCapsulePtr         = NULL;
     mCapsuleTotalNumber = 0;
@@ -279,6 +313,7 @@ InitCapsulePtr (
   CapsuleNameCapsulePtr =  (VOID **)AllocateZeroPool (sizeof (VOID *) * CapsuleNameCapsuleTotalNumber);
   if (CapsuleNameCapsulePtr == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate CapsuleNameCapsulePtr fail!\n"));
+    CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
     FreePool (mCapsulePtr);
     FreePool (mCapsuleStatusArray);
     mCapsulePtr         = NULL;
@@ -304,6 +339,13 @@ InitCapsulePtr (
   }
 
   //
+  // Append any capsules loaded from disk above (unnecessary NULL check calms code analyzer)
+  //
+  for (Index2 = 0; CapsuleOnDiskBuf != NULL && Index2 < CapsuleOnDiskNum; Index2++) {
+    mCapsulePtr[Index++] = CapsuleOnDiskBuf[Index2].ImageAddress;
+  }
+
+  //
   // Find Capsule On Disk Names
   //
   for (Index = 0; Index < CapsuleNameCapsuleTotalNumber; Index++) {
@@ -313,10 +355,15 @@ InitCapsulePtr (
     }
   }
 
+  //
+  // XXX: could use file names from CapsuleOnDiskBuf for capsule names as if
+  //      they came from name capsules.
+  //
   if (CapsuleNameTotalNumber == mCapsuleTotalNumber) {
     mCapsuleNamePtr = (CHAR16 **)AllocateZeroPool (sizeof (CHAR16 *) * mCapsuleTotalNumber);
     if (mCapsuleNamePtr == NULL) {
       DEBUG ((DEBUG_ERROR, "Allocate mCapsuleNamePtr fail!\n"));
+      CoDFreeImages (CapsuleOnDiskBuf, CapsuleOnDiskNum);
       FreePool (mCapsulePtr);
       FreePool (mCapsuleStatusArray);
       FreePool (CapsuleNameCapsulePtr);
@@ -336,6 +383,14 @@ InitCapsulePtr (
     }
   } else {
     mCapsuleNamePtr = NULL;
+  }
+
+  if (CapsuleOnDiskNum != 0) {
+    for (Index = 0; CapsuleOnDiskBuf != NULL && Index < CapsuleOnDiskNum; Index++) {
+      FreePool (CapsuleOnDiskBuf[Index].FileInfo);
+    }
+
+    FreePool (CapsuleOnDiskBuf);
   }
 
   FreePool (CapsuleNameCapsulePtr);
@@ -509,9 +564,15 @@ ProcessTheseCapsules (
   BOOLEAN                   ResetRequired;
   CHAR16                    *CapsuleName;
 
+  DEBUG ((DEBUG_ERROR, "%a(): Round #%d.\n", __func__, FirstRound ? 1 : 2));
+
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32 (PcdStatusCodeSubClassCapsule) | PcdGet32 (PcdCapsuleStatusCodeProcessCapsulesBegin)));
 
-  if (FirstRound) {
+  //
+  // Working around on-disk capsules not being discovered on the first round
+  // because storage devices are uninitialized then.
+  //
+  if (FirstRound || (PcdGetBool (PcdCapsuleOnDiskSupport) && (mCapsuleTotalNumber == 0))) {
     InitCapsulePtr ();
   }
 
@@ -633,6 +694,18 @@ DoResetSystem (
 {
   DEBUG ((DEBUG_INFO, "Capsule Request Cold Reboot.\n"));
 
+  if (CoDCheckCapsuleOnDiskFlag ()) {
+    //
+    // Do not reboot without clearing the flag first.  This avoids a boot loop, when setting
+    // the flag causes firmware to boot into flash mode.
+    //
+    // This can't be assumed to be done before ProcessCapsules().  CoDClearCapsuleOnDiskFlag()
+    // deletes BootNext, which can be used with on-disk capsules, so it makes sense to do the
+    // clearing after both invocations of ProcessCapsules(), which may reset the system here.
+    //
+    CoDClearCapsuleOnDiskFlag ();
+  }
+
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32 (PcdStatusCodeSubClassCapsule) | PcdGet32 (PcdCapsuleStatusCodeResettingSystem)));
 
   gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
@@ -686,7 +759,13 @@ ProcessCapsules (
     // Reboot System if and only if all capsule processed.
     // If not, defer reset to 2nd process.
     //
-    if (mNeedReset && AreAllImagesProcessed ()) {
+    // Not resetting if there were no capsules for on-disk capsules, because
+    // they aren't discovered until the second round.
+    //
+    if (mNeedReset &&
+        (!CoDShouldProcessThisBoot () || (mCapsuleTotalNumber != 0)) &&
+        AreAllImagesProcessed ())
+    {
       DoResetSystem ();
     }
   } else {
