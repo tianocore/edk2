@@ -337,7 +337,7 @@ RedfishRestExEventService (
   );
 
 /**
-  Create a new TLS session becuase the previous on is closed.
+  Create a new TLS session because the previous on is closed.
   status.
 
   @param[in]  Instance            Pointer to EFI_REST_EX_PROTOCOL instance for a particular

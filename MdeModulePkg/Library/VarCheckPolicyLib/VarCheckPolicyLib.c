@@ -48,7 +48,7 @@ UINTN   mPaginationCacheSize      = 0;
 UINT32  mCurrentPaginationCommand = 0;
 
 /**
-  MM Communication Handler to recieve commands from the DXE protocol for
+  MM Communication Handler to receive commands from the DXE protocol for
   Variable Policies. This communication channel is used to register new policies
   and poll and toggle the enforcement of variable policies.
 
