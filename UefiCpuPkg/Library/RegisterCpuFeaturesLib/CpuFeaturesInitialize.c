@@ -617,25 +617,27 @@ DumpRegisterTableOnProcessor (
       case Msr:
         DEBUG ((
           DebugPrintErrorLevel,
-          "Processor: %04d: Index %04d, MSR  : %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
+          "Processor: %04d: Index %04d, MSR  : %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx, TestThenWrite: %d\r\n",
           (UINT32)ProcessorNumber,
           (UINT32)FeatureIndex,
           RegisterTableEntry->Index,
           RegisterTableEntry->ValidBitStart,
           RegisterTableEntry->ValidBitLength,
-          RegisterTableEntry->Value
+          RegisterTableEntry->Value,
+          RegisterTableEntry->TestThenWrite
           ));
         break;
       case ControlRegister:
         DEBUG ((
           DebugPrintErrorLevel,
-          "Processor: %04d: Index %04d, CR   : %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
+          "Processor: %04d: Index %04d, CR   : %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx, TestThenWrite: %d\r\n",
           (UINT32)ProcessorNumber,
           (UINT32)FeatureIndex,
           RegisterTableEntry->Index,
           RegisterTableEntry->ValidBitStart,
           RegisterTableEntry->ValidBitLength,
-          RegisterTableEntry->Value
+          RegisterTableEntry->Value,
+          RegisterTableEntry->TestThenWrite
           ));
         break;
       case MemoryMapped:
