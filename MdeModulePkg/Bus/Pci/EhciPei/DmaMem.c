@@ -225,6 +225,8 @@ IoMmuFreeBuffer (
     IoMmu->SetAttribute (IoMmu, Mapping, 0);
     IoMmu->Unmap (IoMmu, Mapping);
     IoMmu->FreeBuffer (IoMmu, Pages, HostAddress);
+  } else {
+    PeiServicesFreePages ((UINTN)HostAddress, Pages);
   }
 }
 
