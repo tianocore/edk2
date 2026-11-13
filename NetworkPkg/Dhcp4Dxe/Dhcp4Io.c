@@ -1135,6 +1135,21 @@ DhcpSendMessage (
   UINT32                 Len;
   UINT32                 Index;
 
+  if (((Type == DHCP_MSG_DECLINE) || (Type == DHCP_MSG_RELEASE) ||
+       ((Type == DHCP_MSG_REQUEST) && (DhcpSb->DhcpState == Dhcp4Requesting))) &&
+      ((Para == NULL) || (Para->ServerId == 0)))
+  {
+    ASSERT ((Para != NULL) && (Para->ServerId != 0));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((((Type == DHCP_MSG_REQUEST) && (DhcpSb->DhcpState == Dhcp4Requesting)) ||
+       (Type == DHCP_MSG_DECLINE)) && (Seed == NULL))
+  {
+    ASSERT (Seed != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // Allocate a big enough memory block to hold the DHCP packet
   //
@@ -1203,8 +1218,6 @@ DhcpSendMessage (
       ((Type == DHCP_MSG_REQUEST) && (DhcpSb->DhcpState == Dhcp4Requesting))
       )
   {
-    ASSERT ((Para != NULL) && (Para->ServerId != 0));
-
     IpAddr = HTONL (Para->ServerId);
     Buf    = DhcpAppendOption (Buf, DHCP4_TAG_SERVER_ID, 4, (UINT8 *)&IpAddr);
   }
@@ -1221,11 +1234,21 @@ DhcpSendMessage (
     if (DhcpSb->DhcpState == Dhcp4Rebooting) {
       IpAddr = EFI_IP4 (Config->ClientAddress);
     } else if (DhcpSb->DhcpState == Dhcp4Requesting) {
-      ASSERT (SeedHead != NULL);
+      if (SeedHead == NULL) {
+        ASSERT (SeedHead != NULL);
+        FreePool (Packet);
+        return EFI_INVALID_PARAMETER;
+      }
+
       IpAddr = EFI_IP4 (SeedHead->YourAddr);
     }
   } else if (Type == DHCP_MSG_DECLINE) {
-    ASSERT (SeedHead != NULL);
+    if (SeedHead == NULL) {
+      ASSERT (SeedHead != NULL);
+      FreePool (Packet);
+      return EFI_INVALID_PARAMETER;
+    }
+
     IpAddr = EFI_IP4 (SeedHead->YourAddr);
   }
 
