@@ -3,7 +3,7 @@ Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
 Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -90,6 +90,12 @@ UINTN  mSmmStackSize;
 
 UINTN    mSmmShadowStackSize;
 BOOLEAN  mCetSupported = TRUE;
+
+//
+// Clear CPU microarchitectural buffers (VERW) before RSM to mitigate TSA.
+// Only enabled on AuthenticAMD processors.
+//
+X86_ASSEMBLY_PATCH_LABEL  mPatchVerwSupported;
 
 UINTN  mMaxNumberOfCpus = 0;
 UINTN  mNumberOfCpus    = 0;
@@ -728,6 +734,69 @@ GetMpInformation (
 }
 
 /**
+  Determine whether the current processor is subject to Transient Scheduler
+  Attacks (TSA).
+
+  The caller is expected to have already established that the processor is an
+  AuthenticAMD part. A processor is subject to TSA when it is Family 0x19 or
+  later (older families are immune but do not advertise the not-affected bits)
+  and does not report all of TSA_SQ_NO, TSA_L1_NO, and TSA_FILL_NO in CPUID
+  Fn8000_0021_ECX. This mirrors the detection performed by the Linux kernel.
+
+  @retval TRUE   The processor is (or must be assumed) subject to TSA.
+  @retval FALSE  The processor is not affected by TSA.
+
+**/
+STATIC
+BOOLEAN
+IsCpuSubjectToTsa (
+  VOID
+  )
+{
+  UINT32                             RegEax;
+  UINT32                             MaxExtLeaf;
+  UINT32                             DisplayFamily;
+  CPUID_AMD_EXTENDED_FEATURES_2_ECX  ExtFeatures2Ecx;
+
+  //
+  // Compute the display family from CPUID leaf 1:
+  //   DisplayFamily = BaseFamily (EAX[11:8]) + ExtendedFamily (EAX[27:20]).
+  // Families older than 0x19 (Zen 4) are immune to TSA.
+  //
+  AsmCpuid (CPUID_VERSION_INFO, &RegEax, NULL, NULL, NULL);
+  DisplayFamily = (RegEax >> 8) & 0xf;
+  if (DisplayFamily == 0xf) {
+    DisplayFamily += (RegEax >> 20) & 0xff;
+  }
+
+  if (DisplayFamily < 0x19) {
+    return FALSE;
+  }
+
+  //
+  // If CPUID Fn8000_0021 is not available, the not-affected bits cannot be
+  // reported; treat the processor as subject to TSA (matches Linux behavior).
+  //
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtLeaf, NULL, NULL, NULL);
+  if (MaxExtLeaf < CPUID_AMD_EXTENDED_FEATURES_2) {
+    return TRUE;
+  }
+
+  //
+  // The processor is not affected only if it advertises all of TSA_SQ_NO,
+  // TSA_L1_NO, and TSA_FILL_NO; otherwise it is subject to TSA.
+  //
+  AsmCpuid (CPUID_AMD_EXTENDED_FEATURES_2, NULL, NULL, &ExtFeatures2Ecx.Uint32, NULL);
+  if ((ExtFeatures2Ecx.Bits.TsaSqNo == 1) && (ExtFeatures2Ecx.Bits.TsaL1No == 1) &&
+      (ExtFeatures2Ecx.Bits.TsaFillNo == 1))
+  {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
   The module Entry Point of the CPU SMM driver.
 
   @retval EFI_SUCCESS    The common entry point is executed successfully.
@@ -968,6 +1037,16 @@ PiSmmCpuEntryCommon (
     // AMD processors do not support MSR_IA32_MISC_ENABLE
     //
     PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
+
+    //
+    // Enable clearing of CPU microarchitectural buffers (VERW) before RSM only
+    // on AMD processors actually subject to Transient Scheduler Attacks
+    // (Family 0x19 or later and not advertising all of
+    // TSA_SQ_NO, TSA_L1_NO, and TSA_FILL_NO). See AMD TSA technical guidance.
+    //
+    if (IsCpuSubjectToTsa ()) {
+      PatchInstructionX86 (mPatchVerwSupported, TRUE, 1);
+    }
   }
 
   //
