@@ -450,7 +450,7 @@ EdDsaSign (
     return FALSE;
   }
 
-  if ((Signature == NULL) && (SigSize == NULL)) {
+  if ((Signature == NULL) || (SigSize == NULL)) {
     return FALSE;
   }
 
