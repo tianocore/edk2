@@ -1488,7 +1488,8 @@ WifiMgrOnTimerTick (
   }
 
   Nic = (WIFI_MGR_DEVICE_DATA *)Context;
-  if ((Nic->ConnectPendingNetwork == NULL) && !Nic->HasDisconnectPendingNetwork) {
+  // Background scans disrupt links owned by other agents sharing the radio; scan only on user intent.
+  if ((Nic->ConnectPendingNetwork == NULL) && !Nic->HasDisconnectPendingNetwork && !Nic->NetworkListFormOpen) {
     DEBUG ((DEBUG_VERBOSE, "[WiFi Connection Manager] No profile for connection, no scan triggered!\n"));
     gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
     return;
