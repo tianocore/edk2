@@ -69,7 +69,10 @@ ValidateBmuInfo (
   for (DevNum = 0; DevNum < DevCount; DevNum++) {
     RegInfo = &BmuRegInfo[DevNum];
 
-    if ((RegInfo->BaseAddress == 0) || (RegInfo->Length == 0)) {
+    if ((RegInfo->BaseAddress == 0) ||
+        (RegInfo->Length == 0)      ||
+        (RegInfo->BaseAddress > MAX_UINT64 - (RegInfo->Length - 1)))
+    {
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: SSDT-BMU: Invalid BMU register range.\n"
