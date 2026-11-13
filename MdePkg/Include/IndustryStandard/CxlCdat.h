@@ -93,7 +93,6 @@ typedef struct {
 typedef struct {
   CXL_CDAT_COMMON_SUBTABLE_HEADER    Header;
   UINT8                              DsmasHandle;
-  UINT8                              Flags;
   UINT8                              Reserved[3];
   UINT64                             MemorySideCacheSize;
   UINT32                             CacheAttributes;

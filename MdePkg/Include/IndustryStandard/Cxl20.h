@@ -262,6 +262,34 @@ typedef struct {
 #define CXL_DVSEC_CXL_DEVICE_REVISION_1  0x1
 
 //
+// CXL Extensions DVSEC for Ports (DVSEC ID 0003h)
+// Compute Express Link Specification Revision 2.0 - Chapter 8.1.5
+//
+typedef union {
+  struct {
+    UINT16    PortPowerManagementInitializationComplete : 1;  // bit 0
+    UINT16    Reserved1                                 : 13; // bit 1..13
+    UINT16    ViralStatus                               : 1;  // bit 14
+    UINT16    Reserved2                                 : 1;  // bit 15
+  } Bits;
+  UINT16    Uint16;
+} CXL_DVSEC_CXL_PORT_EXTENSION_STATUS;
+
+typedef union {
+  struct {
+    UINT16    UnmaskSbr                 : 1;   // bit 0
+    UINT16    UnmaskLinkDisable         : 1;   // bit 1
+    UINT16    AltMemoryAndIdSpaceEnable : 1;   // bit 2
+    UINT16    AltBme                    : 1;   // bit 3
+    UINT16    UioToHdmEnable            : 1;   // bit 4
+    UINT16    Reserved                  : 9;   // bit 5..13
+    UINT16    ViralEnable               : 1;   // bit 14
+    UINT16    Reserved2                 : 1;   // bit 15
+  } Bits;
+  UINT16    Uint16;
+} CXL_DVSEC_CXL_PORT_CONTROL_EXTENSIONS;
+
+//
 // Register Locator DVSEC
 // Compute Express Link Specification Revision 2.0 - Chapter 8.1.9
 //
