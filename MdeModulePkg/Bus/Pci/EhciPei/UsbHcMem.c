@@ -32,14 +32,15 @@ UsbHcAllocMemBlock (
   VOID                  *Mapping;
   EFI_PHYSICAL_ADDRESS  MappedAddr;
   EFI_STATUS            Status;
-  UINTN                 PageNumber;
+  UINTN                 BlockPages;
+  UINTN                 BitArrayPages;
   EFI_PHYSICAL_ADDRESS  TempPtr;
 
   Mapping    = NULL;
-  PageNumber =  sizeof (USBHC_MEM_BLOCK)/PAGESIZE +1;
+  BlockPages = sizeof (USBHC_MEM_BLOCK) / PAGESIZE + 1;
   Status     = PeiServicesAllocatePages (
                  EfiBootServicesCode,
-                 PageNumber,
+                 BlockPages,
                  &TempPtr
                  );
 
@@ -47,7 +48,7 @@ UsbHcAllocMemBlock (
     return NULL;
   }
 
-  ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);
+  ZeroMem ((VOID *)(UINTN)TempPtr, BlockPages * EFI_PAGE_SIZE);
 
   //
   // each bit in the bit array represents USBHC_MEM_UNIT
@@ -59,18 +60,18 @@ UsbHcAllocMemBlock (
   Block->BufLen  = EFI_PAGES_TO_SIZE (Pages);
   Block->BitsLen = Block->BufLen / (USBHC_MEM_UNIT * 8);
 
-  PageNumber =  (Block->BitsLen)/PAGESIZE +1;
-  Status     = PeiServicesAllocatePages (
-                 EfiBootServicesCode,
-                 PageNumber,
-                 &TempPtr
-                 );
+  BitArrayPages = Block->BitsLen / PAGESIZE + 1;
+  Status        = PeiServicesAllocatePages (
+                    EfiBootServicesCode,
+                    BitArrayPages,
+                    &TempPtr
+                    );
 
   if (EFI_ERROR (Status)) {
-    return NULL;
+    goto FreeBlock;
   }
 
-  ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);
+  ZeroMem ((VOID *)(UINTN)TempPtr, BitArrayPages * EFI_PAGE_SIZE);
 
   Block->Bits = (UINT8 *)(UINTN)TempPtr;
 
@@ -82,7 +83,7 @@ UsbHcAllocMemBlock (
              &Mapping
              );
   if (EFI_ERROR (Status)) {
-    return NULL;
+    goto FreeBitArray;
   }
 
   ZeroMem (BufHost, Pages*EFI_PAGE_SIZE);
@@ -92,7 +93,7 @@ UsbHcAllocMemBlock (
   // should be restricted into the same 4G
   //
   if (Pool->Check4G && (Pool->Which4G != USB_HC_HIGH_32BIT (MappedAddr))) {
-    return NULL;
+    goto FreeBuffer;
   }
 
   Block->BufHost = BufHost;
@@ -101,6 +102,20 @@ UsbHcAllocMemBlock (
   Block->Next    = NULL;
 
   return Block;
+
+FreeBuffer:
+  if (Ehc->IoMmu != NULL) {
+    IoMmuFreeBuffer (Ehc->IoMmu, Pages, BufHost, Mapping);
+  } else {
+    PeiServicesFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)BufHost, Pages);
+  }
+
+FreeBitArray:
+  PeiServicesFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Block->Bits, BitArrayPages);
+
+FreeBlock:
+  PeiServicesFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Block, BlockPages);
+  return NULL;
 }
 
 /**
@@ -330,6 +345,7 @@ UsbHcInitMemPool (
   Pool->Head    = UsbHcAllocMemBlock (Ehc, Pool, USBHC_MEM_DEFAULT_PAGES);
 
   if (Pool->Head == NULL) {
+    PeiServicesFreePages (TempPtr, PageNumber);
     Pool = NULL;
   }
 
