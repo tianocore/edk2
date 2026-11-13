@@ -142,6 +142,7 @@ NonCoherentIoMmuMap (
            DmaOperation,
            HostAddress,
            NumberOfBytes,
+           NULL, // DeviceHandle=NULL opts out of IoMmu programming
            DeviceAddress,
            Mapping
            );

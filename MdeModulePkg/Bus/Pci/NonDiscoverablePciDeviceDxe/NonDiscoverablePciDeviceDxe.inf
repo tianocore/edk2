@@ -29,6 +29,7 @@
   BaseMemoryLib
   DebugLib
   DxeServicesTableLib
+  IoMmuLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint

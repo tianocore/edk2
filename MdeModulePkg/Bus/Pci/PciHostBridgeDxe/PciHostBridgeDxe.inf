@@ -39,6 +39,7 @@
   UefiLib
   PciHostBridgeLib
   TimerLib
+  IoMmuLib
 
 [Protocols]
   gEfiCpuIo2ProtocolGuid                          ## CONSUMES
@@ -46,7 +47,6 @@
   gEfiPciRootBridgeIoProtocolGuid                 ## BY_START
   gEfiPciHostBridgeResourceAllocationProtocolGuid ## BY_START
   gEdkiiPciHostBridgeFixedResourceProtocolGuid    ## BY_START
-  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiCpuIo2ProtocolGuid AND
