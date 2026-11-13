@@ -2,6 +2,7 @@
   Define NVData structures used by the HTTP Boot configuration component.
 
 Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -19,8 +20,23 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define URI_STR_MIN_SIZE  0
 #define URI_STR_MAX_SIZE  255
 
+//
+// URI_STR_MAX_SIZE matches the VFR maxsize for the Uri/ProxyUri input, so a
+// maximum-length string leaves no room for the CHAR16 NUL terminator. Add 1
+// to reserve space for it in the Uri/ProxyUri storage buffers.
+//
+#define URI_STR_UI_MAX_SIZE  256
+
 #define DESCRIPTION_STR_MIN_SIZE  6
 #define DESCRIPTION_STR_MAX_SIZE  75
+
+//
+// DESCRIPTION_STR_MAX_SIZE matches the VFR maxsize for the Description
+// input, so a maximum-length string leaves no room for the CHAR16 NUL
+// terminator. Add 1 to reserve space for it in the Description storage
+// buffer.
+//
+#define DESCRIPTION_STR_UI_MAX_SIZE  76
 
 #define CONFIGURATION_VARSTORE_ID  0x1234
 
@@ -35,8 +51,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct _HTTP_BOOT_CONFIG_IFR_NVDATA {
   UINT8     IpVersion;
   UINT8     Padding;
-  CHAR16    Description[DESCRIPTION_STR_MAX_SIZE];
-  CHAR16    Uri[URI_STR_MAX_SIZE];
-  CHAR16    ProxyUri[URI_STR_MAX_SIZE];
+  CHAR16    Description[DESCRIPTION_STR_UI_MAX_SIZE];
+  CHAR16    Uri[URI_STR_UI_MAX_SIZE];
+  CHAR16    ProxyUri[URI_STR_UI_MAX_SIZE];
 } HTTP_BOOT_CONFIG_IFR_NVDATA;
 #pragma pack()
