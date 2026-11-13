@@ -24,6 +24,8 @@ def TheTestSuite():
     suites.append(MetaFileParserTests.TheTestSuite())
     import FMMTTests
     suites.append(FMMTTests.TheTestSuite())
+    import MultipleWorkspaceTests
+    suites.append(MultipleWorkspaceTests.TheTestSuite())
     return unittest.TestSuite(suites)
 
 if __name__ == '__main__':
