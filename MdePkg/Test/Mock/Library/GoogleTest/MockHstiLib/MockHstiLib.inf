@@ -1,0 +1,27 @@
+## @file
+# Google Test mocks for HstiLib
+#
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = MockHstiLib
+  FILE_GUID                      = 8f2b6c1a-9d34-4e67-a1f0-3c5b7d8e9f01
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HstiLib
+
+[Sources]
+  MockHstiLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
