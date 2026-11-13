@@ -132,6 +132,8 @@ UsbHcFreeMemBlock (
   ASSERT ((Pool != NULL) && (Block != NULL));
 
   IoMmuFreeBuffer (Ehc->IoMmu, EFI_SIZE_TO_PAGES (Block->BufLen), Block->BufHost, Block->Mapping);
+  PeiServicesFreePages ((UINTN)Block->Bits, Block->BitsLen / PAGESIZE + 1);
+  PeiServicesFreePages ((UINTN)Block, sizeof (USBHC_MEM_BLOCK) / PAGESIZE + 1);
 }
 
 /**
@@ -371,11 +373,13 @@ UsbHcFreeMemPool (
   //
   // Unlink all the memory blocks from the pool, then free them.
   //
-  for (Block = Pool->Head->Next; Block != NULL; Block = Block->Next) {
+  while (Pool->Head != NULL) {
+    Block      = Pool->Head;
+    Pool->Head = Block->Next;
     UsbHcFreeMemBlock (Ehc, Pool, Block);
   }
 
-  UsbHcFreeMemBlock (Ehc, Pool, Pool->Head);
+  PeiServicesFreePages ((UINTN)Pool, sizeof (USBHC_MEM_POOL) / PAGESIZE + 1);
 
   return EFI_SUCCESS;
 }
