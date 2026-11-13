@@ -11,6 +11,7 @@
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
+# Copyright (c) 2025 - 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -1971,6 +1972,14 @@
   ## Null-terminated Unicode string that contains the date the firmware was released
   # @Prompt Firmware release data string.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString|L""|VOID*|0x00010053
+
+  ## If TRUE, clear the full graphics framebuffer before blitting the boot logo.
+  # @Prompt Fill boot logo background.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootLogoFillBackground|FALSE|BOOLEAN|0x0001008C
+
+  ## RGB color used when clearing the graphics framebuffer before blitting the boot logo.
+  # @Prompt Boot logo background color.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootLogoBackgroundColor|0x00000000|UINT32|0x0001007B
 
   ## PcdStatusCodeMemorySize is used when PcdStatusCodeUseMemory is set to true.
   #  (PcdStatusCodeMemorySize * KBytes) is the total taken memory size.<BR><BR>
