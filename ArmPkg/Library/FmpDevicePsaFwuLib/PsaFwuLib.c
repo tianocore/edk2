@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -508,6 +508,7 @@ FwuBeginStaging (
     return EFI_INVALID_PARAMETER;
   }
 
+  ReqData.Reserved           = 0;
   ReqData.VendorFlags        = VendorFlags;
   ReqData.PartialUpdateCount = UpdateCount;
 
