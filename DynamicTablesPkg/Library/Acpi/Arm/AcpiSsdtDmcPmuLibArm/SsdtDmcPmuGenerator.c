@@ -494,11 +494,10 @@ BuildSsdtDmcPmuTable (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = AmlCodeGenDefinitionBlock (
-             "SSDT",
-             "ARMLTD",
-             "DMC-",
-             0x01,
+  Status = AddSsdtAcpiHeader (
+             CfgMgrProtocol,
+             This,
+             AcpiTableInfo,
              &RootNode
              );
   if (EFI_ERROR (Status)) {

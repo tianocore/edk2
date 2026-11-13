@@ -10,14 +10,14 @@
     (https://support.arm.com/documentation/111115/latest)
 **/
 
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerHelper.h>
 #include <Library/AcpiHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
+#include <Library/TableHelperLib.h>
 
 #include "SsdtScmiGenerator.h"
 
@@ -977,11 +977,10 @@ BuildSsdtScmiTable (
     return Status;
   }
 
-  Status = AmlCodeGenDefinitionBlock (
-             "SSDT",
-             "ARMLTD",
-             "SCMI",
-             1,
+  Status = AddSsdtAcpiHeader (
+             CfgMgrProtocol,
+             This,
+             AcpiTableInfo,
              &RootNode
              );
   if (EFI_ERROR (Status)) {
