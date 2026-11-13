@@ -221,11 +221,11 @@ PlatformAddHobCB (
 
       break;
     case EfiAcpiAddressRangeReserved:
-      BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_RESERVED, 0, Base, End - Base);
+      BuildResourceDescriptor2Hob (EFI_RESOURCE_MEMORY_RESERVED, 0, Base, End - Base, EFI_MEMORY_UC, NULL);
       DEBUG ((DEBUG_INFO, "%a: Reserved [0x%Lx, 0x%Lx)\n", __func__, Base, End));
       break;
     case EfiAcpiAddressRangeSoftReserved:
-      BuildResourceDescriptorHob (
+      BuildResourceDescriptor2Hob (
         EFI_RESOURCE_SYSTEM_MEMORY,
         EFI_RESOURCE_ATTRIBUTE_PRESENT |
         EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -236,7 +236,9 @@ PlatformAddHobCB (
         EFI_RESOURCE_ATTRIBUTE_TESTED |
         EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,
         Base,
-        End - Base
+        End - Base,
+        EFI_MEMORY_WB,
+        NULL
         );
       DEBUG ((DEBUG_INFO, "%a: SoftReserved [0x%Lx, 0x%Lx)\n", __func__, Base, End));
       break;
