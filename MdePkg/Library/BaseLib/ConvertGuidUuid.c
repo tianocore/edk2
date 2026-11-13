@@ -1,7 +1,7 @@
 /** @file
   Convert 128 bit unique identifier between GUID and UUID format.
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -81,8 +81,8 @@
 VOID
 EFIAPI
 ConvertGuidToUuid (
-  IN   GUID  *FromGuid,
-  OUT  GUID  *ToUuid
+  IN   CONST GUID  *FromGuid,
+  OUT  GUID        *ToUuid
   )
 {
   ASSERT (ToUuid != NULL);
@@ -108,8 +108,8 @@ ConvertGuidToUuid (
 VOID
 EFIAPI
 ConvertUuidToGuid (
-  IN   GUID  *FromUuid,
-  OUT  GUID  *ToGuid
+  IN   CONST GUID  *FromUuid,
+  OUT  GUID        *ToGuid
   )
 {
   // The conversion is symmetric, so we can use the same function.
