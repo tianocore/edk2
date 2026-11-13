@@ -2,6 +2,7 @@
   BMC ACPI SSDT.
 
 Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -18,9 +19,13 @@ DefinitionBlock (
     )
 {
 
+#if FixedPcdGetBool (PcdIpmiBmcAcpiUseGenericNamespace)
+  External(\_SB, DeviceObj)
+  Scope (\_SB)
+#else
   External(\_SB.PC00.LPC0, DeviceObj)
-
   Scope (\_SB.PC00.LPC0)
+#endif
   {
     #include "IpmiOprRegions.asi"
   }
