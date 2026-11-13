@@ -92,7 +92,7 @@ MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, RsaOaepDecrypt, 6, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7GetSigners, 6, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7FreeSigners, 1, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7GetCertificatesList, 6, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7Sign, 9, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7Sign, 10, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7Verify, 6, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, Pkcs7Encrypt, 7, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockBaseCryptLib, VerifyEKUsInPkcs7Signature, 5, EFIAPI);

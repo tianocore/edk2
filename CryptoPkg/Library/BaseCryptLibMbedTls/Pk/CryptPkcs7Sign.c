@@ -435,6 +435,7 @@ MbedTlsPkcs7WriteDer (
   @param[in]  InData           Pointer to the content to be signed.
   @param[in]  InDataSize       Size of InData in bytes.
   @param[in]  SignCert         Pointer to signer's DER-encoded certificate to sign with.
+  @param[in]  SignCertSize     Size of signer's DER-encoded certificate to sign with.
   @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
                                include in the PKCS#7 signedData (e.g. any intermediate
                                CAs in the chain).
@@ -455,7 +456,8 @@ Pkcs7Sign (
   IN CONST UINT8  *KeyPassword,
   IN UINT8        *InData,
   IN UINTN        InDataSize,
-  IN UINT8        *SignCert,
+  IN CONST UINT8  *SignCert,
+  IN UINTN        SignCertSize,
   IN UINT8        *OtherCerts OPTIONAL,
   OUT UINT8       **SignedData,
   OUT UINTN       *SignedDataSize
@@ -468,7 +470,7 @@ Pkcs7Sign (
   UINT8               Signature[MAX_SIGNATURE_SIZE];
   UINTN               SignatureLen;
   UINT8               *NewPrivateKey;
-  mbedtls_x509_crt    *Crt;
+  mbedtls_x509_crt    Crt;
 
   MbedtlsPkcs7            Pkcs7;
   MbedtlsPkcs7SignerInfo  SignerInfo;
@@ -490,7 +492,6 @@ Pkcs7Sign (
   BufferSize = 4096;
 
   SignatureLen = MAX_SIGNATURE_SIZE;
-  Crt          = (mbedtls_x509_crt *)SignCert;
 
   NewPrivateKey = NULL;
   if (PrivateKey[PrivateKeySize - 1] != 0) {
@@ -512,6 +513,14 @@ Pkcs7Sign (
   }
 
   mbedtls_pk_init (&Pkey);
+  mbedtls_x509_crt_init (&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der (&Crt, SignCert, SignCertSize);
+  if (Ret != 0) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
   Ret = mbedtls_pk_parse_key (
           &Pkey,
           NewPrivateKey,
@@ -554,8 +563,8 @@ Pkcs7Sign (
   ZeroMem (&Pkcs7, sizeof (MbedtlsPkcs7));
   Pkcs7.SignedData.Version = 1;
 
-  Crt->next                     = (mbedtls_x509_crt *)OtherCerts;
-  Pkcs7.SignedData.Certificates = *Crt;
+  Crt.next                      = (mbedtls_x509_crt *)OtherCerts;
+  Pkcs7.SignedData.Certificates = Crt;
 
   SignerInfo.Next              = NULL;
   SignerInfo.Sig.p             = Signature;
@@ -574,8 +583,8 @@ Pkcs7Sign (
     }
   }
 
-  SignerInfo.Serial            = ((mbedtls_x509_crt *)SignCert)->serial;
-  SignerInfo.IssuerRaw         = ((mbedtls_x509_crt *)SignCert)->issuer_raw;
+  SignerInfo.Serial            = Crt.serial;
+  SignerInfo.IssuerRaw         = Crt.issuer_raw;
   Pkcs7.SignedData.SignerInfos = SignerInfo;
 
   Buffer = AllocateZeroPool (BufferSize);
@@ -621,6 +630,10 @@ Cleanup:
   if (&Pkey != NULL) {
     mbedtls_pk_free (&Pkey);
   }
+
+  // OtherCerts is owned by the caller and must not be freed with Crt.
+  Crt.next = NULL;
+  mbedtls_x509_crt_free (&Crt);
 
   if (NewPrivateKey != NULL) {
     memset (NewPrivateKey, 0, PrivateKeySize);

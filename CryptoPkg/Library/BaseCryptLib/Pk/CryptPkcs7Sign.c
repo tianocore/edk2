@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param[in]  InData           Pointer to the content to be signed.
   @param[in]  InDataSize       Size of InData in bytes.
   @param[in]  SignCert         Pointer to signer's DER-encoded certificate to sign with.
+  @param[in]  SignCertSize     Size of signer's DER-encoded certificate to sign with.
   @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
                                include in the PKCS#7 signedData (e.g. any intermediate
                                CAs in the chain).
@@ -44,13 +45,15 @@ Pkcs7Sign (
   IN   CONST UINT8  *KeyPassword,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   UINT8        *SignCert,
+  IN   CONST UINT8  *SignCert,
+  IN   UINTN        SignCertSize,
   IN   UINT8        *OtherCerts      OPTIONAL,
   OUT  UINT8        **SignedData,
   OUT  UINTN        *SignedDataSize
   )
 {
   BOOLEAN   Status;
+  X509      *Cert;
   EVP_PKEY  *Key;
   BIO       *DataBio;
   PKCS7     *Pkcs7;
@@ -69,6 +72,7 @@ Pkcs7Sign (
   }
 
   RsaContext = NULL;
+  Cert       = NULL;
   Key        = NULL;
   Pkcs7      = NULL;
   DataBio    = NULL;
@@ -107,6 +111,14 @@ Pkcs7Sign (
   RandomSeed (NULL, 0);
 
   //
+  // Read DER-encoded root certificate and Construct X509 Certificate
+  //
+  Cert = d2i_X509 (NULL, &SignCert, (long)SignCertSize);
+  if (Cert == NULL) {
+    goto _Exit;
+  }
+
+  //
   // Construct OpenSSL EVP_PKEY for private key.
   //
   Key = EVP_PKEY_new ();
@@ -134,7 +146,7 @@ Pkcs7Sign (
   // Create the PKCS#7 signedData structure.
   //
   Pkcs7 = PKCS7_sign (
-            (X509 *)SignCert,
+            Cert,
             Key,
             (STACK_OF (X509) *) OtherCerts,
             DataBio,
@@ -182,6 +194,10 @@ _Exit:
   //
   // Release Resources
   //
+  if (Cert != NULL) {
+    X509_free (Cert);
+  }
+
   if (Key != NULL) {
     EVP_PKEY_free (Key);
   }
