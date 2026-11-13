@@ -180,8 +180,11 @@ IScsiMapV4ToV6Addr (
   @param[in, out]  Heap     The heap buffer used to store the variable length
                             parameters such as iSCSI name.
 
+  @retval EFI_SUCCESS      The NIC and target sections were filled.
+  @retval EFI_NOT_FOUND    The boot-selected attempt or required NIC was not found.
+
 **/
-VOID
+EFI_STATUS
 IScsiFillNICAndTargetSections (
   IN     EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_HEADER  *Table,
   IN OUT UINT8                                      **Heap
@@ -224,7 +227,7 @@ IScsiFillNICAndTargetSections (
         //
         // First boot selected entry can not be found.
         //
-        break;
+        return EFI_NOT_FOUND;
       }
 
       ASSERT (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED);
@@ -318,7 +321,10 @@ IScsiFillNICAndTargetSections (
     // Get Nic Info: VLAN tag, Mac address, PCI location.
     //
     NicInfo = IScsiGetNicInfoByIndex (Attempt->NicIndex);
-    ASSERT (NicInfo != NULL);
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      return EFI_NOT_FOUND;
+    }
 
     Nic->VLanTag = NicInfo->VlanId;
     CopyMem (Nic->Mac, &NicInfo->PermanentAddress, sizeof (Nic->Mac));
@@ -423,6 +429,8 @@ IScsiFillNICAndTargetSections (
 
     Index++;
   }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -506,15 +514,26 @@ IScsiPublishIbft (
   //
   // Fill in the various section of the iSCSI Boot Firmware Table.
   //
-  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
+  if (Xsdt != NULL) {
     IScsiInitIbfTableHeader (Table, Xsdt->OemId, &Xsdt->OemTableId);
   } else {
+    if (Rsdt == NULL) {
+      ASSERT (Rsdt != NULL);
+      FreePool (Table);
+      return;
+    }
+
     IScsiInitIbfTableHeader (Table, Rsdt->OemId, &Rsdt->OemTableId);
   }
 
   IScsiInitControlSection (Table);
   IScsiFillInitiatorSection (Table, &Heap);
-  IScsiFillNICAndTargetSections (Table, &Heap);
+  Status = IScsiFillNICAndTargetSections (Table, &Heap);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "IScsiPublishIbft: Failed to fill NIC and target sections: %r\n", Status));
+    FreePool (Table);
+    return;
+  }
 
   Checksum        = CalculateCheckSum8 ((UINT8 *)Table, Table->Length);
   Table->Checksum = Checksum;
