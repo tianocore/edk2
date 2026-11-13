@@ -619,6 +619,113 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicIwbInfoParser[] = {
   { "Identifier",      sizeof (UINT32),          "0x%x",   NULL },
 };
 
+/** A parser for EArmObjAestBitmapArray.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestBitmapWordParser[] = {
+  { "Word", sizeof (UINT64), "0x%llx", NULL }
+};
+
+/** A parser for EArmObjAestInterruptArray.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestInterruptParser[] = {
+  { "Type",  sizeof (UINT8),  "0x%x", NULL },
+  { "Flags", sizeof (UINT8),  "0x%x", NULL },
+  { "Gsiv",  sizeof (UINT32), "0x%x", NULL }
+};
+
+/** A parser for the interface embedded in AEST node objects.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestInterfaceParser[] = {
+  { "Type",                                       sizeof (UINT8),           "0x%x",   NULL },
+  { "GroupFormat",                                sizeof (UINT8),           "0x%x",   NULL },
+  { "Flags",                                      sizeof (UINT32),          "0x%x",   NULL },
+  { "BaseAddress",                                sizeof (UINT64),          "0x%llx", NULL },
+  { "StartErrorRecordIndex",                      sizeof (UINT32),          "0x%x",   NULL },
+  { "NumberErrorRecords",                         sizeof (UINT32),          "0x%x",   NULL },
+  { "ImplementedBitmapToken",                     sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "GroupStatusBitmapToken",                     sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "AddressModeBitmapToken",                     sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ProcessorHierarchyToken",                    sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ArmErrorNodeDeviceUid",                      sizeof (UINT32),          "0x%x",   NULL },
+  { "GroupStatusRegistersBaseAddress",            sizeof (UINT64),          "0x%llx", NULL },
+  { "FaultInjectionRegistersBaseAddress",         sizeof (UINT64),          "0x%llx", NULL },
+  { "InterruptConfigurationRegistersBaseAddress", sizeof (UINT64),          "0x%llx", NULL }
+};
+
+/** A parser for the fields shared by AEST node objects.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestCommonParser[] = {
+  { "TimestampRate",               sizeof (UINT64),                "0x%llx", NULL },
+  { "TimebaseOffset",              sizeof (INT64),                 "%lld",   NULL },
+  { "ErrorInjectionCountdownRate", sizeof (UINT64),                "0x%llx", NULL },
+  { "Interface",                   sizeof (CM_ARM_AEST_INTERFACE), NULL,     NULL,
+    CmArmAestInterfaceParser, ARRAY_SIZE (CmArmAestInterfaceParser) },
+  { "InterruptCount",              sizeof (UINT32),                "0x%x",   NULL },
+  { "InterruptArrayToken",         sizeof (CM_OBJECT_TOKEN),       "0x%p",   NULL }
+};
+
+/** A parser for EArmObjAestProcessorNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestProcessorNodeParser[] = {
+  { "Common",       sizeof (CM_ARM_AEST_COMMON),             NULL,   NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "ResourceType", sizeof (UINT8),                          "0x%x", NULL },
+  { "Flags",        sizeof (UINT8),                          "0x%x", NULL },
+  { "Resource",     sizeof (CM_ARM_AEST_PROCESSOR_RESOURCE), NULL,   HexDump }
+};
+
+/** A parser for EArmObjAestMemoryNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestMemoryNodeParser[] = {
+  { "Common",               sizeof (CM_ARM_AEST_COMMON), NULL,   NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN),    "0x%p", NULL }
+};
+
+/** A parser for EArmObjAestSmmuNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestSmmuNodeParser[] = {
+  { "Common",            sizeof (CM_ARM_AEST_COMMON), NULL,   NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "SmmuToken",         sizeof (CM_OBJECT_TOKEN),    "0x%p", NULL },
+  { "SubcomponentToken", sizeof (CM_OBJECT_TOKEN),    "0x%p", NULL }
+};
+
+/** A parser for EArmObjAestVendorNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestVendorNodeParser[] = {
+  { "Common",     sizeof (CM_ARM_AEST_COMMON),                         NULL,   NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "HardwareId", sizeof (((CM_ARM_AEST_VENDOR_NODE *)0)->HardwareId), NULL,   HexDump },
+  { "UniqueId",   sizeof (UINT32),                                     "0x%x", NULL },
+  { "VendorData", sizeof (((CM_ARM_AEST_VENDOR_NODE *)0)->VendorData), NULL,   HexDump }
+};
+
+/** A parser for EArmObjAestGicNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestGicNodeParser[] = {
+  { "Common",        sizeof (CM_ARM_AEST_COMMON), NULL,   NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "InterfaceType", sizeof (UINT32),             "0x%x", NULL },
+  { "InstanceToken", sizeof (CM_OBJECT_TOKEN),    "0x%p", NULL }
+};
+
+/** A parser for EArmObjAestPcieRootComplexNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestPcieRootComplexNodeParser[] = {
+  { "Common",           sizeof (CM_ARM_AEST_COMMON), NULL,   NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "RootComplexToken", sizeof (CM_OBJECT_TOKEN),    "0x%p", NULL }
+};
+
+/** A parser for EArmObjAestProxyNode.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmAestProxyNodeParser[] = {
+  { "Common",      sizeof (CM_ARM_AEST_COMMON), NULL,     NULL,
+    CmArmAestCommonParser, ARRAY_SIZE (CmArmAestCommonParser) },
+  { "NodeAddress", sizeof (UINT64),             "0x%llx", NULL }
+};
+
 /** A parser for the EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE structure.
 */
 STATIC CONST CM_OBJ_PARSER  AcpiGenericAddressParser[] = {
@@ -2065,6 +2172,15 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjScmiDeviceInfo,                  CmArmScmiDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjScmiPccTransportInfo,            CmArmScmiPccTransportInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjScmiProtocolInfo,                CmArmScmiProtocolInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestProcessorNode,               CmArmAestProcessorNodeParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestBitmapArray,                 CmArmAestBitmapWordParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestInterruptArray,              CmArmAestInterruptParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestMemoryNode,                  CmArmAestMemoryNodeParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestSmmuNode,                    CmArmAestSmmuNodeParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestVendorNode,                  CmArmAestVendorNodeParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestGicNode,                     CmArmAestGicNodeParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestPcieRootComplexNode,         CmArmAestPcieRootComplexNodeParser),
+  CM_PARSER_ADD_OBJECT (EArmObjAestProxyNode,                   CmArmAestProxyNodeParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
