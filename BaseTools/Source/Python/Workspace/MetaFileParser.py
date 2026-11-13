@@ -28,7 +28,7 @@ from Common.Expression import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from collections import defaultdict
-from .MetaFileTable import MetaFileStorage
+from .MetaFileTable import MetaFileStorage, MetaFileTable
 from .MetaFileCommentParser import CheckInfComment
 from Common.DataType import TAB_COMMENT_EDK_START, TAB_COMMENT_EDK_END
 
@@ -843,6 +843,16 @@ class InfParser(MetaFileParser):
         MODEL_META_DATA_USER_EXTENSION  :   MetaFileParser._SkipUserExtension,
     }
 
+class _DscIncludeTail:
+    def __init__(self, FilePath, FromItem, StartLine, Records, Context, SubsectionContext):
+        self.FilePath = FilePath
+        self.FromItem = FromItem
+        self.StartLine = StartLine
+        self.Records = Records
+        self.Context = Context
+        self.SubsectionContext = SubsectionContext
+
+
 ## DSC file parser class
 #
 #   @param      FilePath        The path of platform description file
@@ -952,6 +962,9 @@ class DscParser(MetaFileParser):
         self._IdMapping = {-1:-1}
 
         self._Content = None
+        self._StartLine = 0
+        self._CurrentSectionScope = []
+        self._CurrentOwner = -1
 
     ## Parser starter
     def Start(self):
@@ -966,7 +979,7 @@ class DscParser(MetaFileParser):
 
         Content = self.ProcessMultipleLineCODEValue(Content)
 
-        for Index in range(0, len(Content)):
+        for Index in range(self._StartLine, len(Content)):
             Line = CleanString(Content[Index])
             # skip empty line
             if Line == '':
@@ -1398,12 +1411,32 @@ class DscParser(MetaFileParser):
         self._Content = self._RawTable.GetAll()
         self._ContentIndex = 0
         self._InSubsection = False
+        self._CurrentSectionScope = []
+        self._CurrentOwner = -1
         while self._ContentIndex < len(self._Content) :
+            Record = self._Content[self._ContentIndex]
+            if isinstance(Record, _DscIncludeTail):
+                if Record.SubsectionContext is not None:
+                    self._SubsectionName, self._SubsectionType, self._InSubsection = \
+                        Record.SubsectionContext
+                if self.__GetIncludeContext() == Record.Context:
+                    TailRecords = Record.Records
+                else:
+                    TailRecords = self.__ParseIncludeTail(Record)
+                self._Content[self._ContentIndex:self._ContentIndex + 1] = TailRecords
+                self._FileWithError = Record.FilePath
+                continue
+
             Id, self._ItemType, V1, V2, V3, S1, S2, S3, Owner, self._From, \
-                LineStart, ColStart, LineEnd, ColEnd, Enabled = self._Content[self._ContentIndex]
+                LineStart, ColStart, LineEnd, ColEnd, Enabled = Record
 
             if self._From < 0:
                 self._FileWithError = self.MetaFile
+
+            if self._ItemType == MODEL_META_DATA_SECTION_HEADER:
+                self._CurrentSectionScope = self.__GetSectionScope(
+                    self._ContentIndex, Owner, self._From, LineStart, LineEnd
+                )
 
             self._ContentIndex += 1
 
@@ -1416,6 +1449,8 @@ class DscParser(MetaFileParser):
                 if self._ContentIndex >= len(self._Content):
                     break
                 Record = self._Content[self._ContentIndex]
+                if isinstance(Record, _DscIncludeTail):
+                    break
                 #
                 # Avoid merging includes with different owners to make sure an
                 # include is correctly processed per arch.
@@ -1434,6 +1469,7 @@ class DscParser(MetaFileParser):
                 self._InSubsection = True
             else:
                 self._InSubsection = False
+            self._CurrentOwner = Owner
             try:
                 Processer[self._ItemType]()
             except EvaluationException as Excpt:
@@ -1491,6 +1527,80 @@ class DscParser(MetaFileParser):
         GlobalData.gPlatformDefines.update(self._FileLocalMacros)
         self._PostProcessed = True
         self._Content = None
+
+    def __GetIncludeContext(self):
+        return copy.deepcopy((
+            self._SectionName,
+            self._SectionType,
+            self._CurrentSectionScope or self._Scope,
+            self._SubsectionName,
+            self._SubsectionType,
+            self._InSubsection,
+            self._CurrentOwner,
+            self._FileLocalMacros,
+            self._SectionsMacroDict,
+            self._Defines,
+            self._Symbols,
+            self._GuidDict,
+            self._DirectiveStack,
+            self._DirectiveEvalStack,
+            self._Enabled,
+        ))
+
+    def __GetSectionScope(self, Index, Owner, FromItem, LineStart, LineEnd):
+        Scope = []
+        for Record in self._Content[Index:]:
+            if (isinstance(Record, _DscIncludeTail) or
+                Record[1] != MODEL_META_DATA_SECTION_HEADER or
+                Record[8] != Owner or Record[9] != FromItem or
+                Record[10] != LineStart or Record[12] != LineEnd):
+                break
+
+            SectionScope = [ReplaceMacro(Record[5], self._Macros), Record[6], Record[7]]
+            if SectionScope not in Scope:
+                Scope.append(SectionScope)
+        return Scope
+
+    def __GetMetaFileFromItem(self, FromItem):
+        if FromItem < 0:
+            return self.MetaFile
+
+        for FileInfo in self._RawTable.DB.TblFile:
+            if FileInfo[MetaFileTable._FILE_FROM_ITEM_] == FromItem:
+                return PathClass(FileInfo[MetaFileTable._FILE_PATH_])
+
+        EdkLogger.error('Parser', FILE_READ_FAILURE,
+                        "Unable to find the source file for DSC include continuation",
+                        File=self.MetaFile)
+
+    def __ParseIncludeTail(self, Tail):
+        Table = MetaFileStorage(self._RawTable.DB, Tail.FilePath, MODEL_FILE_DSC, True,
+                                FromItem=Tail.FromItem)
+        Parser = object.__new__(DscParser)
+        DscParser.__init__(Parser, Tail.FilePath, self._FileType, self._Arch, Table,
+                           Owner=self._CurrentOwner if self._InSubsection else -1,
+                           From=Tail.FromItem)
+
+        Parser._StartLine = Tail.StartLine
+        Parser._SectionName = self._SectionName
+        Parser._SectionType = self._SectionType
+        Parser._SubsectionName = self._SubsectionName
+        Parser._SubsectionType = self._SubsectionType
+        Parser._InSubsection = self._InSubsection
+        Parser._Scope = copy.deepcopy(self._CurrentSectionScope or self._Scope)
+        Parser._Enabled = self._Enabled
+        Parser._FileLocalMacros = self._FileLocalMacros.copy()
+        Parser._SectionsMacroDict = copy.deepcopy(self._SectionsMacroDict)
+        Parser._Defines = self._Defines.copy()
+        Parser._Symbols = self._Symbols.copy()
+        Parser._GuidDict = self._GuidDict.copy()
+        Parser._DirectiveStack = [
+            (Directive, Tail.StartLine + 1, '') for Directive in self._DirectiveStack
+        ]
+        Parser._InDirective = len(Parser._DirectiveStack) - 1
+        Parser.StartParse()
+        return Table.GetAll()
+
     def _ProcessError(self):
         if not self._Enabled:
             return
@@ -1642,6 +1752,10 @@ class DscParser(MetaFileParser):
                 self._FileWithError = IncludedFile1
 
                 FromItem = self._Content[self._ContentIndex - 1][0]
+                ParentFrom = self._From
+                ParentStartLine = self._LineIndex + 1
+                ParentFile = self.__GetMetaFileFromItem(ParentFrom)
+                ParentContext = self.__GetIncludeContext()
                 if self._InSubsection:
                     Owner = self._Content[self._ContentIndex - 1][8]
                 else:
@@ -1654,6 +1768,7 @@ class DscParser(MetaFileParser):
 
                 # set the parser status with current status
                 Parser._SectionName = self._SectionName
+                Parser._SubsectionName = self._SubsectionName
                 Parser._SubsectionType = self._SubsectionType
                 Parser._InSubsection = self._InSubsection
                 Parser._SectionType = self._SectionType
@@ -1663,11 +1778,41 @@ class DscParser(MetaFileParser):
                 Parser.StartParse()
                 # Insert all records in the table for the included file into dsc file table
                 Records = IncludedFileTable.GetAll()
+                SubsectionContext = (
+                    Parser._SubsectionName,
+                    Parser._SubsectionType,
+                    Parser._InSubsection,
+                )
                 if Records:
-                    self._Content[self._ContentIndex:self._ContentIndex] = Records
-                    self._Content.pop(self._ContentIndex - 1)
+                    InsertIndex = self._ContentIndex
+                    self._Content[InsertIndex:InsertIndex] = Records
+                    self._Content.pop(InsertIndex - 1)
+
+                    ChildIndex = InsertIndex - 1
+                    TailStart = ChildIndex + len(Records)
+                    TailEnd = TailStart
+                    while TailEnd < len(self._Content):
+                        TailRecord = self._Content[TailEnd]
+                        if (isinstance(TailRecord, _DscIncludeTail) or
+                            TailRecord[9] != ParentFrom or
+                            TailRecord[10] <= ParentStartLine):
+                            break
+                        TailEnd += 1
+                    if TailEnd > TailStart:
+                        ParentTailRecords = self._Content[TailStart:TailEnd]
+                        self._Content[TailStart:TailEnd] = [
+                            _DscIncludeTail(
+                                ParentFile,
+                                ParentFrom,
+                                ParentStartLine,
+                                ParentTailRecords,
+                                ParentContext,
+                                SubsectionContext,
+                            )
+                        ]
+
                     self._ValueList = None
-                    self._ContentIndex -= 1
+                    self._ContentIndex = ChildIndex
 
     def __ProcessPackages(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)

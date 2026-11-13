@@ -23,9 +23,12 @@ class Tests(TestTools.BaseToolsTest):
 
     def SingleFileTest(self, filename):
         try:
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                py_compile.compile(filename, cfile=temp_file.name, doraise=True)
-                os.unlink(temp_file.name)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                py_compile.compile(
+                    filename,
+                    cfile=os.path.join(temp_dir, 'temp.pyc'),
+                    doraise=True
+                )
         except Exception as e:
             self.fail('syntax error: %s, Error is %s' % (filename, str(e)))
 
