@@ -108,6 +108,19 @@ typedef struct _USB_DEV_CONTEXT    USB_DEV_CONTEXT;
 #define USB_DESC_TYPE_HUB_SUPER_SPEED  0x2a
 
 //
+// USB maximum packet sizes per USB 2.0/3.x spec (Table 9-8 and USB 3.x spec)
+//
+#define USB_LOW_SPEED_MAX_PACKET_SIZE           8     ///< Low-speed control EP0 max packet size
+#define USB_FULL_SPEED_CTRL_MAX_PACKET_SIZE_16  16    ///< Full-speed control EP0, 16-byte variant
+#define USB_FULL_SPEED_CTRL_MAX_PACKET_SIZE_32  32    ///< Full-speed control EP0, 32-byte variant
+#define USB_FULL_SPEED_CTRL_MAX_PACKET_SIZE_64  64    ///< Full-speed control EP0, 64-byte variant
+#define USB_SUPER_SPEED_CTRL_MAX_PACKET_SIZE    512   ///< SuperSpeed control EP0 max packet size
+#define USB_FULL_SPEED_BULK_MAX_PACKET_SIZE     64    ///< Full-speed bulk/interrupt EP max packet size
+#define USB_HIGH_SPEED_BULK_MAX_PACKET_SIZE     512   ///< High-speed bulk EP max packet size
+#define USB_SUPER_SPEED_BULK_MAX_PACKET_SIZE    1024  ///< SuperSpeed bulk EP max packet size
+#define USB_HIGH_SPEED_INT_MAX_PACKET_SIZE      3072  ///< High-speed interrupt EP max packet size
+
+//
 // The RequestType in EFI_USB_DEVICE_REQUEST is composed of
 // three fields: One bit direction, 2 bit type, and 5 bit
 // target.
