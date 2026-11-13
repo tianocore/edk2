@@ -2673,10 +2673,17 @@ UpdateDeletePage (
             );
         }
       }
-
-      ItemDataSize -= CertList->SignatureListSize;
-      CertList      = (EFI_SIGNATURE_LIST *)((UINT8 *)CertList + CertList->SignatureListSize);
+    } else {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Skip unknown signature type %g\n",
+        __func__,
+        &CertList->SignatureType
+        ));
     }
+
+    ItemDataSize -= CertList->SignatureListSize;
+    CertList      = (EFI_SIGNATURE_LIST *)((UINT8 *)CertList + CertList->SignatureListSize);
   }
 
 ON_EXIT:
