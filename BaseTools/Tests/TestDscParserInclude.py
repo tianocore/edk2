@@ -50,7 +50,12 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
             '  Included.inf\n'
             '[LibraryClasses]\n'
             '  IncludedLibrary|IncludedLibrary.inf\n'
-            '[Components]\n',
+            '!include Nested.dsc.inc\n',
+        )
+        self.WriteTmpFile(
+            'Nested.dsc.inc',
+            '[Components]\n'
+            '  Nested.inf\n',
         )
         self.WriteTmpFile(
             'LibraryClasses.dsc.inc',
@@ -93,8 +98,42 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
         self.assertIn(('AfterSecondInclude', 'AfterSecond.inf'), LibraryClassRecords)
         self.assertIn('AfterInclude|After.inf', ComponentRecords)
         self.assertIn('Included.inf', ComponentRecords)
+        self.assertIn('Nested.inf', ComponentRecords)
         self.assertIn('AfterNextSection.inf', ComponentRecords)
         self.assertNotIn('AfterSecondInclude|AfterSecond.inf', ComponentRecords)
+
+    def test_parent_section_after_closed_component_subsection(self):
+        self.WriteTmpFile(
+            'Component.dsc.inc',
+            '[Components]\n'
+            '  Included.inf {\n'
+            '    <LibraryClasses>\n'
+            '      IncludedLibrary|IncludedLibrary.inf\n'
+            '  }\n',
+        )
+        self.WriteTmpFile(
+            'Platform.dsc',
+            '[LibraryClasses]\n'
+            '  BeforeInclude|Before.inf\n'
+            '!include Component.dsc.inc\n'
+            '[LibraryClasses]\n'
+            '  AfterInclude|After.inf\n',
+        )
+
+        DscFile = PathClass(os.path.join(self.testDir, 'Platform.dsc'))
+        Table = MetaFileStorage(
+            WorkspaceDatabase(),
+            DscFile,
+            MODEL_FILE_DSC,
+            True,
+        )
+        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
+
+        LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_COMMON]
+        LibraryClassRecords = [(Record[0], Record[1]) for Record in LibraryClasses]
+
+        self.assertIn(('BeforeInclude', 'Before.inf'), LibraryClassRecords)
+        self.assertIn(('AfterInclude', 'After.inf'), LibraryClassRecords)
 
 
 def TheTestSuite():

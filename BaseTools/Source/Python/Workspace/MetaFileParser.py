@@ -844,12 +844,13 @@ class InfParser(MetaFileParser):
     }
 
 class _DscIncludeTail:
-    def __init__(self, FilePath, FromItem, StartLine, Records, Context):
+    def __init__(self, FilePath, FromItem, StartLine, Records, Context, SubsectionContext):
         self.FilePath = FilePath
         self.FromItem = FromItem
         self.StartLine = StartLine
         self.Records = Records
         self.Context = Context
+        self.SubsectionContext = SubsectionContext
 
 
 ## DSC file parser class
@@ -1415,6 +1416,9 @@ class DscParser(MetaFileParser):
         while self._ContentIndex < len(self._Content) :
             Record = self._Content[self._ContentIndex]
             if isinstance(Record, _DscIncludeTail):
+                if Record.SubsectionContext is not None:
+                    self._SubsectionName, self._SubsectionType, self._InSubsection = \
+                        Record.SubsectionContext
                 if self.__GetIncludeContext() == Record.Context:
                     TailRecords = Record.Records
                 else:
@@ -1445,6 +1449,8 @@ class DscParser(MetaFileParser):
                 if self._ContentIndex >= len(self._Content):
                     break
                 Record = self._Content[self._ContentIndex]
+                if isinstance(Record, _DscIncludeTail):
+                    break
                 #
                 # Avoid merging includes with different owners to make sure an
                 # include is correctly processed per arch.
@@ -1762,6 +1768,7 @@ class DscParser(MetaFileParser):
 
                 # set the parser status with current status
                 Parser._SectionName = self._SectionName
+                Parser._SubsectionName = self._SubsectionName
                 Parser._SubsectionType = self._SubsectionType
                 Parser._InSubsection = self._InSubsection
                 Parser._SectionType = self._SectionType
@@ -1771,6 +1778,14 @@ class DscParser(MetaFileParser):
                 Parser.StartParse()
                 # Insert all records in the table for the included file into dsc file table
                 Records = IncludedFileTable.GetAll()
+                SubsectionContext = None
+                if not any(IncludeRecord[1] == MODEL_META_DATA_INCLUDE
+                           for IncludeRecord in Records):
+                    SubsectionContext = (
+                        Parser._SubsectionName,
+                        Parser._SubsectionType,
+                        Parser._InSubsection,
+                    )
                 if Records:
                     InsertIndex = self._ContentIndex
                     self._Content[InsertIndex:InsertIndex] = Records
@@ -1795,6 +1810,7 @@ class DscParser(MetaFileParser):
                                 ParentStartLine,
                                 ParentTailRecords,
                                 ParentContext,
+                                SubsectionContext,
                             )
                         ]
 
