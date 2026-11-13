@@ -1778,14 +1778,11 @@ class DscParser(MetaFileParser):
                 Parser.StartParse()
                 # Insert all records in the table for the included file into dsc file table
                 Records = IncludedFileTable.GetAll()
-                SubsectionContext = None
-                if not any(IncludeRecord[1] == MODEL_META_DATA_INCLUDE
-                           for IncludeRecord in Records):
-                    SubsectionContext = (
-                        Parser._SubsectionName,
-                        Parser._SubsectionType,
-                        Parser._InSubsection,
-                    )
+                SubsectionContext = (
+                    Parser._SubsectionName,
+                    Parser._SubsectionType,
+                    Parser._InSubsection,
+                )
                 if Records:
                     InsertIndex = self._ContentIndex
                     self._Content[InsertIndex:InsertIndex] = Records

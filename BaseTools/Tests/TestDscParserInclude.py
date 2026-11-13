@@ -135,6 +135,44 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
         self.assertIn(('BeforeInclude', 'Before.inf'), LibraryClassRecords)
         self.assertIn(('AfterInclude', 'After.inf'), LibraryClassRecords)
 
+    def test_nested_include_closes_component_subsection(self):
+        self.WriteTmpFile(
+            'NestedComponents.dsc.inc',
+            '[Components]\n'
+            '  Included.inf {\n'
+            '    <LibraryClasses>\n'
+            '      IncludedLibrary|IncludedLibrary.inf\n'
+            '  }\n',
+        )
+        self.WriteTmpFile(
+            'Included.dsc.inc',
+            '[Components]\n'
+            '!include NestedComponents.dsc.inc\n',
+        )
+        self.WriteTmpFile(
+            'Platform.dsc',
+            '[LibraryClasses]\n'
+            '  BeforeInclude|Before.inf\n'
+            '!include Included.dsc.inc\n'
+            '[LibraryClasses]\n'
+            '  AfterInclude|After.inf\n',
+        )
+
+        DscFile = PathClass(os.path.join(self.testDir, 'Platform.dsc'))
+        Table = MetaFileStorage(
+            WorkspaceDatabase(),
+            DscFile,
+            MODEL_FILE_DSC,
+            True,
+        )
+        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
+
+        LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_COMMON]
+        LibraryClassRecords = [(Record[0], Record[1]) for Record in LibraryClasses]
+
+        self.assertIn(('BeforeInclude', 'Before.inf'), LibraryClassRecords)
+        self.assertIn(('AfterInclude', 'After.inf'), LibraryClassRecords)
+
 
 def TheTestSuite():
     return unittest.TestLoader().loadTestsFromTestCase(TestDscParserInclude)
