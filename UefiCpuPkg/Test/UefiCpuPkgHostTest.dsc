@@ -2,6 +2,7 @@
 # UefiCpuPkg DSC file used to build host-based unit tests.
 #
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -40,3 +41,8 @@
   # Build HOST_APPLICATION that tests the CpuPageTableLib
   #
   UefiCpuPkg/Library/CpuPageTableLib/UnitTest/CpuPageTableLibUnitTestHost.inf
+
+  #
+  # Build HOST_APPLICATION that tests AmdMmSaveStateLib
+  #
+  UefiCpuPkg/Library/MmSaveStateLib/UnitTest/AmdMmSaveStateUnitTestHost.inf
