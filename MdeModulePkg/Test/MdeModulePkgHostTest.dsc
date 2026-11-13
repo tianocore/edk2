@@ -28,6 +28,12 @@
   #
   # Build MdeModulePkg HOST_APPLICATION Tests
   #
+  MdeModulePkg/Library/BrotliCustomDecompressLib/UnitTest/BrotliDecompressLibUnitTestHost.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/BrotliCustomDecompressLib/BrotliCustomDecompressLib.inf
+      ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
+  }
+
   MdeModulePkg/Library/DxeResetSystemLib/UnitTest/DxeResetSystemLibUnitTestHost.inf {
     <LibraryClasses>
       ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
