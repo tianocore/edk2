@@ -620,6 +620,11 @@ BuildUpFastReadTable (
       );
   }
 
+  // DWORD 17 is optional in shorter Basic Flash Parameter Tables.
+  if (Instance->SfdpBasicFlashByteCount < 17 * sizeof (UINT32)) {
+    return;
+  }
+
   // Build up Fast Read table 1S-1S-8S
   if (Instance->SfdpBasicFlash->FastRead118Instr != 0) {
     CreateSpiFastReadTableEntry (
