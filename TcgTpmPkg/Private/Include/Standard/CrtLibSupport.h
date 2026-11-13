@@ -36,7 +36,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CONFIG_HEADER_BN_H
 
 #if !defined (SIXTY_FOUR_BIT) && !defined (THIRTY_TWO_BIT)
-  #if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_IA64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
+  #if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
 //
 // With GCC we would normally use SIXTY_FOUR_BIT_LONG, but MSVC needs
 // SIXTY_FOUR_BIT, because 'long' is 32-bit and only 'long long' is
@@ -48,6 +48,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   #else
     #error Unknown target architecture
   #endif
+#endif
+
+//
+// Largest value representable in UINTN, as a plain integer constant.
+//
+// The architecture list deliberately matches the one used above to select
+// SIXTY_FOUR_BIT.
+//
+// Cannot be based on SIXTY_FOUR_BIT -- that guides the integer width to use
+// for bignum computations and is not guaranteed to match UINTN or size_t.
+//
+// Cannot use MAX_UINTN because that expands to a cast and cannot be used for
+// preprocessor expressions.
+//
+#if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
+#define CRT_MAX_UINTN  0xFFFFFFFFFFFFFFFFUL
+#elif defined (MDE_CPU_IA32)
+#define CRT_MAX_UINTN  0xFFFFFFFFUL
+#elif defined (MDE_CPU_EBC)
+  //
+  // On EBC, sizeof(UINTN) is evaluated at runtime, so we cannot provide valid
+  // preprocessor expressions for it.
+  //
+  #error Unsupported target architecture - EBC runtime sizeof(UINTN) conflicts with SIZE_MAX and UINTPTR_MAX preprocessor definitions
+#else
+  #error Unknown target architecture
 #endif
 
 //
@@ -70,7 +96,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define UINT_MAX      0xFFFFFFFF      /* Maximum unsigned int value */
 #define ULONG_MAX     0xFFFFFFFF      /* Maximum unsigned long value */
 #define CHAR_BIT      8               /* Number of bits in a char */
-#define SIZE_MAX      0xFFFFFFFF      /* Maximum unsigned size_t */
+#define SIZE_MAX      CRT_MAX_UINTN   /* Maximum unsigned size_t */
 #define INT16_MAX     0x7FFF          /* Maximum (signed) short value */
 #define UINT16_MAX    0xFFFF          /* Maximum unsigned short value */
 
@@ -97,7 +123,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef UINTN   size_t;
 typedef UINTN   off_t;
 typedef UINTN   u_int;
-typedef UINTN   intptr_t;
+typedef INTN    intptr_t;
 typedef INTN    ptrdiff_t;
 typedef INTN    ssize_t;
 typedef INT64   time_t;
@@ -487,8 +513,4 @@ memcpy (
 #endif
 
 #undef UINTPTR_MAX
-#if (UINT_MAX > 0xFFFFFFFFUL)
-#define UINTPTR_MAX  0xFFFFFFFFFFFFFFFFUL
-#else
-#define UINTPTR_MAX  0xFFFFFFFFUL
-#endif
+#define UINTPTR_MAX  CRT_MAX_UINTN
