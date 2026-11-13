@@ -1077,6 +1077,11 @@ typedef struct {
 } EFI_ACPI_6_7_RINTC_AFFINITY_STRUCTURE;
 
 ///
+/// RINTC Affinity Structure Flags. All other bits are reserved and must be 0.
+///
+#define EFI_ACPI_6_7_RINTC_AFFINITY_STRUCTURE_ENABLED  BIT0
+
+///
 /// IRS Affinity Structure Definition
 ///
 typedef struct {
