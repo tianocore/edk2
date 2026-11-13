@@ -3,6 +3,7 @@
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2365,6 +2366,14 @@ Ip6ConfigInitInstance (
   //
   NetMapInit (&Instance->DadFailedMap);
   NetMapInit (&Instance->DadPassedMap);
+
+  //
+  // Initialize the NV data address lists so they are always valid, even if
+  // Ip6ConfigFormInit() fails early and Ip6ConfigFormUnload() frees them.
+  //
+  InitializeListHead (&Instance->Ip6NvData.ManualAddress);
+  InitializeListHead (&Instance->Ip6NvData.GatewayAddress);
+  InitializeListHead (&Instance->Ip6NvData.DnsAddress);
 
   //
   // Initialize each data type: associate storage and set data size for the
