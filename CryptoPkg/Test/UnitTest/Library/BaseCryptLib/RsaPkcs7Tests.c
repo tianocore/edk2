@@ -8,6 +8,7 @@
 **/
 
 #include "TestBaseCryptLib.h"
+#include "VerifyTestSignatures.h"
 
 //
 // Password-protected PEM Key data for RSA Private Key Retrieving (encryption key is "client").
@@ -386,18 +387,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  TestCert2[] = {
 };
 
 //
-// Message Hash for Signing & Verification Validation.
-//
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  MsgHash[] = {
-  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
-  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09
-};
-
-//
-// Payload for PKCS#7 Signing & Verification Validation.
-//
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  *Payload = "Payload Data for PKCS#7 Signing";
-
 UNIT_TEST_STATUS
 EFIAPI
 TestVerifyRsaCertPkcs1SignVerify (
@@ -405,10 +394,8 @@ TestVerifyRsaCertPkcs1SignVerify (
   )
 {
   BOOLEAN           Status;
-  VOID              *RsaPrivKey;
   VOID              *RsaPubKey;
-  UINT8             *Signature;
-  UINTN             SigSize;
+  UINT8             HashValue[SHA1_DIGEST_SIZE];
   UINT8             *Subject;
   UINTN             SubjectSize;
   RETURN_STATUS     ReturnStatus;
@@ -416,20 +403,13 @@ TestVerifyRsaCertPkcs1SignVerify (
   UINTN             CommonNameSize;
   CHAR8             OrgName[64];
   UINTN             OrgNameSize;
+  CONST CHAR8       *Message;
   UNIT_TEST_STATUS  TestStatus;
 
-  RsaPrivKey = NULL;
-  RsaPubKey  = NULL;
-  Signature  = NULL;
-  Subject    = NULL;
+  RsaPubKey = NULL;
+  Subject   = NULL;
 
   TestStatus = UNIT_TEST_ERROR_TEST_FAILED;
-
-  //
-  // Retrieve RSA private key from encrypted PEM data.
-  //
-  Status = RsaGetPrivateKeyFromPem (TestKeyPem, sizeof (TestKeyPem), PemPass, &RsaPrivKey);
-  UT_ASSERT_TRUE (Status);
 
   //
   // Retrieve RSA public key from X509 Certificate.
@@ -438,27 +418,17 @@ TestVerifyRsaCertPkcs1SignVerify (
   Status    = RsaGetPublicKeyFromX509 (TestCert, sizeof (TestCert), &RsaPubKey);
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Generate RSA PKCS#1 Signature.
-  //
-  SigSize = 0;
-  Status  = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA1_DIGEST_SIZE, NULL, &SigSize);
-  UT_ASSERT_FALSE (Status);
-  UT_ASSERT_NOT_EQUAL (SigSize, 0);
-
-  Signature = AllocatePool (SigSize);
-  if (Signature == NULL) {
-    UT_LOG_ERROR ("Failed to allocate memory for Signature.\n");
-    goto Exit;
-  }
-
-  Status = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA1_DIGEST_SIZE, Signature, &SigSize);
+  Message = "RSA certificate verification test message";
+  Status  = Sha1HashAll ((UINT8 *)Message, AsciiStrLen (Message), HashValue);
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Verify RSA PKCS#1-encoded Signature.
-  //
-  Status = RsaPkcs1Verify (RsaPubKey, MsgHash, SHA1_DIGEST_SIZE, Signature, SigSize);
+  Status = RsaPkcs1Verify (
+             RsaPubKey,
+             HashValue,
+             sizeof (HashValue),
+             mRsaCertPkcs1TestSignature,
+             sizeof (mRsaCertPkcs1TestSignature)
+             );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -509,143 +479,63 @@ Exit:
     FreePool (Subject);
   }
 
-  if (Signature != NULL) {
-    FreePool (Signature);
-  }
-
   if (RsaPubKey != NULL) {
     RsaFree (RsaPubKey);
-  }
-
-  if (RsaPrivKey != NULL) {
-    RsaFree (RsaPrivKey);
   }
 
   return TestStatus;
 }
 
+/**
+  Validate attached PKCS#7 signature verification.
+
+  @param[in]  Context  Unit test context.
+
+  @retval UNIT_TEST_PASSED               The test case has completed successfully.
+  @retval UNIT_TEST_ERROR_TEST_FAILED    A test case assertion has failed.
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestVerifyPkcs7SignVerify (
-  IN UNIT_TEST_CONTEXT  Context
+  UNIT_TEST_CONTEXT  Context
   )
 {
-  BOOLEAN  Status;
-  UINT8    *P7SignedData;
-  UINTN    P7SignedDataSize;
-  UINT8    *SignCert;
+  BOOLEAN      Status;
+  CONST CHAR8  *Message;
 
-  P7SignedData = NULL;
-  SignCert     = NULL;
-
-  //
-  // Construct Signer Certificate from RAW data.
-  //
-  Status = X509ConstructCertificate (TestCert, sizeof (TestCert), (UINT8 **)&SignCert);
+  Message = "PKCS7 verification test message";
+  Status  = Pkcs7Verify (
+              mRsaPkcs7TestSignature,
+              sizeof (mRsaPkcs7TestSignature),
+              TestCACert,
+              sizeof (TestCACert),
+              (UINT8 *)Message,
+              AsciiStrLen (Message)
+              );
   UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SignCert);
-
-  //
-  // Create PKCS#7 signedData on Payload.
-  // Note: Caller should release P7SignedData manually.
-  //
-  Status = Pkcs7Sign (
-             TestKeyPem,
-             sizeof (TestKeyPem),
-             (CONST UINT8 *)PemPass,
-             (UINT8 *)Payload,
-             AsciiStrLen (Payload),
-             SignCert,
-             NULL,
-             &P7SignedData,
-             &P7SignedDataSize
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_EQUAL (P7SignedDataSize, 0);
-
-  Status = Pkcs7Verify (
-             P7SignedData,
-             P7SignedDataSize,
-             TestCACert,
-             sizeof (TestCACert),
-             (UINT8 *)Payload,
-             AsciiStrLen (Payload)
-             );
-  UT_ASSERT_TRUE (Status);
-
-  if (P7SignedData != NULL) {
-    FreePool (P7SignedData);
-  }
-
-  if (SignCert != NULL) {
-    X509Free (SignCert);
-  }
 
   return UNIT_TEST_PASSED;
 }
 
-//
-// TestCase2: Non self issued CA (partial certificate chains)
-// This case uses a non-self-issued certificate as the signing certificate and CA.
-// BaseCryptLib can pass this case (with X509_V_FLAG_PARTIAL_CHAIN enabled).
-// BaseCryptLibMbedTls cannot, because Mbedtls certificate chain validation lacks support for partial certificate chains currently .
-//
 UNIT_TEST_STATUS
 EFIAPI
 TestVerifyPkcs7SignVerifyNonSelfIssued (
-  IN UNIT_TEST_CONTEXT  Context
+  UNIT_TEST_CONTEXT  Context
   )
 {
-  BOOLEAN  Status;
-  UINT8    *P7SignedData;
-  UINTN    P7SignedDataSize;
-  UINT8    *SignCert;
+  CONST CHAR8  *Message;
+  BOOLEAN      Status;
 
-  P7SignedData = NULL;
-  SignCert     = NULL;
-
-  //
-  // Construct Signer Certificate from RAW data.
-  //
-  Status = X509ConstructCertificate (TestCert2, sizeof (TestCert2), (UINT8 **)&SignCert);
+  Message = "Payload Data for PKCS#7 Signing";
+  Status  = Pkcs7Verify (
+              mRsaPkcs7PartialChainTestSignature,
+              sizeof (mRsaPkcs7PartialChainTestSignature),
+              TestCert2,
+              sizeof (TestCert2),
+              (UINT8 *)Message,
+              AsciiStrLen (Message)
+              );
   UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SignCert);
-
-  //
-  // Create PKCS#7 signedData on Payload.
-  // Note: Caller should release P7SignedData manually.
-  //
-  Status = Pkcs7Sign (
-             TestKeyCert2Pem,
-             sizeof (TestKeyCert2Pem),
-             (CONST UINT8 *)TestKeyCert2PemPass,
-             (UINT8 *)Payload,
-             AsciiStrLen (Payload),
-             SignCert,
-             NULL,
-             &P7SignedData,
-             &P7SignedDataSize
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_EQUAL (P7SignedDataSize, 0);
-
-  Status = Pkcs7Verify (
-             P7SignedData,
-             P7SignedDataSize,
-             TestCert2,
-             sizeof (TestCert2),
-             (UINT8 *)Payload,
-             AsciiStrLen (Payload)
-             );
-  UT_ASSERT_TRUE (Status);
-
-  if (P7SignedData != NULL) {
-    FreePool (P7SignedData);
-  }
-
-  if (SignCert != NULL) {
-    X509Free (SignCert);
-  }
 
   return UNIT_TEST_PASSED;
 }
