@@ -785,6 +785,7 @@ AcpiTableProtocolReady (
 
   MetadataFreeHandle (Root);
 
-  Status = gBS->CloseEvent (Event);
+  Status     = gBS->CloseEvent (Event);
+  mAcpiEvent = NULL;
   ASSERT_EFI_ERROR (Status);
 }
