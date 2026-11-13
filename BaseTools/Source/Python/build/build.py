@@ -2713,6 +2713,12 @@ def Main():
         #
         BuildError = False
     except OSError as X:
+        if MyBuild is not None:
+            # for multi-thread build exits safely
+            MyBuild.Relinquish()
+        if Option is not None and Option.debug is not None:
+            EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
+        EdkLogger.error("build", RESOURCE_UNKNOWN_ERROR, ExtraData=str(X), RaiseError=False)
         ReturnCode = RESOURCE_UNKNOWN_ERROR
     except FatalError as X:
         if MyBuild is not None:
