@@ -1060,15 +1060,17 @@ typedef struct {
 ///
 /// ARM Register Context Type.
 ///@{
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_GPRS    0
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_EL1     1
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_EL2     2
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_SECURE  3
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_GPRS    4
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL1     5
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL2     6
-#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL3     7
-#define EFI_ARM_REG_CONTEXT_TYPE_MISC_SYS_REG    8
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_GPRS         0
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_EL1          1
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_EL2          2
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_SECURE       3
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_GPRS         4
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL1          5
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL2          6
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL3          7
+#define EFI_ARM_REG_CONTEXT_TYPE_MISC_SYS_REG         8
+#define EFI_ARM_REG_CONTEXT_TYPE_128BIT_TTBR          9
+#define EFI_ARM_REG_CONTEXT_TYPE_MISC_128BIT_SYS_REG  10
 ///@}
 
 ///
@@ -1265,6 +1267,54 @@ typedef struct {
 } EFI_ARM_MISC_CONTEXT_SYSTEM_REGISTER;
 
 ///
+/// ARMv8 AARCH64 128-bit Translation Table Base Registers (Type 9).
+///
+/// When this register array is present, some of its registers may be invalid.
+/// An invalid register must have all 128 bits set.
+///
+typedef struct {
+  UINT64    TTBR0_EL1Low;
+  UINT64    TTBR0_EL1High;
+  UINT64    TTBR0_EL2Low;
+  UINT64    TTBR0_EL2High;
+  UINT64    TTBR0_EL3Low;
+  UINT64    TTBR0_EL3High;
+  UINT64    TTBR1_EL1Low;
+  UINT64    TTBR1_EL1High;
+  UINT64    TTBR1_EL2Low;
+  UINT64    TTBR1_EL2High;
+  UINT64    VTTBR_EL2Low;
+  UINT64    VTTBR_EL2High;
+} EFI_ARM_AARCH64_128BIT_TTBR_REGISTERS;
+
+///
+/// Flags field of the ARM Misc. 128-bit Context System Register (Type 10).
+///@{
+#define EFI_ARM_MISC_128BIT_SYS_REG_FLAG_BANKED_INDEX_VALID  BIT0
+#define EFI_ARM_MISC_128BIT_SYS_REG_FLAG_VALUE_HIGH_VALID    BIT1
+///@}
+
+///
+/// ARMv8 AARCH64 Misc. 128-bit Context System Register (Type 10) - Single Register Entry.
+///
+/// The System Register Name field contains the MRS encoding of the register.
+/// The Index field is only meaningful for banked registers and must be 0
+/// otherwise; ValueHigh must be zero unless
+/// EFI_ARM_MISC_128BIT_SYS_REG_FLAG_VALUE_HIGH_VALID is set.
+///
+typedef struct {
+  UINT16    MRS_Op2 : 3;
+  UINT16    MRS_CRm : 4;
+  UINT16    MRS_CRn : 4;
+  UINT16    MRS_Op1 : 3;
+  UINT16    MRS_Op0 : 2;
+  UINT16    Flags;
+  UINT32    Index;
+  UINT64    ValueLow;
+  UINT64    ValueHigh;
+} EFI_ARM_MISC_128BIT_CONTEXT_SYSTEM_REGISTER;
+
+///
 /// ARM Processor Error Context Register Array Information.
 ///
 typedef union {
@@ -1277,6 +1327,8 @@ typedef union {
   EFI_ARM_AARCH64_EL2_CONTEXT_SYSTEM_REGISTERS       Type6SysRegs;
   EFI_ARM_AARCH64_EL3_CONTEXT_SYSTEM_REGISTERS       Type7SysRegs;
   EFI_ARM_MISC_CONTEXT_SYSTEM_REGISTER               SysRegInfo;
+  EFI_ARM_AARCH64_128BIT_TTBR_REGISTERS              Type9SysRegs;
+  EFI_ARM_MISC_128BIT_CONTEXT_SYSTEM_REGISTER        Type10SysRegs;
 } EFI_CONTEXT_REGISTER_ARRAY_INFO;
 
 ///
