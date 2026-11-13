@@ -67,6 +67,7 @@
 
 [Sources.RISCV64]
   ArchUtility.c
+  RiscV/RiscVArchUtility.c
   RiscV/RiscVFdtInterrupt.c
   RiscV/RiscVFdtHwInfoParser.c
   RiscV/Intc/RiscVIntcParser.c
