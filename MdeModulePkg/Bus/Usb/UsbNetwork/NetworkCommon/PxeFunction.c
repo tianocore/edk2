@@ -173,15 +173,13 @@ UndiStart (
     Cdb->StatFlags = PXE_STATFLAGS_COMMAND_COMPLETE;
     Cdb->StatCode  = PXE_STATCODE_SUCCESS;
   } else {
-    if (Nic->RateLimitingEnable == TRUE) {
+    if ((Nic->RateLimitingEnable == TRUE) && (Nic->RateLimiter != NULL)) {
       if (!EventError) {
-        gBS->SetTimer (&Nic->RateLimiter, TimerCancel, 0);
+        gBS->SetTimer (Nic->RateLimiter, TimerCancel, 0);
       }
 
-      if (Nic->RateLimiter) {
-        gBS->CloseEvent (&Nic->RateLimiter);
-        Nic->RateLimiter = 0;
-      }
+      gBS->CloseEvent (Nic->RateLimiter);
+      Nic->RateLimiter = NULL;
     }
 
     // Initial the state when UNDI start is fail
@@ -243,9 +241,10 @@ UndiStop (
   Nic->PxeStart.Sync_Mem  = 0;
   Nic->State              = PXE_STATFLAGS_GET_STATE_STOPPED;
 
-  if (Nic->RateLimitingEnable == TRUE) {
-    gBS->SetTimer (&Nic->RateLimiter, TimerCancel, 0);
-    gBS->CloseEvent (&Nic->RateLimiter);
+  if ((Nic->RateLimitingEnable == TRUE) && (Nic->RateLimiter != NULL)) {
+    gBS->SetTimer (Nic->RateLimiter, TimerCancel, 0);
+    gBS->CloseEvent (Nic->RateLimiter);
+    Nic->RateLimiter = NULL;
   }
 
   if (Nic->UsbEth->UsbEthUndi.UsbEthUndiStop != NULL) {
