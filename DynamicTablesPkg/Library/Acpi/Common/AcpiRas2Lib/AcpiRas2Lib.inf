@@ -1,0 +1,31 @@
+## @file
+#  RAS2 Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiRas2Lib
+  FILE_GUID      = 2b6ea472-3589-422d-bbd7-0d1c284dbf43
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER HOST_APPLICATION
+  CONSTRUCTOR    = AcpiRas2LibConstructor
+  DESTRUCTOR     = AcpiRas2LibDestructor
+
+[Sources]
+  Ras2Generator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CmObjHelperLib
+  DebugLib
+  MemoryAllocationLib
+  TableHelperLib

@@ -1914,6 +1914,15 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMchiNetworkDeviceDescPciInfoParser[] = {
   { "IpmiToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL    },
 };
 
+/** A parser for EArchCommonObjRas2PccInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonRas2PccInfoParser[] = {
+  { "PccSubspaceType",  sizeof (UINT8),           "0x%x", NULL },
+  { "PccSubspaceToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "FeatureType",      sizeof (UINT8),           "0x%x", NULL },
+  { "InstanceToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -2021,6 +2030,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjVirtioMmioDeviceInfo,             CmArchCommonVirtioMmioDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjFirmwareInventoryInfo,            CmArchCommonFirmwareInventoryInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjFirmwareInventoryComponent,       CmArchCommonFirmwareInventoryComponentParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjRas2PccInfo,                      CmArchCommonRas2PccInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
