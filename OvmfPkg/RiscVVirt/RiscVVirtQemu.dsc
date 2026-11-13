@@ -72,8 +72,13 @@
 !include MdePkg/MdeLibs.dsc.inc
 !include NetworkPkg/Network.dsc.inc
 
+[Defines]
 !if $(CAPSULE_ENABLE) == TRUE
   POSTBUILD                      = python OvmfPkg/RiscVVirt/Feature/Capsule/GenerateCapsule/GenCapsule.py
+!endif
+
+[Components]
+!if $(CAPSULE_ENABLE) == TRUE
 !include OvmfPkg/RiscVVirt/RiscVVirtSystemFW.dsc.inc
 !endif
 
