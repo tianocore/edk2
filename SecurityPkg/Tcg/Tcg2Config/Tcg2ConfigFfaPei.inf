@@ -37,6 +37,7 @@
   DebugLib
   PcdLib
   HobLib
+  MemoryAllocationLib
 
 [Guids]
   gTpm2ServiceFfaGuid                 ## SOMETIMES_CONSUMES
