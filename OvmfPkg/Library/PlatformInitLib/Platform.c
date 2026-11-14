@@ -193,7 +193,7 @@ PlatformMemMapInitialization (
   PlatformInfoHob->PcdPciMmio32Size = PciSize;
 
   PlatformAddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
-  PlatformAddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
+  PlatformAddIoMemoryBaseSizeHob (0xFED00000, SIZE_4KB);
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     PlatformAddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
     //
