@@ -297,7 +297,7 @@ SetSmbiosStructureTable (
   UINT8                                    *RequestBuffer;
   UINT8                                    *DataPointer;
   UINT32                                   Crc32;
-  UINT16                                   TableLength;
+  UINT32                                   TableLength;
   EFI_SMBIOS_TABLE_HEADER                  *Record;
   PLDM_SET_SMBIOS_STRUCTURE_TABLE_REQUEST  *PldmSetSmbiosStructureTable;
 
@@ -360,7 +360,19 @@ SetSmbiosStructureTable (
     DEBUG ((DEBUG_MANAGEABILITY_INFO, "  SMBIOS type %d to BMC\n", Record->Type));
   } while (Status == EFI_SUCCESS);
 
-  TableLength = (UINT16)GetSmbiosTableLength ((VOID *)(UINTN)SmbiosEntry->TableAddress, SmbiosEntry->TableMaximumSize);
+  //
+  // GetSmbiosTableLength () is bounded by TableMaximumSize, which is a UINT32
+  // in the SMBIOS 3.0 entry point, so the result always fits in a UINT32.
+  //
+  TableLength = (UINT32)GetSmbiosTableLength ((VOID *)(UINTN)SmbiosEntry->TableAddress, SmbiosEntry->TableMaximumSize);
+
+  //
+  // Make sure request header + table + padding (max 3) + CRC32 fits in a UINT32.
+  //
+  if (TableLength > MAX_UINT32 - (sizeof (PLDM_SET_SMBIOS_STRUCTURE_TABLE_REQUEST) + 3 + sizeof (Crc32))) {
+    DEBUG ((DEBUG_ERROR, "%a: SMBIOS table too large (0x%x).\n", __func__, TableLength));
+    return EFI_BAD_BUFFER_SIZE;
+  }
 
   // Padding requirement (0 ~ 3 bytes)
   PaddingSize = (4 - (TableLength % 4)) % 4;
