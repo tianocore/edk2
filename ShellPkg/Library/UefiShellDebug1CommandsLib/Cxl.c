@@ -16,7 +16,7 @@
 #pragma pack(1)
 typedef struct {
   EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE_HEADER    DoeHeader;
-  CXL_CDAT_STRUCTURE                                     Cdat;
+  CXL_CDAT_HEADER                                        Cdat;
 } CXL_LIB_DOE_CDAT_HEADER_RESP;
 #pragma pack()
 
