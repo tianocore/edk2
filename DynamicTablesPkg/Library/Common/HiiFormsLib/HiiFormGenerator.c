@@ -21,6 +21,73 @@
 
 #include "InternalHiiFormsLib.h"
 
+/** Check if the varstore ID has already been added.
+
+  Check if the variable store ID has already been added as
+  part of an earlier added variable store.
+
+  @param [in]  VarstoreList     List of added variable stores.
+  @param [in]  VarstoreId       Variable store ID to look for
+                                in the list.
+
+  @retval EFI_SUCCESS             If a duplicate variable store ID
+                                  is not found.
+  @retval EFI_ALREADY_STARTED     A duplicate variable store ID found.
+  @retval EFI_INVALID_PARAMETER   Node type is not DynHiiNodeVarstore.
+
+**/
+static
+EFI_STATUS
+DynHiiVarstoreIdCheck (
+  IN  CONST LIST_ENTRY       *VarstoreList,
+  IN        EFI_VARSTORE_ID  VarstoreId
+  )
+{
+  LIST_ENTRY        *Link;
+  EFI_VARSTORE_ID   Id;
+  DYN_HII_NODE_HDR  *Hdr;
+  DYN_HII_VARSTORE  *Varstore;
+
+  ASSERT (VarstoreList != NULL);
+  ASSERT (VarstoreId != 0);
+
+  Link = GetFirstNode (VarstoreList);
+  while (!IsNull (VarstoreList, Link)) {
+    Hdr = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
+    if (Hdr->Type != DynHiiNodeVarstore) {
+      ASSERT (Hdr->Type == DynHiiNodeVarstore);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Varstore = (DYN_HII_VARSTORE *)Hdr;
+    switch (Varstore->VarstoreType) {
+      case DynHiiVarstoreBuffer:
+        Id = Varstore->Data.Buffer.VarstoreId;
+        break;
+
+      case DynHiiVarstoreEfi:
+        Id = Varstore->Data.Efi.VarstoreId;
+        break;
+
+      case DynHiiVarstoreNameValue:
+        Id = Varstore->Data.NameValue.VarstoreId;
+        break;
+
+      default:
+        ASSERT (0);
+        return EFI_INVALID_PARAMETER;
+    }
+
+    if (Id == VarstoreId) {
+      return EFI_ALREADY_STARTED;
+    }
+
+    Link = GetNextNode (VarstoreList, Link);
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Check if the default has already been added.
 
   Check if the default has already been added for the provided
@@ -1522,8 +1589,13 @@ DynHiiAddVarstoreBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Guid == NULL) || (Name == NULL) || (Size == 0)) {
+  if ((Guid == NULL) || (Name == NULL) || (Size == 0) || (VarstoreId == 0)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Varstore = AllocateZeroPool (sizeof (*Varstore));
@@ -1595,8 +1667,13 @@ DynHiiAddVarstoreEfi (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Guid == NULL) || (Name == NULL) || (Size == 0)) {
+  if ((Guid == NULL) || (Name == NULL) || (Size == 0) || (VarstoreId == 0)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Varstore = AllocateZeroPool (sizeof (*Varstore));
@@ -1652,6 +1729,7 @@ DynHiiAddVarstoreNameValue (
   IN            EFI_VARSTORE_ID  VarstoreId
   )
 {
+  EFI_STATUS        Status;
   DYN_HII_FORMSET   *Formset;
   DYN_HII_VARSTORE  *Varstore;
 
@@ -1662,6 +1740,15 @@ DynHiiAddVarstoreNameValue (
 
   if (Guid == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Guid == NULL) || (VarstoreId == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Varstore = AllocateZeroPool (sizeof (*Varstore));
