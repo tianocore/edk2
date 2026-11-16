@@ -119,7 +119,8 @@ SHELL_STATUS
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to
                                     register the shell command.
   @retval RETURN_UNSUPPORTED        The ShellMinSupportLevel was higher than the
-                                    currently allowed support level.
+                                    currently allowed support level, or one or
+                                    more required protocols could not be found.
   @retval RETURN_ALREADY_STARTED    The CommandString represents a command that
                                     is already registered.  Only one handler set for
                                     a given command is allowed.
@@ -228,6 +229,7 @@ typedef struct {
   @retval  RETURN_SUCCESS           The handlers were registered.
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to
                                     register the shell command.
+  @retval  RETURN_UNSUPPORTED       One or more required protocols could not be found.
 **/
 RETURN_STATUS
 EFIAPI
