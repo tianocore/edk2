@@ -362,6 +362,10 @@ DynHiiAddStatement (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (Form->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if (StatementData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -371,8 +375,9 @@ DynHiiAddStatement (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewStmt->Hdr.Type  = DynHiiNodeStatement;
-  NewStmt->Hdr.Scope = TRUE;
+  NewStmt->Hdr.Type          = DynHiiNodeStatement;
+  NewStmt->Hdr.Scope         = TRUE;
+  NewStmt->Hdr.FormsetHandle = Form->Hdr.FormsetHandle;
   InitializeListHead (&NewStmt->Hdr.Link);
 
   NewStmt->StatementType    = StatementType;
@@ -608,8 +613,9 @@ DynHiiCreateFormSet (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewFormset->Hdr.Type  = DynHiiNodeFormset;
-  NewFormset->Hdr.Scope = TRUE;
+  NewFormset->Hdr.Type          = DynHiiNodeFormset;
+  NewFormset->Hdr.Scope         = TRUE;
+  NewFormset->Hdr.FormsetHandle = NewFormset;
   InitializeListHead (&NewFormset->Hdr.Link);
 
   CopyGuid (&NewFormset->FormsetGuid, FormsetGuid);
@@ -670,13 +676,18 @@ DynHiiAddForm (
     return EFI_BAD_BUFFER_SIZE;
   }
 
+  if (Formset->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   NewForm = AllocateZeroPool (sizeof (*NewForm));
   if (NewForm == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewForm->Hdr.Type  = DynHiiNodeForm;
-  NewForm->Hdr.Scope = TRUE;
+  NewForm->Hdr.Type          = DynHiiNodeForm;
+  NewForm->Hdr.Scope         = TRUE;
+  NewForm->Hdr.FormsetHandle = Formset;
   InitializeListHead (&NewForm->Hdr.Link);
 
   NewForm->FormId = ++Formset->FormIdCounter;
@@ -1425,6 +1436,10 @@ DynHiiAddOption (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (Statement->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if ((Flags & ~DYN_HII_VALID_OPTION_FLAGS) != 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1448,8 +1463,9 @@ DynHiiAddOption (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewOption->Hdr.Type  = DynHiiNodeOption;
-  NewOption->Hdr.Scope = FALSE;
+  NewOption->Hdr.Type          = DynHiiNodeOption;
+  NewOption->Hdr.Scope         = FALSE;
+  NewOption->Hdr.FormsetHandle = Statement->Hdr.FormsetHandle;
   InitializeListHead (&NewOption->Hdr.Link);
 
   NewOption->Text  = Text;
@@ -1528,6 +1544,10 @@ DynHiiAddDefault (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (Statement->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if (IsDefaultPresent (&Statement->ChildList, DefaultId)) {
     return EFI_ALREADY_STARTED;
   }
@@ -1537,8 +1557,9 @@ DynHiiAddDefault (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewDefault->Hdr.Type  = DynHiiNodeDefault;
-  NewDefault->Hdr.Scope = FALSE;
+  NewDefault->Hdr.Type          = DynHiiNodeDefault;
+  NewDefault->Hdr.Scope         = FALSE;
+  NewDefault->Hdr.FormsetHandle = Statement->Hdr.FormsetHandle;
   InitializeListHead (&NewDefault->Hdr.Link);
 
   NewDefault->DefaultId = DefaultId;
@@ -1593,6 +1614,10 @@ DynHiiAddVarstoreBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (Formset->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1603,8 +1628,9 @@ DynHiiAddVarstoreBuffer (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Varstore->Hdr.Type  = DynHiiNodeVarstore;
-  Varstore->Hdr.Scope = FALSE;
+  Varstore->Hdr.Type          = DynHiiNodeVarstore;
+  Varstore->Hdr.Scope         = FALSE;
+  Varstore->Hdr.FormsetHandle = Formset->Hdr.FormsetHandle;
   InitializeListHead (&Varstore->Hdr.Link);
 
   Varstore->VarstoreType = DynHiiVarstoreBuffer;
@@ -1671,6 +1697,10 @@ DynHiiAddVarstoreEfi (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (Formset->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1681,9 +1711,10 @@ DynHiiAddVarstoreEfi (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Varstore->VarstoreType = DynHiiVarstoreEfi;
-  Varstore->Hdr.Type     = DynHiiNodeVarstore;
-  Varstore->Hdr.Scope    = FALSE;
+  Varstore->VarstoreType      = DynHiiVarstoreEfi;
+  Varstore->Hdr.Type          = DynHiiNodeVarstore;
+  Varstore->Hdr.Scope         = FALSE;
+  Varstore->Hdr.FormsetHandle = Formset->Hdr.FormsetHandle;
   InitializeListHead (&Varstore->Hdr.Link);
 
   Efi = &Varstore->Data.Efi;
@@ -1738,7 +1769,7 @@ DynHiiAddVarstoreNameValue (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Guid == NULL) {
+  if (Formset->Hdr.FormsetHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1756,8 +1787,9 @@ DynHiiAddVarstoreNameValue (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Varstore->Hdr.Type  = DynHiiNodeVarstore;
-  Varstore->Hdr.Scope = FALSE;
+  Varstore->Hdr.Type          = DynHiiNodeVarstore;
+  Varstore->Hdr.Scope         = FALSE;
+  Varstore->Hdr.FormsetHandle = Formset->Hdr.FormsetHandle;
   InitializeListHead (&Varstore->Hdr.Link);
 
   Varstore->VarstoreType = DynHiiVarstoreNameValue;
