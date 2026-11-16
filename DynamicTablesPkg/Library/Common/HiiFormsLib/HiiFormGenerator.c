@@ -88,6 +88,194 @@ DynHiiVarstoreIdCheck (
   return EFI_SUCCESS;
 }
 
+/** Free up the question ID buffer.
+
+  Free up the memory allocated for the sorted question ID
+  buffer.
+
+  @param [in]   QuestionIdArr   Pointer to a structure holding
+                                the sorted question ID array.
+
+**/
+static
+VOID
+DynHiiFreeQuestionIdBuf (
+  IN  DYN_HII_QUESTION_ID_BUF  *QuestionIdArr
+  )
+{
+  if (QuestionIdArr == NULL) {
+    return;
+  }
+
+  if (QuestionIdArr->Ids != NULL) {
+    FreePool (QuestionIdArr->Ids);
+  }
+}
+
+/** Initialize the question ID buffer.
+
+  Allocate memory store question ID's and initialize the corresponding
+  members of the question ID buffer structure.
+
+  @param [in, out]  QuestionIdArr   Pointer to a structure holding the
+                                    sorted question ID array.
+
+  @retval EFI_SUCCESS             Question ID buffer allocated.
+  @retval EFI_INVALID_PARAMETER   One of the input parameters is invalid.
+  @retval EFI_OUT_OF_RESOURCES    Unable to allocate resources.
+
+**/
+static
+EFI_STATUS
+DynHiiQuestionIdBufInit (
+  IN OUT DYN_HII_QUESTION_ID_BUF  *QuestionIdArr
+  )
+{
+  UINTN            Capacity;
+  EFI_QUESTION_ID  *NewIds;
+
+  if (QuestionIdArr == NULL) {
+    ASSERT (QuestionIdArr != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (QuestionIdArr->Count != 0) {
+    ASSERT (QuestionIdArr->Count == 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (QuestionIdArr->Capacity != 0) {
+    ASSERT (QuestionIdArr->Capacity == 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (QuestionIdArr->Ids != NULL) {
+    ASSERT (QuestionIdArr->Ids == NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Capacity = 8;
+  NewIds   = AllocateZeroPool (Capacity * sizeof (EFI_QUESTION_ID));
+  if (NewIds == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  QuestionIdArr->Ids      = NewIds;
+  QuestionIdArr->Capacity = Capacity;
+
+  return EFI_SUCCESS;
+}
+
+/** Check if the question ID has already been added.
+
+  Iterate through the sorted array of question ID's, and check
+  if the question ID has already been added. Add the question
+  ID to the sorted array if it has not been already added.
+
+  @param [in, out]  QuestionIdArr   Pointer to a structure holding the
+                                    sorted question ID array.
+  @param [in]       QuestionId      Question ID to look for in the sorted
+                                    array.
+
+  @retval EFI_SUCCESS             Question ID not present in the array.
+  @retval EFI_ALREADY_STARTED     Question ID is already present in the
+                                  array.
+  @retval EFI_INVALID_PARAMETER   One of the input parameters is invalid.
+
+**/
+static
+EFI_STATUS
+DynHiiQuestionIdCheck (
+  IN OUT DYN_HII_QUESTION_ID_BUF  *QuestionIdArr,
+  IN     EFI_QUESTION_ID          QuestionId
+  )
+{
+  UINTN            Low;
+  UINTN            High;
+  UINTN            Mid;
+  UINTN            Insert;
+  UINTN            NewCapacity;
+  EFI_QUESTION_ID  *NewIds;
+
+  if ((QuestionIdArr == NULL) || (QuestionId == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Low  = 0;
+  High = QuestionIdArr->Count;
+
+  while (Low < High) {
+    Mid = Low + ((High - Low) / 2);
+
+    if (QuestionIdArr->Ids[Mid] == QuestionId) {
+      return EFI_ALREADY_STARTED;
+    }
+
+    if (QuestionIdArr->Ids[Mid] < QuestionId) {
+      Low = Mid + 1;
+    } else {
+      High = Mid;
+    }
+  }
+
+  ASSERT (Low == High);
+  Insert = Low;
+  if (QuestionIdArr->Count == QuestionIdArr->Capacity) {
+    NewCapacity = QuestionIdArr->Capacity * 2;
+
+    NewIds = ReallocatePool (
+               QuestionIdArr->Capacity * sizeof (EFI_QUESTION_ID),
+               NewCapacity * sizeof (EFI_QUESTION_ID),
+               QuestionIdArr->Ids
+               );
+    if (NewIds == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    QuestionIdArr->Ids      = NewIds;
+    QuestionIdArr->Capacity = NewCapacity;
+  }
+
+  if (Insert < QuestionIdArr->Count) {
+    CopyMem (
+      &QuestionIdArr->Ids[Insert + 1],
+      &QuestionIdArr->Ids[Insert],
+      (QuestionIdArr->Count - Insert) * sizeof (EFI_QUESTION_ID)
+      );
+  }
+
+  QuestionIdArr->Ids[Insert] = QuestionId;
+  QuestionIdArr->Count++;
+
+  return EFI_SUCCESS;
+}
+
+/** Check if this is a question or a statement
+
+  Check if the statement passed is a question, as not all
+  statements are questions.
+
+  @param [in]  StatementType    Type of the statement
+
+  @retval TRUE if question, FALSE otherwise
+
+**/
+static
+BOOLEAN
+IsTypeQuestion (
+  IN  DYN_HII_STATEMENT_TYPE  StatementType
+  )
+{
+  switch (StatementType) {
+    case DynHiiStSubtitle:
+    case DynHiiStText:
+      return FALSE;
+
+    default:
+      return TRUE;
+  }
+}
+
 /** Check if the default has already been added.
 
   Check if the default has already been added for the provided
@@ -351,8 +539,11 @@ DynHiiAddStatement (
   OUT DYN_HII_HANDLE          *StatementHandle  OPTIONAL
   )
 {
-  DYN_HII_STATEMENT       *NewStmt;
-  DYN_HII_STATEMENT_DATA  *NewStatementData;
+  EFI_STATUS               Status;
+  DYN_HII_FORMSET          *Formset;
+  DYN_HII_STATEMENT        *NewStmt;
+  DYN_HII_STATEMENT_DATA   *NewStatementData;
+  DYN_HII_QUESTION_ID_BUF  *QuestionIds;
 
   if (StatementHandle != NULL) {
     *StatementHandle = NULL;
@@ -411,8 +602,21 @@ DynHiiAddStatement (
       break;
 
     default:
+      Status = EFI_UNSUPPORTED;
       goto err_out;
       break;
+  }
+
+  if (IsTypeQuestion (StatementType)) {
+    Formset     = Form->Hdr.FormsetHandle;
+    QuestionIds = &Formset->QuestionIdArr;
+    Status      = DynHiiQuestionIdCheck (
+                    QuestionIds,
+                    StatementData->QuestionHdr.QuestionId
+                    );
+    if (EFI_ERROR (Status)) {
+      goto err_out;
+    }
   }
 
   InsertTailList (&Form->ChildList, &NewStmt->Hdr.Link);
@@ -426,7 +630,7 @@ DynHiiAddStatement (
 err_out:
   FreePool (NewStmt);
 
-  return EFI_UNSUPPORTED;
+  return Status;
 }
 
 /** Add the Varstore Name.
@@ -594,6 +798,7 @@ DynHiiCreateFormSet (
   )
 {
   UINT8            Idx;
+  EFI_STATUS       Status;
   DYN_HII_FORMSET  *NewFormset;
 
   if ((FormsetHandle == NULL) || (FormsetGuid == NULL)) {
@@ -626,6 +831,12 @@ DynHiiCreateFormSet (
 
   for (Idx = 0; Idx < ClassGuidCount; Idx++) {
     CopyGuid (&NewFormset->ClassGuid[Idx], &ClassGuid[Idx]);
+  }
+
+  Status = DynHiiQuestionIdBufInit (&NewFormset->QuestionIdArr);
+  if (EFI_ERROR (Status)) {
+    FreePool (NewFormset);
+    return Status;
   }
 
   InitializeListHead (&NewFormset->ChildList);
@@ -1827,6 +2038,7 @@ DynHiiFreeFormSet (
   DynHiiFreeVarstoreList (&Formset->VarstoreList);
   DynHiiFreeDefaultStoreList (&Formset->DefaultstoreList);
   DynHiiFreeFormsetChildren (&Formset->ChildList);
+  DynHiiFreeQuestionIdBuf (&Formset->QuestionIdArr);
 
   FreePool (Formset);
 }
