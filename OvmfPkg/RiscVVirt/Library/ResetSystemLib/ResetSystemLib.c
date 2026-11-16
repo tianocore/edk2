@@ -79,7 +79,7 @@ ResetPlatformSpecific (
   )
 {
   //
-  // Can map to OpenSBI vendor or platform specific reset type.
+  // Can map to an SBI firmware vendor or platform specific reset type.
   //
   return;
 }
