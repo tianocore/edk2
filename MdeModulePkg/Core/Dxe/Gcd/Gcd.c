@@ -965,6 +965,7 @@ CoreConvertSpace (
       //
       case GCD_ADD_MEMORY_OPERATION:
         Entry->GcdMemoryType = GcdMemoryType;
+        Entry->Attributes   |= Attributes;
         if (GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
           Entry->Capabilities = Capabilities | EFI_MEMORY_RUNTIME | EFI_MEMORY_PORT_IO;
         } else {
@@ -2165,6 +2166,41 @@ CoreConvertResourceDescriptorHobAttributesToCapabilities (
 }
 
 /**
+  Convert protection settings already applied by the resource HOB producer.
+
+  @param Attributes  Resource descriptor HOB attributes.
+
+  @return The current memory protection attributes.
+**/
+STATIC
+UINT64
+CoreConvertResourceDescriptorHobAttributesToAttributes (
+  IN UINT64  Attributes
+  )
+{
+  UINT64  MemoryAttributes;
+
+  MemoryAttributes = 0;
+  if ((Attributes & EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED) != 0) {
+    MemoryAttributes |= EFI_MEMORY_RP;
+  }
+
+  if ((Attributes & EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED) != 0) {
+    MemoryAttributes |= EFI_MEMORY_WP;
+  }
+
+  if ((Attributes & EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED) != 0) {
+    MemoryAttributes |= EFI_MEMORY_XP;
+  }
+
+  if ((Attributes & EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED) != 0) {
+    MemoryAttributes |= EFI_MEMORY_RO;
+  }
+
+  return MemoryAttributes;
+}
+
+/**
    Find the largest region in the specified region that is not covered by an existing memory allocation
 
    @param BaseAddress   On input start of the region to check.
@@ -2871,6 +2907,7 @@ CoreInitializeGcdServices (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            Index;
   UINT64                           Capabilities;
+  UINT64                           Attributes;
   EFI_HOB_CPU                      *CpuHob;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMapHobList;
 
@@ -2999,11 +3036,28 @@ CoreInitializeGcdServices (
                        Hob.ResourceDescriptor2->ResourceCapabilities
                        );
 
-      Status = CoreInternalAddMemorySpace (
+      //
+      // Preserve the producer's active protections before CPU protocol
+      // notification can apply the initial NX policy. Version 2 carries
+      // memory attributes separately from resource capabilities.
+      //
+      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2) {
+        Attributes = Hob.ResourceDescriptor2->ResourceMemoryAttributes &
+                     (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO);
+      } else {
+        Attributes = CoreConvertResourceDescriptorHobAttributesToAttributes (
+                       Hob.ResourceDescriptor->ResourceAttribute
+                       );
+      }
+
+      Status = CoreConvertSpace (
+                 GCD_ADD_MEMORY_OPERATION,
                  GcdMemoryType,
+                 (EFI_GCD_IO_TYPE)0,
                  Hob.ResourceDescriptor2->PhysicalStart,
                  Hob.ResourceDescriptor2->ResourceLength,
-                 Capabilities
+                 Capabilities,
+                 Attributes
                  );
     }
 

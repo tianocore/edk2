@@ -181,17 +181,20 @@ GetUefiImageProtectionPolicy (
 }
 
 /**
-  Set UEFI image memory attributes.
+  Update selected UEFI memory permission attributes.
 
   @param[in]  BaseAddress            Specified start address
   @param[in]  Length                 Specified length
   @param[in]  Attributes             Specified attributes
+  @param[in]  AttributeMask          Permission attributes to update
 **/
+STATIC
 VOID
-SetUefiImageMemoryAttributes (
+SetUefiMemoryAttributes (
   IN UINT64  BaseAddress,
   IN UINT64  Length,
-  IN UINT64  Attributes
+  IN UINT64  Attributes,
+  IN UINT64  AttributeMask
   )
 {
   EFI_STATUS                       Status;
@@ -232,8 +235,8 @@ SetUefiImageMemoryAttributes (
       CurrentLength = ImageEnd - CurrentAddress;
     }
 
-    // Preserve the existing caching and virtual attributes, but remove the hardware access bits
-    FinalAttributes = (Descriptor.Attributes & ~EFI_MEMORY_ACCESS_MASK) | (Attributes & EFI_MEMORY_ATTRIBUTE_MASK);
+    // Preserve caching, virtual attributes and permissions outside the mask.
+    FinalAttributes = (Descriptor.Attributes & ~AttributeMask) | (Attributes & AttributeMask);
 
     DEBUG ((DEBUG_VERBOSE, "SetUefiImageMemoryAttributes - 0x%016lx - 0x%016lx (0x%016lx)\n", CurrentAddress, CurrentLength, FinalAttributes));
 
@@ -304,6 +307,23 @@ SetUefiImageMemoryAttributes (
     // or the end of the image, whichever is smaller
     CurrentAddress += CurrentLength;
   }
+}
+
+/**
+  Set UEFI image memory attributes.
+
+  @param[in]  BaseAddress            Specified start address
+  @param[in]  Length                 Specified length
+  @param[in]  Attributes             Specified attributes
+**/
+VOID
+SetUefiImageMemoryAttributes (
+  IN UINT64  BaseAddress,
+  IN UINT64  Length,
+  IN UINT64  Attributes
+  )
+{
+  SetUefiMemoryAttributes (BaseAddress, Length, Attributes, EFI_MEMORY_ACCESS_MASK);
 }
 
 /**
@@ -780,10 +800,13 @@ InitializeDxeNxMemoryProtectionPolicy (
   while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
     Attributes = GetPermissionAttributeForMemoryType (MemoryMapEntry->Type);
     if (Attributes != 0) {
-      SetUefiImageMemoryAttributes (
+      // Initial NX policy must not remove platform read/write protections.
+      // The range may span GCD descriptors with different RP/RO attributes.
+      SetUefiMemoryAttributes (
         MemoryMapEntry->PhysicalStart,
         LShiftU64 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT),
-        Attributes
+        Attributes,
+        EFI_MEMORY_XP
         );
 
       //
