@@ -423,42 +423,64 @@ typedef struct {
   LIST_ENTRY          ChildList;
 } DYN_HII_FORM;
 
+/** A structure for holding information on
+    currently allocated question ID's in
+    the formset.
+*/
+typedef struct {
+  /// An array of sorted question ID's that
+  /// have been allocated in the formset
+  EFI_QUESTION_ID    *Ids;
+
+  /// Current count of number of question
+  /// ID's that have been allocated
+  UINTN              Count;
+
+  /// Maximum capacity of the question
+  /// ID array
+  UINTN              Capacity;
+} DYN_HII_QUESTION_ID_BUF;
+
 /** A structure for holding information associated
     with a Formset.
 */
 typedef struct {
   /// Formset node header
-  DYN_HII_NODE_HDR    Hdr;
+  DYN_HII_NODE_HDR           Hdr;
 
   /// Formset GUID
-  EFI_GUID            FormsetGuid;
+  EFI_GUID                   FormsetGuid;
 
   /// Formset title string ID
-  EFI_STRING_ID       Title;
+  EFI_STRING_ID              Title;
 
   /// Formset help string ID
-  EFI_STRING_ID       Help;
+  EFI_STRING_ID              Help;
 
   /// Number of class identifier GUID's
   /// in the formset
-  UINT8               ClassGuidCount;
+  UINT8                      ClassGuidCount;
 
   /// Class identifier GUID array
-  EFI_GUID            ClassGuid[MAX_FORMSET_CLASS_GUID];
+  EFI_GUID                   ClassGuid[MAX_FORMSET_CLASS_GUID];
 
-  EFI_FORM_ID         FormIdCounter;
+  EFI_FORM_ID                FormIdCounter;
+
+  /// Sorted array of question ID's that have
+  /// been allocated for the formset
+  DYN_HII_QUESTION_ID_BUF    QuestionIdArr;
 
   /// List of variable stores associated
   /// with this formset
-  LIST_ENTRY          VarstoreList;
+  LIST_ENTRY                 VarstoreList;
 
   /// List of default stores associated
   /// with this formset
-  LIST_ENTRY          DefaultstoreList;
+  LIST_ENTRY                 DefaultstoreList;
 
   /// List of child nodes associated
   /// with this formset
-  LIST_ENTRY          ChildList;
+  LIST_ENTRY                 ChildList;
 } DYN_HII_FORMSET;
 
 /** A structure for holding information associated
