@@ -172,6 +172,9 @@ SetupIpmiRequestTransportPacket (
 /**
   Common code to submit IPMI commands
 
+  If both response arguments are NULL, the response is received into an internal
+  buffer and discarded. Transport and completion-code checks still apply.
+
   @param[in]         TransportToken    TRansport token.
   @param[in]         NetFunction       Net function of the command.
   @param[in]         Command           IPMI Command.
@@ -187,6 +190,8 @@ SetupIpmiRequestTransportPacket (
   @retval EFI_TIMEOUT            The command time out.
   @retval EFI_UNSUPPORTED        The command was not successfully sent to the device.
   @retval EFI_OUT_OF_RESOURCES   The resource allocation is out of resource or data size error.
+  @retval EFI_INVALID_PARAMETER  Only one of the response arguments is NULL.
+  @retval EFI_BUFFER_TOO_SMALL   A discarded response filled the internal buffer.
 **/
 EFI_STATUS
 CommonIpmiSubmitCommand (
@@ -208,10 +213,29 @@ CommonIpmiSubmitCommand (
   MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  TransportAdditionalStatus;
   UINT16                                     HeaderSize;
   UINT16                                     TrailerSize;
+  UINT8                                      DiscardedResponse[MAX_UINT8 + 1];
+  UINT32                                     DiscardedResponseSize;
+  BOOLEAN                                    DiscardResponse;
 
   if (TransportToken == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: No transport toke for IPMI\n", __func__));
     return EFI_UNSUPPORTED;
+  }
+
+  if ((ResponseData == NULL) != (ResponseDataSize == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a: ResponseData and ResponseDataSize must both be NULL or non-NULL.\n", __func__));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DiscardResponse = (ResponseData == NULL);
+  if (DiscardResponse) {
+    //
+    // Exceed the legacy 255-byte IPMI message limit so KCS can also read its
+    // terminal dummy byte when receiving the largest supported response.
+    //
+    DiscardedResponseSize = sizeof (DiscardedResponse);
+    ResponseData          = DiscardedResponse;
+    ResponseDataSize      = &DiscardedResponseSize;
   }
 
   Status = TransportToken->Transport->Function.Version1_0->TransportStatus (
@@ -294,6 +318,11 @@ CommonIpmiSubmitCommand (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to send IPMI command.\n", __func__));
     return Status;
+  }
+
+  if (DiscardResponse && (TransferToken.ReceivePackage.ReceiveSizeInByte >= sizeof (DiscardedResponse))) {
+    DEBUG ((DEBUG_ERROR, "%a: Discarded IPMI response filled the internal buffer.\n", __func__));
+    return EFI_BUFFER_TOO_SMALL;
   }
 
   if (ResponseDataSize != NULL) {

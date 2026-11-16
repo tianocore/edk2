@@ -231,6 +231,15 @@ the BMC device ID and firmware version. A transport failure, truncated mandatory
 response, or nonzero completion code prevents PPI publication. The optional
 auxiliary firmware revision field is not required.
 
+### Discarding IPMI responses
+
+The IPMI providers accept both response arguments as `NULL` when the caller
+does not need the result. They still receive the reply into an internal
+256-byte buffer, so the KCS transaction can finish before the next command.
+Transport and completion-code errors are still returned. Passing only one
+response argument as `NULL` returns `EFI_INVALID_PARAMETER`; a discarded
+response that fills the internal buffer returns `EFI_BUFFER_TOO_SMALL`.
+
 The host test DSC is `ManageabilityPkg/Test/ManageabilityPkgHostTest.dsc`.
 Run its package CI build and tests with:
 

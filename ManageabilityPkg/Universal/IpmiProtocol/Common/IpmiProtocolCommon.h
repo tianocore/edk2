@@ -98,6 +98,9 @@ SetupIpmiRequestTransportPacket (
 /**
   Common code to submit IPMI commands
 
+  If both response arguments are NULL, the response is received into an internal
+  buffer and discarded. Transport and completion-code checks still apply.
+
   @param[in]         TransportToken    TRansport token.
   @param[in]         NetFunction       Net function of the command.
   @param[in]         Command           IPMI Command.
@@ -113,6 +116,8 @@ SetupIpmiRequestTransportPacket (
   @retval EFI_TIMEOUT            The command time out.
   @retval EFI_UNSUPPORTED        The command was not successfully sent to the device.
   @retval EFI_OUT_OF_RESOURCES   The resource allocation is out of resource or data size error.
+  @retval EFI_INVALID_PARAMETER  Only one of the response arguments is NULL.
+  @retval EFI_BUFFER_TOO_SMALL   A discarded response filled the internal buffer.
 **/
 EFI_STATUS
 CommonIpmiSubmitCommand (
