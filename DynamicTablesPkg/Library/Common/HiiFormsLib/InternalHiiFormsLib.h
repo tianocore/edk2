@@ -106,15 +106,19 @@ typedef enum {
 */
 typedef struct {
   /// A link to another node
-  LIST_ENTRY    Link;
+  LIST_ENTRY        Link;
 
   /// Type of the node. Refer DYN_HII_NODE_TYPE
-  UINT16        Type;
+  UINT16            Type;
 
   /// Whether the node opens a scope. This
   /// indicates that the node has another
   /// node as it's child
-  BOOLEAN       Scope;
+  BOOLEAN           Scope;
+
+  /// Pointer to the formset, which is the
+  /// root node of the tree
+  DYN_HII_HANDLE    FormsetHandle;
 } DYN_HII_NODE_HDR;
 
 /** A structure for Buffer type
