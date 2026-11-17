@@ -2,6 +2,7 @@
   Brotli Decompress interfaces
 
   Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -32,7 +33,6 @@ BrAlloc (
     Private->BuffSize -= Size;
     return Addr;
   } else {
-    ASSERT (FALSE);
     return NULL;
   }
 }
@@ -68,6 +68,7 @@ BrFree (
   @param  Source      The source buffer containing the compressed data.
   @param  SourceSize  The size of source buffer.
   @param  Destination The destination buffer to store the decompressed data.
+  @param  DestinationSize The expected size of the decompressed data.
   @param  BuffInfo    The pointer to the BROTLI_BUFF instance.
 
   @retval EFI_SUCCESS Decompression completed successfully, and
@@ -82,6 +83,7 @@ BrotliDecompressInternal (
   IN CONST VOID  *Source,
   IN UINTN       SourceSize,
   IN OUT VOID    *Destination,
+  IN UINTN       DestinationSize,
   IN VOID        *BuffInfo
   )
 {
@@ -93,12 +95,15 @@ BrotliDecompressInternal (
   size_t               AvailableIn;
   size_t               AvailableOut;
   VOID                 *Temp;
+  UINTN                CopySize;
+  EFI_STATUS           Status;
   BrotliDecoderResult  Result;
   BrotliDecoderState   *BroState;
 
   TotalOut     = 0;
   AvailableOut = FILE_BUFFER_SIZE;
   Result       = BROTLI_DECODER_RESULT_ERROR;
+  Status       = EFI_INVALID_PARAMETER;
   BroState     = BrotliDecoderCreateInstance (BrAlloc, BrFree, BuffInfo);
   Temp         = Destination;
 
@@ -134,10 +139,15 @@ BrotliDecompressInternal (
       SourceSize -= AvailableIn;
       NextIn      = Input;
     } else if (Result == BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT) {
+      if (DestinationSize < FILE_BUFFER_SIZE) {
+        goto Done;
+      }
+
       CopyMem (Temp, Output, FILE_BUFFER_SIZE);
-      AvailableOut = FILE_BUFFER_SIZE;
-      Temp         = (VOID *)((UINT8 *)Temp +FILE_BUFFER_SIZE);
-      NextOut      = Output;
+      AvailableOut     = FILE_BUFFER_SIZE;
+      Temp             = (VOID *)((UINT8 *)Temp +FILE_BUFFER_SIZE);
+      DestinationSize -= FILE_BUFFER_SIZE;
+      NextOut          = Output;
     } else {
       break; /* Error or success. */
     }
@@ -153,13 +163,24 @@ BrotliDecompressInternal (
   }
 
   if (NextOut != Output) {
-    CopyMem (Temp, Output, (size_t)(NextOut - Output));
+    CopySize = (UINTN)(NextOut - Output);
+    if (CopySize > DestinationSize) {
+      goto Done;
+    }
+
+    CopyMem (Temp, Output, CopySize);
+    DestinationSize -= CopySize;
   }
 
+  if ((Result == BROTLI_DECODER_RESULT_SUCCESS) && (DestinationSize == 0)) {
+    Status = EFI_SUCCESS;
+  }
+
+Done:
   BrFree (BuffInfo, Input);
   BrFree (BuffInfo, Output);
   BrotliDecoderDestroyInstance (BroState);
-  return (Result == BROTLI_DECODER_RESULT_SUCCESS) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+  return Status;
 }
 
 /**
@@ -204,7 +225,8 @@ BrGetDecodedSizeOfBuf (
   field from the BROTLI_SCRATCH_MAX beginning bytes of the source data and output it as DestinationSize.
   And ScratchSize is specific to the decompression implementation.
 
-  If SourceSize is less than BROTLI_SCRATCH_MAX, then ASSERT().
+  Reject buffers shorter than BROTLI_SCRATCH_MAX and sizes that do not fit
+  in the UINT32 output parameters.
 
   @param  Source          The source buffer containing the compressed data.
   @param  SourceSize      The size, in bytes, of the source buffer.
@@ -218,6 +240,10 @@ BrGetDecodedSizeOfBuf (
   @retval EFI_SUCCESS     The size of the uncompressed data was returned
                           in DestinationSize and the size of the scratch
                           buffer was returned in ScratchSize.
+  @retval EFI_INVALID_PARAMETER  A required pointer is NULL or the source
+                                buffer is too short.
+  @retval EFI_UNSUPPORTED  A decoded or scratch size does not fit in UINT32.
+                          Output parameters have not been modified.
 **/
 EFI_STATUS
 EFIAPI
@@ -228,17 +254,23 @@ BrotliUefiDecompressGetInfo (
   OUT UINT32      *ScratchSize
   )
 {
-  UINT64  GetSize;
-  UINT8   MaxOffset;
+  UINT64  DecodedSize;
+  UINT64  RequiredScratchSize;
 
-  ASSERT (SourceSize >= BROTLI_SCRATCH_MAX);
+  if ((Source == NULL) || (DestinationSize == NULL) || (ScratchSize == NULL) ||
+      (SourceSize < BROTLI_SCRATCH_MAX))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  MaxOffset        = BROTLI_DECODE_MAX;
-  GetSize          = BrGetDecodedSizeOfBuf ((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
-  *DestinationSize = (UINT32)GetSize;
-  MaxOffset        = BROTLI_SCRATCH_MAX;
-  GetSize          = BrGetDecodedSizeOfBuf ((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
-  *ScratchSize     = (UINT32)GetSize;
+  DecodedSize         = BrGetDecodedSizeOfBuf ((UINT8 *)Source, 0, BROTLI_DECODE_MAX);
+  RequiredScratchSize = BrGetDecodedSizeOfBuf ((UINT8 *)Source, BROTLI_DECODE_MAX, BROTLI_SCRATCH_MAX);
+  if ((DecodedSize > MAX_UINT32) || (RequiredScratchSize > MAX_UINT32)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  *DestinationSize = (UINT32)DecodedSize;
+  *ScratchSize     = (UINT32)RequiredScratchSize;
   return EFI_SUCCESS;
 }
 
@@ -251,6 +283,10 @@ BrotliUefiDecompressGetInfo (
   specified by Source is not in a valid compressed data format,
   then RETURN_INVALID_PARAMETER is returned.
 
+  Destination and Scratch must be allocated using the sizes returned by
+  BrotliUefiDecompressGetInfo() for the same source buffer. The decoded data
+  must exactly match the destination size advertised in the source header.
+
   @param  Source      The source buffer containing the compressed data.
   @param  SourceSize  The size of source buffer.
   @param  Destination The destination buffer to store the decompressed data
@@ -262,7 +298,10 @@ BrotliUefiDecompressGetInfo (
                       the uncompressed buffer is returned in Destination.
   @retval EFI_INVALID_PARAMETER
                       The source buffer specified by Source is corrupted
-                      (not in a valid compressed format).
+                      (not in a valid compressed format), a required buffer
+                      is NULL, or the decoded size does not match the header.
+  @retval EFI_UNSUPPORTED
+                      A source, decoded, or scratch size does not fit in UINT32.
 **/
 EFI_STATUS
 EFIAPI
@@ -275,19 +314,32 @@ BrotliUefiDecompress (
 {
   EFI_STATUS   Status;
   BROTLI_BUFF  BroBuff;
-  UINT64       GetSize;
-  UINT8        MaxOffset;
+  UINT32       DestinationSize;
+  UINT32       ScratchSize;
 
-  MaxOffset = BROTLI_SCRATCH_MAX;
-  GetSize   = BrGetDecodedSizeOfBuf ((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  if (SourceSize > MAX_UINT32) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = BrotliUefiDecompressGetInfo (Source, (UINT32)SourceSize, &DestinationSize, &ScratchSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (((Destination == NULL) && (DestinationSize != 0)) ||
+      ((Scratch == NULL) && (ScratchSize != 0)))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
 
   BroBuff.Buff     = Scratch;
-  BroBuff.BuffSize = (UINTN)GetSize;
+  BroBuff.BuffSize = ScratchSize;
 
   Status = BrotliDecompressInternal (
              (VOID *)((UINT8 *)Source + BROTLI_SCRATCH_MAX),
              SourceSize - BROTLI_SCRATCH_MAX,
              Destination,
+             DestinationSize,
              (VOID *)(&BroBuff)
              );
 
