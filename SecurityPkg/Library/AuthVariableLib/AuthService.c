@@ -526,7 +526,6 @@ CheckSignatureListFormat (
   UINT32              Index;
   UINT32              SigCount;
   BOOLEAN             IsPk;
-  VOID                *RsaContext;
   EFI_SIGNATURE_DATA  *CertData;
   UINTN               CertLen;
 
@@ -551,7 +550,6 @@ CheckSignatureListFormat (
   SigCount    = 0;
   SigList     = (EFI_SIGNATURE_LIST *)Data;
   SigDataSize = DataSize;
-  RsaContext  = NULL;
 
   //
   // Walk through the input signature list and check the data format.
@@ -589,17 +587,14 @@ CheckSignatureListFormat (
 
     if (CompareGuid (&SigList->SignatureType, &gEfiCertX509Guid)) {
       //
-      // Try to retrieve the RSA public key from the X.509 certificate.
-      // If this operation fails, it's not a valid certificate.
+      // Verify that the X.509 certificate contains a supported public key.
       //
-      CertData   = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
-      CertLen    = SigList->SignatureSize - sizeof (EFI_GUID);
-      RsaContext = NULL;
-      if ((CertLen > 0) && !RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
+      CertData = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
+      CertLen  = SigList->SignatureSize - sizeof (EFI_GUID);
+      if (!X509IsPublicKeySupported (CertData->SignatureData, CertLen)) {
+        DEBUG ((DEBUG_ERROR, "CheckSignatureListFormat - X509 public key unsupported\n"));
         return EFI_INVALID_PARAMETER;
       }
-
-      RsaFree (RsaContext);
     }
 
     if ((SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) % SigList->SignatureSize != 0) {
