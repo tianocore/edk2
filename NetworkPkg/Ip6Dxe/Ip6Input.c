@@ -316,7 +316,7 @@ Ip6Reassemble (
     // to valid memory area.
     //
     if ((Assemble->Head != NULL) || (Assemble->Packet != NULL)) {
-      goto Error;
+      goto DropAssemble;
     }
 
     //
@@ -324,14 +324,19 @@ Ip6Reassemble (
     //
     Duplicate = NetbufDuplicate (Packet, NULL, sizeof (EFI_IP6_HEADER));
     if (Duplicate == NULL) {
-      goto Error;
+      goto DropAssemble;
     }
 
     //
     // Revert IP head to network order.
     //
     DupHead = NetbufGetByte (Duplicate, 0, NULL);
-    ASSERT (DupHead != NULL);
+    if (DupHead == NULL) {
+      ASSERT (DupHead != NULL);
+      NetbufFree (Duplicate);
+      goto DropAssemble;
+    }
+
     Duplicate->Ip.Ip6 = Ip6NtohHead ((EFI_IP6_HEADER *)DupHead);
     Assemble->Packet  = Duplicate;
 
@@ -352,7 +357,7 @@ Ip6Reassemble (
                      0
                      );
       if (NextHeader == NULL) {
-        goto Error;
+        goto DropAssemble;
       }
 
       *NextHeader = This->NextHeader;
@@ -387,7 +392,7 @@ Ip6Reassemble (
     Fragment = NET_LIST_USER_STRUCT (ListHead->BackLink, NET_BUF, List);
     if (IP6_GET_CLIP_INFO (Fragment)->End != (INTN)Assemble->TotalLen) {
       Ip6FreeAssembleEntry (Assemble);
-      goto Error;
+      return NULL;
     }
 
     Fragment = NET_LIST_HEAD (ListHead, NET_BUF, List);
@@ -399,7 +404,11 @@ Ip6Reassemble (
     // the Fragment Header is excluded.
     //
     TmpPacket = NetbufGetFragment (Fragment, 0, This->HeadLen, 0);
-    ASSERT (TmpPacket != NULL);
+    if (TmpPacket == NULL) {
+      ASSERT (TmpPacket != NULL);
+      Ip6FreeAssembleEntry (Assemble);
+      return NULL;
+    }
 
     NET_LIST_FOR_EACH (Cur, ListHead) {
       //
@@ -424,7 +433,7 @@ Ip6Reassemble (
 
     if (NewPacket == NULL) {
       Ip6FreeAssembleEntry (Assemble);
-      goto Error;
+      return NULL;
     }
 
     NewPacket->Ip.Ip6 = Assemble->Head;
@@ -434,6 +443,14 @@ Ip6Reassemble (
     return NewPacket;
   }
 
+  return NULL;
+
+DropAssemble:
+  //
+  // Fragment insertion may have changed other fragments and assembly counters.
+  //
+  RemoveEntryList (&Assemble->Link);
+  Ip6FreeAssembleEntry (Assemble);
   return NULL;
 
 Error:
@@ -1302,19 +1319,19 @@ Ip6InstanceFrameAcceptable (
   //
   ExtHdrs = NetbufGetByte (Packet, 0, NULL);
 
-  if (!Ip6IsExtsValid (
-         IpInstance->Service,
-         Packet,
-         &Head->NextHeader,
-         ExtHdrs,
-         (UINT32)Head->PayloadLength,
-         TRUE,
-         NULL,
-         &Proto,
-         NULL,
-         NULL,
-         NULL
-         ))
+  if ((ExtHdrs == NULL) || !Ip6IsExtsValid (
+                              IpInstance->Service,
+                              Packet,
+                              &Head->NextHeader,
+                              ExtHdrs,
+                              (UINT32)Head->PayloadLength,
+                              TRUE,
+                              NULL,
+                              &Proto,
+                              NULL,
+                              NULL,
+                              NULL
+                              ))
   {
     return FALSE;
   }
@@ -1336,20 +1353,19 @@ Ip6InstanceFrameAcceptable (
       //
       ErrMsgPayloadLen = NTOHS (Icmp.IpHead.PayloadLength);
       ErrMsgPayload    = NetbufGetByte (Packet, sizeof (Icmp), NULL);
-
-      if (!Ip6IsExtsValid (
-             NULL,
-             NULL,
-             &Icmp.IpHead.NextHeader,
-             ErrMsgPayload,
-             ErrMsgPayloadLen,
-             TRUE,
-             NULL,
-             &Proto,
-             NULL,
-             NULL,
-             NULL
-             ))
+      if ((ErrMsgPayload == NULL) || !Ip6IsExtsValid (
+                                        NULL,
+                                        NULL,
+                                        &Icmp.IpHead.NextHeader,
+                                        ErrMsgPayload,
+                                        ErrMsgPayloadLen,
+                                        TRUE,
+                                        NULL,
+                                        &Proto,
+                                        NULL,
+                                        NULL,
+                                        NULL
+                                        ))
       {
         return FALSE;
       }
@@ -1506,7 +1522,12 @@ Ip6InstanceDeliverPacket (
       // may be not continuous before the data.
       //
       Head = NetbufAllocSpace (Dup, sizeof (EFI_IP6_HEADER), NET_BUF_HEAD);
-      ASSERT (Head != NULL);
+      if (Head == NULL) {
+        ASSERT (Head != NULL);
+        NetbufFree (Dup);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       Dup->Ip.Ip6 = (EFI_IP6_HEADER *)Head;
 
       CopyMem (Head, Packet->Ip.Ip6, sizeof (EFI_IP6_HEADER));
