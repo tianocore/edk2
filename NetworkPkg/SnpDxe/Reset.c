@@ -103,7 +103,8 @@ SnpUndi32Reset (
   //
   if (!ExtendedVerification) {
     DEBUG ((DEBUG_WARN, "ExtendedVerification = %d is not implemented!\n", ExtendedVerification));
-    return EFI_INVALID_PARAMETER;
+
+    return EFI_UNSUPPORTED;
   }
 
   if (This == NULL) {
