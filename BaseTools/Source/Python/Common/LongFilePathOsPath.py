@@ -35,6 +35,7 @@ splitdrive = os.path.splitdrive
 split = os.path.split
 abspath = os.path.abspath
 basename = os.path.basename
+commonpath = os.path.commonpath
 commonprefix = os.path.commonprefix
 sep = os.path.sep
 normpath = os.path.normpath
