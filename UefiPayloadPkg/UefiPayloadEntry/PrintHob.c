@@ -72,6 +72,7 @@ PrintSerialGuidHob (
   DEBUG ((DEBUG_INFO, "   RegisterStride = 0x%x\n", SerialPortInfo->RegisterStride));
   DEBUG ((DEBUG_INFO, "   BaudRate       = %d\n", SerialPortInfo->BaudRate));
   DEBUG ((DEBUG_INFO, "   RegisterBase   = 0x%lx\n", SerialPortInfo->RegisterBase));
+  DEBUG ((DEBUG_INFO, "   InputHertz     = 0x%lx\n", SerialPortInfo->InputHertz));
   return EFI_SUCCESS;
 }
 
