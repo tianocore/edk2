@@ -493,7 +493,8 @@ VerifyMandatoryTablesArePresent (
 
   The function gathers the information necessary for installing the
   ACPI tables from the Configuration Manager, invokes the generators
-  and installs them (via BuildAndInstallAcpiTable).
+  and installs them (via BuildAndInstallAcpiTable).  A table whose generator
+  reports EFI_NOT_FOUND is skipped.
 
   @param [in]  TableFactoryProtocol Pointer to the Table Factory Protocol
                                     interface.
@@ -501,7 +502,7 @@ VerifyMandatoryTablesArePresent (
                                     Protocol Interface.
 
   @retval EFI_SUCCESS           Success.
-  @retval EFI_NOT_FOUND         If a mandatory table or a generator is not found.
+  @retval EFI_NOT_FOUND         If a mandatory table is not found.
   @retval EFI_ALREADY_STARTED   If mandatory table found in AcpiTableInfo is already installed.
 **/
 STATIC
@@ -649,6 +650,16 @@ ProcessAcpiTables (
                &AcpiTableInfo[Idx]
                );
     if (EFI_ERROR (Status)) {
+      if (Status == EFI_NOT_FOUND) {
+        DEBUG ((
+          DEBUG_WARN,
+          "WARNING: ACPI Table not found, skipping." \
+          " TableGeneratorId = 0x%x\n",
+          AcpiTableInfo[Idx].TableGeneratorId
+          ));
+        continue;
+      }
+
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: Failed to find, build, and install ACPI Table." \
