@@ -228,6 +228,36 @@ edk2-platforms repository.
 
 **Companion PR**: None required; no edk2-platforms consumer was identified.
 
+##### Breaking Change: Fix EFI_IMAGE_IMPORT_DESCRIPTOR size on 64-bit
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#13161](https://github.com/tianocore/edk2/issues/13161)
+- **Pull Request**: [tianocore/edk2#13459](https://github.com/tianocore/edk2/pull/13459)
+- **Type**: Source-Level (Non-removal) - Structure layout change
+
+**What changed**: The `FirstThunk` field of `EFI_IMAGE_IMPORT_DESCRIPTOR` was
+changed from `EFI_IMAGE_THUNK_DATA *` to `UINT32` in
+`MdePkg/Include/IndustryStandard/PeImage.h` and from `EFI_IMAGE_THUNK_DATA` to
+`c_uint32` in `BaseTools/Source/Python/FirmwareStorageFormat/PECOFFHeader.py`.
+
+**Why it changed**: Under the Microsoft PE/COFF specification (Section 6.4), the
+Import Directory Table entry (IMAGE_IMPORT_DESCRIPTOR) is defined as five
+consecutive 32-bit fields (20 bytes total). Declaring `FirstThunk` as a pointer
+caused the structure to expand to 24 bytes on 64-bit architectures, breaking array
+traversal strides when parsing PE imports.
+
+**What replaces it**: `FirstThunk` is now a 32-bit integer (Relative Virtual Address)
+matching the PE/COFF specification.
+
+**How to migrate**: Code accessing `FirstThunk` directly should treat it as a 32-bit
+RVA rather than an in-memory pointer.
+
+**Breaking conditions**: Affects code that directly dereferences `FirstThunk` as a
+pointer or expects `sizeof(EFI_IMAGE_IMPORT_DESCRIPTOR) == 24` on 64-bit targets.
+No consumers of import descriptors currently exist in core UEFI/PI PE/COFF loaders.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
+
 ### edk2-stable202611: Behavioral Breaking Changes
 
 ##### Breaking Change: IntelTdxX64 enables Secure Boot and omits the UEFI Shell by default
