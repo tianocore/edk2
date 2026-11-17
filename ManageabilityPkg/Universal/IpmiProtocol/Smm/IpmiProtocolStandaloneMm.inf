@@ -50,6 +50,8 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoDataAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoCommandAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress

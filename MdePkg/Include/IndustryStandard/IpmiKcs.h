@@ -2,6 +2,7 @@
   IPMI KCS Register Definitions
 
   Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -12,6 +13,10 @@
 
 #pragma once
 
+///
+/// Register offsets for the standard contiguous, byte-aligned KCS layout.
+/// These offsets do not apply when explicit register addresses are provided.
+///
 #define IPMI_KCS_STATUS_REGISTER_OFFSET    1
 #define IPMI_KCS_COMMAND_REGISTER_OFFSET   1
 #define IPMI_KCS_DATA_OUT_REGISTER_OFFSET  0
