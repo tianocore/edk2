@@ -345,16 +345,6 @@ SmiHandlerRegister (
     return EFI_INVALID_PARAMETER;
   }
 
-  SmiHandler = AllocateZeroPool (sizeof (SMI_HANDLER));
-  if (SmiHandler == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  SmiHandler->Signature  = SMI_HANDLER_SIGNATURE;
-  SmiHandler->Handler    = Handler;
-  SmiHandler->CallerAddr = (UINTN)RETURN_ADDRESS (0);
-  SmiHandler->ToRemove   = FALSE;
-
   if (HandlerType == NULL) {
     //
     // This is root SMI handler
@@ -372,7 +362,16 @@ SmiHandlerRegister (
 
   List = &SmiEntry->SmiHandlers;
 
-  SmiHandler->SmiEntry = SmiEntry;
+  SmiHandler = AllocateZeroPool (sizeof (SMI_HANDLER));
+  if (SmiHandler == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  SmiHandler->Signature  = SMI_HANDLER_SIGNATURE;
+  SmiHandler->Handler    = Handler;
+  SmiHandler->CallerAddr = (UINTN)RETURN_ADDRESS (0);
+  SmiHandler->ToRemove   = FALSE;
+  SmiHandler->SmiEntry   = SmiEntry;
   InsertTailList (List, &SmiHandler->Link);
 
   *DispatchHandle = (EFI_HANDLE)SmiHandler;
