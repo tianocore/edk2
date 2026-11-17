@@ -1,7 +1,7 @@
 /** @file
   Arm Ffa library common code.
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -843,6 +843,86 @@ ArmFfaLibMsgSendDirectReq (
   ImpDefArgs->Arg3 = FfaArgs.Arg6;
   ImpDefArgs->Arg4 = FfaArgs.Arg7;
 
+  return EFI_SUCCESS;
+}
+
+/**
+  Send a direct request using the 32-bit ABI, including on AArch64.
+
+  Resume interrupted requests until a direct response or error is returned.
+  Only the low 32 bits of the five payload registers are transmitted.
+
+  @param[in]      DestPartId  Destination partition ID.
+  @param[in]      Flags       Direct-message flags.
+  @param[in,out]  ImpDefArgs  Payload registers w3-w7, using Arg0-Arg4.
+
+  @retval EFI_SUCCESS            A 32-bit direct response was received.
+  @retval EFI_INVALID_PARAMETER  Invalid destination or NULL arguments.
+  @retval EFI_PROTOCOL_ERROR     Unexpected response function identifier.
+  @retval Others                 FF-A request or continuation failed.
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibMsgSendDirectReq32 (
+  IN UINT16               DestPartId,
+  IN UINT32               Flags,
+  IN OUT DIRECT_MSG_ARGS  *ImpDefArgs
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  Args;
+  UINT16        PartId;
+  UINT32        RunTarget;
+
+  if (ImpDefArgs == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ArmFfaLibGetPartId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DestPartId == PartId) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ZeroMem (&Args, sizeof (Args));
+  Args.Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_REQ_AARCH32;
+  Args.Arg1 = PACK_PARTITION_ID_INFO (PartId, DestPartId);
+  Args.Arg2 = Flags;
+  Args.Arg3 = (UINT32)ImpDefArgs->Arg0;
+  Args.Arg4 = (UINT32)ImpDefArgs->Arg1;
+  Args.Arg5 = (UINT32)ImpDefArgs->Arg2;
+  Args.Arg6 = (UINT32)ImpDefArgs->Arg3;
+  Args.Arg7 = (UINT32)ImpDefArgs->Arg4;
+  ArmCallFfa (&Args);
+
+  while ((Args.Arg0 == ARM_FID_FFA_INTERRUPT) || (Args.Arg0 == ARM_FID_FFA_YIELD)) {
+    RunTarget = (UINT32)Args.Arg1;
+    ZeroMem (&Args, sizeof (Args));
+    Args.Arg0 = ARM_FID_FFA_RUN;
+    Args.Arg1 = RunTarget;
+    ArmCallFfa (&Args);
+  }
+
+  if (Args.Arg0 == ARM_FID_FFA_ERROR) {
+    return FfaStatusToEfiStatus (Args.Arg2);
+  }
+
+  if (Args.Arg0 == (UINTN)ARM_FFA_RET_NOT_SUPPORTED) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Args.Arg0 != ARM_FID_FFA_MSG_SEND_DIRECT_RESP_AARCH32) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  ImpDefArgs->Arg0 = (UINT32)Args.Arg3;
+  ImpDefArgs->Arg1 = (UINT32)Args.Arg4;
+  ImpDefArgs->Arg2 = (UINT32)Args.Arg5;
+  ImpDefArgs->Arg3 = (UINT32)Args.Arg6;
+  ImpDefArgs->Arg4 = (UINT32)Args.Arg7;
   return EFI_SUCCESS;
 }
 
