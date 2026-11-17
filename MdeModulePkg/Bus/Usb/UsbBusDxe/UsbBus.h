@@ -3,6 +3,7 @@
     Usb Bus Driver Binding and Bus IO Protocol.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -196,6 +197,7 @@ struct _USB_DEVICE {
   USB_INTERFACE                         *ParentIf;
   UINT8                                 ParentPort; // Start at 0
   UINT8                                 Tier;
+  BOOLEAN                               Connected;
   BOOLEAN                               DisconnectFail;
   UINT8                                 EnumScript;
   BOOLEAN                               IsSSDev;
