@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include "FrontPageCustomizedUiSupport.h"
+#include "FrontPage.h"
 
 //
 // This is the VFR compiler generated header file which defines the
@@ -148,6 +149,8 @@ LanguageChangeHandler (
   } else {
     ASSERT (FALSE);
   }
+
+  UpdateFrontPageForm ();
 
   FreePool (Lang);
 

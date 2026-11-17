@@ -205,3 +205,13 @@ CHAR16 *
 ExtractDevicePathFromHiiHandle (
   IN      EFI_HII_HANDLE  Handle
   );
+
+/**
+
+  Update the menus in the front page.
+
+**/
+VOID
+UpdateFrontPageForm (
+  VOID
+  );
