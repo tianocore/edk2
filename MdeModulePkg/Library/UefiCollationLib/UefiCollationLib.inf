@@ -1,0 +1,42 @@
+## @file
+#
+#  Instance of the Collation library using UEFI protocols and services.
+#
+#  Copyright 2014, Insyde Software Corp. All Rights Reserved.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiCollationLib
+  FILE_GUID                      = 5CFE94C7-6A5E-48b5-9FDE-AF64513789B5
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CollationLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UefiCollationLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  CollationLib.c
+  InternalCollationLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid
+
+[Depex]
+  gEfiUnicodeCollation2ProtocolGuid
