@@ -467,7 +467,7 @@ def TrimAsmFile(Source, Target, IncludePathFile):
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
 
-def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
+def GenerateVfrBinSec(ModuleName, DebugDir, OutputDir, OutputFile):
     VfrNameList = []
     if os.path.isdir(DebugDir):
         for CurrentDir, Dirs, Files in os.walk(DebugDir):
@@ -479,7 +479,7 @@ def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
     VfrNameList.append (ModuleName + 'Strings')
 
     EfiFileName = os.path.join(DebugDir, ModuleName + '.efi')
-    MapFileName = os.path.join(DebugDir, ModuleName + '.map')
+    MapFileName = os.path.join(OutputDir, ModuleName + '.map')
     VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, VfrNameList)
 
     if not VfrUniOffsetList:
@@ -563,6 +563,8 @@ def Options():
         make_option("--ModuleName", dest="ModuleName", help="The module's BASE_NAME"),
         make_option("--DebugDir", dest="DebugDir",
                           help="Debug Output directory to store the output files"),
+        make_option("--OutputDir", dest="OutputDir",
+                          help="Output directory to store the output files"),
         make_option("-v", "--verbose", dest="LogLevel", action="store_const", const=EdkLogger.VERBOSE,
                           help="Run verbosely"),
         make_option("-d", "--debug", dest="LogLevel", type="int",
@@ -573,7 +575,7 @@ def Options():
     ]
 
     # use clearer usage to override default usage message
-    UsageString = "%prog [-s|-r|-a|--Vfr-Uni-Offset] [-c] [-v|-d <debug_level>|-q] [-i <include_path_file>] [-o <output_file>] [--ModuleName <ModuleName>] [--DebugDir <DebugDir>] [<input_file>]"
+    UsageString = "%prog [-s|-r|-a|--Vfr-Uni-Offset] [-c] [-v|-d <debug_level>|-q] [-i <include_path_file>] [-o <output_file>] [--ModuleName <ModuleName>] [--DebugDir <DebugDir>] [--OutputDir <OutputDir>] [<input_file>]"
 
     Parser = OptionParser(description=__copyright__, version=__version__, option_list=OptionList, usage=UsageString)
     Parser.set_defaults(FileType="Vfr")
@@ -626,7 +628,7 @@ def Main():
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
             TrimAslFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile,CommandOptions.AslDeps)
         elif CommandOptions.FileType == "VfrOffsetBin":
-            GenerateVfrBinSec(CommandOptions.ModuleName, CommandOptions.DebugDir, CommandOptions.OutputFile)
+            GenerateVfrBinSec(CommandOptions.ModuleName, CommandOptions.DebugDir, CommandOptions.OutputDir, CommandOptions.OutputFile)
         elif CommandOptions.FileType == "Asm":
             TrimAsmFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile)
         else :

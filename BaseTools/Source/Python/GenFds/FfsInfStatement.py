@@ -1034,7 +1034,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                             UniVfrOffsetFileSection = os.path.join(self.OutputPath, self.BaseName + 'Offset' + '.raw')
                             UniVfrOffsetFileNameList = []
                             UniVfrOffsetFileNameList.append(UniVfrOffsetFileName)
-                            TrimCmd = "Trim --Vfr-Uni-Offset -o %s --ModuleName=%s --DebugDir=%s " % (UniVfrOffsetFileName, self.BaseName, self.EfiDebugPath)
+                            TrimCmd = "Trim --Vfr-Uni-Offset -o %s --ModuleName=%s --DebugDir=%s --OutputDir=%s " % (UniVfrOffsetFileName, self.BaseName, self.EfiDebugPath, self.EfiOutputPath)
                             GenFdsGlobalVariable.SecCmdList.append(TrimCmd)
                             GenFdsGlobalVariable.GenerateSection(UniVfrOffsetFileSection,
                                                                 [UniVfrOffsetFileName],
