@@ -108,8 +108,8 @@ class GUIDTools:
         self.tooldef = dict()
 
     def SetConfigFile(self) -> None:
-        if os.environ['FmmtConfPath']:
-            self.tooldef_file = os.path.join(os.environ['FmmtConfPath'], 'FmmtConf.ini')
+        if os.environ.get('FmmtConfPath'):
+            self.tooldef_file = os.environ['FmmtConfPath']
         else:
             PathList = os.environ['PATH'].split(os.pathsep)
             for CurrentPath in PathList:
