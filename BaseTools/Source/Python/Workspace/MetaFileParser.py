@@ -851,6 +851,8 @@ class _DscIncludeTail:
         self.Records = Records
         self.Context = Context
         self.SubsectionContext = SubsectionContext
+        self.DirectiveStack = Context[12]
+        self.Enabled = Context[14]
 
 
 ## DSC file parser class
@@ -946,6 +948,8 @@ class DscParser(MetaFileParser):
         # to store conditional directive evaluation result
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
+        # Track the inherited conditional depth for each included file.
+        self._DirectiveStackBase = {From: 0}
         self._Enabled = 1
 
         #
@@ -1401,6 +1405,7 @@ class DscParser(MetaFileParser):
         self._IdMapping = {-1:-1}
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
+        self._DirectiveStackBase = {self._From: 0}
         self._FileWithError = self.MetaFile
         self._FileLocalMacros = {}
         self._SectionsMacroDict.clear()
@@ -1419,7 +1424,7 @@ class DscParser(MetaFileParser):
                 if Record.SubsectionContext is not None:
                     self._SubsectionName, self._SubsectionType, self._InSubsection = \
                         Record.SubsectionContext
-                if self.__GetIncludeContext() == Record.Context:
+                if self.__GetIncludeContext(Record.FromItem) == Record.Context:
                     TailRecords = Record.Records
                 else:
                     TailRecords = self.__ParseIncludeTail(Record)
@@ -1528,7 +1533,10 @@ class DscParser(MetaFileParser):
         self._PostProcessed = True
         self._Content = None
 
-    def __GetIncludeContext(self):
+    def __GetIncludeContext(self, FromItem=None):
+        if FromItem is None:
+            FromItem = self._From
+        DirectiveStackBase = self._DirectiveStackBase[FromItem]
         return copy.deepcopy((
             self._SectionName,
             self._SectionType,
@@ -1542,8 +1550,8 @@ class DscParser(MetaFileParser):
             self._Defines,
             self._Symbols,
             self._GuidDict,
-            self._DirectiveStack,
-            self._DirectiveEvalStack,
+            self._DirectiveStack[DirectiveStackBase:],
+            self._DirectiveEvalStack[DirectiveStackBase:],
             self._Enabled,
         ))
 
@@ -1588,16 +1596,16 @@ class DscParser(MetaFileParser):
         Parser._SubsectionType = self._SubsectionType
         Parser._InSubsection = self._InSubsection
         Parser._Scope = copy.deepcopy(self._CurrentSectionScope or self._Scope)
-        Parser._Enabled = self._Enabled
         Parser._FileLocalMacros = self._FileLocalMacros.copy()
         Parser._SectionsMacroDict = copy.deepcopy(self._SectionsMacroDict)
         Parser._Defines = self._Defines.copy()
         Parser._Symbols = self._Symbols.copy()
         Parser._GuidDict = self._GuidDict.copy()
         Parser._DirectiveStack = [
-            (Directive, Tail.StartLine + 1, '') for Directive in self._DirectiveStack
+            (Directive, Tail.StartLine + 1, '') for Directive in Tail.DirectiveStack
         ]
         Parser._InDirective = len(Parser._DirectiveStack) - 1
+        Parser._Enabled = Tail.Enabled
         Parser.StartParse()
         return Table.GetAll()
 
@@ -1756,6 +1764,7 @@ class DscParser(MetaFileParser):
                 ParentStartLine = self._LineIndex + 1
                 ParentFile = self.__GetMetaFileFromItem(ParentFrom)
                 ParentContext = self.__GetIncludeContext()
+                self._DirectiveStackBase[FromItem] = len(self._DirectiveStack)
                 if self._InSubsection:
                     Owner = self._Content[self._ContentIndex - 1][8]
                 else:

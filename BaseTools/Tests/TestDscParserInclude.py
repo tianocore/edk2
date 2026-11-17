@@ -102,6 +102,94 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
         self.assertIn('AfterNextSection.inf', ComponentRecords)
         self.assertNotIn('AfterSecondInclude|AfterSecond.inf', ComponentRecords)
 
+    def test_consecutive_includes_use_second_section_for_parent_tail(self):
+        self.WriteTmpFile(
+            'First.dsc.inc',
+            '[LibraryClasses]\n'
+            '  FirstLibrary|FirstLibrary.inf\n',
+        )
+        self.WriteTmpFile(
+            'Second.dsc.inc',
+            '[Components]\n'
+            '  Second.inf\n',
+        )
+        self.WriteTmpFile(
+            'Platform.dsc',
+            '[LibraryClasses]\n'
+            '  BeforeInclude|Before.inf\n'
+            '!include First.dsc.inc\n'
+            '!include Second.dsc.inc\n'
+            '  AfterSecondInclude|AfterSecondInclude.inf\n',
+        )
+
+        DscFile = PathClass(os.path.join(self.testDir, 'Platform.dsc'))
+        Table = MetaFileStorage(
+            WorkspaceDatabase(),
+            DscFile,
+            MODEL_FILE_DSC,
+            True,
+        )
+        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
+
+        LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_COMMON]
+        Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_COMMON]
+        LibraryClassRecords = [(Record[0], Record[1]) for Record in LibraryClasses]
+        ComponentRecords = [Record[0] for Record in Components]
+
+        self.assertIn(('BeforeInclude', 'Before.inf'), LibraryClassRecords)
+        self.assertIn(('FirstLibrary', 'FirstLibrary.inf'), LibraryClassRecords)
+        self.assertIn('Second.inf', ComponentRecords)
+        self.assertIn(
+            'AfterSecondInclude|AfterSecondInclude.inf',
+            ComponentRecords,
+        )
+        self.assertNotIn(
+            ('AfterSecondInclude', 'AfterSecondInclude.inf'),
+            LibraryClassRecords,
+        )
+
+    def test_nested_include_inside_conditional_preserves_directive_state(self):
+        self.WriteTmpFile(
+            'Nested.dsc.inc',
+            '[Components]\n'
+            '  Nested.inf\n',
+        )
+        self.WriteTmpFile(
+            'Included.dsc.inc',
+            '[Components]\n'
+            '!include Nested.dsc.inc\n'
+            '[LibraryClasses]\n'
+            '  IncludedLibrary|IncludedLibrary.inf\n',
+        )
+        self.WriteTmpFile(
+            'Platform.dsc',
+            '[Defines]\n'
+            '  DEFINE INCLUDE_FEATURE = TRUE\n'
+            '!if $(INCLUDE_FEATURE) == TRUE\n'
+            '!include Included.dsc.inc\n'
+            '!endif\n'
+            '[LibraryClasses]\n'
+            '  AfterConditional|AfterConditional.inf\n',
+        )
+
+        DscFile = PathClass(os.path.join(self.testDir, 'Platform.dsc'))
+        Table = MetaFileStorage(
+            WorkspaceDatabase(),
+            DscFile,
+            MODEL_FILE_DSC,
+            True,
+        )
+        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
+
+        LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_COMMON]
+        Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_COMMON]
+        LibraryClassRecords = [(Record[0], Record[1]) for Record in LibraryClasses]
+        ComponentRecords = [Record[0] for Record in Components]
+
+        self.assertIn(('IncludedLibrary', 'IncludedLibrary.inf'), LibraryClassRecords)
+        self.assertIn(('AfterConditional', 'AfterConditional.inf'), LibraryClassRecords)
+        self.assertIn('Nested.inf', ComponentRecords)
+
     def test_parent_section_after_closed_component_subsection(self):
         self.WriteTmpFile(
             'Component.dsc.inc',
