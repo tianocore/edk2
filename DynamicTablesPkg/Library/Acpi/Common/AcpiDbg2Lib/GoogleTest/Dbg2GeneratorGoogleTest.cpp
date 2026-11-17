@@ -177,11 +177,11 @@ protected:
     EXPECT_NE (SsdtTable, nullptr);
     EXPECT_EQ (SsdtTable->Signature, (UINT32)EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE);
     EXPECT_EQ (SsdtTable->Revision, EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_REVISION);
-    EXPECT_EQ (SsdtTable->OemId[0], (UINT8)'A');
-    EXPECT_EQ (SsdtTable->OemId[1], (UINT8)'R');
-    EXPECT_EQ (SsdtTable->OemId[2], (UINT8)'M');
-    EXPECT_EQ (SsdtTable->OemId[3], (UINT8)'L');
-    EXPECT_EQ (SsdtTable->OemId[4], (UINT8)'T');
+    EXPECT_EQ (SsdtTable->OemId[0], (UINT8)'T');
+    EXPECT_EQ (SsdtTable->OemId[1], (UINT8)'E');
+    EXPECT_EQ (SsdtTable->OemId[2], (UINT8)'S');
+    EXPECT_EQ (SsdtTable->OemId[3], (UINT8)'T');
+    EXPECT_EQ (SsdtTable->OemId[4], (UINT8)'I');
     EXPECT_EQ (SsdtTable->OemId[5], (UINT8)'D');
   }
 };

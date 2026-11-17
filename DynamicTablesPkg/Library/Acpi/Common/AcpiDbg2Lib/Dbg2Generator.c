@@ -337,6 +337,9 @@ PopulateDbg2Device (
 
 /** Builds the serial port device entry.
 
+  @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
+                                    protocol interface.
+  @param [in]       Generator       Pointer to the ACPI table Generator.
   @param [in]       AcpiTableInfo   Pointer to the ACPI table information.
   @param [in, out]  AcpiDbg2Device  Pointer to the DBG2 ACPI table to add device to.
                                       Pointer will be updated to point to after the new DBG2 device.
@@ -353,6 +356,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildDbg2SerialPortEntry  (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
+  IN  CONST ACPI_TABLE_GENERATOR                   *CONST  Generator,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN OUT EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT     **AcpiDbg2Device,
   IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO                *SerialPortInfo,
@@ -429,6 +434,8 @@ BuildDbg2SerialPortEntry  (
 
   // Build a SSDT table describing the serial port.
   Status = BuildSsdtSerialPortTable (
+             CfgMgrProtocol,
+             Generator,
              AcpiTableInfo,
              SerialPortInfo,
              SerialPortDeviceInfo.ObjectName,
@@ -721,6 +728,8 @@ BuildDbg2TableEx (
     }
 
     Status = BuildDbg2SerialPortEntry (
+               CfgMgrProtocol,
+               This,
                AcpiTableInfo,
                &CurrentDbg2Device,
                &SerialPortInfo[0],

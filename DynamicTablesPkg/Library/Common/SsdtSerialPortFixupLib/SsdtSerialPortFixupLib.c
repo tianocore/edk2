@@ -29,6 +29,7 @@
 #include <Library/AcpiHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
 #include <Library/SsdtSerialPortFixupLib.h>
+#include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 /** C array containing the compiled AML template.
@@ -447,6 +448,9 @@ FreeSsdtSerialPortTable (
 
   The table created by this function must be freed by FreeSsdtSerialTable.
 
+  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager protocol
+                                interface.
+  @param [in]  Generator        Pointer to the ACPI table Generator.
   @param [in]  AcpiTableInfo    Pointer to the ACPI table information.
   @param [in]  SerialPortInfo   Serial port to describe in the SSDT table.
   @param [in]  Name             The Name to give to the Device.
@@ -463,21 +467,29 @@ FreeSsdtSerialPortTable (
 EFI_STATUS
 EFIAPI
 BuildSsdtSerialPortTable (
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO       *AcpiTableInfo,
-  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo,
-  IN  CONST CHAR8                            *Name,
-  IN  CONST UINT64                           Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER      **Table
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO                    *AcpiTableInfo,
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO               *SerialPortInfo,
+  IN  CONST CHAR8                                         *Name,
+  IN  CONST UINT64                                        Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER                   **Table
   )
 {
-  EFI_STATUS            Status;
-  EFI_STATUS            Status1;
-  AML_ROOT_NODE_HANDLE  RootNodeHandle;
+  EFI_STATUS              Status;
+  EFI_STATUS              Status1;
+  AML_ROOT_NODE_HANDLE    RootNodeHandle;
+  AML_ROOT_NODE_HANDLE    SsdtRootNode;
+  AML_OBJECT_NODE_HANDLE  ScopeNode;
 
+  ASSERT (CfgMgrProtocol != NULL);
+  ASSERT (Generator != NULL);
   ASSERT (AcpiTableInfo != NULL);
   ASSERT (SerialPortInfo != NULL);
   ASSERT (Name != NULL);
   ASSERT (Table != NULL);
+
+  SsdtRootNode = NULL;
 
   // Validate the Serial Port Info.
   Status = ValidateSerialPortInfo (SerialPortInfo, 1);
@@ -518,9 +530,39 @@ BuildSsdtSerialPortTable (
     goto exit_handler;
   }
 
+  Status = AddSsdtAcpiHeader (
+             CfgMgrProtocol,
+             Generator,
+             AcpiTableInfo,
+             &SsdtRootNode
+             );
+  if (EFI_ERROR (Status)) {
+    goto exit_handler;
+  }
+
+  // Find the \_SB scope node.
+  Status = AmlFindNode (RootNodeHandle, "\\_SB_", &ScopeNode);
+  if (EFI_ERROR (Status)) {
+    goto exit_handler;
+  }
+
+  // Detach \_SB scope from the template.
+  Status = AmlDetachNode (ScopeNode);
+  if (EFI_ERROR (Status)) {
+    goto exit_handler;
+  }
+
+  // Attach \_SB scope to SsdtRootNode.
+  Status = AmlAttachNode (SsdtRootNode, ScopeNode);
+  if (EFI_ERROR (Status)) {
+    // Free the detached node.
+    AmlDeleteTree (ScopeNode);
+    goto exit_handler;
+  }
+
   // Serialize the tree.
   Status = AmlSerializeDefinitionBlock (
-             RootNodeHandle,
+             SsdtRootNode,
              Table
              );
   if (EFI_ERROR (Status)) {
@@ -534,6 +576,21 @@ BuildSsdtSerialPortTable (
 
 exit_handler:
   // Cleanup
+  if (SsdtRootNode != NULL) {
+    Status1 = AmlDeleteTree (SsdtRootNode);
+    if (EFI_ERROR (Status1)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SSDT-SERIAL-PORT-FIXUP: Failed to cleanup AML tree."
+        " Status = %r\n",
+        Status1
+        ));
+      if (!EFI_ERROR (Status)) {
+        Status = Status1;
+      }
+    }
+  }
+
   if (RootNodeHandle != NULL) {
     Status1 = AmlDeleteTree (RootNodeHandle);
     if (EFI_ERROR (Status1)) {
