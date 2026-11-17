@@ -401,14 +401,12 @@ InitializePlatform (
     Q35SmramAtDefaultSmbaseInitialization (PlatformInfoHob);
   }
 
-  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
-    Status = MemTypeInfoInitialization (PlatformInfoHob);
-    if (EFI_ERROR (Status)) {
-      // Failing here is okay, it just means that the variable read PPI wasn't found, so
-      // we need to return EFI_SUCCESS here and let the dispatcher dispatch the variable PEIM first
-      // and then we'll get called back to finish initialization.
-      return EFI_SUCCESS;
-    }
+  Status = MemTypeInfoInitialization (PlatformInfoHob);
+  if (EFI_ERROR (Status)) {
+    // Failing here is okay, it just means that the variable read PPI wasn't found, so
+    // we need to return EFI_SUCCESS here and let the dispatcher dispatch the variable PEIM first
+    // and then we'll get called back to finish initialization.
+    return EFI_SUCCESS;
   }
 
   CompleteInitialization (PlatformInfoHob, PeiServices);
