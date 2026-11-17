@@ -472,7 +472,7 @@ class PlatformInfo(AutoGenInfo):
             ToPcd.expressions = FromPcd.expressions
             ToPcd.CustomAttribute = FromPcd.CustomAttribute
 
-        if FromPcd is not None and ToPcd.DatumType == TAB_VOID and not ToPcd.MaxDatumSize:
+        if FromPcd is not None and ToPcd.DatumType == TAB_VOID and not ToPcd.MaxSizeUserSet:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \
                             % (ToPcd.TokenSpaceGuidCName, TokenCName))
             Value = ToPcd.DefaultValue
