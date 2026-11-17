@@ -85,7 +85,7 @@
 #define SBI_ERR_IO                 -14
 
 //
-// EDK2 OpenSBI firmware extension return status.
+// EDK2 SBI firmware extension return status.
 //
 typedef struct {
   UINTN    Error; ///< SBI status code

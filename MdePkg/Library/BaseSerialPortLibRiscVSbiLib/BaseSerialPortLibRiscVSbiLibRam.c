@@ -170,7 +170,8 @@ SerialPortPoll (
   )
 {
   /*
-   * Careful. OpenSBI with HTIF console will return -1 followed by -2
+   * Careful. An SBI firmware with an HTIF console will return -1 followed by
+   * -2
    * if there is no character received. So just check for values >= 0.
    */
 
