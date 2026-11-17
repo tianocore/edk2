@@ -581,6 +581,305 @@ DynHiiAddVarstoreNameValue (
   IN            EFI_VARSTORE_ID  VarstoreId
   );
 
+/** Add a SuppressIf conditional expression.
+
+  Create a scoped EFI_IFR_SUPPRESS_IF_OP node and add it under the given parent
+  node. The parent can be a form, statement or another condition.
+
+  @param [in]  ParentHandle     Parent handle.
+  @param [out] ConditionHandle  Handle to the newly created condition node.
+
+  @retval  EFI_SUCCESS            The Condition was created successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddSuppressIf (
+  IN  DYN_HII_HANDLE  ParentHandle,
+  OUT DYN_HII_HANDLE  *ConditionHandle
+  );
+
+/** Add a GrayOutIf conditional expression.
+
+  Create a scoped EFI_IFR_GRAY_OUT_IF_OP node and add it under the given parent
+  node. The parent can be a form, statement or another condition.
+
+  @param [in]  ParentHandle     Parent handle.
+  @param [out] ConditionHandle  Handle to the newly created condition node.
+
+  @retval  EFI_SUCCESS            The Condition was created successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddGrayOutIf (
+  IN  DYN_HII_HANDLE  ParentHandle,
+  OUT DYN_HII_HANDLE  *ConditionHandle
+  );
+
+/** Add a DisableIf conditional expression.
+
+  Create a scoped EFI_IFR_DISABLE_IF_OP node and add it under the given parent
+  node. The parent can be a form, statement or another condition.
+
+  @param [in]  ParentHandle     Parent handle.
+  @param [out] ConditionHandle  Handle to the newly created condition node.
+
+  @retval  EFI_SUCCESS            The Condition was created successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddDisableIf (
+  IN  DYN_HII_HANDLE  ParentHandle,
+  OUT DYN_HII_HANDLE  *ConditionHandle
+  );
+
+/** Add a QuestionRef1 expression to a Condition.
+
+  @param [in] ConditionHandle  Condition handle under which the expression is
+                               to be added.
+  @param [in] QuestionId       Question ID referenced by the expression.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddQuestionRef1Expr (
+  IN DYN_HII_HANDLE   ConditionHandle,
+  IN EFI_QUESTION_ID  QuestionId
+  );
+
+/** Add an unsigned 64-bit value onto the expression stack.
+
+  Add an unsigned 64-bit value that will be pushed on the expression
+  stack. Corresponds to EFI_IFR_UIN64_OP
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+  @param [in] Value             64-bit unsigned value.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddUint64ValueExpr (
+  IN DYN_HII_HANDLE  ConditionHandle,
+  IN UINT64          Value
+  );
+
+/** Add an equality operator expression to a condition.
+
+  Add an equality check expression operator to a condition. This pops
+  two values from the stack, and returns TRUE if the values are equal
+  and FALSE otherwise. Corresponds to EFI_IFR_EQUAL_OP.
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddEqualExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
+/** Add an equal value check expression operator to a condition.
+
+  Add an equal value check expression operator to a condition. This
+  fetches the specified question's value, and compares it with the
+  specified unsigned 16-bit value. Returns TRUE if the values are
+  equal and FALSE otherwise. Corresponds to EFI_IFR_EQ_ID_VAL_OP.
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+  @param [in] QuestionId        Question ID whose value is to be fetched.
+  @param [in] Value             16-bit value to be checked.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddEqualValExpr (
+  IN DYN_HII_HANDLE   ConditionHandle,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN UINT16           Value
+  );
+
+/** Add an equal val list check expression operator to a condition.
+
+  This expression operator results in a checking the value passed to it
+  in a list of unsigned integers. Returns TRUE if the value is found in
+  the list, and FALSE otherwise. Corresponds to EFI_IFR_EQ_ID_VAL_LIST_OP.
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+  @param [in] QuestionId        Question ID whose value is to be fetched
+                                and compared.
+  @param [in] ListLength        Length of the list in which the question
+                                is to be searched.
+  @param [in] List              Pointer to the list of unsigned integers.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddEqualValListExpr (
+  IN DYN_HII_HANDLE   ConditionHandle,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN UINT16           ListLength,
+  IN UINT16           *List
+  );
+
+/** Add a bitwise AND operator expression to a Condition.
+
+  Add a bitwise AND operator expression, which corresponds
+  to EFI_IFR_BITWISE_AND_OP. This expression pops two values
+  from the expression stack and performs a bitwise AND on them.
+  Returns a TRUE if the expression evaluates as such, returns
+  FALSE otherwise
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddBitwiseAndExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
+/** Add a logical OR operator expression to a Condition.
+
+  Add a logical OR operator expression, which corresponds
+  to EFI_IFR_OR_OP. This expression pops two values
+  from the expression stack and performs a logical OR on them.
+  Returns a TRUE if the expression evaluates as such, returns
+  FALSE otherwise
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+
+EFI_STATUS
+EFIAPI
+DynHiiAddOrExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
+/** Add a logical AND operator expression to a Condition.
+
+  Add a logical AND operator expression, which corresponds
+  to EFI_IFR_AND_OP. This expression pops two values
+  from the expression stack and performs a logical AND on
+  them. Returns a TRUE if the expression evaluates as such,
+  returns FALSE otherwise
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+
+EFI_STATUS
+EFIAPI
+DynHiiAddAndExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
+/** Add a greater than operator expression to a Condition.
+
+  Add a greater than operator expression, which corresponds
+  to EFI_IFR_GREATER_THAN_OP. This expression pops two values
+  from the expression stack and returns TRUE if the first value
+  is greater than the second, and returns FALSE otherwise.
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+
+EFI_STATUS
+EFIAPI
+DynHiiAddGreaterThanExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
+/** Push a TRUE onto the expression stack
+
+  Push a TRUE onto the expression stack. Corresponds to EFI_IFR_TRUE_OP.
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddTrueExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
+/** Do a NOT of the value popped from the expression stack.
+
+  Pop a value from the expression stack, and push the logical NOT
+  of the popped value. Corresponds to EFI_IFR_NOT_OP.
+
+  @param [in] ConditionHandle   Condition handle under which the expression
+                                is to be added.
+
+  @retval  EFI_SUCCESS            The expression was added successfully.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters is invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+DynHiiAddNotExpr (
+  IN DYN_HII_HANDLE  ConditionHandle
+  );
+
 /** Generate the IFR byte-stream for the Formset.
 
   Serialize the Formset and it's child nodes to generate an IFR byte-stream
