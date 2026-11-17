@@ -29,7 +29,7 @@
   BaseMemoryLib
   DebugLib
   DevicePathLib
-  MapMmioLib
+  DxeServicesLib
   MemoryAllocationLib
   PciHostBridgeUtilityLib
   PciPcdProducerLib
