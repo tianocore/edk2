@@ -5,6 +5,7 @@
 #  Copyright (c) 2014 - 2023, Arm Ltd. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -54,6 +55,11 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable
+  gArmTokenSpaceGuid.PcdPlatformBootManagerProgressBarColor
+  gArmTokenSpaceGuid.PcdPlatformBootManagerProgressBarBackgroundColor
+  gArmTokenSpaceGuid.PcdPlatformBootManagerProgressBarTitleForegroundColor
+  gArmTokenSpaceGuid.PcdPlatformBootManagerFirmwareVersionForegroundColor
+  gArmTokenSpaceGuid.PcdPlatformBootManagerFirmwareVersionBackgroundColor
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits

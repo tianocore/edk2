@@ -4,6 +4,7 @@
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2026, ARM Limited. All rights reserved.
 # Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
+# Copyright (c) 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -189,6 +190,36 @@
   # The default value is FALSE.
   #
   gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable|FALSE|BOOLEAN|0x0000052
+
+  #
+  # RGB color used by PlatformBootManagerLib for the boot splash progress bar.
+  # The value is encoded as 0x00RRGGBB.
+  #
+  gArmTokenSpaceGuid.PcdPlatformBootManagerProgressBarColor|0x00FFFFFF|UINT32|0x00000055
+
+  #
+  # RGB color used by PlatformBootManagerLib for the cleared progress area and
+  # the progress title background. The value is encoded as 0x00RRGGBB.
+  #
+  gArmTokenSpaceGuid.PcdPlatformBootManagerProgressBarBackgroundColor|0x00000000|UINT32|0x00000058
+
+  #
+  # RGB color used by PlatformBootManagerLib for the boot splash progress
+  # title foreground. The value is encoded as 0x00RRGGBB.
+  #
+  gArmTokenSpaceGuid.PcdPlatformBootManagerProgressBarTitleForegroundColor|0x00FFFFFF|UINT32|0x0000005B
+
+  #
+  # RGB color used by PlatformBootManagerLib for the firmware version banner
+  # foreground in graphics mode. The value is encoded as 0x00RRGGBB.
+  #
+  gArmTokenSpaceGuid.PcdPlatformBootManagerFirmwareVersionForegroundColor|0x00FFFFFF|UINT32|0x0000005E
+
+  #
+  # RGB color used by PlatformBootManagerLib for the firmware version banner
+  # background in graphics mode. The value is encoded as 0x00RRGGBB.
+  #
+  gArmTokenSpaceGuid.PcdPlatformBootManagerFirmwareVersionBackgroundColor|0x00000000|UINT32|0x0000005F
 
   ## Define the conduit to use for monitor calls.
   # Default PcdMonitorConduitHvc = FALSE, conduit = SMC

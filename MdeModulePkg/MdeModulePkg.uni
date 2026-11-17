@@ -5,6 +5,7 @@
 // and libraries instances, which are used for those modules.
 //
 // Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -435,6 +436,14 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareReleaseDateString_PROMPT  #language en-US "Firmware release data string"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareReleaseDateString_HELP  #language en-US "Null-terminated Unicode string that contains the date the firmware was released"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBootLogoFillBackground_PROMPT  #language en-US "Fill boot logo background"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBootLogoFillBackground_HELP  #language en-US "If TRUE, clear the full graphics framebuffer before blitting the boot logo. If FALSE, BootLogoLib preserves the existing framebuffer contents outside the logo area."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBootLogoBackgroundColor_PROMPT  #language en-US "Boot logo background color"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBootLogoBackgroundColor_HELP  #language en-US "RGB color used when clearing the graphics framebuffer before blitting the boot logo. The value is encoded as 0x00RRGGBB."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdStatusCodeMemorySize_PROMPT  #language en-US "StatusCode memory size"
 
