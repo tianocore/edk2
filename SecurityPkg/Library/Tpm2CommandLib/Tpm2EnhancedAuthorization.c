@@ -59,6 +59,16 @@ typedef struct {
 typedef struct {
   TPM2_COMMAND_HEADER    Header;
   TPMI_SH_POLICY         PolicySession;
+  TPMA_LOCALITY          Locality;
+} TPM2_POLICY_LOCALITY_COMMAND;
+
+typedef struct {
+  TPM2_RESPONSE_HEADER    Header;
+} TPM2_POLICY_LOCALITY_RESPONSE;
+
+typedef struct {
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_SH_POLICY         PolicySession;
 } TPM2_POLICY_GET_DIGEST_COMMAND;
 
 typedef struct {
@@ -327,6 +337,56 @@ Tpm2PolicyCommandCode (
 
   if (SwapBytes32 (RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
     DEBUG ((DEBUG_ERROR, "Tpm2PolicyCommandCode - responseCode - %x\n", SwapBytes32 (RecvBuffer.Header.responseCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This command indicates that the authorization will be limited to a specific locality.
+
+  @param[in]  PolicySession      Handle for the policy session being extended.
+  @param[in]  Locality           The allowed locality(ies).
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PolicyLocality (
+  IN      TPMI_SH_POLICY  PolicySession,
+  IN      TPMA_LOCALITY   Locality
+  )
+{
+  EFI_STATUS                     Status;
+  TPM2_POLICY_LOCALITY_COMMAND   SendBuffer;
+  TPM2_POLICY_LOCALITY_RESPONSE  RecvBuffer;
+  UINT32                         SendBufferSize;
+  UINT32                         RecvBufferSize;
+
+  SendBuffer.Header.tag         = SwapBytes16 (TPM_ST_NO_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32 (TPM_CC_PolicyLocality);
+
+  SendBuffer.PolicySession = SwapBytes32 (PolicySession);
+  SendBuffer.Locality      = Locality;
+
+  SendBufferSize              = (UINT32)sizeof (SendBuffer);
+  SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
+
+  RecvBufferSize = sizeof (RecvBuffer);
+  Status         = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicyLocality - RecvBufferSize Error - %x\n", RecvBufferSize));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (SwapBytes32 (RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicyLocality - responseCode - %x\n", SwapBytes32 (RecvBuffer.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
