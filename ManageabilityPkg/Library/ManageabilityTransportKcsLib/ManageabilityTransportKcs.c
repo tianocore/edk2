@@ -156,7 +156,8 @@ KcsTransportStatus (
       *TransportAdditionalStatus |= MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS_BUSY_IN_WRITE;
       return EFI_NOT_READY;
     } else {
-      return EFI_DEVICE_ERROR;
+      // The next WRITE_START recovers ERROR_STATE (IPMI 2.0, Section 9.11).
+      return EFI_SUCCESS;
     }
   }
 
