@@ -1,0 +1,35 @@
+## @file
+#  Driver Binding and resource helpers for device-tree discovery.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtDispatcherLib
+  FILE_GUID                      = 4d1a8d87-4c06-4b7f-9638-86d11a7a6a9d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UfdtDispatcherLib|DXE_DRIVER UEFI_DRIVER
+
+[Sources]
+  UfdtDispatcherLibInternal.h
+  UfdtDriverBinding.c
+  UfdtTree.c
+  UfdtResource.c
+  UfdtNodeInfo.c
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/ArmUfdtNodeInfo.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib

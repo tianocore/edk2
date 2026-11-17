@@ -1,0 +1,40 @@
+## @file
+#  Register architectural timer configuration callbacks.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtTimerBindingDriver
+  FILE_GUID                      = c2d2aba7-3ddd-4bb3-b4ad-4f6c770381d9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  CONSTRUCTOR                    = UfdtTimerBindingDriverConstructor
+
+[Sources]
+  UfdtTimerBindingDriver.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UfdtDispatcherLib
+  PcdLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[Protocols]
+  gEdkiiUfdtTimerInfoProtocolGuid  ## SOMETIMES_PRODUCES
+  gEdkiiUfdtTimerAbsentProtocolGuid  ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum

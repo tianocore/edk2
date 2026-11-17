@@ -118,11 +118,6 @@
   }
 
   #
-  # Architectural Protocols
-  #
-  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-
-  #
   # Platform Driver
   #
   ArmVirtPkg/XenioFdtDxe/XenioFdtDxe.inf

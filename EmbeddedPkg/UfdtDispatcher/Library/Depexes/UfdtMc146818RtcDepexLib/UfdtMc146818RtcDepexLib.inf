@@ -1,0 +1,31 @@
+## @file
+#  Gate legacy MC146818 RTC consumers on completed device configuration.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtMc146818RtcDepexLib
+  FILE_GUID                      = 177025c8-8ff9-4b8e-9f71-e02481eb22d7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = UfdtMc146818RtcDepexLibConstructor
+
+[Sources]
+  UfdtMc146818RtcDepexLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UfdtDepexLib
+
+[Protocols]
+  gEdkiiUfdtMc146818RtcInfoProtocolGuid  ## CONSUMES
+
+[Depex]
+  gEdkiiUfdtMc146818RtcInfoProtocolGuid

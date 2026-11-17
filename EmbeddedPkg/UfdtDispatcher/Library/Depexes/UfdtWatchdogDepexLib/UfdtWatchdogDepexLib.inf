@@ -1,0 +1,31 @@
+## @file
+#  Gate legacy SBSA watchdog consumers on completed device configuration.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtWatchdogDepexLib
+  FILE_GUID                      = 8c82364e-24a9-4de6-a44c-ecdcd4b28037
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = UfdtWatchdogDepexLibConstructor
+
+[Sources]
+  UfdtWatchdogDepexLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UfdtDepexLib
+
+[Protocols]
+  gEdkiiUfdtWatchdogInfoProtocolGuid  ## CONSUMES
+
+[Depex]
+  gEdkiiUfdtWatchdogInfoProtocolGuid
