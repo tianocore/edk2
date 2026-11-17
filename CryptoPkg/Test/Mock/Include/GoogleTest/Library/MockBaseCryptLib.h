@@ -583,37 +583,6 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
-    RsaGenerateKey,
-    (
-     IN OUT  VOID         *RsaContext,
-     IN      UINTN        ModulusLength,
-     IN      CONST UINT8  *PublicExponent,
-     IN      UINTN        PublicExponentSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaCheckKey,
-    (
-     IN  VOID  *RsaContext
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaPkcs1Sign,
-    (
-     IN      VOID         *RsaContext,
-     IN      CONST UINT8  *MessageHash,
-     IN      UINTN        HashSize,
-     OUT     UINT8        *Signature,
-     IN OUT  UINTN        *SigSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
     RsaPkcs1Verify,
     (
      IN  VOID         *RsaContext,
@@ -621,20 +590,6 @@ struct MockBaseCryptLib {
      IN  UINTN        HashSize,
      IN  CONST UINT8  *Signature,
      IN  UINTN        SigSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaPssSign,
-    (
-     IN      VOID         *RsaContext,
-     IN      CONST UINT8  *Message,
-     IN      UINTN        MsgSize,
-     IN      UINT16       DigestLen,
-     IN      UINT16       SaltLen,
-     OUT     UINT8        *Signature,
-     IN OUT  UINTN        *SigSize
     )
     );
 
@@ -649,17 +604,6 @@ struct MockBaseCryptLib {
      IN  UINTN        SigSize,
      IN  UINT16       DigestLen,
      IN  UINT16       SaltLen
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaGetPrivateKeyFromPem,
-    (
-     IN   CONST UINT8  *PemData,
-     IN   UINTN        PemSize,
-     IN   CONST CHAR8  *Password,
-     OUT  VOID         **RsaContext
     )
     );
 
@@ -801,32 +745,6 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
-    Pkcs1v2Decrypt,
-    (
-     IN   CONST UINT8  *PrivateKey,
-     IN   UINTN        PrivateKeySize,
-     IN   UINT8        *EncryptedData,
-     IN   UINTN        EncryptedDataSize,
-     OUT  UINT8        **OutData,
-     OUT  UINTN        *OutDataSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    RsaOaepDecrypt,
-    (
-     IN   VOID    *RsaContext,
-     IN   UINT8   *EncryptedData,
-     IN   UINTN   EncryptedDataSize,
-     IN   UINT16  DigestLen   OPTIONAL,
-     OUT  UINT8   **OutData,
-     OUT  UINTN   *OutDataSize
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
     Pkcs7GetSigners,
     (
      IN  CONST UINT8  *P7Data,
@@ -856,22 +774,6 @@ struct MockBaseCryptLib {
      OUT UINTN        *ChainLength,
      OUT UINT8        **UnchainCerts,
      OUT UINTN        *UnchainLength
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    Pkcs7Sign,
-    (
-     IN   CONST UINT8  *PrivateKey,
-     IN   UINTN        PrivateKeySize,
-     IN   CONST UINT8  *KeyPassword,
-     IN   UINT8        *InData,
-     IN   UINTN        InDataSize,
-     IN   UINT8        *SignCert,
-     IN   UINT8        *OtherCerts      OPTIONAL,
-     OUT  UINT8        **SignedData,
-     OUT  UINTN        *SignedDataSize
     )
     );
 
@@ -1745,17 +1647,6 @@ struct MockBaseCryptLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
-    EcGetPrivateKeyFromPem,
-    (
-     IN   CONST UINT8  *PemData,
-     IN   UINTN        PemSize,
-     IN   CONST CHAR8  *Password,
-     OUT  VOID         **EcContext
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
     EcGetPublicKeyFromPem,
     (
      IN   CONST UINT8  *PemData,
@@ -1782,19 +1673,6 @@ struct MockBaseCryptLib {
      IN   CONST UINT8  *Cert,
      IN   UINTN        CertSize,
      OUT  VOID         **EcContext
-    )
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    EcDsaSign,
-    (
-     IN      VOID         *EcContext,
-     IN      UINTN        HashNid,
-     IN      CONST UINT8  *MessageHash,
-     IN      UINTN        HashSize,
-     OUT     UINT8        *Signature,
-     IN OUT  UINTN        *SigSize
     )
     );
 

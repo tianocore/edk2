@@ -61,77 +61,6 @@ EdDsaFree (
 }
 
 /**
-  Sets the EdDSA private key in the EdDSA context.
-
-  This function imports a raw private key into the EdDSA context. The private key
-  must be in raw binary format (not PEM or DER encoded). The key size must match
-  the expected size for the curve type (57 bytes for Ed448).
-
-  OpenSSL automatically derives the public key from the private key, so after
-  calling this function, both signing and verification operations are possible.
-
-  If EdDsaContext is NULL, then return FALSE.
-  If PrivateKey is NULL, then return FALSE.
-  If PrivateKeySize is 0, then return FALSE.
-  If PrivateKeySize does not match the expected size for the curve, then return FALSE.
-
-  @param[in]  EdDsaContext    Pointer to EdDSA context created by EdDsaNewByNid().
-  @param[in]  PrivateKey      Pointer to raw private key bytes.
-  @param[in]  PrivateKeySize  Size of the private key in bytes.
-
-  @retval TRUE   EdDSA private key was set successfully.
-  @retval FALSE  Invalid parameters or key size mismatch.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaSetPrivKey (
-  IN    VOID   *EdDsaContext,
-  IN    UINT8  *PrivateKey,
-  IN    UINTN  PrivateKeySize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
-  Extracts the EdDSA public key from the EdDSA context.
-
-  This function retrieves the public key from the EdDSA context and copies it to
-  the provided buffer. The context must have a key set (either via EdDsaSetPrivKey()
-  or EdDsaSetPubKey()) before calling this function. OpenSSL automatically derives
-  the public key when a private key is set.
-
-  The public key is returned in raw binary format (57 bytes for Ed448).
-
-  If EdDsaContext is NULL, then return FALSE.
-  If PublicKey is NULL, then return FALSE.
-  If the context does not contain a valid key, then return FALSE.
-  If PublicKeySize does not match the expected size for the curve, then return FALSE.
-
-  @param[in]   EdDsaContext    Pointer to EdDSA context containing the key.
-  @param[out]  PublicKey       Pointer to buffer to receive the public key.
-  @param[in]   PublicKeySize   Size of the public key buffer in bytes.
-                               Must match the key size for the curve (57 bytes for Ed448).
-
-  @retval TRUE   EdDSA public key extracted successfully.
-  @retval FALSE  Invalid parameters or key extraction failed.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaGeneratePubKey (
-  IN   VOID   *EdDsaContext,
-  OUT  UINT8  *PublicKey,
-  IN   UINTN  PublicKeySize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
   Sets the EdDSA public key in the EdDSA context.
 
   This function imports a raw public key into the EdDSA context. The public key
@@ -196,57 +125,6 @@ EdDsaGetPubKey (
   IN      VOID   *EdDsaContext,
   IN      UINT8  *PublicKey,
   IN OUT  UINTN  *PublicKeySize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
-  Generates an EdDSA signature for a given message.
-
-  This function creates an EdDSA signature using the private key stored in the
-  EdDSA context. EdDSA uses a 'pure' signature scheme where the entire message
-  is processed directly without pre-computing a hash digest.
-
-  For Ed448, an optional context string can be provided for domain separation.
-  This allows the same key to be used in different contexts without creating
-  security vulnerabilities.
-
-  The context must contain a private key (set via EdDsaSetPrivKey() or loaded
-  from PEM) before calling this function.
-
-  If EdDsaContext is NULL, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If MessageSize is 0 or exceeds INT_MAX, then return FALSE.
-  If Signature is NULL, then return FALSE.
-  If SigSize is NULL, then return FALSE.
-  For Ed448: Context may be NULL if no context string is used (ContextSize must be 0).
-
-  @param[in]      EdDsaContext    Pointer to EdDSA context containing the private key.
-  @param[in]      Context         Optional context string for Ed448 domain separation.
-                                  May be NULL for default context.
-  @param[in]      ContextSize     Size of context string in bytes. Set to 0 if Context is NULL.
-  @param[in]      Message         Pointer to message data to be signed.
-  @param[in]      MessageSize     Size of message in bytes.
-  @param[out]     Signature       Pointer to buffer to receive the signature.
-  @param[in,out]  SigSize         On input, size of Signature buffer.
-                                  On output, actual size of signature (114 bytes for Ed448).
-
-  @retval TRUE   EdDSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EdDsaSign (
-  IN      VOID         *EdDsaContext,
-  IN      CONST UINT8  *Context,
-  IN      UINTN        ContextSize,
-  IN      CONST UINT8  *Message,
-  IN      UINTN        MessageSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
   )
 {
   ASSERT (FALSE);

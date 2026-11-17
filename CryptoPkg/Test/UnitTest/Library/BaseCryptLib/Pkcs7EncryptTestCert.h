@@ -1,11 +1,9 @@
 /** @file
-  Test certificates and matching private keys for the Pkcs7Encrypt() and
-  Pkcs7Decrypt() unit tests.
+  Test certificates and matching private keys for PKCS#7 test fixtures.
 
-  Two independent, self-signed RSA-2048 certificates are provided so that the
-  tests can build envelopedData for one or two distinct recipients and then
-  recover the content with the matching private key. Each private key is stored
-  in password-protected PEM form.
+  Two independent, self-signed RSA-2048 certificates are provided for building
+  envelopedData with one or two distinct recipients. Matching private keys are
+  included in password-protected PEM form.
 
   Generated with the Python "cryptography" package:
     * Recipient 1: CN = "EDK2 Pkcs7 Test Recipient 1", serial 0x11,

@@ -3,9 +3,8 @@
 
   These tests exercise both the OpenSSL- and mbedtls-backed implementations.
   They build envelopedData ContentInfo blobs for one or more recipients with
-  each supported AES-CBC cipher and verify the result structurally (DER walk),
-  plus the parameter-validation contract documented in BaseCryptLib.h. Proving
-  that the content can be recovered is covered by Pkcs7DecryptTests.c.
+  each supported AES-CBC cipher, verify the result structurally (DER walk), and
+  validate the parameter contract documented in BaseCryptLib.h.
 
   Copyright (c) Microsoft Corporation. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -354,8 +353,7 @@ ValidatePkcs7EnvelopedData (
 /**
   Run an end-to-end encryption with a single recipient and validate the output.
 
-  The resulting envelopedData is checked structurally. Recovering the plaintext
-  is covered separately by the Pkcs7Decrypt() tests.
+  The resulting envelopedData is checked structurally.
 
   @param[in]  CipherNid             Symmetric cipher NID to request.
   @param[in]  ExpectedCipherOid     Reference DER-encoded OID.

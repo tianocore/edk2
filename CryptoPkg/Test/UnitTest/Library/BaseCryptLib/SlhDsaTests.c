@@ -11,7 +11,7 @@
 
   The test structure mirrors SlhDsaTests.c and validates:
   - Context creation and destruction (SlhDsaNewByNid, SlhDsaFree)
-  - Key setting and retrieval error cases (SlhDsaSetPrivKey, SlhDsaSetPubKey, SlhDsaGetPubKey)
+  - Public key setting and retrieval error cases (SlhDsaSetPubKey, SlhDsaGetPubKey)
   - Signature verification via PEM/X509 (TestVerifySlhDsaPemX509)
   - Error handling for invalid inputs
 
@@ -162,24 +162,6 @@ TestVerifySlhDsaKeySetGet (
   UT_ASSERT_NOT_EQUAL (TooSmallSize, SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE);
 
   //
-  // Test SlhDsaSetPrivKey with NULL context
-  //
-  Status = SlhDsaSetPrivKey (NULL, (UINT8 *)mSlhDsaShake256sTestPemKey, 100);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test SlhDsaSetPrivKey with NULL key
-  //
-  Status = SlhDsaSetPrivKey (SlhDsaContext1, NULL, SLH_DSA_SHAKE_256S_PRIVATE_KEY_SIZE);
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test SlhDsaSetPrivKey with wrong size
-  //
-  Status = SlhDsaSetPrivKey (SlhDsaContext1, (UINT8 *)mSlhDsaShake256sTestPemKey, 32);
-  UT_ASSERT_FALSE (Status);
-
-  //
   // Test SlhDsaSetPubKey with NULL context
   //
   Status = SlhDsaSetPubKey (NULL, (UINT8 *)mSlhDsaShake256sTestCert, 100);
@@ -328,25 +310,11 @@ TestVerifySlhDsaPemX509 (
   )
 {
   BOOLEAN  Status;
-  VOID     *SlhDsaPrivKey;
   VOID     *SlhDsaPubKey;
   UINTN    MessageSize;
 
-  SlhDsaPrivKey = NULL;
-  SlhDsaPubKey  = NULL;
-  MessageSize   = AsciiStrLen (mSlhDsaTestMessage);
-
-  //
-  // Retrieve SLH-DSA private key from PEM data.
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &SlhDsaPrivKey
-             );
-  UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SlhDsaPrivKey);
+  SlhDsaPubKey = NULL;
+  MessageSize  = AsciiStrLen (mSlhDsaTestMessage);
 
   //
   // Retrieve SLH-DSA public key from X509 certificate.
@@ -373,21 +341,6 @@ TestVerifySlhDsaPemX509 (
              );
   UT_ASSERT_TRUE (Status);
 
-  //
-  // Verify the known-answer signature using the PEM private key.
-  //
-  Status = SlhDsaVerify (
-             SlhDsaPrivKey,
-             NULL,
-             0,
-             (UINT8 *)mSlhDsaTestMessage,
-             MessageSize,
-             (UINT8 *)mSlhDsaShake256sTestSignature,
-             sizeof (mSlhDsaShake256sTestSignature)
-             );
-  UT_ASSERT_TRUE (Status);
-
-  SlhDsaFree (SlhDsaPrivKey);
   SlhDsaFree (SlhDsaPubKey);
 
   return UNIT_TEST_PASSED;
@@ -489,30 +442,25 @@ TestVerifySlhDsaGetPubKey (
   )
 {
   BOOLEAN  Status;
-  VOID     *SlhDsaPrivKey;
+  VOID     *SlhDsaPubKey;
   UINT8    PublicKey[SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE];
   UINTN    PublicKeySize;
 
-  SlhDsaPrivKey = NULL;
-
-  //
-  // Retrieve SLH-DSA private key from PEM data.
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &SlhDsaPrivKey
-             );
+  SlhDsaPubKey = NULL;
+  Status       = SlhDsaGetPublicKeyFromX509 (
+                   mSlhDsaShake256sTestCert,
+                   sizeof (mSlhDsaShake256sTestCert),
+                   &SlhDsaPubKey
+                   );
   UT_ASSERT_TRUE (Status);
-  UT_ASSERT_NOT_NULL (SlhDsaPrivKey);
+  UT_ASSERT_NOT_NULL (SlhDsaPubKey);
 
   //
-  // Get public key from private key context
+  // Get public key from the certificate context
   //
   PublicKeySize = sizeof (PublicKey);
   Status        = SlhDsaGetPubKey (
-                    SlhDsaPrivKey,
+                    SlhDsaPubKey,
                     PublicKey,
                     &PublicKeySize
                     );
@@ -535,7 +483,7 @@ TestVerifySlhDsaGetPubKey (
 
   UT_ASSERT_FALSE (AllZeros);
 
-  SlhDsaFree (SlhDsaPrivKey);
+  SlhDsaFree (SlhDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
@@ -686,39 +634,6 @@ TestVerifySlhDsaPemErrors (
   VOID     *SlhDsaKey;
 
   SlhDsaKey = NULL;
-
-  //
-  // Test SlhDsaGetPrivateKeyFromPem with NULL PEM data
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             NULL,
-             100,
-             NULL,
-             &SlhDsaKey
-             );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test SlhDsaGetPrivateKeyFromPem with NULL context pointer
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             NULL
-             );
-  UT_ASSERT_FALSE (Status);
-
-  //
-  // Test SlhDsaGetPrivateKeyFromPem with invalid PEM data
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             (UINT8 *)"Invalid PEM data",
-             16,
-             NULL,
-             &SlhDsaKey
-             );
-  UT_ASSERT_FALSE (Status);
 
   //
   // Test SlhDsaGetPublicKeyFromX509 with NULL certificate
@@ -888,20 +803,15 @@ TestVerifySlhDsaGetPubKeyNullBuffer (
   )
 {
   BOOLEAN  Status;
-  VOID     *SlhDsaPrivKey;
+  VOID     *SlhDsaPubKey;
   UINTN    PublicKeySize;
 
-  SlhDsaPrivKey = NULL;
-
-  //
-  // Get valid private key
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &SlhDsaPrivKey
-             );
+  SlhDsaPubKey = NULL;
+  Status       = SlhDsaGetPublicKeyFromX509 (
+                   mSlhDsaShake256sTestCert,
+                   sizeof (mSlhDsaShake256sTestCert),
+                   &SlhDsaPubKey
+                   );
   UT_ASSERT_TRUE (Status);
 
   //
@@ -910,14 +820,14 @@ TestVerifySlhDsaGetPubKeyNullBuffer (
   //
   PublicKeySize = 9999;
   Status        = SlhDsaGetPubKey (
-                    SlhDsaPrivKey,
+                    SlhDsaPubKey,
                     NULL,
                     &PublicKeySize
                     );
   UT_ASSERT_FALSE (Status);
   UT_ASSERT_EQUAL (PublicKeySize, 0);
 
-  SlhDsaFree (SlhDsaPrivKey);
+  SlhDsaFree (SlhDsaPubKey);
 
   return UNIT_TEST_PASSED;
 }
@@ -1208,29 +1118,24 @@ TestVerifySlhDsaKeyReplacement (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
+  VOID     *SourceKey;
   UINT8    PublicKey1[SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE];
   UINT8    PublicKey2[SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE];
   UINTN    PubKeySize;
 
-  PrivKey = NULL;
-
-  //
-  // Load first key
-  //
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &PrivKey
-             );
+  SourceKey = NULL;
+  Status    = SlhDsaGetPublicKeyFromX509 (
+                mSlhDsaShake256sTestCert,
+                sizeof (mSlhDsaShake256sTestCert),
+                &SourceKey
+                );
   UT_ASSERT_TRUE (Status);
 
   //
   // Get public key
   //
   PubKeySize = sizeof (PublicKey1);
-  Status     = SlhDsaGetPubKey (PrivKey, PublicKey1, &PubKeySize);
+  Status     = SlhDsaGetPubKey (SourceKey, PublicKey1, &PubKeySize);
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1256,7 +1161,7 @@ TestVerifySlhDsaKeyReplacement (
   UT_ASSERT_TRUE (Status);
   UT_ASSERT_EQUAL (PubKeySize, SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE);
 
-  SlhDsaFree (PrivKey);
+  SlhDsaFree (SourceKey);
   SlhDsaFree (SlhDsaContext1);
   SlhDsaContext1 = NULL;
 
@@ -1332,19 +1237,17 @@ TestVerifySlhDsaGetPubKeyRepeated (
   )
 {
   BOOLEAN  Status;
-  VOID     *PrivKey;
+  VOID     *PubKey;
   UINT8    PubKey1[SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE];
   UINT8    PubKey2[SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE];
   UINT8    PubKey3[SLH_DSA_SHAKE_256S_PUBLIC_KEY_SIZE];
   UINTN    Size1, Size2, Size3;
 
-  PrivKey = NULL;
-
-  Status = SlhDsaGetPrivateKeyFromPem (
-             mSlhDsaShake256sTestPemKey,
-             sizeof (mSlhDsaShake256sTestPemKey),
-             NULL,
-             &PrivKey
+  PubKey = NULL;
+  Status = SlhDsaGetPublicKeyFromX509 (
+             mSlhDsaShake256sTestCert,
+             sizeof (mSlhDsaShake256sTestCert),
+             &PubKey
              );
   UT_ASSERT_TRUE (Status);
 
@@ -1352,15 +1255,15 @@ TestVerifySlhDsaGetPubKeyRepeated (
   // Get public key three times
   //
   Size1  = sizeof (PubKey1);
-  Status = SlhDsaGetPubKey (PrivKey, PubKey1, &Size1);
+  Status = SlhDsaGetPubKey (PubKey, PubKey1, &Size1);
   UT_ASSERT_TRUE (Status);
 
   Size2  = sizeof (PubKey2);
-  Status = SlhDsaGetPubKey (PrivKey, PubKey2, &Size2);
+  Status = SlhDsaGetPubKey (PubKey, PubKey2, &Size2);
   UT_ASSERT_TRUE (Status);
 
   Size3  = sizeof (PubKey3);
-  Status = SlhDsaGetPubKey (PrivKey, PubKey3, &Size3);
+  Status = SlhDsaGetPubKey (PubKey, PubKey3, &Size3);
   UT_ASSERT_TRUE (Status);
 
   //
@@ -1371,7 +1274,7 @@ TestVerifySlhDsaGetPubKeyRepeated (
   UT_ASSERT_MEM_EQUAL (PubKey1, PubKey2, Size1);
   UT_ASSERT_MEM_EQUAL (PubKey2, PubKey3, Size2);
 
-  SlhDsaFree (PrivKey);
+  SlhDsaFree (PubKey);
 
   return UNIT_TEST_PASSED;
 }

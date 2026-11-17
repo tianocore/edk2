@@ -24,7 +24,8 @@
             "8001", "IsLeap",
             "8001", "OBJ_get0_data",
             "8001", "OBJ_length",
-            "5005", "X509PopCertificate"
+            "5005", "X509PopCertificate",
+            "8004", "test_generate_base_crypt_lib_test_signatures.py"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
