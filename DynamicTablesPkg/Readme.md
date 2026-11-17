@@ -79,6 +79,7 @@ The framework currently supports the following table generators:
 * EINJ - APEI Error Injection Table
 * BERT - Boot Error Record Table
 * ERST - Error Record Serialization Table
+* RAS2 - RAS2 Feature Table
 
 ## Dynamic AML
 

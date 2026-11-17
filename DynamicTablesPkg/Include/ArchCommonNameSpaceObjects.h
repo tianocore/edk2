@@ -171,6 +171,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjVirtioMmioDeviceInfo,              ///< 101 - Virtio MMIO Device Information
   EArchCommonObjFirmwareInventoryInfo,             ///< 102 - Firmware Inventory Information
   EArchCommonObjFirmwareInventoryComponent,        ///< 103 - Firmware Inventory Associated Component
+  EArchCommonObjRas2PccInfo,                       ///< 104 - RAS2 PCC Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -2697,5 +2698,28 @@ typedef struct CmArchCommonVirtioMmioDeviceInfo {
   /// TRUE indicates coherent DMA; FALSE indicates non-coherent DMA.
   BOOLEAN                              CacheCoherent;
 } CM_ARCH_COMMON_VIRTIO_MMIO_DEVICE_INFO;
+
+/** A structure that describes a RAS2 Platform Communication Channel.
+
+    ACPI Specification 6.6, Section 5.2.21.
+
+    ID: EArchCommonObjRas2PccInfo
+*/
+typedef struct CmArchCommonRas2PccInfo {
+  /// PCC subspace type, used to select the CM object type
+  /// when resolving PccSubspaceToken.
+  UINT8              PccSubspaceType;
+
+  /// Token identifying the referenced PCC subspace instance.
+  CM_OBJECT_TOKEN    PccSubspaceToken;
+
+  /// RAS feature type.
+  /// 0x00 = Memory RAS.
+  UINT8              FeatureType;
+
+  /// Token identifying the feature-specific instance.
+  /// For Memory RAS: CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.
+  CM_OBJECT_TOKEN    InstanceToken;
+} CM_ARCH_COMMON_RAS2_PCC_INFO;
 
 #pragma pack()
