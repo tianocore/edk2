@@ -6,13 +6,13 @@
   If a register returned is a single 32-bit value, then a data structure is
   not provided for that register.
 
-  Copyright (c) 2017 - 2024, Advanced Micro Devices. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Advanced Micro Devices. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
   AMD64 Architecture Programming Manual volume 2, March 2024
-
+  AMD64 Architecture Programmer's Manual Volume 3: July 2026
 **/
 
 #pragma once
@@ -871,3 +871,75 @@ typedef union {
   ///
   UINT32    Uint32;
 } CPUID_MEMORY_ENCRYPTION_INFO_EDX;
+
+/**
+  CPUID Extended Features 2
+  @note
+    - AMD64 Architecture Programmer's Manual Volume 3: General-Purpose and System Instructions
+      Version 4.10
+      Publication Date: July 2026
+      Publication Number: 40332
+    - Appendix E
+      - E.4 Extended Feature Function Numbers
+      - E.4.19 Function 8000_0021-Extended Feature Identification
+**/
+#define CPUID_AMD_EXTENDED_FEATURES_2  0x80000021
+
+/**
+  CPUID Extended Features 2 ECX for CPUID leaf
+  #CPUID_AMD_EXTENDED_FEATURES_2.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Reserved
+    ///
+    UINT32    Reserved1       : 1;
+    ///
+    /// [Bit 1] TSA_SQ_NO: When set, the processor is not vulnerable to TSA-SQ.
+    /// See Technical Guidance for Mitigating Transient Scheduler Attacks.
+    ///
+    UINT32    TsaSqNo         : 1;
+    ///
+    /// [Bit 2] TSA_L1_NO: When set, the processor is not vulnerable to TSA-L1.
+    /// See Technical Guidance for Mitigating Transient Scheduler Attacks.
+    ///
+    UINT32    TsaL1No         : 1;
+    ///
+    /// [Bits 4:3] Reserved
+    ///
+    UINT32    Reserved2       : 2;
+    ///
+    /// [Bit 5] VERW_CLEAR: When set, the memory form of the VERW instruction
+    /// may be used to help mitigate TSA. See Technical Guidance for Mitigating
+    /// Transient Scheduler Attacks.
+    ///
+    UINT32    VerwClear       : 1;
+    ///
+    /// [Bits 6] Reserved
+    ///
+    UINT32    Reserved3       : 1;
+    ///
+    /// [Bit 7] TSA_FILL_NO: When set, the processor is not vulnerable to TSA-FILL.
+    /// See Technical Guidance for Mitigating Transient Scheduler Attacks.
+    ///
+    UINT32    TsaFillNo       : 1;
+    ///
+    /// [Bit 8] BtbCtxIsolation: When set, branch predictions in one context
+    /// (as determined by user/supervisor and guest/host) may only be influenced
+    /// by execution in the same context.
+    ///
+    UINT32    BtbCtxIsolation : 1;
+    ///
+    /// [Bits 31:9] Reserved
+    ///
+    UINT32    Reserved4       : 23;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32    Uint32;
+} CPUID_AMD_EXTENDED_FEATURES_2_ECX;
