@@ -49,7 +49,9 @@ typedef enum {
   DynHiiNodeOption,
   DynHiiNodeDefault,
   DynHiiNodeString,
+  DynHiiNodeCondition,
   DynHiiNodeExpression,
+  DynHiiNodeValue,
   DynHiiNodeMax
 } DYN_HII_NODE_TYPE;
 
@@ -97,6 +99,43 @@ typedef enum {
   DynHiiRef5,
   DynHiiRefMax
 } DYN_HII_REF_QUESTION_TYPE;
+
+/** The DYN_HII_DEFAULT_TYPE enum type defines the type
+    of default value representation used by a default node.
+*/
+typedef enum {
+  DynHiiDefaultLiteral = 1,
+  DynHiiDefaultExpression,
+  DynHiiDefaultMax
+} DYN_HII_DEFAULT_TYPE;
+
+/** The DYN_HII_CONDITION_TYPE enum type defines scoped
+    conditional IFR opcodes.
+*/
+typedef enum {
+  DynHiiConditionSuppressIf = 1,
+  DynHiiConditionGrayOutIf,
+  DynHiiConditionDisableIf,
+  DynHiiConditionMax
+} DYN_HII_CONDITION_TYPE;
+
+/** The DYN_HII_EXPRESSION_TYPE enum type defines expression
+    opcodes that can be emitted under a condition node.
+*/
+typedef enum {
+  DynHiiExprQuestionRef1 = 1,
+  DynHiiExprEqIdVal,
+  DynHiiExprEqIdValList,
+  DynHiiExprEqual,
+  DynHiiExprGreaterThan,
+  DynHiiExprAnd,
+  DynHiiExprOr,
+  DynHiiExprNot,
+  DynHiiExprBitwiseAnd,
+  DynHiiExprTrue,
+  DynHiiExprUint64,
+  DynHiiExprMax
+} DYN_HII_EXPRESSION_TYPE;
 
 /** Mask for valid numeric flags */
 #define NUMERIC_FLAGS_MASK  (UINT8)0x33
@@ -202,6 +241,110 @@ typedef struct {
   /// The varstore data
   DYN_HII_VARSTORE_DATA    Data;
 } DYN_HII_VARSTORE;
+
+/** A structure for holding the
+    EFI_IFR_QUESTION_REF1_OP expression payload.
+*/
+typedef struct {
+  /// Question ID referenced by the expression.
+  EFI_QUESTION_ID    QuestionId;
+} DYN_HII_EXPR_QUESTION_REF1_DATA;
+
+/** A structure for holding the EFI_IFR_EQ_ID_VAL_OP
+    expression payload.
+*/
+typedef struct {
+  /// Question ID whose value is to be compared.
+  EFI_QUESTION_ID    QuestionId;
+
+  /// UINT16 comparison value.
+  UINT16             Value;
+} DYN_HII_EXPR_EQ_ID_VAL_DATA;
+
+/** A structure for holding the EFI_IFR_EQ_ID_VAL_LIST_OP
+    expression payload.
+*/
+typedef struct {
+  /// Question ID whose value is to be searched in ValueList.
+  EFI_QUESTION_ID    QuestionId;
+
+  /// Number of UINT16 values in ValueList.
+  UINT16             ValueCount;
+
+  /// Dynamically allocated UINT16 value list.
+  UINT16             *ValueList;
+} DYN_HII_EXPR_EQ_ID_VAL_LIST_DATA;
+
+/** A structure for holding the EFI_IFR_UINT64_OP
+    expression payload.
+*/
+typedef struct {
+  /// UINT64 literal value pushed onto the expression stack.
+  UINT64    Value;
+} DYN_HII_EXPR_UINT64_DATA;
+
+/** A union for holding expression opcode payload data.
+*/
+typedef union {
+  /// EFI_IFR_QUESTION_REF1_OP payload.
+  DYN_HII_EXPR_QUESTION_REF1_DATA     QuestionRef1;
+
+  /// EFI_IFR_EQ_ID_VAL_OP payload.
+  DYN_HII_EXPR_EQ_ID_VAL_DATA         EqIdVal;
+
+  /// EFI_IFR_EQ_ID_VAL_LIST_OP payload.
+  DYN_HII_EXPR_EQ_ID_VAL_LIST_DATA    EqIdValList;
+
+  /// EFI_IFR_UINT64_OP payload.
+  DYN_HII_EXPR_UINT64_DATA            Uint64;
+} DYN_HII_EXPRESSION_DATA;
+
+/** A structure for holding expression opcode data.
+
+  Expressions are serialized in the order in which
+  they are linked into a condition node's
+  ExpressionList.
+*/
+typedef struct {
+  /// Expression node header
+  DYN_HII_NODE_HDR           Hdr;
+
+  /// Type of expression opcode
+  DYN_HII_EXPRESSION_TYPE    ExpressionType;
+
+  /// Expression type specific payload.
+  DYN_HII_EXPRESSION_DATA    Data;
+} DYN_HII_EXPRESSION;
+
+/** A structure for scoped condition node.
+
+  Conditions will have expression(s) under it,
+  followed by other statements/forms/options
+  etc.
+*/
+typedef struct {
+  /// Condition node header
+  DYN_HII_NODE_HDR          Hdr;
+
+  /// Type of conditional opcode to emit
+  DYN_HII_CONDITION_TYPE    ConditionType;
+
+  /// Count of number of expressions under
+  /// the condition
+  UINT32                    ExpressionCount;
+
+  /// Parent node under which this condition
+  /// is attached.
+  DYN_HII_HANDLE            ParentNode;
+
+  /// Expression opcodes controlled by this
+  /// condition
+  LIST_ENTRY                ExpressionList;
+
+  /// Statements or nested condition nodes
+  /// under this condition
+  LIST_ENTRY                ChildList;
+} DYN_HII_CONDITION;
 
 /** A structure for Checkbox Question
     specific information.
@@ -355,21 +498,52 @@ typedef struct {
 } DYN_HII_ONE_OF_OPTION;
 
 /** A structure for holding information associated
+    with an EFI_IFR_VALUE_OP node.
+
+  The value node is used as an expression wrapper
+  under nodes such as DYN_HII_DEFAULT when the
+  value is generated from one or more expression
+  opcodes.
+*/
+typedef struct {
+  /// Value node header
+  DYN_HII_NODE_HDR    Hdr;
+
+  /// Count of expression nodes under this value
+  /// node
+  UINT32              ExpressionCount;
+
+  /// Expression opcodes used to compute the value
+  LIST_ENTRY          ExpressionList;
+} DYN_HII_VALUE;
+
+/** A structure for holding information associated
     with a Default for a Question.
 */
 typedef struct {
   /// Default node header
-  DYN_HII_NODE_HDR      Hdr;
+  DYN_HII_NODE_HDR        Hdr;
 
   /// Default store associated with this
   /// default value
-  UINT16                DefaultId;
+  UINT16                  DefaultId;
 
-  /// Type of data in the value field
-  UINT8                 Type;
+  /// Type of default value representation
+  DYN_HII_DEFAULT_TYPE    DefaultType;
 
+  /// Type of data in the Value field.
+  /// This field is valid if DefaultType is
+  /// DynHiiDefaultLiteral
+  UINT8                   ValueType;
+
+  /// The default value. This field is valid
+  /// if DefaultType is DynHiiDefaultLiteral
   /// The default value
-  EFI_IFR_TYPE_VALUE    Value;
+  EFI_IFR_TYPE_VALUE      Value;
+
+  /// List of child nodes. This is used for
+  /// expression backed defaults.
+  LIST_ENTRY              ChildList;
 } DYN_HII_DEFAULT;
 
 /** A structure for holding information associated
