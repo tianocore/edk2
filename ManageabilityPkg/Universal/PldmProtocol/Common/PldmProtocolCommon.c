@@ -91,7 +91,7 @@ SetupPldmRequestTransportPacket (
     MctpHeader->MessageHeader.IntegrityCheck = FALSE;
     MctpHeader->MessageHeader.MessageType    = MCTP_MESSAGE_TYPE_PLDM;
     *PacketHeader                            = (MANAGEABILITY_TRANSPORT_HEADER *)MctpHeader;
-    *PacketHeaderSize                        = sizeof (MANAGEABILITY_TRANSPORT_HEADER);
+    *PacketHeaderSize                        = sizeof (MANAGEABILITY_MCTP_TRANSPORT_HEADER);
     *PacketTrailer                           = NULL;
     *PacketTrailerSize                       = 0;
   } else {
