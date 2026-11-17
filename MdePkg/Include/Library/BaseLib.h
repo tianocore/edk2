@@ -7,7 +7,7 @@ Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 Portions Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
-Copyright (c) 2023 - 2024, Arm Limited. All rights reserved.<BR>
+Copyright (c) 2023 - 2026, Arm Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -4875,8 +4875,8 @@ BitFieldCountOnes64 (
 VOID
 EFIAPI
 ConvertGuidToUuid (
-  IN   GUID  *FromGuid,
-  OUT  GUID  *ToUuid
+  IN   CONST GUID  *FromGuid,
+  OUT  GUID        *ToUuid
   );
 
 /**
@@ -4893,8 +4893,8 @@ ConvertGuidToUuid (
 VOID
 EFIAPI
 ConvertUuidToGuid (
-  IN   GUID  *FromUuid,
-  OUT  GUID  *ToGuid
+  IN   CONST GUID  *FromUuid,
+  OUT  GUID        *ToGuid
   );
 
 //
