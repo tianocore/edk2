@@ -1,0 +1,46 @@
+## @file # [CODE_FIRST] 13226
+#  The SPI Host Controller Module PEIM INF file # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+#  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved. # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+#  SPDX-License-Identifier: BSD-2-Clause-Patent # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+## # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Defines] # [CODE_FIRST] 13226
+  INF_VERSION               = 1.30 # [CODE_FIRST] 13226
+  BASE_NAME                 = SpiHcPei # [CODE_FIRST] 13226
+  FILE_GUID                 = 3A7C9E15-2B4D-4F86-9C0A-5D8E1F63B2A7 # [CODE_FIRST] 13226
+  MODULE_TYPE               = PEIM # [CODE_FIRST] 13226
+  VERSION_STRING            = 0.1 # [CODE_FIRST] 13226
+  PI_SPECIFICATION_VERSION  = 1.10 # [CODE_FIRST] 13226
+  ENTRY_POINT               = SpiHcPeiEntry # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Packages] # [CODE_FIRST] 13226
+  MdePkg/MdePkg.dec # [CODE_FIRST] 13226
+  MdeModulePkg/MdeModulePkg.dec # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[LibraryClasses] # [CODE_FIRST] 13226
+  BaseLib # [CODE_FIRST] 13226
+  BaseMemoryLib # [CODE_FIRST] 13226
+  DebugLib # [CODE_FIRST] 13226
+  MemoryAllocationLib # [CODE_FIRST] 13226
+  PeimEntryPoint # [CODE_FIRST] 13226
+  PeiServicesLib # [CODE_FIRST] 13226
+  SpiHcPlatformLib # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Sources] # [CODE_FIRST] 13226
+  SpiHc.h # [CODE_FIRST] 13226
+  SpiHc.c # [CODE_FIRST] 13226
+  SpiHcPei.c # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Ppis] # [CODE_FIRST] 13226
+  gEfiPeiSpiHcPpiGuid                              ## PRODUCES # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+# The PEIM's only external dependency is SpiHcPlatformLib, # [CODE_FIRST] 13226
+# which is resolved at build time. # [CODE_FIRST] 13226
+[Depex] # [CODE_FIRST] 13226
+  TRUE # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[UserExtensions.TianoCore."ExtraFiles"] # [CODE_FIRST] 13226
+  SpiHc.uni # [CODE_FIRST] 13226
