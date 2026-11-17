@@ -50,7 +50,9 @@ SECTIONS {
    * this binary.
    */
   .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(COMMONPAGESIZE)) {
-    *(.data .data.* .gnu.linkonce.d.*)
+    *(.data)
+    *(.data.*)
+    *(.gnu.linkonce.d.*)
     *(.bss .bss.*)
     KEEP(*(.prmexportdescriptor))
   } :data
