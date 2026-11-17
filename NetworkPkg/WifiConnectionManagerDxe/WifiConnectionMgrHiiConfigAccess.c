@@ -2,6 +2,7 @@
   The Hii functions for WiFi Connection Manager.
 
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1978,6 +1979,7 @@ WifiMgrDxeHiiConfigAccessCallback (
   @retval EFI_SUCCESS             The configuration form is initialized.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
   @retval EFI_INVALID_PARAMETER   Any input parameter is invalid.
+  @retval EFI_NOT_READY           The required HII protocols are not available.
   @retval Other Erros             Returned Errors when installing protocols.
 
 **/
@@ -1990,6 +1992,10 @@ WifiMgrDxeConfigFormInit (
 
   if (Private == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if ((gHiiDatabase == NULL) || (gHiiString == NULL) || (gHiiConfigRouting == NULL)) {
+    return EFI_NOT_READY;
   }
 
   Private->ConfigAccess.ExtractConfig = WifiMgrDxeHiiConfigAccessExtractConfig;
