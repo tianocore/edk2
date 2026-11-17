@@ -27,8 +27,8 @@
   * Single EFI_HOB_TYPE_FV to describe the Firmware Volume where MM Core resides.
   * Single GUIDed (gEfiSmmSmramMemoryGuid) HOB to describe the MM regions.
   * Single EFI_HOB_MEMORY_ALLOCATION_MODULE to describe the MM region used by MM Core.
-  * Multiple EFI_HOB_RESOURCE_DESCRIPTOR to describe the non-MM regions and their access permissions.
-    Note: All accessible non-MM regions should be described by EFI_HOB_RESOURCE_DESCRIPTOR HOBs.
+  * Multiple EFI_HOB_RESOURCE_DESCRIPTOR2 to describe the non-MM regions and their access permissions.
+    Note: All accessible non-MM regions should be described by EFI_HOB_RESOURCE_DESCRIPTOR2 HOBs.
   * Single GUIDed (gMmCommBufferHobGuid) HOB to identify MM Communication buffer in non-MM region.
   * Multiple GUIDed (gSmmBaseHobGuid) HOB to describe the SMM base address of each processor.
   * Multiple GUIDed (gMpInformation2HobGuid) HOB to describe the MP information.
@@ -58,10 +58,10 @@ CreateMmPlatformHob (
   IN OUT  UINTN  *BufferSize
   )
 {
-  EFI_HOB_GUID_TYPE            *GuidHob;
-  UINTN                        Size;
-  EFI_HOB_RESOURCE_DESCRIPTOR  Hob;
-  UINTN                        NumberOfHobResourceDescriptor;
+  EFI_HOB_GUID_TYPE             *GuidHob;
+  UINTN                         Size;
+  EFI_HOB_RESOURCE_DESCRIPTOR2  Hob;
+  UINTN                         NumberOfHobResourceDescriptor;
 
   if (BufferSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -78,7 +78,7 @@ CreateMmPlatformHob (
   Size   += GET_HOB_LENGTH (GuidHob);
 
   // Account for resource descriptor HOBs for MM region
-  Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR) * NUMBER_OF_HOB_RESOURCE_DESCRIPTOR;
+  Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2) * NUMBER_OF_HOB_RESOURCE_DESCRIPTOR;
 
   if (Size > *BufferSize) {
     *BufferSize = Size;
@@ -96,33 +96,36 @@ CreateMmPlatformHob (
 
   // Create resource descriptor HOBs for MM region
   // APIC
-  Hob.Header.HobType    = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR;
-  Hob.Header.HobLength  = (UINT16)sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
-  Hob.ResourceType      = EFI_RESOURCE_MEMORY_MAPPED_IO;
-  Hob.ResourceAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-                          EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                          EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-                          EFI_RESOURCE_ATTRIBUTE_TESTED;
-  Hob.PhysicalStart  = PcdGet32 (PcdCpuLocalApicBaseAddress);
-  Hob.ResourceLength = SIZE_1MB;
+  ZeroMem (&Hob, sizeof (Hob));
+  Hob.Header.HobType       = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2;
+  Hob.Header.HobLength     = (UINT16)sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2);
+  Hob.ResourceType         = EFI_RESOURCE_MEMORY_MAPPED_IO;
+  Hob.ResourceCapabilities = EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+                             EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                             EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+                             EFI_RESOURCE_ATTRIBUTE_TESTED;
+  Hob.ResourceMemoryAttributes = EFI_MEMORY_UC;
+  Hob.PhysicalStart            = PcdGet32 (PcdCpuLocalApicBaseAddress);
+  Hob.ResourceLength           = SIZE_1MB;
   ZeroMem (&(Hob.Owner), sizeof (EFI_GUID));
-  CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
-  Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+  CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2));
+  Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2);
   NumberOfHobResourceDescriptor++;
 
   // flash device
-  Hob.Header.HobType    = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR;
-  Hob.Header.HobLength  = (UINT16)sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
-  Hob.ResourceType      = EFI_RESOURCE_MEMORY_MAPPED_IO;
-  Hob.ResourceAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-                          EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                          EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-                          EFI_RESOURCE_ATTRIBUTE_TESTED;
-  Hob.PhysicalStart  = PcdGet32 (PcdOvmfFdBaseAddress);
-  Hob.ResourceLength = PcdGet32 (PcdOvmfFirmwareFdSize);
+  Hob.Header.HobType       = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2;
+  Hob.Header.HobLength     = (UINT16)sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2);
+  Hob.ResourceType         = EFI_RESOURCE_MEMORY_MAPPED_IO;
+  Hob.ResourceCapabilities = EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+                             EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                             EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+                             EFI_RESOURCE_ATTRIBUTE_TESTED;
+  Hob.ResourceMemoryAttributes = EFI_MEMORY_UC;
+  Hob.PhysicalStart            = PcdGet32 (PcdOvmfFdBaseAddress);
+  Hob.ResourceLength           = PcdGet32 (PcdOvmfFirmwareFdSize);
   ZeroMem (&(Hob.Owner), sizeof (EFI_GUID));
-  CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
-  Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+  CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2));
+  Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2);
   NumberOfHobResourceDescriptor++;
 
   ASSERT (NumberOfHobResourceDescriptor == NUMBER_OF_HOB_RESOURCE_DESCRIPTOR);
