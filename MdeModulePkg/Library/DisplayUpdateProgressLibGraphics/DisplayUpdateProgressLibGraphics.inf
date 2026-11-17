@@ -41,3 +41,6 @@
 [Protocols]
   gEfiGraphicsOutputProtocolGuid  # CONSUMES
   gEdkiiBootLogo2ProtocolGuid     # CONSUMES
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressBarBackgroundColor  ## CONSUMES
