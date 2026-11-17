@@ -57,6 +57,20 @@ PciHostBridgeGetRootBridges (
     MemAbove4G.Base       = PcdGet64 (PcdPciMmio64Base);
     MemAbove4G.Limit      = PcdGet64 (PcdPciMmio64Base) +
                             PcdGet64 (PcdPciMmio64Size) - 1;
+
+    //
+    // Ask PciHostBridgeDxe to map the 64-bit MMIO window as EFI_MEMORY_WB, so
+    // that it remains covered by the default MTRR type (WB) rather than by a
+    // variable MTRR of type UC, which would take precedence over cacheable
+    // mappings of BARs in this window created by the OS.
+    //
+    // PciHostBridgeDxe only honours this for apertures that are not already
+    // described in an incompatible way in the GCD memory space map, and so
+    // the 32-bit MMIO window, which is covered by an uncached MMIO resource
+    // descriptor HOB created during platform initialization, will remain
+    // EFI_MEMORY_UC.
+    //
+    Attributes |= EFI_PCI_ATTRIBUTE_MEMORY_CACHED;
   } else {
     CopyMem (&MemAbove4G, &mNonExistAperture, sizeof (mNonExistAperture));
   }

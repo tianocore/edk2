@@ -189,6 +189,7 @@ READ_LOCK_STATUS   = TRUE
   # Video support
   #
   INF OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  INF OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
   INF OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
   INF OvmfPkg/PlatformDxe/Platform.inf
 

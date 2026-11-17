@@ -412,6 +412,7 @@
   # Video support
   #
   OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
   OvmfPkg/PlatformDxe/Platform.inf
 
