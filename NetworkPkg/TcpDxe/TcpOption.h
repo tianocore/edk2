@@ -79,6 +79,7 @@ TcpComputeScale (
   @param[in]  Nbuf    Pointer to the buffer to store the options.
 
   @return             The total length of the TCP option field.
+  @retval MAX_UINT16  Insufficient buffer space. Any options added are removed.
 
 **/
 UINT16
@@ -94,6 +95,7 @@ TcpSynBuildOption (
   @param[in]  Nbuf    Pointer to the buffer to store the options.
 
   @return             The total length of the TCP option field.
+  @retval MAX_UINT16  Insufficient buffer space. The buffer is unchanged.
 
 **/
 UINT16
