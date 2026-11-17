@@ -48,7 +48,7 @@
 typedef struct {
   UINT8    DataAccess        : 2;
   UINT8    InstructionAccess : 2;
-  UINT8    Reservd           : 4;
+  UINT8    Reserved          : 4;
 } FFA_MEMORY_ACCESS_PERMISSIONS;
 
 /**
