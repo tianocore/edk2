@@ -1,5 +1,6 @@
 /** @file
-Elf convert solution
+Converts ELF images into PE/COFF images by dispatching to the ELF32 or ELF64
+converter, and provides the COFF section header and relocation helpers they use.
 
 Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 

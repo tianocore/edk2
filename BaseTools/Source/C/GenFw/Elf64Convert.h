@@ -1,5 +1,5 @@
 /** @file
-Header file for Elf64 convert solution
+Function prototype for the ELF64 to PE32+ converter.
 
 Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 

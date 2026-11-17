@@ -1,5 +1,8 @@
 /** @file
-Converts a pe32+ image to an FW, Te image type, or other specific image.
+Converts PE/COFF or ELF images into EFI PE32/PE32+ or TE images, and performs
+other firmware image operations such as creating ACPI tables and microcode
+binaries, building HII package lists, rebasing, time stamping and stripping
+relocations.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
