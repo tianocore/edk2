@@ -378,6 +378,8 @@ NetworkCommonDriverStart (
                   );
 
   if (EFI_ERROR (Status)) {
+    UsbEth->UsbEthInterrupt (UsbEth, FALSE, 0, NULL);
+    UpdateNicNum (NULL, gPxe);
     if (NicDevice->NiiProtocol.IfNum < MAX_LAN_INTERFACE) {
       gLanDeviceList[NicDevice->NiiProtocol.IfNum] = NULL;
     }
@@ -551,6 +553,24 @@ NetworkCommonDriverStop (
                       EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                       );
     } else {
+      if (NicDevice->NicInfo.RateLimiter != NULL) {
+        gBS->SetTimer (NicDevice->NicInfo.RateLimiter, TimerCancel, 0);
+        gBS->CloseEvent (NicDevice->NicInfo.RateLimiter);
+        NicDevice->NicInfo.RateLimiter = NULL;
+      }
+
+      if ((NicDevice->NicInfo.UsbEth != NULL) && (NicDevice->NicInfo.UsbEth->UsbEthInterrupt != NULL)) {
+        NicDevice->NicInfo.UsbEth->UsbEthInterrupt (NicDevice->NicInfo.UsbEth, FALSE, 0, NULL);
+      }
+
+      if (NicDevice->NiiProtocol.IfNum < MAX_LAN_INTERFACE) {
+        gLanDeviceList[NicDevice->NiiProtocol.IfNum] = NULL;
+      }
+
+      if (gPxe != NULL) {
+        UpdateNicNum (NULL, gPxe);
+      }
+
       FreePool (NicDevice->DevPath);
       FreePool (NicDevice);
     }
