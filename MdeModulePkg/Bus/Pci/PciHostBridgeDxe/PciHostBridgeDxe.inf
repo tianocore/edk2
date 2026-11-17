@@ -31,6 +31,7 @@
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   DebugLib
+  DxeServicesLib
   DxeServicesTableLib
   DevicePathLib
   BaseMemoryLib

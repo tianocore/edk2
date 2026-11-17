@@ -74,6 +74,10 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask|0x00
 !endif #$(NO_SHELL_PROFILES)
 
+[LibraryClasses.AARCH64]
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+
 [Components]
   #
   # Build all the libraries when building this package.
