@@ -328,19 +328,20 @@ class MetaFileParser(object):
                 S1 = ItemList[1].upper()
             else:
                 S1 = TAB_ARCH_COMMON
-            S1 = ReplaceMacro(S1, self._Macros)
-            ArchList.add(S1)
+            # Check the ARCH with the macros known at this point, even if the
+            # field itself is expanded later
+            ArchList.add(ReplaceMacro(S1, self._SectionHeaderMacros).upper())
+            S1 = self._ReplaceSectionHeaderMacro(S1).upper()
 
             # S2 may be Platform or ModuleType
             if len(ItemList) > 2:
-                if self._SectionName.upper() in SECTIONS_HAVE_ITEM_PCD_SET:
-                    S2 = ItemList[2]
-                else:
-                    S2 = ItemList[2].upper()
+                S2 = self._ReplaceSectionHeaderMacro(ItemList[2])
+                if self._SectionName.upper() not in SECTIONS_HAVE_ITEM_PCD_SET:
+                    S2 = S2.upper()
             else:
                 S2 = TAB_COMMON
             if len(ItemList) > 3:
-                S3 = ItemList[3]
+                S3 = self._ReplaceSectionHeaderMacro(ItemList[3])
             else:
                 S3 = TAB_COMMON
             self._Scope.append([S1, S2, S3])
@@ -433,6 +434,20 @@ class MetaFileParser(object):
         Macros.update(self._FileLocalMacros)
         Macros.update(self._GetApplicableSectionMacro())
         return Macros
+
+    ## Macros that may be referenced in a section header
+    #
+    # A macro defined inside a section is scoped to that section, so it is
+    # not visible to any section header, including the header of its own
+    # section.
+    #
+    @property
+    def _SectionHeaderMacros(self):
+        return dict(self._FileLocalMacros)
+
+    ## Expand the macros in a section header field when the header is parsed
+    def _ReplaceSectionHeaderMacro(self, Value):
+        return ReplaceMacro(Value, self._SectionHeaderMacros)
 
     ## Construct section Macro dict
     def _ConstructSectionMacroDict(self, Name, Value):
@@ -1349,6 +1364,27 @@ class DscParser(MetaFileParser):
                 Macros[PcdName.strip()] = TmpValue
         return Macros
 
+    ## Override parent's method to add the macros which are global to the DSC file
+    @property
+    def _SectionHeaderMacros(self):
+        Macros = {}
+        Macros.update(self._FileLocalMacros)
+        Macros.update(GlobalData.gEdkGlobal)
+        Macros.update(GlobalData.gPlatformDefines)
+        Macros.update(GlobalData.gCommandLineDefines)
+        return Macros
+
+    ## Override parent's method to keep the macros in a section header field
+    #
+    # A DSC macro is positional: a later definition, including one in an
+    # !include'd file, overrides the previous value for the remainder of the
+    # file. The raw parse reads the DSC file without its !include'd files, so
+    # the fields are expanded during post-processing instead, in file order
+    # with the !include'd content in place.
+    #
+    def _ReplaceSectionHeaderMacro(self, Value):
+        return Value
+
     def _PostProcess(self):
         Processer = {
             MODEL_META_DATA_SECTION_HEADER                  :   self.__ProcessSectionHeader,
@@ -1435,6 +1471,7 @@ class DscParser(MetaFileParser):
             else:
                 self._InSubsection = False
             try:
+                self.__ExpandSectionScope()
                 Processer[self._ItemType]()
             except EvaluationException as Excpt:
                 #
@@ -1467,8 +1504,6 @@ class DscParser(MetaFileParser):
                 continue
 
             NewOwner = self._IdMapping.get(Owner, -1)
-            if NewOwner > 0:
-                self.__ExpandArchitectureScope()
             self._Enabled = int((not self._DirectiveEvalStack) or (False not in self._DirectiveEvalStack))
             self._LastItem = self._Store(
                                 self._ItemType,
@@ -1476,8 +1511,8 @@ class DscParser(MetaFileParser):
                                 self._ValueList[1],
                                 self._ValueList[2],
                                 self._Scope[0][0],
-                                S2,
-                                S3,
+                                self._Scope[0][1],
+                                self._Scope[0][2],
                                 NewOwner,
                                 self._From,
                                 self._LineIndex + 1,
@@ -1723,16 +1758,50 @@ class DscParser(MetaFileParser):
 
     def __ProcessComponent(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
-        self.__ExpandArchitectureScope()
 
-    def __ExpandArchitectureScope(self):
-        OriginalArch = self._Scope[0][0]
-        self._Scope[0][0] = ReplaceMacro(OriginalArch, self._Macros)
-        if '$(' in self._Scope[0][0] and OriginalArch != TAB_ARCH_COMMON:
-            EdkLogger.warn("Parser",
-                           "Macro in arch field was not resolved. "
-                           "'%s' used in section header is not defined." % OriginalArch,
-                           File=self._FileWithError, Line=self._LineIndex + 1)
+    ## Expand macros used in the section header scope of the current record
+    #
+    # The raw parse keeps the macros in a section header (see
+    # _ReplaceSectionHeaderMacro), so the scope fields (arch, module type or
+    # SKU ID, default store) are resolved here for every record, in file order
+    # with the !include'd content in place. A macro redefined in an
+    # !include'd file therefore applies to the section headers that follow
+    # it, as if the file content were pasted into the DSC file.
+    #
+    # This is independent of record ownership: a top-level section header in
+    # an !include'd file is not owned by a Component, but its macros must still
+    # be expanded as if the file content were pasted into the DSC file.
+    #
+    # Unresolved or empty fields are reported on the section header record
+    # itself, rather than on every record of the section.
+    #
+    def __ExpandSectionScope(self):
+        IsSectionHeader = self._ItemType == MODEL_META_DATA_SECTION_HEADER
+        if IsSectionHeader:
+            SectionName = self._ValueList[0]
+        else:
+            SectionName = self._SectionName
+
+        for Scope in self._Scope:
+            for Index in range(3):
+                OriginalValue = Scope[Index]
+                if '$(' in OriginalValue:
+                    Value = ReplaceMacro(OriginalValue, self._SectionHeaderMacros)
+                    if '$(' not in Value:
+                        if Index == 0 or (Index == 1 and SectionName.upper() not in SECTIONS_HAVE_ITEM_PCD_SET):
+                            Value = Value.upper()
+                        Scope[Index] = Value
+                if not IsSectionHeader:
+                    continue
+                if '$(' in Scope[Index]:
+                    EdkLogger.warn("Parser",
+                                   "Macro in section header was not resolved. "
+                                   "'%s' used in section header is not defined." % OriginalValue,
+                                   File=self._FileWithError, Line=self._LineIndex + 1)
+                elif not Scope[Index].strip():
+                    EdkLogger.warn("Parser",
+                                   "Section header field is empty after macro expansion.",
+                                   File=self._FileWithError, Line=self._LineIndex + 1)
 
     def __ProcessBuildOption(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=False)
