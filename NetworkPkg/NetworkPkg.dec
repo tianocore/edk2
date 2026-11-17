@@ -143,6 +143,41 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdSnpCreateExitBootServicesEvent|TRUE|BOOLEAN|0x1000000C
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## The DHCPv4 Discover timeout values in seconds used by UEFI PXE.
+  # The value is an array of UINT32 values, one for each Discover attempt.
+  # A timeout value of zero is interpreted as one second by DHCPv4.
+  # The driver uses the first PcdPxeDhcp4DiscoverTryCount elements. Therefore,
+  # the array must contain at least PcdPxeDhcp4DiscoverTryCount elements.
+  # @Prompt PXE DHCPv4 Discover timeout values.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp4DiscoverTimeout|{ 0x04, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00 }|VOID*|0x10000014
+
+  ## The number of DHCPv4 Discover attempts used by UEFI PXE.
+  # This value must be non-zero and specifies how many elements of
+  # PcdPxeDhcp4DiscoverTimeout are used.
+  # @Prompt PXE DHCPv4 Discover retry count.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp4DiscoverTryCount|4|UINT32|0x10000015
+
+  ## The initial retransmission time in seconds for DHCPv6 Solicit used by UEFI PXE.
+  # @Prompt PXE DHCPv6 Solicit initial retransmission time.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitInitialRetransmissionTime|4|UINT32|0x10000016
+
+  ## The maximum retransmission count for DHCPv6 Solicit used by UEFI PXE.
+  # At least one of PcdPxeDhcp6SolicitMaximumRetransmissionCount and
+  # PcdPxeDhcp6SolicitMaximumRetransmissionDuration must be non-zero.
+  # @Prompt PXE DHCPv6 Solicit maximum retransmission count.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionCount|4|UINT32|0x10000017
+
+  ## The maximum retransmission time in seconds for DHCPv6 Solicit used by UEFI PXE.
+  # @Prompt PXE DHCPv6 Solicit maximum retransmission time.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionTime|32|UINT32|0x10000018
+
+  ## The maximum retransmission duration in seconds for DHCPv6 Solicit used by UEFI PXE.
+  # At least one of PcdPxeDhcp6SolicitMaximumRetransmissionCount and
+  # PcdPxeDhcp6SolicitMaximumRetransmissionDuration must be non-zero.
+  # @Prompt PXE DHCPv6 Solicit maximum retransmission duration.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeDhcp6SolicitMaximumRetransmissionDuration|60|UINT32|0x10000019
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
   # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
   # 04 = UUID-Based DHCPv6 Unique Identifier (DUID-UUID)
@@ -192,6 +227,53 @@
 
   ## IPv6 HTTP support
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6HttpSupport|TRUE|BOOLEAN|0x10000013
+
+  ## The TCP establishment and TLS negotiation timeouts in seconds used by HTTP.
+  # Valid values are 1 to 0xFFFFFFFF seconds. Zero is not supported.
+  # TcpDxe supports TCP establishment timeouts from 60 to 75 seconds, inclusive;
+  # values outside this range fall back to 75 seconds.
+  # TLS negotiation uses the configured value directly.
+  # TCP establishment and TLS negotiation have separate timeout budgets.
+  # This PCD does not define a single overall connection deadline.
+  # For example, a value of 10 selects 75 seconds for TCP and 10 seconds
+  # for TLS.
+  # @Prompt HTTP connection timeout.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpConnectionTimeout|60|UINT32|0x1000001A
+
+  ## The DHCPv4 Discover timeout values in seconds used by HTTP Boot.
+  # The value is an array of UINT32 values, one for each Discover attempt.
+  # A timeout value of zero is interpreted as one second by DHCPv4.
+  # The driver uses the first PcdHttpBootDhcp4DiscoverTryCount elements.
+  # Therefore, the array must contain at least
+  # PcdHttpBootDhcp4DiscoverTryCount elements.
+  # @Prompt HTTP Boot DHCPv4 Discover timeout values.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp4DiscoverTimeout|{ 0x04, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00 }|VOID*|0x1000001B
+
+  ## The number of DHCPv4 Discover attempts used by HTTP Boot.
+  # This value must be non-zero and specifies how many elements of
+  # PcdHttpBootDhcp4DiscoverTimeout are used.
+  # @Prompt HTTP Boot DHCPv4 Discover retry count.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp4DiscoverTryCount|4|UINT32|0x1000001C
+
+  ## The initial retransmission time in seconds for DHCPv6 Solicit used by HTTP Boot.
+  # @Prompt HTTP Boot DHCPv6 Solicit initial retransmission time.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitInitialRetransmissionTime|4|UINT32|0x1000001D
+
+  ## The maximum retransmission count for DHCPv6 Solicit used by HTTP Boot.
+  # At least one of PcdHttpBootDhcp6SolicitMaximumRetransmissionCount and
+  # PcdHttpBootDhcp6SolicitMaximumRetransmissionDuration must be non-zero.
+  # @Prompt HTTP Boot DHCPv6 Solicit maximum retransmission count.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitMaximumRetransmissionCount|4|UINT32|0x1000001E
+
+  ## The maximum retransmission time in seconds for DHCPv6 Solicit used by HTTP Boot.
+  # @Prompt HTTP Boot DHCPv6 Solicit maximum retransmission time.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitMaximumRetransmissionTime|32|UINT32|0x1000001F
+
+  ## The maximum retransmission duration in seconds for DHCPv6 Solicit used by HTTP Boot.
+  # At least one of PcdHttpBootDhcp6SolicitMaximumRetransmissionCount and
+  # PcdHttpBootDhcp6SolicitMaximumRetransmissionDuration must be non-zero.
+  # @Prompt HTTP Boot DHCPv6 Solicit maximum retransmission duration.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpBootDhcp6SolicitMaximumRetransmissionDuration|60|UINT32|0x10000020
 
   ## The default size of the HTTP transfer data buffer in bytes.
   # This size is used for HTTP transfers, with a default value of 2MB.

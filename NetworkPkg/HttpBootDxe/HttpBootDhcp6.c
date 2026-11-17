@@ -1030,6 +1030,19 @@ HttpBootDhcp6Sarr (
   EFI_STATUS                Status;
   UINT32                    Random;
   EFI_IP6_CONFIG_PROTOCOL   *Ip6Cfg;
+  UINT32                    MaximumRetransmissionCount;
+  UINT32                    MaximumRetransmissionDuration;
+
+  MaximumRetransmissionCount    = PcdGet32 (PcdHttpBootDhcp6SolicitMaximumRetransmissionCount);
+  MaximumRetransmissionDuration = PcdGet32 (PcdHttpBootDhcp6SolicitMaximumRetransmissionDuration);
+
+  //
+  // The EFI_DHCP6_PROTOCOL requires at least one retransmission limit.
+  //
+  if ((MaximumRetransmissionCount == 0) && (MaximumRetransmissionDuration == 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: DHCPv6 Solicit MRC and MRD must not both be zero\n", __func__));
+    return EFI_INVALID_PARAMETER;
+  }
 
   Dhcp6 = Private->Dhcp6;
   ASSERT (Dhcp6 != NULL);
@@ -1067,10 +1080,10 @@ HttpBootDhcp6Sarr (
   Config.IaDescriptor.IaId     = Random;
   Config.IaDescriptor.Type     = EFI_DHCP6_IA_TYPE_NA;
   Config.SolicitRetransmission = Retransmit;
-  Retransmit->Irt              = 4;
-  Retransmit->Mrc              = 4;
-  Retransmit->Mrt              = 32;
-  Retransmit->Mrd              = 60;
+  Retransmit->Irt              = PcdGet32 (PcdHttpBootDhcp6SolicitInitialRetransmissionTime);
+  Retransmit->Mrc              = MaximumRetransmissionCount;
+  Retransmit->Mrt              = PcdGet32 (PcdHttpBootDhcp6SolicitMaximumRetransmissionTime);
+  Retransmit->Mrd              = MaximumRetransmissionDuration;
 
   //
   // Configure the DHCPv6 instance for HTTP boot.
