@@ -868,7 +868,8 @@ struct MockBaseCryptLib {
      IN   CONST UINT8  *KeyPassword,
      IN   UINT8        *InData,
      IN   UINTN        InDataSize,
-     IN   UINT8        *SignCert,
+     IN   CONST UINT8  *SignCert,
+     IN   UINTN        SignCertSize,
      IN   UINT8        *OtherCerts      OPTIONAL,
      OUT  UINT8        **SignedData,
      OUT  UINTN        *SignedDataSize
