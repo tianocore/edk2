@@ -49,6 +49,34 @@ UnitTestValidateHandle (
 }
 
 /**
+  Remove handle from handle database and free it.
+
+  @param UserHandle    Handle to be removed from list
+
+ **/
+static
+VOID
+UnitTestRemoveHandleFromHandleList (
+  IN EFI_HANDLE  UserHandle
+  )
+{
+  IHANDLE  *Handle;
+
+  Handle = UserHandle;
+
+  if (!IsListEmpty (&Handle->Protocols)) {
+    return;
+  }
+
+  //
+  // If there are no more interfaces for the handle, free the handle
+  //
+  Handle->Signature = 0;
+  RemoveEntryList (&Handle->AllHandles);
+  FreePool (Handle);
+}
+
+/**
   Finds the protocol entry for the requested protocol.
 
   @param  Protocol               The ID of the protocol
@@ -723,9 +751,7 @@ UnitTestReinstallProtocolInterface (
 }
 
 /**
-  Uninstalls all instances of a protocol:interfacer from a handle.
-  If the last protocol interface is remove from the handle, the
-  handle is freed.
+  Internal function that removes protocol interface from handle.
 
   @param  UserHandle             The handle to remove the protocol handler from
   @param  Protocol               The protocol, of protocol:interface, to remove
@@ -733,11 +759,10 @@ UnitTestReinstallProtocolInterface (
 
   @retval EFI_INVALID_PARAMETER  Protocol is NULL.
   @retval EFI_SUCCESS            Protocol interface successfully uninstalled.
-
-**/
+ **/
+static
 EFI_STATUS
-EFIAPI
-UnitTestUninstallProtocolInterface (
+UnitTestUninstallProtocolInterfaceInternal (
   IN EFI_HANDLE  UserHandle,
   IN EFI_GUID    *Protocol,
   IN VOID        *Interface
@@ -812,16 +837,40 @@ UnitTestUninstallProtocolInterface (
     Status = EFI_SUCCESS;
   }
 
-  //
-  // If there are no more handlers for the handle, free the handle
-  //
-  if (IsListEmpty (&Handle->Protocols)) {
-    Handle->Signature = 0;
-    RemoveEntryList (&Handle->AllHandles);
-    FreePool (Handle);
+Done:
+  return Status;
+}
+
+/**
+  Uninstalls all instances of a protocol:interface from a handle.
+  If the last protocol interface is removed from the handle, the
+  handle is freed.
+
+  @param  UserHandle             The handle to remove the protocol handler from
+  @param  Protocol               The protocol, of protocol:interface, to remove
+  @param  Interface              The interface, of protocol:interface, to remove
+
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL.
+  @retval EFI_SUCCESS            Protocol interface successfully uninstalled.
+
+**/
+EFI_STATUS
+EFIAPI
+UnitTestUninstallProtocolInterface (
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *Interface
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = UnitTestUninstallProtocolInterfaceInternal (UserHandle, Protocol, Interface);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-Done:
+  UnitTestRemoveHandleFromHandleList (UserHandle);
+
   return Status;
 }
 
@@ -1622,7 +1671,7 @@ UnitTestUninstallMultipleProtocolInterfaces (
     //
     // Uninstall it
     //
-    Status = UnitTestUninstallProtocolInterface (Handle, Protocol, Interface);
+    Status = UnitTestUninstallProtocolInterfaceInternal (Handle, Protocol, Interface);
   }
 
   VA_END (Args);
@@ -1644,6 +1693,8 @@ UnitTestUninstallMultipleProtocolInterfaces (
 
     VA_END (Args);
     Status = EFI_INVALID_PARAMETER;
+  } else {
+    UnitTestRemoveHandleFromHandleList (Handle);
   }
 
   return Status;
