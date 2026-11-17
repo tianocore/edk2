@@ -97,7 +97,7 @@ class IdfFileClassObject(object):
                     if LineDetails[1] not in self.ImageIDList:
                         self.ImageIDList.append(LineDetails[1])
                     else:
-                        EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %s of File %s is already defined.' % (LineDetails[1], LineNo, File.Path))
+                        EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %d of File %s is already defined.' % (LineDetails[1], LineNo, File.Path))
                     if Len == 4:
                         ImageFile = ImageFileObject(LineDetails[Len-1], LineDetails[1], True)
                     else:
