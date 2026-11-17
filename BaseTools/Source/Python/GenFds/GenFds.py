@@ -591,15 +591,12 @@ class GenFds(object):
             TotalSizeValue = int(FvSpaceInfo[1], 0)
             UsedSizeValue = int(FvSpaceInfo[2], 0)
             FreeSizeValue = int(FvSpaceInfo[3], 0)
-            if UsedSizeValue == TotalSizeValue:
-                Percentage = '100'
-            else:
-                Percentage = str((UsedSizeValue + 0.0) / TotalSizeValue)[0:4].lstrip('0.')
+            Percentage = UsedSizeValue * 100.0 / TotalSizeValue
 
-            GenFdsGlobalVariable.InfLogger(Name + ' ' + '[' + Percentage + '%Full] '\
-                                           + str(TotalSizeValue) + ' (' + hex(TotalSizeValue) + ')' + ' total, '\
-                                           + str(UsedSizeValue) + ' (' + hex(UsedSizeValue) + ')' + ' used, '\
-                                           + str(FreeSizeValue) + ' (' + hex(FreeSizeValue) + ')' + ' free')
+            GenFdsGlobalVariable.InfLogger(f'{Name} [{Percentage:.1f}%Full] '\
+                                           f'{TotalSizeValue} ({TotalSizeValue:#x}) total, '\
+                                           f'{UsedSizeValue} ({UsedSizeValue:#x}) used, '\
+                                           f'{FreeSizeValue} ({FreeSizeValue:#x}) free')
 
     ## PreprocessImage()
     #
