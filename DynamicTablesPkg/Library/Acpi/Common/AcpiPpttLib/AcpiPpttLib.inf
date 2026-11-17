@@ -20,6 +20,12 @@
   PpttGenerator.c
   PpttGenerator.h
 
+[Sources.AARCH64, Sources.LOONGARCH64]
+  Arm/ArmPpttGenerator.c
+
+[Sources.RISCV64]
+  RiscV/RiscVPpttGenerator.c
+
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
