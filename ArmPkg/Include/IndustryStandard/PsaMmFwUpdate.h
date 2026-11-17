@@ -1,7 +1,7 @@
 /** @file
   Firmware Update GUID header file.
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -166,7 +166,7 @@ typedef struct {
   UINT32    VendorSpecificFlags;
 
   /// Array of bytes indicating functions that are implemented
-  UINT8     FunctionPresence[];
+  UINT16    FunctionPresence[];
 } PSA_MM_FWU_DISCOVER_RESP;
 
 /** Request data structure of fwu_begin_staging operation.
