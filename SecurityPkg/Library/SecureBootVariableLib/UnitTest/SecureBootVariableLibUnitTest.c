@@ -62,7 +62,7 @@ extern EFI_TIME  mDefaultPayloadTimestamp;
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set,
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS being set,
                                  but the AuthInfo does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
@@ -1975,7 +1975,7 @@ SetSecureBootVariablesDBTOptional (
 }
 
 /**
-  Initialze the unit test framework, suite, and unit tests for the
+  Initialize the unit test framework, suite, and unit tests for the
   SecureBootVariableLib and run the SecureBootVariableLib unit test.
 
   @retval  EFI_SUCCESS           All test cases were dispatched.

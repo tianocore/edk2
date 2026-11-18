@@ -129,7 +129,7 @@ CopyDigestListToBuffer (
   @param[in]     BufferSize         Size of Buffer.
   @param[out]    DigestList         TPML_DIGEST_VALUES.
 
-  @retval EFI_SUCCESS               Buffer was succesfully copied to DigestList.
+  @retval EFI_SUCCESS               Buffer was successfully copied to DigestList.
   @retval EFI_BAD_BUFFER_SIZE       A bad buffer size passed to the function.
   @retval EFI_INVALID_PARAMETER     An invalid parameter passed to the function: NULL pointer or
                                     BufferSize bigger than TPML_DIGEST_VALUES.

@@ -287,7 +287,7 @@ TestSanitizePeImageEventSize (
   // Test that the event size may not overflow
   Status = TpmSanitizePeImageEventSize (MAX_UINT32, &EventSize);
   if (Status != EFI_BAD_BUFFER_SIZE) {
-    UT_LOG_ERROR ("SanitizePeImageEventSize succeded when it was supposed to fail with %r\n", Status);
+    UT_LOG_ERROR ("SanitizePeImageEventSize succeeded when it was supposed to fail with %r\n", Status);
     goto Exit;
   }
 

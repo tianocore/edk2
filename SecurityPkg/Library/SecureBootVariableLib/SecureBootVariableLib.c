@@ -34,7 +34,7 @@
 //
 // This is the size of a signature list with some data in it. Effectively 44 bytes are
 // required to set the DBX. However in reality, the size of a real payload will be larger
-// since this miniumum size does not consider the SIGNATURE_LIST
+// since this minimum size does not consider the SIGNATURE_LIST
 //
 #define MINIMUM_VALID_SIGNATURE_LIST  (sizeof(EFI_SIGNATURE_LIST) + sizeof(EFI_SIGNATURE_DATA) - 1)
 

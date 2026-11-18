@@ -46,7 +46,7 @@ EFI_HANDLE                 mReadyToLockHandle;
 **/
 EFI_STATUS
 EFIAPI
-TpmNvsCommunciate (
+TpmNvsCommunicate (
   IN     EFI_HANDLE  DispatchHandle,
   IN     CONST VOID  *RegisterContext,
   IN OUT VOID        *CommBuffer,
@@ -242,7 +242,7 @@ InitializeTcgCommon (
   mMcSoftwareSmi     = MAX_UINTN;
 
   // Register a root handler to communicate the NVS region and SMI channel between MM and DXE
-  Status = gMmst->MmiHandlerRegister (TpmNvsCommunciate, &gTpmNvsMmGuid, &mReadyToLockHandle);
+  Status = gMmst->MmiHandlerRegister (TpmNvsCommunicate, &gTpmNvsMmGuid, &mReadyToLockHandle);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "[%a] Failed to register NVS communicate as root MM handler - %r!\n", __func__, Status));

@@ -147,7 +147,7 @@ DefinitionBlock (
       // has to be the same as returned by _CRS (according to ACPI spec).
       //
       // Platform may choose to override this function with specific interrupt
-      // programing logic to replace FIFO/TIS SIRQ registers programing
+      // programming logic to replace FIFO/TIS SIRQ registers programming
       //
       Method(_SRS,1,Serialized)
       {

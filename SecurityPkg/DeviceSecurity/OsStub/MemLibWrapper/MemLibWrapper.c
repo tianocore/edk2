@@ -69,7 +69,7 @@ libspdm_copy_mem (
     ASSERT (0);
   }
 
-  /* Gaurd against invalid source. Zero "dst" in this case. */
+  /* Guard against invalid source. Zero "dst" in this case. */
   if (src == NULL) {
     ZeroMem (dst_buf, dst_len);
     ASSERT (0);
