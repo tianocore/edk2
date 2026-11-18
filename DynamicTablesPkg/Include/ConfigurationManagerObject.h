@@ -8,6 +8,7 @@
 
   @par Glossary:
     - Cm or CM   - Configuration Manager
+    - Hii or HII - Human Interface Infrastructure
     - Obj or OBJ - Object
     - X64 or x64 - X64 Architecture
 **/
@@ -40,6 +41,7 @@ Bits: [31:28] - Name Space ID
                 0011 - X64
                 0100 - RISC-V
                 0101 - LoongArch64
+                1110 - Hii Forms
                 1111 - Custom/OEM
                 All other values are reserved.
 
@@ -94,7 +96,8 @@ typedef enum ObjectNameSpaceID {
   EObjNameSpaceX64,               ///< X64 Objects Namespace
   EObjNameSpaceRiscV,             ///< RISC-V Objects Namespace
   EObjNameSpaceLoongArch64,       ///< LoongArch64 Objects Namespace
-  EObjNameSpaceOem = 0xF,         ///< OEM Objects Namespace
+  EObjNameSpaceHiiForms = 0xE,    ///< Hii Forms Objects Namespace
+  EObjNameSpaceOem      = 0xF,    ///< OEM Objects Namespace
   EObjNameSpaceMax,
 } EOBJECT_NAMESPACE_ID;
 
