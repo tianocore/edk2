@@ -1110,7 +1110,7 @@ GetRevertTimeOut (
   UINT16                       BaseComId;
   UINT32                       MsidLength;
   UINT8                        Msid[OPAL_MSID_LENGTH];
-  UINT32                       RemovalMechanishLists[ReservedMechanism];
+  UINT32                       RemovalMechanismLists[ReservedMechanism];
   UINT8                        ActiveDataRemovalMechanism;
 
   TcgResult = OpalGetSupportedAttributesInfo (Session, &SupportedAttributes, &BaseComId);
@@ -1123,7 +1123,7 @@ GetRevertTimeOut (
     return 0;
   }
 
-  TcgResult = OpalUtilGetDataRemovalMechanismLists (Session, RemovalMechanishLists);
+  TcgResult = OpalUtilGetDataRemovalMechanismLists (Session, RemovalMechanismLists);
   if (TcgResult != TcgResultSuccess) {
     return 0;
   }
@@ -1133,5 +1133,5 @@ GetRevertTimeOut (
     return 0;
   }
 
-  return RemovalMechanishLists[ActiveDataRemovalMechanism];
+  return RemovalMechanismLists[ActiveDataRemovalMechanism];
 }

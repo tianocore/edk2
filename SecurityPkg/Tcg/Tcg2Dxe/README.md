@@ -2,7 +2,7 @@
 
 Tcg2Dxe is a DXE-phase UEFI driver that publishes the TCG2 protocol defined
 by the [TCG EFI Protocol Specification](https://trustedcomputinggroup.org/resource/tcg-efi-protocol-specification/).
-Its main responsibilites are to expose a standard interface to a TPM device,
+Its main responsibilities are to expose a standard interface to a TPM device,
 measure components and events into PCRs, support measured boot, and enable
 secure boot attestation.
 

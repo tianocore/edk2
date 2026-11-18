@@ -2,7 +2,7 @@
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface shim that switches between
   SVSM vTPM Ptp and regular Ptp implementations.
 
-  Use TryUseSvsmVTpm () do check for SVSM vTPM presnece and initialzie the shim.
+  Use TryUseSvsmVTpm () to check for SVSM vTPM presence and initialize the shim.
 
   The SVSM vTPM presence state is cached across library instances.
 

@@ -2641,7 +2641,7 @@ MeasureAllSecureVariables (
   }
 
   //
-  // Meaurement UEFI device signature database
+  // Measurement UEFI device signature database
   //
   if ((PcdGet32 (PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_106) &&
       (PcdGet8 (PcdEnableSpdmDeviceAuthentication) != 0))

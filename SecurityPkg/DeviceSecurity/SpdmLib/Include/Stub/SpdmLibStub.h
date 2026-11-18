@@ -90,7 +90,7 @@ typedef struct {
   UINT8     DataObjectType;
   UINT8     Reserved;
 
-  /* length of the data object being transfered in number of DW, including the header (2 DW)
+  /* length of the data object being transferred in number of DW, including the header (2 DW)
    * It only includes bit[0~17], bit[18~31] are reserved.
    * A value of 00000h indicate 2^18 DW == 2^20 byte.*/
   UINT32    Length;

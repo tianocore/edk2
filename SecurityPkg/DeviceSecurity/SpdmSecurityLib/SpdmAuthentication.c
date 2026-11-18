@@ -86,7 +86,7 @@ MeasureVariable (
 }
 
 /**
-  Extend Certicate and auth state to NV Index and measure trust anchor to PCR.
+  Extend Certificate and auth state to NV Index and measure trust anchor to PCR.
 
   @param[in]  SpdmDeviceContext          The SPDM context for the device.
   @param[in]  AuthState                  The auth state of this deice.
