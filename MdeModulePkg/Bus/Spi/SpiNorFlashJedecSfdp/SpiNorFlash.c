@@ -63,10 +63,8 @@ FillWriteBuffer (
     SfdpAddressBytes = (UINT8)Instance->SfdpBasicFlash->AddressBytes;
   }
 
-  // Copy Opcode into Write Buffer
-  Instance->SpiTransactionWriteBuffer[0] = Opcode;
-  Index                                  = 1;
-  AddressSize                            = 0;
+  Index       = 1;
+  AddressSize = 0;
   if (UseAddress) {
     if (AddressBytesSupported == SPI_ADDR_3BYTE_ONLY) {
       if (SfdpAddressBytes != 0) {
@@ -134,6 +132,9 @@ FillWriteBuffer (
       );
     Index += AddressSize;
   }
+
+  // Copy Opcode into Write Buffer
+  Instance->SpiTransactionWriteBuffer[0] = Opcode;
 
   // Fill DummyBytes
   if (DummyBytes != 0) {
