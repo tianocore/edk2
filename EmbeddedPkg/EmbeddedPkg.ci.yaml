@@ -86,7 +86,7 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": True,           # Fails right now with over 270 errors
+        "AuditOnly": False,          # Fail CI on spelling errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [             # words to extend to the dictionary for this package
             "ddisable",
