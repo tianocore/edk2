@@ -93,7 +93,7 @@
 
     ## options defined ci/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "AuditOnly": False,          # Fail CI on spelling errors
         "IgnoreFiles": [
             "DeviceSecurity/SpdmLib/libspdm/**" # Upstream submodule, including its dependencies
         ],
