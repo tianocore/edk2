@@ -165,6 +165,7 @@ class MetaFileParser(object):
 
         # for recursive parsing
         self._Owner = [Owner]
+        self._FromItem = From
         self._From = From
 
         # parsr status for parsing
@@ -949,7 +950,7 @@ class DscParser(MetaFileParser):
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
         # Track the inherited conditional depth for each included file.
-        self._DirectiveStackBase = {From: 0}
+        self._DirectiveStackBase = {self._FromItem: 0}
         self._Enabled = 1
 
         #
@@ -1405,7 +1406,8 @@ class DscParser(MetaFileParser):
         self._IdMapping = {-1:-1}
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
-        self._DirectiveStackBase = {self._From: 0}
+        self._From = self._FromItem
+        self._DirectiveStackBase = {self._FromItem: 0}
         self._FileWithError = self.MetaFile
         self._FileLocalMacros = {}
         self._SectionsMacroDict.clear()

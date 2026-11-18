@@ -190,6 +190,35 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
         self.assertIn(('AfterConditional', 'AfterConditional.inf'), LibraryClassRecords)
         self.assertIn('Nested.inf', ComponentRecords)
 
+    def test_reprocessing_after_include_resets_directive_stack_base(self):
+        self.WriteTmpFile(
+            'Included.dsc.inc',
+            '[Components]\n'
+            '  Included.inf\n',
+        )
+        self.WriteTmpFile(
+            'Platform.dsc',
+            '[Components]\n'
+            '!include Included.dsc.inc\n',
+        )
+
+        DscFile = PathClass(os.path.join(self.testDir, 'Platform.dsc'))
+        Table = MetaFileStorage(
+            WorkspaceDatabase(),
+            DscFile,
+            MODEL_FILE_DSC,
+            True,
+        )
+        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
+
+        Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_COMMON]
+        ComponentRecords = [Record[0] for Record in Components]
+        self.assertIn('Included.inf', ComponentRecords)
+
+        Parser.DoPostProcess()
+        Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_COMMON]
+        self.assertEqual(ComponentRecords, [Record[0] for Record in Components])
+
     def test_parent_section_after_closed_component_subsection(self):
         self.WriteTmpFile(
             'Component.dsc.inc',
