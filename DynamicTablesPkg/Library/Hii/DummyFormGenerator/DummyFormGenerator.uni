@@ -1,0 +1,43 @@
+// /** @file
+// Dynamic HII Dummy Form Generator.
+//
+// Demonstrates dynamic HII conditional expression generation.
+//
+// Copyright (c) 2026, Arm Limited. All rights reserved.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// --*/
+
+#langdef en-US  "English"
+
+#string STR_MODULE_ABSTRACT                     #language en-US "Dummy dynamic HII form generator"
+#string STR_MODULE_DESCRIPTION                  #language en-US "Dummy form generator used to demonstrate dynamic HII conditional expressions."
+#string STR_DUMMY_FORM_SET_TITLE                #language en-US "Dynamic HII Conditional Demo"
+#string STR_DUMMY_FORM_SET_HELP                 #language en-US "Demonstrates suppressif, grayoutif, disableif and expression opcodes."
+#string STR_DUMMY_MAIN_FORM_TITLE               #language en-US "Conditional Expression Demo"
+#string STR_DUMMY_ADVANCED_FORM_TITLE           #language en-US "Advanced Conditional Demo"
+#string STR_DUMMY_SUBTITLE                      #language en-US "The controls below demonstrate runtime-generated HII conditions."
+#string STR_DUMMY_ENABLE_PROMPT                 #language en-US "Enable feature"
+#string STR_DUMMY_ENABLE_HELP                   #language en-US "Master boolean used by several conditional examples."
+#string STR_DUMMY_MODE_PROMPT                   #language en-US "Operating mode"
+#string STR_DUMMY_MODE_HELP                     #language en-US "OneOf question with conditionally visible options."
+#string STR_DUMMY_MODE_DISABLED                 #language en-US "Disabled"
+#string STR_DUMMY_MODE_BASIC                    #language en-US "Basic"
+#string STR_DUMMY_MODE_ADVANCED                 #language en-US "Advanced"
+#string STR_DUMMY_THRESHOLD_PROMPT              #language en-US "Threshold value."
+#string STR_DUMMY_THRESHOLD_HELP                #language en-US "Numeric question grayed out unless the feature is enabled."
+#string STR_DUMMY_ADVANCED_PROMPT               #language en-US "Advanced switch"
+#string STR_DUMMY_ADVANCED_HELP                 #language en-US "Checkbox placed below nested conditional expressions."
+#string STR_DUMMY_REF_PROMPT                    #language en-US "Open advanced form"
+#string STR_DUMMY_REF_HELP                      #language en-US "Reference question suppressed when the advanced form is disabled."
+#string STR_DUMMY_FORM_ENABLE_PROMPT            #language en-US "Show advanced form"
+#string STR_DUMMY_FORM_ENABLE_HELP              #language en-US "Controls whether the link to the advanced form is visible."
+#string STR_DUMMY_ADV_FORM_SUBTITLE             #language en-US "Controls below live on the advanced form."
+#string STR_DUMMY_ADV_LIMIT_PROMPT              #language en-US "Advanced limit"
+#string STR_DUMMY_ADV_LIMIT_HELP                #language en-US "Numeric question placed directly on the advanced form."
+#string STR_DUMMY_DIAG_MODE_PROMPT              #language en-US "Diagnostic mode"
+#string STR_DUMMY_DIAG_MODE_HELP                #language en-US "OneOf question placed directly on the advanced form."
+#string STR_DUMMY_DIAG_OFF                      #language en-US "Off"
+#string STR_DUMMY_DIAG_SUMMARY                  #language en-US "Summary"
+#string STR_DUMMY_DIAG_VERBOSE                  #language en-US "Verbose"
