@@ -1023,7 +1023,7 @@ QxferLibrary (
   if (Offset == 0) {
     gPacketqXferLibraryOffset += gXferObjectReadResponse ('m', "<library-list>\n");
 
-    // The owner of the table may have had to ralloc it so grab a fresh copy every time
+    // The owner of the table may have had to reallocate it so grab a fresh copy every time
     // we assume qXferLibrary will get called over and over again until the entire XML table is
     // returned in a tight loop. Since we are in the debugger the table should not get updated
     gDebugTable              = gDebugImageTableHeader->EfiDebugImageInfoTable;

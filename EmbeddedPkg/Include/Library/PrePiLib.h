@@ -291,7 +291,7 @@ HobConstructor (
 VOID *
 CreateHob (
   IN  UINT16  HobType,
-  IN  UINT16  HobLenght
+  IN  UINT16  HobLength
   );
 
 /**

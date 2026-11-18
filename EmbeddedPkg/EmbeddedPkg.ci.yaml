@@ -86,9 +86,35 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": True,           # Fails right now with over 270 errors
+        "AuditOnly": False,          # Fail CI on spelling errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
-        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "ExtendWords": [             # words to extend to the dictionary for this package
+            "ddisable",
+            "DebugAgentTimerIntialize", # Preserve the existing library interface spelling
+            "dmdepkg",
+            "dxe's",
+            "ebadbufsize",
+            "ebadmemlengbufsize",
+            "einvalidarg",
+            "einvalidbrkpointtype",
+            "einvalidregnum",
+            "emmcbackward",
+            "emmchs",
+            "eunknown",
+            "gigadevice",
+            "KernelTaggsAddress",    # Preserve the existing public structure member spelling
+            "lauterbach",
+            "packetq",
+            "pvmfw",
+            "qxfer",
+            "readbllen",
+            "rhboot's",
+            "rwatch",
+            "stmicro",
+            "txrdy",
+            "writebllen",
+            "xinkai"
+        ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
     },
