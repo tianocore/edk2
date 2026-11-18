@@ -25,6 +25,7 @@
 
   @retval EFI_SUCCESS            The version of the protocol is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -45,6 +46,7 @@ BaseGetVersion (
   @retval EFI_SUCCESS            Total number of protocols supported are
                                  returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -55,6 +57,12 @@ BaseGetTotalProtocols (
 {
   EFI_STATUS  Status;
   UINT32      *ReturnValues;
+
+  ASSERT (TotalProtocols != NULL);
+
+  if (TotalProtocols == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiGetProtocolAttributes (ScmiProtocolIdBase, &ReturnValues);
   if (EFI_ERROR (Status)) {
@@ -75,6 +83,7 @@ BaseGetTotalProtocols (
 
   @retval EFI_SUCCESS            VendorIdentifier is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -87,6 +96,12 @@ BaseDiscoverVendorDetails (
   UINT32        *ReturnValues;
   SCMI_COMMAND  Cmd;
   UINT32        PayloadLength;
+
+  ASSERT (VendorIdentifier != NULL);
+
+  if (VendorIdentifier == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Cmd.ProtocolId = ScmiProtocolIdBase;
   Cmd.MessageId  = MessageId;
@@ -120,6 +135,7 @@ BaseDiscoverVendorDetails (
 
   @retval EFI_SUCCESS            VendorIdentifier is returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -143,6 +159,7 @@ BaseDiscoverVendor (
 
   @retval EFI_SUCCESS            VendorIdentifier is returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 BaseDiscoverSubVendor (
@@ -164,6 +181,7 @@ BaseDiscoverSubVendor (
 
   @retval EFI_SUCCESS            Implementation version is returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -176,6 +194,12 @@ BaseDiscoverImplVersion (
   UINT32        *ReturnValues;
   SCMI_COMMAND  Cmd;
   UINT32        PayloadLength;
+
+  ASSERT (ImplementationVersion != NULL);
+
+  if (ImplementationVersion == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Cmd.ProtocolId = ScmiProtocolIdBase;
   Cmd.MessageId  = ScmiMessageIdBaseDiscoverImplementationVersion;
@@ -208,6 +232,7 @@ BaseDiscoverImplVersion (
   @retval EFI_BUFFER_TOO_SMALL   ProtocolListSize is too small for the result.
                                  It has been updated to the size needed.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -227,6 +252,12 @@ BaseDiscoverListProtocols (
   UINT32              PayloadLength;
   UINT32              RequiredSize;
 
+  ASSERT (ProtocolListSize != NULL);
+
+  if (ProtocolListSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = BaseGetTotalProtocols (This, &TotalProtocols);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -241,6 +272,12 @@ BaseDiscoverListProtocols (
   if (*ProtocolListSize < RequiredSize) {
     *ProtocolListSize = RequiredSize;
     return EFI_BUFFER_TOO_SMALL;
+  }
+
+  ASSERT ((ProtocolList != NULL) || (RequiredSize == 0));
+
+  if ((ProtocolList == NULL) && (RequiredSize != 0)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   Cmd.ProtocolId = ScmiProtocolIdBase;

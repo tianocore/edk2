@@ -10,6 +10,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/ArmScmiPerformanceProtocol.h>
 
@@ -26,6 +27,7 @@
 
   @retval EFI_SUCCESS            The version is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -45,6 +47,7 @@ PerformanceGetVersion (
 
   @retval EFI_SUCCESS            Protocol attributes are returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -55,6 +58,12 @@ PerformanceGetAttributes (
 {
   EFI_STATUS  Status;
   UINT32      *ReturnValues;
+
+  ASSERT (Attributes != NULL);
+
+  if (Attributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiGetProtocolAttributes (
              ScmiProtocolIdPerformance,
@@ -83,6 +92,7 @@ PerformanceGetAttributes (
 
   @retval EFI_SUCCESS            Domain attributes are returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -97,6 +107,12 @@ PerformanceDomainAttributes (
   UINT32        *ReturnValues;
   UINT32        PayloadLength;
   SCMI_COMMAND  Cmd;
+
+  ASSERT (DomainAttributes != NULL);
+
+  if (DomainAttributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -144,6 +160,7 @@ PerformanceDomainAttributes (
   @retval EFI_BUFFER_TOO_SMALL   LevelArraySize is too small for the result. It
                                  has been updated to the size needed.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -167,6 +184,13 @@ PerformanceDescribeLevels (
   UINT32        ReturnRemainNumLevels;
 
   PERF_DESCRIBE_LEVELS  *Levels;
+
+  ASSERT (NumLevels != NULL);
+  ASSERT (LevelArraySize != NULL);
+
+  if ((NumLevels == NULL) || (LevelArraySize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams1);
   if (EFI_ERROR (Status)) {
@@ -211,6 +235,12 @@ PerformanceDescribeLevels (
       }
     }
 
+    ASSERT ((LevelArray != NULL) || (ReturnNumLevels == 0));
+
+    if ((LevelArray == NULL) && (ReturnNumLevels != 0)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     for (LevelNo = 0; LevelNo < ReturnNumLevels; LevelNo++) {
       CopyMem (
         &LevelArray[LevelIndex++],
@@ -233,6 +263,7 @@ PerformanceDescribeLevels (
 
   @retval EFI_SUCCESS            Performance limits set successfully.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 PerformanceLimitsSet (
@@ -245,6 +276,12 @@ PerformanceLimitsSet (
   UINT32        PayloadLength;
   SCMI_COMMAND  Cmd;
   UINT32        *MessageParams;
+
+  ASSERT (Limits != NULL);
+
+  if (Limits == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -278,6 +315,7 @@ PerformanceLimitsSet (
 
   @retval EFI_SUCCESS            Performance limits are returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 PerformanceLimitsGet (
@@ -292,6 +330,12 @@ PerformanceLimitsGet (
   UINT32        *MessageParams;
 
   SCMI_PERFORMANCE_LIMITS  *ReturnValues;
+
+  ASSERT (Limits != NULL);
+
+  if (Limits == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -372,6 +416,7 @@ PerformanceLevelSet (
 
   @retval EFI_SUCCESS            Performance level got successfully.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 PerformanceLevelGet (
@@ -385,6 +430,12 @@ PerformanceLevelGet (
   SCMI_COMMAND  Cmd;
   UINT32        *ReturnValues;
   UINT32        *MessageParams;
+
+  ASSERT (Level != NULL);
+
+  if (Level == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {

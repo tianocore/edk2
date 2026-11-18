@@ -24,6 +24,7 @@
   @param[out]  Payload  Holds pointer to the message payload.
 
   @retval EFI_SUCCESS            Payload holds a valid message payload pointer.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
   @retval EFI_TIMEOUT            Time out error if MTL channel is busy.
   @retval EFI_UNSUPPORTED        If MTL channel is unsupported.
 **/
@@ -34,6 +35,12 @@ ScmiCommandGetPayload (
 {
   EFI_STATUS   Status;
   MTL_CHANNEL  *Channel;
+
+  ASSERT (Payload != NULL);
+
+  if (Payload == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   // Get handle to the Channel.
   Status = MtlGetChannel (MTL_CHANNEL_TYPE_LOW, &Channel);
@@ -69,6 +76,7 @@ ScmiCommandGetPayload (
                                  successfully.
   @retval EFI_DEVICE_ERROR       Channel not ready, response message header
                                  corrupted, or SCP returned an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
   @retval EFI_TIMEOUT            Timeout on the channel.
   @retval EFI_UNSUPPORTED        Channel not supported.
 **/
@@ -85,7 +93,12 @@ ScmiCommandExecute (
   UINT32                 ResponseHeader;
   MTL_CHANNEL            *Channel;
 
+  ASSERT (Command != NULL);
   ASSERT (PayloadLength != NULL);
+
+  if ((Command == NULL) || (PayloadLength == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = MtlGetChannel (MTL_CHANNEL_TYPE_LOW, &Channel);
   if (EFI_ERROR (Status)) {
@@ -183,6 +196,7 @@ ScmiProtocolDiscoveryCommon (
   @retval EFI_SUCCESS            Version holds a valid version received from
                                  the SCP.
   @retval EFI_DEVICE_ERROR       SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 ScmiGetProtocolVersion (
@@ -192,6 +206,12 @@ ScmiGetProtocolVersion (
 {
   EFI_STATUS  Status;
   UINT32      *ProtocolVersion;
+
+  ASSERT (Version != NULL);
+
+  if (Version == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiProtocolDiscoveryCommon (
              ProtocolId,

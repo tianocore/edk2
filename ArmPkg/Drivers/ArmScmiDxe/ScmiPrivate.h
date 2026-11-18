@@ -84,6 +84,7 @@ typedef struct {
   @param[out]  Payload  Holds pointer to the message payload.
 
   @retval EFI_SUCCESS            Payload holds a valid message payload pointer.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
   @retval EFI_TIMEOUT            Time out error if MTL channel is busy.
   @retval EFI_UNSUPPORTED        If MTL channel is unsupported.
 **/
@@ -108,6 +109,7 @@ ScmiCommandGetPayload (
                                  successfully.
   @retval EFI_DEVICE_ERROR       Channel not ready, response message header
                                  corrupted, or SCP returned an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
   @retval EFI_TIMEOUT            Timeout on the channel.
   @retval EFI_UNSUPPORTED        Channel not supported.
 **/
@@ -126,6 +128,7 @@ ScmiCommandExecute (
   @retval EFI_SUCCESS            Version holds a valid version received from
                                  the SCP.
   @retval EFI_DEVICE_ERROR       SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 ScmiGetProtocolVersion (

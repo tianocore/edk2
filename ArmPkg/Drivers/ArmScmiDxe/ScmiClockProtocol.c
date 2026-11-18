@@ -44,6 +44,7 @@ ConvertTo64Bit (
 
   @retval EFI_SUCCESS            The version is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -64,6 +65,7 @@ ClockGetVersion (
 
   @retval EFI_SUCCESS            Total number of clocks supported is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -74,6 +76,12 @@ ClockGetTotalClocks (
 {
   EFI_STATUS  Status;
   UINT32      *ReturnValues;
+
+  ASSERT (TotalClocks != NULL);
+
+  if (TotalClocks == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiGetProtocolAttributes (ScmiProtocolIdClock, &ReturnValues);
   if (EFI_ERROR (Status)) {
@@ -96,6 +104,7 @@ ClockGetTotalClocks (
 
   @retval EFI_SUCCESS            Clock device attributes are returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -112,6 +121,13 @@ ClockGetClockAttributes (
   CLOCK_ATTRIBUTES  *ClockAttributes;
   SCMI_COMMAND      Cmd;
   UINT32            PayloadLength;
+
+  ASSERT (Enabled != NULL);
+  ASSERT (ClockAsciiName != NULL);
+
+  if ((Enabled == NULL) || (ClockAsciiName == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -169,6 +185,7 @@ ClockGetClockAttributes (
   @retval EFI_BUFFER_TOO_SMALL   RateArraySize is too small for the result. It
                                  has been updated to the size needed.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -193,6 +210,14 @@ ClockDescribeRates (
   UINT32  RateIndex;
   UINT32  RateNo;
   UINT32  RateOffset;
+
+  ASSERT (Format != NULL);
+  ASSERT (TotalRates != NULL);
+  ASSERT (RateArraySize != NULL);
+
+  if ((Format == NULL) || (TotalRates == NULL) || (RateArraySize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   *TotalRates       = 0;
   RequiredArraySize = 0;
@@ -242,6 +267,16 @@ ClockDescribeRates (
       }
     }
 
+    if ((NUM_RATES (DescribeRates->NumRatesFlags) != 0) ||
+        (*Format == ScmiClockRateFormatLinear))
+    {
+      ASSERT (RateArray != NULL);
+
+      if (RateArray == NULL) {
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+
     RateOffset = 0;
 
     if (*Format == ScmiClockRateFormatDiscrete) {
@@ -285,6 +320,7 @@ ClockDescribeRates (
 
   @retval EFI_SUCCESS            Clock rate is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -301,6 +337,12 @@ ClockRateGet (
   SCMI_COMMAND      Cmd;
 
   UINT32  PayloadLength;
+
+  ASSERT (Rate != NULL);
+
+  if (Rate == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {

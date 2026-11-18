@@ -85,6 +85,7 @@ typedef struct _SCMI_CLOCK_PROTOCOL SCMI_CLOCK_PROTOCOL;
 
   @retval EFI_SUCCESS            The version is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -102,6 +103,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            Total number of clocks supported is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -121,6 +123,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            Clock device attributes are returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -154,6 +157,7 @@ EFI_STATUS
   @retval EFI_BUFFER_TOO_SMALL   RateArraySize is too small for the result. It
                                  has been updated to the size needed.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -175,6 +179,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            Clock rate is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS

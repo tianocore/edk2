@@ -45,6 +45,7 @@ typedef struct _SCMI_BASE_PROTOCOL SCMI_BASE_PROTOCOL;
 
   @retval EFI_SUCCESS            The version of the protocol is returned.
   @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -62,6 +63,7 @@ EFI_STATUS
   @retval EFI_SUCCESS            Total number of protocols supported are
                                  returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -79,6 +81,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            VendorIdentifier is returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -96,6 +99,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            VendorIdentifier is returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -112,6 +116,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            Implementation version is returned.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -132,6 +137,7 @@ EFI_STATUS
   @retval EFI_BUFFER_TOO_SMALL   ProtocolListSize is too small for the result.
                                  It has been updated to the size needed.
   @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
