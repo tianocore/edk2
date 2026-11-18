@@ -27,7 +27,7 @@ on the TianoCore wiki.
 | NetworkPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | OvmfPkg              | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
 | PcAtChipsetPkg       | :heavy_check_mark: | :heavy_check_mark: |
-| SecurityPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| SecurityPkg          | :heavy_check_mark: | :heavy_check_mark: |
 | ShellPkg             | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
 | SourceLevelDebugPkg  |
 | StandaloneMmPkg      | :heavy_check_mark: | :heavy_check_mark: |
