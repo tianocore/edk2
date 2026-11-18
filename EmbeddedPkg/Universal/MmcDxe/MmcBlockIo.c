@@ -254,7 +254,7 @@ MmcIoBlocks (
   UINTN                  Cmd;
   MMC_HOST_INSTANCE      *MmcHostInstance;
   EFI_MMC_HOST_PROTOCOL  *MmcHost;
-  UINTN                  BytesRemainingToBeTransfered;
+  UINTN                  BytesRemainingToBeTransferred;
   UINTN                  BlockCount;
   UINTN                  ConsumeSize;
   UINTN                  MaxBlock;
@@ -311,9 +311,9 @@ MmcIoBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
-  RemainingBlock               = BufferSize / This->Media->BlockSize;
-  BytesRemainingToBeTransfered = BufferSize;
-  while (BytesRemainingToBeTransfered > 0) {
+  RemainingBlock                = BufferSize / This->Media->BlockSize;
+  BytesRemainingToBeTransferred = BufferSize;
+  while (BytesRemainingToBeTransferred > 0) {
     BlockCount = MIN (MaxBlock, RemainingBlock);
 
     // Check if the Card is in Ready status
@@ -356,8 +356,8 @@ MmcIoBlocks (
     }
 
     ConsumeSize = BlockCount * This->Media->BlockSize;
-    if (BytesRemainingToBeTransfered < ConsumeSize) {
-      ConsumeSize = BytesRemainingToBeTransfered;
+    if (BytesRemainingToBeTransferred < ConsumeSize) {
+      ConsumeSize = BytesRemainingToBeTransferred;
     }
 
     Status = MmcTransferBlock (This, Cmd, Transfer, MediaId, Lba, ConsumeSize, Buffer);
@@ -365,9 +365,9 @@ MmcIoBlocks (
       DEBUG ((DEBUG_ERROR, "%a(): Failed to transfer block and Status:%r\n", __func__, Status));
     }
 
-    RemainingBlock               -= BlockCount;
-    BytesRemainingToBeTransfered -= ConsumeSize;
-    if (BytesRemainingToBeTransfered > 0) {
+    RemainingBlock                -= BlockCount;
+    BytesRemainingToBeTransferred -= ConsumeSize;
+    if (BytesRemainingToBeTransferred > 0) {
       Lba   += BlockCount;
       Buffer = (UINT8 *)Buffer + ConsumeSize;
     }

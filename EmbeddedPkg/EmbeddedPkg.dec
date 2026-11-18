@@ -149,7 +149,7 @@
   # Android FastBoot
   #
 
-  # The Android FastBoot utility has hard-coded USB Vendor IDs that it recognises
+  # The Android FastBoot utility has hard-coded USB Vendor IDs that it can recognise
   # (and 0xf00d isn't one of them!).
   # You'll need to pass it "-i 0xf00d" to get it to recognise this device.
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbVendorId|0xf00d|UINT32|0x00000022
