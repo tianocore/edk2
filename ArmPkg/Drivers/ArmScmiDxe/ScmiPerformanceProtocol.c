@@ -10,6 +10,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/ArmScmiPerformanceProtocol.h>
 
@@ -24,9 +25,10 @@
   @param[out] Version   Version of the supported SCMI performance management
                         protocol.
 
-  @retval EFI_SUCCESS       The version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version is returned.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 STATIC
 EFI_STATUS
@@ -231,11 +233,12 @@ PerformanceDescribeLevels (
 
   @param[in] This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
   @param[in] DomainId    Identifier for the performance domain.
-  @param[in] Limit       Performance limit to set.
+  @param[in] Limits      Performance limit to set.
 
-  @retval EFI_SUCCESS          Performance limits set successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits set successfully.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 EFI_STATUS
 PerformanceLimitsSet (
@@ -248,6 +251,12 @@ PerformanceLimitsSet (
   UINT32        PayloadLength;
   SCMI_COMMAND  Cmd;
   UINT32        *MessageParams;
+
+  ASSERT (Limits != NULL);
+
+  if (Limits == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -279,9 +288,10 @@ PerformanceLimitsSet (
 
   @param[out] Limit       Performance Limits of the domain.
 
-  @retval EFI_SUCCESS          Performance limits are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits are returned.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 EFI_STATUS
 PerformanceLimitsGet (
@@ -296,6 +306,12 @@ PerformanceLimitsGet (
   UINT32        *MessageParams;
 
   SCMI_PERFORMANCE_LIMITS  *ReturnValues;
+
+  ASSERT (Limits != NULL);
+
+  if (Limits == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -375,9 +391,10 @@ PerformanceLevelSet (
 
   @param[out] Level       Performance level of the domain.
 
-  @retval EFI_SUCCESS          Performance level got successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance level got successfully.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 EFI_STATUS
 PerformanceLevelGet (
@@ -391,6 +408,12 @@ PerformanceLevelGet (
   SCMI_COMMAND  Cmd;
   UINT32        *ReturnValues;
   UINT32        *MessageParams;
+
+  ASSERT (Level != NULL);
+
+  if (Level == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {

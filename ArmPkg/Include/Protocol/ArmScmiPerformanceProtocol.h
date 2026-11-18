@@ -138,9 +138,10 @@ typedef enum {
   @param[out] Version   Version of the supported SCMI performance management
                         protocol.
 
-  @retval EFI_SUCCESS       The version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version is returned.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 typedef
 EFI_STATUS
@@ -217,11 +218,12 @@ EFI_STATUS
 
   @param[in] This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
   @param[in] DomainId    Identifier for the performance domain.
-  @param[in] Limit       Performance limit to set.
+  @param[in] Limits      Performance limit to set.
 
-  @retval EFI_SUCCESS          Performance limits set successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits set successfully.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 typedef
 EFI_STATUS
@@ -238,9 +240,10 @@ EFI_STATUS
 
   @param[out] Limit       Performance Limits of the domain.
 
-  @retval EFI_SUCCESS          Performance limits are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits are returned.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 typedef
 EFI_STATUS
@@ -275,9 +278,10 @@ EFI_STATUS
 
   @param[out] Level       Performance level of the domain.
 
-  @retval EFI_SUCCESS          Performance level got successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance level got successfully.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 typedef
 EFI_STATUS

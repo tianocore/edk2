@@ -104,12 +104,13 @@ ScmiCommandGetPayload (
 
   @param[out] OPTIONAL  ReturnValues   Pointer to SCMI response.
 
-  @retval OUT EFI_SUCCESS       Command sent and message received successfully.
-  @retval OUT EFI_UNSUPPORTED   Channel not supported.
-  @retval OUT EFI_TIMEOUT       Timeout on the channel.
-  @retval OUT EFI_DEVICE_ERROR  Channel not ready.
-  @retval OUT EFI_DEVICE_ERROR  Message Header corrupted.
-  @retval OUT EFI_DEVICE_ERROR  SCMI error.
+  @retval OUT EFI_SUCCESS            Command sent and message received successfully.
+  @retval OUT EFI_INVALID_PARAMETER  Invalid input.
+  @retval OUT EFI_UNSUPPORTED        Channel not supported.
+  @retval OUT EFI_TIMEOUT            Timeout on the channel.
+  @retval OUT EFI_DEVICE_ERROR       Channel not ready.
+  @retval OUT EFI_DEVICE_ERROR       Message Header corrupted.
+  @retval OUT EFI_DEVICE_ERROR       SCMI error.
 **/
 EFI_STATUS
 ScmiCommandExecute (
@@ -120,13 +121,14 @@ ScmiCommandExecute (
 
 /** Return protocol version from SCP for a given protocol ID.
 
-  @param[in]  Protocol ID    Protocol ID.
+  @param[in]  ProtocolId     Protocol ID.
   @param[out] Version        Pointer to version of the protocol.
 
-  @retval EFI_SUCCESS       Version holds a valid version received
-                             from the SCP.
-  @retval EFI_DEVICE_ERROR  SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Version holds a valid version received
+                                 from the SCP.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_DEVICE_ERROR       SCMI error.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 EFI_STATUS
 ScmiGetProtocolVersion (
