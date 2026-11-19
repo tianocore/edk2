@@ -84,6 +84,27 @@ ArmLpa2Enabled (
   );
 
 /**
+  Determine whether LPA2 descriptor encoding is required for
+  a 4 KB translation granule.
+
+  This function does not depend on the current TCR configuration
+  and can be called before the MMU is configured.
+
+  @param [in] Is52BitTgran4Supported  Whether FEAT_LPA2 is supported
+                                      for 4 KB translation granules.
+  @param [in] MaxAddressBits          Maximum configured address width.
+
+  @retval TRUE   LPA2 descriptor encoding is required and supported.
+  @retval FALSE  LPA2 descriptor encoding is not selected.
+**/
+BOOLEAN
+EFIAPI
+ArmIsLpa2Tgran4Required (
+  IN BOOLEAN  Is52BitTgran4Supported,
+  IN UINT64   MaxAddressBits
+  );
+
+/**
   Configure the protection attribute for the page tables
   describing the memory region.
 
