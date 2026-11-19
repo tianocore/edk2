@@ -2,6 +2,7 @@
   Helper functions for configuring or getting the parameters relating to Ip4.
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -901,9 +902,17 @@ Ip4FormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
-    Size             = (StrLen (ConfigRequestHdr) * sizeof (CHAR16)) + sizeof (L"&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW");
-    ConfigRequest    = AllocateZeroPool (Size);
+    if (ConfigRequestHdr == NULL) {
+      FreePool (IfrFormNvData);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Failure;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) * sizeof (CHAR16)) + sizeof (L"&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW");
+    ConfigRequest = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
+      FreePool (ConfigRequestHdr);
+      FreePool (IfrFormNvData);
       Status = EFI_OUT_OF_RESOURCES;
       goto Failure;
     }
