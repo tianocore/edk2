@@ -2882,6 +2882,7 @@ AhciModeInitialization (
   EFI_ATA_DEVICE_TYPE      DeviceType;
   EFI_ATA_COLLECTIVE_MODE  *SupportedModes;
   EFI_ATA_TRANSFER_MODE    TransferMode;
+  BOOLEAN                  DmaCapable;
   UINT32                   PhyDetectDelay;
   UINT32                   Value;
 
@@ -3165,9 +3166,13 @@ AhciModeInitialization (
       if (SupportedModes->UdmaMode.Valid) {
         TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
         TransferMode.ModeNumber   = (UINT8)(SupportedModes->UdmaMode.Mode);
+        DmaCapable                = TRUE;
       } else if (SupportedModes->MultiWordDmaMode.Valid) {
         TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
         TransferMode.ModeNumber   = (UINT8)SupportedModes->MultiWordDmaMode.Mode;
+        DmaCapable                = TRUE;
+      } else {
+        DmaCapable = FALSE;
       }
 
       Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode), ATA_ATAPI_TIMEOUT);
@@ -3179,7 +3184,7 @@ AhciModeInitialization (
       //
       // Found a ATA or ATAPI device, add it into the device list.
       //
-      CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, &Buffer);
+      CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, DmaCapable, &Buffer);
       if (DeviceType == EfiIdeHarddisk) {
         REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
         AhciEnableDevSlp (

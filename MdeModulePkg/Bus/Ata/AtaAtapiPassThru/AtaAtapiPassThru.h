@@ -72,6 +72,7 @@ typedef struct {
   UINT16                 Port;
   UINT16                 PortMultiplier;
   EFI_ATA_DEVICE_TYPE    Type;
+  BOOLEAN                DmaCapable;
 
   EFI_IDENTIFY_DATA      *IdentifyData;
 } EFI_ATA_DEVICE_INFO;
@@ -458,6 +459,7 @@ SearchDeviceInfoList (
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
                                   If there is no port multiplier, then specify 0xFFFF.
   @param[in]  DeviceType          The device type of the ATA device.
+  @param[in]  DmaCapable          TRUE if a UDMA or MDMA mode was programmed.
   @param[in]  IdentifyData        The data buffer to store the output of the IDENTIFY cmd.
 
   @retval EFI_SUCCESS             Successfully insert the ata device to the tail of device list.
@@ -471,6 +473,7 @@ CreateNewDeviceInfo (
   IN  UINT16                        Port,
   IN  UINT16                        PortMultiplier,
   IN  EFI_ATA_DEVICE_TYPE           DeviceType,
+  IN  BOOLEAN                       DmaCapable,
   IN  EFI_IDENTIFY_DATA             *IdentifyData
   );
 
