@@ -388,6 +388,7 @@ UefiMain (
   InitializeListHead (&ShellInfoObject.BufferToFreeList.Link);
   InitializeListHead (&ShellInfoObject.ViewingSettings.CommandHistory.Link);
   InitializeListHead (&ShellInfoObject.SplitList.Link);
+  InitializeListHead (&gShellEnvVarList.Link);
 
   //
   // Check PCDs for optional features that are not implemented yet.
@@ -454,7 +455,10 @@ UefiMain (
     ASSERT_EFI_ERROR (Status);
 
     Status = CommandInit ();
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: One or more required protocols could not be found\n", __func__));
+      goto FreeResources;
+    }
 
     Status = ShellInitEnvVarList ();
 
