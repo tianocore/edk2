@@ -21,4 +21,5 @@
   INF RedfishPkg/RedfishPlatformConfigDxe/RedfishPlatformConfigDxe.inf
   INF MdeModulePkg/Universal/RegularExpressionDxe/RegularExpressionDxe.inf
   INF RedfishPkg/RedfishHttpDxe/RedfishHttpDxe.inf
+  INF RedfishPkg/RedfishResourceDxe/RedfishResourceDxe.inf  # [CODE_FIRST] 13357
 !endif

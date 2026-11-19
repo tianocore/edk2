@@ -1,0 +1,45 @@
+## @file                                                                       # [CODE_FIRST] 13357
+#  RedfishResourceDxe installs EDKII_REDFISH_RESOURCE_PROTOCOL.                # [CODE_FIRST] 13357
+#                                                                              # [CODE_FIRST] 13357
+#  This driver provides a data repository for platform Redfish resource.       # [CODE_FIRST] 13357
+#  Platform porting code calls SetResource() to publish data; Redfish feature  # [CODE_FIRST] 13357
+#  drivers call GetResource() to retrieve it.                                  # [CODE_FIRST] 13357
+#                                                                              # [CODE_FIRST] 13357
+#  Copyright (C) 2026 Jabil Inc. All rights reserved.<BR>                      # [CODE_FIRST] 13357
+#  SPDX-License-Identifier: BSD-2-Clause-Patent                                # [CODE_FIRST] 13357
+#                                                                              # [CODE_FIRST] 13357
+##                                                                             # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[Defines]                                                                      # [CODE_FIRST] 13357
+  INF_VERSION                    = 0x0001001B                                  # [CODE_FIRST] 13357
+  BASE_NAME                      = RedfishResourceDxe                          # [CODE_FIRST] 13357
+  FILE_GUID                      = 7A3C2E01-0816-4B8E-A1C9-3F7D5E8B6C02        # [CODE_FIRST] 13357
+  MODULE_TYPE                    = DXE_DRIVER                                  # [CODE_FIRST] 13357
+  VERSION_STRING                 = 1.0                                         # [CODE_FIRST] 13357
+  ENTRY_POINT                    = RedfishResourceDxeEntryPoint                # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[Sources]                                                                      # [CODE_FIRST] 13357
+  RedfishResourceDxe.c                                                         # [CODE_FIRST] 13357
+  RedfishResourceDxeInternal.h                                                 # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[Packages]                                                                     # [CODE_FIRST] 13357
+  MdePkg/MdePkg.dec                                                            # [CODE_FIRST] 13357
+  RedfishPkg/RedfishPkg.dec                                                    # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[LibraryClasses]                                                               # [CODE_FIRST] 13357
+  BaseLib                                                                      # [CODE_FIRST] 13357
+  BaseMemoryLib                                                                # [CODE_FIRST] 13357
+  DebugLib                                                                     # [CODE_FIRST] 13357
+  MemoryAllocationLib                                                          # [CODE_FIRST] 13357
+  PcdLib                                                                       # [CODE_FIRST] 13357
+  UefiBootServicesTableLib                                                     # [CODE_FIRST] 13357
+  UefiDriverEntryPoint                                                         # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[FixedPcd]                                                                     # [CODE_FIRST] 13357
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishResourceMaxEntries    ## CONSUMES     # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[Protocols]                                                                    # [CODE_FIRST] 13357
+  gEdkIIRedfishResourceProtocolGuid    ## PRODUCES                             # [CODE_FIRST] 13357
+                                                                               # [CODE_FIRST] 13357
+[Depex]                                                                        # [CODE_FIRST] 13357
+  TRUE                                                                         # [CODE_FIRST] 13357
