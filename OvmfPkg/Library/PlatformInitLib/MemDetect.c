@@ -1182,7 +1182,7 @@ QemuInitializeRamBelow1gb (
   )
 {
   if (PlatformInfoHob->SmmSmramRequire && PlatformInfoHob->Q35SmramAtDefaultSmbase) {
-    PlatformAddMemoryRangeHob (0, SMM_DEFAULT_SMBASE);
+    PlatformAddMemoryRangeHob (EFI_PAGE_SIZE, SMM_DEFAULT_SMBASE);
     PlatformAddReservedMemoryBaseSizeHob (
       SMM_DEFAULT_SMBASE,
       MCH_DEFAULT_SMBASE_SIZE,
@@ -1197,7 +1197,7 @@ QemuInitializeRamBelow1gb (
       BASE_512KB + BASE_128KB
       );
   } else {
-    PlatformAddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+    PlatformAddMemoryRangeHob (EFI_PAGE_SIZE, BASE_512KB + BASE_128KB);
   }
 }
 
