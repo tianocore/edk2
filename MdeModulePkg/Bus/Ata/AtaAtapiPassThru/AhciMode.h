@@ -334,6 +334,7 @@ typedef struct {
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
   @param Port               The number of port.
   @param PortMultiplier     The number of port multiplier.
+  @param DeviceInfo         The device enumerated for this port.
   @param Packet             A pointer to EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET structure.
 
   @retval EFI_SUCCESS       send out the ATAPI packet command successfully
@@ -348,6 +349,7 @@ AhciPacketCommandExecute (
   IN  EFI_AHCI_REGISTERS                          *AhciRegisters,
   IN  UINT8                                       Port,
   IN  UINT8                                       PortMultiplier,
+  IN  EFI_ATA_DEVICE_INFO                         *DeviceInfo,
   IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   );
 
