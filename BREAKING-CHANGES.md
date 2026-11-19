@@ -23,7 +23,47 @@ None
 
 #### edk2-stable202702: Changes without Removal
 
-None
+##### Breaking Change: Prefix the SMBIOS System Slots Slot Information enumerators
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#10395](https://github.com/tianocore/edk2/issues/10395)
+- **Pull Request**: [tianocore/edk2#13542](https://github.com/tianocore/edk2/pull/13542)
+- **Type**: Source-Level (Non-removal) - Public identifier rename and enum
+  value correction
+
+**What changed**: The `MISC_SLOT_INFORMATION` enumerators in
+`MdePkg/Include/IndustryStandard/SmBios.h` were renamed to use the
+`SlotInformation` prefix. The value of the PCI Express Gen 2 enumerator was
+corrected from `0x01` to `0x02`.
+
+**Why it changed**: The previous enumerator names were too generic and could
+conflict with identifiers defined by any module that includes `SmBios.h`. All
+other System Slots enumerations in the header already use a field-specific
+prefix. SMBIOS Specification v3.9.0, Section 7.10.10, defines Slot
+Information as the numeric PCI Express generation, so Gen 2 is `0x02`; the
+previous `Gen2` value duplicated `Gen1`.
+
+**What replaces it**:
+
+- `Others` is replaced by `SlotInformationOthers`.
+- `Gen1` is replaced by `SlotInformationGen1`.
+- `Gen2` (`0x01`) is replaced by `SlotInformationGen2` (`0x02`).
+- `Gen3` is replaced by `SlotInformationGen3`.
+- `Gen4` is replaced by `SlotInformationGen4`.
+- `Gen5` is replaced by `SlotInformationGen5`.
+- `Gen6` is replaced by `SlotInformationGen6`.
+
+**How to migrate**: Replace the old enumerator names with the
+`SlotInformation`-prefixed names listed above. Code that used `Gen2` to fill
+the Type 9 Slot Information field now produces `0x02`, as required by the
+SMBIOS specification.
+
+**Breaking conditions**: This affects out-of-tree code that references the
+old `MISC_SLOT_INFORMATION` enumerator names. No consumer was found in the
+current edk2-platforms repository. The only edk2 consumer,
+`SmbiosType9Generator`, is updated by this change.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
 
 ### edk2-stable202702: Behavioral Breaking Changes
 

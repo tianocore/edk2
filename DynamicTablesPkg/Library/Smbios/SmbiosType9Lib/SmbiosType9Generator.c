@@ -171,7 +171,7 @@ ValidateSystemSlotInfo (
   }
 
   if ((SystemSlotInfo->SlotType == SlotTypePCIExpressGen6andBeyond) &&
-      (SystemSlotInfo->SlotInformation < Gen6))
+      (SystemSlotInfo->SlotInformation < SlotInformationGen6))
   {
     DEBUG ((DEBUG_ERROR, "%a: PCIe Gen 6 slot requires Gen 6 or later SlotInformation\n", __func__));
     return EFI_INVALID_PARAMETER;

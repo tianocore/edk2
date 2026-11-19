@@ -1555,13 +1555,13 @@ typedef enum {
 /// System Slots - Slot Information.
 ///
 typedef enum {
-  Others = 0x00,
-  Gen1   = 0x01,
-  Gen2   = 0x01,
-  Gen3   = 0x03,
-  Gen4   = 0x04,
-  Gen5   = 0x05,
-  Gen6   = 0x06
+  SlotInformationOthers = 0x00,
+  SlotInformationGen1   = 0x01,
+  SlotInformationGen2   = 0x02,
+  SlotInformationGen3   = 0x03,
+  SlotInformationGen4   = 0x04,
+  SlotInformationGen5   = 0x05,
+  SlotInformationGen6   = 0x06
 } MISC_SLOT_INFORMATION;
 
 ///
