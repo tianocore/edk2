@@ -2111,7 +2111,7 @@ AhciDeviceSetFeature (
   This function is used to send out ATAPI commands conforms to the Packet Command
   with PIO Protocol.
 
-  @param PciIo              The PCI IO protocol instance.
+  @param Instance           The ATA_ATAPI_PASS_THRU_INSTANCE protocol instance.
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
   @param Port               The number of port.
   @param PortMultiplier     The number of port multiplier.
@@ -2126,7 +2126,7 @@ AhciDeviceSetFeature (
 EFI_STATUS
 EFIAPI
 AhciPacketCommandExecute (
-  IN  EFI_PCI_IO_PROTOCOL                         *PciIo,
+  IN  ATA_ATAPI_PASS_THRU_INSTANCE                *Instance,
   IN  EFI_AHCI_REGISTERS                          *AhciRegisters,
   IN  UINT8                                       Port,
   IN  UINT8                                       PortMultiplier,
@@ -2141,7 +2141,7 @@ AhciPacketCommandExecute (
   EFI_ATA_STATUS_BLOCK   AtaStatusBlock;
   BOOLEAN                Read;
 
-  if ((DeviceInfo == NULL) || (Packet == NULL) || (Packet->Cdb == NULL)) {
+  if ((Instance == NULL) || (Instance->PciIo == NULL) || (DeviceInfo == NULL) || (Packet == NULL) || (Packet->Cdb == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2171,7 +2171,7 @@ AhciPacketCommandExecute (
 
   if (Length == 0) {
     Status = AhciNonDataTransfer (
-               PciIo,
+               Instance->PciIo,
                AhciRegisters,
                Port,
                PortMultiplier,
@@ -2184,7 +2184,7 @@ AhciPacketCommandExecute (
                );
   } else {
     Status = AhciPioTransfer (
-               PciIo,
+               Instance->PciIo,
                AhciRegisters,
                Port,
                PortMultiplier,

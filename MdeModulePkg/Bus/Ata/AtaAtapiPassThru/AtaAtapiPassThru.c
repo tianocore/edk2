@@ -2123,7 +2123,7 @@ ExtScsiPassThruPassThru (
         PortMultiplier = 0;
       }
 
-      Status = AhciPacketCommandExecute (Instance->PciIo, &Instance->AhciRegisters, Port, PortMultiplier, DeviceInfo, Packet);
+      Status = AhciPacketCommandExecute (Instance, &Instance->AhciRegisters, Port, PortMultiplier, DeviceInfo, Packet);
       break;
     default:
       Status = EFI_DEVICE_ERROR;
