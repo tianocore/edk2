@@ -2385,6 +2385,7 @@ DetectAndConfigIdeDevice (
   EFI_ATA_COLLECTIVE_MODE  *SupportedModes;
   EFI_ATA_TRANSFER_MODE    TransferMode;
   EFI_ATA_DRIVE_PARMS      DriveParameters;
+  BOOLEAN                  DmaCapable;
 
   IdeRegisters = &Instance->IdeRegisters[IdeChannel];
   IdeInit      = Instance->IdeControllerInit;
@@ -2534,6 +2535,7 @@ DetectAndConfigIdeDevice (
       TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
       TransferMode.ModeNumber   = (UINT8)(SupportedModes->UdmaMode.Mode);
       Status                    = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
+      DmaCapable                = TRUE;
 
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
@@ -2543,11 +2545,14 @@ DetectAndConfigIdeDevice (
       TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
       TransferMode.ModeNumber   = (UINT8)SupportedModes->MultiWordDmaMode.Mode;
       Status                    = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
+      DmaCapable                = TRUE;
 
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
+    } else {
+      DmaCapable = FALSE;
     }
 
     //
@@ -2575,7 +2580,7 @@ DetectAndConfigIdeDevice (
     // IDE controller and IDE device timing is configured successfully.
     // Now insert the device into device list.
     //
-    Status = CreateNewDeviceInfo (Instance, IdeChannel, IdeDevice, DeviceType, &Buffer);
+    Status = CreateNewDeviceInfo (Instance, IdeChannel, IdeDevice, DeviceType, DmaCapable, &Buffer);
     if (EFI_ERROR (Status)) {
       continue;
     }

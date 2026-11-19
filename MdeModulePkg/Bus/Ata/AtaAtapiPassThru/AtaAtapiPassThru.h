@@ -72,6 +72,7 @@ typedef struct {
   UINT16                 Port;
   UINT16                 PortMultiplier;
   EFI_ATA_DEVICE_TYPE    Type;
+  BOOLEAN                DmaCapable;
 
   EFI_IDENTIFY_DATA      *IdentifyData;
 } EFI_ATA_DEVICE_INFO;
@@ -458,6 +459,7 @@ SearchDeviceInfoList (
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
                                   If there is no port multiplier, then specify 0xFFFF.
   @param[in]  DeviceType          The device type of the ATA device.
+  @param[in]  DmaCapable          TRUE if a UDMA or MDMA mode was programmed.
   @param[in]  IdentifyData        The data buffer to store the output of the IDENTIFY cmd.
 
   @retval EFI_SUCCESS             Successfully insert the ata device to the tail of device list.
@@ -471,6 +473,7 @@ CreateNewDeviceInfo (
   IN  UINT16                        Port,
   IN  UINT16                        PortMultiplier,
   IN  EFI_ATA_DEVICE_TYPE           DeviceType,
+  IN  BOOLEAN                       DmaCapable,
   IN  EFI_IDENTIFY_DATA             *IdentifyData
   );
 
@@ -1065,6 +1068,33 @@ EFI_STATUS
 EFIAPI
 AhciModeInitialization (
   IN  ATA_ATAPI_PASS_THRU_INSTANCE  *Instance
+  );
+
+/**
+  This function is used to send out ATAPI commands.
+  Data transfers use DMA if the device is capable, otherwise PIO.
+
+  @param Instance           The ATA_ATAPI_PASS_THRU_INSTANCE protocol instance.
+  @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
+  @param Port               The number of port.
+  @param PortMultiplier     The number of port multiplier.
+  @param DeviceInfo         The device enumerated for this port.
+  @param Packet             A pointer to EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET structure.
+
+  @retval EFI_SUCCESS       send out the ATAPI packet command successfully
+                            and device sends data successfully.
+  @retval EFI_DEVICE_ERROR  the device failed to send data.
+
+**/
+EFI_STATUS
+EFIAPI
+AhciPacketCommandExecute (
+  IN  ATA_ATAPI_PASS_THRU_INSTANCE                *Instance,
+  IN  EFI_AHCI_REGISTERS                          *AhciRegisters,
+  IN  UINT8                                       Port,
+  IN  UINT8                                       PortMultiplier,
+  IN  EFI_ATA_DEVICE_INFO                         *DeviceInfo,
+  IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   );
 
 /**
