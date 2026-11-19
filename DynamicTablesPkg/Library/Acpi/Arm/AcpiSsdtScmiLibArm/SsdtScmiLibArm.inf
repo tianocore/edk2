@@ -31,3 +31,4 @@
   BaseLib
   DebugLib
   MemoryAllocationLib
+  TableHelperLib
