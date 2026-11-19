@@ -586,6 +586,11 @@
   #
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
+!if $(SMM_REQUIRE) == TRUE
+  # KVM drops a Start-up IPI that reaches a vCPU in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApSipiResendIntervalInMicroSeconds|10000
+!endif
+
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
 [PcdsFixedAtBuild.IA32]
