@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -893,10 +893,10 @@ FmpDeviceSetImageWithStatus (
   }
 
   TotalBytes = 0;
-  WriteBytes = MIN (ImageSize, mMaxPayloadSize);
+  WriteBytes = (UINT32)MIN (ImageSize, mMaxPayloadSize);
 
   do {
-    Status = FwuWriteStream (Handle, Image + TotalBytes, WriteBytes);
+    Status = FwuWriteStream (Handle, (CONST UINT8 *)Image + TotalBytes, WriteBytes);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -907,7 +907,7 @@ FmpDeviceSetImageWithStatus (
     }
 
     TotalBytes += WriteBytes;
-    WriteBytes  = MIN ((ImageSize - TotalBytes), mMaxPayloadSize);
+    WriteBytes  = (UINT32)MIN (ImageSize - TotalBytes, mMaxPayloadSize);
 
     /**
      * Set the progress percentage between 5% to 55%
