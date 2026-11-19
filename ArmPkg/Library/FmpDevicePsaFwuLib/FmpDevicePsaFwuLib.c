@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1099,6 +1099,7 @@ FmpDeviceSetImage (
                                   If the value falls outside this range, it will be converted
                                   to LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL.
 
+  @retval EFI_UNSUPPORTED        Firmware update is disabled or the image has no directory entry.
   @retval EFI_SUCCESS            The image was successfully checked.  Additional
                                  status information is returned in
                                  ImageUpdatable.
@@ -1125,10 +1126,17 @@ FmpDeviceCheckImageWithStatus (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((ImageSize > mImageEntry->ImgMaxSize) || (mUpdateDisabled)) {
+  if (mUpdateDisabled || (mImageEntry == NULL)) {
+    *ImageUpdatable    = IMAGE_UPDATABLE_INVALID;
+    *LastAttemptStatus = ErrStatusToAttemptStatus (EFI_UNSUPPORTED);
+    DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Firmware update unavailable.\n"));
+    return EFI_UNSUPPORTED;
+  }
+
+  if (ImageSize > mImageEntry->ImgMaxSize) {
     *ImageUpdatable    = IMAGE_UPDATABLE_INVALID;
     *LastAttemptStatus = ErrStatusToAttemptStatus (EFI_INVALID_PARAMETER);
-    DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Invalid Status.\n"));
+    DEBUG ((DEBUG_ERROR, "FmpPsaFwuLib: CheckImageWithStatus - Image too large.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
