@@ -71,6 +71,8 @@ typedef struct {
 
   QEMU_FW_CFG_WORK_AREA    QemuFwCfgWorkArea;
 
+  UINT64                   PageTablePoolHead;
+
   BOOLEAN                  IgvmScanned;
 } EFI_HOB_PLATFORM_INFO;
 #pragma pack()

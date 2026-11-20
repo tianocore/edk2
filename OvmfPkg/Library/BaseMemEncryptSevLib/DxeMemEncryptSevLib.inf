@@ -46,10 +46,14 @@
   CacheMaintenanceLib
   CpuLib
   DebugLib
+  HobLib
   MemoryAllocationLib
   PcdLib
   CcExitLib
   AmdSvsmLib
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
