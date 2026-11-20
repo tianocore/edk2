@@ -834,7 +834,7 @@ BmGetNvmeDescription (
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
   EFI_NVM_EXPRESS_COMMAND                   Command;
   EFI_NVM_EXPRESS_COMPLETION                Completion;
-  NVME_ADMIN_CONTROLLER_DATA                ControllerData;
+  NVME_ADMIN_CONTROLLER_DATA                *ControllerData;
   CHAR16                                    *Description;
   CHAR16                                    *Char;
   UINTN                                     Index;
@@ -861,6 +861,15 @@ BmGetNvmeDescription (
   Status = gBS->HandleProtocol (Handle, &gEfiNvmExpressPassThruProtocolGuid, (VOID **)&NvmePassthru);
   ASSERT_EFI_ERROR (Status);
 
+  ControllerData = AllocateAlignedPages (
+                     EFI_SIZE_TO_PAGES (sizeof (NVME_ADMIN_CONTROLLER_DATA)),
+                     NvmePassthru->Mode->IoAlign
+                     );
+  if (ControllerData == NULL) {
+    return NULL;
+  }
+
+  ZeroMem (ControllerData, sizeof (NVME_ADMIN_CONTROLLER_DATA));
   ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
   ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
   ZeroMem (&Completion, sizeof (EFI_NVM_EXPRESS_COMPLETION));
@@ -873,8 +882,8 @@ BmGetNvmeDescription (
   Command.Nsid                 = 0;
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
-  CommandPacket.TransferBuffer = &ControllerData;
-  CommandPacket.TransferLength = sizeof (ControllerData);
+  CommandPacket.TransferBuffer = ControllerData;
+  CommandPacket.TransferLength = sizeof (NVME_ADMIN_CONTROLLER_DATA);
   CommandPacket.CommandTimeout = EFI_TIMER_PERIOD_SECONDS (5);
   CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
   //
@@ -890,24 +899,25 @@ BmGetNvmeDescription (
                            NULL
                            );
   if (EFI_ERROR (Status)) {
+    FreeAlignedPages (ControllerData, EFI_SIZE_TO_PAGES (sizeof (NVME_ADMIN_CONTROLLER_DATA)));
     return NULL;
   }
 
   Description = AllocateZeroPool (
-                  (ARRAY_SIZE (ControllerData.Mn) + 1
-                   + ARRAY_SIZE (ControllerData.Sn) + 1
+                  (ARRAY_SIZE (ControllerData->Mn) + 1
+                   + ARRAY_SIZE (ControllerData->Sn) + 1
                    + MAXIMUM_VALUE_CHARACTERS + 1
                   ) * sizeof (CHAR16)
                   );
   if (Description != NULL) {
     Char = Description;
-    for (Index = 0; Index < ARRAY_SIZE (ControllerData.Mn); Index++) {
-      *(Char++) = (CHAR16)ControllerData.Mn[Index];
+    for (Index = 0; Index < ARRAY_SIZE (ControllerData->Mn); Index++) {
+      *(Char++) = (CHAR16)ControllerData->Mn[Index];
     }
 
     *(Char++) = L' ';
-    for (Index = 0; Index < ARRAY_SIZE (ControllerData.Sn); Index++) {
-      *(Char++) = (CHAR16)ControllerData.Sn[Index];
+    for (Index = 0; Index < ARRAY_SIZE (ControllerData->Sn); Index++) {
+      *(Char++) = (CHAR16)ControllerData->Sn[Index];
     }
 
     *(Char++) = L' ';
@@ -920,6 +930,8 @@ BmGetNvmeDescription (
       );
     BmEliminateExtraSpaces (Description);
   }
+
+  FreeAlignedPages (ControllerData, EFI_SIZE_TO_PAGES (sizeof (NVME_ADMIN_CONTROLLER_DATA)));
 
   return Description;
 }
