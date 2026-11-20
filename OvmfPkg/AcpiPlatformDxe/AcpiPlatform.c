@@ -38,8 +38,10 @@ InstallAcpiTables (
   if (HostBridgeDevId == CLOUDHV_DEVICE_ID) {
     if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
       Status = InstallCloudHvTablesTdx (AcpiTable);
-    } else {
+    } else if (PcdGet32 (PcdXenPvhStartOfDayStructPtr) != 0) {
       Status = InstallCloudHvTables (AcpiTable);
+    } else {
+      Status = InstallQemuFwCfgTables (AcpiTable);
     }
   } else {
     Status = InstallQemuFwCfgTables (AcpiTable);
