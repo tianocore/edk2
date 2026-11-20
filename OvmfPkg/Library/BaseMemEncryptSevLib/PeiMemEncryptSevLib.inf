@@ -57,6 +57,7 @@
 
 [Guids]
   gEfiIgvmDataHobGuid
+  gPageTablePoolHobGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

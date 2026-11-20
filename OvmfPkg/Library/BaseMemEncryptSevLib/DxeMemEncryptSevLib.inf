@@ -51,6 +51,9 @@
   CcExitLib
   AmdSvsmLib
 
+[Guids]
+  gPageTablePoolHobGuid
+
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
