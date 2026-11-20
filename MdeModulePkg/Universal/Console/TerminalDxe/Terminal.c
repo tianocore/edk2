@@ -379,6 +379,7 @@ StartTerminalStateMachine (
   )
 {
   EFI_STATUS  Status;
+  UINT64      TimerInterval;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
@@ -389,10 +390,20 @@ StartTerminalStateMachine (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  // Timer interval is determined by 1. PCD, 2. SerialInTimeOut, 3. Default value.
+  if (PcdGet32 (PcdTerminalKeyboardTimerInterval) != 0) {
+    TimerInterval = PcdGet32 (PcdTerminalKeyboardTimerInterval);
+  } else if (TerminalDevice->SerialInTimeOut == 0) {
+    TimerInterval = KEYBOARD_TIMER_INTERVAL;
+  } else {
+    // We should check back when filled in half of the FIFO, TimerInterval is in the unit of 100ns.
+    TimerInterval = TerminalDevice->SerialInTimeOut * RAW_FIFO_MAX_NUMBER / 4 * 10;
+  }
+
   Status = gBS->SetTimer (
                   TerminalDevice->TimerEvent,
                   TimerPeriodic,
-                  KEYBOARD_TIMER_INTERVAL
+                  TimerInterval
                   );
   ASSERT_EFI_ERROR (Status);
 
