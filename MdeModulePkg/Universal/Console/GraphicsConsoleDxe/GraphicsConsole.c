@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1087,26 +1088,23 @@ GraphicsConsoleConOutTestString (
   IN  CHAR16                           *WString
   )
 {
-  EFI_STATUS  Status;
-  UINT16      Count;
-
+  EFI_STATUS        Status;
   EFI_IMAGE_OUTPUT  *Blt;
 
-  Blt   = NULL;
-  Count = 0;
+  Blt = NULL;
 
-  while (WString[Count] != 0) {
+  for ( ; *WString != CHAR_NULL; WString++) {
     //
-    // In TerminalConOutOutputString(), WIDE_CHAR/NARROW_CHAR will be ignored.
+    // In GraphicsConsoleConOutOutputString(), WIDE_CHAR/NARROW_CHAR will be ignored.
     // So, WString contains WIDE_CHAR/NARROW_CHAR is also valid.
     //
-    if ((WString[Count] == WIDE_CHAR) || (WString[Count] == NARROW_CHAR)) {
+    if ((*WString == WIDE_CHAR) || (*WString == NARROW_CHAR)) {
       continue;
     }
 
     Status = mHiiFont->GetGlyph (
                          mHiiFont,
-                         WString[Count],
+                         *WString,
                          NULL,
                          &Blt,
                          NULL
@@ -1115,8 +1113,6 @@ GraphicsConsoleConOutTestString (
       FreePool (Blt);
       Blt = NULL;
     }
-
-    Count++;
 
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
