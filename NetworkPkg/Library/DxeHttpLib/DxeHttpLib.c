@@ -695,6 +695,7 @@ HttpUrlGetIp6 (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or Port is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No port number in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  @retval EFI_UNSUPPORTED          The port number exceeds the range of UINTN.
 
 **/
 EFI_STATUS
@@ -752,8 +753,11 @@ HttpUrlGetPort (
   }
 
   Status =  AsciiStrDecimalToUintnS (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset, (CHAR8 **)NULL, &Data);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
 
-  if (EFI_ERROR (Status) || (Data > HTTP_URI_PORT_MAX_NUM)) {
+  if (Data > HTTP_URI_PORT_MAX_NUM) {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
@@ -1541,10 +1545,12 @@ HttpSetFieldNameAndValue (
 
   if (HttpHeader->FieldName != NULL) {
     FreePool (HttpHeader->FieldName);
+    HttpHeader->FieldName = NULL;
   }
 
   if (HttpHeader->FieldValue != NULL) {
     FreePool (HttpHeader->FieldValue);
+    HttpHeader->FieldValue = NULL;
   }
 
   FieldNameSize         = AsciiStrSize (FieldName);
@@ -1560,6 +1566,7 @@ HttpSetFieldNameAndValue (
   HttpHeader->FieldValue = AllocateZeroPool (FieldValueSize);
   if (HttpHeader->FieldValue == NULL) {
     FreePool (HttpHeader->FieldName);
+    HttpHeader->FieldName = NULL;
     return EFI_OUT_OF_RESOURCES;
   }
 
