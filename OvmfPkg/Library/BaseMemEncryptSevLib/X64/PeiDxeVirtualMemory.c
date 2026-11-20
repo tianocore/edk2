@@ -11,15 +11,15 @@
 
 **/
 
+#include <PiPei.h>
 #include <Library/CpuLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
 
 #include "VirtualMemory.h"
 #include "SnpPageStateChange.h"
-
-STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 STATIC VOID  *mPscBuffer = NULL;
 
@@ -47,6 +47,46 @@ InternalGetMemEncryptionAddressMask (
 }
 
 /**
+  Locate, or optionally create, the HOB slot holding the head of the page table
+  pool list.
+
+  @param[in]  Create  If TRUE, create the HOB if it does not exist yet.
+
+  @return Pointer to the slot in the HOB data that holds the head of the pool
+          list, or NULL if the HOB does not exist and Create is FALSE or could
+          not be built.
+**/
+STATIC
+PAGE_TABLE_POOL **
+GetPageTablePoolHeadSlot (
+  IN BOOLEAN  Create
+  )
+{
+  VOID             *Hob;
+  PAGE_TABLE_POOL  **PoolHeadHobSlot;
+
+  Hob = GetFirstGuidHob (&gPageTablePoolHobGuid);
+
+  // Reuse the HOB if it has already been created.
+  if (Hob != NULL) {
+    return (PAGE_TABLE_POOL **)GET_GUID_HOB_DATA (Hob);
+  }
+
+  // Lookups should not create the HOB.
+  if (!Create) {
+    return NULL;
+  }
+
+  // Allocate a new HOB to hold the PAGE_TABLE_POOL * pointer.
+  PoolHeadHobSlot = BuildGuidHob (&gPageTablePoolHobGuid, sizeof (PAGE_TABLE_POOL *));
+  if (PoolHeadHobSlot != NULL) {
+    *PoolHeadHobSlot = NULL;
+  }
+
+  return PoolHeadHobSlot;
+}
+
+/**
   Initialize a buffer pool for page table use only.
 
   To reduce the potential split operation on page table, the pages reserved for
@@ -70,7 +110,9 @@ InitializePageTablePool (
   IN  UINTN  PoolPages
   )
 {
-  VOID  *Buffer;
+  VOID             *Buffer;
+  PAGE_TABLE_POOL  *PageTablePool;
+  PAGE_TABLE_POOL  **PoolHeadHobSlot;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
@@ -86,22 +128,37 @@ InitializePageTablePool (
   }
 
   //
+  // Get the HOB slot holding the pool head.
+  //
+  PoolHeadHobSlot = GetPageTablePoolHeadSlot (TRUE);
+  if (PoolHeadHobSlot == NULL) {
+    return FALSE;
+  }
+
+  PageTablePool = *PoolHeadHobSlot;
+
+  //
   // Link all pools into a list for easier track later.
   //
-  if (mPageTablePool == NULL) {
-    mPageTablePool           = Buffer;
-    mPageTablePool->NextPool = mPageTablePool;
+  if (PageTablePool == NULL) {
+    PageTablePool           = Buffer;
+    PageTablePool->NextPool = PageTablePool;
   } else {
-    ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
-    mPageTablePool->NextPool              = Buffer;
-    mPageTablePool                        = Buffer;
+    ((PAGE_TABLE_POOL *)Buffer)->NextPool = PageTablePool->NextPool;
+    PageTablePool->NextPool               = Buffer;
+    PageTablePool                         = Buffer;
   }
 
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages = PoolPages - 1;
-  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+  PageTablePool->FreePages = PoolPages - 1;
+  PageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+
+  //
+  // Store the updated pool head in the HOB slot.
+  //
+  *PoolHeadHobSlot = PageTablePool;
 
   return TRUE;
 }
@@ -130,27 +187,41 @@ AllocatePageTableMemory (
   IN UINTN  Pages
   )
 {
-  VOID  *Buffer;
+  VOID             *Buffer;
+  PAGE_TABLE_POOL  *PageTablePool;
+  PAGE_TABLE_POOL  **PoolHeadHobSlot;
 
   if (Pages == 0) {
     return NULL;
   }
 
   //
+  // Get the HOB slot holding the pool head.
+  //
+  PoolHeadHobSlot = GetPageTablePoolHeadSlot (TRUE);
+  if (PoolHeadHobSlot == NULL) {
+    return NULL;
+  }
+
+  PageTablePool = *PoolHeadHobSlot;
+
+  //
   // Renew the pool if necessary.
   //
-  if ((mPageTablePool == NULL) ||
-      (Pages > mPageTablePool->FreePages))
+  if ((PageTablePool == NULL) ||
+      (Pages > PageTablePool->FreePages))
   {
     if (!InitializePageTablePool (Pages)) {
       return NULL;
     }
+
+    PageTablePool = *PoolHeadHobSlot;
   }
 
-  Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
+  Buffer = (UINT8 *)PageTablePool + PageTablePool->Offset;
 
-  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
-  mPageTablePool->FreePages -= Pages;
+  PageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  PageTablePool->FreePages -= Pages;
 
   DEBUG ((
     DEBUG_PAGING,
@@ -376,18 +447,24 @@ EnablePageTableProtection (
 {
   PAGE_TABLE_POOL       *HeadPool;
   PAGE_TABLE_POOL       *Pool;
+  PAGE_TABLE_POOL       **PoolHeadHobSlot;
   UINT64                PoolSize;
   EFI_PHYSICAL_ADDRESS  Address;
 
-  if (mPageTablePool == NULL) {
+  //
+  // Get the HOB slot holding the pool head.
+  //
+  PoolHeadHobSlot = GetPageTablePoolHeadSlot (FALSE);
+  if ((PoolHeadHobSlot == NULL) || (*PoolHeadHobSlot == NULL)) {
     return;
   }
 
   //
-  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
-  // remember original one in advance.
+  // SetPageTablePoolReadOnly might allocate a new pool and thereby update the
+  // head stored in the HOB slot. It's safer to remember the original head in
+  // advance.
   //
-  HeadPool = mPageTablePool;
+  HeadPool = *PoolHeadHobSlot;
   Pool     = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
