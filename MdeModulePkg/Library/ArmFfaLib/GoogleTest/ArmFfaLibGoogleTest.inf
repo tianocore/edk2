@@ -1,0 +1,48 @@
+## @file
+# Host based unit tests for ArmFfaLib partition discovery via registers.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = ArmFfaLibGoogleTest
+  FILE_GUID      = 9FA46EBD-6A6D-4C9A-9FE0-E0A74853B96D
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ArmFfaLibGoogleTest.cpp
+  ../ArmFfaCommon.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+  SafeIntLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+
+[Guids]
+  gArmFfaRxTxBufferInfoGuid
+
+[BuildOptions]
+  # ArmFfaCommon.c otherwise only targets AARCH64 GCC/CLANG builds.
+  MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4245

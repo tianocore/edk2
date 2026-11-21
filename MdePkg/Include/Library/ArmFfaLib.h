@@ -317,6 +317,35 @@ ArmFfaLibPartitionInfoGetRegs (
   );
 
 /**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescSize      Return size of requested partition info related
+                                      to Service guid when PartDesc == NULL.
+                                      Otherwise return size of partition info
+                                      copied in PartDesc
+  @param [out]      Count             On successful return, number of partition info entries retrieved.
+                                      On buffer too small, the total number of partition info entries available.
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_BUFFER_TOO_SMALL
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegsEx (
+  IN EFI_GUID    *ServiceGuid,
+  IN OUT UINT32  *PartDescSize,
+  OUT UINT32     *Count,
+  OUT VOID       *PartDesc OPTIONAL
+  );
+
+/**
   Get partition or VM id.
   This function is only called in ArmFfaLibConstructor.
 
@@ -448,4 +477,30 @@ EFIAPI
 ArmFfaLibGetPartitionInfo (
   IN EFI_GUID                 *ServiceGuid,
   OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  );
+
+/**
+  Helper to retrieve the first partition information associated with
+  a service GUID via registers.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [out]      PartDesc          Partition information Buffer, optional.
+  @param [in, out]  PartDescSize      Return size of requested partition info related
+                                      to Service guid when PartDesc == NULL.
+                                      Otherwise return size of partition info
+                                      copied in PartDesc
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_BUFFER_TOO_SMALL
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfoEx (
+  IN EFI_GUID    *ServiceGuid,
+  OUT VOID       *PartDesc OPTIONAL,
+  IN OUT UINT32  *PartDescSize
   );

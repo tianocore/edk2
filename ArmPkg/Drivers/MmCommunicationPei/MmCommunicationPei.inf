@@ -26,6 +26,7 @@
   DebugLib
   ArmSmcLib
   ArmFfaLib
+  MemoryAllocationLib
   PeimEntryPoint
   PeiServicesLib
   HobLib
