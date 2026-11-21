@@ -36,6 +36,7 @@
   @param  ImageHandle         The firmware allocated handle for UEFI image.
 
   @retval  EFI_HANDLE         The device handle from which the Image is loaded from.
+  @retval  NULL               Failed to locate a EFI_LOADED_IMAGE_PROTOCOL on ImageHandle.
 
 **/
 EFI_HANDLE
@@ -55,6 +56,9 @@ InternalImageHandleToFvHandle (
                   );
 
   ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
 
   //
   // The LoadedImage->DeviceHandle may be NULL.
