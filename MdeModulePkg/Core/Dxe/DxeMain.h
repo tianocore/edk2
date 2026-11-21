@@ -2689,6 +2689,15 @@ CoreInitializeMemoryProtection (
   );
 
 /**
+  Initialize memory protections when the CPU architectural protocol is installed.
+**/
+VOID
+EFIAPI
+MemoryProtectionCpuArchProtocolNotify (
+  VOID
+  );
+
+/**
   Install MemoryAttributesTable on memory allocation.
 
   @param[in] MemoryType EFI memory type.

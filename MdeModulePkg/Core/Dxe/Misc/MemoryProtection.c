@@ -874,18 +874,12 @@ InitializeDxeNxMemoryProtectionPolicy (
 }
 
 /**
-  A notification for CPU_ARCH protocol.
-
-  @param[in]  Event                 Event whose notification function is being invoked.
-  @param[in]  Context               Pointer to the notification function's context,
-                                    which is implementation-dependent.
-
+  Initialize memory protections when the CPU architectural protocol is installed.
 **/
 VOID
 EFIAPI
 MemoryProtectionCpuArchProtocolNotify (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
+  VOID
   )
 {
   EFI_STATUS                 Status;
@@ -896,9 +890,10 @@ MemoryProtectionCpuArchProtocolNotify (
   UINTN                      Index;
 
   DEBUG ((DEBUG_INFO, "MemoryProtectionCpuArchProtocolNotify:\n"));
-  Status = CoreLocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
-  if (EFI_ERROR (Status)) {
-    goto Done;
+
+  if (gCpu == NULL) {
+    ASSERT (gCpu != NULL);
+    return;
   }
 
   //
@@ -914,7 +909,7 @@ MemoryProtectionCpuArchProtocolNotify (
   HeapGuardCpuArchProtocolNotify ();
 
   if (mImageProtectionPolicy == 0) {
-    goto Done;
+    return;
   }
 
   Status = gBS->LocateHandleBuffer (
@@ -925,7 +920,7 @@ MemoryProtectionCpuArchProtocolNotify (
                   &HandleBuffer
                   );
   if (EFI_ERROR (Status) && (NoHandles == 0)) {
-    goto Done;
+    return;
   }
 
   for (Index = 0; Index < NoHandles; Index++) {
@@ -951,9 +946,6 @@ MemoryProtectionCpuArchProtocolNotify (
   }
 
   FreePool (HandleBuffer);
-
-Done:
-  CoreCloseEvent (Event);
 }
 
 /**
@@ -1098,25 +1090,6 @@ CoreInitializeMemoryProtection (
     GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
     GetPermissionAttributeForMemoryType (EfiConventionalMemory)
     );
-
-  Status = CoreCreateEvent (
-             EVT_NOTIFY_SIGNAL,
-             TPL_CALLBACK,
-             MemoryProtectionCpuArchProtocolNotify,
-             NULL,
-             &Event
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Register for protocol notifactions on this event
-  //
-  Status = CoreRegisterProtocolNotify (
-             &gEfiCpuArchProtocolGuid,
-             Event,
-             &Registration
-             );
-  ASSERT_EFI_ERROR (Status);
 
   // Register an event to populate the memory attribute protocol
   Status = CoreCreateEvent (
