@@ -2689,6 +2689,15 @@ CoreInitializeMemoryProtection (
   );
 
 /**
+  Initialize memory protections when the CPU architectural protocol is installed.
+**/
+VOID
+EFIAPI
+MemoryProtectionCpuArchProtocolNotify (
+  VOID
+  );
+
+/**
   Install MemoryAttributesTable on memory allocation.
 
   @param[in] MemoryType EFI memory type.
@@ -2800,5 +2809,14 @@ MergeMemoryMap (
 +**/
 EFI_STATUS
 CoreInitializeHandleServices (
+  VOID
+  );
+
+/**
+  Activate NX compatibility mode to disable memory protections for non-NX_COMPAT EFI_APPLICATIONS.
+**/
+VOID
+EFIAPI
+ActivateNxCompatibilityMode (
   VOID
   );
