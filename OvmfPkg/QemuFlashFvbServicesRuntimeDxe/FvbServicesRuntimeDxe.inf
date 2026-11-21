@@ -48,6 +48,7 @@
   DevicePathLib
   DxeServicesTableLib
   MemEncryptSevLib
+  AmdSevLib
   MemoryAllocationLib
   PcdLib
   UefiBootServicesTableLib

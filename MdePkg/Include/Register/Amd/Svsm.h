@@ -102,6 +102,7 @@ typedef union {
 #define SVSM_PROTOCOL_CORE         0
 #define SVSM_PROTOCOL_ATTESTATION  1
 #define SVSM_PROTOCOL_VTPM         2
+#define SVSM_PROTOCOL_APIC         3
 #define SVSM_UEFI_MM_PROTOCOL      4
 /// @}
 
@@ -126,4 +127,13 @@ typedef union {
 /// SVSM UEFI MM Protocol calls
 /// @{
 #define SVSM_UEFI_MM_REQUEST  1
+/// @}
+
+/// SVSM APIC Protocol calls
+/// @{
+#define SVSM_APIC_QUERY_FEATURES    0
+#define SVSM_APIC_CONFIG_EMULATION  1
+#define SVSM_APIC_READ_REGISTER     2
+#define SVSM_APIC_WRITE_REGISTER    3
+#define SVSM_APIC_CONFIG_VECTOR     4
 /// @}

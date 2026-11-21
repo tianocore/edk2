@@ -14,6 +14,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 #include <IndustryStandard/IgvmData.h>
 
 #include "SnpPageStateChange.h"
@@ -108,7 +109,7 @@ MemEncryptSevSnpPreValidateSystemRam (
   SNP_PRE_VALIDATED_RANGE  OverlapRange;
   EFI_STATUS               Status;
 
-  if (!MemEncryptSevSnpIsEnabled ()) {
+  if (!AmdSevSnpIsEnabled ()) {
     return;
   }
 

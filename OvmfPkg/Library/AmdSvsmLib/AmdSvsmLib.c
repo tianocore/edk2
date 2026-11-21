@@ -13,6 +13,7 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Amd/Svsm.h>
 #include <Register/Amd/SvsmMsr.h>
+#include <Library/AmdSevLib.h>
 
 #define PAGES_PER_2MB_ENTRY  512
 
@@ -670,4 +671,202 @@ AmdSvsmUefiMmRequest (
 
   Ret = SvsmMsrProtocol (&SvsmCallData);
   return (Ret == 0) ? TRUE : FALSE;
+}
+
+/**
+  Issue an SVSM request to perform a SVSM APIC read operation.
+
+  @param[in]  MsrIndex  APIC register MSR.
+
+  @return               The value of the register.
+
+**/
+UINT64
+EFIAPI
+AmdSvsmSnpReadApicMsr (
+  IN  UINT32  MsrIndex
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_CAA        *Caa;
+  SVSM_FUNCTION   Function;
+  UINT64          Val;
+  UINTN           Ret;
+
+  Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+
+  Function.Id.Protocol = SVSM_PROTOCOL_APIC;
+  Function.Id.CallId   = SVSM_APIC_READ_REGISTER;
+
+  SvsmCallData.Caa   = Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = MsrIndex;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  if (Ret != 0) {
+    SnpTerminate ();
+  }
+
+  Val = SvsmCallData.RdxOut;
+
+  return Val;
+}
+
+/**
+  Issue an SVSM request to perform a SVSM APIC write operation.
+
+  @param[in]  MsrIndex  APIC register MSR.
+  @param[in]  Value     The value of the register.
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpWriteApicMsr (
+  IN UINT32  MsrIndex,
+  IN UINT64  Value
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_CAA        *Caa;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+
+  Function.Id.Protocol = SVSM_PROTOCOL_APIC;
+  Function.Id.CallId   = SVSM_APIC_WRITE_REGISTER;
+
+  SvsmCallData.Caa   = Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = MsrIndex;
+  SvsmCallData.RdxIn = Value;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  if (Ret != 0) {
+    SnpTerminate ();
+  }
+}
+
+/**
+  Issue an SVSM request to perform a SVSM APIC features query operation.
+
+  @return  bitmask of supported features.
+
+**/
+UINT64
+EFIAPI
+AmdSvsmSnpApicQueryFeatures (
+  VOID
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_CAA        *Caa;
+  SVSM_FUNCTION   Function;
+  UINT64          Val;
+  UINTN           Ret;
+
+  Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+
+  Function.Id.Protocol = SVSM_PROTOCOL_APIC;
+  Function.Id.CallId   = SVSM_APIC_QUERY_FEATURES;
+
+  SvsmCallData.Caa   = Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  if (Ret != 0) {
+    SnpTerminate ();
+  }
+
+  Val = SvsmCallData.RcxOut;
+
+  return Val;
+}
+
+/**
+  Issue an SVSM request to perform a register/deregister Alternate Injection
+  operation.
+
+  @param[in]  Vector  bitmask of the intended operation
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpApicConfigEmulation (
+  IN SVSM_AI_CTRL  Vector
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_CAA        *Caa;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+
+  Function.Id.Protocol = SVSM_PROTOCOL_APIC;
+  Function.Id.CallId   = SVSM_APIC_CONFIG_EMULATION;
+
+  SvsmCallData.Caa   = Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Vector;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  if (Ret != 0) {
+    SnpTerminate ();
+  }
+}
+
+/**
+  Issue an SVSM request to configure interrupt vectors which is allowed to be
+  delivered from the Hypervisor.
+
+  @param[in]  Vector  bitmask of the single interrupt vector.
+  @param[in]  Value   bitmask of the intended operation.
+
+**/
+VOID
+EFIAPI
+AmdSvsmSnpApicConfigVector (
+  IN UINT8            Vector,
+  IN SVSM_VEC_ENABLE  Value
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_CAA        *Caa;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+
+  Function.Id.Protocol = SVSM_PROTOCOL_APIC;
+  Function.Id.CallId   = SVSM_APIC_CONFIG_VECTOR;
+
+  SvsmCallData.Caa   = Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Vector | (Value << 8);
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  if (Ret != 0) {
+    SnpTerminate ();
+  }
+}
+
+/**
+  Check Alternate Injection enablement.
+  @retval  TRUE   Alternate Injection enabled
+  @retval  FALSE  Alternate Injection not enabled
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmAltInjEnabled (
+  VOID
+  )
+{
+  return AmdSevSnpAlternateInjectionIsEnabled ();
 }
