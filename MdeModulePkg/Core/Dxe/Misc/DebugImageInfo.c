@@ -145,7 +145,12 @@ CoreUpdateDebugTableCrc32 (
 {
   ASSERT (mDebugTable != NULL);
   mDebugTable->Crc32 = 0;
-  gBS->CalculateCrc32 ((VOID *)mDebugTable, sizeof (EFI_SYSTEM_TABLE_POINTER), &mDebugTable->Crc32);
+  //
+  // Don't include padding bytes.
+  //
+  gBS->CalculateCrc32 ((VOID *)mDebugTable,
+                       OFFSET_OF (EFI_SYSTEM_TABLE_POINTER, Crc32) + sizeof(mDebugTable->Crc32),
+                       &mDebugTable->Crc32);
 }
 
 /**
