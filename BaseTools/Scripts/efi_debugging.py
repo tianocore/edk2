@@ -1820,7 +1820,7 @@ class EfiConfigurationTable:
             if system_table_pointer.Signature == efi_system_table_signature:
                 buf1 = bytearray(system_table_pointer)[:16]
                 crc32_value = zlib.crc32(buf1)
-                crc32_value = zlib.crc32(b'\0' * (sizeof(EFI_SYSTEM_TABLE_POINTER) - len(buf1)), crc32_value)
+                crc32_value = zlib.crc32(b'\0' * 4, crc32_value)
                 if crc32_value == system_table_pointer.Crc32:
                     break
             system_table_pointer = None
