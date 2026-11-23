@@ -525,6 +525,7 @@ CheckSignatureListFormat (
   UINTN               SigDataSize;
   UINT32              Index;
   UINT32              SigCount;
+  UINT32              SigListCount;
   BOOLEAN             IsPk;
   VOID                *RsaContext;
   EFI_SIGNATURE_DATA  *CertData;
@@ -574,6 +575,8 @@ CheckSignatureListFormat (
       return EFI_INVALID_PARAMETER;
     }
 
+    SigListCount = (SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) / SigList->SignatureSize;
+
     for (Index = 0; Index < (sizeof (mSupportSigItem) / sizeof (EFI_SIGNATURE_ITEM)); Index++ ) {
       if (CompareGuid (&SigList->SignatureType, &mSupportSigItem[Index].SigType)) {
         //
@@ -604,6 +607,10 @@ CheckSignatureListFormat (
     }
 
     if (CompareGuid (&SigList->SignatureType, &gEfiCertX509Guid)) {
+      if (SigListCount != 1) {
+        return EFI_INVALID_PARAMETER;
+      }
+
       //
       // Try to retrieve the RSA public key from the X.509 certificate.
       // If this operation fails, it's not a valid certificate.
@@ -618,7 +625,7 @@ CheckSignatureListFormat (
       RsaFree (RsaContext);
     }
 
-    SigCount += (SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) / SigList->SignatureSize;
+    SigCount += SigListCount;
 
     SigDataSize -= SigList->SignatureListSize;
     SigList      = (EFI_SIGNATURE_LIST *)((UINT8 *)SigList + SigList->SignatureListSize);
