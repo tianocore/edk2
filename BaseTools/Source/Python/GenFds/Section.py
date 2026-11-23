@@ -124,7 +124,7 @@ class Section (SectionClassObject):
             for File in FfsInf.BinFileList:
                 if File.Arch == TAB_ARCH_COMMON or FfsInf.CurrentArch == File.Arch:
                     if File.Type == FileType or (int(FfsInf.PiSpecVersion, 16) >= 0x0001000A \
-                                                 and FileType == 'DXE_DPEX' and File.Type == BINARY_FILE_TYPE_SMM_DEPEX) \
+                                                 and FileType == 'DXE_DEPEX' and File.Type == BINARY_FILE_TYPE_SMM_DEPEX) \
                                                  or (FileType == BINARY_FILE_TYPE_TE and File.Type == BINARY_FILE_TYPE_PE32):
                         if TAB_STAR in FfsInf.TargetOverrideList or File.Target == TAB_STAR or File.Target in FfsInf.TargetOverrideList or FfsInf.TargetOverrideList == []:
                             FileList.append(FfsInf.PatchEfiFile(File.Path, File.Type))
