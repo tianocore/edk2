@@ -226,20 +226,32 @@ IsLmceSignaled (
   Given timeout constraint, wait for all APs to arrive, and insure when this function returns, no AP will execute normal mode code before
   entering SMM, except SMI disabled APs.
 
+  @param[in] DeferPerformance  TRUE to save timestamps for migration after AP
+                              dispatch has ended, without allocating memory.
+                              FALSE to log performance records immediately.
+
 **/
 VOID
 SmmWaitForApArrival (
-  VOID
+  IN BOOLEAN  DeferPerformance
   )
 {
   UINT64   Timer;
   UINTN    Index;
+  UINTN    BspIndex;
   UINT32   DelayedCount;
   UINT32   BlockedCount;
   UINT32   DisabledCount;
   BOOLEAN  SyncNeeded;
 
-  PERF_FUNCTION_BEGIN ();
+  BspIndex = mSmmMpSyncData->BspIndex;
+  if (DeferPerformance) {
+    if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) {
+      MpPerfBegin (BspIndex, SMM_MP_PERF_PROCEDURE_ID (SmmWaitForApArrival));
+    }
+  } else {
+    PERF_FUNCTION_BEGIN ();
+  }
 
   DelayedCount  = 0;
   BlockedCount  = 0;
@@ -329,7 +341,13 @@ SmmWaitForApArrival (
     DEBUG ((DEBUG_ERROR, "SmmWaitForApArrival: Failed to wait all APs enter SMI. Delayed AP Count = %d, Blocked AP Count = %d, Disabled AP Count = %d\n", DelayedCount, BlockedCount, DisabledCount));
   }
 
-  PERF_FUNCTION_END ();
+  if (DeferPerformance) {
+    if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) {
+      MpPerfEnd (BspIndex, SMM_MP_PERF_PROCEDURE_ID (SmmWaitForApArrival));
+    }
+  } else {
+    PERF_FUNCTION_END ();
+  }
 }
 
 /**
@@ -506,9 +524,10 @@ BSPHandler (
   //
   if ((SyncMode == MmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
-    // Wait for APs to arrive
+    // Wait for APs to arrive. Defer performance records because allocation can
+    // require AP dispatch before the APs are ready to accept work.
     //
-    SmmWaitForApArrival ();
+    SmmWaitForApArrival (TRUE);
 
     //
     // Lock door for late coming CPU checkin and retrieve the Arrived number of APs

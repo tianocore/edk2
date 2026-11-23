@@ -1558,10 +1558,14 @@ SmmCpuRendezvous (
 /**
   Insure when this function returns, no AP will execute normal mode code before entering SMM, except SMI disabled APs.
 
+  @param[in] DeferPerformance  TRUE to save timestamps for migration after AP
+                              dispatch has ended, without allocating memory.
+                              FALSE to log performance records immediately.
+
 **/
 VOID
 SmmWaitForApArrival (
-  VOID
+  IN BOOLEAN  DeferPerformance
   );
 
 /**
