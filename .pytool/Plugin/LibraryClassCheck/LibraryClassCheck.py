@@ -73,8 +73,7 @@ class LibraryClassCheck(ICiBuildPlugin):
             return -1
 
         # Get all include folders
-        dec = DecParser()
-        dec.SetBaseAbsPath(Edk2pathObj.WorkspacePath).SetPackagePaths(Edk2pathObj.PackagePathList)
+        dec = DecParser().SetEdk2Path(Edk2pathObj)
         dec.ParseFile(wsr_dec_path)
 
         AllHeaderFiles = []
