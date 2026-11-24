@@ -133,14 +133,13 @@ typedef enum {
 /** Return version of the performance management protocol supported by SCP.
    firmware.
 
-  @param[in]  This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   This     A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
 
-  @param[out] Version   Version of the supported SCMI performance management
+  @param[out]  Version  Version of the supported SCMI performance management
                         protocol.
 
-  @retval EFI_SUCCESS       The version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -151,13 +150,12 @@ EFI_STATUS
 
 /** Return protocol attributes of the performance management protocol.
 
-  @param[in] This         A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
 
-  @param[out] Attributes  Protocol attributes.
+  @param[out]  Attributes  Protocol attributes.
 
-  @retval EFI_SUCCESS       Protocol attributes are returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Protocol attributes are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -169,14 +167,14 @@ EFI_STATUS
 
 /** Return performance domain attributes.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]   This              A Pointer to SCMI_PERFORMANCE_PROTOCOL
+                                 Instance.
+  @param[in]   DomainId          Identifier for the performance domain.
 
-  @param[out] Attributes  Performance domain attributes.
+  @param[out]  DomainAttributes  Performance domain attributes.
 
-  @retval EFI_SUCCESS       Domain attributes are returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Domain attributes are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -188,20 +186,20 @@ EFI_STATUS
 
 /** Return list of performance domain levels of a given domain.
 
-  @param[in] This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in] DomainId    Identifier for the performance domain.
+  @param[in]      This            A Pointer to SCMI_PERFORMANCE_PROTOCOL
+                                  Instance.
+  @param[in]      DomainId        Identifier for the performance domain.
 
-  @param[out] NumLevels   Total number of levels a domain can support.
+  @param[out]     NumLevels       Total number of levels a domain can support.
 
-  @param[in,out]  LevelArraySize Size of the performance level array.
+  @param[in,out]  LevelArraySize  Size of the performance level array.
 
-  @param[out] LevelArray   Array of the performance levels.
+  @param[out]     LevelArray      Array of the performance levels.
 
-  @retval EFI_SUCCESS          Domain levels are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval EFI_BUFFER_TOO_SMALL LevelArraySize is too small for the result.
-                               It has been updated to the size needed.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Domain levels are returned.
+  @retval EFI_BUFFER_TOO_SMALL   LevelArraySize is too small for the result. It
+                                 has been updated to the size needed.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -215,13 +213,12 @@ EFI_STATUS
 
 /** Set performance limits of a domain.
 
-  @param[in] This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in] DomainId    Identifier for the performance domain.
-  @param[in] Limit       Performance limit to set.
+  @param[in]  This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]  DomainId  Identifier for the performance domain.
+  @param[in]  Limits    Performance limit to set.
 
-  @retval EFI_SUCCESS          Performance limits set successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits set successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -233,14 +230,13 @@ EFI_STATUS
 
 /** Get performance limits of a domain.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]   This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   DomainId  Identifier for the performance domain.
 
-  @param[out] Limit       Performance Limits of the domain.
+  @param[out]  Limits    Performance Limits of the domain.
 
-  @retval EFI_SUCCESS          Performance limits are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -252,13 +248,12 @@ EFI_STATUS
 
 /** Set performance level of a domain.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
-  @param[in]  Level       Performance level of the domain.
+  @param[in]  This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]  DomainId  Identifier for the performance domain.
+  @param[in]  Level     Performance level of the domain.
 
-  @retval EFI_SUCCESS          Performance level set successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance level set successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -270,14 +265,13 @@ EFI_STATUS
 
 /** Get performance level of a domain.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]   This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   DomainId  Identifier for the performance domain.
 
-  @param[out] Level       Performance level of the domain.
+  @param[out]  Level     Performance level of the domain.
 
-  @retval EFI_SUCCESS          Performance level got successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance level got successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -290,21 +284,21 @@ EFI_STATUS
 /** Discover the attributes of the FastChannel for the specified
     performance domain and the specified message.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
-  @param[in]  MessageId   Message Id of the FastChannel to discover.
-                          Must be one of:
-                           - PERFORMANCE_LIMITS_SET
-                           - PERFORMANCE_LIMITS_GET
-                           - PERFORMANCE_LEVEL_SET
-                           - PERFORMANCE_LEVEL_GET
-  @param[out] FastChannel If success, contains the FastChannel description.
+  @param[in]   This         A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   DomainId     Identifier for the performance domain.
+  @param[in]   MessageId    Message Id of the FastChannel to discover.
+                            Must be one of:
+                              - PERFORMANCE_LIMITS_SET
+                              - PERFORMANCE_LIMITS_GET
+                              - PERFORMANCE_LEVEL_SET
+                              - PERFORMANCE_LEVEL_GET
+  @param[out]  FastChannel  If success, contains the FastChannel description.
 
-  @retval EFI_SUCCESS             Performance level got successfully.
-  @retval EFI_DEVICE_ERROR        SCP returns an SCMI error.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_TIMEOUT             Time out.
-  @retval EFI_UNSUPPORTED         Unsupported.
+  @retval EFI_SUCCESS            Performance level got successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval EFI_TIMEOUT            Time out.
+  @retval EFI_UNSUPPORTED        Unsupported.
 **/
 typedef
 EFI_STATUS
