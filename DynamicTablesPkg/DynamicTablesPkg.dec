@@ -1,7 +1,7 @@
 ## @file
 # dec file for Dynamic Tables Framework.
 #
-# Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -21,6 +21,9 @@
   ##  @libraryclass  Defines a set of Acpi helper methods
   #   independent from the Dynamic Tables Framework.
   AcpiHelperLib|Include/Library/AcpiHelperLib.h
+
+  ##  @libraryclass  Generates an SSDT describing an Arm PL031 RTC.
+  AcpiRtcPl031Lib|Include/Library/AcpiRtcPl031Lib.h
 
   ##  @libraryclass  Defines a set of APIs for Dynamic AML generation.
   AmlLib|Include/Library/AmlLib/AmlLib.h

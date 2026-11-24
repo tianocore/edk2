@@ -2,7 +2,7 @@
 #  Dsc file for Dynamic Tables Framework.
 #
 #  Copyright (c) 2019, Linaro Limited. All rights reserved.<BR>
-#  Copyright (c) 2019 - 2022, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2019 - 2026, Arm Limited. All rights reserved.<BR>
 #  Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -56,6 +56,7 @@
   DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
 
 [Components.AARCH64]
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiRtcPl031Lib/AcpiRtcPl031Lib.inf
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
   DynamicTablesPkg/Library/Smbios/Arm/SmbiosSmcLib/SmbiosSmcLib.inf
 
