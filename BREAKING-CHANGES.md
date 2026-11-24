@@ -23,7 +23,45 @@ None
 
 #### edk2-stable202702: Changes without Removal
 
-None
+##### Breaking Change: CapsuleRuntimeDxe requires ProcessCapsuleRuntimeLib
+
+- **Status**: Announced
+- **Tracking Issue**: [tinocore/edk2#13586](https://github.com/tianocore/edk2/issues/13586)
+- **Pull Request**: [tianocore/edk2#13587](https://github.com/tianocore/edk2/pull/13587)
+- **Type**: Source-Level (Non-removal) - Library class dependency addition
+
+**What changed**: `CapsuleRuntimeDxe` now requires `ProcessCapsuleRuntimeLib`.
+
+**Why it changed**: Some architectures support processing capsule images at
+runtime. The new library class provides a dedicated interface to enable
+this functionality on such architectures.
+
+**What replaces it**: No existing interface is removed.
+BaseProcessCapsuleRuntimeLib provides a default implementation that
+returns EFI_OUT_OF_RESOURCES, preserving the existing behavior when
+runtime capsule processing is unsupported.
+
+**Library dependency case**: Single expected instance for preserving
+existing behavior: BaseProcessCapsuleRuntimeLib. Architectures supporting
+runtime capsule processing can provide and select an appropriate library
+instance.
+
+**How to migrate**: All DSC configurations that include CapsuleRuntimeDxe
+must resolve the new library dependency, irrespective of whether runtime
+capsule processing is supported. To preserve the existing behavior, add
+the following library class mapping to the DSC configuration or an
+included DSC file:
+
+```
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  ProcessCapsuleRuntimeLib|MdeModulePkg/Library/BaseProcessCapsuleRuntimeLib/BaseProcessCapsuleRuntimeLib.inf
+```
+
+**Breaking conditions**: Platforms that build `CapsuleRuntimeDxe`
+without a mapping for `ProcessCapsuleRuntimeLib` will fail to build.
+
+**Companion PR**:
+[tianocore/edk2-platforms#1088](https://github.com/tianocore/edk2-platforms/pull/1088)
 
 ### edk2-stable202702: Behavioral Breaking Changes
 
