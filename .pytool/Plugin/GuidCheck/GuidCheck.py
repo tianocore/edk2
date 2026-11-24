@@ -162,7 +162,7 @@ class GuidCheck(ICiBuildPlugin):
                             elif(len(entry) == 2 and b.guid.upper() == entry[1].upper()):
                                 gs.remove(b)
                             else:
-                                c.LogStdError("GuidCheck.IgnoreGuidName -> {0} incomplete match.  Invalid ignore guid".format(a))
+                                tc.LogStdError("GuidCheck.IgnoreGuidName -> {0} incomplete match.  Invalid ignore guid".format(a))
 
                 except:
                     tc.LogStdError("GuidCheck.IgnoreGuidName -> {0} not found.  Invalid ignore name".format(a))
