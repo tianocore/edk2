@@ -711,6 +711,7 @@ ArmSetMemoryAttributes (
   UINT64      PageAttributes;
   UINT64      PageAttributeMask;
   UINT64      CcaProtectionAttribute;
+  BOOLEAN     IsHostShared;
 
   PageAttributes = GcdAttributeToPageAttribute (Attributes);
 
@@ -742,8 +743,25 @@ ArmSetMemoryAttributes (
   if ((CcaProtectionAttribute != 0) &&
       ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_UC))
   {
-    PageAttributes    |= CcaProtectionAttribute;
-    PageAttributeMask &= ~CcaProtectionAttribute;
+    //
+    // If a device is emulated within the Realm (in Realm Plane 0) or
+    // by the RMM, then the CCA Protection Attribute must not be set.
+    // The CCA Protection attribute must only be set for the memory
+    // range which is shared with the Host.
+    //
+    Status = ArmCcaCheckMemRangeIsHostShared (
+               BaseAddress,
+               Length,
+               &IsHostShared
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (IsHostShared) {
+      PageAttributes    |= CcaProtectionAttribute;
+      PageAttributeMask &= ~CcaProtectionAttribute;
+    }
   }
 
   if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {

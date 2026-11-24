@@ -106,3 +106,26 @@ ArmCcaSetMemoryProtectionAttribute (
   // Nothing to do here, return EFI_UNSUPPORTED.
   return EFI_UNSUPPORTED;
 }
+
+/** Check if the address range is host shared, i.e. RIPAS Empty.
+
+  @param[in]  BaseAddress   Base address of the memory region.
+  @param[in]  Length        Length of the memory region in bytes.
+  @param[out] IsHostShared  TRUE if the RIPAS state for the full address range
+                            is Empty. FALSE otherwise.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_UNSUPPORTED        The request is not initiated in a Realm.
+**/
+EFI_STATUS
+EFIAPI
+ArmCcaCheckMemRangeIsHostShared (
+  IN  UINT64   BaseAddress,
+  IN  UINT64   Length,
+  OUT BOOLEAN  *IsHostShared
+  )
+{
+  // Nothing to do here, return EFI_UNSUPPORTED.
+  return EFI_UNSUPPORTED;
+}
