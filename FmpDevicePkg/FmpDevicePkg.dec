@@ -48,14 +48,13 @@
   #                  from firmware device.
   FmpDependencyDeviceLib|Include/Library/FmpDependencyDeviceLib.h
 
-[LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
   #                  Payload Header.  The structure is not included in the
   #                  library class.  Instead, services are provided to retrieve
   #                  information from the FMP Payload Header.  If information is
   #                  added to the FMP Payload Header, then new services may be
   #                  added to this library class to retrieve the new information.
-  FmpPayloadHeaderLib|PrivateInclude/Library/FmpPayloadHeaderLib.h
+  FmpPayloadHeaderLib|Include/Library/FmpPayloadHeaderLib.h
 
 [Guids]
   ## Firmware Management Protocol Device Package Token Space GUID
