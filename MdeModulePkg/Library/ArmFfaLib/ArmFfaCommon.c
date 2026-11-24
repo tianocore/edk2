@@ -24,6 +24,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/SafeIntLib.h>
 
@@ -1307,6 +1308,84 @@ ArmFfaLibGetPartitionInfoWithSize (
 
   CopyMem (PartDesc, RxBuffer, Size);
   ArmFfaLibRxRelease (PartId);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Wrapper function to facilitate retrieving the first partition information descriptor associated with
+  a service GUID.
+
+  @param [in]   ServiceGuid       Service guid.
+  @param [out]  PartDesc          Partition information Buffer, caller is
+                                  responsible for freeing it.
+  @param [out]  PartDescSize      Return size of requested partition info
+                                  related to Service guid copied in PartDesc.
+                                  On success, this will be at least the size of
+                                  EFI_FFA_PART_INFO_DESC.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_DEVICE_ERROR
+  @retval EFI_OUT_OF_RESOURCES
+  @retval EFI_UNSUPPORTED
+  @retval Other                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetAllocatedPartitionInfo (
+  IN EFI_GUID  *ServiceGuid,
+  OUT VOID     **PartDesc,
+  OUT UINT32   *PartDescSize
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      PartInfoSize;
+  VOID        *PartInfo;
+
+  if ((ServiceGuid == NULL) || (PartDesc == NULL) || (PartDescSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *PartDesc    = NULL;
+  PartInfoSize = 0;
+  Status       = ArmFfaLibGetPartitionInfoWithSize (ServiceGuid, NULL, &PartInfoSize);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to query the partition Info(%g) descriptor size. Status: %r\n",
+      ServiceGuid,
+      Status
+      ));
+    Status = EFI_ERROR (Status) ? Status : EFI_DEVICE_ERROR;
+    return Status;
+  }
+
+  if (PartInfoSize < sizeof (EFI_FFA_PART_INFO_DESC)) {
+    DEBUG ((DEBUG_ERROR, "Partition Info descriptor size is too small. Size: %u\n", PartInfoSize));
+    return EFI_UNSUPPORTED;
+  }
+
+  PartInfo = AllocateZeroPool (PartInfoSize);
+  if (PartInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = ArmFfaLibGetPartitionInfoWithSize (ServiceGuid, PartInfo, &PartInfoSize);
+  if (EFI_ERROR (Status)) {
+    FreePool (PartInfo);
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to get partition Info(%g). Status: %r\n",
+      ServiceGuid,
+      Status
+      ));
+    return Status;
+  }
+
+  *PartDesc     = PartInfo;
+  *PartDescSize = PartInfoSize;
 
   return EFI_SUCCESS;
 }
