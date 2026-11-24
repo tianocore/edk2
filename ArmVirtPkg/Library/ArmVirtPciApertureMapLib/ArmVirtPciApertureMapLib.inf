@@ -1,0 +1,36 @@
+## @file
+#  An Arm CCA implementation of PCI aperture mapping library.
+#
+#  Provides functions to premap the PCI apertures. This is required for
+#  Arm CCA so that the memory attributes for the PCI mmio regions is set
+#  as Uncached memory.
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmVirtPciApertureMapLib
+  FILE_GUID                      = 647183a4-1e2c-4b32-8ce7-577023534f30
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciApertureMapLib
+
+[Sources]
+  ArmVirtPciApertureMapLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  ArmCcaLib
+  DebugLib
+  DxeServicesLib
+
+
