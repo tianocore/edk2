@@ -746,6 +746,8 @@ PeiAllocatePages (
   EFI_PEI_HOB_POINTERS  Hob;
   EFI_PHYSICAL_ADDRESS  *FreeMemoryTop;
   EFI_PHYSICAL_ADDRESS  *FreeMemoryBottom;
+  EFI_PHYSICAL_ADDRESS  AllocationTop;
+  UINTN                 TopOffset;
   UINTN                 RemainingPages;
   UINTN                 RemainingMemory;
   UINTN                 Granularity;
@@ -766,6 +768,7 @@ PeiAllocatePages (
   }
 
   RemainingPages = 0;
+  TopOffset      = 0;
 
   Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
 
@@ -805,6 +808,9 @@ PeiAllocatePages (
     // if we are in permanent memory and have memory bins, we need to respect them. A maximum address
     // of 0 means the memory type is using the default bin, which is the PHIT here.
     if (PrivateData->MemoryTypeInformationInitialized && (PrivateData->MemoryTypeStatistics[MemoryType].MaximumAddress != 0)) {
+      // The memory bins have an inclusive end while the PHIT has an exclusive end. We will take account of that
+      // through the TopOffset adjustment and forcing all of this logic to work on exclusive ends.
+      TopOffset        = 1;
       FreeMemoryTop    = &(PrivateData->MemoryTypeStatistics[MemoryType].MaximumAddress);
       FreeMemoryBottom = &(PrivateData->MemoryTypeStatistics[MemoryType].BaseAddress);
     } else {
@@ -843,12 +849,17 @@ PeiAllocatePages (
     // If not aligned, make the allocation aligned and that we are not trying to allocate page 0, which is used for
     // null detection.
     //
-    Padding = *(FreeMemoryTop) & (Granularity - 1);
-    if (((UINTN)(*FreeMemoryTop - *FreeMemoryBottom) < Padding) || (*(FreeMemoryTop) - Padding == 0)) {
-      if ((Index == 0) && PrivateData->MemoryTypeInformationInitialized && (PrivateData->MemoryTypeStatistics[MemoryType].MaximumAddress != 0)) {
+    AllocationTop = *FreeMemoryTop + TopOffset;
+    Padding       = AllocationTop & (Granularity - 1);
+    if ((AllocationTop < *FreeMemoryBottom) ||
+        ((UINTN)(AllocationTop - *FreeMemoryBottom) < Padding) ||
+        (AllocationTop - Padding == 0))
+    {
+      if (TopOffset != 0) {
         //
         // Try the default bin before searching memory allocation HOBs
         //
+        TopOffset        = 0;
         FreeMemoryTop    = &(Hob.HandoffInformationTable->EfiFreeMemoryTop);
         FreeMemoryBottom = &(Hob.HandoffInformationTable->EfiFreeMemoryBottom);
         continue;
@@ -857,7 +868,9 @@ PeiAllocatePages (
       goto NotEnoughFreeMemory;
     }
 
-    *(FreeMemoryTop) -= Padding;
+    AllocationTop -= Padding;
+    *FreeMemoryTop = AllocationTop - TopOffset;
+
     if (Padding >= EFI_PAGE_SIZE) {
       //
       // Create a memory allocation HOB to cover
@@ -865,7 +878,7 @@ PeiAllocatePages (
       //
       InternalBuildMemoryAllocationHob (
         PeiServices,
-        *(FreeMemoryTop),
+        AllocationTop,
         Padding & ~(UINTN)EFI_PAGE_MASK,
         EfiConventionalMemory
         );
@@ -881,7 +894,7 @@ PeiAllocatePages (
     //
     // Verify that there is sufficient memory to satisfy the allocation.
     //
-    RemainingMemory = (UINTN)(*FreeMemoryTop - *FreeMemoryBottom);
+    RemainingMemory = (UINTN)(AllocationTop - *FreeMemoryBottom);
     RemainingPages  = (UINTN)(RShiftU64 (RemainingMemory, EFI_PAGE_SHIFT));
     //
     // The number of remaining pages needs to be greater than or equal to that of
@@ -896,19 +909,20 @@ PeiAllocatePages (
       //
       // Update the PHIT to reflect the memory usage
       //
-      *(FreeMemoryTop) -= Pages * EFI_PAGE_SIZE;
+      AllocationTop -= Pages * EFI_PAGE_SIZE;
+      *FreeMemoryTop = AllocationTop - TopOffset;
 
       //
       // Update the value for the caller
       //
-      *Memory = *(FreeMemoryTop);
+      *Memory = AllocationTop;
 
       //
       // Create a memory allocation HOB.
       //
       InternalBuildMemoryAllocationHob (
         PeiServices,
-        *(FreeMemoryTop),
+        AllocationTop,
         Pages * EFI_PAGE_SIZE,
         MemoryType
         );
@@ -918,10 +932,11 @@ PeiAllocatePages (
 
     // If this was the first allocation attempt, we are using memory bins, and this memory type lands in a bin,
     // retry allocation but target the PHIT free region.
-    if ((Index == 0) && PrivateData->MemoryTypeInformationInitialized && (PrivateData->MemoryTypeStatistics[MemoryType].MaximumAddress != 0)) {
+    if (TopOffset != 0) {
       //
       // Try to the default bin before searching memory allocation HOBs
       //
+      TopOffset        = 0;
       FreeMemoryTop    = &(Hob.HandoffInformationTable->EfiFreeMemoryTop);
       FreeMemoryBottom = &(Hob.HandoffInformationTable->EfiFreeMemoryBottom);
       continue;
