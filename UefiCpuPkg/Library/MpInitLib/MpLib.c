@@ -279,7 +279,15 @@ RestoreVolatileRegisters (
     Tss = (IA32_TSS_DESCRIPTOR *)(VolatileRegisters->Gdtr.Base +
                                   VolatileRegisters->Tr);
 
-    if ((Tss->Bits.P == 1) && ((Tss->Bits.Type & BIT1) == 0)) {
+    if ((Tss->Bits.P == 1) && (Tss->Bits.Type == IA32_GDT_TYPE_TSS)) {
+      //
+      // Type is only valid when the S field (bit 44) is clear. Otherwise,
+      // a present, ring 0, code, execute-only, accessed (S=1, Type=1001b)
+      // descriptor could be mistaken for a TSS descriptor but those are
+      // never created by EDK2.
+      //
+      ASSERT (Tss->Bits.Reserved_43 == 0);
+
       // TR is used to enable a separate safe stack when a stack overflow occurs.
       // When PEI starts up the APs, TR is non-zero and so each processor has its
       // own GDT. TR is an offset into the GDT and so points to a different TSS entry
@@ -300,8 +308,8 @@ RestoreVolatileRegisters (
       //
       // To avoid this issue, the task register is only loaded if TR is non-zero and the
       // TSS descriptor is valid and not busy. HW sets the busy bit and does not clear it. edk2 does
-      // not clear the busy bit, so the BSP's TSS descriptor will be marked busy forever and the APs
-      // will not load the task register until they have their own GDT/TSS set up.
+      // not clear the busy bit on the BSP's TSS descriptor either, and so it will be marked busy
+      // forever and the APs will not load the task register until they have their own GDT/TSS set up.
       AsmWriteTr (VolatileRegisters->Tr);
     }
   }
@@ -743,6 +751,53 @@ PlaceAPInMwaitLoopOrRunLoop (
 }
 
 /**
+  Clear a stale busy flag in the TSS descriptor this AP is about to reload.
+
+  An AP that is woken up with INIT-SIPI-SIPI (e.g., in HLT loop mode) comes
+  back with TR reset to 0, but the busy flag that its previous LTR set in its
+  TSS descriptor is still set. RestoreVolatileRegisters() would then never
+  reload TR, and the AP would keep running with TR == 0 while its IDT may
+  select IST stacks for some exceptions.
+
+  The busy flag is only cleared if TR has actually been reset, and only if the
+  descriptor lives in a GDT that is private to this AP. The GDT handed out to
+  all APs by MpInitLibInitialize() (still recorded in the BSP's CPU_AP_DATA)
+  may hold a TSS descriptor that is in use by another processor, and must be
+  left alone (see RestoreVolatileRegisters()).
+
+  @param[in] CpuMpData        Pointer to CPU MP Data
+  @param[in] ProcessorNumber  The handle number of the calling AP
+**/
+STATIC
+VOID
+ClearStaleTssBusyFlag (
+  IN CPU_MP_DATA  *CpuMpData,
+  IN UINTN        ProcessorNumber
+  )
+{
+  CPU_VOLATILE_REGISTERS  *VolatileRegisters;
+  IA32_TSS_DESCRIPTOR     *Tss;
+
+  VolatileRegisters = &CpuMpData->CpuData[ProcessorNumber].VolatileRegisters;
+  if ((AsmReadTr () != 0) ||
+      (VolatileRegisters->Tr == 0) ||
+      ((UINTN)VolatileRegisters->Tr + sizeof (IA32_TSS_DESCRIPTOR) - 1 >
+       VolatileRegisters->Gdtr.Limit) ||
+      (VolatileRegisters->Gdtr.Base ==
+       CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters.Gdtr.Base))
+  {
+    return;
+  }
+
+  Tss = (IA32_TSS_DESCRIPTOR *)(VolatileRegisters->Gdtr.Base +
+                                VolatileRegisters->Tr);
+  if ((Tss->Bits.P == 1) && (Tss->Bits.Type == (IA32_GDT_TYPE_TSS | BIT1))) {
+    ASSERT (Tss->Bits.Reserved_43 == 0);
+    Tss->Bits.Type = IA32_GDT_TYPE_TSS;
+  }
+}
+
+/**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param[in] CpuMpData        Pointer to CPU MP Data
@@ -826,6 +881,7 @@ ApWakeupFunction (
         0
         );
 
+      ClearStaleTssBusyFlag (CpuMpData, ProcessorNumber);
       RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
