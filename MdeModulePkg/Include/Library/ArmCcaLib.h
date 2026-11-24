@@ -67,3 +67,25 @@ ArmCcaMemRangeIsProtectedMmio (
   IN  UINT64   Length,
   OUT BOOLEAN  *IsProtectedMmio
   );
+
+/** Check if the address range is Host shared i.e. Ripas Empty.
+
+  @param [in]   BaseAddress      Base address of the device MMIO region.
+  @param [in]   Length           Length of the device MMIO region.
+  @param [out]  IsHostShared     TRUE - if the RIPAS for the address range is
+                                        Host shared.
+                                 FALSE - if the RIPAS for the address range is
+                                         not Host shared.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The request is not initiated in a
+                                    Realm.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaMemRangeIsHostShared (
+  IN  UINT64   BaseAddress,
+  IN  UINT64   Length,
+  OUT BOOLEAN  *IsHostShared
+  );
