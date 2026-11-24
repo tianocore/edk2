@@ -182,6 +182,7 @@
   PciSegmentLib                    | MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib                 | OvmfPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
   PciHostBridgeUtilityLib          | OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+  PciApertureMapLib                | OvmfPkg/Library/PciApertureMapLibNull/PciApertureMapLibNull.inf
   FileExplorerLib                  | MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   ImagePropertiesRecordLib         | MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
