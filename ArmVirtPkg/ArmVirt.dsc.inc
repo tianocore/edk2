@@ -180,6 +180,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 
   # PCI Libraries
+  PciApertureMapLib|ArmVirtPkg/Library/ArmVirtPciApertureMapLib/ArmVirtPciApertureMapLib.inf
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|OvmfPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf

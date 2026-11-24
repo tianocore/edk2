@@ -36,4 +36,5 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PciApertureMapLib
   PciLib
