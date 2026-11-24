@@ -71,6 +71,11 @@
   #                  instances in ArmVirtPkg and OvmfPkg.
   PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
 
+  ##  @libraryclass  Provides functions to premap the PCI apertures in
+  #                  PciHostBridgeUtilityLib instances in ArmVirtPkg and
+  #                  OvmfPkg.
+  PciApertureMapLib|Include/Library/PciApertureMapLib.h
+
   ##  @libraryclass  Register a status code handler for printing the Boot
   #                  Manager's LoadImage() and StartImage() preparations, and
   #                  return codes, to the UEFI console.
