@@ -18,6 +18,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/HardwareInfoLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PciApertureMapLib.h>
 #include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -678,7 +679,9 @@ FreeBridges:
 
   @param[in]  PMemAbove4G            Prefetchable MMIO aperture above 4G.
 
-  @return                            All the root bridge instances in an array.
+  @return  All root bridge instances in an array, or NULL if the input
+             parameters are invalid, PCI aperture mapping fails, or root bridge
+             discovery fails.
 **/
 PCI_ROOT_BRIDGE *
 EFIAPI
@@ -697,7 +700,19 @@ PciHostBridgeUtilityGetRootBridges (
   IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G
   )
 {
+  EFI_STATUS       Status;
   PCI_ROOT_BRIDGE  *Bridges;
+  UINTN            Index;
+
+  if ((Count == NULL)       ||
+      (Io == NULL)          ||
+      (Mem == NULL)         ||
+      (MemAbove4G == NULL)  ||
+      (PMem == NULL)        ||
+      (PMemAbove4G == NULL))
+  {
+    return NULL;
+  }
 
   *Count = 0;
 
@@ -726,6 +741,26 @@ PciHostBridgeUtilityGetRootBridges (
                 PMem,
                 PMemAbove4G
                 );
+  }
+
+  if (Bridges == NULL) {
+    return NULL;
+  }
+
+  for (Index = 0; Index < *Count; Index++) {
+    Status = MapPciApertures (
+               &Bridges[Index].Io,
+               &Bridges[Index].Mem,
+               &Bridges[Index].MemAbove4G,
+               &Bridges[Index].PMem,
+               &Bridges[Index].PMemAbove4G
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      PciHostBridgeUtilityFreeRootBridges (Bridges, *Count);
+      *Count = 0;
+      return NULL;
+    }
   }
 
   return Bridges;
