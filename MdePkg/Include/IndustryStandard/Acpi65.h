@@ -3157,6 +3157,18 @@ typedef struct {
 ///
 #define EFI_ACPI_6_5_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_REVISION  0x01
 
+///
+/// Software Delegated Exceptions Interface Table (SDEI)
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+} EFI_ACPI_6_5_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_HEADER;
+
+///
+/// SDEI Revision
+///
+#define EFI_ACPI_6_5_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_REVISION  0x01
+
 //
 // Known table signatures
 //
