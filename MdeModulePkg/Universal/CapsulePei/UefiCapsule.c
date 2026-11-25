@@ -1315,7 +1315,7 @@ CreateState (
   //
   // Copy to our new buffer for DXE
   //
-  DEBUG ((DEBUG_INFO, "Capsule copy from 0x%8X to 0x%8X with size 0x%8X\n", (UINTN)((UINT8 *)PrivateData + sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof (UINT64)), (UINTN)NewBuffer, Size));
+  DEBUG ((DEBUG_INFO, "Capsule copy from 0x%lX to 0x%lX with size 0x%lX\n", (UINT64)(UINTN)((UINT8 *)PrivateData + sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof (UINT64)), (UINT64)(UINTN)NewBuffer, (UINT64)Size));
   CopyMem ((VOID *)(UINTN)NewBuffer, (VOID *)(UINTN)((UINT8 *)PrivateData + sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof (UINT64)), Size);
   //
   // Check for test data pattern. If it is the test pattern, then we'll
