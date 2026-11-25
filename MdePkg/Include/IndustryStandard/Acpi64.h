@@ -3052,6 +3052,18 @@ typedef struct {
   UINT8    CedtStructure[];
 } EFI_ACPI_6_4_CXL_EARLY_DISCOVERY_TABLE;
 
+///
+/// Software Delegated Exceptions Interface Table (SDEI)
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+} EFI_ACPI_6_4_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_HEADER;
+
+///
+/// SDEI Revision
+///
+#define EFI_ACPI_6_4_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_REVISION  0x01
+
 //
 // Known table signatures
 //
