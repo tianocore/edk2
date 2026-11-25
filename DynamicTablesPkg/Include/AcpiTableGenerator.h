@@ -111,6 +111,8 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT SCMI generator collates the SCMI device, protocol, and
             PCC transport information from the Configuration Manager and uses
             the Dynamic AML CodeGen APIs to build the SSDT SCMI table.
+  - SDEI  : The SDEI generator builds the Software Delegated Exceptions
+            Interface table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -162,6 +164,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtSmc91x,                    ///< SSDT SMC91X Network Device Generator
   EStdAcpiTableIdSsdtVirtioMmioDevice,          ///< SSDT Virtio MMIO Device Generator
   EStdAcpiTableIdSsdtScmi,                      ///< SSDT SCMI Generator
+  EStdAcpiTableIdSdei,                          ///< SDEI Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
