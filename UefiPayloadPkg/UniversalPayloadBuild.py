@@ -337,7 +337,7 @@ def InitArgumentParser(LoadDefault):
     parser.add_argument("-sk", "--SkipBuild", action='store_true', help='Skip UniversalPayload build')
     parser.add_argument("-af", "--AddFv", type=ValidateAddFv, action='append', help='Add or replace specific FV into payload, Ex: uefi_fv=XXX.fv')
     parser.add_argument("-f", "--Fit", action='store_true', help='Build UniversalPayload file as UniversalPayload.fit', default=False)
-    parser.add_argument('-l', "--LoadAddress", type=lambda x: int(x, 0), help='Specify payload load address', default =0x000800000)
+    parser.add_argument('-l', "--LoadAddress", type=lambda x: int(x, 0), help='Specify payload load address. Defaults to 0x800000, or 0x84000000 for RISCV64.', default=None)
     parser.add_argument('-c', '--DscPath', type=str, default="UefiPayloadPkg/UefiPayloadPkg.dsc", help='Path to the DSC file')
     parser.add_argument('-ac', '--add_cc_flags', action='append', help='Add specified CC compile flags')
     parser.add_argument('-ci','--CiBuild', action='store_true', help='Call from edk2 CI Build Process or not', default=False)
@@ -345,6 +345,15 @@ def InitArgumentParser(LoadDefault):
         args, _ = parser.parse_known_args()
     else:
         args = parser.parse_args()
+    if args.LoadAddress is None:
+        #
+        # QEMU virt DRAM starts at 0x80000000, and the running kernel is often
+        # loaded at 0x80200000. Keep the FIT image above that range.
+        #
+        if args.Arch == 'RISCV64':
+            args.LoadAddress = 0x84000000
+        else:
+            args.LoadAddress = 0x000800000
     return args
 
 def UniversalPayloadFullBuild(args):

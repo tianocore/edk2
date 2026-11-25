@@ -22,7 +22,7 @@
   PLATFORM_GUID                       = F71608AB-D63D-4491-B744-A99998C8CD96
   PLATFORM_VERSION                    = 0.1
   DSC_SPECIFICATION                   = 0x00010005
-  SUPPORTED_ARCHITECTURES             = IA32|X64|AARCH64
+  SUPPORTED_ARCHITECTURES             = IA32|X64|AARCH64|RISCV64
   BUILD_TARGETS                       = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER                    = DEFAULT
   BUILD_ARCH                          = Legacy
@@ -474,6 +474,22 @@
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
 
+[LibraryClasses.RISCV64]
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+
+  RiscVSbiLib|MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
+  RiscVMmuLib|UefiCpuPkg/Library/BaseRiscVMmuLib/BaseRiscVMmuLib.inf
+  TimerLib|UefiPayloadPkg/Library/RiscV64TimerLib/RiscV64TimerLib.inf
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+  ResetSystemLib|OvmfPkg/RiscVVirt/Library/ResetSystemLib/BaseResetSystemLib.inf
+
+  RealTimeClockLib|EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf
+  TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
+
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
+
 [LibraryClasses.common.SEC]
   HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -785,6 +801,26 @@
    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
 !endif
 
+[PcdsPatchableInModule.RISCV64]
+  gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|16
+  gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8
+
+  #
+  # Use default settings from virt NS16550 UART for QEMU platform
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x10000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|3686400
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
+
+!if $(TARGET) == DEBUG
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07
+!else
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
+!endif
+
+
 ################################################################################
 #
 # Pcd DynamicEx Section - list of all EDK II PCD Entries defined by this Platform
@@ -929,7 +965,7 @@
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif
 !else
-  [Components.X64, Components.AARCH64]
+  [Components.X64, Components.AARCH64, Components.RISCV64]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
       UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
@@ -960,7 +996,7 @@
   !include NetworkPkg/Network.dsc.inc
 !endif
 
-[Components.X64, Components.AARCH64]
+[Components.X64, Components.AARCH64, Components.RISCV64]
   #
   # DXE Core
   #
@@ -1035,7 +1071,9 @@
 !if $(DISABLE_RESET_SYSTEM) == FALSE
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 !endif
+!if "RISCV64" not in "$(ARCH)"
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+!endif
 !if $(EMU_VARIABLE_ENABLE) == TRUE
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
@@ -1060,7 +1098,9 @@
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+!if "RISCV64" not in "$(ARCH)"
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+!endif
 
   UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
 
@@ -1284,6 +1324,11 @@
   # ACPI Support
   OvmfPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
 
+[Components.RISCV64]
+  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
+  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+
   #------------------------------
   #  Build the shell
   #------------------------------
@@ -1300,7 +1345,7 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   !include NetworkPkg/NetworkLibs.dsc.inc
 
-[Components.X64, Components.AARCH64]
+[Components.X64, Components.AARCH64, Components.RISCV64]
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
     <PcdsFixedAtBuild>
       ## This flag is used to control initialization of the shell library
