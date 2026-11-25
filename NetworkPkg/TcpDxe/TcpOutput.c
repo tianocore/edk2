@@ -867,7 +867,7 @@ TcpToSendData (
     Seg->End  = End;
     Seg->Flag = Flag;
 
-    if ((TcpVerifySegment (Nbuf) == 0) || (TcpCheckSndQue (&Tcb->SndQue) == 0)) {
+    if (TcpVerifySegment (Nbuf) == 0) {
       DEBUG (
         (DEBUG_ERROR,
          "TcpToSendData: discard a broken segment for TCB %p\n",
@@ -875,6 +875,23 @@ TcpToSendData (
         );
       goto OnError;
     }
+
+    DEBUG_CODE_BEGIN ();
+    //
+    // TcpCheckSndQue walks the whole retransmit queue, so its cost grows with
+    // the number of segments in flight. It is a consistency check only, so
+    // run it in debug builds.
+    //
+    if (TcpCheckSndQue (&Tcb->SndQue) == 0) {
+      DEBUG (
+        (DEBUG_ERROR,
+         "TcpToSendData: discard a broken send queue for TCB %p\n",
+         Tcb)
+        );
+      goto OnError;
+    }
+
+    DEBUG_CODE_END ();
 
     //
     // Don't send an empty segment here.
