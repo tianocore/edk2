@@ -13,6 +13,7 @@
 
 #include <Library/ArmLib.h>
 #include <Library/FdtLib.h>
+#include "ArchUtility.h"
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "Arm/Gic/ArmGicCParser.h"
@@ -1097,8 +1098,7 @@ ArmGicCInfoParser (
   }
 
   for (Index = 0; Index < CpuCount; Index++) {
-    ASSERT (((CpuNodeOffsetMap[Index]) & ~CM_ABSTRACT_TOKEN_ID_MASK) == 0);
-    CpuTokenTable[Index] = (CM_OBJECT_TOKEN)CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceFdtHwInfo, EFdtHwInfoGicCObject, (UINT32)CpuNodeOffsetMap[Index]);
+    CpuTokenTable[Index] = GetCpuToken (Index);
   }
 
   // Add all the CmObjs to the Configuration Manager.

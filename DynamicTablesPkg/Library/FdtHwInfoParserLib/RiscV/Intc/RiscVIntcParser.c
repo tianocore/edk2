@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
+#include "ArchUtility.h"
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "RiscV/Intc/RiscVIntcParser.h"
@@ -333,6 +334,20 @@ CpuNodeParser (
   RintcInfo->AcpiProcessorUid = ProcUid;
   RintcInfo->ExtIntcId        = 0; // Will be updated later
 
+  // Get the proximity domain from the optional "numa-node-id" property.
+  Prop = FdtGetProp (Fdt, CpuNode, "numa-node-id", &PropSize);
+  if (Prop != NULL) {
+    if (PropSize != sizeof (UINT32)) {
+      ASSERT (0);
+      return EFI_ABORTED;
+    }
+
+    RintcInfo->ProximityDomain = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if ((RintcInfo->Flags & EFI_ACPI_6_6_RINTC_FLAG_ENABLE) != 0) {
+      RintcInfo->AffinityFlags = EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE_ENABLED;
+    }
+  }
+
   Status = IsaStringInfoParser (FdtParserHandle, CpuNode, &RintcInfo->IsaStringInfoToken);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -407,8 +422,8 @@ CpusNodeParser (
     return EFI_ABORTED;
   }
 
-  // Count the number of "cpu" nodes under the "cpus" node.
-  Status = FdtCountNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNodeCount);
+  // Count the number of CPU device nodes under the "cpus" node.
+  Status = FdtCountCondNodeInBranch (Fdt, CpusNode, IsCpuDeviceNode, NULL, &CpuNodeCount);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -426,17 +441,10 @@ CpusNodeParser (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CpuNode = CpusNode;
-  for (Index = 0; Index < CpuNodeCount; Index++) {
-    Status = FdtGetNextNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNode);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      if (Status == EFI_NOT_FOUND) {
-        // Should have found the node.
-        Status = EFI_ABORTED;
-      }
-
-      goto exit_handler;
+  Index = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    if (!IsCpuDeviceNode (Fdt, CpuNode, NULL)) {
+      continue;
     }
 
     // Parse the "cpu" node.
@@ -456,7 +464,15 @@ CpusNodeParser (
       ASSERT (0);
       goto exit_handler;
     }
-  } // for
+
+    Index++;
+  }
+
+  if (Index != CpuNodeCount) {
+    ASSERT (FALSE);
+    Status = EFI_ABORTED;
+    goto exit_handler;
+  }
 
   Status = CreateCmObjDesc (
              CREATE_CM_RISCV_OBJECT_ID (ERiscVObjRintcInfo),
@@ -1335,15 +1351,18 @@ RiscVIntcInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
   EFI_STATUS         Status;
+  UINT32             Index;
+  CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
+  CM_OBJECT_TOKEN    *CpuTokenTable;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  NewCmObjDesc = NULL;
+  NewCmObjDesc  = NULL;
+  CpuTokenTable = NULL;
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
   // and create a CM_OBJ_DESCRIPTOR.
@@ -1367,14 +1386,29 @@ RiscVIntcInfoParser (
     goto exit_handler;
   }
 
+  CpuTokenTable = AllocateZeroPool (sizeof (*CpuTokenTable) * NewCmObjDesc->Count);
+  if (CpuTokenTable == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  for (Index = 0; Index < NewCmObjDesc->Count; Index++) {
+    CpuTokenTable[Index] = GetCpuToken (Index);
+  }
+
   // Finally, add all the RINTC CmObjs to the Configuration Manager.
-  Status = AddMultipleCmObj (FdtParserHandle, NewCmObjDesc, 0, NULL);
+  Status = AddMultipleCmObjWithToken (FdtParserHandle, NewCmObjDesc, CpuTokenTable);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
   }
 
 exit_handler:
+  if (CpuTokenTable != NULL) {
+    FreePool (CpuTokenTable);
+  }
+
   FreeCmObjDesc (NewCmObjDesc);
   return Status;
 }
