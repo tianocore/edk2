@@ -169,7 +169,8 @@ typedef struct {
 */
 STATIC ARMCCA_HASH_INFO  mHashInfo[] = {
   { ARM_CCA_RSI_HASH_SHA_256, TPM_ALG_SHA256 },
-  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512 }
+  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512 },
+  { ARM_CCA_RSI_HASH_SHA_384, TPM_ALG_SHA384 }
 };
 
 /**
@@ -243,7 +244,8 @@ GetRealmHashAlgorithm (
   FreeAlignedPages (Config, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_REALM_CONFIG)));
 
   if ((HashAlgorithm != ARM_CCA_RSI_HASH_SHA_256) &&
-      (HashAlgorithm != ARM_CCA_RSI_HASH_SHA_512))
+      (HashAlgorithm != ARM_CCA_RSI_HASH_SHA_512) &&
+      (HashAlgorithm != ARM_CCA_RSI_HASH_SHA_384))
   {
     return EFI_UNSUPPORTED;
   }
