@@ -1,0 +1,29 @@
+## @file
+#  SDEI Table Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001E
+  BASE_NAME      = AcpiSdeiLibArm
+  FILE_GUID      = 2F16C151-F2F2-4F54-843C-D98A68454703
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSdeiLibConstructor
+  DESTRUCTOR     = AcpiSdeiLibDestructor
+
+[Sources]
+  SdeiGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  TableHelperLib
