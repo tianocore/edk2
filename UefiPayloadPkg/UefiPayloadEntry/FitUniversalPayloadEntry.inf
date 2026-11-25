@@ -41,6 +41,7 @@
   X64/DxeLoadFuncFit.c
 
 [Sources.RISCV64]
+  RiscV64/ClearSupervisorTrap.S
   RiscV64/DxeLoadFunc.c
   RiscV64/DxeLoadFuncFit.c
 
