@@ -890,8 +890,15 @@ TcpToSendData (
     }
 
     if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
-      NetbufTrim (Nbuf, (Nbuf->Tcp->HeadLen << 2), NET_BUF_HEAD);
-      Nbuf->Tcp = NULL;
+      //
+      // TcpTransmitSegment verifies the segment before it attaches a TCP
+      // header, so on that failure Nbuf->Tcp is still NULL and there is no
+      // header to trim.
+      //
+      if (Nbuf->Tcp != NULL) {
+        NetbufTrim (Nbuf, (Nbuf->Tcp->HeadLen << 2), NET_BUF_HEAD);
+        Nbuf->Tcp = NULL;
+      }
 
       if ((Flag & TCP_FLG_FIN) != 0) {
         TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT);
