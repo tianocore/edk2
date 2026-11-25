@@ -56,7 +56,8 @@ using namespace testing;
 /** Maximum number of synthetic allocation HOBs used by the fixture. **/
 static constexpr UINTN  MAX_MEMORY_ALLOCATION_HOBS = 4;
 /** Top of the PHIT free-memory range used by allocation tests. **/
-static constexpr EFI_PHYSICAL_ADDRESS  FREE_MEMORY_TOP = 0x10000000;
+static constexpr EFI_PHYSICAL_ADDRESS  FREE_MEMORY_TOP   = 0x10000000;
+static constexpr EFI_PHYSICAL_ADDRESS  RESERVED_BIN_BASE = 0x20000000;
 
 /**
   Fixture for exercising PEI Core page allocation with controlled HOB state.
@@ -531,6 +532,23 @@ TEST_F (PeiMemoryServicesTest, PermanentMemory_TopDownFirst) {
   EXPECT_EQ (FreedRange->AllocDescriptor.MemoryType, EfiConventionalMemory);
 }
 
+TEST_F (PeiMemoryServicesTest, PermanentMemory_FirstAllocationFromReservedBin) {
+  EFI_PHYSICAL_ADDRESS  Memory = 0;
+  EFI_STATUS            Status;
+
+  HobList.EfiFreeMemoryBottom = FREE_MEMORY_TOP - EFI_PAGES_TO_SIZE (64);
+  MemoryAllocationHobs[0]     = UnusedHob;
+  InitializeMemoryServices (&PrivateData, NULL, &PrivateData);
+  ASSERT_TRUE (PrivateData.MemoryTypeInformationInitialized);
+  Status = PeiAllocatePages (PeiServices (), EfiReservedMemoryType, 16, &Memory);
+  FreePool (PrivateData.MemoryTypeStatistics);
+  FreePool (PrivateData.MemoryTypeInformation);
+
+  ASSERT_EQ (Status, EFI_SUCCESS);
+  EXPECT_EQ (Memory, RESERVED_BIN_BASE + EFI_PAGES_TO_SIZE (16));
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, FREE_MEMORY_TOP);
+}
+
 /**
   Verify that Permanent Memory allocation uses the PHIT top when free HOBs are too small.
 
@@ -734,7 +752,7 @@ PeiServicesCreateHob (
 
   @param[out] MemoryTypeInformation  Receives the discovered memory types.
 
-  @retval EFI_NOT_FOUND  Memory-type discovery is outside this test's scope.
+  @retval EFI_SUCCESS  A 32-page Reserved bin is configured.
 **/
 extern "C" EFI_STATUS
 EFIAPI
@@ -742,8 +760,8 @@ PopulateMemoryTypeInformation (
   IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation
   )
 {
-  (VOID)MemoryTypeInformation;
-  return EFI_NOT_FOUND;
+  MemoryTypeInformation[EfiReservedMemoryType].NumberOfPages = 32;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -814,11 +832,15 @@ AllocateMemoryTypeInformationBins (
   IN BOOLEAN                      CreateHob
   )
 {
-  (VOID)MemoryTypeInformationInitialized;
-  (VOID)MemoryTypeInformation;
-  (VOID)MemoryTypeStatistics;
+  EFI_MEMORY_TYPE_STATISTICS  *Bin;
+
   (VOID)DefaultMaximumAddress;
   (VOID)CreateHob;
+  Bin                               = &MemoryTypeStatistics[EfiReservedMemoryType];
+  Bin->NumberOfPages                = MemoryTypeInformation[EfiReservedMemoryType].NumberOfPages;
+  Bin->BaseAddress                  = RESERVED_BIN_BASE;
+  Bin->MaximumAddress               = Bin->BaseAddress + EFI_PAGES_TO_SIZE (Bin->NumberOfPages) - 1;
+  *MemoryTypeInformationInitialized = TRUE;
 }
 
 /**
@@ -827,7 +849,7 @@ AllocateMemoryTypeInformationBins (
   @param[in] PeiServices  PEI services table pointer.
   @param[out] HobList     Receives the HOB list pointer.
 
-  @retval EFI_NOT_AVAILABLE_YET  HOB-list retrieval is outside this test's scope.
+  @retval EFI_SUCCESS  HobList points to the fixture's PHIT.
 **/
 extern "C" EFI_STATUS
 EFIAPI
@@ -836,9 +858,11 @@ PeiGetHobList (
   IN OUT VOID                **HobList
   )
 {
-  (VOID)PeiServices;
-  (VOID)HobList;
-  return EFI_NOT_AVAILABLE_YET;
+  PEI_CORE_INSTANCE  *PrivateData;
+
+  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+  *HobList    = PrivateData->HobList.Raw;
+  return EFI_SUCCESS;
 }
 
 /**

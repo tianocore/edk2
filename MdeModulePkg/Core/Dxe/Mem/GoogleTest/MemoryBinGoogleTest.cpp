@@ -152,14 +152,14 @@ TEST_F (BaseMemoryBinLibTest, CalculateTotalMemoryBinSizeNeededCalculatesCorrect
   UINT64  TotalSize;
 
   gMemoryTypeInformation[0].Type          = EfiRuntimeServicesCode;
-  gMemoryTypeInformation[0].NumberOfPages = 10;
+  gMemoryTypeInformation[0].NumberOfPages = 16;
   gMemoryTypeInformation[1].Type          = EfiRuntimeServicesData;
-  gMemoryTypeInformation[1].NumberOfPages = 20;
+  gMemoryTypeInformation[1].NumberOfPages = 32;
   gMemoryTypeInformation[2].Type          = EfiMaxMemoryType;
 
   TotalSize = CalculateTotalMemoryBinSizeNeeded (NULL, gMemoryTypeInformation);
 
-  ASSERT_EQ (TotalSize, (UINT64)(30 * EFI_PAGE_SIZE));
+  ASSERT_EQ (TotalSize, (UINT64)(48 * EFI_PAGE_SIZE));
 }
 
 //
@@ -173,32 +173,104 @@ TEST_F (BaseMemoryBinLibTest, CoreSetMemoryTypeInformationRangeSetsUpBinsCorrect
   Length = 0x100000;
 
   gMemoryTypeInformation[0].Type          = EfiRuntimeServicesCode;
-  gMemoryTypeInformation[0].NumberOfPages = 20;
+  gMemoryTypeInformation[0].NumberOfPages = 32;
   gMemoryTypeInformation[1].Type          = EfiRuntimeServicesData;
-  gMemoryTypeInformation[1].NumberOfPages = 10;
+  gMemoryTypeInformation[1].NumberOfPages = 16;
   gMemoryTypeInformation[2].Type          = EfiReservedMemoryType;
-  gMemoryTypeInformation[2].NumberOfPages = 5;
+  gMemoryTypeInformation[2].NumberOfPages = 16;
   gMemoryTypeInformation[3].Type          = EfiACPIReclaimMemory;
-  gMemoryTypeInformation[3].NumberOfPages = 15;
+  gMemoryTypeInformation[3].NumberOfPages = 16;
   gMemoryTypeInformation[4].Type          = EfiACPIMemoryNVS;
-  gMemoryTypeInformation[4].NumberOfPages = 25;
+  gMemoryTypeInformation[4].NumberOfPages = 32;
   gMemoryTypeInformation[5].Type          = EfiMaxMemoryType;
 
   CoreSetMemoryTypeInformationRange (Start, Length, gMemoryTypeInformation, &mMemoryTypeInformationInitialized, mMemoryTypeStatistics, &mDefaultMaximumAddress);
 
   ASSERT_TRUE (mMemoryTypeInformationInitialized);
 
-  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesCode].NumberOfPages, (UINT32)20);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].NumberOfPages, (UINT32)10);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].NumberOfPages, (UINT32)5);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIReclaimMemory].NumberOfPages, (UINT32)15);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIMemoryNVS].NumberOfPages, (UINT32)25);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesCode].NumberOfPages, (UINT32)32);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].NumberOfPages, (UINT32)16);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].NumberOfPages, (UINT32)16);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIReclaimMemory].NumberOfPages, (UINT32)16);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIMemoryNVS].NumberOfPages, (UINT32)32);
 
   // Confirm contiguous bins
   ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].MaximumAddress + 1, mMemoryTypeStatistics[EfiRuntimeServicesCode].BaseAddress);
   ASSERT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].MaximumAddress + 1, mMemoryTypeStatistics[EfiRuntimeServicesData].BaseAddress);
   ASSERT_EQ (mMemoryTypeStatistics[EfiACPIReclaimMemory].MaximumAddress + 1, mMemoryTypeStatistics[EfiReservedMemoryType].BaseAddress);
   ASSERT_EQ (mMemoryTypeStatistics[EfiACPIMemoryNVS].MaximumAddress + 1, mMemoryTypeStatistics[EfiACPIReclaimMemory].BaseAddress);
+}
+
+TEST_F (BaseMemoryBinLibTest, NewRangeAlignsReservedBinAboveBootServicesData) {
+  EFI_MEMORY_TYPE_INFORMATION  Bins[] = {
+    { EfiReservedMemoryType, 0x170 },
+    { EfiBootServicesData,   8     },
+    { EfiMaxMemoryType,      0     }
+  };
+  EFI_PHYSICAL_ADDRESS         Base         = 0;
+  UINT64                       Length       = 0;
+  UINT64                       BootSize     = EFI_PAGES_TO_SIZE (8);
+  UINT64                       ReservedSize = EFI_PAGES_TO_SIZE (0x170);
+  UINT64                       BootSpan     = ALIGN_VALUE (BootSize, RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+
+  EXPECT_CALL (HobLib, BuildResourceDescriptorWithOwnerHob (_, _, _, _, &gEfiMemoryTypeInformationGuid))
+    .WillOnce (DoAll (SaveArg<2> (&Base), SaveArg<3> (&Length)));
+  AllocateMemoryTypeInformationBins (&mMemoryTypeInformationInitialized, Bins, mMemoryTypeStatistics, &mDefaultMaximumAddress, TRUE);
+
+  ASSERT_TRUE (mMemoryTypeInformationInitialized);
+  EXPECT_EQ (Length, BootSpan + ReservedSize);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].BaseAddress, Base + BootSpan);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].MaximumAddress + 1, Base + BootSpan + ReservedSize);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiBootServicesData].BaseAddress, Base + BootSpan - BootSize);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiBootServicesData].MaximumAddress + 1, Base + BootSpan);
+}
+
+TEST_F (BaseMemoryBinLibTest, InheritedRangeAlignsReservedBinBelowBootServicesData) {
+  EFI_MEMORY_TYPE_INFORMATION  Bins[] = {
+    { EfiBootServicesData,   8     },
+    { EfiReservedMemoryType, 0x170 },
+    { EfiMaxMemoryType,      0     }
+  };
+  EFI_PHYSICAL_ADDRESS         Top          = 0xFD700000;
+  UINT64                       BootSize     = EFI_PAGES_TO_SIZE (8);
+  UINT64                       ReservedSize = EFI_PAGES_TO_SIZE (0x170);
+  UINT64                       BootSpan     = ALIGN_VALUE (BootSize, RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+  UINT64                       Length       = BootSpan + ReservedSize;
+
+  CoreSetMemoryTypeInformationRange (Top - Length, Length, Bins, &mMemoryTypeInformationInitialized, mMemoryTypeStatistics, &mDefaultMaximumAddress);
+
+  ASSERT_TRUE (mMemoryTypeInformationInitialized);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiBootServicesData].BaseAddress, Top - BootSize);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiBootServicesData].MaximumAddress + 1, Top);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].BaseAddress, Top - Length);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].MaximumAddress + 1, Top - BootSpan);
+}
+
+TEST_F (BaseMemoryBinLibTest, BootServicesDataBetweenRuntimeCodeAndData) {
+  EFI_MEMORY_TYPE_INFORMATION  Bins[] = {
+    { EfiRuntimeServicesCode, 16 },
+    { EfiBootServicesData,    8  },
+    { EfiRuntimeServicesData, 16 },
+    { EfiMaxMemoryType,       0  }
+  };
+  EFI_PHYSICAL_ADDRESS         Base        = SIZE_1MB;
+  UINT64                       RuntimeSize = EFI_PAGES_TO_SIZE (16);
+  UINT64                       BootSize    = EFI_PAGES_TO_SIZE (8);
+  UINT64                       BootSpan    = ALIGN_VALUE (BootSize, RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+  UINT64                       Length;
+
+  Length = CalculateTotalMemoryBinSizeNeeded (NULL, Bins);
+  EXPECT_EQ (Length, RuntimeSize + BootSpan + RuntimeSize);
+
+  CoreSetMemoryTypeInformationRange (Base, Length, Bins, &mMemoryTypeInformationInitialized, mMemoryTypeStatistics, &mDefaultMaximumAddress);
+
+  ASSERT_TRUE (mMemoryTypeInformationInitialized);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].BaseAddress, Base);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].MaximumAddress + 1, Base + RuntimeSize);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiBootServicesData].BaseAddress, Base + RuntimeSize + BootSpan - BootSize);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiBootServicesData].MaximumAddress + 1, Base + RuntimeSize + BootSpan);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesCode].BaseAddress, Base + RuntimeSize + BootSpan);
+  EXPECT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesCode].MaximumAddress + 1, Base + Length);
 }
 
 //
@@ -365,15 +437,15 @@ TEST_F (BaseMemoryBinLibTest, DoesNothingWhenNoPagesNeeded) {
 //
 TEST_F (BaseMemoryBinLibTest, AllocatesPagesAndInitializesBins) {
   gMemoryTypeInformation[0].Type          = EfiRuntimeServicesCode;
-  gMemoryTypeInformation[0].NumberOfPages = 20;
+  gMemoryTypeInformation[0].NumberOfPages = 32;
   gMemoryTypeInformation[1].Type          = EfiRuntimeServicesData;
-  gMemoryTypeInformation[1].NumberOfPages = 10;
+  gMemoryTypeInformation[1].NumberOfPages = 16;
   gMemoryTypeInformation[2].Type          = EfiReservedMemoryType;
-  gMemoryTypeInformation[2].NumberOfPages = 5;
+  gMemoryTypeInformation[2].NumberOfPages = 16;
   gMemoryTypeInformation[3].Type          = EfiACPIReclaimMemory;
-  gMemoryTypeInformation[3].NumberOfPages = 15;
+  gMemoryTypeInformation[3].NumberOfPages = 16;
   gMemoryTypeInformation[4].Type          = EfiACPIMemoryNVS;
-  gMemoryTypeInformation[4].NumberOfPages = 25;
+  gMemoryTypeInformation[4].NumberOfPages = 32;
   gMemoryTypeInformation[5].Type          = EfiMaxMemoryType;
 
   // HOB should not be built in this case
@@ -384,11 +456,11 @@ TEST_F (BaseMemoryBinLibTest, AllocatesPagesAndInitializesBins) {
 
   ASSERT_TRUE (mMemoryTypeInformationInitialized);
 
-  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesCode].NumberOfPages, (UINT32)20);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].NumberOfPages, (UINT32)10);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].NumberOfPages, (UINT32)5);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIReclaimMemory].NumberOfPages, (UINT32)15);
-  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIMemoryNVS].NumberOfPages, (UINT32)25);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesCode].NumberOfPages, (UINT32)32);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].NumberOfPages, (UINT32)16);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiReservedMemoryType].NumberOfPages, (UINT32)16);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIReclaimMemory].NumberOfPages, (UINT32)16);
+  ASSERT_EQ (mMemoryTypeStatistics[EfiACPIMemoryNVS].NumberOfPages, (UINT32)32);
 
   // Confirm contiguous bins
   ASSERT_EQ (mMemoryTypeStatistics[EfiRuntimeServicesData].MaximumAddress + 1, mMemoryTypeStatistics[EfiRuntimeServicesCode].BaseAddress);
@@ -401,12 +473,12 @@ TEST_F (BaseMemoryBinLibTest, AllocatesPagesAndInitializesBins) {
 // Test: AllocateMemoryTypeInformationBins creates HOB when requested
 //
 TEST_F (BaseMemoryBinLibTest, CreatesHobWhenRequested) {
-  UINT64  TotalPages = 30;
+  UINT64  TotalPages = 48;
 
   gMemoryTypeInformation[0].Type          = EfiRuntimeServicesCode;
-  gMemoryTypeInformation[0].NumberOfPages = 10;
+  gMemoryTypeInformation[0].NumberOfPages = 16;
   gMemoryTypeInformation[1].Type          = EfiRuntimeServicesData;
-  gMemoryTypeInformation[1].NumberOfPages = 20;
+  gMemoryTypeInformation[1].NumberOfPages = 32;
   gMemoryTypeInformation[2].Type          = EfiMaxMemoryType;
 
   EXPECT_CALL (

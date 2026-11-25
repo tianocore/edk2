@@ -43,6 +43,26 @@
                                    EFI_RESOURCE_ATTRIBUTE_TESTED      )
 
 /**
+  Return the allocation granularity for a memory type bin.
+**/
+static
+UINT64
+GetMemoryBinAlignment (
+  IN UINT32  Type
+  )
+{
+  if ((Type == EfiReservedMemoryType) ||
+      (Type == EfiACPIMemoryNVS) ||
+      (Type == EfiRuntimeServicesCode) ||
+      (Type == EfiRuntimeServicesData))
+  {
+    return RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  }
+
+  return DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+}
+
+/**
   Calculate total memory bin size needed.
 
   @param BinTop                The top address of the memory bins. This is an optional parameter.
@@ -72,40 +92,51 @@ CalculateTotalMemoryBinSizeNeeded (
     return 0;
   }
 
-  //
-  // Loop through each memory type in the order specified by the MemoryTypeInformation[] array
-  //
   TotalSize = 0;
-  for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-    Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
-    if ((MemoryTypeInformation[Index].Type == EfiReservedMemoryType) ||
-        (MemoryTypeInformation[Index].Type == EfiACPIMemoryNVS) ||
-        (MemoryTypeInformation[Index].Type == EfiRuntimeServicesCode) ||
-        (MemoryTypeInformation[Index].Type == EfiRuntimeServicesData))
-    {
-      Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  if (BinTop == NULL) {
+    //
+    // AllocateAlignedPages() supplies an aligned base. Size the range
+    // from low to high addresses, in reverse memory type table order.
+    //
+    for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+      // Find the end of the table.
     }
 
-    // MemoryTypeInformation[Index].NumberOfPages is already aligned to the allocation granularity
-    TotalSize += EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index].NumberOfPages);
+    for ( ; Index > 0; Index--) {
+      if (MemoryTypeInformation[Index - 1].NumberOfPages == 0) {
+        continue;
+      }
 
-    // BinTop is optional
-    if (BinTop == NULL) {
+      //
+      // Round the running size up to include the padding needed to align
+      // the start of this bin. Its page count is already aligned to the
+      // allocation granularity.
+      //
+      Granularity = GetMemoryBinAlignment (MemoryTypeInformation[Index - 1].Type);
+      TotalSize   = ALIGN_VALUE (TotalSize, Granularity);
+      TotalSize  += EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index - 1].NumberOfPages);
+    }
+
+    return TotalSize;
+  }
+
+  //
+  // The upper bound is known. Account for padding while placing bins
+  // from high to low addresses, in memory type table order.
+  //
+  for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
+    if (MemoryTypeInformation[Index].NumberOfPages == 0) {
       continue;
     }
 
-    // Lower the bin top to the next aligned address, taking any padding into account in the size
-    *BinTop   -= EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index].NumberOfPages);
-    TotalSize += (*BinTop & (Granularity - 1));
-    *BinTop   &= ~(Granularity - 1);
+    Granularity = GetMemoryBinAlignment (MemoryTypeInformation[Index].Type);
+    TotalSize  += EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index].NumberOfPages);
+    *BinTop    -= EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index].NumberOfPages);
+    TotalSize  += (*BinTop & (Granularity - 1));
+    *BinTop    &= ~(Granularity - 1);
   }
 
-  if (BinTop != NULL) {
-    // Set *BinTop to the new top of the memory bins. It currently points to the base address of
-    // the memory bins
-    *BinTop += TotalSize;
-  }
-
+  *BinTop += TotalSize;
   return TotalSize;
 }
 
@@ -391,6 +422,7 @@ CoreSetMemoryTypeInformationRange (
     }
 
     if (MemoryTypeInformation[Index].NumberOfPages != 0) {
+      Top                                      &= ~(GetMemoryBinAlignment (Type) - 1);
       MemoryTypeStatistics[Type].MaximumAddress = Top - 1;
       Top                                      -= EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index].NumberOfPages);
       MemoryTypeStatistics[Type].BaseAddress    = Top;
@@ -525,7 +557,8 @@ AllocateMemoryTypeInformationBins (
     }
 
     if (MemoryTypeInformation[Index].NumberOfPages != 0) {
-      MemoryTypeStatistics[Type].BaseAddress    = LastBinAddress - EFI_PAGES_TO_SIZE (MemoryTypeInformation[Index].NumberOfPages);
+      LastBinAddress                           &= ~(GetMemoryBinAlignment (Type) - 1);
+      MemoryTypeStatistics[Type].BaseAddress    = LastBinAddress - EFI_PAGES_TO_SIZE ((UINTN)MemoryTypeInformation[Index].NumberOfPages);
       MemoryTypeStatistics[Type].MaximumAddress = LastBinAddress - 1;
       LastBinAddress                            = MemoryTypeStatistics[Type].BaseAddress;
     }
