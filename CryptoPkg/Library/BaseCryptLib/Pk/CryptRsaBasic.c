@@ -110,12 +110,10 @@ RsaSetKeyNED (
 
       break;
     case RsaKeyD:
-      PassD = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
-      if (PassD == NULL) {
-        goto Exit;
-      }
-
-      break;
+      //
+      // Deprecated: RSA private exponent (d) is no longer supported.
+      //
+      goto Exit;
     default:
       goto Exit;
   }
@@ -181,187 +179,6 @@ Exit:
 }
 
 /**
-  Install one of the p, q factors of an RSA key. See RsaSetKeyNED() for the
-  shared invariants; the only difference is the setter used and the slot set.
-
-  @param[in, out]  RsaKey     OpenSSL RSA object.
-  @param[in]       KeyTag     One of RsaKeyP, RsaKeyQ.
-  @param[in]       BigNumber  Octet integer buffer to install.
-  @param[in]       BnSize     Size of BigNumber in bytes.
-
-  @retval  TRUE   Component installed.
-  @retval  FALSE  Allocation or RSA_set0_factors failed; RsaKey is unchanged.
-
-**/
-STATIC
-BOOLEAN
-RsaSetKeyFactors (
-  IN OUT  RSA          *RsaKey,
-  IN      RSA_KEY_TAG  KeyTag,
-  IN      CONST UINT8  *BigNumber,
-  IN      UINTN        BnSize
-  )
-{
-  BIGNUM        *PassP;
-  BIGNUM        *PassQ;
-  const BIGNUM  *CurP;
-  const BIGNUM  *CurQ;
-  BOOLEAN       Result;
-
-  PassP  = NULL;
-  PassQ  = NULL;
-  Result = FALSE;
-
-  switch (KeyTag) {
-    case RsaKeyP:
-      PassP = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
-      if (PassP == NULL) {
-        goto Exit;
-      }
-
-      break;
-    case RsaKeyQ:
-      PassQ = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
-      if (PassQ == NULL) {
-        goto Exit;
-      }
-
-      break;
-    default:
-      goto Exit;
-  }
-
-  RSA_get0_factors (RsaKey, &CurP, &CurQ);
-
-  if ((PassP == NULL) && (CurP == NULL)) {
-    PassP = BN_new ();
-    if (PassP == NULL) {
-      goto Exit;
-    }
-  }
-
-  if ((PassQ == NULL) && (CurQ == NULL)) {
-    PassQ = BN_new ();
-    if (PassQ == NULL) {
-      goto Exit;
-    }
-  }
-
-  if (RSA_set0_factors (RsaKey, PassP, PassQ) == 0) {
-    goto Exit;
-  }
-
-  PassP  = NULL;
-  PassQ  = NULL;
-  Result = TRUE;
-
-Exit:
-  BN_clear_free (PassP);
-  BN_clear_free (PassQ);
-  return Result;
-}
-
-/**
-  Install one of the dp, dq, qInv CRT parameters of an RSA key. See
-  RsaSetKeyNED() for the shared invariants.
-
-  @param[in, out]  RsaKey     OpenSSL RSA object.
-  @param[in]       KeyTag     One of RsaKeyDp, RsaKeyDq, RsaKeyQInv.
-  @param[in]       BigNumber  Octet integer buffer to install.
-  @param[in]       BnSize     Size of BigNumber in bytes.
-
-  @retval  TRUE   Component installed.
-  @retval  FALSE  Allocation or RSA_set0_crt_params failed; RsaKey is unchanged.
-
-**/
-STATIC
-BOOLEAN
-RsaSetKeyCrtParams (
-  IN OUT  RSA          *RsaKey,
-  IN      RSA_KEY_TAG  KeyTag,
-  IN      CONST UINT8  *BigNumber,
-  IN      UINTN        BnSize
-  )
-{
-  BIGNUM        *PassDp;
-  BIGNUM        *PassDq;
-  BIGNUM        *PassQInv;
-  const BIGNUM  *CurDp;
-  const BIGNUM  *CurDq;
-  const BIGNUM  *CurQInv;
-  BOOLEAN       Result;
-
-  PassDp   = NULL;
-  PassDq   = NULL;
-  PassQInv = NULL;
-  Result   = FALSE;
-
-  switch (KeyTag) {
-    case RsaKeyDp:
-      PassDp = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
-      if (PassDp == NULL) {
-        goto Exit;
-      }
-
-      break;
-    case RsaKeyDq:
-      PassDq = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
-      if (PassDq == NULL) {
-        goto Exit;
-      }
-
-      break;
-    case RsaKeyQInv:
-      PassQInv = BN_bin2bn (BigNumber, (UINT32)BnSize, NULL);
-      if (PassQInv == NULL) {
-        goto Exit;
-      }
-
-      break;
-    default:
-      goto Exit;
-  }
-
-  RSA_get0_crt_params (RsaKey, &CurDp, &CurDq, &CurQInv);
-
-  if ((PassDp == NULL) && (CurDp == NULL)) {
-    PassDp = BN_new ();
-    if (PassDp == NULL) {
-      goto Exit;
-    }
-  }
-
-  if ((PassDq == NULL) && (CurDq == NULL)) {
-    PassDq = BN_new ();
-    if (PassDq == NULL) {
-      goto Exit;
-    }
-  }
-
-  if ((PassQInv == NULL) && (CurQInv == NULL)) {
-    PassQInv = BN_new ();
-    if (PassQInv == NULL) {
-      goto Exit;
-    }
-  }
-
-  if (RSA_set0_crt_params (RsaKey, PassDp, PassDq, PassQInv) == 0) {
-    goto Exit;
-  }
-
-  PassDp   = NULL;
-  PassDq   = NULL;
-  PassQInv = NULL;
-  Result   = TRUE;
-
-Exit:
-  BN_clear_free (PassDp);
-  BN_clear_free (PassDq);
-  BN_clear_free (PassQInv);
-  return Result;
-}
-
-/**
   Sets the tag-designated key component into the established RSA context.
 
   This function sets the tag-designated RSA key component into the established
@@ -414,15 +231,23 @@ RsaSetKey (
     //
     case RsaKeyN:
     case RsaKeyE:
-    case RsaKeyD:
       return RsaSetKeyNED (RsaKey, KeyTag, BigNumber, BnSize);
+
+    case RsaKeyD:
+      //
+      // Deprecated: RSA private exponent (d) is no longer supported.
+      //
+      return FALSE;
 
     //
     // RSA Secret Prime Factor of Modulus (p and q)
     //
     case RsaKeyP:
     case RsaKeyQ:
-      return RsaSetKeyFactors (RsaKey, KeyTag, BigNumber, BnSize);
+      //
+      // Deprecated: RSA secret prime factors p and q are no longer supported.
+      //
+      return FALSE;
 
     //
     // p's CRT Exponent (== d mod (p - 1)),  q's CRT Exponent (== d mod (q - 1)),
@@ -431,7 +256,10 @@ RsaSetKey (
     case RsaKeyDp:
     case RsaKeyDq:
     case RsaKeyQInv:
-      return RsaSetKeyCrtParams (RsaKey, KeyTag, BigNumber, BnSize);
+      //
+      // Deprecated: RSA CRT parameters are no longer supported.
+      //
+      return FALSE;
 
     default:
       return FALSE;

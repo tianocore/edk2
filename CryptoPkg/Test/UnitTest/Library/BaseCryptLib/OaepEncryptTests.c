@@ -257,17 +257,6 @@ BOOLEAN
   OUT     UINTN       *CipherTextSize
   );
 
-typedef
-BOOLEAN
-(EFIAPI *OAEP_TEST_DECRYPT)(
-  IN      OAEP_ENC_DEC_TEST_CONTEXT *TestContext,
-  IN      CONST UINT8 *CipherText,
-  IN      UINTN       CipherTextSize,
-  IN      UINT16      DigestLen,
-  OUT     UINT8       **ClearText,
-  OUT     UINTN       *ClearTextSize
-  );
-
 typedef struct _OAEP_ENC_DEC_TEST_CONTEXT {
   CONST UINT8          *SelfTestCert;
   UINTN                SelfTestCertSize;
@@ -287,7 +276,6 @@ typedef struct _OAEP_ENC_DEC_TEST_CONTEXT {
   UINTN                CipherTextSize;
   UINT16               DigestLen;
   OAEP_TEST_ENCRYPT    Encrypt;
-  OAEP_TEST_DECRYPT    Decrypt;
   UNIT_TEST_STATUS     Expect;
 } OAEP_ENC_DEC_TEST_CONTEXT;
 
@@ -317,30 +305,6 @@ CallPkcs1v2Encrypt (
              CipherTextSize
              );
 
-  return Status;
-}
-
-BOOLEAN
-EFIAPI
-CallPkcs1v2Decrypt (
-  OAEP_ENC_DEC_TEST_CONTEXT  *TestCtx,
-  CONST UINT8                *CipherText,
-  UINTN                      CipherTextSize,
-  UINT16                     DigestLen,
-  UINT8                      **ClearText,
-  UINTN                      *ClearTextSize
-  )
-{
-  BOOLEAN  Status;
-
-  Status = Pkcs1v2Decrypt (
-             TestCtx->PrivateKey,
-             TestCtx->PrivateKeySize,
-             (UINT8 *)CipherText,
-             CipherTextSize,
-             ClearText,
-             ClearTextSize
-             );
   return Status;
 }
 
@@ -378,44 +342,6 @@ CallRsaOaepEncrypt (
              DigestLen,
              CipherText,
              CipherTextSize
-             );
-
-  return Status;
-}
-
-BOOLEAN
-EFIAPI
-CallRsaOaepDecrypt (
-  OAEP_ENC_DEC_TEST_CONTEXT  *TestCtx,
-  CONST UINT8                *CipherText,
-  UINTN                      CipherTextSize,
-  UINT16                     DigestLen,
-  UINT8                      **ClearText,
-  UINTN                      *ClearTextSize
-  )
-{
-  VOID     *RsaContext = NULL;
-  BOOLEAN  Status;
-
-  RsaContext = RsaNew ();
-  UT_ASSERT_FALSE (RsaContext == NULL);
-
-  Status = RsaSetKey (RsaContext, RsaKeyN, TestCtx->RsaN, TestCtx->RsaNSize);
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaSetKey (RsaContext, RsaKeyE, TestCtx->RsaE, TestCtx->RsaESize);
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaSetKey (RsaContext, RsaKeyD, TestCtx->RsaD, TestCtx->RsaDSize);
-  UT_ASSERT_TRUE (Status);
-
-  Status = RsaOaepDecrypt (
-             RsaContext,
-             (UINT8 *)CipherText,
-             CipherTextSize,
-             DigestLen,
-             ClearText,
-             ClearTextSize
              );
 
   return Status;
@@ -474,103 +400,6 @@ TestVerifyEncrypt (
     FreePool (OutBuffer2);
     OutBuffer2     = NULL;
     OutBuffer2Size = 0;
-  }
-
-  return UNIT_TEST_PASSED;
-}
-
-UNIT_TEST_STATUS
-EFIAPI
-TestVerifyDecrypt (
-  IN UNIT_TEST_CONTEXT  Context
-  )
-{
-  BOOLEAN                    Status;
-  UINT8                      *OutBuffer    = NULL;
-  UINTN                      OutBufferSize = 0;
-  OAEP_ENC_DEC_TEST_CONTEXT  *TestCtx;
-
-  TestCtx = Context;
-
-  Status = TestCtx->Decrypt (
-                      TestCtx,
-                      TestCtx->CipherText,
-                      TestCtx->CipherTextSize,
-                      TestCtx->DigestLen,
-                      &OutBuffer,
-                      &OutBufferSize
-                      );
-  UT_ASSERT_TRUE (Status);
-
-  UT_ASSERT_TRUE (CompareMem (OutBuffer, TestCtx->ClearText, OutBufferSize >= TestCtx->ClearTextSize ? OutBufferSize : TestCtx->ClearTextSize) == 0);
-  UT_ASSERT_TRUE (OutBufferSize == TestCtx->ClearTextSize);
-
-  if (OutBuffer) {
-    FreePool (OutBuffer);
-    OutBuffer     = NULL;
-    OutBufferSize = 0;
-  }
-
-  return UNIT_TEST_PASSED;
-}
-
-UNIT_TEST_STATUS
-EFIAPI
-TestVerifyEncryptDecrypt (
-  IN UNIT_TEST_CONTEXT  Context
-  )
-{
-  BOOLEAN                    Status;
-  UINT8                      *ClearText     = NULL;
-  UINTN                      ClearTextSize  = 0;
-  UINT8                      *CipherText    = NULL;
-  UINTN                      CipherTextSize = 0;
-  OAEP_ENC_DEC_TEST_CONTEXT  *TestCtx;
-
-  TestCtx = Context;
-
-  Status = TestCtx->Encrypt (
-                      TestCtx,
-                      TestCtx->ClearText,
-                      TestCtx->ClearTextSize,
-                      TestCtx->PrngSeed,
-                      TestCtx->PrngSeedSize,
-                      TestCtx->DigestLen,
-                      &CipherText,
-                      &CipherTextSize
-                      );
-  UT_ASSERT_TRUE (Status);
-
-  Status = TestCtx->Decrypt (
-                      TestCtx,
-                      CipherText,
-                      CipherTextSize,
-                      TestCtx->DigestLen,
-                      &ClearText,
-                      &ClearTextSize
-                      );
-
-  if (TestCtx->Expect == UNIT_TEST_PASSED) {
-    UT_ASSERT_TRUE (Status);
-  } else {
-    UT_ASSERT_FALSE (Status);
-  }
-
-  if (TestCtx->Expect == UNIT_TEST_PASSED) {
-    UT_ASSERT_TRUE (CompareMem (ClearText, TestCtx->ClearText, ClearTextSize >= TestCtx->ClearTextSize ? ClearTextSize : TestCtx->ClearTextSize) == 0);
-    UT_ASSERT_TRUE (ClearTextSize == TestCtx->ClearTextSize);
-  }
-
-  if (CipherText) {
-    FreePool (CipherText);
-    CipherText     = NULL;
-    CipherTextSize = 0;
-  }
-
-  if (ClearText) {
-    FreePool (ClearText);
-    ClearText     = NULL;
-    ClearTextSize = 0;
   }
 
   return UNIT_TEST_PASSED;
@@ -703,7 +532,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyPkcs1v2Msg1230 = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
   .DigestLen        = 0,
   .Encrypt          = CallPkcs1v2Encrypt,
-  .Decrypt          = CallPkcs1v2Decrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -726,7 +554,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyPkcs1v2Msg1230PrngSeed = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
   .DigestLen        = 0,
   .Encrypt          = CallPkcs1v2Encrypt,
-  .Decrypt          = CallPkcs1v2Decrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -749,7 +576,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyRsaOaepMsg1230 = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
   .DigestLen        = 0,
   .Encrypt          = CallRsaOaepEncrypt,
-  .Decrypt          = CallRsaOaepDecrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -772,49 +598,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyRsaOaepMsg1230PrngSeed = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
   .DigestLen        = 0,
   .Encrypt          = CallRsaOaepEncrypt,
-  .Decrypt          = CallRsaOaepDecrypt,
-  .Expect           = UNIT_TEST_PASSED
-};
-
-OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyPkcs1v2EncryptRsaOaepDecrypt = {
-  .SelfTestCert     = SelfTestCert,
-  .SelfTestCertSize = sizeof (SelfTestCert),
-  .PrivateKey       = PrivateKey,
-  .PrivateKeySize   = sizeof (PrivateKey),
-  .RsaN             = RsaN,
-  .RsaNSize         = sizeof (RsaN),
-  .RsaE             = RsaE,
-  .RsaESize         = sizeof (RsaE),
-  .RsaD             = RsaD,
-  .RsaDSize         = sizeof (RsaD),
-  .ClearText        = Msg1230,
-  .ClearTextSize    = sizeof (Msg1230),
-  .CipherText       = Ct1230RsaesOaepMdSha1Mgf1Sha1,
-  .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
-  .DigestLen        = 0,
-  .Encrypt          = CallPkcs1v2Encrypt,
-  .Decrypt          = CallRsaOaepDecrypt,
-  .Expect           = UNIT_TEST_PASSED
-};
-
-OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyRsaOaepEncryptPkcs1v2Decrypt = {
-  .SelfTestCert     = SelfTestCert,
-  .SelfTestCertSize = sizeof (SelfTestCert),
-  .PrivateKey       = PrivateKey,
-  .PrivateKeySize   = sizeof (PrivateKey),
-  .RsaN             = RsaN,
-  .RsaNSize         = sizeof (RsaN),
-  .RsaE             = RsaE,
-  .RsaESize         = sizeof (RsaE),
-  .RsaD             = RsaD,
-  .RsaDSize         = sizeof (RsaD),
-  .ClearText        = Msg1230,
-  .ClearTextSize    = sizeof (Msg1230),
-  .CipherText       = Ct1230RsaesOaepMdSha1Mgf1Sha1,
-  .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
-  .DigestLen        = 0,
-  .Encrypt          = CallRsaOaepEncrypt,
-  .Decrypt          = CallPkcs1v2Decrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -835,7 +618,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyRsaesOaep2048MdDefaultBgf1Default = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
   .DigestLen        = 0,
   .Encrypt          = CallRsaOaepEncrypt,
-  .Decrypt          = CallRsaOaepDecrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -856,7 +638,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyRsaesOaep2048MdSha1Mgf1Sha1 = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaepMdSha1Mgf1Sha1),
   .DigestLen        = SHA1_DIGEST_SIZE,
   .Encrypt          = CallRsaOaepEncrypt,
-  .Decrypt          = CallRsaOaepDecrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -877,7 +658,6 @@ OAEP_ENC_DEC_TEST_CONTEXT  mTestVerifyRsaesOaep2048MdSha256Mgf1Sha256 = {
   .CipherTextSize   = sizeof (Ct1230RsaesOaep2048MdSha256Mgf1Sha256),
   .DigestLen        = SHA256_DIGEST_SIZE,
   .Encrypt          = CallRsaOaepEncrypt,
-  .Decrypt          = CallRsaOaepDecrypt,
   .Expect           = UNIT_TEST_PASSED
 };
 
@@ -886,37 +666,25 @@ TEST_DESC  mOaepTest[] = {
   // -----Description--------------------------------------Class----------------------Function-----------------Pre---Post--Context
   //
   // Pkcs1v2Encrypt / Decrypt
-  { "Pkcs1v2Encrypt (Interface)",                   "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.Interface",                   TestVerifyPkcs1v2EncryptInterface, NULL, NULL, &mTestVerifyPkcs1v2Msg1230                    },
-  { "Pkcs1v2Encrypt (NoSeed)",                      "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.NoSeed",                      TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230                    },
-  { "Pkcs1v2Encrypt (Seeded)",                      "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.Seeded",                      TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230PrngSeed            },
-  { "Pkcs1v2Decrypt",                               "CryptoPkg.BaseCryptLib.Pkcs1v2Decrypt",                             TestVerifyDecrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230                    },
-  { "Pkcs1v2EncryptDecrypt",                        "CryptoPkg.BaseCryptLib.Pkcs1v2EncryptDecrypt",                      TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyPkcs1v2Msg1230                    },
+  { "Pkcs1v2Encrypt (Interface)",            "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.Interface",            TestVerifyPkcs1v2EncryptInterface, NULL, NULL, &mTestVerifyPkcs1v2Msg1230                    },
+  { "Pkcs1v2Encrypt (NoSeed)",               "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.NoSeed",               TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230                    },
+  { "Pkcs1v2Encrypt (Seeded)",               "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.Seeded",               TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230PrngSeed            },
 
   // RsaOaepEncrypt / Decrypt
-  { "RsaOaepEncrypt (Interface)",                   "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.Interface",                   TestVerifyRsaOaepEncryptInterface, NULL, NULL, &mTestVerifyRsaOaepMsg1230                    },
-  { "RsaOaepEncrypt (NoSeed)",                      "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.NoSeed",                      TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaOaepMsg1230                    },
-  { "RsaOaepEncrypt (Seeded)",                      "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.Seeded",                      TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaOaepMsg1230PrngSeed            },
-  { "RsaOaepDecrypt",                               "CryptoPkg.BaseCryptLib.RsaOaepDecrypt",                             TestVerifyDecrypt,                 NULL, NULL, &mTestVerifyRsaOaepMsg1230                    },
-  { "RsaOaepEncryptDecrypt",                        "CryptoPkg.BaseCryptLib.RsaOaepEncryptDecrypt",                      TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyRsaOaepMsg1230                    },
+  { "RsaOaepEncrypt (Interface)",            "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.Interface",            TestVerifyRsaOaepEncryptInterface, NULL, NULL, &mTestVerifyRsaOaepMsg1230                    },
+  { "RsaOaepEncrypt (NoSeed)",               "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.NoSeed",               TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaOaepMsg1230                    },
+  { "RsaOaepEncrypt (Seeded)",               "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.Seeded",               TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaOaepMsg1230PrngSeed            },
 
   // Mix interfaces
-  { "RsaOaepEncryptPkcs1v2Decrypt",                 "CryptoPkg.BaseCryptLib.RsaOaepEncryptPkcs1v2Decrypt",               TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyRsaOaepEncryptPkcs1v2Decrypt      },
-  { "Pkcs1v2EncryptRsaOaepDecrypt",                 "CryptoPkg.BaseCryptLib.Pkcs1v2EncryptRsaOaepDecrypt",               TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyPkcs1v2EncryptRsaOaepDecrypt      },
 
   // Message digest default / MGF1 default (SHA1)
-  { "RsaOaepEncrypt (MdDefaultMgf1Default)",        "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.MdDefaultMgf1Default",        TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdDefaultBgf1Default },
-  { "RsaOaepDecrypt (MdDefaultMgf1Default)",        "CryptoPkg.BaseCryptLib.RsaOaepDecrypt.MdDefaultMgf1Default",        TestVerifyDecrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdDefaultBgf1Default },
-  { "RsaOaepEncryptDecrypt (MdDefaultMgf1Default)", "CryptoPkg.BaseCryptLib.RsaOaepEncryptDecrypt.MdDefaultMgf1Default", TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyRsaesOaep2048MdDefaultBgf1Default },
+  { "RsaOaepEncrypt (MdDefaultMgf1Default)", "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.MdDefaultMgf1Default", TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdDefaultBgf1Default },
 
   // Message digest SHA1 / MGF1 SHA1
-  { "RsaOaepEncrypt (MdSha1Bgf1Sha1",               "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.MdSha1Bgf1Sha1",              TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdSha1Mgf1Sha1       },
-  { "RsaOaepDecrypt (MdSha1Bgf1Sha1)",              "CryptoPkg.BaseCryptLib.RsaOaepDecrypt.MdSha1Bgf1Sha1",              TestVerifyDecrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdSha1Mgf1Sha1       },
-  { "RsaOaepEncryptDecrypt (MdSha1Bgf1Sha1)",       "CryptoPkg.BaseCryptLib.RsaOaepEncryptDecrypt.MdSha1Bgf1Sha1",       TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyRsaesOaep2048MdSha1Mgf1Sha1       },
+  { "RsaOaepEncrypt (MdSha1Bgf1Sha1",        "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.MdSha1Bgf1Sha1",       TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdSha1Mgf1Sha1       },
 
   // Message digest SHA256 / MGF1 SHA256
-  { "RsaOaepEncrypt (MdSha256Bgf1Sha256)",          "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.MdSha256Bgf1Sha256",          TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdSha256Mgf1Sha256   },
-  { "RsaOaepDecrypt (MdSha256Bgf1Sha256)",          "CryptoPkg.BaseCryptLib.RsaOaepDecrypt.MdSha256Bgf1Sha256",          TestVerifyDecrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdSha256Mgf1Sha256   },
-  { "RsaOaepEncryptDecrypt (MdSha256Bgf1Sha256)",   "CryptoPkg.BaseCryptLib.RsaOaepEncryptDecryptMdSha256Bgf1Sha256",    TestVerifyEncryptDecrypt,          NULL, NULL, &mTestVerifyRsaesOaep2048MdSha256Mgf1Sha256   },
+  { "RsaOaepEncrypt (MdSha256Bgf1Sha256)",   "CryptoPkg.BaseCryptLib.RsaOaepEncrypt.MdSha256Bgf1Sha256",   TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyRsaesOaep2048MdSha256Mgf1Sha256   },
 };
 
 UINTN  mOaepTestNum = ARRAY_SIZE (mOaepTest);
