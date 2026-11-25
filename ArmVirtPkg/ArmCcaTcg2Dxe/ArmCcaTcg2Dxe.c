@@ -1,7 +1,7 @@
 /** @file
   This module implements EFI CC Measurement Protocol for Arm CCA.
 
-  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2025 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -45,6 +45,7 @@
 #include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
@@ -161,18 +162,14 @@ typedef struct {
   UINT8            RealmHashAlgorithm;
   /// The alogrithm ID for the hash function.
   TPMI_ALG_HASH    HashAlgo;
-  /// The hash size.
-  UINT16           HashSize;
-  /// The hash mask.
-  UINT32           HashMask;
 } ARMCCA_HASH_INFO;
 
 /**
   A map of the hash algorithms supported by a Realm.
 */
 STATIC ARMCCA_HASH_INFO  mHashInfo[] = {
-  { ARM_CCA_RSI_HASH_SHA_256, TPM_ALG_SHA256, SHA256_DIGEST_SIZE, HASH_ALG_SHA256 },
-  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512, SHA512_DIGEST_SIZE, HASH_ALG_SHA512 }
+  { ARM_CCA_RSI_HASH_SHA_256, TPM_ALG_SHA256 },
+  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512 }
 };
 
 /**
@@ -198,79 +195,6 @@ RealmHashAlgoToTpmAlgoId (
 
   // No suitable algorithm found return.
   return TPM_ALG_ERROR;
-}
-
-/**
-  Get the hash information based on the Hash Algo.
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Pointer to the Hash information on success or NULL.
-**/
-STATIC
-ARMCCA_HASH_INFO *
-GetHashInfoFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < ARRAY_SIZE (mHashInfo); Index++) {
-    if (mHashInfo[Index].HashAlgo == HashAlgo) {
-      return &mHashInfo[Index];
-    }
-  }
-
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Get hash size based on Algo
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Size of the hash.
-**/
-STATIC
-UINT16
-GetHashSizeFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  ARMCCA_HASH_INFO  *HashInfo;
-
-  HashInfo = GetHashInfoFromAlgo (HashAlgo);
-  if (HashInfo != NULL) {
-    return HashInfo->HashSize;
-  }
-
-  ASSERT (FALSE);
-  return 0;
-}
-
-/**
-  Get hash mask based on Algo
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Hash mask.
-**/
-STATIC
-UINT32
-GetHashMaskFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  ARMCCA_HASH_INFO  *HashInfo;
-
-  HashInfo = GetHashInfoFromAlgo (HashAlgo);
-  if (HashInfo != NULL) {
-    return HashInfo->HashMask;
-  }
-
-  ASSERT (FALSE);
-  return 0;
 }
 
 /**
@@ -329,60 +253,6 @@ GetRealmHashAlgorithm (
 }
 
 /**
-  Copy TPML_DIGEST_VALUES into a buffer
-
-  @param[in,out] Buffer             Buffer to hold copied TPML_DIGEST_VALUES
-                                    compact binary.
-  @param[in]     DigestList         TPML_DIGEST_VALUES to be copied.
-  @param[in]     HashAlgorithmMask  HASH bits corresponding to the desired
-                                    digests to copy.
-
-  @return The end of buffer to hold TPML_DIGEST_VALUES.
-**/
-VOID *
-CopyDigestListToBuffer (
-  IN OUT VOID            *Buffer,
-  IN TPML_DIGEST_VALUES  *DigestList,
-  IN UINT32              HashAlgorithmMask
-  )
-{
-  UINTN   Index;
-  UINT16  DigestSize;
-  UINT32  DigestListCount;
-  UINT32  *DigestListCountPtr;
-
-  DigestListCountPtr = (UINT32 *)Buffer;
-  DigestListCount    = 0;
-  Buffer             = (UINT8 *)Buffer + sizeof (DigestList->count);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    if ((DigestList->digests[Index].hashAlg & HashAlgorithmMask) == 0) {
-      DEBUG ((
-        DEBUG_WARN,
-        "WARNING: ArmCCA Event log has HashAlg unsupported (0x%x)\n",
-        DigestList->digests[Index].hashAlg
-        ));
-      continue;
-    }
-
-    CopyMem (
-      Buffer,
-      &DigestList->digests[Index].hashAlg,
-      sizeof (DigestList->digests[Index].hashAlg)
-      );
-    Buffer = (UINT8 *)Buffer +
-             sizeof (DigestList->digests[Index].hashAlg);
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
-    Buffer = (UINT8 *)Buffer + DigestSize;
-    DigestListCount++;
-  }
-
-  WriteUnaligned32 (DigestListCountPtr, DigestListCount);
-
-  return Buffer;
-}
-
-/**
   This function initialize CC_EVENT_HDR for EV_NO_ACTION
   Event Type other than EFI Specification ID event. The behavior is defined
   by TCG PC Client PFP Spec. Section 9.3.4 EV_NO_ACTION Event Types
@@ -420,7 +290,7 @@ InitNoActionEvent (
   {
     HashAlgId = TPM_ALG_SHA256;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
@@ -429,7 +299,7 @@ InitNoActionEvent (
   {
     HashAlgId = TPM_ALG_SHA512;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
@@ -729,7 +599,7 @@ DumpCcEvent (
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
     DEBUG ((DEBUG_INFO, "      HashAlgo : 0x%04x\n", HashAlgo));
     DEBUG ((DEBUG_INFO, "      Digest(%d): \n", DigestIndex));
-    DigestSize = GetHashSizeFromAlgo (HashAlgo);
+    DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
     DUMP_HEX (DEBUG_INFO, 0, DigestBuffer, DigestSize, "Digest Buffer");
     //
     // Prepare next
@@ -773,7 +643,7 @@ GetCcEventSize (
   HashAlgo     = CcEvent->Digests.digests[0].hashAlg;
   DigestBuffer = (UINT8 *)&CcEvent->Digests.digests[0].digest;
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
-    DigestSize = GetHashSizeFromAlgo (HashAlgo);
+    DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
     //
     // Prepare next
     //
@@ -1310,7 +1180,7 @@ GetDigestListBinSize (
     TotalSize    += sizeof (HashAlg);
     DigestListBin = (UINT8 *)DigestListBin + sizeof (HashAlg);
 
-    DigestSize    = GetHashSizeFromAlgo (HashAlg);
+    DigestSize    = Tpm2GetHashSizeFromAlgo (HashAlg);
     TotalSize    += DigestSize;
     DigestListBin = (UINT8 *)DigestListBin + DigestSize;
   }
@@ -1362,10 +1232,10 @@ ArmCcaDxeLogHashEvent (
   CcEvent.MrIndex   = NewEventHdr->MrIndex;
   CcEvent.EventType = NewEventHdr->EventType;
   DigestBuffer      = (UINT8 *)&CcEvent.Digests;
-  EventSizePtr      = CopyDigestListToBuffer (
+  EventSizePtr      = Tpm2CopyDigestListToBuffer (
                         DigestBuffer,
                         DigestList,
-                        GetHashMaskFromAlgo (AlgoId)
+                        Tpm2GetHashMaskFromAlgo (AlgoId)
                         );
   CopyMem (EventSizePtr, &NewEventHdr->EventSize, sizeof (NewEventHdr->EventSize));
 
@@ -1726,7 +1596,7 @@ SetupCcEventLog (
   TempDigestSize              = DigestSize;
   TempDigestSize             += NumberOfAlgorithms;
   TempDigestSize->algorithmId = AlgoId;
-  TempDigestSize->digestSize  = GetHashSizeFromAlgo (AlgoId);
+  TempDigestSize->digestSize  = Tpm2GetHashSizeFromAlgo (AlgoId);
   NumberOfAlgorithms++;
 
   CopyMem (
@@ -2883,7 +2753,7 @@ DriverEntry (
   // implementations maintain a migration path to SHA-384 or
   // SHA-512.
   //
-  mArmCcaDxeData.BsCap.HashAlgorithmBitmap = GetHashMaskFromAlgo (TpmAlgoId);
+  mArmCcaDxeData.BsCap.HashAlgorithmBitmap = Tpm2GetHashMaskFromAlgo (TpmAlgoId);
 
   // Arm CCA guests only support EFI_TCG2_EVENT_LOG_FORMAT_TCG_2
   mArmCcaDxeData.BsCap.SupportedEventLogs = EFI_CC_EVENT_LOG_FORMAT_TCG_2;

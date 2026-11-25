@@ -46,6 +46,7 @@
   PrintLib
   ReportStatusCodeLib
   TpmMeasurementLib
+  Tpm2HelpLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
