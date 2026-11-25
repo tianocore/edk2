@@ -1,7 +1,7 @@
 /** @file
   Library that implements the Arm CCA Realm Service Interface calls.
 
-  Copyright (c) 2022 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2022 - 2026, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
     - Rsi or RSI   - Realm Service Interface
@@ -64,6 +64,11 @@
    SHA-512 (Secure Hash Standard (SHS))
 */
 #define ARM_CCA_RSI_HASH_SHA_512  1
+
+/* The values of the RsiHashAlgorithm enumeration.
+   SHA-384 (Secure Hash Standard (SHS))
+*/
+#define ARM_CCA_RSI_HASH_SHA_384  2
 
 /* The RsiRipasChangeFlags fieldset contains flags provided by
    the Realm when requesting a RIPAS change.
