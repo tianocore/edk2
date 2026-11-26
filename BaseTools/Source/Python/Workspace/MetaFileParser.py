@@ -845,15 +845,18 @@ class InfParser(MetaFileParser):
     }
 
 class _DscIncludeTail:
-    def __init__(self, FilePath, FromItem, StartLine, Records, Context, SubsectionContext):
+    def __init__(self, FilePath, FromItem, StartLine, Records, Context, SubsectionContext,
+                 ForceReparse=False, Continuation=False):
         self.FilePath = FilePath
         self.FromItem = FromItem
         self.StartLine = StartLine
         self.Records = Records
         self.Context = Context
         self.SubsectionContext = SubsectionContext
-        self.DirectiveStack = Context[12]
-        self.Enabled = Context[14]
+        self.ForceReparse = ForceReparse
+        self.Continuation = Continuation
+        self.DirectiveStack = Context[12] if Context is not None else []
+        self.Enabled = Context[14] if Context is not None else 1
 
 
 ## DSC file parser class
@@ -952,6 +955,8 @@ class DscParser(MetaFileParser):
         # Track the inherited conditional depth for each included file.
         self._DirectiveStackBase = {self._FromItem: 0}
         self._Enabled = 1
+        self._StopAtInclude = False
+        self._ContinuationLine = None
 
         #
         # Specify whether current line is in uncertain condition
@@ -1012,13 +1017,18 @@ class DscParser(MetaFileParser):
             # directive line
             elif Line[0] == '!':
                 TokenList = GetSplitValueList(Line, ' ', 1)
-                if TokenList[0] == TAB_INCLUDE:
+                IsInclude = TokenList[0].upper() == TAB_INCLUDE.upper()
+                if IsInclude:
                     for Arch, ModuleType, DefaultStore in self._Scope:
                         if self._SubsectionType != MODEL_UNKNOWN and Arch in OwnerId:
                             self._Owner[-1] = OwnerId[Arch]
                         self._DirectiveParser()
                 else:
                     self._DirectiveParser()
+                if self._StopAtInclude and IsInclude:
+                    if Index + 1 < len(Content):
+                        self._ContinuationLine = Index + 1
+                    break
                 continue
             if Line[0] == TAB_OPTION_START and not self._InSubsection:
                 EdkLogger.error("Parser", FILE_READ_FAILURE, "Missing the '{' before %s in Line %s" % (Line, Index+1), ExtraData=self.MetaFile)
@@ -1065,7 +1075,7 @@ class DscParser(MetaFileParser):
                 if self._SubsectionType == MODEL_UNKNOWN and self._InSubsection:
                     OwnerId[Arch] = self._LastItem
 
-        if self._DirectiveStack:
+        if self._DirectiveStack and self._ContinuationLine is None:
             Type, Line, Text = self._DirectiveStack[-1]
             EdkLogger.error('Parser', FORMAT_INVALID, "No matching '!endif' found",
                             ExtraData=Text, File=self.MetaFile, Line=Line)
@@ -1426,7 +1436,8 @@ class DscParser(MetaFileParser):
                 if Record.SubsectionContext is not None:
                     self._SubsectionName, self._SubsectionType, self._InSubsection = \
                         Record.SubsectionContext
-                if self.__GetIncludeContext(Record.FromItem) == Record.Context:
+                if (not Record.ForceReparse and
+                    self.__GetIncludeContext(Record.FromItem) == Record.Context):
                     TailRecords = Record.Records
                 else:
                     TailRecords = self.__ParseIncludeTail(Record)
@@ -1559,7 +1570,17 @@ class DscParser(MetaFileParser):
 
     def __GetSectionScope(self, Index, Owner, FromItem, LineStart, LineEnd):
         Scope = []
-        for Record in self._Content[Index:]:
+        Start = Index
+        while Start > 0:
+            Record = self._Content[Start - 1]
+            if (isinstance(Record, _DscIncludeTail) or
+                Record[1] != MODEL_META_DATA_SECTION_HEADER or
+                Record[8] != Owner or Record[9] != FromItem or
+                Record[10] != LineStart or Record[12] != LineEnd):
+                break
+            Start -= 1
+
+        for Record in self._Content[Start:]:
             if (isinstance(Record, _DscIncludeTail) or
                 Record[1] != MODEL_META_DATA_SECTION_HEADER or
                 Record[8] != Owner or Record[9] != FromItem or
@@ -1608,8 +1629,21 @@ class DscParser(MetaFileParser):
         ]
         Parser._InDirective = len(Parser._DirectiveStack) - 1
         Parser._Enabled = Tail.Enabled
+        Parser._StopAtInclude = True
         Parser.StartParse()
-        return Table.GetAll()
+        Records = Table.GetAll()
+        if Parser._ContinuationLine is not None:
+            Records.append(_DscIncludeTail(
+                Tail.FilePath,
+                Tail.FromItem,
+                Parser._ContinuationLine,
+                [],
+                None,
+                None,
+                ForceReparse=True,
+                Continuation=True,
+            ))
+        return Records
 
     def _ProcessError(self):
         if not self._Enabled:
@@ -1731,6 +1765,22 @@ class DscParser(MetaFileParser):
                                  MODEL_META_DATA_CONDITIONAL_STATEMENT_IFNDEF]:
                     break
         elif self._ItemType == MODEL_META_DATA_INCLUDE:
+            ParentFrom = self._From
+            ParentStartLine = self._LineIndex + 1
+            ParentContext = self.__GetIncludeContext()
+            Continuation = None
+            if self._ContentIndex < len(self._Content):
+                Continuation = self._Content[self._ContentIndex]
+                if (isinstance(Continuation, _DscIncludeTail) and
+                    Continuation.Continuation):
+                    Continuation.Context = ParentContext
+                    Continuation.DirectiveStack = ParentContext[12]
+                    Continuation.Enabled = ParentContext[14]
+                    Continuation.SubsectionContext = ParentContext[3:6]
+                    Continuation.Continuation = False
+                else:
+                    Continuation = None
+
             # The included file must be relative to workspace or same directory as DSC file
             __IncludeMacros = {}
             #
@@ -1762,10 +1812,7 @@ class DscParser(MetaFileParser):
                 self._FileWithError = IncludedFile1
 
                 FromItem = self._Content[self._ContentIndex - 1][0]
-                ParentFrom = self._From
-                ParentStartLine = self._LineIndex + 1
                 ParentFile = self.__GetMetaFileFromItem(ParentFrom)
-                ParentContext = self.__GetIncludeContext()
                 self._DirectiveStackBase[FromItem] = len(self._DirectiveStack)
                 if self._InSubsection:
                     Owner = self._Content[self._ContentIndex - 1][8]
@@ -1794,6 +1841,8 @@ class DscParser(MetaFileParser):
                     Parser._SubsectionType,
                     Parser._InSubsection,
                 )
+                if Continuation is not None:
+                    Continuation.SubsectionContext = SubsectionContext
                 if Records:
                     InsertIndex = self._ContentIndex
                     self._Content[InsertIndex:InsertIndex] = Records

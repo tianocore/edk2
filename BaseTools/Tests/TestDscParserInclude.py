@@ -11,12 +11,13 @@ import unittest
 
 import TestTools
 from Common import GlobalData
-from Common.DataType import TAB_ARCH_COMMON
+from Common.DataType import TAB_ARCH_COMMON, TAB_ARCH_RISCV64
 from Common.Misc import PathClass
 from CommonDataClass.DataClass import (
     MODEL_EFI_LIBRARY_CLASS,
     MODEL_FILE_DSC,
     MODEL_META_DATA_COMPONENT,
+    MODEL_META_DATA_HEADER,
 )
 from Workspace.MetaFileParser import DscParser
 from Workspace.MetaFileTable import MetaFileStorage
@@ -110,16 +111,16 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
         )
         self.WriteTmpFile(
             'Second.dsc.inc',
-            '[Components]\n'
+            '[Components.IA32, Components.X64, Components.RISCV64, Components.LOONGARCH64]\n'
             '  Second.inf\n',
         )
         self.WriteTmpFile(
             'Platform.dsc',
-            '[LibraryClasses]\n'
-            '  BeforeInclude|Before.inf\n'
+            '[Defines]\n'
+            '  PLATFORM_NAME = Platform\n'
             '!include First.dsc.inc\n'
             '!include Second.dsc.inc\n'
-            '  AfterSecondInclude|AfterSecondInclude.inf\n',
+            '  POSTBUILD = python GenerateCapsule.py\n',
         )
 
         DscFile = PathClass(os.path.join(self.testDir, 'Platform.dsc'))
@@ -129,44 +130,47 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
             MODEL_FILE_DSC,
             True,
         )
-        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
+        Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_RISCV64, Table)
 
-        LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_COMMON]
-        Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_COMMON]
+        Headers = Parser[MODEL_META_DATA_HEADER, TAB_ARCH_RISCV64]
+        LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_RISCV64]
+        Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_RISCV64]
+        HeaderRecords = [(Record[0], Record[1]) for Record in Headers]
         LibraryClassRecords = [(Record[0], Record[1]) for Record in LibraryClasses]
         ComponentRecords = [Record[0] for Record in Components]
 
-        self.assertIn(('BeforeInclude', 'Before.inf'), LibraryClassRecords)
         self.assertIn(('FirstLibrary', 'FirstLibrary.inf'), LibraryClassRecords)
         self.assertIn('Second.inf', ComponentRecords)
-        self.assertIn(
-            'AfterSecondInclude|AfterSecondInclude.inf',
-            ComponentRecords,
-        )
-        self.assertNotIn(
-            ('AfterSecondInclude', 'AfterSecondInclude.inf'),
-            LibraryClassRecords,
-        )
+        self.assertNotIn(('POSTBUILD', 'python GenerateCapsule.py'), HeaderRecords)
+        self.assertIn('POSTBUILD = python GenerateCapsule.py', ComponentRecords)
 
-    def test_nested_include_inside_conditional_preserves_directive_state(self):
+    def test_consecutive_nested_includes_inside_conditional_preserve_directive_state(self):
+        self.WriteTmpFile(
+            'First.dsc.inc',
+            '[Components]\n'
+            '!include Nested.dsc.inc\n'
+            '[LibraryClasses]\n'
+            '  FirstLibrary|FirstLibrary.inf\n',
+        )
         self.WriteTmpFile(
             'Nested.dsc.inc',
             '[Components]\n'
             '  Nested.inf\n',
         )
         self.WriteTmpFile(
-            'Included.dsc.inc',
+            'Second.dsc.inc',
             '[Components]\n'
-            '!include Nested.dsc.inc\n'
-            '[LibraryClasses]\n'
-            '  IncludedLibrary|IncludedLibrary.inf\n',
+            '  Second.inf\n'
+            '!include Nested.dsc.inc\n',
         )
         self.WriteTmpFile(
             'Platform.dsc',
             '[Defines]\n'
             '  DEFINE INCLUDE_FEATURE = TRUE\n'
             '!if $(INCLUDE_FEATURE) == TRUE\n'
-            '!include Included.dsc.inc\n'
+            '!include First.dsc.inc\n'
+            '!include Second.dsc.inc\n'
+            '  POSTBUILD = python GenerateCapsule.py\n'
             '!endif\n'
             '[LibraryClasses]\n'
             '  AfterConditional|AfterConditional.inf\n',
@@ -181,14 +185,19 @@ class TestDscParserInclude(TestTools.BaseToolsTest):
         )
         Parser = DscParser(DscFile, MODEL_FILE_DSC, TAB_ARCH_COMMON, Table)
 
+        Headers = Parser[MODEL_META_DATA_HEADER, TAB_ARCH_COMMON]
         LibraryClasses = Parser[MODEL_EFI_LIBRARY_CLASS, TAB_ARCH_COMMON]
         Components = Parser[MODEL_META_DATA_COMPONENT, TAB_ARCH_COMMON]
+        HeaderRecords = [(Record[0], Record[1]) for Record in Headers]
         LibraryClassRecords = [(Record[0], Record[1]) for Record in LibraryClasses]
         ComponentRecords = [Record[0] for Record in Components]
 
-        self.assertIn(('IncludedLibrary', 'IncludedLibrary.inf'), LibraryClassRecords)
+        self.assertIn(('FirstLibrary', 'FirstLibrary.inf'), LibraryClassRecords)
         self.assertIn(('AfterConditional', 'AfterConditional.inf'), LibraryClassRecords)
+        self.assertNotIn(('POSTBUILD', 'python GenerateCapsule.py'), HeaderRecords)
+        self.assertIn('Second.inf', ComponentRecords)
         self.assertIn('Nested.inf', ComponentRecords)
+        self.assertIn('POSTBUILD = python GenerateCapsule.py', ComponentRecords)
 
     def test_reprocessing_after_include_resets_directive_stack_base(self):
         self.WriteTmpFile(
