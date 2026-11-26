@@ -898,11 +898,17 @@ FindVariableEx (
       Valid    = GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
       if (Valid && (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS)) {
         //
-        // Skip variables with deleted state (0x3C).
-        // When a variable is deleted, the state becomes 0x3C (VAR_IN_DELETED_TRANSITION & VAR_DELETED & VAR_ADDED).
-        // This check ensures only valid states (0x3F or 0x3E) are processed.
+        // Only accept valid states: VAR_ADDED (0x3F) or VAR_IN_DELETED_TRANSITION & VAR_ADDED (0x3E).
+        // The index table caches offsets recorded at an earlier scan, so the entry may have been
+        // deleted since then (e.g. by Standalone MM during PEI). A deleted variable can be:
+        //   0x3C - VAR_IN_DELETED_TRANSITION & VAR_DELETED & VAR_ADDED (deleted via the update path)
+        //   0x3D - VAR_DELETED & VAR_ADDED (deleted directly)
+        // Returning such a stale entry makes GetNextVariableName() loop forever when a newer
+        // copy of the same variable exists later in the store.
         //
-        if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_DELETED & VAR_ADDED)) {
+        if ((VariableHeader->State != VAR_ADDED) &&
+            (VariableHeader->State != (VAR_IN_DELETED_TRANSITION & VAR_ADDED)))
+        {
           continue;
         }
 
