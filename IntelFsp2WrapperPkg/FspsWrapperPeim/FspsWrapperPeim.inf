@@ -75,6 +75,7 @@
 
 [Guids]
   gFspHobGuid                           ## CONSUMES ## HOB
+  gFspImageBaseHobGuid                  ## SOMETIMES_PRODUCES ## HOB
   gFspApiPerformanceGuid                ## SOMETIMES_CONSUMES ## GUID
 
 [Sources]

@@ -18,17 +18,18 @@
 
 Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "SmmCorePerformanceLibInternal.h"
 
-#include <Library/DxeServicesLib.h>
 #include <Library/SmmMemLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/SmmBase2.h>
 #include <Protocol/SmmExitBootServices.h>
 
@@ -142,6 +143,7 @@ GetLoadedImageProtocol (
 /**
   Get the module name from the user interface section.
 
+  @param[in]  FvHandle      The firmware volume device handle of the target image.
   @param[in]  ModuleGuid    The GUID of the module.
   @param[out] NameString    The buffer to store the name string.
   @param[in]  BufferSize    The size of the buffer in bytes.
@@ -152,25 +154,42 @@ GetLoadedImageProtocol (
 **/
 EFI_STATUS
 GetNameFromUiSection (
-  IN EFI_GUID  *ModuleGuid,
-  OUT CHAR8    *NameString,
-  IN UINTN     BufferSize
+  IN EFI_HANDLE  FvHandle,
+  IN EFI_GUID    *ModuleGuid,
+  OUT CHAR8      *NameString,
+  IN UINTN       BufferSize
   )
 {
-  EFI_STATUS  Status;
-  CHAR16      *StringPtr;
-  UINTN       Index;
-  UINTN       StringSize;
+  EFI_STATUS                     Status;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
+  CHAR16                         *StringPtr;
+  UINTN                          Index;
+  UINTN                          StringSize;
+  UINT32                         AuthenticationStatus;
+
+  Status = gBS->OpenProtocol (
+                  FvHandle,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  (VOID **)&Fv,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   StringPtr  = NULL;
   StringSize = 0;
-  Status     = GetSectionFromAnyFv (
-                 ModuleGuid,
-                 EFI_SECTION_USER_INTERFACE,
-                 0,
-                 (VOID **)&StringPtr,
-                 &StringSize
-                 );
+  Status     = Fv->ReadSection (
+                     Fv,
+                     ModuleGuid,
+                     EFI_SECTION_USER_INTERFACE,
+                     0,
+                     (VOID **)&StringPtr,
+                     &StringSize,
+                     &AuthenticationStatus
+                     );
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < BufferSize - 1 && StringPtr[Index] != 0; Index++) {
       NameString[Index] = (CHAR8)StringPtr[Index];

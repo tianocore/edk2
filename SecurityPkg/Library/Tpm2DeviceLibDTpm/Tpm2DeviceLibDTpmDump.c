@@ -413,6 +413,12 @@ DumpTpmPcrCommand (
           DigestCount--;    // Account for this digest.
           break;
 
+        case TPM_ALG_SHA384:
+          DUMP_HEX (DEBUG_SECURITY, 0, CurrentDigest->digest.sha384, SHA384_DIGEST_SIZE, "- SHA384: ");
+          CurrentDigest = (TPMT_HA *)((UINT8 *)CurrentDigest + OFFSET_OF (TPMT_HA, digest) + SHA384_DIGEST_SIZE);
+          DigestCount--;    // Account for this digest.
+          break;
+
         default:
           // This algorithm hasn't been programmed yet. We need to bail.
           DEBUG ((DEBUG_SECURITY, "%a - Unknown hash algorithm! 0x%04X\n", __func__, SwapBytes16 (CurrentDigest->hashAlg)));

@@ -133,16 +133,19 @@ GetSpecIdEventSize (
 /**
   Get size of digest list in eventlog.
 
-  @param[in]   TcgPcrEvent2        eventlog.
+  @param[in]   TcgPcrEvent2        Event log entry.
+  @param[in]   RemainingSize       Bytes available from TcgPcrEvent2 to the end
+                                   of the event log.
 
-  @return      Size of digest list.
+  @return      Size of digest list, excluding the count, or 0 if invalid.
 
  **/
 STATIC
 UINTN
 EFIAPI
 GetDigestListSize (
-  IN  TCG_PCR_EVENT2  *TcgPcrEvent2
+  IN  TCG_PCR_EVENT2  *TcgPcrEvent2,
+  IN  UINTN           RemainingSize
   )
 {
   EFI_STATUS          Status;
@@ -160,9 +163,21 @@ GetDigestListSize (
    *
    * See the TCG EFI Protocol Specification's 5.2 Crypto Agile Log Entry Format.
    */
+  if ((TcgPcrEvent2 == NULL) ||
+      (RemainingSize < OFFSET_OF (TCG_PCR_EVENT2, Digest.digests[0].digest)))
+  {
+    return 0;
+  }
+
   DigestCount = TcgPcrEvent2->Digest.count;
-  HashAlgo    = TcgPcrEvent2->Digest.digests[0].hashAlg;
-  Digest      = (VOID *)&TcgPcrEvent2->Digest.digests[0].digest;
+  if (DigestCount == 0) {
+    return 0;
+  }
+
+  RemainingSize -= OFFSET_OF (TCG_PCR_EVENT2, Digest.digests[0].digest);
+
+  HashAlgo = TcgPcrEvent2->Digest.digests[0].hashAlg;
+  Digest   = (VOID *)&TcgPcrEvent2->Digest.digests[0].digest;
 
   for (Idx = 0; Idx < DigestCount; Idx++) {
     Status = GetHashInfo (HashAlgo, &HashInfo);
@@ -171,12 +186,22 @@ GetDigestListSize (
       return 0;
     }
 
-    Digest += HashInfo->HashSize;
-    CopyMem (&HashAlgo, Digest, sizeof (TPMI_ALG_HASH));
-    Digest += sizeof (TPMI_ALG_HASH);
-  }
+    if (RemainingSize < HashInfo->HashSize) {
+      return 0;
+    }
 
-  Digest -= sizeof (TPMI_ALG_HASH);
+    Digest        += HashInfo->HashSize;
+    RemainingSize -= HashInfo->HashSize;
+    if (Idx + 1 < DigestCount) {
+      if (RemainingSize < sizeof (TPMI_ALG_HASH)) {
+        return 0;
+      }
+
+      CopyMem (&HashAlgo, Digest, sizeof (TPMI_ALG_HASH));
+      Digest        += sizeof (TPMI_ALG_HASH);
+      RemainingSize -= sizeof (TPMI_ALG_HASH);
+    }
+  }
 
   return (UINTN)Digest - (UINTN)&TcgPcrEvent2->Digest.digests[0];
 }
@@ -230,6 +255,8 @@ EventLogIteratorGetNext (
   VOID            *Event;
   UINT32          EventSize;
   UINTN           DigestListSize;
+  UINTN           EventOffset;
+  UINTN           RemainingSize;
 
   if (Iter->Event == NULL) {
     Iter->Event = (VOID *)Iter->EventLogBase;
@@ -237,7 +264,8 @@ EventLogIteratorGetNext (
     Iter->Event += Iter->EventSize;
   }
 
-  if ((UINTN)Iter->Event >= (Iter->EventLogBase + Iter->EventLogSize)) {
+  EventOffset = (UINTN)Iter->Event - Iter->EventLogBase;
+  if (EventOffset >= Iter->EventLogSize) {
     Status          = EFI_NOT_FOUND;
     Iter->Event     = NULL;
     Iter->EventSize = 0;
@@ -250,9 +278,10 @@ EventLogIteratorGetNext (
     goto ExitHandler;
   }
 
+  RemainingSize  = Iter->EventLogSize - EventOffset;
   TcgPcrEvent2   = ((TCG_PCR_EVENT2 *)Iter->Event);
   Event          = (VOID *)&TcgPcrEvent2->Digest.digests[0];
-  DigestListSize = GetDigestListSize (TcgPcrEvent2);
+  DigestListSize = GetDigestListSize (TcgPcrEvent2, RemainingSize);
   if (DigestListSize == 0) {
     Status          = EFI_INVALID_PARAMETER;
     Iter->Event     = NULL;
@@ -260,9 +289,26 @@ EventLogIteratorGetNext (
     goto ExitHandler;
   }
 
-  Event += DigestListSize;
+  Event         += DigestListSize;
+  RemainingSize -= (UINTN)Event - (UINTN)Iter->Event;
+  if (RemainingSize < sizeof (TcgPcrEvent2->EventSize)) {
+    Status          = EFI_INVALID_PARAMETER;
+    Iter->Event     = NULL;
+    Iter->EventSize = 0;
+    goto ExitHandler;
+  }
+
   CopyMem (&EventSize, Event, sizeof (TcgPcrEvent2->EventSize));
   Event += sizeof (TcgPcrEvent2->EventSize);
+
+  RemainingSize -= sizeof (TcgPcrEvent2->EventSize);
+  if (RemainingSize < EventSize) {
+    Status          = EFI_INVALID_PARAMETER;
+    Iter->Event     = NULL;
+    Iter->EventSize = 0;
+    goto ExitHandler;
+  }
+
   Event += EventSize;
 
   Iter->EventSize = (UINTN)Event - (UINTN)Iter->Event;

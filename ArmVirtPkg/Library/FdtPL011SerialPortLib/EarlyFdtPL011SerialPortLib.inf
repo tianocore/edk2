@@ -20,12 +20,14 @@
   EarlyFdtPL011SerialPortLib.c
 
 [LibraryClasses]
+  ArmCcaLib
   PL011UartLib
   PcdLib
   FdtSerialPortAddressLib
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   OvmfPkg/OvmfPkg.dec

@@ -540,6 +540,7 @@
 
 [Components.AARCH64]
   MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
   MdeModulePkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
   MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf

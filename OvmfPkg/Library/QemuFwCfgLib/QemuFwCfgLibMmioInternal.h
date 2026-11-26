@@ -11,11 +11,25 @@
 
 #pragma once
 
+#include <Protocol/IoMmu.h>
+
 typedef struct {
   UINTN    FwCfgSelectorAddress;
   UINTN    FwCfgDataAddress;
   UINTN    FwCfgDmaAddress;
 } QEMU_FW_CFG_RESOURCE;
+
+/**
+  Get the IOMMU protocol instance
+
+  @param VOID
+
+  @retval  Pointer to the IoMMU protocol.
+**/
+EDKII_IOMMU_PROTOCOL *
+GetIoMmuProtocol (
+  VOID
+  );
 
 /**
   Reads firmware configuration bytes into a buffer

@@ -477,16 +477,6 @@ size_t _filelength(int fd)
   return stat_buf.st_size;
 }
 
-#ifndef __CYGWIN__
-char *strlwr(char *s)
-{
-  char *p = s;
-  for(;*s;s++) {
-    *s = tolower(*s);
-  }
-  return p;
-}
-#endif
 #endif
 #endif
 
