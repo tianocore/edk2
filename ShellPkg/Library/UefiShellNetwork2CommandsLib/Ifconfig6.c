@@ -977,9 +977,11 @@ IfConfig6ShowInterfaceInfo (
 {
   LIST_ENTRY              *Entry;
   IFCONFIG6_INTERFACE_CB  *IfCb;
+  EFI_STATUS              MediaStatus;
   UINTN                   Index;
 
-  Entry = IfList->ForwardLink;
+  Entry       = IfList->ForwardLink;
+  MediaStatus = EFI_SUCCESS;
 
   if (IsListEmpty (IfList)) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
@@ -997,6 +999,19 @@ IfConfig6ShowInterfaceInfo (
     // Print interface name.
     //
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_IF_NAME), gShellNetwork2HiiHandle, IfCb->IfInfo->Name);
+
+    //
+    // Get Media State.
+    //
+    if (EFI_SUCCESS == NetLibDetectMediaWaitTimeout (IfCb->NicHandle, 0, &MediaStatus)) {
+      if (MediaStatus != EFI_SUCCESS) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_MEDIA_STATE), gShellNetwork2HiiHandle, L"Media disconnected");
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_MEDIA_STATE), gShellNetwork2HiiHandle, L"Media present");
+      }
+    } else {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_MEDIA_STATE), gShellNetwork2HiiHandle, L"Media state unknown");
+    }
 
     //
     // Print interface config policy.
