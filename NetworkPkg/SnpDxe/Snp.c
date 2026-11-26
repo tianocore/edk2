@@ -3,6 +3,7 @@
 
 Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -318,7 +319,7 @@ SimpleNetworkDriverStart (
   UINT8                                      BarIndex;
   PXE_STATFLAGS                              InitStatFlags;
   EFI_PCI_IO_PROTOCOL                        *PciIo;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR          *BarDesc;
+  EFI_ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR    *BarDesc;
   BOOLEAN                                    FoundIoBar;
   BOOLEAN                                    FoundMemoryBar;
 
@@ -556,6 +557,18 @@ SimpleNetworkDriverStart (
       goto ErrorDeleteSnp;
     }
 
+    //
+    // Per the UEFI spec GetBarAttributes() returns either a QWORD address space
+    // descriptor or an END_TAG descriptor (e.g. for an unused BAR). Only inspect
+    // ResType when the descriptor is a complete QWORD address space descriptor.
+    //
+    if ((BarDesc->Header.Header.Byte != ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR) ||
+        (BarDesc->Header.Length < (sizeof (EFI_ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR) - sizeof (ACPI_LARGE_RESOURCE_HEADER))))
+    {
+      FreePool (BarDesc);
+      continue;
+    }
+
     if ((!FoundMemoryBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM)) {
       Snp->MemoryBarIndex = BarIndex;
       FoundMemoryBar      = TRUE;
@@ -569,6 +582,10 @@ SimpleNetworkDriverStart (
     if (FoundMemoryBar && FoundIoBar) {
       break;
     }
+  }
+
+  if (!FoundMemoryBar && !FoundIoBar) {
+    DEBUG ((DEBUG_WARN, "SNP: No memory or IO BAR found for the device.\n"));
   }
 
   Status = PxeStart (Snp);
