@@ -160,6 +160,16 @@ DescribeExceptionSyndrome (
   Ec  = Esr >> 26;
   Iss = Esr & 0x00ffffff;
 
+  //
+  // Exception Class (EC) values, see ESR_ELx in the Arm ARM (DDI 0487):
+  //   0x15 (0b010101) SVC instruction execution in AArch64 state
+  //   0x20 (0b100000) Instruction Abort from a lower Exception level
+  //   0x21 (0b100001) Instruction Abort taken without a change in Exception level
+  //   0x22 (0b100010) PC alignment fault
+  //   0x24 (0b100100) Data Abort from a lower Exception level
+  //   0x25 (0b100101) Data Abort taken without a change in Exception level
+  //   0x26 (0b100110) SP alignment fault
+  //
   switch (Ec) {
     case 0x15: Message = "SVC executed in AArch64";
       break;
@@ -168,11 +178,11 @@ DescribeExceptionSyndrome (
       return;
     case 0x22: Message = "PC alignment fault";
       break;
-    case 0x23: Message = "SP alignment fault";
-      break;
     case 0x24:
     case 0x25: DescribeInstructionOrDataAbort ("Data abort", Iss);
       return;
+    case 0x26: Message = "SP alignment fault";
+      break;
     default: return;
   }
 
