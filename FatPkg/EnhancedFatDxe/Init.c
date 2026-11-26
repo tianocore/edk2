@@ -390,7 +390,12 @@ FatOpenDevice (
     Volume->FatEntrySize = sizeof (UINT16);
     DirtyMask            = FAT16_DIRTY_MASK;
   } else {
-    if (Volume->MaxCluster < FAT_MAX_FAT16_CLUSTER) {
+    //
+    // FAT32 layout comes from the BPB (32-bit FAT).  Small volumes such as a
+    // ~200 MiB ESP with 4 KB sectors can be valid FAT32 while MaxCluster is
+    // still below FAT_MAX_FAT16_CLUSTER; mkfs.fat and Linux use this layout.
+    //
+    if (Volume->MaxCluster < FAT_MAX_FAT12_CLUSTER) {
       return EFI_VOLUME_CORRUPTED;
     }
 
