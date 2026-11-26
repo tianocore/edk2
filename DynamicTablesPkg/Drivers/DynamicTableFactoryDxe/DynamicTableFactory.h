@@ -55,6 +55,16 @@ typedef struct DynamicTableFactoryInfo {
         SmbiosHandleMap[FixedPcdGet16 (
                       PcdMaxSmbiosHandleMapEntries
                       )];
+
+  /// An array for holding the list of STD HII form generators.
+  CONST HII_FORM_GENERATOR *
+        StdHiiFormGeneratorList[EStdHiiFormsIdMax];
+
+  /// An array for holding the list of custom HII form generators.
+  CONST HII_FORM_GENERATOR *
+        CustomHiiFormGeneratorList[FixedPcdGet16 (
+                                 PcdMaxCustomHiiGenerators
+                                 )];
 } EDKII_DYNAMIC_TABLE_FACTORY_INFO;
 
 /** Return a pointer to the ACPI table generator.
@@ -118,6 +128,28 @@ GetDtTableGenerator (
   IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
   IN  CONST DT_TABLE_GENERATOR_ID                         GeneratorId,
   OUT CONST DT_TABLE_GENERATOR                   **CONST  Generator
+  );
+
+/** Return a pointer to the HII form generator.
+
+  @param [in]  This         Pointer to the dynamic table factory
+                            protocol.
+  @param [in]  GeneratorId  The HII form generator ID for the
+                            requested generator.
+  @param [out] Generator    Pointer to the requested HII form
+                            generator.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_NOT_FOUND         The requested generator is not found
+                                in the list of registered generators.
+**/
+EFI_STATUS
+EFIAPI
+GetHiiFormGenerator (
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST   This,
+  IN  CONST HII_FORM_GENERATOR_ID                          GeneratorId,
+  OUT CONST HII_FORM_GENERATOR                    **CONST  Generator
   );
 
 #pragma pack()
