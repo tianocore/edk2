@@ -117,5 +117,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

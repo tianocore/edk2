@@ -137,6 +137,8 @@ PlatformMemMapInitialization (
   UINT64  PciExBarBase;
   UINT32  PciBase;
   UINT32  PciSize;
+  UINT32  FlashBase;
+  UINT32  FlashSize;
 
   PciIoBase = 0xC000;
   PciIoSize = 0x4000;
@@ -147,6 +149,10 @@ PlatformMemMapInitialization (
   if (!TdIsEnabled ()) {
     PlatformAddIoMemoryRangeHob (0x0A0000, BASE_1MB);
   }
+
+  FlashBase = PcdGet32 (PcdOvmfFdBaseAddress);
+  FlashSize = PcdGet32 (PcdOvmfFirmwareFdSize);
+  PlatformAddIoMemoryBaseSizeHob (FlashBase, FlashSize);
 
   if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
     PlatformAddIoMemoryBaseSizeHob (MICROVM_GED_MMIO_BASE, SIZE_4KB);

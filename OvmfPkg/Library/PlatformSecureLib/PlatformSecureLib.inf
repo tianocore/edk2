@@ -26,3 +26,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
