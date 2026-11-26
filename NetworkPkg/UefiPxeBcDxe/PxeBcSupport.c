@@ -184,6 +184,7 @@ PxeBcArpCacheUpdate (
 {
   PXEBC_PRIVATE_DATA      *Private;
   EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_ARP_FIND_DATA       *ArpEntries;
   EFI_ARP_FIND_DATA       *ArpEntry;
   UINT32                  EntryLength;
   UINT32                  EntryCount;
@@ -204,12 +205,14 @@ PxeBcArpCacheUpdate (
                            NULL,
                            &EntryLength,
                            &EntryCount,
-                           &ArpEntry,
+                           &ArpEntries,
                            TRUE
                            );
   if (EFI_ERROR (Status)) {
     return;
   }
+
+  ArpEntry = ArpEntries;
 
   //
   // Update the Arp cache in mode data.
@@ -229,6 +232,11 @@ PxeBcArpCacheUpdate (
       );
     ArpEntry = (EFI_ARP_FIND_DATA *)((UINT8 *)ArpEntry + EntryLength);
   }
+
+  //
+  // The buffer was allocated by Arp->Find (), free it here.
+  //
+  FreePool (ArpEntries);
 }
 
 /**
