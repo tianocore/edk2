@@ -6,6 +6,7 @@
 
 **/
 #include <Library/PcdLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 /**
 
@@ -30,5 +31,5 @@ UserPhysicalPresent (
   VOID
   )
 {
-  return TRUE;
+  return PcdGet64 (PcdConfidentialComputingGuestAttr) == CCAttrNotEncrypted;
 }
