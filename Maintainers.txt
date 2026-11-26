@@ -376,6 +376,7 @@ F: MdeModulePkg/*Smm*/
 F: MdeModulePkg/Include/*Smi*.h
 F: MdeModulePkg/Include/*Smm*.h
 R: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
+R: Ray Ni <ray.ni@linux.alibaba.com> [niruiyu]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
 MdeModulePkg: Pei Core
@@ -493,6 +494,7 @@ M: Antaeus Kleinert-Strand <antklein@microsoft.com> [antklein]
 R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
+R: Varshit Pandya <varshit.pandya@arm.com> [vbpandya]
 
 OvmfPkg
 F: OvmfPkg/
@@ -671,6 +673,7 @@ StandaloneMmPkg
 F: StandaloneMmPkg/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+M: Ray Ni <ray.ni@linux.alibaba.com> [niruiyu]
 M: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 R: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
@@ -683,6 +686,7 @@ M: Yeoreum Yun <yeoreum.yun@arm.com> [LeviYeoReum]
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/uefi_cpu_pkg.html
+M: Ray Ni <ray.ni@linux.alibaba.com> [niruiyu]
 M: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
 M: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]

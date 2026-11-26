@@ -52,7 +52,7 @@ ArmFfaLibExitBootServiceEvent (
   IN VOID       *Context
   )
 {
-  ArmFfaLibRxTxUnmap ();
+  ArmFfaLibRxTxUnmapOnExitBootServices ();
 }
 
 /**

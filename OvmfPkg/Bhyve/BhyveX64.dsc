@@ -654,6 +654,13 @@
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 
+  #
+  # Cc Measurement PPI for Td guest
+  #
+  !if $(CC_MEASUREMENT_ENABLE) == TRUE
+    OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf
+  !endif
+
 !include OvmfPkg/Include/Dsc/OvmfTpmComponentsPei.dsc.inc
 
   #
