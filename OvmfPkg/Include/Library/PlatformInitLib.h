@@ -70,6 +70,8 @@ typedef struct {
   BOOLEAN                  QemuFwCfgChecked;
 
   QEMU_FW_CFG_WORK_AREA    QemuFwCfgWorkArea;
+
+  BOOLEAN                  IgvmScanned;
 } EFI_HOB_PLATFORM_INFO;
 #pragma pack()
 

@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <Library/DebugLib.h>
+
 /* This header file does not include internal Node definition,
    i.e. AML_ROOT_NODE, AML_OBJECT_NODE, etc. The node definitions
    must be included by the caller file. The function prototypes must
@@ -36,18 +38,6 @@
      - The AML NameSpace from the root node.
   @}
 */
-
-/** This function performs a raw data dump of the ACPI table.
-
-  @param  [in]  Ptr     Pointer to the start of the table buffer.
-  @param  [in]  Length  The length of the buffer.
-**/
-VOID
-EFIAPI
-AmlDbgDumpRaw (
-  IN  CONST UINT8   *Ptr,
-  IN        UINT32  Length
-  );
 
 /** Print Size chars at Buffer address.
 
@@ -135,9 +125,6 @@ AmlDbgPrintNameSpace (
 /* Macros to encapsulate Aml Debug Print APIs.
 */
 
-#define AMLDBG_DUMP_RAW(Ptr, Length)                  \
-          AmlDbgDumpRaw (Ptr, Length)
-
 #define AMLDBG_PRINT_CHARS(ErrorLevel, Buffer, Size)  \
           AmlDbgPrintChars (ErrorLevel, Buffer, Size)
 
@@ -157,8 +144,6 @@ AmlDbgPrintNameSpace (
           AmlDbgPrintNameSpace (RootNode)
 
 #else
-
-#define AMLDBG_DUMP_RAW(Ptr, Length)
 
 #define AMLDBG_PRINT_CHARS(ErrorLevel, Buffer, Size)
 

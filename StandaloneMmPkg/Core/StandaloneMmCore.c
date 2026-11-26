@@ -816,9 +816,9 @@ InitializeMmHobList (
   Hob.Raw = (UINT8 *)HobStart;
   while (!END_OF_HOB_LIST (Hob)) {
     Hob.Raw = GET_NEXT_HOB (Hob);
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      ResourceHobBase = Hob.ResourceDescriptor->PhysicalStart;
-      ResourceHobEnd  = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      ResourceHobBase = Hob.ResourceDescriptor2->PhysicalStart;
+      ResourceHobEnd  = Hob.ResourceDescriptor2->PhysicalStart + Hob.ResourceDescriptor2->ResourceLength;
 
       for (Index = 0; Index < MmramRangeCount; Index++) {
         MmramBase = MmramRanges[Index].PhysicalStart;

@@ -232,16 +232,3 @@ DoDeviceAuthentication (
   IN  BOOLEAN                      RootCertMatch,
   OUT EDKII_DEVICE_SECURITY_STATE  *SecurityState
   );
-
-/**
- * This function dump raw data.
- *
- * @param  data  raw data
- * @param  size  raw data size
- **/
-VOID
-EFIAPI
-InternalDumpData (
-  CONST UINT8  *Data,
-  UINTN        Size
-  );

@@ -25,8 +25,6 @@
 #include <Pcd/RestExServiceDevicePath.h>
 #include <Guid/GlobalVariable.h>
 
-#define VERBOSE_COLUME_SIZE  (16)
-
 REDFISH_OVER_IP_PROTOCOL_DATA  *mRedfishOverIpProtocolData;
 UINT8                          mRedfishProtocolDataSize;
 
@@ -228,56 +226,6 @@ InternalDumpIp6Addr (
 }
 
 /**
-  Dump data
-
-  @param[in] Data Pointer to data.
-  @param[in] Size size of data to dump.
-**/
-VOID
-InternalDumpData (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < Size; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", (UINTN)Data[Index]));
-  }
-}
-
-/**
-  Dump hex data
-
-  @param[in] Data Pointer to hex data.
-  @param[in] Size size of hex data to dump.
-**/
-VOID
-InternalDumpHex (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-  UINTN  Count;
-  UINTN  Left;
-
-  Count = Size / VERBOSE_COLUME_SIZE;
-  Left  = Size % VERBOSE_COLUME_SIZE;
-  for (Index = 0; Index < Count; Index++) {
-    InternalDumpData (Data + Index * VERBOSE_COLUME_SIZE, VERBOSE_COLUME_SIZE);
-    DEBUG ((DEBUG_VERBOSE, "\n"));
-  }
-
-  if (Left != 0) {
-    InternalDumpData (Data + Index * VERBOSE_COLUME_SIZE, Left);
-    DEBUG ((DEBUG_VERBOSE, "\n"));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
-}
-
-/**
   Dump Redfish over IP protocol data
 
   @param[in] RedfishProtocolData     Pointer to REDFISH_OVER_IP_PROTOCOL_DATA
@@ -292,7 +240,7 @@ DumpRedfishIpProtocolData (
   CHAR16  Hostname[16];
 
   DEBUG ((DEBUG_VERBOSE, "RedfishProtocolData: \n"));
-  InternalDumpHex ((UINT8 *)RedfishProtocolData, RedfishProtocolDataSize);
+  DUMP_HEX (DEBUG_VERBOSE, 0, RedfishProtocolData, RedfishProtocolDataSize, "");
 
   DEBUG ((DEBUG_VERBOSE, "Parsing as below: \n"));
 

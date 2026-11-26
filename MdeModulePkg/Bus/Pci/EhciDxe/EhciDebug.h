@@ -36,16 +36,3 @@ EhcDumpQh (
   IN CHAR8    *Msg,
   IN BOOLEAN  DumpBuf
   );
-
-/**
-  Dump the buffer in the form of hex.
-
-  @param  Buf      The buffer to dump.
-  @param  Len      The length of buffer.
-
-**/
-VOID
-EhcDumpBuf (
-  IN UINT8  *Buf,
-  IN UINTN  Len
-  );

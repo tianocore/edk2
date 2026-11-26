@@ -2,7 +2,6 @@
   PCI enumeration support functions declaration for PCI Bus module.
 
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -292,6 +291,7 @@ SetNewAlign (
 
   @param PciIoDevice  Pci device instance.
   @param Offset       Bar offset.
+  @param BarIndex     Bar index.
 
   @return Next bar offset.
 
@@ -299,7 +299,23 @@ SetNewAlign (
 UINTN
 PciParseBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
-  IN UINTN          Offset
+  IN UINTN          Offset,
+  IN UINTN          BarIndex
+  );
+
+/**
+  Parse the Enhanced Allocation (EA) capability of a PCI function, if present,
+  and record the fixed BARs it describes in the PCI device instance.
+
+  This must be called after the BARs have been parsed with PciParseBar (), and
+  before resource allocation takes place.
+
+  @param PciIoDevice  Pci device instance.
+
+**/
+VOID
+PciParseEnhancedAllocation (
+  IN PCI_IO_DEVICE  *PciIoDevice
   );
 
 /**
@@ -307,6 +323,7 @@ PciParseBar (
 
   @param PciIoDevice  Pci device instance.
   @param Offset       Bar offset.
+  @param BarIndex     Bar index.
 
   @return Next bar offset.
 
@@ -314,7 +331,8 @@ PciParseBar (
 UINTN
 PciIovParseVfBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
-  IN UINTN          Offset
+  IN UINTN          Offset,
+  IN UINTN          BarIndex
   );
 
 /**

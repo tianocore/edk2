@@ -557,15 +557,15 @@ CollectPlatformMemoryRegions (
   // Collect memory ranges
   //
   while (Hob.Raw < PlatformHobList + PlatformHobSize) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if (  (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO)
-         || (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY)
-         || (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_FIRMWARE_DEVICE)
-         || (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED))
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if (  (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO)
+         || (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY)
+         || (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_FIRMWARE_DEVICE)
+         || (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_RESERVED))
       {
         if (Index < *MemoryRegionCount) {
-          MemoryRegion[Index].Base   = Hob.ResourceDescriptor->PhysicalStart;
-          MemoryRegion[Index].Length = Hob.ResourceDescriptor->ResourceLength;
+          MemoryRegion[Index].Base   = Hob.ResourceDescriptor2->PhysicalStart;
+          MemoryRegion[Index].Length = Hob.ResourceDescriptor2->ResourceLength;
         }
 
         Index++;

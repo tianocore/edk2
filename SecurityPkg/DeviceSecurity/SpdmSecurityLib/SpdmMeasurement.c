@@ -137,27 +137,6 @@ CreateDeviceMeasurementContext (
 }
 
 /**
-  This function dumps data.
-
-  @param[in]  Data             A pointer to Data.
-  @param[in]  Size             The size of Data.
-
-**/
-VOID
-EFIAPI
-InternalDumpData (
-  CONST UINT8  *Data,
-  UINTN        Size
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < Size; Index++) {
-    DEBUG ((DEBUG_INFO, "%02x ", (UINTN)Data[Index]));
-  }
-}
-
-/**
   This function extend the PCI digest from the DvSec register.
 
   @param[in]  SpdmDeviceContext       The SPDM context for the device.
@@ -227,9 +206,7 @@ ExtendMeasurement (
     DEBUG ((DEBUG_INFO, "SpdmMeasurementBlockDmtfHeader\n"));
     DEBUG ((DEBUG_INFO, "  DMTFSpecMeasurementValueType - 0x%02x\n", SpdmMeasurementBlockDmtfHeader->DMTFSpecMeasurementValueType));
     DEBUG ((DEBUG_INFO, "  DMTFSpecMeasurementValueSize - 0x%04x\n", SpdmMeasurementBlockDmtfHeader->DMTFSpecMeasurementValueSize));
-    DEBUG ((DEBUG_INFO, "Measurement - "));
-    InternalDumpData (Digest, DigestSize);
-    DEBUG ((DEBUG_INFO, "\n"));
+    DUMP_HEX (DEBUG_INFO, 0, Digest, DigestSize, "Measurement - ");
     if (MeasurementRecordLength <= sizeof (SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + sizeof (SPDM_MEASUREMENT_BLOCK_DMTF_HEADER)) {
       SecurityState->MeasurementState = EDKII_DEVICE_SECURITY_STATE_ERROR_MEASUREMENT_AUTH_FAILURE;
       return EFI_SECURITY_VIOLATION;

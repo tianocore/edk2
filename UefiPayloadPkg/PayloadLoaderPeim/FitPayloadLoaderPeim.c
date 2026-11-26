@@ -262,33 +262,6 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mReadyToPayloadNotifyList[] = {
 #endif
 
 /**
-  Print FDT data.
-  @param[in] FdtBase         Address of the Fdt data.
-**/
-VOID
-PrintFdt (
-  IN     VOID  *FdtBase
-  )
-{
-  UINT8   *Fdt;
-  UINT32  i;
-
-  Fdt = NULL;
-  i   = 0;
-
-  DEBUG ((DEBUG_ERROR, "FDT DTB data:"));
-  for (Fdt = FdtBase, i = 0; i < Fdt32ToCpu (((FDT_HEADER *)FdtBase)->TotalSize); i++, Fdt++) {
-    if (i % 16 == 0) {
-      DEBUG ((DEBUG_ERROR, "\n"));
-    }
-
-    DEBUG ((DEBUG_ERROR, "%02x ", *Fdt));
-  }
-
-  DEBUG ((DEBUG_ERROR, "\n"));
-}
-
-/**
   It will build FDT for UPL consumed.
   @param[in] FdtBase         Address of the Fdt data.
   @retval EFI_SUCCESS        If it completed successfully.
@@ -346,7 +319,7 @@ FdtPpiNotifyCallback (
   Status = BuildFdtForUPL (FdtBase);
   ASSERT_EFI_ERROR (Status);
 
-  PrintFdt (FdtBase);
+  DUMP_HEX (DEBUG_ERROR, 0, FdtBase, Fdt32ToCpu (((FDT_HEADER *)FdtBase)->TotalSize), "FDT DTB data: ");
 
   Fdt = BuildGuidHob (&gUniversalPayloadDeviceTreeGuid, sizeof (UNIVERSAL_PAYLOAD_DEVICE_TREE));
   if (Fdt == NULL) {

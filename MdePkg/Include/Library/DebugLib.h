@@ -669,3 +669,74 @@ UnitTestDebugAssert (
     NULL :                                                                                  \
     BASE_CR (Record, TYPE, Field)
 #endif
+
+/**
+  Log a formatted hexdump as the debug message on the specified debug
+  error level.
+  The hexdump is split into lines of 16 dumped bytes. Each line is
+  prefixed with a caller-provided string and offset. The full hexdump
+  is bracketed, and its byte ascii char also print. If the byte value
+  is not the ascii code, it will print as '.'
+  @param[in] ErrorLevel        The error level of the debug message.
+  @param[in] Offset            Offset to be displayed after LinePrefixFormat.
+                               Offset will be increased for each print line.
+  @param[in] Data              The data to dump.
+  @param[in] DataSize          Number of bytes in Data.
+  @param[in] LinePrefixFormat  Format string describing the prefix that is
+                               printed at the beginning of each dump line,
+                               including the bracket lines.
+  @param[in] ...               Arguments for LinePrefixFormat.
+**/
+#if !defined (MDEPKG_NDEBUG)
+#define DUMP_HEX(ErrorLevel, Offset, Data, DataSize, LinePrefixFormat, ...)         \
+  do {                                                                              \
+    if (DebugPrintEnabled () && DebugPrintLevelEnabled (ErrorLevel)) {              \
+      CONST CHAR8  *_digits = "0123456789ABCDEF";                                   \
+      CONST UINT8  *_bytes  = (CONST UINT8 *)(Data);                                \
+      UINTN        _hexOff  = (Offset);                                             \
+      UINTN        _remaining;                                                      \
+      UINTN        _index;                                                          \
+      CHAR8        _line[49];                                                       \
+      CHAR8        _ascii[17];                                                      \
+                                                                                    \
+      if (_bytes == NULL) {                                                         \
+        DebugPrint (ErrorLevel, LinePrefixFormat, ##__VA_ARGS__);                   \
+        DebugPrint (ErrorLevel, "%08X: <NULL>\r\n", _hexOff);                       \
+        break;                                                                      \
+      }                                                                             \
+      for (_remaining = (DataSize), _index = 0; _remaining != 0;                    \
+           --_remaining, ++_bytes, _index = (_index + 1) & 0x0F) {                  \
+        _line[3 * _index]     = _digits[*_bytes >> 4];                              \
+        _line[3 * _index + 1] = _digits[*_bytes & 0xF];                             \
+        _line[3 * _index + 2] = (_index == 7) ? '-' : ' ';                          \
+        _ascii[_index] = (*_bytes < ' ' || *_bytes > '~') ? '.' : (CHAR8)*_bytes;   \
+        if ((_index == 15) || (_remaining == 1)) {                                  \
+          _line[3 * (_index + 1)] = '\0';                                           \
+          _ascii[_index + 1]      = '\0';                                           \
+          DebugPrint (ErrorLevel, LinePrefixFormat, ##__VA_ARGS__);                 \
+          DebugPrint (ErrorLevel, "%08X: %-48a |%a|\r\n", _hexOff, _line, _ascii);  \
+          _hexOff += _index + 1;                                                    \
+        }                                                                           \
+      }                                                                             \
+    }                                                                               \
+  } while (FALSE)
+#else
+// When MDEPKG_NDEBUG is set, we don't print anything. However, compilers will complain
+// about unused parameters, so we need to consume them here. This includes the variable
+// arguments, which are consumed by routing them through the DEBUG macro. This code path
+// is not actually taken due to the if (FALSE) check, but it satisfies compilers.
+#define DUMP_HEX(ErrorLevel,                                                        \
+                 Offset,                                                            \
+                 Data,                                                              \
+                 DataSize,                                                          \
+                 LinePrefixFormat,                                                  \
+                 ...)                                                               \
+    do {                                                                            \
+      if (FALSE) {                                                                  \
+        (VOID) (Offset);                                                            \
+        (VOID) (Data);                                                              \
+        (VOID) (DataSize);                                                          \
+        DebugPrint (ErrorLevel, LinePrefixFormat, ##__VA_ARGS__);                   \
+      }                                                                             \
+    } while (FALSE)
+#endif

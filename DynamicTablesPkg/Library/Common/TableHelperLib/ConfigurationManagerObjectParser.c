@@ -510,6 +510,46 @@ STATIC CONST CM_OBJ_PARSER  CmArmBmuRegInfoParser[] = {
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
+/** A parser for SCMI transport token arrays.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiTransportTokenParser[] = {
+  { "A2pTransportToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "P2aTransportToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiDeviceInfoParser[] = {
+  { "Token",                sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CommonTransportToken",
+    sizeof (CM_OBJECT_TOKEN) * ArmScmiTransportDirectionMax,
+    NULL,
+    NULL,
+    CmArmScmiTransportTokenParser,
+    ARRAY_SIZE (CmArmScmiTransportTokenParser) },
+  { "ProtocolInfoToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiPccTransportInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiPccTransportInfoParser[] = {
+  { "Token",            sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "PccSubspaceToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjScmiProtocolInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmScmiProtocolInfoParser[] = {
+  { "ProtocolType",            sizeof (CM_ARM_SCMI_PROTOCOL_TYPE), "0x%x", NULL },
+  { "ExclusiveTransportToken",
+    sizeof (CM_OBJECT_TOKEN) * ArmScmiTransportDirectionMax,
+    NULL,
+    NULL,
+    CmArmScmiTransportTokenParser,
+    ARRAY_SIZE (CmArmScmiTransportTokenParser) },
+  { "NotificationsSupported",  sizeof (BOOLEAN),                   "0x%x", NULL },
+};
+
 /** A parser for EArmObjCmnInfo containing CMN information.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCmnInfoParser[] = {
@@ -1484,6 +1524,31 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonGroupAssociationItemParser[] = {
   { "ReferencedTableGeneratorId", sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
 };
 
+/** A parser for EArchCommonObjFirmwareInventoryInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonFirmwareInventoryInfoParser[] = {
+  { "FirmwareInventoryInfoToken",   sizeof (CM_OBJECT_TOKEN),          "0x%p",  NULL        },
+  { "FirmwareComponentName",        SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "FirmwareVersion",              SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "FirmwareVersionFormat",        sizeof (UINT8),                    "0x%x",  NULL        },
+  { "FirmwareId",                   SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "FirmwareIdFormat",             sizeof (UINT8),                    "0x%x",  NULL        },
+  { "ReleaseDate",                  SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "Manufacturer",                 SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "LowestSupportedVersion",       SMBIOS_MAX_STRING_SIZE,            NULL,    PrintString },
+  { "ImageSize",                    sizeof (UINT64),                   "0x%lx", NULL        },
+  { "Characteristics",              sizeof (FIRMWARE_CHARACTERISTICS), NULL,    HexDump     },
+  { "State",                        sizeof (UINT8),                    "0x%x",  NULL        },
+  { "AssociatedComponentListToken", sizeof (CM_OBJECT_TOKEN),          "0x%p",  NULL        },
+};
+
+/** A parser for EArchCommonObjFirmwareInventoryComponent.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonFirmwareInventoryComponentParser[] = {
+  { "ReferencedObjectToken",      sizeof (CM_OBJECT_TOKEN),           "0x%p", NULL },
+  { "ReferencedTableGeneratorId", sizeof (SMBIOS_TABLE_GENERATOR_ID), "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjBiosLanguageInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonBiosLanguageInfoParser[] = {
@@ -1542,6 +1607,23 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSmc91xInfoParser[] = {
     NULL,
     CmArchCommonGenericInterruptParser,
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) }
+};
+
+/** A parser for EArchCommonObjVirtioMmioDeviceInfo.
+
+  Extended and generic interrupts have the same layout, so the generic
+  interrupt parser is reused.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonVirtioMmioDeviceInfoParser[] = {
+  { "BaseAddress",       8,                "0x%llx", NULL },
+  { "BaseAddressLength", 8,                "0x%llx", NULL },
+  { "Interrupt",
+    sizeof (CM_ARCH_COMMON_EXTENDED_INTERRUPT),
+    NULL,
+    NULL,
+    CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
+  { "CacheCoherent",     sizeof (BOOLEAN), "0x%x",   NULL }
 };
 
 /** A parser for EArchCommonObjSystemPowerSupplyInfo.
@@ -1936,6 +2018,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjSmc91xInfo,                       CmArchCommonSmc91xInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationInfo,             CmArchCommonGroupAssociationInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjGroupAssociationItem,             CmArchCommonGroupAssociationItemParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjVirtioMmioDeviceInfo,             CmArchCommonVirtioMmioDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjFirmwareInventoryInfo,            CmArchCommonFirmwareInventoryInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjFirmwareInventoryComponent,       CmArchCommonFirmwareInventoryComponentParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -1977,6 +2062,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicIwbInfo,                      CmArmGicIwbInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjBmuRegInfo,                      CmArmBmuRegInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPl050Info,                       CmArmPl050InfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiDeviceInfo,                  CmArmScmiDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiPccTransportInfo,            CmArmScmiPccTransportInfoParser),
+  CM_PARSER_ADD_OBJECT (EArmObjScmiProtocolInfo,                CmArmScmiProtocolInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
@@ -2531,11 +2619,7 @@ HexDump (
   IN UINT32       Length
   )
 {
-  UINT32  Index;
-
-  for (Index = 0; Index < Length; Index++) {
-    DEBUG ((DEBUG_INFO, "0x%02x ", *Ptr++));
-  }
+  DUMP_HEX (DEBUG_INFO, 0, Ptr, Length, "");
 }
 
 /** Print fields of the objects.

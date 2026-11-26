@@ -115,12 +115,12 @@ PlatformScanE820Tdx (
   Hob.Raw = (UINT8 *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
 
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) ||
-          (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY))
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      if ((Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) ||
+          (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY))
       {
-        E820Entry.BaseAddr = Hob.ResourceDescriptor->PhysicalStart;
-        E820Entry.Length   = Hob.ResourceDescriptor->ResourceLength;
+        E820Entry.BaseAddr = Hob.ResourceDescriptor2->PhysicalStart;
+        E820Entry.Length   = Hob.ResourceDescriptor2->ResourceLength;
         E820Entry.Type     = EfiAcpiAddressRangeMemory;
         Callback (&E820Entry, PlatformInfoHob);
       }
@@ -420,43 +420,6 @@ PlatformScanE820 (
   return EFI_SUCCESS;
 }
 
-STATIC
-UINT64
-GetHighestSystemMemoryAddressFromPvhMemmap (
-  BOOLEAN  Below4gb
-  )
-{
-  struct hvm_memmap_table_entry  *Memmap;
-  UINT32                         MemmapEntriesCount;
-  struct hvm_memmap_table_entry  *Entry;
-  EFI_STATUS                     Status;
-  UINT32                         Loop;
-  UINT64                         HighestAddress;
-  UINT64                         EntryEnd;
-
-  HighestAddress = 0;
-
-  Status = GetPvhMemmapEntries (&Memmap, &MemmapEntriesCount);
-  ASSERT_EFI_ERROR (Status);
-
-  for (Loop = 0; Loop < MemmapEntriesCount; Loop++) {
-    Entry    = Memmap + Loop;
-    EntryEnd = Entry->addr + Entry->size;
-
-    if ((Entry->type == XEN_HVM_MEMMAP_TYPE_RAM) &&
-        (EntryEnd > HighestAddress))
-    {
-      if (Below4gb && (EntryEnd <= BASE_4GB)) {
-        HighestAddress = EntryEnd;
-      } else if (!Below4gb && (EntryEnd >= BASE_4GB)) {
-        HighestAddress = EntryEnd;
-      }
-    }
-  }
-
-  return HighestAddress;
-}
-
 VOID
 EFIAPI
 PlatformGetSystemMemorySizeBelow4gb (
@@ -466,14 +429,6 @@ PlatformGetSystemMemorySizeBelow4gb (
   EFI_STATUS  Status;
   UINT8       Cmos0x34;
   UINT8       Cmos0x35;
-
-  if ((PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) &&
-      (CcProbe () != CcGuestTypeIntelTdx))
-  {
-    // Get the information from PVH memmap
-    PlatformInfoHob->LowMemory = (UINT32)GetHighestSystemMemoryAddressFromPvhMemmap (TRUE);
-    return;
-  }
 
   Status = PlatformScanE820 (PlatformGetLowMemoryCB, PlatformInfoHob);
   if (!EFI_ERROR (Status) && (PlatformInfoHob->LowMemory > 0)) {

@@ -61,6 +61,14 @@ NOTE: This implementation ignores the possibility that the Serial settings may
 */
 #define NAME_STR_SPCR_PORT  "COM1"
 
+/** _SB scope of the AML namespace.
+*/
+#define SB_SCOPE  "\\_SB_."
+
+/** The fully qualified ACPI namespace path of the SPCR port.
+*/
+#define NAMESPACE_STR_SPCR_PORT  SB_SCOPE NAME_STR_SPCR_PORT
+
 /** An UID representing the SPCR port.
 */
 #define UID_SPCR_PORT  1
@@ -105,7 +113,7 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  AcpiSpcr = {
   0x00,
   0, // {Template}: UART Clock Frequency
   0, // {Template}: Precise Baud Rate
-  sizeof (NAME_STR_SPCR_PORT),
+  sizeof (NAMESPACE_STR_SPCR_PORT),
   OFFSET_OF (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4, NameSpaceString)
 };
 
@@ -523,7 +531,8 @@ BuildSpcrTableEx (
   if (AcpiTableInfo->AcpiTableRevision < EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
     Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE);
   } else {
-    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4) + sizeof (NAME_STR_SPCR_PORT);
+    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4) +
+           sizeof (NAMESPACE_STR_SPCR_PORT);
   }
 
   // Build SPCR table.
@@ -667,7 +676,11 @@ BuildSpcrTableEx (
 
   CopyMem (Spcr, &AcpiSpcr, MIN (Size, sizeof (AcpiSpcr)));
   if (AcpiTableInfo->AcpiTableRevision >= EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
-    CopyMem (Spcr->NameSpaceString, NAME_STR_SPCR_PORT, sizeof (NAME_STR_SPCR_PORT));
+    CopyMem (
+      Spcr->NameSpaceString,
+      NAMESPACE_STR_SPCR_PORT,
+      sizeof (NAMESPACE_STR_SPCR_PORT)
+      );
   }
 
   TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)Spcr;

@@ -189,6 +189,15 @@ NorFlashInitialise (
 
   Status = VirtNorFlashPlatformGetDevices (&NorFlashDevices, &mNorFlashDeviceCount);
   if (EFI_ERROR (Status)) {
+    if (Status == EFI_NOT_FOUND) {
+      // No Flash Device found, request the NOR Flash Driver to be unloaded.
+      DEBUG ((
+        DEBUG_INFO,
+        "NorFlashInitialise: No NOR Flash device found, unloading driver.\n"
+        ));
+      return EFI_REQUEST_UNLOAD_IMAGE;
+    }
+
     DEBUG ((DEBUG_ERROR, "NorFlashInitialise: Fail to get Nor Flash devices\n"));
     return Status;
   }

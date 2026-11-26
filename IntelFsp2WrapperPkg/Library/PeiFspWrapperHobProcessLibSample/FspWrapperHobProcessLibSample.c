@@ -175,34 +175,34 @@ PostFspmHobProcess (
   Hob.Raw = (UINT8 *)(UINTN)FspHobList;
   DEBUG ((DEBUG_INFO, "FspHobList - 0x%x\n", FspHobList));
 
-  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw)) != NULL) {
-    DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
-    if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
-        (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED))
+  while ((Hob.Raw = GetNextResourceHob (Hob.Raw)) != NULL) {
+    DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor2->ResourceType));
+    if ((Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
+        (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_RESERVED))
     {
-      DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
-      DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%x\n", Hob.ResourceDescriptor->PhysicalStart));
-      DEBUG ((DEBUG_INFO, "ResourceLength: 0x%x\n", Hob.ResourceDescriptor->ResourceLength));
-      DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
+      DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor2->ResourceCapabilities));
+      DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%x\n", Hob.ResourceDescriptor2->PhysicalStart));
+      DEBUG ((DEBUG_INFO, "ResourceLength: 0x%x\n", Hob.ResourceDescriptor2->ResourceLength));
+      DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor2->Owner));
     }
 
-    if (  (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) // Found the low memory length below 4G
-       && (Hob.ResourceDescriptor->PhysicalStart >= BASE_1MB)
-       && (Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength <= BASE_4GB))
+    if (  (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) // Found the low memory length below 4G
+       && (Hob.ResourceDescriptor2->PhysicalStart >= BASE_1MB)
+       && (Hob.ResourceDescriptor2->PhysicalStart + Hob.ResourceDescriptor2->ResourceLength <= BASE_4GB))
     {
-      LowMemorySize += Hob.ResourceDescriptor->ResourceLength;
+      LowMemorySize += Hob.ResourceDescriptor2->ResourceLength;
       Hob.Raw        = GET_NEXT_HOB (Hob);
       continue;
     }
 
-    if (  (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) // Found the low memory length below 4G
-       && (Hob.ResourceDescriptor->PhysicalStart >= BASE_1MB)
-       && (Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength <= BASE_4GB)
-       && (CompareGuid (&Hob.ResourceDescriptor->Owner, &gFspReservedMemoryResourceHobGuid)))
+    if (  (Hob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) // Found the low memory length below 4G
+       && (Hob.ResourceDescriptor2->PhysicalStart >= BASE_1MB)
+       && (Hob.ResourceDescriptor2->PhysicalStart + Hob.ResourceDescriptor2->ResourceLength <= BASE_4GB)
+       && (CompareGuid (&Hob.ResourceDescriptor2->Owner, &gFspReservedMemoryResourceHobGuid)))
     {
       FoundFspMemHob = TRUE;
-      FspMemoryBase  = Hob.ResourceDescriptor->PhysicalStart;
-      FspMemorySize  = Hob.ResourceDescriptor->ResourceLength;
+      FspMemoryBase  = Hob.ResourceDescriptor2->PhysicalStart;
+      FspMemorySize  = Hob.ResourceDescriptor2->ResourceLength;
       DEBUG ((DEBUG_INFO, "Find fsp mem hob, base 0x%x, len 0x%x\n", FspMemoryBase, FspMemorySize));
     }
 
@@ -210,10 +210,10 @@ PostFspmHobProcess (
     // Report the resource hob
     //
     BuildResourceDescriptorHob (
-      Hob.ResourceDescriptor->ResourceType,
-      Hob.ResourceDescriptor->ResourceAttribute,
-      Hob.ResourceDescriptor->PhysicalStart,
-      Hob.ResourceDescriptor->ResourceLength
+      Hob.ResourceDescriptor2->ResourceType,
+      Hob.ResourceDescriptor2->ResourceCapabilities,
+      Hob.ResourceDescriptor2->PhysicalStart,
+      Hob.ResourceDescriptor2->ResourceLength
       );
 
     Hob.Raw = GET_NEXT_HOB (Hob);

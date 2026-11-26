@@ -69,14 +69,21 @@ jobs:
         Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
-      TARGET_CRYPTO_DEBUG:
-        Build.Pkgs: 'CryptoPkg'
-        Build.Targets: 'DEBUG'
-        Build.Archlist: ${{ parameters.arch_list }}
-      TARGET_CRYPTO_RELEASE:
-        Build.Pkgs: 'CryptoPkg'
-        Build.Targets: 'RELEASE,NO-TARGET'
-        Build.Archlist: ${{ parameters.arch_list }}
+      # CryptoPkg builds one architecture per job to stay within agent disk space.
+      ${{ each arch in split(parameters.arch_list, ',') }}:
+        TARGET_CRYPTO_DEBUG_${{ arch }}:
+          Build.Pkgs: 'CryptoPkg'
+          Build.Targets: 'DEBUG'
+          Build.Archlist: ${{ arch }}
+        TARGET_CRYPTO_RELEASE_${{ arch }}:
+          Build.Pkgs: 'CryptoPkg'
+          Build.Targets: 'RELEASE'
+          Build.Archlist: ${{ arch }}
+      ${{ if or(eq(parameters.tool_chain_tag, 'GCC'), startsWith(parameters.tool_chain_tag, 'VS')) }}:
+        TARGET_CRYPTO_NO_TARGET:
+          Build.Pkgs: 'CryptoPkg'
+          Build.Targets: 'NO-TARGET'
+          Build.Archlist: ${{ parameters.arch_list }}
       TARGET_FSP:
         Build.Pkgs: 'IntelFsp2Pkg,IntelFsp2WrapperPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'

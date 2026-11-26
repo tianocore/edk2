@@ -1220,7 +1220,6 @@ BootScriptExecuteInformation (
   )
 
 {
-  UINT32                       Index;
   EFI_BOOT_SCRIPT_INFORMATION  Information;
   UINT8                        *InformationData;
 
@@ -1229,12 +1228,7 @@ BootScriptExecuteInformation (
   InformationData = Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION);
   DEBUG ((DEBUG_INFO, "BootScriptExecuteInformation - 0x%08x\n", (UINTN)InformationData));
 
-  DEBUG ((DEBUG_INFO, "BootScriptInformation: "));
-  for (Index = 0; Index < Information.InformationLength; Index++) {
-    DEBUG ((DEBUG_INFO, "%02x ", InformationData[Index]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, InformationData, Information.InformationLength, "BootScriptInformation: ");
 }
 
 /**
@@ -1249,7 +1243,6 @@ BootScriptExecuteLabel (
   )
 
 {
-  UINT32                       Index;
   EFI_BOOT_SCRIPT_INFORMATION  Information;
   UINT8                        *InformationData;
 
@@ -1258,12 +1251,7 @@ BootScriptExecuteLabel (
   InformationData = Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION);
   DEBUG ((DEBUG_INFO, "BootScriptExecuteLabel - 0x%08x\n", (UINTN)InformationData));
 
-  DEBUG ((DEBUG_INFO, "BootScriptLabel: "));
-  for (Index = 0; Index < Information.InformationLength; Index++) {
-    DEBUG ((DEBUG_INFO, "%02x ", InformationData[Index]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, InformationData, Information.InformationLength, "BootScriptLabel: ");
 }
 
 /**
