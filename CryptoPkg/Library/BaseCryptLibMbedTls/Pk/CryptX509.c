@@ -158,6 +158,7 @@ X509ConstructCertificateStackV (
 
     CertSize = VA_ARG (Args, UINTN);
     if (CertSize == 0) {
+      Ret = -1;
       break;
     }
 
