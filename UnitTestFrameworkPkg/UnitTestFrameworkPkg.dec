@@ -44,6 +44,11 @@
   #
   HostMemoryAllocationBelowAddressLib|Include/Library/HostMemoryAllocationBelowAddressLib.h
 
+  ##  @libraryclass  Provides a services table that can be used to mock UEFI Runtime Services in unit tests.
+  #   Only available to DXE and UEFI module types.
+  #
+  MockUefiRuntimeServicesTableLib|Include/Library/MockUefiRuntimeServicesTableLib.h
+
 [LibraryClasses.Common.Private]
   ## @libraryclass Provides a unit test result report
   #
