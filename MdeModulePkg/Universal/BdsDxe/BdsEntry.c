@@ -734,26 +734,8 @@ BdsEntry (
   BdsFormalizeEfiGlobalVariable ();
 
   //
-  // Mark the read-only variables if the Variable Lock protocol exists
+  // Initialize Hardware Error Recording Support.
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
-  DEBUG ((DEBUG_INFO, "[BdsDxe] Locate Variable Policy protocol - %r\n", Status));
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < ARRAY_SIZE (mReadOnlyVariables); Index++) {
-      Status = RegisterBasicVariablePolicy (
-                 VariablePolicy,
-                 &gEfiGlobalVariableGuid,
-                 mReadOnlyVariables[Index],
-                 VARIABLE_POLICY_NO_MIN_SIZE,
-                 VARIABLE_POLICY_NO_MAX_SIZE,
-                 VARIABLE_POLICY_NO_MUST_ATTR,
-                 VARIABLE_POLICY_NO_CANT_ATTR,
-                 VARIABLE_POLICY_TYPE_LOCK_NOW
-                 );
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
-
   InitializeHwErrRecSupport ();
 
   //
@@ -813,6 +795,33 @@ BdsEntry (
   // Initialize the platform language variables
   //
   InitializeLanguage (TRUE);
+
+  //
+  // Lock the Read Only Variables immediately. The read only variables cannot be created/modified
+  //  after the variable policy is created.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < ARRAY_SIZE (mReadOnlyVariables); Index++) {
+      Status = RegisterBasicVariablePolicy (
+                 VariablePolicy,
+                 &gEfiGlobalVariableGuid,
+                 mReadOnlyVariables[Index],
+                 VARIABLE_POLICY_NO_MIN_SIZE,
+                 VARIABLE_POLICY_NO_MAX_SIZE,
+                 VARIABLE_POLICY_NO_MUST_ATTR,
+                 VARIABLE_POLICY_NO_CANT_ATTR,
+                 VARIABLE_POLICY_TYPE_LOCK_NOW
+                 );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a Failed to register variable policy! - %r\n", __func__, Status));
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+  } else {
+    DEBUG ((DEBUG_INFO, "%a Locate Variable Policy protocol failed! - %r\n", __func__, Status));
+  }
 
   FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
   if (FilePath == NULL) {

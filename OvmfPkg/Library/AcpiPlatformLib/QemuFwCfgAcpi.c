@@ -613,10 +613,10 @@ ProcessCmdAddChecksum (
     return EFI_PROTOCOL_ERROR;
   }
 
-  Blob->Base[AddChecksum->ResultOffset] = CalculateCheckSum8 (
-                                            Blob->Base + AddChecksum->Start,
-                                            AddChecksum->Length
-                                            );
+  Blob->Base[AddChecksum->ResultOffset] -= CalculateSum8 (
+                                             Blob->Base + AddChecksum->Start,
+                                             AddChecksum->Length
+                                             );
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: File=\"%a\" ResultOffset=0x%x Start=0x%x "
