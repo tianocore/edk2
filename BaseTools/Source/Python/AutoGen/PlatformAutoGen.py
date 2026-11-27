@@ -12,7 +12,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 import os.path as path
 import copy
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from .BuildEngine import BuildRule,gDefaultBuildRuleFile,AutoGenReqBuildRuleVerNum
 from .GenVar import VariableMgr, var_info
@@ -984,15 +984,15 @@ class PlatformAutoGen(AutoGen):
     ## Return the build options specific for all modules in this platform
     @cached_property
     def BuildOption(self):
-        return self._ExpandBuildOption(self.Platform.BuildOptions)
+        return self._ExpandGroupedBuildOption(self.Platform.BuildOptions)
 
     def _BuildOptionWithToolDef(self, ToolDef):
-        return self._ExpandBuildOption(self.Platform.BuildOptions, ToolDef=ToolDef)
+        return self._ExpandGroupedBuildOption(self.Platform.BuildOptions, ToolDef=ToolDef)
 
     ## Return the build options specific for EDKII modules in this platform
     @cached_property
     def EdkIIBuildOption(self):
-        return self._ExpandBuildOption(self.Platform.BuildOptions, EDKII_NAME)
+        return self._ExpandGroupedBuildOption(self.Platform.BuildOptions, EDKII_NAME)
 
     ## Parse build_rule.txt in Conf Directory.
     #
@@ -1445,6 +1445,36 @@ class PlatformAutoGen(AutoGen):
                 for guid,mpath in Guid_Path:
                     retVal[(name,mpath)] = '%s_%s' % (name,guid)
         return retVal
+
+    ## Expand build options from grouped sections independently.
+    #
+    #  The BUILDRULEFAMILY vs FAMILY matching in _ExpandBuildOption is
+    #  designed so that within a single [BuildOptions] section,
+    #  BUILDRULEFAMILY takes precedence over FAMILY. When multiple
+    #  [BuildOptions] sections are merged (e.g. from !include files),
+    #  each section must be evaluated independently to avoid a
+    #  BUILDRULEFAMILY match in one section suppressing FAMILY matches
+    #  in another.
+    #
+    def _ExpandGroupedBuildOption(self, OptionGroups, ModuleStyle=None, ToolDef=None):
+        Merged = {}
+        for Options in OptionGroups:
+            # Pass a copy since _ExpandBuildOption may mutate the dictionary
+            Result = self._ExpandBuildOption(OrderedDict(Options), ModuleStyle, ToolDef)
+            for Tool in Result:
+                if Tool not in Merged:
+                    Merged[Tool] = {}
+                for Attr in Result[Tool]:
+                    Value = Result[Tool][Attr]
+                    if Attr != "FLAGS" or Attr not in Merged[Tool] or Value.startswith('='):
+                        Merged[Tool][Attr] = Value
+                    else:
+                        if Attr != 'PATH':
+                            Merged[Tool][Attr] += " " + Value
+                        else:
+                            Merged[Tool][Attr] = Value
+        return Merged
+
     ## Expand * in build option key
     #
     #   @param  Options     Options to be expanded
