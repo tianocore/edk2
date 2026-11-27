@@ -18,6 +18,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
 
+/**
+  EL2 && !E2H.
+  EL is assumed to be 1 or 2.
+ **/
+STATIC
+BOOLEAN
+ArmIsTraditionalEL2 (
+  VOID
+  )
+{
+  return ArmReadCurrentEL () == AARCH64_EL2 && !(ArmReadHcr () & ARM_HCR_E2H);
+}
+
+/**
+  TT_XN_MASK or TT_UXN_MASK | TT_PXN_MASK depending on ArmIsTraditionalEL2.
+ **/
+STATIC
+UINT64
+ArmGetTT_XN_MASK (
+  VOID
+  )
+{
+  return ArmIsTraditionalEL2 () ? TT_XN_MASK : (TT_UXN_MASK | TT_PXN_MASK);
+}
+
 STATIC
 UINT64
 GetOutputAddress (
@@ -375,12 +400,7 @@ EfiAttributeToArmAttribute (
 
   switch (EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) {
     case EFI_MEMORY_UC:
-      if (ArmReadCurrentEL () == AARCH64_EL2) {
-        ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY | TT_XN_MASK;
-      } else {
-        ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY | TT_UXN_MASK | TT_PXN_MASK;
-      }
-
+      ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY | ArmGetTT_XN_MASK ();
       break;
     case EFI_MEMORY_WC:
       ArmAttributes = TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
@@ -407,7 +427,7 @@ EfiAttributeToArmAttribute (
 
   // Process eXecute Never attribute
   if ((EfiAttributes & EFI_MEMORY_XP) != 0) {
-    ArmAttributes |= TT_PXN_MASK;
+    ArmAttributes |= ArmGetTT_XN_MASK ();
   }
 
   return ArmAttributes;
