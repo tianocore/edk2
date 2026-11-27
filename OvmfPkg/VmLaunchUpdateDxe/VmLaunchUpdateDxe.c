@@ -398,13 +398,13 @@ VmLaunchUpdateDxeEntrypoint (
 
   if (!QemuFwCfgIsAvailable ()) {
     DEBUG ((DEBUG_INFO, "%a: QemuFwCfg not available\n", __func__));
-    return EFI_UNSUPPORTED;
+    return EFI_REQUEST_UNLOAD_IMAGE;
   }
 
   Status = QemuFwCfgFindFile (VM_LAUNCH_UPDATE_FILE_NAME, &FwCfgItem, &FwCfgSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "%a: %a not available (%r)\n", __func__, VM_LAUNCH_UPDATE_FILE_NAME, Status));
-    return Status;
+    return EFI_REQUEST_UNLOAD_IMAGE;
   }
 
   if (FwCfgSize != sizeof (VM_LAUNCH_UPDATE_FW_CFG)) {
