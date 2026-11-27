@@ -110,13 +110,7 @@ VmLaunchBufferSetShared (
     return Status;
   }
 
-  if (CC_GUEST_IS_TDX (CcAttr)) {
-    // TODO
-    DEBUG ((DEBUG_ERROR, "%a: TDX: not implemented yet\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
-
-  DEBUG ((DEBUG_ERROR, "%a: unknown CC guest type\n", __func__));
+  DEBUG ((DEBUG_ERROR, "%a: unsupported/unknown CC guest type\n", __func__));
   return EFI_UNSUPPORTED;
 }
 
@@ -142,13 +136,7 @@ VmLaunchBufferSetPrivate (
     return Status;
   }
 
-  if (CC_GUEST_IS_TDX (CcAttr)) {
-    // TODO
-    DEBUG ((DEBUG_ERROR, "%a: TDX: not implemented yet\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
-
-  DEBUG ((DEBUG_ERROR, "%a: unknown CC guest type\n", __func__));
+  DEBUG ((DEBUG_ERROR, "%a: unsupported/unknown CC guest type\n", __func__));
   return EFI_UNSUPPORTED;
 }
 
