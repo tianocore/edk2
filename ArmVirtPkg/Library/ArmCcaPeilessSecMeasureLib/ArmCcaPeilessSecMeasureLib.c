@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2025, Arm Limited. All rights reserved.
+  Copyright (c) 2025 - 2026, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -28,6 +28,7 @@
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
+#include <Library/Tpm2HelpLib.h>
 
 #include <Protocol/CcMeasurement.h>
 
@@ -67,10 +68,6 @@ typedef struct {
   UINT8              RealmHashAlgorithm;
   /// The alogrithm ID for the hash function.
   TPMI_ALG_HASH      HashAlgo;
-  /// The hash size.
-  UINT16             HashSize;
-  /// The hash mask.
-  UINT32             HashMask;
   /// A function pointer to the hash function.
   DIGEST_FUNCTION    DigestFunction;
 } ARMCCA_HASH_INFO;
@@ -79,20 +76,8 @@ typedef struct {
   A map of the hash algorithms supported by a Realm.
 */
 STATIC ARMCCA_HASH_INFO  mHashInfo[] = {
-  {
-    ARM_CCA_RSI_HASH_SHA_256,
-    TPM_ALG_SHA256,
-    SHA256_DIGEST_SIZE,
-    HASH_ALG_SHA256,
-    Sha256HashAll
-  },
-  {
-    ARM_CCA_RSI_HASH_SHA_512,
-    TPM_ALG_SHA512,
-    SHA512_DIGEST_SIZE,
-    HASH_ALG_SHA512,
-    Sha512HashAll
-  }
+  { ARM_CCA_RSI_HASH_SHA_256, TPM_ALG_SHA256, Sha256HashAll },
+  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512, Sha512HashAll }
 };
 
 /**
@@ -142,53 +127,6 @@ GetHashInfoFromAlgo (
   }
 
   return NULL;
-}
-
-/**
-  Get hash size based on Algo
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Size of the hash.
-**/
-STATIC
-UINT16
-GetHashSizeFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  ARMCCA_HASH_INFO  *HashInfo;
-
-  HashInfo = GetHashInfoFromAlgo (HashAlgo);
-  if (HashInfo != NULL) {
-    return HashInfo->HashSize;
-  }
-
-  return 0;
-}
-
-/**
-  Get hash mask based on Algo
-
-  @param[in]     HashAlgo           Hash Algorithm Id.
-
-  @return Hash mask.
-**/
-STATIC
-UINT32
-GetHashMaskFromAlgo (
-  IN TPMI_ALG_HASH  HashAlgo
-  )
-{
-  ARMCCA_HASH_INFO  *HashInfo;
-
-  HashInfo = GetHashInfoFromAlgo (HashAlgo);
-  if (HashInfo != NULL) {
-    return HashInfo->HashMask;
-  }
-
-  ASSERT (FALSE);
-  return 0;
 }
 
 /**
@@ -249,90 +187,6 @@ GetRealmHashAlgorithm (
 }
 
 /**
-  Get TPML_DIGEST_VALUES data size.
-
-  @param[in]     DigestList    TPML_DIGEST_VALUES data.
-
-  @return TPML_DIGEST_VALUES data size.
-**/
-UINT32
-EFIAPI
-GetDigestListSize (
-  IN TPML_DIGEST_VALUES  *DigestList
-  )
-{
-  UINTN   Index;
-  UINT16  DigestSize;
-  UINT32  TotalSize;
-
-  TotalSize = sizeof (DigestList->count);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    TotalSize += sizeof (DigestList->digests[Index].hashAlg) + DigestSize;
-  }
-
-  return TotalSize;
-}
-
-/**
-  Copy TPML_DIGEST_VALUES into a buffer
-
-  @param[in,out] Buffer             Buffer to hold copied TPML_DIGEST_VALUES
-                                    compact binary.
-  @param[in]     DigestList         TPML_DIGEST_VALUES to be copied.
-  @param[in]     HashAlgorithmMask  HASH bits corresponding to the desired
-                                    digests to copy.
-
-  @return The end of buffer to hold TPML_DIGEST_VALUES.
-**/
-STATIC
-VOID *
-CopyDigestListToBuffer (
-  IN OUT VOID            *Buffer,
-  IN TPML_DIGEST_VALUES  *DigestList,
-  IN UINT32              HashAlgorithmMask
-  )
-{
-  UINTN   Index;
-  UINT16  DigestSize;
-  UINT32  DigestListCount;
-  UINT32  *DigestListCountPtr;
-
-  DigestListCountPtr = (UINT32 *)Buffer;
-  DigestListCount    = 0;
-  Buffer             = (UINT8 *)Buffer + sizeof (DigestList->count);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    if ((GetHashMaskFromAlgo (DigestList->digests[Index].hashAlg) &
-         HashAlgorithmMask) == 0)
-    {
-      DEBUG ((
-        DEBUG_WARN,
-        "WARNING: ArmCCA Event log has HashAlg unsupported (0x%x)\n",
-        DigestList->digests[Index].hashAlg
-        ));
-      continue;
-    }
-
-    CopyMem (
-      Buffer,
-      &DigestList->digests[Index].hashAlg,
-      sizeof (DigestList->digests[Index].hashAlg)
-      );
-
-    Buffer = (UINT8 *)Buffer +
-             sizeof (DigestList->digests[Index].hashAlg);
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
-    Buffer = (UINT8 *)Buffer + DigestSize;
-    DigestListCount++;
-  }
-
-  WriteUnaligned32 (DigestListCountPtr, DigestListCount);
-
-  return Buffer;
-}
-
-/**
   Calculate the digest of input Data and extend it to the REM register.
 
   @param TpmAlgId        The algorithm Id
@@ -369,7 +223,7 @@ ArmCcaHashAndExtendToRem (
     return EFI_UNSUPPORTED;
   }
 
-  if ((DigestLen != HashInfo->HashSize)) {
+  if (DigestLen != Tpm2GetHashSizeFromAlgo (HashInfo->HashAlgo)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -420,14 +274,14 @@ LogHashEvent (
   UINT8           *DigestBuffer;
 
   //
-  // Use GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
+  // Use Tpm2GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
   // to reserve enough buffer to hold TPML_DIGEST_VALUES compact binary.
   //
   HobData = BuildGuidHob (
               &gCcEventEntryHobGuid,
               sizeof (TcgPcrEvent2->PCRIndex) +
               sizeof (TcgPcrEvent2->EventType) +
-              GetDigestListSize (DigestList) +
+              Tpm2GetDigestListSize (DigestList) +
               sizeof (TcgPcrEvent2->EventSize) +
               NewEventHdr->EventSize
               );
@@ -445,10 +299,10 @@ LogHashEvent (
   //     - TPM_ALG_SHA256
   //     - TPM_ALG_SHA512
   //
-  DigestBuffer = CopyDigestListToBuffer (
+  DigestBuffer = Tpm2CopyDigestListToBuffer (
                    DigestBuffer,
                    DigestList,
-                   GetHashMaskFromAlgo (TpmAlgId)
+                   Tpm2GetHashMaskFromAlgo (TpmAlgId)
                    );
 
   CopyMem (
@@ -507,7 +361,7 @@ HashLogExtendEvent (
     }
   }
 
-  DigestLen = GetHashSizeFromAlgo (mTpmAlgId);
+  DigestLen = Tpm2GetHashSizeFromAlgo (mTpmAlgId);
   if (DigestLen == 0) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;

@@ -38,6 +38,7 @@
   HobLib
   MemoryAllocationLib
   PrePiLib
+  Tpm2HelpLib
 
 [Guids]
   gCcEventEntryHobGuid
