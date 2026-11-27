@@ -77,7 +77,8 @@ typedef struct {
 */
 STATIC ARMCCA_HASH_INFO  mHashInfo[] = {
   { ARM_CCA_RSI_HASH_SHA_256, TPM_ALG_SHA256, Sha256HashAll },
-  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512, Sha512HashAll }
+  { ARM_CCA_RSI_HASH_SHA_512, TPM_ALG_SHA512, Sha512HashAll },
+  { ARM_CCA_RSI_HASH_SHA_384, TPM_ALG_SHA384, Sha384HashAll }
 };
 
 /**
@@ -298,6 +299,7 @@ LogHashEvent (
   // Arm CCA support one digest hash among below hash algo list:
   //     - TPM_ALG_SHA256
   //     - TPM_ALG_SHA512
+  //     - TPM_ALG_SHA384
   //
   DigestBuffer = Tpm2CopyDigestListToBuffer (
                    DigestBuffer,
