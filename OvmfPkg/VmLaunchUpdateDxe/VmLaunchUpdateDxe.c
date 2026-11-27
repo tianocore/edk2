@@ -371,6 +371,19 @@ VmLaunchUpdateLaunch (
 // ---------------------------------------------------------------------
 // entry point
 
+STATIC VM_LAUNCH_UPDATE_DEVICE  mLaunchUpdateDevice = {
+  .Signature = VM_LAUNCH_UPDATE_DEVICE_SIGNATURE,
+  .Protocol  = {
+    .Version         = VM_LAUNCH_UPDATE_PROTOCOL_VERSION,
+    .GetCapabilities = VmLaunchUpdateGetCapabilities,
+    .SetControl      = VmLaunchUpdateSetControl,
+    .SetImage        = VmLaunchUpdateSetImage,
+    .SetOpaque       = VmLaunchUpdateSetOpaque,
+    .Load            = VmLaunchUpdateLoad,
+    .Launch          = VmLaunchUpdateLaunch,
+  },
+};
+
 EFI_STATUS
 EFIAPI
 VmLaunchUpdateDxeEntrypoint (
@@ -405,13 +418,7 @@ VmLaunchUpdateDxeEntrypoint (
     return EFI_DEVICE_ERROR;
   }
 
-  Device = AllocatePool (sizeof (*Device));
-  if (Device == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  ZeroMem (Device, sizeof (*Device));
-  Device->Signature = VM_LAUNCH_UPDATE_DEVICE_SIGNATURE;
+  Device            = &mLaunchUpdateDevice;
   Device->FwCfgItem = FwCfgItem;
   Device->FwCfgSize = FwCfgSize;
   VmLaunchUpdateFileRead (Device);
@@ -424,14 +431,6 @@ VmLaunchUpdateDxeEntrypoint (
     Device->Config.Version,
     (Device->Config.Capabilities & VM_LAUNCH_UPDATE_CAP_IGVM) ? "+" : "-"
     ));
-
-  Device->Protocol.Version         = VM_LAUNCH_UPDATE_PROTOCOL_VERSION;
-  Device->Protocol.GetCapabilities = VmLaunchUpdateGetCapabilities;
-  Device->Protocol.SetControl      = VmLaunchUpdateSetControl;
-  Device->Protocol.SetImage        = VmLaunchUpdateSetImage;
-  Device->Protocol.SetOpaque       = VmLaunchUpdateSetOpaque;
-  Device->Protocol.Load            = VmLaunchUpdateLoad;
-  Device->Protocol.Launch          = VmLaunchUpdateLaunch;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
