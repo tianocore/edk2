@@ -621,6 +621,7 @@ StorageToConfigResp (
                       (VOID **)&HiiConfigRouting
                       );
       if (EFI_ERROR (Status)) {
+        FreePool (TempConfigRequest);
         return Status;
       }
 
@@ -662,6 +663,7 @@ StorageToConfigResp (
       break;
   }
 
+  FreePool (TempConfigRequest);
   return Status;
 }
 
@@ -1246,6 +1248,10 @@ LoadFormSetStorage (
                   (VOID **)&HiiConfigRouting
                   );
   if (EFI_ERROR (Status)) {
+    if (ConfigRequest != NULL) {
+      FreePool (ConfigRequest);
+    }
+
     return;
   }
 
@@ -1269,18 +1275,9 @@ LoadFormSetStorage (
   }
 
   Storage->ConfigRequest = AllocateCopyPool (StrSize (ConfigRequest), ConfigRequest);
-  if (Storage->ConfigRequest == NULL) {
-    if (ConfigRequest != NULL) {
-      FreePool (ConfigRequest);
-    }
-
-    return;
-  }
-
-  if (Storage->Type != EFI_HII_VARSTORE_NAME_VALUE) {
-    if (ConfigRequest != NULL) {
-      FreePool (ConfigRequest);
-    }
+  ASSERT (Storage->ConfigRequest != NULL);
+  if (ConfigRequest != NULL) {
+    FreePool (ConfigRequest);
   }
 }
 
@@ -1696,6 +1693,9 @@ GetQuestionValue (
     MaxLen        = Length + 1;
     ConfigRequest = AllocatePool (MaxLen * sizeof (CHAR16));
     ASSERT (ConfigRequest != NULL);
+    if (ConfigRequest == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     StrCpyS (ConfigRequest, MaxLen, FormsetStorage->ConfigHdr);
     if (IsBufferStorage) {
@@ -1711,6 +1711,7 @@ GetQuestionValue (
                     (VOID **)&HiiConfigRouting
                     );
     if (EFI_ERROR (Status)) {
+      FreePool (ConfigRequest);
       return Status;
     }
 
