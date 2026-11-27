@@ -2,6 +2,7 @@
   Google Test mocks for UefiBootServicesTableLib
 
   Copyright (c) Microsoft Corporation.
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include <GoogleTest/Library/MockUefiBootServicesTableLib.h>
@@ -11,12 +12,19 @@ MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_GetMemoryMap, 5, EFI
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CreateEvent, 5, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CloseEvent, 1, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_HandleProtocol, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_SetMem, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_LocateHandleBuffer, 5, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_LocateProtocol, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_RegisterProtocolNotify, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_SignalEvent, 1, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_InstallProtocolInterface, 4, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CreateEventEx, 6, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_LocateDevicePath, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_OpenProtocol, 6, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_CloseProtocol, 4, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_InstallConfigurationTable, 2, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_AllocatePool, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiBootServicesTableLib, gBS_FreePool, 1, EFIAPI);
 
 static EFI_BOOT_SERVICES  LocalBs = {
   { 0, 0, 0, 0, 0 },             // EFI_TABLE_HEADER
@@ -25,20 +33,20 @@ static EFI_BOOT_SERVICES  LocalBs = {
   NULL,                          // EFI_ALLOCATE_PAGES
   NULL,                          // EFI_FREE_PAGES
   gBS_GetMemoryMap,              // EFI_GET_MEMORY_MAP
-  NULL,                          // EFI_ALLOCATE_POOL
-  NULL,                          // EFI_FREE_POOL
+  gBS_AllocatePool,              // EFI_ALLOCATE_POOL
+  gBS_FreePool,                  // EFI_FREE_POOL
   gBS_CreateEvent,               // EFI_CREATE_EVENT
   NULL,                          // EFI_SET_TIMER
   NULL,                          // EFI_WAIT_FOR_EVENT
-  NULL,                          // EFI_SIGNAL_EVENT
+  gBS_SignalEvent,               // EFI_SIGNAL_EVENT
   gBS_CloseEvent,                // EFI_CLOSE_EVENT
   NULL,                          // EFI_CHECK_EVENT
-  NULL,                          // EFI_INSTALL_PROTOCOL_INTERFACE
+  gBS_InstallProtocolInterface,  // EFI_INSTALL_PROTOCOL_INTERFACE
   NULL,                          // EFI_REINSTALL_PROTOCOL_INTERFACE
   NULL,                          // EFI_UNINSTALL_PROTOCOL_INTERFACE
   gBS_HandleProtocol,            // EFI_HANDLE_PROTOCOL
   NULL,                          // VOID
-  NULL,                          // EFI_REGISTER_PROTOCOL_NOTIFY
+  gBS_RegisterProtocolNotify,    // EFI_REGISTER_PROTOCOL_NOTIFY
   NULL,                          // EFI_LOCATE_HANDLE
   gBS_LocateDevicePath,          // EFI_LOCATE_DEVICE_PATH
   gBS_InstallConfigurationTable, // EFI_INSTALL_CONFIGURATION_TABLE
@@ -56,13 +64,13 @@ static EFI_BOOT_SERVICES  LocalBs = {
   gBS_CloseProtocol,             // EFI_CLOSE_PROTOCOL
   NULL,                          // EFI_OPEN_PROTOCOL_INFORMATION
   NULL,                          // EFI_PROTOCOLS_PER_HANDLE
-  NULL,                          // EFI_LOCATE_HANDLE_BUFFER
+  gBS_LocateHandleBuffer,        // EFI_LOCATE_HANDLE_BUFFER
   gBS_LocateProtocol,            // EFI_LOCATE_PROTOCOL
   NULL,                          // EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES
   NULL,                          // EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES
   NULL,                          // EFI_CALCULATE_CRC32
   NULL,                          // EFI_COPY_MEM
-  NULL,                          // EFI_SET_MEM
+  gBS_SetMem,                    // EFI_SET_MEM
   gBS_CreateEventEx              // EFI_CREATE_EVENT_EX
 };
 

@@ -14,6 +14,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = DynamicTableManagerDxeInitialize
+  UNLOAD_IMAGE                   = DynamicTableManagerDxeUnInitialize
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -28,6 +29,8 @@
   SmbiosTableDispatcher.h
   AcpiTableBuilder.c
   SmbiosTableBuilder.c
+  HiiFormsBuilder.c
+  HiiFormsBuilder.h
 
 [Sources.AARCH64]
   Arm/ArmDynamicTableManager.c
@@ -47,6 +50,8 @@
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  HiiLib
+  MemoryAllocationLib
   MetadataHandlerLib
   PrintLib
   TableHelperLib
