@@ -83,6 +83,23 @@ struct MockUefiBootServicesTableLib {
 
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
+    gBS_ConnectController,
+    (IN  EFI_HANDLE                ControllerHandle,
+     IN  EFI_HANDLE                *DriverImageHandle    OPTIONAL,
+     IN  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath  OPTIONAL,
+     IN  BOOLEAN                   Recursive)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_DisconnectController,
+    (IN  EFI_HANDLE  ControllerHandle,
+     IN  EFI_HANDLE  DriverImageHandle  OPTIONAL,
+     IN  EFI_HANDLE  ChildHandle        OPTIONAL)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
     gBS_RegisterProtocolNotify,
     (IN  EFI_GUID  *Protocol,
      IN  EFI_EVENT Event,
@@ -148,6 +165,15 @@ struct MockUefiBootServicesTableLib {
     gBS_InstallConfigurationTable,
     (IN EFI_GUID  *Guid,
      IN VOID      *Table)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_AllocatePages,
+    (IN     EFI_ALLOCATE_TYPE     Type,
+     IN     EFI_MEMORY_TYPE       MemoryType,
+     IN     UINTN                 Pages,
+     IN OUT EFI_PHYSICAL_ADDRESS  *Memory)
     );
 
   MOCK_FUNCTION_DECLARATION (
