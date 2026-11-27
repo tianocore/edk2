@@ -148,6 +148,10 @@ GenericProtocolNotify (
   // Do special operations for Architectural Protocols
   //
 
+  if (CompareGuid (Entry->ProtocolGuid, &gEfiCpuArchProtocolGuid)) {
+    MemoryProtectionCpuArchProtocolNotify ();
+  }
+
   if (CompareGuid (Entry->ProtocolGuid, &gEfiTimerArchProtocolGuid)) {
     //
     // Register the Core timer tick handler with the Timer AP

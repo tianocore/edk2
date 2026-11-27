@@ -204,6 +204,10 @@ typedef struct {
   /// data from the start of the unloaded image.
   ///
   EFI_IMAGE_DATA_DIRECTORY    SecurityDataDirectory;
+  /// Set by PeCoffLoaderGetImageInfo() to TRUE if the image has the IMAGE_DLLCHARACTERISTICS_NX_COMPAT
+  /// flag set.
+  ///
+  BOOLEAN                     SupportsNx;
 } PE_COFF_LOADER_IMAGE_CONTEXT;
 
 /**
