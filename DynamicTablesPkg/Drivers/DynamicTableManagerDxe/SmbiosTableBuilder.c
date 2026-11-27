@@ -24,6 +24,8 @@
 #include <SmbiosTableGenerator.h>
 #include <SmbiosTableDispatcher.h>
 
+#include "DynamicTableManagerDxe.h"
+
 /** This macro expands to a function that retrieves the SMBIOS Table
     List from the Configuration Manager.
 */
@@ -634,6 +636,7 @@ SmbiosProtocolReady (
       ));
   }
 
-  Status = gBS->CloseEvent (Event);
+  Status       = gBS->CloseEvent (Event);
+  mSmbiosEvent = NULL;
   ASSERT_EFI_ERROR (Status);
 }
