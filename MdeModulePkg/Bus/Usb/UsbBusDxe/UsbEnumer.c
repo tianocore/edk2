@@ -3,6 +3,7 @@
     Usb bus enumeration support.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -235,6 +236,8 @@ UsbCreateDevice (
   Device->Tier       = (UINT8)(ParentIf->Device->Tier + 1);
   Device->EnumScript = 0;
   Device->IsSSDev    = FALSE;
+  Device->Connected  = TRUE;
+  DEBUG ((DEBUG_INFO, "UsbCreateDevice: ParentIf %p port %d Connected\n", ParentIf, ParentPort));
   return Device;
 }
 
@@ -609,6 +612,8 @@ UsbRemoveDevice (
     return ReturnStatus;
   }
 
+  Device->Connected = FALSE;
+  DEBUG ((DEBUG_INFO, "UsbRemoveDevice: ParentIf %p port %d Disonnected\n", Device->ParentIf, Device->ParentPort));
   Status = UsbRemoveConfig (Device);
 
   if (!EFI_ERROR (Status)) {
