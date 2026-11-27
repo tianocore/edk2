@@ -43,6 +43,7 @@
   gIntelFsp2WrapperTokenSpaceGuid       = { 0xa34cf082, 0xf50, 0x4f0d,  { 0x89, 0x8a, 0x3d, 0x39, 0x30, 0x2b, 0xc5, 0x1e } }
   gFspApiPerformanceGuid                = { 0xc9122295, 0x56ed, 0x4d4e, { 0x06, 0xa6, 0x50, 0x8d, 0x89, 0x4d, 0x3e, 0x40 } }
   gFspHobGuid                           = { 0x6d86fb36, 0xba90, 0x472c, { 0xb5, 0x83, 0x3f, 0xbe, 0xd3, 0xfb, 0x20, 0x9a } }
+  gFspImageBaseHobGuid                  = { 0x5acef3e9, 0x597b, 0x435d, { 0x93, 0xd2, 0x91, 0x1c, 0x11, 0xe6, 0x52, 0x5c } }
 
 [Ppis]
   gFspSiliconInitDonePpiGuid            = { 0x4eb6e09c, 0xd256, 0x4e1e, { 0xb5, 0x0a, 0x87, 0x4b, 0xd2, 0x84, 0xb3, 0xde } }
@@ -132,7 +133,13 @@
   # BIT1: Need measure FSPT. (for FSP 2.x)
   # BIT2: Need measure FSPM. (for FSP 2.x)
   # BIT3: Need measure FSPS. (for FSP 2.x)
-  # BIT4~30: reserved.
+  # BIT4: Need measure FSPI. (for FSP 2.x)
+  # BIT5~29: reserved.
+  # BIT30: Measure the original FSP_INFO_HEADER.ImageBase (PCR0). Only used with BIT31.
+    #0: measure ImageBase as found in memory.
+    #1: when ImageBase holds the base address of the measured FSP, as written when the
+    #   FSP is loaded to memory, hash the value saved in FSP_IMAGE_BASE_HOB instead.
+    #   Without that HOB, or with any other ImageBase value, measure ImageBase as found.
   # BIT31: Need isolate UPD region measurement.
     #0: measure FSP[T|M|S] as one binary in one record (PCR0).
     #1: measure FSP UPD region in one record (PCR1), the FSP code without UPD in another record (PCR0).

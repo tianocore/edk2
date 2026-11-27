@@ -1120,16 +1120,11 @@ MainCmdMap (
   ShellStatus = SHELL_SUCCESS;
   MapAsHandle = NULL;
 
-  //
-  // check for "-?"
-  //
   SfoMode   = ShellCommandLineGetFlag (Package, L"-sfo");
   ConstMode = ShellCommandLineGetFlag (Package, L"-c");
   NormlMode = ShellCommandLineGetFlag (Package, L"-f");
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
+
+  if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"map");
     return SHELL_INVALID_PARAMETER;
   }

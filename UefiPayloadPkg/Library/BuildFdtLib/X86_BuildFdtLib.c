@@ -95,7 +95,6 @@ BuildFdtForMemory (
   EFI_STATUS                   Status;
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
-  VOID                         *HobStart;
   VOID                         *Fdt;
   INT32                        TempNode;
   CHAR8                        TempStr[32];
@@ -103,12 +102,11 @@ BuildFdtForMemory (
 
   Fdt = FdtBase;
 
-  HobStart = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
   //
   // Scan resource descriptor hobs to set memory nodes
   //
-  for (Hob.Raw = HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       ResourceHob = Hob.ResourceDescriptor;
       // Memory
       if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {

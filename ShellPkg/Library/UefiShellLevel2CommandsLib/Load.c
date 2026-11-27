@@ -198,13 +198,7 @@ MainCmdLoad (
   ListHead    = NULL;
   ShellStatus = SHELL_SUCCESS;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-    return ShellStatus;
-  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+  if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     //
     // we didnt get a single file to load parameter
     //

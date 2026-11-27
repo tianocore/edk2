@@ -1,0 +1,35 @@
+## @file
+#  SMBIOS Type 14 Group Associations Table Generator.
+#
+#  Copyright (c) 2024 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+#  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosType14Lib
+  FILE_GUID      = b4bf1467-d871-44d6-90bb-4253684dcfed
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = SmbiosType14LibConstructor
+  DESTRUCTOR     = SmbiosType14LibDestructor
+
+[Sources]
+  SmbiosType14Generator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  SmbiosStringTableLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+  gEdkiiDynamicTableFactoryProtocolGuid

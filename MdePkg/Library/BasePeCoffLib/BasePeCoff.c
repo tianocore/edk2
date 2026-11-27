@@ -76,6 +76,14 @@ PeCoffLoaderGetPeHeader (
   EFI_IMAGE_SECTION_HEADER  SectionHeader;
 
   //
+  // Zero the security data directory. It is populated below only if the image
+  // has a non-empty EFI_IMAGE_DIRECTORY_ENTRY_SECURITY entry that passes
+  // bounds checking.
+  //
+  ImageContext->SecurityDataDirectory.VirtualAddress = 0;
+  ImageContext->SecurityDataDirectory.Size           = 0;
+
+  //
   // Read the DOS image header to check for its existence
   //
   Size     = sizeof (EFI_IMAGE_DOS_HEADER);
@@ -303,6 +311,16 @@ PeCoffLoaderGetPeHeader (
 
             return Status;
           }
+
+          //
+          // The security data directory exists and is within the image bounds. Record a copy of it
+          // in the image context so callers can locate the certificate data without re-parsing the headers.
+          //
+          CopyMem (
+            &ImageContext->SecurityDataDirectory,
+            &Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY],
+            sizeof (EFI_IMAGE_DATA_DIRECTORY)
+            );
         }
       }
 
@@ -425,6 +443,16 @@ PeCoffLoaderGetPeHeader (
 
             return Status;
           }
+
+          //
+          // The security data directory exists and is within the image bounds. Record a copy of it
+          // in the image context so callers can locate the certificate data without re-parsing the headers.
+          //
+          CopyMem (
+            &ImageContext->SecurityDataDirectory,
+            &Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY],
+            sizeof (EFI_IMAGE_DATA_DIRECTORY)
+            );
         }
       }
 

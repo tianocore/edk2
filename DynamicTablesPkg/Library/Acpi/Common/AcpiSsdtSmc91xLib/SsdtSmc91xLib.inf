@@ -1,0 +1,32 @@
+## @file
+# SSDT SMC91X network device Table Generator
+#
+# Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtSmc91xLib
+  FILE_GUID      = F2996DD3-617A-4D27-8A0B-A86420C649BB
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtSmc91xLibConstructor
+  DESTRUCTOR     = AcpiSsdtSmc91xLibDestructor
+
+[Sources]
+  SsdtSmc91xGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  DebugLib
+  MemoryAllocationLib
+  TableHelperLib

@@ -39,8 +39,6 @@ UINT8  mPhysMemAddressWidth;
 STATIC UINT32  mS3AcpiReservedMemoryBase;
 STATIC UINT32  mS3AcpiReservedMemorySize;
 
-STATIC UINT16  mQ35TsegMbytes;
-
 VOID
 Q35TsegMbytesInitialization (
   VOID
@@ -81,7 +79,6 @@ Q35TsegMbytesInitialization (
   PciWrite16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB), MCH_EXT_TSEG_MB_QUERY);
   ExtendedTsegMbytes = PciRead16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB));
   if (ExtendedTsegMbytes == MCH_EXT_TSEG_MB_QUERY) {
-    mQ35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
     return;
   }
 
@@ -93,7 +90,6 @@ Q35TsegMbytesInitialization (
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
   ASSERT_RETURN_ERROR (PcdStatus);
-  mQ35TsegMbytes = ExtendedTsegMbytes;
 }
 
 STATIC

@@ -1,7 +1,7 @@
 /** @file
   Arm Gic Interrupt Translation Service Parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -14,6 +14,7 @@
 #include "FdtHwInfoParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
 #include "Arm/Gic/ArmGicItsParser.h"
+#include "Arm/Iort/ArmIortParser.h"
 
 /** Parse a Gic compatible interrupt-controller node,
     extracting GicIts information.
@@ -40,10 +41,8 @@ GicItsIntcNodeParser (
   IN  CM_ARM_GIC_ITS_INFO  *GicItsInfo
   )
 {
-  EFI_STATUS   Status;
-  INT32        AddressCells;
-  CONST UINT8  *Data;
-  INT32        DataSize;
+  EFI_STATUS  Status;
+  UINT64      RegionSize;
 
   if ((Fdt == NULL) ||
       (GicItsInfo == NULL))
@@ -52,31 +51,16 @@ GicItsIntcNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FdtGetParentAddressInfo (Fdt, GicIntcNode, &AddressCells, NULL);
+  Status = FdtGetTranslatedReg (
+             Fdt,
+             GicIntcNode,
+             0,
+             &GicItsInfo->PhysicalBaseAddress,
+             &RegionSize
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
-  }
-
-  // Don't support more than 64 bits and less than 32 bits addresses.
-  if ((AddressCells < 1)  ||
-      (AddressCells > 2))
-  {
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  Data = FdtGetProp (Fdt, GicIntcNode, "reg", &DataSize);
-  if ((Data == NULL) || (DataSize < (INT32)(AddressCells * sizeof (UINT32)))) {
-    // If error or not enough space.
-    ASSERT (0);
-    return EFI_ABORTED;
-  }
-
-  if (AddressCells == 2) {
-    GicItsInfo->PhysicalBaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
-  } else {
-    GicItsInfo->PhysicalBaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
   }
 
   // Gic Its Id
@@ -102,7 +86,7 @@ GicItsIntcNodeParser (
     CM_OBJECT_TOKEN    Token;                          // {default = CM_NULL_TOKEN}
     UINT32             ItsIdCount;                     // {Populated}
     CM_OBJECT_TOKEN    ItsIdToken;                     // {Populated}
-    UINT32             Identifier;                     // {default = 0}
+    UINT32             Identifier;                     // {Populated}
   } CM_ARM_ITS_GROUP_NODE;
 
   typedef struct CmArmGicItsIdentifier {
@@ -250,6 +234,7 @@ ArmGicItsInfoParser (
 
     ItsGroupNodeInfo.ItsIdCount = 1;
     ItsGroupNodeInfo.ItsIdToken = Token;
+    ItsGroupNodeInfo.Identifier = GetNextIortIdentifier ();
 
     // Add the CmObj to the Configuration Manager.
     // Abstract token allows the IORT parser to link to this object

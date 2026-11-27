@@ -21,6 +21,7 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]

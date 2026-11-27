@@ -223,13 +223,6 @@ MainCmdVol (
   CurDir      = NULL;
   FullPath    = NULL;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"vol");
     ShellStatus = SHELL_INVALID_PARAMETER;

@@ -120,7 +120,7 @@ FadtArchUpdate (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (Fadt != NULL);
 
-  Fadt->Flags = FADT_FLAGS;
+  Fadt->Flags |= FADT_FLAGS;
 
   return ArmFadtBootArchInfoUpdate (CfgMgrProtocol, Fadt);
 }

@@ -159,6 +159,10 @@ typedef struct {
 /// ARMH GIC interrupt (Global System Interrupt)
 ///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC  0x8
+///
+/// RISC-V PLIC/APLIC interrupt (Global System Interrupt)
+///
+#define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_RISCV  0x10
 
 //
 // Baud Rate

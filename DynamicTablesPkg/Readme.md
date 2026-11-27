@@ -77,6 +77,8 @@ The framework currently supports the following table generators:
 * SSDT DMC
 * HEST - Hardware Error Source Table
 * EINJ - APEI Error Injection Table
+* BERT - Boot Error Record Table
+* ERST - Error Record Serialization Table
 
 ## Dynamic AML
 
@@ -485,7 +487,7 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  17   | GIC ITS Identifier Array                  |          |
 |  18   | ID Mapping Array                          |          |
 |  19   | SMMU Interrupt Array                      |          |
-|  20   | CMN 600 Info                              |          |
+|  20   | CMN Info                                  |          |
 |  21   | Reserved Memory Range Node                |          |
 |  22   | Memory Range Descriptor                   |          |
 |  23   | Embedded Trace Extension/Module Info      |          |

@@ -1308,7 +1308,8 @@ NetLibDetectMedia (
 
   @retval EFI_SUCCESS           Media detection success.
   @retval EFI_INVALID_PARAMETER ServiceHandle is not a valid network device handle or
-                                MediaState pointer is NULL.
+                                MediaState pointer is NULL. When returned because no SNP
+                                handle is found, *MediaState is set to EFI_NO_MEDIA.
   @retval EFI_DEVICE_ERROR      A device error occurred.
   @retval EFI_TIMEOUT           Network is connecting but timeout.
 

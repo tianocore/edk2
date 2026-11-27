@@ -1579,10 +1579,12 @@ typedef enum {
 /// System Slots - Slot Length.
 ///
 typedef enum {
-  SlotLengthOther   = 0x01,
-  SlotLengthUnknown = 0x02,
-  SlotLengthShort   = 0x03,
-  SlotLengthLong    = 0x04
+  SlotLengthOther                  = 0x01,
+  SlotLengthUnknown                = 0x02,
+  SlotLengthShort                  = 0x03,
+  SlotLengthLong                   = 0x04,
+  SlotLength2_5InchDriveFormFactor = 0x05,
+  SlotLength3_5InchDriveFormFactor = 0x06
 } MISC_SLOT_LENGTH;
 
 ///
@@ -1995,7 +1997,8 @@ typedef enum {
   MemoryTypeDdr5                     = 0x22,
   MemoryTypeLpddr5                   = 0x23,
   MemoryTypeHBM3                     = 0x24,
-  MemoryTypeMrDimm                   = 0x25  ///< SMBIOS spec 3.9.0 CR248
+  MemoryTypeMrDimm                   = 0x25, ///< SMBIOS spec 3.9.0 CR248
+  MemoryTypeLpddr6                   = 0x26  ///< SMBIOS spec 3.10
 } MEMORY_DEVICE_TYPE;
 
 ///

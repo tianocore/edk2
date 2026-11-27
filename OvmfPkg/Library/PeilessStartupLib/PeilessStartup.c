@@ -47,7 +47,8 @@ InitializePlatform (
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  VOID  *VariableStore;
+  VOID        *VariableStore;
+  EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
@@ -92,7 +93,18 @@ InitializePlatform (
   VariableStore                                  = PlatformReserveEmuVariableNvStore ();
   PlatformInfoHob->PcdEmuVariableNvStoreReserved = (UINT64)(UINTN)VariableStore;
   if (FeaturePcdGet (PcdSecureBootSupported)) {
-    PlatformInitEmuVariableNvStore (VariableStore);
+    //
+    // When Secure Boot is supported the emulated variable NV store holds the
+    // authenticated variables (PK/KEK/db/dbx) that gate image verification. If
+    // its initialization from the flash template fails the store is left in an
+    // attacker-influenced state, so fail closed instead of continuing the boot
+    // with an unverified Secure Boot configuration.
+    //
+    Status = PlatformInitEmuVariableNvStore (VariableStore);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: PlatformInitEmuVariableNvStore failed: %r\n", __func__, Status));
+      return Status;
+    }
   }
 
   if (TdIsEnabled ()) {

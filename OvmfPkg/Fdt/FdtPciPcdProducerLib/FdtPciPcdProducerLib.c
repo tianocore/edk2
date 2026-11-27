@@ -133,7 +133,7 @@ FdtPciPcdProducerLibConstructor (
                           );
 
     if (!EFI_ERROR (Status) && (RegSize == 2 * sizeof (UINT64))) {
-      PciExpressBaseAddress = SwapBytes64 (*Reg);
+      PciExpressBaseAddress = SwapBytes64 (ReadUnaligned64 (Reg));
 
       PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, FALSE);
       ASSERT_RETURN_ERROR (PcdStatus);

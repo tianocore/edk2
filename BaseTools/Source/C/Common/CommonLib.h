@@ -449,9 +449,6 @@ Returns:
 #define _stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
-#ifndef __CYGWIN__
-char *strlwr(char *s);
-#endif
 #endif
 
 #ifdef _WIN32

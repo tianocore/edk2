@@ -15,7 +15,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001a
   OUTPUT_DIRECTORY               = Build/DynamicTables
-  SUPPORTED_ARCHITECTURES        = AARCH64|X64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64|X64|LOONGARCH64|RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -28,6 +28,7 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -35,10 +36,12 @@
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
 [LibraryClasses.AARCH64]
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 
 [Components.common]
@@ -53,6 +56,8 @@
   DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
   DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
+  DynamicTablesPkg/Library/Common/HiiFormsLib/HiiFormsLib.inf
+  DynamicTablesPkg/Library/Common/HiiStringsLib/HiiStringsLib.inf
 
 [Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
@@ -60,6 +65,9 @@
 
 [Components.AARCH64]
   DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
+
+[Components.RISCV64]
+  DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

@@ -31,8 +31,3 @@
 // 32-bit MMIO memory hole size
 //
 #define CLOUDHV_MMIO_HOLE_SIZE  0x38000000
-
-//
-// SMBIOS address
-//
-#define CLOUDHV_SMBIOS_ADDRESS  0xf0000

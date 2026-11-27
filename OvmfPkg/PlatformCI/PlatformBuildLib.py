@@ -253,10 +253,16 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
 
 
+        SerialLog = None
         if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
+            SerialLog = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "serial.log")
+            if os.path.exists(SerialLog):
+                os.remove(SerialLog)
+            args += f" -serial file:{SerialLog}"
             f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
             f.write("BOOT SUCCESS !!! \n")
             ## add commands here
+            f.write("dh -d -v -p SimpleTextIn\n")
             f.write("reset -s\n")
             f.close()
 
@@ -264,6 +270,21 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         if ret == 0xc0000005:
             #for some reason getting a c0000005 on successful return
-            return 0
+            ret = 0
+
+        if ret == 0 and SerialLog is not None:
+            # Verify that the ISA serial console (PNP0501, formatted as
+            # "Serial(0x0)" by UefiDevicePathLib) and PS/2 keyboard (PNP0303)
+            # bound to SimpleTextIn and that startup.nsh output reached the
+            # serial port.
+            if not os.path.exists(SerialLog):
+                logging.error(f"Serial log file not found: {SerialLog}")
+                return 1
+            with open(SerialLog, "r", errors="replace") as f:
+                serial_output = f.read()
+            for expected in ("Serial(0x0)", "Acpi(PNP0303,0x0)", "BOOT SUCCESS !!!"):
+                if expected not in serial_output:
+                    logging.error(f"Expected string '{expected}' not found in serial log")
+                    return 1
 
         return ret

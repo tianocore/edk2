@@ -98,16 +98,17 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 raise NotImplementedError("Unsupported Operating System")
 
             if not testList:
-                logging.warning(dedent("""
-                    UnitTest Coverage:
-                      No unit tests discovered. Test coverage will not be generated.
+                logging.warning(dedent(f"""
+                    UnitTest Coverage ({arch}):
+                      No unit tests discovered for this architecture.
+                      Skipping it; coverage will not be generated for this architecture.
 
                       Prevent this message by:
                       1. Adding host-based unit tests to this package
                       2. Ensuring tests have the word "Test" in their name
                       3. Disabling HostUnitTestCompilerPlugin in the package CI YAML file
                     """).strip())
-                return 0
+                continue
 
             for test in testList:
                 # Configure output name if test uses cmocka.

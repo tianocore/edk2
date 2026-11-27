@@ -27,6 +27,7 @@
 #include <Library/FspWrapperHobProcessLib.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <Library/FspMeasurementLib.h>
+#include <Guid/FspImageBaseHob.h>
 #include <Ppi/Tcg.h>
 #include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
 #include <Library/PeCoffLib.h>
@@ -138,13 +139,14 @@ FspiWrapperInitApiMode (
   VOID
   )
 {
-  FSP_INFO_HEADER    *FspiHeaderPtr;
-  EFI_STATUS         Status;
-  UINT64             TimeStampCounterStart;
-  EFI_HOB_GUID_TYPE  *GuidHob;
-  VOID               *FspHobListPtr;
-  VOID               *FspiUpdDataPtr;
-  UINTN              *SourceData;
+  FSP_INFO_HEADER     *FspiHeaderPtr;
+  EFI_STATUS          Status;
+  UINT64              TimeStampCounterStart;
+  EFI_HOB_GUID_TYPE   *GuidHob;
+  VOID                *FspHobListPtr;
+  VOID                *FspiUpdDataPtr;
+  UINTN               *SourceData;
+  FSP_IMAGE_BASE_HOB  *ImageBaseHob;
 
   DEBUG ((DEBUG_INFO, "PeiFspSmmInit enter\n"));
 
@@ -158,6 +160,18 @@ FspiWrapperInitApiMode (
   }
 
   if (FspiHeaderPtr->ImageBase != PcdGet32 (PcdFspiBaseAddress)) {
+    if ((PcdGet32 (PcdFspMeasurementConfig) & (FSP_MEASURE_FSPUPD | FSP_MEASURE_ORIGINAL_IMAGEBASE)) ==
+        (FSP_MEASURE_FSPUPD | FSP_MEASURE_ORIGINAL_IMAGEBASE))
+    {
+      ImageBaseHob = BuildGuidHob (&gFspImageBaseHobGuid, sizeof (FSP_IMAGE_BASE_HOB));
+      if (ImageBaseHob != NULL) {
+        ImageBaseHob->FspBase           = PcdGet32 (PcdFspiBaseAddress);
+        ImageBaseHob->OriginalImageBase = FspiHeaderPtr->ImageBase;
+      } else {
+        DEBUG ((DEBUG_ERROR, "FSP-I ImageBase HOB not built\n"));
+      }
+    }
+
     FspiHeaderPtr->ImageBase = PcdGet32 (PcdFspiBaseAddress);
     Status                   = RebaseFspFv (PcdGet32 (PcdFspiBaseAddress));
     ASSERT_EFI_ERROR (Status);

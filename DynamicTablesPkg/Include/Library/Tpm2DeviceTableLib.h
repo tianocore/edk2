@@ -27,10 +27,10 @@
 EFI_STATUS
 EFIAPI
 BuildTpm2DeviceTable (
-  IN  CONST CM_ARCH_COMMON_TPM2_DEVICE_INFO  *TpmDevInfo,
-  IN  CONST CHAR8                            *Name,
-  IN  CONST UINT64                           Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER      **Table
+  IN  CONST CM_ARCH_COMMON_TPM_DEVICE_INFO  *TpmDevInfo,
+  IN  CONST CHAR8                           *Name,
+  IN  CONST UINT64                          Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER     **Table
   );
 
 /** Free an Tpm2 device table previously created by

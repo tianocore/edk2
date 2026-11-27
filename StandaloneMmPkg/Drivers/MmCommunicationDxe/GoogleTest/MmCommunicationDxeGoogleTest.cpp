@@ -140,9 +140,9 @@ TEST_F (MmCommunicationOverflowTest, V1MessageLengthOverflowWrapsToZero) {
   //
   // Craft MessageLength so that OFFSET_OF(Data) + MessageLength = 0 (wraps)
   // OFFSET_OF(EFI_MM_COMMUNICATE_HEADER, Data) = 0x18 (24)
-  // MAX_UINT64 - 0x18 + 1 = 0xFFFFFFFFFFFFFFE8
+  // MAX_UINTN - 0x18 + 1 = 0xFFFFFFFFFFFFFFE8 (64-bit) or 0xFFFFFFE8 (32-bit)
   //
-  Header->MessageLength = MAX_UINT64 - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + 1;
+  Header->MessageLength = MAX_UINTN - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + 1;
 
   EFI_STATUS  Status = ProcessCommunicationBuffer (mCommBuffer, NULL);
 
@@ -158,10 +158,10 @@ TEST_F (MmCommunicationOverflowTest, V1MessageLengthOverflowWrapsToSmallValue) {
   ZeroMem (&Header->HeaderGuid, sizeof (EFI_GUID));
 
   //
-  // MessageLength = MAX_UINT64 - 0x18 + 1 + 8 = MAX_UINT64 - 0x0F
-  // Result: OFFSET_OF(Data) + MessageLength = 0x18 + (MAX_UINT64 - 0x0F) = 0x08 (wraps)
+  // MessageLength = MAX_UINTN - 0x18 + 1 + 8 = MAX_UINTN - 0x0F
+  // Result: OFFSET_OF(Data) + MessageLength = 0x18 + (MAX_UINTN - 0x0F) = 0x08 (wraps)
   //
-  Header->MessageLength = MAX_UINT64 - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + 1 + 8;
+  Header->MessageLength = MAX_UINTN - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + 1 + 8;
 
   EFI_STATUS  Status = ProcessCommunicationBuffer (mCommBuffer, NULL);
 

@@ -128,8 +128,9 @@ GetSerialRegisterBase (
   UINTN          SerialRegisterBase;
 
   //
-  // The LoongArchVirt serial hook path uses KS1 to hand off the UART base.
-  // Reuse it here to avoid repeated FDT lookups during early debug output.
+  // SEC initializes KS1 before the first debug output. The LoongArchVirt
+  // serial hook path then uses it to hand off the UART base. Reuse the value
+  // here to avoid repeated FDT lookups during early debug output.
   //
   SerialRegisterBase = CsrRead (LOONGARCH_CSR_KS1);
   if (SerialRegisterBase != 0) {

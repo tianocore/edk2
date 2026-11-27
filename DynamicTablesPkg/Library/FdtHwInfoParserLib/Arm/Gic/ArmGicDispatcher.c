@@ -1,7 +1,7 @@
 /** @file
   Arm Gic dispatcher.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2026, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -138,7 +138,7 @@ ArmGicDispatcher (
   }
 
   // Get the interrupt-controller node associated to the "cpus" node.
-  Status = FdtGetIntcParentNode (Fdt, CpusNode, &IntcNode);
+  Status = FdtGetIntControllerNode (Fdt, CpusNode, &IntcNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     if (Status == EFI_NOT_FOUND) {
@@ -153,6 +153,13 @@ ArmGicDispatcher (
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
+  }
+
+  // PPI partitions are not supported.
+  if (FdtSubnodeOffset (Fdt, IntcNode, "ppi-partitions") >= 0) {
+    DEBUG ((DEBUG_ERROR, "%a: PPI partitions are not supported\n", __func__));
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
   }
 
   // Parse the GicC information.

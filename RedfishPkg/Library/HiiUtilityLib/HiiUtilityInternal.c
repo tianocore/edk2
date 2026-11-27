@@ -5594,6 +5594,8 @@ ReGetDefault:
           } else {
             CopyMem (DefaultValue->Buffer, StrValue, DefaultValue->BufferLen);
           }
+
+          FreePool (StrValue);
         }
 
         return EFI_SUCCESS;

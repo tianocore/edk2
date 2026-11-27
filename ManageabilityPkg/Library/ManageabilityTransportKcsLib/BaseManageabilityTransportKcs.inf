@@ -2,6 +2,7 @@
 # KCS instance of Manageability Transport Library
 #
 # Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -13,7 +14,7 @@
   FILE_GUID                      = 1D13D1F8-82DC-408D-9979-9E7D7CDFCD04
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ManageabilityTransportLib|PEIM DXE_DRIVER
+  LIBRARY_CLASS                  = ManageabilityTransportLib|PEIM DXE_DRIVER DXE_SMM_DRIVER MM_STANDALONE
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 AARCH64
@@ -42,4 +43,3 @@
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress                        # Used as default KCS I/O base adddress
   gManageabilityPkgTokenSpaceGuid.PcdKcsStatusCheckTimeout                 # Use the predefined timeout value in micro seconds
-

@@ -7,6 +7,7 @@
 Copyright (c) 2009 - 2026, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
 (c) Copyright 2026 HP Development Company, L.P.
+Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -3688,6 +3689,85 @@ HkdfSha384Expand (
   IN   UINTN        OutSize
   );
 
+/**
+  Derive SHA512 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha512ExtractAndExpand (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt (non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha512Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  );
+
+/**
+  Derive SHA512 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha512Expand (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
 // =====================================================================================
 //    Big number primitives
 // =====================================================================================
@@ -4498,6 +4578,62 @@ EcPointsMul (
   );
 
 /**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted
+                           PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which
+                           contain the retrieved EC public key component.
+                           Use EcFree() function to free the resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPublicKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  );
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]      EcContext   Pointer to EC DSA context.
+  @param[out]     PemData     Pointer to the PEM-encoded key data to be
+                              retrieved.
+  @param[in, out] PemSize     On input, size of PemData in bytes.
+                              On output, size of data returned or required size.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and *PemSize is zero, then return FALSE and set
+  *PemSize to the required size of the PemData buffer.
+  If PemData is NULL and *PemSize is not zero, then return FALSE.
+  If PemData is not NULL and *PemSize is too small, then return FALSE and
+  set *PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+BOOLEAN
+EFIAPI
+EcPublicKeyToPEM (
+  IN  VOID      *EcContext,
+  OUT UINT8     *PemData,
+  IN OUT UINTN  *PemSize
+  );
+
+/**
   Calculate the inverse of the supplied EC point.
 
   @param[in]     EcGroup   EC group object.
@@ -4623,6 +4759,23 @@ VOID
 EFIAPI
 EcFree (
   IN  VOID  *EcContext
+  );
+
+/**
+  Return the NID for the Elliptic Curve Context.
+
+  @param[in]  EcContext  Pointer to the EC context.
+  @param[out] Nid        Identifying number for the ECC curve (Defined in
+                         BaseCryptLib.h).
+
+  @retval  TRUE   The NID for the EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+**/
+BOOLEAN
+EFIAPI
+EcGetCurveNid (
+  IN      VOID   *EcContext,
+  OUT     UINTN  *Nid
   );
 
 /**
@@ -5610,50 +5763,6 @@ SlhDsaGeneratePubKey (
   IN  VOID   *SlhDsaContext,
   OUT UINT8  *PublicKey,
   IN  UINTN  PublicKeySize
-  );
-
-/**
-  Generates an SLH-DSA signature for a given message.
-
-  This function creates an SLH-DSA signature using the private key stored in the
-  SLH-DSA context. SLH-DSA signatures can include an optional context string for
-  domain separation, allowing the same key to be used in different contexts
-  without creating security vulnerabilities.
-
-  The context must contain a private key (set via SlhDsaSetPrivKey()) before
-  calling this function.
-
-  If SlhDsaContext is NULL, then return FALSE.
-  If Message is NULL, then return FALSE.
-  If Signature is NULL, then return FALSE.
-  If SigSize is NULL, then return FALSE.
-  If SigSize buffer is too small, SigSize is updated with required size and return FALSE.
-  Context may be NULL if no context string is used (ContextSize must be 0).
-
-  @param[in]      SlhDsaContext  Pointer to SLH-DSA context containing the private key.
-  @param[in]      Context        Optional context string for domain separation.
-                                 May be NULL for default context.
-  @param[in]      ContextSize    Size of context string in bytes. Set to 0 if Context is NULL.
-  @param[in]      Message        Pointer to message data to be signed.
-  @param[in]      MessageSize    Size of message in bytes.
-  @param[out]     Signature      Pointer to buffer to receive the signature.
-  @param[in,out]  SigSize        On input, size of Signature buffer.
-                                 On output, actual size of signature (29792 bytes for SLH-DSA-SHAKE-256s).
-
-  @retval TRUE   SLH-DSA signature generated successfully.
-  @retval FALSE  Invalid parameters or signature generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-SlhDsaSign (
-  IN      VOID         *SlhDsaContext,
-  IN      UINT8        *Context,
-  IN      UINTN        ContextSize,
-  IN      CONST UINT8  *Message,
-  IN      UINTN        MessageSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
   );
 
 /**

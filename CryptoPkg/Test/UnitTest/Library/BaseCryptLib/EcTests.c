@@ -2,6 +2,7 @@
   Application for Diffie-Hellman Primitives Validation.
 
 Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -364,6 +365,71 @@ TestVerifyEcDh (
 
 UNIT_TEST_STATUS
 EFIAPI
+TestVerifyEcGetCurveNid (
+  UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  VOID     *EcContext;
+  UINTN    CurveCount;
+  UINTN    Nid;
+  UINTN    PublicKeySize;
+  UINT8    PublicKey[66 * 2];
+
+  //
+  // Test if EcContext is NULL.
+  //
+  Status = EcGetCurveNid (NULL, &Nid);
+  UT_ASSERT_FALSE (Status);
+
+  for (CurveCount = 0; CurveCount < EC_CURVE_NUM_SUPPORTED; CurveCount++) {
+    //
+    // Generate an EcContext for the curve.
+    //
+    EcContext = EcNewByNid (EcCurveList[CurveCount]);
+    UT_ASSERT_NOT_NULL (EcContext);
+
+    //
+    // Test if the Nid parameter is NULL.
+    //
+    Status = EcGetCurveNid (EcContext, NULL);
+    UT_ASSERT_FALSE (Status);
+
+    //
+    // Get the Nid for the curve and compare with the EcContext Curve Nid.
+    //
+    Nid    = 0;
+    Status = EcGetCurveNid (EcContext, &Nid);
+    UT_ASSERT_TRUE (Status);
+    UT_ASSERT_EQUAL (Nid, EcCurveList[CurveCount]);
+
+    //
+    // Generate an EC key.
+    //
+    PublicKeySize = sizeof (PublicKey);
+    Status        = EcGenerateKey (EcContext, PublicKey, &PublicKeySize);
+    UT_ASSERT_TRUE (Status);
+
+    //
+    // Retrieve the Nid using the EC key context and
+    // compare with the Curve Nid.
+    //
+    Nid    = 0;
+    Status = EcGetCurveNid (EcContext, &Nid);
+    UT_ASSERT_TRUE (Status);
+    UT_ASSERT_EQUAL (Nid, EcCurveList[CurveCount]);
+
+    //
+    // Free resources.
+    //
+    EcFree (EcContext);
+  }
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
 TestVerifyEcKey (
   UNIT_TEST_CONTEXT  Context
   )
@@ -434,13 +500,202 @@ TestVerifyEcKey (
   return UNIT_TEST_PASSED;
 }
 
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifyEcPublicKeyPem (
+  UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  VOID     *EcPubKey;
+  VOID     *EcPubKeyFromPem;
+  VOID     *EcNoKey;
+  UINT8    *PemData;
+  UINTN    PemSize;
+  UINTN    RequiredPemSize;
+  UINT8    PemSmall[1];
+  UINTN    PublicKeySize;
+  UINTN    PublicKeyFromPemSize;
+
+  // For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  // For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  // For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  UINT8  PublicKeyFromPem[66 * 2];
+  UINT8  PublicKey[66 * 2];
+
+  EcPubKey        = NULL;
+  EcPubKeyFromPem = NULL;
+  EcNoKey         = NULL;
+  PemData         = NULL;
+
+  //
+  // Retrieve EC public key context from X509 Certificate.
+  //
+  Status = EcGetPublicKeyFromX509 (
+             mEccTestRootCer,
+             sizeof (mEccTestRootCer),
+             &EcPubKey
+             );
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_NOT_NULL (EcPubKey);
+
+  //
+  // Get the PEM data size.
+  //
+  PemSize = 0;
+  Status  = EcPublicKeyToPEM (
+              EcPubKey,
+              NULL,
+              &PemSize
+              );
+  UT_ASSERT_FALSE (Status);
+  UT_ASSERT_TRUE (PemSize > 0);
+  RequiredPemSize = PemSize;
+
+  //
+  // Test for PEM size less than required size.
+  //
+  PemSize = sizeof (PemSmall);
+  Status  = EcPublicKeyToPEM (
+              EcPubKey,
+              PemSmall,
+              &PemSize
+              );
+  UT_ASSERT_FALSE (Status);
+  UT_ASSERT_EQUAL (PemSize, RequiredPemSize);
+
+  //
+  // Test if EcContext is NULL.
+  //
+  Status = EcPublicKeyToPEM (
+             NULL,
+             PemSmall,
+             &PemSize
+             );
+  UT_ASSERT_FALSE (Status);
+
+  //
+  // Test if PEM size passed is NULL.
+  //
+  Status = EcPublicKeyToPEM (
+             EcPubKey,
+             PemSmall,
+             NULL
+             );
+  UT_ASSERT_FALSE (Status);
+
+  //
+  // Test a fresh EC context with no key (PEM data).
+  //
+  EcNoKey = EcNewByNid (CRYPTO_NID_SECP256R1);
+  UT_ASSERT_NOT_NULL (EcNoKey);
+
+  PemSize = 0;
+  Status  = EcPublicKeyToPEM (
+              EcNoKey,
+              NULL,
+              &PemSize
+              );
+  UT_ASSERT_FALSE (Status);
+  UT_ASSERT_EQUAL (PemSize, 0);
+  EcFree (EcNoKey);
+  EcNoKey = NULL;
+
+  //
+  // Retrieve the PEM data.
+  //
+  PemSize = RequiredPemSize;
+  PemData = AllocateZeroPool (PemSize);
+  UT_ASSERT_NOT_NULL (PemData);
+  Status = EcPublicKeyToPEM (
+             EcPubKey,
+             PemData,
+             &PemSize
+             );
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_TRUE (PemSize > 0);
+
+  //
+  // Retrieve EC public key from PEM data.
+  //
+  Status = EcGetPublicKeyFromPem (
+             PemData,
+             PemSize,
+             NULL,
+             &EcPubKeyFromPem
+             );
+  UT_ASSERT_TRUE (Status);
+  UT_ASSERT_NOT_NULL (EcPubKeyFromPem);
+
+  //
+  // Get the public key data from the EcPubKey.
+  //
+  PublicKeySize = sizeof (PublicKey);
+  Status        = EcGetPubKey (
+                    EcPubKey,
+                    PublicKey,
+                    &PublicKeySize
+                    );
+  UT_ASSERT_TRUE (Status);
+
+  //
+  // Get the public key data from the EcPubKeyFromPem.
+  //
+  PublicKeyFromPemSize = sizeof (PublicKeyFromPem);
+  Status               = EcGetPubKey (
+                           EcPubKeyFromPem,
+                           PublicKeyFromPem,
+                           &PublicKeyFromPemSize
+                           );
+  UT_ASSERT_TRUE (Status);
+
+  //
+  // Compare the key size and data for the public keys.
+  //
+  UT_ASSERT_EQUAL (PublicKeyFromPemSize, PublicKeySize);
+  UT_ASSERT_MEM_EQUAL (PublicKeyFromPem, PublicKey, PublicKeySize);
+
+  //
+  // Test if PemData is NULL.
+  //
+  Status = EcGetPublicKeyFromPem (
+             NULL,
+             PemSize,
+             NULL,
+             &EcNoKey
+             );
+  UT_ASSERT_FALSE (Status);
+  UT_ASSERT_EQUAL ((UINTN)EcNoKey, (UINTN)NULL);
+
+  //
+  // Test if EcContext is NULL.
+  //
+  Status = EcGetPublicKeyFromPem (
+             PemData,
+             PemSize,
+             NULL,
+             NULL
+             );
+  UT_ASSERT_FALSE (Status);
+
+  //
+  // Free the resources.
+  //
+  FreePool (PemData);
+  EcFree (EcPubKey);
+  EcFree (EcPubKeyFromPem);
+  return UNIT_TEST_PASSED;
+}
+
 TEST_DESC  mEcTest[] = {
   //
   // -----Description-----------------Class------------------Function----Pre----Post----Context
   //
-  { "TestVerifyEcBasic()", "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcBasic, TestVerifyEcPreReq, TestVerifyEcCleanUp, NULL },
-  { "TestVerifyEcDh()",    "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcDh,    TestVerifyEcPreReq, TestVerifyEcCleanUp, NULL },
-  { "TestVerifyEcKey()",   "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcKey,   NULL,               NULL,                NULL },
+  { "TestVerifyEcBasic()",        "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcBasic,        TestVerifyEcPreReq, TestVerifyEcCleanUp, NULL },
+  { "TestVerifyEcDh()",           "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcDh,           TestVerifyEcPreReq, TestVerifyEcCleanUp, NULL },
+  { "TestVerifyEcGetCurveNid()",  "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcGetCurveNid,  NULL,               NULL,                NULL },
+  { "TestVerifyEcKey()",          "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcKey,          NULL,               NULL,                NULL },
+  { "TestVerifyEcPublicKeyPem()", "CryptoPkg.BaseCryptLib.Ec", TestVerifyEcPublicKeyPem, NULL,               NULL,                NULL },
 };
 
 UINTN  mEcTestNum = ARRAY_SIZE (mEcTest);

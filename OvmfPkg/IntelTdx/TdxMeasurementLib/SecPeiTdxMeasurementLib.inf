@@ -39,6 +39,7 @@
   DebugLib
   HobLib
   PcdLib
+  SafeIntLib
   TdxLib
 
 [Guids]

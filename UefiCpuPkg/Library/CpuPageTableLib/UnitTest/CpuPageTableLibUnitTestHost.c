@@ -2,6 +2,7 @@
   Unit tests of the CpuPageTableLib instance of the CpuPageTableLib class
 
   Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -822,6 +823,87 @@ TestCaseToCheckMapMaskAndAttr (
 }
 
 /**
+  Check that splitting a non-present large page populates all small page
+  entries.
+
+  @param[in]  Context    Unit test context.
+
+  @retval  UNIT_TEST_PASSED             The unit test completed successfully.
+  @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+TestCaseSplitNonPresentLargePage (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN               PageTable;
+  PAGING_MODE         PagingMode;
+  VOID                *Buffer;
+  UINTN               PageTableBufferSize;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  RETURN_STATUS       Status;
+  IA32_PAGING_ENTRY   *PagingEntry;
+  UINTN               Index;
+
+  PagingMode                = Paging4Level;
+  PageTableBufferSize       = 0;
+  PageTable                 = 0;
+  MapAttribute.Uint64       = 0;
+  MapAttribute.Bits.Present = 1;
+  MapAttribute.Bits.Nx      = 1;
+  MapMask.Uint64            = MAX_UINT64;
+
+  // Start with a 2MB XP page.
+  Status = PageTableMap (&PageTable, PagingMode, NULL, &PageTableBufferSize, 0, SIZE_2MB, &MapAttribute, &MapMask, NULL);
+  UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
+  Buffer = AllocatePages (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+  Status = PageTableMap (&PageTable, PagingMode, Buffer, &PageTableBufferSize, 0, SIZE_2MB, &MapAttribute, &MapMask, NULL);
+  UT_ASSERT_EQUAL (Status, RETURN_SUCCESS);
+
+  // Mark the 2MB page as RP.
+  MapAttribute.Uint64  = 0;
+  MapMask.Uint64       = 0;
+  MapMask.Bits.Present = 1;
+  Status               = PageTableMap (&PageTable, PagingMode, NULL, &PageTableBufferSize, 0, SIZE_2MB, &MapAttribute, &MapMask, NULL);
+  UT_ASSERT_EQUAL (Status, RETURN_SUCCESS);
+
+  // Map the first 4 KB page as R/W/X.
+  MapAttribute.Uint64         = 0;
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
+  MapMask.Uint64              = MAX_UINT64;
+  Status                      = PageTableMap (&PageTable, PagingMode, NULL, &PageTableBufferSize, 0, SIZE_4KB, &MapAttribute, &MapMask, NULL);
+
+  // The above should trigger splitting, and thus needs more allocation.
+  UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
+  Buffer = AllocatePages (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+  Status = PageTableMap (&PageTable, PagingMode, Buffer, &PageTableBufferSize, 0, SIZE_4KB, &MapAttribute, &MapMask, NULL);
+  UT_ASSERT_EQUAL (Status, RETURN_SUCCESS);
+
+  PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)PageTable;
+  PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (PagingEntry);
+  PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (PagingEntry);
+  PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (PagingEntry);
+
+  // The newly mapped first 4 KB page should be present, R/W, and executable.
+  UT_ASSERT_EQUAL (PagingEntry[0].Pte4K.Bits.Present, 1);
+  UT_ASSERT_EQUAL (PagingEntry[0].Pte4K.Bits.ReadWrite, 1);
+  UT_ASSERT_EQUAL (PagingEntry[0].Pte4K.Bits.Nx, 0);
+
+  // The rest should remain RP and XP.
+  for (Index = 1; Index < 512; Index++) {
+    UT_ASSERT_EQUAL (PagingEntry[Index].Pte4K.Bits.Present, 0);
+    UT_ASSERT_EQUAL (PagingEntry[Index].Pte4K.Bits.Nx, 1);
+    UT_ASSERT_EQUAL (PagingEntry[Index].Pte4K.Bits.PageTableBaseAddressLow, Index);
+    UT_ASSERT_EQUAL (PagingEntry[Index].Pte4K.Bits.PageTableBaseAddressHigh, 0);
+  }
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
   Initialize the unit test framework, suite, and unit tests for the
   sample unit tests and run the unit tests.
 
@@ -872,6 +954,7 @@ UefiTestMain (
   AddTestCase (ManualTestCase, "Check if the parent entry has different Nx attribute", "Manual Test Case6", TestCaseManualChangeNx, NULL, NULL, NULL);
   AddTestCase (ManualTestCase, "Check if the needed size is expected", "Manual Test Case7", TestCaseManualSizeNotMatch, NULL, NULL, NULL);
   AddTestCase (ManualTestCase, "Check MapMask when creating new page table or mapping not-present range", "Manual Test Case8", TestCaseToCheckMapMaskAndAttr, NULL, NULL, NULL);
+  AddTestCase (ManualTestCase, "Check splitting a non-present large page populates small page entries", "Manual Test Case9", TestCaseSplitNonPresentLargePage, NULL, NULL, NULL);
   //
   // Populate the Random Test Cases.
   //

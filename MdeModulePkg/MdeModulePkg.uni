@@ -1357,3 +1357,9 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarMaxSize_HELP   #language en-US "Set platform limit for max size to pick from Resizable BAR Capability register.<BR><BR>\n"
                                                                                              "Decimal value 'n' is interpreted as 2^(n+20), which means 0=>1MB, 1=>2MB, 2=>4MB, 3=>8MB, etc.<BR>\n"
                                                                                              "Maximum reasonable size to set is half of processor address with, i.e. address width - 1.<BR>\n"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdLogoFileGuid_PROMPT #language en-US "Logo File GUID"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdLogoFileGuid_HELP   #language en-US "Specifies the GUID of the logo file to be loaded from firmware volume.<BR><BR>\n"
+                                                                                   "If set to zero GUID (default), the embedded HII logo is used.<BR>\n"
+                                                                                   "If set to a non-zero GUID, the logo is loaded from the firmware volume file with the specified GUID.<BR>"

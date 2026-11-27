@@ -18,7 +18,7 @@
 #string STR_FORM_HELP                  #language en-US  "List all the Driver Health instances to manage"
                                        #language fr-FR  "List all the Driver Health instances to manage"
 #string STR_NULL                       #language en-US  ""
-                                       #lauguage fr-FR  ""
+                                       #language fr-FR  ""
 
 #string STR_REPAIR_REQUIRED            #language en-US  "Repair Required."
                                        #language fr-FR  "Repair Required."

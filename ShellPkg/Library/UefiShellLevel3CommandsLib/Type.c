@@ -243,13 +243,6 @@ MainCmdType (
   ParamCount  = 0;
   FileList    = NULL;
 
-  //
-  // check for "-?"
-  //
-  if (ShellCommandLineGetFlag (Package, L"-?")) {
-    ASSERT (FALSE);
-  }
-
   AsciiMode   = ShellCommandLineGetFlag (Package, L"-a");
   UnicodeMode = ShellCommandLineGetFlag (Package, L"-u");
 

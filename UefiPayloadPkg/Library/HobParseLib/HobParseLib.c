@@ -138,7 +138,7 @@ FindResourceDescriptorByRange (
     //
     // Skip all HOBs except Resource Descriptor HOBs
     //
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       continue;
     }
 
@@ -197,7 +197,7 @@ FindAnotherHighestBelow4GResourceDescriptor (
     //
     // Skip all HOBs except Resource Descriptor HOBs
     //
-    if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (!IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
       continue;
     }
 

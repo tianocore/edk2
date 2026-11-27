@@ -74,7 +74,7 @@ SmmRestoreCpu (
   SMM_S3_RESUME_STATE       *SmmS3ResumeState;
   IA32_DESCRIPTOR           Ia32Idtr;
   IA32_DESCRIPTOR           X64Idtr;
-  IA32_IDT_GATE_DESCRIPTOR  IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
+  IA32_IDT_GATE_DESCRIPTOR  IdtEntryTable[X86_CPU_INTERRUPT_NUM];
   EFI_STATUS                Status;
 
   DEBUG ((DEBUG_INFO, "SmmRestoreCpu()\n"));

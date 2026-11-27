@@ -304,6 +304,21 @@ PciParseBar (
   );
 
 /**
+  Parse the Enhanced Allocation (EA) capability of a PCI function, if present,
+  and record the fixed BARs it describes in the PCI device instance.
+
+  This must be called after the BARs have been parsed with PciParseBar (), and
+  before resource allocation takes place.
+
+  @param PciIoDevice  Pci device instance.
+
+**/
+VOID
+PciParseEnhancedAllocation (
+  IN PCI_IO_DEVICE  *PciIoDevice
+  );
+
+/**
   Parse PCI IOV VF bar information and fill them into PCI device instance.
 
   @param PciIoDevice  Pci device instance.

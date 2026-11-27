@@ -80,7 +80,7 @@ def Refine_FV_EXT_ENTRY_OEM_TYPE_Header(nums: int) -> EFI_FIRMWARE_VOLUME_EXT_EN
             ('TypeMask',             c_uint32),
             ('Types',                ARRAY(GUID, nums))
         ]
-    return EFI_FIRMWARE_VOLUME_EXT_ENTRY_OEM_TYPE(Structure)
+    return EFI_FIRMWARE_VOLUME_EXT_ENTRY_OEM_TYPE
 
 class EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE_0(Structure):
     _fields_ = [
@@ -102,7 +102,7 @@ def Refine_FV_EXT_ENTRY_GUID_TYPE_Header(nums: int) -> EFI_FIRMWARE_VOLUME_EXT_E
             ('FormatType',           GUID),
             ('Data',                 ARRAY(c_uint8, nums))
         ]
-    return EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE(Structure)
+    return EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE
 
 class EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE(Structure):
     _fields_ = [

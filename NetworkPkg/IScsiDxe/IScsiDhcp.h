@@ -22,7 +22,7 @@ typedef struct _ISCSI_ATTEMPT_CONFIG_NVDATA ISCSI_ATTEMPT_CONFIG_NVDATA;
 
 typedef struct _ISCSI_ROOT_PATH_FIELD {
   CHAR8    *Str;
-  UINT8    Len;
+  UINTN    Len;
 } ISCSI_ROOT_PATH_FIELD;
 
 /**

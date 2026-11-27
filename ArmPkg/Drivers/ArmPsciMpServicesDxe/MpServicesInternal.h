@@ -92,6 +92,13 @@ ApProcedure (
   VOID
   );
 
+/** Turns off the calling AP using PSCI CPU_OFF. Does not return.
+**/
+VOID
+ApCpuOff (
+  VOID
+  );
+
 /** Turns on the specified core using PSCI and executes the user-supplied
     function that's been configured via a previous call to SetApProcedure.
 

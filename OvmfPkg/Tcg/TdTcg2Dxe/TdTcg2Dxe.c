@@ -154,62 +154,6 @@ MeasurePeImageAndExtend (
   OUT TPML_DIGEST_VALUES    *DigestList
   );
 
-#define COLUME_SIZE  (16 * 2)
-
-/**
-
-  This function dump raw data.
-
-  @param  Data  raw data
-  @param  Size  raw data size
-
-**/
-VOID
-InternalDumpData (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < Size; Index++) {
-    DEBUG ((DEBUG_INFO, Index == COLUME_SIZE/2 ? " | %02x" : " %02x", (UINTN)Data[Index]));
-  }
-}
-
-/**
-
-  This function dump raw data with colume format.
-
-  @param  Data  raw data
-  @param  Size  raw data size
-
-**/
-VOID
-InternalDumpHex (
-  IN UINT8  *Data,
-  IN UINTN  Size
-  )
-{
-  UINTN  Index;
-  UINTN  Count;
-  UINTN  Left;
-
-  Count = Size / COLUME_SIZE;
-  Left  = Size % COLUME_SIZE;
-  for (Index = 0; Index < Count; Index++) {
-    DEBUG ((DEBUG_INFO, "%04x: ", Index * COLUME_SIZE));
-    InternalDumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
-    DEBUG ((DEBUG_INFO, "\n"));
-  }
-
-  if (Left != 0) {
-    DEBUG ((DEBUG_INFO, "%04x: ", Index * COLUME_SIZE));
-    InternalDumpData (Data + Index * COLUME_SIZE, Left);
-    DEBUG ((DEBUG_INFO, "\n"));
-  }
-}
-
 /**
 
   This function initialize TD_EVENT_HDR for EV_NO_ACTION
@@ -390,19 +334,12 @@ DumpPcrEvent (
   IN TCG_PCR_EVENT_HDR  *EventHdr
   )
 {
-  UINTN  Index;
-
   DEBUG ((DEBUG_INFO, "  Event:\n"));
   DEBUG ((DEBUG_INFO, "    MrIndex  - %d\n", EventHdr->PCRIndex));
   DEBUG ((DEBUG_INFO, "    EventType - 0x%08x\n", EventHdr->EventType));
-  DEBUG ((DEBUG_INFO, "    Digest    - "));
-  for (Index = 0; Index < sizeof (TCG_DIGEST); Index++) {
-    DEBUG ((DEBUG_INFO, "%02x ", EventHdr->Digest.digest[Index]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, EventHdr->Digest.digest, sizeof (TCG_DIGEST), "    Digest    - ");
   DEBUG ((DEBUG_INFO, "    EventSize - 0x%08x\n", EventHdr->EventSize));
-  InternalDumpHex ((UINT8 *)(EventHdr + 1), EventHdr->EventSize);
+  DUMP_HEX (DEBUG_INFO, 0, (UINT8 *)(EventHdr + 1), EventHdr->EventSize, "");
 }
 
 /**
@@ -445,12 +382,7 @@ DumpTcgEfiSpecIdEventStruct (
   VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
   DEBUG ((DEBUG_INFO, "    VendorInfoSize     - 0x%02x\n", *VendorInfoSize));
   VendorInfo = VendorInfoSize + 1;
-  DEBUG ((DEBUG_INFO, "    VendorInfo         - "));
-  for (Index = 0; Index < *VendorInfoSize; Index++) {
-    DEBUG ((DEBUG_INFO, "%02x ", VendorInfo[Index]));
-  }
-
-  DEBUG ((DEBUG_INFO, "\n"));
+  DUMP_HEX (DEBUG_INFO, 0, VendorInfo, *VendorInfoSize, "    VendorInfo         - ");
 }
 
 /**
@@ -504,7 +436,7 @@ DumpCcEvent (
     DEBUG ((DEBUG_INFO, "      HashAlgo : 0x%04x\n", HashAlgo));
     DEBUG ((DEBUG_INFO, "      Digest(%d): \n", DigestIndex));
     DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
-    InternalDumpHex (DigestBuffer, DigestSize);
+    DUMP_HEX (DEBUG_INFO, 0, DigestBuffer, DigestSize, "");
     //
     // Prepare next
     //
@@ -517,7 +449,7 @@ DumpCcEvent (
   CopyMem (&EventSize, DigestBuffer, sizeof (CcEvent->EventSize));
   DEBUG ((DEBUG_INFO, "    EventSize - 0x%08x\n", EventSize));
   EventBuffer = DigestBuffer + sizeof (CcEvent->EventSize);
-  InternalDumpHex (EventBuffer, EventSize);
+  DUMP_HEX (DEBUG_INFO, 0, EventBuffer, EventSize, "");
   DEBUG ((DEBUG_INFO, "\n"));
 }
 

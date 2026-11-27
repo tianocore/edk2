@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/FdtLib.h>
+#include "ArchUtility.h"
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "RiscV/Intc/RiscVIntcParser.h"
@@ -309,10 +310,10 @@ CpuNodeParser (
 
   CpuName = FdtGetName (Fdt, CpuNode, &PropSize);
   ProcUid = AsciiStrDecimalToUintn (&CpuName[4]);
-  if (AddressCells == 2) {
-    HartId = Fdt64ToCpu (*((UINT64 *)Prop));
-  } else {
-    HartId = Fdt32ToCpu (*((UINT32 *)Prop));
+  Status  = ReadFdtCells64 ((UINT32 *)Prop, AddressCells, &HartId);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
   }
 
   /*
@@ -332,6 +333,20 @@ CpuNodeParser (
   RintcInfo->Version          = EFI_ACPI_6_6_RINTC_STRUCTURE_VERSION;
   RintcInfo->AcpiProcessorUid = ProcUid;
   RintcInfo->ExtIntcId        = 0; // Will be updated later
+
+  // Get the proximity domain from the optional "numa-node-id" property.
+  Prop = FdtGetProp (Fdt, CpuNode, "numa-node-id", &PropSize);
+  if (Prop != NULL) {
+    if (PropSize != sizeof (UINT32)) {
+      ASSERT (0);
+      return EFI_ABORTED;
+    }
+
+    RintcInfo->ProximityDomain = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if ((RintcInfo->Flags & EFI_ACPI_6_6_RINTC_FLAG_ENABLE) != 0) {
+      RintcInfo->AffinityFlags = EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE_ENABLED;
+    }
+  }
 
   Status = IsaStringInfoParser (FdtParserHandle, CpuNode, &RintcInfo->IsaStringInfoToken);
   if (EFI_ERROR (Status)) {
@@ -407,8 +422,8 @@ CpusNodeParser (
     return EFI_ABORTED;
   }
 
-  // Count the number of "cpu" nodes under the "cpus" node.
-  Status = FdtCountNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNodeCount);
+  // Count the number of CPU device nodes under the "cpus" node.
+  Status = FdtCountCondNodeInBranch (Fdt, CpusNode, IsCpuDeviceNode, NULL, &CpuNodeCount);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -426,17 +441,10 @@ CpusNodeParser (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CpuNode = CpusNode;
-  for (Index = 0; Index < CpuNodeCount; Index++) {
-    Status = FdtGetNextNamedNodeInBranch (Fdt, CpusNode, "cpu", &CpuNode);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      if (Status == EFI_NOT_FOUND) {
-        // Should have found the node.
-        Status = EFI_ABORTED;
-      }
-
-      goto exit_handler;
+  Index = 0;
+  FdtForEachSubnode (CpuNode, Fdt, CpusNode) {
+    if (!IsCpuDeviceNode (Fdt, CpuNode, NULL)) {
+      continue;
     }
 
     // Parse the "cpu" node.
@@ -456,7 +464,15 @@ CpusNodeParser (
       ASSERT (0);
       goto exit_handler;
     }
-  } // for
+
+    Index++;
+  }
+
+  if (Index != CpuNodeCount) {
+    ASSERT (FALSE);
+    Status = EFI_ABORTED;
+    goto exit_handler;
+  }
 
   Status = CreateCmObjDesc (
              CREATE_CM_RISCV_OBJECT_ID (ERiscVObjRintcInfo),
@@ -482,7 +498,7 @@ STATIC
 CM_RISCV_RINTC_INFO *
 RiscVFindRintc (
   IN CM_OBJ_DESCRIPTOR  *NewRintcCmObjDesc,
-  IN UINTN              HartId
+  IN UINT64             HartId
   )
 {
   CM_RISCV_RINTC_INFO  *RintcInfo;
@@ -544,7 +560,7 @@ IsImsicNode (
   }
 
   IrqProp = (INT32 *)FdtGetProp (Fdt, Node, "interrupts-extended", &Len);
-  if (!IrqProp || (Len < 4) ||
+  if (!IrqProp || (Len < 2 * sizeof (*IrqProp)) ||
       (Fdt32ToCpu (IrqProp[1]) != IRQ_S_EXT))
   {
     return FALSE;
@@ -559,7 +575,8 @@ IsImsicNode (
   need only S-mode APLIC.
 
   @param [in]  Fdt             Pointer to device tree.
-  @param [in]  AplicNode       Node with APLIC compatible property.
+  @param [in]  ExtIntcNode     Node with APLIC compatible property.
+  @param [out] MsiParentNode   IMSIC node for MSI mode; unchanged for direct mode.
 
   @retval TRUE                 The AplicNode is S-mode APLIC
   @retval FALSE                The AplicNode is not S-mode APLIC
@@ -567,8 +584,9 @@ IsImsicNode (
 STATIC
 BOOLEAN
 IsAplicNode (
-  IN VOID   *Fdt,
-  IN INT32  ExtIntcNode
+  IN VOID    *Fdt,
+  IN INT32   ExtIntcNode,
+  OUT INT32  *MsiParentNode
   )
 {
   INT32  *IrqProp;
@@ -581,7 +599,7 @@ IsAplicNode (
   }
 
   IrqProp = (INT32 *)FdtGetProp (Fdt, ExtIntcNode, "interrupts-extended", &Len);
-  if ((IrqProp > 0) && (Len >= 4) &&
+  if ((IrqProp != NULL) && (Len >= 2 * sizeof (*IrqProp)) &&
       (Fdt32ToCpu (IrqProp[1]) == IRQ_S_EXT))
   {
     return TRUE;
@@ -593,17 +611,11 @@ IsAplicNode (
   }
 
   ImsicNode = FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*MsiProp));
-  if (ImsicNode < 0) {
+  if ((ImsicNode < 0) || !IsImsicNode (Fdt, ImsicNode)) {
     return FALSE;
   }
 
-  IrqProp = (INT32 *)FdtGetProp (Fdt, ImsicNode, "interrupts-extended", &Len);
-  if ((!IrqProp) || (Len < 4) ||
-      (Fdt32ToCpu (IrqProp[1]) != IRQ_S_EXT))
-  {
-    return FALSE;
-  }
-
+  *MsiParentNode = ImsicNode;
   return TRUE;
 }
 
@@ -631,11 +643,12 @@ RiscVUpdateRintc (
   )
 {
   CM_RISCV_RINTC_INFO  *RintcInfo;
-  CONST INT32          *Data;
-  UINT32               AddressCells;
+  CONST UINT32         *Data;
+  INT32                AddressCells;
   INT32                DataSize;
-  UINTN                HartId;
+  UINT64               HartId;
   INT32                CpusNode;
+  EFI_STATUS           Status;
 
   CpusNode     = FdtParentOffset (Fdt, CpuNode);
   AddressCells = FdtAddressCells (Fdt, CpusNode);
@@ -653,10 +666,10 @@ RiscVUpdateRintc (
     return EFI_ABORTED;
   }
 
-  if (AddressCells == 2) {
-    HartId = Fdt64ToCpu (*((UINT64 *)Data));
-  } else {
-    HartId = Fdt32ToCpu (*((UINT32 *)Data));
+  Status = ReadFdtCells64 (Data, AddressCells, &HartId);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
   }
 
   RintcInfo = RiscVFindRintc (NewRintcCmObjDesc, HartId);
@@ -878,6 +891,7 @@ PlicAplicInfoParser (
   UINT32                  Id;
   UINT32                  GsiBase;
   INT32                   Len;
+  INT32                   MsiParentNode;
   INT32                   Prev;
   INT32                   ExtIntcNode;
   VOID                    *Fdt;
@@ -890,14 +904,26 @@ PlicAplicInfoParser (
   Fdt     = FdtParserHandle->Fdt;
   GsiBase = 0;
   Id      = 0;
+  ZeroMem (&PlicAplicCommonInfo, sizeof (PlicAplicCommonInfo));
 
   for (Prev = 0; ; Prev = ExtIntcNode) {
     ExtIntcNode = FdtNextNode (Fdt, Prev, NULL);
     if (ExtIntcNode < 0) {
-      return EFI_SUCCESS;
+      return (Id == 0) ? EFI_NOT_FOUND : EFI_SUCCESS;
     }
 
-    if (!(IsPlicNode (Fdt, ExtIntcNode) || IsAplicNode (Fdt, ExtIntcNode))) {
+    MsiParentNode = -1;
+    if (!(IsPlicNode (Fdt, ExtIntcNode) ||
+          IsAplicNode (Fdt, ExtIntcNode, &MsiParentNode)))
+    {
+      continue;
+    }
+
+    if (!FdtNodeIsEnabled (Fdt, ExtIntcNode)) {
+      continue;
+    }
+
+    if ((MsiParentNode >= 0) && !FdtNodeIsEnabled (Fdt, MsiParentNode)) {
       continue;
     }
 
@@ -961,7 +987,9 @@ PlicAplicInfoParser (
 
   Parse RINTC information using IMSIC.
 
-  @param [in]      FdtParserHandle     A handle to the parser instance.
+  @param [in]      Fdt             Pointer to device tree.
+  @param [in]      ImsicNode       IMSIC node.
+  @param [in]      GuestIndexBits  Guest interrupt file index width.
   @param [in, out] NewRintcCmObjDesc   Pointer to array of RINTC CM objects.
 
   @retval EFI_SUCCESS                  The function completed successfully.
@@ -976,17 +1004,18 @@ EFIAPI
 UpdateRintcInfo (
   IN  CONST VOID               *Fdt,
   IN  CONST INT32              ImsicNode,
+  IN  CONST UINT8              GuestIndexBits,
   IN  OUT   CM_OBJ_DESCRIPTOR  *NewRintcCmObjDesc
   )
 {
   CM_RISCV_RINTC_INFO  *RintcInfoBuffer;
   CONST UINT32         *IntExtProp;
   CONST UINT64         *ImsicRegProp;
-  CONST INT32          *Data;
+  CONST UINT32         *Data;
   UINT64               ImsicBaseAddr;
   UINT64               ImsicBaseLen;
-  UINT64               ImsicCpuBaseAddr;
-  UINT64               ImsicCpuBaseLen;
+  EFI_STATUS           Status;
+  UINT32               PagesPerHart;
   INT32                NumPhandle;
   INT32                Len;
   INT32                AddressCells;
@@ -995,12 +1024,14 @@ UpdateRintcInfo (
   INT32                DataSize;
   INT32                IntcNode;
   INT32                Phandle;
-  UINTN                HartId;
+  UINT64               HartId;
   UINTN                NumImsicBase;
   INTN                 Limit;
   INTN                 Idx;
   INTN                 Idx1;
   INTN                 Idx2;
+
+  PagesPerHart = 1U << GuestIndexBits;
 
   IntExtProp = (UINT32 *)FdtGetProp (Fdt, ImsicNode, "interrupts-extended", &Len);
   if ((IntExtProp == 0) || ((Len / sizeof (UINT32)) % 2 != 0)) {
@@ -1027,9 +1058,9 @@ UpdateRintcInfo (
   for (Idx = 0; Idx < NumImsicBase; Idx++) {
     ImsicBaseAddr = Fdt64ToCpu (ImsicRegProp[Idx * 2]);
     ImsicBaseLen  = Fdt64ToCpu (ImsicRegProp[Idx * 2 + 1]);
-    // Calculate the limit of number of cpu nodes this imsic can handle
+    // Each hart occupies its supervisor file followed by its guest files.
     Limit = ImsicBaseLen /  IMSIC_MMIO_PAGE_SZ;
-    for (Idx1 = 0; Idx1 < Limit && Idx2 < NumPhandle; Idx1++, Idx2++) {
+    for (Idx1 = 0; Idx1 < Limit && Idx2 < NumPhandle; Idx1 += PagesPerHart, Idx2++) {
       Phandle      = Fdt32ToCpu (IntExtProp[Idx2 * 2]);
       IntcNode     = FdtNodeOffsetByPhandle (Fdt, Phandle);
       CpuNode      = FdtParentOffset (Fdt, IntcNode);
@@ -1053,10 +1084,10 @@ UpdateRintcInfo (
         return EFI_ABORTED;
       }
 
-      if (AddressCells == 2) {
-        HartId = Fdt64ToCpu (*((UINT64 *)Data));
-      } else {
-        HartId = Fdt32ToCpu (*((UINT32 *)Data));
+      Status = ReadFdtCells64 (Data, AddressCells, &HartId);
+      if (EFI_ERROR (Status)) {
+        ASSERT (FALSE);
+        return EFI_ABORTED;
       }
 
       RintcInfoBuffer = RiscVFindRintc (NewRintcCmObjDesc, HartId);
@@ -1064,10 +1095,11 @@ UpdateRintcInfo (
         return EFI_NOT_FOUND;
       }
 
-      ImsicCpuBaseAddr                  = ImsicBaseAddr + Idx1 * IMSIC_MMIO_PAGE_SZ;
-      ImsicCpuBaseLen                   = IMSIC_MMIO_PAGE_SZ;
-      RintcInfoBuffer->ImsicBaseAddress = ImsicCpuBaseAddr;
-      RintcInfoBuffer->ImsicSize        = ImsicCpuBaseLen;
+      RintcInfoBuffer->ImsicBaseAddress = ImsicBaseAddr + Idx1 * IMSIC_MMIO_PAGE_SZ;
+      RintcInfoBuffer->ImsicSize        = MIN (
+                                            PagesPerHart * IMSIC_MMIO_PAGE_SZ,
+                                            ImsicBaseLen - Idx1 * IMSIC_MMIO_PAGE_SZ
+                                            );
     }
   }
 
@@ -1098,6 +1130,7 @@ ImsicGetInfo (
 {
   CONST UINT32  *IntExtProp;
   CONST UINT64  *Prop;
+  UINT32        Value;
   INT32         Len;
   INT32         NumPhandle;
 
@@ -1132,18 +1165,45 @@ ImsicGetInfo (
   }
 
   ImsicInfo->NumIds = Fdt32ToCpu (*(const UINT32 *)Prop);
-  Prop              = FdtGetProp (Fdt, ImsicNode, "riscv,num-guest-ids", &Len);
-  if (Prop == 0) {
-    ImsicInfo->NumGuestIds = ImsicInfo->NumIds;
-  } else {
-    ImsicInfo->NumGuestIds = Fdt32ToCpu (*(const UINT32 *)Prop);
-  }
 
   Prop = FdtGetProp (Fdt, ImsicNode, "riscv,guest-index-bits", &Len);
   if (Prop == 0) {
     ImsicInfo->GuestIndexBits = 0;
   } else {
-    ImsicInfo->GuestIndexBits = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if (Len != sizeof (UINT32)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Value = Fdt32ToCpu (*(const UINT32 *)Prop);
+    if (Value > IMSIC_MAX_GUEST_INDEX_BITS) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    ImsicInfo->GuestIndexBits = Value;
+  }
+
+  if (ImsicInfo->GuestIndexBits == 0) {
+    // ACPI requires zero guest interrupt identities when no guest files exist.
+    ImsicInfo->NumGuestIds = 0;
+  } else {
+    Prop = FdtGetProp (Fdt, ImsicNode, "riscv,num-guest-ids", &Len);
+    if (Prop == 0) {
+      ImsicInfo->NumGuestIds = ImsicInfo->NumIds;
+    } else {
+      if (Len != sizeof (UINT32)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Value = Fdt32ToCpu (*(const UINT32 *)Prop);
+      if ((Value < IMSIC_MIN_NUM_GUEST_IDS) ||
+          (Value > IMSIC_MAX_NUM_GUEST_IDS) ||
+          (((Value + 1) % 64) != 0))
+      {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      ImsicInfo->NumGuestIds = Value;
+    }
   }
 
   Prop = FdtGetProp (Fdt, ImsicNode, "riscv,hart-index-bits", &Len);
@@ -1232,13 +1292,17 @@ ImsicInfoParser (
       continue;
     }
 
+    if (!FdtNodeIsEnabled (Fdt, ImsicNode)) {
+      continue;
+    }
+
     Status = ImsicGetInfo (Fdt, ImsicNode, &ImsicInfo);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
     }
 
-    Status = UpdateRintcInfo (Fdt, ImsicNode, NewRintcCmObjDesc);
+    Status = UpdateRintcInfo (Fdt, ImsicNode, ImsicInfo.GuestIndexBits, NewRintcCmObjDesc);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -1287,15 +1351,18 @@ RiscVIntcInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
   EFI_STATUS         Status;
+  UINT32             Index;
+  CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
+  CM_OBJECT_TOKEN    *CpuTokenTable;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  NewCmObjDesc = NULL;
+  NewCmObjDesc  = NULL;
+  CpuTokenTable = NULL;
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
   // and create a CM_OBJ_DESCRIPTOR.
@@ -1319,14 +1386,29 @@ RiscVIntcInfoParser (
     goto exit_handler;
   }
 
+  CpuTokenTable = AllocateZeroPool (sizeof (*CpuTokenTable) * NewCmObjDesc->Count);
+  if (CpuTokenTable == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  for (Index = 0; Index < NewCmObjDesc->Count; Index++) {
+    CpuTokenTable[Index] = GetCpuToken (Index);
+  }
+
   // Finally, add all the RINTC CmObjs to the Configuration Manager.
-  Status = AddMultipleCmObj (FdtParserHandle, NewCmObjDesc, 0, NULL);
+  Status = AddMultipleCmObjWithToken (FdtParserHandle, NewCmObjDesc, CpuTokenTable);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
   }
 
 exit_handler:
+  if (CpuTokenTable != NULL) {
+    FreePool (CpuTokenTable);
+  }
+
   FreeCmObjDesc (NewCmObjDesc);
   return Status;
 }

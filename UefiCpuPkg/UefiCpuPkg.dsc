@@ -233,7 +233,9 @@
 
 [Components.AARCH64]
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLibCca.inf
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
+  UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLibCca.inf
   UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
 
 [Components.LOONGARCH64]

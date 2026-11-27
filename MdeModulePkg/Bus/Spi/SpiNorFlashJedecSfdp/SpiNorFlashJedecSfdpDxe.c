@@ -67,15 +67,17 @@ CreateSpiNorFlashSfdpInstance (
       DEBUG ((DEBUG_ERROR, "%a: Fail to initial SPI_NOR_FLASH_INSTANCE.\n", __func__));
       FreePool (Instance);
     } else {
-      // Install SPI NOR Flash Protocol.
-      Status = gBS->InstallProtocolInterface (
+      // Install SPI NOR Flash Protocol Ex.
+      Status = gBS->InstallMultipleProtocolInterfaces (
                       &Instance->Handle,
+                      &gEdkiiSpiNorFlashProtocolExGuid,
+                      &Instance->ProtocolEx,
                       &gEfiSpiNorFlashProtocolGuid,
-                      EFI_NATIVE_INTERFACE,
-                      &Instance->Protocol
+                      &Instance->Protocol,
+                      NULL
                       );
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a: Fail to Install gEfiSpiNorFlashProtocolGuid protocol.\n", __func__));
+        DEBUG ((DEBUG_ERROR, "%a: Fail to install SPI NOR Flash protocols: %r\n", __func__, Status));
         FreePool (Instance);
       }
     }

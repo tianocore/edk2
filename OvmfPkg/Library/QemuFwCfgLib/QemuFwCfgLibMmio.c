@@ -191,8 +191,18 @@ DmaTransferBytes (
   IN     UINT32  Control
   )
 {
-  volatile FW_CFG_DMA_ACCESS  Access;
+  FW_CFG_DMA_ACCESS           LocalAccess;
+  UINTN                       AccessSize;
+  UINTN                       BufferSize;
+  volatile FW_CFG_DMA_ACCESS  *Access;
   UINT32                      Status;
+  EFI_PHYSICAL_ADDRESS        BufferDeviceAddress;
+  EFI_PHYSICAL_ADDRESS        AccessDeviceAddress = 0;
+  VOID                        *AccessMapping;
+  VOID                        *BufferMapping;
+  EFI_STATUS                  RetStatus;
+  EDKII_IOMMU_PROTOCOL        *IoMmuProtocol;
+  EDKII_IOMMU_OPERATION       IoMmuOperation;
 
   ASSERT (
     Control == FW_CFG_DMA_CTL_WRITE || Control == FW_CFG_DMA_CTL_READ ||
@@ -205,9 +215,88 @@ DmaTransferBytes (
 
   ASSERT (Size <= MAX_UINT32);
 
-  Access.Control = SwapBytes32 (Control);
-  Access.Length  = SwapBytes32 ((UINT32)Size);
-  Access.Address = SwapBytes64 ((UINT64)(UINTN)Buffer);
+  IoMmuProtocol = GetIoMmuProtocol ();
+  if (IoMmuProtocol != NULL) {
+    RetStatus = IoMmuProtocol->AllocateBuffer (
+                                 IoMmuProtocol,
+                                 AllocateAnyPages,
+                                 EfiBootServicesData,
+                                 1,
+                                 (VOID **)&Access,
+                                 EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED
+                                 );
+    if (EFI_ERROR (RetStatus)) {
+      ASSERT_EFI_ERROR (RetStatus);
+      return;
+    }
+
+    AccessSize = sizeof (FW_CFG_DMA_ACCESS);
+    RetStatus  = IoMmuProtocol->Map (
+                                  IoMmuProtocol,
+                                  EdkiiIoMmuOperationBusMasterCommonBuffer64,
+                                  (VOID *)Access,
+                                  &AccessSize,
+                                  &AccessDeviceAddress,
+                                  &AccessMapping
+                                  );
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "Map access %r %p 0x%llx 0x%llx\n",
+      RetStatus,
+      Access,
+      AccessSize,
+      AccessDeviceAddress
+      ));
+    if (EFI_ERROR (RetStatus)) {
+      ASSERT_EFI_ERROR (RetStatus);
+      IoMmuProtocol->FreeBuffer (IoMmuProtocol, 1, (VOID *)Access);
+      return;
+    }
+
+    if (Control & (FW_CFG_DMA_CTL_READ | FW_CFG_DMA_CTL_WRITE)) {
+      BufferSize = Size;
+
+      /* CTL_WRITE is device read */
+      IoMmuOperation = (Control & FW_CFG_DMA_CTL_WRITE) ?
+                       EdkiiIoMmuOperationBusMasterRead64 :
+                       EdkiiIoMmuOperationBusMasterWrite64;
+      RetStatus = IoMmuProtocol->Map (
+                                   IoMmuProtocol,
+                                   IoMmuOperation,
+                                   Buffer,
+                                   &BufferSize,
+                                   &BufferDeviceAddress,
+                                   &BufferMapping
+                                   );
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "Map buffer %r %p 0x%llx 0x%llx\n",
+        RetStatus,
+        Buffer,
+        BufferSize,
+        BufferDeviceAddress
+        ));
+      if (EFI_ERROR (RetStatus)) {
+        ASSERT_EFI_ERROR (RetStatus);
+        IoMmuProtocol->Unmap (IoMmuProtocol, AccessMapping);
+        IoMmuProtocol->FreeBuffer (IoMmuProtocol, 1, (VOID *)Access);
+        return;
+      }
+    } else {
+      // If the Control is FW_CFG_DMA_CTL_SKIP, we do not expect any read/write
+      // operation. So pass NULL here.
+      BufferDeviceAddress = 0;
+      BufferMapping       = NULL;
+    }
+  } else {
+    Access              = &LocalAccess;
+    AccessDeviceAddress = (EFI_PHYSICAL_ADDRESS)&LocalAccess;
+    BufferDeviceAddress = (EFI_PHYSICAL_ADDRESS)Buffer;
+  }
+
+  Access->Control = SwapBytes32 (Control);
+  Access->Length  = SwapBytes32 ((UINT32)Size);
+  Access->Address = SwapBytes64 ((UINT64)BufferDeviceAddress);
 
   //
   // We shouldn't start the transfer before setting up Access.
@@ -218,9 +307,9 @@ DmaTransferBytes (
   // This will fire off the transfer.
   //
  #if defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
-  MmioWrite64 (QemuGetFwCfgDmaAddress (), SwapBytes64 ((UINT64)&Access));
+  MmioWrite64 (QemuGetFwCfgDmaAddress (), SwapBytes64 ((UINT64)AccessDeviceAddress));
  #else
-  MmioWrite32 ((UINT32)(QemuGetFwCfgDmaAddress () + 4), SwapBytes32 ((UINT32)&Access));
+  MmioWrite32 ((UINT32)(QemuGetFwCfgDmaAddress () + 4), SwapBytes32 ((UINT32)AccessDeviceAddress));
  #endif
 
   //
@@ -229,7 +318,7 @@ DmaTransferBytes (
   MemoryFence ();
 
   do {
-    Status = SwapBytes32 (Access.Control);
+    Status = SwapBytes32 (Access->Control);
     ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
   } while (Status != 0);
 
@@ -237,6 +326,15 @@ DmaTransferBytes (
   // The caller will want to access the transferred data.
   //
   MemoryFence ();
+
+  if (IoMmuProtocol) {
+    if (BufferMapping != NULL) {
+      IoMmuProtocol->Unmap (IoMmuProtocol, BufferMapping);
+    }
+
+    IoMmuProtocol->Unmap (IoMmuProtocol, AccessMapping);
+    IoMmuProtocol->FreeBuffer (IoMmuProtocol, 1, (VOID *)Access);
+  }
 }
 
 /**

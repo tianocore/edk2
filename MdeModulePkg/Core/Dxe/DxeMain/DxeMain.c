@@ -261,8 +261,15 @@ DxeMain (
   //
   // Setup Exception Stack
   //
-  Status = InitializeSeparateExceptionStacks (NULL, NULL);
-  ASSERT_EFI_ERROR (Status);
+  // This only runs on the BSP, and loads TR, which cannot be undone and is
+  // inherited by the OS loader. The Windows Server 2016 hypervisor (Hyper-V /
+  // Credential Guard) fails to launch if TR != 0 at handoff, so only do this
+  // if stack guard is enabled.
+  //
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    Status = InitializeSeparateExceptionStacks (NULL, NULL);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Initialize Debug Agent to support source level debug in DXE phase

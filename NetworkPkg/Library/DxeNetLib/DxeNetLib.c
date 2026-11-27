@@ -2673,7 +2673,8 @@ Exit:
 
   @retval EFI_SUCCESS           Media detection success.
   @retval EFI_INVALID_PARAMETER ServiceHandle is not a valid network device handle or
-                                MediaState pointer is NULL.
+                                MediaState pointer is NULL. When returned because no SNP
+                                handle is found, *MediaState is set to EFI_NO_MEDIA.
   @retval EFI_DEVICE_ERROR      A device error occurred.
   @retval EFI_TIMEOUT           Network is connecting but timeout.
 
@@ -2696,6 +2697,7 @@ NetLibDetectMediaWaitTimeout (
   EFI_STATUS                        TimerStatus;
   EFI_EVENT                         Timer;
   UINT64                            TimeRemained;
+  EFI_TPL                           OldTpl;
 
   if (MediaState == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2710,6 +2712,7 @@ NetLibDetectMediaWaitTimeout (
   Snp       = NULL;
   SnpHandle = NetLibGetSnpHandle (ServiceHandle, &Snp);
   if (SnpHandle == NULL) {
+    *MediaState = EFI_NO_MEDIA;
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2719,6 +2722,7 @@ NetLibDetectMediaWaitTimeout (
                   (VOID *)&Aip
                   );
   if (EFI_ERROR (Status)) {
+    OldTpl       = gBS->RaiseTPL (TPL_CALLBACK);
     MediaPresent = TRUE;
     Status       = NetLibDetectMedia (ServiceHandle, &MediaPresent);
     if (!EFI_ERROR (Status)) {
@@ -2728,6 +2732,8 @@ NetLibDetectMediaWaitTimeout (
         *MediaState = EFI_NO_MEDIA;
       }
     }
+
+    gBS->RestoreTPL (OldTpl);
 
     //
     // NetLibDetectMedia doesn't support EFI_NOT_READY status, return now!
@@ -2756,6 +2762,7 @@ NetLibDetectMediaWaitTimeout (
       //
       // If gEfiAdapterInfoMediaStateGuid is not supported, call NetLibDetectMedia to get media state!
       //
+      OldTpl       = gBS->RaiseTPL (TPL_CALLBACK);
       MediaPresent = TRUE;
       Status       = NetLibDetectMedia (ServiceHandle, &MediaPresent);
       if (!EFI_ERROR (Status)) {
@@ -2765,6 +2772,8 @@ NetLibDetectMediaWaitTimeout (
           *MediaState = EFI_NO_MEDIA;
         }
       }
+
+      gBS->RestoreTPL (OldTpl);
 
       return Status;
     }

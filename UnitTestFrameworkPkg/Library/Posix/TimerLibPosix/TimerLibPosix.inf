@@ -27,3 +27,9 @@
 
 [LibraryClasses]
   DebugLib
+
+[BuildOptions]
+  #
+  # Force 64-bit time_t and file offsets for IA32 builds.
+  #
+  *_*_IA32_CC_FLAGS = -D_FILE_OFFSET_BITS=64 -D_TIME_BITS=64

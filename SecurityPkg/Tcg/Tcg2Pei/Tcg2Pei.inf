@@ -65,6 +65,7 @@
   gEfiTpmDeviceInstanceNoneGuid                                        ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
   gEfiTpmDeviceInstanceTpm12Guid                                       ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
   gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB
+  gEdkiiFirmwareVolumeMeasurementExcludedHobGuid                       ## SOMETIMES_PRODUCES     ## HOB
 
 [Ppis]
   gEfiPeiFirmwareVolumeInfoPpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY

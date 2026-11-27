@@ -194,25 +194,18 @@ PtpCrbTpmCommand (
   DEBUG_CODE_BEGIN ();
   UINTN  DebugSize;
 
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Send - "));
   if (SizeIn > 0x100) {
     DebugSize = 0x40;
   } else {
     DebugSize = SizeIn;
   }
 
-  for (Index = 0; Index < DebugSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-  }
+  DUMP_HEX (DEBUG_VERBOSE, 0, BufferIn, DebugSize, "PtpCrbTpmCommand Send - ");
 
   if (DebugSize != SizeIn) {
-    DEBUG ((DEBUG_VERBOSE, "...... "));
-    for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-    }
+    DUMP_HEX (DEBUG_VERBOSE, SizeIn - 0x20, BufferIn + SizeIn - 0x20, 0x20, "PtpCrbTpmCommand Send - ...... ");
   }
 
-  DEBUG ((DEBUG_VERBOSE, "\n"));
   DEBUG_CODE_END ();
 
   TpmOutSize = 0;
@@ -267,12 +260,7 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand ReceiveHeader - "));
-  for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DUMP_HEX (DEBUG_VERBOSE, 0, BufferOut, sizeof (TPM2_RESPONSE_HEADER), "PtpCrbTpmCommand ReceiveHeader - ");
   DEBUG_CODE_END ();
   //
   // Check the response data header (tag, parasize and returncode)
@@ -304,12 +292,7 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Receive - "));
-  for (Index = 0; Index < TpmOutSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DUMP_HEX (DEBUG_VERBOSE, 0, BufferOut, TpmOutSize, "PtpCrbTpmCommand Receive - ");
   DEBUG_CODE_END ();
 
 Exit:

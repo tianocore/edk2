@@ -1171,10 +1171,15 @@ UsbRootHubResetPort (
        && (Bus->Devices[Index]->ParentPort == Port)
        && (Bus->Devices[Index]->ParentIf == RootIf))
     {
+      //
+      // DevDesc is freed and set to NULL by UsbEnumerateNewDev() before
+      // it retries the port reset, so check it before dereferencing.
+      //
       if (  (Bus->Usb2Hc != NULL)
          && (Bus->Usb2Hc->MajorRevision >= 0x3)
          && (Bus->Devices[Index]->IsSSDev)
          && (Bus->Devices[Index]->Speed < EFI_USB_SPEED_SUPER)
+         && (Bus->Devices[Index]->DevDesc != NULL)
          && (Bus->Devices[Index]->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE))
       {
         DEBUG ((DEBUG_INFO, "Found the device matched, Index = %d, Port = %X, ParentIf = %X\n", Index, Port, RootIf));

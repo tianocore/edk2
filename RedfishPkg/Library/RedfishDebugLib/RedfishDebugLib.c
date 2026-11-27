@@ -17,9 +17,8 @@
 #include <Library/RedfishHttpLib.h>
 #include <Library/UefiLib.h>
 
-#define REDFISH_JSON_STRING_LENGTH          200
-#define REDFISH_JSON_OUTPUT_FORMAT          (EDKII_JSON_COMPACT | EDKII_JSON_INDENT(2))
-#define REDFISH_PRINT_BUFFER_BYTES_PER_ROW  16
+#define REDFISH_JSON_STRING_LENGTH  200
+#define REDFISH_JSON_OUTPUT_FORMAT  (EDKII_JSON_COMPACT | EDKII_JSON_INDENT(2))
 
 /**
   Determine whether the Redfish debug category is enabled in
@@ -330,44 +329,6 @@ DumpIpv4Address (
   }
 
   DEBUG ((ErrorLevel, "%d.%d.%d.%d\n", Ipv4Address->Addr[0], Ipv4Address->Addr[1], Ipv4Address->Addr[2], Ipv4Address->Addr[3]));
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Debug output raw data buffer.
-
-  @param[in]    ErrorLevel  DEBUG macro error level
-  @param[in]    Buffer      Debug output data buffer.
-  @param[in]    BufferSize  The size of Buffer in byte.
-
-  @retval EFI_SUCCESS             Debug dump finished.
-  @retval EFI_INVALID_PARAMETER   Buffer is NULL.
-
-**/
-EFI_STATUS
-DumpBuffer (
-  IN  UINTN  ErrorLevel,
-  IN  UINT8  *Buffer,
-  IN  UINTN  BufferSize
-  )
-{
-  UINTN  Index;
-
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  DEBUG ((ErrorLevel, "Address: 0x%p size: %d\n", Buffer, BufferSize));
-  for (Index = 0; Index < BufferSize; Index++) {
-    if (Index % REDFISH_PRINT_BUFFER_BYTES_PER_ROW == 0) {
-      DEBUG ((ErrorLevel, "\n%04X: ", Index));
-    }
-
-    DEBUG ((ErrorLevel, "%02X ", Buffer[Index]));
-  }
-
-  DEBUG ((ErrorLevel, "\n"));
 
   return EFI_SUCCESS;
 }

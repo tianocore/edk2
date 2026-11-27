@@ -8,6 +8,7 @@
     - ACPI   - Advanced Configuration and Power Interface
     - SMBIOS - System Management BIOS
     - DT     - Device Tree
+    - HII    - Human Interface Infrastructure
 **/
 
 #pragma once
@@ -37,7 +38,8 @@ _______________________________________________________________________________
        0 - ACPI Table
        1 - SMBIOS Table
        2 - DT (Device Tree) Table
-       3 - Reserved (INVALID)
+       3 - HII Forms
+       4 - Reserved (INVALID)
 
   Bit [27:16] - Reserved, Must Be Zero
 
@@ -73,6 +75,13 @@ _______________________________________________________________________________
       26 - SSDT DMC
       27 - HEST
       28 - EINJ
+      29 - HMAT
+      30 - APMT
+      31 - MSCT
+      32 - BERT
+      33 - ERST
+      34 - SSDT BMU
+      35 - SSDT PL050
 
     Standard SMBIOS Table IDs:
        0 - Reserved
@@ -132,6 +141,7 @@ typedef enum TableGeneratorType {
   ETableGeneratorTypeAcpi = 0,  ///< ACPI Table Generator Type.
   ETableGeneratorTypeSmbios,    ///< SMBIOS Table Generator Type.
   ETableGeneratorTypeDt,        ///< Device Tree Table Generator Type.
+  ETableGeneratorTypeHii,       ///< HII Forms Generator Type.
   ETableGeneratorTypeReserved
 } ETABLE_GENERATOR_TYPE;
 

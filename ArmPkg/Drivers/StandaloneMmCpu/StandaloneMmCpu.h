@@ -31,6 +31,18 @@ extern EFI_MM_CPU_PROTOCOL  mMmCpuState;
 //
 extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 
+//
+// On ARM platforms every event is expected to have a GUID associated with
+// it. It will be used by the MM Entry point to find the handler for the
+// event. It will either be populated in a EFI_MM_COMMUNICATE_HEADER by the
+// caller of the event (e.g. MM_COMMUNICATE SMC) or by the CPU driver
+// (e.g. during an asynchronous event). In either case, this context is
+// maintained in single global variable because StandaloneMm is UP-migratable
+// (which means it cannot run concurrently)
+//
+extern EFI_MM_COMMUNICATE_HEADER  *mGuidedEventContext;
+extern UINT64                     mGuidedEventContextSize;
+
 /**
   The PI Standalone MM entry point for the CPU driver.
 

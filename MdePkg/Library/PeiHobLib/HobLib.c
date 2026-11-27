@@ -91,6 +91,36 @@ GetNextHob (
 }
 
 /**
+  Returns the next Resource Descriptor HOB from the starting HOB.
+
+  @param  HobStart      The starting HOB pointer to search from.
+
+  @return The next Resource Descriptor HOB from the starting HOB.
+
+**/
+VOID *
+EFIAPI
+GetNextResourceHob (
+  IN CONST VOID  *HobStart
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (HobStart != NULL);
+
+  Hob.Raw = (UINT8 *)HobStart;
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (IS_RESOURCE_DESCRIPTOR_HOB (Hob)) {
+      return Hob.Raw;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return NULL;
+}
+
+/**
   Returns the first instance of a HOB type among the whole HOB list.
 
   This function searches the first instance of a HOB type among the whole HOB list.
@@ -343,6 +373,51 @@ BuildResourceDescriptorWithOwnerHob (
 }
 
 /**
+Builds a HOB that describes a chunk of system memory with memory attributes.
+
+This function builds a HOB that describes a chunk of system memory.
+If there is no additional space for HOB creation, then ASSERT().
+
+@param  ResourceType               The type of resource described by this HOB.
+@param  ResourceCapabilities       The resource capabilities of the memory described by this HOB.
+@param  PhysicalStart              The 64 bit physical address of memory described by this HOB.
+@param  ResourceLength             The length of the memory described by this HOB in bytes.
+@param  ResourceMemoryAttributes   The memory attribute for the memory described by this HOB.
+@param  OwnerGuid                  GUID for the owner of this resource.
+
+**/
+VOID
+EFIAPI
+BuildResourceDescriptor2Hob (
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceCapabilities,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       ResourceLength,
+  IN UINT64                       ResourceMemoryAttributes,
+  IN EFI_GUID                     *OwnerGuid OPTIONAL
+  )
+{
+  EFI_HOB_RESOURCE_DESCRIPTOR2  *Hob;
+
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR2, (UINT16)sizeof (EFI_HOB_RESOURCE_DESCRIPTOR2));
+  if (Hob == NULL) {
+    return;
+  }
+
+  Hob->ResourceType             = ResourceType;
+  Hob->ResourceCapabilities     = ResourceCapabilities;
+  Hob->PhysicalStart            = PhysicalStart;
+  Hob->ResourceLength           = ResourceLength;
+  Hob->ResourceMemoryAttributes = ResourceMemoryAttributes;
+
+  if (OwnerGuid == NULL) {
+    ZeroMem (&Hob->Owner, sizeof (EFI_GUID));
+  } else {
+    CopyGuid (&Hob->Owner, OwnerGuid);
+  }
+}
+
+/**
   Builds a HOB that describes a chunk of system memory.
 
   This function builds a HOB that describes a chunk of system memory.
@@ -398,7 +473,7 @@ BuildResourceDescriptorHob (
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/
@@ -420,6 +495,9 @@ BuildGuidHob (
   // Make sure that data length is not too long.
   //
   ASSERT (DataLength <= (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)));
+  if (DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE))) {
+    return NULL;
+  }
 
   Hob = InternalPeiCreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16)(sizeof (EFI_HOB_GUID_TYPE) + DataLength));
   if (Hob == NULL) {
@@ -451,7 +529,7 @@ BuildGuidHob (
   @param  Data          The data to be copied into the data field of the GUID HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
 
-  @retval  NULL         The GUID HOB could not be allocated.
+  @retval  NULL         DataLength is too large or the GUID HOB could not be allocated.
   @retval  others       The start address of GUID HOB data.
 
 **/

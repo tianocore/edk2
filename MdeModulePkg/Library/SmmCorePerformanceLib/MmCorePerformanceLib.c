@@ -12,6 +12,7 @@
   Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) Microsoft Corporation.
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -112,8 +113,8 @@ GetModuleInfoFromHandle (
     }
   }
 
-  if (!IsZeroGuid (TempGuid)) {
-    Status = GetNameFromUiSection (TempGuid, NameString, BufferSize);
+  if ((LoadedImage != NULL) && (LoadedImage->DeviceHandle != NULL) && !IsZeroGuid (TempGuid)) {
+    Status = GetNameFromUiSection (LoadedImage->DeviceHandle, TempGuid, NameString, BufferSize);
   }
 
 Done:

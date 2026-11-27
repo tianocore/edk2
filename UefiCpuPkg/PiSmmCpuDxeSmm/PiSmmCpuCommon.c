@@ -78,8 +78,6 @@ EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL  mSmmMemoryAttribute = {
   EdkiiSmmClearMemoryAttributes
 };
 
-EFI_CPU_INTERRUPT_HANDLER  mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
-
 volatile BOOLEAN  *mSmmInitialized = NULL;
 UINT32            mBspApicId       = 0;
 

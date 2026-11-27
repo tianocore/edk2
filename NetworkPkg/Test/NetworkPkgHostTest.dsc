@@ -26,6 +26,7 @@
   # Build HOST_APPLICATION that tests NetworkPkg
   #
   NetworkPkg/Dhcp6Dxe/GoogleTest/Dhcp6DxeGoogleTest.inf
+  NetworkPkg/IScsiDxe/GoogleTest/IScsiDxeGoogleTest.inf
   NetworkPkg/Ip6Dxe/GoogleTest/Ip6DxeGoogleTest.inf
   NetworkPkg/UefiPxeBcDxe/GoogleTest/UefiPxeBcDxeGoogleTest.inf {
     <LibraryClasses>

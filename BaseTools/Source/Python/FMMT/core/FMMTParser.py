@@ -15,7 +15,7 @@ class FMMTParser:
     def __init__(self, name: str, TYPE: str) -> None:
         self.WholeFvTree = BIOSTREE(name)
         self.WholeFvTree.type = TYPE
-        self.FinalData = b''
+        self.FinalData = bytearray()
         self.BinaryInfo = []
 
     ## Parser the nodes in WholeTree.

@@ -269,7 +269,10 @@ AddMemLatBwInfo (
     }
 
     Status = FindDomainIndex (DomainId, InitiatorDomains, InitiatorDomainCount, &InitiatorIdx);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
     Status = GetProximityDomainId (
                CfgMgrProtocol,
@@ -283,7 +286,10 @@ AddMemLatBwInfo (
     }
 
     Status = FindDomainIndex (DomainId, TargetDomains, TargetDomainCount, &TargetIdx);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
     if (CmMemLatBwRelations[Index].Relation > MAX_UINT16) {
       DEBUG ((

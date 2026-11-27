@@ -94,7 +94,6 @@ typedef Elf64_Dyn Elf_Dyn;
 //
 STATIC Elf_Ehdr *mEhdr;
 STATIC Elf_Shdr *mShdrBase;
-STATIC Elf_Phdr *mPhdrBase;
 
 //
 // GOT information
@@ -200,7 +199,6 @@ InitializeElf64 (
   //
   VerboseMsg ("Update Header Pointers");
   mShdrBase  = (Elf_Shdr *)((UINT8 *)mEhdr + mEhdr->e_shoff);
-  mPhdrBase = (Elf_Phdr *)((UINT8 *)mEhdr + mEhdr->e_phoff);
 
   //
   // Create COFF Section offset buffer and zero.

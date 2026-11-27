@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/SafeIntLib.h>
 #include <IndustryStandard/Tpm20.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/TdxMeasurementLib.h>
@@ -49,6 +50,8 @@ TdxMeasurementBuildGuidHob (
   VOID                *EventHobData;
   UINT8               *Ptr;
   TPML_DIGEST_VALUES  *TdxDigest;
+  UINT32              DataLength;
+  RETURN_STATUS       Status;
 
   if (HashSize != SHA384_DIGEST_SIZE) {
     return EFI_INVALID_PARAMETER;
@@ -56,11 +59,24 @@ TdxMeasurementBuildGuidHob (
 
   #define TDX_DIGEST_VALUE_LEN  (sizeof (UINT32) + sizeof (TPMI_ALG_HASH) + SHA384_DIGEST_SIZE)
 
+  //
+  // EventSize is derived from the measured input and can be attacker-
+  // influenced. Reject a total length that overflows UINT32; BuildGuidHob()
+  // rejects lengths above the maximum GUID HOB payload.
+  //
+  Status = SafeUint32Add (
+             (UINT32)(sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) +
+                      TDX_DIGEST_VALUE_LEN + sizeof (UINT32)),
+             EventSize,
+             &DataLength
+             );
+  if (RETURN_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   EventHobData = BuildGuidHob (
                    &gCcEventEntryHobGuid,
-                   sizeof (TCG_PCRINDEX) + sizeof (TCG_EVENTTYPE) +
-                   TDX_DIGEST_VALUE_LEN +
-                   sizeof (UINT32) + EventSize
+                   DataLength
                    );
 
   if (EventHobData == NULL) {

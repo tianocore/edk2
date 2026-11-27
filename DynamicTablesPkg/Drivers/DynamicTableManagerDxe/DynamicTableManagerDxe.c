@@ -23,9 +23,107 @@
 #include <Protocol/DynamicTableFactoryProtocol.h>
 
 #include "DynamicTableManagerDxe.h"
+#include "HiiFormsBuilder.h"
 
 STATIC VOID  *mAcpiTableProtocolRegistration;
 STATIC VOID  *mSmbiosProtocolRegistration;
+
+EFI_EVENT  mAcpiEvent;
+EFI_EVENT  mSmbiosEvent;
+
+/** Register ACPI table protocol notification handler.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_OUT_OF_RESOURCES  Event allocation failed.
+  @retval Others                Failure returned by boot services.
+
+**/
+STATIC
+EFI_STATUS
+RegisterAcpiTableHandler (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  AcpiTableProtocolReady,
+                  NULL,
+                  &mAcpiEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    mAcpiEvent = NULL;
+    return Status;
+  }
+
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiAcpiTableProtocolGuid,
+                  mAcpiEvent,
+                  &mAcpiTableProtocolRegistration
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (mAcpiEvent);
+    mAcpiEvent = NULL;
+    return Status;
+  }
+
+  Status = gBS->SignalEvent (mAcpiEvent);
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (mAcpiEvent);
+    mAcpiEvent = NULL;
+  }
+
+  return Status;
+}
+
+/** Register SMBIOS table protocol notification handler.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_OUT_OF_RESOURCES  Event allocation failed.
+  @retval Others                Failure returned by boot services.
+
+**/
+STATIC
+EFI_STATUS
+RegisterSmbiosTableHandler (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  SmbiosProtocolReady,
+                  NULL,
+                  &mSmbiosEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    mSmbiosEvent = NULL;
+    return Status;
+  }
+
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiSmbiosProtocolGuid,
+                  mSmbiosEvent,
+                  &mSmbiosProtocolRegistration
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (mSmbiosEvent);
+    mSmbiosEvent = NULL;
+    return Status;
+  }
+
+  Status = gBS->SignalEvent (mSmbiosEvent);
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (mSmbiosEvent);
+    mSmbiosEvent = NULL;
+  }
+
+  return Status;
+}
 
 /** Entrypoint of Dynamic Table Manager Dxe.
 
@@ -55,38 +153,68 @@ DynamicTableManagerDxeInitialize (
   IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_EVENT  AcpiEvent;
-  EFI_EVENT  SmbiosEvent;
+  EFI_STATUS  Status;
 
-  AcpiEvent = EfiCreateProtocolNotifyEvent (
-                &gEfiAcpiTableProtocolGuid,
-                TPL_CALLBACK,
-                AcpiTableProtocolReady,
-                NULL,
-                &mAcpiTableProtocolRegistration
-                );
-  if (AcpiEvent == NULL) {
+  Status = RegisterAcpiTableHandler ();
+  if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "Failed to register ACPI protocol notification event.\n"
+      "Failed to register ACPI protocol notification event. Status = %r\n",
+      Status
       ));
-    return EFI_OUT_OF_RESOURCES;
+    return Status;
   }
 
-  SmbiosEvent = EfiCreateProtocolNotifyEvent (
-                  &gEfiSmbiosProtocolGuid,
-                  TPL_CALLBACK,
-                  SmbiosProtocolReady,
-                  NULL,
-                  &mSmbiosProtocolRegistration
-                  );
-  if (SmbiosEvent == NULL) {
+  Status = RegisterSmbiosTableHandler ();
+  if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "Failed to register SMBIOS protocol notification event.\n"
+      "Failed to register SMBIOS protocol notification event. Status = %r\n",
+      Status
       ));
-    gBS->CloseEvent (AcpiEvent);
-    return EFI_OUT_OF_RESOURCES;
+    if (mAcpiEvent != NULL) {
+      gBS->CloseEvent (mAcpiEvent);
+      mAcpiEvent = NULL;
+    }
+
+    return Status;
+  }
+
+  DynamicHiiFormsProcess ();
+
+  return EFI_SUCCESS;
+}
+
+/** Cleanup of Dynamic Table Manager Dxe.
+
+  This function is invoked when UnloadImage() is called
+  for this module. It is cleaning up the dynamic HII form
+  resources.
+
+  @param  ImageHandle   Handle to the image.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Function parameter is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+DynamicTableManagerDxeUnInitialize (
+  IN  EFI_HANDLE  ImageHandle
+  )
+{
+  if (ImageHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FreeHiiFormResources ();
+
+  if (mSmbiosEvent != NULL) {
+    gBS->CloseEvent (mSmbiosEvent);
+  }
+
+  if (mAcpiEvent != NULL) {
+    gBS->CloseEvent (mAcpiEvent);
   }
 
   return EFI_SUCCESS;
