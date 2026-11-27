@@ -982,6 +982,17 @@ UfsPassThruDriverBindingStart (
   }
 
   //
+  // Install the config protocol before caching the config so consumers can update
+  //
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Controller,
+                  &gEfiUfsDeviceConfigProtocolGuid,
+                  &(Private->UfsDevConfig),
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
   // Check if 8 common luns are active and set corresponding bit mask.
   //
   UnitDescriptorSize = sizeof (UFS_UNIT_DESC);
@@ -1041,8 +1052,6 @@ UfsPassThruDriverBindingStart (
                   &Controller,
                   &gEfiExtScsiPassThruProtocolGuid,
                   &(Private->ExtScsiPassThru),
-                  &gEfiUfsDeviceConfigProtocolGuid,
-                  &(Private->UfsDevConfig),
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

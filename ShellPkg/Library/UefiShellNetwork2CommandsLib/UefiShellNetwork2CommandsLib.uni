@@ -43,6 +43,7 @@
 #string STR_IFCONFIG6_INFO_JOINT               #language en-US    " >> "
 #string STR_IFCONFIG6_INFO_NEWLINE             #language en-US    "\r\n"
 #string STR_IFCONFIG6_INFO_IF_NAME             #language en-US    "\n%Hname         : %s%N\r\n"
+#string STR_IFCONFIG6_INFO_MEDIA_STATE         #language en-US    "%HMedia State  : %s%N\r\n"
 #string STR_IFCONFIG6_INFO_POLICY_AUTO         #language en-US    "%Hpolicy       : automatic%N\r\n"
 #string STR_IFCONFIG6_INFO_POLICY_MAN          #language en-US    "%Hpolicy       : manual%N\r\n"
 #string STR_IFCONFIG6_INFO_DAD_TRANSMITS       #language en-US    "%Hdad xmits    : %d%N\r\n"

@@ -10,6 +10,7 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Amd/Svsm.h>
 
+#include <ConfidentialComputingGuestAttr.h>
 #include "VirtMmCommunication.h"
 
 BOOLEAN
@@ -19,6 +20,13 @@ VirtMmSvsmProbe (
   )
 {
   UINT32  Min, Max;
+  UINT64  CcAttr;
+
+  CcAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+  if ((CcAttr & CCAttrTypeMask) != CCAttrAmdSevSnp) {
+    DEBUG ((DEBUG_VERBOSE, "%a: no SEV-SNP guest\n", __func__));
+    return FALSE;
+  }
 
   if (!AmdSvsmIsSvsmPresent ()) {
     DEBUG ((DEBUG_VERBOSE, "%a: no SVSM present\n", __func__));
