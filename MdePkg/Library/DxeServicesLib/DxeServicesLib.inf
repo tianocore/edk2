@@ -27,6 +27,8 @@
 
 [Sources]
   DxeServicesLib.c
+  MapMmioMemory.c
+  MmioArchConfig.h
 
 [Sources.IA32, Sources.EBC, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
   Allocate.c
@@ -34,9 +36,18 @@
 [Sources.X64]
   X64/Allocate.c
 
+[Sources.X64, Sources.IA32, Sources.EBC, Sources.RISCV64, Sources.LOONGARCH64]
+  MmioArchConfig.c
+
+[Sources.AARCH64]
+  AArch64/MmioArchConfig.c
+
 [Packages]
   MdePkg/MdePkg.dec
 
+[Packages.AARCH64]
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -48,8 +59,13 @@
 [LibraryClasses.X64]
   HobLib
 
+[LibraryClasses.AARCH64]
+  ArmCcaLib
+  ArmMmuLib
+
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## UNDEFINED
+  gEfiDxeServicesTableGuid                      ## SOMETIMES_CONSUMES
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMES
@@ -57,4 +73,3 @@
   gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
-
