@@ -63,6 +63,12 @@ struct _NON_DISCOVERABLE_DEVICE {
   // The MMIO and I/O regions owned by the device
   //
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR    *Resources;
+  //
+  // Platform-assigned UniqueId used by NonDiscoverablePciDeviceDxe
+  // to derive a deterministic SBDF in EFI_PCI_IO_PROTOCOL.GetLocation().
+  // The platform must ensure values are unique across all registrations.
+  //
+  UINTN                                UniqueId;
 };
 
 extern EFI_GUID  gEdkiiNonDiscoverableDeviceProtocolGuid;
