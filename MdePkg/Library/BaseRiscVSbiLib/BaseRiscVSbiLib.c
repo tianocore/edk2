@@ -184,7 +184,7 @@ SbiSystemReset (
 }
 
 /**
-  Probe support for an extension in OpenSBI
+  Probe support for an SBI extension
 
   Check if the extension is supported by SBI.
 

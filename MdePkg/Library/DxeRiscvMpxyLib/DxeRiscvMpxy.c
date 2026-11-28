@@ -642,7 +642,8 @@ SbiMpxyLibInit (
   }
 
   //
-  // Allocate memory to be shared with OpenSBI for initial MPXY communications
+  // Allocate memory to be shared with the SBI firmware for initial MPXY
+  // communications
   // until channels are initialized by their respective drivers.
   //
   mNonChanTempShmem = AllocateAlignedRuntimePages (

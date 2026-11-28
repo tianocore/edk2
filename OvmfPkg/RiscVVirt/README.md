@@ -4,8 +4,8 @@
 RISC-V QEMU 'virt' is a generic platform which does not correspond to any real
 hardware.
 
-EDK2 for RISC-V virt platform is a payload (S-mode) for the previous stage M-mode
-firmware like OpenSBI. It follows PEI less design.
+EDK2 for RISC-V virt platform runs under SBI firmware such as OpenSBI or
+RustSBI. It follows a PEI-less design.
 
 The minimum QEMU version required is
 **[8.1](https://wiki.qemu.org/Planning/8.1)** or with commit
@@ -106,10 +106,14 @@ Below example shows how to boot openSUSE Tumbleweed E20.
         -initrd initrd-6.5.2-1-default \
         -append "${CMDLINE[*]}"
 
-## Test with your own OpenSBI binary
+## Test with your own SBI firmware
+
 Using the above QEMU command lines, **RISCV_VIRT_CODE.fd** is launched by the
-OpenSBI binary that is bundled with QEMU. You can build your own OpenSBI binary
-as well:
+firmware bundled with QEMU.
+
+### OpenSBI
+
+Build an OpenSBI binary as follows:
 
     OPENSBI_DIR=...
     git clone https://github.com/riscv/opensbi.git $OPENSBI_DIR
@@ -123,7 +127,16 @@ option:
 
     -bios $OPENSBI_DIR/build/platform/generic/firmware/fw_dynamic.bin
 
-Note that the above only makes a difference with software emulation (which you
-can force with `-M accel=tcg`). With hardware virtualization (`-M accel=kvm`),
-KVM services the SBI (Supervisor Binary Interface) calls internally, therefore
-any OpenSBI binary specified with `-bios` is rejected.
+### RustSBI
+
+Build RustSBI Prototyper in dynamic mode according to the
+[RustSBI Prototyper documentation](https://github.com/rustsbi/rustsbi/tree/main/docs/src/03_prototyper):
+
+    cargo prototyper build
+
+    -bios /path/to/rustsbi-prototyper-dynamic.elf
+
+These `-bios` options affect software emulation, which you can force with
+`-M accel=tcg`. With hardware virtualization (`-M accel=kvm`), KVM services
+the SBI calls internally, so an external SBI firmware specified with `-bios`
+is rejected.
