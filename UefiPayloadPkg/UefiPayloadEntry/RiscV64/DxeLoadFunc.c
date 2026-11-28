@@ -52,9 +52,8 @@ RiscVBuildSecHandoffHob (
   )
 {
   RISCV_SEC_HANDOFF_DATA  SecData;
-  EFI_GUID                SecHobDataGuid;
+  CONST EFI_GUID          SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
 
-  SecHobDataGuid     = RISCV_SEC_HANDOFF_HOB_GUID;
   SecData.BootHartId = mRiscVBootHartId;
   SecData.FdtPointer = mRiscVFdtBase;
   BuildGuidDataHob (&SecHobDataGuid, &SecData, sizeof (SecData));
