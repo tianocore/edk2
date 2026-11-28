@@ -28,3 +28,4 @@
   AcpiHelperLib
   AmlLib
   BaseLib
+  TableHelperLib
