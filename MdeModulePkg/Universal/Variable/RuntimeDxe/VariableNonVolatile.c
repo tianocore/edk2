@@ -333,7 +333,16 @@ InitNonVolatileVariableStore (
     NextVariable = GetNextVariablePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat);
     VariableSize = (UINTN)NextVariable - (UINTN)Variable;
     if ((Variable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-      mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+      if ((Variable->State | VAR_DELETED) == VAR_DELETED) {
+        //
+        // A deleted hardware error record no longer counts against the
+        // hardware error record quota. Its space is accounted against the
+        // common variable quota until it is released by a reclaim.
+        //
+        mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+      } else {
+        mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+      }
     } else {
       mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
     }
