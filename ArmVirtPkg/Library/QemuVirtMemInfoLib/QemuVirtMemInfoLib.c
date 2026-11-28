@@ -20,7 +20,7 @@
 #include <Library/FdtLib.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  (5)
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  (6)
 
 /** A macro to trace the memory map.
 **/
@@ -55,49 +55,6 @@ QemuVirtMemInfoLibConstructor (
   Size = PcdGet64 (PcdSystemMemorySize);
   Hob  = BuildGuidDataHob (&gArmVirtSystemMemorySizeGuid, &Size, sizeof Size);
   ASSERT (Hob != NULL);
-
-  return RETURN_SUCCESS;
-}
-
-/**
-  Get the serial port base address to be used for the serial console output.
-
-  @param[in]  DeviceTreeBase        Base address of the Device Tree.
-  @param[out] UartBase              Base address of the Uart.
-
-  @retval RETURN_INVALID_PARAMETER  Device Tree Base address is invalid.
-  @retval RETURN_NOT_FOUND          No enabled console port has been found.
-  @retval RETURN_SUCCESS            BaseAddress has been populated.
-**/
-STATIC
-RETURN_STATUS
-EFIAPI
-GetUartBase (
-  IN  VOID    *DeviceTreeBase,
-  OUT UINT64  *UartBase
-  )
-{
-  RETURN_STATUS     RetStatus;
-  FDT_SERIAL_PORTS  Ports;
-
-  if (DeviceTreeBase == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  RetStatus = FdtSerialGetPorts (DeviceTreeBase, "arm,pl011", &Ports);
-  if (RETURN_ERROR (RetStatus)) {
-    return RetStatus;
-  }
-
-  //
-  // Default to the first port found, but (if there are multiple ports) allow
-  // the "/chosen" node to override it. Note that if FdtSerialGetConsolePort()
-  // fails, it does not modify UartBase.
-  //
-  *UartBase = Ports.BaseAddress[0];
-  if (Ports.NumberOfPorts > 1) {
-    FdtSerialGetConsolePort (DeviceTreeBase, UartBase);
-  }
 
   return RETURN_SUCCESS;
 }
@@ -198,7 +155,8 @@ ArmVirtGetMemoryMap (
   VOID                          *DeviceTreeBase;
   UINT64                        MappingBase;
   UINT64                        MappingSize;
-  UINT64                        UartBase;
+  UINTN                         PortIdx;
+  FDT_SERIAL_PORTS              Ports;
   UINT64                        FwCfgBase;
   UINT64                        FwCfgSize;
 
@@ -223,8 +181,12 @@ ArmVirtGetMemoryMap (
     return;
   }
 
-  RetStatus = GetUartBase (DeviceTreeBase, &UartBase);
-  if (RETURN_ERROR (RetStatus) || (UartBase == 0)) {
+  //
+  // Map at most two PL011 UARTs, as reported by FdtSerialGetPorts(). When
+  // two are present, the console uses the one selected by "/chosen" and
+  // DebugLib uses the other one.
+  RetStatus = FdtSerialGetPorts (DeviceTreeBase, "arm,pl011", &Ports);
+  if (RETURN_ERROR (RetStatus)) {
     ASSERT_RETURN_ERROR (RetStatus);
     return;
   }
@@ -270,17 +232,21 @@ ArmVirtGetMemoryMap (
   LOG_MEM_MAP ("FV Region");
   Idx++;
 
-  // Map the UART
-  MappingBase = UartBase & ~(UINT64)EFI_PAGE_MASK;
-  MappingSize = EFI_PAGES_TO_SIZE (
-                  EFI_SIZE_TO_PAGES (UartBase - MappingBase + EFI_PAGE_SIZE)
-                  );
-  VirtualMemoryTable[Idx].PhysicalBase = (MappingBase | DevMapBit);
-  VirtualMemoryTable[Idx].VirtualBase  = MappingBase;
-  VirtualMemoryTable[Idx].Length       = MappingSize;
-  VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-  LOG_MEM_MAP ("Serial Port");
-  Idx++;
+  // Map the UARTs
+  for (PortIdx = 0; PortIdx < Ports.NumberOfPorts; PortIdx++) {
+    MappingBase = Ports.BaseAddress[PortIdx] & ~(UINT64)EFI_PAGE_MASK;
+    MappingSize = EFI_PAGES_TO_SIZE (
+                    EFI_SIZE_TO_PAGES (
+                      Ports.BaseAddress[PortIdx] - MappingBase + EFI_PAGE_SIZE
+                      )
+                    );
+    VirtualMemoryTable[Idx].PhysicalBase = (MappingBase | DevMapBit);
+    VirtualMemoryTable[Idx].VirtualBase  = MappingBase;
+    VirtualMemoryTable[Idx].Length       = MappingSize;
+    VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+    LOG_MEM_MAP ("Serial Port");
+    Idx++;
+  }
 
   // Map the fw_cfg MMIO region
   MappingBase = FwCfgBase & ~(UINT64)EFI_PAGE_MASK;

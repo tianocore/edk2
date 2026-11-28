@@ -2,7 +2,7 @@
   ACPI 6.2 definitions from the ACPI Specification Revision 6.2 May, 2017.
 
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, ARM Ltd. All rights reserved.<BR>
   Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -2690,6 +2690,18 @@ typedef struct {
   UINT16    MinorRev;
   UINT16    SpinRev;
 } EFI_ACPI_6_2_PPTT_STRUCTURE_ID;
+
+///
+/// Software Delegated Exceptions Interface Table (SDEI)
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+} EFI_ACPI_6_2_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_HEADER;
+
+///
+/// SDEI Revision
+///
+#define EFI_ACPI_6_2_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_REVISION  0x01
 
 //
 // Known table signatures

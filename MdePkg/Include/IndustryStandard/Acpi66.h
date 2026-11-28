@@ -2,7 +2,7 @@
   ACPI 6.6 definitions from the ACPI Specification Revision 6.6 May, 2025.
 
   Copyright (c) 2017 - 2025, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2024, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2026, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
   Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
@@ -1022,6 +1022,11 @@ typedef struct {
   UINT32    Flags;
   UINT32    ClockDomain;
 } EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE;
+
+///
+/// RINTC Affinity Structure Flags. All other bits are reserved and must be 0.
+///
+#define EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE_ENABLED  BIT0
 
 //
 // Generic Initiator Affinity Structure Device Handle Types
@@ -3319,6 +3324,18 @@ typedef struct {
 /// CCEL Revision (as defined in ACPI 6.6 spec.)
 ///
 #define EFI_ACPI_6_6_CONFIDENTIAL_COMPUTING_EVENT_LOG_TABLE_REVISION  0x01
+
+///
+/// Software Delegated Exceptions Interface Table (SDEI)
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+} EFI_ACPI_6_6_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_HEADER;
+
+///
+/// SDEI Revision
+///
+#define EFI_ACPI_6_6_SOFTWARE_DELEGATED_EXCEPTIONS_INTERFACE_TABLE_REVISION  0x01
 
 //
 // Known table signatures

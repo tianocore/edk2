@@ -24,6 +24,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Disable warning when last field of data structure is a zero sized array.
 //
   #pragma warning ( disable : 4200 )
+//
+// Allow header-only objects whose flexible array member is intentionally empty.
+//
+  #pragma warning ( disable : 4815 )
 #endif
 
 //

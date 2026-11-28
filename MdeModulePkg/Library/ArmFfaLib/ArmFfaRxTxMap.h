@@ -37,9 +37,7 @@ ArmFfaLibRxTxMap (
   );
 
 /**
-  Unmap Rx/Tx buffer.
-  This function is only called in Exit boot service because
-  Rx/Tx buffer is registered only once per partition.
+  Unmap Rx/Tx buffer and free the Rx/Tx buffer pages.
 
   @retval EFI_SUCCESS
   @retval EFI_INVALID_PARAMETERS               Already unregistered
@@ -49,6 +47,22 @@ ArmFfaLibRxTxMap (
 EFI_STATUS
 EFIAPI
 ArmFfaLibRxTxUnmap (
+  IN VOID
+  );
+
+/**
+  Unmap Rx/Tx buffer in an Exit Boot Services notification.
+  Memory allocation services must not be used there, so the Rx/Tx buffer
+  pages are not freed. They are boot services memory reclaimed by the OS.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETERS               Already unregistered
+  @retval EFI_UNSUPPORTED                      Not supported
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibRxTxUnmapOnExitBootServices (
   IN VOID
   );
 

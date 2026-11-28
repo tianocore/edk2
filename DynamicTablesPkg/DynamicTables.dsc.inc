@@ -27,6 +27,8 @@
   MetadataObjLib|DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   MetadataHandlerLib|DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
   Tpm2DeviceTableLib|DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
+  HiiFormsLib|DynamicTablesPkg/Library/Common/HiiFormsLib/HiiFormsLib.inf
+  HiiStringsLib|DynamicTablesPkg/Library/Common/HiiStringsLib/HiiStringsLib.inf
 
 [LibraryClasses.AARCH64]
   ArmSmcccSocIdLib|ArmPkg/Library/ArmSmcccSocIdLib/ArmSmcccSocIdLib.inf
@@ -101,6 +103,9 @@
   #
   DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
 
+  #  HII Form Generators
+  DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
+
 [Components.X64]
   #
   # Generators (X64 specific)
@@ -150,6 +155,7 @@
   DynamicTablesPkg/Library/Acpi/Arm/AcpiGtdtLibArm/AcpiGtdtLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiMadtLibArm/AcpiMadtLibArm.inf
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiSdeiLibArm/AcpiSdeiLibArm.inf
   DynamicTablesPkg/Library/Acpi/Arm/AcpiApmtLibArm/AcpiApmtLibArm.inf
 
   # AML Fixup (Arm specific)
@@ -189,6 +195,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiGtdtLibArm/AcpiGtdtLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiMadtLibArm/AcpiMadtLibArm.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSdeiLibArm/AcpiSdeiLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiApmtLibArm/AcpiApmtLibArm.inf
 
       # AML Fixup
@@ -238,6 +245,9 @@
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType43Lib/SmbiosType43Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType44Lib/SmbiosType44Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType45Lib/SmbiosType45Lib.inf
+
+      #  HII Form Generators
+      NULL|DynamicTablesPkg/Library/Hii/RootFormGenerator/RootFormGenerator.inf
   }
 
 [Components.RISCV64]

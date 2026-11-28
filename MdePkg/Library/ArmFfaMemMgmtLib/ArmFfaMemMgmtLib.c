@@ -59,6 +59,7 @@ ArmFfaMemLibDonate (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ((UINTN)BufferAddr > MAX_UINT32) ? ARM_FID_FFA_MEM_DONATE_AARCH64 : ARM_FID_FFA_MEM_DONATE_AARCH32;
 
   Status = ArmFfaLibGetFeatures (
@@ -154,6 +155,7 @@ ArmFfaMemLibLend (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ((UINTN)BufferAddr > MAX_UINT32) ? ARM_FID_FFA_MEM_LEND_AARCH64 : ARM_FID_FFA_MEM_LEND_AARCH32;
 
   Status = ArmFfaLibGetFeatures (
@@ -247,6 +249,7 @@ ArmFfaMemLibShare (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ((UINTN)BufferAddr > MAX_UINT32) ? ARM_FID_FFA_MEM_SHARE_AARCH64 : ARM_FID_FFA_MEM_SHARE_AARCH32;
 
   Status = ArmFfaLibGetFeatures (
@@ -344,6 +347,7 @@ ArmFfaMemLibRetrieveReq (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ((UINTN)BufferAddr > MAX_UINT32) ? ARM_FID_FFA_MEM_RETRIEVE_REQ_AARCH64 : ARM_FID_FFA_MEM_RETRIEVE_REQ_AARCH32;
 
   Status = ArmFfaLibGetFeatures (
@@ -427,6 +431,7 @@ ArmFfaMemLibRelinquish (
   ARM_FFA_ARGS  FfaArgs;
   EFI_STATUS    Status;
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_MEM_RETRIEVE_RELINQUISH;
 
   Status = ArmFfaLibGetFeatures (
@@ -439,6 +444,10 @@ ArmFfaMemLibRelinquish (
     DEBUG ((DEBUG_ERROR, "%a: Failed to get FFA_MEM_RETRIEVE_RELINQUISH feature... Status: %r\n", __func__, Status));
     return Status;
   }
+
+  // Clear the arg1 and arg2 fields before making the FFA call
+  FfaArgs.Arg1 = 0;
+  FfaArgs.Arg2 = 0;
 
   ArmCallFfa (&FfaArgs);
 
@@ -470,6 +479,7 @@ ArmFfaMemLibReclaim (
   UINT32        HandleHi = 0;
   UINT32        HandleLo = 0;
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_MEM_RETRIEVE_RECLAIM;
 
   Status = ArmFfaLibGetFeatures (
@@ -530,6 +540,7 @@ ArmFfaMemLibPermGet (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ((UINTN)BaseAddr > MAX_UINT32) ? ARM_FID_FFA_MEM_PERM_GET_AARCH64 : ARM_FID_FFA_MEM_PERM_GET_AARCH32;
 
   Status = ArmFfaLibGetFeatures (
@@ -585,6 +596,7 @@ ArmFfaMemLibPermSet (
 
   ASSERT ((MemoryPerm & ARM_FFA_MEM_PERM_RESERVED_MASK) == 0);
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ((UINTN)BaseAddr > MAX_UINT32) ? ARM_FID_FFA_MEM_PERM_SET_AARCH64 : ARM_FID_FFA_MEM_PERM_SET_AARCH32;
 
   Status = ArmFfaLibGetFeatures (
