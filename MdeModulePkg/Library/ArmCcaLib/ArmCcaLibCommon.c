@@ -105,6 +105,76 @@ ExitHandler:
   return Status;
 }
 
+/** Check if the address range has the Ripas state set
+
+  @param [in]   BaseAddress      Base address of the region.
+  @param [in]   Length           Length of the device region.
+  @param [in]   State            The Ripas State to check for the region.
+  @param [out]  IsRipasStateSet  TRUE if the RIPAS state for the full address
+                                 range matches State. FALSE otherwise.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The request is not initiated in a
+                                    Realm.
+**/
+STATIC
+RETURN_STATUS
+EFIAPI
+ArmCcaMemRangeIsRipasStateSet (
+  IN  UINT64         BaseAddress,
+  IN  UINT64         Length,
+  IN  ARM_CCA_RIPAS  State,
+  OUT BOOLEAN        *IsRipasStateSet
+  )
+{
+  RETURN_STATUS  RetStatus;
+  ARM_CCA_RIPAS  CurrentState;
+  UINT64         *Base;
+  UINT64         *Top;
+  UINT64         *End;
+
+  if ((Length == 0) ||
+      (IsRipasStateSet == NULL) ||
+      (BaseAddress > MAX_UINT64 - Length))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if (!ArmCcaIsRealm ()) {
+    *IsRipasStateSet = FALSE;
+    return RETURN_UNSUPPORTED;
+  }
+
+  Base = (UINT64 *)BaseAddress;
+  End  = (UINT64 *)(BaseAddress + Length);
+
+  while (Base < End) {
+    Top       = End;
+    RetStatus = ArmCcaRsiGetIpaState (
+                  Base,
+                  &Top,
+                  &CurrentState
+                  );
+    if (RETURN_ERROR (RetStatus)) {
+      // An error occurred.
+      *IsRipasStateSet = FALSE;
+      return RetStatus;
+    }
+
+    if (CurrentState != State) {
+      // RIPAS state does not match.
+      *IsRipasStateSet = FALSE;
+      return RetStatus;
+    }
+
+    Base = Top;
+  } // while
+
+  *IsRipasStateSet = TRUE;
+  return RETURN_SUCCESS;
+}
+
 /** Check if the address range is protected MMIO
 
   @param [in]   BaseAddress      Base address of the device MMIO region.
@@ -127,45 +197,40 @@ ArmCcaMemRangeIsProtectedMmio (
   OUT BOOLEAN  *IsProtectedMmio
   )
 {
-  RETURN_STATUS  RetStatus;
-  UINT64         *Base;
-  UINT64         *Top;
-  UINT64         *End;
-  ARM_CCA_RIPAS  State;
+  return ArmCcaMemRangeIsRipasStateSet (
+           BaseAddress,
+           Length,
+           RipasDev,
+           IsProtectedMmio
+           );
+}
 
-  if ((Length == 0) || (IsProtectedMmio == NULL)) {
-    return RETURN_INVALID_PARAMETER;
-  }
+/** Check if the address range is Host shared i.e. Ripas Empty.
 
-  if (!ArmCcaIsRealm ()) {
-    *IsProtectedMmio = FALSE;
-    return RETURN_UNSUPPORTED;
-  }
+  @param [in]   BaseAddress      Base address of the device MMIO region.
+  @param [in]   Length           Length of the device MMIO region.
+  @param [out]  IsHostShared     TRUE - if the RIPAS for the address range is
+                                        Host shared.
+                                 FALSE - if the RIPAS for the address range is
+                                         not Host shared.
 
-  Base = (UINT64 *)BaseAddress;
-  End  = (UINT64 *)(BaseAddress + Length);
-
-  while (Base < End) {
-    Top       = End;
-    RetStatus = ArmCcaRsiGetIpaState (
-                  Base,
-                  &Top,
-                  &State
-                  );
-    if (RETURN_ERROR (RetStatus)) {
-      // An error occurred.
-      return RetStatus;
-    }
-
-    if (State != RipasDev) {
-      // The address range is not protected MMIO.
-      *IsProtectedMmio = FALSE;
-      return RetStatus;
-    }
-
-    Base = Top;
-  } // while
-
-  *IsProtectedMmio = TRUE;
-  return RETURN_SUCCESS;
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The request is not initiated in a
+                                    Realm.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaMemRangeIsHostShared (
+  IN  UINT64   BaseAddress,
+  IN  UINT64   Length,
+  OUT BOOLEAN  *IsHostShared
+  )
+{
+  return ArmCcaMemRangeIsRipasStateSet (
+           BaseAddress,
+           Length,
+           RipasEmpty,
+           IsHostShared
+           );
 }

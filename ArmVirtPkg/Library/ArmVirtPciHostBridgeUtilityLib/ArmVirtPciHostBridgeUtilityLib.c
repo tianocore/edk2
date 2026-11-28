@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PciApertureMapLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
@@ -78,7 +79,8 @@ STATIC PCI_ROOT_BRIDGE  mRootBridge;
   @param [in]  PMem                   Prefetchable MMIO aperture.
   @param [in]  PMemAbove4G            Prefetchable MMIO aperture above 4G.
 
-  @return                            All the root bridge instances in an array.
+  @return  The root bridge instance array, or NULL if the input parameters are
+             invalid or PCI aperture mapping fails.
 **/
 PCI_ROOT_BRIDGE *
 EFIAPI
@@ -97,6 +99,8 @@ PciHostBridgeUtilityGetRootBridges (
   IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G
   )
 {
+  EFI_STATUS  Status;
+
   if ((Count == NULL)       ||
       (Io == NULL)          ||
       (Mem == NULL)         ||
@@ -104,6 +108,19 @@ PciHostBridgeUtilityGetRootBridges (
       (PMem == NULL)        ||
       (PMemAbove4G == NULL))
   {
+    return NULL;
+  }
+
+  Status = MapPciApertures (
+             Io,
+             Mem,
+             MemAbove4G,
+             PMem,
+             PMemAbove4G
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    *Count = 0;
     return NULL;
   }
 

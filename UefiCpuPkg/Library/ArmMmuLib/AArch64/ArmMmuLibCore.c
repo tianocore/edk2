@@ -711,6 +711,7 @@ ArmSetMemoryAttributes (
   UINT64      PageAttributes;
   UINT64      PageAttributeMask;
   UINT64      CcaProtectionAttribute;
+  BOOLEAN     IsHostShared;
 
   PageAttributes = GcdAttributeToPageAttribute (Attributes);
 
@@ -720,18 +721,48 @@ ArmSetMemoryAttributes (
   }
 
   //
-  // Full memory type updates replace the normal descriptor attributes, but must
-  // not change the Realm protected/unprotected state. UpdateRegionMapping()
-  // preserves bits that are set in PageAttributeMask by copying them from the
-  // existing descriptor, i.e. (*Entry & AttributeClearMask) | AttributeSetMask
-  // which is something equivalent to:
+  // Full memory type updates replace the normal descriptor attributes. By
+  // default, preserve the Realm protected/unprotected state from the old
+  // descriptor. UpdateRegionMapping() preserves bits that are set in
+  // PageAttributeMask by copying them from the existing descriptor, i.e.
+  // (*Entry & AttributeClearMask) | AttributeSetMask, which is equivalent to:
   //   NewEntry = (OldEntry & PageAttributeMask) | PageAttributes;
-  // Therefore, clear the CCA protection bit from PageAttributes so that
-  // the new value cannot force it, then add the bit to PageAttributeMask so
-  // the old descriptor keeps supplying the protected/unprotected state.
+  // Therefore, clear the CCA protection bit from PageAttributes so that the new
+  // value cannot force it, then add the bit to PageAttributeMask so the old
+  // descriptor keeps supplying the protected/unprotected state.
   //
   PageAttributes   &= ~CcaProtectionAttribute;
   PageAttributeMask = CcaProtectionAttribute;
+
+  //
+  // Check the CcaProtectionAttribute to determine if we are running in a Realm.
+  // EFI_MEMORY_UC is used for MMIO mappings. In a Realm, MMIO must be mapped in
+  // the unprotected IPA space, so force the CCA protection bit instead of
+  // preserving the old descriptor value for this memory type.
+  //
+  if ((CcaProtectionAttribute != 0) &&
+      ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_UC))
+  {
+    //
+    // If a device is emulated within the Realm (in Realm Plane 0) or
+    // by the RMM, then the CCA Protection Attribute must not be set.
+    // The CCA Protection attribute must only be set for the memory
+    // range which is shared with the Host.
+    //
+    Status = ArmCcaCheckMemRangeIsHostShared (
+               BaseAddress,
+               Length,
+               &IsHostShared
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (IsHostShared) {
+      PageAttributes    |= CcaProtectionAttribute;
+      PageAttributeMask &= ~CcaProtectionAttribute;
+    }
+  }
 
   if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
     //
@@ -761,8 +792,9 @@ ArmSetMemoryAttributes (
   } else {
     //
     // Full memory type update, this means update the
-    // cacheability/shareability/permission bits from PageAttributes,
-    // but preserve the CCA protection bit from the old descriptor.
+    // cacheability/shareability/permission bits from PageAttributes.
+    // The CCA protection bit is preserved from the old descriptor, except for
+    // EFI_MEMORY_UC Realm mappings where it was forced above.
     //
     ASSERT (AttributeMask == 0);
     if (AttributeMask != 0) {
@@ -797,6 +829,10 @@ ArmConfigureMmu (
   UINTN       RootTableEntryCount;
   UINT64      TCR;
   EFI_STATUS  Status;
+  BOOLEAN     IsDualRegime;
+  BOOLEAN     Is52BitTgran4Supported;
+  BOOLEAN     EnableLpa2Tgran4;
+  BOOLEAN     UseLpa2Tgran4;
 
   ASSERT (ArmReadCurrentEL () < AARCH64_EL3);
   if (ArmReadCurrentEL () == AARCH64_EL3) {
@@ -808,6 +844,12 @@ ArmConfigureMmu (
     return EFI_INVALID_PARAMETER;
   }
 
+  // Used to indicate if LPA2 support is being configured in the TCR.
+  EnableLpa2Tgran4 = FALSE;
+
+  // Used to indicate that LPA2 support can be enabled.
+  UseLpa2Tgran4 = FALSE;
+
   //
   // Limit the virtual address space to what we can actually use: UEFI
   // mandates a 1:1 mapping, so no point in making the virtual address
@@ -815,7 +857,8 @@ ArmConfigureMmu (
   // into account the architectural limitations that result from UEFI's
   // use of 4 KB pages.
   //
-  if (ArmHas52BitTgran4 ()) {
+  Is52BitTgran4Supported = ArmHas52BitTgran4 ();
+  if (Is52BitTgran4Supported) {
     MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_LPA2);
   } else {
     MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
@@ -829,7 +872,8 @@ ArmConfigureMmu (
   //
   // Set TCR that allows us to retrieve T0SZ in the subsequent functions
   //
-  if (!TranslationRegimeIsDual ()) {
+  IsDualRegime = TranslationRegimeIsDual ();
+  if (!IsDualRegime) {
     // Note: Bits 23 and 31 are reserved(RES1) bits in TCR_EL2
     TCR = T0SZ | (1UL << 31) | (1UL << 23) | TCR_TG0_4KB;
 
@@ -846,8 +890,9 @@ ArmConfigureMmu (
       TCR |= TCR_PS_16TB;
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_PS_256TB;
-    } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
-      TCR |= TCR_PS_4PB | TCR_DS_NVHE;
+    } else if ((MaxAddress < SIZE_4PB) && Is52BitTgran4Supported) {
+      TCR             |= TCR_PS_4PB | TCR_DS_NVHE;
+      EnableLpa2Tgran4 = TRUE;
     } else {
       DEBUG ((
         DEBUG_ERROR,
@@ -874,8 +919,9 @@ ArmConfigureMmu (
       TCR |= TCR_IPS_16TB;
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_IPS_256TB;
-    } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
-      TCR |= TCR_IPS_4PB | TCR_DS;
+    } else if ((MaxAddress < SIZE_4PB) && Is52BitTgran4Supported) {
+      TCR             |= TCR_IPS_4PB | TCR_DS;
+      EnableLpa2Tgran4 = TRUE;
     } else {
       DEBUG ((
         DEBUG_ERROR,
@@ -885,6 +931,23 @@ ArmConfigureMmu (
       ASSERT (0); // Bigger than 48/52-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
+  }
+
+  //
+  // Keep the TCR LPA2 selection consistent with the address-size based
+  // LPA2 descriptor format decision made before the MMU is enabled.
+  //
+  UseLpa2Tgran4 = ArmIsLpa2Tgran4Required (
+                    Is52BitTgran4Supported,
+                    MaxAddressBits
+                    );
+  if (EnableLpa2Tgran4 != UseLpa2Tgran4) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ArmConfigureMmu: LPA2 TCR selection does not match selected LPA2 mode.\n"
+      ));
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
   }
 
   //
@@ -997,6 +1060,30 @@ ArmLpa2Enabled (
   return !TranslationRegimeIsDual () ?
          ((TCR & TCR_DS_NVHE) != 0) :
          ((TCR & TCR_DS) != 0);
+}
+
+/**
+  Determine whether LPA2 descriptor encoding is required for
+  a 4 KB translation granule.
+
+  This function does not depend on the current TCR configuration
+  and can be called before the MMU is configured.
+
+  @param [in] Is52BitTgran4Supported  Whether FEAT_LPA2 is supported
+                                      for 4 KB translation granules.
+  @param [in] MaxAddressBits          Maximum configured address width.
+
+  @retval TRUE   LPA2 descriptor encoding is required and supported.
+  @retval FALSE  LPA2 descriptor encoding is not selected.
+**/
+BOOLEAN
+EFIAPI
+ArmIsLpa2Tgran4Required (
+  IN BOOLEAN  Is52BitTgran4Supported,
+  IN UINT64   MaxAddressBits
+  )
+{
+  return Is52BitTgran4Supported && (MaxAddressBits > MAX_VA_BITS_48);
 }
 
 RETURN_STATUS

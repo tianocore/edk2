@@ -71,6 +71,11 @@
   #                  instances in ArmVirtPkg and OvmfPkg.
   PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
 
+  ##  @libraryclass  Provides functions to premap the PCI apertures in
+  #                  PciHostBridgeUtilityLib instances in ArmVirtPkg and
+  #                  OvmfPkg.
+  PciApertureMapLib|Include/Library/PciApertureMapLib.h
+
   ##  @libraryclass  Register a status code handler for printing the Boot
   #                  Manager's LoadImage() and StartImage() preparations, and
   #                  return codes, to the UEFI console.
@@ -163,10 +168,6 @@
   ##  @libraryclass  MemDebugLogLib
   #
   MemDebugLogLib|Include/Library/MemDebugLogLib.h
-
-  ##  @libraryclass   Provides helper interface for mapping mmio memory regions.
-  #
-  MapMmioLib|Include/Library/MapMmioLib.h
 
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}

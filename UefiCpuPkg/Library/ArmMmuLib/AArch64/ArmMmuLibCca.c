@@ -55,6 +55,8 @@ ArmCcaGetMemoryProtectionAttribute (
   UINT64         TopBits;
   UINT64         MaxAddressBits;
   UINT64         CcaProtectionAttribute;
+  BOOLEAN        Is52BitTgran4Supported;
+  BOOLEAN        UseLpa2Tgran4;
 
   if (CcaProtectionAttributeMask == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -73,28 +75,38 @@ ArmCcaGetMemoryProtectionAttribute (
 
   CcaProtectionAttribute = 1ULL << (IpaWidth - 1);
 
-  if (ArmLpa2Enabled ()) {
-    /*
-    * For LPA2, the top IPA bits (e.g., bits 50..51) map into upper page table
-    * attributes in a packed form. Extract those top IPA bits and move them to
-    * the encoding expected in the Attributes field.
-    *
-    * TopBits calculation: use BIT51|BIT50 to detect whether the protection bit
-    * sits in the top IPA range, then translate to the TTBR/LPA2 attribute
-    * position. (See ARM ARM: translation-table entry formats for LPA2).
-    * When FEAT_LPA2 is implemented and TCR_ELX.DS = 1:
-    *   Bits[9:8] of translation table descriptors hold output address[51:50].
-    */
-    TopBits = CcaProtectionAttribute & TT_UPPER_IPA_BITS;
-    if (TopBits != 0) {
-      CcaProtectionAttribute = (TopBits >> (TT_UPPER_IPA_TO_OUTADDR_SHIFT));
-    }
-  }
+  Is52BitTgran4Supported = ArmHas52BitTgran4 ();
 
-  if (ArmHas52BitTgran4 ()) {
+  if (Is52BitTgran4Supported) {
     MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_LPA2);
   } else {
     MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
+  }
+
+  /*
+   * For LPA2, the top IPA bits (e.g., bits 50..51) map into upper page table
+   * attributes in a packed form. Extract those top IPA bits and move them to
+   * the encoding expected in the Attributes field.
+   *
+   * TopBits calculation: use BIT51|BIT50 to detect whether the protection bit
+   * sits in the top IPA range, then translate to the TTBR/LPA2 attribute
+   * position. (See ARM ARM: translation-table entry formats for LPA2).
+   * When FEAT_LPA2 is implemented and TCR_ELX.DS = 1:
+   *   Bits[9:8] of translation table descriptors hold output address[51:50].
+   */
+  TopBits = CcaProtectionAttribute & TT_UPPER_IPA_BITS;
+  if (TopBits != 0) {
+    // If TopBits are set, FEAT_LPA2 must be supported. ArmConfigureMmu()
+    // must later enable the matching descriptor format.
+    UseLpa2Tgran4 = ArmIsLpa2Tgran4Required (
+                      Is52BitTgran4Supported,
+                      MaxAddressBits
+                      );
+    if (!UseLpa2Tgran4) {
+      return EFI_UNSUPPORTED;
+    }
+
+    CcaProtectionAttribute = (TopBits >> (TT_UPPER_IPA_TO_OUTADDR_SHIFT));
   }
 
   if (CcaProtectionAttribute > (1ULL << (MaxAddressBits - 1))) {
@@ -200,4 +212,30 @@ ArmCcaSetMemoryProtectionAttribute (
            ArmLpa2Enabled (),
            CcaProtectionAttribute
            );
+}
+
+/** Check if the address range is host shared, i.e. RIPAS Empty.
+
+  @param[in]  BaseAddress   Base address of the memory region.
+  @param[in]  Length        Length of the memory region in bytes.
+  @param[out] IsHostShared  TRUE if the RIPAS state for the full address range
+                            is Empty. FALSE otherwise.
+
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_UNSUPPORTED        The request is not initiated in a Realm.
+**/
+EFI_STATUS
+EFIAPI
+ArmCcaCheckMemRangeIsHostShared (
+  IN  UINT64   BaseAddress,
+  IN  UINT64   Length,
+  OUT BOOLEAN  *IsHostShared
+  )
+{
+  return (EFI_STATUS)ArmCcaMemRangeIsHostShared (
+                       BaseAddress,
+                       Length,
+                       IsHostShared
+                       );
 }

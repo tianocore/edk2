@@ -12,7 +12,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/MapMmioLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 

@@ -33,5 +33,6 @@
   DevicePathLib
   DxeHardwareInfoLib
   MemoryAllocationLib
+  PciApertureMapLib
   PciLib
   QemuFwCfgLib

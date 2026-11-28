@@ -576,6 +576,7 @@
     <LibraryClasses>
       PciHostBridgeLib|OvmfPkg/Library/PciHostBridgeLibScan/PciHostBridgeLibScan.inf
       PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+      PciApertureMapLib|OvmfPkg/Library/PciApertureMapLibNull/PciApertureMapLibNull.inf
       NULL|OvmfPkg/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
   }
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
