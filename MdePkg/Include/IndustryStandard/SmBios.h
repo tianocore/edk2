@@ -1557,7 +1557,7 @@ typedef enum {
 typedef enum {
   Others = 0x00,
   Gen1   = 0x01,
-  Gen2   = 0x01,
+  Gen2   = 0x02,
   Gen3   = 0x03,
   Gen4   = 0x04,
   Gen5   = 0x05,
