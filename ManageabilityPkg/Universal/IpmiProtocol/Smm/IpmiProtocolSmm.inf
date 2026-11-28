@@ -36,6 +36,7 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  IpmiPlatformInitLib
   ManageabilityTransportHelperLib
   ManageabilityTransportLib
   MmServicesTableLib
@@ -50,6 +51,7 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress   # Used as default KCS I/O base adddress
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress

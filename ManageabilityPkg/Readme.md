@@ -173,7 +173,76 @@ platform design.
 
 ## Transport Implementation
 
-   The manageability transport library could have the implementation in library or
-   invoke the existing edk2 protocol which is defined in UEFI or PI specifications.
-   This is the implementation decision made by the developer when introduce a new
-   manageability transport library.
+The manageability transport library can implement a transport directly or
+invoke an existing protocol defined by the UEFI or PI specifications. This is
+the transport library developer's implementation decision.
+
+### KCS library instances
+
+For PEIM consumers, map `ManageabilityTransportLib` to
+`ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcsPei.inf`.
+This instance stores hardware configuration and session ownership in a GUID HOB.
+After permanent memory is discovered, temporary-memory sessions are no longer
+valid: consumers must acquire and initialize a new transport session before
+issuing commands. Stale tokens are rejected without dereferencing them.
+The IPMI PEI provider registers a Memory Discovered notification to rebind its
+PPI method and rebuild its transport automatically. If that rebuild fails, the
+next command retries initialization before using the transport.
+
+DXE, SMM and Standalone MM consumers use
+`ManageabilityPkg/Library/ManageabilityTransportKcsLib/BaseManageabilityTransportKcs.inf`.
+The former `Dxe/DxeManageabilityTransportKcs.inf` duplicate has been removed;
+platform DSC files referencing it must use the base instance instead.
+
+The IPMI KCS data port comes from
+`gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress`. Set
+`gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress` to an absolute
+command/status port when it is not adjacent to the data port. Its default value
+of zero preserves the data-base-plus-one mapping. For example, data port
+`0xCA0` and command/status port `0xCA4` are configured as:
+
+```ini
+[PcdsFixedAtBuild]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xCA0
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress|0xCA4
+```
+
+Command ports below the data port are also supported. The IPMI providers use
+this setting in PEI, DXE, SMM and Standalone MM. Direct KCS transport consumers
+that provide explicit hardware information retain control of all register
+addresses; the PCDs are defaults only when that information is absent.
+
+### IPMI platform initialization
+
+Each PEI, DXE, SMM and Standalone MM IPMI provider calls
+`IpmiPlatformInitialize()` before acquiring its transport or publishing its
+interface. A failure is logged and prevents provider initialization. This hook
+is not called again during PEI memory recovery or command submission.
+
+`Manageability.dsc.inc` maps `IpmiPlatformInitLib` to the no-op
+`ManageabilityPkg/Library/IpmiPlatformInitLibNull/IpmiPlatformInitLibNull.inf`.
+Platforms needing KCS I/O decode or other hardware preparation must override
+that mapping with a phase-appropriate implementation. The hook must not call
+back into the IPMI provider being initialized. PEI implementations must not
+write image globals or retain temporary-memory pointers across migration.
+
+Before publishing the PEI IPMI PPI, the provider issues Get Device ID and logs
+the BMC device ID and firmware version. A transport failure, truncated mandatory
+response, or nonzero completion code prevents PPI publication. The optional
+auxiliary firmware revision field is not required.
+
+### Discarding IPMI responses
+
+The IPMI providers accept both response arguments as `NULL` when the caller
+does not need the result. They still receive the reply into an internal
+256-byte buffer, so the KCS transaction can finish before the next command.
+Transport and completion-code errors are still returned. Passing only one
+response argument as `NULL` returns `EFI_INVALID_PARAMETER`; a discarded
+response that fills the internal buffer returns `EFI_BUFFER_TOO_SMALL`.
+
+The host test DSC is `ManageabilityPkg/Test/ManageabilityPkgHostTest.dsc`.
+Run its package CI build and tests with:
+
+```text
+stuart_ci_build -c .pytool/CISettings.py -p ManageabilityPkg -a X64 -t NOOPT -d HostUnitTestCompilerPlugin=run
+```

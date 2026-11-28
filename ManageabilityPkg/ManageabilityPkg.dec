@@ -48,6 +48,10 @@
   #   Provide the help functions to check the BMC state
   PlatformBmcReadyLib|Include/Library/PlatformBmcReadyLib.h
 
+  ##  @libraryclass Explicit IPMI Platform Initialization Library
+  #   Prepare platform hardware before IPMI transport initialization
+  IpmiPlatformInitLib|Include/Library/IpmiPlatformInitLib.h
+
 [Guids]
   gManageabilityPkgTokenSpaceGuid   = { 0xBDEFFF48, 0x1C31, 0x49CD, { 0xA7, 0x6D, 0x92, 0x9E, 0x60, 0xDB, 0xB9, 0xF8 } }
 
@@ -77,6 +81,8 @@
   # Manageability variable Guid
   gManageabilityVariableGuid        = { 0xac4cf43f, 0x3f64, 0x416a, { 0x96, 0x1d, 0x03, 0x1b, 0x53, 0x5b, 0x91, 0x5f } }
 
+  gManageabilityKcsInfoHobGuid      = { 0x81f06210, 0xfad4, 0x4854, { 0xac, 0x22, 0xd2, 0x5d, 0x7e, 0x40, 0x73, 0x0d } }
+
 [Protocols]
   gEdkiiPldmProtocolGuid                = { 0x60997616, 0xDB70, 0x4B5F, { 0x86, 0xA4, 0x09, 0x58, 0xA3, 0x71, 0x47, 0xB4 } }
   gEdkiiPldmSmbiosTransferProtocolGuid  = { 0xFA431C3C, 0x816B, 0x4B32, { 0xA3, 0xE0, 0xAD, 0x9B, 0x7F, 0x64, 0x27, 0x2E } }
@@ -99,6 +105,11 @@
   ## This is the timeout value for the KCS status check.
   # @Prompt KCS interface status check timeout in microseconds.
   gManageabilityPkgTokenSpaceGuid.PcdKcsStatusCheckTimeout|5000000|UINT64|0x00000005
+
+  ## Absolute IPMI KCS command/status I/O address.
+  #  Zero derives the address from PcdIpmiKcsIoBaseAddress plus one.
+  # @Prompt IPMI KCS command/status I/O address
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress|0|UINT16|0x00000006
 
   ## This value is the PLDM source and destination terminus ID for transmiting PLDM message.
   # @Prompt PLDM source terminus ID

@@ -211,13 +211,14 @@ IpmiSendMessage (
   );
 
 /**
-  This function gets the system UUID.
+  This function gets the system UUID as a canonical EFI_GUID.
 
-  @param[out] SystemGuid   The pointer to retrieve system UUID.
+  @param[out] SystemGuid   The pointer to retrieve system UUID. Unchanged on failure.
 
-  @retval EFI_SUCCESS            Command is sent successfully.
-  @retval EFI_NOT_AVAILABLE_YET  Transport interface is not ready yet.
-  @retval Others                 Other errors.
+  @retval EFI_SUCCESS            UUID is returned.
+  @retval EFI_INVALID_PARAMETER  SystemGuid is a NULL pointer.
+  @retval EFI_DEVICE_ERROR       The command failed or its response is invalid.
+  @retval EFI_UNSUPPORTED        This library instance does not implement the command.
 
 **/
 EFI_STATUS
@@ -733,4 +734,45 @@ IpmiGetSdr (
   IN  IPMI_GET_SDR_REQUEST   *GetSdrRequest,
   OUT IPMI_GET_SDR_RESPONSE  *GetSdrResponse,
   IN OUT UINT32              *GetSdrResponseSize
+  );
+
+/**
+  This function sends the Set Sensor Thresholds command for a sensor.
+
+  @param[in]  SetSensorThresholdRequestData  The filled out Set Sensor Thresholds
+                                             request.
+  @param[out] CompletionCode                 The command completion code.
+
+  @retval EFI_SUCCESS            The command was sent successfully.
+  @retval EFI_INVALID_PARAMETER  SetSensorThresholdRequestData or CompletionCode
+                                 is NULL.
+  @retval EFI_UNSUPPORTED        This library instance does not implement the command.
+  @retval Others                 See the return values of IpmiSubmitCommand () function.
+
+**/
+EFI_STATUS
+EFIAPI
+IpmiSetSensorThreshold (
+  IN  IPMI_SENSOR_SET_SENSOR_THRESHOLD_REQUEST_DATA  *SetSensorThresholdRequestData,
+  OUT UINT8                                          *CompletionCode
+  );
+
+/**
+  This function sends the Get Sensor Thresholds command for a sensor.
+
+  @param[in]  SensorNumber                The unique identifier of the sensor being queried.
+  @param[out] GetSensorThresholdResponse  The Get Sensor Thresholds response, including
+                                          the completion code.
+
+  @retval EFI_SUCCESS            The command was sent successfully.
+  @retval EFI_INVALID_PARAMETER  GetSensorThresholdResponse is NULL.
+  @retval EFI_UNSUPPORTED        This library instance does not implement the command.
+  @retval Others                 See the return values of IpmiSubmitCommand () function.
+
+**/
+EFI_STATUS
+EFIAPI
+IpmiGetSensorThreshold (
+  IN  UINT8                                           SensorNumber,
+  OUT IPMI_SENSOR_GET_SENSOR_THRESHOLD_RESPONSE_DATA  *GetSensorThresholdResponse
   );

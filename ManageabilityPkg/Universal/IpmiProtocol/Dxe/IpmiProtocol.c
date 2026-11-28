@@ -7,6 +7,7 @@
 
 #include <PiDxe.h>
 #include <Library/DebugLib.h>
+#include <Library/IpmiPlatformInitLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ManageabilityTransportLib.h>
@@ -91,6 +92,12 @@ DxeIpmiEntry (
   EFI_HANDLE                                 Handle;
   MANAGEABILITY_TRANSPORT_CAPABILITY         TransportCapability;
   MANAGEABILITY_TRANSPORT_ADDITIONAL_STATUS  TransportAdditionalStatus;
+
+  Status = IpmiPlatformInitialize ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: IPMI platform initialization failed - %r\n", __func__, Status));
+    return Status;
+  }
 
   Status = HelperAcquireManageabilityTransport (
              &gManageabilityProtocolIpmiGuid,

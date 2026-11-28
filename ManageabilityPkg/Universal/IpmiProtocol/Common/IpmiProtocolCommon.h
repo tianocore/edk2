@@ -18,8 +18,11 @@
 #define IPMI_KCS_BASE_ADDRESS  PcdGet16 (PcdIpmiKcsIoBaseAddress)
 #define IPMI_KCS_REG_DATA_IN   IPMI_KCS_BASE_ADDRESS + IPMI_KCS_DATA_IN_REGISTER_OFFSET
 #define IPMI_KCS_REG_DATA_OUT  IPMI_KCS_BASE_ADDRESS + IPMI_KCS_DATA_OUT_REGISTER_OFFSET
-#define IPMI_KCS_REG_COMMAND   IPMI_KCS_BASE_ADDRESS + IPMI_KCS_COMMAND_REGISTER_OFFSET
-#define IPMI_KCS_REG_STATUS    IPMI_KCS_BASE_ADDRESS + IPMI_KCS_STATUS_REGISTER_OFFSET
+#define IPMI_KCS_REG_COMMAND \
+  ((PcdGet16 (PcdIpmiKcsIoCmdAddress) == 0) ? \
+   (IPMI_KCS_BASE_ADDRESS + IPMI_KCS_COMMAND_REGISTER_OFFSET) : \
+   PcdGet16 (PcdIpmiKcsIoCmdAddress))
+#define IPMI_KCS_REG_STATUS  IPMI_KCS_REG_COMMAND
 
 ///
 /// IPMI SSIF hardware information.
@@ -95,6 +98,9 @@ SetupIpmiRequestTransportPacket (
 /**
   Common code to submit IPMI commands
 
+  If both response arguments are NULL, the response is received into an internal
+  buffer and discarded. Transport and completion-code checks still apply.
+
   @param[in]         TransportToken    TRansport token.
   @param[in]         NetFunction       Net function of the command.
   @param[in]         Command           IPMI Command.
@@ -110,6 +116,8 @@ SetupIpmiRequestTransportPacket (
   @retval EFI_TIMEOUT            The command time out.
   @retval EFI_UNSUPPORTED        The command was not successfully sent to the device.
   @retval EFI_OUT_OF_RESOURCES   The resource allocation is out of resource or data size error.
+  @retval EFI_INVALID_PARAMETER  Only one of the response arguments is NULL.
+  @retval EFI_BUFFER_TOO_SMALL   A discarded response filled the internal buffer.
 **/
 EFI_STATUS
 CommonIpmiSubmitCommand (

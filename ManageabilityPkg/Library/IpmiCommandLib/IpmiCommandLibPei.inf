@@ -19,6 +19,7 @@
   IpmiCommandLibNetFnApp.c
   IpmiCommandLibNetFnChassis.c
   IpmiCommandLibNetFnStorage.c
+  IpmiCommandLibNetFnSensor.c
   IpmiCommandLibNetFnTransport.c
 
 [Packages]

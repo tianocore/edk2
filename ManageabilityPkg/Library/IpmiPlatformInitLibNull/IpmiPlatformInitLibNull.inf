@@ -1,0 +1,21 @@
+## @file
+#  No-op instance of the explicit IPMI platform initialization library.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = IpmiPlatformInitLibNull
+  FILE_GUID                      = 69D54337-2A08-4066-8E34-5E0691DF9AED
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiPlatformInitLib|PEIM DXE_DRIVER DXE_SMM_DRIVER MM_STANDALONE
+
+[Sources]
+  IpmiPlatformInitLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec

@@ -23,6 +23,7 @@
   IpmiCommandLibNetFnTransport.c
   IpmiCommandLibNetFnChassis.c
   IpmiCommandLibNetFnStorage.c
+  IpmiCommandLibNetFnSensor.c
 
 [Packages]
   MdePkg/MdePkg.dec

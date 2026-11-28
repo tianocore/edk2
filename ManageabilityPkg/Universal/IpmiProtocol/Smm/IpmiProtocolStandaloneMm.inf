@@ -33,6 +33,7 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  IpmiPlatformInitLib
   ManageabilityTransportHelperLib
   ManageabilityTransportLib
   MemoryAllocationLib
@@ -50,6 +51,7 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiKcsIoCmdAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress
