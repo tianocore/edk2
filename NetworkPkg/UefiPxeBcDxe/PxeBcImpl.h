@@ -213,12 +213,14 @@ struct _PXEBC_PRIVATE_DATA {
   //   (OfferIndex is 0-based.)
   //
   //
-  UINT32                     SelectIndex;
-  UINT32                     SelectProxyType;
-  PXEBC_DHCP_PACKET_CACHE    OfferBuffer[PXEBC_OFFER_MAX_NUM];
-  UINT32                     OfferNum;
-  UINT32                     OfferCount[PxeOfferTypeMax];
-  UINT32                     OfferIndex[PxeOfferTypeMax][PXEBC_OFFER_MAX_NUM];
+  UINT32                       SelectIndex;
+  UINT32                       SelectProxyType;
+  PXEBC_DHCP_PACKET_CACHE      OfferBuffer[PXEBC_OFFER_MAX_NUM];
+  UINT32                       OfferNum;
+  UINT32                       OfferCount[PxeOfferTypeMax];
+  UINT32                       OfferIndex[PxeOfferTypeMax][PXEBC_OFFER_MAX_NUM];
+  EFI_UDP4_COMPLETION_TOKEN    Udp4Token;
+  EFI_UDP6_COMPLETION_TOKEN    Udp6Token;
 };
 
 extern EFI_PXE_BASE_CODE_PROTOCOL           gPxeBcProtocolTemplate;
