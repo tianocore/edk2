@@ -97,14 +97,16 @@ MemoryPeim (
   SystemMemoryTop  = SystemMemoryBase + (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemorySize);
 
   //
-  // Check if the resource for the main system memory has been declared
+  // Check if the resource for the main system memory has been declared. The PCD range may be expanded by a platform
+  // during runtime when it creates HOBs, so we will only check if the SystemMemoryBase is contained within a HOB
+  // already.
   //
   Found       = FALSE;
   NextHob.Raw = GetHobList ();
   while ((NextHob.Raw = GetNextResourceHob (NextHob.Raw)) != NULL) {
     if ((NextHob.ResourceDescriptor2->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
         (SystemMemoryBase >= NextHob.ResourceDescriptor2->PhysicalStart) &&
-        (NextHob.ResourceDescriptor2->PhysicalStart + NextHob.ResourceDescriptor2->ResourceLength <= SystemMemoryTop))
+        (NextHob.ResourceDescriptor2->PhysicalStart + NextHob.ResourceDescriptor2->ResourceLength > SystemMemoryBase))
     {
       Found = TRUE;
       break;
