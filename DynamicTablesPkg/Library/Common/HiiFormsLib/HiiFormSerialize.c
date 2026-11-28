@@ -30,6 +30,22 @@
 */
 #define MAX_HII_OPCODE_LENGTH  127
 
+/** Forward declarations for functions
+*/
+static
+EFI_STATUS
+DynHiiProcessCondition (
+  IN  DYN_HII_CONDITION   *Condition,
+  IN  DYN_HII_IFR_BUFFER  *BufInfo
+  );
+
+static
+EFI_STATUS
+DynHiiProcessForm (
+  IN  CONST DYN_HII_FORM        *Form,
+  IN        DYN_HII_IFR_BUFFER  *BufInfo
+  );
+
 /** Re-size the IFR byte-stream buffer.
 
   Re-size the IFR byte-stream buffer to accommodate the TotalSize passed to
@@ -227,6 +243,595 @@ DynHiiInsertEndOp (
 
   CopyMem (Buf, &End, sizeof (EFI_IFR_END));
   BufInfo->Position += sizeof (EFI_IFR_END);
+
+  return EFI_SUCCESS;
+}
+
+/** Serialize the question reference expression into the IFR buffer.
+
+  Serialize the expression which pushes the given question's value onto
+  the expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters was invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeQuestionRef1Expr (
+  IN  CONST DYN_HII_NODE_HDR    *Hdr,
+  IN        DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  UINT8                  *Buf;
+  UINT32                 ExprSize;
+  EFI_STATUS             Status;
+  DYN_HII_EXPRESSION     *Expr;
+  EFI_IFR_QUESTION_REF1  QuestionRef1;
+
+  ASSERT (Hdr->Type == DynHiiNodeExpression);
+
+  Expr     = (DYN_HII_EXPRESSION *)Hdr;
+  ExprSize = sizeof (EFI_IFR_QUESTION_REF1);
+
+  if (Expr->ExpressionType != DynHiiExprQuestionRef1) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Expr->Data.QuestionRef1.QuestionId == 0) {
+    ASSERT (Expr->Data.QuestionRef1.QuestionId != 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiIfrBufferSizeCheck (BufInfo, ExprSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Buf = BufInfo->Data + BufInfo->Position;
+
+  QuestionRef1.Header.OpCode = EFI_IFR_QUESTION_REF1_OP;
+  QuestionRef1.Header.Length = (UINT8)ExprSize;
+  QuestionRef1.Header.Scope  = Hdr->Scope;
+  QuestionRef1.QuestionId    = Expr->Data.QuestionRef1.QuestionId;
+
+  CopyMem (Buf, &QuestionRef1, ExprSize);
+  BufInfo->Position += ExprSize;
+
+  return EFI_SUCCESS;
+}
+
+/** Serialize the 64-bit value expression into the IFR buffer.
+
+  Serialize the expression which pushes a 64-bit unsigned integer onto
+  the expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters was invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeUint64Expr (
+  IN  CONST DYN_HII_NODE_HDR    *Hdr,
+  IN        DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  UINT8               *Buf;
+  UINT32              ExprSize;
+  EFI_STATUS          Status;
+  DYN_HII_EXPRESSION  *Expr;
+  EFI_IFR_UINT64      Uint64;
+
+  ASSERT (Hdr->Type == DynHiiNodeExpression);
+
+  Expr     = (DYN_HII_EXPRESSION *)Hdr;
+  ExprSize = sizeof (EFI_IFR_UINT64);
+
+  if (Expr->ExpressionType != DynHiiExprUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiIfrBufferSizeCheck (BufInfo, ExprSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Buf = BufInfo->Data + BufInfo->Position;
+
+  Uint64.Header.OpCode = EFI_IFR_UINT64_OP;
+  Uint64.Header.Length = (UINT8)ExprSize;
+  Uint64.Header.Scope  = Hdr->Scope;
+  Uint64.Value         = Expr->Data.Uint64.Value;
+
+  CopyMem (Buf, &Uint64, ExprSize);
+  BufInfo->Position += ExprSize;
+
+  return EFI_SUCCESS;
+}
+
+/** Serialize the equal value check expression into the IFR buffer.
+
+  Serialize the expression which pops two values, compares them, and pushes
+  a TRUE onto the expression stack if the values are equal, FALSE otherwise.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters was invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeEqIdValExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  UINT8               *Buf;
+  UINT32              ExprSize;
+  EFI_STATUS          Status;
+  DYN_HII_EXPRESSION  *Expr;
+  EFI_IFR_EQ_ID_VAL   EqIdVal;
+
+  ASSERT (Hdr->Type == DynHiiNodeExpression);
+
+  Expr     = (DYN_HII_EXPRESSION *)Hdr;
+  ExprSize = sizeof (EFI_IFR_EQ_ID_VAL);
+
+  if (Expr->ExpressionType != DynHiiExprEqIdVal) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Expr->Data.EqIdVal.QuestionId == 0) {
+    ASSERT (Expr->Data.EqIdVal.QuestionId != 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiIfrBufferSizeCheck (BufInfo, ExprSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Buf = BufInfo->Data + BufInfo->Position;
+
+  EqIdVal.Header.OpCode = EFI_IFR_EQ_ID_VAL_OP;
+  EqIdVal.Header.Length = (UINT8)ExprSize;
+  EqIdVal.Header.Scope  = Hdr->Scope;
+  EqIdVal.Value         = Expr->Data.EqIdVal.Value;
+  EqIdVal.QuestionId    = Expr->Data.EqIdVal.QuestionId;
+
+  CopyMem (Buf, &EqIdVal, ExprSize);
+  BufInfo->Position += ExprSize;
+
+  return EFI_SUCCESS;
+}
+
+/** Serialize the equal value list check expression into the IFR buffer.
+
+  Serialize the expression which compares the given question's value against
+  a list of unsigned 16-bit integer values, and pushes a TRUE onto the
+  expression stack if the value appears in the list, FALSE otherwise.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_INVALID_PARAMETER  One of the input parameters was invalid.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeEqIdValListExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  UINT8                   *Buf;
+  UINT32                  ValListSize;
+  UINT32                  ExprSize;
+  EFI_STATUS              Status;
+  DYN_HII_EXPRESSION      *Expr;
+  EFI_IFR_EQ_ID_VAL_LIST  EqIdValList;
+
+  ASSERT (Hdr->Type == DynHiiNodeExpression);
+
+  Expr = (DYN_HII_EXPRESSION *)Hdr;
+
+  if (Expr->ExpressionType != DynHiiExprEqIdValList) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Expr->Data.EqIdValList.ValueCount == 0) {
+    ASSERT (Expr->Data.EqIdValList.ValueCount != 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Expr->Data.EqIdValList.ValueList == NULL) {
+    ASSERT (Expr->Data.EqIdValList.ValueList != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Expr->Data.EqIdValList.QuestionId == 0) {
+    ASSERT (Expr->Data.EqIdValList.QuestionId != 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ValListSize = Expr->Data.EqIdValList.ValueCount * sizeof (UINT16);
+  ExprSize    = OFFSET_OF (EFI_IFR_EQ_ID_VAL_LIST, ValueList) + ValListSize;
+  if (ExprSize > MAX_HII_OPCODE_LENGTH) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  Status = DynHiiIfrBufferSizeCheck (BufInfo, ExprSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Buf = BufInfo->Data + BufInfo->Position;
+
+  EqIdValList.Header.OpCode = EFI_IFR_EQ_ID_VAL_LIST_OP;
+  EqIdValList.Header.Length = (UINT8)ExprSize;
+  EqIdValList.Header.Scope  = Hdr->Scope;
+  EqIdValList.QuestionId    = Expr->Data.EqIdValList.QuestionId;
+  EqIdValList.ListLength    = Expr->Data.EqIdValList.ValueCount;
+
+  CopyMem (Buf, &EqIdValList, OFFSET_OF (EFI_IFR_EQ_ID_VAL_LIST, ValueList));
+  BufInfo->Position += OFFSET_OF (EFI_IFR_EQ_ID_VAL_LIST, ValueList);
+
+  Buf = BufInfo->Data + BufInfo->Position;
+  CopyMem (
+    Buf,
+    Expr->Data.EqIdValList.ValueList,
+    ValListSize
+    );
+
+  BufInfo->Position += ValListSize;
+
+  return EFI_SUCCESS;
+}
+
+/** Serialize the header only expressions into the IFR buffer.
+
+  Serialize the expressions which do not include any data other than
+  EFI_IFR_OP_HEADER.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+  @param [in]  OpCode           Opcode for which serialization is to be done.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeExprOpHeader (
+  IN  CONST DYN_HII_NODE_HDR    *Hdr,
+  IN        DYN_HII_IFR_BUFFER  *BufInfo,
+  IN        UINT8               OpCode
+  )
+{
+  UINT8              *Buf;
+  UINT32             ExprSize;
+  EFI_STATUS         Status;
+  EFI_IFR_OP_HEADER  OpHdr;
+
+  ExprSize = sizeof (EFI_IFR_OP_HEADER);
+
+  Status = DynHiiIfrBufferSizeCheck (BufInfo, ExprSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Buf = BufInfo->Data + BufInfo->Position;
+
+  OpHdr.OpCode = OpCode;
+  OpHdr.Length = (UINT8)ExprSize;
+  OpHdr.Scope  = Hdr->Scope;
+
+  CopyMem (Buf, &OpHdr, ExprSize);
+  BufInfo->Position += ExprSize;
+
+  return EFI_SUCCESS;
+}
+
+/** Serialize the equal check expression into the IFR buffer.
+
+  Serialize the expression which pops two values, compares them, and pushes
+  a TRUE onto the expression stack if the values are equal, FALSE otherwise.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeEqualExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_EQUAL_OP);
+}
+
+/** Serialize the bitwise AND check expression into the IFR buffer.
+
+  Serialize the expression which pops two values, does a bitwise AND operation
+  on them, and pushes the result of the operation onto the expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeBitwiseAndExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_BITWISE_AND_OP);
+}
+
+/** Serialize the logical OR check expression into the IFR buffer.
+
+  Serialize the expression which pops two boolen values, does a logical
+  OR operation on them, and pushes the result of the operation onto the
+  expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeOrExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_OR_OP);
+}
+
+/** Serialize the logical AND check expression into the IFR buffer.
+
+  Serialize the expression which pops two boolen values, does a logical
+  AND operation on them, and pushes the result of the operation onto the
+  expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeAndExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_AND_OP);
+}
+
+/** Serialize the greater than check expression into the IFR buffer.
+
+  Serialize the expression which pops two values, compares them, and pushes
+  TRUE onto the expression stack if the first value is greater than the
+  second, pushes FALSE otherwise.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeGreaterThanExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_GREATER_THAN_OP);
+}
+
+/** Serialize the TRUE expression into the IFR buffer.
+
+  Serialize the expression which pushes a TRUE onto the expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeTrueExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_TRUE_OP);
+}
+
+/** Serialize the NOT expression into the IFR buffer.
+
+  Serialize the expression which pops a boolean, and pushes the NOT of that
+  value onto the expression stack.
+
+  @param [in]  Hdr              Pointer to the node header.
+  @param [in]  BufInfo          Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeNotExpr (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  return DynHiiSerializeExprOpHeader (Hdr, BufInfo, EFI_IFR_NOT_OP);
+}
+
+/** Serialize the expression data into the IFR buffer.
+
+  Check for the type of expressions and call the appropriate function
+  for serializing the expression data into the IFR buffer.
+
+  @param [in]  Hdr                Pointer to the node header.
+  @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_INVALID_PARAMETER  Invalid expression type.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeExpression (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  CONST DYN_HII_EXPRESSION           *Expr;
+  STATIC CONST DYN_HII_SERIALIZE_FN  ExprSerializers[DynHiiExprMax] = {
+    NULL,                                 // 0 is invalid
+    DynHiiSerializeQuestionRef1Expr,      // DynHiiExprQuestionRef1
+    DynHiiSerializeEqIdValExpr,           // DynHiiExprEqIdVal
+    DynHiiSerializeEqIdValListExpr,       // DynHiiExprEqIdValList
+    DynHiiSerializeEqualExpr,             // DynHiiExprEqual
+    DynHiiSerializeGreaterThanExpr,       // DynHiiExprGreaterThan
+    DynHiiSerializeAndExpr,               // DynHiiExprAnd
+    DynHiiSerializeOrExpr,                // DynHiiExprOr
+    DynHiiSerializeNotExpr,               // DynHiiExprNot
+    DynHiiSerializeBitwiseAndExpr,        // DynHiiExprBitwiseAnd
+    DynHiiSerializeTrueExpr,              // DynHiiExprTrue
+    DynHiiSerializeUint64Expr             // DynHiiExprUint64
+  };
+
+  if ((Hdr == NULL) || (Hdr->Type != DynHiiNodeExpression)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Expr = (CONST DYN_HII_EXPRESSION *)Hdr;
+  if (Expr->ExpressionType == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return DynHiiDispatchSerializeHandler (
+           ExprSerializers,
+           ARRAY_SIZE (ExprSerializers),
+           Expr->ExpressionType,
+           Hdr,
+           BufInfo
+           );
+}
+
+/** Serialize the condition into the IFR buffer.
+
+  Serialize the condition opcode into the IFR buffer.
+
+  @param [in]  Hdr                Pointer to the node header.
+  @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
+                                  buffer.
+  @retval  EFI_INVALID_PARAMETER  Invalid condition type.
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
+
+**/
+static
+EFI_STATUS
+DynHiiSerializeCondition (
+  IN  CONST    DYN_HII_NODE_HDR    *Hdr,
+  IN           DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  UINT8              *Buf;
+  UINT8              OpCode;
+  UINT32             CondSize;
+  EFI_STATUS         Status;
+  DYN_HII_CONDITION  *Condition;
+  EFI_IFR_OP_HEADER  OpHdr;
+
+  ASSERT (Hdr->Type == DynHiiNodeCondition);
+  ASSERT (Hdr->Scope == TRUE);
+
+  Condition = (DYN_HII_CONDITION *)Hdr;
+  switch (Condition->ConditionType) {
+    case DynHiiConditionSuppressIf:
+      OpCode = EFI_IFR_SUPPRESS_IF_OP;
+      break;
+
+    case DynHiiConditionGrayOutIf:
+      OpCode = EFI_IFR_GRAY_OUT_IF_OP;
+      break;
+
+    case DynHiiConditionDisableIf:
+      OpCode = EFI_IFR_DISABLE_IF_OP;
+      break;
+
+    default:
+      return EFI_UNSUPPORTED;
+  }
+
+  CondSize = sizeof (EFI_IFR_OP_HEADER);
+  Status   = DynHiiIfrBufferSizeCheck (BufInfo, CondSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Buf = BufInfo->Data + BufInfo->Position;
+
+  OpHdr.OpCode = OpCode;
+  OpHdr.Length = (UINT8)CondSize;
+  OpHdr.Scope  = TRUE;
+
+  CopyMem (Buf, &OpHdr, CondSize);
+  BufInfo->Position += CondSize;
 
   return EFI_SUCCESS;
 }
@@ -1313,6 +1918,7 @@ DynHiiSerializeOption (
 
   @retval  EFI_SUCCESS            The opcode was added successfully to the IFR
                                   buffer.
+  @retval  EFI_UNSUPPORTED        Default type is not supported.
   @retval  EFI_BAD_BUFFER_SIZE    Opcode data size greater than 127 bytes.
   @retval  EFI_OUT_OF_RESOURCES   Unable to allocate memory.
 
@@ -1334,7 +1940,11 @@ DynHiiSerializeDefault (
 
   DefaultSize = OFFSET_OF (EFI_IFR_DEFAULT, Value);
 
-  switch (DefaultNode->Type) {
+  if (DefaultNode->DefaultType != DynHiiDefaultLiteral) {
+    return EFI_UNSUPPORTED;
+  }
+
+  switch (DefaultNode->ValueType) {
     case EFI_IFR_TYPE_NUM_SIZE_8:
       DefaultSize += sizeof (UINT8);
       break;
@@ -1375,7 +1985,7 @@ DynHiiSerializeDefault (
   Default.Header.Scope  = 0;
 
   Default.DefaultId = DefaultNode->DefaultId;
-  Default.Type      = DefaultNode->Type;
+  Default.Type      = DefaultNode->ValueType;
   Default.Value     = DefaultNode->Value;
 
   CopyMem (Buf, &Default, DefaultSize);
@@ -1523,7 +2133,9 @@ DynHiiSerializeNode (
     DynHiiSerializeOption,        // DynHiiNodeOption
     DynHiiSerializeDefault,       // DynHiiNodeDefault
     NULL,                         // DynHiiNodeString, unsupported
-    NULL                          // DynHiiNodeExpression, unsupported
+    DynHiiSerializeCondition,     // DynHiiNodeCondition, unsupported
+    DynHiiSerializeExpression,    // DynHiiNodeExpression, unsupported
+    NULL                          // DynHiiNodeValue, unsupported
   };
 
   if ((Hdr == NULL) || (BufInfo == NULL)) {
@@ -1539,49 +2151,56 @@ DynHiiSerializeNode (
            );
 }
 
-/** Process the statement child based on it's type
+/** Iterate the statement child list.
 
-  Iterate through the list of a statement children, and serialize a child
-  node if it matches the NodeType argument passed to this function. This
-  ensures that child nodes of a certain type are clubbed together in the
-  IFR byte-stream.
+  Iterate through the statement's child list, and for each node found, call
+  the function to process the node data.
 
-  @param [in]  ChildList          List of child nodes of a Statement/Question.
-  @param [in]  NodeType           Type of child node to be serialized.
-  @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
+  @param [in]  StatementChildList   List of statement's child nodes.
+  @param [in]  BufInfo              Pointer to the DYN_HII_IFR_BUFFER structure.
 
-  @retval  EFI_SUCCESS            If the processing was successfull.
-           EFI_INVALID_PARAMETER  Any invalid child node type found.
+  @retval  EFI_SUCCESS  If the processing was successfull or any error code
+                        returned by the called functions.
 
 **/
 static
 EFI_STATUS
-DynHiiSerializeStatementChild (
-  IN   CONST LIST_ENTRY          *ChildList,
-  IN         DYN_HII_NODE_TYPE   NodeType,
-  IN         DYN_HII_IFR_BUFFER  *BufInfo
+DynHiiIterateStatementChildList (
+  IN  CONST LIST_ENTRY          *StatementChildList,
+  IN        DYN_HII_IFR_BUFFER  *BufInfo
   )
 {
-  LIST_ENTRY        *Link;
   EFI_STATUS        Status;
+  LIST_ENTRY        *Link;
   DYN_HII_NODE_HDR  *Hdr;
 
-  Link = GetFirstNode (ChildList);
-  while (!IsNull (ChildList, Link)) {
+  Link = GetFirstNode (StatementChildList);
+  while (!IsNull (StatementChildList, Link)) {
     Hdr = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
 
-    if (Hdr->Type == NodeType) {
-      Status = DynHiiSerializeNode (Hdr, BufInfo);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
+    switch (Hdr->Type) {
+      case DynHiiNodeOption:
+        Status = DynHiiSerializeOption (Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeDefault:
+        Status = DynHiiSerializeDefault (Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeCondition:
+        Status = DynHiiProcessCondition ((DYN_HII_CONDITION *)Hdr, BufInfo);
+        break;
+
+      default:
+        ASSERT (0);
+        return EFI_INVALID_PARAMETER;
     }
 
-    if ((Hdr->Type != DynHiiNodeDefault) && (Hdr->Type != DynHiiNodeOption)) {
-      return EFI_INVALID_PARAMETER;
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
 
-    Link = GetNextNode (ChildList, Link);
+    Link = GetNextNode (StatementChildList, Link);
   }
 
   return EFI_SUCCESS;
@@ -1614,20 +2233,7 @@ DynHiiProcessStatement (
     return Status;
   }
 
-  Status = DynHiiSerializeStatementChild (
-             &Statement->ChildList,
-             DynHiiNodeOption,
-             BufInfo
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = DynHiiSerializeStatementChild (
-             &Statement->ChildList,
-             DynHiiNodeDefault,
-             BufInfo
-             );
+  Status = DynHiiIterateStatementChildList (&Statement->ChildList, BufInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1635,12 +2241,12 @@ DynHiiProcessStatement (
   return DynHiiInsertEndOp (&Statement->Hdr, BufInfo);
 }
 
-/** Iterate the statement list.
+/** Iterate the form child list.
 
-  Iterate through the statement list, and for each node found, call the
-  function to serialize the process the node data.
+  Iterate through the form's child list, and for each node found, call the
+  function to process the node data.
 
-  @param [in]  StatementList      List of statement nodes.
+  @param [in]  FormChildList      List of form's child nodes.
   @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
 
   @retval  EFI_SUCCESS  If the processing was successfull or any error code
@@ -1649,25 +2255,101 @@ DynHiiProcessStatement (
 **/
 static
 EFI_STATUS
-DynHiiIterateStatementList (
-  IN  CONST LIST_ENTRY          *StatementList,
+DynHiiIterateFormChildList (
+  IN  CONST LIST_ENTRY          *FormChildList,
   IN        DYN_HII_IFR_BUFFER  *BufInfo
   )
 {
-  EFI_STATUS         Status;
-  LIST_ENTRY         *Link;
-  DYN_HII_STATEMENT  *Statement;
+  EFI_STATUS        Status;
+  LIST_ENTRY        *Link;
+  DYN_HII_NODE_HDR  *Hdr;
 
-  Link = GetFirstNode (StatementList);
-  while (!IsNull (StatementList, Link)) {
-    Statement = BASE_CR (Link, DYN_HII_STATEMENT, Hdr.Link);
+  Link = GetFirstNode (FormChildList);
+  while (!IsNull (FormChildList, Link)) {
+    Hdr = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
 
-    Status = DynHiiProcessStatement (Statement, BufInfo);
+    switch (Hdr->Type) {
+      case DynHiiNodeCondition:
+        Status = DynHiiProcessCondition ((DYN_HII_CONDITION *)Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeStatement:
+        Status = DynHiiProcessStatement ((DYN_HII_STATEMENT *)Hdr, BufInfo);
+        break;
+
+      default:
+        ASSERT (0);
+        return EFI_INVALID_PARAMETER;
+    }
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Link = GetNextNode (StatementList, Link);
+    Link = GetNextNode (FormChildList, Link);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Iterate the condition child list.
+
+  Iterate through the condition's child list, and for each node found, call the
+  function to process the node data.
+
+  @param [in]  CondChildList      List of condition's child nodes.
+  @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS  If the processing was successfull or any error code
+                        returned by the called functions.
+
+**/
+static
+EFI_STATUS
+DynHiiIterateCondChildList (
+  IN  CONST LIST_ENTRY          *CondChildList,
+  IN        DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  EFI_STATUS        Status;
+  LIST_ENTRY        *Link;
+  DYN_HII_NODE_HDR  *Hdr;
+
+  Link = GetFirstNode (CondChildList);
+  while (!IsNull (CondChildList, Link)) {
+    Hdr = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
+
+    switch (Hdr->Type) {
+      case DynHiiNodeForm:
+        Status = DynHiiProcessForm ((DYN_HII_FORM *)Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeCondition:
+        Status = DynHiiProcessCondition ((DYN_HII_CONDITION *)Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeStatement:
+        Status = DynHiiProcessStatement ((DYN_HII_STATEMENT *)Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeOption:
+        Status = DynHiiSerializeNode (Hdr, BufInfo);
+        break;
+
+      case DynHiiNodeDefault:
+        Status = DynHiiSerializeNode (Hdr, BufInfo);
+        break;
+
+      default:
+        ASSERT (0);
+        return EFI_INVALID_PARAMETER;
+    }
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Link = GetNextNode (CondChildList, Link);
   }
 
   return EFI_SUCCESS;
@@ -1699,12 +2381,169 @@ DynHiiProcessForm (
     return Status;
   }
 
-  Status = DynHiiIterateStatementList (&Form->ChildList, BufInfo);
+  Status = DynHiiIterateFormChildList (&Form->ChildList, BufInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   return DynHiiInsertEndOp (&Form->Hdr, BufInfo);
+}
+
+/** Process the expression list.
+
+  Serialize the expressions in the expression list that has been passed.
+  Some kind of processing is needed in case of a expression count of
+  more than 1, as the first expression then needs to start a scope,
+  which needs to be closed after the expression list has been serialized.
+
+  @param [in]  ExprList           List of expressions to be serialized.
+  @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
+  @param [in]  CompoundExpr       Is this a compound expression.
+
+  @retval  EFI_SUCCESS  If the processing was successfull or any error code
+                        returned by the called functions.
+
+**/
+static
+EFI_STATUS
+DynHiiProcessExprList (
+  IN    LIST_ENTRY          *ExprList,
+  IN    DYN_HII_IFR_BUFFER  *BufInfo,
+  IN    BOOLEAN             CompoundExpr
+  )
+{
+  BOOLEAN             FirstExpr;
+  EFI_STATUS          Status;
+  LIST_ENTRY          *Link;
+  DYN_HII_EXPRESSION  *Expression;
+  DYN_HII_EXPRESSION  *FirstExpression;
+
+  Status          = EFI_SUCCESS;
+  FirstExpr       = TRUE;
+  FirstExpression = NULL;
+
+  Link = GetFirstNode (ExprList);
+  while (!IsNull (ExprList, Link)) {
+    Expression = BASE_CR (Link, DYN_HII_EXPRESSION, Hdr.Link);
+
+    Expression->Hdr.Scope = FirstExpr && CompoundExpr ? TRUE : FALSE;
+    if (FirstExpr) {
+      FirstExpression = Expression;
+    }
+
+    Status = DynHiiSerializeNode (&Expression->Hdr, BufInfo);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    FirstExpr = FALSE;
+    Link      = GetNextNode (ExprList, Link);
+  }
+
+  if ((CompoundExpr) && (FirstExpression != NULL)) {
+    Status = DynHiiInsertEndOp (&FirstExpression->Hdr, BufInfo);
+  }
+
+  return Status;
+}
+
+/** Check if the expression count is correct.
+
+  Check if ExpressionCount field in a conditional's structure
+  matches the actual number of expressions that have been added
+  to the conditional's ExpressionList.
+
+  @param [in]  ExprList           List of expressions under a conditional
+                                  node.
+  @param [in]  ExpressionCount    Expression count to match.
+
+  @retval  EFI_SUCCESS            The expression count matches the number
+                                  expressions in ExprList.
+  @retval  EFI_INVALID_PARAMETER  Mismatch in the expression count and the
+                                  number of expressions in the list.
+
+**/
+static
+EFI_STATUS
+DynHiiExprCountCheck (
+  IN  CONST   LIST_ENTRY  *ExprList,
+  IN          UINT32      ExpressionCount
+  )
+{
+  UINT32      ExprCount;
+  LIST_ENTRY  *Link;
+
+  ExprCount = 0;
+  Link      = GetFirstNode (ExprList);
+  while (!IsNull (ExprList, Link)) {
+    ExprCount++;
+    Link = GetNextNode (ExprList, Link);
+  }
+
+  return ExprCount == ExpressionCount ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+}
+
+/** Process the condition node.
+
+  Serialize the condition node data by calling the corresponding function.
+  Process the expressions for the condition, and then proceed to iterate
+  through the condition node's children. Finally, add the end opcode for
+  the form.
+
+  @param [in]  Condition          Pointer to the condition node.
+  @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
+
+  @retval  EFI_SUCCESS  If the processing was successfull or any error code
+                        returned by the called functions.
+
+**/
+static
+EFI_STATUS
+DynHiiProcessCondition (
+  IN  DYN_HII_CONDITION   *Condition,
+  IN  DYN_HII_IFR_BUFFER  *BufInfo
+  )
+{
+  EFI_STATUS  Status;
+  LIST_ENTRY  *ExprList;
+  BOOLEAN     CompoundExpr;
+
+  if (Condition->ExpressionCount == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ExprList = &Condition->ExpressionList;
+  if (IsNull (ExprList, GetFirstNode (ExprList))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiExprCountCheck (ExprList, Condition->ExpressionCount);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = DynHiiSerializeNode (&Condition->Hdr, BufInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  CompoundExpr = Condition->ExpressionCount > 1;
+
+  Status = DynHiiProcessExprList (
+             &Condition->ExpressionList,
+             BufInfo,
+             CompoundExpr
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = DynHiiIterateCondChildList (&Condition->ChildList, BufInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return DynHiiInsertEndOp (&Condition->Hdr, BufInfo);
 }
 
 /** Iterate the varstore list.
@@ -1745,12 +2584,12 @@ DynHiiIterateVarstoreList (
   return EFI_SUCCESS;
 }
 
-/** Iterate the form list.
+/** Iterate the formset child list.
 
-  Iterate through the form list, and for each node found, call the function
-  to process the form.
+  Iterate through the formset's child list, and for each node found, call the
+  function to process the child node.
 
-  @param [in]  FormList           List of form nodes.
+  @param [in]  ChildList          List of formset child nodes.
   @param [in]  BufInfo            Pointer to the DYN_HII_IFR_BUFFER structure.
 
   @retval  EFI_SUCCESS  If the serialization was successfull or any error code
@@ -1759,25 +2598,42 @@ DynHiiIterateVarstoreList (
 **/
 static
 EFI_STATUS
-DynHiiIterateFormList (
-  IN  CONST LIST_ENTRY          *FormList,
+DynHiiIterateFormsetChildList (
+  IN  CONST LIST_ENTRY          *ChildList,
   IN        DYN_HII_IFR_BUFFER  *BufInfo
   )
 {
-  EFI_STATUS    Status;
-  LIST_ENTRY    *Link;
-  DYN_HII_FORM  *Form;
+  EFI_STATUS        Status;
+  LIST_ENTRY        *Link;
+  DYN_HII_NODE_HDR  *Hdr;
 
-  Link = GetFirstNode (FormList);
-  while (!IsNull (FormList, Link)) {
-    Form = BASE_CR (Link, DYN_HII_FORM, Hdr.Link);
+  Link = GetFirstNode (ChildList);
+  while (!IsNull (ChildList, Link)) {
+    Hdr = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
 
-    Status = DynHiiProcessForm (Form, BufInfo);
-    if (EFI_ERROR (Status)) {
-      return Status;
+    switch (Hdr->Type) {
+      case DynHiiNodeCondition:
+        Status = DynHiiProcessCondition ((DYN_HII_CONDITION *)Hdr, BufInfo);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
+        break;
+
+      case DynHiiNodeForm:
+        Status = DynHiiProcessForm ((DYN_HII_FORM *)Hdr, BufInfo);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
+        break;
+
+      default:
+        ASSERT (0);
+        return EFI_INVALID_PARAMETER;
     }
 
-    Link = GetNextNode (FormList, Link);
+    Link = GetNextNode (ChildList, Link);
   }
 
   return EFI_SUCCESS;
@@ -1868,7 +2724,7 @@ DynHiiProcessFormset (
     return Status;
   }
 
-  Status = DynHiiIterateFormList (&Formset->ChildList, BufInfo);
+  Status = DynHiiIterateFormsetChildList (&Formset->ChildList, BufInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }

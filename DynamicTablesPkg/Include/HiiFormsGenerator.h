@@ -25,6 +25,7 @@ typedef TABLE_GENERATOR_ID HII_FORM_GENERATOR_ID;
 typedef enum HiiFormsId {
   EStdHiiFormsIdRootForm = 0x0000,             ///< Reserved for the Root form generator.
   EStdHiiFormsIdCpuArm,                        ///< Cpu Generator for Arm Platforms.
+  EStdHiiFormsIdDummy,                         ///< Dummy form generator for showcasing conditional expressions.
   EStdHiiFormsIdMax
 } ESTD_HII_FORMS_ID;
 

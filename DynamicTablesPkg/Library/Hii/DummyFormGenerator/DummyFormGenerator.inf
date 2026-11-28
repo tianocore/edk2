@@ -1,0 +1,48 @@
+## @file
+#  Dynamic HII Dummy Form Generator
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = DummyFormGenerator
+  MODULE_UNI_FILE                = DummyFormGenerator.uni
+  FILE_GUID                      = 4E694308-C830-4C56-9AB5-0F702B8D40E8
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = HiiDummyFormConstructor
+  DESTRUCTOR                     = HiiDummyFormDestructor
+
+[Sources]
+  DummyFormGenerator.c
+  DummyFormGenerator.h
+  DummyFormGenerator.uni
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiFormsLib
+  HiiStringsLib
+  HiiLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

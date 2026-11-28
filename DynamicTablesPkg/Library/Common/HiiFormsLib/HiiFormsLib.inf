@@ -15,6 +15,7 @@
   LIBRARY_CLASS  = HiiFormsLib
 
 [Sources]
+  HiiFormExpression.c
   HiiFormGenerator.c
   HiiFormSerialize.c
   InternalHiiFormsLib.h

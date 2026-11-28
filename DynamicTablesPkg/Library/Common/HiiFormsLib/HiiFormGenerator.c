@@ -21,6 +21,423 @@
 
 #include "InternalHiiFormsLib.h"
 
+// Forward declaration of the condition node freeing up
+// function
+static
+VOID
+DynHiiFreeCondition (
+  IN DYN_HII_CONDITION  *Condition
+  );
+
+/** Check if the varstore ID has already been added.
+
+  Check if the variable store ID has already been added as
+  part of an earlier added variable store.
+
+  @param [in]  VarstoreList     List of added variable stores.
+  @param [in]  VarstoreId       Variable store ID to look for
+                                in the list.
+
+  @retval EFI_SUCCESS             If a duplicate variable store ID
+                                  is not found.
+  @retval EFI_ALREADY_STARTED     A duplicate variable store ID found.
+  @retval EFI_INVALID_PARAMETER   Node type is not DynHiiNodeVarstore.
+
+**/
+static
+EFI_STATUS
+DynHiiVarstoreIdCheck (
+  IN  CONST LIST_ENTRY       *VarstoreList,
+  IN        EFI_VARSTORE_ID  VarstoreId
+  )
+{
+  LIST_ENTRY        *Link;
+  EFI_VARSTORE_ID   Id;
+  DYN_HII_NODE_HDR  *Hdr;
+  DYN_HII_VARSTORE  *Varstore;
+
+  ASSERT (VarstoreList != NULL);
+  ASSERT (VarstoreId != 0);
+
+  Link = GetFirstNode (VarstoreList);
+  while (!IsNull (VarstoreList, Link)) {
+    Hdr = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
+    if (Hdr->Type != DynHiiNodeVarstore) {
+      ASSERT (Hdr->Type == DynHiiNodeVarstore);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Varstore = (DYN_HII_VARSTORE *)Hdr;
+    switch (Varstore->VarstoreType) {
+      case DynHiiVarstoreBuffer:
+        Id = Varstore->Data.Buffer.VarstoreId;
+        break;
+
+      case DynHiiVarstoreEfi:
+        Id = Varstore->Data.Efi.VarstoreId;
+        break;
+
+      case DynHiiVarstoreNameValue:
+        Id = Varstore->Data.NameValue.VarstoreId;
+        break;
+
+      default:
+        ASSERT (0);
+        return EFI_INVALID_PARAMETER;
+    }
+
+    if (Id == VarstoreId) {
+      return EFI_ALREADY_STARTED;
+    }
+
+    Link = GetNextNode (VarstoreList, Link);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Free up the question ID buffer.
+
+  Free up the memory allocated for the sorted question ID
+  buffer.
+
+  @param [in]   QuestionIdArr   Pointer to a structure holding
+                                the sorted question ID array.
+
+**/
+static
+VOID
+DynHiiFreeQuestionIdBuf (
+  IN  DYN_HII_QUESTION_ID_BUF  *QuestionIdArr
+  )
+{
+  if (QuestionIdArr == NULL) {
+    return;
+  }
+
+  if (QuestionIdArr->Ids != NULL) {
+    FreePool (QuestionIdArr->Ids);
+  }
+}
+
+/** Initialize the question ID buffer.
+
+  Allocate memory store question ID's and initialize the corresponding
+  members of the question ID buffer structure.
+
+  @param [in, out]  QuestionIdArr   Pointer to a structure holding the
+                                    sorted question ID array.
+
+  @retval EFI_SUCCESS             Question ID buffer allocated.
+  @retval EFI_INVALID_PARAMETER   One of the input parameters is invalid.
+  @retval EFI_OUT_OF_RESOURCES    Unable to allocate resources.
+
+**/
+static
+EFI_STATUS
+DynHiiQuestionIdBufInit (
+  IN OUT DYN_HII_QUESTION_ID_BUF  *QuestionIdArr
+  )
+{
+  UINTN            Capacity;
+  EFI_QUESTION_ID  *NewIds;
+
+  if (QuestionIdArr == NULL) {
+    ASSERT (QuestionIdArr != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (QuestionIdArr->Count != 0) {
+    ASSERT (QuestionIdArr->Count == 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (QuestionIdArr->Capacity != 0) {
+    ASSERT (QuestionIdArr->Capacity == 0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (QuestionIdArr->Ids != NULL) {
+    ASSERT (QuestionIdArr->Ids == NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Capacity = 8;
+  NewIds   = AllocateZeroPool (Capacity * sizeof (EFI_QUESTION_ID));
+  if (NewIds == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  QuestionIdArr->Ids      = NewIds;
+  QuestionIdArr->Capacity = Capacity;
+
+  return EFI_SUCCESS;
+}
+
+/** Check if the question ID has already been added.
+
+  Iterate through the sorted array of question ID's, and check
+  if the question ID has already been added. Add the question
+  ID to the sorted array if it has not been already added.
+
+  @param [in, out]  QuestionIdArr   Pointer to a structure holding the
+                                    sorted question ID array.
+  @param [in]       QuestionId      Question ID to look for in the sorted
+                                    array.
+
+  @retval EFI_SUCCESS             Question ID not present in the array.
+  @retval EFI_ALREADY_STARTED     Question ID is already present in the
+                                  array.
+  @retval EFI_INVALID_PARAMETER   One of the input parameters is invalid.
+
+**/
+static
+EFI_STATUS
+DynHiiQuestionIdCheck (
+  IN OUT DYN_HII_QUESTION_ID_BUF  *QuestionIdArr,
+  IN     EFI_QUESTION_ID          QuestionId
+  )
+{
+  UINTN            Low;
+  UINTN            High;
+  UINTN            Mid;
+  UINTN            Insert;
+  UINTN            NewCapacity;
+  EFI_QUESTION_ID  *NewIds;
+
+  if ((QuestionIdArr == NULL) || (QuestionId == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Low  = 0;
+  High = QuestionIdArr->Count;
+
+  while (Low < High) {
+    Mid = Low + ((High - Low) / 2);
+
+    if (QuestionIdArr->Ids[Mid] == QuestionId) {
+      return EFI_ALREADY_STARTED;
+    }
+
+    if (QuestionIdArr->Ids[Mid] < QuestionId) {
+      Low = Mid + 1;
+    } else {
+      High = Mid;
+    }
+  }
+
+  ASSERT (Low == High);
+  Insert = Low;
+  if (QuestionIdArr->Count == QuestionIdArr->Capacity) {
+    NewCapacity = QuestionIdArr->Capacity * 2;
+
+    NewIds = ReallocatePool (
+               QuestionIdArr->Capacity * sizeof (EFI_QUESTION_ID),
+               NewCapacity * sizeof (EFI_QUESTION_ID),
+               QuestionIdArr->Ids
+               );
+    if (NewIds == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    QuestionIdArr->Ids      = NewIds;
+    QuestionIdArr->Capacity = NewCapacity;
+  }
+
+  if (Insert < QuestionIdArr->Count) {
+    CopyMem (
+      &QuestionIdArr->Ids[Insert + 1],
+      &QuestionIdArr->Ids[Insert],
+      (QuestionIdArr->Count - Insert) * sizeof (EFI_QUESTION_ID)
+      );
+  }
+
+  QuestionIdArr->Ids[Insert] = QuestionId;
+  QuestionIdArr->Count++;
+
+  return EFI_SUCCESS;
+}
+
+/** Get the child list for the parent
+
+  Given the parent type, get the child list from the
+  parent.
+
+  @param [in] ParentHandle    Pointer to the parent.
+
+  @retval Pointer to the child list, NULL if parent type
+          is not valid.
+
+**/
+LIST_ENTRY *
+DynHiiGetNodeChildList (
+  IN DYN_HII_HANDLE  ParentHandle
+  )
+{
+  DYN_HII_NODE_HDR  *Hdr;
+
+  if (ParentHandle == NULL) {
+    return NULL;
+  }
+
+  Hdr = (DYN_HII_NODE_HDR *)ParentHandle;
+
+  switch (Hdr->Type) {
+    case DynHiiNodeFormset:
+      return &((DYN_HII_FORMSET *)ParentHandle)->ChildList;
+
+    case DynHiiNodeForm:
+      return &((DYN_HII_FORM *)ParentHandle)->ChildList;
+
+    case DynHiiNodeStatement:
+      return &((DYN_HII_STATEMENT *)ParentHandle)->ChildList;
+
+    case DynHiiNodeCondition:
+      return &((DYN_HII_CONDITION *)ParentHandle)->ChildList;
+
+    default:
+      return NULL;
+  }
+}
+
+/** Check if this is a question or a statement
+
+  Check if the statement passed is a question, as not all
+  statements are questions.
+
+  @param [in]  StatementType    Type of the statement
+
+  @retval TRUE if question, FALSE otherwise
+
+**/
+static
+BOOLEAN
+IsTypeQuestion (
+  IN  DYN_HII_STATEMENT_TYPE  StatementType
+  )
+{
+  switch (StatementType) {
+    case DynHiiStSubtitle:
+    case DynHiiStText:
+      return FALSE;
+
+    default:
+      return TRUE;
+  }
+}
+
+/** Check if the parent node is valid.
+
+  For a node that is being added, check if the parent node is
+  valid.
+
+  @param [in]  Node             Node that is being added.
+  @param [in]  ParentHandle     Parent under which the node is being
+                                added.
+
+  @retval TRUE if the parent is valid, FALSE otherwise.
+
+**/
+static
+BOOLEAN
+IsParentValid (
+  IN DYN_HII_NODE_TYPE  Node,
+  IN DYN_HII_HANDLE     ParentHandle
+  )
+{
+  DYN_HII_NODE_HDR  *Hdr;
+
+  ASSERT (ParentHandle != NULL);
+  ASSERT (Node != 0);
+
+  Hdr = ParentHandle;
+
+  switch (Node) {
+    case DynHiiNodeForm:
+      if ((Hdr->Type != DynHiiNodeFormset) &&
+          (Hdr->Type != DynHiiNodeCondition))
+      {
+        return FALSE;
+      }
+
+      break;
+
+    case DynHiiNodeStatement:
+      if ((Hdr->Type != DynHiiNodeForm) &&
+          (Hdr->Type != DynHiiNodeCondition))
+      {
+        return FALSE;
+      }
+
+      break;
+
+    case DynHiiNodeOption:
+      if ((Hdr->Type != DynHiiNodeStatement) &&
+          (Hdr->Type != DynHiiNodeCondition))
+      {
+        return FALSE;
+      }
+
+      break;
+
+    case DynHiiNodeDefault:
+      if ((Hdr->Type != DynHiiNodeStatement) &&
+          (Hdr->Type != DynHiiNodeCondition))
+      {
+        return FALSE;
+      }
+
+      break;
+
+    default:
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+/** Get the parent node of the requested type.
+
+  Walk through the condition parent chain to get the parent node
+  of the requested type.
+
+  @param [in]  ParentHandle     Parent under which the node is being
+                                added.
+  @param [in]  NodeType         Node type to find.
+
+  @retval Pointer to the requested parent node, or NULL if not found.
+
+**/
+static
+DYN_HII_NODE_HDR *
+DynHiiGetConditionAncestorNode (
+  IN DYN_HII_HANDLE     ParentHandle,
+  IN DYN_HII_NODE_TYPE  NodeType
+  )
+{
+  DYN_HII_NODE_HDR   *Hdr;
+  DYN_HII_CONDITION  *Condition;
+
+  ASSERT (ParentHandle != NULL);
+  ASSERT (NodeType != 0);
+
+  Hdr = ParentHandle;
+  while (Hdr->Type == DynHiiNodeCondition) {
+    Condition = (DYN_HII_CONDITION *)Hdr;
+    if (Condition->ParentNode == NULL) {
+      return NULL;
+    }
+
+    Hdr = Condition->ParentNode;
+  }
+
+  if (Hdr->Type != NodeType) {
+    return NULL;
+  }
+
+  return Hdr;
+}
+
 /** Check if the default has already been added.
 
   Check if the default has already been added for the provided
@@ -85,6 +502,10 @@ DynHiiFreeStatement (
     RemoveEntryList (Link);
 
     switch (Hdr->Type) {
+      case DynHiiNodeCondition:
+        DynHiiFreeCondition ((DYN_HII_CONDITION *)Hdr);
+        break;
+
       case DynHiiNodeOption:
         FreePool ((DYN_HII_ONE_OF_OPTION *)Hdr);
         break;
@@ -129,6 +550,10 @@ DynHiiFreeForm (
     RemoveEntryList (Link);
 
     switch (Hdr->Type) {
+      case DynHiiNodeCondition:
+        DynHiiFreeCondition ((DYN_HII_CONDITION *)Hdr);
+        break;
+
       case DynHiiNodeStatement:
         DynHiiFreeStatement ((DYN_HII_STATEMENT *)Hdr);
         break;
@@ -143,6 +568,128 @@ DynHiiFreeForm (
   }
 
   FreePool (Form);
+}
+
+/** Free up the conditional child list.
+
+  Iterate through the conditional child list,
+  and free all allocated memory.
+
+  @param [in]  ChildList      Child list to be free'd up
+
+**/
+static
+VOID
+DynHiiFreeConditionChildList (
+  IN LIST_ENTRY  *ChildList
+  )
+{
+  LIST_ENTRY        *Link;
+  LIST_ENTRY        *Next;
+  DYN_HII_NODE_HDR  *Hdr;
+
+  Link = GetFirstNode (ChildList);
+  while (!IsNull (ChildList, Link)) {
+    Next = GetNextNode (ChildList, Link);
+    Hdr  = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
+    RemoveEntryList (Link);
+
+    switch (Hdr->Type) {
+      case DynHiiNodeForm:
+        DynHiiFreeForm ((DYN_HII_FORM *)Hdr);
+        break;
+
+      case DynHiiNodeCondition:
+        DynHiiFreeCondition ((DYN_HII_CONDITION *)Hdr);
+        break;
+
+      case DynHiiNodeStatement:
+        DynHiiFreeStatement ((DYN_HII_STATEMENT *)Hdr);
+        break;
+
+      case DynHiiNodeOption:
+        FreePool ((DYN_HII_ONE_OF_OPTION *)Hdr);
+        break;
+
+      case DynHiiNodeDefault:
+        FreePool ((DYN_HII_DEFAULT *)Hdr);
+        break;
+
+      default:
+        ASSERT (0);
+        FreePool (Hdr);
+        break;
+    }
+
+    Link = Next;
+  }
+}
+
+/** Free up the condition's expression list.
+
+  Iterate through the conditional expression list,
+  and free all allocated memory.
+
+  @param [in]  ExprList   Expression list to be free'd up
+
+**/
+static
+VOID
+DynHiiFreeConditionExprList (
+  IN LIST_ENTRY  *ExprList
+  )
+{
+  LIST_ENTRY          *Link;
+  LIST_ENTRY          *Next;
+  DYN_HII_NODE_HDR    *Hdr;
+  DYN_HII_EXPRESSION  *Expr;
+
+  Link = GetFirstNode (ExprList);
+  while (!IsNull (ExprList, Link)) {
+    Next = GetNextNode (ExprList, Link);
+    Hdr  = BASE_CR (Link, DYN_HII_NODE_HDR, Link);
+    RemoveEntryList (Link);
+
+    switch (Hdr->Type) {
+      case DynHiiNodeExpression:
+        Expr = (DYN_HII_EXPRESSION *)Hdr;
+        if ((Expr->ExpressionType == DynHiiExprEqIdValList) &&
+            (Expr->Data.EqIdValList.ValueList != NULL))
+        {
+          FreePool (Expr->Data.EqIdValList.ValueList);
+        }
+
+        FreePool (Expr);
+        break;
+
+      default:
+        ASSERT (0);
+        FreePool (Hdr);
+        break;
+    }
+
+    Link = Next;
+  }
+}
+
+/** Free up the conditional.
+
+  Iterate through the conditional child and expression lists,
+  and free all allocated memory.
+
+  @param [in]  Condition      Condition to be free'd up
+
+**/
+static
+VOID
+DynHiiFreeCondition (
+  IN DYN_HII_CONDITION  *Condition
+  )
+{
+  DynHiiFreeConditionExprList (&Condition->ExpressionList);
+  DynHiiFreeConditionChildList (&Condition->ChildList);
+
+  FreePool (Condition);
 }
 
 /** Free all the added Variable Stores.
@@ -188,6 +735,7 @@ DynHiiFreeVarstoreList (
 }
 
 /** Free all the added Default Stores.
+
 
   Iterate through the default store list, and free all allocated memory.
 
@@ -245,6 +793,10 @@ DynHiiFreeFormsetChildren (
     RemoveEntryList (Link);
 
     switch (Hdr->Type) {
+      case DynHiiNodeCondition:
+        DynHiiFreeCondition ((DYN_HII_CONDITION *)Hdr);
+        break;
+
       case DynHiiNodeForm:
         DynHiiFreeForm ((DYN_HII_FORM *)Hdr);
         break;
@@ -263,7 +815,7 @@ DynHiiFreeFormsetChildren (
 
   Create a HII Statement/Question and add it to the given Form.
 
-  @param [in]  Form              Form under which Statement is to be added.
+  @param [in]  ParentHandle      Parent under which Statement is to be added.
   @param [in]  StatementType     Type of statement to be added.
   @param [in]  StatementData     Data of the corresponding Statement to be added.
   @param [out] StatementHandle   Optional statement handle for storing the
@@ -278,20 +830,28 @@ static
 EFI_STATUS
 EFIAPI
 DynHiiAddStatement (
-  IN  DYN_HII_FORM            *Form,
+  IN  DYN_HII_HANDLE          ParentHandle,
   IN  DYN_HII_STATEMENT_TYPE  StatementType,
   IN  DYN_HII_STATEMENT_DATA  *StatementData,
   OUT DYN_HII_HANDLE          *StatementHandle  OPTIONAL
   )
 {
-  DYN_HII_STATEMENT       *NewStmt;
-  DYN_HII_STATEMENT_DATA  *NewStatementData;
+  LIST_ENTRY               *ChildList;
+  EFI_STATUS               Status;
+  DYN_HII_FORMSET          *Formset;
+  DYN_HII_NODE_HDR         *Hdr;
+  DYN_HII_STATEMENT        *NewStmt;
+  DYN_HII_QUESTION_ID_BUF  *QuestionIds;
+  DYN_HII_STATEMENT_DATA   *NewStatementData;
 
   if (StatementHandle != NULL) {
     *StatementHandle = NULL;
   }
 
-  if (Form == NULL) {
+  ASSERT (ParentHandle != NULL);
+  Hdr = ParentHandle;
+
+  if (Hdr->FormsetHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -304,8 +864,9 @@ DynHiiAddStatement (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewStmt->Hdr.Type  = DynHiiNodeStatement;
-  NewStmt->Hdr.Scope = TRUE;
+  NewStmt->Hdr.Type          = DynHiiNodeStatement;
+  NewStmt->Hdr.Scope         = TRUE;
+  NewStmt->Hdr.FormsetHandle = Hdr->FormsetHandle;
   InitializeListHead (&NewStmt->Hdr.Link);
 
   NewStmt->StatementType    = StatementType;
@@ -339,11 +900,30 @@ DynHiiAddStatement (
       break;
 
     default:
+      Status = EFI_UNSUPPORTED;
       goto err_out;
       break;
   }
 
-  InsertTailList (&Form->ChildList, &NewStmt->Hdr.Link);
+  if (IsTypeQuestion (StatementType)) {
+    Formset     = Hdr->FormsetHandle;
+    QuestionIds = &Formset->QuestionIdArr;
+    Status      = DynHiiQuestionIdCheck (
+                    QuestionIds,
+                    StatementData->QuestionHdr.QuestionId
+                    );
+    if (EFI_ERROR (Status)) {
+      goto err_out;
+    }
+  }
+
+  ChildList = DynHiiGetNodeChildList (ParentHandle);
+  if (ChildList == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto err_out;
+  }
+
+  InsertTailList (ChildList, &NewStmt->Hdr.Link);
 
   if (StatementHandle != NULL) {
     *StatementHandle = NewStmt;
@@ -354,7 +934,7 @@ DynHiiAddStatement (
 err_out:
   FreePool (NewStmt);
 
-  return EFI_UNSUPPORTED;
+  return Status;
 }
 
 /** Add the Varstore Name.
@@ -522,6 +1102,7 @@ DynHiiCreateFormSet (
   )
 {
   UINT8            Idx;
+  EFI_STATUS       Status;
   DYN_HII_FORMSET  *NewFormset;
 
   if ((FormsetHandle == NULL) || (FormsetGuid == NULL)) {
@@ -541,8 +1122,9 @@ DynHiiCreateFormSet (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewFormset->Hdr.Type  = DynHiiNodeFormset;
-  NewFormset->Hdr.Scope = TRUE;
+  NewFormset->Hdr.Type          = DynHiiNodeFormset;
+  NewFormset->Hdr.Scope         = TRUE;
+  NewFormset->Hdr.FormsetHandle = NewFormset;
   InitializeListHead (&NewFormset->Hdr.Link);
 
   CopyGuid (&NewFormset->FormsetGuid, FormsetGuid);
@@ -553,6 +1135,12 @@ DynHiiCreateFormSet (
 
   for (Idx = 0; Idx < ClassGuidCount; Idx++) {
     CopyGuid (&NewFormset->ClassGuid[Idx], &ClassGuid[Idx]);
+  }
+
+  Status = DynHiiQuestionIdBufInit (&NewFormset->QuestionIdArr);
+  if (EFI_ERROR (Status)) {
+    FreePool (NewFormset);
+    return Status;
   }
 
   InitializeListHead (&NewFormset->ChildList);
@@ -589,15 +1177,37 @@ DynHiiAddForm (
   OUT  EFI_FORM_ID     *FormId
   )
 {
-  DYN_HII_FORM     *NewForm;
-  DYN_HII_FORMSET  *Formset;
+  LIST_ENTRY         *ChildList;
+  DYN_HII_FORM       *NewForm;
+  DYN_HII_FORMSET    *Formset;
+  DYN_HII_NODE_HDR   *Hdr;
+  DYN_HII_CONDITION  *Condition;
 
-  Formset = ParentHandle;
-  if ((Formset == NULL) || (FormId == NULL) ||
-      (Formset->Hdr.Type != DynHiiNodeFormset))
-  {
+  if ((ParentHandle == NULL) || (FormId == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (!IsParentValid (DynHiiNodeForm, ParentHandle)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Hdr = ParentHandle;
+
+  if (Hdr->FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Hdr->Type == DynHiiNodeCondition) {
+    Condition = (DYN_HII_CONDITION *)Hdr;
+
+    if ((Condition->ConditionType != DynHiiConditionSuppressIf) &&
+        (Condition->ConditionType != DynHiiConditionDisableIf))
+    {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Formset = (DYN_HII_FORMSET *)Hdr->FormsetHandle;
 
   if (Formset->FormIdCounter == MAX_UINT16) {
     return EFI_BAD_BUFFER_SIZE;
@@ -608,15 +1218,23 @@ DynHiiAddForm (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewForm->Hdr.Type  = DynHiiNodeForm;
-  NewForm->Hdr.Scope = TRUE;
+  NewForm->Hdr.Type          = DynHiiNodeForm;
+  NewForm->Hdr.Scope         = TRUE;
+  NewForm->Hdr.FormsetHandle = Formset;
   InitializeListHead (&NewForm->Hdr.Link);
 
   NewForm->FormId = ++Formset->FormIdCounter;
   NewForm->Title  = Title;
-
   InitializeListHead (&NewForm->ChildList);
-  InsertTailList (&Formset->ChildList, &NewForm->Hdr.Link);
+
+  ChildList = DynHiiGetNodeChildList (ParentHandle);
+  if (ChildList == NULL) {
+    FreePool (NewForm);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  InsertTailList (ChildList, &NewForm->Hdr.Link);
+
   *FormId = NewForm->FormId;
 
   return EFI_SUCCESS;
@@ -650,17 +1268,18 @@ DynHiiAddSubtitle (
   )
 {
   UINT8                   InvalidStFlags;
-  DYN_HII_FORM            *Form;
   DYN_HII_STATEMENT_DATA  StatementData;
   DYN_HII_SUBTITLE_DATA   *Subtitle;
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
   InvalidStFlags = (UINT8) ~(EFI_IFR_FLAGS_HORIZONTAL);
-
   if ((SubtitleFlags & InvalidStFlags) != 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -673,7 +1292,7 @@ DynHiiAddSubtitle (
   Subtitle->Flags  = SubtitleFlags;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStSubtitle,
            &StatementData,
            StatementHandle
@@ -718,12 +1337,14 @@ DynHiiAddCheckbox (
 {
   UINT8                    InvalidQtFlags;
   UINT8                    InvalidCbFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -756,7 +1377,7 @@ DynHiiAddCheckbox (
   StatementData.Statement.Checkbox.Flags = CheckboxFlags;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStCheckbox,
            &StatementData,
            StatementHandle
@@ -806,13 +1427,15 @@ DynHiiAddNumeric (
   )
 {
   UINT8                    InvalidQtFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_NUMERIC_DATA     *Numeric;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -850,7 +1473,7 @@ DynHiiAddNumeric (
   Numeric->Step     = Step;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStNumeric,
            &StatementData,
            StatementHandle
@@ -892,13 +1515,15 @@ DynHiiAddRef (
   )
 {
   UINT8                    InvalidQtFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_REF_DATA         *Ref;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -924,7 +1549,7 @@ DynHiiAddRef (
   QuestionHdr->Flags         = QuestionFlags;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStRef,
            &StatementData,
            StatementHandle
@@ -967,13 +1592,15 @@ DynHiiAddRef2 (
   )
 {
   UINT8                    InvalidQtFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_REF_DATA         *Ref;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1000,7 +1627,7 @@ DynHiiAddRef2 (
   QuestionHdr->Flags         = QuestionFlags;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStRef,
            &StatementData,
            StatementHandle
@@ -1047,7 +1674,6 @@ DynHiiAddRef3 (
   )
 {
   UINT8                    InvalidQtFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_REF_DATA         *Ref;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
@@ -1056,8 +1682,11 @@ DynHiiAddRef3 (
     return EFI_INVALID_PARAMETER;
   }
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1085,7 +1714,7 @@ DynHiiAddRef3 (
   QuestionHdr->Flags         = QuestionFlags;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStRef,
            &StatementData,
            StatementHandle
@@ -1138,7 +1767,6 @@ DynHiiAddRef4 (
   )
 {
   UINT8                    InvalidQtFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_REF_DATA         *Ref;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
@@ -1147,8 +1775,11 @@ DynHiiAddRef4 (
     return EFI_INVALID_PARAMETER;
   }
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1179,7 +1810,7 @@ DynHiiAddRef4 (
   QuestionHdr->Flags         = QuestionFlags;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStRef,
            &StatementData,
            StatementHandle
@@ -1256,13 +1887,15 @@ DynHiiAddOneOf (
   )
 {
   UINT8                    InvalidQtFlags;
-  DYN_HII_FORM             *Form;
   DYN_HII_ONE_OF_DATA      *OneOf;
   DYN_HII_STATEMENT_DATA   StatementData;
   EFI_IFR_QUESTION_HEADER  *QuestionHdr;
 
-  Form = ParentHandle;
-  if ((Form == NULL) || (Form->Hdr.Type != DynHiiNodeForm)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeStatement, ParentHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1308,7 +1941,7 @@ DynHiiAddOneOf (
   OneOf->ValueType = ValueType;
 
   return DynHiiAddStatement (
-           Form,
+           ParentHandle,
            DynHiiStOneOf,
            &StatementData,
            StatementHandle
@@ -1343,18 +1976,53 @@ DynHiiAddOption (
   )
 {
   UINT64                 OptionValue;
+  LIST_ENTRY             *ChildList;
+  DYN_HII_NODE_HDR       *Hdr;
   DYN_HII_STATEMENT      *Statement;
+  DYN_HII_CONDITION      *Condition;
   DYN_HII_ONE_OF_DATA    *OneOf;
   DYN_HII_ONE_OF_OPTION  *NewOption;
 
-  Statement = ParentHandle;
-  if ((Statement == NULL) || (Statement->Hdr.Type != DynHiiNodeStatement)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeOption, ParentHandle)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Hdr = ParentHandle;
+  if (Hdr->FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Hdr->Type == DynHiiNodeCondition) {
+    Condition = (DYN_HII_CONDITION *)Hdr;
+
+    if ((Condition->ConditionType != DynHiiConditionSuppressIf) &&
+        (Condition->ConditionType != DynHiiConditionGrayOutIf) &&
+        (Condition->ConditionType != DynHiiConditionDisableIf))
+    {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Statement = (DYN_HII_STATEMENT *)DynHiiGetConditionAncestorNode (
+                                     ParentHandle,
+                                     DynHiiNodeStatement
+                                     );
+  if (Statement == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   /// For now, it is only the OneOf question type that
   /// will use the Option
   if (Statement->StatementType != DynHiiStOneOf) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  OneOf = &Statement->Data.Statement.OneOf;
+  if (OneOf->ValueType != Type) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1371,18 +2039,14 @@ DynHiiAddOption (
     return EFI_INVALID_PARAMETER;
   }
 
-  OneOf = &Statement->Data.Statement.OneOf;
-  if (OneOf->ValueType != Type) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   NewOption = AllocateZeroPool (sizeof (*NewOption));
   if (NewOption == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewOption->Hdr.Type  = DynHiiNodeOption;
-  NewOption->Hdr.Scope = FALSE;
+  NewOption->Hdr.Type          = DynHiiNodeOption;
+  NewOption->Hdr.Scope         = FALSE;
+  NewOption->Hdr.FormsetHandle = Statement->Hdr.FormsetHandle;
   InitializeListHead (&NewOption->Hdr.Link);
 
   NewOption->Text  = Text;
@@ -1422,7 +2086,13 @@ DynHiiAddOption (
     }
   }
 
-  InsertTailList (&Statement->ChildList, &NewOption->Hdr.Link);
+  ChildList = DynHiiGetNodeChildList (ParentHandle);
+  if (ChildList == NULL) {
+    FreePool (NewOption);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  InsertTailList (ChildList, &NewOption->Hdr.Link);
 
   return EFI_SUCCESS;
 }
@@ -1453,11 +2123,45 @@ DynHiiAddDefault (
   IN  EFI_IFR_TYPE_VALUE  Value
   )
 {
+  LIST_ENTRY         *ChildList;
+  DYN_HII_NODE_HDR   *Hdr;
   DYN_HII_DEFAULT    *NewDefault;
   DYN_HII_STATEMENT  *Statement;
+  DYN_HII_CONDITION  *Condition;
 
-  Statement = ParentHandle;
-  if ((Statement == NULL) || (Statement->Hdr.Type != DynHiiNodeStatement)) {
+  if (ParentHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!IsParentValid (DynHiiNodeDefault, ParentHandle)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Hdr = ParentHandle;
+  if (Hdr->FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Hdr->Type == DynHiiNodeCondition) {
+    Condition = (DYN_HII_CONDITION *)Hdr;
+
+    if ((Condition->ConditionType != DynHiiConditionSuppressIf) &&
+        (Condition->ConditionType != DynHiiConditionGrayOutIf) &&
+        (Condition->ConditionType != DynHiiConditionDisableIf))
+    {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Statement = (DYN_HII_STATEMENT *)DynHiiGetConditionAncestorNode (
+                                     ParentHandle,
+                                     DynHiiNodeStatement
+                                     );
+  if (Statement == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Statement->Hdr.FormsetHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1470,15 +2174,24 @@ DynHiiAddDefault (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewDefault->Hdr.Type  = DynHiiNodeDefault;
-  NewDefault->Hdr.Scope = FALSE;
+  NewDefault->Hdr.Type          = DynHiiNodeDefault;
+  NewDefault->Hdr.Scope         = FALSE;
+  NewDefault->Hdr.FormsetHandle = Statement->Hdr.FormsetHandle;
   InitializeListHead (&NewDefault->Hdr.Link);
+  InitializeListHead (&NewDefault->ChildList);
 
-  NewDefault->DefaultId = DefaultId;
-  NewDefault->Type      = Type;
-  NewDefault->Value     = Value;
+  NewDefault->DefaultId   = DefaultId;
+  NewDefault->DefaultType = DynHiiDefaultLiteral;
+  NewDefault->ValueType   = Type;
+  NewDefault->Value       = Value;
 
-  InsertTailList (&Statement->ChildList, &NewDefault->Hdr.Link);
+  ChildList = DynHiiGetNodeChildList (ParentHandle);
+  if (ChildList == NULL) {
+    FreePool (NewDefault);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  InsertTailList (ChildList, &NewDefault->Hdr.Link);
 
   return EFI_SUCCESS;
 }
@@ -1522,8 +2235,17 @@ DynHiiAddVarstoreBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Guid == NULL) || (Name == NULL) || (Size == 0)) {
+  if ((Guid == NULL) || (Name == NULL) || (Size == 0) || (VarstoreId == 0)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (Formset->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Varstore = AllocateZeroPool (sizeof (*Varstore));
@@ -1531,8 +2253,9 @@ DynHiiAddVarstoreBuffer (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Varstore->Hdr.Type  = DynHiiNodeVarstore;
-  Varstore->Hdr.Scope = FALSE;
+  Varstore->Hdr.Type          = DynHiiNodeVarstore;
+  Varstore->Hdr.Scope         = FALSE;
+  Varstore->Hdr.FormsetHandle = Formset->Hdr.FormsetHandle;
   InitializeListHead (&Varstore->Hdr.Link);
 
   Varstore->VarstoreType = DynHiiVarstoreBuffer;
@@ -1595,8 +2318,17 @@ DynHiiAddVarstoreEfi (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Guid == NULL) || (Name == NULL) || (Size == 0)) {
+  if ((Guid == NULL) || (Name == NULL) || (Size == 0) || (VarstoreId == 0)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (Formset->Hdr.FormsetHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Varstore = AllocateZeroPool (sizeof (*Varstore));
@@ -1604,9 +2336,10 @@ DynHiiAddVarstoreEfi (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Varstore->VarstoreType = DynHiiVarstoreEfi;
-  Varstore->Hdr.Type     = DynHiiNodeVarstore;
-  Varstore->Hdr.Scope    = FALSE;
+  Varstore->VarstoreType      = DynHiiVarstoreEfi;
+  Varstore->Hdr.Type          = DynHiiNodeVarstore;
+  Varstore->Hdr.Scope         = FALSE;
+  Varstore->Hdr.FormsetHandle = Formset->Hdr.FormsetHandle;
   InitializeListHead (&Varstore->Hdr.Link);
 
   Efi = &Varstore->Data.Efi;
@@ -1652,6 +2385,7 @@ DynHiiAddVarstoreNameValue (
   IN            EFI_VARSTORE_ID  VarstoreId
   )
 {
+  EFI_STATUS        Status;
   DYN_HII_FORMSET   *Formset;
   DYN_HII_VARSTORE  *Varstore;
 
@@ -1660,8 +2394,17 @@ DynHiiAddVarstoreNameValue (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Guid == NULL) {
+  if (Formset->Hdr.FormsetHandle == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Guid == NULL) || (VarstoreId == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DynHiiVarstoreIdCheck (&Formset->VarstoreList, VarstoreId);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Varstore = AllocateZeroPool (sizeof (*Varstore));
@@ -1669,8 +2412,9 @@ DynHiiAddVarstoreNameValue (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Varstore->Hdr.Type  = DynHiiNodeVarstore;
-  Varstore->Hdr.Scope = FALSE;
+  Varstore->Hdr.Type          = DynHiiNodeVarstore;
+  Varstore->Hdr.Scope         = FALSE;
+  Varstore->Hdr.FormsetHandle = Formset->Hdr.FormsetHandle;
   InitializeListHead (&Varstore->Hdr.Link);
 
   Varstore->VarstoreType = DynHiiVarstoreNameValue;
@@ -1708,6 +2452,7 @@ DynHiiFreeFormSet (
   DynHiiFreeVarstoreList (&Formset->VarstoreList);
   DynHiiFreeDefaultStoreList (&Formset->DefaultstoreList);
   DynHiiFreeFormsetChildren (&Formset->ChildList);
+  DynHiiFreeQuestionIdBuf (&Formset->QuestionIdArr);
 
   FreePool (Formset);
 }
