@@ -1,0 +1,30 @@
+## @file
+#  Host tests for AML address-space resource usage flags.
+#
+#  Copyright (c) 2026, Jin Kang. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.29
+  BASE_NAME      = AmlResourceUsageGoogleTest
+  FILE_GUID      = 734CC53E-3D07-4E30-A34D-94137EED9174
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+[Sources]
+  AmlResourceUsageGoogleTest.cpp
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AmlLib
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc

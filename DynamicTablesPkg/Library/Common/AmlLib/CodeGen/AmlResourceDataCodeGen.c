@@ -197,6 +197,7 @@ MemoryRangeSpecificFlags (
 
   See ACPI 6.4 spec, s19.6.36 for more.
 
+  @param [in]  IsResourceConsumer   ResourceUsage parameter.
   @param [in]  IsPosDecode          Decode parameter
   @param [in]  IsMinFixed           Minimum address is fixed.
   @param [in]  IsMaxFixed           Maximum address is fixed.
@@ -207,12 +208,14 @@ STATIC
 UINT8
 EFIAPI
 AddressSpaceGeneralFlags (
+  IN  BOOLEAN  IsResourceConsumer,
   IN  BOOLEAN  IsPosDecode,
   IN  BOOLEAN  IsMinFixed,
   IN  BOOLEAN  IsMaxFixed
   )
 {
-  return (IsPosDecode ? 0 : BIT1)    |
+  return (IsResourceConsumer ? BIT0 : 0) |
+         (IsPosDecode ? 0 : BIT1)    |
          (IsMinFixed ? BIT2 : 0)     |
          (IsMaxFixed ? BIT3 : 0);
 }
@@ -326,6 +329,7 @@ AmlCodeGenRdDWordSpace (
   // Body
   RdDWord.ResType = ResourceType;
   RdDWord.GenFlag = AddressSpaceGeneralFlags (
+                      IsResourceConsumer,
                       IsPosDecode,
                       IsMinFixed,
                       IsMaxFixed
@@ -706,6 +710,7 @@ AmlCodeGenRdWordSpace (
   // Body
   Rdword.ResType = ResourceType;
   Rdword.GenFlag = AddressSpaceGeneralFlags (
+                     IsResourceConsumer,
                      IsPosDecode,
                      IsMinFixed,
                      IsMaxFixed
@@ -1004,6 +1009,7 @@ AmlCodeGenRdQWordSpace (
   // Body
   RdQword.ResType = ResourceType;
   RdQword.GenFlag = AddressSpaceGeneralFlags (
+                      IsResourceConsumer,
                       IsPosDecode,
                       IsMinFixed,
                       IsMaxFixed
