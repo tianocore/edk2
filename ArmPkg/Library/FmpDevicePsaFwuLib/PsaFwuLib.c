@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -442,6 +442,7 @@ FwuDiscovery (
   )
 {
   EFI_STATUS  Status;
+  UINT64      MaxPayloadSize;
 
   if (Discovery == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -471,9 +472,30 @@ FwuDiscovery (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to %a. Status: %r\n", __func__, Status));
+    return Status;
   }
 
-  return Status;
+  if ((*Discovery)->ServiceStatus != SERVICE_STATUS_OPERATIVE) {
+    return EFI_SUCCESS;
+  }
+
+  // Both stream directions use the same payload limit.
+  MaxPayloadSize = MIN (
+                     FwuGetAvailableReqDataSize (PSA_MM_FWU_COMMAND_WRITE_STREAM),
+                     FwuGetAvailableRespDataSize (PSA_MM_FWU_COMMAND_READ_STREAM)
+                     );
+  MaxPayloadSize = MIN (MaxPayloadSize, MAX_UINT32);
+  if ((*Discovery)->MaxPayloadSize > MaxPayloadSize) {
+    DEBUG ((
+      DEBUG_WARN,
+      "FwuDiscovery: Reducing maximum payload size from %Lu to %Lu bytes.\n",
+      (*Discovery)->MaxPayloadSize,
+      MaxPayloadSize
+      ));
+    (*Discovery)->MaxPayloadSize = MaxPayloadSize;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
