@@ -50,6 +50,7 @@
   CacheMaintenanceLib
   CpuLib
   DebugLib
+  HobLib
   MemoryAllocationLib
   PcdLib
   CcExitLib
@@ -57,6 +58,7 @@
 
 [Guids]
   gEfiIgvmDataHobGuid
+  gUefiOvmfPkgPlatformInfoGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

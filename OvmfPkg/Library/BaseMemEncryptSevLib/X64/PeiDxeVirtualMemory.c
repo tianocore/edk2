@@ -11,15 +11,16 @@
 
 **/
 
+#include <PiPei.h>
 #include <Library/CpuLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/PlatformInitLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
 
 #include "VirtualMemory.h"
 #include "SnpPageStateChange.h"
-
-STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 STATIC VOID  *mPscBuffer = NULL;
 
@@ -47,6 +48,74 @@ InternalGetMemEncryptionAddressMask (
 }
 
 /**
+  Get the Platform Info HOB.
+
+  @return Pointer to the Platform Info HOB, or NULL if it does not exist.
+**/
+STATIC
+EFI_HOB_PLATFORM_INFO *
+GetPlatformInfoHob (
+  VOID
+  )
+{
+  VOID  *Hob;
+
+  Hob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  if (Hob == NULL) {
+    return NULL;
+  }
+
+  return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (Hob);
+}
+
+/**
+  Get the head of the page table pool list from the Platform Info HOB.
+
+  @return Pointer to the head of the page table pool list, or NULL if no
+          pool has been created yet or the Platform Info HOB does not exist.
+**/
+STATIC
+PAGE_TABLE_POOL *
+GetPageTablePoolHead (
+  VOID
+  )
+{
+  EFI_HOB_PLATFORM_INFO  *PlatformInfo;
+
+  PlatformInfo = GetPlatformInfoHob ();
+  if (PlatformInfo == NULL) {
+    return NULL;
+  }
+
+  return (PAGE_TABLE_POOL *)(UINTN)PlatformInfo->PageTablePoolHead;
+}
+
+/**
+  Store the head of the page table pool list in the Platform Info HOB.
+
+  @param[in]  Head  Pointer to the new head of the page table pool list.
+
+  @retval TRUE   The head was stored.
+  @retval FALSE  The Platform Info HOB does not exist.
+**/
+STATIC
+BOOLEAN
+SetPageTablePoolHead (
+  IN PAGE_TABLE_POOL  *Head
+  )
+{
+  EFI_HOB_PLATFORM_INFO  *PlatformInfo;
+
+  PlatformInfo = GetPlatformInfoHob ();
+  if (PlatformInfo == NULL) {
+    return FALSE;
+  }
+
+  PlatformInfo->PageTablePoolHead = (EFI_PHYSICAL_ADDRESS)(UINTN)Head;
+  return TRUE;
+}
+
+/**
   Initialize a buffer pool for page table use only.
 
   To reduce the potential split operation on page table, the pages reserved for
@@ -70,7 +139,8 @@ InitializePageTablePool (
   IN  UINTN  PoolPages
   )
 {
-  VOID  *Buffer;
+  VOID             *Buffer;
+  PAGE_TABLE_POOL  *PageTablePool;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
@@ -86,22 +156,40 @@ InitializePageTablePool (
   }
 
   //
+  // The pool head is kept in the Platform Info HOB. Make sure it exists before
+  // allocating anything.
+  //
+  if (GetPlatformInfoHob () == NULL) {
+    ASSERT (FALSE);
+    return FALSE;
+  }
+
+  PageTablePool = GetPageTablePoolHead ();
+
+  //
   // Link all pools into a list for easier track later.
   //
-  if (mPageTablePool == NULL) {
-    mPageTablePool           = Buffer;
-    mPageTablePool->NextPool = mPageTablePool;
+  if (PageTablePool == NULL) {
+    PageTablePool           = Buffer;
+    PageTablePool->NextPool = PageTablePool;
   } else {
-    ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
-    mPageTablePool->NextPool              = Buffer;
-    mPageTablePool                        = Buffer;
+    ((PAGE_TABLE_POOL *)Buffer)->NextPool = PageTablePool->NextPool;
+    PageTablePool->NextPool               = Buffer;
+    PageTablePool                         = Buffer;
   }
 
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages = PoolPages - 1;
-  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+  PageTablePool->FreePages = PoolPages - 1;
+  PageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+
+  //
+  // Store the updated pool head in the Platform Info HOB.
+  //
+  if (!SetPageTablePoolHead (PageTablePool)) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -130,27 +218,33 @@ AllocatePageTableMemory (
   IN UINTN  Pages
   )
 {
-  VOID  *Buffer;
+  VOID             *Buffer;
+  PAGE_TABLE_POOL  *PageTablePool;
 
   if (Pages == 0) {
     return NULL;
   }
 
+  PageTablePool = GetPageTablePoolHead ();
+
   //
   // Renew the pool if necessary.
   //
-  if ((mPageTablePool == NULL) ||
-      (Pages > mPageTablePool->FreePages))
+  if ((PageTablePool == NULL) ||
+      (Pages > PageTablePool->FreePages))
   {
     if (!InitializePageTablePool (Pages)) {
       return NULL;
     }
+
+    PageTablePool = GetPageTablePoolHead ();
+    ASSERT (PageTablePool != NULL);
   }
 
-  Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
+  Buffer = (UINT8 *)PageTablePool + PageTablePool->Offset;
 
-  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
-  mPageTablePool->FreePages -= Pages;
+  PageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  PageTablePool->FreePages -= Pages;
 
   DEBUG ((
     DEBUG_PAGING,
@@ -379,16 +473,17 @@ EnablePageTableProtection (
   UINT64                PoolSize;
   EFI_PHYSICAL_ADDRESS  Address;
 
-  if (mPageTablePool == NULL) {
+  HeadPool = GetPageTablePoolHead ();
+  if (HeadPool == NULL) {
     return;
   }
 
   //
-  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
-  // remember original one in advance.
+  // SetPageTablePoolReadOnly might allocate a new pool and thereby update the
+  // head stored in the Platform Info HOB. It's safer to iterate from the
+  // original head.
   //
-  HeadPool = mPageTablePool;
-  Pool     = HeadPool;
+  Pool = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
     PoolSize = Pool->Offset + EFI_PAGES_TO_SIZE (Pool->FreePages);
