@@ -29,7 +29,7 @@ EFI_DRIVER_BINDING_PROTOCOL  gVirtualKeyboardDriverBinding = {
 /**
   Check whether the driver supports this device.
 
-  @param  This                   The Udriver binding protocol.
+  @param  This                   The driver binding protocol.
   @param  Controller             The controller handle to check.
   @param  RemainingDevicePath    The remaining device path.
 
@@ -501,7 +501,7 @@ VirtualKeyboardWaitForKey (
   // will have a bad performance during this period,
   // e.g. usb keyboard driver.
   // Add a stall period can greatly increate other driver performance during
-  // the WaitForKey is recursivly invoked. 1ms delay will make little impact
+  // the WaitForKey is recursively invoked. 1ms delay will make little impact
   // to the thunk keyboard driver, and user can not feel the delay at all when
   // input.
   //
@@ -667,7 +667,7 @@ KeyboardReadKeyStrokeWorker (
   // bad performance during this period,
   // e.g. usb keyboard driver.
   // Add a stall period can greatly increate other driver performance during
-  // the WaitForKey is recursivly invoked. 1ms delay will make little impact
+  // the WaitForKey is recursively invoked. 1ms delay will make little impact
   // to the thunk keyboard driver, and user can not feel the delay at all when
   // input.
   //

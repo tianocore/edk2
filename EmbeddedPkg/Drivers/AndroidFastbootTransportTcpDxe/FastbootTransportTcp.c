@@ -87,7 +87,7 @@ DataReceived (
 */
 STATIC
 EFI_STATUS
-SubmitRecieveToken (
+SubmitReceiveToken (
   VOID
   )
 {
@@ -209,7 +209,7 @@ DataReceived (
       = ReceiveToken->Packet.RxData->FragmentTable[0].FragmentLength;
 
     // Prepare to receive more data
-    SubmitRecieveToken ();
+    SubmitReceiveToken ();
   } else {
     // Fatal receive error. Put an entry with NULL in the queue, signifying
     // to return EFI_DEVICE_ERROR from TcpFastbootTransportReceive.
@@ -283,7 +283,7 @@ ConnectionAccepted (
   }
 
   for (Index = 0; Index < NUM_RX_TOKENS; Index++) {
-    SubmitRecieveToken ();
+    SubmitReceiveToken ();
   }
 }
 

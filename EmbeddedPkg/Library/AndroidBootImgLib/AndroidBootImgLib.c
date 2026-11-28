@@ -176,7 +176,7 @@ AndroidBootImgGetImgSize (
   /* The page size is not specified, but it should be power of 2 at least */
   ASSERT (IS_VALID_ANDROID_PAGE_SIZE (Header->PageSize));
 
-  /* Get real size of abootimg */
+  /* Get real size of boot img */
   *ImgSize = ALIGN_VALUE (Header->KernelSize, Header->PageSize) +
              ALIGN_VALUE (Header->RamdiskSize, Header->PageSize) +
              ALIGN_VALUE (Header->SecondStageBootloaderSize, Header->PageSize) +
