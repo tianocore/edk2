@@ -342,7 +342,16 @@ MnpInstanceDeliverPacket (
     //
     // Duplicate the net buffer.
     //
-    NetbufDuplicate (RxDataWrap->Nbuf, DupNbuf, 0);
+    if (NetbufDuplicate (RxDataWrap->Nbuf, DupNbuf, 0) == NULL) {
+      DEBUG ((DEBUG_WARN, "MnpDeliverPacket: Failed to duplicate the received packet.\n"));
+
+      //
+      // Keep the original packet queued so delivery can be retried.
+      //
+      MnpFreeNbuf (MnpDeviceData, DupNbuf);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     MnpFreeNbuf (MnpDeviceData, RxDataWrap->Nbuf);
     RxDataWrap->Nbuf = DupNbuf;
   }

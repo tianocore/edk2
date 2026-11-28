@@ -535,19 +535,36 @@ HttpIoSendChunkedTransfer (
       }
 
       NewHeaders = AllocateZeroPool ((RequestMessage->HeaderCount + AddNewHeader) * sizeof (EFI_HTTP_HEADER));
+      if (NewHeaders == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem ((VOID *)NewHeaders, (VOID *)RequestMessage->Headers, RequestMessage->HeaderCount * sizeof (EFI_HTTP_HEADER));
       if (AddNewHeader == 0) {
         //
         // Override content-length to Transfer-Encoding.
         //
-        ContentLengthHeader             = HttpFindHeader (RequestMessage->HeaderCount, NewHeaders, HTTP_HEADER_CONTENT_LENGTH);
+        ContentLengthHeader = HttpFindHeader (RequestMessage->HeaderCount, NewHeaders, HTTP_HEADER_CONTENT_LENGTH);
+        if (ContentLengthHeader == NULL) {
+          FreePool (NewHeaders);
+          return EFI_INVALID_PARAMETER;
+        }
+
         ContentLengthHeader->FieldName  = NULL;
         ContentLengthHeader->FieldValue = NULL;
       } else {
         ContentLengthHeader = NewHeaders + RequestMessage->HeaderCount;
       }
 
-      HttpSetFieldNameAndValue (ContentLengthHeader, HTTP_HEADER_TRANSFER_ENCODING, HTTP_HEADER_TRANSFER_ENCODING_CHUNKED);
+      Status = HttpSetFieldNameAndValue (
+                 ContentLengthHeader,
+                 HTTP_HEADER_TRANSFER_ENCODING,
+                 HTTP_HEADER_TRANSFER_ENCODING_CHUNKED
+                 );
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+
       HeaderCount       = RequestMessage->HeaderCount + AddNewHeader;
       MessageBodyLength = 0;
       MessageBody       = NULL;
@@ -634,6 +651,8 @@ HttpIoSendChunkedTransfer (
              MessageBodyLength,
              MessageBody
              );
+
+ON_EXIT:
   if (ContentLengthHeader != NULL) {
     if (ContentLengthHeader->FieldName != NULL) {
       FreePool (ContentLengthHeader->FieldName);

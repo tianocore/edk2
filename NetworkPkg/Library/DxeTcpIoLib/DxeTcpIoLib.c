@@ -188,14 +188,29 @@ TcpIoCreateSocket (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR (Status) || (*Interface == NULL)) {
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  if (*Interface == NULL) {
+    Status = EFI_DEVICE_ERROR;
     goto ON_ERROR;
   }
 
   if (TcpVersion == TCP_VERSION_4) {
     Tcp4 = TcpIo->Tcp.Tcp4;
+    if (Tcp4 == NULL) {
+      ASSERT (Tcp4 != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
+    }
   } else {
     Tcp6 = TcpIo->Tcp.Tcp6;
+    if (Tcp6 == NULL) {
+      ASSERT (Tcp6 != NULL);
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
+    }
   }
 
   TcpIo->Image      = Image;
@@ -248,8 +263,6 @@ TcpIoCreateSocket (
       sizeof (EFI_IPv4_ADDRESS)
       );
 
-    ASSERT (Tcp4 != NULL);
-
     //
     // Configure the TCP4 protocol.
     //
@@ -287,7 +300,6 @@ TcpIoCreateSocket (
 
     IP6_COPY_ADDRESS (&AccessPoint6->RemoteAddress, &ConfigData->Tcp6IoConfigData.RemoteIp);
 
-    ASSERT (Tcp6 != NULL);
     //
     // Configure the TCP6 protocol.
     //
@@ -550,10 +562,18 @@ TcpIoConnect (
   Tcp6 = NULL;
 
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
-    Tcp4   = TcpIo->Tcp.Tcp4;
+    Tcp4 = TcpIo->Tcp.Tcp4;
+    if (Tcp4 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp4->Connect (Tcp4, &TcpIo->ConnToken.Tcp4Token);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
-    Tcp6   = TcpIo->Tcp.Tcp6;
+    Tcp6 = TcpIo->Tcp.Tcp6;
+    if (Tcp6 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp6->Connect (Tcp6, &TcpIo->ConnToken.Tcp6Token);
   } else {
     return EFI_UNSUPPORTED;
@@ -601,6 +621,7 @@ TcpIoConnect (
 
   @retval EFI_TIMEOUT            Failed to connect to the other endpoint of the
                                  TCP socket in the specified time period.
+  @retval EFI_DEVICE_ERROR       The accepted TCP child has no protocol interface.
   @retval Others                 Other errors as indicated.
 
 **/
@@ -613,6 +634,7 @@ TcpIoAccept (
 {
   EFI_STATUS         Status;
   EFI_GUID           *ProtocolGuid;
+  EFI_GUID           *ServiceBindingGuid;
   EFI_TCP4_PROTOCOL  *Tcp4;
   EFI_TCP6_PROTOCOL  *Tcp6;
 
@@ -626,10 +648,18 @@ TcpIoAccept (
   Tcp6 = NULL;
 
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
-    Tcp4   = TcpIo->Tcp.Tcp4;
+    Tcp4 = TcpIo->Tcp.Tcp4;
+    if (Tcp4 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp4->Accept (Tcp4, &TcpIo->ListenToken.Tcp4Token);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
-    Tcp6   = TcpIo->Tcp.Tcp6;
+    Tcp6 = TcpIo->Tcp.Tcp6;
+    if (Tcp6 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     Status = Tcp6->Accept (Tcp6, &TcpIo->ListenToken.Tcp6Token);
   } else {
     return EFI_UNSUPPORTED;
@@ -665,11 +695,16 @@ TcpIoAccept (
   //
   if (!EFI_ERROR (Status)) {
     if (TcpIo->TcpVersion == TCP_VERSION_4) {
-      ProtocolGuid = &gEfiTcp4ProtocolGuid;
+      ProtocolGuid       = &gEfiTcp4ProtocolGuid;
+      ServiceBindingGuid = &gEfiTcp4ServiceBindingProtocolGuid;
     } else {
-      ProtocolGuid = &gEfiTcp6ProtocolGuid;
+      ProtocolGuid       = &gEfiTcp6ProtocolGuid;
+      ServiceBindingGuid = &gEfiTcp6ServiceBindingProtocolGuid;
     }
 
+    //
+    // NewTcp is a union, so Tcp4 and Tcp6 share the same interface pointer.
+    //
     Status = gBS->OpenProtocol (
                     TcpIo->ListenToken.Tcp4Token.NewChildHandle,
                     ProtocolGuid,
@@ -678,6 +713,36 @@ TcpIoAccept (
                     TcpIo->Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
+    if (!EFI_ERROR (Status) && (TcpIo->NewTcp.Tcp4 == NULL)) {
+      //
+      // Without an interface, TcpIoDestroySocket cannot clean up the accepted child.
+      // Close the successful protocol open before destroying that child.
+      //
+      Status = gBS->CloseProtocol (
+                      TcpIo->ListenToken.Tcp4Token.NewChildHandle,
+                      ProtocolGuid,
+                      TcpIo->Image,
+                      TcpIo->Controller
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "TcpIoAccept: Failed to close the accepted TCP protocol: %r.\n", Status));
+        return Status;
+      }
+
+      Status = NetLibDestroyServiceChild (
+                 TcpIo->Controller,
+                 TcpIo->Image,
+                 ServiceBindingGuid,
+                 TcpIo->ListenToken.Tcp4Token.NewChildHandle
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "TcpIoAccept: Failed to destroy the accepted TCP child: %r.\n", Status));
+        return Status;
+      }
+
+      TcpIo->ListenToken.Tcp4Token.NewChildHandle = NULL;
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
   return Status;
@@ -710,11 +775,19 @@ TcpIoReset (
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
     TcpIo->CloseToken.Tcp4Token.AbortOnClose = TRUE;
     Tcp4                                     = TcpIo->Tcp.Tcp4;
-    Status                                   = Tcp4->Close (Tcp4, &TcpIo->CloseToken.Tcp4Token);
+    if (Tcp4 == NULL) {
+      return;
+    }
+
+    Status = Tcp4->Close (Tcp4, &TcpIo->CloseToken.Tcp4Token);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
     TcpIo->CloseToken.Tcp6Token.AbortOnClose = TRUE;
     Tcp6                                     = TcpIo->Tcp.Tcp6;
-    Status                                   = Tcp6->Close (Tcp6, &TcpIo->CloseToken.Tcp6Token);
+    if (Tcp6 == NULL) {
+      return;
+    }
+
+    Status = Tcp6->Close (Tcp6, &TcpIo->CloseToken.Tcp6Token);
   } else {
     return;
   }
