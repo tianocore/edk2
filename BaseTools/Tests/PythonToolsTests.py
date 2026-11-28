@@ -18,6 +18,8 @@ def TheTestSuite():
     suites.append(CheckPythonSyntax.TheTestSuite())
     import CheckUnicodeSourceFiles
     suites.append(CheckUnicodeSourceFiles.TheTestSuite())
+    import TestDscParserInclude
+    suites.append(TestDscParserInclude.TheTestSuite())
     import TestMultipleWorkspace
     suites.append(TestMultipleWorkspace.TheTestSuite())
     import MetaFileParserTests
