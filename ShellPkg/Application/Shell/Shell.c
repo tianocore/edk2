@@ -401,6 +401,8 @@ UefiMain (
   //
   gBS->SetWatchdogTimer (0, 0, 0, NULL);
 
+  ShellInitEnvVarList ();
+
   //
   // install our console logger.  This will keep a log of the output for back-browsing
   //
@@ -454,9 +456,10 @@ UefiMain (
     ASSERT_EFI_ERROR (Status);
 
     Status = CommandInit ();
-    ASSERT_EFI_ERROR (Status);
-
-    Status = ShellInitEnvVarList ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: One or more required protocols could not be found\n", __func__));
+      goto FreeResources;
+    }
 
     //
     // Check the command line

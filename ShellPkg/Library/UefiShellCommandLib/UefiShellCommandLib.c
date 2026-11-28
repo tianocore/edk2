@@ -573,7 +573,8 @@ ShellCommandGetCommandHelp (
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to
                                     register the shell command.
   @retval RETURN_UNSUPPORTED        the ShellMinSupportLevel was higher than the
-                                    currently allowed support level.
+                                    currently allowed support level, or one or
+                                    more required protocols could not be found.
   @retval RETURN_ALREADY_STARTED    The CommandString represents a command that
                                     is already registered.  Only 1 handler set for
                                     a given command is allowed.
@@ -612,6 +613,10 @@ ShellCommandRegisterCommandName (
   ASSERT (GetManFileName != NULL);
   ASSERT (CommandHandler != NULL);
   ASSERT (ProfileName    != NULL);
+
+  if (gUnicodeCollation == NULL) {
+    return (RETURN_UNSUPPORTED);
+  }
 
   //
   // check for shell support level
@@ -897,6 +902,7 @@ ShellCommandGetCommandList (
   @retval  RETURN_SUCCESS           The handlers were registered.
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources available to
                                     register the shell command.
+  @retval  RETURN_UNSUPPORTED       One or more required protocols could not be found.
 **/
 RETURN_STATUS
 EFIAPI
@@ -915,6 +921,10 @@ ShellCommandRegisterAlias (
   //
   ASSERT (Command != NULL);
   ASSERT (Alias   != NULL);
+
+  if (gUnicodeCollation == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
 
   //
   // allocate memory for new struct
