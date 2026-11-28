@@ -36,12 +36,14 @@ ArmPlatformGetBootMode (
 /**
   First platform specific function to be called in the PEI phase
 
-  This function is actually the first function called by the PrePi
-  or PrePeiCore modules. It allows to retrieve arguments passed to
+  This function is actually the first function called by the Sec or
+  PeilessSec modules. It allows to retrieve arguments passed to
   the UEFI firmware through the CPU registers.
 
   This function might be written into assembler as no stack are set
   when the function is invoked.
+
+  On AArch64, this function is permitted to enable the MMU.
 
 **/
 VOID
