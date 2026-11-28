@@ -866,7 +866,18 @@ IScsiStart (
       }
     }
 
+    if (Index == AttemptConfigOrderSize / sizeof (UINT8)) {
+      Status = EFI_NOT_FOUND;
+      goto ON_ERROR;
+    }
+
     if (mPrivate->EnableMpio) {
+      if (ExistPrivate == NULL) {
+        ASSERT (ExistPrivate != NULL);
+        Status = EFI_NOT_FOUND;
+        goto ON_ERROR;
+      }
+
       //
       // Use the attempt in earlier order. Abort the later one in MPIO.
       //
