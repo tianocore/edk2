@@ -913,6 +913,241 @@ ON_EXIT:
 }
 
 /**
+  Remove malformed non-Alert options from the private packet copy.
+
+  Some DHCP servers send optional options with a format that does not
+  strictly comply with RFC standards. Alert options consumed by the
+  DHCP state machine must remain strictly validated, but malformed
+  non-Alert options can be safely removed from the private packet copy
+  before strict validation.
+
+  RFC 3396 allows an option to be split across several same-tag
+  instances. The merged length is used for validation; if the merged
+  value fails, all instances of that tag are removed.
+
+  @param[in, out] Packet  The DHCP packet to sanitize.
+
+**/
+VOID
+EFIAPI
+DhcpRemoveMalformedNonAlertOptions (
+  IN OUT EFI_DHCP4_PACKET  *Packet
+  )
+{
+  UINT8               *Cur;
+  UINT8               *End;
+  UINT8               Tag;
+  UINT8               Len;
+  UINTN               Index;
+  DHCP_OPTION_FORMAT  *Format;
+  BOOLEAN             RemoveTag[DHCP_MAX_OPTIONS];
+  BOOLEAN             OptionPresent[DHCP_MAX_OPTIONS];
+  UINT16              MergedLen[DHCP_MAX_OPTIONS];
+  UINT16              MergedOffset[DHCP_MAX_OPTIONS];
+  UINT16              WriteOffset[DHCP_MAX_OPTIONS];
+  UINT8               *ScratchBuffer;
+  UINT32              TotalMergedLen;
+
+  //
+  // 1. If OVERLOAD is present, skip sanitization entirely to avoid
+  // complex cross-region parsing. Strict validation will handle it.
+  //
+  Cur = Packet->Dhcp4.Option;
+  End = (UINT8 *)&Packet->Dhcp4 + Packet->Length;
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    if ((Tag == DHCP4_TAG_OVERLOAD) && (Len == 1) && (*Cur != 0)) {
+      return;
+    }
+
+    Cur += Len;
+  }
+
+  SetMem (RemoveTag, sizeof (RemoveTag), 0);
+  SetMem (OptionPresent, sizeof (OptionPresent), 0);
+  SetMem (MergedLen, sizeof (MergedLen), 0);
+  SetMem (MergedOffset, sizeof (MergedOffset), 0);
+  SetMem (WriteOffset, sizeof (WriteOffset), 0);
+
+  //
+  // 2. First pass: compute merged length and presence.
+  //
+  Cur = Packet->Dhcp4.Option;
+  End = (UINT8 *)&Packet->Dhcp4 + Packet->Length;
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    OptionPresent[Tag] = TRUE;
+    MergedLen[Tag]     = (UINT16)(MergedLen[Tag] + Len);
+    Cur               += Len;
+  }
+
+  //
+  // 3. Allocate ONE scratch buffer and partition it.
+  //
+  TotalMergedLen = 0;
+  for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {
+    if (OptionPresent[Index]) {
+      MergedOffset[Index] = (UINT16)TotalMergedLen;
+      if (MergedLen[Index] == 0) {
+        TotalMergedLen++; // Reserve one byte for zero-length option
+      } else {
+        TotalMergedLen += MergedLen[Index];
+      }
+    }
+  }
+
+  ScratchBuffer = NULL;
+  if (TotalMergedLen > 0) {
+    ScratchBuffer = AllocateZeroPool (TotalMergedLen);
+    if (ScratchBuffer == NULL) {
+      //
+      // If allocation fails, skip sanitization and let strict validation
+      // handle the packet, avoiding any potential NULL pointer access.
+      //
+      return;
+    }
+  }
+
+  //
+  // 4. Second pass: fill the merged data.
+  //
+  Cur = Packet->Dhcp4.Option;
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    if (OptionPresent[Tag]) {
+      CopyMem (ScratchBuffer + MergedOffset[Tag] + WriteOffset[Tag], Cur, Len);
+      WriteOffset[Tag] += Len;
+    }
+
+    Cur += Len;
+  }
+
+  //
+  // 5. Mark malformed non-Alert tags using real merged data.
+  //
+  for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {
+    if (!OptionPresent[Index]) {
+      continue;
+    }
+
+    Tag    = (UINT8)Index;
+    Format = DhcpFindOptionFormat (Tag);
+    if ((Format == NULL) || Format->Alert) {
+      continue;
+    }
+
+    if (!DhcpOptionIsValid (Format, ScratchBuffer + MergedOffset[Tag], MergedLen[Tag])) {
+      RemoveTag[Tag] = TRUE;
+      DEBUG ((
+        DEBUG_WARN,
+        "DhcpRemoveMalformedNonAlertOptions: Remove Tag=%d\n",
+        Tag
+        ));
+    }
+  }
+
+  if (ScratchBuffer != NULL) {
+    FreePool (ScratchBuffer);
+  }
+
+  //
+  // 6. Third pass: remove all instances of marked tags.
+  //
+  Cur = Packet->Dhcp4.Option;
+  End = (UINT8 *)&Packet->Dhcp4 + Packet->Length;
+  while (Cur < End) {
+    Tag = *Cur++;
+
+    if (Tag == DHCP4_TAG_EOP) {
+      break;
+    }
+
+    if (Tag == DHCP4_TAG_PAD) {
+      continue;
+    }
+
+    if (Cur >= End) {
+      break;
+    }
+
+    Len = *Cur++;
+
+    if (Cur + Len > End) {
+      break;
+    }
+
+    if (RemoveTag[Tag]) {
+      CopyMem (Cur - 2, Cur + Len, (UINTN)(End - (Cur + Len)));
+      Packet->Length -= (UINT32)(Len + 2);
+      End            -= (Len + 2);
+      Cur            -= 2;
+      continue;
+    }
+
+    Cur += Len;
+  }
+
+  ASSERT (Packet->Length >= sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32));
+}
+
+/**
   Handle the received DHCP packets. This function drives the DHCP
   state machine.
 
@@ -993,14 +1228,20 @@ DhcpInput (
   }
 
   //
-  // Validate the options and retrieve the interested options
+  // Validate the options and retrieve the interested options. Remove
+  // malformed non-Alert options from the private copy first, so
+  // downstream consumers do not read malformed data. Alert options and
+  // public APIs remain strictly validated.
   //
   Para = NULL;
   if ((Packet->Length > sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)) &&
-      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC) &&
-      EFI_ERROR (DhcpValidateOptions (Packet, &Para)))
+      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC))
   {
-    goto RESTART;
+    DhcpRemoveMalformedNonAlertOptions (Packet);
+
+    if (EFI_ERROR (DhcpValidateOptions (Packet, &Para))) {
+      goto RESTART;
+    }
   }
 
   //
