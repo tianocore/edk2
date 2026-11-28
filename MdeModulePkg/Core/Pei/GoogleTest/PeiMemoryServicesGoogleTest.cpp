@@ -561,6 +561,192 @@ TEST_F (PeiMemoryServicesTest, PermanentMemory_SmallHobTopDown) {
   EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryLength, AllocatedPages * EFI_PAGE_SIZE);
 }
 
+TEST_F (PeiMemoryServicesTest, Bin_ExclusiveCursorPreservesAlignedTop) {
+  EFI_MEMORY_TYPE_STATISTICS  Statistics[EfiMaxMemoryType + 1] = { };
+  EFI_PHYSICAL_ADDRESS        Memory;
+  EFI_PHYSICAL_ADDRESS        BinBase;
+  UINTN                       Granularity;
+  UINTN                       Pages;
+
+  Granularity                                      = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  Pages                                            = EFI_SIZE_TO_PAGES (Granularity);
+  BinBase                                          = FREE_MEMORY_TOP + Granularity;
+  Statistics[EfiReservedMemoryType].BaseAddress    = BinBase;
+  Statistics[EfiReservedMemoryType].MaximumAddress = BinBase + (3 * Granularity) - 1;
+  Statistics[EfiReservedMemoryType].NumberOfPages  = (UINT32)(3 * Pages);
+  PrivateData.MemoryTypeStatistics                 = Statistics;
+  PrivateData.MemoryTypeInformationInitialized     = TRUE;
+
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, BinBase + (2 * Granularity));
+  EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, Memory - 1);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryBaseAddress, Memory);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryLength, Granularity);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, FREE_MEMORY_TOP);
+}
+
+TEST_F (PeiMemoryServicesTest, Phit_ExactFitRequiresHobHeadroom) {
+  EFI_PHYSICAL_ADDRESS  Memory;
+  EFI_PHYSICAL_ADDRESS  PhitTop;
+  UINTN                 Granularity;
+  UINTN                 Pages;
+
+  Granularity                 = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  Pages                       = EFI_SIZE_TO_PAGES (Granularity);
+  PhitTop                     = HobList.EfiFreeMemoryTop;
+  HobList.EfiFreeMemoryBottom = PhitTop - Granularity;
+  Memory                      = 0;
+
+  EXPECT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_OUT_OF_RESOURCES);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, PhitTop);
+  EXPECT_EQ (Memory, (EFI_PHYSICAL_ADDRESS)0);
+  EXPECT_EQ (UnusedHob.Header.HobType, EFI_HOB_TYPE_UNUSED);
+
+  HobList.EfiFreeMemoryBottom -= sizeof (EFI_HOB_MEMORY_ALLOCATION) - 1;
+  EXPECT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_OUT_OF_RESOURCES);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, PhitTop);
+  EXPECT_EQ (Memory, (EFI_PHYSICAL_ADDRESS)0);
+
+  HobList.EfiFreeMemoryBottom--;
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, PhitTop - Granularity);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, Memory);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryBaseAddress, Memory);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryLength, Granularity);
+}
+
+TEST_F (PeiMemoryServicesTest, Bin_ExclusiveCursorExactFitAndFallback) {
+  EFI_MEMORY_TYPE_STATISTICS  Statistics[EfiMaxMemoryType + 1] = { };
+  EFI_PHYSICAL_ADDRESS        Memory;
+  EFI_PHYSICAL_ADDRESS        BinBase;
+  EFI_PHYSICAL_ADDRESS        PhitTop;
+  UINTN                       Granularity;
+  UINTN                       Pages;
+
+  Granularity                                      = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  Pages                                            = EFI_SIZE_TO_PAGES (Granularity);
+  BinBase                                          = FREE_MEMORY_TOP + Granularity;
+  PhitTop                                          = HobList.EfiFreeMemoryTop;
+  HobList.EfiFreeMemoryBottom                      = PhitTop - (4 * Granularity);
+  Statistics[EfiReservedMemoryType].BaseAddress    = BinBase;
+  Statistics[EfiReservedMemoryType].MaximumAddress = BinBase + (2 * Granularity) - 1;
+  Statistics[EfiReservedMemoryType].NumberOfPages  = (UINT32)(2 * Pages);
+  PrivateData.MemoryTypeStatistics                 = Statistics;
+  PrivateData.MemoryTypeInformationInitialized     = TRUE;
+
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, BinBase + Granularity);
+  EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, BinBase + Granularity - 1);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryBaseAddress, Memory);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, PhitTop);
+
+  UnusedHob.Header.HobType = EFI_HOB_TYPE_UNUSED;
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, BinBase);
+  EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, BinBase - 1);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, PhitTop);
+
+  UnusedHob.Header.HobType = EFI_HOB_TYPE_UNUSED;
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, Pages, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, PhitTop - Granularity);
+  EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, BinBase - 1);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, Memory);
+}
+
+TEST_F (PeiMemoryServicesTest, Bin_ExhaustedPhitWithoutReusableHobReturnsError) {
+  EFI_MEMORY_TYPE_STATISTICS  Statistics[EfiMaxMemoryType + 1] = { };
+  EFI_PHYSICAL_ADDRESS        Memory;
+  EFI_PHYSICAL_ADDRESS        BinTop;
+
+  BinTop                                          = FREE_MEMORY_TOP + (4 * RUNTIME_PAGE_ALLOCATION_GRANULARITY) - 1;
+  Statistics[EfiReservedMemoryType].BaseAddress    = FREE_MEMORY_TOP + RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  Statistics[EfiReservedMemoryType].MaximumAddress = BinTop;
+  Statistics[EfiReservedMemoryType].NumberOfPages  = (UINT32)EFI_SIZE_TO_PAGES (3 * RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+  PrivateData.MemoryTypeStatistics                 = Statistics;
+  PrivateData.MemoryTypeInformationInitialized     = TRUE;
+  UnusedHob.Header.HobType                         = EFI_HOB_TYPE_END_OF_HOB_LIST;
+
+  for (UINTN HobSpace = 0; HobSpace < sizeof (EFI_HOB_MEMORY_ALLOCATION); HobSpace++) {
+    HobList.EfiFreeMemoryBottom = HobList.EfiFreeMemoryTop - HobSpace;
+    Memory                     = 0;
+
+    EXPECT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, 1, &Memory), EFI_OUT_OF_RESOURCES);
+    EXPECT_EQ (Memory, (EFI_PHYSICAL_ADDRESS)0);
+    EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, BinTop);
+    EXPECT_EQ (HobList.EfiFreeMemoryTop, FREE_MEMORY_TOP);
+    EXPECT_EQ (HobList.EfiFreeMemoryBottom, FREE_MEMORY_TOP - HobSpace);
+  }
+}
+
+TEST_F (PeiMemoryServicesTest, Bin_ExhaustedPhitCanReuseAllocationHob) {
+  EFI_MEMORY_TYPE_STATISTICS  Statistics[EfiMaxMemoryType + 1] = { };
+  EFI_PHYSICAL_ADDRESS        Memory;
+  EFI_PHYSICAL_ADDRESS        BinTop;
+
+  BinTop                                          = FREE_MEMORY_TOP + (4 * RUNTIME_PAGE_ALLOCATION_GRANULARITY) - 1;
+  Statistics[EfiReservedMemoryType].BaseAddress    = FREE_MEMORY_TOP + RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  Statistics[EfiReservedMemoryType].MaximumAddress = BinTop;
+  Statistics[EfiReservedMemoryType].NumberOfPages  = (UINT32)EFI_SIZE_TO_PAGES (3 * RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+  PrivateData.MemoryTypeStatistics                 = Statistics;
+  PrivateData.MemoryTypeInformationInitialized     = TRUE;
+  HobList.EfiFreeMemoryBottom                      = HobList.EfiFreeMemoryTop;
+
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, 1, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, BinTop + 1 - RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+  EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, Memory - 1);
+  EXPECT_EQ (UnusedHob.Header.HobType, EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryBaseAddress, Memory);
+  EXPECT_EQ (UnusedHob.AllocDescriptor.MemoryLength, (UINT64)RUNTIME_PAGE_ALLOCATION_GRANULARITY);
+  EXPECT_EQ (HobList.EfiFreeMemoryTop, FREE_MEMORY_TOP);
+  EXPECT_EQ (HobList.EfiFreeMemoryBottom, FREE_MEMORY_TOP);
+}
+
+TEST_F (PeiMemoryServicesTest, Bin_InvalidRangeFallsBackWithoutUnderflow) {
+  EFI_MEMORY_TYPE_STATISTICS  Statistics[EfiMaxMemoryType + 1] = { };
+  EFI_PHYSICAL_ADDRESS        Memory;
+  EFI_PHYSICAL_ADDRESS        PhitTop;
+
+  PhitTop                                      = HobList.EfiFreeMemoryTop;
+  Statistics[EfiLoaderData].BaseAddress        = FREE_MEMORY_TOP + (2 * DEFAULT_PAGE_ALLOCATION_GRANULARITY);
+  Statistics[EfiLoaderData].MaximumAddress     = FREE_MEMORY_TOP - 1;
+  Statistics[EfiLoaderData].NumberOfPages      = 1;
+  PrivateData.MemoryTypeStatistics             = Statistics;
+  PrivateData.MemoryTypeInformationInitialized = TRUE;
+
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiLoaderData, 1, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, PhitTop - DEFAULT_PAGE_ALLOCATION_GRANULARITY);
+  EXPECT_EQ (Statistics[EfiLoaderData].MaximumAddress, FREE_MEMORY_TOP - 1);
+}
+
+TEST_F (PeiMemoryServicesTest, Bin_PaddingCursorSavedBeforeFallback) {
+  EFI_MEMORY_TYPE_STATISTICS  Statistics[EfiMaxMemoryType + 1] = { };
+  EFI_PHYSICAL_ADDRESS        Memory;
+  EFI_PHYSICAL_ADDRESS        BinBase;
+  EFI_PHYSICAL_ADDRESS        PhitTop;
+  UINTN                       Granularity;
+  UINTN                       Pages;
+
+  Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  if (Granularity == EFI_PAGE_SIZE) {
+    GTEST_SKIP ();
+  }
+
+  Pages                                                               = EFI_SIZE_TO_PAGES (Granularity);
+  BinBase                                                             = FREE_MEMORY_TOP + Granularity;
+  PhitTop                                                             = HobList.EfiFreeMemoryTop;
+  HobList.EfiFreeMemoryBottom                                         = PhitTop - (4 * Granularity);
+  Statistics[EfiReservedMemoryType].BaseAddress                       = BinBase;
+  Statistics[EfiReservedMemoryType].MaximumAddress                    = BinBase + Granularity + EFI_PAGE_SIZE - 1;
+  Statistics[EfiReservedMemoryType].NumberOfPages                     = (UINT32)(Pages + 1);
+  PrivateData.MemoryTypeStatistics                                    = Statistics;
+  PrivateData.MemoryTypeInformationInitialized                        = TRUE;
+  AddFreeRange (BinBase + Granularity, EFI_PAGE_SIZE)->Header.HobType = EFI_HOB_TYPE_UNUSED;
+
+  ASSERT_EQ (PeiAllocatePages (PeiServices (), EfiReservedMemoryType, 2 * Pages, &Memory), EFI_SUCCESS);
+  EXPECT_EQ (Memory, PhitTop - (2 * Granularity));
+  EXPECT_EQ (Statistics[EfiReservedMemoryType].MaximumAddress, BinBase + Granularity - 1);
+}
+
 /**
   Verify that an invalid memory type is rejected without changing free memory.
 **/
