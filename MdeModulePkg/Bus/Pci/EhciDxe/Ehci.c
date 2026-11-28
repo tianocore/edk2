@@ -1614,6 +1614,15 @@ EhcExitBootService (
   Ehc = (USB2_HC_DEV *)Context;
 
   //
+  // If the controller is still running, turn off the periodic and
+  // asynchronous schedules before halting it. Some controllers may
+  // never halt if USBCMD.RS is cleared while both schedules are enabled.
+  //
+  if (!EhcIsHalt (Ehc)) {
+    EhcQuiesceHC (Ehc, EHC_GENERIC_TIMEOUT);
+  }
+
+  //
   // Reset the Host Controller
   //
   EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
