@@ -586,20 +586,77 @@ class GenFds(object):
                     FvSpaceInfoList.append((FvName, Total, Used, Free))
 
         GenFdsGlobalVariable.InfLogger('\nFV Space Information')
+        if not FvSpaceInfoList:
+            return
+
+        Names = []
+        Percentages = []
+        Sizes = ([], [], [])
         for FvSpaceInfo in FvSpaceInfoList:
-            Name = FvSpaceInfo[0]
+            Names.append(FvSpaceInfo[0])
             TotalSizeValue = int(FvSpaceInfo[1], 0)
             UsedSizeValue = int(FvSpaceInfo[2], 0)
             FreeSizeValue = int(FvSpaceInfo[3], 0)
-            if UsedSizeValue == TotalSizeValue:
-                Percentage = '100'
-            else:
-                Percentage = str((UsedSizeValue + 0.0) / TotalSizeValue)[0:4].lstrip('0.')
+            Percentages.append(GenFds._GetUsedPercentage(UsedSizeValue, TotalSizeValue))
+            Sizes[0].append(TotalSizeValue)
+            Sizes[1].append(UsedSizeValue)
+            Sizes[2].append(FreeSizeValue)
 
-            GenFdsGlobalVariable.InfLogger(Name + ' ' + '[' + Percentage + '%Full] '\
-                                           + str(TotalSizeValue) + ' (' + hex(TotalSizeValue) + ')' + ' total, '\
-                                           + str(UsedSizeValue) + ' (' + hex(UsedSizeValue) + ')' + ' used, '\
-                                           + str(FreeSizeValue) + ' (' + hex(FreeSizeValue) + ')' + ' free')
+        Header = ['FV Name', 'Used %', 'Total', 'Used', 'Free']
+        Columns = [Names, Percentages] + [GenFds._FormatSizeColumn(Column) for Column in Sizes]
+        Widths = [max([len(Header[Index])] + [len(Cell) for Cell in Columns[Index]]) for Index in range(len(Header))]
+
+        def FormatRow(Cells):
+            return '  '.join([Cells[0].ljust(Widths[0])] + [Cells[Index].rjust(Widths[Index]) for Index in range(1, len(Cells))]).rstrip()
+
+        GenFdsGlobalVariable.InfLogger(FormatRow(Header))
+        GenFdsGlobalVariable.InfLogger('  '.join('-' * Width for Width in Widths))
+        for Row in range(len(Names)):
+            GenFdsGlobalVariable.InfLogger(FormatRow([Column[Row] for Column in Columns]))
+
+    ## _GetUsedPercentage()
+    #
+    #   Use the same calculation and format as the FV usage in BuildReport.
+    #
+    #   @param  Used            Used size in bytes
+    #   @param  Total           Total size in bytes
+    #   @retval str             Percentage used with one decimal place, such as '99.6%'
+    #
+    @staticmethod
+    def _GetUsedPercentage(Used, Total):
+        if Total == 0:
+            return '0.0%'
+        return f'{Used * 100.0 / Total:.1f}%'
+
+    ## _FormatSizeColumn()
+    #
+    #   Format sizes as '<readable size> <unit> (<bytes>/<hex bytes>)', padding
+    #   each part to the widest value in the column so that all parts line up.
+    #   Hex values are zero-padded so they line up on the right like the
+    #   decimal values.
+    #
+    #   @param  SizeList        List of sizes in bytes
+    #   @retval list            Formatted strings, all the same length
+    #
+    @staticmethod
+    def _FormatSizeColumn(SizeList):
+        HexDigits = max(len(f'{Size:x}') for Size in SizeList)
+        Parts = []
+        for Size in SizeList:
+            Exact = f'({Size}/0x{Size:0{HexDigits}x})'
+            if Size < 1024:
+                Parts.append((f'{Size}', 'B', Exact))
+                continue
+            Value = float(Size)
+            for Unit in ('KiB', 'MiB', 'GiB'):
+                Value /= 1024
+                if Value < 1024 or Unit == 'GiB':
+                    break
+            Parts.append((f'{Value:.2f}', Unit, Exact))
+
+        Widths = [max(len(Part[Index]) for Part in Parts) for Index in range(3)]
+        return [f'{Number:>{Widths[0]}} {Unit:<{Widths[1]}} {Exact:>{Widths[2]}}'
+                for Number, Unit, Exact in Parts]
 
     ## PreprocessImage()
     #
