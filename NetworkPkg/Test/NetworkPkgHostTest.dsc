@@ -26,7 +26,11 @@
   # Build HOST_APPLICATION that tests NetworkPkg
   #
   NetworkPkg/Dhcp6Dxe/GoogleTest/Dhcp6DxeGoogleTest.inf
-  NetworkPkg/IScsiDxe/GoogleTest/IScsiDxeGoogleTest.inf
+  NetworkPkg/IScsiDxe/GoogleTest/IScsiDxeGoogleTest.inf {
+    <LibraryClasses>
+      HiiLib|MdeModulePkg/Test/Mock/Library/GoogleTest/MockHiiLib/MockHiiLib.inf
+      UefiRuntimeServicesTableLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
+  }
   NetworkPkg/Ip6Dxe/GoogleTest/Ip6DxeGoogleTest.inf
   NetworkPkg/UefiPxeBcDxe/GoogleTest/UefiPxeBcDxeGoogleTest.inf {
     <LibraryClasses>
