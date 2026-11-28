@@ -626,6 +626,18 @@ SetKeyboardLayoutEvent (
     CopyMem (&TempKey, KeyDescriptor, sizeof (EFI_KEY_DESCRIPTOR));
 
     //
+    // TempKey.Key comes from the HII keyboard layout package and is not bounded
+    // by the caller. EfiKeyToUsbKeyCodeConvertionTable only covers EfiKeyLCtrl
+    // through EfiKeyPause, so values at or beyond its size (e.g. EfiKeyIntl0..9)
+    // would read past the table.
+    //
+    if ((UINTN)(UINT8)(TempKey.Key) >= ARRAY_SIZE (EfiKeyToUsbKeyCodeConvertionTable)) {
+      ReleaseKeyboardLayoutResources (UsbKeyboardDevice);
+      FreePool (KeyboardLayout);
+      return;
+    }
+
+    //
     // Fill the key into KeyConvertionTable, whose index is calculated from USB keycode.
     //
     KeyCode    = EfiKeyToUsbKeyCodeConvertionTable[(UINT8)(TempKey.Key)];
