@@ -21,7 +21,7 @@
    and Platform Hierarchy Authorization Policy (platformPolicy) can be defined through this function.
 
   @param  Event   Pointer to this event
-  @param  Context Event hanlder private data
+  @param  Context Event handler private data
  **/
 VOID
 EFIAPI

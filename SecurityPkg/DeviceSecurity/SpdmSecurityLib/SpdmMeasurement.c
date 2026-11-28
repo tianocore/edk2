@@ -469,7 +469,7 @@ Exit:
 
   @param[in]  SpdmDeviceContext            The SPDM context for the device.
   @param[in]  SlotId                       The number of slot id of the certificate.
-  @param[out] SecurityState                A poniter to security state of the requester.
+  @param[out] SecurityState                A pointer to security state of the requester.
 
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES   Out of memory.

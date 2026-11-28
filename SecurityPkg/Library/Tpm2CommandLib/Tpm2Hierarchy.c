@@ -279,7 +279,7 @@ Tpm2Clear (
   }
 
   //
-  // Unmarshal the response
+  // un-Marshal the response
   //
 
   // None
@@ -373,7 +373,7 @@ Tpm2ClearControl (
   }
 
   //
-  // Unmarshal the response
+  // un-Marshal the response
   //
 
   // None

@@ -1276,7 +1276,7 @@ OpalDiskInitialize (
   TCG_RESULT    TcgResult;
   OPAL_SESSION  Session;
   UINT8         ActiveDataRemovalMechanism;
-  UINT32        RemovalMechanishLists[ReservedMechanism];
+  UINT32        RemovalMechanismLists[ReservedMechanism];
 
   ZeroMem (&Dev->OpalDisk, sizeof (OPAL_DISK));
   Dev->OpalDisk.Sscp           = Dev->Sscp;
@@ -1300,7 +1300,7 @@ OpalDiskInitialize (
   }
 
   if (Dev->OpalDisk.SupportedAttributes.DataRemoval) {
-    TcgResult = OpalUtilGetDataRemovalMechanismLists (&Session, RemovalMechanishLists);
+    TcgResult = OpalUtilGetDataRemovalMechanismLists (&Session, RemovalMechanismLists);
     if (TcgResult != TcgResultSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -1310,7 +1310,7 @@ OpalDiskInitialize (
       return EFI_DEVICE_ERROR;
     }
 
-    Dev->OpalDisk.EstimateTimeCost = RemovalMechanishLists[ActiveDataRemovalMechanism];
+    Dev->OpalDisk.EstimateTimeCost = RemovalMechanismLists[ActiveDataRemovalMechanism];
   }
 
   return OpalDiskUpdateStatus (&Dev->OpalDisk);

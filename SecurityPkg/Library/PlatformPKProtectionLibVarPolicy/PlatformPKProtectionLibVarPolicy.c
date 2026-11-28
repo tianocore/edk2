@@ -21,7 +21,7 @@
 
   @retval     EFI_SUCCESS             State has been successfully updated.
   @retval     Others                  Error returned from implementation specific
-                                      underying APIs.
+                                      underlying APIs.
 
 **/
 EFI_STATUS

@@ -93,22 +93,36 @@
 
     ## options defined ci/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "AuditOnly": False,          # Fail CI on spelling errors
+        "IgnoreFiles": [
+            "DeviceSecurity/SpdmLib/libspdm/**" # Upstream submodule, including its dependencies
+        ],
         "ExtendWords": [             # words to extend to the dictionary for this package
             "shortformed", # tpm acpi
             "autodetect",
             "blocksid",
             "comid",
             "cpinsidpin", #OpalSScV2
+            "certn", # Certificate-stack notation: certificate n
+            "certsn", # Certificate-database notation: certificates n
             "ecdsa", # TPM
             "ecschnorr", # TPM
+            "EDKII_DEVICE_SECURITY_STATE_ERROR_CERTIFIACTE_FAILURE", # Existing public protocol constant
             "eisaid", # ACPI
+            "gDefaultdbFileGuid",
+            "gDefaultdbxFileGuid",
+            "gryanko",
             "harddisk",
             "hashall",
             "hashto",
             "kek's",
             "lfanew", # PE/COFF
+            "libspdm",
+            "LIBSPDM_STATUS_VERIF_FAIL", # Upstream libspdm status constants
+            "LIBSPDM_STATUS_VERIF_NO_AUTHORITY",
+            "mssim",
             "pcrindex",
+            "PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE", # Existing public TPM operation
             "pkglength",
             "ppuser",
             "preos",

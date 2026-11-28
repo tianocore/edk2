@@ -374,7 +374,7 @@ PublishTpm2 (
   // Set the FF-A specific parameters.
   Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.Flags      = 0x00;  // Notifications Not Supported
   Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.Attributes = (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_4KB << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_SHIFT) |
-                                                                            (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_NOT_CACHABLE << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_SHIFT);
+                                                                            (EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_NOT_CACHEABLE << EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_MEM_TYPE_SHIFT);
   Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.PartitionId = PcdGet16 (PcdTpmServiceFfaPartitionId);
   ASSERT (Tpm2AcpiTableV5->StartMethodSpecificParameters.FfaParameters.PartitionId != 0);
 

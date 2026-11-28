@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 LIST_ENTRY  mSpdmDeviceContextList = INITIALIZE_LIST_HEAD_VARIABLE (mSpdmDeviceContextList);
 
-#define CONNECTUIN_FAILURE_GET_SPDM_UID_FAILED      "Fail to get Spdm Uid"
-#define CONNECTUIN_FAILURE_STGNATURE_DB_FUL_STRING  "The Signature database devdb is full"
+#define CONNECTION_FAILURE_GET_SPDM_UID_FAILED       "Fail to get Spdm Uid"
+#define CONNECTION_FAILURE_SIGNATURE_DB_FULL_STRING  "The Signature database devdb is full"
 
 /**
   record Spdm Io protocol into the context list.
@@ -292,8 +292,8 @@ CreateSpdmDeviceContext (
   Status = GetSpdmUid (&SpdmDeviceContext->DeviceUID);
   if (EFI_ERROR (Status)) {
     Status = RecordConnectionFailureStatus (
-               CONNECTUIN_FAILURE_GET_SPDM_UID_FAILED,
-               sizeof (CONNECTUIN_FAILURE_GET_SPDM_UID_FAILED)
+               CONNECTION_FAILURE_GET_SPDM_UID_FAILED,
+               sizeof (CONNECTION_FAILURE_GET_SPDM_UID_FAILED)
                );
     if (EFI_ERROR (Status)) {
       goto Error;
@@ -343,8 +343,8 @@ CreateSpdmDeviceContext (
         if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
           if (SpdmReturn == LIBSPDM_STATUS_BUFFER_FULL) {
             Status = RecordConnectionFailureStatus (
-                       CONNECTUIN_FAILURE_STGNATURE_DB_FUL_STRING,
-                       sizeof (CONNECTUIN_FAILURE_STGNATURE_DB_FUL_STRING)
+                       CONNECTION_FAILURE_SIGNATURE_DB_FULL_STRING,
+                       sizeof (CONNECTION_FAILURE_SIGNATURE_DB_FULL_STRING)
                        );
             if (EFI_ERROR (Status)) {
               goto Error;

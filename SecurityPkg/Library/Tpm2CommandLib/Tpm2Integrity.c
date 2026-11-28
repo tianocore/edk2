@@ -192,7 +192,7 @@ Tpm2PcrExtend (
   DEBUG_CODE_END ();
 
   //
-  // Unmarshal the response
+  // Un-marshal the response
   //
 
   // None
@@ -287,7 +287,7 @@ Tpm2PcrEvent (
   }
 
   //
-  // Unmarshal the response
+  // Un-marshal the response
   //
   Buffer = (UINT8 *)&Res.Digests;
 

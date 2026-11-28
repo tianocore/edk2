@@ -4019,7 +4019,7 @@ ON_EXIT:
 
 /**
   Format the help info for the signature data, each help info contain 3 parts.
-  1. Onwer Guid.
+  1. Owner Guid.
   2. Content, depends on the type of the signature list.
   3. Revocation time.
 
