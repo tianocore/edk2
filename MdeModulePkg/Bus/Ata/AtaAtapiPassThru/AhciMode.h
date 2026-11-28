@@ -327,31 +327,6 @@ typedef struct {
 } EFI_AHCI_REGISTERS;
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command
-  with PIO Protocol.
-
-  @param PciIo              The PCI IO protocol instance.
-  @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
-  @param Port               The number of port.
-  @param PortMultiplier     The number of port multiplier.
-  @param Packet             A pointer to EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET structure.
-
-  @retval EFI_SUCCESS       send out the ATAPI packet command successfully
-                            and device sends data successfully.
-  @retval EFI_DEVICE_ERROR  the device failed to send data.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciPacketCommandExecute (
-  IN  EFI_PCI_IO_PROTOCOL                         *PciIo,
-  IN  EFI_AHCI_REGISTERS                          *AhciRegisters,
-  IN  UINT8                                       Port,
-  IN  UINT8                                       PortMultiplier,
-  IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
-  );
-
-/**
   Start command for give slot on specific port.
 
   @param  PciIo              The PCI IO protocol instance.

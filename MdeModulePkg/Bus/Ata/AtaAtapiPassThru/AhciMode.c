@@ -2108,13 +2108,14 @@ AhciDeviceSetFeature (
 }
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command
-  with PIO Protocol.
+  This function is used to send out ATAPI commands.
+  Data transfers use DMA if the device is capable, otherwise PIO.
 
-  @param PciIo              The PCI IO protocol instance.
+  @param Instance           The ATA_ATAPI_PASS_THRU_INSTANCE protocol instance.
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
   @param Port               The number of port.
   @param PortMultiplier     The number of port multiplier.
+  @param DeviceInfo         The device enumerated for this port.
   @param Packet             A pointer to EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET structure.
 
   @retval EFI_SUCCESS       send out the ATAPI packet command successfully
@@ -2125,10 +2126,11 @@ AhciDeviceSetFeature (
 EFI_STATUS
 EFIAPI
 AhciPacketCommandExecute (
-  IN  EFI_PCI_IO_PROTOCOL                         *PciIo,
+  IN  ATA_ATAPI_PASS_THRU_INSTANCE                *Instance,
   IN  EFI_AHCI_REGISTERS                          *AhciRegisters,
   IN  UINT8                                       Port,
   IN  UINT8                                       PortMultiplier,
+  IN  EFI_ATA_DEVICE_INFO                         *DeviceInfo,
   IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
 {
@@ -2139,17 +2141,13 @@ AhciPacketCommandExecute (
   EFI_ATA_STATUS_BLOCK   AtaStatusBlock;
   BOOLEAN                Read;
 
-  if ((Packet == NULL) || (Packet->Cdb == NULL)) {
+  if ((Instance == NULL) || (Instance->PciIo == NULL) || (DeviceInfo == NULL) || (Packet == NULL) || (Packet->Cdb == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
   ZeroMem (&AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
   AtaCommandBlock.AtaCommand = ATA_CMD_PACKET;
-  //
-  // No OVL; No DMA
-  //
-  AtaCommandBlock.AtaFeatures = 0x00;
   //
   // set the transfersize to ATAPI_MAX_BYTE_COUNT to let the device
   // determine how many data should be transferred.
@@ -2168,8 +2166,12 @@ AhciPacketCommandExecute (
   }
 
   if (Length == 0) {
+    //
+    // No OVL; No DMA
+    //
+    AtaCommandBlock.AtaFeatures = 0x00;
     Status = AhciNonDataTransfer (
-               PciIo,
+               Instance->PciIo,
                AhciRegisters,
                Port,
                PortMultiplier,
@@ -2180,9 +2182,33 @@ AhciPacketCommandExecute (
                Packet->Timeout,
                NULL
                );
+  } else if (DeviceInfo->DmaCapable) {
+    //
+    // No OVL; DMA
+    //
+    AtaCommandBlock.AtaFeatures = 0x01;
+    Status = AhciDmaTransfer (
+               Instance,
+               AhciRegisters,
+               Port,
+               PortMultiplier,
+               Packet->Cdb,
+               Packet->CdbLength,
+               Read,
+               &AtaCommandBlock,
+               &AtaStatusBlock,
+               Buffer,
+               Length,
+               Packet->Timeout,
+               NULL
+               );
   } else {
+    //
+    // No OVL; No DMA
+    //
+    AtaCommandBlock.AtaFeatures = 0x00;
     Status = AhciPioTransfer (
-               PciIo,
+               Instance->PciIo,
                AhciRegisters,
                Port,
                PortMultiplier,
@@ -2882,6 +2908,7 @@ AhciModeInitialization (
   EFI_ATA_DEVICE_TYPE      DeviceType;
   EFI_ATA_COLLECTIVE_MODE  *SupportedModes;
   EFI_ATA_TRANSFER_MODE    TransferMode;
+  BOOLEAN                  DmaCapable;
   UINT32                   PhyDetectDelay;
   UINT32                   Value;
 
@@ -3165,9 +3192,13 @@ AhciModeInitialization (
       if (SupportedModes->UdmaMode.Valid) {
         TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
         TransferMode.ModeNumber   = (UINT8)(SupportedModes->UdmaMode.Mode);
+        DmaCapable                = TRUE;
       } else if (SupportedModes->MultiWordDmaMode.Valid) {
         TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
         TransferMode.ModeNumber   = (UINT8)SupportedModes->MultiWordDmaMode.Mode;
+        DmaCapable                = TRUE;
+      } else {
+        DmaCapable = FALSE;
       }
 
       Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode), ATA_ATAPI_TIMEOUT);
@@ -3179,7 +3210,7 @@ AhciModeInitialization (
       //
       // Found a ATA or ATAPI device, add it into the device list.
       //
-      CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, &Buffer);
+      CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, DmaCapable, &Buffer);
       if (DeviceType == EfiIdeHarddisk) {
         REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
         AhciEnableDevSlp (
