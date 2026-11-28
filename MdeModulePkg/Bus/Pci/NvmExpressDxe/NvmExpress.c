@@ -893,6 +893,36 @@ NvmExpressDriverBindingSupported (
   //
   if ((ClassCode[0] != PCI_IF_NVMHCI) || (ClassCode[1] != PCI_CLASS_MASS_STORAGE_NVM) || (ClassCode[2] != PCI_CLASS_MASS_STORAGE)) {
     Status = EFI_UNSUPPORTED;
+    goto Done;
+  }
+
+  //
+  // If the NVMe pass-thru protocol is already installed on the controller,
+  // then another NVMe driver has already started and configured it.  Binding
+  // to the controller would reset it (see NvmeControllerInit()) and destroy
+  // the state of that driver, so report the controller as already started.
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiNvmExpressPassThruProtocolGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "NvmExpressDriverBindingSupported: %a\n",
+      "controller already managed by another NVMe driver"
+      ));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    //
+    // EFI_NOT_FOUND here just means no other driver owns the controller,
+    // which is the normal case and must not leak out of Supported().
+    //
+    Status = EFI_SUCCESS;
   }
 
 Done:
