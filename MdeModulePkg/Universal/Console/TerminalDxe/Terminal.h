@@ -37,24 +37,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/BaseLib.h>
 
-#define RAW_FIFO_MAX_NUMBER  255
-#define FIFO_MAX_NUMBER      128
+#define RAW_FIFO_MAX_NUMBER  600
+#define FIFO_MAX_NUMBER      300
 
 typedef struct {
-  UINT8    Head;
-  UINT8    Tail;
-  UINT8    Data[RAW_FIFO_MAX_NUMBER + 1];
+  UINT16    Head;
+  UINT16    Tail;
+  UINT8     Data[RAW_FIFO_MAX_NUMBER + 1];
 } RAW_DATA_FIFO;
 
 typedef struct {
-  UINT8     Head;
-  UINT8     Tail;
+  UINT16    Head;
+  UINT16    Tail;
   UINT16    Data[FIFO_MAX_NUMBER + 1];
 } UNICODE_FIFO;
 
 typedef struct {
-  UINT8            Head;
-  UINT8            Tail;
+  UINT16           Head;
+  UINT16           Tail;
   EFI_INPUT_KEY    Data[FIFO_MAX_NUMBER + 1];
 } EFI_KEY_FIFO;
 
@@ -888,7 +888,7 @@ SetTerminalDevicePath (
 EFI_STATUS
 GetOneKeyFromSerial (
   EFI_SERIAL_IO_PROTOCOL  *SerialIo,
-  UINT8                   *Input
+  UINT8                   *Output
   );
 
 /**

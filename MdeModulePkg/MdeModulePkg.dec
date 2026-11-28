@@ -2357,6 +2357,12 @@
   # @Prompt The value is use for Usb Network rate limiting supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
+  ## This PCD determines the timer interval to be set when using serial console.
+  #  Default value is 200000 (20ms). When set to 0, the timer will be programmed based on baud rate or
+  #  serial timeout and software FIFO capacity.
+  # @Prompt Sets the serial console timer interval, in the unit of 100ns.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTerminalKeyboardTimerInterval|200000|UINT32|0x00030025
+
   ## Define the conduit to use in ArmFfalib.
   #  Default PcdFfaLibConduitSmc == TRUE, conduit = SMC
   #  If PcdFfaLibConduitSvc == FALSE, conduit = SVC
