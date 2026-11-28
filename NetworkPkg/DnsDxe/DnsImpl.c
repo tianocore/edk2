@@ -1090,7 +1090,11 @@ IsValidDnsResponse (
       continue;
     } else {
       TxString = NetbufGetByte (Packet, 0, NULL);
-      ASSERT (TxString != NULL);
+      if (TxString == NULL) {
+        ASSERT (TxString != NULL);
+        continue;
+      }
+
       DnsHeader    = (DNS_HEADER *)TxString;
       QueryName    = (CHAR8 *)(TxString + sizeof (*DnsHeader));
       QuerySection = (DNS_QUERY_SECTION *)(QueryName + AsciiStrLen (QueryName) + 1);
@@ -1256,8 +1260,8 @@ ParseDnsResponse (
       goto ON_EXIT;
     }
 
-    ASSERT (Item != NULL);
-    if (Item == NULL) {
+    if ((Item == NULL) || (Item->Key == NULL)) {
+      ASSERT ((Item != NULL) && (Item->Key != NULL));
       *Completed = FALSE;
       Status     = EFI_ABORTED;
       goto ON_EXIT;
@@ -1278,8 +1282,8 @@ ParseDnsResponse (
       goto ON_EXIT;
     }
 
-    ASSERT (Item != NULL);
-    if (Item == NULL) {
+    if ((Item == NULL) || (Item->Key == NULL)) {
+      ASSERT ((Item != NULL) && (Item->Key != NULL));
       *Completed = FALSE;
       Status     = EFI_ABORTED;
       goto ON_EXIT;
@@ -1310,8 +1314,8 @@ ParseDnsResponse (
   // Do some buffer allocations.
   //
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    ASSERT (Dns4TokenEntry != NULL);
     if (Dns4TokenEntry == NULL) {
+      ASSERT (Dns4TokenEntry != NULL);
       Status = EFI_ABORTED;
       goto ON_EXIT;
     }
@@ -1353,8 +1357,8 @@ ParseDnsResponse (
       }
     }
   } else {
-    ASSERT (Dns6TokenEntry != NULL);
     if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
       Status = EFI_ABORTED;
       goto ON_EXIT;
     }
@@ -1452,7 +1456,19 @@ ParseDnsResponse (
     //
     // Check whether it's the GeneralLookUp querying.
     //
-    if ((Instance->Service->IpVersion == IP_VERSION_4) && Dns4TokenEntry->GeneralLookUp) {
+    if (Instance->Service->IpVersion == IP_VERSION_4) {
+      if (Dns4TokenEntry == NULL) {
+        ASSERT (Dns4TokenEntry != NULL);
+        Status = EFI_ABORTED;
+        goto ON_EXIT;
+      }
+    } else if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
+      Status = EFI_ABORTED;
+      goto ON_EXIT;
+    }
+
+    if ((Instance->Service->IpVersion == IP_VERSION_4) && (Dns4TokenEntry != NULL) && Dns4TokenEntry->GeneralLookUp) {
       Dns4RR     = Dns4TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
 
@@ -1480,7 +1496,7 @@ ParseDnsResponse (
 
       RRCount++;
       Status = EFI_SUCCESS;
-    } else if ((Instance->Service->IpVersion == IP_VERSION_6) && Dns6TokenEntry->GeneralLookUp) {
+    } else if ((Instance->Service->IpVersion == IP_VERSION_6) && (Dns6TokenEntry != NULL) && Dns6TokenEntry->GeneralLookUp) {
       Dns6RR     = Dns6TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
 
@@ -1518,8 +1534,8 @@ ParseDnsResponse (
           //
           // This is address entry, get Data.
           //
-          ASSERT (Dns4TokenEntry != NULL);
           if (Dns4TokenEntry == NULL) {
+            ASSERT (Dns4TokenEntry != NULL);
             Status = EFI_ABORTED;
             goto ON_EXIT;
           }
@@ -1584,8 +1600,8 @@ ParseDnsResponse (
           //
           // This is address entry, get Data.
           //
-          ASSERT (Dns6TokenEntry != NULL);
           if (Dns6TokenEntry == NULL) {
+            ASSERT (Dns6TokenEntry != NULL);
             Status = EFI_ABORTED;
             goto ON_EXIT;
           }
@@ -1668,8 +1684,8 @@ ParseDnsResponse (
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    ASSERT (Dns4TokenEntry != NULL);
     if (Dns4TokenEntry == NULL) {
+      ASSERT (Dns4TokenEntry != NULL);
       Status = EFI_ABORTED;
       goto ON_EXIT;
     }
@@ -1685,8 +1701,8 @@ ParseDnsResponse (
       }
     }
   } else {
-    ASSERT (Dns6TokenEntry != NULL);
     if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
       Status = EFI_ABORTED;
       goto ON_EXIT;
     }
@@ -1712,8 +1728,8 @@ ON_COMPLETE:
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    ASSERT (Dns4TokenEntry != NULL);
     if (Dns4TokenEntry == NULL) {
+      ASSERT (Dns4TokenEntry != NULL);
       Status = EFI_ABORTED;
       goto ON_EXIT;
     }
@@ -1725,8 +1741,8 @@ ON_COMPLETE:
       DispatchDpc ();
     }
   } else {
-    ASSERT (Dns6TokenEntry != NULL);
     if (Dns6TokenEntry == NULL) {
+      ASSERT (Dns6TokenEntry != NULL);
       Status = EFI_ABORTED;
       goto ON_EXIT;
     }
