@@ -908,6 +908,16 @@ TlsCommonReceive (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (!HttpInstance->LocalAddressIsIPv6 && (HttpInstance->Tcp4 == NULL)) {
+    ASSERT (HttpInstance->Tcp4 != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (HttpInstance->LocalAddressIsIPv6 && (HttpInstance->Tcp6 == NULL)) {
+    ASSERT (HttpInstance->Tcp6 != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
   FragmentCount = Packet->BlockOpNum;
   Fragment      = AllocatePool (FragmentCount * sizeof (NET_FRAGMENT));
   if (Fragment == NULL) {
@@ -923,14 +933,18 @@ TlsCommonReceive (
   if (!HttpInstance->LocalAddressIsIPv6) {
     Tcp4RxData = HttpInstance->Tcp4TlsRxToken.Packet.RxData;
     if (Tcp4RxData == NULL) {
-      return EFI_INVALID_PARAMETER;
+      ASSERT (Tcp4RxData != NULL);
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
 
     Tcp4RxData->FragmentCount = 1;
   } else {
     Tcp6RxData = HttpInstance->Tcp6TlsRxToken.Packet.RxData;
     if (Tcp6RxData == NULL) {
-      return EFI_INVALID_PARAMETER;
+      ASSERT (Tcp6RxData != NULL);
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
 
     Tcp6RxData->FragmentCount = 1;
@@ -941,11 +955,23 @@ TlsCommonReceive (
 
   while (CurrentFragment < FragmentCount) {
     if (!HttpInstance->LocalAddressIsIPv6) {
+      if (Tcp4RxData == NULL) {
+        ASSERT (Tcp4RxData != NULL);
+        Status = EFI_DEVICE_ERROR;
+        goto ON_EXIT;
+      }
+
       Tcp4RxData->DataLength                      = Fragment[CurrentFragment].Len;
       Tcp4RxData->FragmentTable[0].FragmentLength = Fragment[CurrentFragment].Len;
       Tcp4RxData->FragmentTable[0].FragmentBuffer = Fragment[CurrentFragment].Bulk;
       Status                                      = HttpInstance->Tcp4->Receive (HttpInstance->Tcp4, &HttpInstance->Tcp4TlsRxToken);
     } else {
+      if (Tcp6RxData == NULL) {
+        ASSERT (Tcp6RxData != NULL);
+        Status = EFI_DEVICE_ERROR;
+        goto ON_EXIT;
+      }
+
       Tcp6RxData->DataLength                      = Fragment[CurrentFragment].Len;
       Tcp6RxData->FragmentTable[0].FragmentLength = Fragment[CurrentFragment].Len;
       Tcp6RxData->FragmentTable[0].FragmentBuffer = Fragment[CurrentFragment].Bulk;
@@ -989,6 +1015,12 @@ TlsCommonReceive (
         goto ON_EXIT;
       }
 
+      if (Tcp4RxData == NULL) {
+        ASSERT (Tcp4RxData != NULL);
+        Status = EFI_DEVICE_ERROR;
+        goto ON_EXIT;
+      }
+
       Fragment[CurrentFragment].Len -= Tcp4RxData->FragmentTable[0].FragmentLength;
       if (Fragment[CurrentFragment].Len == 0) {
         CurrentFragment++;
@@ -998,6 +1030,12 @@ TlsCommonReceive (
     } else {
       Status = HttpInstance->Tcp6TlsRxToken.CompletionToken.Status;
       if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+
+      if (Tcp6RxData == NULL) {
+        ASSERT (Tcp6RxData != NULL);
+        Status = EFI_DEVICE_ERROR;
         goto ON_EXIT;
       }
 
