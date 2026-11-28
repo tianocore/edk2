@@ -93,6 +93,9 @@ Fixup_PHIT:
       if (PrivateData->MemoryTypeStatistics[Index].MaximumAddress > EndBinAddress) {
         EndBinAddress = PrivateData->MemoryTypeStatistics[Index].MaximumAddress;
       }
+
+      // PeiAllocatePages() uses the bin end as an exclusive free-memory cursor.
+      PrivateData->MemoryTypeStatistics[Index].MaximumAddress++;
     }
   }
 

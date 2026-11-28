@@ -82,6 +82,8 @@
   MdeModulePkg/Core/Pei/PeiMemoryServicesGoogleTestHost.inf {
     <LibraryClasses>
       HobLib|MdePkg/Test/Mock/Library/GoogleTest/MockHobLib/MockHobLib.inf
+    <PcdsFeatureFlag>
+      gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|TRUE
   }
 
   MdeModulePkg/Library/GptLib/UnitTest/GptLibUnitTestHost.inf {

@@ -1256,7 +1256,7 @@ CoreInternalAllocatePages (
   // if (Start + NumberOfBytes) rolls over 0 or
   // if Start is above MAX_ALLOC_ADDRESS or
   // if End is above MAX_ALLOC_ADDRESS,
-  // if Start..End overlaps any tracked MemoryTypeStatistics range
+  // if Start..End crosses a special bin boundary or overlaps a different type,
   // return EFI_NOT_FOUND.
   //
   if (Type == AllocateAddress) {
@@ -1282,32 +1282,23 @@ CoreInternalAllocatePages (
     }
 
     //
-    // A driver is allowed to call AllocatePages using an AllocateAddress type.  This type of
-    // AllocatePage request the exact physical address if it is not used.  The existing code
-    // will allow this request even in 'special' pages.  The problem with this is that the
-    // reason to have 'special' pages for OS hibernate/resume is defeated as memory is
-    // fragmented.
+    // A fixed-address allocation must not cross a special bin boundary or
+    // overlap a bin of another memory type, including after size rounding.
     //
-
     for (CheckType = (EFI_MEMORY_TYPE)0; CheckType < EfiMaxMemoryType; CheckType++) {
-      if ((MemoryType != CheckType) &&
-          mMemoryTypeStatistics[CheckType].Special &&
-          (mMemoryTypeStatistics[CheckType].NumberOfPages > 0))
+      if (mMemoryTypeStatistics[CheckType].Special &&
+          (mMemoryTypeStatistics[CheckType].NumberOfPages > 0) &&
+          MemoryRegionsIntersect (
+            Start,
+            End,
+            mMemoryTypeStatistics[CheckType].BaseAddress,
+            mMemoryTypeStatistics[CheckType].MaximumAddress
+            )
+          )
       {
-        if ((Start >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (Start <= mMemoryTypeStatistics[CheckType].MaximumAddress))
-        {
-          return EFI_NOT_FOUND;
-        }
-
-        if ((End >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End <= mMemoryTypeStatistics[CheckType].MaximumAddress))
-        {
-          return EFI_NOT_FOUND;
-        }
-
-        if ((Start < mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End   > mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((MemoryType != CheckType) ||
+            (Start < mMemoryTypeStatistics[CheckType].BaseAddress) ||
+            (End > mMemoryTypeStatistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
