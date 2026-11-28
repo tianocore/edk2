@@ -28,6 +28,7 @@
 
 [Sources]
   CheckSum.c
+  ConvertGuidUuid.c
   SwitchStack.c
   SwapBytes64.c
   SwapBytes32.c

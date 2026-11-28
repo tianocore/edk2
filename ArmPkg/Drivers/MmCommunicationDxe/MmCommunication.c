@@ -15,6 +15,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/HobLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -589,9 +590,10 @@ InitializeFfaCommunication (
   )
 {
   EFI_STATUS              Status;
-  EFI_FFA_PART_INFO_DESC  StmmPartInfo;
+  EFI_FFA_PART_INFO_DESC  *StmmPartInfo;
+  UINT32                  StmmPartInfoSize;
 
-  Status = ArmFfaLibGetPartitionInfo (&gEfiMmCommunication2ProtocolGuid, &StmmPartInfo);
+  Status = ArmFfaLibGetAllocatedPartitionInfo (&gEfiMmCommunication2ProtocolGuid, (VOID **)&StmmPartInfo, &StmmPartInfoSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
@@ -602,13 +604,15 @@ InitializeFfaCommunication (
     return Status;
   }
 
-  if ((StmmPartInfo.PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
+  if ((StmmPartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
     Status = EFI_UNSUPPORTED;
     DEBUG ((DEBUG_ERROR, "StandaloneMm doesn't receive DIRECT_MSG_REQ...\n"));
+    FreePool (StmmPartInfo);
     return Status;
   }
 
-  mStMmPartId = StmmPartInfo.PartitionId;
+  mStMmPartId = StmmPartInfo->PartitionId;
+  FreePool (StmmPartInfo);
 
   return EFI_SUCCESS;
 }

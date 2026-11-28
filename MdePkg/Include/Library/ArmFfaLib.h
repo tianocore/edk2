@@ -317,6 +317,35 @@ ArmFfaLibPartitionInfoGetRegs (
   );
 
 /**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescSize      Return size of requested partition info related
+                                      to Service guid when PartDesc == NULL.
+                                      Otherwise return size of partition info
+                                      copied in PartDesc
+  @param [out]      Count             On successful return, number of partition info entries retrieved.
+                                      On buffer too small, the total number of partition info entries available.
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_BUFFER_TOO_SMALL
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegsWithSize (
+  IN EFI_GUID    *ServiceGuid,
+  IN OUT UINT32  *PartDescSize,
+  OUT UINT32     *Count,
+  OUT VOID       *PartDesc OPTIONAL
+  );
+
+/**
   Get partition or VM id.
   This function is only called in ArmFfaLibConstructor.
 
@@ -448,4 +477,58 @@ EFIAPI
 ArmFfaLibGetPartitionInfo (
   IN EFI_GUID                 *ServiceGuid,
   OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  );
+
+/**
+  Helper to retrieve the first partition information associated with
+  a service GUID.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [out]      PartDesc          Partition information Buffer, optional.
+  @param [in, out]  PartDescSize      Return size of requested partition info related
+                                      to Service guid when PartDesc == NULL.
+                                      Otherwise return size of partition info
+                                      copied in PartDesc
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_BUFFER_TOO_SMALL
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfoWithSize (
+  IN EFI_GUID    *ServiceGuid,
+  OUT VOID       *PartDesc OPTIONAL,
+  IN OUT UINT32  *PartDescSize
+  );
+
+/**
+  Wrapper function to facilitate retrieving the first partition information descriptor associated with
+  a service GUID.
+
+  @param [in]   ServiceGuid       Service guid.
+  @param [out]  PartDesc          Partition information Buffer, caller is
+                                  responsible for freeing it.
+  @param [out]  PartDescSize      Return size of requested partition info
+                                  related to Service guid copied in PartDesc.
+                                  On success, this will be at least the size of
+                                  EFI_FFA_PART_INFO_DESC.
+
+  @retval EFI_SUCCESS
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_DEVICE_ERROR
+  @retval EFI_OUT_OF_RESOURCES
+  @retval EFI_UNSUPPORTED
+  @retval Other                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetAllocatedPartitionInfo (
+  IN EFI_GUID  *ServiceGuid,
+  OUT VOID     **PartDesc,
+  OUT UINT32   *PartDescSize
   );

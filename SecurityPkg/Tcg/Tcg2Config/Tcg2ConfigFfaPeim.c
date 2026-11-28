@@ -20,6 +20,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/ArmFfaLib.h>
 
@@ -116,7 +117,8 @@ Tcg2ConfigFfaPeimEntryPoint (
   EFI_STATUS                    Status;
   UINTN                         Size;
   UINT16                        TpmPartId;
-  EFI_FFA_PART_INFO_DESC        TpmPartInfo;
+  EFI_FFA_PART_INFO_DESC        *TpmPartInfo;
+  UINT32                        TpmPartInfoSize;
   CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList;
   GUID                          *TpmInstanceGuid;
 
@@ -124,14 +126,15 @@ Tcg2ConfigFfaPeimEntryPoint (
 
   TpmInstanceGuid = &gEfiTpmDeviceInstanceNoneGuid;
   PpiList         = &mTpmInitializationDonePpiList;
+  TpmPartInfo     = NULL;
 
-  Status = ArmFfaLibGetPartitionInfo (&gTpm2ServiceFfaGuid, &TpmPartInfo);
+  Status = ArmFfaLibGetAllocatedPartitionInfo (&gTpm2ServiceFfaGuid, (VOID **)&TpmPartInfo, &TpmPartInfoSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get Tpm2 partition info. Status: %r\n", Status));
     goto Cleanup;
   }
 
-  TpmPartId = TpmPartInfo.PartitionId;
+  TpmPartId = TpmPartInfo->PartitionId;
 
   Status = Tpm2FfaCheckInterfaceVersion (TpmPartId);
   if (EFI_ERROR (Status)) {
@@ -147,6 +150,10 @@ Tcg2ConfigFfaPeimEntryPoint (
   PpiList         = &mTpmSelectedPpi;
 
 Cleanup:
+  if (TpmPartInfo != NULL) {
+    FreePool (TpmPartInfo);
+  }
+
   Size   = sizeof (GUID);
   Status = PcdSetPtrS (
              PcdTpmInstanceGuid,
