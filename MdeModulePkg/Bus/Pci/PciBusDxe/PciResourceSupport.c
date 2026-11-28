@@ -1921,9 +1921,14 @@ ProgramResource (
 
     if (Node->Fixed) {
       //
-      // Fixed BARs are not programmed, but they are allocated by definition.
+      // Fixed BARs are allocated by definition. A BAR whose register does not
+      // already hold its fixed address is programmed with it.
       //
       if (!IsPpbWindowNode (Node)) {
+        if (!Node->PciDev->PciBar[Node->Bar].AddressProgrammed) {
+          ProgramBar (Node->FixedBase, Node);
+        }
+
         Node->PciDev->Allocated = TRUE;
       }
 
