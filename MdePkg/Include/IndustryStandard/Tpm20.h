@@ -345,7 +345,7 @@ typedef UINT32 TPM_CC;
 // Table 15 - TPM_RC Constants (Actions)
 typedef UINT32 TPM_RC;
 #define TPM_RC_SUCCESS            (TPM_RC)(0x000)
-#define TPM_RC_BAD_TAG            (TPM_RC)(0x030)
+#define TPM_RC_BAD_TAG            (TPM_RC)(0x01E)
 #define RC_VER1                   (TPM_RC)(0x100)
 #define TPM_RC_INITIALIZE         (TPM_RC)(RC_VER1 + 0x000)
 #define TPM_RC_FAILURE            (TPM_RC)(RC_VER1 + 0x001)
