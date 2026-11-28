@@ -1,0 +1,12 @@
+// /** @file
+// Functions to deal with an FMP payload in a transparent way.
+//
+// Copyright (c) 2026, 3mdeb Sp. z o.o. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Functions to deal with an FMP payload in a transparent way."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Functions to deal with an FMP payload in a transparent way."
