@@ -390,7 +390,7 @@ PxeBcExtractBootFileUrl (
   CHAR8       *BootFileName;
   UINT16      BootFileNameLen;
   CHAR8       *TmpStr;
-  CHAR8       TmpChar;
+  CHAR8       HexStr[3];
   CHAR8       *ServerAddressOption;
   CHAR8       *ServerAddress;
   CHAR8       *ModeStr;
@@ -543,14 +543,26 @@ PxeBcExtractBootFileUrl (
     //
     // Decode percent-encoding in boot file name.
     //
+    HexStr[2] = '\0';
     while (*BootFileNamePtr != '\0') {
       if (*BootFileNamePtr == '%') {
-        TmpChar               = *(BootFileNamePtr+ 3);
-        *(BootFileNamePtr+ 3) = '\0';
-        *BootFileName         = (UINT8)AsciiStrHexToUintn ((CHAR8 *)(BootFileNamePtr + 1));
+        //
+        // A '%' must be followed by two hex digits within the string. The
+        // short-circuit stops the second test from reading past the NUL
+        // terminator when the first byte after '%' is already the NUL.
+        //
+        if (!NET_IS_HEX (BootFileNamePtr[1]) || !NET_IS_HEX (BootFileNamePtr[2])) {
+          FreePool (TmpStr);
+          FreePool (*FileName);
+          *FileName = NULL;
+          return EFI_INVALID_PARAMETER;
+        }
+
+        HexStr[0]     = BootFileNamePtr[1];
+        HexStr[1]     = BootFileNamePtr[2];
+        *BootFileName = (UINT8)AsciiStrHexToUintn (HexStr);
         BootFileName++;
-        *(BootFileNamePtr+ 3) = TmpChar;
-        BootFileNamePtr      += 3;
+        BootFileNamePtr += 3;
       } else {
         *BootFileName = *BootFileNamePtr;
         BootFileName++;
