@@ -68,9 +68,9 @@ class LicenseCheck(ICiBuildPlugin):
             os.makedirs(temp_path)
         # Output file to use for git diff operations
         temp_diff_output = os.path.join (temp_path, 'diff.txt')
-        params = "diff --output={} --unified=0 origin/master HEAD".format(temp_diff_output)
+        params = "diff --output={} --unified=0 origin/main HEAD".format(temp_diff_output)
         RunCmd("git", params)
-        with open(temp_diff_output, encoding='utf8') as file:
+        with open(temp_diff_output, encoding='utf8', errors='replace') as file:
             patch = file.read().strip().split("\n")
         # Delete temp directory
         if os.path.exists(temp_path):

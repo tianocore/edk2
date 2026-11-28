@@ -144,17 +144,17 @@ class EccCheck(ICiBuildPlugin):
     def GetDiff(self, pkg: str, temp_diff_output: str) -> List[str]:
         patch = []
         #
-        # Generate unified diff between origin/master and HEAD.
+        # Generate unified diff between origin/main and HEAD.
         #
-        params = "diff --output={} --unified=0 origin/master HEAD".format(temp_diff_output)
+        params = "diff --output={} --unified=0 origin/main HEAD".format(temp_diff_output)
         RunCmd("git", params)
-        with open(temp_diff_output, encoding='utf8') as file:
+        with open(temp_diff_output, encoding='utf8', errors='replace') as file:
             patch = file.read().strip().split('\n')
         return patch
 
     def GetModifyDir(self, pkg: str, temp_diff_output: str) -> List[str]:
         #
-        # Generate diff between origin/master and HEAD using --diff-filter to
+        # Generate diff between origin/main and HEAD using --diff-filter to
         # exclude deleted and renamed files that do not need to be scanned by
         # ECC.  Also use --name-status to only generate the names of the files
         # with differences.  The output format of this git diff command is a
@@ -164,7 +164,7 @@ class EccCheck(ICiBuildPlugin):
         #   M       MdeModulePkg/Application/CapsuleApp/CapsuleApp.h
         #   M       MdeModulePkg/Application/UiApp/FrontPage.h
         #
-        params = "diff --output={} --diff-filter=dr --name-status origin/master HEAD".format(temp_diff_output)
+        params = "diff --output={} --diff-filter=dr --name-status origin/main HEAD".format(temp_diff_output)
         RunCmd("git", params)
         dir_list = []
         with open(temp_diff_output, encoding='utf8') as file:
