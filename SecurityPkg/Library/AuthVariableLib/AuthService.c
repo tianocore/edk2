@@ -525,6 +525,7 @@ CheckSignatureListFormat (
   UINTN               SigDataSize;
   UINT32              Index;
   UINT32              SigCount;
+  UINT32              SigListCount;
   BOOLEAN             IsPk;
   VOID                *RsaContext;
   EFI_SIGNATURE_DATA  *CertData;
@@ -557,7 +558,25 @@ CheckSignatureListFormat (
   // Walk through the input signature list and check the data format.
   // If any signature is incorrectly formed, the whole check will fail.
   //
-  while ((SigDataSize > 0) && (SigDataSize >= (UINTN)SigList->SignatureListSize)) {
+  while ((SigDataSize >= sizeof (EFI_SIGNATURE_LIST)) && (SigDataSize >= (UINTN)SigList->SignatureListSize)) {
+    if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) < SigList->SignatureHeaderSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (SigList->SignatureSize < sizeof (EFI_GUID)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) % SigList->SignatureSize != 0) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    SigListCount = (SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) / SigList->SignatureSize;
+
     for (Index = 0; Index < (sizeof (mSupportSigItem) / sizeof (EFI_SIGNATURE_ITEM)); Index++ ) {
       if (CompareGuid (&SigList->SignatureType, &mSupportSigItem[Index].SigType)) {
         //
@@ -588,6 +607,10 @@ CheckSignatureListFormat (
     }
 
     if (CompareGuid (&SigList->SignatureType, &gEfiCertX509Guid)) {
+      if (SigListCount != 1) {
+        return EFI_INVALID_PARAMETER;
+      }
+
       //
       // Try to retrieve the RSA public key from the X.509 certificate.
       // If this operation fails, it's not a valid certificate.
@@ -602,11 +625,7 @@ CheckSignatureListFormat (
       RsaFree (RsaContext);
     }
 
-    if ((SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) % SigList->SignatureSize != 0) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    SigCount += (SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) / SigList->SignatureSize;
+    SigCount += SigListCount;
 
     SigDataSize -= SigList->SignatureListSize;
     SigList      = (EFI_SIGNATURE_LIST *)((UINT8 *)SigList + SigList->SignatureListSize);
