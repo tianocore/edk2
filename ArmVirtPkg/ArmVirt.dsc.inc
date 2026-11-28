@@ -73,6 +73,9 @@ DEFINE FD_SIZE_IN_MB    = 3
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
+  AcpiHelperLib|DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
+  AcpiRtcPl031Lib|DynamicTablesPkg/Library/Acpi/Arm/AcpiRtcPl031Lib/AcpiRtcPl031Lib.inf
+  AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   GptLib|MdeModulePkg/Library/GptLib/GptLib.inf
 !if $(TARGET) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf

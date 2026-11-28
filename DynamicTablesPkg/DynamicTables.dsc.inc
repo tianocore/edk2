@@ -16,6 +16,7 @@
 
 [LibraryClasses.common]
   AcpiHelperLib|DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
+  AcpiRtcPl031Lib|DynamicTablesPkg/Library/Acpi/Arm/AcpiRtcPl031Lib/AcpiRtcPl031Lib.inf
   AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   CmObjHelperLib|DynamicTablesPkg/Library/Common/CmObjHelperLib/CmObjHelperLib.inf
   IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf

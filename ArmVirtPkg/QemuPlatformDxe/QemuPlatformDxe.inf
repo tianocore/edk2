@@ -1,7 +1,8 @@
 ## @file
 # The QemuPlatformDxe performs platform specific initialization.
 #
-#  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
+#  Copyright (c) 2018 - 2026, Arm Limited. All rights reserved.
+#  Copyright (c) 2026, Google LLC. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -20,16 +21,21 @@
 
 [Packages]
   OvmfPkg/OvmfPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  AcpiRtcPl031Lib
   ArmCcaLib
   BaseLib
   DebugLib
+  MemoryAllocationLib
+  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  UefiLib
 
 [Guids]
   gEdkiiNvVarStoreFormattedGuid   ## SOMETIMES_PRODUCES ## PROTOCOL
@@ -38,6 +44,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
 
 [Protocols]
+  gEfiAcpiTableProtocolGuid       ## SOMETIMES_CONSUMES
   gFdtClientProtocolGuid          ## CONSUMES
 
 [Depex]

@@ -1,0 +1,27 @@
+## @file
+#  PL031 RTC SSDT generation library.
+#
+#  Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiRtcPl031Lib
+  FILE_GUID      = AB81C612-885E-473C-9E4D-E1CC6672AC73
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = AcpiRtcPl031Lib
+
+[Sources]
+  AcpiRtcPl031Lib.c
+  AcpiRtcPl031LibInternal.h
+  SsdtPl031Template.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AmlLib
+  MemoryAllocationLib
