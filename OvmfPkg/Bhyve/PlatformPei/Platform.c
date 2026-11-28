@@ -71,14 +71,16 @@ AddIoMemoryBaseSizeHob (
   UINT64                MemorySize
   )
 {
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_MEMORY_MAPPED_IO,
     EFI_RESOURCE_ATTRIBUTE_PRESENT     |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
     EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
-    MemorySize
+    MemorySize,
+    EFI_MEMORY_UC,
+    NULL
     );
 }
 
@@ -89,7 +91,7 @@ AddReservedMemoryBaseSizeHob (
   BOOLEAN               Cacheable
   )
 {
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_MEMORY_RESERVED,
     EFI_RESOURCE_ATTRIBUTE_PRESENT     |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -102,7 +104,9 @@ AddReservedMemoryBaseSizeHob (
     ) |
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
-    MemorySize
+    MemorySize,
+    EFI_MEMORY_UC,
+    NULL
     );
 }
 
@@ -121,7 +125,7 @@ AddMemoryBaseSizeHob (
   UINT64                MemorySize
   )
 {
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_SYSTEM_MEMORY,
     EFI_RESOURCE_ATTRIBUTE_PRESENT |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -131,7 +135,9 @@ AddMemoryBaseSizeHob (
     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
-    MemorySize
+    MemorySize,
+    EFI_MEMORY_WB,
+    NULL
     );
 }
 
@@ -263,12 +269,14 @@ MemMapInitialization (
   //
   // Add PCI IO Port space available for PCI resource allocations.
   //
-  BuildResourceDescriptorHob (
+  BuildResourceDescriptor2Hob (
     EFI_RESOURCE_IO,
     EFI_RESOURCE_ATTRIBUTE_PRESENT     |
     EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
     PciIoBase,
-    PciIoSize
+    PciIoSize,
+    0,
+    NULL
     );
   PcdStatus = PcdSet64S (PcdPciIoBase, PciIoBase);
   ASSERT_RETURN_ERROR (PcdStatus);
