@@ -3,6 +3,7 @@
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -436,9 +437,12 @@ HttpBootGetBootFileCaller (
         }
 
         //
-        // Load the boot file into Buffer
+        // Load the boot file into Buffer. The download is always attempted at
+        // least once, and then retried up to PcdMaxHttpResumeRetries additional
+        // times if it is interrupted, even when PcdMaxHttpResumeRetries is 0.
         //
-        for (Retries = 1; Retries <= PcdGet32 (PcdMaxHttpResumeRetries); Retries++) {
+        Retries = 0;
+        do {
           Status = HttpBootGetBootFile (
                      Private,
                      FALSE,
@@ -452,7 +456,7 @@ HttpBootGetBootFileCaller (
             return Status;
           }
 
-          if (Retries == PcdGet32 (PcdMaxHttpResumeRetries)) {
+          if (Retries >= PcdGet32 (PcdMaxHttpResumeRetries)) {
             DEBUG ((DEBUG_ERROR, "HttpBootGetBootFileCaller: Error downloading NBP file, even after trying to resume %d times.\n", Retries));
             return Status;
           }
@@ -469,12 +473,13 @@ HttpBootGetBootFileCaller (
             return Status;
           }
 
+          Retries++;
           DEBUG ((DEBUG_WARN | DEBUG_INFO, "HttpBootGetBootFileCaller: NBP file download interrupted, will try to resume the operation.\n"));
           gBS->Stall (1000 * 1000 * PcdGet32 (PcdHttpDelayBetweenResumeRetries));
-        }
+        } while (Retries <= PcdGet32 (PcdMaxHttpResumeRetries));
 
         //
-        // Only reach here if the for loop above is not executed, which means PcdMaxHttpResumeRetries is 0.
+        // Only reach here if the do-while loop above exits abnormally, which should never happen.
         //
         return EFI_UNSUPPORTED;
 
