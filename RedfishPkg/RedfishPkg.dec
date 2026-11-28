@@ -110,6 +110,9 @@
   ## Include/Protocol/EdkIIRedfishHttpProtocol.h
   gEdkIIRedfishHttpProtocolGuid = { 0x58a0f47e, 0xf45f, 0x4d44, { 0x89, 0x5b, 0x2a, 0xfe, 0xb0, 0x80, 0x15, 0xe2 } }
 
+  ## Include/Protocol/RedfishResourceProtocol.h  # [CODE_FIRST] 13357
+  gEdkIIRedfishResourceProtocolGuid = { 0x574527BC, 0xB976, 0x0816, { 0xA1, 0x3B, 0x91, 0xBD, 0x9C, 0x9B, 0xA8, 0x99 } }  # [CODE_FIRST] 13357
+                                                 # [CODE_FIRST] 13357
 [Guids]
   gEfiRedfishPkgTokenSpaceGuid      = { 0x4fdbccb7, 0xe829, 0x4b4c, { 0x88, 0x87, 0xb2, 0x3f, 0xd7, 0x25, 0x4b, 0x85 }}
 
@@ -223,3 +226,9 @@
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishCredentialDeleteAccount|TRUE|BOOLEAN|0x00001015
   ## Default Redfish version string
   gEfiRedfishPkgTokenSpaceGuid.PcdDefaultRedfishVersion|L"v1"|VOID*|0x00001016
+                                                                                        # [CODE_FIRST] 13357
+[PcdsFixedAtBuild]                                                                      # [CODE_FIRST] 13357
+  ## Maximum number of resource entries in EDKII_REDFISH_RESOURCE_PROTOCOL repository.  # [CODE_FIRST] 13357
+  #  This value dimensions a statically allocated array, so it must be resolved at      # [CODE_FIRST] 13357
+  #  build time. It is declared FixedAtBuild only for that reason.                      # [CODE_FIRST] 13357
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishResourceMaxEntries|32|UINT32|0x00001017        # [CODE_FIRST] 13357
