@@ -37,6 +37,7 @@
 #include <LastAttemptStatus.h>
 #include <FmpLastAttemptStatus.h>
 #include <Library/VariablePolicyHelperLib.h>
+#include <Library/DetectTestKeyLib.h>
 
 #define VERSION_STRING_NOT_SUPPORTED  L"VERSION STRING NOT SUPPORTED"
 #define VERSION_STRING_NOT_AVAILABLE  L"VERSION STRING NOT AVAILABLE"
@@ -83,21 +84,6 @@ typedef struct {
 /// Null-terminated Unicode string retrieved from PcdFmpDeviceImageIdName.
 ///
 extern CHAR16  *mImageIdName;
-
-/**
-  Check to see if any of the keys in PcdFmpDevicePkcs7CertBufferXdr matches
-  the test key.  PcdFmpDeviceTestKeySha256Digest contains the SHA256 hash of
-  the test key.  For each key in PcdFmpDevicePkcs7CertBufferXdr, compute the
-  SHA256 hash and compare it to PcdFmpDeviceTestKeySha256Digest.  If the
-  SHA256 hash matches or there is then error computing the SHA256 hash, then
-  set PcdTestKeyUsed to TRUE.  Skip this check if PcdTestKeyUsed is already
-  TRUE or PcdFmpDeviceTestKeySha256Digest is not exactly SHA256_DIGEST_SIZE
-  bytes.
-**/
-VOID
-DetectTestKey (
-  VOID
-  );
 
 /**
   Returns information about the current firmware image(s) of the device.

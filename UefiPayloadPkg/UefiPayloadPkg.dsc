@@ -311,6 +311,7 @@
   FmpDependencyDeviceLib|FmpDevicePkg/Library/FmpDependencyDeviceLibNull/FmpDependencyDeviceLibNull.inf
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
   FmpPayloadHeaderLib|FmpDevicePkg/Library/FmpPayloadHeaderLibV1/FmpPayloadHeaderLibV1.inf
+  DetectTestKeyLib|FmpDevicePkg/Library/DetectTestKeyLib/DetectTestKeyLib.inf
   !else
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   !endif
@@ -647,6 +648,15 @@
 
   ## Whether FMP capsules are enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|$(CAPSULE_SUPPORT)
+!if $(CAPSULE_SUPPORT) == TRUE
+  # Public certificate used for validation of UEFI capsules
+  #
+  # Consumed by FmpDxe and DetectTestKeyDxe.
+  #
+  # See BaseTools/Source/Python/Pkcs7Sign/Readme.md for more details on such
+  # PCDs and include files.
+  !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+!endif
 
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
 !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
@@ -1046,11 +1056,6 @@
       FILE_GUID = $(CAPSULE_MAIN_FW_GUID)
     <PcdsFixedAtBuild>
       gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"System Firmware"
-      # Public certificate used for validation of UEFI capsules
-      #
-      # See BaseTools/Source/Python/Pkcs7Sign/Readme.md for more details on such
-      # PCDs and include files.
-      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
     <LibraryClasses>
 !if $(BOOTLOADER) == "COREBOOT"
       FmpDeviceLib|UefiPayloadPkg/Library/FmpDeviceSmmLib/FmpDeviceSmmLib.inf
@@ -1060,6 +1065,7 @@
 !endif
   }
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+  FmpDevicePkg/DetectTestKeyDxe/DetectTestKeyDxe.inf
 !endif
 
 
