@@ -1819,17 +1819,65 @@ class FdRegionReport(object):
                             for FvSection in Section.SectionList:
                                 if FvSection.FvName in self.FvList:
                                     continue
-                                self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
+                                self._GuidsDb[Ffs.NameGuid.upper()] = getattr(FvSection, 'FvFileName', None) or FvSection.FvName
                                 self.FvList.append(FvSection.FvName)
                                 self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
+                                self._AddPrebuiltFv(FvSection, Wa)
                                 self._DiscoverNestedFvList(FvSection.FvName, Wa)
                         else:
                             self._GuidsDb[Ffs.NameGuid.upper()] = Section.FvFileName
+                            if Section.FvName in self.FvList:
+                                continue
                             self.FvList.append(Section.FvName)
                             self.FvInfo[Section.FvName] = ("Nested FV", 0, 0)
+                            self._AddPrebuiltFv(Section, Wa)
                             self._DiscoverNestedFvList(Section.FvName, Wa)
                     except AttributeError:
                         pass
+
+    ##
+    # Record a prebuilt FV included by an FV_IMAGE section.
+    #
+    # Use the same rule as GenFds (FvImageSection.GenSection()): an FV_IMAGE
+    # section names a prebuilt FV file when it has an FV file name and the
+    # name is not an FV defined in the FDF file.
+    #
+    # The FDF parser upper-cases FvName, so keep the original-case
+    # FvFileName to locate the FV report file on case-sensitive file
+    # systems.
+    #
+    # @param self            The object pointer
+    # @param FvSection       The FV_IMAGE section object
+    # @param Wa              Workspace context information
+    #
+    def _AddPrebuiltFv(self, FvSection, Wa):
+        FvFileName = getattr(FvSection, 'FvFileName', None)
+        if FvFileName and FvSection.FvName.upper() not in Wa.FdfProfile.FvDict:
+            self._PrebuiltFvFiles[FvSection.FvName] = FvFileName
+
+    ##
+    # Locate the report file of a prebuilt FV.
+    #
+    # Resolve the FV file path the same way GenFds does
+    # (GenFdsGlobalVariable.ReplaceWorkspaceMacro()), so the report file
+    # is looked up next to the FV file that GenFds actually used.
+    #
+    # @param self            The object pointer
+    # @param FvFileName      The original-case FV file name from the FDF file
+    #
+    # @retval string         The FV report file name
+    #
+    def _GetPrebuiltFvReportFileName(self, FvFileName):
+        FvFilePath = mws.handleWsMacro(FvFileName)
+        FvFilePath = FvFilePath.replace(TAB_WORKSPACE, self._WorkspaceDir)
+        if os.path.exists(FvFilePath):
+            FvFilePath = os.path.abspath(FvFilePath)
+        else:
+            FvFilePath = mws.join(self._WorkspaceDir, FvFileName)
+        FvFilePath = os.path.normpath(FvFilePath)
+        if FvFilePath.upper().endswith('.FV'):
+            return FvFilePath + ".txt"
+        return FvFilePath + ".Fv.txt"
 
     ##
     # Constructor function for class FdRegionReport
@@ -1850,6 +1898,7 @@ class FdRegionReport(object):
         self.FvList = []
         self.FvInfo = {}
         self._GuidsDb = {}
+        self._PrebuiltFvFiles = {}
         self._FvDir = Wa.FvDir
         self._WorkspaceDir = Wa.WorkspaceDir
 
@@ -1955,15 +2004,28 @@ class FdRegionReport(object):
             FvTotalSize = 0
             FvTakenSize = 0
             FvFreeSize  = 0
-            if FvName.upper().endswith('.FV'):
-                FileExt = FvName + ".txt"
-            else:
-                FileExt = FvName + ".Fv.txt"
-
-            if not os.path.isfile(FileExt):
-                FvReportFileName = mws.join(self._WorkspaceDir, FileExt)
+            FvReportName = self._PrebuiltFvFiles.get(FvName, FvName)
+            if FvName in self._PrebuiltFvFiles:
+                FvReportFileName = self._GetPrebuiltFvReportFileName(FvReportName)
                 if not os.path.isfile(FvReportFileName):
-                    FvReportFileName = os.path.join(self._FvDir, FileExt)
+                    #
+                    # A prebuilt FV may not come with a report file. List it
+                    # by name without size information.
+                    #
+                    FileWrite(File, "Fv Name:            %s (prebuilt, no report file)" % FvReportName)
+                    FileWrite(File, gSubSectionEnd)
+                    return
+            else:
+                if FvName.upper().endswith('.FV'):
+                    FileExt = FvName + ".txt"
+                else:
+                    FileExt = FvName + ".Fv.txt"
+
+                FvReportFileName = FileExt
+                if not os.path.isfile(FvReportFileName):
+                    FvReportFileName = mws.join(self._WorkspaceDir, FileExt)
+                    if not os.path.isfile(FvReportFileName):
+                        FvReportFileName = os.path.join(self._FvDir, FileExt)
             try:
                 #
                 # Collect size info in the firmware volume.
@@ -1973,16 +2035,34 @@ class FdRegionReport(object):
                 if Match:
                     FvTotalSize = int(Match.group(1), 16)
                 Match = gFvTakenSizePattern.search(FvReport)
+                FvTakenSizeFound = Match is not None
                 if Match:
                     FvTakenSize = int(Match.group(1), 16)
                 FvFreeSize = FvTotalSize - FvTakenSize
+                if FvTotalSize > 0:
+                    FvTotalSizeText = "0x%X (%.0fK)" % (FvTotalSize, FvTotalSize / 1024.0)
+                    FvUsage = "%.1f%% Full" % (FvTakenSize * 100.0 / FvTotalSize)
+                    FvTakenSizeText = "0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0)
+                    FvFreeSizeText = "0x%X (%.0fK)" % (FvFreeSize, FvFreeSize / 1024.0)
+                else:
+                    #
+                    # The total size is missing or zero, so the report file
+                    # is incomplete. Do not report size values derived from it.
+                    #
+                    FvTotalSizeText = "N/A"
+                    FvUsage = "N/A"
+                    if FvTakenSizeFound:
+                        FvTakenSizeText = "0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0)
+                    else:
+                        FvTakenSizeText = "N/A"
+                    FvFreeSizeText = "N/A"
                 #
                 # Write size information to the report file.
                 #
-                FileWrite(File, "Size:               0x%X (%.0fK)" % (FvTotalSize, FvTotalSize / 1024.0))
-                FileWrite(File, "Fv Name:            %s (%.1f%% Full)" % (FvName, FvTakenSize * 100.0 / FvTotalSize))
-                FileWrite(File, "Occupied Size:      0x%X (%.0fK)" % (FvTakenSize, FvTakenSize / 1024.0))
-                FileWrite(File, "Free Size:          0x%X (%.0fK)" % (FvFreeSize, FvFreeSize / 1024.0))
+                FileWrite(File, "Size:               %s" % FvTotalSizeText)
+                FileWrite(File, "Fv Name:            %s (%s)" % (FvReportName, FvUsage))
+                FileWrite(File, "Occupied Size:      %s" % FvTakenSizeText)
+                FileWrite(File, "Free Size:          %s" % FvFreeSizeText)
                 FileWrite(File, "Offset     Module")
                 FileWrite(File, gSubSectionSep)
                 #
