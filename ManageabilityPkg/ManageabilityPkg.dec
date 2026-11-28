@@ -100,6 +100,11 @@
   # @Prompt KCS interface status check timeout in microseconds.
   gManageabilityPkgTokenSpaceGuid.PcdKcsStatusCheckTimeout|5000000|UINT64|0x00000005
 
+  ## Place the BMC IPMC device directly under \_SB when TRUE.
+  #  FALSE preserves the legacy \_SB.PC00.LPC0.IPMC device path.
+  # @Prompt Use generic IPMI BMC ACPI namespace
+  gManageabilityPkgTokenSpaceGuid.PcdIpmiBmcAcpiUseGenericNamespace|FALSE|BOOLEAN|0x00000006
+
   ## This value is the PLDM source and destination terminus ID for transmiting PLDM message.
   # @Prompt PLDM source terminus ID
   gManageabilityPkgTokenSpaceGuid.PcdPldmSourceTerminusId|0|UINT8|0x00000040
