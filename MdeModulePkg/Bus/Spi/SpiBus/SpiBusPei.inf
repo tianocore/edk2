@@ -1,0 +1,45 @@
+## @file # [CODE_FIRST] 13226
+#  Component description for the SPI BUS PEIM # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+#  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR> # [CODE_FIRST] 13226
+#  SPDX-License-Identifier: BSD-2-Clause-Patent # [CODE_FIRST] 13226
+# # [CODE_FIRST] 13226
+## # [CODE_FIRST] 13226
+[Defines] # [CODE_FIRST] 13226
+  INF_VERSION               = 1.30 # [CODE_FIRST] 13226
+  BASE_NAME                 = SpiBusPei # [CODE_FIRST] 13226
+  FILE_GUID                 = 1F5B8A2C-3E47-4D96-B80D-6A9C2E15F304 # [CODE_FIRST] 13226
+  MODULE_TYPE               = PEIM # [CODE_FIRST] 13226
+  VERSION_STRING            = 0.1 # [CODE_FIRST] 13226
+  PI_SPECIFICATION_VERSION  = 1.10 # [CODE_FIRST] 13226
+  ENTRY_POINT               = SpiBusPeiEntry # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Packages] # [CODE_FIRST] 13226
+  MdePkg/MdePkg.dec # [CODE_FIRST] 13226
+  MdeModulePkg/MdeModulePkg.dec # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[LibraryClasses] # [CODE_FIRST] 13226
+  BaseLib # [CODE_FIRST] 13226
+  BaseMemoryLib # [CODE_FIRST] 13226
+  DebugLib # [CODE_FIRST] 13226
+  DevicePathLib # [CODE_FIRST] 13226
+  MemoryAllocationLib # [CODE_FIRST] 13226
+  PeimEntryPoint # [CODE_FIRST] 13226
+  PeiServicesLib # [CODE_FIRST] 13226
+  SpiHcPlatformLib # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Sources] # [CODE_FIRST] 13226
+  SpiBusPei.c # [CODE_FIRST] 13226
+  SpiBus.c # [CODE_FIRST] 13226
+  SpiBus.h # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Ppis] # [CODE_FIRST] 13226
+  gEfiPeiSpiConfigurationPpiGuid                   ## CONSUMES # [CODE_FIRST] 13226
+  gEfiPeiSpiHcPpiGuid                              ## CONSUMES # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[Depex] # [CODE_FIRST] 13226
+  gEfiPeiSpiConfigurationPpiGuid AND # [CODE_FIRST] 13226
+  gEfiPeiSpiHcPpiGuid # [CODE_FIRST] 13226
+ # [CODE_FIRST] 13226
+[UserExtensions.TianoCore."ExtraFiles"] # [CODE_FIRST] 13226
+  SpiBus.uni # [CODE_FIRST] 13226
