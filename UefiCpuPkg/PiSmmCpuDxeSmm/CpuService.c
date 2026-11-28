@@ -437,7 +437,7 @@ SmmCpuRendezvous (
     //
     // There are some APs outside SMM, Wait for all available APs to arrive.
     //
-    SmmWaitForApArrival ();
+    SmmWaitForApArrival (FALSE);
     Status = mSmmMpSyncData->AllApArrivedWithException ? EFI_SUCCESS : EFI_TIMEOUT;
   } else {
     //
