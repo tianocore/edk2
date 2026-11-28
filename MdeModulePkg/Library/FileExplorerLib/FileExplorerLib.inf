@@ -2,6 +2,7 @@
 #  library defines a set of interfaces for how to do file explorer.
 #
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -12,7 +13,7 @@
   FILE_GUID                      = 4FC9C630-0F90-4053-8F13-264CBD22FC58
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = FileExplorerLib|DXE_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = FileExplorerLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = FileExplorerLibConstructor
   DESTRUCTOR                     = FileExplorerLibDestructor
 
