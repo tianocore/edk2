@@ -4,6 +4,7 @@
 Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
+Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -14,6 +15,9 @@ EFI_RAM_DISK_PROTOCOL  *mRamDisk = NULL;
 
 EFI_BOOT_MANAGER_REFRESH_LEGACY_BOOT_OPTION  mBmRefreshLegacyBootOption = NULL;
 EFI_BOOT_MANAGER_LEGACY_BOOT                 mBmLegacyBoot              = NULL;
+
+STATIC EFI_EVENT  mBmVariablePolicyEvent    = NULL;
+STATIC BOOLEAN    mBmVariablePolicyNotified = FALSE;
 
 ///
 /// This GUID is used for an EFI Variable that stores the front device pathes
@@ -2860,6 +2864,9 @@ OnVariablePolicyNotification (
     if (Event != NULL) {
       gBS->CloseEvent (Event);
     }
+
+    mBmVariablePolicyEvent    = NULL;
+    mBmVariablePolicyNotified = TRUE;
   } else {
     DEBUG ((DEBUG_ERROR, "%a: - Unable to locate variable policy protocol - Status=%r\n", __func__, Status));
   }
@@ -2868,11 +2875,16 @@ OnVariablePolicyNotification (
 /**
   Constructor for UefiBootMangerLib.
 
+  Sets up a notification for the variable policy protocol and registers the
+  OnVariablePolicyNotification() callback to enforce variable policies when the
+  protocol becomes available. Save the event for later cleanup in the destructor.
+
   @param[in] ImageHandle  The handle of the loaded image.
   @param[in] SystemTable  System resources and configuration
 
   @retval EFI_SUCCESS   The constructor set the variable policy if implemented
   @retval others        The constructor did not succeed and one or more variable policy are not set
+
 **/
 EFI_STATUS
 EFIAPI
@@ -2881,15 +2893,56 @@ UefiBootManagerLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID  *Registration;
+  VOID       *Registration;
+  EFI_EVENT  Event;
 
-  EfiCreateProtocolNotifyEvent (
-    &gEdkiiVariablePolicyProtocolGuid,
-    TPL_CALLBACK,
-    OnVariablePolicyNotification,
-    NULL,
-    &Registration
-    );
+  mBmVariablePolicyNotified = FALSE;
+
+  Event = EfiCreateProtocolNotifyEvent (
+            &gEdkiiVariablePolicyProtocolGuid,
+            TPL_CALLBACK,
+            OnVariablePolicyNotification,
+            NULL,
+            &Registration
+            );
+
+  //
+  // EfiCreateProtocolNotifyEvent() signals the event once. If the variable policy
+  // protocol is already installed, OnVariablePolicyNotification() has run and closed
+  // the event already, so it must not be tracked for the destructor.
+  //
+  if (!mBmVariablePolicyNotified) {
+    mBmVariablePolicyEvent = Event;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Destructor for UefiBootManagerLib.
+
+  Closes the variable policy protocol notify event if it is still pending, so that
+  OnVariablePolicyNotification() cannot be called after this image has been unloaded
+  (for example when the module's entry point returns an error).
+
+  @param[in] ImageHandle  The handle of the loaded image.
+  @param[in] SystemTable  System resources and configuration
+
+  @retval EFI_SUCCESS   The destructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+UefiBootManagerLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  if (mBmVariablePolicyEvent != NULL) {
+    DEBUG ((DEBUG_INFO, "%a: Closing pending variable policy notify event\n", __func__));
+    gBS->CloseEvent (mBmVariablePolicyEvent);
+    mBmVariablePolicyEvent = NULL;
+  }
 
   return EFI_SUCCESS;
 }
