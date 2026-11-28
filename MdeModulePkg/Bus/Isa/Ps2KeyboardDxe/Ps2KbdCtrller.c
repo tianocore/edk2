@@ -1035,6 +1035,14 @@ KeyboardWaitForValue (
       break;
     }
 
+    //
+    // The 8042 returns RESEND when no device responds, and a device asking
+    // for a resend won't send the expected value either, as nothing is resent.
+    //
+    if (Data == KEYBOARD_8048_RETURN_8042_RESEND) {
+      break;
+    }
+
     if (SumTimeOut >= mWaitForValueTimeOut) {
       break;
     }

@@ -209,6 +209,7 @@ InstallPs2KeyboardDriver (
 #define KEYBOARD_8048_RETURN_8042_BAT_SUCCESS  0xAA
 #define KEYBOARD_8048_RETURN_8042_BAT_ERROR    0xFC
 #define KEYBOARD_8048_RETURN_8042_ACK          0xFA
+#define KEYBOARD_8048_RETURN_8042_RESEND       0xFE
 
 //
 // Keyboard Controller Status
