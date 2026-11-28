@@ -72,7 +72,7 @@ typedef union {
   SMM_STORE_PARAMS_CLEAR    Clear;
 } SMM_STORE_COM_BUF;
 
-#pragma pack(0)
+#pragma pack()
 
 UINTN
 EFIAPI
