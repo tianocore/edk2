@@ -695,7 +695,7 @@ class EFI_IMAGE_IMPORT_DESCRIPTOR(Structure):
         ('TimeDateStamp',            c_uint32),
         ('ForwarderChain',           c_uint32),
         ('Name',                     c_uint32),
-        ('FirstThunk',               EFI_IMAGE_THUNK_DATA),
+        ('FirstThunk',               c_uint32),
     ]
 
 EFI_IMAGE_DEBUG_TYPE_CODEVIEW  = 2
