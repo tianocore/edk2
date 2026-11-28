@@ -1,0 +1,44 @@
+## @file  # [CODE_FIRST] 13253
+#  Host-based unit tests for the RMEM ACPI publisher.  # [CODE_FIRST] 13253
+#  # [CODE_FIRST] 13253
+#  Copyright (c) Microsoft Corporation.  # [CODE_FIRST] 13253
+#  SPDX-License-Identifier: BSD-2-Clause-Patent  # [CODE_FIRST] 13253
+##  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Defines]  # [CODE_FIRST] 13253
+  INF_VERSION                    = 0x00010006  # [CODE_FIRST] 13253
+  BASE_NAME                      = RmemAcpiDxeUnitTestHost  # [CODE_FIRST] 13253
+  FILE_GUID                      = 307A485B-9F30-4B3E-B634-C13E97FE96A0  # [CODE_FIRST] 13253
+  MODULE_TYPE                    = HOST_APPLICATION  # [CODE_FIRST] 13253
+  VERSION_STRING                 = 1.0  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Sources]  # [CODE_FIRST] 13253
+  RmemAcpiDxeUnitTest.c  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Packages]  # [CODE_FIRST] 13253
+  MdePkg/MdePkg.dec  # [CODE_FIRST] 13253
+  MdeModulePkg/MdeModulePkg.dec  # [CODE_FIRST] 13253
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[LibraryClasses]  # [CODE_FIRST] 13253
+  BaseLib  # [CODE_FIRST] 13253
+  BaseMemoryLib  # [CODE_FIRST] 13253
+  DebugLib  # [CODE_FIRST] 13253
+  MemoryAllocationLib  # [CODE_FIRST] 13253
+  PcdLib  # [CODE_FIRST] 13253
+  UnitTestLib  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Guids]  # [CODE_FIRST] 13253
+  gEdkiiRmemRecordHobGuid  # [CODE_FIRST] 13253
+  gEfiEventReadyToBootGuid  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Protocols]  # [CODE_FIRST] 13253
+  gEdkiiRmemRegistrationProtocolGuid  # [CODE_FIRST] 13253
+  gEfiAcpiTableProtocolGuid  # [CODE_FIRST] 13253
+# [CODE_FIRST] 13253
+[Pcd]  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId  # [CODE_FIRST] 13253
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  # [CODE_FIRST] 13253
