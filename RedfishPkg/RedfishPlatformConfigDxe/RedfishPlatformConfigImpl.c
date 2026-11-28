@@ -267,25 +267,65 @@ HiiDeleteString (
   @param[in]  StringId          The identifier of the string to retrieved from the string
                                 package associated with HiiHandle.
 
+  @param[in]  AllowCache        TRUE to serve exact-language hits from the per-formset
+                                string cache; FALSE to always read through the HII
+                                string protocol.
+
   @retval NULL   The string specified by StringId is not present in the string package.
   @retval Other  The string was returned.
 
 **/
+STATIC
 EFI_STRING
-HiiGetRedfishString (
+HiiGetRedfishStringEx (
   IN EFI_HII_HANDLE  HiiHandle,
   IN CHAR8           *Language,
-  IN EFI_STRING_ID   StringId
+  IN EFI_STRING_ID   StringId,
+  IN BOOLEAN         AllowCache
   )
 {
-  EFI_STATUS  Status;
-  UINTN       StringSize;
-  CHAR16      TempString;
-  EFI_STRING  String;
+  EFI_STATUS                                Status;
+  UINTN                                     StringSize;
+  CHAR16                                    TempString;
+  EFI_STRING                                String;
+  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate;
+  REDFISH_HII_STRING_CACHE                  *StringCache;
+  CHAR16                                    *CachedString;
 
   if ((mRedfishPlatformConfigPrivate->HiiString == NULL) || (HiiHandle == NULL) || (StringId == 0) || IS_EMPTY_STRING (Language)) {
     ASSERT (FALSE);
     return NULL;
+  }
+
+  //
+  // Fast path: serve the string from the per-formset, per-language cache.
+  // EFI_HII_STRING_PROTOCOL.GetString() walks the string package block by
+  // block from string ID 1 on every call, which dominates attribute
+  // enumeration on platforms with thousands of strings.  The cache only
+  // covers an exact language match; anything else (best-language fallback,
+  // packages not yet exported, string IDs outside the package) takes the
+  // original path below.
+  //
+  FormsetPrivate = AllowCache ? GetFormsetPrivateByHiiHandle (HiiHandle, &mRedfishPlatformConfigPrivate->FormsetList) : NULL;
+  if (FormsetPrivate != NULL) {
+    StringCache = GetOrBuildHiiStringCache (FormsetPrivate, Language);
+    if ((StringCache != NULL) && ((UINTN)StringId < StringCache->Count)) {
+      CachedString = StringCache->Strings[StringId];
+      if (CachedString != NULL) {
+        //
+        // The cached pointer is into the exported package and is only byte
+        // aligned, so copy with the HII-aware size helper.
+        //
+        StringSize = HiiStrSize (CachedString);
+        String     = AllocateZeroPool (StringSize);
+        if (String == NULL) {
+          return NULL;
+        }
+
+        CopyMem (String, CachedString, StringSize);
+        return String;
+      }
+    }
   }
 
   //
@@ -343,6 +383,109 @@ HiiGetRedfishString (
   // Return the Null-terminated Unicode string
   //
   return String;
+}
+
+/**
+  Retrieves a unicode string from a string package in a given language. The
+  returned string is allocated using AllocatePool().  The caller is responsible
+  for freeing the allocated buffer using FreePool().  Exact-language hits are
+  served from the per-formset string cache; see HiiGetRedfishStringUncached()
+  for strings that may change at runtime.
+
+  If HiiHandle is NULL, then ASSERT().
+  If StringId is 0, then ASSET.
+
+  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
+  @param[in]  Language          The specified configure language to get string.
+  @param[in]  StringId          The identifier of the string to retrieved from the string
+                                package associated with HiiHandle.
+
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
+
+**/
+EFI_STRING
+HiiGetRedfishString (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN CHAR8           *Language,
+  IN EFI_STRING_ID   StringId
+  )
+{
+  return HiiGetRedfishStringEx (HiiHandle, Language, StringId, TRUE);
+}
+
+/**
+  Same as HiiGetRedfishString() but always reads through
+  EFI_HII_STRING_PROTOCOL, bypassing the per-formset string cache.
+
+  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
+  @param[in]  Language          The specified configure language to get string.
+  @param[in]  StringId          The identifier of the string to retrieve.
+
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
+
+**/
+EFI_STRING
+HiiGetRedfishStringUncached (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN CHAR8           *Language,
+  IN EFI_STRING_ID   StringId
+  )
+{
+  return HiiGetRedfishStringEx (HiiHandle, Language, StringId, FALSE);
+}
+
+/**
+  ASCII variant of HiiGetRedfishStringUncached().
+
+  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
+  @param[in]  Language          The specified configure language to get string.
+  @param[in]  StringId          The identifier of the string to retrieve.
+
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
+
+**/
+CHAR8 *
+HiiGetRedfishAsciiStringUncached (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN CHAR8           *Language,
+  IN EFI_STRING_ID   StringId
+  )
+{
+  EFI_STRING  HiiString;
+  CHAR8       *AsciiString;
+
+  HiiString = HiiGetRedfishStringUncached (HiiHandle, Language, StringId);
+  if (HiiString == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Can not find string ID: 0x%x with %a\n", __func__, StringId, Language));
+    return NULL;
+  }
+
+  AsciiString = StrToAsciiStr (HiiString);
+  FreePool (HiiString);
+
+  return AsciiString;
+}
+
+/**
+  English ASCII variant of HiiGetRedfishStringUncached().
+
+  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
+  @param[in]  StringId          The identifier of the string to retrieve.
+
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
+
+**/
+CHAR8 *
+HiiGetEnglishAsciiStringUncached (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN EFI_STRING_ID   StringId
+  )
+{
+  return HiiGetRedfishAsciiStringUncached (HiiHandle, ENGLISH_LANGUAGE_CODE, StringId);
 }
 
 /**
@@ -732,6 +875,30 @@ GetStatementPrivateByConfigureLang (
       continue;
     }
 
+    //
+    // Fast path: search the per-formset index built in LoadFormset().  It
+    // returns the same statement the linear walk below would (first visible in
+    // load order).  If the index could not be built (allocation failure at
+    // load), fall through to the linear walk for this formset only.
+    //
+    if (HiiFormsetPrivate->ConfigLangIndexBuilt) {
+      HiiStatementPrivate = SearchConfigureLangIndex (HiiFormsetPrivate, ConfigureLang);
+      if (HiiStatementPrivate != NULL) {
+        DEBUG_REDFISH_THIS_MODULE (
+          REDFISH_PLATFORM_CONFIG_DEBUG_CONFIG_LANG_SEARCH,
+          "%a: indexed hit %s in QID: 0x%x formset: %g\n",
+          __func__,
+          ConfigureLang,
+          HiiStatementPrivate->QuestionId,
+          &HiiFormsetPrivate->Guid
+          );
+        return HiiStatementPrivate;
+      }
+
+      HiiFormsetLink = HiiFormsetNextLink;
+      continue;
+    }
+
     HiiFormLink = GetFirstNode (&HiiFormsetPrivate->HiiFormList);
     while (!IsNull (&HiiFormsetPrivate->HiiFormList, HiiFormLink)) {
       HiiNextFormLink = GetNextNode (&HiiFormsetPrivate->HiiFormList, HiiFormLink);
@@ -824,6 +991,730 @@ GetFormsetPrivateByHiiHandle (
 }
 
 /**
+  Export the HII package list of the formset into FormsetPrivate->HiiPackageListHeader
+  if it has not been exported yet.
+
+  @param[in]  FormsetPrivate  Pointer to HII form-set private instance.
+
+  @retval EFI_SUCCESS         Package list is available in FormsetPrivate->HiiPackageListHeader.
+  @retval Others              Export failed; HiiPackageListHeader is NULL.
+
+**/
+EFI_STATUS
+ExportFormsetPackageList (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+
+  if (FormsetPrivate == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (FormsetPrivate->HiiPackageListHeader != NULL) {
+    return EFI_SUCCESS;
+  }
+
+  if (mRedfishPlatformConfigPrivate->HiiDatabase == NULL) {
+    return EFI_NOT_READY;
+  }
+
+  BufferSize = 0;
+  Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
+                                                             mRedfishPlatformConfigPrivate->HiiDatabase,
+                                                             FormsetPrivate->HiiHandle,
+                                                             &BufferSize,
+                                                             NULL
+                                                             );
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to export package list: %r\n", __func__, Status));
+    return EFI_ERROR (Status) ? Status : EFI_DEVICE_ERROR;
+  }
+
+  FormsetPrivate->HiiPackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)AllocateZeroPool (BufferSize);
+  if (FormsetPrivate->HiiPackageListHeader == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory for the exported package list.\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
+                                                         mRedfishPlatformConfigPrivate->HiiDatabase,
+                                                         FormsetPrivate->HiiHandle,
+                                                         &BufferSize,
+                                                         FormsetPrivate->HiiPackageListHeader
+                                                         );
+  if (EFI_ERROR (Status)) {
+    FreePool (FormsetPrivate->HiiPackageListHeader);
+    FormsetPrivate->HiiPackageListHeader = NULL;
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Record one UCS-2 string pointer in the cache array if it fits.
+
+  @param[in]  Strings   Output array (may be NULL during the counting pass).
+  @param[in]  Capacity  Number of entries in Strings.
+  @param[in]  StringId  String ID of the text.
+  @param[in]  Text      Pointer to the UCS-2 text inside the package.
+
+**/
+STATIC
+VOID
+RecordCachedString (
+  IN  CHAR16         **Strings OPTIONAL,
+  IN  UINTN          Capacity,
+  IN  EFI_STRING_ID  StringId,
+  IN  UINT8          *Text
+  )
+{
+  if ((Strings != NULL) && ((UINTN)StringId < Capacity)) {
+    Strings[StringId] = (CHAR16 *)Text;
+  }
+}
+
+/**
+  Walk the string blocks of one HII string package.  When Strings is NULL the
+  walk only counts, returning the highest string ID seen plus one in *Count.
+  When Strings is provided (sized *Count), every UCS-2 string block is recorded
+  as Strings[StringId] = pointer to its text inside the package.  SCSU-encoded
+  blocks are not recorded (callers fall back to GetString for those).
+
+  @param[in]      HiiStringPackageHeader  HII string package to walk.
+  @param[in]      Strings                 Optional output array indexed by string ID.
+  @param[in,out]  Count                   In: capacity of Strings when non-NULL.
+                                          Out: highest string ID + 1 observed.
+
+**/
+STATIC
+VOID
+WalkStringPackageForCache (
+  IN      EFI_HII_STRING_PACKAGE_HDR  *HiiStringPackageHeader,
+  IN      CHAR16                      **Strings OPTIONAL,
+  IN OUT  UINTN                       *Count
+  )
+{
+  UINT8                    *BlockHdr;
+  UINT8                    *StringBlockInfo;
+  UINT8                    *StringTextPtr;
+  UINTN                    BlockSize;
+  UINTN                    Offset;
+  UINTN                    Index;
+  UINTN                    Capacity;
+  UINTN                    PackageEnd;
+  EFI_STRING_ID            CurrentStringId;
+  EFI_STRING_ID            DuplicateId;
+  UINT16                   StringCount;
+  UINT16                   SkipCount;
+  UINT8                    Length8;
+  EFI_HII_SIBT_EXT2_BLOCK  Ext2;
+  UINT32                   Length32;
+
+  Capacity        = (Strings != NULL) ? *Count : 0;
+  StringBlockInfo = (UINT8 *)((UINTN)HiiStringPackageHeader + HiiStringPackageHeader->StringInfoOffset);
+  PackageEnd      = (UINTN)HiiStringPackageHeader + HiiStringPackageHeader->Header.Length;
+  BlockHdr        = StringBlockInfo;
+  BlockSize       = 0;
+  CurrentStringId = 1;
+
+  //
+  // Never read past the package even if the END block is missing.
+  //
+  while (((UINTN)BlockHdr < PackageEnd) && (*BlockHdr != EFI_HII_SIBT_END)) {
+    switch (*BlockHdr) {
+      case EFI_HII_SIBT_STRING_SCSU:
+        Offset        = sizeof (EFI_HII_STRING_BLOCK);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset + AsciiStrSize ((CHAR8 *)StringTextPtr);
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRING_SCSU_FONT:
+        Offset        = sizeof (EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK) - sizeof (UINT8);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset + AsciiStrSize ((CHAR8 *)StringTextPtr);
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRINGS_SCSU:
+        CopyMem (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+        StringTextPtr = (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_BLOCK) - sizeof (UINT8));
+        BlockSize    += StringTextPtr - BlockHdr;
+        for (Index = 0; Index < StringCount; Index++) {
+          BlockSize    += AsciiStrSize ((CHAR8 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + AsciiStrSize ((CHAR8 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_STRINGS_SCSU_FONT:
+        CopyMem (&StringCount, (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)), sizeof (UINT16));
+        StringTextPtr = (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK) - sizeof (UINT8));
+        BlockSize    += StringTextPtr - BlockHdr;
+        for (Index = 0; Index < StringCount; Index++) {
+          BlockSize    += AsciiStrSize ((CHAR8 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + AsciiStrSize ((CHAR8 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_STRING_UCS2:
+        Offset        = sizeof (EFI_HII_STRING_BLOCK);
+        StringTextPtr = BlockHdr + Offset;
+        RecordCachedString (Strings, Capacity, CurrentStringId, StringTextPtr);
+        BlockSize += (Offset + HiiStrSize ((CHAR16 *)StringTextPtr));
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRING_UCS2_FONT:
+        Offset        = sizeof (EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK) - sizeof (CHAR16);
+        StringTextPtr = BlockHdr + Offset;
+        RecordCachedString (Strings, Capacity, CurrentStringId, StringTextPtr);
+        BlockSize += (Offset + HiiStrSize ((CHAR16 *)StringTextPtr));
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRINGS_UCS2:
+        Offset        = sizeof (EFI_HII_SIBT_STRINGS_UCS2_BLOCK) - sizeof (CHAR16);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset;
+        CopyMem (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+        for (Index = 0; Index < StringCount; Index++) {
+          RecordCachedString (Strings, Capacity, CurrentStringId, StringTextPtr);
+          BlockSize    += HiiStrSize ((CHAR16 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + HiiStrSize ((CHAR16 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_STRINGS_UCS2_FONT:
+        Offset        = sizeof (EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK) - sizeof (CHAR16);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset;
+        CopyMem (&StringCount, (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)), sizeof (UINT16));
+        for (Index = 0; Index < StringCount; Index++) {
+          RecordCachedString (Strings, Capacity, CurrentStringId, StringTextPtr);
+          BlockSize    += HiiStrSize ((CHAR16 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + HiiStrSize ((CHAR16 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_DUPLICATE:
+        //
+        // Resolve to the referenced string if it was already recorded.
+        //
+        CopyMem (&DuplicateId, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (EFI_STRING_ID));
+        if ((Strings != NULL) && ((UINTN)DuplicateId < Capacity) && ((UINTN)CurrentStringId < Capacity)) {
+          Strings[CurrentStringId] = Strings[DuplicateId];
+        }
+
+        BlockSize += sizeof (EFI_HII_SIBT_DUPLICATE_BLOCK);
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_SKIP1:
+        SkipCount       = (UINT16)(*(UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK)));
+        CurrentStringId = (UINT16)(CurrentStringId + SkipCount);
+        BlockSize      += sizeof (EFI_HII_SIBT_SKIP1_BLOCK);
+        break;
+
+      case EFI_HII_SIBT_SKIP2:
+        CopyMem (&SkipCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+        CurrentStringId = (UINT16)(CurrentStringId + SkipCount);
+        BlockSize      += sizeof (EFI_HII_SIBT_SKIP2_BLOCK);
+        break;
+
+      case EFI_HII_SIBT_EXT1:
+        CopyMem (&Length8, (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)), sizeof (UINT8));
+        if (Length8 == 0) {
+          *Count = CurrentStringId;
+          return;
+        }
+
+        BlockSize += Length8;
+        break;
+
+      case EFI_HII_SIBT_EXT2:
+        CopyMem (&Ext2, BlockHdr, sizeof (EFI_HII_SIBT_EXT2_BLOCK));
+        if (Ext2.Length == 0) {
+          *Count = CurrentStringId;
+          return;
+        }
+
+        BlockSize += Ext2.Length;
+        break;
+
+      case EFI_HII_SIBT_EXT4:
+        CopyMem (&Length32, (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)), sizeof (UINT32));
+        if (Length32 == 0) {
+          *Count = CurrentStringId;
+          return;
+        }
+
+        BlockSize += Length32;
+        break;
+
+      default:
+        //
+        // Unknown block type: stop here rather than mis-parse the rest.
+        //
+        *Count = CurrentStringId;
+        return;
+    }
+
+    BlockHdr = (UINT8 *)(StringBlockInfo + BlockSize);
+  }
+
+  *Count = CurrentStringId;
+}
+
+/**
+  Return the string cache for the given language, building it on first use from
+  the formset's exported HII package list.
+
+  @param[in]  FormsetPrivate  Pointer to HII form-set private instance.
+  @param[in]  Language        HII language of the string package to index.
+
+  @retval REDFISH_HII_STRING_CACHE *  Cache for this language. Count is 0 when the
+                                      language is not present in the package list.
+  @retval NULL                        Out of resources or package list unavailable.
+
+**/
+REDFISH_HII_STRING_CACHE *
+GetOrBuildHiiStringCache (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN  CHAR8                                     *Language
+  )
+{
+  EFI_STATUS                  Status;
+  LIST_ENTRY                  *Link;
+  REDFISH_HII_STRING_CACHE    *Cache;
+  EFI_HII_PACKAGE_HEADER      *PackageHeader;
+  EFI_HII_STRING_PACKAGE_HDR  *HiiStringPackageHeader;
+  UINTN                       EndingPackageAddress;
+  UINTN                       Count;
+
+  if ((FormsetPrivate == NULL) || IS_EMPTY_STRING (Language)) {
+    return NULL;
+  }
+
+  //
+  // Existing cache for this language?
+  //
+  Link = GetFirstNode (&FormsetPrivate->HiiStringCacheList);
+  while (!IsNull (&FormsetPrivate->HiiStringCacheList, Link)) {
+    Cache = REDFISH_HII_STRING_CACHE_FROM_LINK (Link);
+    if (AsciiStriCmp (Cache->Language, Language) == 0) {
+      return Cache;
+    }
+
+    Link = GetNextNode (&FormsetPrivate->HiiStringCacheList, Link);
+  }
+
+  Status = ExportFormsetPackageList (FormsetPrivate);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Cache = AllocateZeroPool (sizeof (REDFISH_HII_STRING_CACHE));
+  if (Cache == NULL) {
+    return NULL;
+  }
+
+  Cache->Language = AllocateCopyPool (AsciiStrSize (Language), Language);
+  if (Cache->Language == NULL) {
+    FreePool (Cache);
+    return NULL;
+  }
+
+  //
+  // Find the string package for this language.  A negative result is kept in
+  // the list too (Count == 0) so the packages are not re-walked per request.
+  //
+  EndingPackageAddress = (UINTN)FormsetPrivate->HiiPackageListHeader + FormsetPrivate->HiiPackageListHeader->PackageLength;
+  PackageHeader        = (EFI_HII_PACKAGE_HEADER *)(FormsetPrivate->HiiPackageListHeader + 1);
+  while ((UINTN)PackageHeader < EndingPackageAddress) {
+    if (PackageHeader->Type == EFI_HII_PACKAGE_STRINGS) {
+      HiiStringPackageHeader = (EFI_HII_STRING_PACKAGE_HDR *)PackageHeader;
+      if (AsciiStriCmp (HiiStringPackageHeader->Language, Language) == 0) {
+        Count = 0;
+        WalkStringPackageForCache (HiiStringPackageHeader, NULL, &Count);
+        if (Count > 0) {
+          Cache->Strings = AllocateZeroPool (Count * sizeof (CHAR16 *));
+          if (Cache->Strings == NULL) {
+            FreePool (Cache->Language);
+            FreePool (Cache);
+            return NULL;
+          }
+
+          Cache->Count = Count;
+          WalkStringPackageForCache (HiiStringPackageHeader, Cache->Strings, &Count);
+        }
+
+        break;
+      }
+    }
+
+    PackageHeader = (EFI_HII_PACKAGE_HEADER *)((UINTN)PackageHeader + PackageHeader->Length);
+  }
+
+  DEBUG ((
+    DEBUG_REDFISH_PLATFORM_CONFIG,
+    "%a: formset %g language %a: %u string IDs cached\n",
+    __func__,
+    &FormsetPrivate->Guid,
+    Language,
+    (UINT32)Cache->Count
+    ));
+
+  InsertTailList (&FormsetPrivate->HiiStringCacheList, &Cache->Link);
+  return Cache;
+}
+
+/**
+  Release every per-language string cache attached to the formset.
+
+  @param[in]  FormsetPrivate  Pointer to HII form-set private instance.
+
+**/
+VOID
+ReleaseHiiStringCacheList (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate
+  )
+{
+  LIST_ENTRY                *Link;
+  LIST_ENTRY                *NextLink;
+  REDFISH_HII_STRING_CACHE  *Cache;
+
+  if (FormsetPrivate == NULL) {
+    return;
+  }
+
+  Link = GetFirstNode (&FormsetPrivate->HiiStringCacheList);
+  while (!IsNull (&FormsetPrivate->HiiStringCacheList, Link)) {
+    NextLink = GetNextNode (&FormsetPrivate->HiiStringCacheList, Link);
+    Cache    = REDFISH_HII_STRING_CACHE_FROM_LINK (Link);
+    RemoveEntryList (&Cache->Link);
+    if (Cache->Strings != NULL) {
+      FreePool (Cache->Strings);
+    }
+
+    if (Cache->Language != NULL) {
+      FreePool (Cache->Language);
+    }
+
+    FreePool (Cache);
+    Link = NextLink;
+  }
+}
+
+/**
+  Order two configure-language index entries: by x-UEFI-redfish string, then by
+  load order so equal keys keep the order the statements were parsed in.
+
+  @param[in]  Entry1  First entry.
+  @param[in]  Entry2  Second entry.
+
+  @retval <0, 0, >0    Entry1 sorts before, equal to, after Entry2.
+
+**/
+STATIC
+INTN
+CompareConfigureLangIndexEntry (
+  IN CONST REDFISH_CONFIG_LANG_INDEX_ENTRY  *Entry1,
+  IN CONST REDFISH_CONFIG_LANG_INDEX_ENTRY  *Entry2
+  )
+{
+  INTN  Result;
+
+  Result = HiiStrCmp (Entry1->ConfigureLang, Entry2->ConfigureLang);
+  if (Result != 0) {
+    return Result;
+  }
+
+  if (Entry1->Order < Entry2->Order) {
+    return -1;
+  }
+
+  return (Entry1->Order > Entry2->Order) ? 1 : 0;
+}
+
+/**
+  In-place heapsort of the configure-language index.
+
+  BaseLib QuickSort() recurses once per partition with a last-element pivot, so
+  its depth is O(n) for already sorted or duplicate-heavy input.  Generated VFR
+  can easily present thousands of attributes in alphabetical order, which would
+  exhaust the DXE stack.  Heapsort is O(n log n) with O(1) extra space and no
+  recursion; the Order tie-break in the comparator makes the result
+  deterministic despite heapsort not being stable.
+
+  @param[in,out]  Entries  Array to sort.
+  @param[in]      Count    Number of entries.
+
+**/
+STATIC
+VOID
+HeapSortConfigureLangIndex (
+  IN OUT REDFISH_CONFIG_LANG_INDEX_ENTRY  *Entries,
+  IN     UINTN                            Count
+  )
+{
+  UINTN                            Start;
+  UINTN                            End;
+  UINTN                            Root;
+  UINTN                            Child;
+  REDFISH_CONFIG_LANG_INDEX_ENTRY  Temp;
+
+  if (Count < 2) {
+    return;
+  }
+
+  //
+  // Build a max-heap, then repeatedly move the largest element to the end.
+  //
+  for (Start = Count / 2; Start > 0; Start--) {
+    Root = Start - 1;
+    while ((Child = 2 * Root + 1) < Count) {
+      if (((Child + 1) < Count) && (CompareConfigureLangIndexEntry (&Entries[Child], &Entries[Child + 1]) < 0)) {
+        Child++;
+      }
+
+      if (CompareConfigureLangIndexEntry (&Entries[Root], &Entries[Child]) >= 0) {
+        break;
+      }
+
+      Temp           = Entries[Root];
+      Entries[Root]  = Entries[Child];
+      Entries[Child] = Temp;
+      Root           = Child;
+    }
+  }
+
+  for (End = Count - 1; End > 0; End--) {
+    Temp         = Entries[0];
+    Entries[0]   = Entries[End];
+    Entries[End] = Temp;
+
+    Root = 0;
+    while ((Child = 2 * Root + 1) < End) {
+      if (((Child + 1) < End) && (CompareConfigureLangIndexEntry (&Entries[Child], &Entries[Child + 1]) < 0)) {
+        Child++;
+      }
+
+      if (CompareConfigureLangIndexEntry (&Entries[Root], &Entries[Child]) >= 0) {
+        break;
+      }
+
+      Temp           = Entries[Root];
+      Entries[Root]  = Entries[Child];
+      Entries[Child] = Temp;
+      Root           = Child;
+    }
+  }
+}
+
+/**
+  Build the sorted configure-language index over all statements of the formset
+  that carry an x-UEFI-redfish string. Must be called after all forms and
+  statements have been attached to FormsetPrivate.
+
+  @param[in]  FormsetPrivate  Pointer to HII form-set private instance.
+
+  @retval EFI_SUCCESS           Index built (possibly empty).
+  @retval EFI_OUT_OF_RESOURCES  Out of memory; lookups fall back to a linear search.
+
+**/
+EFI_STATUS
+BuildConfigureLangIndex (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate
+  )
+{
+  LIST_ENTRY                                 *FormLink;
+  LIST_ENTRY                                 *StatementLink;
+  REDFISH_PLATFORM_CONFIG_FORM_PRIVATE       *FormPrivate;
+  REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE  *StatementPrivate;
+  UINTN                                      Count;
+  UINTN                                      Index;
+
+  if (FormsetPrivate == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ReleaseConfigureLangIndex (FormsetPrivate);
+
+  //
+  // Count statements that have a configure language.
+  //
+  Count    = 0;
+  FormLink = GetFirstNode (&FormsetPrivate->HiiFormList);
+  while (!IsNull (&FormsetPrivate->HiiFormList, FormLink)) {
+    FormPrivate   = REDFISH_PLATFORM_CONFIG_FORM_FROM_LINK (FormLink);
+    StatementLink = GetFirstNode (&FormPrivate->StatementList);
+    while (!IsNull (&FormPrivate->StatementList, StatementLink)) {
+      StatementPrivate = REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK (StatementLink);
+      if (StatementPrivate->XuefiRedfishStr != NULL) {
+        Count++;
+      }
+
+      StatementLink = GetNextNode (&FormPrivate->StatementList, StatementLink);
+    }
+
+    FormLink = GetNextNode (&FormsetPrivate->HiiFormList, FormLink);
+  }
+
+  if (Count > 0) {
+    FormsetPrivate->ConfigLangIndex = AllocateZeroPool (Count * sizeof (REDFISH_CONFIG_LANG_INDEX_ENTRY));
+    if (FormsetPrivate->ConfigLangIndex == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Index    = 0;
+    FormLink = GetFirstNode (&FormsetPrivate->HiiFormList);
+    while (!IsNull (&FormsetPrivate->HiiFormList, FormLink)) {
+      FormPrivate   = REDFISH_PLATFORM_CONFIG_FORM_FROM_LINK (FormLink);
+      StatementLink = GetFirstNode (&FormPrivate->StatementList);
+      while (!IsNull (&FormPrivate->StatementList, StatementLink)) {
+        StatementPrivate = REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK (StatementLink);
+        if ((StatementPrivate->XuefiRedfishStr != NULL) && (Index < Count)) {
+          FormsetPrivate->ConfigLangIndex[Index].ConfigureLang = StatementPrivate->XuefiRedfishStr;
+          FormsetPrivate->ConfigLangIndex[Index].Order         = Index;
+          FormsetPrivate->ConfigLangIndex[Index].Statement     = StatementPrivate;
+          Index++;
+        }
+
+        StatementLink = GetNextNode (&FormPrivate->StatementList, StatementLink);
+      }
+
+      FormLink = GetNextNode (&FormsetPrivate->HiiFormList, FormLink);
+    }
+
+    FormsetPrivate->ConfigLangIndexCount = Index;
+    HeapSortConfigureLangIndex (FormsetPrivate->ConfigLangIndex, FormsetPrivate->ConfigLangIndexCount);
+  }
+
+  //
+  // An empty index is still a valid index: lookups on this formset can stop
+  // without walking its statements.
+  //
+  FormsetPrivate->ConfigLangIndexBuilt = TRUE;
+
+  DEBUG ((
+    DEBUG_REDFISH_PLATFORM_CONFIG,
+    "%a: formset %g: %u configure languages indexed\n",
+    __func__,
+    &FormsetPrivate->Guid,
+    (UINT32)FormsetPrivate->ConfigLangIndexCount
+    ));
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Release the configure-language index of the formset.
+
+  @param[in]  FormsetPrivate  Pointer to HII form-set private instance.
+
+**/
+VOID
+ReleaseConfigureLangIndex (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate
+  )
+{
+  if (FormsetPrivate == NULL) {
+    return;
+  }
+
+  if (FormsetPrivate->ConfigLangIndex != NULL) {
+    FreePool (FormsetPrivate->ConfigLangIndex);
+    FormsetPrivate->ConfigLangIndex = NULL;
+  }
+
+  FormsetPrivate->ConfigLangIndexCount = 0;
+  FormsetPrivate->ConfigLangIndexBuilt = FALSE;
+}
+
+/**
+  Look up a configure language in the index of one formset.
+
+  Equal keys are ordered by load order, so this returns the same statement the
+  linear walk of forms and statements would have returned: the first one, in
+  load order, that carries the configure language and is visible under the
+  current REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED policy.
+
+  @param[in]  FormsetPrivate  Formset whose index to search.
+  @param[in]  ConfigureLang   Configure language to find.
+
+  @retval Statement pointer, or NULL when no visible statement matches.
+
+**/
+REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE *
+SearchConfigureLangIndex (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN  EFI_STRING                                ConfigureLang
+  )
+{
+  REDFISH_CONFIG_LANG_INDEX_ENTRY            *Entries;
+  REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE  *Statement;
+  UINTN                                      Low;
+  UINTN                                      High;
+  UINTN                                      Mid;
+  UINTN                                      Index;
+  INTN                                       Result;
+  BOOLEAN                                    AllowSuppressed;
+
+  if ((FormsetPrivate == NULL) || IS_EMPTY_STRING (ConfigureLang)) {
+    return NULL;
+  }
+
+  Entries = FormsetPrivate->ConfigLangIndex;
+  if ((Entries == NULL) || (FormsetPrivate->ConfigLangIndexCount == 0)) {
+    return NULL;
+  }
+
+  //
+  // Lower bound: first entry whose key is >= ConfigureLang.
+  //
+  Low  = 0;
+  High = FormsetPrivate->ConfigLangIndexCount;
+  while (Low < High) {
+    Mid    = Low + (High - Low) / 2;
+    Result = HiiStrCmp (Entries[Mid].ConfigureLang, ConfigureLang);
+    if (Result < 0) {
+      Low = Mid + 1;
+    } else {
+      High = Mid;
+    }
+  }
+
+  AllowSuppressed = RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED);
+
+  //
+  // Scan the run of equal keys in load order for the first visible statement.
+  //
+  for (Index = Low; Index < FormsetPrivate->ConfigLangIndexCount; Index++) {
+    if (HiiStrCmp (Entries[Index].ConfigureLang, ConfigureLang) != 0) {
+      break;
+    }
+
+    Statement = Entries[Index].Statement;
+    if ((Statement->Description != 0) && (AllowSuppressed || !Statement->Suppressed)) {
+      return Statement;
+    }
+  }
+
+  return NULL;
+}
+
+/**
   Release x-UEFI-string related information.
 
   @param[in]      FormsetPrivate Pointer to HII form-set private instance.
@@ -843,8 +1734,15 @@ ReleaseXuefiStringDatabase (
   BOOLEAN                         EndDatabase;
   BOOLEAN                         EndArray;
 
+  //
+  // The per-language string caches point into the exported package list, so
+  // they must go before it does, regardless of which caller releases it.
+  //
+  ReleaseHiiStringCacheList (FormsetPrivate);
+
   if (FormsetPrivate->HiiPackageListHeader != NULL) {
     FreePool (FormsetPrivate->HiiPackageListHeader);
+    FormsetPrivate->HiiPackageListHeader = NULL;
   }
 
   // Walk through x-UEFI-redfish string database.
@@ -961,6 +1859,12 @@ ReleaseFormset (
     FormsetPrivate->SupportedSchema.Count      = 0;
   }
 
+  //
+  // The index points into the statements released above; the string caches
+  // point into the exported package list and are released together with it
+  // inside ReleaseXuefiStringDatabase().
+  //
+  ReleaseConfigureLangIndex (FormsetPrivate);
   ReleaseXuefiStringDatabase (FormsetPrivate);
 
   return EFI_SUCCESS;
@@ -989,6 +1893,7 @@ NewFormsetPrivate (
   //
   InitializeListHead (&NewFormsetPrivate->HiiFormList);
   InitializeListHead (&NewFormsetPrivate->XuefiRedfishStringDatabase);
+  InitializeListHead (&NewFormsetPrivate->HiiStringCacheList);
 
   return NewFormsetPrivate;
 }
@@ -1505,7 +2410,6 @@ BuildXUefiRedfishStringDatabase (
   )
 {
   EFI_STATUS                  Status;
-  UINTN                       BufferSize;
   EFI_HII_PACKAGE_HEADER      *PackageHeader;
   UINTN                       EndingPackageAddress;
   EFI_HII_STRING_PACKAGE_HDR  *HiiStringPackageHeader;
@@ -1517,33 +2421,8 @@ BuildXUefiRedfishStringDatabase (
 
   DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-UEFI-redfish string database, HII Formset GUID - %g.\n", __func__, &FormsetPrivate->Guid));
 
-  BufferSize = 0;
-  Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
-                                                             mRedfishPlatformConfigPrivate->HiiDatabase,
-                                                             FormsetPrivate->HiiHandle,
-                                                             &BufferSize,
-                                                             FormsetPrivate->HiiPackageListHeader
-                                                             );
-  if (Status != EFI_BUFFER_TOO_SMALL) {
-    DEBUG ((DEBUG_ERROR, "  Failed to export package list.\n"));
-    return;
-  }
-
-  FormsetPrivate->HiiPackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)AllocateZeroPool (BufferSize);
-  if (FormsetPrivate->HiiPackageListHeader == NULL) {
-    DEBUG ((DEBUG_ERROR, "  Failed to allocate memory for the exported package list.\n"));
-    return;
-  }
-
-  Status = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
-                                                         mRedfishPlatformConfigPrivate->HiiDatabase,
-                                                         FormsetPrivate->HiiHandle,
-                                                         &BufferSize,
-                                                         FormsetPrivate->HiiPackageListHeader
-                                                         );
+  Status = ExportFormsetPackageList (FormsetPrivate);
   if (EFI_ERROR (Status)) {
-    FreePool (FormsetPrivate->HiiPackageListHeader);
-    FormsetPrivate->HiiPackageListHeader = NULL;
     return;
   }
 
@@ -1786,6 +2665,16 @@ LoadFormset (
     //
     InsertTailList (&FormsetPrivate->HiiFormList, &HiiFormPrivate->Link);
     HiiFormLink = GetNextNode (&HiiFormSet->FormListHead, HiiFormLink);
+  }
+
+  //
+  // All statements are attached; build the configure-language index so that
+  // per-attribute lookups are a binary search instead of a walk of every
+  // statement.  Failure is not fatal: lookups fall back to the linear walk.
+  //
+  Status = BuildConfigureLangIndex (FormsetPrivate);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: configure-language index not built for %g: %r\n", __func__, &FormsetPrivate->Guid, Status));
   }
 
   return EFI_SUCCESS;
