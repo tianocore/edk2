@@ -194,6 +194,10 @@
   #
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
 
+  ##  @libraryclass   Provides interfaces for capsule image update at runtime.
+  #
+  ProcessCapsuleRuntimeLib|Include/Library/ProcessCapsuleRuntimeLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

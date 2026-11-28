@@ -331,6 +331,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+  ProcessCapsuleRuntimeLib|MdeModulePkg/Library/BaseProcessCapsuleRuntimeLib/BaseProcessCapsuleRuntimeLib.inf
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG

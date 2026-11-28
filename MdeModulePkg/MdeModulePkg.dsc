@@ -143,6 +143,7 @@
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
+  ProcessCapsuleRuntimeLib|MdeModulePkg/Library/BaseProcessCapsuleRuntimeLib/BaseProcessCapsuleRuntimeLib.inf
 
 [LibraryClasses.common.SMM_CORE]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -353,6 +354,7 @@
   MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
   MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+  MdeModulePkg/Library/BaseProcessCapsuleRuntimeLib/BaseProcessCapsuleRuntimeLib.inf
 
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf

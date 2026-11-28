@@ -65,6 +65,7 @@
   BaseMemoryLib
   CacheMaintenanceLib
   VariablePolicyHelperLib
+  ProcessCapsuleRuntimeLib
 
 [LibraryClasses.X64]
   UefiLib

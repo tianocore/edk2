@@ -188,6 +188,7 @@
 !if $(CAPSULE_ENABLE) == TRUE
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 !endif
+  ProcessCapsuleRuntimeLib|MdeModulePkg/Library/BaseProcessCapsuleRuntimeLib/BaseProcessCapsuleRuntimeLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   TimerLib|UefiCpuPkg/Library/RiscV64CpuTimerLib/RiscV64CpuTimerDxeLib.inf

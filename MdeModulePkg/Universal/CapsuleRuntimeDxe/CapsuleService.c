@@ -143,8 +143,12 @@ UpdateCapsule (
     // Platform specific update for the non-reset capsule image.
     //
     if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) == 0) {
-      if (EfiAtRuntime () && !FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime)) {
-        Status = EFI_OUT_OF_RESOURCES;
+      if (EfiAtRuntime ()) {
+        if (!FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime)) {
+          Status = EFI_OUT_OF_RESOURCES;
+        } else {
+          Status = ProcessCaspuleImageAtRuntime (CapsuleHeader);
+        }
       } else {
         Status = ProcessCapsuleImage (CapsuleHeader);
       }
