@@ -21,10 +21,20 @@ FmpDevicePkg/FmpDxe/FmpDxe.inf {
       gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"RISC-V VIRT System Firmware Device"
 
       #
-      # ESRT and FMP Lowest Support Version for this capsule update module
-      # 000.000.000.000
+      # Firmware revision that is reported by FMP
+      # Can be overridden at build time with -D FIRMWARE_REVISION=0x...
       #
-      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion|0x00000001
+      !ifdef $(FIRMWARE_REVISION)
+      gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision|$(FIRMWARE_REVISION)
+      !endif
+
+      #
+      # ESRT and FMP Lowest Supported Version for this capsule update module
+      # Override the DEC default (0x0) at build time with -D LSV=0x...
+      #
+      !ifdef $(LSV)
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion|$(LSV)
+      !endif
 
       gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressWatchdogTimeInSeconds|2
 
