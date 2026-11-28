@@ -1417,6 +1417,11 @@ WifiMgrDxeHiiConfigAccessCallback (
 
       case KEY_REFRESH_NETWORK_LIST:
 
+        Private->CurrentNic->NetworkListFormOpen = TRUE;
+        if (EFI_ERROR (gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500)))) {
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Failed to arm network list refresh timer\n"));
+        }
+
         if (Private->CurrentNic->UserSelectedProfile != NULL) {
           Profile = Private->CurrentNic->UserSelectedProfile;
 
@@ -1484,6 +1489,10 @@ WifiMgrDxeHiiConfigAccessCallback (
       case KEY_EAP_ENROLL_CERT_FROM_FILE:
       case KEY_EAP_ENROLL_PRIVATE_KEY_FROM_FILE:
       case KEY_REFRESH_NETWORK_LIST:
+
+        if (QuestionId == KEY_REFRESH_NETWORK_LIST) {
+          Private->CurrentNic->NetworkListFormOpen = FALSE;
+        }
 
         if (Private->CurrentNic->UserSelectedProfile == NULL) {
           break;
