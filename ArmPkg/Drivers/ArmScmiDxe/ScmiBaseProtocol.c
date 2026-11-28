@@ -19,13 +19,13 @@
 
 /** Return version of the Base protocol supported by SCP firmware.
 
-  @param[in]  This     A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This     A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] Version  Version of the supported SCMI Base protocol.
+  @param[out]  Version  Version of the supported SCMI Base protocol.
 
-  @retval EFI_SUCCESS       The version of the protocol is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version of the protocol is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -39,13 +39,14 @@ BaseGetVersion (
 
 /** Return total number of SCMI protocols supported by the SCP firmware.
 
-  @param[in]  This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This            A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] TotalProtocols Total number of SCMI protocols supported.
+  @param[out]  TotalProtocols  Total number of SCMI protocols supported.
 
-  @retval EFI_SUCCESS       Total number of protocols supported are returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Total number of protocols supported are
+                                 returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -56,6 +57,12 @@ BaseGetTotalProtocols (
 {
   EFI_STATUS  Status;
   UINT32      *ReturnValues;
+
+  ASSERT (TotalProtocols != NULL);
+
+  if (TotalProtocols == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiGetProtocolAttributes (ScmiProtocolIdBase, &ReturnValues);
   if (EFI_ERROR (Status)) {
@@ -69,15 +76,14 @@ BaseGetTotalProtocols (
 
 /** Common function which returns vendor details.
 
-  @param[in] MessageId       ScmiMessageIdBaseDiscoverVendor
-                             OR
-                             ScmiMessageIdBaseDiscoverSubVendor
+  @param[in]   MessageId         ScmiMessageIdBaseDiscoverVendor OR
+                                 ScmiMessageIdBaseDiscoverSubVendor
 
-  @param[out] VendorIdentifier ASCII name of the vendor/subvendor.
+  @param[out]  VendorIdentifier  ASCII name of the vendor/subvendor.
 
-  @retval EFI_SUCCESS       VendorIdentifier is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            VendorIdentifier is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -90,6 +96,12 @@ BaseDiscoverVendorDetails (
   UINT32        *ReturnValues;
   SCMI_COMMAND  Cmd;
   UINT32        PayloadLength;
+
+  ASSERT (VendorIdentifier != NULL);
+
+  if (VendorIdentifier == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Cmd.ProtocolId = ScmiProtocolIdBase;
   Cmd.MessageId  = MessageId;
@@ -116,14 +128,14 @@ BaseDiscoverVendorDetails (
 
 /** Return vendor name.
 
-  @param[in] This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This              A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] VendorIdentifier Null terminated ASCII string of up to
-                               16 bytes with a vendor name.
+  @param[out]  VendorIdentifier  Null terminated ASCII string of up to 16 bytes
+                                 with a vendor name.
 
-  @retval EFI_SUCCESS       VendorIdentifier is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            VendorIdentifier is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -140,14 +152,14 @@ BaseDiscoverVendor (
 
 /** Return sub vendor name.
 
-  @param[in]  This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This              A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] VendorIdentifier Null terminated ASCII string of up to
-                               16 bytes with a sub vendor name.
+  @param[out]  VendorIdentifier  Null terminated ASCII string of up to 16 bytes
+                                 with a sub vendor name.
 
-  @retval EFI_SUCCESS       VendorIdentifier is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            VendorIdentifier is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 BaseDiscoverSubVendor (
@@ -163,13 +175,13 @@ BaseDiscoverSubVendor (
 
 /** Return implementation version.
 
-  @param[in] This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This                   A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] ImplementationVersion Vendor specific implementation version.
+  @param[out]  ImplementationVersion  Vendor specific implementation version.
 
-  @retval EFI_SUCCESS       Implementation version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Implementation version is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -182,6 +194,12 @@ BaseDiscoverImplVersion (
   UINT32        *ReturnValues;
   SCMI_COMMAND  Cmd;
   UINT32        PayloadLength;
+
+  ASSERT (ImplementationVersion != NULL);
+
+  if (ImplementationVersion == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Cmd.ProtocolId = ScmiProtocolIdBase;
   Cmd.MessageId  = ScmiMessageIdBaseDiscoverImplementationVersion;
@@ -204,17 +222,17 @@ BaseDiscoverImplVersion (
 
 /** Return list of protocols.
 
-  @param[in]  This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]      This              A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] ProtocolListSize  Size of the ProtocolList.
+  @param[in,out]  ProtocolListSize  Size of the ProtocolList.
 
-  @param[out] ProtocolList   Protocol list.
+  @param[out]     ProtocolList      Protocol list.
 
-  @retval EFI_SUCCESS          List of protocols is returned.
-  @retval EFI_BUFFER_TOO_SMALL ProtocolListSize is too small for the result.
-                                It has been updated to the size needed.
-  @retval EFI_DEVICE_ERROR     SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            List of protocols is returned.
+  @retval EFI_BUFFER_TOO_SMALL   ProtocolListSize is too small for the result.
+                                 It has been updated to the size needed.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -234,6 +252,12 @@ BaseDiscoverListProtocols (
   UINT32              PayloadLength;
   UINT32              RequiredSize;
 
+  ASSERT (ProtocolListSize != NULL);
+
+  if (ProtocolListSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = BaseGetTotalProtocols (This, &TotalProtocols);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -248,6 +272,12 @@ BaseDiscoverListProtocols (
   if (*ProtocolListSize < RequiredSize) {
     *ProtocolListSize = RequiredSize;
     return EFI_BUFFER_TOO_SMALL;
+  }
+
+  ASSERT ((ProtocolList != NULL) || (RequiredSize == 0));
+
+  if ((ProtocolList == NULL) && (RequiredSize != 0)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   Cmd.ProtocolId = ScmiProtocolIdBase;
@@ -292,10 +322,10 @@ STATIC CONST SCMI_BASE_PROTOCOL  BaseProtocol = {
 
 /** Initialize Base protocol and install protocol on a given handle.
 
-   @param[in] Handle              Handle to install Base protocol.
+  @param[in,out]  Handle  Handle to install Base protocol.
 
-   @retval EFI_SUCCESS            Base protocol interface installed
-                                  successfully.
+  @retval EFI_SUCCESS            Base protocol interface installed
+                                 successfully.
 **/
 EFI_STATUS
 ScmiBaseProtocolInit (

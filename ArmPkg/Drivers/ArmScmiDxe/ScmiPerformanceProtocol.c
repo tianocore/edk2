@@ -10,6 +10,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/ArmScmiPerformanceProtocol.h>
 
@@ -19,14 +20,14 @@
 /** Return version of the performance management protocol supported by SCP.
    firmware.
 
-  @param[in]  This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   This     A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
 
-  @param[out] Version   Version of the supported SCMI performance management
+  @param[out]  Version  Version of the supported SCMI performance management
                         protocol.
 
-  @retval EFI_SUCCESS       The version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -40,13 +41,13 @@ PerformanceGetVersion (
 
 /** Return protocol attributes of the performance management protocol.
 
-  @param[in] This         A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
 
-  @param[out] Attributes  Protocol attributes.
+  @param[out]  Attributes  Protocol attributes.
 
-  @retval EFI_SUCCESS       Protocol attributes are returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Protocol attributes are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -57,6 +58,12 @@ PerformanceGetAttributes (
 {
   EFI_STATUS  Status;
   UINT32      *ReturnValues;
+
+  ASSERT (Attributes != NULL);
+
+  if (Attributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiGetProtocolAttributes (
              ScmiProtocolIdPerformance,
@@ -77,14 +84,15 @@ PerformanceGetAttributes (
 
 /** Return performance domain attributes.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]   This              A Pointer to SCMI_PERFORMANCE_PROTOCOL
+                                 Instance.
+  @param[in]   DomainId          Identifier for the performance domain.
 
-  @param[out] Attributes  Performance domain attributes.
+  @param[out]  DomainAttributes  Performance domain attributes.
 
-  @retval EFI_SUCCESS       Domain attributes are returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Domain attributes are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -99,6 +107,12 @@ PerformanceDomainAttributes (
   UINT32        *ReturnValues;
   UINT32        PayloadLength;
   SCMI_COMMAND  Cmd;
+
+  ASSERT (DomainAttributes != NULL);
+
+  if (DomainAttributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -132,20 +146,21 @@ PerformanceDomainAttributes (
 
 /** Return list of performance domain levels of a given domain.
 
-  @param[in] This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in] DomainId    Identifier for the performance domain.
+  @param[in]      This            A Pointer to SCMI_PERFORMANCE_PROTOCOL
+                                  Instance.
+  @param[in]      DomainId        Identifier for the performance domain.
 
-  @param[out] NumLevels   Total number of levels a domain can support.
+  @param[out]     NumLevels       Total number of levels a domain can support.
 
-  @param[in,out]  LevelArraySize Size of the performance level array.
+  @param[in,out]  LevelArraySize  Size of the performance level array.
 
-  @param[out] LevelArray   Array of the performance levels.
+  @param[out]     LevelArray      Array of the performance levels.
 
-  @retval EFI_SUCCESS          Domain levels are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval EFI_BUFFER_TOO_SMALL LevelArraySize is too small for the result.
-                               It has been updated to the size needed.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Domain levels are returned.
+  @retval EFI_BUFFER_TOO_SMALL   LevelArraySize is too small for the result. It
+                                 has been updated to the size needed.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 STATIC
 EFI_STATUS
@@ -169,6 +184,13 @@ PerformanceDescribeLevels (
   UINT32        ReturnRemainNumLevels;
 
   PERF_DESCRIBE_LEVELS  *Levels;
+
+  ASSERT (NumLevels != NULL);
+  ASSERT (LevelArraySize != NULL);
+
+  if ((NumLevels == NULL) || (LevelArraySize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams1);
   if (EFI_ERROR (Status)) {
@@ -213,6 +235,12 @@ PerformanceDescribeLevels (
       }
     }
 
+    ASSERT ((LevelArray != NULL) || (ReturnNumLevels == 0));
+
+    if ((LevelArray == NULL) && (ReturnNumLevels != 0)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     for (LevelNo = 0; LevelNo < ReturnNumLevels; LevelNo++) {
       CopyMem (
         &LevelArray[LevelIndex++],
@@ -229,13 +257,13 @@ PerformanceDescribeLevels (
 
 /** Set performance limits of a domain.
 
-  @param[in] This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in] DomainId    Identifier for the performance domain.
-  @param[in] Limit       Performance limit to set.
+  @param[in]  This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]  DomainId  Identifier for the performance domain.
+  @param[in]  Limits    Performance limit to set.
 
-  @retval EFI_SUCCESS          Performance limits set successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits set successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 PerformanceLimitsSet (
@@ -248,6 +276,12 @@ PerformanceLimitsSet (
   UINT32        PayloadLength;
   SCMI_COMMAND  Cmd;
   UINT32        *MessageParams;
+
+  ASSERT (Limits != NULL);
+
+  if (Limits == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -274,14 +308,14 @@ PerformanceLimitsSet (
 
 /** Get performance limits of a domain.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]   This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   DomainId  Identifier for the performance domain.
 
-  @param[out] Limit       Performance Limits of the domain.
+  @param[out]  Limits    Performance Limits of the domain.
 
-  @retval EFI_SUCCESS          Performance limits are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance limits are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 PerformanceLimitsGet (
@@ -296,6 +330,12 @@ PerformanceLimitsGet (
   UINT32        *MessageParams;
 
   SCMI_PERFORMANCE_LIMITS  *ReturnValues;
+
+  ASSERT (Limits != NULL);
+
+  if (Limits == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -326,13 +366,12 @@ PerformanceLimitsGet (
 
 /** Set performance level of a domain.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
-  @param[in]  Level       Performance level of the domain.
+  @param[in]  This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]  DomainId  Identifier for the performance domain.
+  @param[in]  Level     Performance level of the domain.
 
-  @retval EFI_SUCCESS          Performance level set successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance level set successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 EFI_STATUS
 PerformanceLevelSet (
@@ -370,14 +409,14 @@ PerformanceLevelSet (
 
 /** Get performance level of a domain.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]   This      A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   DomainId  Identifier for the performance domain.
 
-  @param[out] Level       Performance level of the domain.
+  @param[out]  Level     Performance level of the domain.
 
-  @retval EFI_SUCCESS          Performance level got successfully.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Performance level got successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 PerformanceLevelGet (
@@ -391,6 +430,12 @@ PerformanceLevelGet (
   SCMI_COMMAND  Cmd;
   UINT32        *ReturnValues;
   UINT32        *MessageParams;
+
+  ASSERT (Level != NULL);
+
+  if (Level == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {
@@ -421,21 +466,21 @@ PerformanceLevelGet (
 /** Discover the attributes of the FastChannel for the specified
     performance domain and the specified message.
 
-  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
-  @param[in]  DomainId    Identifier for the performance domain.
-  @param[in]  MessageId   Message Id of the FastChannel to discover.
-                          Must be one of:
-                           - PERFORMANCE_LIMITS_SET
-                           - PERFORMANCE_LIMITS_GET
-                           - PERFORMANCE_LEVEL_SET
-                           - PERFORMANCE_LEVEL_GET
-  @param[out] FastChannel If success, contains the FastChannel description.
+  @param[in]   This         A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]   DomainId     Identifier for the performance domain.
+  @param[in]   MessageId    Message Id of the FastChannel to discover.
+                            Must be one of:
+                              - PERFORMANCE_LIMITS_SET
+                              - PERFORMANCE_LIMITS_GET
+                              - PERFORMANCE_LEVEL_SET
+                              - PERFORMANCE_LEVEL_GET
+  @param[out]  FastChannel  If success, contains the FastChannel description.
 
-  @retval EFI_SUCCESS             Performance level got successfully.
-  @retval EFI_DEVICE_ERROR        SCP returns an SCMI error.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_TIMEOUT             Time out.
-  @retval EFI_UNSUPPORTED         Unsupported.
+  @retval EFI_SUCCESS            Performance level got successfully.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval EFI_TIMEOUT            Time out.
+  @retval EFI_UNSUPPORTED        Unsupported.
 **/
 EFI_STATUS
 DescribeFastchannel (
@@ -502,8 +547,7 @@ STATIC CONST SCMI_PERFORMANCE_PROTOCOL  PerformanceProtocol = {
 
 /** Initialize performance management protocol and install on a given Handle.
 
-  @param[in] Handle              Handle to install performance management
-                                 protocol.
+  @param[in]  Handle  Handle to install performance management protocol.
 
   @retval EFI_SUCCESS            Performance protocol installed successfully.
 **/

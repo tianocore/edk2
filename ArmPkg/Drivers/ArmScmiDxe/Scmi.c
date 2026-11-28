@@ -21,11 +21,12 @@
 
 /** Return a pointer to the message payload.
 
-  @param[out] Payload         Holds pointer to the message payload.
+  @param[out]  Payload  Holds pointer to the message payload.
 
-  @retval EFI_SUCCESS         Payload holds a valid message payload pointer.
-  @retval EFI_TIMEOUT         Time out error if MTL channel is busy.
-  @retval EFI_UNSUPPORTED     If MTL channel is unsupported.
+  @retval EFI_SUCCESS            Payload holds a valid message payload pointer.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_TIMEOUT            Time out error if MTL channel is busy.
+  @retval EFI_UNSUPPORTED        If MTL channel is unsupported.
 **/
 EFI_STATUS
 ScmiCommandGetPayload (
@@ -34,6 +35,12 @@ ScmiCommandGetPayload (
 {
   EFI_STATUS   Status;
   MTL_CHANNEL  *Channel;
+
+  ASSERT (Payload != NULL);
+
+  if (Payload == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   // Get handle to the Channel.
   Status = MtlGetChannel (MTL_CHANNEL_TYPE_LOW, &Channel);
@@ -58,19 +65,20 @@ ScmiCommandGetPayload (
   This function uses a MTL channel to transfer message to SCP
   and waits for a response.
 
-  @param[in]   Command      Pointer to the SCMI command (Protocol ID
-                            and Message ID)
+  @param[in]      Command        Pointer to the SCMI command (Protocol ID and
+                                 Message ID)
 
-  @param[in,out] PayloadLength   SCMI command message length.
+  @param[in,out]  PayloadLength  SCMI command message length.
 
-  @param[out] OPTIONAL  ReturnValues   Pointer to SCMI response.
+  @param[out]     ReturnValues   Optional pointer to the SCMI response.
 
-  @retval OUT EFI_SUCCESS       Command sent and message received successfully.
-  @retval OUT EFI_UNSUPPORTED   Channel not supported.
-  @retval OUT EFI_TIMEOUT       Timeout on the channel.
-  @retval OUT EFI_DEVICE_ERROR  Channel not ready.
-  @retval OUT EFI_DEVICE_ERROR  Message Header corrupted.
-  @retval OUT EFI_DEVICE_ERROR  SCMI error.
+  @retval EFI_SUCCESS            Command sent and message received
+                                 successfully.
+  @retval EFI_DEVICE_ERROR       Channel not ready, response message header
+                                 corrupted, or SCP returned an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
+  @retval EFI_TIMEOUT            Timeout on the channel.
+  @retval EFI_UNSUPPORTED        Channel not supported.
 **/
 EFI_STATUS
 ScmiCommandExecute (
@@ -85,7 +93,12 @@ ScmiCommandExecute (
   UINT32                 ResponseHeader;
   MTL_CHANNEL            *Channel;
 
+  ASSERT (Command != NULL);
   ASSERT (PayloadLength != NULL);
+
+  if ((Command == NULL) || (PayloadLength == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = MtlGetChannel (MTL_CHANNEL_TYPE_LOW, &Channel);
   if (EFI_ERROR (Status)) {
@@ -145,14 +158,13 @@ ScmiCommandExecute (
 
 /** Internal common function useful for common protocol discovery messages.
 
-  @param[in] ProtocolId    Protocol Id of the protocol.
-  @param[in] MessageId     Message Id of the message.
+  @param[in]   ProtocolId    Protocol Id of the protocol.
+  @param[in]   MessageId     Message Id of the message.
 
-  @param[out] ReturnValues SCMI response return values.
+  @param[out]  ReturnValues  SCMI response return values.
 
-  @retval EFI_SUCCESS      Success with valid return values.
-  @retval EFI_DEVICE_ERROR SCMI error.
-  @retval !(EFI_SUCCESS)   Other errors.
+  @retval EFI_SUCCESS            Success with valid return values.
+  @retval EFI_DEVICE_ERROR       SCMI error.
 **/
 STATIC
 EFI_STATUS
@@ -178,13 +190,13 @@ ScmiProtocolDiscoveryCommon (
 
 /** Return protocol version from SCP for a given protocol ID.
 
-  @param[in]  Protocol ID    Protocol ID.
-  @param[out] Version        Pointer to version of the protocol.
+  @param[in]   ProtocolId  Protocol ID.
+  @param[out]  Version     Pointer to version of the protocol.
 
-  @retval EFI_SUCCESS       Version holds a valid version received
-                             from the SCP.
-  @retval EFI_DEVICE_ERROR  SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Version holds a valid version received from
+                                 the SCP.
+  @retval EFI_DEVICE_ERROR       SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 EFI_STATUS
 ScmiGetProtocolVersion (
@@ -194,6 +206,12 @@ ScmiGetProtocolVersion (
 {
   EFI_STATUS  Status;
   UINT32      *ProtocolVersion;
+
+  ASSERT (Version != NULL);
+
+  if (Version == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ScmiProtocolDiscoveryCommon (
              ProtocolId,
@@ -211,12 +229,11 @@ ScmiGetProtocolVersion (
 
 /** Return protocol attributes from SCP for a given protocol ID.
 
-  @param[in]  Protocol ID    Protocol ID.
-  @param[out] ReturnValues   Pointer to attributes of the protocol.
+  @param[in]   ProtocolId    Protocol ID.
+  @param[out]  ReturnValues  Pointer to attributes of the protocol.
 
-  @retval EFI_SUCCESS       ReturnValues points to protocol attributes.
-  @retval EFI_DEVICE_ERROR  SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            ReturnValues points to protocol attributes.
+  @retval EFI_DEVICE_ERROR       SCMI error.
 **/
 EFI_STATUS
 ScmiGetProtocolAttributes (
@@ -233,12 +250,12 @@ ScmiGetProtocolAttributes (
 
 /** Return protocol message attributes from SCP for a given protocol ID.
 
-  @param[in]  Protocol ID    Protocol ID.
-  @param[out] Attributes     Pointer to attributes of the protocol.
+  @param[in]   ProtocolId    Protocol ID.
+  @param[out]  ReturnValues  Pointer to attributes of the protocol.
 
-  @retval EFI_SUCCESS       ReturnValues points to protocol message attributes.
-  @retval EFI_DEVICE_ERROR  SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            ReturnValues points to protocol message
+                                 attributes.
+  @retval EFI_DEVICE_ERROR       SCMI error.
 **/
 EFI_STATUS
 ScmiGetProtocolMessageAttributes (

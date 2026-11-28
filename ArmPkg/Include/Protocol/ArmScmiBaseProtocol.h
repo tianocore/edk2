@@ -39,13 +39,13 @@ typedef struct _SCMI_BASE_PROTOCOL SCMI_BASE_PROTOCOL;
 
 /** Return version of the Base protocol supported by SCP firmware.
 
-  @param[in]  This     A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This     A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] Version  Version of the supported SCMI Base protocol.
+  @param[out]  Version  Version of the supported SCMI Base protocol.
 
-  @retval EFI_SUCCESS       The version of the protocol is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version of the protocol is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -56,13 +56,14 @@ EFI_STATUS
 
 /** Return total number of SCMI protocols supported by the SCP firmware.
 
-  @param[in]  This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This            A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] TotalProtocols Total number of SCMI protocols supported.
+  @param[out]  TotalProtocols  Total number of SCMI protocols supported.
 
-  @retval EFI_SUCCESS       Total number of protocols supported are returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Total number of protocols supported are
+                                 returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -73,14 +74,14 @@ EFI_STATUS
 
 /** Return vendor name.
 
-  @param[in] This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This              A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] VendorIdentifier Null terminated ASCII string of up to
-                               16 bytes with a vendor name.
+  @param[out]  VendorIdentifier  Null terminated ASCII string of up to 16 bytes
+                                 with a vendor name.
 
-  @retval EFI_SUCCESS       VendorIdentifier is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            VendorIdentifier is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -91,14 +92,14 @@ EFI_STATUS
 
 /** Return sub vendor name.
 
-  @param[in]  This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This              A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] VendorIdentifier Null terminated ASCII string of up to
-                               16 bytes with a vendor name.
+  @param[out]  VendorIdentifier  Null terminated ASCII string of up to 16 bytes
+                                 with a vendor name.
 
-  @retval EFI_SUCCESS       VendorIdentifier is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            VendorIdentifier is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -109,13 +110,13 @@ EFI_STATUS
 
 /** Return implementation version.
 
-  @param[in] This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]   This                   A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] ImplementationVersion Vendor specific implementation version.
+  @param[out]  ImplementationVersion  Vendor specific implementation version.
 
-  @retval EFI_SUCCESS       Implementation version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Implementation version is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -126,17 +127,17 @@ EFI_STATUS
 
 /** Return list of protocols.
 
-  @param[in]  This           A Pointer to SCMI_BASE_PROTOCOL Instance.
+  @param[in]      This              A Pointer to SCMI_BASE_PROTOCOL Instance.
 
-  @param[out] ProtocolListSize  Size of the ProtocolList.
+  @param[in,out]  ProtocolListSize  Size of the ProtocolList.
 
-  @param[out] ProtocolList   Protocol list.
+  @param[out]     ProtocolList      Protocol list.
 
-  @retval EFI_SUCCESS          List of protocols is returned.
-  @retval EFI_BUFFER_TOO_SMALL ProtocolListSize is too small for the result.
-                                It has been updated to the size needed.
-  @retval EFI_DEVICE_ERROR     SCP returns a SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            List of protocols is returned.
+  @retval EFI_BUFFER_TOO_SMALL   ProtocolListSize is too small for the result.
+                                 It has been updated to the size needed.
+  @retval EFI_DEVICE_ERROR       SCP returns a SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS

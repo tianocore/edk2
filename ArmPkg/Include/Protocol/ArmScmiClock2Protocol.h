@@ -28,13 +28,14 @@ typedef struct _SCMI_CLOCK2_PROTOCOL SCMI_CLOCK2_PROTOCOL;
 
 /** Return version of the clock management protocol supported by SCP firmware.
 
-  @param[in]  This     A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]   This     A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
 
-  @param[out] Version  Version of the supported SCMI Clock management protocol.
+  @param[out]  Version  Version of the supported SCMI Clock management
+                        protocol.
 
-  @retval EFI_SUCCESS       The version is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            The version is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -46,13 +47,13 @@ EFI_STATUS
 /** Return total number of clock devices supported by the clock management
    protocol.
 
-  @param[in]  This         A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]   This         A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
 
-  @param[out] TotalClocks  Total number of clocks supported.
+  @param[out]  TotalClocks  Total number of clocks supported.
 
-  @retval EFI_SUCCESS       Total number of clocks supported is returned.
-  @retval EFI_DEVICE_ERROR  SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)    Other errors.
+  @retval EFI_SUCCESS            Total number of clocks supported is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -63,16 +64,16 @@ EFI_STATUS
 
 /** Return attributes of a clock device.
 
-  @param[in]  This        A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
-  @param[in]  ClockId     Identifier for the clock device.
+  @param[in]   This            A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]   ClockId         Identifier for the clock device.
 
-  @param[out] Enabled         If TRUE, the clock device is enabled.
-  @param[out] ClockAsciiName  A NULL terminated ASCII string with the clock
-                              name, of up to 16 bytes.
+  @param[out]  Enabled         If TRUE, the clock device is enabled.
+  @param[out]  ClockAsciiName  A NULL terminated ASCII string with the clock
+                               name, of up to 16 bytes.
 
-  @retval EFI_SUCCESS          Clock device attributes are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Clock device attributes are returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -85,26 +86,28 @@ EFI_STATUS
 
 /** Return list of rates supported by a given clock device.
 
-  @param[in] This        A pointer to SCMI_CLOCK2_PROTOCOL Instance.
-  @param[in] ClockId     Identifier for the clock device.
+  @param[in]      This           A pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]      ClockId        Identifier for the clock device.
 
-  @param[out] Format      ScmiClockRateFormatDiscrete: Clock device
-                          supports range of clock rates which are non-linear.
+  @param[out]     Format         ScmiClockRateFormatDiscrete: Clock device
+                                 supports range of clock rates which are
+                                 non-linear.
 
-                          ScmiClockRateFormatLinear: Clock device supports
-                          range of linear clock rates from Min to Max in steps.
+                                 ScmiClockRateFormatLinear: Clock device
+                                 supports range of linear clock rates from Min
+                                 to Max in steps.
 
-  @param[out] TotalRates  Total number of rates.
+  @param[out]     TotalRates     Total number of rates.
 
-  @param[in,out] RateArraySize  Size of the RateArray.
+  @param[in,out]  RateArraySize  Size of the RateArray.
 
-  @param[out] RateArray   List of clock rates.
+  @param[out]     RateArray      List of clock rates.
 
-  @retval EFI_SUCCESS          List of clock rates are returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval EFI_BUFFER_TOO_SMALL RateArraySize is too small for the result.
-                               It has been updated to the size needed.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            List of clock rates are returned.
+  @retval EFI_BUFFER_TOO_SMALL   RateArraySize is too small for the result. It
+                                 has been updated to the size needed.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -119,14 +122,14 @@ EFI_STATUS
 
 /** Get clock rate.
 
-  @param[in]  This        A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
-  @param[in]  ClockId     Identifier for the clock device.
+  @param[in]   This     A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]   ClockId  Identifier for the clock device.
 
-  @param[out]  Rate       Clock rate.
+  @param[out]  Rate     Clock rate.
 
-  @retval EFI_SUCCESS          Clock rate is returned.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Clock rate is returned.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER  Invalid input.
 **/
 typedef
 EFI_STATUS
@@ -138,13 +141,12 @@ EFI_STATUS
 
 /** Set clock rate.
 
-  @param[in]  This        A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
-  @param[in]  ClockId     Identifier for the clock device.
-  @param[in]  Rate        Clock rate.
+  @param[in]  This     A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]  ClockId  Identifier for the clock device.
+  @param[in]  Rate     Clock rate.
 
-  @retval EFI_SUCCESS          Clock rate set success.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Clock rate set success.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
@@ -157,13 +159,12 @@ EFI_STATUS
 /** Enable/Disable specified clock.
     Function is only available under gArmScmiClock2ProtocolGuid
 
-  @param[in]  This        A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
-  @param[in]  ClockId     Identifier for the clock device.
-  @param[in]  Enable      TRUE to enable, FALSE to disable.
+  @param[in]  This     A Pointer to SCMI_CLOCK2_PROTOCOL Instance.
+  @param[in]  ClockId  Identifier for the clock device.
+  @param[in]  Enable   TRUE to enable, FALSE to disable.
 
-  @retval EFI_SUCCESS          Clock enable/disable successful.
-  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
-  @retval !(EFI_SUCCESS)       Other errors.
+  @retval EFI_SUCCESS            Clock enable/disable successful.
+  @retval EFI_DEVICE_ERROR       SCP returns an SCMI error.
 **/
 typedef
 EFI_STATUS
