@@ -61,4 +61,31 @@ struct MockDxeServicesTableLib {
     (IN EFI_PHYSICAL_ADDRESS  BaseAddress,
      IN UINT64                Length)
     );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gDS_AddIoSpace,
+    (IN EFI_GCD_IO_TYPE       GcdIoType,
+     IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+     IN UINT64                Length)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gDS_AllocateIoSpace,
+    (IN     EFI_GCD_ALLOCATE_TYPE  GcdAllocateType,
+     IN     EFI_GCD_IO_TYPE        GcdIoType,
+     IN     UINTN                 Alignment,
+     IN     UINT64                Length,
+     IN OUT EFI_PHYSICAL_ADDRESS  *BaseAddress,
+     IN     EFI_HANDLE            ImageHandle,
+     IN     EFI_HANDLE            DeviceHandle)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gDS_GetIoSpaceDescriptor,
+    (IN  EFI_PHYSICAL_ADDRESS         BaseAddress,
+     OUT EFI_GCD_IO_SPACE_DESCRIPTOR  *Descriptor)
+    );
 };

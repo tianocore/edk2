@@ -13,6 +13,9 @@ MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_AddMemorySpace, 4, EFIAPI
 MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_AllocateMemorySpace, 7, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_FreeMemorySpace, 2, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_RemoveMemorySpace, 2, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_AddIoSpace, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_AllocateIoSpace, 7, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockDxeServicesTableLib, gDS_GetIoSpaceDescriptor, 2, EFIAPI);
 
 static EFI_DXE_SERVICES  LocalDs = {
   { 0, 0, 0, 0, 0 },                                                                   // EFI_TABLE_HEADER
@@ -23,11 +26,11 @@ static EFI_DXE_SERVICES  LocalDs = {
   NULL,                                                                                // EFI_GET_MEMORY_SPACE_DESCRIPTOR
   NULL,                                                                                // EFI_SET_MEMORY_SPACE_ATTRIBUTES
   NULL,                                                                                // EFI_GET_MEMORY_SPACE_MAP
-  NULL,                                                                                // EFI_ADD_IO_SPACE
-  NULL,                                                                                // EFI_ALLOCATE_IO_SPACE
+  gDS_AddIoSpace,                                                                      // EFI_ADD_IO_SPACE
+  gDS_AllocateIoSpace,                                                                 // EFI_ALLOCATE_IO_SPACE
   NULL,                                                                                // EFI_FREE_IO_SPACE
   NULL,                                                                                // EFI_REMOVE_IO_SPACE
-  NULL,                                                                                // EFI_GET_IO_SPACE_DESCRIPTOR
+  gDS_GetIoSpaceDescriptor,                                                            // EFI_GET_IO_SPACE_DESCRIPTOR
   NULL,                                                                                // EFI_GET_IO_SPACE_MAP
   gDS_Dispatch,                                                                        // EFI_DISPATCH
   NULL,                                                                                // EFI_SCHEDULE
