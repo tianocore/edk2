@@ -1051,6 +1051,7 @@
   OvmfPkg/IgvmSecureBootDxe/IgvmSecureBootDxe.inf
   OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
 !endif
+  OvmfPkg/VmLaunchUpdateDxe/VmLaunchUpdateDxe.inf
 
   OvmfPkg/PlatformDxe/Platform.inf
   OvmfPkg/AmdSevDxe/AmdSevDxe.inf {
