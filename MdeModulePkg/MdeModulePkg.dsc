@@ -468,6 +468,7 @@
 [Components.IA32, Components.X64, Components.AARCH64]
   MdeModulePkg/Library/BrotliCustomDecompressLib/BrotliCustomDecompressLib.inf
   MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  MdeModulePkg/Library/Lz4CustomDecompressLib/Lz4CustomDecompressLib.inf
   MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
@@ -520,6 +521,7 @@
   MdeModulePkg/Library/SmmSmiHandlerProfileLib/SmmSmiHandlerProfileLib.inf
   MdeModulePkg/Library/SmmSmiHandlerProfileLib/StandaloneMmSmiHandlerProfileLib.inf
   MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaArchCustomDecompressLib.inf
+  MdeModulePkg/Library/Lz4CustomDecompressLib/Lz4CustomDecompressLib.inf
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
   MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
   MdeModulePkg/Universal/Acpi/SmmS3SaveState/SmmS3SaveState.inf

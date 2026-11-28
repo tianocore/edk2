@@ -41,3 +41,10 @@
 [submodule "MdePkg/Library/ArmTransferListLib/libtl"]
 	path = MdePkg/Library/ArmTransferListLib/libtl
 	url = https://github.com/TF-Shared/transfer-list-library.git
+[submodule "BaseTools/Source/C/Lz4Compress/lz4"]
+	path = BaseTools/Source/C/Lz4Compress/lz4
+	url = https://github.com/lz4/lz4.git
+	ignore = untracked
+[submodule "MdeModulePkg/Library/Lz4CustomDecompressLib/lz4"]
+	path = MdeModulePkg/Library/Lz4CustomDecompressLib/lz4
+	url = https://github.com/lz4/lz4.git
