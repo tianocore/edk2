@@ -4215,7 +4215,7 @@ CryptoServiceVerifyEKUsInPkcs7Signature (
   IN  BOOLEAN       RequireAllPresent
   )
 {
-  return CALL_BASECRYPTLIB (Pkcs.Services.VerifyEKUsInPkcs7Signature, VerifyEKUsInPkcs7Signature, (Pkcs7Signature, SignatureSize, RequiredEKUs, RequiredEKUsSize, RequireAllPresent), FALSE);
+  return CALL_BASECRYPTLIB (Pkcs.Services.VerifyEKUsInPkcs7Signature, VerifyEKUsInPkcs7Signature, (Pkcs7Signature, SignatureSize, RequiredEKUs, RequiredEKUsSize, RequireAllPresent), RETURN_UNSUPPORTED);
 }
 
 /**
