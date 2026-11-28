@@ -12,8 +12,10 @@ import logging
 import os
 import pathlib
 import shutil
-import stat
 import timeit
+from io import StringIO
+from typing import Any
+
 from edk2toolext.environment import version_aggregator
 from edk2toolext.environment.plugin_manager import PluginManager
 from edk2toolext.environment.plugintypes.ci_build_plugin import ICiBuildPlugin
@@ -23,8 +25,6 @@ from edk2toollib.gitignore_parser import parse_gitignore_lines
 from edk2toollib.log.junit_report_format import JunitReportTestCase
 from edk2toollib.uefi.edk2.path_utilities import Edk2Path
 from edk2toollib.utility_functions import RunCmd
-from io import StringIO
-from typing import Any, Dict, List, Optional, Tuple
 
 
 #
@@ -112,7 +112,7 @@ class UncrustifyCheck(ICiBuildPlugin):
     #
     UNCRUSTIFY_PATH_ENV_KEY = "UNCRUSTIFY_CI_PATH"
 
-    def GetTestName(self, packagename: str, environment: VarDict) -> Tuple:
+    def GetTestName(self, packagename: str, environment: VarDict) -> tuple:
         """Provide the testcase name and classname for use in reporting
 
         Args:
@@ -133,7 +133,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         self,
         package_rel_path: str,
         edk2_path: Edk2Path,
-        package_config: Dict[str, List[str]],
+        package_config: dict[str, list[str]],
         environment_config: Any,
         plugin_manager: PluginManager,
         plugin_manager_helper: HelperFunctions,
@@ -184,9 +184,9 @@ class UncrustifyCheck(ICiBuildPlugin):
 
         except UncrustifyException as e:
             self._tc.LogStdError(
-                f"Uncrustify error {e.exit_code}. Details:\n\n{str(e)}"
+                f"Uncrustify error {e.exit_code}. Details:\n\n{e!s}"
             )
-            logging.warning(f"Uncrustify error {e.exit_code}. Details:\n\n{str(e)}")
+            logging.warning(f"Uncrustify error {e.exit_code}. Details:\n\n{e!s}")
             return -1
         else:
             if self._formatted_file_error_count > 0:
@@ -279,7 +279,7 @@ class UncrustifyCheck(ICiBuildPlugin):
             pathlib.Path(self._working_dir).mkdir(parents=True, exist_ok=True)
         except OSError as e:
             raise UncrustifyInputFileCreationErrorException(
-                f"Error creating plugin directory {self._working_dir}.\n\n{repr(e)}."
+                f"Error creating plugin directory {self._working_dir}.\n\n{e!r}."
             )
 
     def _create_uncrustify_file_list_file(self) -> None:
@@ -291,7 +291,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         )
 
         with open(self._app_input_file_path, "w", encoding="utf8") as f:
-            f.writelines(f"\n".join(self._abs_file_paths_to_format))
+            f.writelines("\n".join(self._abs_file_paths_to_format))
 
     def _execute_uncrustify(self) -> None:
         """
@@ -328,7 +328,7 @@ class UncrustifyCheck(ICiBuildPlugin):
             ignored_files, "Package configuration file", self._abs_package_path
         )
 
-    def _get_git_ignored_paths(self) -> List[str]:
+    def _get_git_ignored_paths(self) -> list[str]:
         """
         Returns a list of file absolute path strings to all files ignored in this git repository.
 
@@ -361,7 +361,7 @@ class UncrustifyCheck(ICiBuildPlugin):
             )
         return abs_paths
 
-    def _get_git_repo_path(self) -> Optional[str]:
+    def _get_git_repo_path(self) -> str | None:
         """
         Returns the absolute path to the root of the git repository that contains the package
         currently being checked. This is not necessarily the edk2 repository, since the package
@@ -392,7 +392,7 @@ class UncrustifyCheck(ICiBuildPlugin):
 
         return os.path.normpath(outstream_buffer.getvalue().strip())
 
-    def _get_git_submodule_paths(self) -> List[str]:
+    def _get_git_submodule_paths(self) -> list[str]:
         """
         Returns a list of directory absolute path strings to the root of each submodule in the
         package's git repository.
@@ -546,7 +546,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         self,
         package_rel_path: str,
         edk2_path: Edk2Path,
-        package_config: Dict[str, List[str]],
+        package_config: dict[str, list[str]],
         tc: JunitReportTestCase,
     ) -> None:
         """
@@ -666,7 +666,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         self._audit_only_mode = False
         self._output_file_diffs = True
 
-        if "AuditOnly" in self._package_config and self._package_config["AuditOnly"]:
+        if self._package_config.get("AuditOnly"):
             self._audit_only_mode = True
 
         if (
@@ -800,7 +800,7 @@ class UncrustifyCheck(ICiBuildPlugin):
             """
             Private function to attempt to change permissions on file/folder being deleted.
             """
-            os.chmod(path, stat.S_IWRITE)
+            os.chmod(path, os.stat.S_IWRITE)
             func(path)
 
         for _ in range(3):  # retry up to 3 times
@@ -831,5 +831,5 @@ class UncrustifyCheck(ICiBuildPlugin):
 
         if self._app_exit_code != 0 and self._app_exit_code != 1:
             raise UncrustifyAppExecutionException(
-                f"Error {str(self._app_exit_code)} returned from Uncrustify:\n\n{str(self._app_output)}"
+                f"Error {self._app_exit_code!s} returned from Uncrustify:\n\n{self._app_output!s}"
             )
