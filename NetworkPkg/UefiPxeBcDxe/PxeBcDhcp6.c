@@ -2350,6 +2350,19 @@ PxeBcDhcp6Sarr (
   UINT64                                    GetMappingTimeOut;
   UINTN                                     DataSize;
   EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS  DadXmits;
+  UINT32                                    MaximumRetransmissionCount;
+  UINT32                                    MaximumRetransmissionDuration;
+
+  MaximumRetransmissionCount    = PcdGet32 (PcdPxeDhcp6SolicitMaximumRetransmissionCount);
+  MaximumRetransmissionDuration = PcdGet32 (PcdPxeDhcp6SolicitMaximumRetransmissionDuration);
+
+  //
+  // The EFI_DHCP6_PROTOCOL requires at least one retransmission limit.
+  //
+  if ((MaximumRetransmissionCount == 0) && (MaximumRetransmissionDuration == 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: DHCPv6 Solicit MRC and MRD must not both be zero\n", __func__));
+    return EFI_INVALID_PARAMETER;
+  }
 
   PxeMode = Private->PxeBc.Mode;
   Ip6Cfg  = Private->Ip6Cfg;
@@ -2379,10 +2392,10 @@ PxeBcDhcp6Sarr (
   Config.IaDescriptor.IaId     = Private->IaId;
   Config.IaDescriptor.Type     = EFI_DHCP6_IA_TYPE_NA;
   Config.SolicitRetransmission = Retransmit;
-  Retransmit->Irt              = 4;
-  Retransmit->Mrc              = 4;
-  Retransmit->Mrt              = 32;
-  Retransmit->Mrd              = 60;
+  Retransmit->Irt              = PcdGet32 (PcdPxeDhcp6SolicitInitialRetransmissionTime);
+  Retransmit->Mrc              = MaximumRetransmissionCount;
+  Retransmit->Mrt              = PcdGet32 (PcdPxeDhcp6SolicitMaximumRetransmissionTime);
+  Retransmit->Mrd              = MaximumRetransmissionDuration;
 
   //
   // Configure the DHCPv6 instance for PXE boot.
