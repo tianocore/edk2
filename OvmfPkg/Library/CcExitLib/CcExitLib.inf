@@ -41,6 +41,7 @@
   DebugLib
   LocalApicLib
   MemEncryptSevLib
+  AmdSevLib
   AmdSvsmLib
 
 [Pcd]

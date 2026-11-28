@@ -40,6 +40,7 @@
   DebugLib
   LocalApicLib
   MemEncryptSevLib
+  AmdSevLib
   PcdLib
   AmdSvsmLib
 

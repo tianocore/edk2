@@ -39,6 +39,7 @@
   IoLib
   PcdLib
   CpuLib
+  AmdSvsmLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds  ## SOMETIMES_CONSUMES

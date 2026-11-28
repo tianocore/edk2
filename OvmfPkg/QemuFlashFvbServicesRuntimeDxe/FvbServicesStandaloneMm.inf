@@ -51,6 +51,7 @@
   DevicePathLib
   MemoryAllocationLib
   MemEncryptSevLib
+  AmdSevLib
   PcdLib
   MmServicesTableLib
   StandaloneMmDriverEntryPoint

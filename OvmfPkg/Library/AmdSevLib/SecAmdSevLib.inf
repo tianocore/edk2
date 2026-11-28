@@ -1,0 +1,34 @@
+## @file
+#  Library provides the helper functions for SEV guest
+#
+# Copyright (c) 2020 - 2026, Advanced Micro Devices. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = SecAmdSevLib
+  FILE_GUID                      = 3409e0ec-8e11-43b2-bb6a-e09078dee9a0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AmdSevLib|SEC
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[Sources]
+  SecAmdSevLib.c
+  AmdSevLib.c
+
+[LibraryClasses]
+  PcdLib
+
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

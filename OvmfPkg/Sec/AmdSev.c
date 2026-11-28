@@ -190,7 +190,7 @@ SevEsProtocolCheck (
   }
 
   //
-  // We cannot use the MemEncryptSevSnpIsEnabled () because the
+  // We cannot use the AmdSevSnpIsEnabled () because the
   // ProcessLibraryConstructorList () is not called yet.
   //
   if (SevSnpIsEnabled ()) {
@@ -332,8 +332,14 @@ SecMapApicBaseUnencrypted (
   }
 
   ApicAddress = (UINT64)GetLocalApicBaseAddress ();
-  Buffer      = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecApicPageTableBase);
-  Cr3         = AsmReadCr3 ();
+
+  // Alternate Injection is enabled, XAPIC is disabled.
+  if (ApicAddress == 0) {
+    return;
+  }
+
+  Buffer = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecApicPageTableBase);
+  Cr3    = AsmReadCr3 ();
 
   MapAttribute.Uint64         = ApicAddress;
   MapAttribute.Bits.Present   = 1;

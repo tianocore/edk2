@@ -12,6 +12,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/AmdSevLib.h>
 
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
@@ -34,7 +35,7 @@ MemEncryptSevSnpPreValidateSystemRam (
 {
   EFI_STATUS  Status;
 
-  if (!MemEncryptSevSnpIsEnabled ()) {
+  if (!AmdSevSnpIsEnabled ()) {
     return;
   }
 
