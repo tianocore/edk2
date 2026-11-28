@@ -41,6 +41,18 @@ ReadKeyStrokeWorker (
     return EFI_NOT_READY;
   }
 
+  //
+  // Keys are still queued, so signal the wait events now. ConSplitter checks
+  // WaitForKey with CheckEvent() from its own TPL_NOTIFY notify function, where
+  // TerminalConInWaitForKey() (also TPL_NOTIFY) can't be dispatched. Without this,
+  // every key waits for the next timer interrupt (PcdTimerPeriod), which limits
+  // console input to one key per timer tick.
+  //
+  if (!IsEfiKeyFiFoEmpty (TerminalDevice)) {
+    gBS->SignalEvent (TerminalDevice->SimpleInput.WaitForKey);
+    gBS->SignalEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -634,6 +646,18 @@ TerminalConInTimerHandler (
   // according to different terminal type supported.
   //
   TranslateRawDataToEfiKey (TerminalDevice);
+
+  //
+  // Keys are still queued, so signal the wait events now. ConSplitter checks
+  // WaitForKey with CheckEvent() from its own TPL_NOTIFY notify function, where
+  // TerminalConInWaitForKey() (also TPL_NOTIFY) can't be dispatched. Without this,
+  // every key waits for the next timer interrupt (PcdTimerPeriod), which limits
+  // console input to one key per timer tick.
+  //
+  if (!IsEfiKeyFiFoEmpty (TerminalDevice)) {
+    gBS->SignalEvent (TerminalDevice->SimpleInput.WaitForKey);
+    gBS->SignalEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
+  }
 }
 
 /**
