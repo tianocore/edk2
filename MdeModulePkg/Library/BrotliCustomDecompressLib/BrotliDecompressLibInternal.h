@@ -4,6 +4,7 @@
   Allows BROTLI code to build under UEFI (edk2) build environment
 
   Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -41,4 +42,22 @@ BrotliUefiDecompress (
   IN UINTN       SourceSize,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
+  );
+
+RETURN_STATUS
+EFIAPI
+BrotliGuidedSectionGetInfo (
+  IN  CONST VOID  *InputSection,
+  OUT UINT32      *OutputBufferSize,
+  OUT UINT32      *ScratchBufferSize,
+  OUT UINT16      *SectionAttribute
+  );
+
+RETURN_STATUS
+EFIAPI
+BrotliGuidedSectionExtraction (
+  IN CONST VOID  *InputSection,
+  OUT VOID       **OutputBuffer,
+  OUT VOID       *ScratchBuffer OPTIONAL,
+  OUT UINT32     *AuthenticationStatus
   );

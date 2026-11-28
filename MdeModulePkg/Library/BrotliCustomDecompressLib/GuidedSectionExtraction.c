@@ -4,11 +4,88 @@
   and registers them into GUIDed handler table.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <BrotliDecompressLibInternal.h>
+
+/**
+  Validate a Brotli GUIDed section before locating its compressed data.
+
+  @param[in]  InputSection  The GUIDed section.
+  @param[out] Source        The compressed data, including the Brotli header.
+  @param[out] SourceSize    The size of the compressed data.
+  @param[out] Attributes    The section attributes, if requested.
+
+  @retval EFI_SUCCESS            The section header and offsets are valid.
+  @retval EFI_UNSUPPORTED        The section GUID is not supported.
+  @retval EFI_INVALID_PARAMETER  The section header or offsets are invalid.
+**/
+STATIC
+EFI_STATUS
+GetBrotliSectionData (
+  IN  CONST VOID  *InputSection,
+  OUT CONST VOID  **Source,
+  OUT UINT32      *SourceSize,
+  OUT UINT16      *Attributes OPTIONAL
+  )
+{
+  CONST EFI_GUID_DEFINED_SECTION   *Section;
+  CONST EFI_GUID_DEFINED_SECTION2  *Section2;
+  CONST EFI_GUID                   *SectionGuid;
+  UINT32                           SectionSize;
+  UINT32                           HeaderSize;
+  UINT16                           DataOffset;
+  UINT16                           SectionAttributes;
+
+  if (InputSection == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (IS_SECTION2 (InputSection)) {
+    Section2    = (CONST EFI_GUID_DEFINED_SECTION2 *)InputSection;
+    SectionSize = SECTION2_SIZE (InputSection);
+    HeaderSize  = sizeof (*Section2);
+    if (SectionSize < HeaderSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    SectionGuid       = &(Section2->SectionDefinitionGuid);
+    DataOffset        = Section2->DataOffset;
+    SectionAttributes = Section2->Attributes;
+  } else {
+    Section     = (CONST EFI_GUID_DEFINED_SECTION *)InputSection;
+    SectionSize = SECTION_SIZE (InputSection);
+    HeaderSize  = sizeof (*Section);
+    if (SectionSize < HeaderSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    SectionGuid       = &(Section->SectionDefinitionGuid);
+    DataOffset        = Section->DataOffset;
+    SectionAttributes = Section->Attributes;
+  }
+
+  if (!CompareGuid (&gBrotliCustomDecompressGuid, SectionGuid)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((DataOffset < HeaderSize) || (DataOffset > SectionSize) ||
+      (SectionSize - DataOffset < BROTLI_SCRATCH_MAX))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Source     = (CONST UINT8 *)InputSection + DataOffset;
+  *SourceSize = SectionSize - DataOffset;
+  if (Attributes != NULL) {
+    *Attributes = SectionAttributes;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Examines a GUIDed section and returns the size of the decoded buffer and the
@@ -24,10 +101,8 @@
   the size of an optional scratch buffer is returned in ScratchSize, and the Attributes field
   from EFI_GUID_DEFINED_SECTION header of InputSection is returned in SectionAttribute.
 
-  If InputSection is NULL, then ASSERT().
-  If OutputBufferSize is NULL, then ASSERT().
-  If ScratchBufferSize is NULL, then ASSERT().
-  If SectionAttribute is NULL, then ASSERT().
+  Required pointers must not be NULL. Section sizes and data offsets must
+  contain a complete GUIDed section header and Brotli header.
 
 
   @param[in]  InputSection       A pointer to a GUIDed section of an FFS formatted file.
@@ -39,7 +114,7 @@
                                  field of EFI_GUID_DEFINED_SECTION in the PI Specification.
 
   @retval  RETURN_SUCCESS            The information about InputSection was returned.
-  @retval  RETURN_UNSUPPORTED        The section specified by InputSection does not match the GUID this handler supports.
+  @retval  RETURN_UNSUPPORTED        The section GUID is not supported, or a decoded or scratch size does not fit in UINT32.
   @retval  RETURN_INVALID_PARAMETER  The information can not be retrieved from the section specified by InputSection.
 
 **/
@@ -52,46 +127,26 @@ BrotliGuidedSectionGetInfo (
   OUT UINT16      *SectionAttribute
   )
 {
-  ASSERT (InputSection != NULL);
-  ASSERT (OutputBufferSize != NULL);
-  ASSERT (ScratchBufferSize != NULL);
-  ASSERT (SectionAttribute != NULL);
+  RETURN_STATUS  Status;
+  CONST VOID     *Source;
+  UINT32         SourceSize;
+  UINT16         Attributes;
 
-  if (IS_SECTION2 (InputSection)) {
-    if (!CompareGuid (
-           &gBrotliCustomDecompressGuid,
-           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
-           ))
-    {
-      return RETURN_INVALID_PARAMETER;
-    }
-
-    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->Attributes;
-
-    return BrotliUefiDecompressGetInfo (
-             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
-             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
-             OutputBufferSize,
-             ScratchBufferSize
-             );
-  } else {
-    if (!CompareGuid (
-           &gBrotliCustomDecompressGuid,
-           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
-           ))
-    {
-      return RETURN_INVALID_PARAMETER;
-    }
-
-    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes;
-
-    return BrotliUefiDecompressGetInfo (
-             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
-             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
-             OutputBufferSize,
-             ScratchBufferSize
-             );
+  if ((OutputBufferSize == NULL) || (ScratchBufferSize == NULL) || (SectionAttribute == NULL)) {
+    return RETURN_INVALID_PARAMETER;
   }
+
+  Status = GetBrotliSectionData (InputSection, &Source, &SourceSize, &Attributes);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = BrotliUefiDecompressGetInfo (Source, SourceSize, OutputBufferSize, ScratchBufferSize);
+  if (!RETURN_ERROR (Status)) {
+    *SectionAttribute = Attributes;
+  }
+
+  return Status;
 }
 
 /**
@@ -106,10 +161,8 @@ BrotliGuidedSectionGetInfo (
   data in InputSection, then OutputBuffer is set to point at the data in InputSection.  Otherwise,
   the decoded data will be placed in caller allocated buffer specified by OutputBuffer.
 
-  If InputSection is NULL, then ASSERT().
-  If OutputBuffer is NULL, then ASSERT().
-  If ScratchBuffer is NULL and this decode operation requires a scratch buffer, then ASSERT().
-  If AuthenticationStatus is NULL, then ASSERT().
+  Required pointers must not be NULL. Section sizes and data offsets must
+  contain a complete GUIDed section header and Brotli header.
 
   @param[in]  InputSection  A pointer to a GUIDed section of an FFS formatted file.
   @param[out] OutputBuffer  A pointer to a buffer that contains the result of a decode operation.
@@ -122,7 +175,7 @@ BrotliGuidedSectionGetInfo (
                             never be set by this handler.
 
   @retval  RETURN_SUCCESS            The buffer specified by InputSection was decoded.
-  @retval  RETURN_UNSUPPORTED        The section specified by InputSection does not match the GUID this handler supports.
+  @retval  RETURN_UNSUPPORTED        The section GUID is not supported, or a decoded or scratch size does not fit in UINT32.
   @retval  RETURN_INVALID_PARAMETER  The section specified by InputSection can not be decoded.
 
 **/
@@ -135,50 +188,25 @@ BrotliGuidedSectionExtraction (
   OUT       UINT32  *AuthenticationStatus
   )
 {
-  ASSERT (OutputBuffer != NULL);
-  ASSERT (InputSection != NULL);
+  RETURN_STATUS  Status;
+  CONST VOID     *Source;
+  UINT32         SourceSize;
 
-  if (IS_SECTION2 (InputSection)) {
-    if (!CompareGuid (
-           &gBrotliCustomDecompressGuid,
-           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
-           ))
-    {
-      return RETURN_INVALID_PARAMETER;
-    }
-
-    //
-    // Authentication is set to Zero, which may be ignored.
-    //
-    *AuthenticationStatus = 0;
-
-    return BrotliUefiDecompress (
-             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
-             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
-             *OutputBuffer,
-             ScratchBuffer
-             );
-  } else {
-    if (!CompareGuid (
-           &gBrotliCustomDecompressGuid,
-           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
-           ))
-    {
-      return RETURN_INVALID_PARAMETER;
-    }
-
-    //
-    // Authentication is set to Zero, which may be ignored.
-    //
-    *AuthenticationStatus = 0;
-
-    return BrotliUefiDecompress (
-             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
-             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
-             *OutputBuffer,
-             ScratchBuffer
-             );
+  if ((OutputBuffer == NULL) || (AuthenticationStatus == NULL)) {
+    return RETURN_INVALID_PARAMETER;
   }
+
+  Status = GetBrotliSectionData (InputSection, &Source, &SourceSize, NULL);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Authentication is set to Zero, which may be ignored.
+  //
+  *AuthenticationStatus = 0;
+
+  return BrotliUefiDecompress (Source, SourceSize, *OutputBuffer, ScratchBuffer);
 }
 
 /**
