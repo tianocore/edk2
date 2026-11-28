@@ -346,7 +346,14 @@ QueryCapsuleCapabilities (
     //
     // Check if the platform supports update capsule across a system reset
     //
-    if (!IsPersistAcrossResetCapsuleSupported ()) {
+    // Because we don't know whether a capsule is going to be submitted as a
+    // file or a memory buffer, avoid failing if on-disk capsules are supported.
+    // This check cannot be done in IsPersistAcrossResetCapsuleSupported() as
+    // that would fail UpdateCapsule() invocations that submit in-RAM capsules.
+    //
+    if (!IsPersistAcrossResetCapsuleSupported () &&
+        !FixedPcdGetBool (PcdCapsuleOnDiskSupport))
+    {
       return EFI_UNSUPPORTED;
     }
 
