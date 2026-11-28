@@ -23,7 +23,41 @@ None
 
 #### edk2-stable202702: Changes without Removal
 
-None
+##### Breaking Change: Prefix the SMBIOS System Slots Slot Information enumerators
+
+- **Status**: Announced
+- **Tracking Issue**: [tianocore/edk2#10395](https://github.com/tianocore/edk2/issues/10395)
+- **Pull Request**: [tianocore/edk2#13542](https://github.com/tianocore/edk2/pull/13542)
+- **Type**: Source-Level (Non-removal) - Public identifier rename
+
+**What changed**: The `MISC_SLOT_INFORMATION` enumerators in
+`MdePkg/Include/IndustryStandard/SmBios.h` were renamed to use the
+`SlotInformation` prefix.
+
+**Why it changed**: The previous enumerator names were too generic and could
+conflict with identifiers defined by any module that includes `SmBios.h`. All
+other System Slots enumerations in the header already use a field-specific
+prefix.
+
+**What replaces it**:
+
+- `Others` is replaced by `SlotInformationOthers`.
+- `Gen1` is replaced by `SlotInformationGen1`.
+- `Gen2` is replaced by `SlotInformationGen2`.
+- `Gen3` is replaced by `SlotInformationGen3`.
+- `Gen4` is replaced by `SlotInformationGen4`.
+- `Gen5` is replaced by `SlotInformationGen5`.
+- `Gen6` is replaced by `SlotInformationGen6`.
+
+**How to migrate**: Replace the old enumerator names with the
+`SlotInformation`-prefixed names listed above.
+
+**Breaking conditions**: This affects out-of-tree code that references the
+old `MISC_SLOT_INFORMATION` enumerator names. No consumer was found in the
+current edk2-platforms repository. The only edk2 consumer,
+`SmbiosType9Generator`, is updated by this change.
+
+**Companion PR**: None required; no edk2-platforms consumer was identified.
 
 ### edk2-stable202702: Behavioral Breaking Changes
 
