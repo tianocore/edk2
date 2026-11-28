@@ -40,6 +40,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
+  UefiLib
   BaseMemoryLib
   DebugLib
   PrintLib
@@ -48,7 +49,8 @@
   PcdLib
 
 [Guids]
-  gEfiIfrTianoGuid  ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiIfrTianoGuid        ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiGlobalVariableGuid  ## CONSUMES
 
 [Protocols]
 

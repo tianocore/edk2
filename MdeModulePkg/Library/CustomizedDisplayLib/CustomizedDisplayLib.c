@@ -16,8 +16,48 @@ EFI_HII_HANDLE  mCDLStringPackHandle;
 UINT16          gClassOfVfr;                   // Formset class information
 BOOLEAN         gLibIsFirstForm = TRUE;
 BANNER_DATA     *gBannerData;
+STATIC CHAR8    *mCachedPlatformLang = NULL;
 
 UINTN  gFooterHeight;
+
+/**
+  Checks if the platform language has changed and reloads library strings if necessary.
+
+  Retrieves the current "PlatformLang" EFI global variable and compares it with
+  the cached value. If the language has changed or has not been cached yet, updates
+  the cached language and reinitializes the library's HII string pack.
+
+**/
+STATIC
+VOID
+RefreshLibStringsIfLanguageChanged (
+  VOID
+  )
+{
+  EFI_STATUS Status;
+  UINTN      Size;
+  CHAR8      *Lang;
+
+  Status = GetEfiGlobalVariable2 (L"PlatformLang", (VOID **)&Lang, &Size);
+
+  if (EFI_ERROR (Status) || (Lang == NULL)) {
+    return;
+  }
+
+  if ((mCachedPlatformLang == NULL) || (AsciiStrCmp (mCachedPlatformLang, Lang) != 0)) {
+    if (mCachedPlatformLang != NULL) {
+      FreePool (mCachedPlatformLang);
+    }
+
+    mCachedPlatformLang = Lang;
+
+    FreeLibStrings ();
+    InitializeLibStrings ();
+  } else {
+    FreePool (Lang);
+  }
+}
+
 
 /**
 +------------------------------------------------------------------------------+
@@ -58,6 +98,8 @@ DisplayPageFrame (
   )
 {
   EFI_STATUS  Status;
+
+  RefreshLibStringsIfLanguageChanged ();
 
   ASSERT (FormData != NULL && ScreenForStatement != NULL);
   if ((FormData == NULL) || (ScreenForStatement == NULL)) {
@@ -966,6 +1008,11 @@ CustomizedDisplayLibDestructor (
   HiiRemovePackages (mCDLStringPackHandle);
 
   FreeLibStrings ();
+
+  if (mCachedPlatformLang != NULL) {
+    FreePool (mCachedPlatformLang);
+    mCachedPlatformLang = NULL;
+  }
 
   return EFI_SUCCESS;
 }
