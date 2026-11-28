@@ -1971,7 +1971,7 @@ EfiBootManagerBoot (
   //
   OptionNumber = BmFindBootOptionInVariable (BootOption);
   if (OptionNumber == LoadOptionNumberUnassigned) {
-    Status = BmGetFreeOptionNumber (LoadOptionTypeBoot, &Uint16);
+    Status = BmGetFreeOptionNumber (LoadOptionTypeBoot, FALSE, &Uint16);
     if (!EFI_ERROR (Status)) {
       //
       // Save the BootOption->OptionNumber to restore later
