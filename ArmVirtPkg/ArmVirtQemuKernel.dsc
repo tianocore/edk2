@@ -188,9 +188,6 @@
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
-  ## PL031 RealTimeClock
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
-
   #
   # Set video resolution for boot options and for text setup.
   # PlatformDxe can set the former at runtime.
@@ -239,10 +236,6 @@
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
-  }
-  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmVirtPL031FdtClientLib/ArmVirtPL031FdtClientLib.inf
   }
 
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf

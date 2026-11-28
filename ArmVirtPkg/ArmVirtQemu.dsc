@@ -234,9 +234,6 @@
   # Define PCD for emulating runtime variable storage when CFI flash is absent
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
 
-  ## PL031 RealTimeClock
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
-
   #
   # SMBIOS entry point version
   #
@@ -347,10 +344,6 @@
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
-  }
-  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
-    <LibraryClasses>
-      NULL|ArmVirtPkg/Library/ArmVirtPL031FdtClientLib/ArmVirtPL031FdtClientLib.inf
   }
 
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf

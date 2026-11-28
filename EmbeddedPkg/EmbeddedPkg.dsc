@@ -44,6 +44,8 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
+  UfdtDispatcherLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDispatcherLib/UfdtDispatcherLib.inf
+  UfdtDepexLib|EmbeddedPkg/UfdtDispatcher/Library/UfdtDepexLib/UfdtDepexLib.inf
 #  DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
@@ -124,6 +126,7 @@
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
 
 [LibraryClasses.AARCH64]
+  MapMmioLib|OvmfPkg/Library/MapMmioLib/MapMmioLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
@@ -192,6 +195,22 @@
   gEmbeddedTokenSpaceGuid.PcdTimerVector|7
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
 
+[PcdsDynamicDefault.AARCH64]
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|0
+
 [BuildOptions]
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
   *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
@@ -202,6 +221,8 @@
 #
 ################################################################################
 [Components.common]
+  EmbeddedPkg/UfdtDispatcher/Library/UfdtDepexLib/UfdtDepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/UfdtDispatcherLib/UfdtDispatcherLib.inf
   EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf
   EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf
   EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
@@ -239,6 +260,40 @@
   }
 
 [Components.AARCH64]
+  # FDT discovery framework and resource parsers.
+  EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtPl031BindingDriver/UfdtPl031BindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtMc146818RtcBindingDriver/UfdtMc146818RtcBindingDriver.inf
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtWatchdogBindingDriver/UfdtWatchdogBindingDriver.inf
+  }
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
+  }
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV3DepexLib/UfdtGicV3DepexLib.inf
+      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  }
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtFixedClockBindingDriver/UfdtFixedClockBindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV2BindingDriver/UfdtGicV2BindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtGicV3BindingDriver/UfdtGicV3BindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtMc146818RtcBindingDriver/UfdtMc146818RtcBindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtPl031BindingDriver/UfdtPl031BindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtTimerBindingDriver/UfdtTimerBindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/BindingDrivers/UfdtWatchdogBindingDriver/UfdtWatchdogBindingDriver.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV2DepexLib/UfdtGicV2DepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtGicV3DepexLib/UfdtGicV3DepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtRtcDepexLib/UfdtRtcDepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtMc146818RtcDepexLib/UfdtMc146818RtcDepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtTimerDepexLib/UfdtTimerDepexLib.inf
+  EmbeddedPkg/UfdtDispatcher/Library/Depexes/UfdtWatchdogDepexLib/UfdtWatchdogDepexLib.inf
+
   EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
@@ -246,3 +301,6 @@
 
 [Components.IA32, Components.X64]
   EmbeddedPkg/GdbStub/GdbStub.inf
+
+[Components.IA32, Components.X64, Components.RISCV64, Components.LOONGARCH64]
+  EmbeddedPkg/UfdtDispatcher/UfdtDispatcherDxe/UfdtDispatcher.inf

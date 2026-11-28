@@ -1,0 +1,50 @@
+## @file
+#  FDT hardware discovery dispatcher.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtDispatcher
+  FILE_GUID                      = d951a9ca-c118-480c-a6a8-e99d63ade9eb
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UfdtDispatcherEntryPoint
+
+[Sources]
+  UfdtDeviceTree.c
+  UfdtDispatcher.c
+  UfdtDriverBinding.c
+  UfdtDispatcherEntryPoint.c
+  UfdtDispatcherInternal.h
+
+[LibraryClasses]
+  UfdtDispatcherLib
+  UefiDriverEntryPoint
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  FdtLib
+  HobLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gEdkiiUfdtNodeProtocolGuid     ## PRODUCES
+  gEfiDevicePathProtocolGuid     ## PRODUCES
+  gEfiDriverBindingProtocolGuid  ## PRODUCES
+
+[Guids]
+  gEfiEventReadyToBootGuid  ## CONSUMES ## Event
+  gFdtHobGuid  ## CONSUMES ## HOB
+
+[Depex]
+  TRUE

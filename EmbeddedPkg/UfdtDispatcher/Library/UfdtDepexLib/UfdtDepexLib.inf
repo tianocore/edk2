@@ -1,0 +1,24 @@
+## @file
+#  Shared MMIO mapping for UFDT resource consumer constructors.
+#
+#  Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = UfdtDepexLib
+  FILE_GUID                      = 66f0a32c-3bee-4ac6-9070-4adf5125c7c1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UfdtDepexLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
+
+[Sources]
+  UfdtDepexLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
