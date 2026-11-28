@@ -266,12 +266,37 @@ UsbEthNcmReceive (
       return Status;
     }
 
-    Nth                         = (USB_NCM_TRANSFER_HEADER_16 *)UsbEthDriver->BulkBuffer;
-    Ndp                         = (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)UsbEthDriver->BulkBuffer + Nth->NdpIndex);
-    Datagram                    = (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+    Nth = (USB_NCM_TRANSFER_HEADER_16 *)UsbEthDriver->BulkBuffer;
+
+    //
+    // NdpIndex, the NDP Length and the per datagram index/length below are all
+    // taken from the received bulk data, which a malicious device controls.
+    // Bound each one against the bytes actually transferred (BulkDataLength)
+    // before it is used as a BulkBuffer offset, so the datagram pointer walk
+    // and the CopyMem source stay inside the buffer.
+    //
+    if ((Nth->NdpIndex > BulkDataLength) ||
+        (BulkDataLength - Nth->NdpIndex < sizeof (USB_NCM_DATAGRAM_POINTER_16)))
+    {
+      return EFI_DEVICE_ERROR;
+    }
+
+    Ndp      = (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)UsbEthDriver->BulkBuffer + Nth->NdpIndex);
+    Datagram = (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+
+    if ((Ndp->Length < USB_NCM_NDP_LENGTH) || (Ndp->Length > BulkDataLength - Nth->NdpIndex)) {
+      return EFI_DEVICE_ERROR;
+    }
+
     UsbEthDriver->TotalDatagram = (UINT8)((Ndp->Length - 8) / 4 - 1);
 
     for (Index = 0; Index < UsbEthDriver->TotalDatagram; Index++) {
+      if ((Datagram->DatagramIndex > BulkDataLength) ||
+          (BulkDataLength - Datagram->DatagramIndex < Datagram->DatagramLength))
+      {
+        return EFI_DEVICE_ERROR;
+      }
+
       TotalLength += Datagram->DatagramLength;
       Datagram     = (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM));
     }
