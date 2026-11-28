@@ -85,6 +85,40 @@ XenGetSharedInfoPage (
 }
 
 /**
+  Unmap the shared_info_t page mapped by XenGetSharedInfoPage().
+
+  Xen on Arm refuses to map the shared info page at a new address while it
+  is still mapped at another one, so the OS could not map it after
+  ExitBootServices().
+
+  @param Dev    A XENBUS_DEVICE instance.
+**/
+STATIC
+VOID
+XenPutSharedInfoPage (
+  IN OUT XENBUS_DEVICE  *Dev
+  )
+{
+  xen_remove_from_physmap_t  Parameter;
+  INTN                       ReturnCode;
+
+  ASSERT (Dev->SharedInfo != NULL);
+
+  Parameter.domid = DOMID_SELF;
+  Parameter.gpfn  = (UINTN)Dev->SharedInfo >> EFI_PAGE_SHIFT;
+  ReturnCode      = XenHypercallMemoryOp (XENMEM_remove_from_physmap, &Parameter);
+  if (ReturnCode != 0) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "XenBus: shared info remove_from_physmap hypercall error: %Ld\n",
+      (INT64)ReturnCode
+      ));
+  }
+
+  Dev->SharedInfo = NULL;
+}
+
+/**
   Unloads an image.
 
   @param  ImageHandle           Handle that identifies the image to be unloaded.
@@ -500,6 +534,7 @@ XenBusDxeDriverBindingStop (
   gBS->CloseEvent (Dev->ExitBootEvent);
   XenStoreDeinit (Dev);
   XenGrantTableDeinit (Dev);
+  XenPutSharedInfoPage (Dev);
 
   gBS->CloseProtocol (
          ControllerHandle,
