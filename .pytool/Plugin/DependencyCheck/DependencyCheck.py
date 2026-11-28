@@ -68,7 +68,7 @@ class DependencyCheck(ICiBuildPlugin):
                 try:
                     INFFiles.remove(a)
                     tc.LogStdOut("IgnoreInf {0}".format(a))
-                except:
+                except ValueError:
                     logging.info("DependencyConfig.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
                     tc.LogStdError("DependencyConfig.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
 
@@ -94,7 +94,7 @@ class DependencyCheck(ICiBuildPlugin):
         for file in INFFiles:
             ip = InfParser()
             logging.debug("Parsing " + file)
-            ip.SetBaseAbsPath(Edk2pathObj.WorkspacePath).SetPackagePaths(Edk2pathObj.PackagePathList).ParseFile(file)
+            ip.SetEdk2Path(Edk2pathObj).ParseFile(file)
 
             if("MODULE_TYPE" not in ip.Dict):
                 tc.LogStdOut("Ignoring INF. Missing key for MODULE_TYPE {0}".format(file))

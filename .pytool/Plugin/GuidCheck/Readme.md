@@ -43,6 +43,8 @@ This list allows strings in two formats.
   * This will also ignore the GUID by name but only if the value equals the
     GuidValue.
   * GuidValue should be in registry format.
+  * A matching name with a different value is reported as an incomplete match
+    and is not ignored.
   * This is the suggested format to use as it will limit the ignore to only the
     defined case.
 

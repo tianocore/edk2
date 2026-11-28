@@ -89,7 +89,7 @@ class DscCompleteCheck(ICiBuildPlugin):
                 try:
                     tc.LogStdOut("Ignoring INF {0}".format(a))
                     INFFiles.remove(a)
-                except Exception:
+                except ValueError:
                     tc.LogStdError(
                         "DscCompleteCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
                     logging.info(

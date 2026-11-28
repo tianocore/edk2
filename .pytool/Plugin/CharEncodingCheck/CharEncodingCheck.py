@@ -86,7 +86,7 @@ class CharEncodingCheck(ICiBuildPlugin):
                     try:
                         tc.LogStdOut("Ignoring File {0}".format(a))
                         files.remove(a)
-                    except:
+                    except ValueError:
                         tc.LogStdError("CharEncodingCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
                         logging.info("CharEncodingCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
 
