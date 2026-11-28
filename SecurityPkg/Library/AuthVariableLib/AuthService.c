@@ -717,6 +717,7 @@ ProcessVarWithPk (
   //
   Del = FALSE;
   if (  (InCustomMode () && UserPhysicalPresent ())
+     || !IsVariablePolicyEnabled ()
      || (  (mPlatformMode == SETUP_MODE)
         && !(FeaturePcdGet (PcdRequireSelfSignedPk) && IsPk)))
   {
