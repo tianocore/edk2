@@ -16,6 +16,7 @@
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/CacheMaintenanceLib.h>
+#include <Library/PeilessSecMeasureLib.h>
 
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/ArmMpCoreInfo.h>
@@ -46,6 +47,9 @@ PrePiMain (
               (VOID *)StacksBase // The top of the UEFI Memory is reserved for the stacks
               );
   PrePeiSetHobList (HobList);
+
+  Status = MeasurePeilessSec ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Ensure that the loaded image is invalidated in the caches, so that any

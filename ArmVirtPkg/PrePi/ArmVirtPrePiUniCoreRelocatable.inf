@@ -30,6 +30,7 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   ArmCcaInitPeiLib
@@ -43,6 +44,7 @@
   SerialPortLib
   ExtractGuidedSectionLib
   PeCoffLib
+  PeilessSecMeasureLib
   PrePiLib
   MemoryAllocationLib
   HobLib
