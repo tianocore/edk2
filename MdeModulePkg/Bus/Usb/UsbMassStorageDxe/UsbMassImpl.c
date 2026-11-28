@@ -111,6 +111,8 @@ UsbMassReadBlocks (
   VOID                *OriginalBuffer;
   EFI_LBA             OriginalLba;
   UINTN               OriginalBufferSize;
+  UINT32              MaxConsecutiveReadErrors;
+  BOOLEAN             FatalReadError;
 
   //
   // Raise TPL to TPL_CALLBACK to serialize all its operations
@@ -124,6 +126,12 @@ UsbMassReadBlocks (
   OriginalBuffer     = Buffer;
   OriginalBufferSize = BufferSize;
   OriginalLba        = Lba;
+
+  //
+  // PcdUsbMassStorageMaxConsecutiveReadErrors controls read-error latching:
+  // zero disables it; a positive value is the consecutive read error threshold.
+  //
+  MaxConsecutiveReadErrors = PcdGet32 (PcdUsbMassStorageMaxConsecutiveReadErrors);
 
   while (ResetRetryCount >= 0) {
     Buffer     = OriginalBuffer;
@@ -180,19 +188,71 @@ UsbMassReadBlocks (
       goto ON_EXIT;
     }
 
+    //
+    // Stop issuing reads after the configured failure threshold. Keep the
+    // media geometry intact because an unreadable medium is still present.
+    //
+    if (UsbMass->StickyReadError) {
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
+
     if (UsbMass->Cdb16Byte) {
       Status = UsbBootReadWriteBlocks16 (UsbMass, FALSE, Lba, TotalBlock, Buffer);
     } else {
       Status = UsbBootReadWriteBlocks (UsbMass, FALSE, (UINT32)Lba, TotalBlock, Buffer);
     }
 
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
-      UsbMassReset (This, TRUE);
-      ResetRetryCount--;
-    } else {
+    if (!EFI_ERROR (Status)) {
+      UsbMass->ConsecutiveReadErrorCount = 0;
       break;
     }
+
+    FatalReadError = (BOOLEAN)((Status != EFI_NO_MEDIA) &&
+                               (Status != EFI_MEDIA_CHANGED));
+    if (!FatalReadError) {
+      UsbMass->ConsecutiveReadErrorCount = 0;
+    } else {
+      UsbMass->ConsecutiveReadErrorCount++;
+    }
+
+    DEBUG ((
+      DEBUG_ERROR,
+      "UsbMassReadBlocks: MediaId:0x%x UsbBootReadBlocks (%r) "
+      "Lba=0x%Lx Blocks=0x%Lx Consecutive=%u -> Reset\n",
+      MediaId,
+      Status,
+      (UINT64)Lba,
+      (UINT64)TotalBlock,
+      (UINT32)UsbMass->ConsecutiveReadErrorCount
+      ));
+
+    //
+    // Keep existing local recovery attempt. This tree intentionally leaves the
+    // port reset disabled, so honor that decision and do not re-enable it here.
+    //
+    UsbMassReset (This, TRUE);
+
+    if (FatalReadError &&
+        (MaxConsecutiveReadErrors > 0) &&
+        (UsbMass->ConsecutiveReadErrorCount >= (UINTN)MaxConsecutiveReadErrors))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "UsbMassReadBlocks: latch repeated read failure as EFI_DEVICE_ERROR "
+        "(ReadStatus=%r Count=%u Threshold=%u)\n",
+        Status,
+        (UINT32)UsbMass->ConsecutiveReadErrorCount,
+        MaxConsecutiveReadErrors
+        ));
+
+      UsbMass->StickyReadError           = TRUE;
+      UsbMass->ConsecutiveReadErrorCount = 0;
+      Status                             = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
+
+    ResetRetryCount--;
   }
 
 ON_EXIT:
@@ -310,7 +370,7 @@ UsbMassWriteBlocks (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbMassWriteBlocks: MediaId:0x%x UsbBootWriteBlocks (%r) -> Reset\n", MediaId, Status));
     UsbMassReset (This, TRUE);
   }
 
@@ -371,6 +431,9 @@ UsbMassInitMedia (
   Media->WriteCaching     = FALSE;
   Media->IoAlign          = 0;
   Media->MediaId          = 1;
+
+  UsbMass->StickyReadError           = FALSE;
+  UsbMass->ConsecutiveReadErrorCount = 0;
 
   Status = UsbBootGetParams (UsbMass);
   DEBUG ((DEBUG_INFO, "UsbMassInitMedia: UsbBootGetParams (%r)\n", Status));
